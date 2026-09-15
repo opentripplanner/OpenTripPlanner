@@ -44,20 +44,22 @@ class AdaptivePruningTest {
     // Near island
     bidirectional(g, h);
 
-    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f, g, h).prune(
-      IslandPruningParameters.of()
-        // low pruning threshold which does not apply to any island
-        .withPruningThresholdIslandWithoutStops(2)
-        // adaptive factor 3 will prune max 3*2 vertex islands
-        // note that largest graph is never pruned
-        .withAdaptivePruningFactor(3)
-        // 100 m distance excludes distant island from adaptive pruning
-        .withAdaptivePruningDistance(100)
-        .build()
-    );
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f, g, h)
+      .prune(
+        IslandPruningParameters.of()
+          // low pruning threshold which does not apply to any island
+          .withPruningThresholdIslandWithoutStops(2)
+          // adaptive factor 3 will prune max 3*2 vertex islands
+          // note that largest graph is never pruned
+          .withAdaptivePruningFactor(3)
+          // 100 m distance excludes distant island from adaptive pruning
+          .withAdaptivePruningDistance(100)
+          .build()
+      );
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // main graph: untouched
         "(0,0) → (0,0.001) PEDESTRIAN ♿✅",

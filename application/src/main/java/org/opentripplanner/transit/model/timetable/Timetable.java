@@ -73,16 +73,13 @@ public class Timetable implements Serializable {
   /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
   // TODO maybe put this is a more appropriate place
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
-    tripTimes = tripTimes
-      .stream()
+    tripTimes = tripTimes.stream()
       .map(tt -> tt.withServiceCode(serviceCodes.get(tt.getTrip().getServiceId())))
       .toList();
-    tripTimesIndex = tripTimes
-      .stream()
+    tripTimesIndex = tripTimes.stream()
       .collect(Collectors.toUnmodifiableMap(tt -> tt.getTrip().getId(), tt -> tt));
     // Repeated code... bad sign...
-    frequencyEntries = frequencyEntries
-      .stream()
+    frequencyEntries = frequencyEntries.stream()
       .map(tt -> tt.withServiceCode(serviceCodes.get(tt.tripTimes().getTrip().getServiceId())))
       .toList();
   }

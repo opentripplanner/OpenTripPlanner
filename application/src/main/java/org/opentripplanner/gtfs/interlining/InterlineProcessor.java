@@ -54,8 +54,7 @@ public class InterlineProcessor {
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
     this.transitServiceStart = calendarServiceData.getFirstDate().orElse(null);
-    this.daysInTransitService = calendarServiceData
-      .getLastDate()
+    this.daysInTransitService = calendarServiceData.getLastDate()
       .map(lastDate -> (int) ChronoUnit.DAYS.between(transitServiceStart, lastDate) + 1)
       .orElse(0);
     this.calendarServiceData = calendarServiceData;
@@ -66,32 +65,27 @@ public class InterlineProcessor {
       return List.of();
     }
     var interlinedTrips = this.getInterlinedTrips(tripPatterns);
-    var transfers = interlinedTrips
-      .entries()
-      .stream()
-      .filter(this::staySeatedAllowed)
-      .map(p -> {
-        var constraint = TransferConstraint.of();
-        constraint.staySeated();
-        constraint.priority(TransferPriority.ALLOWED);
+    var transfers = interlinedTrips.entries().stream().filter(this::staySeatedAllowed).map(p -> {
+      var constraint = TransferConstraint.of();
+      constraint.staySeated();
+      constraint.priority(TransferPriority.ALLOWED);
 
-        var fromTrip = p.getValue().from();
-        var toTrip = p.getValue().to();
+      var fromTrip = p.getValue().from();
+      var toTrip = p.getValue().to();
 
-        var from = new TripTransferPoint(fromTrip, p.getKey().from().numberOfStops() - 1);
-        var to = new TripTransferPoint(toTrip, 0);
+      var from = new TripTransferPoint(fromTrip, p.getKey().from().numberOfStops() - 1);
+      var to = new TripTransferPoint(toTrip, 0);
 
-        LOG.debug(
-          "Creating stay-seated transfer from trip {} (route {}) to trip {} (route {})",
-          fromTrip.getId(),
-          fromTrip.getRoute().getId(),
-          toTrip.getId(),
-          toTrip.getRoute().getId()
-        );
+      LOG.debug(
+        "Creating stay-seated transfer from trip {} (route {}) to trip {} (route {})",
+        fromTrip.getId(),
+        fromTrip.getRoute().getId(),
+        toTrip.getId(),
+        toTrip.getRoute().getId()
+      );
 
-        return new ConstrainedTransfer(null, from, to, constraint.build());
-      })
-      .toList();
+      return new ConstrainedTransfer(null, from, to, constraint.build());
+    }).toList();
 
     if (!transfers.isEmpty()) {
       LOG.info(
@@ -107,11 +101,10 @@ public class InterlineProcessor {
   private boolean staySeatedAllowed(Map.Entry<TripPatternPair, TripPair> p) {
     var fromTrip = p.getValue().from();
     var toTrip = p.getValue().to();
-    return staySeatedNotAllowed
-      .stream()
+    return staySeatedNotAllowed.stream()
       .noneMatch(
-        t ->
-          t.fromTrip().getId().equals(fromTrip.getId()) && t.toTrip().getId().equals(toTrip.getId())
+        t -> t.fromTrip().getId().equals(fromTrip.getId()) &&
+          t.toTrip().getId().equals(toTrip.getId())
       );
   }
 
@@ -159,14 +152,14 @@ public class InterlineProcessor {
           var toServiceId = toTripTimes.getTrip().getServiceId();
           if (
             toServiceId.equals(fromServiceId) &&
-            createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
+              createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
           ) {
             break;
           }
           BitSet daysForToTripTimes = getDaysForService(toTripTimes.getTrip().getServiceId());
           if (
             uncoveredDays.intersects(daysForToTripTimes) &&
-            createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
+              createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
           ) {
             uncoveredDays.andNot(daysForToTripTimes);
             if (uncoveredDays.isEmpty()) {
@@ -196,7 +189,7 @@ public class InterlineProcessor {
   ) {
     if (
       fromTripTimes.getDepartureTime(fromTripTimes.getNumStops() - 1) >
-      toTripTimes.getArrivalTime(0)
+        toTripTimes.getArrivalTime(0)
     ) {
       LOG.error(
         "Trip times within block {} are not increasing on after trip {}.",

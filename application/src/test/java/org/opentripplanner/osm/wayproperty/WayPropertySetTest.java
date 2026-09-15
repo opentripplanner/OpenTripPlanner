@@ -111,8 +111,7 @@ class WayPropertySetTest {
     // add a better match
     OsmSpecifier lane_and_footway = new BestMatchSpecifier("cycleway=lane;highway=footway");
 
-    WayProperties safer_and_peds = new WayPropertiesBuilder(PEDESTRIAN)
-      .bicycleSafety(0.75)
+    WayProperties safer_and_peds = new WayPropertiesBuilder(PEDESTRIAN).bicycleSafety(0.75)
       .walkSafety(1.0)
       .build();
 
@@ -138,8 +137,7 @@ class WayPropertySetTest {
       .build();
 
     OsmSpecifier track_only = new BestMatchSpecifier("highway=footway;cycleway=track");
-    WayProperties track_is_safest = new WayPropertiesBuilder(ALL)
-      .bicycleSafety(0.25)
+    WayProperties track_is_safest = new WayPropertiesBuilder(ALL).bicycleSafety(0.25)
       .walkSafety(1.0)
       .build();
 

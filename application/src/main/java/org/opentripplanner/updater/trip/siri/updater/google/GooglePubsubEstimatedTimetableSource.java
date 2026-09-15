@@ -121,19 +121,14 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     this.initialGetDataTimeout = initialGetDataTimeout;
 
     String subscriptionId = buildSubscriptionId();
-    subscriptionName = ProjectSubscriptionName.of(
-      subscriptionProjectName,
-      subscriptionId
-    ).toString();
-    subscriber = Subscriber.newBuilder(
-      subscriptionName,
-      new EstimatedTimetableMessageReceiver()
-    ).build();
+    subscriptionName = ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId)
+      .toString();
+    subscriber = Subscriber.newBuilder(subscriptionName, new EstimatedTimetableMessageReceiver())
+      .build();
     this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
 
-    retry = new OtpRetryBuilder()
-      .withName("SIRI-ET Google PubSub Updater setup")
+    retry = new OtpRetryBuilder().withName("SIRI-ET Google PubSub Updater setup")
       .withMaxAttempts(RETRY_MAX_ATTEMPTS)
       .withInitialRetryInterval(RETRY_INITIAL_DELAY)
       .withBackoffMultiplier(RETRY_BACKOFF)
@@ -202,9 +197,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
           .setPushConfig(pushConfig)
           .setMessageRetentionDuration(
             // How long will an unprocessed message be kept - minimum 10 minutes
-            com.google.protobuf.Duration.newBuilder()
-              .setSeconds(600)
-              .build()
+            com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
           )
           .setExpirationPolicy(
             ExpirationPolicy.newBuilder()
@@ -344,8 +337,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private void logPubsubMessage(ServiceDelivery serviceDelivery) {
     int numberOfUpdatedTrips = 0;
     try {
-      numberOfUpdatedTrips = serviceDelivery
-        .getEstimatedTimetableDeliveries()
+      numberOfUpdatedTrips = serviceDelivery.getEstimatedTimetableDeliveries()
         .getFirst()
         .getEstimatedJourneyVersionFrames()
         .getFirst()
@@ -363,10 +355,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         numberOfMessages,
         numberOfUpdates,
         FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-        Duration.between(
-          serviceDelivery.getResponseTimestamp().toInstant(),
-          Instant.now()
-        ).toMillis(),
+        Duration.between(serviceDelivery.getResponseTimestamp().toInstant(), Instant.now())
+          .toMillis(),
         getTimeSinceStartupString()
       );
     }

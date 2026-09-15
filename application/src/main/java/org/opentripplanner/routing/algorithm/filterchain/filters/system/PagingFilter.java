@@ -52,8 +52,7 @@ public class PagingFilter implements RemoveItineraryFlagger {
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    return itineraries
-      .stream()
+    return itineraries.stream()
       .filter(this::sortsIntoDeduplicationAreaRelativeToRemovedItinerary)
       .collect(Collectors.toList());
   }

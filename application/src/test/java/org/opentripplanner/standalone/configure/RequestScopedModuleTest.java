@@ -29,8 +29,6 @@ class RequestScopedModuleTest {
       "All @Provides methods in %s must also be annotated @HttpRequestScoped, but these are not: %s",
       RequestScopedModule.class.getSimpleName(),
       unscoped
-    )
-      .that(unscoped)
-      .isEmpty();
+    ).that(unscoped).isEmpty();
   }
 }

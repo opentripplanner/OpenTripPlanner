@@ -26,8 +26,9 @@ class PermanentAreaVertexLinkingTest {
 
     assertThat(env.linker().addPermanentAreaVertex(boardingLocation, areaGroup)).isTrue();
 
-    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl())
-      .that(env.graph().summarizeEdges())
+    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl()).that(
+      env.graph().summarizeEdges()
+    )
       .containsExactly(
         "(0,0) → (0,1) PEDESTRIAN_AND_BICYCLE ♿✅",
         "(0,1) → (0,0) PEDESTRIAN_AND_BICYCLE ♿✅",
@@ -54,8 +55,9 @@ class PermanentAreaVertexLinkingTest {
 
     assertThat(env.linker().addPermanentAreaVertex(boardingLocation, areaGroup)).isTrue();
 
-    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl())
-      .that(env.graph().summarizeEdges())
+    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl()).that(
+      env.graph().summarizeEdges()
+    )
       .containsExactly(
         "(0,0) → (0,1) PEDESTRIAN_AND_BICYCLE ♿✅",
         "(0,1) → (0,0) PEDESTRIAN_AND_BICYCLE ♿✅",

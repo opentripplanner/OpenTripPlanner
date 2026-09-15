@@ -109,11 +109,10 @@ public class UberService extends CachingRideHailingService {
 
     LOG.debug("Received {} Uber arrival time estimates", response.times().size());
 
-    var arrivalTimes = response
-      .times()
+    var arrivalTimes = response.times()
       .stream()
-      .map(time ->
-        new ArrivalTime(
+      .map(
+        time -> new ArrivalTime(
           RideHailingProvider.UBER,
           time.product_id(),
           time.localized_display_name(),
@@ -157,22 +156,17 @@ public class UberService extends CachingRideHailingService {
 
     LOG.debug("Received {} Uber price estimates", response.prices().size());
 
-    return response
-      .prices()
-      .stream()
-      .map(price -> {
-        var currency = Currency.getInstance(price.currency_code());
-        return new RideEstimate(
-          RideHailingProvider.UBER,
-          Duration.ofSeconds(price.duration()),
-          Money.ofFractionalAmount(currency, price.low_estimate()),
-          Money.ofFractionalAmount(currency, price.high_estimate()),
-          price.product_id(),
-          price.display_name()
-        );
-      })
-      .filter(re -> filterRides(re, request.wheelchairAccessible()))
-      .toList();
+    return response.prices().stream().map(price -> {
+      var currency = Currency.getInstance(price.currency_code());
+      return new RideEstimate(
+        RideHailingProvider.UBER,
+        Duration.ofSeconds(price.duration()),
+        Money.ofFractionalAmount(currency, price.low_estimate()),
+        Money.ofFractionalAmount(currency, price.high_estimate()),
+        price.product_id(),
+        price.display_name()
+      );
+    }).filter(re -> filterRides(re, request.wheelchairAccessible())).toList();
   }
 
   private <T> T getUberEstimateResponse(URI finalUri, Class<T> clazz) throws IOException {

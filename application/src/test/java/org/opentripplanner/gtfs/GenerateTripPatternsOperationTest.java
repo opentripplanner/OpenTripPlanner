@@ -55,8 +55,7 @@ class GenerateTripPatternsOperationTest {
     stopA = transitRepositoryForTest.stop("stopA").build();
     stopB = transitRepositoryForTest.stop("stopB").build();
     stopC = transitRepositoryForTest.stop("stopC").build();
-    siteRepository = transitRepositoryForTest
-      .siteRepositoryBuilder()
+    siteRepository = transitRepositoryForTest.siteRepositoryBuilder()
       .withRegularStop(stopA)
       .withRegularStop(stopB)
       .withRegularStop(stopC)
@@ -70,8 +69,7 @@ class GenerateTripPatternsOperationTest {
     stopTimeC.setStop(stopC);
 
     FeedScopedId serviceId1 = FeedScopedIdForTestFactory.id("SERVICE_ID_1");
-    trip1 = trip("TRIP_ID_1")
-      .withServiceId(serviceId1)
+    trip1 = trip("TRIP_ID_1").withServiceId(serviceId1)
       .withMode(TransitMode.RAIL)
       .withNetexSubmode("SUBMODE_1")
       .withDirection(Direction.INBOUND)
@@ -79,8 +77,7 @@ class GenerateTripPatternsOperationTest {
 
     // same route, mode, submode and direction as trip1
     FeedScopedId serviceId2 = FeedScopedIdForTestFactory.id("SERVICE_ID_2");
-    trip2 = trip("TRIP_ID_2")
-      .withServiceId(serviceId2)
+    trip2 = trip("TRIP_ID_2").withServiceId(serviceId2)
       .withRoute(trip1.getRoute())
       .withMode(trip1.getMode())
       .withNetexSubmode(trip1.getNetexSubMode().name())
@@ -89,8 +86,7 @@ class GenerateTripPatternsOperationTest {
 
     // same route, direction as trip1, different mode
     FeedScopedId serviceId3 = FeedScopedIdForTestFactory.id("SERVICE_ID_3");
-    trip3 = trip("TRIP_ID_3")
-      .withServiceId(serviceId3)
+    trip3 = trip("TRIP_ID_3").withServiceId(serviceId3)
       .withRoute(trip1.getRoute())
       .withMode(TransitMode.BUS)
       .withDirection(trip1.getDirection())
@@ -98,8 +94,7 @@ class GenerateTripPatternsOperationTest {
 
     // same route, mode, direction  as trip1, different submode
     FeedScopedId serviceId4 = FeedScopedIdForTestFactory.id("SERVICE_ID_4");
-    trip4 = trip("TRIP_ID_4")
-      .withServiceId(serviceId4)
+    trip4 = trip("TRIP_ID_4").withServiceId(serviceId4)
       .withRoute(trip1.getRoute())
       .withMode(trip1.getMode())
       .withNetexSubmode("SUMODE_2")
@@ -108,8 +103,7 @@ class GenerateTripPatternsOperationTest {
 
     // same route, mode  as trip1, different direction
     FeedScopedId serviceId5 = FeedScopedIdForTestFactory.id("SERVICE_ID_5");
-    trip5 = trip("TRIP_ID_5")
-      .withServiceId(serviceId5)
+    trip5 = trip("TRIP_ID_5").withServiceId(serviceId5)
       .withRoute(trip1.getRoute())
       .withMode(trip1.getMode())
       .withNetexSubmode(trip1.getNetexSubMode().name())
@@ -227,8 +221,7 @@ class GenerateTripPatternsOperationTest {
     Assertions.assertEquals(1, transitServiceBuilder.getTripPatterns().size());
     Assertions.assertEquals(
       2,
-      transitServiceBuilder
-        .getTripPatterns()
+      transitServiceBuilder.getTripPatterns()
         .values()
         .stream()
         .findFirst()

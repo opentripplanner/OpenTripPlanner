@@ -83,8 +83,10 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
     // Decide if the transfer needs to be taken into account in the Raptor routing process
     // or can be dealt with outside raptor, e.g in path transfer optimization.
-    this.includeInRaptorRouting =
-      staySeated || guaranteed || priority == NOT_ALLOWED || minTransferTime != NOT_SET;
+    this.includeInRaptorRouting = staySeated ||
+      guaranteed ||
+      priority == NOT_ALLOWED ||
+      minTransferTime != NOT_SET;
 
     if (isMaxWaitTimeSet() && !guaranteed) {
       throw new IllegalArgumentException("'maxWaitTime' do only apply to guaranteed transfers.");
@@ -251,12 +253,10 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     if (!(o instanceof final TransferConstraint that)) {
       return false;
     }
-    return (
-      staySeated == that.staySeated &&
+    return (staySeated == that.staySeated &&
       guaranteed == that.guaranteed &&
       priority == that.priority &&
-      maxWaitTime == that.maxWaitTime
-    );
+      maxWaitTime == that.maxWaitTime);
   }
 
   public String toString() {

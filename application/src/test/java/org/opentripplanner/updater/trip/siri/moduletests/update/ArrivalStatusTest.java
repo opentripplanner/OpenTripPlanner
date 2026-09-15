@@ -33,18 +33,15 @@ class ArrivalStatusTest implements RealtimeTestConstants {
   void testRecordedCallWithArrivalButNoDeparture() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
-    var update = siri
-      .etBuilder()
+    var update = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .arriveAimedActual("00:10", "00:10")
           .departAimedExpected("00:10", "00:11")
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .arriveAimedExpected("00:20", "00:20")
           .departAimedExpected("00:20", "00:20")
           .call(STOP_C)
@@ -69,13 +66,11 @@ class ArrivalStatusTest implements RealtimeTestConstants {
   void testUpdateJourneyWithArrivalStatusArrived() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
-    var update = siri
-      .etBuilder()
+    var update = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:10", "00:10"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .departAimedExpected("00:20", "00:20")
           .withArrivalStatus(CallStatusEnumeration.ARRIVED)
           .call(STOP_C)

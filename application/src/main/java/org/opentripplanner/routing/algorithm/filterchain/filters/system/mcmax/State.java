@@ -108,8 +108,7 @@ class State {
    */
   @Nullable
   private static Item findItemInFirstSingleItemGroup(List<Group> groups) {
-    return groups
-      .stream()
+    return groups.stream()
       .filter(Group::isSingleItemGroup)
       .findFirst()
       .map(Group::first)

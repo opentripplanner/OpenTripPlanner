@@ -159,8 +159,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite_lane"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(0.87).addPermission(BICYCLE)
+      new MixinPropertiesBuilder().directional(
+        TraverseDirection.BACKWARD,
+        builder -> builder.withBicycleSafety(0.87).addPermission(BICYCLE)
       )
     );
 
@@ -179,8 +180,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite_track"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(0.75).addPermission(BICYCLE)
+      new MixinPropertiesBuilder().directional(
+        TraverseDirection.BACKWARD,
+        builder -> builder.withBicycleSafety(0.75).addPermission(BICYCLE)
       )
     );
 
@@ -199,8 +201,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(1.4).addPermission(BICYCLE)
+      new MixinPropertiesBuilder().directional(
+        TraverseDirection.BACKWARD,
+        builder -> builder.withBicycleSafety(1.4).addPermission(BICYCLE)
       )
     );
 
@@ -491,13 +494,11 @@ public class OsmTagMapper {
   }
 
   public boolean doesTagValueDisallowThroughTraffic(String tagValue) {
-    return (
-      "no".equals(tagValue) ||
+    return ("no".equals(tagValue) ||
       "destination".equals(tagValue) ||
       "private".equals(tagValue) ||
       "customers".equals(tagValue) ||
-      "delivery".equals(tagValue)
-    );
+      "delivery".equals(tagValue));
   }
 
   public float getCarSpeedForWay(

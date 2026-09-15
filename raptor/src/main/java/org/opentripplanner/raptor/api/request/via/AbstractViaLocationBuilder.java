@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract sealed class AbstractViaLocationBuilder<T extends AbstractViaLocationBuilder> permits
-  ViaVisitLocationBuilder,
-  PassThroughLocationBuilder {
+  ViaVisitLocationBuilder, PassThroughLocationBuilder {
 
   protected final String label;
   protected final List<ViaConnection> connections = new ArrayList<>();

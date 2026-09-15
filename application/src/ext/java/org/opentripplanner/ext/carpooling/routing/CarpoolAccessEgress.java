@@ -106,8 +106,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     this.durationInSeconds = walkSeconds + rideSeconds;
     this.passengerArrivalTime = passengerDepartureTime + this.durationInSeconds;
 
-    double walkWeight =
-      GraphPathUtils.weightOrZero(walkToPickup) + GraphPathUtils.weightOrZero(walkFromDropoff);
+    double walkWeight = GraphPathUtils.weightOrZero(walkToPickup) +
+      GraphPathUtils.weightOrZero(walkFromDropoff);
     double totalWeight = walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance);
     this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
   }
@@ -331,8 +331,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * preceding the passenger's pickup; independent of {@code transitSearchTimeZero}.
    */
   public ZonedDateTime getCarpoolStart() {
-    return insertionCandidate
-      .trip()
+    return insertionCandidate.trip()
       .startTime()
       .plus(insertionCandidate.getDurationUntilPickupArrival());
   }

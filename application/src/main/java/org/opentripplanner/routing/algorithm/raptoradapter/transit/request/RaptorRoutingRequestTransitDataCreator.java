@@ -98,9 +98,10 @@ class RaptorRoutingRequestTransitDataCreator {
     // This is done in a loop to increase performance.
     Map<RoutingTripPattern, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
     for (TripPatternForDate patternForDate : patternForDateList) {
-      patternForDateByPattern
-        .computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>())
-        .add(patternForDate);
+      patternForDateByPattern.computeIfAbsent(
+        patternForDate.getTripPattern(),
+        k -> new ArrayList<>()
+      ).add(patternForDate);
     }
 
     List<TripPatternForDates> combinedList = new ArrayList<>();
@@ -109,13 +110,12 @@ class RaptorRoutingRequestTransitDataCreator {
 
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates
-    for (Map.Entry<
-      RoutingTripPattern,
-      List<TripPatternForDate>
-    > patternEntry : patternForDateByPattern.entrySet()) {
+    for (
+      Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern
+        .entrySet()
+    ) {
       // Sort by date. We can mutate the array, as it was created above in the grouping.
-      TripPatternForDate[] patternsSorted = patternEntry
-        .getValue()
+      TripPatternForDate[] patternsSorted = patternEntry.getValue()
         .toArray(new TripPatternForDate[0]);
       Arrays.sort(patternsSorted);
 
@@ -182,8 +182,8 @@ class RaptorRoutingRequestTransitDataCreator {
     // and any previous day, while on subsequent search days we only want to add the
     // TripPatternForDate objects that start on that particular day. This is to prevent duplicates.
     // This was previously a stream, but was unrolled for improved performance.
-    Collection<TripPatternForDate> tripPatternsForDate =
-      raptorTransitData.getTripPatternsForRunningDate(date);
+    Collection<TripPatternForDate> tripPatternsForDate = raptorTransitData
+      .getTripPatternsForRunningDate(date);
 
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {

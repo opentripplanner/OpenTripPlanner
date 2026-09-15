@@ -42,27 +42,27 @@ class DayOfWeekMapper {
    */
   static Set<DayOfWeek> mapDayOfWeek(DayOfWeekEnumeration value) {
     switch (value) {
-      case MONDAY:
+      case MONDAY :
         return EnumSet.of(DayOfWeek.MONDAY);
-      case TUESDAY:
+      case TUESDAY :
         return EnumSet.of(DayOfWeek.TUESDAY);
-      case WEDNESDAY:
+      case WEDNESDAY :
         return EnumSet.of(DayOfWeek.WEDNESDAY);
-      case THURSDAY:
+      case THURSDAY :
         return EnumSet.of(DayOfWeek.THURSDAY);
-      case FRIDAY:
+      case FRIDAY :
         return EnumSet.of(DayOfWeek.FRIDAY);
-      case SATURDAY:
+      case SATURDAY :
         return EnumSet.of(DayOfWeek.SATURDAY);
-      case SUNDAY:
+      case SUNDAY :
         return EnumSet.of(DayOfWeek.SUNDAY);
-      case WEEKDAYS:
+      case WEEKDAYS :
         return EnumSet.range(DayOfWeek.MONDAY, DayOfWeek.FRIDAY);
-      case WEEKEND:
+      case WEEKEND :
         return EnumSet.range(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
-      case EVERYDAY:
+      case EVERYDAY :
         return EnumSet.range(DayOfWeek.MONDAY, DayOfWeek.SUNDAY);
-      case NONE:
+      case NONE :
         return EnumSet.noneOf(DayOfWeek.class);
     }
     throw new IllegalArgumentException("Day of week enum mapping missing: " + value);

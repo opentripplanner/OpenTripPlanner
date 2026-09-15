@@ -130,8 +130,7 @@ class StopAndStationMapper {
       return List.of();
     }
 
-    return stopPlace
-      .getTariffZones()
+    return stopPlace.getTariffZones()
       .getTariffZoneRef_()
       .stream()
       .map(ref -> findTariffZone(stopPlace, (TariffZoneRef) ref.getValue()))
@@ -162,8 +161,7 @@ class StopAndStationMapper {
    * Sort stop places on version with latest version first (descending order).
    */
   private List<StopPlace> sortStopPlacesByValidityAndVersionDesc(Collection<StopPlace> stopPlaces) {
-    return stopPlaces
-      .stream()
+    return stopPlaces.stream()
       .sorted(new StopPlaceVersionAndValidityComparator())
       .collect(toList());
   }

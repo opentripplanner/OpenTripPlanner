@@ -26,8 +26,7 @@ public class OffsetDateTimeRangeUtil {
       return null;
     }
     requireNonEmpty(ranges, fieldName);
-    return ranges
-      .stream()
+    return ranges.stream()
       .map(range -> mapRange(range.getGraphQLStart(), range.getGraphQLEnd(), fieldName))
       .toList();
   }

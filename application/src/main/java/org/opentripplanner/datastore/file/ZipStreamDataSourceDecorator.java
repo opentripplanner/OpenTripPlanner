@@ -130,11 +130,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   @Override
   public DataSource entry(String name) {
     loadContent();
-    return content
-      .stream()
-      .filter(it -> name.equals(it.name()))
-      .findFirst()
-      .orElse(null);
+    return content.stream().filter(it -> name.equals(it.name())).findFirst().orElse(null);
   }
 
   @Override

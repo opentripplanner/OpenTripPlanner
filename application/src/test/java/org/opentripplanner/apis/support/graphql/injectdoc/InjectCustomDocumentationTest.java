@@ -96,8 +96,7 @@ class InjectCustomDocumentationTest {
     var p = new SchemaPrinter();
     var result = p.print(newSchema);
 
-    var missingValues = texts
-      .values()
+    var missingValues = texts.values()
       .stream()
       .sorted()
       .filter(it -> !result.contains(it))

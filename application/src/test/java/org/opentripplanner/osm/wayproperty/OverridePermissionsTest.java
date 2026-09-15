@@ -41,8 +41,7 @@ class OverridePermissionsTest {
     permissionPair = getWayProperties(way);
     assertTrue(permissionPair.main().allowsNothing());
 
-    way = way
-      .copy()
+    way = way.copy()
       .withTag("motorcar", "private")
       .withTag("bicycle", "private")
       .withTag("foot", "private")
@@ -102,8 +101,7 @@ class OverridePermissionsTest {
     permissionPair = getWayProperties(way);
     assertTrue(permissionPair.main().allowsNothing());
 
-    way = way
-      .copy()
+    way = way.copy()
       .withTag("motor_vehicle", "private")
       .withTag("bicycle", "private")
       .withTag("foot", "private")

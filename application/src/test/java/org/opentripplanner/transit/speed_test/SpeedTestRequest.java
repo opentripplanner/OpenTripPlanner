@@ -78,9 +78,8 @@ public class SpeedTestRequest {
       if (tModes.isEmpty()) {
         journeyBuilder.withTransit(b -> b.disable());
       } else {
-        var fb = TransitFilterRequest.of().addSelect(
-          SelectRequest.of().withTransportModes(tModes).build()
-        );
+        var fb = TransitFilterRequest.of()
+          .addSelect(SelectRequest.of().withTransportModes(tModes).build());
         journeyBuilder.withTransit(b -> b.withFilters(List.of(fb.build())));
       }
 
@@ -88,29 +87,28 @@ public class SpeedTestRequest {
         builder.withSearchWindow(Duration.ZERO);
       }
 
-      journeyBuilder.withTransit(transitBuilder ->
-        transitBuilder.withRaptorDebugging(d ->
-          d.withStops(opts.debugStops()).withPath(opts.debugPath())
+      journeyBuilder.withTransit(
+        transitBuilder -> transitBuilder.withRaptorDebugging(
+          d -> d.withStops(opts.debugStops()).withPath(opts.debugPath())
         )
       );
     });
 
     builder.withPreferences(pref -> {
       if (input.departureTimeSet() && input.arrivalTimeSet()) {
-        pref.withTransit(transit ->
-          transit.withRaptor(r -> r.withTimeLimit(time(input.arrivalTime())))
+        pref.withTransit(
+          transit -> transit.withRaptor(r -> r.withTimeLimit(time(input.arrivalTime())))
         );
       }
-      pref.withTransit(transit ->
-        transit.withRaptor(raptor ->
-          raptor
-            .withProfile(profile.raptorProfile())
+      pref.withTransit(
+        transit -> transit.withRaptor(
+          raptor -> raptor.withProfile(profile.raptorProfile())
             .withOptimizations(profile.optimizations())
             .withSearchDirection(profile.direction())
         )
       );
-      pref.withSystem(it ->
-        it.addTags(
+      pref.withSystem(
+        it -> it.addTags(
           List.of(
             RoutingTag.testCaseSample(input.idAndDescription()),
             RoutingTag.testCaseCategory(input.category())

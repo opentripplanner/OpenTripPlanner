@@ -56,8 +56,9 @@ class UnconnectedParkAndRideTest {
 
     var fetcher = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl())
-      .that(fetcher.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl()).that(
+      fetcher.summarizeEdges()
+    )
       .containsExactly(
         "(0,-0.001) → (0.001,0.002) ALL ♿✅",
         "(0.001,0.002) → (0,-0.001) ALL ♿✅",

@@ -25,15 +25,17 @@ public class LocalDateRangeTest {
 
   @Test
   public void ofInclusiveEndFailsIfEndIsBeforeStart() {
-    assertThrows(IllegalArgumentException.class, () ->
-      LocalDateRange.ofInclusiveEnd(d1.plusDays(1), d1)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> LocalDateRange.ofInclusiveEnd(d1.plusDays(1), d1)
     );
   }
 
   @Test
   public void ofExclusiveEndFailsIfEndIsBeforeStart() {
-    assertThrows(IllegalArgumentException.class, () ->
-      LocalDateRange.ofExclusiveEnd(d1.plusDays(1), d1)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> LocalDateRange.ofExclusiveEnd(d1.plusDays(1), d1)
     );
   }
 
@@ -139,10 +141,10 @@ public class LocalDateRangeTest {
 
   @Test
   public void intersectionFailsIfRangesDoNotOverlap() {
-    assertThrows(IllegalArgumentException.class, () ->
-      LocalDateRange.ofInclusiveEnd(d0, d1).intersection(
-        LocalDateRange.ofInclusiveEnd(d1.plusDays(1), d2)
-      )
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> LocalDateRange.ofInclusiveEnd(d0, d1)
+        .intersection(LocalDateRange.ofInclusiveEnd(d1.plusDays(1), d2))
     );
   }
 
@@ -205,24 +207,24 @@ public class LocalDateRangeTest {
   @Test
   public void asLocalDatesEnumeratesBoundedRange() {
     var range = LocalDateRange.ofExclusiveEnd(d1, d1.plusDays(3));
-    assertThat(range.asLocalDates(LocalDate.MIN, LocalDate.MAX))
-      .containsExactly(d1, d1.plusDays(1), d1.plusDays(2))
-      .inOrder();
+    assertThat(range.asLocalDates(LocalDate.MIN, LocalDate.MAX)).containsExactly(
+      d1,
+      d1.plusDays(1),
+      d1.plusDays(2)
+    ).inOrder();
   }
 
   @Test
   public void asLocalDatesUsesDefaultsForUnboundedSides() {
     var range = LocalDateRange.ofUnbounded();
-    assertThat(range.asLocalDates(d1, d1.plusDays(2)))
-      .containsExactly(d1, d1.plusDays(1))
+    assertThat(range.asLocalDates(d1, d1.plusDays(2))).containsExactly(d1, d1.plusDays(1))
       .inOrder();
   }
 
   @Test
   public void asLocalDatesClampsToTighterBounds() {
     var range = LocalDateRange.ofExclusiveEnd(d0, d4);
-    assertThat(range.asLocalDates(d1, d1.plusDays(2)))
-      .containsExactly(d1, d1.plusDays(1))
+    assertThat(range.asLocalDates(d1, d1.plusDays(2))).containsExactly(d1, d1.plusDays(1))
       .inOrder();
 
     var tight = LocalDateRange.ofExclusiveEnd(d1, d1.plusDays(2));
@@ -238,8 +240,9 @@ public class LocalDateRangeTest {
   @Test
   public void asLocalDatesThrowsWhenRangeTooLarge() {
     var range = LocalDateRange.ofExclusiveEnd(d0, d0.plusDays(10001));
-    assertThrows(IllegalArgumentException.class, () ->
-      range.asLocalDates(LocalDate.MIN, LocalDate.MAX)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> range.asLocalDates(LocalDate.MIN, LocalDate.MAX)
     );
   }
 }

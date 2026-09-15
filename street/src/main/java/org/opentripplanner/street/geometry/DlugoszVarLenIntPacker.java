@@ -160,8 +160,7 @@ class DlugoszVarLenIntPacker {
         width = 3;
       } else if ((v1 & 0xF8) == 0xE0) {
         // 1110 0xxx + 3x8 -> 27 bits value
-        sv =
-          ((v1 & 0x1F) << 24) +
+        sv = ((v1 & 0x1F) << 24) +
           ((arr[p + 1] & 0xFF) << 16) +
           ((arr[p + 2] & 0xFF) << 8) +
           (arr[p + 3] & 0xFF) -
@@ -170,8 +169,7 @@ class DlugoszVarLenIntPacker {
       } else {
         // 1110 1xxx + 4x8 -> 35 bits value; the tag occupies the upper 5 bits,
         // leaving 3 value bits in v1.
-        long lsv =
-          (((long) v1 & 0x07) << 32) +
+        long lsv = (((long) v1 & 0x07) << 32) +
           ((arr[p + 1] & 0xFF) << 24) +
           ((arr[p + 2] & 0xFF) << 16) +
           ((arr[p + 3] & 0xFF) << 8) +

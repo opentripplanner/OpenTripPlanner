@@ -32,7 +32,8 @@ class TransportModeMapper {
   public NetexMainAndSubMode map(
     AllVehicleModesOfTransportEnumeration netexMode,
     TransportSubmodeStructure submode
-  ) throws UnsupportedModeException {
+  )
+    throws UnsupportedModeException {
     if (submode == null) {
       return new NetexMainAndSubMode(mapAllVehicleModesOfTransport(netexMode));
     } else {

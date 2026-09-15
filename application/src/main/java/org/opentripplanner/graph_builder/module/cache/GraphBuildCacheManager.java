@@ -153,10 +153,11 @@ public class GraphBuildCacheManager implements Closeable {
     LOG.info("Saving {} cache to '{}' (async).", task, entry.path());
     writeExecutor.submit(() -> {
       try (Output output = new Output(entry.asOutputStream())) {
-        KryoBuilder.create().writeClassAndObject(
-          output,
-          new CacheSerializationObject<>(task.serializationVersionId, data)
-        );
+        KryoBuilder.create()
+          .writeClassAndObject(
+            output,
+            new CacheSerializationObject<>(task.serializationVersionId, data)
+          );
         LOG.info("Saved {} cache to '{}'.", task, entry.path());
       } catch (KryoException e) {
         LOG.warn("Failed to save {} cache to '{}': {}.", task, entry.path(), e.getMessage());

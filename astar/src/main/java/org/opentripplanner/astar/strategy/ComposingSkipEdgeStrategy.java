@@ -9,10 +9,7 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
  * of stops visited. Only one needs to be skipped in order for
  * {@link SkipEdgeStrategy#shouldSkipEdge(State, Edge)} to return null.
  */
-public record ComposingSkipEdgeStrategy<
-  State extends AStarState<State, Edge, ?>,
-  Edge extends AStarEdge<State, Edge, ?>
->(
+public record ComposingSkipEdgeStrategy<State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>>(
   SkipEdgeStrategy<State, Edge>... strategies
 ) implements SkipEdgeStrategy<State, Edge> {
   @Override

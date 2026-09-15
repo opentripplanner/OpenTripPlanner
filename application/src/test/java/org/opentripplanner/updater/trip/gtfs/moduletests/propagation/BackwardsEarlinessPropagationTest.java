@@ -27,8 +27,7 @@ class BackwardsEarlinessPropagationTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addNoDataStop(0)
       .addNoDataStop(1)
       .addStopTime(2, "10:09")
@@ -46,8 +45,7 @@ class BackwardsEarlinessPropagationTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addNoDataStop(0)
       .addNoDataStop(1)
       .addNoDataStop(2)

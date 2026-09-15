@@ -16,11 +16,13 @@ import org.opentripplanner.framework.application.OTPFeature;
 
 class IntrospectionTypeWiring {
 
-  private static final Predicate<Method> IS_METHOD_PUBLIC = method ->
-    Modifier.isPublic(method.getModifiers());
-  private static final Predicate<Method> IS_METHOD_RETURN_TYPE_DATA_FETCHER = (
-    (Predicate<Method>) method -> method.getReturnType().equals(DataFetcher.class)
-  ).or(method -> Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class));
+  private static final Predicate<Method> IS_METHOD_PUBLIC = method -> Modifier.isPublic(
+    method.getModifiers()
+  );
+  private static final Predicate<Method> IS_METHOD_RETURN_TYPE_DATA_FETCHER =
+    ((Predicate<Method>) method -> method.getReturnType().equals(DataFetcher.class)).or(
+      method -> Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class)
+    );
 
   private final TypeDefinitionRegistry typeRegistry;
 
@@ -33,10 +35,9 @@ class IntrospectionTypeWiring {
 
     String typeName = clazz.getSimpleName().replaceAll("Impl$", "");
 
-    TypeDefinition type = typeRegistry
-      .getType(typeName)
-      .orElseThrow(() ->
-        new IllegalArgumentException("Type %s not found in schema".formatted(typeName))
+    TypeDefinition type = typeRegistry.getType(typeName)
+      .orElseThrow(
+        () -> new IllegalArgumentException("Type %s not found in schema".formatted(typeName))
       );
 
     if (!(type instanceof ObjectTypeDefinition objectType)) {
@@ -48,49 +49,45 @@ class IntrospectionTypeWiring {
         Arrays.stream(clazz.getDeclaredMethods())
           .filter(IS_METHOD_PUBLIC)
           .filter(IS_METHOD_RETURN_TYPE_DATA_FETCHER)
-          .collect(
-            Collectors.toMap(Method::getName, method -> {
-              String fieldName = method.getName();
-              try {
-                DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
-                if (dataFetcher == null) {
-                  throw new RuntimeException(
-                    String.format(
-                      "Data fetcher %s for type %s is null",
-                      fieldName,
-                      clazz.getSimpleName()
-                    )
-                  );
-                }
-                if (
-                  OTPFeature.AsyncGraphQLFetchers.isOn() &&
-                  objectType
-                    .getFieldDefinitions()
+          .collect(Collectors.toMap(Method::getName, method -> {
+            String fieldName = method.getName();
+            try {
+              DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
+              if (dataFetcher == null) {
+                throw new RuntimeException(
+                  String.format(
+                    "Data fetcher %s for type %s is null",
+                    fieldName,
+                    clazz.getSimpleName()
+                  )
+                );
+              }
+              if (
+                OTPFeature.AsyncGraphQLFetchers.isOn() &&
+                  objectType.getFieldDefinitions()
                     .stream()
                     .filter(fieldDefinition -> fieldDefinition.getName().equals(fieldName))
-                    .anyMatch(fieldDefinition ->
-                      fieldDefinition
-                        .getDirectives()
+                    .anyMatch(
+                      fieldDefinition -> fieldDefinition.getDirectives()
                         .stream()
                         .anyMatch(directive -> directive.getName().equals("async"))
                     )
-                ) {
-                  return AsyncDataFetcher.async(dataFetcher);
-                }
-
-                return dataFetcher;
-              } catch (IllegalAccessException | InvocationTargetException error) {
-                throw new RuntimeException(
-                  String.format(
-                    "Data fetcher %s for type %s threw error",
-                    fieldName,
-                    clazz.getSimpleName()
-                  ),
-                  error
-                );
+              ) {
+                return AsyncDataFetcher.async(dataFetcher);
               }
-            })
-          )
+
+              return dataFetcher;
+            } catch (IllegalAccessException | InvocationTargetException error) {
+              throw new RuntimeException(
+                String.format(
+                  "Data fetcher %s for type %s threw error",
+                  fieldName,
+                  clazz.getSimpleName()
+                ),
+                error
+              );
+            }
+          }))
       )
       .build();
   }

@@ -19,8 +19,7 @@ public class ApisArchitectureTest {
 
   @Test
   void transmodelMustNotDependOnGtfs() {
-    noClasses()
-      .that()
+    noClasses().that()
       .resideInAPackage(TRANSMODEL.packageIdentifier())
       .should()
       .dependOnClassesThat()
@@ -30,8 +29,7 @@ public class ApisArchitectureTest {
 
   @Test
   void gtfsMustNotDependOnTransmodel() {
-    noClasses()
-      .that()
+    noClasses().that()
       .resideInAPackage(GTFS.packageIdentifier())
       .should()
       .dependOnClassesThat()

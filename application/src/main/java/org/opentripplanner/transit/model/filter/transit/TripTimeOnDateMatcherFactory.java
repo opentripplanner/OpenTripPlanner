@@ -77,8 +77,9 @@ public class TripTimeOnDateMatcherFactory {
         selector.transportModes().get().stream().map(NarrowedTransitMode::of).toList()
       );
       expr.matches(
-        new GenericUnaryMatcher<>("transportMode", (TripTimeOnDate tripTime) ->
-          transportModeFilter.match(
+        new GenericUnaryMatcher<>(
+          "transportMode",
+          (TripTimeOnDate tripTime) -> transportModeFilter.match(
             tripTime.getTrip().getMode(),
             tripTime.getTrip().getNetexSubMode()
           )
@@ -122,10 +123,7 @@ public class TripTimeOnDateMatcherFactory {
    * all matches if the period contains the instant of the visit.
    */
   private static boolean visitOverlaps(TimePeriod period, Instant arrival, Instant departure) {
-    boolean afterStart = period
-      .start()
-      .map(start -> !departure.isBefore(start))
-      .orElse(true);
+    boolean afterStart = period.start().map(start -> !departure.isBefore(start)).orElse(true);
     boolean beforeEnd = period.end().map(arrival::isBefore).orElse(true);
     return afterStart && beforeEnd;
   }

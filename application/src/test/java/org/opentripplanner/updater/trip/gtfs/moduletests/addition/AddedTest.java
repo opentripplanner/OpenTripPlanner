@@ -41,26 +41,22 @@ class AddedTest implements RealtimeTestConstants {
   private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
   private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
 
-  private final TransitTestEnvironment env = envBuilder
-    .addTrip(
-      TripInput.of(TRIP_1_ID)
-        // just to set the schedule period
-        .withServiceDates(
-          envBuilder.defaultServiceDate().minusDays(1),
-          envBuilder.defaultServiceDate().plusDays(1)
-        )
-        .addStop(STOP_A, "12:00", "12:00")
-        .addStop(STOP_B, "12:10", "12:10")
-        .addStop(STOP_C, "12:20", "12:20")
-    )
-    .addStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
-    .build();
+  private final TransitTestEnvironment env = envBuilder.addTrip(
+    TripInput.of(TRIP_1_ID)
+      // just to set the schedule period
+      .withServiceDates(
+        envBuilder.defaultServiceDate().minusDays(1),
+        envBuilder.defaultServiceDate().plusDays(1)
+      )
+      .addStop(STOP_A, "12:00", "12:00")
+      .addStop(STOP_B, "12:10", "12:10")
+      .addStop(STOP_C, "12:20", "12:20")
+  ).addStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID).build();
   private final GtfsRtTestHelper gtfsRt = GtfsRtTestHelper.of(env);
 
   @Test
   void addedTrip() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
@@ -72,8 +68,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTripWithNewRoute() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B_ID, "00:40", COORDINATE_WITH_DRIVER)
@@ -106,8 +101,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithUnknownStop() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -121,8 +115,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithStopTimeWithoutStopId() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(2, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
@@ -134,8 +127,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithSingleStop() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .build();
 
@@ -145,8 +137,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       // add extension to set route name, url, mode
       .addTripExtension()
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
@@ -169,8 +160,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .withTripProperties("A loop", "SW1234")
       .addStopTime(STOP_A_ID, "00:30", DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B_ID, "00:40", DropOffPickupType.COORDINATE_WITH_DRIVER)
@@ -204,8 +194,7 @@ class AddedTest implements RealtimeTestConstants {
   public void addedTripWithDelay() {
     var builder = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED);
 
-    builder
-      .addStopTime(STOP_A_ID, "08:00")
+    builder.addStopTime(STOP_A_ID, "08:00")
       .addStopTimeWithDelay(STOP_B_ID, "08:35", 300)
       .addStopTimeWithScheduled(STOP_C_ID, "09:10", "09:00");
 
@@ -225,8 +214,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTripWithDefaultRoute() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
@@ -244,8 +232,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTripWithExistingRoute() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .withRouteId("Route1")
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
@@ -261,8 +248,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void differentialUpdateOfAddedTrip() {
-    var firstUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var firstUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
@@ -270,8 +256,7 @@ class AddedTest implements RealtimeTestConstants {
 
     assertSuccess(gtfsRt.applyTripUpdate(firstUpdate, DIFFERENTIAL));
 
-    var secondUpdate = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var secondUpdate = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "01:00")
       .addStopTime(STOP_B_ID, "01:10")
       .addStopTime(STOP_C_ID, "01:25")
@@ -288,15 +273,13 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void multipleAddedTripsInSingleBatch() {
-    var update1 = gtfsRt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var update1 = gtfsRt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")
       .build();
 
-    var update2 = gtfsRt
-      .tripUpdate("AddedTrip2", ADDED)
+    var update2 = gtfsRt.tripUpdate("AddedTrip2", ADDED)
       .addStopTime(STOP_A_ID, "01:00")
       .addStopTime(STOP_B_ID, "01:10")
       .addStopTime(STOP_C_ID, "01:25")

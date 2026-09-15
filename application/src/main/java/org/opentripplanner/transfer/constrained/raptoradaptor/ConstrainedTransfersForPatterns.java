@@ -38,10 +38,8 @@ public class ConstrainedTransfersForPatterns {
       return false;
     }
     ConstrainedTransfersForPatterns that = (ConstrainedTransfersForPatterns) o;
-    return (
-      Objects.equals(transfersToStop, that.transfersToStop) &&
-      Objects.equals(transfersFromStop, that.transfersFromStop)
-    );
+    return (Objects.equals(transfersToStop, that.transfersToStop) &&
+      Objects.equals(transfersFromStop, that.transfersFromStop));
   }
 
   @Override

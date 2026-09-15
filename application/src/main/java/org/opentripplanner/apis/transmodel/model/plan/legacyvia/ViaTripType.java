@@ -43,8 +43,9 @@ public class ViaTripType {
           .name("from")
           .description("The index of the trip pattern in the segment before the via point")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(dataFetchingEnvironment ->
-            ((ViaRoutingResponseConnection) dataFetchingEnvironment.getSource()).from()
+          .dataFetcher(
+            dataFetchingEnvironment -> ((ViaRoutingResponseConnection) dataFetchingEnvironment
+              .getSource()).from()
           )
           .build()
       )
@@ -53,8 +54,9 @@ public class ViaTripType {
           .name("to")
           .description("The index of the trip pattern in the segment after the via point")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(dataFetchingEnvironment ->
-            ((ViaRoutingResponseConnection) dataFetchingEnvironment.getSource()).to()
+          .dataFetcher(
+            dataFetchingEnvironment -> ((ViaRoutingResponseConnection) dataFetchingEnvironment
+              .getSource()).to()
           )
           .build()
       )

@@ -113,8 +113,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ViaModule.class,
     WarmupModule.class,
     WorldEnvelopeServiceModule.class,
-    TransactionModule.class,
-  }
+    TransactionModule.class, }
 )
 public interface ConstructApplicationFactory {
   ConfigModel config();
@@ -126,10 +125,7 @@ public interface ConstructApplicationFactory {
   TransferRepository transferRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
-  RepositoryHandle<
-    RealtimeVehicleRepositorySnapshot,
-    RealtimeVehicleRepository
-  > realtimeVehicleRepositoryHandle();
+  RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   VehicleParkingRepository vehicleParkingRepository();

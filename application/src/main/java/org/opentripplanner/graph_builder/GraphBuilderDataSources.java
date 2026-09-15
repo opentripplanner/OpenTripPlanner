@@ -137,9 +137,7 @@ public class GraphBuilderDataSources implements Closeable {
     return ofStream(GTFS).map(this::mapGtfsFeed).toList();
   }
 
-  public Iterable<
-    ConfiguredCompositeDataSource<NetexFeedParameters>
-  > getNetexConfiguredDataSource() {
+  public Iterable<ConfiguredCompositeDataSource<NetexFeedParameters>> getNetexConfiguredDataSource() {
     return ofStream(NETEX).map(this::mapNetexFeed).toList();
   }
 
@@ -147,9 +145,7 @@ public class GraphBuilderDataSources implements Closeable {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
   }
 
-  public Iterable<
-    ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>
-  > getEmpiricalDelayConfiguredDataSource() {
+  public Iterable<ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>> getEmpiricalDelayConfiguredDataSource() {
     return ofStream(EMPIRICAL_DATA).map(this::mapEmpiricalDelayFeed).toList();
   }
 
@@ -228,35 +224,30 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
-    var p = buildConfig.osm.parameters
-      .stream()
+    var p = buildConfig.osm.parameters.stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(
-        new OsmExtractParametersBuilder(buildConfig.osmDefaults)
-          .withSource(dataSource.uri())
+        new OsmExtractParametersBuilder(buildConfig.osmDefaults).withSource(dataSource.uri())
           .build()
       );
     return new ConfiguredDataSource<>(dataSource, p);
   }
 
   private ConfiguredDataSource<DemExtractParameters> mapDemData(DataSource dataSource) {
-    var p = buildConfig.dem
-      .demExtracts()
+    var p = buildConfig.dem.demExtracts()
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(
-        new DemExtractParametersBuilder(buildConfig.demDefaults)
-          .withSource(dataSource.uri())
+        new DemExtractParametersBuilder(buildConfig.demDefaults).withSource(dataSource.uri())
           .build()
       );
     return new ConfiguredDataSource<>(dataSource, p);
   }
 
   private ConfiguredCompositeDataSource<GtfsFeedParameters> mapGtfsFeed(DataSource dataSource) {
-    var p = buildConfig.transitFeeds
-      .gtfsFeeds()
+    var p = buildConfig.transitFeeds.gtfsFeeds()
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
@@ -265,8 +256,7 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   private ConfiguredCompositeDataSource<NetexFeedParameters> mapNetexFeed(DataSource dataSource) {
-    var p = buildConfig.transitFeeds
-      .netexFeeds()
+    var p = buildConfig.transitFeeds.netexFeeds()
       .stream()
       .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
       .findFirst()
@@ -275,8 +265,7 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   private ConfiguredDataSource<EmissionFeedParameters> mapEmissionFeed(DataSource dataSource) {
-    var p = buildConfig.emission
-      .feeds()
+    var p = buildConfig.emission.feeds()
       .stream()
       .filter(c -> uriMatch(c.source(), dataSource.uri()))
       .findFirst()
@@ -287,8 +276,7 @@ public class GraphBuilderDataSources implements Closeable {
   private ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters> mapEmpiricalDelayFeed(
     DataSource dataSource
   ) {
-    var p = buildConfig.empiricalDelay
-      .feeds()
+    var p = buildConfig.empiricalDelay.feeds()
       .stream()
       .filter(c -> uriMatch(c.source(), dataSource.uri()))
       .findFirst()
@@ -303,11 +291,9 @@ public class GraphBuilderDataSources implements Closeable {
    * relative to the base directory.
    */
   private boolean uriMatch(URI configURI, URI datasourceURI) {
-    return (
-      configURI.equals(datasourceURI) ||
+    return (configURI.equals(datasourceURI) ||
       (!configURI.isAbsolute() &&
-        baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI))
-    );
+        baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI)));
   }
 
   private void logSkippedAndSelectedFiles() {

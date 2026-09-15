@@ -93,10 +93,10 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
      */
     if (
       a.backEdge != b.getBackEdge() &&
-      a.backEdge instanceof StreetEdge &&
-      a.getBackMode() != null &&
-      a.getBackMode().isDrivingIsh() &&
-      a.getRequest().isCloseToStartOrEnd(a.getVertex())
+        a.backEdge instanceof StreetEdge &&
+        a.getBackMode() != null &&
+        a.getBackMode().isDrivingIsh() &&
+        a.getRequest().isCloseToStartOrEnd(a.getVertex())
     ) {
       return false;
     }
@@ -162,10 +162,8 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       // Our solution to this is to give existing states some slack to dominate new states more easily.
 
       final double EPSILON = 1e-4;
-      return (
-        a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds() + EPSILON &&
-        a.getWeight() <= b.getWeight() + EPSILON
-      );
+      return (a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds() + EPSILON &&
+        a.getWeight() <= b.getWeight() + EPSILON);
     }
   }
 }

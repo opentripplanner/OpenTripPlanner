@@ -39,8 +39,8 @@ public class BicyclePreferencesMapper {
       preferences.withBoardCost(boardCost.toSeconds());
     }
     preferences.withWalking(walk -> setBicycleWalkPreferences(walk, args.getGraphQLWalk()));
-    preferences.withParking(parking ->
-      setBicycleParkingPreferences(parking, args.getGraphQLParking(), environment)
+    preferences.withParking(
+      parking -> setBicycleParkingPreferences(parking, args.getGraphQLParking(), environment)
     );
     preferences.withRental(rental -> setBicycleRentalPreferences(rental, args.getGraphQLRental()));
     setBicycleOptimization(preferences, args.getGraphQLOptimization());
@@ -146,8 +146,7 @@ public class BicyclePreferencesMapper {
     var triangleArgs = args.getGraphQLTriangle();
     if (isBicycleTriangleSet(triangleArgs)) {
       preferences.withForcedOptimizeTriangle(triangle -> {
-        triangle
-          .withSlope(triangleArgs.getGraphQLFlatness())
+        triangle.withSlope(triangleArgs.getGraphQLFlatness())
           .withSafety(triangleArgs.getGraphQLSafety())
           .withTime(triangleArgs.getGraphQLTime());
       });
@@ -157,11 +156,9 @@ public class BicyclePreferencesMapper {
   private static boolean isBicycleTriangleSet(
     GraphQLTypes.GraphQLTriangleCyclingFactorsInput args
   ) {
-    return (
-      args != null &&
+    return (args != null &&
       args.getGraphQLFlatness() != null &&
       args.getGraphQLSafety() != null &&
-      args.getGraphQLTime() != null
-    );
+      args.getGraphQLTime() != null);
   }
 }

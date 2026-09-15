@@ -187,8 +187,7 @@ public final class TransitPreferences implements Serializable {
       return false;
     }
     TransitPreferences that = (TransitPreferences) o;
-    return (
-      boardSlack.equals(that.boardSlack) &&
+    return (boardSlack.equals(that.boardSlack) &&
       alightSlack.equals(that.alightSlack) &&
       reluctanceForMode.equals(that.reluctanceForMode) &&
       Objects.equals(otherThanPreferredRoutesPenalty, that.otherThanPreferredRoutesPenalty) &&
@@ -198,8 +197,7 @@ public final class TransitPreferences implements Serializable {
       includePlannedCancellations == that.includePlannedCancellations &&
       includeRealtimeCancellations == that.includeRealtimeCancellations &&
       raptor.equals(that.raptor) &&
-      directTransitPreferences.equals(that.directTransitPreferences)
-    );
+      directTransitPreferences.equals(that.directTransitPreferences));
   }
 
   @Override

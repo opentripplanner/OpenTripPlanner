@@ -24,13 +24,12 @@ class DstServiceDateTest implements RealtimeTestConstants {
     var envBuilder = TransitTestEnvironment.of(serviceDate);
     var stopA = envBuilder.stop(STOP_A_ID);
     var stopB = envBuilder.stop(STOP_B_ID);
-    var env = envBuilder
-      .addTrip(TripInput.of(TRIP_1_ID).addStop(stopA, "10:00").addStop(stopB, "10:10"))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID).addStop(stopA, "10:00").addStop(stopB, "10:10")
+    ).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addStopTime(STOP_A_ID, "10:01")
       .addStopTime(STOP_B_ID, "10:11")
       .build();
@@ -45,13 +44,12 @@ class DstServiceDateTest implements RealtimeTestConstants {
     var envBuilder = TransitTestEnvironment.of(serviceDate);
     var stopA = envBuilder.stop(STOP_A_ID);
     var stopB = envBuilder.stop(STOP_B_ID);
-    var env = envBuilder
-      .addTrip(TripInput.of(TRIP_1_ID).addStop(stopA, "10:00").addStop(stopB, "10:10"))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID).addStop(stopA, "10:00").addStop(stopB, "10:10")
+    ).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdate(ADDED_TRIP_ID, ADDED)
+    var tripUpdate = rt.tripUpdate(ADDED_TRIP_ID, ADDED)
       .addStopTime(STOP_A_ID, "12:01")
       .addStopTime(STOP_B_ID, "12:11")
       .build();

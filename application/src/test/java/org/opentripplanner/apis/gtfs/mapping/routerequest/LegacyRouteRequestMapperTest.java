@@ -67,8 +67,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   static {
     Graph graph = new Graph();
     var testModel = TransitRepositoryForTest.of();
-    var stopModelBuilder = testModel
-      .siteRepositoryBuilder()
+    var stopModelBuilder = testModel.siteRepositoryBuilder()
       .withRegularStop(testModel.stop("stop1").build());
     var transitRepository = new TransitRepository(stopModelBuilder.build());
     transitRepository.initTimeZone(ZoneIds.BERLIN);

@@ -68,8 +68,9 @@ class ConcavePlatformWithStairsTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stairs into A (wheelchair-inaccessible steps)
         "(0.004,0) → (0.005,0) PEDESTRIAN ♿❌",

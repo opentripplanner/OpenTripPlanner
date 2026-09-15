@@ -72,9 +72,9 @@ public final class EndpointContextLineString {
      */
     if (
       Math.abs(x0 - seq.getX(0)) > EPS ||
-      Math.abs(y0 - seq.getY(0)) > EPS ||
-      Math.abs(x1 - seq.getX(n - 1)) > EPS ||
-      Math.abs(y1 - seq.getY(n - 1)) > EPS
+        Math.abs(y0 - seq.getY(0)) > EPS ||
+        Math.abs(x1 - seq.getX(n - 1)) > EPS ||
+        Math.abs(y1 - seq.getY(n - 1)) > EPS
     ) {
       throw new IllegalArgumentException(
         "EndpointContextLineString geometry must stick to given end points. If you need to relax this, please read source code."
@@ -108,8 +108,9 @@ public final class EndpointContextLineString {
     double y0 = reverse ? yb : ya;
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
-    int intermediateCount =
-      packedCoords == null ? 0 : DlugoszVarLenIntPacker.countValues(packedCoords) / 2;
+    int intermediateCount = packedCoords == null
+      ? 0
+      : DlugoszVarLenIntPacker.countValues(packedCoords) / 2;
     double[] c = new double[(intermediateCount + 2) * 2];
     c[0] = x0;
     c[1] = y0;

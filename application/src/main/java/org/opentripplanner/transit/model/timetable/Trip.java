@@ -76,10 +76,9 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     // Route is done first, it is used as a fallback for some fields
     this.route = requireNonNull(builder.getRoute());
     this.mode = requireNonNullElse(builder.getMode(), route.getMode());
-    this.netexSubmode =
-      builder.getNetexSubmode() != null
-        ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
-        : route.getNetexSubmode();
+    this.netexSubmode = builder.getNetexSubmode() != null
+      ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
+      : route.getNetexSubmode();
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
     this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
     this.carsAllowed = requireNonNullElse(builder.getCarsAllowed(), CarAccess.UNKNOWN);
@@ -216,8 +215,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
 
   @Override
   public boolean sameAs(Trip other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(this.operator, other.operator) &&
       Objects.equals(this.route, other.route) &&
       Objects.equals(this.shortName, other.shortName) &&
@@ -232,8 +230,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
       Objects.equals(this.bikesAllowed, other.bikesAllowed) &&
       Objects.equals(this.carsAllowed, other.carsAllowed) &&
       Objects.equals(this.wheelchairBoarding, other.wheelchairBoarding) &&
-      Objects.equals(this.netexAlteration, other.netexAlteration)
-    );
+      Objects.equals(this.netexAlteration, other.netexAlteration));
   }
 
   @Override

@@ -232,24 +232,22 @@ public class ScheduledTransitLeg implements TransitLeg {
   public int departureDelay() {
     return tripTimes.isCanceledStop(boardStopPosInPattern) ||
       tripTimes.isNoDataStop(boardStopPosInPattern)
-      ? 0
-      : tripTimes.getDepartureDelay(boardStopPosInPattern);
+        ? 0
+        : tripTimes.getDepartureDelay(boardStopPosInPattern);
   }
 
   @Override
   public int arrivalDelay() {
     return tripTimes.isCanceledStop(alightStopPosInPattern) ||
       tripTimes.isNoDataStop(alightStopPosInPattern)
-      ? 0
-      : tripTimes.getArrivalDelay(alightStopPosInPattern);
+        ? 0
+        : tripTimes.getArrivalDelay(alightStopPosInPattern);
   }
 
   @Override
   public boolean isRealTimeUpdated() {
-    return (
-      tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
-      tripTimes.isRealTimeUpdated(alightStopPosInPattern)
-    );
+    return (tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
+      tripTimes.isRealTimeUpdated(alightStopPosInPattern));
   }
 
   @Override

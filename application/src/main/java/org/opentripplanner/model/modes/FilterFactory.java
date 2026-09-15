@@ -53,8 +53,7 @@ class FilterFactory {
       return filters.get(0);
     }
 
-    Map<Class<?>, List<AllowTransitModeFilter>> map = filters
-      .stream()
+    Map<Class<?>, List<AllowTransitModeFilter>> map = filters.stream()
       .collect(Collectors.groupingBy(Object::getClass));
 
     if (map.containsKey(AllowAllModesFilter.class)) {

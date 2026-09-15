@@ -48,8 +48,7 @@ public class StreetEdgeScooterTraversalTest {
 
     double length = 650.0;
 
-    StreetEdge testStreet = new StreetEdgeBuilder<>()
-      .withFromVertex(v1)
+    StreetEdge testStreet = new StreetEdgeBuilder<>().withFromVertex(v1)
       .withToVertex(v2)
       .withGeometry(geometry)
       .withName("Test Lane")
@@ -116,9 +115,7 @@ public class StreetEdgeScooterTraversalTest {
       StreetModelFactory.V2,
       100.0,
       StreetTraversalPermission.ALL
-    )
-      .withCarSpeed(10.0f)
-      .buildAndConnect();
+    ).withCarSpeed(10.0f).buildAndConnect();
 
     var request = StreetSearchRequest.of()
       .withWalk(walk -> walk.withReluctance(1))
@@ -159,8 +156,7 @@ public class StreetEdgeScooterTraversalTest {
 
     double length = 650.0;
 
-    StreetEdge testStreet = new StreetEdgeBuilder<>()
-      .withFromVertex(v1)
+    StreetEdge testStreet = new StreetEdgeBuilder<>().withFromVertex(v1)
       .withToVertex(v2)
       .withGeometry(geometry)
       .withName("Test Lane")
@@ -175,8 +171,7 @@ public class StreetEdgeScooterTraversalTest {
       new Coordinate(0, 0),
       new Coordinate(length / 2, length / 20.0),
       // slope = -0.1
-      new Coordinate(length, 0),
-    };
+      new Coordinate(length, 0), };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
     StreetElevationExtensionBuilder.of(testStreet)
       .withElevationProfile(elev)
@@ -189,16 +184,12 @@ public class StreetEdgeScooterTraversalTest {
 
     var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
 
-    request
-      .withScooter(scooter ->
-        scooter
-          .withSpeed(SPEED)
-          .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
-          .withOptimizeTriangle(it -> it.withTime(1))
-          .withReluctance(1)
-      )
-      .withWalk(walk -> walk.withReluctance(1))
-      .withCar(car -> car.withReluctance(1));
+    request.withScooter(
+      scooter -> scooter.withSpeed(SPEED)
+        .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+        .withOptimizeTriangle(it -> it.withTime(1))
+        .withReluctance(1)
+    ).withWalk(walk -> walk.withReluctance(1)).withCar(car -> car.withReluctance(1));
 
     var rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
     var startState = link.traverse(rentedState[0])[0];

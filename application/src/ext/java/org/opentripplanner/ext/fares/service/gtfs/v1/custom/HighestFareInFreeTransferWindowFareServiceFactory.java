@@ -54,14 +54,12 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends GtfsFareS
   @Override
   public void configure(JsonNode config) {
     var adapter = new NodeAdapter(config, null);
-    freeTransferWindow = adapter
-      .of("freeTransferWindow")
+    freeTransferWindow = adapter.of("freeTransferWindow")
       .since(NA)
       .summary("TODO")
       .asDuration(freeTransferWindow);
 
-    analyzeInterlinedTransfers = adapter
-      .of("analyzeInterlinedTransfers")
+    analyzeInterlinedTransfers = adapter.of("analyzeInterlinedTransfers")
       .since(NA)
       .summary("TODO")
       .asBoolean(analyzeInterlinedTransfers);

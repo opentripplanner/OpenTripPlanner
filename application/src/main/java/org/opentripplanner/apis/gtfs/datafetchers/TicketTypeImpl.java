@@ -11,27 +11,25 @@ public class TicketTypeImpl implements GraphQLDataFetchers.GraphQLTicketType {
 
   @Override
   public DataFetcher<String> currency() {
-    return environment ->
-      ((FareRuleSet) environment.getSource())
-        .getFareAttribute()
-        .getPrice()
-        .currency()
-        .getCurrencyCode();
+    return environment -> ((FareRuleSet) environment.getSource()).getFareAttribute()
+      .getPrice()
+      .currency()
+      .getCurrencyCode();
   }
 
   @Override
   public DataFetcher<String> fareId() {
-    return environment ->
-      ((FareRuleSet) environment.getSource()).getFareAttribute().getId().toString();
+    return environment -> ((FareRuleSet) environment.getSource()).getFareAttribute()
+      .getId()
+      .toString();
   }
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId(
-        "TicketType",
-        ((FareRuleSet) environment.getSource()).getFareAttribute().getId().toString()
-      );
+    return environment -> new Relay.ResolvedGlobalId(
+      "TicketType",
+      ((FareRuleSet) environment.getSource()).getFareAttribute().getId().toString()
+    );
   }
 
   @Override
@@ -43,8 +41,7 @@ public class TicketTypeImpl implements GraphQLDataFetchers.GraphQLTicketType {
       symbols.setDecimalSeparator('.');
       format.setDecimalFormatSymbols(symbols);
       String price = format.format(
-        ((FareRuleSet) environment.getSource())
-          .getFareAttribute()
+        ((FareRuleSet) environment.getSource()).getFareAttribute()
           .getPrice()
           .fractionalAmount()
           .floatValue()

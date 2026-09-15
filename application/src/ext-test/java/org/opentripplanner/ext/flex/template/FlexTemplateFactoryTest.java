@@ -356,10 +356,10 @@ class FlexTemplateFactoryTest {
   ) {
     var st = MODEL.stopTime(TRIP, seqNr, stop);
     switch (boardAlight) {
-      case BOARD_ONLY:
+      case BOARD_ONLY :
         st.setDropOffType(PickDrop.NONE);
         break;
-      case ALIGHT_ONLY:
+      case ALIGHT_ONLY :
         st.setPickupType(PickDrop.NONE);
         break;
     }

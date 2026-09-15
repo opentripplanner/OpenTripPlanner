@@ -105,10 +105,8 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
   }
 
   public boolean isStaySeatedOntoNextLeg() {
-    return (
-      constrainedTransferAfterLeg != null &&
-      constrainedTransferAfterLeg.getTransferConstraint().isStaySeated()
-    );
+    return (constrainedTransferAfterLeg != null &&
+      constrainedTransferAfterLeg.getTransferConstraint().isStaySeated());
   }
 
   @Override
@@ -125,14 +123,12 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
       return false;
     }
     TransitPathLeg<?> that = (TransitPathLeg<?>) o;
-    return (
-      boardTime == that.boardTime &&
+    return (boardTime == that.boardTime &&
       boardStopPos == that.boardStopPos &&
       alightTime == that.alightTime &&
       alightStopPos == that.alightStopPos &&
       trip.equals(that.trip) &&
-      next.equals(that.next)
-    );
+      next.equals(that.next));
   }
 
   @Override

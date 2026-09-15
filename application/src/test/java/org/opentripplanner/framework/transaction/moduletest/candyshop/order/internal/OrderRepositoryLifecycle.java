@@ -11,9 +11,8 @@ import org.opentripplanner.framework.transaction.moduletest.candyshop.order.Orde
  * support atomic commits and rollback in case a task fails, but is more memory efficient since only
  * the freeze action triggers copying the internal data structure.
  */
-public class OrderRepositoryLifecycle
-  implements RepositoryLifecycle<OrderService, OrderRepository>
-{
+public class OrderRepositoryLifecycle implements
+  RepositoryLifecycle<OrderService, OrderRepository> {
 
   // The one live, mutable repository instance, reused for every transaction - not derived from
   // the published snapshot, since freeze() always returns a decoupled copy of it.

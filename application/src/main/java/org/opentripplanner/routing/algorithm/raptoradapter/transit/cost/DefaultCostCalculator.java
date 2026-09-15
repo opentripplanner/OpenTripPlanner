@@ -47,10 +47,9 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
     this.boardAndTransferCost = transferCostOnly + boardCostOnly;
     this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
 
-    this.transitFactors =
-      transitReluctanceFactors == null
-        ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
-        : new IndexBasedFactorStrategy(transitReluctanceFactors);
+    this.transitFactors = transitReluctanceFactors == null
+      ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
+      : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
     this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }
@@ -93,9 +92,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
 
   @Override
   public int transitCost(int transitDuration, T tripScheduledBoarded) {
-    return (
-      transitDuration * transitFactors.factor(tripScheduledBoarded.transitReluctanceFactorIndex())
-    );
+    return (transitDuration *
+      transitFactors.factor(tripScheduledBoarded.transitReluctanceFactorIndex()));
   }
 
   @Override
@@ -129,11 +127,9 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule> implemen
     int fromStopIndex
   ) {
     if (minNumTransfers > -1) {
-      return (
-        boardCostOnly +
+      return (boardCostOnly +
         boardAndTransferCost * minNumTransfers +
-        transitFactors.minFactor() * minTravelDuration
-      );
+        transitFactors.minFactor() * minTravelDuration);
     } else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       int fixedCost = transitFactors.minFactor() * minTravelDuration;

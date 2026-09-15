@@ -227,13 +227,13 @@ class DeferredForkHandlerTest {
         }
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
-          NETWORK.equals(s.getVehicleRentalNetwork())
+            NETWORK.equals(s.getVehicleRentalNetwork())
         ) {
           hasRenting = true;
         }
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
-          s.getVehicleRentalNetwork() == null
+            s.getVehicleRentalNetwork() == null
         ) {
           hasGeneric = true;
         }
@@ -314,7 +314,7 @@ class DeferredForkHandlerTest {
       for (var s : result) {
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
-          NETWORK.equals(s.getVehicleRentalNetwork())
+            NETWORK.equals(s.getVehicleRentalNetwork())
         ) {
           fail("should not create renting branch for network inside adjacent no-drop-off zone");
         }

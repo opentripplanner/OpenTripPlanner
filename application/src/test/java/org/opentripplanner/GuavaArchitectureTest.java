@@ -61,25 +61,22 @@ public class GuavaArchitectureTest {
     new DescribedPredicate<>("a Guava class not in the white-list") {
       @Override
       public boolean test(JavaClass javaClass) {
-        return (
-          isInGuava(javaClass) && !WHITE_LISTED_GUAVA_CLASSES.contains(topLevelClassName(javaClass))
-        );
+        return (isInGuava(javaClass) &&
+          !WHITE_LISTED_GUAVA_CLASSES.contains(topLevelClassName(javaClass)));
       }
     };
 
   @Test
   void enforceGuavaClassWhiteList() {
-    noClasses()
-      .should()
+    noClasses().should()
       .dependOnClassesThat(A_GUAVA_CLASS_NOT_IN_THE_WHITE_LIST)
       .check(ArchComponent.OTP_CLASSES);
   }
 
   private static boolean isInGuava(JavaClass javaClass) {
     var packageName = javaClass.getPackageName();
-    return (
-      packageName.equals(GUAVA_ROOT_PACKAGE) || packageName.startsWith(GUAVA_ROOT_PACKAGE + ".")
-    );
+    return (packageName.equals(GUAVA_ROOT_PACKAGE) ||
+      packageName.startsWith(GUAVA_ROOT_PACKAGE + "."));
   }
 
   /**

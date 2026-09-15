@@ -79,10 +79,7 @@ public class TestServerContext {
     );
   }
 
-  private static RepositoryHandle<
-    TimetableRepositorySnapshot,
-    TimetableRepository
-  > indexAndRegisterTimetableSnapshot(
+  private static RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> indexAndRegisterTimetableSnapshot(
     TransitRepository transitRepository,
     TransferRepository transferRepository,
     RepositoryRegistry registry

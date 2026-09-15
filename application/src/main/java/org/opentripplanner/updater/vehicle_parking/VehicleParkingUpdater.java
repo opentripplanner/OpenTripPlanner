@@ -86,16 +86,14 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
     updateGraph(graphWriterRunnable);
   }
 
-  private class VehicleParkingGraphWriterRunnable
-    implements GraphWriterRunnable<StreetRealTimeUpdateContext>
-  {
+  private class VehicleParkingGraphWriterRunnable implements
+    GraphWriterRunnable<StreetRealTimeUpdateContext> {
 
     private final Map<FeedScopedId, VehicleParking> oldVehicleParkingsById;
     private final Set<VehicleParking> updatedVehicleParkings;
 
     private VehicleParkingGraphWriterRunnable(List<VehicleParking> updatedVehicleParkings) {
-      this.oldVehicleParkingsById = oldVehicleParkings
-        .stream()
+      this.oldVehicleParkingsById = oldVehicleParkings.stream()
         .collect(Collectors.toMap(VehicleParking::getId, Function.identity()));
       this.updatedVehicleParkings = new HashSet<>(updatedVehicleParkings);
     }
@@ -115,8 +113,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
         var alreadyExists = oldVehicleParkings.contains(updatedVehicleParking);
 
         if (alreadyExists) {
-          oldVehicleParkingsById
-            .get(updatedVehicleParking.getId())
+          oldVehicleParkingsById.get(updatedVehicleParking.getId())
             .updateAvailability(updatedVehicleParking.getAvailability());
         } else {
           toAdd.add(updatedVehicleParking);
@@ -134,8 +131,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
 
         if (verticesByPark.containsKey(oldVehicleParking)) {
           tempEdgesByPark.get(oldVehicleParking).forEach(DisposableEdgeCollection::disposeEdges);
-          verticesByPark
-            .get(oldVehicleParking)
+          verticesByPark.get(oldVehicleParking)
             .forEach(v -> removeVehicleParkingEdgesFromGraph(v, context.graph()));
           verticesByPark.remove(oldVehicleParking);
         }
@@ -188,17 +184,16 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
           vehicleParkingEntranceVertex,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                (VehicleParkingEntranceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                streetVertex,
-                (VehicleParkingEntranceVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetVehicleParkingLink.createStreetVehicleParkingLink(
+              (VehicleParkingEntranceVertex) vertex,
+              streetVertex
+            ),
+            StreetVehicleParkingLink.createStreetVehicleParkingLink(
+              streetVertex,
+              (VehicleParkingEntranceVertex) vertex
             )
+          )
         );
         disposableEdgeCollections.add(disposableWalkEdges);
       }
@@ -208,17 +203,16 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
           vehicleParkingEntranceVertex,
           new TraverseModeSet(TraverseMode.CAR),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                (VehicleParkingEntranceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleParkingLink.createStreetVehicleParkingLink(
-                streetVertex,
-                (VehicleParkingEntranceVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetVehicleParkingLink.createStreetVehicleParkingLink(
+              (VehicleParkingEntranceVertex) vertex,
+              streetVertex
+            ),
+            StreetVehicleParkingLink.createStreetVehicleParkingLink(
+              streetVertex,
+              (VehicleParkingEntranceVertex) vertex
             )
+          )
         );
         disposableEdgeCollections.add(disposableCarEdges);
       }
@@ -230,13 +224,11 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
       VehicleParkingEntranceVertex entranceVertex,
       Graph graph
     ) {
-      entranceVertex
-        .getIncoming()
+      entranceVertex.getIncoming()
         .stream()
         .filter(VehicleParkingEdge.class::isInstance)
         .forEach(graph::removeEdge);
-      entranceVertex
-        .getOutgoing()
+      entranceVertex.getOutgoing()
         .stream()
         .filter(VehicleParkingEdge.class::isInstance)
         .forEach(graph::removeEdge);

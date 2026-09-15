@@ -41,13 +41,14 @@ public final class RealTimeTripUpdate {
 
     if (pattern.numberOfStops() != updatedTripTimes.getNumStops()) {
       throw new IllegalArgumentException(
-        "The pattern %s has %d stops while the TripTimes for Trip %s on service date %s has %d stops".formatted(
-          pattern.logName(),
-          pattern.numberOfStops(),
-          updatedTripTimes.getTrip(),
-          serviceDate,
-          updatedTripTimes.getNumStops()
-        )
+        "The pattern %s has %d stops while the TripTimes for Trip %s on service date %s has %d stops"
+          .formatted(
+            pattern.logName(),
+            pattern.numberOfStops(),
+            updatedTripTimes.getTrip(),
+            serviceDate,
+            updatedTripTimes.getNumStops()
+          )
       );
     }
   }

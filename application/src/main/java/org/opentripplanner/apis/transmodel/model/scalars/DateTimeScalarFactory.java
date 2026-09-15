@@ -16,12 +16,15 @@ import org.opentripplanner.utils.time.OffsetDateTimeParser;
 
 public final class DateTimeScalarFactory {
 
-  private static final String DOCUMENTATION = """
+  private static final String DOCUMENTATION =
+  """
   DateTime format accepting ISO 8601 dates with time zone offset.
 
   Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`
 
-  Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`""";
+  Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`\
+
+  """;
 
   private static final DateTimeFormatter PARSER = OffsetDateTimeParser.LENIENT_PARSER;
 
@@ -35,68 +38,66 @@ public final class DateTimeScalarFactory {
     return GraphQLScalarType.newScalar()
       .name("DateTime")
       .description(DOCUMENTATION)
-      .coercing(
-        new Coercing<>() {
-          @Override
-          public String serialize(Object input) {
-            if (input instanceof Long inputAsLong) {
-              return mapToString(Instant.ofEpochMilli(inputAsLong));
-            }
-            if (input instanceof Instant inputAsInstant) {
-              return mapToString(inputAsInstant);
-            }
-            if (input instanceof ZonedDateTime zonedDateTime) {
-              // We map to an instant first to output in the given timeZone, not in the
-              // timeZone of the input.
-              return mapToString(zonedDateTime.toInstant());
-            }
-            return null;
+      .coercing(new Coercing<>() {
+        @Override
+        public String serialize(Object input) {
+          if (input instanceof Long inputAsLong) {
+            return mapToString(Instant.ofEpochMilli(inputAsLong));
           }
-
-          @Override
-          public Long parseValue(Object input) {
-            Instant instant = null;
-            if (input instanceof CharSequence inputAsCharSequence) {
-              try {
-                TemporalAccessor temporalAccessor = PARSER.parseBest(
-                  inputAsCharSequence,
-                  OffsetDateTime::from,
-                  ZonedDateTime::from,
-                  LocalDateTime::from
-                );
-
-                if (temporalAccessor instanceof LocalDateTime localDateTime) {
-                  instant = localDateTime.atZone(timeZone).toInstant();
-                } else {
-                  instant = Instant.from(temporalAccessor);
-                }
-              } catch (DateTimeParseException dtpe) {
-                // ignored
-              }
-            }
-
-            if (instant == null) {
-              throw new CoercingParseValueException(
-                "Expected type 'DateTime' but was '" + input + "'."
-              );
-            }
-
-            return instant.toEpochMilli();
+          if (input instanceof Instant inputAsInstant) {
+            return mapToString(inputAsInstant);
           }
-
-          @Override
-          public Long parseLiteral(Object input) {
-            if (input instanceof StringValue inputAsStringValue) {
-              return parseValue(inputAsStringValue.getValue());
-            }
-            return null;
+          if (input instanceof ZonedDateTime zonedDateTime) {
+            // We map to an instant first to output in the given timeZone, not in the
+            // timeZone of the input.
+            return mapToString(zonedDateTime.toInstant());
           }
-
-          private String mapToString(Instant instant) {
-            return instant.atZone(timeZone).format(FORMATTER);
-          }
+          return null;
         }
-      )
+
+        @Override
+        public Long parseValue(Object input) {
+          Instant instant = null;
+          if (input instanceof CharSequence inputAsCharSequence) {
+            try {
+              TemporalAccessor temporalAccessor = PARSER.parseBest(
+                inputAsCharSequence,
+                OffsetDateTime::from,
+                ZonedDateTime::from,
+                LocalDateTime::from
+              );
+
+              if (temporalAccessor instanceof LocalDateTime localDateTime) {
+                instant = localDateTime.atZone(timeZone).toInstant();
+              } else {
+                instant = Instant.from(temporalAccessor);
+              }
+            } catch (DateTimeParseException dtpe) {
+              // ignored
+            }
+          }
+
+          if (instant == null) {
+            throw new CoercingParseValueException(
+              "Expected type 'DateTime' but was '" + input + "'."
+            );
+          }
+
+          return instant.toEpochMilli();
+        }
+
+        @Override
+        public Long parseLiteral(Object input) {
+          if (input instanceof StringValue inputAsStringValue) {
+            return parseValue(inputAsStringValue.getValue());
+          }
+          return null;
+        }
+
+        private String mapToString(Instant instant) {
+          return instant.atZone(timeZone).format(FORMATTER);
+        }
+      })
       .build();
   }
 }

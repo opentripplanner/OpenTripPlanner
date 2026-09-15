@@ -70,8 +70,7 @@ class BookingInfoMapperTest {
     );
     assertEquals(
       FLEXIBLE_LINE_CONTACT,
-      subject
-        .map(emptyStopPoint, emptyServiceJourney, flexibleLine)
+      subject.map(emptyStopPoint, emptyServiceJourney, flexibleLine)
         .getContactInfo()
         .getContactPerson()
     );
@@ -86,8 +85,7 @@ class BookingInfoMapperTest {
     LocalTime stopPointLatestBookingTime = FIVE_THIRTY;
 
     StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern().withBookingArrangements(
-      new BookingArrangementsStructure()
-        .withLatestBookingTime(stopPointLatestBookingTime)
+      new BookingArrangementsStructure().withLatestBookingTime(stopPointLatestBookingTime)
         .withBookWhen(PurchaseWhenEnumeration.ADVANCE_AND_DAY_OF_TRAVEL)
     );
 

@@ -4,9 +4,8 @@ import org.opentripplanner.framework.event.EventHandler;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model.Customer;
 
-public class CustomerEventHandler
-  implements EventHandler<CustomerOrderDomainEvent, CustomerRepository>
-{
+public class CustomerEventHandler implements
+  EventHandler<CustomerOrderDomainEvent, CustomerRepository> {
 
   @Override
   public Class<CustomerOrderDomainEvent> eventType() {

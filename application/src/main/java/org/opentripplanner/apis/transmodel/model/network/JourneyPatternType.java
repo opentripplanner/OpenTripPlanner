@@ -73,8 +73,8 @@ public class JourneyPatternType {
           .name("serviceJourneys")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
-          .dataFetcher(e ->
-            ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList())
+          .dataFetcher(
+            e -> ((TripPattern) e.getSource()).scheduledTripsAsStream().collect(Collectors.toList())
           )
           .build()
       )
@@ -88,14 +88,13 @@ public class JourneyPatternType {
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(environment -> {
-            TIntSet services = GqlUtil.getTransitService(environment).getServiceCodesRunningForDate(
-              Optional.ofNullable((LocalDate) environment.getArgument("date")).orElse(
-                LocalDate.now()
-              )
-            );
+            TIntSet services = GqlUtil.getTransitService(environment)
+              .getServiceCodesRunningForDate(
+                Optional.ofNullable((LocalDate) environment.getArgument("date"))
+                  .orElse(LocalDate.now())
+              );
 
-            return ((TripPattern) environment.getSource())
-              .getScheduledTimetable()
+            return ((TripPattern) environment.getSource()).getScheduledTimetable()
               .getTripTimes()
               .stream()
               .filter(times -> services.contains(times.getServiceCode()))
@@ -133,8 +132,8 @@ public class JourneyPatternType {
             "Detailed path travelled by journey pattern divided into stop-to-stop sections."
           )
           .type(new GraphQLList(stopToStopGeometryType))
-          .dataFetcher(environment ->
-            GeometryMapper.mapStopToStopGeometries(environment.getSource())
+          .dataFetcher(
+            environment -> GeometryMapper.mapStopToStopGeometries(environment.getSource())
           )
           .build()
       )
@@ -145,10 +144,11 @@ public class JourneyPatternType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment -> {
             TripPattern tripPattern = environment.getSource();
-            return GqlUtil.getTransitAlertService(environment).getDirectionAndRouteAlerts(
-              tripPattern.getDirection(),
-              tripPattern.getRoute().getId()
-            );
+            return GqlUtil.getTransitAlertService(environment)
+              .getDirectionAndRouteAlerts(
+                tripPattern.getDirection(),
+                tripPattern.getRoute().getId()
+              );
           })
           .build()
       )

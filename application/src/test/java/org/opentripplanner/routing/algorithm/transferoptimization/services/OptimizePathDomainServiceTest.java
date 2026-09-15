@@ -63,8 +63,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var transfers = dummyTransferGenerator();
 
     // and a path: Walk ~ B ~ T1 ~ C ~ Walk
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1_m)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_B, D1_m)
       .bus(trip1, STOP_C)
       .c2(345)
       .egress(D1_m);
@@ -106,8 +105,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     );
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1_m)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_B, D1_m)
       .bus(trip1, STOP_C)
       .walk(D30_s, STOP_F)
       .bus(trip2, STOP_G)
@@ -119,8 +117,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     // Insert wait-time cost summary info
-    var expected = original
-      .toStringDetailed(this::stopIndexToName)
+    var expected = original.toStringDetailed(this::stopIndexToName)
       .replace("C₁2_770]", "C₁2_770 Tₚ3_300 Wₜ3_103.81]");
 
     assertEquals(expected, PathUtils.pathsToStringDetailed(result));
@@ -165,8 +162,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       )
     );
 
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_A)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .walk(D30_s, STOP_E)
@@ -236,8 +232,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       )
     );
 
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_A)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .egress(D0_s);
@@ -296,8 +291,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       )
     );
 
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_A)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .egress(D0_s);

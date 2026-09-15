@@ -124,8 +124,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
 
     asyncClient.connectWith().keepAlive(30).cleanStart(true).send().join();
 
-    asyncClient
-      .subscribeWith()
+    asyncClient.subscribeWith()
       .topicFilter(topic)
       .qos(Optional.ofNullable(MqttQos.fromCode(qos)).orElse(MqttQos.AT_MOST_ONCE))
       .callback(this::onMessage)
@@ -179,11 +178,10 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater<TransitRealTimeUpda
       // Change fullDataset value if this is an incremental update
       if (
         feedMessage.hasHeader() &&
-        feedMessage.getHeader().hasIncrementality() &&
-        feedMessage
-          .getHeader()
-          .getIncrementality()
-          .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
+          feedMessage.getHeader().hasIncrementality() &&
+          feedMessage.getHeader()
+            .getIncrementality()
+            .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
       ) {
         updateIncrementality = DIFFERENTIAL;
       }

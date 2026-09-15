@@ -172,12 +172,12 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       return null;
     }
 
-    Map<List<?>, List<?>> canonicalLists = this.canonicalLists.computeIfAbsent(clazz, key ->
-      new HashMap<>()
+    Map<List<?>, List<?>> canonicalLists = this.canonicalLists.computeIfAbsent(
+      clazz,
+      key -> new HashMap<>()
     );
 
-    @SuppressWarnings("unchecked")
-    List<T> canonical = (List<T>) canonicalLists.get(original);
+    @SuppressWarnings("unchecked") List<T> canonical = (List<T>) canonicalLists.get(original);
     if (canonical == null) {
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
       boolean containsNull = original.stream().anyMatch(Objects::isNull);
@@ -238,8 +238,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     Map<K, V> map,
     Function<K, String> toName
   ) {
-    map
-      .entrySet()
+    map.entrySet()
       .stream()
       .map(e -> new NameSize(toName.apply(e.getKey()), e.getValue().size()))
       .sorted(Comparator.comparing(NameSize::name))

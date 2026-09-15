@@ -38,26 +38,26 @@ public class FlexAccessEgressRouter {
 
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
       ? AccessEgressRouter.findAccessEgresses(
-          request,
-          StreetMode.WALK,
-          extensionRequestContexts,
-          AccessEgressType.ACCESS,
-          config.maxAccessWalkDuration(),
-          0,
-          linkingContext
-        )
+        request,
+        StreetMode.WALK,
+        extensionRequestContexts,
+        AccessEgressType.ACCESS,
+        config.maxAccessWalkDuration(),
+        0,
+        linkingContext
+      )
       : List.of();
 
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
       ? AccessEgressRouter.findAccessEgresses(
-          request,
-          StreetMode.WALK,
-          extensionRequestContexts,
-          AccessEgressType.EGRESS,
-          config.maxEgressWalkDuration(),
-          0,
-          linkingContext
-        )
+        request,
+        StreetMode.WALK,
+        extensionRequestContexts,
+        AccessEgressType.EGRESS,
+        config.maxEgressWalkDuration(),
+        0,
+        linkingContext
+      )
       : List.of();
 
     FlexRouter flexRouter = new FlexRouter(

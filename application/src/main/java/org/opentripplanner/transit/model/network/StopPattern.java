@@ -111,11 +111,9 @@ public final class StopPattern implements Serializable {
   public boolean equals(Object other) {
     if (other instanceof StopPattern) {
       StopPattern that = (StopPattern) other;
-      return (
-        Arrays.equals(this.stops, that.stops) &&
+      return (Arrays.equals(this.stops, that.stops) &&
         Arrays.equals(this.pickups, that.pickups) &&
-        Arrays.equals(this.dropoffs, that.dropoffs)
-      );
+        Arrays.equals(this.dropoffs, that.dropoffs));
     } else {
       return false;
     }
@@ -149,10 +147,8 @@ public final class StopPattern implements Serializable {
    * Checks that all stops ar non-routable.
    */
   public boolean isAllStopsNonRoutable() {
-    return (
-      Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
-      Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable)
-    );
+    return (Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
+      Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable));
   }
 
   /** Find the given stop position in the sequence, return -1 if not found. */

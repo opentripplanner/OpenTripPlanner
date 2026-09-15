@@ -22,10 +22,8 @@ import java.util.Iterator;
  * serializable for it to work. The view is very light-weight, so in general it is better to avoid
  * serialization. In most cases you can create a new instance every time you need a view.
  */
-public class CollectionsView<T>
-  extends AbstractCollection<T>
-  implements Collection<T>, Serializable
-{
+public class CollectionsView<T> extends AbstractCollection<T> implements Collection<T>,
+  Serializable {
 
   private final Collection<? extends T>[] collections;
 

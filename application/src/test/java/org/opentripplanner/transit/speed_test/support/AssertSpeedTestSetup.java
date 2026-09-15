@@ -13,8 +13,7 @@ public class AssertSpeedTestSetup {
     SpeedTestConfig config,
     BuildConfig buildConfig
   ) {
-    int numberOfPatternForTestDate = transitRepository
-      .getRaptorTransitData()
+    int numberOfPatternForTestDate = transitRepository.getRaptorTransitData()
       .getTripPatternsForRunningDate(config.testDate())
       .size();
 
@@ -30,14 +29,15 @@ public class AssertSpeedTestSetup {
           "transitServiceStart":      %s (%s)
           "transitServiceEnd":        %s (%s)
 
-        """.formatted(
-          numberOfPatternForTestDate,
-          config.testDate(),
-          buildConfig.transitServiceStart,
-          OtpFileNames.BUILD_CONFIG_FILENAME,
-          buildConfig.transitServiceEnd,
-          OtpFileNames.BUILD_CONFIG_FILENAME
-        )
+        """
+          .formatted(
+            numberOfPatternForTestDate,
+            config.testDate(),
+            buildConfig.transitServiceStart,
+            OtpFileNames.BUILD_CONFIG_FILENAME,
+            buildConfig.transitServiceEnd,
+            OtpFileNames.BUILD_CONFIG_FILENAME
+          )
       );
     }
   }

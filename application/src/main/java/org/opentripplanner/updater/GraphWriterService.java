@@ -50,14 +50,12 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
-    RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
-    > realtimeVehicleHandle,
+    RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleHandle,
     TransitRepository transitRepository
   ) {
-    return new GraphWriterService<>(updateManager, ctx ->
-      new DefaultTransitRealTimeUpdateContext(
+    return new GraphWriterService<>(
+      updateManager,
+      ctx -> new DefaultTransitRealTimeUpdateContext(
         transitRepository,
         ctx.repository(timetableHandle),
         () -> ctx.repository(realtimeVehicleHandle)

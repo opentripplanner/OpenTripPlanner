@@ -87,11 +87,9 @@ public final class TimeSlopeSafetyTriangle {
       return false;
     }
     var that = (TimeSlopeSafetyTriangle) obj;
-    return (
-      Double.doubleToLongBits(this.time) == Double.doubleToLongBits(that.time) &&
+    return (Double.doubleToLongBits(this.time) == Double.doubleToLongBits(that.time) &&
       Double.doubleToLongBits(this.slope) == Double.doubleToLongBits(that.slope) &&
-      Double.doubleToLongBits(this.safety) == Double.doubleToLongBits(that.safety)
-    );
+      Double.doubleToLongBits(this.safety) == Double.doubleToLongBits(that.safety));
   }
 
   @Override

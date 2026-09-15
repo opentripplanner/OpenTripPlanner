@@ -43,18 +43,13 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
   }
 
   protected List<Geometry> findGeometries(Envelope query) {
-    return transitService
-      .findRegularStopsByBoundingBox(query)
-      .stream()
-      .filter(filter)
-      .map(stop -> {
-        Geometry point = stop.getGeometry();
+    return transitService.findRegularStopsByBoundingBox(query).stream().filter(filter).map(stop -> {
+      Geometry point = stop.getGeometry();
 
-        point.setUserData(stop);
+      point.setUserData(stop);
 
-        return point;
-      })
-      .toList();
+      return point;
+    }).toList();
   }
 
   enum MapperType {

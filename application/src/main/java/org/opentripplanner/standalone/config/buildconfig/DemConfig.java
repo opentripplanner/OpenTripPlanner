@@ -15,8 +15,7 @@ public class DemConfig {
 
   public static DemExtractParameters mapDemDefaultsConfig(NodeAdapter root, String parameterName) {
     var baseDefaults = DemExtractParameters.DEFAULT;
-    var demDefaults = root
-      .of(parameterName)
+    var demDefaults = root.of(parameterName)
       .since(V2_3)
       .summary("Default properties for DEM extracts.")
       .asObject();
@@ -29,8 +28,7 @@ public class DemConfig {
     DemExtractParameters defaults
   ) {
     return new DemExtractParametersList(
-      root
-        .of(parameterName)
+      root.of(parameterName)
         .since(V2_2)
         .summary("Specify parameters for DEM extracts.")
         .description(
@@ -53,11 +51,9 @@ public class DemConfig {
     DemExtractParameters defaults
   ) {
     String documentationAddition = " Overrides the value specified in `demDefaults`.";
-    return mapGenericDemParameters(config, defaults, documentationAddition)
-      .withSource(
-        config.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
-      )
-      .build();
+    return mapGenericDemParameters(config, defaults, documentationAddition).withSource(
+      config.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
+    ).build();
   }
 
   private static DemExtractParametersBuilder mapGenericDemParameters(
@@ -66,23 +62,23 @@ public class DemConfig {
     String documentationAddition
   ) {
     var docDefaults = DemExtractParameters.DEFAULT;
-    return defaults.copyOf().withElevationUnitMultiplier(
-      node
-        .of("elevationUnitMultiplier")
-        .since(V2_3)
-        .summary(
-          "Specify a multiplier to convert elevation units from source to meters." +
-            documentationAddition
-        )
-        .description(
-          """
-          Unit conversion multiplier for elevation values. No conversion needed if the elevation
-          values are defined in meters in the source data. If, for example, decimetres are used
-          in the source data, this should be set to 0.1.
-          """
-        )
-        .docDefaultValue(docDefaults.elevationUnitMultiplier())
-        .asDouble(defaults.elevationUnitMultiplier())
-    );
+    return defaults.copyOf()
+      .withElevationUnitMultiplier(
+        node.of("elevationUnitMultiplier")
+          .since(V2_3)
+          .summary(
+            "Specify a multiplier to convert elevation units from source to meters." +
+              documentationAddition
+          )
+          .description(
+            """
+            Unit conversion multiplier for elevation values. No conversion needed if the elevation
+            values are defined in meters in the source data. If, for example, decimetres are used
+            in the source data, this should be set to 0.1.
+            """
+          )
+          .docDefaultValue(docDefaults.elevationUnitMultiplier())
+          .asDouble(defaults.elevationUnitMultiplier())
+      );
   }
 }

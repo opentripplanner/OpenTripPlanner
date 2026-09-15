@@ -84,12 +84,10 @@ public class SystemPreferences implements Serializable {
       return false;
     }
     SystemPreferences that = (SystemPreferences) o;
-    return (
-      geoidElevation == that.geoidElevation &&
+    return (geoidElevation == that.geoidElevation &&
       tags.equals(that.tags) &&
       Objects.equals(dataOverlay, that.dataOverlay) &&
-      maxJourneyDuration.equals(that.maxJourneyDuration)
-    );
+      maxJourneyDuration.equals(that.maxJourneyDuration));
   }
 
   @Override

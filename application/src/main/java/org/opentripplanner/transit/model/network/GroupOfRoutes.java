@@ -11,10 +11,8 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  * their particular purposes such as fare harmonization or public presentation. For example divide
  * lines into commercial and non-commercial groups.
  */
-public class GroupOfRoutes
-  extends AbstractTransitEntity<GroupOfRoutes, GroupOfRoutesBuilder>
-  implements LogInfo
-{
+public class GroupOfRoutes extends AbstractTransitEntity<GroupOfRoutes, GroupOfRoutesBuilder>
+  implements LogInfo {
 
   private final String name;
   private final String privateCode;
@@ -65,12 +63,10 @@ public class GroupOfRoutes
 
   @Override
   public boolean sameAs(GroupOfRoutes other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(shortName, other.shortName) &&
       Objects.equals(privateCode, other.privateCode) &&
-      Objects.equals(description, other.description)
-    );
+      Objects.equals(description, other.description));
   }
 }

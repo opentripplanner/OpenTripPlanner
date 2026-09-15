@@ -197,10 +197,11 @@ public class NodeAdapterTest {
       """
       {error-message} Parameter: skim.albin. Source: Test.
       {error-message} Parameter: key. Source: Test.
-      """.replace(
-        "{error-message}",
-        "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. Expected one of [A, B, A_B_C]."
-      ),
+      """
+        .replace(
+          "{error-message}",
+          "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. Expected one of [A, B, A_B_C]."
+        ),
       log.toString()
     );
   }
@@ -256,7 +257,8 @@ public class NodeAdapterTest {
       """
       Unexpected config parameter: 'enumMap.unknown:7' in 'Test'
       The enum value 'unknown' is not legal. Expected one of [A, B, A_B_C]. Parameter: enumMap. Source: Test.
-      """.stripIndent(),
+      """
+        .stripIndent(),
       log.toString()
     );
   }
@@ -271,8 +273,9 @@ public class NodeAdapterTest {
     assertNull(subject.of("missing-key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class));
 
     var subjectMissingB = newNodeAdapterForTest("{ key : { A: true, a_B_c: true } }");
-    assertThrows(OtpAppException.class, () ->
-      subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    assertThrows(
+      OtpAppException.class,
+      () -> subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
 
     // Any extra keys should be ignored for forward/backward compatibility
@@ -284,8 +287,9 @@ public class NodeAdapterTest {
     // A value for C is missing in map
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
 
-    assertThrows(OtpAppException.class, () ->
-      subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
   }
 
@@ -321,10 +325,7 @@ public class NodeAdapterTest {
     assertEquals("[]", subject.of("missing-key").asFeedScopedIds(List.of()).toString());
     assertEquals(
       "[C:12]",
-      subject
-        .of("missing-key")
-        .asFeedScopedIds(List.of(new FeedScopedId("C", "12")))
-        .toString()
+      subject.of("missing-key").asFeedScopedIds(List.of(new FeedScopedId("C", "12"))).toString()
     );
     assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
@@ -369,8 +370,9 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ 'foo' : 'bar' }");
 
     // Then
-    assertThrows(OtpAppException.class, () ->
-      subject.of("foo").asDateOrRelativePeriod(null, ZoneId.systemDefault())
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.of("foo").asDateOrRelativePeriod(null, ZoneId.systemDefault())
     );
   }
 
@@ -484,8 +486,7 @@ public class NodeAdapterTest {
   void objectAsList() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [{ a: 'I' }, { a: '2' } ] }");
 
-    List<ARecord> result = subject
-      .of("key")
+    List<ARecord> result = subject.of("key")
       .since(V2_0)
       .summary("Summary Array")
       .asObjects(List.of(), ARecord::fromJson);

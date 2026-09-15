@@ -101,8 +101,9 @@ public class AlertToLegMapper {
           );
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
           alerts.addAll(
-            getAlertsForRelatedStops(stop, id ->
-              transitAlertService.getStopAlerts(id, stopConditions)
+            getAlertsForRelatedStops(
+              stop,
+              id -> transitAlertService.getStopAlerts(id, stopConditions)
             )
           );
 
@@ -130,8 +131,9 @@ public class AlertToLegMapper {
 
     // Filter alerts when there are multiple timePeriods for each alert
     totalAlerts.removeIf(
-      alert ->
-        !alert.isActiveDuring(TimePeriod.of(leg.startTime().toInstant(), leg.endTime().toInstant()))
+      alert -> !alert.isActiveDuring(
+        TimePeriod.of(leg.startTime().toInstant(), leg.endTime().toInstant())
+      )
     );
 
     if (totalAlerts.isEmpty()) {
@@ -148,10 +150,9 @@ public class AlertToLegMapper {
     ZonedDateTime fromTime,
     ZonedDateTime toTime
   ) {
-    return alerts
-      .stream()
-      .filter(alert ->
-        alert.isActiveDuring(TimePeriod.of(fromTime.toInstant(), toTime.toInstant()))
+    return alerts.stream()
+      .filter(
+        alert -> alert.isActiveDuring(TimePeriod.of(fromTime.toInstant(), toTime.toInstant()))
       )
       .toList();
   }
@@ -162,8 +163,9 @@ public class AlertToLegMapper {
     Set<StopCondition> stopConditions,
     Direction direction
   ) {
-    return getAlertsForRelatedStops(stop, id ->
-      transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions, direction)
+    return getAlertsForRelatedStops(
+      stop,
+      id -> transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions, direction)
     );
   }
 
@@ -173,8 +175,9 @@ public class AlertToLegMapper {
     LocalDate serviceDate,
     Set<StopCondition> stopConditions
   ) {
-    return getAlertsForRelatedStops(stop, id ->
-      transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate, stopConditions)
+    return getAlertsForRelatedStops(
+      stop,
+      id -> transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate, stopConditions)
     );
   }
 

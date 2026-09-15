@@ -185,8 +185,7 @@ public abstract class SnapshotTestBase {
   }
 
   protected void expectItinerariesToMatchSnapshot(List<Itinerary> itineraries) {
-    expect(ITINERARY_MAPPER.mapItineraries(itineraries))
-      .serializer(SNAPSHOT_SERIALIZER)
+    expect(ITINERARY_MAPPER.mapItineraries(itineraries)).serializer(SNAPSHOT_SERIALIZER)
       .toMatchSnapshot();
   }
 
@@ -206,8 +205,7 @@ public abstract class SnapshotTestBase {
   }
 
   private static List<ApiRequestMode> mapModes(Collection<MainAndSubMode> reqModes) {
-    Set<TransitMode> transitModes = reqModes
-      .stream()
+    Set<TransitMode> transitModes = reqModes.stream()
       .map(MainAndSubMode::mainMode)
       .collect(Collectors.toSet());
     List<ApiRequestMode> result = new ArrayList<>();
@@ -258,8 +256,7 @@ public abstract class SnapshotTestBase {
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
     if (filter instanceof TransitFilterRequest filterRequest) {
-      transportModes = filterRequest
-        .select()
+      transportModes = filterRequest.select()
         .get(0)
         .transportModes()
         .stream()
@@ -276,13 +273,9 @@ public abstract class SnapshotTestBase {
         asQualifiedMode(request.journey().direct().mode(), false),
         asQualifiedMode(request.journey().access().mode(), false),
         asQualifiedMode(request.journey().egress().mode(), true)
-      )
-        .filter(Objects::nonNull)
-        .map(QualifiedMode::toString),
+      ).filter(Objects::nonNull).map(QualifiedMode::toString),
       transitModes.stream().map(ApiRequestMode::name)
-    )
-      .distinct()
-      .collect(Collectors.joining(","));
+    ).distinct().collect(Collectors.joining(","));
 
     return String.format(
       "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&arriveBy=%s&wheelchair=%s",
@@ -315,30 +308,30 @@ public abstract class SnapshotTestBase {
     }
 
     switch (streetMode) {
-      case WALK:
+      case WALK :
         return new QualifiedMode(ApiRequestMode.WALK);
-      case BIKE:
+      case BIKE :
         return new QualifiedMode(ApiRequestMode.BICYCLE);
-      case BIKE_TO_PARK:
+      case BIKE_TO_PARK :
         return new QualifiedMode(ApiRequestMode.BICYCLE, Qualifier.PARK);
-      case BIKE_RENTAL:
+      case BIKE_RENTAL :
         return new QualifiedMode(ApiRequestMode.BICYCLE, Qualifier.RENT);
-      case SCOOTER_RENTAL:
+      case SCOOTER_RENTAL :
         return new QualifiedMode(ApiRequestMode.SCOOTER, Qualifier.RENT);
-      case CAR:
+      case CAR :
         return new QualifiedMode(ApiRequestMode.CAR);
-      case CAR_TO_PARK:
+      case CAR_TO_PARK :
         return new QualifiedMode(ApiRequestMode.CAR, Qualifier.PARK);
-      case CAR_PICKUP:
+      case CAR_PICKUP :
         return new QualifiedMode(
           ApiRequestMode.CAR,
           isEgress ? Qualifier.PICKUP : Qualifier.DROPOFF
         );
-      case CAR_RENTAL:
+      case CAR_RENTAL :
         return new QualifiedMode(ApiRequestMode.CAR, Qualifier.RENT);
-      case FLEXIBLE:
+      case FLEXIBLE :
         return new QualifiedMode(ApiRequestMode.FLEX);
-      default:
+      default :
         return null;
     }
   }
@@ -365,8 +358,8 @@ public abstract class SnapshotTestBase {
         @Override
         public DefaultPrettyPrinter withSeparators(Separators separators) {
           this._separators = separators;
-          this._objectFieldValueSeparatorWithSpaces =
-            separators.getObjectFieldValueSeparator() + " ";
+          this._objectFieldValueSeparatorWithSpaces = separators.getObjectFieldValueSeparator() +
+            " ";
           return this;
         }
 

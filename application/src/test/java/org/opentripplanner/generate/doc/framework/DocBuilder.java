@@ -116,8 +116,7 @@ public class DocBuilder {
    */
   DocBuilder addEnums(List<? extends Enum<?>> enums) {
     buffer.append(
-      enums
-        .stream()
+      enums.stream()
         .map(EnumMapper::toString)
         .map(MarkdownFormatter::code)
         .collect(Collectors.joining(" | "))

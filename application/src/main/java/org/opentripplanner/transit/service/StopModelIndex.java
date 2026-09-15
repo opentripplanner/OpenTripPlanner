@@ -77,8 +77,7 @@ class SiteRepositoryIndex {
    * @return A collection of {@link RegularStop}s that are inside of the passed envelope.
    */
   Collection<RegularStop> findRegularStops(Envelope envelope) {
-    return regularStopSpatialIndex
-      .query(envelope)
+    return regularStopSpatialIndex.query(envelope)
       .stream()
       .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
       .toList();
@@ -110,11 +109,8 @@ class SiteRepositoryIndex {
     if (c > 0) {
       double p = (100.0 * c) / stopsByIndex.length;
       // Log this as warning if more than 5% of the space is null
-      LOG.atLevel(p >= 5.0 ? Level.WARN : Level.INFO).log(
-        "The stop index contains holes in it. {} of {} is null.",
-        c,
-        stopsByIndex.length
-      );
+      LOG.atLevel(p >= 5.0 ? Level.WARN : Level.INFO)
+        .log("The stop index contains holes in it. {} of {} is null.", c, stopsByIndex.length);
     }
   }
 }

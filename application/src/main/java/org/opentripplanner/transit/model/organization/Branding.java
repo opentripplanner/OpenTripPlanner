@@ -71,13 +71,11 @@ public class Branding extends AbstractTransitEntity<Branding, BrandingBuilder> i
 
   @Override
   public boolean sameAs(Branding other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(shortName, other.shortName) &&
       Objects.equals(url, other.url) &&
       Objects.equals(description, other.description) &&
-      Objects.equals(image, other.image)
-    );
+      Objects.equals(image, other.image));
   }
 }

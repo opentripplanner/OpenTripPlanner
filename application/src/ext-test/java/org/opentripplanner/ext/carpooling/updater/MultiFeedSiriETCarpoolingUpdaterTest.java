@@ -49,8 +49,8 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   void setUp() {
     repository = new DefaultCarpoolingRepository();
     var resolver = mock(CarpoolTripVertexResolver.class);
-    when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+    when(resolver.resolve(any())).thenAnswer(
+      invocation -> CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );
     updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
     updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
@@ -71,8 +71,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     assertEquals(FEED_A, idA.getFeedId());
     assertEquals(FEED_B, idB.getFeedId());
 
-    Set<FeedScopedId> ids = repository
-      .getCarpoolTrips()
+    Set<FeedScopedId> ids = repository.getCarpoolTrips()
       .stream()
       .map(t -> t.trip().getId())
       .collect(Collectors.toSet());
@@ -103,8 +102,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     updaterA.processEstimatedVehicleJourney(journey);
     updaterB.processEstimatedVehicleJourney(journey);
 
-    var feedPrefixes = repository
-      .getCarpoolTrips()
+    var feedPrefixes = repository.getCarpoolTrips()
       .stream()
       .map(t -> t.trip().getId().getFeedId())
       .collect(Collectors.toSet());
@@ -147,9 +145,6 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   }
 
   private boolean tripIsInRepository(FeedScopedId id) {
-    return repository
-      .getCarpoolTrips()
-      .stream()
-      .anyMatch(t -> t.trip().getId().equals(id));
+    return repository.getCarpoolTrips().stream().anyMatch(t -> t.trip().getId().equals(id));
   }
 }

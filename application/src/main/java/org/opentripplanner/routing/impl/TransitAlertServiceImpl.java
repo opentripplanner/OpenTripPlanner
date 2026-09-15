@@ -57,8 +57,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public TransitAlert getAlertById(FeedScopedId id) {
-    return alerts
-      .values()
+    return alerts.values()
       .stream()
       .filter(transitAlert -> transitAlert.getId().equals(id))
       .findAny()
@@ -75,10 +74,9 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds) {
-    return stopLocationIds
-      .stream()
-      .flatMap(stopLocationId ->
-        findMatchingAlerts(new EntitySelector.Stop(stopLocationId)).stream()
+    return stopLocationIds.stream()
+      .flatMap(
+        stopLocationId -> findMatchingAlerts(new EntitySelector.Stop(stopLocationId)).stream()
       )
       .collect(Collectors.toSet());
   }
@@ -156,12 +154,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   private Collection<TransitAlert> findMatchingAlerts(EntitySelector entitySelector) {
     Set<TransitAlert> result = new HashSet<>();
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (
-        alert
-          .entities()
-          .stream()
-          .anyMatch(selector -> selector.matches(entitySelector))
-      ) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
         result.add(alert);
       }
     }

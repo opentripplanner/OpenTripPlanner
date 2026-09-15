@@ -20,12 +20,11 @@ public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndSt
   private final List<FeedScopedId> keySet;
 
   public GroupBySameRoutesAndStops(Itinerary itinerary) {
-    keySet = itinerary
-      .legs()
+    keySet = itinerary.legs()
       .stream()
       .filter(Leg::isTransitLeg)
-      .flatMap(leg ->
-        Stream.of(
+      .flatMap(
+        leg -> Stream.of(
           leg.from().stop.getStationOrStopId(),
           leg.route().getId(),
           leg.to().stop.getStationOrStopId()

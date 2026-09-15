@@ -87,9 +87,8 @@ class DefaultCarpoolingRepositoryTest {
     repository.upsertCarpoolTrip(withDummyVertices(tripEndingAt(NOON)));
 
     // First sweep runs and purges the expired trip.
-    assertThat(
-      repository.removeExpiredTrips(NOON.plusHours(1).toInstant(), Duration.ZERO)
-    ).isEqualTo(1);
+    assertThat(repository.removeExpiredTrips(NOON.plusHours(1).toInstant(), Duration.ZERO))
+      .isEqualTo(1);
 
     // A second, already-expired trip is added shortly after.
     var addedAfterSweep = withDummyVertices(tripEndingAt(NOON));
@@ -102,9 +101,8 @@ class DefaultCarpoolingRepositoryTest {
     assertThat(repository.getCarpoolTrips()).containsExactly(addedAfterSweep);
 
     // Once the interval has elapsed the next call sweeps again.
-    assertThat(
-      repository.removeExpiredTrips(NOON.plusHours(2).toInstant(), Duration.ZERO)
-    ).isEqualTo(1);
+    assertThat(repository.removeExpiredTrips(NOON.plusHours(2).toInstant(), Duration.ZERO))
+      .isEqualTo(1);
     assertThat(repository.getCarpoolTrips()).isEmpty();
   }
 
@@ -187,8 +185,7 @@ class DefaultCarpoolingRepositoryTest {
     stored[0] = Duration.ofMinutes(99);
     repository.cachedBaselineRouting(trip).legDurations()[0] = Duration.ofMinutes(7);
 
-    assertThat(repository.cachedBaselineRouting(trip).legDurations())
-      .asList()
+    assertThat(repository.cachedBaselineRouting(trip).legDurations()).asList()
       .containsExactly(Duration.ofMinutes(12));
   }
 
@@ -198,19 +195,18 @@ class DefaultCarpoolingRepositoryTest {
     WgsCoordinate destination,
     ZonedDateTime endTime
   ) {
-    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", id))
-      .withStops(
-        List.of(
-          CarpoolStop.of(FeedScopedId.ofNullable("TEST", id + "-origin"))
-            .withCoordinate(origin)
-            .withOnboardCount(1)
-            .build(),
-          CarpoolStop.of(FeedScopedId.ofNullable("TEST", id + "-destination"))
-            .withCoordinate(destination)
-            .withOnboardCount(1)
-            .build()
-        )
+    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", id)).withStops(
+      List.of(
+        CarpoolStop.of(FeedScopedId.ofNullable("TEST", id + "-origin"))
+          .withCoordinate(origin)
+          .withOnboardCount(1)
+          .build(),
+        CarpoolStop.of(FeedScopedId.ofNullable("TEST", id + "-destination"))
+          .withCoordinate(destination)
+          .withOnboardCount(1)
+          .build()
       )
+    )
       .withTotalCapacity(CarpoolTrip.DEFAULT_TOTAL_CAPACITY)
       .withStartTime(NOON)
       .withEndTime(endTime)

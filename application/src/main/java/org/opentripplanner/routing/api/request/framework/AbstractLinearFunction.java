@@ -13,10 +13,8 @@ import org.opentripplanner.utils.lang.Units;
  * <p>
  * The class is a thread-safe, immutable value-object.
  */
-abstract sealed class AbstractLinearFunction<T>
-  implements Serializable
-  permits CostLinearFunction, TimePenalty
-{
+abstract sealed class AbstractLinearFunction<T> implements Serializable permits CostLinearFunction,
+  TimePenalty {
 
   private final T constant;
 

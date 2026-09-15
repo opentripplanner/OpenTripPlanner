@@ -31,8 +31,7 @@ class M01_DirectTransitWithRoutesWithinRelaxC1Test implements RaptorTestConstant
 
   @BeforeEach
   void setup() {
-    data
-      .withRoute(route(pattern("R1", STOP_B, STOP_D)).withTimetable(schedule("00:02 00:03:40")))
+    data.withRoute(route(pattern("R1", STOP_B, STOP_D)).withTimetable(schedule("00:02 00:03:40")))
       .withRoute(route(pattern("R2", STOP_B, STOP_D)).withTimetable(schedule("00:02 00:08:59")))
       .withRoute(route(pattern("R3", STOP_B, STOP_D)).withTimetable(schedule("00:02 00:09:00")))
       .withBoardCost(0);
@@ -56,7 +55,9 @@ class M01_DirectTransitWithRoutesWithinRelaxC1Test implements RaptorTestConstant
     assertEquals(
       """
       Walk 30s ~ B ~ BUS R1 0:02 0:03:40 ~ D ~ Walk 20s [0:01:30 0:04 2m30s Tₙ0 C₁200]
-      Walk 30s ~ B ~ BUS R2 0:02 0:08:59 ~ D ~ Walk 20s [0:01:30 0:09:19 7m49s Tₙ0 C₁519]""",
+      Walk 30s ~ B ~ BUS R2 0:02 0:08:59 ~ D ~ Walk 20s [0:01:30 0:09:19 7m49s Tₙ0 C₁519]\
+      """
+      ,
       pathsToString(paths)
     );
   }

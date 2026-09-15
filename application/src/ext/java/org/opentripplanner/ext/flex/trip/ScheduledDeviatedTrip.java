@@ -23,8 +23,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
 public class ScheduledDeviatedTrip
-  extends FlexTrip<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder>
-{
+  extends
+  FlexTrip<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> {
 
   private final ScheduledDeviatedStopTime[] stopTimes;
 
@@ -64,11 +64,9 @@ public class ScheduledDeviatedTrip
   }
 
   public static boolean isScheduledDeviatedFlexTrip(List<StopTime> stopTimes) {
-    return (
-      stopTimes.size() >= 2 &&
+    return (stopTimes.size() >= 2 &&
       stopTimes.stream().anyMatch(StopTime::hasFlexibleStop) &&
-      stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlexWindow)
-    );
+      stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlexWindow));
   }
 
   @Override
@@ -163,12 +161,10 @@ public class ScheduledDeviatedTrip
 
   @Override
   public boolean sameAs(ScheduledDeviatedTrip other) {
-    return (
-      super.sameAs(other) &&
+    return (super.sameAs(other) &&
       Arrays.equals(stopTimes, other.stopTimes) &&
       Arrays.equals(pickupBookingInfos, other.pickupBookingInfos) &&
-      Arrays.equals(dropOffBookingInfos, other.dropOffBookingInfos)
-    );
+      Arrays.equals(dropOffBookingInfos, other.dropOffBookingInfos));
   }
 
   @Override
@@ -185,8 +181,7 @@ public class ScheduledDeviatedTrip
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof GroupStop groupStop) {
         if (
-          groupStop
-            .getChildLocations()
+          groupStop.getChildLocations()
             .stream()
             .anyMatch(childStop -> childStop.getId().equals(fromStopId))
         ) {
@@ -210,8 +205,7 @@ public class ScheduledDeviatedTrip
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof GroupStop groupStop) {
         if (
-          groupStop
-            .getChildLocations()
+          groupStop.getChildLocations()
             .stream()
             .anyMatch(childStop -> childStop.getId().equals(toStopId))
         ) {

@@ -79,11 +79,8 @@ class FlexServiceDateBookingTimeTest {
   void testBookingTimeOnDifferentDatesProducesDifferentResults() {
     // Same booking instant should produce different requestedBookingTime values
     // for different service dates
-    Instant bookingTime = ZonedDateTime.of(
-      LocalDate.of(2026, 1, 12),
-      LocalTime.of(14, 40),
-      ZONE
-    ).toInstant();
+    Instant bookingTime = ZonedDateTime.of(LocalDate.of(2026, 1, 12), LocalTime.of(14, 40), ZONE)
+      .toInstant();
 
     FlexServiceDate jan12 = FlexServiceDate.of(
       LocalDate.of(2026, 1, 12),

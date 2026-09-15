@@ -8,10 +8,7 @@ package org.opentripplanner.astar.spi;
  *
  * @author bdferris
  */
-public interface SkipEdgeStrategy<
-  State extends AStarState<State, Edge, ?>,
-  Edge extends AStarEdge<State, Edge, ?>
-> {
+public interface SkipEdgeStrategy<State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>> {
   /**
    * @param current the current vertex
    * @param edge    the current edge to potentially be skipped

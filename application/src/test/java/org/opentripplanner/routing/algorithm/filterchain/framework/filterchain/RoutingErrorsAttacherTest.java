@@ -35,8 +35,8 @@ class RoutingErrorsAttacherTest implements PlanTestConstants {
   }
 
   public static List<Itinerary> flagAll(List<Itinerary> itineraries) {
-    itineraries.forEach(i ->
-      i.flagForDeletion(
+    itineraries.forEach(
+      i -> i.flagForDeletion(
         new SystemNotice(
           RemoveTransitIfStreetOnlyIsBetter.TAG,
           "This itinerary is marked as deleted."

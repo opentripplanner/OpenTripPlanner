@@ -214,8 +214,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    this.areaVisibility = root
-      .of("areaVisibility")
+    this.areaVisibility = root.of("areaVisibility")
       .since(V1_5)
       .summary("Perform visibility calculations.")
       .description(
@@ -226,20 +225,17 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asBoolean(false);
     this.cache = GraphBuildCacheConfig.fromConfig(root);
-    this.configVersion = root
-      .of("configVersion")
+    this.configVersion = root.of("configVersion")
       .since(V2_1)
       .summary("Deployment version of the *" + BUILD_CONFIG_FILENAME + "*.")
       .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
       .asString(null);
-    this.dataImportReport = root
-      .of("dataImportReport")
+    this.dataImportReport = root.of("dataImportReport")
       .since(V2_0)
       .summary("Generate nice HTML report of Graph errors/warnings")
       .description("The reports are stored in the same location as the graph.")
       .asBoolean(false);
-    this.distanceBetweenElevationSamples = root
-      .of("distanceBetweenElevationSamples")
+    this.distanceBetweenElevationSamples = root.of("distanceBetweenElevationSamples")
       .since(V2_0)
       .summary("The distance between elevation samples in meters.")
       .description(
@@ -248,16 +244,14 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     this.elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
-    this.embedRouterConfig = root
-      .of("embedRouterConfig")
+    this.embedRouterConfig = root.of("embedRouterConfig")
       .since(V2_0)
       .summary(
         "Embed the Router config in the graph, which allows it to be sent to a server fully " +
           "configured over the wire."
       )
       .asBoolean(true);
-    this.includeEllipsoidToGeoidDifference = root
-      .of("includeEllipsoidToGeoidDifference")
+    this.includeEllipsoidToGeoidDifference = root.of("includeEllipsoidToGeoidDifference")
       .since(V2_0)
       .summary(
         "Include the Ellipsoid to Geoid difference in the calculations of every point along " +
@@ -278,8 +272,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     this.islandPruning = IslandPruningConfig.fromConfig(root);
 
-    this.maxDataImportIssuesPerFile = root
-      .of("maxDataImportIssuesPerFile")
+    this.maxDataImportIssuesPerFile = root.of("maxDataImportIssuesPerFile")
       .since(V2_0)
       .summary("When to split the import report.")
       .description(
@@ -292,8 +285,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     this.regularTransferParameters = RegularTransferConfig.map(root);
 
-    this.maxStopToShapeSnapDistance = root
-      .of("maxStopToShapeSnapDistance")
+    this.maxStopToShapeSnapDistance = root.of("maxStopToShapeSnapDistance")
       .since(V2_1)
       .summary("Maximum distance between route shapes and their stops.")
       .description(
@@ -304,8 +296,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(150);
-    this.multiThreadElevationCalculations = root
-      .of("multiThreadElevationCalculations")
+    this.multiThreadElevationCalculations = root.of("multiThreadElevationCalculations")
       .since(V2_0)
       .summary("Configuring multi-threading during elevation calculations.")
       .description(
@@ -316,8 +307,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
-    this.elevationTileCacheSizeMB = root
-      .of("elevationTileCacheSizeMB")
+    this.elevationTileCacheSizeMB = root.of("elevationTileCacheSizeMB")
       .since(V2_10)
       .summary(
         "Memory budget in megabytes for the Imagen tile cache used during elevation processing."
@@ -331,8 +321,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asInt(100);
-    this.osmCacheDataInMem = root
-      .of("osmCacheDataInMem")
+    this.osmCacheDataInMem = root.of("osmCacheDataInMem")
       .since(V2_0)
       .summary("If OSM data should be cached in memory during processing.")
       .description(
@@ -346,8 +335,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
-    this.platformEntriesLinking = root
-      .of("platformEntriesLinking")
+    this.platformEntriesLinking = root.of("platformEntriesLinking")
       .since(V2_0)
       .summary(
         "Link stairways, elevators and other entries that fall inside a platform's outline into that platform's walking area."
@@ -374,25 +362,21 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
-    this.staticParkAndRide = root
-      .of("staticParkAndRide")
+    this.staticParkAndRide = root.of("staticParkAndRide")
       .since(V1_5)
       .summary("Whether we should create car P+R stations from OSM data.")
       .asBoolean(true);
-    this.staticBikeParkAndRide = root
-      .of("staticBikeParkAndRide")
+    this.staticBikeParkAndRide = root.of("staticBikeParkAndRide")
       .since(V1_5)
       .summary("Whether we should create bike P+R stations from OSM data.")
       .asBoolean(false);
-    this.includeInclinedEdgeLevelInfo = root
-      .of("includeInclinedEdgeLevelInfo")
+    this.includeInclinedEdgeLevelInfo = root.of("includeInclinedEdgeLevelInfo")
       .since(V2_9)
       .summary(
         "Whether level info for inclined edges should be stored in the graph for use during runtime."
       )
       .asBoolean(false);
-    this.subwayAccessTime = root
-      .of("subwayAccessTime")
+    this.subwayAccessTime = root.of("subwayAccessTime")
       .since(V1_5)
       .summary(
         "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
@@ -419,8 +403,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone
       // will just shift the period with one day, so the consequences is limited.
-      this.transitModelTimeZone = root
-        .of("transitModelTimeZone")
+      this.transitModelTimeZone = root.of("transitModelTimeZone")
         .since(V2_2)
         .summary("Time zone for the graph.")
         .description(
@@ -428,8 +411,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .asZoneId(null);
       var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
-      this.transitServiceStart = root
-        .of("transitServiceStart")
+      this.transitServiceStart = root.of("transitServiceStart")
         .since(V2_0)
         .summary("Limit the import of transit services to the given START date.")
         .description(
@@ -444,8 +426,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           """
         )
         .asDateOrRelativePeriod("-P1Y", confZone);
-      this.transitServiceEnd = root
-        .of("transitServiceEnd")
+      this.transitServiceEnd = root.of("transitServiceEnd")
         .since(V2_0)
         .summary("Limit the import of transit services to the given end date.")
         .description(
@@ -462,8 +443,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         .asDateOrRelativePeriod("P3Y", confZone);
     }
 
-    this.transitRouteToStationCentroid = root
-      .of("transitRouteToStationCentroid")
+    this.transitRouteToStationCentroid = root.of("transitRouteToStationCentroid")
       .since(V2_7)
       .summary("List stations that should route to centroid.")
       .description(
@@ -483,28 +463,24 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asFeedScopedIds(List.of());
 
-    this.maxAreaNodes = root
-      .of("maxAreaNodes")
+    this.maxAreaNodes = root.of("maxAreaNodes")
       .since(V2_1)
       .summary(
         "Visibility calculations for an area will not be done if there are more nodes than this limit."
       )
       .asInt(StreetConstants.DEFAULT_MAX_AREA_NODES);
-    this.maxElevationPropagationMeters = root
-      .of("maxElevationPropagationMeters")
+    this.maxElevationPropagationMeters = root.of("maxElevationPropagationMeters")
       .since(V1_5)
       .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
       .asInt(2000);
-    this.boardingLocationTags = root
-      .of("boardingLocationTags")
+    this.boardingLocationTags = root.of("boardingLocationTags")
       .since(V2_2)
       .summary(
         "What OSM tags should be looked on for the source of matching stops to platforms and stops."
       )
       .description("[Detailed documentation](BoardingLocations.md)")
       .asStringSet(List.copyOf(Set.of("ref")));
-    elevatorRefTags = root
-      .of("elevatorRefTags")
+    elevatorRefTags = root.of("elevatorRefTags")
       .since(V2_10)
       .summary("Groups of OSM tags whose values are combined into an elevator id.")
       .description(
@@ -513,12 +489,13 @@ public class BuildConfig implements OtpDataStoreConfig {
         on an elevator node/way, their values are joined with ':' (in the given order) into
         one id. A group with a single tag key produces a plain id. If any tag in a group is
         missing, that group produces no id. If more than one group is configured, the first
-        one (in the given order) that produces an id is used as the elevator's id."""
+        one (in the given order) that produces an id is used as the elevator's id.\
+        """
       )
-      .asObjects(List.of(), node ->
-        CompoundRefTagGroup.of(
-          node
-            .of("tagGroup")
+      .asObjects(
+        List.of(),
+        node -> CompoundRefTagGroup.of(
+          node.of("tagGroup")
             .since(V2_10)
             .summary("The ordered OSM tag keys whose values are combined into one id.")
             .asStringList(List.of())
@@ -526,8 +503,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
       );
 
-    var localFileNamePatternsConfig = root
-      .of("localFileNamePatterns")
+    var localFileNamePatternsConfig = root.of("localFileNamePatterns")
       .since(V2_0)
       .summary("Patterns for matching OTP file types in the base directory")
       .description(
@@ -543,8 +519,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asObject();
-    this.gtfsLocalFilePattern = localFileNamePatternsConfig
-      .of("gtfs")
+    this.gtfsLocalFilePattern = localFileNamePatternsConfig.of("gtfs")
       .since(V2_0)
       .summary("Patterns for matching GTFS zip-files or directories.")
       .description(
@@ -554,8 +529,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asPattern(DEFAULT_GTFS_PATTERN);
-    this.netexLocalFilePattern = localFileNamePatternsConfig
-      .of("netex")
+    this.netexLocalFilePattern = localFileNamePatternsConfig.of("netex")
       .since(V2_0)
       .summary("Patterns for matching NeTEx zip files or directories.")
       .description(
@@ -565,8 +539,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asPattern(DEFAULT_NETEX_PATTERN);
-    this.osmLocalFilePattern = localFileNamePatternsConfig
-      .of("osm")
+    this.osmLocalFilePattern = localFileNamePatternsConfig.of("osm")
       .since(V2_0)
       .summary("Pattern for matching Open Street Map input files.")
       .description(
@@ -576,8 +549,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asPattern(DEFAULT_OSM_PATTERN);
-    this.demLocalFilePattern = localFileNamePatternsConfig
-      .of("dem")
+    this.demLocalFilePattern = localFileNamePatternsConfig.of("dem")
       .since(V2_0)
       .summary("Pattern for matching elevation DEM files.")
       .description(
@@ -588,20 +560,17 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asPattern(DEFAULT_DEM_PATTERN);
 
-    this.graph = root
-      .of("graph")
+    this.graph = root.of("graph")
       .since(V2_0)
       .summary("URI to the graph object file for reading and writing.")
       .description("The file is created or overwritten if OTP saves the graph to the file.")
       .asUri(null);
-    this.streetGraph = root
-      .of("streetGraph")
+    this.streetGraph = root.of("streetGraph")
       .since(V2_0)
       .summary("URI to the street graph object file for reading and writing.")
       .description("The file is created or overwritten if OTP saves the graph to the file")
       .asUri(null);
-    this.buildReportDir = root
-      .of("buildReportDir")
+    this.buildReportDir = root.of("buildReportDir")
       .since(V2_0)
       .summary("URI to the directory where the graph build report should be written to.")
       .description(
@@ -612,8 +581,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asUri(null);
 
-    this.stopConsolidation = root
-      .of("stopConsolidationFile")
+    this.stopConsolidation = root.of("stopConsolidationFile")
       .since(V2_5)
       .summary(
         "Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation."

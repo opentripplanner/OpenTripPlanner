@@ -32,8 +32,7 @@ class PlatformEntranceFinder {
   /// Build the index of platform entrance candidates among `vertices`.
   static PlatformEntranceFinder of(Collection<Vertex> vertices) {
     var index = new STRtree();
-    vertices
-      .stream()
+    vertices.stream()
       .filter(OsmVertex.class::isInstance)
       .map(OsmVertex.class::cast)
       .filter(PlatformEntranceFinder::isPlatformEntranceCandidate)
@@ -50,8 +49,7 @@ class PlatformEntranceFinder {
   /// Return the platform entrance vertices that lie within `polygon`.
   List<OsmVertex> findPlatformVerticesWithin(Polygon polygon) {
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    return query(polygon.getEnvelopeInternal())
-      .stream()
+    return query(polygon.getEnvelopeInternal()).stream()
       .filter(v -> polygon.contains(geometryFactory.createPoint(v.getCoordinate())))
       .toList();
   }

@@ -8,13 +8,11 @@ public class TimeAndCostPenaltyMapper {
 
   public static TimeAndCostPenalty map(NodeAdapter c) {
     return TimeAndCostPenalty.of(
-      c
-        .of("timePenalty")
+      c.of("timePenalty")
         .summary("Penalty added to the time of a path/leg.")
         .since(OtpVersion.V2_4)
         .asTimePenalty(TimeAndCostPenalty.ZERO.timePenalty()),
-      c
-        .of("costFactor")
+      c.of("costFactor")
         .summary("A factor multiplied with the time-penalty to get the cost-penalty.")
         .since(OtpVersion.V2_4)
         .asDouble(TimeAndCostPenalty.ZERO.costFactor())

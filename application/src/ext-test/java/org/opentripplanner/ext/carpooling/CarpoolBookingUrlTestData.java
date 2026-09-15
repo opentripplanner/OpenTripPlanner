@@ -45,12 +45,10 @@ public final class CarpoolBookingUrlTestData {
     WgsCoordinate pickup,
     WgsCoordinate dropoff
   ) {
-    return (
-      baseUrl +
+    return (baseUrl +
       "?from_coordinate=" +
       expandedCoordinate(pickup) +
       "&to_coordinate=" +
-      expandedCoordinate(dropoff)
-    );
+      expandedCoordinate(dropoff));
   }
 }

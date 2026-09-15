@@ -36,8 +36,7 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = updatedJourneyBuilder(siri)
-      .withDatedVehicleJourneyRef(TRIP_1_ID)
+    var updates = updatedJourneyBuilder(siri).withDatedVehicleJourneyRef(TRIP_1_ID)
       .buildEstimatedTimetableDeliveries();
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
@@ -56,11 +55,9 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = updatedJourneyBuilder(siri)
-      .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef(TRIP_1_ID)
-      )
-      .buildEstimatedTimetableDeliveries();
+    var updates = updatedJourneyBuilder(siri).withFramedVehicleJourneyRef(
+      builder -> builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef(TRIP_1_ID)
+    ).buildEstimatedTimetableDeliveries();
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
     assertTripUpdated(env);
@@ -95,13 +92,11 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(threeStopTrip).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
           .departAimedExpected("00:00:21", "00:00:26")
           .call(STOP_C)
@@ -128,12 +123,10 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     // First update: small delay
-    var firstUpdate = siri
-      .etBuilder()
+    var firstUpdate = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -148,12 +141,10 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     );
 
     // Second update: larger delay replaces the first
-    var secondUpdate = siri
-      .etBuilder()
+    var secondUpdate = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:20")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:33")
@@ -176,13 +167,11 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withOccupancy(OccupancyEnumeration.SEATS_AVAILABLE)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -205,13 +194,11 @@ class UpdatedTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withPredictionInaccurate(true)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -228,11 +215,9 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   }
 
   private SiriEtBuilder updatedJourneyBuilder(SiriTestHelper siri) {
-    return siri
-      .etBuilder()
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+    return siri.etBuilder()
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")

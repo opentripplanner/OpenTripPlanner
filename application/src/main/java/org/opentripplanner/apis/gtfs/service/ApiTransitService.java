@@ -54,18 +54,16 @@ public class ApiTransitService {
       Stream.of(originalPattern)
     )
       .distinct()
-      .flatMap(tripPattern ->
-        transitService
-          .findTripTimesOnDate(
-            stop,
-            tripPattern,
-            startTime,
-            timeRange,
-            numDepartures,
-            arrivalDeparture,
-            false
-          )
-          .stream()
+      .flatMap(
+        tripPattern -> transitService.findTripTimesOnDate(
+          stop,
+          tripPattern,
+          startTime,
+          timeRange,
+          numDepartures,
+          arrivalDeparture,
+          false
+        ).stream()
       )
       .sorted(
         Comparator.comparing(
@@ -81,10 +79,9 @@ public class ApiTransitService {
    */
   public List<TripTimeOnDate> findStopCalls(Leg leg) {
     if (leg.isTransitLeg()) {
-      var calls = transitService
-        .findTripTimesOnDate(leg.trip(), leg.serviceDate())
-        .orElseThrow(() ->
-          new IllegalStateException(
+      var calls = transitService.findTripTimesOnDate(leg.trip(), leg.serviceDate())
+        .orElseThrow(
+          () -> new IllegalStateException(
             "Cannot find times for %s on service date %s".formatted(leg.trip(), leg.serviceDate())
           )
         );
@@ -117,8 +114,7 @@ public class ApiTransitService {
       .withCancellationPolicy(CancellationPolicy.ONLY_CANCELLATIONS)
       .build();
 
-    return transitService
-      .findTripTimesOnDate(request)
+    return transitService.findTripTimesOnDate(request)
       .stream()
       .map(call -> new StopCallOnTripOnServiceDate(resolveTripOnServiceDate(call), call))
       .toList();
@@ -146,8 +142,7 @@ public class ApiTransitService {
     if (trip == null) {
       return Optional.empty();
     }
-    boolean runsOnDate = transitService
-      .getTripCalendars()
+    boolean runsOnDate = transitService.getTripCalendars()
       .isActiveOn(trip.getServiceId(), serviceDate);
     if (!runsOnDate) {
       return Optional.empty();
@@ -181,12 +176,10 @@ public class ApiTransitService {
     TripPattern originalPattern,
     LocalDate date
   ) {
-    return originalPattern
-      .scheduledTripsAsStream()
+    return originalPattern.scheduledTripsAsStream()
       .map(trip -> transitService.findNewTripPatternForModifiedTrip(trip.getId(), date))
       .filter(
-        tripPattern ->
-          tripPattern != null &&
+        tripPattern -> tripPattern != null &&
           tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );
   }

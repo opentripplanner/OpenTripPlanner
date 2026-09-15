@@ -75,10 +75,9 @@ public class Ring {
     OsmNode cur = nodes.get(i);
     OsmNode prev = nodes.get((i + n - 1) % n);
     OsmNode next = nodes.get((i + 1) % n);
-    return (
-      (cur.lon - prev.lon) * (next.lat - cur.lat) - (cur.lat - prev.lat) * (next.lon - cur.lon) >
-      0.00000000001
-    );
+    return ((cur.lon - prev.lon) * (next.lat - cur.lat) -
+      (cur.lat - prev.lat) * (next.lon - cur.lon) >
+      0.00000000001);
   }
 
   private Polygon calculateJtsPolygon() {
@@ -91,7 +90,7 @@ public class Ring {
     List<Polygon> polygonHoles = new ArrayList<>();
     for (Ring ring : holes) {
       Polygon polygon = factory.createPolygon(ring.shell, new LinearRing[0]);
-      for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext(); ) {
+      for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext();) {
         Polygon otherHole = it.next();
         if (otherHole.relate(polygon, "F***1****")) {
           polygon = (Polygon) polygon.union(otherHole);

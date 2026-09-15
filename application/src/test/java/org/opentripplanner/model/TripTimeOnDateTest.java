@@ -30,10 +30,8 @@ class TripTimeOnDateTest {
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
   private static final LocalDate DATE = LocalDate.of(2025, 3, 18);
-  private static final Instant MIDNIGHT = ServiceDateUtils.asStartOfService(
-    DATE,
-    ZoneIds.BERLIN
-  ).toInstant();
+  private static final Instant MIDNIGHT = ServiceDateUtils.asStartOfService(DATE, ZoneIds.BERLIN)
+    .toInstant();
 
   @Test
   void gtfsSequence() {
@@ -92,11 +90,7 @@ class TripTimeOnDateTest {
   void previousTimes() {
     var subject = tripTimeOnDate();
 
-    var ids = subject
-      .previousTimes()
-      .stream()
-      .map(t -> t.getStop().getId().toString())
-      .toList();
+    var ids = subject.previousTimes().stream().map(t -> t.getStop().getId().toString()).toList();
     assertEquals(List.of("F:stop-10", "F:stop-20"), ids);
     assertThat(subject.previousTimes().getFirst().previousTimes()).isEmpty();
   }
@@ -119,15 +113,10 @@ class TripTimeOnDateTest {
   @Test
   void nextTimes() {
     var subject = tripTimeOnDate();
-    var ids = subject
-      .nextTimes()
-      .stream()
-      .map(t -> t.getStop().getId().toString())
-      .toList();
+    var ids = subject.nextTimes().stream().map(t -> t.getStop().getId().toString()).toList();
     assertEquals(List.of("F:stop-40", "F:stop-50"), ids);
     var secondLast = subject.nextTimes().getFirst();
-    var lastStop = secondLast
-      .nextTimes()
+    var lastStop = secondLast.nextTimes()
       .stream()
       .map(t -> t.getStop().getId().toString())
       .toList();
@@ -181,8 +170,7 @@ class TripTimeOnDateTest {
       .withTrip(trip)
       .withDepartureTimes(new int[] { 0, 1 })
       .build();
-    var tripPattern = testModel
-      .pattern(TransitMode.BUS)
+    var tripPattern = testModel.pattern(TransitMode.BUS)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
     transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
@@ -250,8 +238,7 @@ class TripTimeOnDateTest {
     var realTimePattern = TransitRepositoryForTest.tripPattern("P1", route)
       .withStopPattern(TransitRepositoryForTest.stopPattern(stopA, realTimeStop, stopC))
       .build();
-    var tripTimes = tripTimesFor(3)
-      .createRealTimeFromScheduledTimes()
+    var tripTimes = tripTimesFor(3).createRealTimeFromScheduledTimes()
       .withExtraCall(1, true)
       .build();
 
@@ -271,9 +258,6 @@ class TripTimeOnDateTest {
   }
 
   private List<String> mapTripTimeOnDateToStopId(List<TripTimeOnDate> tripTimes) {
-    return tripTimes
-      .stream()
-      .map(t -> t.getStop().getId().toString())
-      .toList();
+    return tripTimes.stream().map(t -> t.getStop().getId().toString()).toList();
   }
 }

@@ -102,10 +102,7 @@ public class ElevationProfile {
    * @return The list of elevation steps but without those elements where the y value is unknown.
    */
   public List<Step> stepsWithoutUnknowns() {
-    return steps
-      .stream()
-      .filter(step -> !step.isYUnknown())
-      .toList();
+    return steps.stream().filter(step -> !step.isYUnknown()).toList();
   }
 
   @Override

@@ -59,20 +59,18 @@ public final class TestConstructApplicationFactoryBuilder {
       .empiricalDelayRepository(new DefaultEmpiricalDelayRepository())
       .schema(RouteRequest.defaultValue())
       .streetStreetRepository(new DefaultStreetRepository())
-      .fareServiceFactory(
-        new FareServiceFactory() {
-          @Override
-          public FareService makeFareService() {
-            return new DefaultFareService();
-          }
-
-          @Override
-          public void processGtfs(FareRulesData fareRuleService) {}
-
-          @Override
-          public void configure(JsonNode config) {}
+      .fareServiceFactory(new FareServiceFactory() {
+        @Override
+        public FareService makeFareService() {
+          return new DefaultFareService();
         }
-      )
+
+        @Override
+        public void processGtfs(FareRulesData fareRuleService) {}
+
+        @Override
+        public void configure(JsonNode config) {}
+      })
       .scheduledRaptorTransitData(transitRepository.getRaptorTransitData())
       .scheduledTripCalendars(transitRepository.getTripCalendar())
       .build();

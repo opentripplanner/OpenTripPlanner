@@ -760,12 +760,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<TripPattern> pattern();
     public DataFetcher<Iterable<TripPattern>> patterns();
     public DataFetcher<Iterable<TripPattern>> patternsByIds();
-    public DataFetcher<
-      graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
-    > plan();
-    public DataFetcher<
-      graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
-    > planConnection();
+    public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
+    public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> planConnection();
     public DataFetcher<VehicleRentalVehicle> rentalVehicle();
     public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles();
     public DataFetcher<Route> route();
@@ -1309,9 +1305,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> area();
     public DataFetcher<Boolean> bogusName();
     public DataFetcher<Double> distance();
-    public DataFetcher<
-      Iterable<org.opentripplanner.street.model.elevation.ElevationProfile.Step>
-    > elevationProfile();
+    public DataFetcher<Iterable<org.opentripplanner.street.model.elevation.ElevationProfile.Step>> elevationProfile();
     public DataFetcher<String> exit();
     public DataFetcher<Object> feature();
     public DataFetcher<Double> lat();

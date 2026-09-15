@@ -43,8 +43,7 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
    */
   @BeforeEach
   void setup() {
-    data
-      .access("Walk 30s ~ B")
+    data.access("Walk 30s ~ B")
       .withTimetables(
         """
         B      C      D
@@ -53,8 +52,7 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
       )
       .egress("D ~ Walk 20s");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetable(true);

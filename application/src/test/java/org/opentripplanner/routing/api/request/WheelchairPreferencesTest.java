@@ -52,9 +52,7 @@ class WheelchairPreferencesTest {
         "WheelchairPreferences{trip: AccessibilityPreferences{}}"
       ),
       Arguments.of(
-        WheelchairPreferences.of()
-          .withTrip(it -> it.withInaccessibleCost(100))
-          .build(),
+        WheelchairPreferences.of().withTrip(it -> it.withInaccessibleCost(100)).build(),
         "WheelchairPreferences{trip: AccessibilityPreferences{inaccessibleCost: $100}}"
       ),
       Arguments.of(

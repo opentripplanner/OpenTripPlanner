@@ -36,7 +36,8 @@ public class RouteDataReader {
   public Map<FeedScopedId, Emission> read(
     String resolvedFeedId,
     @Nullable Consumer<String> progressLogger
-  ) throws HeadersDoNotMatch {
+  )
+    throws HeadersDoNotMatch {
     var emissionData = new HashMap<FeedScopedId, Emission>();
 
     OtpCsvReader.<RouteRow>of()

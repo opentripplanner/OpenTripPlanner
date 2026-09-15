@@ -155,8 +155,7 @@ public final class VehicleRentalPreferences implements Serializable {
       return false;
     }
     VehicleRentalPreferences that = (VehicleRentalPreferences) o;
-    return (
-      Objects.equals(pickupTime, that.pickupTime) &&
+    return (Objects.equals(pickupTime, that.pickupTime) &&
       Objects.equals(pickupCost, that.pickupCost) &&
       Objects.equals(dropOffTime, that.dropOffTime) &&
       Objects.equals(dropOffCost, that.dropOffCost) &&
@@ -168,8 +167,10 @@ public final class VehicleRentalPreferences implements Serializable {
       allowArrivingInRentedVehicleAtDestination == that.allowArrivingInRentedVehicleAtDestination &&
       allowedNetworks.equals(that.allowedNetworks) &&
       bannedNetworks.equals(that.bannedNetworks) &&
-      DoubleUtils.doubleEquals(electricAssistSlopeSensitivity, that.electricAssistSlopeSensitivity)
-    );
+      DoubleUtils.doubleEquals(
+        electricAssistSlopeSensitivity,
+        that.electricAssistSlopeSensitivity
+      ));
   }
 
   @Override

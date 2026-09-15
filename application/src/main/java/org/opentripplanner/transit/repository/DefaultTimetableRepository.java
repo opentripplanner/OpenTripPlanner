@@ -154,14 +154,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
   private final Map<Trip, TripPattern> realTimeAddedPatternForTrip;
   private final Multimap<Route, TripPattern> realTimeAddedPatternsForRoute;
   private final Map<FeedScopedId, TripOnServiceDate> realTimeAddedTripOnServiceDateById;
-  private final ListMultimap<
-    FeedScopedId,
-    TripOnServiceDate
-  > realTimeAddedReplacedByTripOnServiceDateById;
-  private final Map<
-    TripIdAndServiceDate,
-    TripOnServiceDate
-  > realTimeAddedTripOnServiceDateForTripAndDay;
+  private final ListMultimap<FeedScopedId, TripOnServiceDate> realTimeAddedReplacedByTripOnServiceDateById;
+  private final Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay;
 
   /**
    * The trip calendar. Since {@link TripCalendars} is immutable, the mutable (not
@@ -490,9 +484,9 @@ public class DefaultTimetableRepository implements TimetableRepository {
     // If this snapshot was modified, it will be dirty after the clear actions.
     if (
       timetablesWereCleared ||
-      newTripPatternsForModifiedTripsWereCleared ||
-      addedTripPatternsWereCleared ||
-      patternsForStopWereCleared
+        newTripPatternsForModifiedTripsWereCleared ||
+        addedTripPatternsWereCleared ||
+        patternsForStopWereCleared
     ) {
       dirty = true;
     }
@@ -541,8 +535,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
         if (tripTimesToRemove != null) {
           for (Timetable originalTimetable : sortedTimetables) {
             if (originalTimetable.getTripTimes().contains(tripTimesToRemove)) {
-              Timetable updatedTimetable = originalTimetable
-                .copyOf()
+              Timetable updatedTimetable = originalTimetable.copyOf()
                 .removeTripTimes(tripTimesToRemove)
                 .build();
               swapTimetable(pattern, originalTimetable, updatedTimetable);
@@ -565,7 +558,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     validateNotReadOnly();
 
     boolean modified = false;
-    for (Iterator<FeedScopedId> it = timetables.keySet().iterator(); it.hasNext(); ) {
+    for (Iterator<FeedScopedId> it = timetables.keySet().iterator(); it.hasNext();) {
       FeedScopedId patternId = it.next();
       SortedSet<Timetable> sortedTimetables = timetables.get(patternId);
       SortedSet<Timetable> toKeepTimetables = new TreeSet<>(new SortedTimetableComparator());
@@ -626,8 +619,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * Does this snapshot contain any realtime data or is it completely empty?
    */
   public boolean isEmpty() {
-    return (
-      dirtyTimetables.isEmpty() &&
+    return (dirtyTimetables.isEmpty() &&
       timetables.isEmpty() &&
       realTimeNewTripPatternsForModifiedTrips.isEmpty() &&
       patternsForStop.isEmpty() &&
@@ -637,8 +629,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
       realTimeAddedPatternsForRoute.isEmpty() &&
       realTimeAddedTripOnServiceDateById.isEmpty() &&
       realTimeAddedReplacedByTripOnServiceDateById.isEmpty() &&
-      realTimeAddedTripOnServiceDateForTripAndDay.isEmpty()
-    );
+      realTimeAddedTripOnServiceDateForTripAndDay.isEmpty());
   }
 
   public RaptorTransitData getRealtimeRaptorTransitData() {
@@ -671,8 +662,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * @return true if the timetable changed as a result of the call
    */
   private boolean clearTimetables(String feedId) {
-    var entriesToBeRemoved = timetables
-      .entrySet()
+    var entriesToBeRemoved = timetables.entrySet()
       .stream()
       .filter(entry -> feedId.equals(entry.getKey().getFeedId()))
       .collect(Collectors.toSet());
@@ -682,8 +672,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
       for (var timetable : timetablesOfPattern) {
         var serviceDate = timetable.getServiceDate();
         var patternAndServiceDate = new TripPatternAndServiceDate(patternId, serviceDate);
-        var scheduledTimetable = timetable
-          .getPattern()
+        var scheduledTimetable = timetable.getPattern()
           .getScheduledTimetable()
           .copyForServiceDate(serviceDate);
         dirtyTimetables.put(patternAndServiceDate, scheduledTimetable);
@@ -699,8 +688,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * @return true if the newTripPatternForModifiedTrip changed as a result of the call
    */
   private boolean clearNewTripPatternsForModifiedTrips(String feedId) {
-    return realTimeNewTripPatternsForModifiedTrips
-      .keySet()
+    return realTimeNewTripPatternsForModifiedTrips.keySet()
       .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
   }
 
@@ -713,20 +701,16 @@ public class DefaultTimetableRepository implements TimetableRepository {
   private boolean clearEntriesForRealtimeAddedTrips(String feedId) {
     // it is sufficient to test for the removal of added trips, since other indexed entities are
     // added only if a new trip is added.
-    boolean removedEntry = realTimeAddedTrips
-      .keySet()
+    boolean removedEntry = realTimeAddedTrips.keySet()
       .removeIf(id -> feedId.equals(id.getFeedId()));
     realTimeAddedPatternForTrip.keySet().removeIf(trip -> feedId.equals(trip.getId().getFeedId()));
-    realTimeAddedTripOnServiceDateForTripAndDay
-      .keySet()
+    realTimeAddedTripOnServiceDateForTripAndDay.keySet()
       .removeIf(tripIdAndServiceDate -> feedId.equals(tripIdAndServiceDate.tripId().getFeedId()));
     realTimeAddedTripOnServiceDateById.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
-    realTimeAddedPatternsForRoute
-      .keySet()
+    realTimeAddedPatternsForRoute.keySet()
       .removeIf(route -> feedId.equals(route.getId().getFeedId()));
     realtimeAddedRoutes.keySet().removeIf(id -> feedId.equals(id.getFeedId()));
-    realTimeAddedReplacedByTripOnServiceDateById
-      .keySet()
+    realTimeAddedReplacedByTripOnServiceDateById.keySet()
       .removeIf(id -> feedId.equals(id.getFeedId()));
     return removedEntry;
   }
@@ -811,17 +795,16 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * @param filter used to filter {@link TripTimes}.
    */
   private List<TripOnServiceDate> findTripsOnServiceDates(Predicate<TripTimes> filter) {
-    return timetables
-      .values()
+    return timetables.values()
       .stream()
-      .flatMap(timetables ->
-        timetables.stream().flatMap(timetable ->
-          timetable
-            .getTripTimes()
-            .stream()
-            .filter(filter)
-            .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
-        )
+      .flatMap(
+        timetables -> timetables.stream()
+          .flatMap(
+            timetable -> timetable.getTripTimes()
+              .stream()
+              .filter(filter)
+              .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
+          )
       )
       .collect(Collectors.toCollection(ArrayList::new));
   }

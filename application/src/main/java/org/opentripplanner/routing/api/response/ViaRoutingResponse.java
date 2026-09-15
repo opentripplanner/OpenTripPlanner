@@ -19,8 +19,7 @@ public record ViaRoutingResponse(
    * Map each of the RoutingResponse to its itineraries
    */
   public List<List<Itinerary>> getItineraries() {
-    return routingResponses
-      .stream()
+    return routingResponses.stream()
       .map(RoutingResponse::getTripPlan)
       .map(plan -> plan.itineraries)
       .toList();

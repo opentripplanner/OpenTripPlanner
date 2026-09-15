@@ -28,18 +28,15 @@ class SingleCriteriaComparatorTest {
   private static final int END_LOW = 2000;
 
   // [Tx, Cost] => [0, 1240]
-  private static final Itinerary ZERO_TRANSFER_LOW_COST = newItinerary(A)
-    .bus(1, START, END_LOW, B)
+  private static final Itinerary ZERO_TRANSFER_LOW_COST = newItinerary(A).bus(1, START, END_LOW, B)
     .walk(60, C)
     .build();
   // [Tx, Cost] => [0, 1360]
-  private static final Itinerary ZERO_TRANSFER_HIGH_COST = newItinerary(A)
-    .bus(1, START, END_LOW, B)
+  private static final Itinerary ZERO_TRANSFER_HIGH_COST = newItinerary(A).bus(1, START, END_LOW, B)
     .walk(120, C)
     .build();
   // [Tx, Cost] => [1, 1240]
-  private static final Itinerary ONE_TRANSFER_LOW_COST = newItinerary(A)
-    .bus(1, START, TX_AT, B)
+  private static final Itinerary ONE_TRANSFER_LOW_COST = newItinerary(A).bus(1, START, TX_AT, B)
     .bus(2, TX_AT, END_LOW, C)
     .build();
 
@@ -89,18 +86,15 @@ class SingleCriteriaComparatorTest {
 
   @Test
   void compareTransitPriorityGroups() {
-    var group1 = newItinerary(A)
-      .bus(1, START, END_LOW, C)
+    var group1 = newItinerary(A).bus(1, START, END_LOW, C)
       .itineraryBuilder()
       .withGeneralizedCost2(1)
       .build();
-    var group2 = newItinerary(A)
-      .bus(1, START, END_LOW, C)
+    var group2 = newItinerary(A).bus(1, START, END_LOW, C)
       .itineraryBuilder()
       .withGeneralizedCost2(2)
       .build();
-    var group1And2 = newItinerary(A)
-      .bus(1, START, END_LOW, C)
+    var group1And2 = newItinerary(A).bus(1, START, END_LOW, C)
       .itineraryBuilder()
       .withGeneralizedCost2(GROUP_PRIORITY_CALCULATOR.mergeInGroupId(1, 2))
       .build();

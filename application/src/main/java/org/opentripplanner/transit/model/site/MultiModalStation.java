@@ -14,9 +14,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  * part of GTFS.
  */
 public class MultiModalStation
-  extends AbstractTransitEntity<MultiModalStation, MultiModalStationBuilder>
-  implements StopLocationsGroup
-{
+  extends
+  AbstractTransitEntity<MultiModalStation, MultiModalStationBuilder> implements StopLocationsGroup {
 
   private final Collection<Station> childStations;
 
@@ -60,10 +59,7 @@ public class MultiModalStation
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations
-      .stream()
-      .flatMap(s -> s.getChildStops().stream())
-      .toList();
+    return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();
   }
 
   @Override
@@ -94,15 +90,13 @@ public class MultiModalStation
 
   @Override
   public boolean sameAs(MultiModalStation other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(childStations, other.getChildStations()) &&
       Objects.equals(name, other.getName()) &&
       Objects.equals(coordinate, other.getCoordinate()) &&
       Objects.equals(code, other.getCode()) &&
       Objects.equals(description, other.getDescription()) &&
-      Objects.equals(url, other.getUrl())
-    );
+      Objects.equals(url, other.getUrl()));
   }
 
   @Override

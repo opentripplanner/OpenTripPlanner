@@ -283,25 +283,22 @@ public class ConstantsForTests {
       // Add transit data from Netex
       {
         var buildConfig = createNetexNordicBuilderParameters();
-        var netexConfig = buildConfig.netexDefaults
-          .copyOf()
+        var netexConfig = buildConfig.netexDefaults.copyOf()
           .withSource(NETEX_MINIMAL_DATA_SOURCE.uri())
           .build();
         var sources = List.of(
           new ConfiguredCompositeDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig)
         );
 
-        new NetexConfigure(buildConfig)
-          .createNetexModule(
-            sources,
-            transitRepository,
-            parkingRepository,
-            streetDetailsRepository,
-            graph,
-            deduplicator,
-            DataImportIssueStore.NOOP
-          )
-          .buildGraph();
+        new NetexConfigure(buildConfig).createNetexModule(
+          sources,
+          transitRepository,
+          parkingRepository,
+          streetDetailsRepository,
+          graph,
+          deduplicator,
+          DataImportIssueStore.NOOP
+        ).buildGraph();
       }
       // Link transit stops to streets
       TestStreetLinkerModule.link(graph, transitRepository);
@@ -392,17 +389,16 @@ public class ConstantsForTests {
           stationVertex,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                (VehicleRentalPlaceVertex) vertex,
-                streetVertex
-              ),
-              StreetVehicleRentalLink.createStreetVehicleRentalLink(
-                streetVertex,
-                (VehicleRentalPlaceVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetVehicleRentalLink.createStreetVehicleRentalLink(
+              (VehicleRentalPlaceVertex) vertex,
+              streetVertex
+            ),
+            StreetVehicleRentalLink.createStreetVehicleRentalLink(
+              streetVertex,
+              (VehicleRentalPlaceVertex) vertex
             )
+          )
         );
       }
     } catch (IOException e) {

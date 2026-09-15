@@ -88,8 +88,9 @@ public class TripTimesUpdaterTest {
       .addNoDataStop(0)
       .build();
 
-    var r = assertFailure(TRIP_NOT_FOUND_IN_PATTERN, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    var r = assertFailure(
+      TRIP_NOT_FOUND_IN_PATTERN,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
@@ -106,8 +107,9 @@ public class TripTimesUpdaterTest {
       .addSkippedStop(0)
       .build();
 
-    assertFailure(INVALID_STOP_SEQUENCE, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    assertFailure(
+      INVALID_STOP_SEQUENCE,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
@@ -123,8 +125,9 @@ public class TripTimesUpdaterTest {
       .addStopTimeWithArrivalAndDeparture(2, "00:10:01", "00:10:00")
       .build();
 
-    assertFailure(NEGATIVE_DWELL_TIME, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    assertFailure(
+      NEGATIVE_DWELL_TIME,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
@@ -147,9 +150,10 @@ public class TripTimesUpdaterTest {
     );
 
     // update trip
-    var tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
-      .addStopTime(1, "00:02:00")
-      .build();
+    var tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE).addStopTime(
+      1,
+      "00:02:00"
+    ).build();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -172,14 +176,12 @@ public class TripTimesUpdaterTest {
     );
 
     // update trip arrival time incorrectly
-    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopSequence(1)
-          .setArrival(StopTimeEvent.newBuilder().setDelay(0).build())
-          .build()
-      )
-      .build();
+    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE).addRawStopTime(
+      StopTimeUpdate.newBuilder()
+        .setStopSequence(1)
+        .setArrival(StopTimeEvent.newBuilder().setDelay(0).build())
+        .build()
+    ).build();
 
     p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -202,14 +204,12 @@ public class TripTimesUpdaterTest {
     );
 
     // update trip arrival time only
-    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopSequence(2)
-          .setArrival(StopTimeEvent.newBuilder().setDelay(1).build())
-          .build()
-      )
-      .build();
+    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE).addRawStopTime(
+      StopTimeUpdate.newBuilder()
+        .setStopSequence(2)
+        .setArrival(StopTimeEvent.newBuilder().setDelay(1).build())
+        .build()
+    ).build();
 
     p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -232,14 +232,12 @@ public class TripTimesUpdaterTest {
     );
 
     // update trip departure time only
-    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopSequence(2)
-          .setDeparture(StopTimeEvent.newBuilder().setDelay(120).build())
-          .build()
-      )
-      .build();
+    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE).addRawStopTime(
+      StopTimeUpdate.newBuilder()
+        .setStopSequence(2)
+        .setDeparture(StopTimeEvent.newBuilder().setDelay(120).build())
+        .build()
+    ).build();
 
     p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -262,14 +260,12 @@ public class TripTimesUpdaterTest {
     );
 
     // update trip using stop id
-    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
-      .addRawStopTime(
-        StopTimeUpdate.newBuilder()
-          .setStopId("B")
-          .setDeparture(StopTimeEvent.newBuilder().setDelay(180).build())
-          .build()
-      )
-      .build();
+    tripUpdate = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE).addRawStopTime(
+      StopTimeUpdate.newBuilder()
+        .setStopId("B")
+        .setDeparture(StopTimeEvent.newBuilder().setDelay(180).build())
+        .build()
+    ).build();
 
     p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -310,8 +306,9 @@ public class TripTimesUpdaterTest {
       )
       .build();
 
-    assertFailure(NEGATIVE_HOP_TIME, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    assertFailure(
+      NEGATIVE_HOP_TIME,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
@@ -329,11 +326,11 @@ public class TripTimesUpdaterTest {
           .setStopSequence(1)
           .setArrival(StopTimeEvent.newBuilder().setDelay(15).build())
           .build()
-      )
-      .build();
+      ).build();
 
-    assertFailure(INVALID_ARRIVAL_TIME, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    assertFailure(
+      INVALID_ARRIVAL_TIME,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.NONE,
@@ -449,8 +446,7 @@ public class TripTimesUpdaterTest {
       TIME_ZONE,
       "new trip headsign",
       null
-    )
-      .addDelayedStopTime(1, 0, "new stop headsign")
+    ).addDelayedStopTime(1, 0, "new stop headsign")
       .addSkippedStop(2)
       .addRawStopTime(
         StopTimeUpdate.newBuilder()
@@ -533,8 +529,7 @@ public class TripTimesUpdaterTest {
           .setStopSequence(3)
           .setArrival(StopTimeEvent.newBuilder().setDelay(15).build())
           .build()
-      )
-      .build();
+      ).build();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -561,8 +556,7 @@ public class TripTimesUpdaterTest {
           .setStopSequence(1)
           .setArrival(StopTimeEvent.newBuilder().setDelay(15).build())
           .build()
-      )
-      .build();
+      ).build();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -585,11 +579,11 @@ public class TripTimesUpdaterTest {
           .setStopSequence(3)
           .setArrival(StopTimeEvent.newBuilder().setDelay(15).build())
           .build()
-      )
-      .build();
+      ).build();
 
-    assertFailure(INVALID_ARRIVAL_TIME, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    assertFailure(
+      INVALID_ARRIVAL_TIME,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
@@ -606,8 +600,7 @@ public class TripTimesUpdaterTest {
           .setStopSequence(3)
           .setArrival(StopTimeEvent.newBuilder().setDelay(-100).build())
           .build()
-      )
-      .build();
+      ).build();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -641,8 +634,7 @@ public class TripTimesUpdaterTest {
           .setStopSequence(3)
           .setArrival(StopTimeEvent.newBuilder().setDelay(-700).build())
           .build()
-      )
-      .build();
+      ).build();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -710,8 +702,7 @@ public class TripTimesUpdaterTest {
           .setStopSequence(3)
           .setArrival(StopTimeEvent.newBuilder().setDelay(-700).build())
           .build()
-      )
-      .build();
+      ).build();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       timetable,
@@ -749,10 +740,7 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addDelayedStopTime(1, 0)
-      .addSkippedStop(2)
-      .addDelayedStopTime(3, -800, -800);
+    ).addDelayedStopTime(1, 0).addSkippedStop(2).addDelayedStopTime(3, -800, -800);
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -788,10 +776,7 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addDelayedStopTime(1, 1000, 1000)
-      .addSkippedStop(2)
-      .addDelayedStopTime(3, 0, 0);
+    ).addDelayedStopTime(1, 1000, 1000).addSkippedStop(2).addDelayedStopTime(3, 0, 0);
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -827,15 +812,13 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addDelayedStopTime(1, 1000, 1000)
-      .addSkippedStop(2)
-      .addDelayedStopTime(3, -400, -400);
+    ).addDelayedStopTime(1, 1000, 1000).addSkippedStop(2).addDelayedStopTime(3, -400, -400);
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    assertFailure(NEGATIVE_HOP_TIME, () ->
-      TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+    assertFailure(
+      NEGATIVE_HOP_TIME,
+      () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
         timetable,
         new TripUpdate(feedId, tripUpdate, NOW),
         ForwardsDelayPropagationType.DEFAULT,
@@ -856,10 +839,7 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addSkippedStop(1)
-      .addDelayedStopTime(2, -700, -700)
-      .addDelayedStopTime(3, 0, 0);
+    ).addSkippedStop(1).addDelayedStopTime(2, -700, -700).addDelayedStopTime(3, 0, 0);
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -895,10 +875,7 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addDelayedStopTime(1, 0, 0)
-      .addDelayedStopTime(2, 700, 700)
-      .addSkippedStop(3);
+    ).addDelayedStopTime(1, 0, 0).addDelayedStopTime(2, 700, 700).addSkippedStop(3);
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -934,8 +911,7 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addDelayedStopTime(1, 600, 600)
+    ).addDelayedStopTime(1, 600, 600)
       .addSkippedStop(2)
       .addSkippedStop(3)
       .addSkippedStop(4)
@@ -946,8 +922,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var scheduledTimetable = patternIndex
-      .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
+    var scheduledTimetable = patternIndex.get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
       .getScheduledTimetable();
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
       scheduledTimetable,
@@ -991,8 +966,7 @@ public class TripTimesUpdaterTest {
       SERVICE_DATE,
       SCHEDULED,
       TIME_ZONE
-    )
-      .addDelayedStopTime(1, 600, 600)
+    ).addDelayedStopTime(1, 600, 600)
       .addSkippedStop(2)
       .addSkippedStop(3)
       .addDelayedStopTime(4, -500, -500)
@@ -1003,8 +977,7 @@ public class TripTimesUpdaterTest {
 
     GtfsRealtime.TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var scheduledTimetable = patternIndex
-      .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
+    var scheduledTimetable = patternIndex.get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
       .getScheduledTimetable();
 
     var p = TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
@@ -1063,8 +1036,9 @@ public class TripTimesUpdaterTest {
       builder.addRawStopTime(emptyStopTime(2, setEmptyEvent));
       GtfsRealtime.TripUpdate tripUpdate = builder.build();
 
-      assertFailure(expectedError, () ->
-        TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
+      assertFailure(
+        expectedError,
+        () -> TRIP_TIMES_UPDATER.createUpdatedTripTimesFromGtfsRt(
           timetable,
           new TripUpdate(feedId, tripUpdate, NOW),
           ForwardsDelayPropagationType.DEFAULT,

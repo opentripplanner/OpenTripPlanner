@@ -94,8 +94,7 @@ class FilterMapper {
     Optional<LineDirectionFilterStructure> lineDirectionFilterStructure,
     Predicate<LineDirectionFilterStructure> predicate
   ) {
-    return lineDirectionFilterStructure
-      .filter(predicate)
+    return lineDirectionFilterStructure.filter(predicate)
       .map(o -> o.getLine())
       .stream()
       .flatMap(r -> r.stream().map(l -> l.getLineRef().getValue()))
@@ -107,8 +106,7 @@ class FilterMapper {
     Optional<OperatorFilterStructure> operatorFilterStructure,
     Predicate<OperatorFilterStructure> predicate
   ) {
-    return operatorFilterStructure
-      .filter(predicate)
+    return operatorFilterStructure.filter(predicate)
       .map(o -> o.getOperatorRef())
       .stream()
       .flatMap(r -> r.stream().map(ref -> ref.getValue()))

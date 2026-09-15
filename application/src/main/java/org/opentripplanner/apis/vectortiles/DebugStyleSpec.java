@@ -130,14 +130,12 @@ public class DebugStyleSpec {
     ElevatorBoardEdge.class,
     ElevatorAlightEdge.class,
     TemporaryPartialStreetEdge.class,
-    TemporaryFreeEdge.class,
-  };
+    TemporaryFreeEdge.class, };
 
   private static final StreetTraversalPermission[] STREET_MODES = new StreetTraversalPermission[] {
     StreetTraversalPermission.PEDESTRIAN,
     StreetTraversalPermission.BICYCLE,
-    StreetTraversalPermission.CAR,
-  };
+    StreetTraversalPermission.CAR, };
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -158,22 +156,17 @@ public class DebugStyleSpec {
       geofencingZones,
       rental,
       transfers
-    )
-      .map(VectorSourceLayer::vectorSource)
-      .map(TileSource.class::cast)
-      .toList();
+    ).map(VectorSourceLayer::vectorSource).map(TileSource.class::cast).toList();
 
-    List<TileSource> extraRasterSources = extraLayers
-      .stream()
+    List<TileSource> extraRasterSources = extraLayers.stream()
       .map(
-        l ->
-          (TileSource) new RasterSource(
-            l.name(),
-            List.of(l.templateUrl()),
-            19,
-            l.tileSize(),
-            l.attribution()
-          )
+        l -> (TileSource) new RasterSource(
+          l.name(),
+          List.of(l.templateUrl()),
+          19,
+          l.tileSize(),
+          l.attribution()
+        )
       )
       .toList();
     var allSources = ListUtils.combine(BACKGROUND_LAYERS, extraRasterSources, vectorSources);
@@ -214,20 +207,17 @@ public class DebugStyleSpec {
   }
 
   private static List<StyleBuilder> backgroundLayers(List<TileSource> extraLayers) {
-    return ListUtils.combine(BACKGROUND_LAYERS, extraLayers)
-      .stream()
-      .map(layer -> {
-        var builder = StyleBuilder.ofId(layer.id())
-          .displayName(layer.name())
-          .typeRaster()
-          .source(layer)
-          .minZoom(0);
-        if (!layer.equals(OSM_BACKGROUND)) {
-          builder.intiallyHidden();
-        }
-        return builder;
-      })
-      .toList();
+    return ListUtils.combine(BACKGROUND_LAYERS, extraLayers).stream().map(layer -> {
+      var builder = StyleBuilder.ofId(layer.id())
+        .displayName(layer.name())
+        .typeRaster()
+        .source(layer)
+        .minZoom(0);
+      if (!layer.equals(OSM_BACKGROUND)) {
+        builder.intiallyHidden();
+      }
+      return builder;
+    }).toList();
   }
 
   private static List<StyleBuilder> stops(
@@ -601,8 +591,8 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> traversalPermissions(VectorSourceLayer edges) {
     var permissionStyles = Arrays.stream(STREET_MODES)
-      .map(streetTraversalPermission ->
-        StyleBuilder.ofId("permission " + streetTraversalPermission)
+      .map(
+        streetTraversalPermission -> StyleBuilder.ofId("permission " + streetTraversalPermission)
           .vectorSourceLayer(edges)
           .group(PERMISSIONS)
           .typeLine()
@@ -637,8 +627,10 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> noThruTraffic(VectorSourceLayer edges) {
     var noThruTrafficStyles = Arrays.stream(STREET_MODES)
-      .map(streetTraversalPermission ->
-        StyleBuilder.ofId("no-thru-traffic " + streetTraversalPermission)
+      .map(
+        streetTraversalPermission -> StyleBuilder.ofId(
+          "no-thru-traffic " + streetTraversalPermission
+        )
           .vectorSourceLayer(edges)
           .group(NO_THRU_TRAFFIC)
           .typeLine()

@@ -33,8 +33,7 @@ public final class BicycleSlopeSpeedFunction {
     2.7987785324442748E+03,
     5.0000000000000000E+03,
     5.0000000000000000E+03,
-    5.0000000000000000E+03,
-  };
+    5.0000000000000000E+03, };
 
   /** Slope (y) knot vector. Bounds: {@code [-0.35, +0.35]}. */
   private static final double[] TY = {
@@ -47,8 +46,7 @@ public final class BicycleSlopeSpeedFunction {
     1.2191105175593375E-01,
     3.4999999999999998E-01,
     3.4999999999999998E-01,
-    3.4999999999999998E-01,
-  };
+    3.4999999999999998E-01, };
 
   /** Spline coefficient matrix (flattened, row-major over the TX x TY grid). */
   private static final double[] COEFF = {
@@ -79,8 +77,7 @@ public final class BicycleSlopeSpeedFunction {
     5.7862890496126462E-01,
     1.6358571778476885E-01,
     9.4846184210137130E-02,
-    5.5464612133430242E-02,
-  };
+    5.5464612133430242E-02, };
 
   private BicycleSlopeSpeedFunction() {}
 

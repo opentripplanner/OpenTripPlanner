@@ -30,8 +30,8 @@ class NoticeAssignmentMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId =
-    ArrayListMultimap.create();
+  private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId = ArrayListMultimap
+    .create();
 
   private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
 
@@ -117,10 +117,9 @@ class NoticeAssignmentMapper {
 
   @Nullable
   private Notice getOrMapNotice(NoticeAssignment assignment) {
-    org.rutebanken.netex.model.Notice notice =
-      assignment.getNotice() != null
-        ? assignment.getNotice()
-        : noticesById.lookup(assignment.getNoticeRef().getRef());
+    org.rutebanken.netex.model.Notice notice = assignment.getNotice() != null
+      ? assignment.getNotice()
+      : noticesById.lookup(assignment.getNoticeRef().getRef());
 
     return notice == null ? null : noticeMapper.map(notice);
   }

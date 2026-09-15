@@ -46,8 +46,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         -- R1
@@ -62,16 +61,14 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       // We add a transfer here which arrive at C before R2, but it should not be used.
       .withTransfer(STOP_B, transfer(STOP_C, D1_m));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10_m);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "Walk 1m ~ A ~ " +
+    var path = "Walk 1m ~ A ~ " +
       "BUS R1 0:05 0:08 ~ B ~ " +
       "BUS R2 0:12 0:15 ~ C ~ " +
       "Walk 1m " +

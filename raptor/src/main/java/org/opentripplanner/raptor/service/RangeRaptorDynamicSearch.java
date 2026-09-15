@@ -60,8 +60,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     this.config = config;
     this.transitData = transitData;
     this.originalRequest = originalRequest;
-    this.dynamicSearchWindowCalculator = config
-      .searchWindowCalculator()
+    this.dynamicSearchWindowCalculator = config.searchWindowCalculator()
       .withSearchParams(originalRequest.searchParams());
     this.extraMcSearch = extraMcSearch;
 
@@ -164,14 +163,12 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private boolean isItPossibleToRunHeuristicsInParallel() {
     SearchParams s = originalRequest.searchParams();
-    return (
-      config.isMultiThreaded() &&
+    return (config.isMultiThreaded() &&
       originalRequest.runInParallel() &&
       s.isEarliestDepartureTimeSet() &&
       s.isLatestArrivalTimeSet() &&
       fwdHeuristics.isEnabled() &&
-      revHeuristics.isEnabled()
-    );
+      revHeuristics.isEnabled());
   }
 
   /**
@@ -259,8 +256,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     if (originalRequest.searchParams().isEarliestDepartureTimeSet()) {
       return originalRequest;
     }
-    return originalRequest
-      .mutate()
+    return originalRequest.mutate()
       .searchParams()
       .earliestDepartureTime(transitData.getValidTransitDataStartTime())
       .build();
@@ -270,8 +266,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     if (originalRequest.searchParams().isLatestArrivalTimeSet()) {
       return originalRequest;
     }
-    return originalRequest
-      .mutate()
+    return originalRequest.mutate()
       .searchParams()
       .latestArrivalTime(
         transitData.getValidTransitDataEndTime() +
@@ -297,12 +292,10 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
   private void calculateDynamicSearchParametersFromHeuristics(@Nullable Heuristics heuristics) {
     if (heuristics != null) {
-      dynamicSearchWindowCalculator
-        .withHeuristics(
-          heuristics.bestOverallJourneyTravelDuration(),
-          heuristics.minWaitTimeForJourneysReachingDestination()
-        )
-        .calculate();
+      dynamicSearchWindowCalculator.withHeuristics(
+        heuristics.bestOverallJourneyTravelDuration(),
+        heuristics.minWaitTimeForJourneysReachingDestination()
+      ).calculate();
     }
   }
 }

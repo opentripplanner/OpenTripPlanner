@@ -61,8 +61,7 @@ class StreetEdgePropulsionCostTest {
 
     var geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
 
-    hillyEdge = new StreetEdgeBuilder<>()
-      .withFromVertex(from)
+    hillyEdge = new StreetEdgeBuilder<>().withFromVertex(from)
       .withToVertex(to)
       .withGeometry(geometry)
       .withName("Hilly Street")
@@ -74,8 +73,7 @@ class StreetEdgePropulsionCostTest {
     Coordinate[] profile = new Coordinate[] {
       new Coordinate(0, 0),
       new Coordinate(LENGTH / 2, LENGTH / 20.0),
-      new Coordinate(LENGTH, 0),
-    };
+      new Coordinate(LENGTH, 0), };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
     StreetElevationExtensionBuilder.of(hillyEdge)
       .withElevationProfile(elev)
@@ -147,8 +145,8 @@ class StreetEdgePropulsionCostTest {
     StreetMode streetMode,
     double slopeSensitivity
   ) {
-    double expectedEffectiveDistance =
-      flatDistance + (slopedDistance - flatDistance) * slopeSensitivity;
+    double expectedEffectiveDistance = flatDistance +
+      (slopedDistance - flatDistance) * slopeSensitivity;
     double expectedWeight = expectedEffectiveDistance / SPEED;
 
     State state = createRentalState(streetMode, formFactor, propulsionType);
@@ -163,15 +161,14 @@ class StreetEdgePropulsionCostTest {
   @Test
   void customElectricAssistSlopeSensitivity() {
     double customSensitivity = 0.5;
-    double expectedEffectiveDistance =
-      flatDistance + (slopedDistance - flatDistance) * customSensitivity;
+    double expectedEffectiveDistance = flatDistance +
+      (slopedDistance - flatDistance) * customSensitivity;
     double expectedWeight = expectedEffectiveDistance / SPEED;
 
     var req = StreetSearchRequest.of()
       .withMode(StreetMode.BIKE_RENTAL)
-      .withBike(bike ->
-        bike
-          .withSpeed(SPEED)
+      .withBike(
+        bike -> bike.withSpeed(SPEED)
           .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
           .withOptimizeTriangle(it -> it.withTime(1))
           .withReluctance(1)
@@ -202,9 +199,8 @@ class StreetEdgePropulsionCostTest {
     if (streetMode == SCOOTER_RENTAL) {
       req = StreetSearchRequest.of()
         .withMode(streetMode)
-        .withScooter(scooter ->
-          scooter
-            .withSpeed(SPEED)
+        .withScooter(
+          scooter -> scooter.withSpeed(SPEED)
             .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
             .withOptimizeTriangle(it -> it.withTime(1))
             .withReluctance(1)
@@ -213,9 +209,8 @@ class StreetEdgePropulsionCostTest {
     } else {
       req = StreetSearchRequest.of()
         .withMode(streetMode)
-        .withBike(bike ->
-          bike
-            .withSpeed(SPEED)
+        .withBike(
+          bike -> bike.withSpeed(SPEED)
             .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
             .withOptimizeTriangle(it -> it.withTime(1))
             .withReluctance(1)

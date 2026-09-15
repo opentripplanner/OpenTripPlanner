@@ -74,13 +74,13 @@ class PathwayMapper {
   private StationElement<?, ?> mapStationElement(Stop stop) {
     if (stop != null) {
       switch (stop.getLocationType()) {
-        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP:
+        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP :
           return stopMapper.map(stop);
-        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT:
+        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT :
           return entranceMapper.map(stop);
-        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE:
+        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE :
           return nodeMapper.map(stop);
-        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA:
+        case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA :
           return boardingAreaMapper.map(stop);
       }
     }

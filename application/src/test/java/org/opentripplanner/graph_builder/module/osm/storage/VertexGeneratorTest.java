@@ -96,8 +96,8 @@ class VertexGeneratorTest {
     assertEquals(w2.getId(), ((BarrierPassThroughVertex) vertexForW2OnBarrier).getEntityId());
     assertFalse(vertexForW2NotOnBarrier instanceof BarrierPassThroughVertex);
 
-    Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers =
-      subject.splitVerticesOnBarriers();
+    Map<OsmNode, Map<OsmEntity, OsmVertex>> splitVerticesOnBarriers = subject
+      .splitVerticesOnBarriers();
     assertEquals(1, splitVerticesOnBarriers.size());
     assertEquals(
       Map.of(w1, vertexForW1OnBarrier, w2, vertexForW2OnBarrier),
@@ -106,22 +106,14 @@ class VertexGeneratorTest {
 
     assertEquals(
       0,
-      issueStore
-        .listIssues()
-        .stream()
-        .filter(x -> x instanceof BarrierIntersectingHighway)
-        .count()
+      issueStore.listIssues().stream().filter(x -> x instanceof BarrierIntersectingHighway).count()
     );
     var barrierVertexOnBarrier = subject.getVertexForOsmNode(n3, w1, NORMAL);
     assertInstanceOf(OsmVertex.class, barrierVertexOnBarrier);
     assertFalse(barrierVertexOnBarrier instanceof BarrierVertex);
     assertEquals(
       1,
-      issueStore
-        .listIssues()
-        .stream()
-        .filter(x -> x instanceof BarrierIntersectingHighway)
-        .count()
+      issueStore.listIssues().stream().filter(x -> x instanceof BarrierIntersectingHighway).count()
     );
     var barrierVertexNotOnBarrier = subject.getVertexForOsmNode(n10, w1, NORMAL);
     assertFalse(barrierVertexNotOnBarrier instanceof BarrierVertex);
@@ -137,8 +129,7 @@ class VertexGeneratorTest {
   }
 
   static DifferentLevelsSharingBarrier[] getBarrierLevelIssues(DataImportIssueStore issueStore) {
-    return issueStore
-      .listIssues()
+    return issueStore.listIssues()
       .stream()
       .filter(issue -> issue instanceof DifferentLevelsSharingBarrier)
       .map(x -> (DifferentLevelsSharingBarrier) x)

@@ -45,10 +45,8 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.Stop s)) {
         return false;
       }
-      return (
-        stopId.equals(s.stopId) &&
-        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions)
-      );
+      return (stopId.equals(s.stopId) &&
+        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions));
     }
   }
 
@@ -74,10 +72,8 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.Trip t)) {
         return false;
       }
-      return (
-        tripId.equals(t.tripId) &&
-        (serviceDate == null || t.serviceDate == null || serviceDate.equals(t.serviceDate))
-      );
+      return (tripId.equals(t.tripId) &&
+        (serviceDate == null || t.serviceDate == null || serviceDate.equals(t.serviceDate)));
     }
   }
 
@@ -115,15 +111,13 @@ public sealed interface EntitySelector {
         return false;
       }
 
-      var matchesDirection =
-        directions == null || (s.directions() != null && directions.containsAll(s.directions()));
+      var matchesDirection = directions == null ||
+        (s.directions() != null && directions.containsAll(s.directions()));
 
-      return (
-        stopId.equals(s.stopId) &&
+      return (stopId.equals(s.stopId) &&
         routeId.equals(s.routeId) &&
         StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions) &&
-        matchesDirection
-      );
+        matchesDirection);
     }
   }
 
@@ -151,12 +145,10 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.StopAndTrip s)) {
         return false;
       }
-      return (
-        stopId.equals(s.stopId) &&
+      return (stopId.equals(s.stopId) &&
         tripId.equals(s.tripId) &&
         StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions) &&
-        (serviceDate == null || s.serviceDate == null || serviceDate.equals(s.serviceDate))
-      );
+        (serviceDate == null || s.serviceDate == null || serviceDate.equals(s.serviceDate)));
     }
   }
 

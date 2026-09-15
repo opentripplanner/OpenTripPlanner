@@ -162,15 +162,13 @@ public class CarRoutingTest {
     temporaryVerticesContainer.close();
 
     // make sure that we only get CAR legs
-    itineraries.forEach(i ->
-      i.legs().forEach(l -> {
-        if (l instanceof StreetLeg stLeg) {
-          assertEquals(TraverseMode.CAR, stLeg.getMode());
-        } else {
-          fail("Expected StreetLeg (CAR): " + l);
-        }
-      })
-    );
+    itineraries.forEach(i -> i.legs().forEach(l -> {
+      if (l instanceof StreetLeg stLeg) {
+        assertEquals(TraverseMode.CAR, stLeg.getMode());
+      } else {
+        fail("Expected StreetLeg (CAR): " + l);
+      }
+    }));
     Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.of(legGeometry).points();
   }

@@ -18,9 +18,7 @@ class WildcardNetworkTransferTest implements FareTestConstants {
   private final GtfsFaresV2Service SERVICE = GtfsFaresV2Service.of()
     .withLegRules(
       // wildcard rule, matches everything
-      FareLegRule.of(id(1), FARE_PRODUCT_A)
-        .withLegGroupId(LEG_GROUP_A)
-        .build()
+      FareLegRule.of(id(1), FARE_PRODUCT_A).withLegGroupId(LEG_GROUP_A).build()
     )
     .withTransferRules(
       // monthly pass with unlimited transfers

@@ -27,12 +27,10 @@ public class DeduplicatorTest {
   private static final String[] STRING_ARRAY_2 = { "Alf" };
   private static final String[][] STRING_2_D_ARRAY = new String[][] {
     { "test_1", "test_2" },
-    { "test_3", "test_4" },
-  };
+    { "test_3", "test_4" }, };
   private static final String[][] STRING_2_D_ARRAY_2 = new String[][] {
     { "test_1", "test_2" },
-    { "test_3", "test_4" },
-  };
+    { "test_3", "test_4" }, };
   private static final LocalDate DATE = LocalDate.of(2021, 1, 15);
   private static final LocalDate DATE_2 = LocalDate.of(2021, 1, 15);
   private static final LocalTime TIME = LocalTime.of(12, 45);

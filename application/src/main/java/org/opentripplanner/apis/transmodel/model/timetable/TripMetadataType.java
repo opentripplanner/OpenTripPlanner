@@ -72,8 +72,8 @@ public class TripMetadataType {
           )
           .deprecate("This not needed for debugging, and is misleading if the window is cropped.")
           .type(new GraphQLNonNull(Scalars.GraphQLInt))
-          .dataFetcher(e ->
-            ((TripSearchMetadata) e.getSource()).raptorSearchWindowUsed().toMinutes()
+          .dataFetcher(
+            e -> ((TripSearchMetadata) e.getSource()).raptorSearchWindowUsed().toMinutes()
           )
           .build()
       )

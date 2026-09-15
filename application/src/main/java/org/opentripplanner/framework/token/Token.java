@@ -78,13 +78,11 @@ public class Token {
 
   @Override
   public String toString() {
-    return (
-      "(v" +
+    return ("(v" +
       version() +
       ", " +
       fieldValues.stream().map(Objects::toString).collect(Collectors.joining(", ")) +
-      ')'
-    );
+      ')');
   }
 
   @Nullable

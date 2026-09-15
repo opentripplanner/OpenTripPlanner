@@ -162,12 +162,9 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
       // prune the transfers AFTER the transit-leg. The transfers are sorted on
       // arrival-time in descending order, so the earliest-arrival-time is the
       // last element of the list of transfers.
-      int earliestDepartureTimeFromLeg =
-        i == 0
-          ? accessArrivalTime
-          : last(possibleTransfers.get(i - 1))
-              .to()
-              .time();
+      int earliestDepartureTimeFromLeg = i == 0
+        ? accessArrivalTime
+        : last(possibleTransfers.get(i - 1)).to().time();
 
       // create a tailSelector for the tails produced in the last round and use it to filter them
       // based on the transfer-arrival-time and given filter
@@ -253,11 +250,9 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private List<List<TripToTripTransfer<T>>> sortTransfersOnArrivalStopPosInDecOrder(
     List<List<TripToTripTransfer<T>>> transfers
   ) {
-    return transfers
-      .stream()
-      .map(it ->
-        it
-          .stream()
+    return transfers.stream()
+      .map(
+        it -> it.stream()
           .sorted(Comparator.comparingInt(l -> -l.to().stopPosition()))
           .collect(Collectors.toList())
       )

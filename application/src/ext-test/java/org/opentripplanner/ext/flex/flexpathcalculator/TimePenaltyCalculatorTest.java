@@ -15,8 +15,11 @@ class TimePenaltyCalculatorTest {
 
   @Test
   void calculate() {
-    FlexPathCalculator delegate = (fromv, tov, boardStopPosition, alightStopPosition) ->
-      new FlexPath(10_000, THIRTY_MINS_IN_SECONDS, () -> LineStrings.SIMPLE);
+    FlexPathCalculator delegate = (
+      fromv,
+      tov,
+      boardStopPosition,
+      alightStopPosition) -> new FlexPath(10_000, THIRTY_MINS_IN_SECONDS, () -> LineStrings.SIMPLE);
 
     var mod = TimePenalty.of(Duration.ofMinutes(10), 1.5f);
     var calc = new TimePenaltyCalculator(delegate, mod);

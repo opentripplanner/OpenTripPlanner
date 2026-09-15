@@ -16,20 +16,20 @@ public class SeverityMapper {
       return "normal";
     }
     switch (severity) {
-      case UNKNOWN_SEVERITY:
+      case UNKNOWN_SEVERITY :
         return "unknown";
-      case INFO:
+      case INFO :
         return "noImpact";
-      case VERY_SLIGHT:
+      case VERY_SLIGHT :
         return "verySlight";
-      case SLIGHT:
+      case SLIGHT :
         return "slight";
-      case SEVERE:
+      case SEVERE :
         return "severe";
-      case VERY_SEVERE:
+      case VERY_SEVERE :
         return "verySevere";
-      case WARNING:
-      default: {
+      case WARNING :
+      default : {
         return "normal";
       }
     }

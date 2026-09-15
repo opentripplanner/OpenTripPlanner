@@ -63,11 +63,9 @@ final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
    */
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    return (
-      edge instanceof TemporaryEdge &&
+    return (edge instanceof TemporaryEdge &&
       !ownTemporaryVertices.contains(edge.getFromVertex()) &&
-      !ownTemporaryVertices.contains(edge.getToVertex())
-    );
+      !ownTemporaryVertices.contains(edge.getToVertex()));
   }
 
   /**
@@ -86,8 +84,8 @@ final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
     }
     Coordinate originCoordinate = origin.getCoordinate();
     boundary.sort(
-      Comparator.comparingDouble(v ->
-        SphericalDistanceLibrary.fastDistance(originCoordinate, v.getCoordinate())
+      Comparator.comparingDouble(
+        v -> SphericalDistanceLibrary.fastDistance(originCoordinate, v.getCoordinate())
       )
     );
     return boundary;

@@ -1,9 +1,7 @@
 package org.opentripplanner.transit.model.framework;
 
-public interface TransitEntityBuilder<
-  E extends TransitObject<E, B>,
-  B extends TransitEntityBuilder<E, B>
-> extends TransitBuilder<E, B> {
+public interface TransitEntityBuilder<E extends TransitObject<E, B>, B extends TransitEntityBuilder<E, B>>
+  extends TransitBuilder<E, B> {
   /**
    * Create a new {@link TransitObject} instance from the builder values and store the object in the
    * current context. This change will propagate to the master service/index when the context commit

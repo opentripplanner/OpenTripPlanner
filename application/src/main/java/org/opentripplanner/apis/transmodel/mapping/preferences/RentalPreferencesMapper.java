@@ -11,12 +11,14 @@ public class RentalPreferencesMapper {
     VehicleRentalPreferences.Builder rental,
     DataFetcherDecorator callWith
   ) {
-    callWith.argument("whiteListed.rentalNetworks", (List<String> networks) ->
-      rental.withAllowedNetworks(Set.copyOf(networks))
+    callWith.argument(
+      "whiteListed.rentalNetworks",
+      (List<String> networks) -> rental.withAllowedNetworks(Set.copyOf(networks))
     );
 
-    callWith.argument("banned.rentalNetworks", (List<String> networks) ->
-      rental.withBannedNetworks(Set.copyOf(networks))
+    callWith.argument(
+      "banned.rentalNetworks",
+      (List<String> networks) -> rental.withBannedNetworks(Set.copyOf(networks))
     );
     callWith.argument(
       "useBikeRentalAvailabilityInformation",

@@ -38,9 +38,8 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
  */
 @Deprecated
 @SuppressWarnings("UnusedReturnValue")
-public class TestTransitData
-  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants
-{
+public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>,
+  RaptorTestConstants {
 
   public static final TransferConstraint TX_GUARANTEED = TransferConstraint.of()
     .guaranteed()
@@ -129,8 +128,7 @@ public class TestTransitData
         TestTripSchedule toTrip,
         int toStopPosition
       ) {
-        var list = routes
-          .stream()
+        var list = routes.stream()
           .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
           .filter(tx -> tx.getSourceTrip().equals(fromTrip))
           .filter(tx -> tx.getSourceStopPos() == fromStopPosition)
@@ -157,8 +155,7 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataStartTime() {
-    return this.routes
-      .stream()
+    return this.routes.stream()
       .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
       .min()
       .orElseThrow();
@@ -166,17 +163,12 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataEndTime() {
-    return this.routes
-      .stream()
-      .mapToInt(route -> {
-        RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
-        RaptorTripPattern pattern = route.pattern();
-        return timetable
-          .getTripSchedule(timetable.numberOfTripSchedules() - 1)
-          .departure(pattern.numberOfStopsInPattern() - 1);
-      })
-      .max()
-      .orElseThrow();
+    return this.routes.stream().mapToInt(route -> {
+      RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
+      RaptorTripPattern pattern = route.pattern();
+      return timetable.getTripSchedule(timetable.numberOfTripSchedules() - 1)
+        .departure(pattern.numberOfStopsInPattern() - 1);
+    }).max().orElseThrow();
   }
 
   @Override
@@ -290,7 +282,7 @@ public class TestTransitData
     for (ConstrainedTransfer tx : constrainedTransfers) {
       if (
         ((TestTransferPoint) tx.getFrom()).matches(fromTrip, fromStop, fromStopPosition) &&
-        ((TestTransferPoint) tx.getTo()).matches(toTrip, toStop, toStopPosition)
+          ((TestTransferPoint) tx.getTo()).matches(toTrip, toStop, toStopPosition)
       ) {
         return tx;
       }

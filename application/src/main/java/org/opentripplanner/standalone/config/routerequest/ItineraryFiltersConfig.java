@@ -20,8 +20,7 @@ public class ItineraryFiltersConfig {
     NodeAdapter root,
     ItineraryFilterPreferences.Builder builder
   ) {
-    NodeAdapter c = root
-      .of(parameterName)
+    NodeAdapter c = root.of(parameterName)
       .since(V2_0)
       .summary(
         "Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results."
@@ -66,18 +65,15 @@ public class ItineraryFiltersConfig {
     }
     var dft = builder.original();
 
-    builder
-      .withDebug(
-        c
-          .of("debug")
-          .since(V2_0)
-          .summary(ItineraryFilterDebugProfile.OFF.typeDescription())
-          .description(docEnumValueList(ItineraryFilterDebugProfile.values()))
-          .asEnum(dft.debug())
-      )
+    builder.withDebug(
+      c.of("debug")
+        .since(V2_0)
+        .summary(ItineraryFilterDebugProfile.OFF.typeDescription())
+        .description(docEnumValueList(ItineraryFilterDebugProfile.values()))
+        .asEnum(dft.debug())
+    )
       .withGroupSimilarityKeepOne(
-        c
-          .of("groupSimilarityKeepOne")
+        c.of("groupSimilarityKeepOne")
           .since(V2_1)
           .summary(
             "Pick ONE itinerary from each group after putting itineraries that are 85% similar together."
@@ -85,8 +81,7 @@ public class ItineraryFiltersConfig {
           .asDouble(dft.groupSimilarityKeepOne())
       )
       .withGroupSimilarityKeepThree(
-        c
-          .of("groupSimilarityKeepThree")
+        c.of("groupSimilarityKeepThree")
           .since(V2_1)
           .summary(
             "Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity."
@@ -94,8 +89,7 @@ public class ItineraryFiltersConfig {
           .asDouble(dft.groupSimilarityKeepThree())
       )
       .withGroupedOtherThanSameLegsMaxCostMultiplier(
-        c
-          .of("groupedOtherThanSameLegsMaxCostMultiplier")
+        c.of("groupedOtherThanSameLegsMaxCostMultiplier")
           .since(V2_1)
           .summary(
             "Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one."
@@ -111,8 +105,7 @@ public class ItineraryFiltersConfig {
       )
       .withTransitGeneralizedCostLimit(
         parseTransitGeneralizedCostLimit(
-          c
-            .of("transitGeneralizedCostLimit")
+          c.of("transitGeneralizedCostLimit")
             .since(V2_1)
             .summary("A relative limit for the generalized-cost for transit itineraries.")
             .description(
@@ -130,8 +123,7 @@ public class ItineraryFiltersConfig {
         )
       )
       .withNonTransitGeneralizedCostLimit(
-        c
-          .of("nonTransitGeneralizedCostLimit")
+        c.of("nonTransitGeneralizedCostLimit")
           .since(V2_1)
           .summary(
             "The function define a max-limit for generalized-cost for non-transit itineraries."
@@ -152,8 +144,7 @@ public class ItineraryFiltersConfig {
           .asCostLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-        c
-          .of("removeTransitWithHigherCostThanBestOnStreetOnly")
+        c.of("removeTransitWithHigherCostThanBestOnStreetOnly")
           .since(V2_4)
           .summary(
             "Limit function for generalized-cost computed from street-only itineries applied to transit itineraries."
@@ -172,8 +163,7 @@ public class ItineraryFiltersConfig {
           .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
       )
       .withBikeRentalDistanceRatio(
-        c
-          .of("bikeRentalDistanceRatio")
+        c.of("bikeRentalDistanceRatio")
           .since(V2_1)
           .summary(
             "Filter routes that consist of bike-rental and walking by the minimum fraction " +
@@ -189,8 +179,7 @@ public class ItineraryFiltersConfig {
           .asDouble(dft.bikeRentalDistanceRatio())
       )
       .withParkAndRideDurationRatio(
-        c
-          .of("parkAndRideDurationRatio")
+        c.of("parkAndRideDurationRatio")
           .since(V2_1)
           .summary(
             "Filter P+R routes that consist of driving and walking by the minimum fraction " +
@@ -206,8 +195,7 @@ public class ItineraryFiltersConfig {
           .asDouble(dft.parkAndRideDurationRatio())
       )
       .withFilterItinerariesWithSameFirstOrLastTrip(
-        c
-          .of("filterItinerariesWithSameFirstOrLastTrip")
+        c.of("filterItinerariesWithSameFirstOrLastTrip")
           .since(V2_2)
           .summary(
             "If more than one itinerary begins or ends with same trip, filter out one of those " +
@@ -224,8 +212,7 @@ public class ItineraryFiltersConfig {
           .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip())
       )
       .withRemoveItinerariesWithSameRoutesAndStops(
-        c
-          .of("removeItinerariesWithSameRoutesAndStops")
+        c.of("removeItinerariesWithSameRoutesAndStops")
           .since(V2_2)
           .summary(
             "Set to true if you want to list only the first itinerary  which goes through the " +
@@ -238,8 +225,7 @@ public class ItineraryFiltersConfig {
           .asBoolean(dft.removeItinerariesWithSameRoutesAndStops())
       )
       .withAccessibilityScore(
-        c
-          .of("accessibilityScore")
+        c.of("accessibilityScore")
           .since(V2_2)
           .summary(
             "An experimental feature contributed by IBI which adds a sandbox accessibility " +
@@ -251,8 +237,7 @@ public class ItineraryFiltersConfig {
           .asBoolean(dft.useAccessibilityScore())
       )
       .withMinBikeParkingDistance(
-        c
-          .of("minBikeParkingDistance")
+        c.of("minBikeParkingDistance")
           .since(V2_3)
           .summary(
             "Filter out bike park+ride results that have fewer meters of cycling than this value."
@@ -263,13 +248,13 @@ public class ItineraryFiltersConfig {
           .asDouble(dft.minBikeParkingDistance())
       )
       .withFilterDirectFlexBySearchWindow(
-        c
-          .of("filterDirectFlexBySearchWindow")
+        c.of("filterDirectFlexBySearchWindow")
           .since(V2_7)
           .summary(
             """
             Filter direct flex results by the search window. The search-window is not used
-            during flex routing, but we use one end to align it with transit results."""
+            during flex routing, but we use one end to align it with transit results.\
+            """
           )
           .description(
             """
@@ -296,8 +281,7 @@ public class ItineraryFiltersConfig {
     }
 
     return new TransitGeneralizedCostFilterParams(
-      node
-        .of("costLimitFunction")
+      node.of("costLimitFunction")
         .since(V2_2)
         .summary("The base function used by the filter.")
         .description(
@@ -305,8 +289,7 @@ public class ItineraryFiltersConfig {
             "exactly the same arrival and departure times."
         )
         .asCostLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
-      node
-        .of("intervalRelaxFactor")
+      node.of("intervalRelaxFactor")
         .since(V2_2)
         .summary(
           "How much the filter should be relaxed for itineraries that do not overlap in time."
@@ -316,7 +299,9 @@ public class ItineraryFiltersConfig {
           This value is used to increase the filter threshold for itineraries further away in
           time, compared to those, that have exactly the same arrival and departure times.
 
-          The unit is cost unit per second of time difference."""
+          The unit is cost unit per second of time difference.\
+
+          """
         )
         .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
     );

@@ -61,9 +61,7 @@ class RaptorTripScheduleTest {
   void restrictedFindDepartureStopPosition() {
     var subject = TestTripSchedule.schedule(
       TestTripPattern.of("restricted-repeating-stops", 1, 1, 1, 3).restrictions("* A * *").build()
-    )
-      .times(time("09:00"), time("09:10"), time("09:15"), time("09:30"))
-      .build();
+    ).times(time("09:00"), time("09:10"), time("09:15"), time("09:30")).build();
 
     assertEquals(2, subject.findDepartureStopPosition(time("09:09"), 1));
   }
@@ -72,9 +70,7 @@ class RaptorTripScheduleTest {
   void findStopPositionInCircularPattern() {
     var subject = TestTripSchedule.schedule(
       TestTripPattern.of("circular-loop", STOP_A, STOP_C, STOP_A).build()
-    )
-      .times(time("09:00"), time("09:10"), time("09:20"))
-      .build();
+    ).times(time("09:00"), time("09:10"), time("09:20")).build();
 
     // find boarding
     assertEquals(0, subject.findDepartureStopPosition(time("09:00"), STOP_A));

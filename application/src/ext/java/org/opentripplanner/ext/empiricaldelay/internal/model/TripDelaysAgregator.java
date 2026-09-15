@@ -39,8 +39,7 @@ public class TripDelaysAgregator {
    * Note! The list is sorted on sequence number before it is returned.
    */
   public List<DelayAtStopDto> delaysSortedForServiceId(String serviceId) {
-    return delaysForServiceId
-      .get(serviceId)
+    return delaysForServiceId.get(serviceId)
       .stream()
       .sorted(Comparator.comparingInt(DelayAtStopDto::sequence))
       .toList();

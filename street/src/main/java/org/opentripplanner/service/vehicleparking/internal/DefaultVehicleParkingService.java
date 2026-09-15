@@ -31,8 +31,7 @@ public class DefaultVehicleParkingService implements Serializable, VehicleParkin
 
   @Override
   public Collection<VehicleParking> listBikeParks() {
-    return repository
-      .listVehicleParkings()
+    return repository.listVehicleParkings()
       .stream()
       .filter(VehicleParking::hasBicyclePlaces)
       .toList();
@@ -40,8 +39,7 @@ public class DefaultVehicleParkingService implements Serializable, VehicleParkin
 
   @Override
   public Collection<VehicleParking> listCarParks() {
-    return repository
-      .listVehicleParkings()
+    return repository.listVehicleParkings()
       .stream()
       .filter(VehicleParking::hasAnyCarPlaces)
       .toList();

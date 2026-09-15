@@ -210,12 +210,10 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   @Override
   public boolean sameAs(UnscheduledTrip other) {
-    return (
-      super.sameAs(other) &&
+    return (super.sameAs(other) &&
       Arrays.equals(stopTimes, other.stopTimes) &&
       Arrays.equals(pickupBookingInfos, other.pickupBookingInfos) &&
-      Arrays.equals(dropOffBookingInfos, other.dropOffBookingInfos)
-    );
+      Arrays.equals(dropOffBookingInfos, other.dropOffBookingInfos));
   }
 
   @Override
@@ -232,8 +230,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       StopLocation stop = stopTimes[i].stop();
       if (stop instanceof GroupStop groupStop) {
         if (
-          groupStop
-            .getChildLocations()
+          groupStop.getChildLocations()
             .stream()
             .anyMatch(childStop -> childStop.getId().equals(fromStopId))
         ) {
@@ -257,8 +254,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       StopLocation stop = stopTimes[i].stop();
       if (stop instanceof GroupStop groupStop) {
         if (
-          groupStop
-            .getChildLocations()
+          groupStop.getChildLocations()
             .stream()
             .anyMatch(childStop -> childStop.getId().equals(toStopId))
         ) {

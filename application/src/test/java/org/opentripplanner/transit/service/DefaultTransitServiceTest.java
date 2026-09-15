@@ -421,10 +421,8 @@ class DefaultTransitServiceTest {
 
   @Test
   void getRealtimeTripTimes() {
-    Instant midnight = ServiceDateUtils.asStartOfService(
-      SERVICE_DATE,
-      service.getTimeZone()
-    ).toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(SERVICE_DATE, service.getTimeZone())
+      .toInstant();
 
     assertEquals(
       Optional.of(
@@ -449,10 +447,8 @@ class DefaultTransitServiceTest {
 
   @Test
   void getRealtimeTripTimesForAddedTrip() {
-    Instant midnight = ServiceDateUtils.asStartOfService(
-      SERVICE_DATE,
-      service.getTimeZone()
-    ).toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(SERVICE_DATE, service.getTimeZone())
+      .toInstant();
 
     assertEquals(
       Optional.of(
@@ -526,9 +522,8 @@ class DefaultTransitServiceTest {
       STOP_A,
       STOP_A
     );
-    assertThat(
-      tripTimes.stream().map(TripTimeOnDate::getRealtimeDeparture).toList()
-    ).containsExactly(DELAY, 10);
+    assertThat(tripTimes.stream().map(TripTimeOnDate::getRealtimeDeparture).toList())
+      .containsExactly(DELAY, 10);
   }
 
   @Test

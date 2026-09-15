@@ -43,8 +43,7 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
     // Given: 3 itineraries with 0, 1, and 2 number-of-transfers and the same cost
     Itinerary walk = newItinerary(A, 0).walk(50, E).build(COST);
     Itinerary bus1 = newItinerary(A).bus(21, 0, 10, B).bus(31, 30, 45, E).build(COST);
-    Itinerary bus2 = newItinerary(A)
-      .bus(21, 0, 10, B)
+    Itinerary bus2 = newItinerary(A).bus(21, 0, 10, B)
       .bus(31, 30, 45, C)
       .bus(41, 30, 45, E)
       .build(COST);

@@ -21,8 +21,8 @@ import org.opentripplanner.transit.model.timetable.TimetableBuilder;
 
 @SuppressWarnings("UnusedReturnValue")
 public final class TripPatternBuilder
-  extends AbstractEntityBuilder<TripPattern, TripPatternBuilder>
-{
+  extends
+  AbstractEntityBuilder<TripPattern, TripPatternBuilder> {
 
   private String name;
   private boolean realTimeTripPattern;
@@ -253,10 +253,8 @@ public final class TripPatternBuilder
     int expectedHops = Math.max(numberOfStops - 1, 0);
     if (hopGeometries != null && hopGeometries.size() != expectedHops) {
       throw new IllegalArgumentException(
-        "hopGeometries size (%d) does not match the number of hops in the stop pattern (%d)".formatted(
-          hopGeometries.size(),
-          expectedHops
-        )
+        "hopGeometries size (%d) does not match the number of hops in the stop pattern (%d)"
+          .formatted(hopGeometries.size(), expectedHops)
       );
     }
     // Cumulative table has one entry per vertex position (0 .. expectedHops). For a degenerate
@@ -268,8 +266,8 @@ public final class TripPatternBuilder
     if (hopGeometries != null) {
       for (int i = 0; i < hopGeometries.size(); i++) {
         LineString hop = hopGeometries.get(i);
-        cumulativeDouble[i + 1] =
-          cumulativeDouble[i] + GeometryUtils.sumDistances(hop.getCoordinateSequence());
+        cumulativeDouble[i + 1] = cumulativeDouble[i] +
+          GeometryUtils.sumDistances(hop.getCoordinateSequence());
         hops.add(hop);
       }
     } else {
@@ -277,8 +275,7 @@ public final class TripPatternBuilder
         StopLocation from = stopPattern.getStop(i);
         StopLocation to = stopPattern.getStop(i + 1);
         LineString hop = GeometryUtils.makeLineString(from.getCoordinate(), to.getCoordinate());
-        cumulativeDouble[i + 1] =
-          cumulativeDouble[i] +
+        cumulativeDouble[i + 1] = cumulativeDouble[i] +
           SphericalDistanceLibrary.distance(from.getLat(), from.getLon(), to.getLat(), to.getLon());
         hops.add(hop);
       }
@@ -305,8 +302,9 @@ public final class TripPatternBuilder
     List<LineString> hopGeometries = new ArrayList<>();
 
     for (int i = 0; i < stopPattern.getSize() - 1; i++) {
-      LineString hopGeometry =
-        i < originalTripPattern.numberOfStops() - 1 ? originalTripPattern.getHopGeometry(i) : null;
+      LineString hopGeometry = i < originalTripPattern.numberOfStops() - 1
+        ? originalTripPattern.getHopGeometry(i)
+        : null;
 
       if (hopGeometry != null && stopPattern.sameStops(originalTripPattern.getStopPattern(), i)) {
         // Copy hop geometry from previous pattern
@@ -316,10 +314,7 @@ public final class TripPatternBuilder
       ) {
         // Use old geometry but patch first and last point with new stops
         var newStart = stopPattern.getStop(i).getCoordinate().asJtsCoordinate();
-        var newEnd = stopPattern
-          .getStop(i + 1)
-          .getCoordinate()
-          .asJtsCoordinate();
+        var newEnd = stopPattern.getStop(i + 1).getCoordinate().asJtsCoordinate();
 
         Coordinate[] coordinates = originalTripPattern.getHopGeometry(i).getCoordinates().clone();
         coordinates[0].setCoordinate(newStart);
@@ -329,13 +324,12 @@ public final class TripPatternBuilder
       } else {
         // Create new straight-line geometry for hop
         hopGeometries.add(
-          GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
-            stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),
-            stopPattern
-              .getStop(i + 1)
-              .getCoordinate()
-              .asJtsCoordinate(),
-          })
+          GeometryUtils.getGeometryFactory()
+            .createLineString(
+              new Coordinate[] {
+                stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),
+                stopPattern.getStop(i + 1).getCoordinate().asJtsCoordinate(), }
+            )
         );
       }
     }

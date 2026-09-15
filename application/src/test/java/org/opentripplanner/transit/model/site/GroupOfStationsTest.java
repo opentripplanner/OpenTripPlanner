@@ -27,10 +27,7 @@ class GroupOfStationsTest {
 
   private static final GroupOfStations SUBJECT = GroupOfStations.of(
     FeedScopedIdForTestFactory.id(ID)
-  )
-    .withName(NAME)
-    .addChildStation(STATION)
-    .build();
+  ).withName(NAME).addChildStation(STATION).build();
 
   @Test
   void copy() {

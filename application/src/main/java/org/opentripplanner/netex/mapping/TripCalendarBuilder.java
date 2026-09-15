@@ -84,8 +84,7 @@ public class TripCalendarBuilder {
         dsjBySJId.add(sjId, new HashSet<>());
       }
 
-      dsjBySJId
-        .lookup(sjId)
+      dsjBySJId.lookup(sjId)
         .addAll(
           DatedServiceJourneyMapper.mapToServiceDates(
             datedServiceJourneyBySJId.get(sjId),

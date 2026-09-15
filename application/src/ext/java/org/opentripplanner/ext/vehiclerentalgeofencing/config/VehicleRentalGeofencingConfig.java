@@ -17,8 +17,7 @@ public class VehicleRentalGeofencingConfig {
     String parameterName,
     NodeAdapter root
   ) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_10)
       .summary("Load GBFS geofencing zones into the graph during graph build.")
       .description(
@@ -45,22 +44,19 @@ public class VehicleRentalGeofencingConfig {
     }
 
     return new VehicleRentalGeofencingParameters(
-      c
-        .of("url")
+      c.of("url")
         .since(V2_10)
         .summary("URL of the GBFS v3 `manifest.json`.")
         .description(
           "A remote URL (http/https). The manifest must conform to the GBFS v3.0 specification."
         )
         .asUri(),
-      c
-        .of("language")
+      c.of("language")
         .since(V2_10)
         .summary("Language code requested from the GBFS feeds.")
         .asString(null),
       HttpHeaders.of(
-        c
-          .of("headers")
+        c.of("headers")
           .since(V2_10)
           .summary("HTTP headers to add to the requests. Any header key, value can be inserted.")
           .asStringMap()

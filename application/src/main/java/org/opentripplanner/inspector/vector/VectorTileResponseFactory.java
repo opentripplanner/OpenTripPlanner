@@ -31,18 +31,15 @@ public class VectorTileResponseFactory {
 
     int cacheMaxSeconds = Integer.MAX_VALUE;
 
-    var availableLayerNames = availableLayers
-      .stream()
+    var availableLayerNames = availableLayers.stream()
       .map(LayerParameters::name)
       .collect(Collectors.toSet());
     if (!availableLayerNames.containsAll(requestedLayers)) {
       return Response.status(Response.Status.NOT_FOUND)
         .header(HttpHeaders.CONTENT_TYPE, HttpUtils.TEXT_PLAIN)
         .entity(
-          "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s.".formatted(
-            requestedLayers,
-            availableLayerNames
-          )
+          "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s."
+            .formatted(requestedLayers, availableLayerNames)
         )
         .build();
     }
@@ -50,13 +47,15 @@ public class VectorTileResponseFactory {
     for (LayerParameters<LayerType> layerParameters : availableLayers) {
       if (
         requestedLayers.contains(layerParameters.name()) &&
-        layerParameters.minZoom() <= z &&
-        z <= layerParameters.maxZoom()
+          layerParameters.minZoom() <= z &&
+          z <= layerParameters.maxZoom()
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
-        VectorTile.Tile.Layer layer = layerBuilderFactory
-          .createLayerBuilder(layerParameters, locale, context)
-          .build(envelope);
+        VectorTile.Tile.Layer layer = layerBuilderFactory.createLayerBuilder(
+          layerParameters,
+          locale,
+          context
+        ).build(envelope);
         mvtBuilder.addLayers(layer);
       }
     }

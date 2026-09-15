@@ -62,8 +62,8 @@ class GeneralizedCostParametersMapperTest {
   @Test
   public void dealWithEmptyList() {
     var routingRequest = RouteRequest.of()
-      .withJourney(jb ->
-        jb.withTransit(b -> b.withUnpreferredAgencies(List.of(agencyWithNoRoutes)))
+      .withJourney(
+        jb -> jb.withTransit(b -> b.withUnpreferredAgencies(List.of(agencyWithNoRoutes)))
       )
       .buildDefault();
 
@@ -80,9 +80,8 @@ class GeneralizedCostParametersMapperTest {
 
   private static TestRoute testTripPattern(FeedScopedId agencyId, FeedScopedId routeId) {
     return TestRoute.route(
-      TestTripPattern.pattern(1, 2).withRoute(
-        route(routeId).withAgency(agency(agencyId.getId())).build()
-      )
+      TestTripPattern.pattern(1, 2)
+        .withRoute(route(routeId).withAgency(agency(agencyId.getId())).build())
     );
   }
 }

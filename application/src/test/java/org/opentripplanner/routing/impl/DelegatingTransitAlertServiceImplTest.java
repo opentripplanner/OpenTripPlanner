@@ -45,9 +45,8 @@ class DelegatingTransitAlertServiceImplTest {
 
   @Test
   void getStopLocationsAlertsWithoutDelegates() {
-    assertThat(
-      new DelegatingTransitAlertServiceImpl().getStopLocationsAlerts(List.of(id(STOP_ID)))
-    ).isEmpty();
+    assertThat(new DelegatingTransitAlertServiceImpl().getStopLocationsAlerts(List.of(id(STOP_ID))))
+      .isEmpty();
   }
 
   @SafeVarargs

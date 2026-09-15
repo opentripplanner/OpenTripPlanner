@@ -126,8 +126,7 @@ class EnglishNgramAnalyzerTest {
       "1003rd:1003",
       "St:St",
       "S3:S3",
-      "Aard:Aard",
-    },
+      "Aard:Aard", },
     delimiter = ':'
   )
   void numberSuffixes(String input, String expected) {

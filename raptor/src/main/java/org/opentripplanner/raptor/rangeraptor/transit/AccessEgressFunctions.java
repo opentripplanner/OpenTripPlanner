@@ -41,8 +41,9 @@ public final class AccessEgressFunctions {
    *   <li>If both have opening hours, both need to be accepted</li>
    * </ol>
    */
-  private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
-    (l.arrivedOnBoard() && !r.arrivedOnBoard()) ||
+  private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) -> (l
+    .arrivedOnBoard() &&
+    !r.arrivedOnBoard()) ||
     r.hasOpeningHours() ||
     l.numberOfRides() < r.numberOfRides() ||
     l.durationInSeconds() < r.durationInSeconds() ||
@@ -52,8 +53,9 @@ public final class AccessEgressFunctions {
    * Filter Multi-criteria Raptor access and egress paths. This can be used to wash access/egress
    * paths - paths that are not optimal using this should not be passed into Raptor - it is a bug.
    */
-  private static final ParetoComparator<RaptorAccessEgress> MC_COMPARATOR = (l, r) ->
-    STANDARD_COMPARATOR.leftDominanceExist(l, r) || l.c1() < r.c1();
+  private static final ParetoComparator<RaptorAccessEgress> MC_COMPARATOR = (
+    l,
+    r) -> STANDARD_COMPARATOR.leftDominanceExist(l, r) || l.c1() < r.c1();
 
   /** private constructor to prevent instantiation of utils class. */
   private AccessEgressFunctions() {}
@@ -133,10 +135,7 @@ public final class AccessEgressFunctions {
   }
 
   static <T extends RaptorAccessEgress> List<T> filterOnSegment(List<T> list, int segment) {
-    return list
-      .stream()
-      .filter(it -> it.numberOfViaLocationsVisited() == segment)
-      .toList();
+    return list.stream().filter(it -> it.numberOfViaLocationsVisited() == segment).toList();
   }
 
   /* private methods */

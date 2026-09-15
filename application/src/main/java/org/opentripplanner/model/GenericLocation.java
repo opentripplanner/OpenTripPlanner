@@ -162,12 +162,10 @@ public class GenericLocation {
       return false;
     }
     var that = (GenericLocation) o;
-    return (
-      Objects.equals(label, that.label) &&
+    return (Objects.equals(label, that.label) &&
       Objects.equals(stopId, that.stopId) &&
       Objects.equals(coordinate, that.coordinate) &&
-      Objects.equals(tripLocation, that.tripLocation)
-    );
+      Objects.equals(tripLocation, that.tripLocation));
   }
 
   @Override

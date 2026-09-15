@@ -32,8 +32,7 @@ public class FlexEgressFactory {
   ) {
     var flexEgressTemplates = calculateFlexEgressTemplates(streetEgresses, dates);
 
-    return flexEgressTemplates
-      .stream()
+    return flexEgressTemplates.stream()
       .flatMap(template -> template.createFlexAccessEgressStream(callbackService))
       .toList();
   }
@@ -43,8 +42,7 @@ public class FlexEgressFactory {
     List<FlexServiceDate> dates
   ) {
     var closestFlexTrips = ClosestTrip.of(callbackService, streetEgresses, matcher, dates, false);
-    return closestFlexTrips
-      .stream()
+    return closestFlexTrips.stream()
       .flatMap(it -> templateFactory.createEgressTemplates(it).stream())
       .toList();
   }

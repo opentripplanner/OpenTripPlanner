@@ -20,10 +20,8 @@ import org.slf4j.LoggerFactory;
  * This is a wrapper around a ZipFile, it can be used to read the content, but not write to it. The
  * {@link #asOutputStream()} is throwing an exception.
  */
-public class ZipFileDataSource
-  extends AbstractFileDataSource
-  implements CompositeDataSource, ZipFileEntryParent
-{
+public class ZipFileDataSource extends AbstractFileDataSource implements CompositeDataSource,
+  ZipFileEntryParent {
 
   private static final Logger LOG = LoggerFactory.getLogger(ZipFileDataSource.class);
   private final Collection<DataSource> content = new ArrayList<>();
@@ -60,11 +58,7 @@ public class ZipFileDataSource
   @Override
   public DataSource entry(String name) {
     loadContent();
-    return content
-      .stream()
-      .filter(it -> it.name().equals(name))
-      .findFirst()
-      .orElse(null);
+    return content.stream().filter(it -> it.name().equals(name)).findFirst().orElse(null);
   }
 
   @Override
@@ -81,7 +75,8 @@ public class ZipFileDataSource
    * a {@link DataSource} around it.
    */
   private static Collection<DataSource> listZipEntries(ZipFileEntryParent parent, ZipFile zipFile)
-    throws IOException, ZipException {
+    throws IOException,
+    ZipException {
     Collection<DataSource> content = new ArrayList<DataSource>();
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
 

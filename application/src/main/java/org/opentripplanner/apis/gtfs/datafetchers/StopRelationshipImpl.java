@@ -10,12 +10,11 @@ public class StopRelationshipImpl implements GraphQLDataFetchers.GraphQLStopRela
 
   @Override
   public DataFetcher<Object> status() {
-    return env ->
-      switch (getSource(env).status()) {
-        case INCOMING_AT -> GraphQLTypes.GraphQLVehicleStopStatus.INCOMING_AT;
-        case IN_TRANSIT_TO -> GraphQLTypes.GraphQLVehicleStopStatus.IN_TRANSIT_TO;
-        case STOPPED_AT -> GraphQLTypes.GraphQLVehicleStopStatus.STOPPED_AT;
-      };
+    return env -> switch (getSource(env).status()) {
+      case INCOMING_AT -> GraphQLTypes.GraphQLVehicleStopStatus.INCOMING_AT;
+      case IN_TRANSIT_TO -> GraphQLTypes.GraphQLVehicleStopStatus.IN_TRANSIT_TO;
+      case STOPPED_AT -> GraphQLTypes.GraphQLVehicleStopStatus.STOPPED_AT;
+    };
   }
 
   @Override

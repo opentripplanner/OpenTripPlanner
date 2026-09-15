@@ -130,8 +130,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (search == null) {
       var profile = MIN_TRAVEL_DURATION;
 
-      var builder = request
-        .mutate()
+      var builder = request.mutate()
         // Disable any optimization that is not valid for a heuristic search
         .clearOptimizations()
         .profile(profile)

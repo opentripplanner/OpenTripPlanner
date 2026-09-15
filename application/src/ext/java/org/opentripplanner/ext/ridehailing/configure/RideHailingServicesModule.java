@@ -18,8 +18,7 @@ public class RideHailingServicesModule {
   @Provides
   @Singleton
   List<RideHailingService> services(RouterConfig config) {
-    return config
-      .rideHailingServiceParameters()
+    return config.rideHailingServiceParameters()
       .stream()
       .map(p -> (RideHailingService) new UberService(p))
       .toList();

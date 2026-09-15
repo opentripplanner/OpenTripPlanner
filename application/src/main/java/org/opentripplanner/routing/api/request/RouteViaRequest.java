@@ -145,8 +145,7 @@ public class RouteViaRequest implements Serializable {
       return false;
     }
 
-    return (
-      viaSegments.equals(other.viaSegments) &&
+    return (viaSegments.equals(other.viaSegments) &&
       from.equals(other.from) &&
       to.equals(other.to) &&
       dateTime.equals(other.dateTime) &&
@@ -154,8 +153,7 @@ public class RouteViaRequest implements Serializable {
       wheelchair == other.wheelchair &&
       Objects.equals(locale, other.locale) &&
       preferences.equals(other.preferences) &&
-      Objects.equals(numItineraries, other.numItineraries)
-    );
+      Objects.equals(numItineraries, other.numItineraries));
   }
 
   @Override

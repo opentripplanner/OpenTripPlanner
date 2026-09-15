@@ -128,8 +128,7 @@ public class ItineraryTest implements PlanTestConstants {
 
   @Test
   void testDerivedFieldsWithBusAndWalkingAccessAndEgress() {
-    Itinerary result = newItinerary(A, T11_05)
-      .walk(D2_m, B)
+    Itinerary result = newItinerary(A, T11_05).walk(D2_m, B)
       // 3 minutes wait
       .bus(1, T11_10, T11_20, C)
       .walk(D3_m, D)
@@ -149,8 +148,7 @@ public class ItineraryTest implements PlanTestConstants {
 
   @Test
   void walkBusBusWalkTrainWalk() {
-    Itinerary result = newItinerary(A, T11_00)
-      .walk(D2_m, B)
+    Itinerary result = newItinerary(A, T11_00).walk(D2_m, B)
       .bus(55, T11_04, T11_14, C)
       .bus(21, T11_16, T11_20, D)
       .walk(D3_m, E)
@@ -176,8 +174,7 @@ public class ItineraryTest implements PlanTestConstants {
 
   @Test
   void walkSeparateFromBike() {
-    var itin = newItinerary(A, T11_00)
-      .walk(D2_m, B)
+    var itin = newItinerary(A, T11_00).walk(D2_m, B)
       .bicycle(T11_05, T11_15, D)
       .walk(D3_m, E)
       .build();
@@ -288,8 +285,7 @@ public class ItineraryTest implements PlanTestConstants {
 
     @Test
     void bothPenalties() {
-      var subject = itineraryBuilder()
-        .withGeneralizedCost(COST)
+      var subject = itineraryBuilder().withGeneralizedCost(COST)
         .withAccessPenalty(PENALTY)
         .withEgressPenalty(PENALTY)
         .build();

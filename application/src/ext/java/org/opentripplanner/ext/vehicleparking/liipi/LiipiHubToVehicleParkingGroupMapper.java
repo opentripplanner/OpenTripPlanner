@@ -63,8 +63,8 @@ public class LiipiHubToVehicleParkingGroupMapper {
 
       var hubForPark = new HashMap<FeedScopedId, VehicleParkingGroup>();
 
-      vehicleParkingIds.forEach(vehicleParkingId ->
-        hubForPark.put(vehicleParkingId, vehicleParkingGroup)
+      vehicleParkingIds.forEach(
+        vehicleParkingId -> hubForPark.put(vehicleParkingId, vehicleParkingGroup)
       );
 
       return hubForPark;

@@ -21,8 +21,8 @@ class PreferencesMapper {
     DataFetcherDecorator callWith,
     RoutingPreferencesBuilder preferences
   ) {
-    preferences.withStreet(street ->
-      mapStreetPreferences(street, environment, preferences.street())
+    preferences.withStreet(
+      street -> mapStreetPreferences(street, environment, preferences.street())
     );
     preferences.withWalk(walk -> mapWalkPreferences(walk, callWith));
     preferences.withBike(bike -> mapBikePreferences(bike, callWith));
@@ -30,8 +30,8 @@ class PreferencesMapper {
     preferences.withScooter(scooter -> mapScooterPreferences(scooter, callWith));
     preferences.withTransfer(transfer -> mapTransferPreferences(transfer, callWith));
     preferences.withTransit(transit -> mapTransitPreferences(transit, environment, callWith));
-    preferences.withItineraryFilter(itineraryFilter ->
-      mapItineraryFilterPreferences(itineraryFilter, environment, callWith)
+    preferences.withItineraryFilter(
+      itineraryFilter -> mapItineraryFilterPreferences(itineraryFilter, environment, callWith)
     );
     callWith.argument("locale", (String v) -> preferences.withLocale(Locale.forLanguageTag(v)));
   }

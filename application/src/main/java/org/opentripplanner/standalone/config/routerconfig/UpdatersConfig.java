@@ -74,27 +74,21 @@ public class UpdatersConfig implements UpdatersParameters {
   private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
 
   public UpdatersConfig(NodeAdapter rootAdapter) {
-    this.vehicleRentalServiceDirectoryFetcherParameters =
-      VehicleRentalServiceDirectoryFetcherConfig.create(
-        "vehicleRentalServiceDirectory",
-        rootAdapter
-      );
+    this.vehicleRentalServiceDirectoryFetcherParameters = VehicleRentalServiceDirectoryFetcherConfig
+      .create("vehicleRentalServiceDirectory", rootAdapter);
 
     timetableUpdates = timetableUpdates(
-      rootAdapter
-        .of("timetableUpdates")
+      rootAdapter.of("timetableUpdates")
         .since(V2_2)
         .summary("Global configuration for timetable updaters.")
         .asObject()
     );
 
-    rootAdapter
-      .of("updaters")
+    rootAdapter.of("updaters")
       .since(V1_5)
       .summary("Configuration for the updaters that import various types of data into OTP.")
       .asObjects(it -> {
-        Type type = it
-          .of("type")
+        Type type = it.of("type")
           .since(V1_5)
           .summary("The type of the updater.")
           .asEnum(Type.class);
@@ -116,8 +110,7 @@ public class UpdatersConfig implements UpdatersParameters {
     }
 
     return new TimetableSnapshotParameters(
-      c
-        .of("maxSnapshotFrequency")
+      c.of("maxSnapshotFrequency")
         .since(V2_2)
         .summary("How long a snapshot should be cached.")
         .description(
@@ -126,8 +119,7 @@ public class UpdatersConfig implements UpdatersParameters {
             "Applies to GTFS-RT and Siri updates."
         )
         .asDuration(dflt.maxSnapshotFrequency()),
-      c
-        .of("purgeExpiredData")
+      c.of("purgeExpiredData")
         .since(V2_2)
         .summary(
           "Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates."

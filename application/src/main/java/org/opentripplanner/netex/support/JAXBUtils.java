@@ -29,8 +29,7 @@ public final class JAXBUtils {
     Class<T> type,
     Collection<S> c
   ) {
-    return c
-      .stream()
+    return c.stream()
       .filter(Objects::nonNull)
       .map(JAXBElement::getValue)
       .filter(Objects::nonNull)

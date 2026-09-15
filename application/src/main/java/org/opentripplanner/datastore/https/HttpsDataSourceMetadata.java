@@ -31,8 +31,7 @@ class HttpsDataSourceMetadata {
 
   HttpsDataSourceMetadata(List<Header> headers) {
     this(
-      headers
-        .stream()
+      headers.stream()
         .filter(header -> HTTP_HEADERS.contains(header.getName()))
         .collect(Collectors.toUnmodifiableMap(Header::getName, Header::getValue))
     );

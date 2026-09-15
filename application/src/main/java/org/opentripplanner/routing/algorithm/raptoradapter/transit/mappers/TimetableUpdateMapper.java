@@ -53,20 +53,16 @@ public class TimetableUpdateMapper {
    * Cache the TripPatternForDates indexed on the original TripPatterns in order to avoid this
    * expensive operation being done each time the update method is called.
    */
-  private final Map<
-    LocalDate,
-    Map<TripPattern, TripPatternForDate>
-  > tripPatternsStartingOnDateMapCache = new HashMap<>();
+  private final Map<LocalDate, Map<TripPattern, TripPatternForDate>> tripPatternsStartingOnDateMapCache =
+    new HashMap<>();
 
   /**
    * Cache the TripPatternForDate currently in use for a trip and service date. Only one
    * TripPatternForDate is allowed for a trip id and service date. This cache is used to clean up
    * extra tripPatternsForDate.
    */
-  private final Map<
-    TripIdAndServiceDate,
-    TripPatternForDate
-  > tripPatternsForTripIdAndServiceDateCache = new HashMap<>();
+  private final Map<TripIdAndServiceDate, TripPatternForDate> tripPatternsForTripIdAndServiceDateCache =
+    new HashMap<>();
 
   private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache =
     new HashMap<>();
@@ -123,8 +119,7 @@ public class TimetableUpdateMapper {
         tripPatternsStartingOnDateMapCache.put(date, map);
       }
 
-      TripPatternForDate oldTripPatternForDate = tripPatternsStartingOnDateMapCache
-        .get(date)
+      TripPatternForDate oldTripPatternForDate = tripPatternsStartingOnDateMapCache.get(date)
         .get(tripPattern);
 
       if (oldTripPatternForDate != null) {
@@ -161,8 +156,8 @@ public class TimetableUpdateMapper {
             triptimes.getTrip().getId(),
             timetable.getServiceDate()
           );
-          TripPatternForDate previousTripPatternForDate =
-            tripPatternsForTripIdAndServiceDateCache.put(id, newTripPatternForDate);
+          TripPatternForDate previousTripPatternForDate = tripPatternsForTripIdAndServiceDateCache
+            .put(id, newTripPatternForDate);
           if (previousTripPatternForDate != null) {
             previouslyUsedPatterns.add(previousTripPatternForDate);
           } else {
@@ -179,16 +174,19 @@ public class TimetableUpdateMapper {
     // Now loop through all running period dates of old and new TripPatternsForDate and update
     // the tripPatternsByRunningPeriodDate accordingly
     for (LocalDate date : datesToBeUpdated) {
-      tripPatternsRunningOnDateMapCache.computeIfAbsent(date, p ->
-        new HashSet<>(realtimeRaptorTransitData.getTripPatternsRunningOnDateCopy(date))
+      tripPatternsRunningOnDateMapCache.computeIfAbsent(
+        date,
+        p -> new HashSet<>(realtimeRaptorTransitData.getTripPatternsRunningOnDateCopy(date))
       );
 
       // Remove old cached tripPatterns where tripTimes are no longer running
       Set<TripPatternForDate> patternsForDate = tripPatternsRunningOnDateMapCache.get(date);
 
-      for (Map.Entry<TripPattern, Collection<TripPatternForDate>> entry : oldTripPatternsForDate
-        .asMap()
-        .entrySet()) {
+      for (
+        Map.Entry<TripPattern, Collection<TripPatternForDate>> entry : oldTripPatternsForDate
+          .asMap()
+          .entrySet()
+      ) {
         for (TripPatternForDate oldTripPatternForDate : entry.getValue()) {
           // Remove old TripPatternForDate for this date if it was valid on this date
           if (oldTripPatternForDate != null) {
@@ -207,8 +205,7 @@ public class TimetableUpdateMapper {
           }
           var oldTimeTable = timetableProvider.apply(pattern.getId());
           if (oldTimeTable != null) {
-            var toRemove = oldTimeTable
-              .stream()
+            var toRemove = oldTimeTable.stream()
               .filter(tt -> tt.getServiceDate().equals(date))
               .findFirst()
               .map(tt -> tt.getTripTimes().isEmpty())
@@ -225,9 +222,11 @@ public class TimetableUpdateMapper {
         }
       }
 
-      for (Map.Entry<TripPattern, Collection<TripPatternForDate>> entry : newTripPatternsForDate
-        .asMap()
-        .entrySet()) {
+      for (
+        Map.Entry<TripPattern, Collection<TripPatternForDate>> entry : newTripPatternsForDate
+          .asMap()
+          .entrySet()
+      ) {
         for (TripPatternForDate newTripPatternForDate : entry.getValue()) {
           // Add new TripPatternForDate for this date if it mapped correctly and is valid on this date
           if (newTripPatternForDate != null) {

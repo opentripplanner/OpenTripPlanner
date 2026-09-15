@@ -97,8 +97,7 @@ public class PagingFilterTest implements PlanTestConstants {
   public void testPotentialDuplicateMarkedForDeletionWithFewerNumberOfTransfers() {
     int t0 = MIDDLE_START;
 
-    Itinerary middleHighNumberOfTransfers = newItinerary(A)
-      .bus(21, t0, t0 + D1_m, B)
+    Itinerary middleHighNumberOfTransfers = newItinerary(A).bus(21, t0, t0 + D1_m, B)
       .bus(22, t0 + D2_m, t0 + D3_m, C)
       .bus(23, t0 + D4_m, MIDDLE_END, D)
       .build(MIDDLE.generalizedCost());
@@ -114,8 +113,7 @@ public class PagingFilterTest implements PlanTestConstants {
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLaterDepartureTime() {
     int t0 = MIDDLE_START;
-    Itinerary middleEarlierDepartureTime = newItinerary(A)
-      .bus(2, t0 - D1_m, t0 + D3_m, B)
+    Itinerary middleEarlierDepartureTime = newItinerary(A).bus(2, t0 - D1_m, t0 + D3_m, B)
       .bus(21, t0 + D4_m, MIDDLE_END, C)
       .build(MIDDLE.generalizedCost());
 
@@ -247,8 +245,7 @@ public class PagingFilterTest implements PlanTestConstants {
       if (nTransfers == 0) {
         builder.bus(10, departureTime, arrivalTime, B);
       } else if (nTransfers == 1) {
-        builder
-          .bus(20, departureTime, departureTime + 120, B)
+        builder.bus(20, departureTime, departureTime + 120, B)
           .bus(21, departureTime + 240, arrivalTime, B);
       } else {
         throw new IllegalArgumentException("nTransfers not supported: " + nTransfers);
@@ -265,8 +262,7 @@ public class PagingFilterTest implements PlanTestConstants {
   }
 
   private static TestItineraryBuilder createMiddleBuilder() {
-    return newItinerary(A)
-      .bus(2, MIDDLE_START, MIDDLE_START + D2_m, B)
+    return newItinerary(A).bus(2, MIDDLE_START, MIDDLE_START + D2_m, B)
       .bus(21, MIDDLE_END - D3_m, MIDDLE_END, D);
   }
 

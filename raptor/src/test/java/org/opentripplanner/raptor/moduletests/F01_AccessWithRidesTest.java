@@ -37,17 +37,16 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access(
-        // lowest num-of-transfers (0)
-        "Walk 10m C₁180 ~ B",
-        // lowest cost
-        "Flex+Walk 2m Rₙ2 C₁239 ~ C",
-        // latest departure time
-        "Flex 3m Rₙ2 C₁360 ~ D",
-        // best on combination of transfers and time
-        "Flex+Walk 7m Rₙ1 C₁480 ~ E"
-      )
+    data.access(
+      // lowest num-of-transfers (0)
+      "Walk 10m C₁180 ~ B",
+      // lowest cost
+      "Flex+Walk 2m Rₙ2 C₁239 ~ C",
+      // latest departure time
+      "Flex 3m Rₙ2 C₁360 ~ D",
+      // best on combination of transfers and time
+      "Flex+Walk 7m Rₙ1 C₁480 ~ E"
+    )
       .withTimetables(
         """
         B     C     D     E     F

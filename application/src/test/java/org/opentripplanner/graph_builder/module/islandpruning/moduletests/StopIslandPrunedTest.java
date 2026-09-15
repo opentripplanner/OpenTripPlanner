@@ -45,16 +45,18 @@ class StopIslandPrunedTest {
     StreetTransitStopLink.createStreetTransitStopLink(stopVertex, i0);
 
     // Islands with stops smaller than 3 street vertices are pruned; this island has 2.
-    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, stopVertex).prune(
-      IslandPruningParameters.of()
-        .withPruningThresholdIslandWithoutStops(3)
-        .withPruningThresholdIslandWithStops(3)
-        .withAdaptivePruningFactor(1)
-        .build()
-    );
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, stopVertex)
+      .prune(
+        IslandPruningParameters.of()
+          .withPruningThresholdIslandWithoutStops(3)
+          .withPruningThresholdIslandWithStops(3)
+          .withAdaptivePruningFactor(1)
+          .build()
+      );
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // main square only: the island's street edges and the stop links are all gone
         "(0,0) → (0,1) PEDESTRIAN ♿✅",

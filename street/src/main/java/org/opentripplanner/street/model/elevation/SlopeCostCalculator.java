@@ -93,8 +93,7 @@ public class SlopeCostCalculator {
 
       double slope_or_zero = Math.max(slope, 0);
       double hypotenuse = Math.sqrt(rise * rise + run * run);
-      double energy =
-        hypotenuse *
+      double energy = hypotenuse *
         (ENERGY_PER_METER_ON_FLAT +
           ENERGY_SLOPE_FACTOR * slope_or_zero * slope_or_zero * slope_or_zero);
       slopeWorkCost += energy;

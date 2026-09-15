@@ -61,8 +61,9 @@ public class GeometryProcessor {
     DataImportIssueStore issueStore
   ) {
     this.builder = builder;
-    this.maxStopToShapeSnapDistance =
-      maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0
+      ? maxStopToShapeSnapDistance
+      : 150;
     this.issueStore = issueStore;
   }
 
@@ -81,8 +82,8 @@ public class GeometryProcessor {
     List<StopTime> stopTimes = builder.getStopTimesSortedByTrip().get(trip);
     if (
       trip.getShapeId() == null ||
-      trip.getShapeId().getId() == null ||
-      trip.getShapeId().getId().isEmpty()
+        trip.getShapeId().getId() == null ||
+        trip.getShapeId().getId().isEmpty()
     ) {
       return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
@@ -91,11 +92,9 @@ public class GeometryProcessor {
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
-    return (
-      startIndex.getSegmentIndex() == endIndex.getSegmentIndex() &&
+    return (startIndex.getSegmentIndex() == endIndex.getSegmentIndex() &&
       startIndex.getSegmentFraction() == endIndex.getSegmentFraction() &&
-      startIndex.getComponentIndex() == endIndex.getComponentIndex()
-    );
+      startIndex.getComponentIndex() == endIndex.getComponentIndex());
   }
 
   /**
@@ -175,8 +174,8 @@ public class GeometryProcessor {
       }
       last = startLocation.getSegmentIndex();
 
-      double startIndex =
-        distanceSoFar + startLocation.getSegmentFraction() * startLocation.getSegmentLength(shape);
+      double startIndex = distanceSoFar +
+        startLocation.getSegmentFraction() * startLocation.getSegmentLength(shape);
       //advance distanceSoFar up to start of segment containing endLocation
       for (int j = last; j < endLocation.getSegmentIndex(); ++j) {
         Coordinate from = shape.getCoordinateN(j);
@@ -186,8 +185,8 @@ public class GeometryProcessor {
         distanceSoFar += Math.sqrt(xd * xd + yd * yd);
       }
       last = startLocation.getSegmentIndex();
-      double endIndex =
-        distanceSoFar + endLocation.getSegmentFraction() * endLocation.getSegmentLength(shape);
+      double endIndex = distanceSoFar +
+        endLocation.getSegmentFraction() * endLocation.getSegmentLength(shape);
 
       ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startIndex, endIndex);
       LineString geometry = geometriesByShapeSegmentKey.get(key);
@@ -358,8 +357,7 @@ public class GeometryProcessor {
             var lastSegment = continuousSegments.getLast().getLast();
             var segmentsForNextStop = possibleSegmentsForStop.get(stopPositionInPattern + 1);
             var s = segment;
-            shouldStartNewSegment = segmentsForNextStop
-              .stream()
+            shouldStartNewSegment = segmentsForNextStop.stream()
               .anyMatch(item -> item.index > lastSegment.index && item.index < s.index);
           }
           if (shouldStartNewSegment) {
@@ -382,8 +380,8 @@ public class GeometryProcessor {
       }
       // we found one!
       // best match may be the split segment with the previous stop, in this case we need to load the full segment
-      IndexedLineSegment matchedSegment =
-        prevSegment != null && bestMatch.index == prevSegment.index ? prevSegment : bestMatch;
+      IndexedLineSegment matchedSegment = prevSegment != null &&
+        bestMatch.index == prevSegment.index ? prevSegment : bestMatch;
       prevSegmentFraction = matchedSegment.fraction(stopCoord);
       LinearLocation location = new LinearLocation(0, bestMatch.index, prevSegmentFraction);
       locations.add(location);
@@ -443,8 +441,7 @@ public class GeometryProcessor {
   private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
     Coordinate[] coordinates = new Coordinate[] {
       s0.getCoordinate().asJtsCoordinate(),
-      s1.getCoordinate().asJtsCoordinate(),
-    };
+      s1.getCoordinate().asJtsCoordinate(), };
     CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
 
     return GEOMETRY_FACTORY.createLineString(sequence);
@@ -470,7 +467,7 @@ public class GeometryProcessor {
     Coordinate endCoord = s1.getCoordinate().asJtsCoordinate();
     if (
       SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) >
-      maxStopToShapeSnapDistance
+        maxStopToShapeSnapDistance
     ) {
       return false;
     } else if (

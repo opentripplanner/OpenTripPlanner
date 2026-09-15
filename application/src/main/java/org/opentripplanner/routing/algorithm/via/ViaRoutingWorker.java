@@ -43,11 +43,7 @@ public class ViaRoutingWorker {
 
   public ViaRoutingResponse route() {
     //Loop over Via, for each cycle change from/to and JourneyRequest.
-    var result = viaRequest
-      .viaSegment()
-      .stream()
-      .map(v -> routeSegment(v))
-      .toList();
+    var result = viaRequest.viaSegment().stream().map(v -> routeSegment(v)).toList();
 
     return combineRoutingResponse(result);
   }
@@ -135,8 +131,8 @@ public class ViaRoutingWorker {
     var latestDeparturetime = i.endTime().plus(v.maxSlack());
 
     // Not before earlist and not after latest to include equal time
-    return j ->
-      !j.startTime().isBefore(earliestDeparturetime) && !j.startTime().isAfter(latestDeparturetime);
+    return j -> !j.startTime().isBefore(earliestDeparturetime) &&
+      !j.startTime().isAfter(latestDeparturetime);
   }
 
   private Optional<ZonedDateTime> firstArrival(RoutingResponse response) {

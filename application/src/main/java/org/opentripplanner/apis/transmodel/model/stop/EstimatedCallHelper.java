@@ -23,14 +23,12 @@ class EstimatedCallHelper {
       return tripTimes;
     }
 
-    return tripTimes
-      .stream()
+    return tripTimes.stream()
       .collect(Collectors.groupingBy(EstimatedCallHelper::destinationDisplayPerLine))
       .values()
       .stream()
-      .flatMap(group ->
-        group
-          .stream()
+      .flatMap(
+        group -> group.stream()
           .sorted(TripTimeOnDate.compareByDeparture())
           .distinct()
           .limit(departuresPerLineAndDestinationDisplay)

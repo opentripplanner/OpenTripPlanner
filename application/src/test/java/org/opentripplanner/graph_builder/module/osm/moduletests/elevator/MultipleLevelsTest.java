@@ -218,9 +218,8 @@ class MultipleLevelsTest {
     addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorHopVertex2);
     addElevatorHopEdges(elevatorHopVertex1, elevatorHopVertex2, 2.5, edgeSet, null);
 
-    var result = StreamSupport.stream(graph.listEdges().spliterator(), false).map(e ->
-      convertEdgeToVertexLabelString(e)
-    );
+    var result = StreamSupport.stream(graph.listEdges().spliterator(), false)
+      .map(e -> convertEdgeToVertexLabelString(e));
     assertThat(result).containsExactlyElementsIn(edgeSet);
   }
 
@@ -254,9 +253,8 @@ class MultipleLevelsTest {
     addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorHopVertex2);
     addElevatorHopEdges(elevatorHopVertex1, elevatorHopVertex2, 0, edgeSet, null);
 
-    var result = StreamSupport.stream(graph.listEdges().spliterator(), false).map(e ->
-      convertEdgeToVertexLabelString(e)
-    );
+    var result = StreamSupport.stream(graph.listEdges().spliterator(), false)
+      .map(e -> convertEdgeToVertexLabelString(e));
     assertThat(result).containsExactlyElementsIn(edgeSet);
   }
 

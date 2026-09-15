@@ -76,17 +76,16 @@ class TestGraph {
         tStop,
         new TraverseModeSet(TraverseMode.WALK),
         LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetTransitStopLink.createStreetTransitStopLink(
-              (TransitStopVertex) vertex,
-              streetVertex
-            ),
-            StreetTransitStopLink.createStreetTransitStopLink(
-              streetVertex,
-              (TransitStopVertex) vertex
-            )
+        (vertex, streetVertex) -> List.of(
+          StreetTransitStopLink.createStreetTransitStopLink(
+            (TransitStopVertex) vertex,
+            streetVertex
+          ),
+          StreetTransitStopLink.createStreetTransitStopLink(
+            streetVertex,
+            (TransitStopVertex) vertex
           )
+        )
       );
     }
   }

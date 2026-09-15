@@ -58,9 +58,8 @@ class RaptorRequestTransferCacheKey {
     RaptorRequestTransferCacheKey cacheKey = (RaptorRequestTransferCacheKey) o;
     // transfersByStopIndex is checked using == on purpose since the instance should not change
     // (there is only one instance per graph)
-    return (
-      transfersByStopIndex == cacheKey.transfersByStopIndex && options.equals(cacheKey.options)
-    );
+    return (transfersByStopIndex == cacheKey.transfersByStopIndex &&
+      options.equals(cacheKey.options));
   }
 
   /**
@@ -124,15 +123,13 @@ class RaptorRequestTransferCacheKey {
       if (!(o instanceof StreetRelevantOptions that)) {
         return false;
       }
-      return (
-        transferMode == that.transferMode &&
+      return (transferMode == that.transferMode &&
         wheelchairEnabled == that.wheelchairEnabled &&
         Objects.equals(that.walk, walk) &&
         Objects.equals(that.bike, bike) &&
         Objects.equals(that.car, car) &&
         Objects.equals(that.turnReluctance, turnReluctance) &&
-        Objects.equals(that.wheelchair, wheelchair)
-      );
+        Objects.equals(that.wheelchair, wheelchair));
     }
   }
 }

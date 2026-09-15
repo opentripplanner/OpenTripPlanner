@@ -112,8 +112,7 @@ public class Itinerary implements ItinerarySortKey {
     this.emissionPerPerson = builder.emissionPerPerson;
 
     // Set aggregated data
-    this.generalizedCostIncludingPenalty = generalizedCost
-      .plus(accessPenalty.cost())
+    this.generalizedCostIncludingPenalty = generalizedCost.plus(accessPenalty.cost())
       .plus(egressPenalty.cost())
       .normalize();
 
@@ -215,8 +214,7 @@ public class Itinerary implements ItinerarySortKey {
    * Total distance in meters.
    */
   public double distanceMeters() {
-    return legs()
-      .stream()
+    return legs().stream()
       // An unknown distance is -1
       .filter(l -> l.distanceMeters() > 0)
       .mapToDouble(Leg::distanceMeters)
@@ -235,8 +233,7 @@ public class Itinerary implements ItinerarySortKey {
   /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
     // TODO This does not look correct, replace with !streetLeg
-    return legs
-      .stream()
+    return legs.stream()
       .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
@@ -530,8 +527,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public List<TransitLeg> listTransitLegs() {
-    return legs()
-      .stream()
+    return legs().stream()
       .filter(TransitLeg.class::isInstance)
       .map(TransitLeg.class::cast)
       .toList();

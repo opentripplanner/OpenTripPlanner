@@ -141,15 +141,13 @@ public final class FareLegRule implements Serializable {
       return false;
     }
     var that = (FareLegRule) obj;
-    return (
-      Objects.equals(this.id, that.id) &&
+    return (Objects.equals(this.id, that.id) &&
       Objects.equals(this.legGroupId, that.legGroupId) &&
       Objects.equals(this.networkId, that.networkId) &&
       Objects.equals(this.fromAreaId, that.fromAreaId) &&
       Objects.equals(this.toAreaId, that.toAreaId) &&
       Objects.equals(this.fareDistance, that.fareDistance) &&
-      Objects.equals(this.fareProducts, that.fareProducts)
-    );
+      Objects.equals(this.fareProducts, that.fareProducts));
   }
 
   @Override

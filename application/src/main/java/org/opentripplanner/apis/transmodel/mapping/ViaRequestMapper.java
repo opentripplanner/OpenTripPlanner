@@ -36,16 +36,14 @@ public class ViaRequestMapper {
     RouteRequest request = context.defaultRouteRequest();
 
     List<Map<String, Object>> viaInput = environment.getArgument("via");
-    List<ViaLocationDeprecated> vias = viaInput
-      .stream()
+    List<ViaLocationDeprecated> vias = viaInput.stream()
       .map(viaLocationDeprecatedMapper::mapViaLocation)
       .toList();
 
     List<JourneyRequest> requests;
     if (environment.containsArgument("segments")) {
       List<Map<String, Object>> segments = environment.getArgument("segments");
-      requests = segments
-        .stream()
+      requests = segments.stream()
         .map(viaRequest -> viaSegmentMapper.mapViaSegment(request, viaRequest))
         .toList();
     } else {

@@ -168,8 +168,7 @@ public class TripCalendars implements Serializable {
     );
     Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = deepCopy(serviceIdsByDate);
     for (FeedScopedId serviceId : data.getServiceIds()) {
-      List<LocalDate> dates = data
-        .getServiceDatesForServiceId(serviceId)
+      List<LocalDate> dates = data.getServiceDatesForServiceId(serviceId)
         .stream()
         .sorted()
         .toList();
@@ -222,8 +221,7 @@ public class TripCalendars implements Serializable {
       }
       List<LocalDate> serviceDates = serviceDatesByServiceId.get(serviceId);
       for (LocalDate serviceDate : serviceDates) {
-        newServiceCodesRunningForDate
-          .computeIfAbsent(serviceDate, ignored -> new TIntHashSet())
+        newServiceCodesRunningForDate.computeIfAbsent(serviceDate, ignored -> new TIntHashSet())
           .add(code);
       }
     }
@@ -323,8 +321,8 @@ public class TripCalendars implements Serializable {
     Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate
   ) {
     Map<LocalDate, Set<FeedScopedId>> frozen = new HashMap<>();
-    serviceIdsByDate.forEach((date, serviceIds) ->
-      frozen.put(date, Collections.unmodifiableSet(serviceIds))
+    serviceIdsByDate.forEach(
+      (date, serviceIds) -> frozen.put(date, Collections.unmodifiableSet(serviceIds))
     );
     return Collections.unmodifiableMap(frozen);
   }
@@ -333,8 +331,8 @@ public class TripCalendars implements Serializable {
     Map<LocalDate, TIntSet> serviceCodesRunningForDate
   ) {
     Map<LocalDate, TIntSet> frozen = new HashMap<>();
-    serviceCodesRunningForDate.forEach((date, codes) ->
-      frozen.put(date, TCollections.unmodifiableSet(codes))
+    serviceCodesRunningForDate.forEach(
+      (date, codes) -> frozen.put(date, TCollections.unmodifiableSet(codes))
     );
     return Collections.unmodifiableMap(frozen);
   }

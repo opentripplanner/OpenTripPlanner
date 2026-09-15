@@ -33,8 +33,8 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
     new DefaultCostCalculator<>(20, 60, 1.0, null, null);
 
-  public static final PathTailFilter<TestTripSchedule> FILTER_CHAIN =
-    MinCostPathTailFilterFactory.ofCostFunction(OptimizedPathTail::generalizedCost);
+  public static final PathTailFilter<TestTripSchedule> FILTER_CHAIN = MinCostPathTailFilterFactory
+    .ofCostFunction(OptimizedPathTail::generalizedCost);
 
   private final int STOP_TIME_ONE = TimeUtils.time("10:00");
   private final int STOP_TIME_TWO = TimeUtils.time("10:20");
@@ -101,8 +101,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   }
 
   private static <T> String firstRide(Collection<T> c) {
-    return c
-      .stream()
+    return c.stream()
       .map(Object::toString)
       .map(it -> it.substring(0, it.indexOf(" ~")))
       .collect(Collectors.joining(" "));

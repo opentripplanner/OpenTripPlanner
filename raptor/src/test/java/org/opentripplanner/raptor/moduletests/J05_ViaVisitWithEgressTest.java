@@ -41,13 +41,11 @@ class J05_ViaVisitWithEgressTest {
   void setup() {
     var builder = data.requestBuilder();
 
-    builder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    builder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: Currently heuristics does not work with via-visit so we turn them off
       .clearOptimizations();
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
@@ -57,8 +55,7 @@ class J05_ViaVisitWithEgressTest {
   @Test
   @DisplayName("Egress VIA stop C, no other options.")
   void viaVisitSimpleCase() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         A     B     C
@@ -82,8 +79,7 @@ class J05_ViaVisitWithEgressTest {
   @Test
   @DisplayName("Optimal egress including VIA, dominating other less favourable egress options.")
   void viaVisitWithEgressViaAsTheOptimalOption() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         A     B     C     D
@@ -114,8 +110,7 @@ class J05_ViaVisitWithEgressTest {
     "Find two paths using optimal egresses, one egress including and one without the via-location"
   )
   void visitViaUsingTransitNotEgress() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         A     B     C
@@ -141,7 +136,9 @@ class J05_ViaVisitWithEgressTest {
     assertEquals(
       """
       Walk 1m ~ A ~ BUS R1 0:05 0:15 ~ C ~ BUS R2 0:18 0:20 ~ D ~ Walk 1m [0:04 0:21 17m Tₙ1 C₁2_340]
-      Walk 1m ~ A ~ BUS R1 0:05 0:10 ~ B ~ Walk 15m Vₙ1 [0:04 0:25 21m Tₙ0 C₁2_820]""",
+      Walk 1m ~ A ~ BUS R1 0:05 0:10 ~ B ~ Walk 15m Vₙ1 [0:04 0:25 21m Tₙ0 C₁2_820]\
+      """
+      ,
       pathsToString(result)
     );
   }
@@ -152,11 +149,11 @@ class J05_ViaVisitWithEgressTest {
     This tests the corner case where two egress paths both depart from the via stop location, one
     has the numberOfViaLocationsVisited() set, the other not. Officially Raptor only supports
     access/egress where the stop is NOT part of the count. But, the implementation supports both
-    cases and there is no reason to restrict it. To handle this gracefully, is NICE TO HAVE."""
+    cases and there is no reason to restrict it. To handle this gracefully, is NICE TO HAVE.\
+    """
   )
   void accessWithViaVisit() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         A     B
@@ -177,7 +174,9 @@ class J05_ViaVisitWithEgressTest {
     assertEquals(
       """
       Walk 1m ~ A ~ BUS R1 0:10 0:20 ~ B ~ Walk 1m [0:09 0:21 12m Tₙ0 C₁1_520]
-      Walk 1m ~ A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Vₙ1 [0:09 0:22 13m Tₙ0 C₁1_420]""",
+      Walk 1m ~ A ~ BUS R1 0:10 0:20 ~ B ~ Walk 2m Vₙ1 [0:09 0:22 13m Tₙ0 C₁1_420]\
+      """
+      ,
       pathsToString(result)
     );
   }
@@ -185,8 +184,7 @@ class J05_ViaVisitWithEgressTest {
   @Test
   @DisplayName("Combine via locations in transit and egress")
   void combineViaLocationsInTransitAndEgress() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         A     B     C     D
@@ -204,7 +202,9 @@ class J05_ViaVisitWithEgressTest {
 
     assertEquals(
       """
-      Walk 1m ~ A ~ BUS R1 0:05 0:15 ~ B ~ BUS R1 0:25 0:35 ~ C ~ Walk 2m Vₙ1 [0:04 0:37 33m Tₙ1 C₁3_220]""",
+      Walk 1m ~ A ~ BUS R1 0:05 0:15 ~ B ~ BUS R1 0:25 0:35 ~ C ~ Walk 2m Vₙ1 [0:04 0:37 33m Tₙ1 C₁3_220]\
+      """
+      ,
       pathsToString(result)
     );
   }

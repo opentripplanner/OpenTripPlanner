@@ -69,8 +69,7 @@ public class PlanResponse {
 
   @Override
   public String toString() {
-    return (
-      "PlanResponse{" +
+    return ("PlanResponse{" +
       "plan=" +
       plan +
       ", metadata=" +
@@ -83,8 +82,7 @@ public class PlanResponse {
       previousPageCursor +
       ", nextPageCursor=" +
       nextPageCursor +
-      '}'
-    );
+      '}');
   }
 
   public Instant date() {

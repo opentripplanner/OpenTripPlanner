@@ -100,14 +100,16 @@ class TripTimeOnDateRequestBuilderTest {
   @Test
   void requiresExactlyOneTimeLimitation() {
     // Neither time nor service date ranges set
-    assertThrows(IllegalArgumentException.class, () ->
-      TripTimeOnDateRequest.of(List.of(STOP)).build()
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> TripTimeOnDateRequest.of(List.of(STOP)).build()
     );
 
     // Both time and service date ranges set
     var range = LocalDateRange.ofExclusiveEnd(LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 5));
-    assertThrows(IllegalArgumentException.class, () ->
-      TripTimeOnDateRequest.of(List.of(STOP))
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> TripTimeOnDateRequest.of(List.of(STOP))
         .withTime(TIME)
         .withServiceDateRanges(List.of(range))
         .build()
@@ -208,9 +210,7 @@ class TripTimeOnDateRequestBuilderTest {
   void withTransitFilters() {
     var filter = FilterRequest.<TripTimeOnDateSelectRequest>of()
       .addSelect(
-        TripTimeOnDateSelectRequest.of()
-          .withAgencies(List.of(new FeedScopedId("F", "A1")))
-          .build()
+        TripTimeOnDateSelectRequest.of().withAgencies(List.of(new FeedScopedId("F", "A1"))).build()
       )
       .build();
 

@@ -17,8 +17,10 @@ public class BikeParkImpl implements GraphQLDataFetchers.GraphQLBikePark {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("BikePark", getSource(environment).getId().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "BikePark",
+      getSource(environment).getId().toString()
+    );
   }
 
   @Override
@@ -33,8 +35,10 @@ public class BikeParkImpl implements GraphQLDataFetchers.GraphQLBikePark {
 
   @Override
   public DataFetcher<String> name() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).getName(), environment);
+    return environment -> GraphQLUtils.getTranslation(
+      getSource(environment).getName(),
+      environment
+    );
   }
 
   @Override

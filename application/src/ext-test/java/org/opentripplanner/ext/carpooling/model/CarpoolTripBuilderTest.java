@@ -25,8 +25,7 @@ public class CarpoolTripBuilderTest {
     var destination = createStopAt(OSLO_NORTH);
 
     var builder = new CarpoolTripBuilder(new FeedScopedId("feed", "id"));
-    var trip = builder
-      .withTotalCapacity(2)
+    var trip = builder.withTotalCapacity(2)
       .withProvider("UNIT")
       .withStartTime(startTime)
       .withEndTime(endTime)
@@ -63,8 +62,9 @@ public class CarpoolTripBuilderTest {
       .build();
     var stops = List.of(createStopAt(1, OSLO_EAST), createStopAt(1, OSLO_NORTH));
 
-    var trip = new CarpoolTripBuilder(new FeedScopedId("feed", "contact-test"))
-      .withStartTime(ZonedDateTime.now())
+    var trip = new CarpoolTripBuilder(new FeedScopedId("feed", "contact-test")).withStartTime(
+      ZonedDateTime.now()
+    )
       .withEndTime(ZonedDateTime.now().plusMinutes(30))
       .withStops(stops)
       .withPublicContactInformation(contact)
@@ -91,8 +91,9 @@ public class CarpoolTripBuilderTest {
     assertEquals("+4712345678", tripWithPhone.publicContactInformation().getPhoneNumber());
     assertNull(tripWithPhone.publicContactInformation().getBookingUrl());
 
-    var tripWithUrl = new CarpoolTripBuilder(new FeedScopedId("feed", "url-only"))
-      .withStartTime(ZonedDateTime.now())
+    var tripWithUrl = new CarpoolTripBuilder(new FeedScopedId("feed", "url-only")).withStartTime(
+      ZonedDateTime.now()
+    )
       .withEndTime(ZonedDateTime.now().plusMinutes(30))
       .withStops(stops)
       .withPublicContactInformation(contactUrlOnly)
@@ -109,21 +110,18 @@ public class CarpoolTripBuilderTest {
   void buildFromValues_withoutPublicContactInformation_defaultsToNull() {
     var stops = List.of(createStopAt(1, OSLO_EAST), createStopAt(1, OSLO_NORTH));
 
-    var trip = new CarpoolTripBuilder(new FeedScopedId("feed", "no-contact"))
-      .withStartTime(ZonedDateTime.now())
-      .withEndTime(ZonedDateTime.now().plusMinutes(30))
-      .withStops(stops)
-      .buildFromValues();
+    var trip = new CarpoolTripBuilder(new FeedScopedId("feed", "no-contact")).withStartTime(
+      ZonedDateTime.now()
+    ).withEndTime(ZonedDateTime.now().plusMinutes(30)).withStops(stops).buildFromValues();
 
     assertNull(trip.publicContactInformation());
   }
 
   @Test
   void buildFromValues_withFewerThanTwoStops_throws() {
-    var builder = new CarpoolTripBuilder(new FeedScopedId("feed", "too-few-stops"))
-      .withStartTime(ZonedDateTime.now())
-      .withEndTime(ZonedDateTime.now().plusMinutes(30))
-      .withStops(List.of(createStopAt(OSLO_EAST)));
+    var builder = new CarpoolTripBuilder(new FeedScopedId("feed", "too-few-stops")).withStartTime(
+      ZonedDateTime.now()
+    ).withEndTime(ZonedDateTime.now().plusMinutes(30)).withStops(List.of(createStopAt(OSLO_EAST)));
 
     assertThrows(IllegalArgumentException.class, builder::buildFromValues);
   }

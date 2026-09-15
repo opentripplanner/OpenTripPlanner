@@ -23,14 +23,10 @@ public class VertexLayerBuilder extends LayerBuilder<Vertex> {
 
   @Override
   protected List<Geometry> findGeometries(Envelope env) {
-    return graph
-      .findVertices(env)
-      .stream()
-      .map(vertex -> {
-        Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
-        geometry.setUserData(vertex);
-        return geometry;
-      })
-      .toList();
+    return graph.findVertices(env).stream().map(vertex -> {
+      Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());
+      geometry.setUserData(vertex);
+      return geometry;
+    }).toList();
   }
 }

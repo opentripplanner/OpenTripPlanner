@@ -75,8 +75,8 @@ public class RequestHandler {
       .stream()
       .flatMap(s -> s.getAbstractFunctionalServiceRequest().stream())
       .findFirst()
-      .orElseThrow(() ->
-        new IllegalArgumentException("No request found in %s XML body.".formatted(apiName))
+      .orElseThrow(
+        () -> new IllegalArgumentException("No request found in %s XML body.".formatted(apiName))
       )
       .getValue();
   }

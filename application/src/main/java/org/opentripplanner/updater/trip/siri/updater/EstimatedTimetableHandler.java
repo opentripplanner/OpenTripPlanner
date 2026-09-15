@@ -31,8 +31,7 @@ public class EstimatedTimetableHandler {
     UpdateIncrementality updateMode,
     TransitRealTimeUpdateContext context
   ) {
-    return adapter
-      .forUpdate(context.timetableRepository())
+    return adapter.forUpdate(context.timetableRepository())
       .applyEstimatedTimetable(
         context.entityResolver(feedId),
         feedId,

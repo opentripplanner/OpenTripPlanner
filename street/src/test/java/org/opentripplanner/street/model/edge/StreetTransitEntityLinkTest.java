@@ -78,9 +78,8 @@ class StreetTransitEntityLinkTest {
         feature = AccessibilityRequest.ofCost(100, 100);
       }
       req.withWheelchairEnabled(true);
-      req.withWheelchair(b ->
-        b
-          .withTrip(feature)
+      req.withWheelchair(
+        b -> b.withTrip(feature)
           .withStop(feature)
           .withElevator(feature)
           .withInaccessibleStreetReluctance(25)
@@ -107,9 +106,7 @@ class StreetTransitEntityLinkTest {
         TestStateBuilder.ofCarRental().pickUpFreeFloatingCar(),
         TestStateBuilder.ofWalking(),
         TestStateBuilder.ofCycling()
-      )
-        .map(TestStateBuilder::build)
-        .toList();
+      ).map(TestStateBuilder::build).toList();
     }
 
     @ParameterizedTest
@@ -125,9 +122,7 @@ class StreetTransitEntityLinkTest {
         // for bike and ride you need to drop the bike at a parking facility first
         TestStateBuilder.ofBikeAndRide().streetEdge(),
         TestStateBuilder.parkAndRide().streetEdge()
-      )
-        .map(TestStateBuilder::build)
-        .toList();
+      ).map(TestStateBuilder::build).toList();
     }
 
     @ParameterizedTest

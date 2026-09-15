@@ -58,22 +58,20 @@ public class TripScheduleIndexResolver {
     int stopIndex,
     TripAndServiceDate tripAndServiceDate
   ) {
-    return raptorRequestTransitData
-      .activeTripPatternsPerStop(stopIndex)
+    return raptorRequestTransitData.activeTripPatternsPerStop(stopIndex)
       .stream()
-      .filter(patternForDates ->
-        tripPatternForDate(patternForDates, tripAndServiceDate.serviceDate())
-          .map(p ->
-            p
-              .tripTimes()
+      .filter(
+        patternForDates -> tripPatternForDate(patternForDates, tripAndServiceDate.serviceDate())
+          .map(
+            p -> p.tripTimes()
               .stream()
               .anyMatch(tt -> tt.getTrip().getId().equals(tripAndServiceDate.trip().getId()))
           )
           .orElse(false)
       )
       .findFirst()
-      .orElseThrow(() ->
-        new InvalidRoutingInputException(
+      .orElseThrow(
+        () -> new InvalidRoutingInputException(
           "No trip pattern on date %s for trip %s".formatted(
             tripAndServiceDate.serviceDate(),
             tripAndServiceDate.trip()
@@ -109,8 +107,7 @@ public class TripScheduleIndexResolver {
         continue;
       }
       if (
-        tripSchedule
-          .getOriginalTripTimes()
+        tripSchedule.getOriginalTripTimes()
           .getTrip()
           .getId()
           .equals(tripAndServiceDate.trip().getId())

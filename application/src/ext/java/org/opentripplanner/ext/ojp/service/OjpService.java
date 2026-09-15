@@ -74,15 +74,13 @@ public class OjpService {
   }
 
   private Optional<FeedScopedId> stopPointRef(OJPStopEventRequestStructure ser) {
-    return placeRefStructure(ser)
-      .map(PlaceRefStructure::getStopPointRef)
+    return placeRefStructure(ser).map(PlaceRefStructure::getStopPointRef)
       .map(StopPointRefStructure::getValue)
       .flatMap(idMapper::parse);
   }
 
   private Optional<WgsCoordinate> coordinate(OJPStopEventRequestStructure ser) {
-    return placeRefStructure(ser)
-      .map(PlaceRefStructure::getGeoPosition)
+    return placeRefStructure(ser).map(PlaceRefStructure::getGeoPosition)
       .map(c -> new WgsCoordinate(c.getLatitude(), c.getLongitude()));
   }
 

@@ -32,8 +32,8 @@ public class CarPreferencesMapper {
     if (boardCost != null) {
       preferences.withBoardCost(boardCost.toSeconds());
     }
-    preferences.withParking(parking ->
-      setCarParkingPreferences(parking, args.getGraphQLParking(), environment)
+    preferences.withParking(
+      parking -> setCarParkingPreferences(parking, args.getGraphQLParking(), environment)
     );
     preferences.withRental(rental -> setCarRentalPreferences(rental, args.getGraphQLRental()));
   }

@@ -279,19 +279,16 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
   private void setupSubscription() throws ServiceBusException {
     // Client with permissions to create subscription
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
-        .credential(
-          fullyQualifiedNamespace,
-          new DefaultAzureCredentialBuilder()
-            // We use the current thread for fetching credentials since the default executor
-            // service can't be used in the shutdownHook where we want to delete the subscription
-            .executorService(MoreExecutors.newDirectExecutorService())
-            .build()
-        )
-        .buildClient();
+      serviceBusAdmin = new ServiceBusAdministrationClientBuilder().credential(
+        fullyQualifiedNamespace,
+        new DefaultAzureCredentialBuilder()
+          // We use the current thread for fetching credentials since the default executor
+          // service can't be used in the shutdownHook where we want to delete the subscription
+          .executorService(MoreExecutors.newDirectExecutorService())
+          .build()
+      ).buildClient();
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
-        .connectionString(serviceBusUrl)
+      serviceBusAdmin = new ServiceBusAdministrationClientBuilder().connectionString(serviceBusUrl)
         .buildClient();
     }
 
@@ -325,8 +322,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
         fullyQualifiedNamespace,
         "fullyQualifiedNamespace must be set for FederatedIdentity authentication"
       );
-      clientBuilder
-        .fullyQualifiedNamespace(fullyQualifiedNamespace)
+      clientBuilder.fullyQualifiedNamespace(fullyQualifiedNamespace)
         .credential(new DefaultAzureCredentialBuilder().build());
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
       Objects.requireNonNull(
@@ -338,8 +334,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
     }
 
-    eventProcessor = clientBuilder
-      .processor()
+    eventProcessor = clientBuilder.processor()
       .topicName(topicName)
       .subscriptionName(subscriptionName)
       .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
@@ -473,8 +468,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-      // should this be recoverable?
-      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
+        // should this be recoverable?
+        reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
     ) {
       LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",
@@ -485,7 +480,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       LOG.error("Message lock lost for message", e);
     } else if (
       reason == ServiceBusFailureReason.SERVICE_BUSY ||
-      reason == ServiceBusFailureReason.UNAUTHORIZED
+        reason == ServiceBusFailureReason.UNAUTHORIZED
     ) {
       LOG.error("Service Bus is busy or unauthorized, wait and try again");
       try {
@@ -501,8 +496,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
   }
 
   protected OtpRetry createOtpRetry(String stepDescription) {
-    return new OtpRetryBuilder()
-      .withName(stepDescription)
+    return new OtpRetryBuilder().withName(stepDescription)
       .withMaxAttempts(MAX_ATTEMPTS)
       .withInitialRetryInterval(INITIAL_RETRY_INTERVALS)
       .withRetryableException(e -> !(e instanceof InterruptedException))

@@ -104,8 +104,7 @@ class EndpointContextLineStringDistanceTest {
       new Coordinate(2.0, 0.0),
       new Coordinate(1.5, 0.4),
       new Coordinate(1.0, 0.1),
-      new Coordinate(0.0, 0.0),
-    };
+      new Coordinate(0.0, 0.0), };
     LineString ls = GF.createLineString(full);
     byte[] packed = EndpointContextLineString.compact(0.0, 0.0, 2.0, 0.0, ls, true);
     double xscale = 0.7;

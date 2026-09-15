@@ -42,8 +42,7 @@ class IndexedLineSegment {
     double lat1Radians = (c1.y * Math.PI) / 180;
     double lat2Radians = (c2.y * Math.PI) / 180;
     double y = Math.sin(deltaLon) * Math.cos(lat2Radians);
-    double x =
-      Math.cos(lat1Radians) * Math.sin(lat2Radians) -
+    double x = Math.cos(lat1Radians) * Math.sin(lat2Radians) -
       Math.sin(lat1Radians) * Math.cos(lat2Radians) * Math.cos(deltaLon);
     return Math.atan2(y, x);
   }
@@ -52,10 +51,9 @@ class IndexedLineSegment {
     double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
     double bearingToCoord = bearing(start, coord);
     double bearingToEnd = bearing(start, end);
-    return (
-      Math.asin(Math.sin(distanceFromStart / RADIUS) * Math.sin(bearingToCoord - bearingToEnd)) *
-      RADIUS
-    );
+    return (Math.asin(
+      Math.sin(distanceFromStart / RADIUS) * Math.sin(bearingToCoord - bearingToEnd)
+    ) * RADIUS);
   }
 
   double distance(Coordinate coord) {
@@ -88,16 +86,14 @@ class IndexedLineSegment {
 
   private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
     double distanceFromEnd = SphericalDistanceLibrary.fastDistance(end, coord);
-    return (
-      Math.acos(Math.cos(distanceFromEnd / RADIUS) / Math.cos(inverseCrossTrackError / RADIUS)) *
-      RADIUS
-    );
+    return (Math.acos(
+      Math.cos(distanceFromEnd / RADIUS) / Math.cos(inverseCrossTrackError / RADIUS)
+    ) * RADIUS);
   }
 
   private double alongTrackDistance(Coordinate coord, double crossTrackError) {
     double distanceFromStart = SphericalDistanceLibrary.fastDistance(start, coord);
-    return (
-      Math.acos(Math.cos(distanceFromStart / RADIUS) / Math.cos(crossTrackError / RADIUS)) * RADIUS
-    );
+    return (Math.acos(Math.cos(distanceFromStart / RADIUS) / Math.cos(crossTrackError / RADIUS)) *
+      RADIUS);
   }
 }

@@ -24,12 +24,7 @@ class StopPositionMapper {
   StopPositionMapper(FeedScopedId tripId, TripTimes tripTimes, Timetable timetable) {
     this.tripId = tripId;
     this.tripTimes = tripTimes;
-    this.stopIds = timetable
-      .getPattern()
-      .getStops()
-      .stream()
-      .map(s -> s.getId().getId())
-      .toList();
+    this.stopIds = timetable.getPattern().getStops().stream().map(s -> s.getId().getId()).toList();
   }
 
   /**

@@ -120,14 +120,12 @@ public class WheelchairRequest {
       return false;
     }
     WheelchairRequest that = (WheelchairRequest) o;
-    return (
-      Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&
+    return (Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&
       Double.compare(that.maxSlope, maxSlope) == 0 &&
       Double.compare(that.slopeExceededReluctance, slopeExceededReluctance) == 0 &&
       Double.compare(that.stairsReluctance, stairsReluctance) == 0 &&
       stop.equals(that.stop) &&
-      elevator.equals(that.elevator)
-    );
+      elevator.equals(that.elevator));
   }
 
   @Override
@@ -212,8 +210,7 @@ public class WheelchairRequest {
     }
 
     public Builder withElevator(Consumer<AccessibilityRequest.Builder> body) {
-      this.elevator = this.elevator
-        .copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
+      this.elevator = this.elevator.copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
         .apply(body)
         .build();
       return this;

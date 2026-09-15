@@ -42,8 +42,7 @@ class StopPlaceTypeMapperTest {
   @Test
   void mapWithSubMode() {
     var transitMode = stopPlaceTypeMapper.map(
-      new StopPlace()
-        .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+      new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
         .withRailSubmode(RailSubmodeEnumeration.REGIONAL_RAIL)
     );
     assertEquals(TransitMode.RAIL, transitMode.mainMode());
@@ -62,8 +61,7 @@ class StopPlaceTypeMapperTest {
   @Test
   void checkSubModePrecedenceOverMainMode() {
     var transitMode = stopPlaceTypeMapper.map(
-      new StopPlace()
-        .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+      new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
         .withBusSubmode(BusSubmodeEnumeration.SIGHTSEEING_BUS)
     );
     assertEquals(TransitMode.BUS, transitMode.mainMode());

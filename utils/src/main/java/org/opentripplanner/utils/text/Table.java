@@ -143,8 +143,7 @@ public class Table {
    */
   static List<String> normalizeRow(Collection<?> row, int nColumns) {
     var list = new ArrayList<>(
-      row
-        .stream()
+      row.stream()
         .map(ObjectUtils::toString)
         .map(it -> it.replace('\n', ' '))
         .map(String::trim)

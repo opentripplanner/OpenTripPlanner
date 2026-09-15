@@ -12,8 +12,7 @@ public class GraphFetcher {
   }
 
   public OsmVertex getVertexForOsmNode(OsmNode node) {
-    return graph
-      .getVerticesOfType(OsmVertex.class)
+    return graph.getVerticesOfType(OsmVertex.class)
       .stream()
       .filter(v -> v.nodeId() == node.getId())
       .findFirst()

@@ -21,8 +21,8 @@ class StreetSearchRequestBuilderTest {
     var orig = StreetSearchRequest.of().build();
     RENTAL_MODES.forEach(m -> assertFalse(orig.rental(m).useAvailabilityInformation()));
     var modified = StreetSearchRequest.copyOf(orig).withUseRentalAvailability(true).build();
-    RENTAL_MODES.forEach(m ->
-      assertTrue(
+    RENTAL_MODES.forEach(
+      m -> assertTrue(
         modified.rental(m).useAvailabilityInformation(),
         "Use rental availability for %s false, but should be true.".formatted(m)
       )

@@ -45,15 +45,13 @@ public class TestRouteData {
   public TestRouteData(Route route, List<RegularStop> stops, List<String> times) {
     final Deduplicator deduplicator = new Deduplicator();
     this.route = route;
-    this.trips = times
-      .stream()
+    this.trips = times.stream()
       .map(it -> parseTripInfo(route.getName(), it, stops, deduplicator))
       .collect(Collectors.toList());
 
     List<StopTime> stopTimesFistTrip = firstTrip().getStopTimes();
     // Get TripTimes in same order as the trips
-    List<TripTimes> tripTimes = trips
-      .stream()
+    List<TripTimes> tripTimes = trips.stream()
       .map(tripTimesByTrip::get)
       .collect(Collectors.toList());
 
@@ -68,8 +66,7 @@ public class TestRouteData {
     var patternForDates = new TripPatternForDates(
       routingTripPattern,
       new TripPatternForDate[] {
-        new TripPatternForDate(routingTripPattern, tripTimes, List.of(), DATE),
-      },
+        new TripPatternForDate(routingTripPattern, tripTimes, List.of(), DATE), },
       new int[] { OFFSET },
       null,
       null,
@@ -91,8 +88,7 @@ public class TestRouteData {
     List<RegularStop> stops,
     String... times
   ) {
-    return new TestRouteData.Builder(route)
-      .withMode(mode)
+    return new TestRouteData.Builder(route).withMode(mode)
       .withStops(stops)
       .withTimes(Arrays.asList(times))
       .build();

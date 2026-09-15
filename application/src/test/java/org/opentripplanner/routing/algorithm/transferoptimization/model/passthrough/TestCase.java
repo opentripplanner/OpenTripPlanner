@@ -22,14 +22,12 @@ record TestCase(
   @Override
   public String toString() {
     var buf = new StringBuilder();
-    buf.append(
-      switch (points.size()) {
-        case 0 -> "No pass-through-points";
-        case 1 -> "One pass-through-point ";
-        case 2 -> "Two pass-through-points ";
-        default -> points.size() + " pass-through-points ";
-      }
-    );
+    buf.append(switch (points.size()) {
+      case 0 -> "No pass-through-points";
+      case 1 -> "One pass-through-point ";
+      case 2 -> "Two pass-through-points ";
+      default -> points.size() + " pass-through-points ";
+    });
     if (description != null) {
       buf.append(description);
     } else {
@@ -49,18 +47,12 @@ record TestCase(
     }
 
     if (stopIndexA > 0 || stopIndexB > 0) {
-      buf
-        .append(". Expects transfer" + (fromAToB ? "" : "s") + " from ")
+      buf.append(". Expects transfer" + (fromAToB ? "" : "s") + " from ")
         .append(stopIndexToName(stopIndexA))
         .append(fromAToB ? " to " : " and ")
         .append(stopIndexToName(stopIndexB));
     }
-    buf.append(". ").append(
-      points
-        .stream()
-        .map(p -> p.toString(this::stopIndexToName))
-        .toList()
-    );
+    buf.append(". ").append(points.stream().map(p -> p.toString(this::stopIndexToName)).toList());
     return buf.toString();
   }
 

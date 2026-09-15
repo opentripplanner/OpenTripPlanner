@@ -56,8 +56,7 @@ public class SpeedTestConfig {
    * from the
    */
   public static SpeedTestConfig createFromConfig(NodeAdapter adapter) {
-    var builder = of()
-      .withFeedId(adapter.of("feedId").asString())
+    var builder = of().withFeedId(adapter.of("feedId").asString())
       .withTestDate(adapter.of("testDate").asDateOrRelativePeriod("PT0D", ZoneId.of("UTC")))
       .withIgnoreStreetResults(adapter.of("ignoreStreetResults").asBoolean(false))
       .withGraph(adapter.of("graph").asUri(null));

@@ -31,28 +31,30 @@ class TransitFilterOldWayMapper {
     TransitRequestBuilder transitBuilder
   ) {
     if (
-      !(
-        GqlUtil.hasArgument(environment, "modes") &&
-        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")
-      ) &&
-      !GqlUtil.hasArgument(environment, "whiteListed") &&
-      !GqlUtil.hasArgument(environment, "banned")
+      !(GqlUtil.hasArgument(environment, "modes") &&
+        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")) &&
+        !GqlUtil.hasArgument(environment, "whiteListed") &&
+        !GqlUtil.hasArgument(environment, "banned")
     ) {
       return;
     }
     var selectorBuilders = new ArrayList<SelectRequest.Builder>();
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
-    callWith.argument("whiteListed.authorities", (Collection<String> authorities) ->
-      whiteListedAgencies.addAll(idMapper.parseListNullSafe(authorities))
+    callWith.argument(
+      "whiteListed.authorities",
+      (Collection<String> authorities) -> whiteListedAgencies.addAll(
+        idMapper.parseListNullSafe(authorities)
+      )
     );
     if (!whiteListedAgencies.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withAgencies(whiteListedAgencies));
     }
 
     var whiteListedLines = new ArrayList<FeedScopedId>();
-    callWith.argument("whiteListed.lines", (List<String> lines) ->
-      whiteListedLines.addAll(idMapper.parseListNullSafe(lines))
+    callWith.argument(
+      "whiteListed.lines",
+      (List<String> lines) -> whiteListedLines.addAll(idMapper.parseListNullSafe(lines))
     );
     if (!whiteListedLines.isEmpty()) {
       selectorBuilders.add(SelectRequest.of().withRoutes(whiteListedLines));
@@ -73,16 +75,20 @@ class TransitFilterOldWayMapper {
       }
 
       var bannedAgencies = new ArrayList<FeedScopedId>();
-      callWith.argument("banned.authorities", (Collection<String> authorities) ->
-        bannedAgencies.addAll(idMapper.parseListNullSafe(authorities))
+      callWith.argument(
+        "banned.authorities",
+        (Collection<String> authorities) -> bannedAgencies.addAll(
+          idMapper.parseListNullSafe(authorities)
+        )
       );
       if (!bannedAgencies.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
       }
 
       var bannedLines = new ArrayList<FeedScopedId>();
-      callWith.argument("banned.lines", (List<String> lines) ->
-        bannedLines.addAll(idMapper.parseListNullSafe(lines))
+      callWith.argument(
+        "banned.lines",
+        (List<String> lines) -> bannedLines.addAll(idMapper.parseListNullSafe(lines))
       );
       if (!bannedLines.isEmpty()) {
         filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
@@ -137,8 +143,7 @@ class TransitFilterOldWayMapper {
     if (selectors.isEmpty()) {
       return List.of(SelectRequest.of().withTransportModes(tModes).build());
     }
-    return selectors
-      .stream()
+    return selectors.stream()
       .peek(it -> it.withTransportModes(tModes))
       .map(it -> it.build())
       .toList();

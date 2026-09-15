@@ -40,12 +40,10 @@ class ReEnabledStopTest implements RealtimeTestConstants {
     var scheduledPattern = env.tripData(TRIP_1_ID).scheduledTripPattern();
     assertEquals(PickDrop.NONE, scheduledPattern.getBoardType(1));
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:11")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:20")

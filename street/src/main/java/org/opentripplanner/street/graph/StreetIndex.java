@@ -85,11 +85,9 @@ class StreetIndex {
    * disconnected from the graph will not be indexed.
    */
   Collection<Edge> findEdges(Envelope envelope) {
-    return edgeIndex
-      .query(envelope, Scope.PERMANENT)
+    return edgeIndex.query(envelope, Scope.PERMANENT)
       .filter(
-        e ->
-          e.isReachableFromGraph() &&
+        e -> e.isReachableFromGraph() &&
           envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
       )
       .toList();
@@ -127,8 +125,7 @@ class StreetIndex {
     if (geometry == null) {
       Coordinate[] coordinates = new Coordinate[] {
         e.getFromVertex().getCoordinate(),
-        e.getToVertex().getCoordinate(),
-      };
+        e.getToVertex().getCoordinate(), };
       geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
     return geometry;
@@ -166,8 +163,7 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
-    return graph
-      .getVerticesOfType(StationCentroidVertex.class)
+    return graph.getVerticesOfType(StationCentroidVertex.class)
       .stream()
       .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
   }

@@ -57,28 +57,22 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
         // earliest-departure-time: 0:03:00 + 10s + 1m + 30s = 0:04:40
         route(pattern("R2", STOP_C, STOP_D)).withTimetable(
           // Missed by 1 second
-          schedule()
-            .departures("00:04:40 00:05:10")
-            .arrDepOffset(D10_s),
+          schedule().departures("00:04:40 00:05:10").arrDepOffset(D10_s),
           // Exact match
-          schedule()
-            .departures("00:04:41 00:05:11")
-            .arrDepOffset(D10_s)
+          schedule().departures("00:04:41 00:05:11").arrDepOffset(D10_s)
         )
       )
       // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .egress("D ~ Walk 20s");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D3_m);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expected =
-      "Walk 30s ~ B " +
+    var expected = "Walk 30s ~ B " +
       "~ BUS R1 0:02:11 0:03:01 ~ C " +
       "~ BUS R2 0:04:41 0:05:01 ~ D " +
       "~ Walk 20s " +

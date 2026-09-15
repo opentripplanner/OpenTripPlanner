@@ -75,8 +75,8 @@ public class SiriETUpdater extends PollingGraphUpdater<TransitRealTimeUpdateCont
         // Mark this updater as primed after last page of updates. Copy moreData into a final
         // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
-        List<EstimatedTimetableDeliveryStructure> etds =
-          serviceDelivery.getEstimatedTimetableDeliveries();
+        List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery
+          .getEstimatedTimetableDeliveries();
         if (etds != null) {
           updateGraph(context -> {
             var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);

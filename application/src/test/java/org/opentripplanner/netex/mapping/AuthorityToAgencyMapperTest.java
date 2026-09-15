@@ -84,8 +84,7 @@ public class AuthorityToAgencyMapperTest {
     String url,
     String phone
   ) {
-    return new Authority()
-      .withId(id)
+    return new Authority().withId(id)
       .withShortName(new MultilingualString().withValue(shortName))
       .withName(new MultilingualString().withValue(name))
       .withContactDetails(new ContactStructure().withUrl(url).withPhone(phone));

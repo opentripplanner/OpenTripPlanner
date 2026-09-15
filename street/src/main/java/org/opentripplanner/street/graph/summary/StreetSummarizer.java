@@ -90,8 +90,7 @@ class StreetSummarizer {
     }
 
     if (!v.areaStops().isEmpty()) {
-      var ids = v
-        .areaStops()
+      var ids = v.areaStops()
         .stream()
         .map(FeedScopedId::toString)
         .sorted()

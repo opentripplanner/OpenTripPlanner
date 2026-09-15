@@ -12,7 +12,8 @@ public class FlexConfig implements FlexParameters {
 
   private static final FlexParameters DEFAULT = FlexParameters.defaultValues();
 
-  public static final String ACCESS_EGRESS_DESCRIPTION = """
+  public static final String ACCESS_EGRESS_DESCRIPTION =
+  """
   If you have multiple overlapping flex zones the high default value can lead to performance problems.
   A lower value means faster routing.
 
@@ -39,14 +40,12 @@ public class FlexConfig implements FlexParameters {
   }
 
   public FlexConfig(NodeAdapter root, String parameterName) {
-    var json = root
-      .of(parameterName)
+    var json = root.of(parameterName)
       .since(V2_1)
       .summary("Configuration for flex routing.")
       .asObject();
 
-    this.maxTransferDuration = json
-      .of("maxTransferDuration")
+    this.maxTransferDuration = json.of("maxTransferDuration")
       .since(V2_3)
       .summary(
         "How long should a passenger be allowed to walk after getting out of a flex vehicle " +
@@ -64,8 +63,7 @@ public class FlexConfig implements FlexParameters {
       )
       .asDuration(DEFAULT.maxTransferDuration());
 
-    maxFlexTripDuration = json
-      .of("maxFlexTripDuration")
+    maxFlexTripDuration = json.of("maxFlexTripDuration")
       .since(V2_3)
       .summary("How long can a non-scheduled flex trip at maximum be.")
       .description(
@@ -75,8 +73,7 @@ public class FlexConfig implements FlexParameters {
       )
       .asDuration(DEFAULT.maxFlexTripDuration());
 
-    maxAccessWalkDuration = json
-      .of("maxAccessWalkDuration")
+    maxAccessWalkDuration = json.of("maxAccessWalkDuration")
       .since(V2_3)
       .summary(
         "The maximum duration the passenger will be allowed to walk to reach a flex stop or zone."
@@ -84,8 +81,7 @@ public class FlexConfig implements FlexParameters {
       .description(ACCESS_EGRESS_DESCRIPTION)
       .asDuration(DEFAULT.maxAccessWalkDuration());
 
-    maxEgressWalkDuration = json
-      .of("maxEgressWalkDuration")
+    maxEgressWalkDuration = json.of("maxEgressWalkDuration")
       .since(V2_3)
       .summary(
         "The maximum duration the passenger will be allowed to walk after leaving the flex vehicle at the final destination."
@@ -93,8 +89,7 @@ public class FlexConfig implements FlexParameters {
       .description(ACCESS_EGRESS_DESCRIPTION)
       .asDuration(DEFAULT.maxEgressWalkDuration());
 
-    boardCost = json
-      .of("boardCost")
+    boardCost = json.of("boardCost")
       .since(V2_10)
       .summary("A board cost added to the generalized cost of a flex leg.")
       .description(
@@ -105,8 +100,7 @@ public class FlexConfig implements FlexParameters {
       )
       .asInt(DEFAULT.boardCost());
 
-    reluctance = json
-      .of("reluctance")
+    reluctance = json.of("reluctance")
       .since(V2_10)
       .summary("A factor multiplied with the travel time of a flex leg to calculate the weight.")
       .asDouble(DEFAULT.reluctance());

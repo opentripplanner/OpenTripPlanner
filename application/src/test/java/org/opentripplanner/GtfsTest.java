@@ -213,8 +213,8 @@ public abstract class GtfsTest {
       transferRepository
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
-    var registry =
-      org.opentripplanner.framework.transaction.internal.TransactionFactory.createRepositoryRegistry();
+    var registry = org.opentripplanner.framework.transaction.internal.TransactionFactory
+      .createRepositoryRegistry();
     var timetableSnapshot = new org.opentripplanner.transit.repository.DefaultTimetableRepository(
       new RaptorTransitData(scheduledRaptorData),
       transitRepository.getTripCalendar()
@@ -227,8 +227,8 @@ public abstract class GtfsTest {
         LocalDate::now
       )
     );
-    var updateManager =
-      org.opentripplanner.framework.transaction.internal.TransactionFactory.createUpdateManagerWithAtomicCommits(
+    var updateManager = org.opentripplanner.framework.transaction.internal.TransactionFactory
+      .createUpdateManagerWithAtomicCommits(
         "test",
         registry,
         java.util.concurrent.Executors.defaultThreadFactory()
@@ -251,24 +251,20 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      updateManager
-        .submit(ctx -> {
-          var buffer = ctx.repository(timetableHandle);
-          tripUpdateAdapter
-            .forUpdate(buffer)
-            .applyTripUpdates(
-              null,
-              ForwardsDelayPropagationType.DEFAULT,
-              BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-              UpdateIncrementality.DIFFERENTIAL,
-              updates,
-              FEED_ID
-            );
-        })
-        .get();
+      updateManager.submit(ctx -> {
+        var buffer = ctx.repository(timetableHandle);
+        tripUpdateAdapter.forUpdate(buffer)
+          .applyTripUpdates(
+            null,
+            ForwardsDelayPropagationType.DEFAULT,
+            BackwardsDelayPropagationType.REQUIRED_NO_DATA,
+            UpdateIncrementality.DIFFERENTIAL,
+            updates,
+            FEED_ID
+          );
+      }).get();
       alertsUpdateHandler.update(feedMessage, null);
-    } catch (FileNotFoundException _) {
-    } catch (Exception e) {
+    } catch (FileNotFoundException _) {} catch (Exception e) {
       throw new RuntimeException(e);
     }
     var transitService = new DefaultTransitService(

@@ -46,11 +46,15 @@ public class TripRequestMapper {
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
-    callWith.argument("from", (Map<String, Object> v) ->
-      genericLocationMapper.toGenericLocation(v).ifPresent(requestBuilder::withFrom)
+    callWith.argument(
+      "from",
+      (Map<String, Object> v) -> genericLocationMapper.toGenericLocation(v)
+        .ifPresent(requestBuilder::withFrom)
     );
-    callWith.argument("to", (Map<String, Object> v) ->
-      genericLocationMapper.toGenericLocation(v).ifPresent(requestBuilder::withTo)
+    callWith.argument(
+      "to",
+      (Map<String, Object> v) -> genericLocationMapper.toGenericLocation(v)
+        .ifPresent(requestBuilder::withTo)
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
       requestBuilder.withViaLocations(tripViaLocationMapper.toLegacyPassThroughLocations(v));
@@ -59,16 +63,21 @@ public class TripRequestMapper {
       requestBuilder.withViaLocations(tripViaLocationMapper.mapToViaLocations(v));
     });
 
-    callWith.argument("dateTime", millisSinceEpoch ->
-      requestBuilder.withDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+    callWith.argument(
+      "dateTime",
+      millisSinceEpoch -> requestBuilder.withDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
-    callWith.argument("bookingTime", millisSinceEpoch ->
-      requestBuilder.withBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+    callWith.argument(
+      "bookingTime",
+      millisSinceEpoch -> requestBuilder.withBookingTime(
+        Instant.ofEpochMilli((long) millisSinceEpoch)
+      )
     );
 
-    callWith.argument("searchWindow", (Integer m) ->
-      requestBuilder.withSearchWindow(Duration.ofMinutes(m))
+    callWith.argument(
+      "searchWindow",
+      (Integer m) -> requestBuilder.withSearchWindow(Duration.ofMinutes(m))
     );
     callWith.argument("pageCursor", requestBuilder::withPageCursorFromEncoded);
     callWith.argument("timetableView", requestBuilder::withTimetableView);
@@ -79,15 +88,24 @@ public class TripRequestMapper {
       callWith.argument("wheelchairAccessible", journeyBuilder::withWheelchair);
 
       journeyBuilder.withTransit(transitBuilder -> {
-        callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.withUnpreferredAgencies(idMapper.parseListNullSafe(authorities))
+        callWith.argument(
+          "unpreferred.authorities",
+          (Collection<String> authorities) -> transitBuilder.withUnpreferredAgencies(
+            idMapper.parseListNullSafe(authorities)
+          )
         );
 
-        callWith.argument("unpreferred.lines", (List<String> lines) ->
-          transitBuilder.withUnpreferredRoutes(idMapper.parseListNullSafe(lines))
+        callWith.argument(
+          "unpreferred.lines",
+          (List<String> lines) -> transitBuilder.withUnpreferredRoutes(
+            idMapper.parseListNullSafe(lines)
+          )
         );
-        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-          transitBuilder.withBannedTrips(idMapper.parseListNullSafe(serviceJourneys))
+        callWith.argument(
+          "banned.serviceJourneys",
+          (Collection<String> serviceJourneys) -> transitBuilder.withBannedTrips(
+            idMapper.parseListNullSafe(serviceJourneys)
+          )
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {
@@ -106,8 +124,8 @@ public class TripRequestMapper {
       }
     });
 
-    requestBuilder.withPreferences(preferences ->
-      PreferencesMapper.mapPreferences(environment, callWith, preferences)
+    requestBuilder.withPreferences(
+      preferences -> PreferencesMapper.mapPreferences(environment, callWith, preferences)
     );
 
     return requestBuilder;

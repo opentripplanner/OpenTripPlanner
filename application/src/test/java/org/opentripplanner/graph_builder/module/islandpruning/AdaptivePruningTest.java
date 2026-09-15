@@ -36,8 +36,7 @@ class AdaptivePruningTest {
   @Test
   void distantIslandIsRetained() {
     assertTrue(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
@@ -48,8 +47,7 @@ class AdaptivePruningTest {
   @Test
   void nearIslandIsRemoved() {
     assertFalse(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())
@@ -60,8 +58,7 @@ class AdaptivePruningTest {
   @Test
   void mainGraphIsNotRemoved() {
     assertTrue(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())

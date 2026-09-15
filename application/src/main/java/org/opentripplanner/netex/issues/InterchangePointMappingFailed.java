@@ -4,8 +4,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
 public class InterchangePointMappingFailed implements DataImportIssue {
 
-  private static final String MSG =
-    "Interchange mapping failed. Detail: %s, " +
+  private static final String MSG = "Interchange mapping failed. Detail: %s, " +
     "interchange: %s, point: %s, serviceJourney: %s, scheduledStopPoint: %s";
 
   private final String point;

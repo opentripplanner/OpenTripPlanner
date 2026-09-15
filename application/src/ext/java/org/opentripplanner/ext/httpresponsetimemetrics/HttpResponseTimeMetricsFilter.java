@@ -36,9 +36,8 @@ import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
  * All timers are pre-created at startup for each combination of monitored client and endpoint to
  * ensure predictable metric cardinality.
  */
-public class HttpResponseTimeMetricsFilter
-  implements ContainerRequestFilter, ContainerResponseFilter
-{
+public class HttpResponseTimeMetricsFilter implements ContainerRequestFilter,
+  ContainerResponseFilter {
 
   static final String CLIENT_TAG = "client";
   static final String URI_TAG = "uri";
@@ -77,8 +76,7 @@ public class HttpResponseTimeMetricsFilter
     MeterRegistry registry
   ) {
     this.clientHeader = clientHeader;
-    this.monitoredClients = monitoredClients
-      .stream()
+    this.monitoredClients = monitoredClients.stream()
       .map(s -> s.toLowerCase(Locale.ROOT))
       .collect(Collectors.toUnmodifiableSet());
     this.monitoredEndpoints = Set.copyOf(monitoredEndpoints);

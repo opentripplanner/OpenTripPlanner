@@ -21,15 +21,15 @@ class JourneyPatternDuplicateStopPoints extends AbstractHMapValidationRule<Strin
   @Override
   public Status validate(ServiceJourney sj) {
     journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
-    JourneyPattern_VersionStructure journeyPattern = index
-      .getJourneyPatternsById()
+    JourneyPattern_VersionStructure journeyPattern = index.getJourneyPatternsById()
       .lookup(journeyPatternId);
 
     Set<String> seenIds = new HashSet<>();
 
-    for (var point : journeyPattern
-      .getPointsInSequence()
-      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()) {
+    for (
+      var point : journeyPattern.getPointsInSequence()
+        .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+    ) {
       String pointId = ((EntityStructure) point).getId();
       if (!seenIds.add(pointId)) {
         duplicateStopPointId = pointId;

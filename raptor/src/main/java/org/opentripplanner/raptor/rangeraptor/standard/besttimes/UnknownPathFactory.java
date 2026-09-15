@@ -76,10 +76,10 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
     // arrival-time without waiting time
     int egressDepartureTime = skipTimeShiftEgressPaths
       ? transitCalculator.calculateEgressDepartureTimeWithoutTimeShift(
-          arrivalTime,
-          egress,
-          transferSlack
-        )
+        arrivalTime,
+        egress,
+        transferSlack
+      )
       : transitCalculator.calculateEgressDepartureTime(arrivalTime, egress, transferSlack);
 
     // Opening hours is not within bounds

@@ -40,8 +40,10 @@ public class SiriAzureSXUpdaterParameters extends SiriAzureUpdaterParameters {
     }
 
     return Optional.of(
-      new URIBuilder(url)
-        .addParameter("publishFromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
+      new URIBuilder(url).addParameter(
+        "publishFromDateTime",
+        fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE)
+      )
         .addParameter("publishToDateTime", toDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
         .build()
     );

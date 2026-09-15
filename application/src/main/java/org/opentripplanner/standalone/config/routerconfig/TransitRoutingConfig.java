@@ -42,8 +42,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     NodeAdapter root,
     RouteRequest routingRequestDefaults
   ) {
-    NodeAdapter c = root
-      .of(parameterName)
+    NodeAdapter c = root.of(parameterName)
       .since(NA)
       .summary("Configuration for transit searches with RAPTOR.")
       .description(
@@ -57,8 +56,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
 
     RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
-    this.maxNumberOfTransfers = c
-      .of("maxNumberOfTransfers")
+    this.maxNumberOfTransfers = c.of("maxNumberOfTransfers")
       .since(NA)
       .summary("This parameter is used to allocate enough memory space for Raptor.")
       .description(
@@ -69,8 +67,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .asInt(dft.maxNumberOfTransfers());
-    this.scheduledTripBinarySearchThreshold = c
-      .of("scheduledTripBinarySearchThreshold")
+    this.scheduledTripBinarySearchThreshold = c.of("scheduledTripBinarySearchThreshold")
       .since(NA)
       .summary("This threshold is used to determine when to perform a binary trip schedule search.")
       .description(
@@ -82,8 +79,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .asInt(dft.scheduledTripBinarySearchThreshold());
-    this.iterationDepartureStepInSeconds = c
-      .of("iterationDepartureStepInSeconds")
+    this.iterationDepartureStepInSeconds = c.of("iterationDepartureStepInSeconds")
       .since(NA)
       .summary("Step for departure times between each RangeRaptor iterations.")
       .description(
@@ -95,8 +91,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .asInt(dft.iterationDepartureStepInSeconds());
-    this.searchThreadPoolSize = c
-      .of("searchThreadPoolSize")
+    this.searchThreadPoolSize = c.of("searchThreadPoolSize")
       .since(NA)
       .summary(
         "Split a travel search in smaller jobs and run them in parallel to improve performance."
@@ -109,8 +104,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .asInt(0);
-    this.earlyTransferPruning = c
-      .of("earlyTransferPruning")
+    this.earlyTransferPruning = c.of("earlyTransferPruning")
       .since(V2_10)
       .summary("Enable the Transfer Early Pruning optimization for standard RAPTOR.")
       .description(
@@ -126,8 +120,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       )
       .asBoolean(dft.earlyTransferPruning());
     // Dynamic Search Window
-    this.stopBoardAlightDuringTransferCost = c
-      .of("stopBoardAlightDuringTransferCost")
+    this.stopBoardAlightDuringTransferCost = c.of("stopBoardAlightDuringTransferCost")
       .since(V2_0)
       .summary(
         "Costs for boarding and alighting during transfers at stops with a given transfer priority."
@@ -158,8 +151,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .asEnumMapAllKeysRequired(StopTransferPriority.class, Integer.class);
-    this.transferCacheMaxSize = c
-      .of("transferCacheMaxSize")
+    this.transferCacheMaxSize = c.of("transferCacheMaxSize")
       .since(NA)
       .summary(
         "The maximum number of distinct transfers parameters to cache pre-calculated transfers for."
@@ -169,8 +161,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       )
       .asInt(25);
 
-    this.transferCacheRequests = c
-      .of("transferCacheRequests")
+    this.transferCacheRequests = c.of("transferCacheRequests")
       .since(V2_3)
       .summary("Routing requests to use for pre-filling the stop-to-stop transfer cache.")
       .description(
@@ -194,11 +185,11 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         """
       )
       .docDefaultValue("`routingDefaults`")
-      .asObjects(List.of(routingRequestDefaults), n ->
-        RouteRequestConfig.mapRouteRequest(n, routingRequestDefaults)
+      .asObjects(
+        List.of(routingRequestDefaults),
+        n -> RouteRequestConfig.mapRouteRequest(n, routingRequestDefaults)
       );
-    this.pagingSearchWindowAdjustments = c
-      .of("pagingSearchWindowAdjustments")
+    this.pagingSearchWindowAdjustments = c.of("pagingSearchWindowAdjustments")
       .since(NA)
       .summary(
         "The provided array of durations is used to increase the search-window for the " +
@@ -215,8 +206,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       )
       .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
-    this.maxSearchWindow = c
-      .of("maxSearchWindow")
+    this.maxSearchWindow = c.of("maxSearchWindow")
       .since(V2_4)
       .summary("Upper limit of the request parameter searchWindow.")
       .description(
@@ -303,8 +293,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     private final int stepMinutes;
 
     public DynamicSearchWindowConfig(String parameterName, NodeAdapter root) {
-      var dsWin = root
-        .of(parameterName)
+      var dsWin = root.of(parameterName)
         .since(V2_1)
         .summary("The dynamic search window coefficients used to calculate the EDT, LAT and SW.")
         .description(
@@ -343,8 +332,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         .asObject();
 
       DynamicSearchWindowCoefficients dsWinDft = new DynamicSearchWindowCoefficients() {};
-      this.minTransitTimeCoefficient = dsWin
-        .of("minTransitTimeCoefficient")
+      this.minTransitTimeCoefficient = dsWin.of("minTransitTimeCoefficient")
         .since(V2_1)
         .summary("The coefficient to multiply with `minTransitTime`.")
         .description(
@@ -352,8 +340,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
             "from the dynamic raptor-search-window calculation."
         )
         .asDouble(dsWinDft.minTransitTimeCoefficient());
-      this.minWaitTimeCoefficient = dsWin
-        .of("minWaitTimeCoefficient")
+      this.minWaitTimeCoefficient = dsWin.of("minWaitTimeCoefficient")
         .since(V2_1)
         .summary("The coefficient to multiply with `minWaitTime`.")
         .description(
@@ -361,14 +348,12 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
             "from the dynamic raptor-search-window calculation."
         )
         .asDouble(dsWinDft.minWaitTimeCoefficient());
-      this.minWindow = dsWin
-        .of("minWindow")
+      this.minWindow = dsWin.of("minWindow")
         .since(V2_2)
         .summary("The constant minimum duration for a raptor-search-window. ")
         .description("Use a value between 20 and 180 minutes in a normal deployment.")
         .asDuration(dsWinDft.minWindow());
-      this.maxWindow = dsWin
-        .of("maxWindow")
+      this.maxWindow = dsWin.of("maxWindow")
         .since(V2_2)
         .summary("Upper limit for the search-window calculation.")
         .description(
@@ -381,8 +366,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
           """
         )
         .asDuration(dsWinDft.maxWindow());
-      this.stepMinutes = dsWin
-        .of("stepMinutes")
+      this.stepMinutes = dsWin.of("stepMinutes")
         .since(V2_1)
         .summary("Used to set the steps the search-window is rounded to.")
         .description(

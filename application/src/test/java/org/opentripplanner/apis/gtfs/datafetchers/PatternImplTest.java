@@ -126,7 +126,8 @@ class PatternImplTest {
   private static List<TripOnServiceDate> tripsOnServiceDate(
     PatternImpl impl,
     DataFetchingEnvironment env
-  ) throws Exception {
+  )
+    throws Exception {
     var result = new ArrayList<TripOnServiceDate>();
     impl.tripsOnServiceDate().get(env).forEach(result::add);
     return result;

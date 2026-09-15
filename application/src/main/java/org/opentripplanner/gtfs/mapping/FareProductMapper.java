@@ -45,10 +45,7 @@ class FareProductMapper {
   }
 
   public Collection<FareProduct> findFareProducts(FeedScopedId fareProductId) {
-    return mappedFareProducts
-      .stream()
-      .filter(p -> p.id().equals(fareProductId))
-      .toList();
+    return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
   @Nullable

@@ -60,8 +60,7 @@ class DuplicatedTripHandler {
     // Look up the original trip's pattern and scheduled times
 
     var originalPattern = transitService.findPattern(originalTrip);
-    var originalScheduledTimes = (ScheduledTripTimes) originalPattern
-      .getScheduledTimetable()
+    var originalScheduledTimes = (ScheduledTripTimes) originalPattern.getScheduledTimetable()
       .getTripTimes(tripUpdate.tripId());
 
     // Calculate how many seconds to shift all stop times
@@ -78,16 +77,14 @@ class DuplicatedTripHandler {
 
     // Shift all scheduled times and rebind to the new trip
     int serviceCode = transitService.getTripCalendars().getServiceCode(serviceId);
-    var newScheduledTimes = originalScheduledTimes
-      .copyOf(deduplicator)
+    var newScheduledTimes = originalScheduledTimes.copyOf(deduplicator)
       .withTrip(newTrip)
       .withServiceCode(serviceCode)
       .plusTimeShift(offsetSeconds)
       .build();
 
     // Produce real-time trip times marked as an added trip
-    var newTripTimes = newScheduledTimes
-      .createRealTimeFromScheduledTimes()
+    var newTripTimes = newScheduledTimes.createRealTimeFromScheduledTimes()
       .withServiceCode(serviceCode)
       .withAdded()
       .withRealTimeUpdated()

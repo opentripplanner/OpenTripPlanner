@@ -110,14 +110,12 @@ public final class WalkRequest {
       return false;
     }
     WalkRequest that = (WalkRequest) o;
-    return (
-      doubleEquals(that.speed, speed) &&
+    return (doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       doubleEquals(that.stairsReluctance, stairsReluctance) &&
       doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
       doubleEquals(that.safetyFactor, safetyFactor) &&
-      escalator.equals(that.escalator)
-    );
+      escalator.equals(that.escalator));
   }
 
   @Override

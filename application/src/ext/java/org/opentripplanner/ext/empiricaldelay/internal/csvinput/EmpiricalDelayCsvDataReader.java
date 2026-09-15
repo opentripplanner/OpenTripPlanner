@@ -74,8 +74,13 @@ public class EmpiricalDelayCsvDataReader {
       .withDataSource(dataSource)
       .withProgressLogger(msg -> LOG.info(msg))
       .withParserFactory(reader -> new CalendarCsvParser(issueStore, reader))
-      .withRowHandler(row ->
-        calBuilder.with(row.serviceId(), row.asDayOfWeekSet(), row.startDate(), row.endDate())
+      .withRowHandler(
+        row -> calBuilder.with(
+          row.serviceId(),
+          row.asDayOfWeekSet(),
+          row.startDate(),
+          row.endDate()
+        )
       )
       .read();
 

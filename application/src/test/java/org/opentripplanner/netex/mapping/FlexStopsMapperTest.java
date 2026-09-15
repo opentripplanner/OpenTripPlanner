@@ -120,8 +120,7 @@ class FlexStopsMapperTest {
   );
   private static final KeyListStructure KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS =
     new KeyListStructure().withKeyValue(
-      new KeyValueStructure()
-        .withKey("FlexibleStopAreaType")
+      new KeyValueStructure().withKey("FlexibleStopAreaType")
         .withValue("UnrestrictedPublicTransportAreas")
     );
 
@@ -185,8 +184,7 @@ class FlexStopsMapperTest {
   @Test
   void testMapGroupStopWithKeyValueOnArea() {
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(VALID_POLYGON);
-    var area = (FlexibleArea) flexibleStopPlace
-      .getAreas()
+    var area = (FlexibleArea) flexibleStopPlace.getAreas()
       .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
       .get(0);
     area.withKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
@@ -233,20 +231,17 @@ class FlexStopsMapperTest {
 
   private void assertGroupStopMapping(FlexibleStopPlace flexibleStopPlace) {
     // Regular stop inside the polygon with same transport mode as the flexible stop
-    RegularStop stop1 = testModel
-      .stop("A")
+    RegularStop stop1 = testModel.stop("A")
       .withCoordinate(59.6505778, 6.3608759)
       .withVehicleType(TransitMode.BUS)
       .build();
     // Regular stop outside the polygon with same transport mode as the flexible stop
-    RegularStop stop2 = testModel
-      .stop("B")
+    RegularStop stop2 = testModel.stop("B")
       .withCoordinate(59.6630333, 6.3697245)
       .withVehicleType(TransitMode.BUS)
       .build();
     // Regular stop inside the polygon with another transport mode than the flexible stop
-    RegularStop stop3 = testModel
-      .stop("A")
+    RegularStop stop3 = testModel.stop("A")
       .withCoordinate(59.6505778, 6.3608759)
       .withVehicleType(TransitMode.RAIL)
       .build();
@@ -281,8 +276,7 @@ class FlexStopsMapperTest {
       );
     }
 
-    return new FlexibleStopPlace()
-      .withId(FLEXIBLE_STOP_PLACE_ID)
+    return new FlexibleStopPlace().withId(FLEXIBLE_STOP_PLACE_ID)
       .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withAreas(areas);
@@ -292,8 +286,7 @@ class FlexStopsMapperTest {
     String flexibleAreaId,
     Collection<Double> areaPosList
   ) {
-    return new FlexibleArea()
-      .withId(flexibleAreaId)
+    return new FlexibleArea().withId(flexibleAreaId)
       .withPolygon(
         new PolygonType().withExterior(
           new AbstractRingPropertyType().withAbstractRing(

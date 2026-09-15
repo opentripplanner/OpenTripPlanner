@@ -53,8 +53,7 @@ public class RequestModesBuilder {
   }
 
   public RequestModesBuilder withAllStreetModes(StreetMode streetMode) {
-    return withAccessMode(streetMode)
-      .withEgressMode(streetMode)
+    return withAccessMode(streetMode).withEgressMode(streetMode)
       .withDirectMode(streetMode)
       .withTransferMode(streetMode);
   }

@@ -60,8 +60,8 @@ public class StreetElevationExtension implements Serializable {
       this.compactedElevationProfile = null;
       this.packedElevationProfile = packedElevationProfile;
     } else {
-      this.compactedElevationProfile =
-        CompactElevationProfile.compactElevationProfileWithRegularSamples(packedElevationProfile);
+      this.compactedElevationProfile = CompactElevationProfile
+        .compactElevationProfileWithRegularSamples(packedElevationProfile);
       this.packedElevationProfile = null;
     }
   }

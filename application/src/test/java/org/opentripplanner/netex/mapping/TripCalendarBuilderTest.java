@@ -118,8 +118,7 @@ public class TripCalendarBuilderTest {
     Collection<ServiceCalendarDate> calendar,
     FeedScopedId serviceId
   ) {
-    return calendar
-      .stream()
+    return calendar.stream()
       .filter(it -> serviceId.equals(it.getServiceId()))
       .map(ServiceCalendarDate::getDate)
       .sorted()
@@ -151,8 +150,7 @@ public class TripCalendarBuilderTest {
   private ArrayListMultimap<String, DatedServiceJourney> dsj_2020_11_02(String sjId) {
     var dsj = new DatedServiceJourney();
     dsj.withOperatingDayRef(new OperatingDayRefStructure().withRef(OD_1));
-    dsj
-      .getJourneyRef()
+    dsj.getJourneyRef()
       .add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
     ArrayListMultimap<String, DatedServiceJourney> map = ArrayListMultimap.create();
     map.put(sjId, dsj);

@@ -89,39 +89,31 @@ public class ReplacementHelper {
   }
 
   public boolean isReplacementTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
-    return (
-      !tripOnServiceDate.getReplacementFor().isEmpty() ||
-      isReplacementTrip(tripOnServiceDate.getTrip())
-    );
+    return (!tripOnServiceDate.getReplacementFor().isEmpty() ||
+      isReplacementTrip(tripOnServiceDate.getTrip()));
   }
 
   private boolean hasReplacedByTripOnServiceDates(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
-    return (
-      !transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
+    return (!transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
       (timetableSnapshot != null &&
-        timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
-    );
+        timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty()));
   }
 
   public boolean replacementsExist(Route route) {
-    return transitService
-      .listTripsOnServiceDate()
+    return transitService.listTripsOnServiceDate()
       .stream()
       .anyMatch(
-        tripOnServiceDate ->
-          tripOnServiceDate.getTrip().getRoute().getId().equals(route.getId()) &&
+        tripOnServiceDate -> tripOnServiceDate.getTrip().getRoute().getId().equals(route.getId()) &&
           hasReplacedByTripOnServiceDates(tripOnServiceDate)
       );
   }
 
   public boolean replacementsExist(Trip trip) {
-    return transitService
-      .listTripsOnServiceDate()
+    return transitService.listTripsOnServiceDate()
       .stream()
       .anyMatch(
-        tripOnServiceDate ->
-          tripOnServiceDate.getTrip().getId().equals(trip.getId()) &&
+        tripOnServiceDate -> tripOnServiceDate.getTrip().getId().equals(trip.getId()) &&
           hasReplacedByTripOnServiceDates(tripOnServiceDate)
       );
   }

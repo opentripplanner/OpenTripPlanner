@@ -12,9 +12,8 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 
-public class TripUpdateGraphWriterRunnable
-  implements GraphWriterRunnable<TransitRealTimeUpdateContext>
-{
+public class TripUpdateGraphWriterRunnable implements
+  GraphWriterRunnable<TransitRealTimeUpdateContext> {
 
   private final UpdateIncrementality updateIncrementality;
 
@@ -54,8 +53,7 @@ public class TripUpdateGraphWriterRunnable
 
   @Override
   public void run(TransitRealTimeUpdateContext context) {
-    var result = adapter
-      .forUpdate(context.timetableRepository())
+    var result = adapter.forUpdate(context.timetableRepository())
       .applyTripUpdates(
         fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
         forwardsDelayPropagationType,

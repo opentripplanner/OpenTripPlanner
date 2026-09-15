@@ -162,8 +162,7 @@ class HttpResponseTimeMetricsFilterTest {
   }
 
   private Timer findTotalTimer(String client, String endpoint) {
-    return registry
-      .find(METRIC_NAME + ".total.time")
+    return registry.find(METRIC_NAME + ".total.time")
       .tag(CLIENT_TAG, client)
       .tag(URI_TAG, endpoint)
       .timer();

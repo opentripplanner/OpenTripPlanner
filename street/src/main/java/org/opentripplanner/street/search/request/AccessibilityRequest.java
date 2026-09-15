@@ -104,11 +104,9 @@ public final class AccessibilityRequest {
       return false;
     }
     AccessibilityRequest that = (AccessibilityRequest) o;
-    return (
-      onlyConsiderAccessible == that.onlyConsiderAccessible &&
+    return (onlyConsiderAccessible == that.onlyConsiderAccessible &&
       Objects.equals(unknownCost, that.unknownCost) &&
-      Objects.equals(inaccessibleCost, that.inaccessibleCost)
-    );
+      Objects.equals(inaccessibleCost, that.inaccessibleCost));
   }
 
   @Override

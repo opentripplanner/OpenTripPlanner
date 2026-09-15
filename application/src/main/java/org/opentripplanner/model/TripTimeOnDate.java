@@ -224,10 +224,8 @@ public class TripTimeOnDate {
    * is the case, this indicates that it's a flexible time window instead.
    */
   public boolean hasScheduledTimes() {
-    return (
-      tripTimes.getScheduledArrivalTime(stopPosition) != StopTime.MISSING_VALUE &&
-      tripTimes.getScheduledDepartureTime(stopPosition) != StopTime.MISSING_VALUE
-    );
+    return (tripTimes.getScheduledArrivalTime(stopPosition) != StopTime.MISSING_VALUE &&
+      tripTimes.getScheduledDepartureTime(stopPosition) != StopTime.MISSING_VALUE);
   }
 
   public int getScheduledArrival() {
@@ -302,10 +300,8 @@ public class TripTimeOnDate {
   }
 
   public boolean isCancelledStop() {
-    return (
-      tripTimes.isCanceledStop(stopPosition) ||
-      tripPattern.isBoardAndAlightAt(stopPosition, PickDrop.CANCELLED)
-    );
+    return (tripTimes.isCanceledStop(stopPosition) ||
+      tripPattern.isBoardAndAlightAt(stopPosition, PickDrop.CANCELLED));
   }
 
   public boolean isExtraCall() {
@@ -318,11 +314,9 @@ public class TripTimeOnDate {
 
   /** Return {code true} if stop is cancelled, or trip is canceled/replaced */
   public boolean isCanceledEffectively() {
-    return (
-      isCancelledStop() ||
+    return (isCancelledStop() ||
       tripTimes.isCanceledOrDeleted() ||
-      tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()
-    );
+      tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced());
   }
 
   public boolean isNoDataStop() {
@@ -424,13 +418,11 @@ public class TripTimeOnDate {
       return false;
     }
     TripTimeOnDate that = (TripTimeOnDate) o;
-    return (
-      stopPosition == that.stopPosition &&
+    return (stopPosition == that.stopPosition &&
       midnight == that.midnight &&
       Objects.equals(tripTimes, that.tripTimes) &&
       Objects.equals(tripPattern, that.tripPattern) &&
-      Objects.equals(serviceDate, that.serviceDate)
-    );
+      Objects.equals(serviceDate, that.serviceDate));
   }
 
   @Override

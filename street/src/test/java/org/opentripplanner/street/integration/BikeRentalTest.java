@@ -63,38 +63,36 @@ public class BikeRentalTest extends GraphRoutingTest {
     //   D <-> E1
     //   D <-> T2
 
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          S1 = stop("S1", 47.5000, 19.0001);
-          A = intersection("A", 47.5000, 19.0000);
-          B = intersection("B", 47.5003, 19.0000);
-          C = intersection("C", 47.5087, 19.0000);
-          D = intersection("D", 47.5090, 19.0000);
-          E1 = entrance("E1", 47.5090, 19.0001);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        S1 = stop("S1", 47.5000, 19.0001);
+        A = intersection("A", 47.5000, 19.0000);
+        B = intersection("B", 47.5003, 19.0000);
+        C = intersection("C", 47.5087, 19.0000);
+        D = intersection("D", 47.5090, 19.0000);
+        E1 = entrance("E1", 47.5090, 19.0001);
 
-          T1 = streetLocation("T1", 47.5000, 18.9999);
-          T2 = streetLocation("T2", 47.5090, 18.9999);
+        T1 = streetLocation("T1", 47.5000, 18.9999);
+        T2 = streetLocation("T2", 47.5090, 18.9999);
 
-          B1 = vehicleRentalStation("B1", 47.5003, 19.0001);
-          B2 = vehicleRentalStation("B2", 47.5087, 19.0001);
+        B1 = vehicleRentalStation("B1", 47.5003, 19.0001);
+        B2 = vehicleRentalStation("B2", 47.5087, 19.0001);
 
-          biLink(A, S1);
-          biLink(D, E1);
+        biLink(A, S1);
+        biLink(D, E1);
 
-          biLink(B, B1);
-          biLink(C, B2);
+        biLink(B, B1);
+        biLink(C, B2);
 
-          link(T1, A);
-          link(D, T2);
+        link(T1, A);
+        link(D, T2);
 
-          SE1 = street(A, B, 50, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-          SE2 = street(B, C, 1000, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-          SE3 = street(C, D, 50, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-        }
+        SE1 = street(A, B, 50, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        SE2 = street(B, C, 1000, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        SE3 = street(C, D, 50, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
       }
-    );
+    });
   }
 
   // This tests exists to test if the cost of walking with a bike changes
@@ -165,8 +163,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testNoBikesAvailable() {
     // Replace B1 with a station that has no bikes available
-    var stationWithNoBikes = ((VehicleRentalStation) B1.getStation())
-      .copyOf()
+    var stationWithNoBikes = ((VehicleRentalStation) B1.getStation()).copyOf()
       .withVehiclesAvailable(0)
       .build();
     B1.setStation(stationWithNoBikes);
@@ -193,8 +190,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testNoSpacesAvailable() {
     // Replace B2 with a station that has no spaces available
-    var stationWithNoSpaces = ((VehicleRentalStation) B2.getStation())
-      .copyOf()
+    var stationWithNoSpaces = ((VehicleRentalStation) B2.getStation()).copyOf()
       .withSpacesAvailable(0)
       .withVehicleSpacesAvailable(Map.of())
       .build();
@@ -222,8 +218,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testIgnoreAvailabilityNoBikesAvailable() {
     // Replace B1 with a station that has no bikes available
-    var stationWithNoBikes = ((VehicleRentalStation) B1.getStation())
-      .copyOf()
+    var stationWithNoBikes = ((VehicleRentalStation) B1.getStation()).copyOf()
       .withVehiclesAvailable(0)
       .build();
     B1.setStation(stationWithNoBikes);
@@ -242,8 +237,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testIgnoreAvailabilityNoSpacesAvailable() {
     // Replace B2 with a station that has no spaces available
-    var stationWithNoSpaces = ((VehicleRentalStation) B2.getStation())
-      .copyOf()
+    var stationWithNoSpaces = ((VehicleRentalStation) B2.getStation()).copyOf()
       .withSpacesAvailable(0)
       .build();
     B2.setStation(stationWithNoSpaces);
@@ -302,8 +296,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testBikeRentalFromStationWantToKeepCantKeep() {
     // Replace B1 with a station that doesn't allow keeping vehicles at destination
-    var stationCantKeep = ((VehicleRentalStation) B1.getStation())
-      .copyOf()
+    var stationCantKeep = ((VehicleRentalStation) B1.getStation()).copyOf()
       .withIsArrivingInRentalVehicleAtDestinationAllowed(false)
       .build();
     B1.setStation(stationCantKeep);
@@ -342,8 +335,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeep() {
     // Replace B1 with a station that allows keeping vehicles at destination
-    var stationCanKeep = ((VehicleRentalStation) B1.getStation())
-      .copyOf()
+    var stationCanKeep = ((VehicleRentalStation) B1.getStation()).copyOf()
       .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
       .build();
     B1.setStation(stationCanKeep);
@@ -382,8 +374,7 @@ public class BikeRentalTest extends GraphRoutingTest {
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeepButCostly() {
     // Replace B1 with a station that allows keeping vehicles at destination
-    var stationCanKeep = ((VehicleRentalStation) B1.getStation())
-      .copyOf()
+    var stationCanKeep = ((VehicleRentalStation) B1.getStation()).copyOf()
       .withIsArrivingInRentalVehicleAtDestinationAllowed(true)
       .build();
     B1.setStation(stationCanKeep);
@@ -478,13 +469,12 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> bannedNetworks,
     Set<String> allowedNetworks
   ) {
-    Consumer<StreetSearchRequestBuilder> setter = options ->
-      options.withBike(bike ->
-        bike.withRental(rental -> {
-          rental.withAllowedNetworks(allowedNetworks);
-          rental.withBannedNetworks(bannedNetworks);
-        })
-      );
+    Consumer<StreetSearchRequestBuilder> setter = options -> options.withBike(
+      bike -> bike.withRental(rental -> {
+        rental.withAllowedNetworks(allowedNetworks);
+        rental.withBannedNetworks(bannedNetworks);
+      })
+    );
 
     assertEquals(
       List.of("WALK - BEFORE_RENTING - BC street (1,503.76, 752)"),
@@ -505,13 +495,12 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> bannedNetworks,
     Set<String> allowedNetworks
   ) {
-    Consumer<StreetSearchRequestBuilder> setter = options ->
-      options.withBike(bike ->
-        bike.withRental(rental -> {
-          rental.withAllowedNetworks(allowedNetworks);
-          rental.withBannedNetworks(bannedNetworks);
-        })
-      );
+    Consumer<StreetSearchRequestBuilder> setter = options -> options.withBike(
+      bike -> bike.withRental(rental -> {
+        rental.withAllowedNetworks(allowedNetworks);
+        rental.withBannedNetworks(bannedNetworks);
+      })
+    );
 
     assertEquals(
       List.of(
@@ -628,13 +617,11 @@ public class BikeRentalTest extends GraphRoutingTest {
     int keepRentedBicycleCost
   ) {
     return runStreetSearchAndCreateDescriptor(fromVertex, toVertex, arriveBy, options -> {
-      options.withBike(b ->
-        b.withRental(rental -> {
-          rental.withUseAvailabilityInformation(useAvailabilityInformation);
-          rental.withArrivingInRentalVehicleAtDestinationCost(costOfSeconds(keepRentedBicycleCost));
-          rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
-        })
-      );
+      options.withBike(b -> b.withRental(rental -> {
+        rental.withUseAvailabilityInformation(useAvailabilityInformation);
+        rental.withArrivingInRentalVehicleAtDestinationCost(costOfSeconds(keepRentedBicycleCost));
+        rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
+      }));
     });
   }
 
@@ -648,10 +635,9 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     optionsSetter.accept(builder);
 
-    builder.withBike(bike ->
-      bike.withRental(rental ->
-        rental
-          .withPickupTime(Duration.ofSeconds(42))
+    builder.withBike(
+      bike -> bike.withRental(
+        rental -> rental.withPickupTime(Duration.ofSeconds(42))
           .withPickupCost(costOfSeconds(62))
           .withDropOffCost(costOfSeconds(33))
           .withDropOffTime(Duration.ofSeconds(15))
@@ -689,11 +675,10 @@ public class BikeRentalTest extends GraphRoutingTest {
       return null;
     }
 
-    return path.states
-      .stream()
+    return path.states.stream()
       .filter(s -> s.getBackEdge() instanceof StreetEdge || s.getVertex() == toVertex)
-      .map(s ->
-        String.format(
+      .map(
+        s -> String.format(
           Locale.ROOT,
           "%s - %s%s - %s (%,.2f, %d)",
           s.getBackMode(),

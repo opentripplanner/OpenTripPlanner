@@ -34,8 +34,7 @@ class OHCalendarTest {
     var calBuilder = service.newBuilder(zoneId);
 
     // Simple case 08:00- 16:30  April 1st to April 3rd
-    calBuilder
-      .openingHours("1-3. April", time(8, 0), time(16, 30))
+    calBuilder.openingHours("1-3. April", time(8, 0), time(16, 30))
       .on(date(Month.APRIL, 1))
       .on(date(Month.APRIL, 2))
       .on(date(Month.APRIL, 3))
@@ -117,8 +116,7 @@ class OHCalendarTest {
 
     var calBuilder = service.newBuilder(zoneId);
 
-    calBuilder
-      .openingHours("Mondays and Sundays", time(13, 0), time(17, 0))
+    calBuilder.openingHours("Mondays and Sundays", time(13, 0), time(17, 0))
       .on(DayOfWeek.MONDAY)
       .on(DayOfWeek.SATURDAY)
       .add();

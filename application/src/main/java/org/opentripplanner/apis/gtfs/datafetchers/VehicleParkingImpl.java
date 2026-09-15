@@ -44,8 +44,10 @@ public class VehicleParkingImpl implements GraphQLDataFetchers.GraphQLVehiclePar
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("VehicleParking", getSource(environment).getId().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "VehicleParking",
+      getSource(environment).getId().toString()
+    );
   }
 
   @Override
@@ -65,14 +67,18 @@ public class VehicleParkingImpl implements GraphQLDataFetchers.GraphQLVehiclePar
 
   @Override
   public DataFetcher<String> name() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).getName(), environment);
+    return environment -> GraphQLUtils.getTranslation(
+      getSource(environment).getName(),
+      environment
+    );
   }
 
   @Override
   public DataFetcher<String> note() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).getNote(), environment);
+    return environment -> GraphQLUtils.getTranslation(
+      getSource(environment).getNote(),
+      environment
+    );
   }
 
   @Override

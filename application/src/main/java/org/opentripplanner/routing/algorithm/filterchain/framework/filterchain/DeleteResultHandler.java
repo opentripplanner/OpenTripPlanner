@@ -22,17 +22,14 @@ public class DeleteResultHandler {
 
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     return switch (debug) {
-      case OFF -> itineraries
-        .stream()
+      case OFF -> itineraries.stream()
         .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
         .collect(Collectors.toList());
       case LIST_ALL -> itineraries;
-      case LIMIT_TO_NUM_OF_ITINERARIES -> itineraries
-        .stream()
+      case LIMIT_TO_NUM_OF_ITINERARIES -> itineraries.stream()
         .limit(numOfItineraries)
         .collect(Collectors.toList());
-      case LIMIT_TO_SEARCH_WINDOW -> itineraries
-        .stream()
+      case LIMIT_TO_SEARCH_WINDOW -> itineraries.stream()
         .filter(Predicate.not(OutsideSearchWindowFilter::taggedBy))
         .collect(Collectors.toList());
     };

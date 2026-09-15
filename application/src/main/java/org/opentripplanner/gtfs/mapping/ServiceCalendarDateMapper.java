@@ -11,10 +11,8 @@ class ServiceCalendarDateMapper {
 
   private final IdFactory idFactory;
 
-  private final Map<
-    org.onebusaway.gtfs.model.ServiceCalendarDate,
-    ServiceCalendarDate
-  > mappedServiceDates = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.ServiceCalendarDate, ServiceCalendarDate> mappedServiceDates =
+    new HashMap<>();
 
   ServiceCalendarDateMapper(IdFactory idFactory) {
     this.idFactory = idFactory;

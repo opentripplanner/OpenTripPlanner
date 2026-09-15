@@ -38,8 +38,7 @@ public class GraphSummarizer {
   }
 
   public List<StreetEdge> listStreetEdges() {
-    return listEdges()
-      .stream()
+    return listEdges().stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .toList();
@@ -74,8 +73,7 @@ public class GraphSummarizer {
   }
 
   public Collection<String> summarizeSplitVertices() {
-    return graph
-      .getVerticesOfType(SplitterVertex.class)
+    return graph.getVerticesOfType(SplitterVertex.class)
       .stream()
       .map(StreetSummarizer::summarizeVertex)
       .toList();
@@ -90,8 +88,7 @@ public class GraphSummarizer {
    * {@link TemporaryPartialStreetEdge}) in the graph.
    */
   public Collection<String> summarizeTempEdges() {
-    return listEdges()
-      .stream()
+    return listEdges().stream()
       .filter(e -> e instanceof TemporaryEdge)
       .map(StreetSummarizer::summarizeEdge)
       .toList();
@@ -103,8 +100,7 @@ public class GraphSummarizer {
 
   /// See [GraphSummarizer#listEdges()] on why both incoming and outgoing edges are returned.
   private Stream<Edge> distinctEdges() {
-    return graph
-      .getVertices()
+    return graph.getVertices()
       .stream()
       .flatMap(v -> Stream.concat(v.getOutgoing().stream(), v.getIncoming().stream()))
       .distinct();

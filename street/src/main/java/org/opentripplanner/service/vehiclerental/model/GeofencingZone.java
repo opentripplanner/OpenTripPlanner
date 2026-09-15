@@ -125,11 +125,9 @@ public final class GeofencingZone implements Serializable {
    * Whether the zone has any restriction that bans riding or dropping off.
    */
   public boolean hasRestriction() {
-    return (
-      Boolean.TRUE.equals(dropOffBanned) ||
+    return (Boolean.TRUE.equals(dropOffBanned) ||
       Boolean.TRUE.equals(traversalBanned) ||
-      Boolean.TRUE.equals(rideStartBanned)
-    );
+      Boolean.TRUE.equals(rideStartBanned));
   }
 
   /**
@@ -157,8 +155,7 @@ public final class GeofencingZone implements Serializable {
     if (other == null) {
       return false;
     }
-    return (
-      priority == other.priority &&
+    return (priority == other.priority &&
       businessArea == other.businessArea &&
       id.equals(other.id) &&
       Objects.equals(name, other.name) &&
@@ -167,8 +164,7 @@ public final class GeofencingZone implements Serializable {
       Objects.equals(traversalBanned, other.traversalBanned) &&
       Objects.equals(rideStartBanned, other.rideStartBanned) &&
       Objects.equals(vehicleTypeIds, other.vehicleTypeIds) &&
-      Objects.equals(maximumSpeedKph, other.maximumSpeedKph)
-    );
+      Objects.equals(maximumSpeedKph, other.maximumSpeedKph));
   }
 
   @Override

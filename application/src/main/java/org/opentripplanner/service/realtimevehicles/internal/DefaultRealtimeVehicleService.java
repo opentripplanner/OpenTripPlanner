@@ -52,8 +52,7 @@ public class DefaultRealtimeVehicleService implements RealtimeVehicleService {
     if (pattern == null) {
       return NO_DATA_AVAILABLE;
     }
-    return getRealtimeVehicles(pattern)
-      .stream()
+    return getRealtimeVehicles(pattern).stream()
       .filter(vehicle -> trip.getId().equals(vehicle.trip().getId()))
       .max(Comparator.comparing(vehicle -> vehicle.time().orElse(Instant.MIN)))
       .flatMap(RealtimeVehicle::occupancyStatus)

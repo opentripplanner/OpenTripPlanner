@@ -55,10 +55,9 @@ public class AccessEgressPenaltyDecorator {
     if (requestedMode == StreetMode.WALK) {
       return penaltyWalking.isEmpty()
         ? input
-        : input
-            .stream()
-            .map(it -> it.withPenalty(penaltyWalking.calculate(it.durationInSeconds())))
-            .toList();
+        : input.stream()
+          .map(it -> it.withPenalty(penaltyWalking.calculate(it.durationInSeconds())))
+          .toList();
     }
 
     // The request mode is NOT WALK, and we need to apply a penalty to the access/egress based on
@@ -70,12 +69,9 @@ public class AccessEgressPenaltyDecorator {
       return input;
     }
 
-    return input
-      .stream()
-      .map(it -> {
-        var penalty = it.isWalkOnly() ? penaltyWalking : penaltyRequestedMode;
-        return it.withPenalty(penalty.calculate(it.durationInSeconds()));
-      })
-      .toList();
+    return input.stream().map(it -> {
+      var penalty = it.isWalkOnly() ? penaltyWalking : penaltyRequestedMode;
+      return it.withPenalty(penalty.calculate(it.durationInSeconds()));
+    }).toList();
   }
 }

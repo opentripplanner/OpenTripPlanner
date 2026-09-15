@@ -99,10 +99,7 @@ class VehicleRentalGeofencingGraphBuilderTest {
         HttpHeaders.empty(),
         clientFactory,
         DataImportIssueStore.NOOP
-      )
-        .stream()
-        .map(VehicleRentalGeofencingGraphBuilder.SelectedNetwork::network)
-        .toList();
+      ).stream().map(VehicleRentalGeofencingGraphBuilder.SelectedNetwork::network).toList();
     }
   }
 

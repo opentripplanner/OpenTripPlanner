@@ -50,12 +50,10 @@ class CancelledStopCrossPatternTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     // Batch 1: Cancel stop B on TRIP_1 — creates TripPatternCache entry
-    var batch1 = siri
-      .etBuilder()
+    var batch1 = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:01:01", "00:01:01")
           .call(STOP_B)
           .withIsCancellation(true)
@@ -66,12 +64,10 @@ class CancelledStopCrossPatternTest implements RealtimeTestConstants {
     assertSuccess(siri.applyEstimatedTimetable(batch1));
 
     // Batch 2: Cancel stop B on TRIP_2 — reuses cached RT pattern (wrong originalTripPattern)
-    var batch2 = siri
-      .etBuilder()
+    var batch2 = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_2_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:02:01", "00:02:01")
           .call(STOP_B)
           .withIsCancellation(true)
@@ -85,12 +81,10 @@ class CancelledStopCrossPatternTest implements RealtimeTestConstants {
     // if matching with originalTripPattern, this fails with TRIP_NOT_FOUND_IN_PATTERN because
     // findPattern(trip2, serviceDate) returns the contaminated RT pattern
     // whose originalTripPattern belongs to TRIP_1's route.
-    var batch3 = siri
-      .etBuilder()
+    var batch3 = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_2_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:02:01", "00:02:01")
           .call(STOP_B)
           .withIsCancellation(true)

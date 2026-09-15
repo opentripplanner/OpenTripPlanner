@@ -52,8 +52,9 @@ class DiagonalStairsOnRingCornersTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stairs at bl and tr (wheelchair-inaccessible steps)
         "(0,0) → (-0.001,0) PEDESTRIAN ♿❌",

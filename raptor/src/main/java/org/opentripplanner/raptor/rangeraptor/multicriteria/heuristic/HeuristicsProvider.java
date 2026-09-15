@@ -75,8 +75,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (debugHandlerFactory.isDebugStopArrival(arrival.stop())) {
       String details = rejectErrorMessage(arrival.stop()) + ", Existing paths: " + paths;
 
-      debugHandlerFactory
-        .debugStopArrival()
+      debugHandlerFactory.debugStopArrival()
         .reject(
           arrival,
           null,

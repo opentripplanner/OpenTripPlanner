@@ -21,22 +21,16 @@ class AddedThenRemovedTest implements RealtimeTestConstants {
   private final RegularStop stopB = envBuilder.stop(STOP_B_ID);
   private final RegularStop stopC = envBuilder.stop(STOP_C_ID);
 
-  private final TransitTestEnvironment env = envBuilder
-    .addTrip(
-      TripInput.of(TRIP_1_ID)
-        .addStop(stopA, "12:00")
-        .addStop(stopB, "12:10")
-        .addStop(stopC, "12:20")
-    )
-    .build();
+  private final TransitTestEnvironment env = envBuilder.addTrip(
+    TripInput.of(TRIP_1_ID).addStop(stopA, "12:00").addStop(stopB, "12:10").addStop(stopC, "12:20")
+  ).build();
   private final GtfsRtTestHelper rt = GtfsRtTestHelper.of(env);
 
   @Test
   void addedThenRemoved() {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
 
-    var tripUpdate = rt
-      .tripUpdate(ADDED_TRIP_ID, NEW)
+    var tripUpdate = rt.tripUpdate(ADDED_TRIP_ID, NEW)
       .addStopTime(STOP_A_ID, "10:30")
       .addStopTime(STOP_B_ID, "10:40")
       .build();

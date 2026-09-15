@@ -199,12 +199,10 @@ public class TripTimesOnDateTest {
         .build()
     );
     assertThat(railResult).hasSize(2);
-    assertThat(
-      railResult
-        .stream()
-        .map(t -> t.getTrip().getId().getId())
-        .toList()
-    ).containsExactly("rail1", "rail2");
+    assertThat(railResult.stream().map(t -> t.getTrip().getId().getId()).toList()).containsExactly(
+      "rail1",
+      "rail2"
+    );
   }
 
   /**
@@ -276,12 +274,11 @@ public class TripTimesOnDateTest {
     );
 
     assertThat(result).hasSize(3);
-    assertThat(
-      result
-        .stream()
-        .map(t -> t.getTrip().getId().getId())
-        .toList()
-    ).containsExactly("coach1", "coach2", "coach3");
+    assertThat(result.stream().map(t -> t.getTrip().getId().getId()).toList()).containsExactly(
+      "coach1",
+      "coach2",
+      "coach3"
+    );
   }
 
   /**
@@ -331,12 +328,11 @@ public class TripTimesOnDateTest {
     );
 
     assertThat(result).hasSize(3);
-    assertThat(
-      result
-        .stream()
-        .map(t -> t.getTrip().getId().getId())
-        .toList()
-    ).containsExactly("coach1", "coach2", "coach3");
+    assertThat(result.stream().map(t -> t.getTrip().getId().getId()).toList()).containsExactly(
+      "coach1",
+      "coach2",
+      "coach3"
+    );
   }
 
   /**

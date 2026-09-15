@@ -53,11 +53,9 @@ public interface RaptorSlackProvider {
     int fromTripAlightSlackIndex,
     int toTripBoardSlackIndex
   ) {
-    return (
-      alightSlack(fromTripAlightSlackIndex) +
+    return (alightSlack(fromTripAlightSlackIndex) +
       transferDurationInSeconds +
       transferSlack() +
-      boardSlack(toTripBoardSlackIndex)
-    );
+      boardSlack(toTripBoardSlackIndex));
   }
 }

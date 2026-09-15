@@ -145,8 +145,7 @@ class ModifiedTripBuilder {
 
     for (var r : journeyRelations) {
       if (r.isReplacedBy()) {
-        var replacedByTripsOnServiceDate = r
-          .relatedJourneys()
+        var replacedByTripsOnServiceDate = r.relatedJourneys()
           .stream()
           .map(entityResolver::resolveTripOnServiceDate)
           .filter(Objects::nonNull)
@@ -234,10 +233,8 @@ class ModifiedTripBuilder {
 
       if (matchingCall == null) {
         throw new IllegalStateException(
-          "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug.".formatted(
-            stopIndex,
-            builder.getTrip().getId()
-          )
+          "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug."
+            .formatted(stopIndex, builder.getTrip().getId())
         );
       }
 
@@ -265,7 +262,8 @@ class ModifiedTripBuilder {
     TripPattern pattern,
     List<CallWrapper> calls,
     EntityResolver entityResolver
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     int numberOfStops = pattern.numberOfStops();
     var builder = pattern.copyPlannedStopPattern();
 
@@ -295,13 +293,11 @@ class ModifiedTripBuilder {
         final int stopIndex = i;
         builder.stops.with(stopIndex, callStop);
 
-        call
-          .pickUp()
+        call.pickUp()
           .applyTo(builder.pickups.original(stopIndex))
           .ifPresent(value -> builder.pickups.with(stopIndex, value));
 
-        call
-          .dropOff()
+        call.dropOff()
           .applyTo(builder.dropoffs.original(stopIndex))
           .ifPresent(value -> builder.dropoffs.with(stopIndex, value));
 

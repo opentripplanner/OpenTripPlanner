@@ -62,9 +62,7 @@ public class StopTimeMapperTest {
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
   private static final List<LngLatAlt> ZONE_COORDINATES = Arrays.stream(
     Polygons.BERLIN.getCoordinates()
-  )
-    .map(c -> new LngLatAlt(c.x, c.y))
-    .toList();
+  ).map(c -> new LngLatAlt(c.x, c.y)).toList();
 
   private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 

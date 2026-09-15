@@ -30,8 +30,7 @@ class StopConsolidationModuleTest {
     assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
     assertFalse(modifiedPattern.sameAs(PATTERN));
 
-    var modifiedStop = modifiedPattern
-      .getRoutingTripPattern()
+    var modifiedStop = modifiedPattern.getRoutingTripPattern()
       .getPattern()
       .getStopPattern()
       .getStop(1);

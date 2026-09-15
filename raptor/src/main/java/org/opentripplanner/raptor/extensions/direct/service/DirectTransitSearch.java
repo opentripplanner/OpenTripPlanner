@@ -221,11 +221,9 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
     @Override
     public boolean leftDominanceExist(RaptorPath<T> left, RaptorPath<T> right) {
-      return (
-        left.startTime() > right.startTime() ||
+      return (left.startTime() > right.startTime() ||
         left.endTime() < right.endTime() ||
-        left.c1() < relaxFunction.relax(right.c1())
-      );
+        left.c1() < relaxFunction.relax(right.c1()));
     }
   }
 

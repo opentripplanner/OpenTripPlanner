@@ -84,15 +84,13 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
       return false;
     }
     ContactInfo that = (ContactInfo) o;
-    return (
-      Objects.equals(contactPerson, that.contactPerson) &&
+    return (Objects.equals(contactPerson, that.contactPerson) &&
       Objects.equals(phoneNumber, that.phoneNumber) &&
       Objects.equals(eMail, that.eMail) &&
       Objects.equals(faxNumber, that.faxNumber) &&
       Objects.equals(infoUrl, that.infoUrl) &&
       Objects.equals(bookingUrl, that.bookingUrl) &&
-      Objects.equals(additionalDetails, that.additionalDetails)
-    );
+      Objects.equals(additionalDetails, that.additionalDetails));
   }
 
   @Override

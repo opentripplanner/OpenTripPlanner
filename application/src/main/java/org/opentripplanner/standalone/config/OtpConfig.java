@@ -19,7 +19,8 @@ public class OtpConfig {
   /**
    * This description is shared for otp-config, build-config and router-config.
    */
-  public static final String CONFIG_VERSION_DESCRIPTION = """
+  public static final String CONFIG_VERSION_DESCRIPTION =
+  """
   The config-version is a parameter which each OTP deployment may set to be able to query the
   OTP server and verify that it uses the correct version of the config. The version should be
   injected into the config in the (continuous) deployment pipeline. How this is done, is up to
@@ -59,14 +60,12 @@ public class OtpConfig {
   public OtpConfig(NodeAdapter nodeAdapter, boolean logUnusedParams) {
     this.root = nodeAdapter;
 
-    this.configVersion = root
-      .of("configVersion")
+    this.configVersion = root.of("configVersion")
       .since(V2_1)
       .summary("Deployment version of the *" + OtpFileNames.OTP_CONFIG_FILENAME + "*.")
       .description(CONFIG_VERSION_DESCRIPTION)
       .asString(null);
-    this.otpFeatures = root
-      .of("otpFeatures")
+    this.otpFeatures = root.of("otpFeatures")
       .since(V2_0)
       .summary("Turn features on/off.")
       .asEnumMap(OTPFeature.class, Boolean.class);

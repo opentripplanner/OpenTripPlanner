@@ -91,8 +91,7 @@ class TransitRequestTest {
   void testEqualsAndHashCode() {
     // To create a copy we ned to modify the subject, and then modify it back, if not we just
     // get the same instance.
-    var copy = subject
-      .copyOf()
+    var copy = subject.copyOf()
       .withRaptorDebugging(d -> d.withPath("1 2 3"))
       .build()
       .copyOf()
@@ -105,11 +104,7 @@ class TransitRequestTest {
         subject.copyOf().disable().build(),
         subject.copyOf().withPriorityGroupsByAgency(List.of()).build(),
         subject.copyOf().addPriorityGroupsGlobal(List.of()).build(),
-        subject
-          .copyOf()
-          .withRaptorDebugging(d -> d.withStops(""))
-          .build()
-          .toString()
+        subject.copyOf().withRaptorDebugging(d -> d.withStops("")).build().toString()
       );
   }
 
@@ -124,7 +119,8 @@ class TransitRequestTest {
         priorityGroupsGlobal: [(subModeRegexp: [G.*])],
         raptorDebugging: DebugRaptor{stops: 1, 2}
       )
-      """,
+      """
+      ,
       subject.toString()
     );
     assertEquals("()", TransitRequest.DEFAULT.toString());

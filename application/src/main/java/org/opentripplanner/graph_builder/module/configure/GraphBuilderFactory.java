@@ -66,8 +66,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     GraphBuilderModule.class,
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
-    VertexLinkerGraphBuildingModule.class,
-  }
+    VertexLinkerGraphBuildingModule.class, }
 )
 public interface GraphBuilderFactory {
   AreaStopsToVerticesMapper areaStopsToVerticesMapper();

@@ -48,8 +48,10 @@ public class VehicleParkingLinkingTest {
   @Test
   public void entranceWithVertexLinkingTest() {
     var parking = StreetModelForTest.vehicleParking()
-      .entrance(builder ->
-        builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
+      .entrance(
+        builder -> builder.entranceId(id("1"))
+          .coordinate(new WgsCoordinate(A.getCoordinate()))
+          .vertex(A)
       )
       .build();
     var parkingVertex = vertexFactory.vehicleParkingEntrance(parking);
@@ -66,9 +68,8 @@ public class VehicleParkingLinkingTest {
   @Test
   public void entranceWithoutVertexLinkingTest() {
     var parking = StreetModelForTest.vehicleParking()
-      .entrance(builder ->
-        builder
-          .entranceId(id("1"))
+      .entrance(
+        builder -> builder.entranceId(id("1"))
           .coordinate(new WgsCoordinate(0, 0.0001))
           .carAccessible(true)
           .walkAccessible(true)
@@ -80,10 +81,11 @@ public class VehicleParkingLinkingTest {
 
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(2);
 
-    graph
-      .findEdges(StreetVehicleParkingLink.class)
-      .forEach(e ->
-        assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex))
+    graph.findEdges(StreetVehicleParkingLink.class)
+      .forEach(
+        e -> assertTrue(
+          e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex)
+        )
       );
   }
 
@@ -100,9 +102,8 @@ public class VehicleParkingLinkingTest {
     StreetModelForTest.streetEdge(A, C, StreetTraversalPermission.NONE);
 
     var parking = StreetModelForTest.vehicleParking()
-      .entrance(builder ->
-        builder
-          .entranceId(id("1"))
+      .entrance(
+        builder -> builder.entranceId(id("1"))
           .coordinate(new WgsCoordinate(0, 0.0001))
           .carAccessible(true)
           .walkAccessible(true)
@@ -114,10 +115,11 @@ public class VehicleParkingLinkingTest {
 
     assertThat(graph.findEdges(StreetVehicleParkingLink.class)).hasSize(4);
 
-    graph
-      .findEdges(StreetVehicleParkingLink.class)
-      .forEach(e ->
-        assertTrue(e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex))
+    graph.findEdges(StreetVehicleParkingLink.class)
+      .forEach(
+        e -> assertTrue(
+          e.getFromVertex().equals(parkingVertex) ^ e.getToVertex().equals(parkingVertex)
+        )
       );
   }
 
@@ -125,16 +127,14 @@ public class VehicleParkingLinkingTest {
   public void removeEntranceWithNonExistingVertexTest() {
     var vehicleParking = StreetModelForTest.vehicleParking()
       .bicyclePlaces(true)
-      .entrance(builder ->
-        builder
-          .entranceId(id("Entrance-1"))
+      .entrance(
+        builder -> builder.entranceId(id("Entrance-1"))
           .coordinate(new WgsCoordinate(A.getCoordinate()))
           .vertex(A)
           .walkAccessible(true)
       )
-      .entrance(builder ->
-        builder
-          .entranceId(id("Entrance-2"))
+      .entrance(
+        builder -> builder.entranceId(id("Entrance-2"))
           .coordinate(new WgsCoordinate(B.getCoordinate()))
           .vertex(B)
           .walkAccessible(true)
@@ -159,9 +159,8 @@ public class VehicleParkingLinkingTest {
   public void removeVehicleParkingWithOneEntranceAndNonExistingVertexTest() {
     var vehicleParking = StreetModelForTest.vehicleParking()
       .bicyclePlaces(true)
-      .entrance(builder ->
-        builder
-          .entranceId(id("Entrance-1"))
+      .entrance(
+        builder -> builder.entranceId(id("Entrance-1"))
           .coordinate(new WgsCoordinate(A.getCoordinate()))
           .vertex(A)
           .walkAccessible(true)

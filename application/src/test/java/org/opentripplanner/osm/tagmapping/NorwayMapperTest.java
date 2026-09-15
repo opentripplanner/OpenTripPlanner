@@ -28,8 +28,7 @@ class NorwayMapperTest {
     "secondary",
     "tertiary",
     "unclassified",
-    "residential",
-  };
+    "residential", };
 
   static List<Arguments> createExpectedBicycleSafetyForMaxspeedCases() {
     Double[][] expectedBicycleSafetyMatrix = {
@@ -38,8 +37,7 @@ class NorwayMapperTest {
       { NaN, 3.43, 3.43, 2.5, 2.37, 2.37, 1.83 },
       { NaN, 3.43, 3.43, 2.37, 2.37, 1.83, 1.83 },
       { NaN, 3.43, 3.43, 1.83, 1.83, 1.83, 1.83 },
-      { NaN, NaN, NaN, 1.83, 1.83, 1.83, 1.83 },
-    };
+      { NaN, NaN, NaN, 1.83, 1.83, 1.83, 1.83 }, };
     ArrayList<Arguments> argumentsList = new ArrayList<>();
     for (int i = 0; i < expectedHighways.length; i++) {
       var highway = expectedHighways[i];

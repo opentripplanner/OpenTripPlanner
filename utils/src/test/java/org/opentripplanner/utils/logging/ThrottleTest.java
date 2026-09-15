@@ -43,11 +43,10 @@ class ThrottleTest {
     List<Integer> events = createIntegerSequence(20_000_000);
     long start = System.currentTimeMillis();
 
-    events
-      .parallelStream()
-      .forEach(i ->
-        subject.throttle(() ->
-          System.err.printf(Locale.ROOT, "%d ms%n", System.currentTimeMillis() - start)
+    events.parallelStream()
+      .forEach(
+        i -> subject.throttle(
+          () -> System.err.printf(Locale.ROOT, "%d ms%n", System.currentTimeMillis() - start)
         )
       );
     /*

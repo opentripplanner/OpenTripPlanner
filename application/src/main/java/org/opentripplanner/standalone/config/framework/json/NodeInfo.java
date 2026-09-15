@@ -66,8 +66,7 @@ public record NodeInfo(
    * child, but that requires a bit of refactoring.
    */
   static NodeInfo ofSkipChild(String name) {
-    return of()
-      .withName(name)
+    return of().withName(name)
       .withSummary("No doc, parent contains doc.")
       .withType(OBJECT)
       .withSince(OtpVersion.NA)
@@ -85,8 +84,7 @@ public record NodeInfo(
    * child, but that requires a bit of refactoring.
    */
   public NodeInfo arraysChild() {
-    return of()
-      .withName("{ object }")
+    return of().withName("{ object }")
       .withSummary("Nested object in array. The object type is determined by the parameters.")
       .withType(elementType)
       .withSince(since)

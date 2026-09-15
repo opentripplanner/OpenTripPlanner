@@ -17,8 +17,7 @@ class RulePriorityMatcher {
   private final Set<String> feedsWithPriorities;
 
   RulePriorityMatcher(Collection<FareLegRule> rules) {
-    this.feedsWithPriorities = rules
-      .stream()
+    this.feedsWithPriorities = rules.stream()
       .filter(r -> r.priority().isPresent())
       .map(FareLegRule::feedId)
       .collect(Collectors.toUnmodifiableSet());

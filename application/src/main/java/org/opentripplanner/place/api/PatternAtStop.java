@@ -96,11 +96,9 @@ public class PatternAtStop {
       return false;
     }
     final PatternAtStop that = (PatternAtStop) o;
-    return (
-      Objects.equals(id, that.id) &&
+    return (Objects.equals(id, that.id) &&
       Objects.equals(stop, that.stop) &&
-      Objects.equals(pattern, that.pattern)
-    );
+      Objects.equals(pattern, that.pattern));
   }
 
   @Override
@@ -118,10 +116,8 @@ public class PatternAtStop {
    */
   private static String toId(StopLocation stop, TripPattern pattern) {
     Base64.Encoder encoder = Base64.getEncoder();
-    return (
-      encoder.encodeToString(stop.getId().toString().getBytes(StandardCharsets.UTF_8)) +
+    return (encoder.encodeToString(stop.getId().toString().getBytes(StandardCharsets.UTF_8)) +
       ";" +
-      encoder.encodeToString(pattern.getId().toString().getBytes(StandardCharsets.UTF_8))
-    );
+      encoder.encodeToString(pattern.getId().toString().getBytes(StandardCharsets.UTF_8)));
   }
 }

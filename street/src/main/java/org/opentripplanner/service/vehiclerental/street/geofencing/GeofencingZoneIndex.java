@@ -50,8 +50,7 @@ public class GeofencingZoneIndex {
   public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
     var point = GeometryUtils.getGeometryFactory().createPoint(coord);
     List<GeofencingZone> candidates = index.query(new Envelope(coord));
-    return candidates
-      .stream()
+    return candidates.stream()
       .filter(z -> preparedGeometries.get(z).covers(point))
       .collect(Collectors.toSet());
   }

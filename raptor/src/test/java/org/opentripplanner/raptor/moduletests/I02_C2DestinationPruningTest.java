@@ -58,16 +58,14 @@ public class I02_C2DestinationPruningTest implements RaptorTestConstants {
 
     data.withRoutes(r1, r2, r3, r4).withBoardCost(0);
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .addAccessPaths(free(STOP_A))
       .addEgressPaths(free(STOP_B));
 
-    requestBuilder.withMultiCriteria(mc ->
-      mc
-        .withRelaxC1(value -> (value * 110) / 100)
+    requestBuilder.withMultiCriteria(
+      mc -> mc.withRelaxC1(value -> (value * 110) / 100)
         .withTransitPriorityCalculator(new TestGroupPriorityCalculator())
     );
 
@@ -75,14 +73,15 @@ public class I02_C2DestinationPruningTest implements RaptorTestConstants {
     assertEquals(
       """
       A ~ BUS R1 0:05 0:10:01 ~ B [0:05 0:10:01 5m1s Tₙ0 C₁301 C₂2]
-      A ~ BUS R3 0:05 0:10:31 ~ B [0:05 0:10:31 5m31s Tₙ0 C₁331 C₂4]""",
+      A ~ BUS R3 0:05 0:10:31 ~ B [0:05 0:10:31 5m31s Tₙ0 C₁331 C₂4]\
+      """
+      ,
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   private static TestRoute routeA2B(String name, int priorityGroup, String timetable) {
-    return route(
-      TestTripPattern.of(name, STOP_A, STOP_B).priorityGroup(priorityGroup).build()
-    ).withTimetable(schedule(timetable));
+    return route(TestTripPattern.of(name, STOP_A, STOP_B).priorityGroup(priorityGroup).build())
+      .withTimetable(schedule(timetable));
   }
 }

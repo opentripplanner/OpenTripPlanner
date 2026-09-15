@@ -63,8 +63,8 @@ class EntityResolverTest {
    */
   @Test
   void resolveDatedServiceJourneyIdFromServiceJourneyCode() {
-    var journey = journey(builder ->
-      builder.withEstimatedVehicleJourneyCode("RUT:ServiceJourney:1234")
+    var journey = journey(
+      builder -> builder.withEstimatedVehicleJourneyCode("RUT:ServiceJourney:1234")
     );
 
     assertEquals(
@@ -75,8 +75,8 @@ class EntityResolverTest {
 
   @Test
   void resolveDatedServiceJourneyIdFromDatedServiceJourneyCode() {
-    var journey = journey(builder ->
-      builder.withEstimatedVehicleJourneyCode("RUT:DatedServiceJourney:1234")
+    var journey = journey(
+      builder -> builder.withEstimatedVehicleJourneyCode("RUT:DatedServiceJourney:1234")
     );
 
     assertEquals(
@@ -91,9 +91,8 @@ class EntityResolverTest {
    */
   @Test
   void resolveDatedServiceJourneyIdFromDatedVehicleJourneyRef() {
-    var journey = journey(builder ->
-      builder
-        .withDatedVehicleJourneyRef("RUT:DatedServiceJourney:5678")
+    var journey = journey(
+      builder -> builder.withDatedVehicleJourneyRef("RUT:DatedServiceJourney:5678")
         .withEstimatedVehicleJourneyCode("RUT:ServiceJourney:1234")
     );
 

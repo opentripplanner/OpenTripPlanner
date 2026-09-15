@@ -94,13 +94,14 @@ public final class ParkingRequest {
       return false;
     }
     ParkingRequest that = (ParkingRequest) o;
-    return (
-      Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&
+    return (Objects.equals(
+      unpreferredVehicleParkingTagCost,
+      that.unpreferredVehicleParkingTagCost
+    ) &&
       Objects.equals(filter, that.filter) &&
       Objects.equals(preferred, that.preferred) &&
       Objects.equals(cost, that.cost) &&
-      Objects.equals(time, that.time)
-    );
+      Objects.equals(time, that.time));
   }
 
   @Override

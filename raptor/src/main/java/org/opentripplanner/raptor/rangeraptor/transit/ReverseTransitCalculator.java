@@ -8,10 +8,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * A calculator that will take you back in time not forward, this is the basic logic to implement a
  * reveres search.
  */
-public class ReverseTransitCalculator<T extends RaptorTripSchedule>
-  extends ReverseTimeCalculator
-  implements TransitCalculator<T>
-{
+public class ReverseTransitCalculator<T extends RaptorTripSchedule> extends ReverseTimeCalculator
+  implements TransitCalculator<T> {
 
   @Override
   public int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {

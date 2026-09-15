@@ -121,24 +121,23 @@ public class DatedServiceJourneyQuery {
           environment.<List<TripAlteration>>getArgument("alterations")
         );
 
-        TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder =
-          TripOnServiceDateRequest.of()
-            .withIncludeServiceDates(operatingDays)
-            .withIncludeAgencies(authorities)
-            .withIncludeRoutes(lines)
-            .withIncludeServiceJourneys(serviceJourneys)
-            .withIncludeReplacementFor(replacementFor);
+        TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
+          .of()
+          .withIncludeServiceDates(operatingDays)
+          .withIncludeAgencies(authorities)
+          .withIncludeRoutes(lines)
+          .withIncludeServiceJourneys(serviceJourneys)
+          .withIncludeReplacementFor(replacementFor);
 
-        tripOnServiceDateRequestBuilder =
-          tripOnServiceDateRequestBuilder.withIncludeNetexInternalPlanningCodes(privateCodes);
+        tripOnServiceDateRequestBuilder = tripOnServiceDateRequestBuilder
+          .withIncludeNetexInternalPlanningCodes(privateCodes);
 
         tripOnServiceDateRequestBuilder = tripOnServiceDateRequestBuilder.withIncludeAlterations(
           alterations
         );
 
-        return GqlUtil.getTransitService(environment).findTripsOnServiceDate(
-          tripOnServiceDateRequestBuilder.build()
-        );
+        return GqlUtil.getTransitService(environment)
+          .findTripsOnServiceDate(tripOnServiceDateRequestBuilder.build());
       })
       .build();
   }

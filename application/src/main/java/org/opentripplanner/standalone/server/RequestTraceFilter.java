@@ -88,7 +88,8 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   public void filter(
     ContainerRequestContext requestContext,
     ContainerResponseContext responseContext
-  ) throws IOException {
+  )
+    throws IOException {
     for (var it : traceParameters) {
       if (it.hasHttpResponseHeader()) {
         var value = resolveValueForResponse(it, requestContext);

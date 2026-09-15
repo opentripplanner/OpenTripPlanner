@@ -20,23 +20,21 @@ class TimetableTest {
   private final RegularStop stopC = envBuilder.stop("C");
 
   @ParameterizedTest
-  @CsvSource(
-    value = """
-    Description           | Timetable      | Expected number of days
-    Same day              | 08:00 22:00    | 0
-    Same day, exact limit | 08:00 23:59    | 0
-    Night bus             | 22:00 1:00+1d  | 1
-    Overnight exact limit | 22:59 23:59+1d | 1
-    2 overnights          | 1:00 1:00+2d   | 2
-    """,
-    delimiter = '|',
-    useHeadersInDisplayName = true
-  )
+  @CsvSource(value =
+  """
+  Description           | Timetable      | Expected number of days
+  Same day              | 08:00 22:00    | 0
+  Same day, exact limit | 08:00 23:59    | 0
+  Night bus             | 22:00 1:00+1d  | 1
+  Overnight exact limit | 22:59 23:59+1d | 1
+  2 overnights          | 1:00 1:00+2d   | 2
+  """
+    , delimiter = '|', useHeadersInDisplayName = true)
   void maxTripSpanDays(String testCaseName, String schedule, int expectedNumberOfDays) {
     var times = schedule.trim().split("\\s+");
-    var env = envBuilder
-      .addTrip(TripInput.of("t1").addStop(stopA, times[0]).addStop(stopC, times[1]))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of("t1").addStop(stopA, times[0]).addStop(stopC, times[1])
+    ).build();
 
     var timetable = env.tripData("t1").tripPattern().getScheduledTimetable();
     assertEquals(expectedNumberOfDays, timetable.getMaxTripSpanDays());
@@ -44,10 +42,9 @@ class TimetableTest {
 
   @Test
   void getTripTimesByTrip() {
-    var env = envBuilder
-      .addTrip(TripInput.of("trip1").addStop(stopA, "08:00").addStop(stopC, "09:00"))
-      .addTrip(TripInput.of("trip2").addStop(stopA, "10:00").addStop(stopC, "11:00"))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of("trip1").addStop(stopA, "08:00").addStop(stopC, "09:00")
+    ).addTrip(TripInput.of("trip2").addStop(stopA, "10:00").addStop(stopC, "11:00")).build();
 
     var timetable = env.tripData("trip1").tripPattern().getScheduledTimetable();
     var trip1 = env.tripData("trip1").trip();
@@ -59,10 +56,9 @@ class TimetableTest {
 
   @Test
   void getTripTimesByFeedScopedId() {
-    var env = envBuilder
-      .addTrip(TripInput.of("trip1").addStop(stopA, "08:00").addStop(stopC, "09:00"))
-      .addTrip(TripInput.of("trip2").addStop(stopA, "10:00").addStop(stopC, "11:00"))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of("trip1").addStop(stopA, "08:00").addStop(stopC, "09:00")
+    ).addTrip(TripInput.of("trip2").addStop(stopA, "10:00").addStop(stopC, "11:00")).build();
 
     var timetable = env.tripData("trip1").tripPattern().getScheduledTimetable();
     var trip1 = env.tripData("trip1").trip();
@@ -74,9 +70,9 @@ class TimetableTest {
 
   @Test
   void getTripTimesUsesEqualsNotIdentity() {
-    var env = envBuilder
-      .addTrip(TripInput.of("sameId").addStop(stopA, "08:00").addStop(stopC, "09:00"))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of("sameId").addStop(stopA, "08:00").addStop(stopC, "09:00")
+    ).build();
 
     var timetable = env.tripData("sameId").tripPattern().getScheduledTimetable();
     var trip1 = env.tripData("sameId").trip();
@@ -91,9 +87,9 @@ class TimetableTest {
 
   @Test
   void getTripTimesReturnsNullForUnknownTrip() {
-    var env = envBuilder
-      .addTrip(TripInput.of("trip1").addStop(stopA, "08:00").addStop(stopC, "09:00"))
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of("trip1").addStop(stopA, "08:00").addStop(stopC, "09:00")
+    ).build();
 
     var timetable = env.tripData("trip1").tripPattern().getScheduledTimetable();
 

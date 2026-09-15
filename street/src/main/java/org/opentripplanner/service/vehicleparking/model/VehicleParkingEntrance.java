@@ -90,13 +90,11 @@ public class VehicleParkingEntrance implements Serializable {
       return false;
     }
     final VehicleParkingEntrance that = (VehicleParkingEntrance) o;
-    return (
-      Objects.equals(coordinate, that.coordinate) &&
+    return (Objects.equals(coordinate, that.coordinate) &&
       carAccessible == that.carAccessible &&
       walkAccessible == that.walkAccessible &&
       Objects.equals(entranceId, that.entranceId) &&
-      Objects.equals(name, that.name)
-    );
+      Objects.equals(name, that.name));
   }
 
   public String toString() {

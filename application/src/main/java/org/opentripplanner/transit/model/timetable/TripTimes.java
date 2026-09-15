@@ -31,10 +31,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * trip's TripPattern, not its GTFS stop sequence for example or Raptor stop index. The stop
  * position is 0(zero) based.
  */
-public sealed interface TripTimes<T extends TripTimes>
-  extends Serializable, Comparable<TripTimes>
-  permits RealTimeTripTimes, ScheduledTripTimes
-{
+public sealed interface TripTimes<T extends TripTimes> extends Serializable, Comparable<TripTimes>
+  permits RealTimeTripTimes, ScheduledTripTimes {
   /**
    * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
    * TripTimes.
@@ -233,8 +231,8 @@ public sealed interface TripTimes<T extends TripTimes>
     int arrival = getScheduledArrivalTime(numStops - 1);
     if (
       departure == StopTime.MISSING_VALUE ||
-      arrival == StopTime.MISSING_VALUE ||
-      departure > arrival
+        arrival == StopTime.MISSING_VALUE ||
+        departure > arrival
     ) {
       return null;
     }

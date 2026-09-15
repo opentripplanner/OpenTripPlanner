@@ -18,8 +18,7 @@ class FlexTripsMapperTest {
   @Test
   void defaultTimePenalty() {
     var builder = new TransitDataImportBuilder(SiteRepository.of().build(), NOOP);
-    builder
-      .getStopTimesSortedByTrip()
+    builder.getStopTimesSortedByTrip()
       .addAll(List.of(area("10:00", "18:00"), area("10:00", "18:00")));
     var trips = FlexTripsMapper.createFlexTrips(builder, NOOP);
     assertEquals("[UnscheduledTrip{F:flex}]", trips.toString());

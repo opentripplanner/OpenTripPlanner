@@ -48,19 +48,19 @@ class SpeedParser {
     float metersSecond;
 
     switch (units) {
-      case "kmh":
-      case "km/h":
-      case "kmph":
-      case "kph":
+      case "kmh" :
+      case "km/h" :
+      case "kmph" :
+      case "kph" :
         metersSecond = 0.277778f * originalUnits;
         break;
-      case "mph":
+      case "mph" :
         metersSecond = 0.446944f * originalUnits;
         break;
-      case "knots":
+      case "knots" :
         metersSecond = 0.514444f * originalUnits;
         break;
-      default:
+      default :
         return null;
     }
 

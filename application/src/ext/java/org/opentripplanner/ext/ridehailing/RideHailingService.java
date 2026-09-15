@@ -26,5 +26,6 @@ public interface RideHailingService {
     WgsCoordinate start,
     WgsCoordinate end,
     boolean wheelchairAccessible
-  ) throws ExecutionException;
+  )
+    throws ExecutionException;
 }

@@ -75,13 +75,11 @@ public class RaptorDebugView {
   }
 
   private static void setupActionListenerTextField(JTextField txtField, Consumer<String> model) {
-    txtField.addFocusListener(
-      new FocusAdapter() {
-        @Override
-        public void focusLost(FocusEvent e) {
-          model.accept(txtField.getText());
-        }
+    txtField.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        model.accept(txtField.getText());
       }
-    );
+    });
   }
 }

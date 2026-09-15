@@ -102,13 +102,8 @@ public class RaptorArchitectureTest {
     RR_DEBUG.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_LIFECYCLE.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_TRANSIT.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE).verify();
-    RR_CONTEXT.dependsOn(
-      RR_SHARED_PACKAGES,
-      RR_DEBUG,
-      RR_LIFECYCLE,
-      RR_SUPPORT,
-      RR_TRANSIT
-    ).verify();
+    RR_CONTEXT.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE, RR_SUPPORT, RR_TRANSIT)
+      .verify();
     RR_PATH.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_TRANSIT, RAPTOR_PATH).verify();
     RR_PATH_CONFIGURE.dependsOn(RR_SHARED_PACKAGES, RR_CONTEXT, RR_PATH).verify();
     RANGE_RAPTOR.dependsOn(RR_SHARED_PACKAGES, RR_INTERNAL_API, RR_LIFECYCLE, RR_TRANSIT).verify();
@@ -125,12 +120,10 @@ public class RaptorArchitectureTest {
     var stdStopArrivals = RR_STANDARD.subPackage("stoparrivals")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi)
       .verify();
-    var stdStopArrivalsView = stdStopArrivals
-      .subPackage("view")
+    var stdStopArrivalsView = stdStopArrivals.subPackage("view")
       .dependsOn(RR_SHARED_PACKAGES, stdStopArrivals)
       .verify();
-    var stdStopArrivalsPath = stdStopArrivals
-      .subPackage("path")
+    var stdStopArrivalsPath = stdStopArrivals.subPackage("path")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi, stdStopArrivalsView)
       .verify();
     var stdDebug = RR_STANDARD.subPackage("debug")
@@ -164,15 +157,13 @@ public class RaptorArchitectureTest {
     var mcArrivals = RR_MULTI_CRITERIA.subPackage("arrivals")
       .dependsOn(RR_SHARED_PACKAGES)
       .verify();
-    var mcArrivalsC1 = mcArrivals
-      .subPackage("stop")
+    var mcArrivalsC1 = mcArrivals.subPackage("stop")
       .dependsOn(mcArrivals, RR_SHARED_PACKAGES)
       .verify();
     var mcRide = RR_MULTI_CRITERIA.subPackage("ride")
       .dependsOn(mcArrivals, RR_SHARED_PACKAGES)
       .verify();
-    var mcRideC1 = mcRide
-      .subPackage("c1")
+    var mcRideC1 = mcRide.subPackage("c1")
       .dependsOn(mcArrivals, mcRide, RR_SHARED_PACKAGES)
       .verify();
     var mcHeuristics = RR_MULTI_CRITERIA.subPackage("heuristic")
@@ -225,8 +216,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforceNoCyclicDependencies() {
-    slices()
-      .matching(RAPTOR.packageIdentifierAllSubPackages())
+    slices().matching(RAPTOR.packageIdentifierAllSubPackages())
       .should()
       .beFreeOfCycles()
       .check(ArchComponent.OTP_CLASSES);

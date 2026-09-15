@@ -160,10 +160,8 @@ public class FlexDirectPathFactory {
 
       // Time-shift departure so the minimum-booking-notice restriction is honored.
       var bookingInfo = trip.getPickupBookingInfo(accessBoardStopPosition);
-      firstStopDepartureTime = RoutingBookingInfo.of(
-        requestedBookingTime,
-        bookingInfo
-      ).earliestDepartureTime(firstStopDepartureTime);
+      firstStopDepartureTime = RoutingBookingInfo.of(requestedBookingTime, bookingInfo)
+        .earliestDepartureTime(firstStopDepartureTime);
 
       int earliestDepartureTime = trip.earliestDepartureTime(
         firstStopDepartureTime,
@@ -186,14 +184,12 @@ public class FlexDirectPathFactory {
     if (accessTemplate.accessEgress.state.getVertex() == flexVertex) {
       return false;
     } else {
-      return (
-        accessTemplate.calculator.calculateFlexPath(
-          accessTemplate.accessEgress.state.getVertex(),
-          flexVertex,
-          accessTemplate.boardStopPosition,
-          accessTemplate.alightStopPosition
-        ) != null
-      );
+      return (accessTemplate.calculator.calculateFlexPath(
+        accessTemplate.accessEgress.state.getVertex(),
+        flexVertex,
+        accessTemplate.boardStopPosition,
+        accessTemplate.alightStopPosition
+      ) != null);
     }
   }
 }

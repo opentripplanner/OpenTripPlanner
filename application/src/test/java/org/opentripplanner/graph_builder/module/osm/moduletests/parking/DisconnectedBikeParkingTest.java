@@ -52,8 +52,9 @@ class DisconnectedBikeParkingTest {
 
     var fetcher = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl())
-      .that(fetcher.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl()).that(
+      fetcher.summarizeEdges()
+    )
       .containsExactly(
         "Parking (0.0005,0.0005)[Vehicle parking OSM:OsmWay/1/centroid] → (0.0005,0.0005)[Vehicle parking OSM:OsmWay/1/centroid]"
       );

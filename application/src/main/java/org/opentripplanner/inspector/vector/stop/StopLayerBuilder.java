@@ -36,14 +36,10 @@ public class StopLayerBuilder<T extends StopLocation> extends LayerBuilder<StopL
 
   @Override
   protected List<Geometry> findGeometries(Envelope query) {
-    return findStops
-      .apply(query)
-      .stream()
-      .map(stop -> {
-        Geometry geometry = stop.getGeometry().copy();
-        geometry.setUserData(stop);
-        return geometry;
-      })
-      .toList();
+    return findStops.apply(query).stream().map(stop -> {
+      Geometry geometry = stop.getGeometry().copy();
+      geometry.setUserData(stop);
+      return geometry;
+    }).toList();
   }
 }

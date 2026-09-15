@@ -30,8 +30,7 @@ public final class TripTimesSearch<T extends RaptorTripSchedule> {
     var transit = arrival.transitPath();
     var trip = transit.trip();
     int boardStopPos = transit.boardStopPosition();
-    int alightStopPosition = trip
-      .pattern()
+    int alightStopPosition = trip.pattern()
       .findAlightStopPositionAfter(boardStopPos, arrival.stop());
 
     if (alightStopPosition == -1) {
@@ -60,8 +59,7 @@ public final class TripTimesSearch<T extends RaptorTripSchedule> {
     var transit = arrival.transitPath();
     var trip = transit.trip();
     int alightStopPosition = transit.boardStopPosition();
-    int boardStopPos = trip
-      .pattern()
+    int boardStopPos = trip.pattern()
       .findBoardStopPositionBefore(alightStopPosition, arrival.stop());
 
     if (boardStopPos == -1) {

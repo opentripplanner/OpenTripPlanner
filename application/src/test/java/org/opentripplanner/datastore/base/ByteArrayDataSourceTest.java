@@ -50,14 +50,8 @@ public class ByteArrayDataSourceTest {
 
   @Test
   public void asInputStream() throws IOException {
-    DataSource subject = new ByteArrayDataSource(
-      PATH,
-      NAME,
-      TYPE,
-      SIZE,
-      LAST_MODIFIED,
-      false
-    ).withBytes(BYTES);
+    DataSource subject = new ByteArrayDataSource(PATH, NAME, TYPE, SIZE, LAST_MODIFIED, false)
+      .withBytes(BYTES);
 
     assertEquals(BYTES, subject.asBytes());
     assertEquals(DATA, new String(subject.asInputStream().readAllBytes(), UTF_8));
@@ -65,14 +59,8 @@ public class ByteArrayDataSourceTest {
 
   @Test
   public void verifyAReadOnlyInstanceIsNotWritable() {
-    DataSource subject = new ByteArrayDataSource(
-      PATH,
-      NAME,
-      TYPE,
-      SIZE,
-      LAST_MODIFIED,
-      false
-    ).withBytes(BYTES);
+    DataSource subject = new ByteArrayDataSource(PATH, NAME, TYPE, SIZE, LAST_MODIFIED, false)
+      .withBytes(BYTES);
 
     assertFalse(subject.isWritable());
     assertThrows(UnsupportedOperationException.class, subject::asOutputStream);

@@ -37,8 +37,7 @@ public class DebugUiConfig {
   DebugUiConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
 
-    this.additionalBackgroundLayers = root
-      .of("additionalBackgroundLayers")
+    this.additionalBackgroundLayers = root.of("additionalBackgroundLayers")
       .since(V2_7)
       .summary("Additional background raster map layers.")
       .description(
@@ -48,11 +47,11 @@ public class DebugUiConfig {
         Currently only raster tile layers are supported.
         """
       )
-      .asObjects(List.of(), node ->
-        new BackgroundTileLayer(
+      .asObjects(
+        List.of(),
+        node -> new BackgroundTileLayer(
           node.of("name").since(V2_7).summary("Name to appear in the layer selector.").asString(),
-          node
-            .of("templateUrl")
+          node.of("templateUrl")
             .since(V2_7)
             .summary(
               """
@@ -62,8 +61,7 @@ public class DebugUiConfig {
             )
             .asString(),
           node.of("tileSize").since(V2_7).summary("Size of the tile in pixels.").asInt(256),
-          node
-            .of("attribution")
+          node.of("attribution")
             .since(V2_7)
             .summary("Attribution for the map data.")
             .asString("© OpenTripPlanner")

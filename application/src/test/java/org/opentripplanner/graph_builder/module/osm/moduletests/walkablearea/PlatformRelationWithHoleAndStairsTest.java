@@ -93,8 +93,9 @@ class PlatformRelationWithHoleAndStairsTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // outer ring (5 segments × 2 directions) — ped splits the north side into two segments
         "(0,0) → (0.0009,0) PEDESTRIAN ♿✅",

@@ -29,10 +29,8 @@ public class AllowNarrowedTransitModesFilter implements AllowTransitModeFilter {
     SubMode subMode,
     @Nullable Integer gtfsExtendedType
   ) {
-    return (
-      mainMode == transitMode &&
-      filters.stream().anyMatch(filter -> filter.match(transitMode, subMode, gtfsExtendedType))
-    );
+    return (mainMode == transitMode &&
+      filters.stream().anyMatch(filter -> filter.match(transitMode, subMode, gtfsExtendedType)));
   }
 
   @Override

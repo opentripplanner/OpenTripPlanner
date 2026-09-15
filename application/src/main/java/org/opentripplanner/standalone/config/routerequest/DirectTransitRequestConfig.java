@@ -8,8 +8,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class DirectTransitRequestConfig {
 
   static void map(NodeAdapter root, DirectTransitPreferences.Builder builder) {
-    NodeAdapter c = root
-      .of("directTransitSearch")
+    NodeAdapter c = root.of("directTransitSearch")
       .since(V2_9)
       .summary("Extend the search result with extra results using a direct transit search")
       .description(
@@ -28,17 +27,14 @@ public class DirectTransitRequestConfig {
     }
     var dft = DirectTransitPreferences.DEFAULT;
 
-    builder
-      .withEnabled(
-        c
-          .of("enabled")
-          .since(V2_9)
-          .summary("Enable the direct transit search")
-          .asBoolean(dft.enabled())
-      )
+    builder.withEnabled(
+      c.of("enabled")
+        .since(V2_9)
+        .summary("Enable the direct transit search")
+        .asBoolean(dft.enabled())
+    )
       .withCostRelaxFunction(
-        c
-          .of("costRelaxFunction")
+        c.of("costRelaxFunction")
           .since(V2_9)
           .summary("The generalized-cost window for which paths to include.")
           .description(
@@ -51,8 +47,7 @@ public class DirectTransitRequestConfig {
           .asCostLinearFunction(dft.costRelaxFunction())
       )
       .withExtraAccessEgressReluctance(
-        c
-          .of("extraAccessEgressReluctance")
+        c.of("extraAccessEgressReluctance")
           .since(V2_9)
           .summary("Add an extra cost factor to access/egress legs for these results")
           .description(
@@ -64,8 +59,7 @@ public class DirectTransitRequestConfig {
           .asDouble(dft.extraAccessEgressReluctance())
       )
       .withMaxAccessEgressDuration(
-        c
-          .of("maxAccessEgressDuration")
+        c.of("maxAccessEgressDuration")
           .since(V2_9)
           .summary("A limit on the duration of access/egress for the direct transit search")
           .description(

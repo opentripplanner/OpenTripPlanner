@@ -21,9 +21,7 @@ public class TripTimesHelper {
       return true;
     }
 
-    return (
-      (tripTimes.isCanceled() || tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()) &&
-      !includeCancellations
-    );
+    return ((tripTimes.isCanceled() ||
+      tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()) && !includeCancellations);
   }
 }

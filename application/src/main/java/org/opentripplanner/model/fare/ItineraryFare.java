@@ -74,10 +74,8 @@ public class ItineraryFare {
       return false;
     }
     ItineraryFare fare1 = (ItineraryFare) o;
-    return (
-      Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
-      Objects.equals(legProducts, fare1.legProducts)
-    );
+    return (Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
+      Objects.equals(legProducts, fare1.legProducts));
   }
 
   @Override

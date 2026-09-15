@@ -13,13 +13,9 @@ public class LocalDateRangeUtil {
    * null then no filtering is necessary and this method returns false.
    */
   public static boolean hasServiceDateFilter(GraphQLTypes.GraphQLLocalDateRangeInput dateRange) {
-    return (
-      dateRange != null &&
-      !LocalDateRange.ofExclusiveEnd(
-        dateRange.getGraphQLStart(),
-        dateRange.getGraphQLEnd()
-      ).isUnbounded()
-    );
+    return (dateRange != null &&
+      !LocalDateRange.ofExclusiveEnd(dateRange.getGraphQLStart(), dateRange.getGraphQLEnd())
+        .isUnbounded());
   }
 
   /**
@@ -38,8 +34,7 @@ public class LocalDateRangeUtil {
         "Service date range filter must be either null or have at least one entry."
       );
     }
-    return ranges
-      .stream()
+    return ranges.stream()
       .map(range -> LocalDateRange.ofExclusiveEnd(range.getGraphQLStart(), range.getGraphQLEnd()))
       .toList();
   }

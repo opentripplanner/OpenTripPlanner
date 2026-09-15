@@ -32,10 +32,9 @@ class DatedJourneyMapper {
     var route = tripTimeOnDate.getTrip().getRoute();
     var firstStop = tripTimeOnDate.pattern().getStops().getFirst();
     var lastStop = tripTimeOnDate.pattern().getStops().getLast();
-    return ofRoute(route, lang)
-      .withJourneyRef(
-        new JourneyRefStructure().withValue(idMapper.mapToApi(tripTimeOnDate.getTrip().getId()))
-      )
+    return ofRoute(route, lang).withJourneyRef(
+      new JourneyRefStructure().withValue(idMapper.mapToApi(tripTimeOnDate.getTrip().getId()))
+    )
       .withOperatingDayRef(
         new OperatingDayRefStructure().withValue(tripTimeOnDate.getServiceDay().toString())
       )
@@ -54,8 +53,9 @@ class DatedJourneyMapper {
     var stops = pattern.getStops();
     var firstStop = stops.getFirst();
     var lastStop = stops.getLast();
-    return ofRoute(route, null)
-      .withJourneyRef(new JourneyRefStructure().withValue(idMapper.mapToApi(trip.getId())))
+    return ofRoute(route, null).withJourneyRef(
+      new JourneyRefStructure().withValue(idMapper.mapToApi(trip.getId()))
+    )
       .withOperatingDayRef(new OperatingDayRefStructure().withValue(serviceDate.toString()))
       .withOriginStopPointRef(stopPointRefMapper.stopPointRef(firstStop))
       .withOriginText(internationalText(firstStop.getName()))
@@ -67,8 +67,9 @@ class DatedJourneyMapper {
   }
 
   private DatedJourneyStructure ofRoute(Route route, @Nullable String lang) {
-    return new DatedJourneyStructure()
-      .withLineRef(new LineRefStructure().withValue(idMapper.mapToApi(route.getId())))
+    return new DatedJourneyStructure().withLineRef(
+      new LineRefStructure().withValue(idMapper.mapToApi(route.getId()))
+    )
       .withPublicCode(route.getName())
       .withMode(new ModeStructure().withPtMode(PtModeMapper.map(route.getMode())))
       .withPublishedServiceName(internationalText(route.getName(), lang))

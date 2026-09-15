@@ -42,13 +42,8 @@ class FinlandMapper extends OsmTagMapper {
   @Override
   public WayPropertySet buildWayPropertySet() {
     var props = WayPropertySet.of();
-    TriFunction<
-      StreetTraversalPermission,
-      Float,
-      OsmEntity,
-      Double
-    > defaultWalkSafetyForPermission = (permission, speedLimit, way) ->
-      switch (permission) {
+    TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultWalkSafetyForPermission =
+      (permission, speedLimit, way) -> switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {
           // ~35kph or under
           if (speedLimit <= 9.75f) {
@@ -236,10 +231,8 @@ class FinlandMapper extends OsmTagMapper {
   @Override
   public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String bicycle = way.getTag("bicycle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(bicycle)
-    );
+    return (isVehicleThroughTrafficExplicitlyDisallowed(way) ||
+      doesTagValueDisallowThroughTraffic(bicycle));
   }
 
   @Override

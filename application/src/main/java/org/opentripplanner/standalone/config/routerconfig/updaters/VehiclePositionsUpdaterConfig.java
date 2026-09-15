@@ -15,28 +15,23 @@ import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParam
 public class VehiclePositionsUpdaterConfig {
 
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var feedId = c
-      .of("feedId")
+    var feedId = c.of("feedId")
       .since(V2_2)
       .summary("Feed ID to which the update should be applied.")
       .asString();
-    var frequency = c
-      .of("frequency")
+    var frequency = c.of("frequency")
       .since(V2_2)
       .summary("How often the positions should be updated.")
       .asDuration(Duration.ofMinutes(1));
-    var url = c
-      .of("url")
+    var url = c.of("url")
       .since(V2_2)
       .summary("The URL of GTFS-RT protobuf HTTP resource to download the positions from.")
       .asUri();
-    var fuzzyTripMatching = c
-      .of("fuzzyTripMatching")
+    var fuzzyTripMatching = c.of("fuzzyTripMatching")
       .since(V2_5)
       .summary("Whether to match trips fuzzily.")
       .asBoolean(false);
-    var features = c
-      .of("features")
+    var features = c.of("features")
       .since(V2_5)
       .summary("Which features of GTFS RT vehicle positions should be loaded into OTP.")
       .asEnumSet(VehiclePositionFeature.class, List.of(POSITION, STOP_POSITION, OCCUPANCY));

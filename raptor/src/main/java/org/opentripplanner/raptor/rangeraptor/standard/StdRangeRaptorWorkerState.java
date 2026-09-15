@@ -116,8 +116,8 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
       return;
     }
 
-    boolean arrivedOnBoard =
-      accessPath.arrivedOnBoard() && newBestTransitArrivalTime(stop, arrivalTime);
+    boolean arrivedOnBoard = accessPath.arrivedOnBoard() &&
+      newBestTransitArrivalTime(stop, arrivalTime);
     boolean bestTime = newOverallBestTime(stop, arrivalTime);
 
     if (arrivedOnBoard || bestTime) {

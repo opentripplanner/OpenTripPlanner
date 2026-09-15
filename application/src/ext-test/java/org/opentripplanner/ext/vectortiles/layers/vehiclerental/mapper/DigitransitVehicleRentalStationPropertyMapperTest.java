@@ -46,17 +46,12 @@ class DigitransitVehicleRentalStationPropertyMapperTest {
       .withId(new FeedScopedId("A", "B"))
       .withLatitude(1)
       .withLongitude(2)
-      .withName(
-        TranslatedString.getI18NString(
-          new HashMap<>() {
-            {
-              put(null, NAME);
-              put("de", germanName);
-            }
-          },
-          false
-        )
-      )
+      .withName(TranslatedString.getI18NString(new HashMap<>() {
+        {
+          put(null, NAME);
+          put("de", germanName);
+        }
+      }, false))
       .withVehicleTypesAvailable(Map.of(vehicleType(BICYCLE), 5, vehicleType(SCOOTER), 10))
       .build();
 

@@ -45,8 +45,7 @@ public final class GtfsFaresV2Service implements Serializable {
     var transitLegs = itinerary.listTransitLegs();
     // individual legs
     transitLegs.forEach(leg -> {
-      Set<LegOffer> legOffers = lookup
-        .legRules(leg)
+      Set<LegOffer> legOffers = lookup.legRules(leg)
         .stream()
         .flatMap(r -> r.fareProducts().stream())
         .map(fp -> LegOffer.of(FareOffer.of(leg.startTime(), fp)))
@@ -57,28 +56,26 @@ public final class GtfsFaresV2Service implements Serializable {
     // add transfers for subsections of the itinerary
     if (transitLegs.size() > 1) {
       var splits = ListUtils.partitionIntoSplits(transitLegs);
-      splits.forEach(split ->
-        split.subTails().forEach(tail -> {
-          var unlimitedTransferOffers = lookup.findTransferOffersForSubLegs(
-            split.head(),
-            tail,
-            FareTransferRule::unlimitedTransfers
-          );
-          tail.forEach(leg -> offerContainer.addToLeg(leg, unlimitedTransferOffers));
-          var hasFreeTransfer = lookup.hasFreeTransfers(tail);
-          if (hasFreeTransfer) {
-            offerContainer.transferProducts(tail.getFirst(), tail);
-          }
+      splits.forEach(split -> split.subTails().forEach(tail -> {
+        var unlimitedTransferOffers = lookup.findTransferOffersForSubLegs(
+          split.head(),
+          tail,
+          FareTransferRule::unlimitedTransfers
+        );
+        tail.forEach(leg -> offerContainer.addToLeg(leg, unlimitedTransferOffers));
+        var hasFreeTransfer = lookup.hasFreeTransfers(tail);
+        if (hasFreeTransfer) {
+          offerContainer.transferProducts(tail.getFirst(), tail);
+        }
 
-          var transfers = tail.size();
-          var limitedTransferOffers = lookup.findTransferOffersForSubLegs(
-            split.head(),
-            tail,
-            t -> t.limitedTransfers() && t.allowsNumberOfTransfers(transfers)
-          );
-          offerContainer.addTransferLimitedOffer(split.head(), tail, limitedTransferOffers);
-        })
-      );
+        var transfers = tail.size();
+        var limitedTransferOffers = lookup.findTransferOffersForSubLegs(
+          split.head(),
+          tail,
+          t -> t.limitedTransfers() && t.allowsNumberOfTransfers(transfers)
+        );
+        offerContainer.addTransferLimitedOffer(split.head(), tail, limitedTransferOffers);
+      }));
     }
 
     return new FareResult(offerContainer.toMultimap());

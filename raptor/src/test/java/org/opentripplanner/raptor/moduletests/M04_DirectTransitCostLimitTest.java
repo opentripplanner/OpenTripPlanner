@@ -29,8 +29,7 @@ public class M04_DirectTransitCostLimitTest implements RaptorTestConstants {
   @Test
   void testIncludeExpensive() {
     var data = new TestTransitData();
-    data
-      .withRoute(route(pattern("FAST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:10")))
+    data.withRoute(route(pattern("FAST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:10")))
       .withRoute(
         route(pattern("SLOW", STOP_A, STOP_B)).withTimetable(
           schedule("00:05, 01:05"),
@@ -52,8 +51,7 @@ public class M04_DirectTransitCostLimitTest implements RaptorTestConstants {
   @Test
   void testRejectExpensive() {
     var data = new TestTransitData();
-    data
-      .withRoute(route(pattern("FAST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:10")))
+    data.withRoute(route(pattern("FAST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:10")))
       .withRoute(route(pattern("SLOWER", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:29")))
       .withRoute(route(pattern("SLOWEST", STOP_A, STOP_B)).withTimetable(schedule("01:00, 01:30")));
 

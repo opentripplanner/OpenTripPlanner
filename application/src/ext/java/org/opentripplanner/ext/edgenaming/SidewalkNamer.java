@@ -66,12 +66,11 @@ class SidewalkNamer implements EdgeNamer {
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (
       way instanceof OsmWay osmWay &&
-      way.isSidewalk() &&
-      way.hasNoName() &&
-      !way.isExplicitlyUnnamed()
+        way.isSidewalk() &&
+        way.hasNoName() &&
+        !way.isExplicitlyUnnamed()
     ) {
-      pair
-        .asIterable()
+      pair.asIterable()
         .forEach(edge -> unnamedSidewalks.add(new EdgeOnLevel(osmWay, edge, levelSet)));
     }
     // The way is _not_ a sidewalk and does have a name
@@ -137,14 +136,12 @@ class SidewalkNamer implements EdgeNamer {
    * into a group and have a better basis for comparison.
    */
   private static Stream<CandidateGroup> groupEdgesByName(List<EdgeOnLevel> candidates) {
-    return candidates
-      .stream()
+    return candidates.stream()
       .collect(Collectors.groupingBy(e -> e.edge().getName()))
       .entrySet()
       .stream()
       .map(entry -> {
-        var levels = entry
-          .getValue()
+        var levels = entry.getValue()
           .stream()
           .flatMap(e -> e.levels().stream())
           .collect(Collectors.toSet());
@@ -171,13 +168,10 @@ class SidewalkNamer implements EdgeNamer {
      * How much of this group intersects with the given geometry, in meters.
      */
     double intersectionLength(Geometry polygon) {
-      return edges
-        .stream()
-        .mapToDouble(edge -> {
-          var intersection = polygon.intersection(edge.getGeometry());
-          return length(intersection);
-        })
-        .sum();
+      return edges.stream().mapToDouble(edge -> {
+        var intersection = polygon.intersection(edge.getGeometry());
+        return length(intersection);
+      }).sum();
     }
 
     private double length(Geometry intersection) {

@@ -131,8 +131,7 @@ public class RaptorTransitData {
     // Trip pattern can run only after midnight. Therefore, we need to get the trip pattern's for
     // the next running date as well and filter out duplicates.
     tripPatternsRunningOnDates.addAll(getTripPatternsRunningOnDateCopy(date.plusDays(1)));
-    return tripPatternsRunningOnDates
-      .stream()
+    return tripPatternsRunningOnDates.stream()
       .filter(t -> t.getServiceDate().equals(date))
       .distinct()
       .collect(Collectors.toList());

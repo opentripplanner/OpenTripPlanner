@@ -12,17 +12,14 @@ import org.opentripplanner.osm.model.TraverseDirection;
  */
 public interface OsmSpecifier {
   static Condition[] parseConditions(String spec, String separator) {
-    return Arrays.stream(spec.split(separator))
-      .filter(p -> !p.isEmpty())
-      .map(pair -> {
-        var kv = pair.split("=");
-        if (kv[1].equals("*")) {
-          return new Condition.Present(kv[0].toLowerCase());
-        } else {
-          return new Condition.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
-        }
-      })
-      .toArray(Condition[]::new);
+    return Arrays.stream(spec.split(separator)).filter(p -> !p.isEmpty()).map(pair -> {
+      var kv = pair.split("=");
+      if (kv[1].equals("*")) {
+        return new Condition.Present(kv[0].toLowerCase());
+      } else {
+        return new Condition.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
+      }
+    }).toArray(Condition[]::new);
   }
 
   /**

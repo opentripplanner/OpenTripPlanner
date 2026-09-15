@@ -35,8 +35,7 @@ class DefaultRealtimeVehicleRepositoryTest implements RealtimeTestConstants {
       .addStop(envBuilder.stop(STOP_B_ID), "12:30:00");
     var env = envBuilder.addTrip(tripInput).build();
     pattern = env.tripData(TRIP_1_ID).scheduledTripPattern();
-    patternInOtherFeed = pattern
-      .copy()
+    patternInOtherFeed = pattern.copy()
       .withId(new FeedScopedId("f2", "p2"))
       .withRoute(pattern.getRoute().copy().withId(new FeedScopedId("f2", "r2")).build())
       .build();
@@ -74,8 +73,7 @@ class DefaultRealtimeVehicleRepositoryTest implements RealtimeTestConstants {
 
   @Test
   void realtimeAddedPattern() {
-    var realtimePattern = pattern
-      .copy()
+    var realtimePattern = pattern.copy()
       .withId(new FeedScopedId(feedId, "realtime-added"))
       .withOriginalTripPattern(pattern)
       .withRealTimeStopPatternModified()

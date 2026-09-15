@@ -16,8 +16,7 @@ public class IslandPruningConfig {
 
   public static IslandPruningConfig fromConfig(NodeAdapter root) {
     return fromSubConfig(
-      root
-        .of("islandPruning")
+      root.of("islandPruning")
         .since(V2_3)
         .summary("Settings for fixing street graph connectivity errors")
         .asObject()
@@ -28,8 +27,7 @@ public class IslandPruningConfig {
   public static IslandPruningConfig fromSubConfig(NodeAdapter config) {
     IslandPruningConfig islandPruning = new IslandPruningConfig();
 
-    islandPruning.pruningThresholdIslandWithStops = config
-      .of("islandWithStopsMaxSize")
+    islandPruning.pruningThresholdIslandWithStops = config.of("islandWithStopsMaxSize")
       .since(V2_3)
       .summary("When a graph island with stops in it should be pruned.")
       .description(
@@ -40,8 +38,7 @@ public class IslandPruningConfig {
       )
       .asInt(2);
 
-    islandPruning.pruningThresholdIslandWithoutStops = config
-      .of("islandWithoutStopsMaxSize")
+    islandPruning.pruningThresholdIslandWithoutStops = config.of("islandWithoutStopsMaxSize")
       .since(V2_3)
       .summary("When a graph island without stops should be pruned.")
       .description(
@@ -52,8 +49,7 @@ public class IslandPruningConfig {
       )
       .asInt(10);
 
-    islandPruning.adaptivePruningDistance = config
-      .of("adaptivePruningDistance")
+    islandPruning.adaptivePruningDistance = config.of("adaptivePruningDistance")
       .since(V2_3)
       .summary("Search distance for analyzing islands in pruning.")
       .description(
@@ -63,8 +59,7 @@ public class IslandPruningConfig {
       )
       .asInt(250);
 
-    islandPruning.adaptivePruningFactor = config
-      .of("adaptivePruningFactor")
+    islandPruning.adaptivePruningFactor = config.of("adaptivePruningFactor")
       .since(V2_3)
       .summary("Defines how much pruning thresholds grow maximally by distance.")
       .description(

@@ -49,8 +49,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getAllAlerts() {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(TransitAlertService::getAllAlerts)
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -58,8 +57,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public TransitAlert getAlertById(FeedScopedId id) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getAlertById(id))
       .filter(Objects::nonNull)
       .findAny()
@@ -71,8 +69,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId stop,
     Set<StopCondition> stopConditions
   ) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getStopAlerts(stop, stopConditions))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -80,8 +77,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getStopLocationsAlerts(stopLocationIds))
       .flatMap(Collection::stream)
       .collect(Collectors.toSet());
@@ -89,8 +85,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getRouteAlerts(FeedScopedId route) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getRouteAlerts(route))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -98,8 +93,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getTripAlerts(FeedScopedId trip) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getTripAlerts(trip))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -107,8 +101,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getTripAlerts(trip, serviceDate))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -116,8 +109,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getAgencyAlerts(FeedScopedId agency) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getAgencyAlerts(agency))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -130,10 +122,14 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
     Set<StopCondition> stopConditions,
     Direction direction
   ) {
-    return transitAlertServices
-      .stream()
-      .map(transitAlertService ->
-        transitAlertService.getStopAndRouteAlerts(stop, route, stopConditions, direction)
+    return transitAlertServices.stream()
+      .map(
+        transitAlertService -> transitAlertService.getStopAndRouteAlerts(
+          stop,
+          route,
+          stopConditions,
+          direction
+        )
       )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -146,10 +142,14 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
     LocalDate serviceDate,
     Set<StopCondition> stopConditions
   ) {
-    return transitAlertServices
-      .stream()
-      .map(transitAlertService ->
-        transitAlertService.getStopAndTripAlerts(stop, trip, serviceDate, stopConditions)
+    return transitAlertServices.stream()
+      .map(
+        transitAlertService -> transitAlertService.getStopAndTripAlerts(
+          stop,
+          trip,
+          serviceDate,
+          stopConditions
+        )
       )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -157,10 +157,9 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getRouteTypeAndAgencyAlerts(int routeType, FeedScopedId agency) {
-    return transitAlertServices
-      .stream()
-      .map(transitAlertService ->
-        transitAlertService.getRouteTypeAndAgencyAlerts(routeType, agency)
+    return transitAlertServices.stream()
+      .map(
+        transitAlertService -> transitAlertService.getRouteTypeAndAgencyAlerts(routeType, agency)
       )
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -168,8 +167,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getRouteTypeAlerts(routeType, feedId))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -180,8 +178,7 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
     Direction direction,
     FeedScopedId route
   ) {
-    return transitAlertServices
-      .stream()
+    return transitAlertServices.stream()
       .map(transitAlertService -> transitAlertService.getDirectionAndRouteAlerts(direction, route))
       .flatMap(Collection::stream)
       .collect(Collectors.toList());

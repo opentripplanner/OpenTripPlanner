@@ -25,17 +25,17 @@ public class BookingMethodMapper {
     }
 
     switch (bookingMethodEnumeration) {
-      case CALL_DRIVER:
+      case CALL_DRIVER :
         return BookingMethod.CALL_DRIVER;
-      case CALL_OFFICE:
+      case CALL_OFFICE :
         return BookingMethod.CALL_OFFICE;
-      case ONLINE:
+      case ONLINE :
         return BookingMethod.ONLINE;
-      case PHONE_AT_STOP:
+      case PHONE_AT_STOP :
         return BookingMethod.PHONE_AT_STOP;
-      case TEXT:
+      case TEXT :
         return BookingMethod.TEXT_MESSAGE;
-      default:
+      default :
         LOG.warn(
           "Booking method unknown/not supported will be ignored: {}. Entity: {}",
           bookingMethodEnumeration,

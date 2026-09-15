@@ -89,11 +89,9 @@ public class CanceledTripsFilterMapper {
       return null;
     }
     if (
-      inputs
-        .stream()
+      inputs.stream()
         .anyMatch(
-          input ->
-            list(input.get("modes"), "filters.*.modes") != null &&
+          input -> list(input.get("modes"), "filters.*.modes") != null &&
             list(input.get("modes"), "filters.*.modes").isEmpty()
         )
     ) {
@@ -101,16 +99,13 @@ public class CanceledTripsFilterMapper {
         "Mode filter must be either null or have at least one entry."
       );
     }
-    var modes = inputs
-      .stream()
-      .flatMap(include -> {
-        var modeValues = list(include.get("modes"), "filters.*.modes");
-        if (modeValues == null) {
-          return Stream.of();
-        }
-        return modeValues.stream().map(CanceledTripsFilterMapper::mapTransitMode);
-      })
-      .collect(Collectors.toSet());
+    var modes = inputs.stream().flatMap(include -> {
+      var modeValues = list(include.get("modes"), "filters.*.modes");
+      if (modeValues == null) {
+        return Stream.of();
+      }
+      return modeValues.stream().map(CanceledTripsFilterMapper::mapTransitMode);
+    }).collect(Collectors.toSet());
 
     return modes.isEmpty() ? null : modes;
   }
@@ -121,11 +116,9 @@ public class CanceledTripsFilterMapper {
       return null;
     }
     if (
-      inputs
-        .stream()
+      inputs.stream()
         .anyMatch(
-          input ->
-            mapList(input.get("serviceDateRanges"), "filters.*.serviceDateRanges") != null &&
+          input -> mapList(input.get("serviceDateRanges"), "filters.*.serviceDateRanges") != null &&
             mapList(input.get("serviceDateRanges"), "filters.*.serviceDateRanges").isEmpty()
         )
     ) {
@@ -134,16 +127,13 @@ public class CanceledTripsFilterMapper {
       );
     }
 
-    var ranges = inputs
-      .stream()
-      .flatMap(input -> {
-        var rangeInputs = mapList(input.get("serviceDateRanges"), "filters.*.serviceDateRanges");
-        if (rangeInputs == null) {
-          return Stream.of();
-        }
-        return rangeInputs.stream().map(CanceledTripsFilterMapper::mapLocalDateRange);
-      })
-      .toList();
+    var ranges = inputs.stream().flatMap(input -> {
+      var rangeInputs = mapList(input.get("serviceDateRanges"), "filters.*.serviceDateRanges");
+      if (rangeInputs == null) {
+        return Stream.of();
+      }
+      return rangeInputs.stream().map(CanceledTripsFilterMapper::mapLocalDateRange);
+    }).toList();
 
     return ranges.isEmpty() ? null : ranges;
   }
@@ -160,17 +150,14 @@ public class CanceledTripsFilterMapper {
     if (inputs == null) {
       return null;
     }
-    var periods = inputs
-      .stream()
-      .flatMap(input -> {
-        var rangeInputs = mapList(input.get(RUNNING_TIME_RANGES), RUNNING_TIME_RANGES_PATH);
-        if (rangeInputs == null) {
-          return Stream.<TimePeriod>of();
-        }
-        OffsetDateTimeRangeUtil.requireNonEmpty(rangeInputs, RUNNING_TIME_RANGES_PATH);
-        return rangeInputs.stream().map(CanceledTripsFilterMapper::mapTimePeriod);
-      })
-      .toList();
+    var periods = inputs.stream().flatMap(input -> {
+      var rangeInputs = mapList(input.get(RUNNING_TIME_RANGES), RUNNING_TIME_RANGES_PATH);
+      if (rangeInputs == null) {
+        return Stream.<TimePeriod>of();
+      }
+      OffsetDateTimeRangeUtil.requireNonEmpty(rangeInputs, RUNNING_TIME_RANGES_PATH);
+      return rangeInputs.stream().map(CanceledTripsFilterMapper::mapTimePeriod);
+    }).toList();
 
     return periods.isEmpty() ? null : periods;
   }

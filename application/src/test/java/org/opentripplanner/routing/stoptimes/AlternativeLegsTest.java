@@ -58,8 +58,7 @@ class AlternativeLegsTest extends GtfsTest {
 
     var legs = toString(alternativeLegs);
 
-    var expected =
-      "B ~ BUS 2 0:20 0:30 ~ C [], " +
+    var expected = "B ~ BUS 2 0:20 0:30 ~ C [], " +
       "B ~ BUS 1 0:10 0:20 ~ C [], " +
       // Previous day
       "B ~ BUS 1 8:20 8:30 ~ C []";
@@ -91,8 +90,7 @@ class AlternativeLegsTest extends GtfsTest {
 
     var legs = toString(alternativeLegs);
 
-    var expected =
-      "B ~ BUS 3 1:00 1:10 ~ C [], " +
+    var expected = "B ~ BUS 3 1:00 1:10 ~ C [], " +
       "B ~ BUS 1 8:20 8:30 ~ C [], " +
       // Next day
       "B ~ BUS 1 0:10 0:20 ~ C []";
@@ -156,8 +154,7 @@ class AlternativeLegsTest extends GtfsTest {
 
   private static String toString(List<ScheduledTransitLeg> alternativeLegs) {
     return Itinerary.toStr(
-      alternativeLegs
-        .stream()
+      alternativeLegs.stream()
         .map(Leg.class::cast)
         .map(List::of)
         .map(it -> Itinerary.ofScheduledTransit(it).withGeneralizedCost(Cost.ZERO).build())

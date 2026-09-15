@@ -48,8 +48,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
     );
 
     LOG.info(progress.startMessage());
-    var results = transitRepository
-      .getSiteRepository()
+    var results = transitRepository.getSiteRepository()
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {
@@ -60,11 +59,11 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       });
 
     ImmutableMultimap<StreetVertex, FeedScopedId> mappedResults = results.collect(
-      ImmutableListMultimap.<
-        MatchResult,
-        StreetVertex,
-        FeedScopedId
-      >flatteningToImmutableListMultimap(MatchResult::vertex, mr -> Stream.of(mr.stop().getId()))
+      ImmutableListMultimap
+        .<MatchResult, StreetVertex, FeedScopedId>flatteningToImmutableListMultimap(
+          MatchResult::vertex,
+          mr -> Stream.of(mr.stop().getId())
+        )
     );
 
     mappedResults.keySet().forEach(vertex -> {
@@ -76,8 +75,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 
   private static Stream<MatchResult> matchingVerticesForStop(Graph graph, AreaStop areaStop) {
     var geom = PreparedGeometryFactory.prepare(areaStop.getGeometry());
-    return graph
-      .findVertices(areaStop.getGeometry().getEnvelopeInternal())
+    return graph.findVertices(areaStop.getGeometry().getEnvelopeInternal())
       .stream()
       .filter(StreetVertex.class::isInstance)
       .map(StreetVertex.class::cast)

@@ -73,30 +73,25 @@ public class BarrierRoutingTest {
       from,
       to,
       BIKE,
-      rr ->
-        rr.withPreferences(p ->
-          p.withBike(it -> it.withWalking(walking -> walking.withReluctance(1d)))
-        ),
-      itineraries ->
-        itineraries
-          .stream()
-          .flatMap(i ->
-            Stream.of(
-              () -> assertEquals(1, i.legs().size()),
-              () -> assertEquals(TraverseMode.BICYCLE, i.streetLeg(0).getMode()),
-              () ->
-                assertEquals(
-                  List.of(false, true, false, true, false),
-                  i
-                    .legs()
-                    .get(0)
-                    .listWalkSteps()
-                    .stream()
-                    .map(WalkStep::isWalkingBike)
-                    .collect(Collectors.toList())
-                )
+      rr -> rr.withPreferences(
+        p -> p.withBike(it -> it.withWalking(walking -> walking.withReluctance(1d)))
+      ),
+      itineraries -> itineraries.stream()
+        .flatMap(
+          i -> Stream.of(
+            () -> assertEquals(1, i.legs().size()),
+            () -> assertEquals(TraverseMode.BICYCLE, i.streetLeg(0).getMode()),
+            () -> assertEquals(
+              List.of(false, true, false, true, false),
+              i.legs()
+                .get(0)
+                .listWalkSteps()
+                .stream()
+                .map(WalkStep::isWalkingBike)
+                .collect(Collectors.toList())
             )
           )
+        )
     );
     assertThatPolylinesAreEqual(polyline2, "o~qgH_ccu@Bi@Bk@Bi@Bg@NaA@_@Dm@Dq@a@KJy@@I@M@E??");
   }
@@ -146,18 +141,15 @@ public class BarrierRoutingTest {
       to,
       streetMode,
       ignored -> {},
-      itineraries ->
-        itineraries
-          .stream()
-          .flatMap(i -> i.legs().stream())
-          .map(
-            l -> () ->
-              assertEquals(
-                mapMode(streetMode),
-                l instanceof StreetLeg s ? s.getMode() : null,
-                "Allow only " + streetMode + " legs"
-              )
+      itineraries -> itineraries.stream()
+        .flatMap(i -> i.legs().stream())
+        .map(
+          l -> () -> assertEquals(
+            mapMode(streetMode),
+            l instanceof StreetLeg s ? s.getMode() : null,
+            "Allow only " + streetMode + " legs"
           )
+        )
     );
   }
 

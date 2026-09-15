@@ -106,8 +106,8 @@ public class TripTimeOnDateFilterMapper {
   private static void validateNotEmpty(Map<String, List<?>> input) {
     if (
       !input.containsKey("lines") &&
-      !input.containsKey("authorities") &&
-      !input.containsKey("transportModes")
+        !input.containsKey("authorities") &&
+        !input.containsKey("transportModes")
     ) {
       throw new InvalidInputException("A selector cannot be empty");
     }

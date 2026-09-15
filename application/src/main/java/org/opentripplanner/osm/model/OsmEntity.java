@@ -326,12 +326,10 @@ public abstract class OsmEntity {
       return true;
     }
     String value = getTag(key);
-    return (
-      "designated".equals(value) ||
+    return ("designated".equals(value) ||
       "official".equals(value) ||
       "permissive".equals(value) ||
-      "unknown".equals(value)
-    );
+      "unknown".equals(value));
   }
 
   /**
@@ -390,10 +388,7 @@ public abstract class OsmEntity {
     // all, in parsing a LocalTime it makes sense and is correct that hours cannot be more than
     // 23 or minutes more than 59, but in durations if you have capped the largest unit, it is
     // reasonable for the amount of the largest unit to be as large as it needs to be.
-    int colonCount = (int) duration
-      .chars()
-      .filter(ch -> ch == ':')
-      .count();
+    int colonCount = (int) duration.chars().filter(ch -> ch == ':').count();
     if (colonCount <= 2) {
       try {
         int i, j;
@@ -403,14 +398,14 @@ public abstract class OsmEntity {
         // and less than 60.
         switch (colonCount) {
           // case "m"
-          case 0:
+          case 0 :
             minutes = Long.parseLong(duration);
             if (minutes >= 0) {
               return Duration.ofMinutes(minutes);
             }
             break;
           // case "h:mm"
-          case 1:
+          case 1 :
             i = duration.indexOf(':');
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1));
@@ -419,7 +414,7 @@ public abstract class OsmEntity {
             }
             break;
           // case "h:mm:ss"
-          default:
+          default :
             i = duration.indexOf(':');
             j = duration.indexOf(':', i + 1);
             hours = Long.parseLong(duration.substring(0, i));
@@ -427,12 +422,12 @@ public abstract class OsmEntity {
             seconds = Long.parseLong(duration.substring(j + 1));
             if (
               j - i == 3 &&
-              duration.length() - j == 3 &&
-              hours >= 0 &&
-              minutes >= 0 &&
-              minutes < 60 &&
-              seconds >= 0 &&
-              seconds < 60
+                duration.length() - j == 3 &&
+                hours >= 0 &&
+                minutes >= 0 &&
+                minutes < 60 &&
+                seconds >= 0 &&
+                seconds < 60
             ) {
               return Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
             }
@@ -632,9 +627,7 @@ public abstract class OsmEntity {
    * traversing in the specified direction. Note that oneway tags are not handled in this method.
    */
   public boolean isGeneralAccessDenied(TraverseDirection direction) {
-    return checkModePermission("access", direction)
-      .map(x -> x == DENY)
-      .orElse(false);
+    return checkModePermission("access", direction).map(x -> x == DENY).orElse(false);
   }
 
   /**
@@ -718,11 +711,9 @@ public abstract class OsmEntity {
   public boolean isParkAndRide() {
     String parkingType = getTag("parking");
     String parkAndRide = getTag("park_ride");
-    return (
-      isParking() &&
+    return (isParking() &&
       ((parkingType != null && parkingType.contains("park_and_ride")) ||
-        (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no")))
-    );
+        (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))));
   }
 
   /**
@@ -739,12 +730,10 @@ public abstract class OsmEntity {
     if (isTagless()) {
       return false;
     }
-    return (
-      isOneOfTags("highway", HIGHWAY_BOARDING_LOCATION_VALUES) ||
+    return (isOneOfTags("highway", HIGHWAY_BOARDING_LOCATION_VALUES) ||
       isOneOfTags("railway", RAILWAY_BOARDING_LOCATION_VALUES) ||
       isOneOfTags("amenity", AMENITY_BOARDING_LOCATION_VALUES) ||
-      isPlatform()
-    );
+      isPlatform());
   }
 
   /**
@@ -755,8 +744,8 @@ public abstract class OsmEntity {
    * from being linked to transit stops that are underneath it.
    **/
   public boolean isPlatform() {
-    var isPlatform =
-      isTag("public_transport", "platform") || isOneOfTags("railway", RAILWAY_PLATFORM_VALUES);
+    var isPlatform = isTag("public_transport", "platform") ||
+      isOneOfTags("railway", RAILWAY_PLATFORM_VALUES);
     return isPlatform && !isTag("usage", "tourism");
   }
 
@@ -764,9 +753,9 @@ public abstract class OsmEntity {
    * @return True if this node / area is a bike parking.
    */
   public boolean isBikeParking() {
-    return (
-      isTag("amenity", "bicycle_parking") && !isTag("access", "private") && !isTag("access", "no")
-    );
+    return (isTag("amenity", "bicycle_parking") &&
+      !isTag("access", "private") &&
+      !isTag("access", "no"));
   }
 
   /**
@@ -785,11 +774,9 @@ public abstract class OsmEntity {
     String cyclewayLeft = getTag("cycleway:left");
     String cyclewayRight = getTag("cycleway:right");
 
-    return (
-      (cycleway != null && cycleway.startsWith("opposite")) ||
+    return ((cycleway != null && cycleway.startsWith("opposite")) ||
       (cyclewayLeft != null && cyclewayLeft.startsWith("opposite")) ||
-      (cyclewayRight != null && cyclewayRight.startsWith("opposite"))
-    );
+      (cyclewayRight != null && cyclewayRight.startsWith("opposite")));
   }
 
   @Nullable
@@ -829,8 +816,7 @@ public abstract class OsmEntity {
    * tag key produces a plain (non-compound) id.
    */
   public Optional<String> getCompoundTagValue(List<CompoundRefTagGroup> tagGroups) {
-    return tagGroups
-      .stream()
+    return tagGroups.stream()
       .flatMap(tagGroup -> tagGroup.compoundValue(this::getTag).stream())
       .findFirst();
   }
@@ -851,8 +837,8 @@ public abstract class OsmEntity {
     } else if (hasTag("highway") || isPlatform() || isIndoorRoutable()) {
       if (
         isGeneralAccessDenied(DIRECTIONLESS) &&
-        isGeneralAccessDenied(TraverseDirection.FORWARD) &&
-        isGeneralAccessDenied(TraverseDirection.BACKWARD)
+          isGeneralAccessDenied(TraverseDirection.FORWARD) &&
+          isGeneralAccessDenied(TraverseDirection.BACKWARD)
       ) {
         // There are exceptions.
         for (var mode : CHECKED_MODES) {
@@ -994,11 +980,7 @@ public abstract class OsmEntity {
           case DENY -> permission.remove(entry.getKey());
         };
       }
-      if (
-        isOneWay(entry.getValue())
-          .map(wayDirection -> wayDirection != direction)
-          .orElse(false)
-      ) {
+      if (isOneWay(entry.getValue()).map(wayDirection -> wayDirection != direction).orElse(false)) {
         // cannot travel against one-way road
         permission = permission.remove(entry.getKey());
       }

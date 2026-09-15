@@ -120,8 +120,7 @@ public class ParkAPIUpdaterTest {
 
     assertTrue(updater.update());
 
-    var openingHours = updater
-      .getUpdates()
+    var openingHours = updater.getUpdates()
       .stream()
       .filter(p -> p.getOpeningHours() != null)
       .map(p -> OsmOpeningHoursSupport.osmFormat(p.getOpeningHours()))

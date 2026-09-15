@@ -11,8 +11,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class CalendarCsvParserTest {
 
-  private static final String DEFAUT_INPUT =
-    String.join(", ", CalendarCsvParser.HEADERS) +
+  private static final String DEFAUT_INPUT = String.join(", ", CalendarCsvParser.HEADERS) +
     "\n" +
     """
     WEEKDAYS,1,1,1,1,1,0,0,2025-01-01, 2025-12-31

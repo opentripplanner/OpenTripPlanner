@@ -70,8 +70,7 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion = root
-      .of("configVersion")
+    this.configVersion = root.of("configVersion")
       .since(V2_1)
       .summary("Deployment version of the *" + ROUTER_CONFIG_FILENAME + "*.")
       .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
@@ -82,8 +81,7 @@ public class RouterConfig implements Serializable {
     this.gtfsApi = new GtfsApiConfig("gtfsApi", root);
     var request = mapDefaultRouteRequest("routingDefaults", root);
     this.transitConfig = new TransitRoutingConfig("transit", root, request);
-    this.routingRequestDefaults = request
-      .copyOf()
+    this.routingRequestDefaults = request.copyOf()
       .withMaxSearchWindow(transitConfig.maxSearchWindow())
       .buildDefault();
     this.updatersParameters = new UpdatersConfig(root);

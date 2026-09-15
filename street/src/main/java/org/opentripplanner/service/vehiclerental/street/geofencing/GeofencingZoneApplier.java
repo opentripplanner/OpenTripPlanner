@@ -52,8 +52,7 @@ public class GeofencingZoneApplier {
    * and identifies boundary-crossing edges.
    */
   public Set<Vertex> applyGeofencingZones(Collection<GeofencingZone> geofencingZones) {
-    var zonesWithGeometry = geofencingZones
-      .stream()
+    var zonesWithGeometry = geofencingZones.stream()
       .filter(z -> z.geometry() != null)
       .filter(z -> requireDropOffInsideBusinessArea || !z.isBusinessArea())
       .toList();
@@ -87,8 +86,7 @@ public class GeofencingZoneApplier {
   ) {
     for (var vertex : vertices) {
       var network = vertex.getStation().network();
-      Set<GeofencingZone> initial = zoneService
-        .findZonesContaining(vertex.getCoordinate(), network)
+      Set<GeofencingZone> initial = zoneService.findZonesContaining(vertex.getCoordinate(), network)
         .stream()
         .filter(z -> requireDropOffInsideBusinessArea || !z.isBusinessArea())
         .collect(Collectors.toUnmodifiableSet());
@@ -164,11 +162,13 @@ public class GeofencingZoneApplier {
     var fromVertex = streetEdge.getFromVertex();
     var toVertex = streetEdge.getToVertex();
 
-    boolean fromInZone = vertexInZone.computeIfAbsent(fromVertex, v ->
-      isVertexInZone(v.getCoordinate(), zoneBBox, preparedZone, reusablePoint)
+    boolean fromInZone = vertexInZone.computeIfAbsent(
+      fromVertex,
+      v -> isVertexInZone(v.getCoordinate(), zoneBBox, preparedZone, reusablePoint)
     );
-    boolean toInZone = vertexInZone.computeIfAbsent(toVertex, v ->
-      isVertexInZone(v.getCoordinate(), zoneBBox, preparedZone, reusablePoint)
+    boolean toInZone = vertexInZone.computeIfAbsent(
+      toVertex,
+      v -> isVertexInZone(v.getCoordinate(), zoneBBox, preparedZone, reusablePoint)
     );
 
     if (fromInZone != toInZone) {

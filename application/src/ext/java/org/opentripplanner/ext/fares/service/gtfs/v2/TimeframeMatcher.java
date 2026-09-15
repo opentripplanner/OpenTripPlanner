@@ -40,11 +40,11 @@ class TimeframeMatcher {
     }
 
     // Check from timeframes (departure time)
-    var fromMatches =
-      fromTimeframes.isEmpty() || matchesAnyTimeframe(leg.start().scheduledTime(), fromTimeframes);
+    var fromMatches = fromTimeframes.isEmpty() ||
+      matchesAnyTimeframe(leg.start().scheduledTime(), fromTimeframes);
 
-    var toMatches =
-      toTimeframes.isEmpty() || matchesAnyTimeframe(leg.end().scheduledTime(), toTimeframes);
+    var toMatches = toTimeframes.isEmpty() ||
+      matchesAnyTimeframe(leg.end().scheduledTime(), toTimeframes);
 
     return fromMatches && toMatches;
   }

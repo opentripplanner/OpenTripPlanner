@@ -25,11 +25,10 @@ public class KeepItinerariesWithFewestTransfers implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    itineraries
-      .stream()
+    itineraries.stream()
       .min(numberOfTransfersComparator())
-      .filter(it ->
-        filterKeys.containsAll(it.systemNotices().stream().map(SystemNotice::tag).toList())
+      .filter(
+        it -> filterKeys.containsAll(it.systemNotices().stream().map(SystemNotice::tag).toList())
       )
       .ifPresent(it -> it.removeDeletionFlags(filterKeys));
 

@@ -33,10 +33,10 @@ public interface RaptorTransferIndex {
     return OTPFeature.OnDemandRaptorTransfer.isOn()
       ? new OnDemandRaptorTransferIndex(transfersByStopIndex, request)
       : new PreCachedRaptorTransferIndex(
-          transfersByStopIndex,
-          request,
-          OTPFeature.ParallelRouting.isOn()
-        );
+        transfersByStopIndex,
+        request,
+        OTPFeature.ParallelRouting.isOn()
+      );
   }
 
   static Collection<DefaultRaptorTransfer> getRaptorTransfers(
@@ -46,8 +46,7 @@ public interface RaptorTransferIndex {
     var mode = request.mode();
     // The transfers are filtered so that there is only one possible directional transfer
     // for a stop pair.
-    return transfers
-      .stream()
+    return transfers.stream()
       .filter(transfer -> transfer.allowsMode(mode))
       .flatMap(s -> s.asRaptorTransfer(request).stream())
       .collect(toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b))

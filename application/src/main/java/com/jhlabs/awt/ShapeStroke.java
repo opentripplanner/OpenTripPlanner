@@ -54,18 +54,18 @@ public class ShapeStroke implements Stroke {
     while (!it.isDone()) {
       type = it.currentSegment(points);
       switch (type) {
-        case PathIterator.SEG_MOVETO:
+        case PathIterator.SEG_MOVETO :
           moveX = lastX = points[0];
           moveY = lastY = points[1];
           result.moveTo(moveX, moveY);
           next = 0;
           break;
-        case PathIterator.SEG_CLOSE:
+        case PathIterator.SEG_CLOSE :
           points[0] = moveX;
           points[1] = moveY;
-        // Fall into....
+          // Fall into....
 
-        case PathIterator.SEG_LINETO:
+        case PathIterator.SEG_LINETO :
           thisX = points[0];
           thisY = points[1];
           float dx = thisX - lastX;

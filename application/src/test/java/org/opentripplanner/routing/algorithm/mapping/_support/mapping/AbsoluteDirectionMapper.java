@@ -11,23 +11,23 @@ class AbsoluteDirectionMapper {
       return null;
     }
     switch (domain) {
-      case NORTH:
+      case NORTH :
         return ApiAbsoluteDirection.NORTH;
-      case NORTHEAST:
+      case NORTHEAST :
         return ApiAbsoluteDirection.NORTHEAST;
-      case EAST:
+      case EAST :
         return ApiAbsoluteDirection.EAST;
-      case SOUTHEAST:
+      case SOUTHEAST :
         return ApiAbsoluteDirection.SOUTHEAST;
-      case SOUTH:
+      case SOUTH :
         return ApiAbsoluteDirection.SOUTH;
-      case SOUTHWEST:
+      case SOUTHWEST :
         return ApiAbsoluteDirection.SOUTHWEST;
-      case WEST:
+      case WEST :
         return ApiAbsoluteDirection.WEST;
-      case NORTHWEST:
+      case NORTHWEST :
         return ApiAbsoluteDirection.NORTHWEST;
-      default:
+      default :
         throw new IllegalArgumentException(domain.toString());
     }
   }

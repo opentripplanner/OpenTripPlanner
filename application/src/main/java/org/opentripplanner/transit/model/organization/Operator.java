@@ -65,11 +65,9 @@ public class Operator extends AbstractTransitEntity<Operator, OperatorBuilder> i
 
   @Override
   public boolean sameAs(Operator other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(url, other.url) &&
-      Objects.equals(phone, other.phone)
-    );
+      Objects.equals(phone, other.phone));
   }
 }

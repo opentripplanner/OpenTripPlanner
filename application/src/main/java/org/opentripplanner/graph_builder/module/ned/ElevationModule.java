@@ -200,8 +200,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     if (multiThreadElevationCalculations) {
       // Multi-threaded execution
-      streetsWithElevationEdges
-        .parallelStream()
+      streetsWithElevationEdges.parallelStream()
         .forEach(ee -> processEdgeWithProgress(ee, progress));
     } else {
       // If using just a single thread, process each edge inline
@@ -261,17 +260,13 @@ public class ElevationModule implements GraphBuilderModule {
       cacheManager.save(CacheTask.ELEVATION, newCachedElevations);
     }
 
-    @SuppressWarnings("unchecked")
-    var elevationsForVertices = collectKnownElevationsForVertices(
+    @SuppressWarnings("unchecked") var elevationsForVertices = collectKnownElevationsForVertices(
       elevationData,
       edgesWithCalculatedElevations
     );
 
-    new MissingElevationHandler(
-      issueStore,
-      elevationsForVertices,
-      maxElevationPropagationMeters
-    ).run();
+    new MissingElevationHandler(issueStore, elevationsForVertices, maxElevationPropagationMeters)
+      .run();
 
     updateElevationMetadata(graph);
 
@@ -322,8 +317,9 @@ public class ElevationModule implements GraphBuilderModule {
   ) {
     // knownElevations will be null if there are no ElevationPoints in the data
     // for instance, with the Shapefile loader.)
-    var elevations =
-      knownElevations != null ? new HashMap<>(knownElevations) : new HashMap<Vertex, Double>();
+    var elevations = knownElevations != null
+      ? new HashMap<>(knownElevations)
+      : new HashMap<Vertex, Double>();
 
     // If including the EllipsoidToGeoidDifference, subtract these from the known elevations
     // found in OpenStreetMap data.
@@ -504,9 +500,7 @@ public class ElevationModule implements GraphBuilderModule {
           try {
             getElevation(coverage, examplarCoordinate);
           } catch (
-            PointOutsideCoverageException
-            | ArrayIndexOutOfBoundsException
-            | TransformException e
+            PointOutsideCoverageException | ArrayIndexOutOfBoundsException | TransformException e
           ) {
             LOG.warn(
               "Error processing elevation for coordinate: {} due to error: {}",
@@ -550,7 +544,8 @@ public class ElevationModule implements GraphBuilderModule {
    * @return elevation in meters
    */
   private double getElevation(Coverage coverage, Coordinate c)
-    throws PointOutsideCoverageException, TransformException {
+    throws PointOutsideCoverageException,
+    TransformException {
     return getElevation(coverage, c.x, c.y);
   }
 
@@ -569,7 +564,8 @@ public class ElevationModule implements GraphBuilderModule {
    *                                        "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
    */
   private double getElevation(Coverage coverage, double x, double y)
-    throws PointOutsideCoverageException, TransformException {
+    throws PointOutsideCoverageException,
+    TransformException {
     double[] values = new double[1];
     try {
       // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
@@ -583,8 +579,7 @@ public class ElevationModule implements GraphBuilderModule {
       throw e;
     }
 
-    var elevation =
-      values[0] * gridCoverageFactory.elevationUnitMultiplier() -
+    var elevation = values[0] * gridCoverageFactory.elevationUnitMultiplier() -
       (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
 
     minElevation = Math.min(minElevation, elevation);

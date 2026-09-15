@@ -116,8 +116,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * than this, so an unusually large preference cannot blow up the search. Lower or remove only
    * once the nearby-stop search is made smarter.
    */
-  public static final Duration MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS =
-    Duration.ofMinutes(60);
+  public static final Duration MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS = Duration
+    .ofMinutes(60);
   private final CarpoolingRepository repository;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final TripPreFilters preFilters;
@@ -216,8 +216,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
 
-    var candidateTrips = allTrips
-      .stream()
+    var candidateTrips = allTrips.stream()
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
 
@@ -278,49 +277,49 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var snappedPickup = new WgsCoordinate(pickupSnap.vertex().getCoordinate());
       var snappedDropoff = new WgsCoordinate(dropoffSnap.vertex().getCoordinate());
 
-      var insertionCandidates = candidateTrips
-        .stream()
-        .map(tripWithVertices -> {
-          var trip = tripWithVertices.trip();
-          List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-            trip,
-            snappedPickup,
-            snappedDropoff,
-            stopDuration
-          );
+      var insertionCandidates = candidateTrips.stream().map(tripWithVertices -> {
+        var trip = tripWithVertices.trip();
+        List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
+          trip,
+          snappedPickup,
+          snappedDropoff,
+          stopDuration
+        );
 
-          if (viablePositions.isEmpty()) {
-            LOG.debug("No viable positions found for trip {} (avoided all routing!)", trip.getId());
-            return null;
-          }
+        if (viablePositions.isEmpty()) {
+          LOG.debug("No viable positions found for trip {} (avoided all routing!)", trip.getId());
+          return null;
+        }
 
-          LOG.debug(
-            "{} viable positions found for trip {}, evaluating with routing",
-            viablePositions.size(),
-            trip.getId()
-          );
+        LOG.debug(
+          "{} viable positions found for trip {}, evaluating with routing",
+          viablePositions.size(),
+          trip.getId()
+        );
 
-          return insertionEvaluator.findBestInsertion(
-            tripWithVertices,
-            viablePositions,
-            new PassengerSnap(
-              pickupSnap.vertex(),
-              dropoffSnap.vertex(),
-              pickupSnap.walkPath(),
-              dropoffSnap.walkPath()
-            )
-          );
-        })
-        .filter(Objects::nonNull)
-        .toList();
+        return insertionEvaluator.findBestInsertion(
+          tripWithVertices,
+          viablePositions,
+          new PassengerSnap(
+            pickupSnap.vertex(),
+            dropoffSnap.vertex(),
+            pickupSnap.walkPath(),
+            dropoffSnap.walkPath()
+          )
+        );
+      }).filter(Objects::nonNull).toList();
 
       LOG.debug("Found {} viable insertion candidates", insertionCandidates.size());
 
       var carpoolReluctance = request.preferences().car().reluctance();
-      itineraries = insertionCandidates
-        .stream()
-        .map(candidate ->
-          itineraryMapper.toItinerary(candidate, carpoolReluctance, request.from(), request.to())
+      itineraries = insertionCandidates.stream()
+        .map(
+          candidate -> itineraryMapper.toItinerary(
+            candidate,
+            carpoolReluctance,
+            request.from(),
+            request.to()
+          )
         )
         .filter(Objects::nonNull)
         .filter(itinerary -> postFilters.isValidItinerary(itinerary, carpoolingRequest))
@@ -368,7 +367,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     AccessEgressType accessOrEgress,
     TransitServiceResolver transitServiceResolver,
     ZonedDateTime transitSearchTimeZero
-  ) throws RoutingValidationException {
+  )
+    throws RoutingValidationException {
     if (
       !StreetMode.CARPOOL.equals(request.journey().access().mode()) && accessOrEgress.isAccess()
     ) {
@@ -390,8 +390,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     GenericLocation passengerLocation = accessOrEgress.isAccess() ? request.from() : request.to();
     WgsCoordinate passengerCoordinates = passengerLocation.wgsCoordinate();
 
-    var candidateTrips = allTrips
-      .stream()
+    var candidateTrips = allTrips.stream()
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
 
@@ -419,15 +418,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var passengerSnap = accessOrEgress.isEgress()
         ? carReachableVertexSnapper.snapDropoff(
-            streetSearchRequest,
-            passengerAccessEgressVertex,
-            maxWalkToCarpool
-          )
+          streetSearchRequest,
+          passengerAccessEgressVertex,
+          maxWalkToCarpool
+        )
         : carReachableVertexSnapper.snapPickup(
-            streetSearchRequest,
-            passengerAccessEgressVertex,
-            maxWalkToCarpool
-          );
+          streetSearchRequest,
+          passengerAccessEgressVertex,
+          maxWalkToCarpool
+        );
       if (passengerSnap == null) {
         LOG.debug(
           "No car-reachable vertex reachable within {} from passenger coords {}",
@@ -441,8 +440,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // request's accessEgress max duration: stops beyond that reach only yield legs that violate
       // the cap. Bound it further by MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS so an
       // unusually large preference cannot blow up the search.
-      var preferredSearchDuration = request
-        .preferences()
+      var preferredSearchDuration = request.preferences()
         .street()
         .accessEgress()
         .maxDuration()
@@ -463,8 +461,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // CAR_PICKUP can return several NearbyStop records per stopId (different paths to the same
       // stop link vertex). They all share the same vertex and stopId — which is everything we read
       // downstream — so any representative works; we don't rank them.
-      var foundStops = streetNearbyStopFinder
-        .build()
+      var foundStops = streetNearbyStopFinder.build()
         .findNearbyStops(
           Set.of(passengerSnap.vertex()),
           request,
@@ -486,15 +483,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
       for (var stop : byStopId.values()) {
         var snap = accessOrEgress.isAccess()
           ? carReachableVertexSnapper.snapDropoff(
-              streetSearchRequest,
-              stop.state.getVertex(),
-              maxWalkToCarpool
-            )
+            streetSearchRequest,
+            stop.state.getVertex(),
+            maxWalkToCarpool
+          )
           : carReachableVertexSnapper.snapPickup(
-              streetSearchRequest,
-              stop.state.getVertex(),
-              maxWalkToCarpool
-            );
+            streetSearchRequest,
+            stop.state.getVertex(),
+            maxWalkToCarpool
+          );
         if (snap != null) {
           stopSnaps.put(stop, snap);
         }
@@ -550,52 +547,44 @@ public class DefaultCarpoolingService implements CarpoolingService {
         stopDuration
       );
 
-      var candidateTripsWithViableStopsAndPositions = routableTrips
-        .stream()
+      var candidateTripsWithViableStopsAndPositions = routableTrips.stream()
         .map(tripWithVertices -> {
-          var viableSegmentInsertions = stopSnaps
-            .entrySet()
-            .stream()
-            .map(entry -> {
-              var nearbyStop = entry.getKey();
-              var stopSnap = entry.getValue();
-              var pickupSide = accessOrEgress.isAccess() ? passengerSnap : stopSnap;
-              var dropoffSide = accessOrEgress.isAccess() ? stopSnap : passengerSnap;
+          var viableSegmentInsertions = stopSnaps.entrySet().stream().map(entry -> {
+            var nearbyStop = entry.getKey();
+            var stopSnap = entry.getValue();
+            var pickupSide = accessOrEgress.isAccess() ? passengerSnap : stopSnap;
+            var dropoffSide = accessOrEgress.isAccess() ? stopSnap : passengerSnap;
 
-              var viablePositions = positionFinder.findViablePositions(
-                tripWithVertices.trip(),
-                new WgsCoordinate(pickupSide.vertex().getCoordinate()),
-                new WgsCoordinate(dropoffSide.vertex().getCoordinate()),
-                stopDuration
-              );
-              return new ViableAccessEgress(
-                nearbyStop,
-                stopSnap.vertex(),
-                passengerSnap.vertex(),
-                accessOrEgress,
-                viablePositions,
-                pickupSide.walkPath(),
-                dropoffSide.walkPath()
-              );
-            })
-            .filter(it -> !it.insertionPositions().isEmpty())
-            .toList();
+            var viablePositions = positionFinder.findViablePositions(
+              tripWithVertices.trip(),
+              new WgsCoordinate(pickupSide.vertex().getCoordinate()),
+              new WgsCoordinate(dropoffSide.vertex().getCoordinate()),
+              stopDuration
+            );
+            return new ViableAccessEgress(
+              nearbyStop,
+              stopSnap.vertex(),
+              passengerSnap.vertex(),
+              accessOrEgress,
+              viablePositions,
+              pickupSide.walkPath(),
+              dropoffSide.walkPath()
+            );
+          }).filter(it -> !it.insertionPositions().isEmpty()).toList();
           return new TripWithViableAccessEgress(tripWithVertices, viableSegmentInsertions);
         })
         .toList();
 
-      var insertionCandidates = candidateTripsWithViableStopsAndPositions
-        .stream()
+      var insertionCandidates = candidateTripsWithViableStopsAndPositions.stream()
         .flatMap(it -> insertionEvaluator.findBestInsertions(it).stream())
         .toList();
 
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.
       var carpoolReluctance = request.preferences().car().reluctance();
-      return insertionCandidates
-        .stream()
-        .map(it ->
-          createCarpoolAccessEgress(
+      return insertionCandidates.stream()
+        .map(
+          it -> createCarpoolAccessEgress(
             transitServiceResolver,
             it,
             transitSearchTimeZero,
@@ -748,8 +737,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     AccessEgressType accessOrEgress,
     GenericLocation passengerLocation
   ) {
-    var carpoolPickupTime = insertionCandidate
-      .trip()
+    var carpoolPickupTime = insertionCandidate.trip()
       .startTime()
       .plus(insertionCandidate.getDurationUntilPickupArrival());
     var passengerStartTime = carpoolPickupTime.minus(

@@ -90,8 +90,10 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
       /* Find nearby stops by euclidean distance */
       Coordinate c0 = originStopVertex.getCoordinate();
-      Map<RegularStop, NearbyStop> stopsEuclidean = straightLineNearbyStopFinder
-        .findNearbyStops(c0, radiusMeters)
+      Map<RegularStop, NearbyStop> stopsEuclidean = straightLineNearbyStopFinder.findNearbyStops(
+        c0,
+        radiusMeters
+      )
         .stream()
         .filter(nearbyStop -> getRegularStop(nearbyStop.stopId) != null)
         .collect(Collectors.toMap(nearbyStop -> getRegularStop(nearbyStop.stopId), t -> t));
@@ -99,12 +101,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       Map<RegularStop, NearbyStop> stopsStreets = new HashMap<>();
       try {
         /* Find nearby stops by street distance */
-        streetNearbyStopFinder
-          .findNearbyStops(c0, radiusMeters * RADIUS_MULTIPLIER)
+        streetNearbyStopFinder.findNearbyStops(c0, radiusMeters * RADIUS_MULTIPLIER)
           .stream()
           .filter(nearbyStop -> getRegularStop(nearbyStop.stopId) != null)
-          .forEach(nearbyStop ->
-            stopsStreets.putIfAbsent(getRegularStop(nearbyStop.stopId), nearbyStop)
+          .forEach(
+            nearbyStop -> stopsStreets.putIfAbsent(getRegularStop(nearbyStop.stopId), nearbyStop)
           );
       } catch (Exception ignored) {}
 
@@ -113,15 +114,13 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       );
 
       /* Get stops found by both street and euclidean search */
-      List<RegularStop> stopsConnected = stopsEuclidean
-        .keySet()
+      List<RegularStop> stopsConnected = stopsEuclidean.keySet()
         .stream()
         .filter(t -> stopsStreets.containsKey(t) && t != originStop)
         .toList();
 
       /* Get stops found by euclidean search but not street search */
-      List<RegularStop> stopsUnconnected = stopsEuclidean
-        .keySet()
+      List<RegularStop> stopsUnconnected = stopsEuclidean.keySet()
         .stream()
         .filter(t -> !stopsStreets.containsKey(t) && t != originStop)
         .toList();
@@ -140,7 +139,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         /* Log transfer where the street distance is too long compared to the euclidean distance */
         if (
           transferInfo.ratio > MIN_RATIO_TO_LOG &&
-          transferInfo.streetDistance > MIN_STREET_DISTANCE_TO_LOG
+            transferInfo.streetDistance > MIN_STREET_DISTANCE_TO_LOG
         ) {
           directTransfersTooLong.add(transferInfo);
         }

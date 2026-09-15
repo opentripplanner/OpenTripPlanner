@@ -41,7 +41,8 @@ class EnumMapperTest {
        - `bar` This is Bar
        - `boo-boo` This is Boo
          Boo
-      """,
+      """
+      ,
       EnumMapper.docEnumValueList(Foo.values())
     );
   }
@@ -51,7 +52,8 @@ class EnumMapperTest {
     BOO_BOO(
       """
       This is Boo
-      Boo"""
+      Boo\
+      """
     );
 
     private final String doc;

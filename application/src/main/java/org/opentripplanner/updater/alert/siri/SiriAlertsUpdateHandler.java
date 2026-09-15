@@ -77,15 +77,16 @@ public class SiriAlertsUpdateHandler {
   }
 
   public void update(ServiceDelivery delivery, TransitRealTimeUpdateContext context) {
-    for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
+    for (
+      SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()
+    ) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
       if (situations != null) {
         long t1 = System.currentTimeMillis();
         int addedCounter = 0;
         int expiredCounter = 0;
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
-          boolean expireSituation =
-            sxElement.getProgress() != null &&
+          boolean expireSituation = sxElement.getProgress() != null &&
             sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED);
 
           if (sxElement.getSituationNumber() == null) {
@@ -143,8 +144,8 @@ public class SiriAlertsUpdateHandler {
 
     if (
       I18NString.hasNoValue(alert.headerText()) &&
-      I18NString.hasNoValue(alert.descriptionText()) &&
-      I18NString.hasNoValue(alert.detailText())
+        I18NString.hasNoValue(alert.descriptionText()) &&
+        I18NString.hasNoValue(alert.detailText())
     ) {
       LOG.debug(
         "Empty Alert - ignoring situationNumber: {}",
@@ -166,12 +167,12 @@ public class SiriAlertsUpdateHandler {
     if (situation.getValidityPeriods().size() > 0) {
       ArrayList<TimePeriod> periods = new ArrayList<>();
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
-        final Instant start =
-          activePeriod.getStartTime() != null
-            ? activePeriod.getStartTime().toInstant().minus(earlyStart)
-            : null;
-        final Instant end =
-          activePeriod.getEndTime() != null ? activePeriod.getEndTime().toInstant() : null;
+        final Instant start = activePeriod.getStartTime() != null
+          ? activePeriod.getStartTime().toInstant().minus(earlyStart)
+          : null;
+        final Instant end = activePeriod.getEndTime() != null
+          ? activePeriod.getEndTime().toInstant()
+          : null;
 
         periods.add(TimePeriod.of(start, end));
       }
@@ -185,10 +186,9 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
-    var fuzzyTripMatcher =
-      siriFuzzyTripMatcherCache != null
-        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
-        : null;
+    var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
+      ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
+      : null;
     alert.addEntites(
       new AffectsMapper(feedId, fuzzyTripMatcher, context.transitService()).mapAffects(
         situation.getAffects()

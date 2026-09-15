@@ -50,7 +50,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case PATTERN:
+            case PATTERN :
               alerts.addAll(
                 alertService.getDirectionAndRouteAlerts(
                   getSource(environment).getDirection(),
@@ -58,13 +58,13 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
                 )
               );
               break;
-            case AGENCY:
+            case AGENCY :
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
               break;
-            case ROUTE:
+            case ROUTE :
               alerts.addAll(alertService.getRouteAlerts(getRoute(environment).getId()));
               break;
-            case ROUTE_TYPE:
+            case ROUTE_TYPE :
               int routeType = getRoute(environment).getGtfsType();
               alerts.addAll(
                 alertService.getRouteTypeAlerts(
@@ -76,50 +76,40 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
                 alertService.getRouteTypeAndAgencyAlerts(routeType, getAgency(environment).getId())
               );
               break;
-            case TRIPS:
-              getTrips(environment).forEach(trip ->
-                alerts.addAll(alertService.getTripAlerts(trip.getId()))
+            case TRIPS :
+              getTrips(environment).forEach(
+                trip -> alerts.addAll(alertService.getTripAlerts(trip.getId()))
               );
               break;
-            case STOPS_ON_PATTERN:
+            case STOPS_ON_PATTERN :
               alerts.addAll(
-                alertService
-                  .getAllAlerts()
+                alertService.getAllAlerts()
                   .stream()
-                  .filter(alert ->
-                    alert
-                      .entities()
+                  .filter(
+                    alert -> alert.entities()
                       .stream()
                       .anyMatch(
-                        entity ->
-                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                        entity -> entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
                           stopAndRoute.routeId().equals(getRoute(environment).getId())
                       )
                   )
                   .toList()
               );
-              getSource(environment)
-                .getStops()
-                .forEach(stop -> {
-                  alerts.addAll(
-                    alertService.getStopLocationsAlerts(stop.getIdAndParentStationId())
-                  );
-                });
+              getSource(environment).getStops().forEach(stop -> {
+                alerts.addAll(alertService.getStopLocationsAlerts(stop.getIdAndParentStationId()));
+              });
               break;
-            case STOPS_ON_TRIPS:
+            case STOPS_ON_TRIPS :
               Iterable<Trip> trips = getTrips(environment);
-              trips.forEach(trip ->
-                alerts.addAll(
-                  alertService
-                    .getAllAlerts()
+              trips.forEach(
+                trip -> alerts.addAll(
+                  alertService.getAllAlerts()
                     .stream()
-                    .filter(alert ->
-                      alert
-                        .entities()
+                    .filter(
+                      alert -> alert.entities()
                         .stream()
                         .anyMatch(
-                          entity ->
-                            entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                          entity -> entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
                             stopAndTrip.tripId().equals(getSource(environment).getId())
                         )
                     )
@@ -163,14 +153,18 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
   @Override
   public DataFetcher<String> headsign() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).getTripHeadsign(), environment);
+    return environment -> GraphQLUtils.getTranslation(
+      getSource(environment).getTripHeadsign(),
+      environment
+    );
   }
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("Pattern", getSource(environment).getId().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "Pattern",
+      getSource(environment).getId().toString()
+    );
   }
 
   @Override
@@ -219,8 +213,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
         TIntSet services = getTransitService(environment).getServiceCodesRunningForDate(
           ServiceDateUtils.parseString(serviceDate)
         );
-        return getSource(environment)
-          .getScheduledTimetable()
+        return getSource(environment).getScheduledTimetable()
           .getTripTimes()
           .stream()
           .filter(times -> services.contains(times.getServiceCode()))
@@ -236,23 +229,22 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   @Override
   public DataFetcher<Iterable<TripOnServiceDate>> tripsOnServiceDate() {
     return env -> {
-      var serviceDate = new GraphQLPatternTripsOnServiceDateArgs(
-        env.getArguments()
-      ).getGraphQLServiceDate();
+      var serviceDate = new GraphQLPatternTripsOnServiceDateArgs(env.getArguments())
+        .getGraphQLServiceDate();
 
       var apiService = new ApiTransitService(getTransitService(env));
-      return getTrips(env)
-        .stream()
-        .flatMap(t ->
-          apiService.findOrCreateTripOnServiceDate(t.getId(), serviceDate).stream()
+      return getTrips(env).stream()
+        .flatMap(
+          t -> apiService.findOrCreateTripOnServiceDate(t.getId(), serviceDate).stream()
         )::iterator;
     };
   }
 
   @Override
   public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions() {
-    return environment ->
-      getRealtimeVehiclesService(environment).getRealtimeVehicles(this.getSource(environment));
+    return environment -> getRealtimeVehiclesService(environment).getRealtimeVehicles(
+      this.getSource(environment)
+    );
   }
 
   @Override
@@ -268,9 +260,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
         "runningTimeRanges"
       );
 
-      var requestBuilder = TripOnServiceDateRequest.of().withIncludePatterns(
-        FilterValues.ofEmptyIsEverything("patterns", List.of(pattern.getId()))
-      );
+      var requestBuilder = TripOnServiceDateRequest.of()
+        .withIncludePatterns(
+          FilterValues.ofEmptyIsEverything("patterns", List.of(pattern.getId()))
+        );
       if (serviceDateRanges != null) {
         requestBuilder.withIncludeServiceDateRanges(
           FilterValues.ofRequired("serviceDateRanges", serviceDateRanges)

@@ -90,14 +90,11 @@ public class NodeTypeResolver implements TypeResolver {
 
   static boolean queryContainsFragment(String type, TypeResolutionEnvironment environment) {
     SelectionSet set = environment.getField().getFields().get(0).getSelectionSet();
-    return (
-      set != null &&
-      set
-        .getSelections()
+    return (set != null &&
+      set.getSelections()
         .stream()
         .filter(selection -> selection instanceof InlineFragment)
         .map(InlineFragment.class::cast)
-        .anyMatch(fragment -> fragment.getTypeCondition().getName().equals(type))
-    );
+        .anyMatch(fragment -> fragment.getTypeCondition().getName().equals(type)));
   }
 }

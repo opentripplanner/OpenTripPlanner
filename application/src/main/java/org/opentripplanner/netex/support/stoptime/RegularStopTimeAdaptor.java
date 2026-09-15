@@ -22,11 +22,9 @@ final class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
 
   @Override
   public boolean isConsistent() {
-    return (
-      arrivalTime() == null ||
+    return (arrivalTime() == null ||
       departureTime() == null ||
-      normalizedDepartureTime() >= normalizedArrivalTime()
-    );
+      normalizedDepartureTime() >= normalizedArrivalTime());
   }
 
   @Override

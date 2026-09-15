@@ -12,8 +12,7 @@ class JavaImmutableMapSerializer extends Serializer<Map<?, ?>> {
 
   @Override
   public void write(Kryo kryo, Output output, Map<?, ?> map) {
-    ImmSerMapEntry[] entries = map
-      .entrySet()
+    ImmSerMapEntry[] entries = map.entrySet()
       .stream()
       .map(ImmSerMapEntry::new)
       .toArray(ImmSerMapEntry[]::new);

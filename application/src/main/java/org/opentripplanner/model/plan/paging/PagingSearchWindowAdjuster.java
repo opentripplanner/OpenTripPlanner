@@ -30,8 +30,7 @@ public final class PagingSearchWindowAdjuster {
   ) {
     this.minSearchWindow = minSearchWindow;
     this.maxSearchWindow = maxSearchWindow;
-    this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments
-      .stream()
+    this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments.stream()
       .mapToInt(d -> (int) d.toMinutes())
       .toArray();
   }

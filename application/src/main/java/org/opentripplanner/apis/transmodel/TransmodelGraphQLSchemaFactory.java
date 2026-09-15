@@ -519,8 +519,8 @@ public class TransmodelGraphQLSchemaFactory {
               .type(new GraphQLNonNull(Scalars.GraphQLString))
               .build()
           )
-          .dataFetcher(env ->
-            StopPlaceType.fetchStopPlaceById(
+          .dataFetcher(
+            env -> StopPlaceType.fetchStopPlaceById(
               idMapper.parseNullSafe(env.getArgument("id")).orElse(null),
               env
             )
@@ -541,16 +541,17 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(env -> {
             if (env.<Collection<String>>getArgument("ids") != null) {
-              return resolveIds(env)
-                .map(id -> StopPlaceType.fetchStopPlaceById(id, env))
+              return resolveIds(env).map(id -> StopPlaceType.fetchStopPlaceById(id, env))
                 .collect(Collectors.toList());
             }
             TransitService transitService = GqlUtil.getTransitService(env);
-            return transitService
-              .listStations()
+            return transitService.listStations()
               .stream()
-              .map(station ->
-                new MonoOrMultiModalStation(station, transitService.findMultiModalStation(station))
+              .map(
+                station -> new MonoOrMultiModalStation(
+                  station,
+                  transitService.findMultiModalStation(station)
+                )
               )
               .collect(Collectors.toList());
           })
@@ -642,10 +643,9 @@ public class TransmodelGraphQLSchemaFactory {
               .type(new GraphQLNonNull(Scalars.GraphQLString))
               .build()
           )
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getStopLocation(
-              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
+              .getStopLocation(idMapper.parseNullSafe(environment.getArgument("id")).orElse(null))
           )
           .build()
       )
@@ -750,9 +750,8 @@ public class TransmodelGraphQLSchemaFactory {
                 .filterByInUse(filterInUse)
                 .build();
 
-            return GqlUtil.getTransitService(environment).findRegularStopsByBoundingBox(
-              findRegularStopsByBoundingBoxRequest
-            );
+            return GqlUtil.getTransitService(environment)
+              .findRegularStopsByBoundingBox(findRegularStopsByBoundingBoxRequest);
           })
           .build()
       )
@@ -812,10 +811,8 @@ public class TransmodelGraphQLSchemaFactory {
                 )
                 .stream()
                 .filter(
-                  stopAtDistance ->
-                    environment.getArgument("authority") == null ||
-                    stopAtDistance.stopId
-                      .getFeedId()
+                  stopAtDistance -> environment.getArgument("authority") == null ||
+                    stopAtDistance.stopId.getFeedId()
                       .equalsIgnoreCase(environment.getArgument("authority"))
                 )
                 .sorted(Comparator.comparing(s -> s.distance))
@@ -938,15 +935,13 @@ public class TransmodelGraphQLSchemaFactory {
             List<FeedScopedId> filterByRoutes = null;
             List<String> filterByBikeRentalStations = null;
             List<String> filterByNetwork = null;
-            @SuppressWarnings("rawtypes")
-            Map filterByIds = environment.getArgument("filterByIds");
+            @SuppressWarnings("rawtypes") Map filterByIds = environment.getArgument("filterByIds");
             if (filterByIds != null) {
               filterByStops = idMapper.parseListNullSafe((List<String>) filterByIds.get("quays"));
               filterByRoutes = idMapper.parseListNullSafe((List<String>) filterByIds.get("lines"));
-              filterByBikeRentalStations =
-                filterByIds.get("bikeRentalStations") != null
-                  ? (List<String>) filterByIds.get("bikeRentalStations")
-                  : List.of();
+              filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null
+                ? (List<String>) filterByIds.get("bikeRentalStations")
+                : List.of();
             }
 
             List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
@@ -964,34 +959,30 @@ public class TransmodelGraphQLSchemaFactory {
             }
 
             List<PlaceAtDistance> places;
-            places = GqlUtil.getNearbyPlaceFinder(environment).findClosestPlaces(
-              environment.getArgument("latitude"),
-              environment.getArgument("longitude"),
-              environment.getArgument("maximumDistance"),
-              maxResults,
-              filterByTransportModes,
-              filterByPlaceTypes,
-              filterByStops,
-              filterByStations,
-              filterByRoutes,
-              filterByBikeRentalStations,
-              filterByNetwork,
-              GqlUtil.getTransitService(environment)
-            );
+            places = GqlUtil.getNearbyPlaceFinder(environment)
+              .findClosestPlaces(
+                environment.getArgument("latitude"),
+                environment.getArgument("longitude"),
+                environment.getArgument("maximumDistance"),
+                maxResults,
+                filterByTransportModes,
+                filterByPlaceTypes,
+                filterByStops,
+                filterByStations,
+                filterByRoutes,
+                filterByBikeRentalStations,
+                filterByNetwork,
+                GqlUtil.getTransitService(environment)
+              );
 
             if (TRUE.equals(environment.getArgument("filterByInUse"))) {
-              places = places
-                .stream()
-                .filter(placeAtDistance -> {
-                  if (placeAtDistance.place() instanceof StopLocation stop) {
-                    return !GqlUtil.getTransitService(environment)
-                      .findPatterns(stop, true)
-                      .isEmpty();
-                  } else {
-                    return true;
-                  }
-                })
-                .toList();
+              places = places.stream().filter(placeAtDistance -> {
+                if (placeAtDistance.place() instanceof StopLocation stop) {
+                  return !GqlUtil.getTransitService(environment).findPatterns(stop, true).isEmpty();
+                } else {
+                  return true;
+                }
+              }).toList();
             }
 
             places = PlaceAtDistanceType.convertQuaysToStopPlaces(
@@ -999,10 +990,7 @@ public class TransmodelGraphQLSchemaFactory {
               places,
               environment.getArgument("multiModalMode"),
               GqlUtil.getTransitService(environment)
-            )
-              .stream()
-              .limit(orgMaxResults)
-              .collect(Collectors.toList());
+            ).stream().limit(orgMaxResults).collect(Collectors.toList());
             if (places.isEmpty()) {
               return new DefaultConnection<>(
                 List.of(),
@@ -1026,9 +1014,8 @@ public class TransmodelGraphQLSchemaFactory {
               .build()
           )
           .dataFetcher(environment -> {
-            return GqlUtil.getTransitService(environment).getAgency(
-              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
-            );
+            return GqlUtil.getTransitService(environment)
+              .getAgency(idMapper.parseNullSafe(environment.getArgument("id")).orElse(null));
           })
           .build()
       )
@@ -1055,10 +1042,9 @@ public class TransmodelGraphQLSchemaFactory {
               .type(new GraphQLNonNull(Scalars.GraphQLString))
               .build()
           )
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getOperator(
-              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
+              .getOperator(idMapper.parseNullSafe(environment.getArgument("id")).orElse(null))
           )
           .build()
       )
@@ -1087,9 +1073,8 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment -> {
             final String id = environment.getArgument("id");
-            return GqlUtil.getTransitService(environment).getRoute(
-              idMapper.parseNullSafe(id).orElse(null)
-            );
+            return GqlUtil.getTransitService(environment)
+              .getRoute(idMapper.parseNullSafe(id).orElse(null));
           })
           .build()
       )
@@ -1161,14 +1146,9 @@ public class TransmodelGraphQLSchemaFactory {
 
               // flexibleLines gets special treatment because it has a default value.
               if (
-                Stream.of(
-                  "name",
-                  "publicCode",
-                  "publicCodes",
-                  "transportModes",
-                  "authorities"
-                ).anyMatch(environment::containsArgument) ||
-                Boolean.TRUE.equals(environment.getArgument("flexibleOnly"))
+                Stream.of("name", "publicCode", "publicCodes", "transportModes", "authorities")
+                  .anyMatch(environment::containsArgument) ||
+                  Boolean.TRUE.equals(environment.getArgument("flexibleOnly"))
               ) {
                 throw new InvalidInputException("Unable to combine other filters with ids");
               }
@@ -1216,10 +1196,9 @@ public class TransmodelGraphQLSchemaFactory {
               .type(new GraphQLNonNull(Scalars.GraphQLString))
               .build()
           )
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getGroupOfRoutes(
-              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
+              .getGroupOfRoutes(idMapper.parseNullSafe(environment.getArgument("id")).orElse(null))
           )
           .build()
       )
@@ -1244,9 +1223,8 @@ public class TransmodelGraphQLSchemaFactory {
               .build()
           )
           .dataFetcher(environment -> {
-            return GqlUtil.getTransitService(environment).getTrip(
-              idMapper.parseNullSafe(environment.getArgument("id")).orElse(null)
-            );
+            return GqlUtil.getTransitService(environment)
+              .getTrip(idMapper.parseNullSafe(environment.getArgument("id")).orElse(null));
           })
           .build()
       )
@@ -1314,8 +1292,7 @@ public class TransmodelGraphQLSchemaFactory {
             );
             List<String> filterByIds = environment.getArgument("ids");
             if (filterByIds != null && !filterByIds.isEmpty()) {
-              return all
-                .stream()
+              return all.stream()
                 .filter(station -> filterByIds.contains(station.stationId()))
                 .collect(Collectors.toList());
             }
@@ -1339,8 +1316,9 @@ public class TransmodelGraphQLSchemaFactory {
             return GqlUtil.getVehicleRentalService(environment)
               .getVehicleRentalStations()
               .stream()
-              .filter(bikeRentalStation ->
-                bikeRentalStation.stationId().equals(environment.getArgument("id"))
+              .filter(
+                bikeRentalStation -> bikeRentalStation.stationId()
+                  .equals(environment.getArgument("id"))
               )
               .findFirst()
               .orElse(null);
@@ -1371,13 +1349,14 @@ public class TransmodelGraphQLSchemaFactory {
               .type(Scalars.GraphQLFloat)
               .build()
           )
-          .dataFetcher(environment ->
-            GqlUtil.getVehicleRentalService(environment).getVehicleRentalStationForEnvelope(
-              environment.getArgument("minimumLongitude"),
-              environment.getArgument("minimumLatitude"),
-              environment.getArgument("maximumLongitude"),
-              environment.getArgument("maximumLatitude")
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getVehicleRentalService(environment)
+              .getVehicleRentalStationForEnvelope(
+                environment.getArgument("minimumLongitude"),
+                environment.getArgument("minimumLatitude"),
+                environment.getArgument("maximumLongitude"),
+                environment.getArgument("maximumLatitude")
+              )
           )
           .build()
       )
@@ -1410,8 +1389,8 @@ public class TransmodelGraphQLSchemaFactory {
           .description("Get all bike parks")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
-          .dataFetcher(environment ->
-            GqlUtil.getVehicleParkingService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getVehicleParkingService(environment)
               .listBikeParks()
               .stream()
               .collect(Collectors.toCollection(ArrayList::new))
@@ -1458,16 +1437,14 @@ public class TransmodelGraphQLSchemaFactory {
               .build()
           )
           .dataFetcher(environment -> {
-            Collection<TransitAlert> alerts = GqlUtil.getTransitAlertService(
-              environment
-            ).getAllAlerts();
+            Collection<TransitAlert> alerts = GqlUtil.getTransitAlertService(environment)
+              .getAllAlerts();
 
             Set<String> codespaces = new HashSet<>();
 
             if (environment.getArgument("authorities") instanceof List) {
               List<String> authorities = environment.getArgument("authorities");
-              authorities
-                .stream()
+              authorities.stream()
                 .map(authority -> authority.split(":")[0])
                 .filter(Objects::nonNull)
                 .filter(Predicate.not(String::isBlank))
@@ -1479,16 +1456,14 @@ public class TransmodelGraphQLSchemaFactory {
             }
 
             if (!codespaces.isEmpty()) {
-              alerts = alerts
-                .stream()
+              alerts = alerts.stream()
                 .filter(alert -> codespaces.contains(alert.siriCodespace()))
                 .collect(Collectors.toSet());
             }
 
             if (environment.getArgument("severities") instanceof List) {
               List<String> severities = environment.getArgument("severities");
-              alerts = alerts
-                .stream()
+              alerts = alerts.stream()
                 .filter(alert -> severities.contains(getTransmodelSeverity(alert.severity())))
                 .collect(Collectors.toSet());
             }
@@ -1513,9 +1488,8 @@ public class TransmodelGraphQLSchemaFactory {
             if (situationNumber.isBlank()) {
               return null;
             }
-            return GqlUtil.getTransitAlertService(environment).getAlertById(
-              idMapper.parseNullSafe(situationNumber).orElse(null)
-            );
+            return GqlUtil.getTransitAlertService(environment)
+              .getAlertById(idMapper.parseNullSafe(situationNumber).orElse(null));
           })
           .build()
       )

@@ -22,7 +22,8 @@ class AreaStopsLayerBuilderTest {
 
   private static final FeedScopedId ID = new FeedScopedId("FEED", "ID");
   private static final I18NString NAME = I18NString.of("Test stop");
-  private static final String CONFIG = """
+  private static final String CONFIG =
+  """
   {
     "vectorTiles": {
       "layers" : [
@@ -46,8 +47,7 @@ class AreaStopsLayerBuilderTest {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
-  private final AreaStop AREA_STOP = siteRepositoryBuilder
-    .areaStop(ID)
+  private final AreaStop AREA_STOP = siteRepositoryBuilder.areaStop(ID)
     .withName(NAME)
     .withGeometry(Polygons.BERLIN)
     .build();

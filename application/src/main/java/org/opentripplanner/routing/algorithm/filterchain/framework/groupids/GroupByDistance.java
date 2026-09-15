@@ -95,8 +95,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   /** package local to be unit-testable */
   static List<Leg> createKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
     // Sort legs descending on distance
-    legs = legs
-      .stream()
+    legs = legs.stream()
       .sorted(Comparator.comparingDouble(Leg::distanceMeters).reversed())
       .toList();
 

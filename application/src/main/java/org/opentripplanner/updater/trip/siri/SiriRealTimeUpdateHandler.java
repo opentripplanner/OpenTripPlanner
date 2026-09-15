@@ -106,8 +106,7 @@ public class SiriRealTimeUpdateHandler {
             successes.add(apply(journey, entityResolver));
           } catch (UpdateException e) {
             errors.add(
-              e
-                .withTripReference(TripReferenceHelper.tripReference(journey))
+              e.withTripReference(TripReferenceHelper.tripReference(journey))
                 .toError(journey.getDataSource())
             );
           }
@@ -210,7 +209,8 @@ public class SiriRealTimeUpdateHandler {
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     EstimatedVehicleJourneyWrapper journey
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     Trip trip = entityResolver.resolveTrip(journey);
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(journey);
@@ -264,7 +264,8 @@ public class SiriRealTimeUpdateHandler {
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     EstimatedVehicleJourneyWrapper journey
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     Trip trip = entityResolver.resolveTrip(journey);
 
     LocalDate serviceDate = entityResolver.resolveServiceDate(journey);

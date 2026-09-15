@@ -21,10 +21,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class RegularStop
-  extends StationElement<RegularStop, RegularStopBuilder>
-  implements StopLocation
-{
+public final class RegularStop extends StationElement<RegularStop, RegularStopBuilder> implements
+  StopLocation {
 
   private final int index;
   private final String platformCode;
@@ -179,8 +177,7 @@ public final class RegularStop
 
   @Override
   public boolean sameAs(RegularStop other) {
-    return (
-      super.sameAs(other) &&
+    return (super.sameAs(other) &&
       Objects.equals(platformCode, other.platformCode) &&
       Objects.equals(url, other.url) &&
       Objects.equals(timeZone, other.timeZone) &&
@@ -188,8 +185,7 @@ public final class RegularStop
       Objects.equals(netexVehicleSubmode, other.netexVehicleSubmode) &&
       Objects.equals(sometimesUsedRealtime, other.sometimesUsedRealtime) &&
       Objects.equals(boardingAreas, other.boardingAreas) &&
-      Objects.equals(fareZones, other.fareZones)
-    );
+      Objects.equals(fareZones, other.fareZones));
   }
 
   @Override

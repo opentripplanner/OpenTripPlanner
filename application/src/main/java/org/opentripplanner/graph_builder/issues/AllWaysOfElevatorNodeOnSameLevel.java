@@ -8,13 +8,13 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 public record AllWaysOfElevatorNodeOnSameLevel(OsmNode node) implements DataImportIssue {
   private static final String FMT =
     "All ways connected to elevator node %s are on the same level. " +
-    "Level information is parsed from the level or layer tag and defaults to 0 without tag data. " +
-    "Please check whether the node is correctly modeled.";
+      "Level information is parsed from the level or layer tag and defaults to 0 without tag data. " +
+      "Please check whether the node is correctly modeled.";
 
   private static final String HTMLFMT =
     "All ways connected to <a href='%s'>elevator node %s</a> are on the same level. " +
-    "Level information is parsed from the level or layer tag and defaults to 0 without tag data. " +
-    "Please check whether the node is correctly modeled.";
+      "Level information is parsed from the level or layer tag and defaults to 0 without tag data. " +
+      "Please check whether the node is correctly modeled.";
 
   @Override
   public String getMessage() {

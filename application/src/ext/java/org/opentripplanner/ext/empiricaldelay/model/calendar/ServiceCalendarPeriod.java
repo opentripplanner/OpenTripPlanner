@@ -42,11 +42,9 @@ public class ServiceCalendarPeriod implements Serializable {
       return false;
     }
     ServiceCalendarPeriod that = (ServiceCalendarPeriod) o;
-    return (
-      Objects.equals(serviceId, that.serviceId) &&
+    return (Objects.equals(serviceId, that.serviceId) &&
       Objects.equals(start, that.start) &&
-      Objects.equals(end, that.end)
-    );
+      Objects.equals(end, that.end));
   }
 
   @Override

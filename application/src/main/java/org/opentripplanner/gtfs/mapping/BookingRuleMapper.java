@@ -24,8 +24,9 @@ class BookingRuleMapper {
       return null;
     }
 
-    return cachedBookingInfos.computeIfAbsent(rule.getId(), k ->
-      BookingInfo.of()
+    return cachedBookingInfos.computeIfAbsent(
+      rule.getId(),
+      k -> BookingInfo.of()
         .withContactInfo(contactInfo(rule))
         .withBookingMethods(bookingMethods())
         .withEarliestBookingTime(earliestBookingTime(rule))

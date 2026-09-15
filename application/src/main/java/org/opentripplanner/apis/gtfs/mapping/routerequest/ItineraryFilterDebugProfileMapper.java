@@ -12,7 +12,8 @@ public class ItineraryFilterDebugProfileMapper {
     GraphQLTypes.GraphQLItineraryFilterDebugProfile profile
   ) {
     return switch (profile) {
-      case LIMIT_TO_NUMBER_OF_ITINERARIES -> ItineraryFilterDebugProfile.LIMIT_TO_NUM_OF_ITINERARIES;
+      case LIMIT_TO_NUMBER_OF_ITINERARIES ->
+        ItineraryFilterDebugProfile.LIMIT_TO_NUM_OF_ITINERARIES;
       case LIMIT_TO_SEARCH_WINDOW -> ItineraryFilterDebugProfile.LIMIT_TO_SEARCH_WINDOW;
       case LIST_ALL -> ItineraryFilterDebugProfile.LIST_ALL;
       case OFF -> ItineraryFilterDebugProfile.OFF;

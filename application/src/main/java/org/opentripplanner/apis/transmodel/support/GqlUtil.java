@@ -63,8 +63,8 @@ public class GqlUtil {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("id")
       .type(new GraphQLNonNull(Scalars.GraphQLID))
-      .dataFetcher(env ->
-        Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
+      .dataFetcher(
+        env -> Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
           .map(AbstractTransitEntity::getId)
           .map(idMapper::mapToApi)
           .orElse("")

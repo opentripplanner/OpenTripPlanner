@@ -28,7 +28,7 @@ public class BookingInfoMapper {
       }
     } else if (
       earliestBookingTime.getDaysPrior() == 0 &&
-      (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
+        (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
     ) {
       return "dayOfTravelOnly";
     } else {

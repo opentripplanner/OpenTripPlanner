@@ -50,8 +50,9 @@ class AreaWithoutVisibilityTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // footway from outside1 to bl
         "(0,0) → (-0.001,0) PEDESTRIAN ♿✅",

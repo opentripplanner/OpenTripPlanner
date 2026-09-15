@@ -89,13 +89,11 @@ class FlexTemplateFactory {
    * Check if stop position is routable and that the latest-booking time criteria is met.
    */
   private boolean isAllowedToBoardAt(int boardStopPosition) {
-    return (
-      trip.getBoardRule(boardStopPosition).isRoutable() &&
+    return (trip.getBoardRule(boardStopPosition).isRoutable() &&
       !RoutingBookingInfo.of(
         date.requestedBookingTime(),
         trip.getPickupBookingInfo(boardStopPosition)
-      ).exceedsLatestBookingTime()
-    );
+      ).exceedsLatestBookingTime());
   }
 
   /**

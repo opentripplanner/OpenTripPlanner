@@ -56,9 +56,7 @@ class FlexRouterTest {
   @Test
   void runningDateToServiceDateAggregationWithFiltering() {
     var subject = setupEnvironment(
-      TripRequest.of()
-        .withIncludeRoutes(List.of(new FeedScopedId("F", ROUTE1)))
-        .build()
+      TripRequest.of().withIncludeRoutes(List.of(new FeedScopedId("F", ROUTE1))).build()
     );
 
     var dates = subject.flexServiceDates();
@@ -72,14 +70,12 @@ class FlexRouterTest {
     Collection<FlexServiceDate> flexServiceDates,
     String... expectedTripIds
   ) {
-    var flexServiceDate = flexServiceDates
-      .stream()
+    var flexServiceDate = flexServiceDates.stream()
       .filter(fsd -> fsd.serviceDate().equals(serviceDate))
       .findFirst()
       .orElseThrow();
 
-    var actualTripIds = flexServiceDate
-      .tripsRunning()
+    var actualTripIds = flexServiceDate.tripsRunning()
       .stream()
       .map(FlexTrip::getId)
       .map(FeedScopedId::getId)
@@ -99,8 +95,7 @@ class FlexRouterTest {
     var route1 = envBuilder.route(ROUTE1);
     var route2 = envBuilder.route(ROUTE2);
 
-    envBuilder
-      .timetable()
+    envBuilder.timetable()
       .trip(
         TripInput.flex("trip1")
           .withRoute(route1)
@@ -109,8 +104,7 @@ class FlexRouterTest {
           .withServiceDates(day1, day2)
       );
 
-    envBuilder
-      .timetable()
+    envBuilder.timetable()
       .trip(
         TripInput.flex("trip2")
           .withRoute(route2)
@@ -119,8 +113,7 @@ class FlexRouterTest {
           .withServiceDates(day1, day2, day3)
       );
 
-    envBuilder
-      .timetable()
+    envBuilder.timetable()
       .trip(
         TripInput.flex("trip3")
           .withRoute(route2)

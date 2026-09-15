@@ -123,9 +123,9 @@ public class CalendarServiceDataFactoryImplTest {
       TransitRepositoryForTest.FEED_ID,
       ConstantsForTests.SIMPLE_GTFS
     );
-    TransitDataImportBuilder builder = ctxBuilder
-      .withDataImportIssueStore(DataImportIssueStore.NOOP)
-      .getTransitBuilder();
+    TransitDataImportBuilder builder = ctxBuilder.withDataImportIssueStore(
+      DataImportIssueStore.NOOP
+    ).getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(removeMondayFromAlldays());

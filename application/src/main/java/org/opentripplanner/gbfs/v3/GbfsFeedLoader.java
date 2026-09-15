@@ -16,8 +16,8 @@ import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
  * according to individual feed's TTL rules.
  */
 public class GbfsFeedLoader
-  extends GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details>
-{
+  extends
+  GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details> {
 
   /**
    * Sets up updaters for the feeds listed in the auto-configuration file.
@@ -27,8 +27,7 @@ public class GbfsFeedLoader
     HttpHeaders httpHeaders,
     OtpHttpClient otpHttpClient
   ) {
-    var feeds = autoConfiguration
-      .mapTo(GBFSGbfs.class)
+    var feeds = autoConfiguration.mapTo(GBFSGbfs.class)
       .getData()
       .getFeeds()
       .stream()

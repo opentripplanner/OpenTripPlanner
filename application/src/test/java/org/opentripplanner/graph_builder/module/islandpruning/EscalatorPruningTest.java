@@ -16,8 +16,7 @@ class EscalatorPruningTest {
       IslandPruningParameters.DEFAULTS
     );
     assertTrue(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())

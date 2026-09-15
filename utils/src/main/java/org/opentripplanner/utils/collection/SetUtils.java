@@ -28,8 +28,7 @@ public class SetUtils {
     } else if (list.size() == 1) {
       return list.getFirst();
     } else {
-      return list
-        .stream()
+      return list.stream()
         .skip(1)
         .collect(() -> new HashSet<>(list.getFirst()), Set::retainAll, Set::retainAll);
     }

@@ -45,18 +45,13 @@ public class StopConnectivityModule implements GraphBuilderModule {
       graph.getVerticesOfType(TransitStopVertex.class).size()
     );
     LOG.info(progress.startMessage());
-    var issues = graph
-      .getVerticesOfType(TransitStopVertex.class)
-      .parallelStream()
-      .map(stop -> {
-        if (stop.isFerryStop()) {
-          return checkFerryStop(stop, progress);
-        } else {
-          return checkWalkingConnection(stop, progress);
-        }
-      })
-      .filter(Objects::nonNull)
-      .toList();
+    var issues = graph.getVerticesOfType(TransitStopVertex.class).parallelStream().map(stop -> {
+      if (stop.isFerryStop()) {
+        return checkFerryStop(stop, progress);
+      } else {
+        return checkWalkingConnection(stop, progress);
+      }
+    }).filter(Objects::nonNull).toList();
 
     issues.forEach(issueStore::add);
 

@@ -136,22 +136,17 @@ public class InsertionEvaluator {
 
     Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments, stopDuration);
 
-    return tripWithViableAccessEgress
-      .viableAccessEgress()
-      .stream()
-      .map(viableAccessEgress -> {
-        var snap = toPassengerSnap(viableAccessEgress);
-        return findBestInsertion(
-          tripWithVertices,
-          viableAccessEgress.insertionPositions(),
-          snap,
-          baselineSegments,
-          cumulativeDurations,
-          viableAccessEgress.transitStop()
-        );
-      })
-      .filter(Objects::nonNull)
-      .toList();
+    return tripWithViableAccessEgress.viableAccessEgress().stream().map(viableAccessEgress -> {
+      var snap = toPassengerSnap(viableAccessEgress);
+      return findBestInsertion(
+        tripWithVertices,
+        viableAccessEgress.insertionPositions(),
+        snap,
+        baselineSegments,
+        cumulativeDurations,
+        viableAccessEgress.transitStop()
+      );
+    }).filter(Objects::nonNull).toList();
   }
 
   private static PassengerSnap toPassengerSnap(ViableAccessEgress viableAccessEgress) {
@@ -235,7 +230,7 @@ public class InsertionEvaluator {
 
       if (
         bestCandidate == null ||
-        candidate.totalTripDuration().compareTo(bestCandidate.totalTripDuration()) < 0
+          candidate.totalTripDuration().compareTo(bestCandidate.totalTripDuration()) < 0
       ) {
         bestCandidate = candidate;
         LOG.debug(

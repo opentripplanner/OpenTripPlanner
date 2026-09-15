@@ -101,8 +101,7 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
     if (parks != null) {
       List<LiipiParkPatch> utilizations = utilizationsDownloader.download();
       if (utilizations != null) {
-        Map<FeedScopedId, List<LiipiParkPatch>> patches = utilizations
-          .stream()
+        Map<FeedScopedId, List<LiipiParkPatch>> patches = utilizations.stream()
           .collect(Collectors.groupingBy(utilization -> utilization.getId()));
         parks.forEach(park -> {
           List<LiipiParkPatch> patchesForPark = patches.get(park.getId());
@@ -139,15 +138,15 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
         Integer spaces = patch.getSpacesAvailable();
 
         switch (type) {
-          case "CAR":
+          case "CAR" :
             availabilityBuilder.carSpaces(spaces);
             hasHandledSpaces = true;
             break;
-          case "BICYCLE":
+          case "BICYCLE" :
             availabilityBuilder.bicycleSpaces(spaces);
             hasHandledSpaces = true;
             break;
-          case "DISABLED":
+          case "DISABLED" :
             availabilityBuilder.wheelchairAccessibleCarSpaces(spaces);
             hasHandledSpaces = true;
             break;

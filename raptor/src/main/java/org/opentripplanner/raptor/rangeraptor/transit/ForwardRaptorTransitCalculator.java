@@ -16,9 +16,8 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
-  extends ForwardTransitCalculator<T>
-  implements RaptorTransitCalculator<T>
-{
+  extends
+  ForwardTransitCalculator<T> implements RaptorTransitCalculator<T> {
 
   private final int earliestDepartureTime;
   private final int searchWindowInSeconds;
@@ -42,10 +41,9 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   ) {
     this.earliestDepartureTime = earliestDepartureTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
-    this.latestAcceptableArrivalTime =
-      latestAcceptableArrivalTime == RaptorConstants.TIME_NOT_SET
-        ? unreachedTime()
-        : latestAcceptableArrivalTime;
+    this.latestAcceptableArrivalTime = latestAcceptableArrivalTime == RaptorConstants.TIME_NOT_SET
+      ? unreachedTime()
+      : latestAcceptableArrivalTime;
     this.iterationStep = iterationStep;
   }
 
@@ -56,11 +54,9 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
 
   @Override
   public String exceedsTimeLimitReason() {
-    return (
-      "The arrival time exceeds the time limit, arrive to late: " +
+    return ("The arrival time exceeds the time limit, arrive to late: " +
       TimeUtils.timeToStrLong(latestAcceptableArrivalTime) +
-      "."
-    );
+      ".");
   }
 
   @Override
@@ -68,10 +64,10 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
     return oneIterationOnly()
       ? IntIterators.singleValueIterator(earliestDepartureTime)
       : IntIterators.intDecIterator(
-          earliestDepartureTime + searchWindowInSeconds,
-          earliestDepartureTime,
-          iterationStep
-        );
+        earliestDepartureTime + searchWindowInSeconds,
+        earliestDepartureTime,
+        iterationStep
+      );
   }
 
   @Override

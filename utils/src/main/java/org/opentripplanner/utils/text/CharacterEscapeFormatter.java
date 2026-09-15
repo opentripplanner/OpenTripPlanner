@@ -88,12 +88,8 @@ public class CharacterEscapeFormatter {
           buf.append(specialChar);
         } else {
           throw new IllegalStateException(
-            "Unexpected combination of escape-char '%c' and '%c' character at position %d. Text: '%s'.".formatted(
-              escapeChar,
-              ch,
-              i,
-              encodedText
-            )
+            "Unexpected combination of escape-char '%c' and '%c' character at position %d. Text: '%s'."
+              .formatted(escapeChar, ch, i, encodedText)
           );
         }
         prevEsc = false;

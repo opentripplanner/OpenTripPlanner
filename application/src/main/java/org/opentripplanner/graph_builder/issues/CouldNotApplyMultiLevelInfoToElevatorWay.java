@@ -14,8 +14,7 @@ public record CouldNotApplyMultiLevelInfoToElevatorWay(
   int levels,
   int intersectionNodes
 ) implements DataImportIssue {
-  private static final String FMT =
-    "Multi-level info for elevator way %s can not be used. " +
+  private static final String FMT = "Multi-level info for elevator way %s can not be used. " +
     "The number of defined levels and intersection nodes did not match. " +
     "The way had %s defined levels and %s intersection nodes. " +
     "Check the level tag and how this way connects to other ways. " +
@@ -23,9 +22,9 @@ public record CouldNotApplyMultiLevelInfoToElevatorWay(
 
   private static final String HTMLFMT =
     "Multi-level info for elevator <a href='%s'>way %s</a> can not be used. " +
-    "The number of defined levels and intersection nodes did not match. " +
-    "The way had %s defined levels and %s intersection nodes. " +
-    "Check the level tag and how this way connects with other ways.";
+      "The number of defined levels and intersection nodes did not match. " +
+      "The way had %s defined levels and %s intersection nodes. " +
+      "Check the level tag and how this way connects with other ways.";
 
   @Override
   public String getMessage() {

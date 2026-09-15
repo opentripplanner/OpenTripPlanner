@@ -86,7 +86,8 @@ public interface CallWrapper {
     StopPointRefStructure stopPointRef,
     java.math.BigInteger order,
     java.math.BigInteger visitNumber
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     var ref = stopPointRef != null ? stopPointRef.getValue() : null;
     if (StringUtils.hasNoValueOrNullAsString(ref)) {
       throw UpdateException.of(UpdateErrorType.EMPTY_STOP_POINT_REF);

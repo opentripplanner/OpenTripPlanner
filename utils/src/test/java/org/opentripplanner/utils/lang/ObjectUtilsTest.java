@@ -39,13 +39,15 @@ class ObjectUtilsTest {
   @Test
   void requireNotInitialized() {
     assertEquals("new", ObjectUtils.requireNotInitialized(null, "new"));
-    var ex = assertThrows(IllegalStateException.class, () ->
-      ObjectUtils.requireNotInitialized("foo", "old", "new")
+    var ex = assertThrows(
+      IllegalStateException.class,
+      () -> ObjectUtils.requireNotInitialized("foo", "old", "new")
     );
     assertEquals("Field foo is already set! Old value: old, new value: new.", ex.getMessage());
 
-    ex = assertThrows(IllegalStateException.class, () ->
-      ObjectUtils.requireNotInitialized("old", "new")
+    ex = assertThrows(
+      IllegalStateException.class,
+      () -> ObjectUtils.requireNotInitialized("old", "new")
     );
     assertEquals("Field is already set! Old value: old, new value: new.", ex.getMessage());
   }
@@ -55,11 +57,9 @@ class ObjectUtilsTest {
     assertEquals("test", ObjectUtils.safeGetOrNull(() -> "test"));
     assertEquals(3000, ObjectUtils.safeGetOrNull(() -> Duration.ofSeconds(3).toMillis()));
     assertNull(ObjectUtils.safeGetOrNull(() -> null));
-    assertNull(
-      ObjectUtils.safeGetOrNull(() -> {
-        throw new NullPointerException("Something went wrong - ignore");
-      })
-    );
+    assertNull(ObjectUtils.safeGetOrNull(() -> {
+      throw new NullPointerException("Something went wrong - ignore");
+    }));
   }
 
   @Test

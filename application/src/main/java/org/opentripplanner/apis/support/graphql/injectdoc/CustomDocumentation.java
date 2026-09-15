@@ -149,8 +149,9 @@ public class CustomDocumentation {
         }
         map.put(key, value);
       }
-      return TextVariablesSubstitution.insertVariables(map, varName ->
-        errorHandlerVariableSubstitution(varName, resource)
+      return TextVariablesSubstitution.insertVariables(
+        map,
+        varName -> errorHandlerVariableSubstitution(varName, resource)
       );
     } catch (IOException e) {
       throw new RuntimeException(e);

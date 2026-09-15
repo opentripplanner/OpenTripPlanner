@@ -560,8 +560,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     ScheduledTransitLeg leg;
 
     if (headwaySecs != null) {
-      leg = new FrequencyTransitLegBuilder()
-        .withTripTimes(tripTimes)
+      leg = new FrequencyTransitLegBuilder().withTripTimes(tripTimes)
         .withTripPattern(tripPattern)
         .withBoardStopIndexInPattern(fromStopIndex)
         .withAlightStopIndexInPattern(toStopIndex)
@@ -575,8 +574,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
         .withToViaLocationType(to.viaLocationType)
         .build();
     } else {
-      leg = new ScheduledTransitLegBuilder()
-        .withTripTimes(tripTimes)
+      leg = new ScheduledTransitLegBuilder().withTripTimes(tripTimes)
         .withTripPattern(tripPattern)
         .withBoardStopIndexInPattern(fromStopIndex)
         .withAlightStopIndexInPattern(toStopIndex)

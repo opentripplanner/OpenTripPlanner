@@ -31,7 +31,8 @@ public class TripQuery {
   public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
   public static final String TRIP_VIA_PARAMETER = "via";
-  public static final String DOC_VIA = """
+  public static final String DOC_VIA =
+  """
   The list of via locations the journey is required to visit. All locations are
   visited in the order they are listed.
   """;
@@ -126,10 +127,11 @@ public class TripQuery {
             much faster. Instead the client can inform the user about the progress.
 
             Maximum value: %d minutes (%dh)
-            """.formatted(
-              transitTuningParameters.maxSearchWindow().toMinutes(),
-              transitTuningParameters.maxSearchWindow().toHours()
-            )
+            """
+              .formatted(
+                transitTuningParameters.maxSearchWindow().toMinutes(),
+                transitTuningParameters.maxSearchWindow().toHours()
+              )
           )
           .type(Scalars.GraphQLInt)
           .build()
@@ -330,7 +332,8 @@ public class TripQuery {
 
             - The `ratio` must be greater or equal to 1.0 and less then 1.2.
             - The `constant` must be greater or equal to '0s' and less then '1h'.
-            """.stripIndent()
+            """
+              .stripIndent()
           )
           .type(RelaxCostType.INPUT_TYPE)
           .defaultValueLiteral(
@@ -619,8 +622,7 @@ public class TripQuery {
 
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   private static String enumValAsString(GraphQLEnumType enumType, Enum<?> otpVal) {
-    return enumType
-      .getValues()
+    return enumType.getValues()
       .stream()
       .filter(e -> e.getValue().equals(otpVal))
       .findFirst()

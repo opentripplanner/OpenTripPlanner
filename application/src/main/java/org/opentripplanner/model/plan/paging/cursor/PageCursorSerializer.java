@@ -57,8 +57,7 @@ final class PageCursorSerializer {
       // and cost, that we use for comparing itineraries in the filter-chain. This is enforced
       // when creating an itinerary - cost and times are normalized to seconds resolution.
       var cut = cursor.itineraryPageCut();
-      tokenBuilder
-        .withBoolean(CUT_ON_STREET_FIELD, cut.isStreetOnly())
+      tokenBuilder.withBoolean(CUT_ON_STREET_FIELD, cut.isStreetOnly())
         .withTimeInstant(CUT_DEPARTURE_TIME_FIELD, cut.startTimeAsInstant())
         .withTimeInstant(CUT_ARRIVAL_TIME_FIELD, cut.endTimeAsInstant())
         .withInt(CUT_N_TRANSFERS_FIELD, cut.numberOfTransfers())

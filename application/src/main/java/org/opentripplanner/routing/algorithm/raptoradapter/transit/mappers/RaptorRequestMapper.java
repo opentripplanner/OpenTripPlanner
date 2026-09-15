@@ -160,8 +160,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     builder.profile(preferences.transit().raptor().profile());
     builder.searchDirection(preferences.transit().raptor().searchDirection());
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .timetable(request.timetableView())
       .constrainedTransfers(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
@@ -173,8 +172,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var debug = builder.debug();
       var debugLogger = new SystemErrDebugLogger(null, true);
 
-      debug
-        .withStops(mapDebugStopList(raptorDebugging.stops()))
+      debug.withStops(mapDebugStopList(raptorDebugging.stops()))
         .withPath(mapDebugStopList(raptorDebugging.path()))
         .withDebugPathFromStopIndex(raptorDebugging.debugPathFromStopIndex())
         .withLogger(debugLogger);

@@ -178,8 +178,10 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private void build(OsmDatabase osmdb, VertexGenerator vertexGenerator) {
-    var parkingProcessor = new ParkingProcessor(graph, issueStore, (node, way) ->
-      vertexGenerator.getVertexForOsmNode(node, way, SPLIT)
+    var parkingProcessor = new ParkingProcessor(
+      graph,
+      issueStore,
+      (node, way) -> vertexGenerator.getVertexForOsmNode(node, way, SPLIT)
     );
 
     var parkingLots = new ArrayList<VehicleParking>();
@@ -351,7 +353,7 @@ public class OsmModule implements GraphBuilderModule {
 
       if (
         !way.isRoutable() ||
-        (forwardPermission.allowsNothing() && backwardPermission.allowsNothing())
+          (forwardPermission.allowsNothing() && backwardPermission.allowsNothing())
       ) {
         continue;
       }
@@ -363,7 +365,7 @@ public class OsmModule implements GraphBuilderModule {
       double lastLat = -1;
       double lastLon = -1;
       String lastLevel = null;
-      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
+      for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext();) {
         long nodeId = iter.next();
         OsmNode node = osmdb.getNode(nodeId);
         if (node == null) {
@@ -438,13 +440,13 @@ public class OsmModule implements GraphBuilderModule {
 
         if (
           vertexGenerator.isIntersectionNode(endNode) ||
-          i == nodes.size() - 2 ||
-          nodes.subList(0, i).contains(nodes.get(i)) ||
-          osmEndNode.hasTag("ele") ||
-          osmEndNode.isBoardingLocation() ||
-          osmEndNode.isBarrier() ||
-          osmEndNode.isEntrance() ||
-          vertexGenerator.nodesInBarrierWays().containsKey(osmEndNode)
+            i == nodes.size() - 2 ||
+            nodes.subList(0, i).contains(nodes.get(i)) ||
+            osmEndNode.hasTag("ele") ||
+            osmEndNode.isBoardingLocation() ||
+            osmEndNode.isBarrier() ||
+            osmEndNode.isEntrance() ||
+            vertexGenerator.nodesInBarrierWays().containsKey(osmEndNode)
         ) {
           segmentCoordinates.add(osmEndNode.lon);
           segmentCoordinates.add(osmEndNode.lat);
@@ -591,10 +593,7 @@ public class OsmModule implements GraphBuilderModule {
 
     return Optional.of(
       new Platform(
-        params
-          .edgeNamer()
-          .getName(way)
-          .orElseGet(() -> I18NString.of("platform " + way.getId())),
+        params.edgeNamer().getName(way).orElseGet(() -> I18NString.of("platform " + way.getId())),
         geometry,
         references
       )
@@ -709,22 +708,17 @@ public class OsmModule implements GraphBuilderModule {
       );
     }
 
-    I18NString name = params
-      .edgeNamer()
-      .getName(way)
-      .orElseGet(() -> {
-        String label = "way " + way.getId() + " from " + index;
-        label = label.intern();
-        return I18NString.of(label);
-      });
+    I18NString name = params.edgeNamer().getName(way).orElseGet(() -> {
+      String label = "way " + way.getId() + " from " + index;
+      label = label.intern();
+      return I18NString.of(label);
+    });
 
-    float carSpeed = way
-      .getOsmProvider()
+    float carSpeed = way.getOsmProvider()
       .getOsmTagMapper()
       .getCarSpeedForWay(way, direction, issueStore);
 
-    StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
-      .withFromVertex(fromVertex)
+    StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>().withFromVertex(fromVertex)
       .withToVertex(toVertex)
       .withGeometry(geometry)
       .withName(name)

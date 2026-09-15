@@ -25,8 +25,8 @@ public class LifeCycleEventPublisher {
     this.prepareForNextRoundListeners = subscriptions.prepareForNextRoundListeners.toArray(
       IntConsumer[]::new
     );
-    this.transfersForRoundCompleteListeners =
-      subscriptions.transfersForRoundCompleteListeners.toArray(Runnable[]::new);
+    this.transfersForRoundCompleteListeners = subscriptions.transfersForRoundCompleteListeners
+      .toArray(Runnable[]::new);
     this.roundCompleteListeners = subscriptions.roundCompleteListeners.toArray(Consumer[]::new);
     this.iterationCompleteListeners = subscriptions.iterationCompleteListeners.toArray(
       Runnable[]::new

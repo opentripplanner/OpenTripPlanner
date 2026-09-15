@@ -45,11 +45,9 @@ public final class FlexTripForDate {
       return false;
     }
     var that = (FlexTripForDate) obj;
-    return (
-      Objects.equals(this.serviceDate, that.serviceDate) &&
+    return (Objects.equals(this.serviceDate, that.serviceDate) &&
       Objects.equals(this.endOfRunningPeriod, that.endOfRunningPeriod) &&
-      Objects.equals(this.flexTrip, that.flexTrip)
-    );
+      Objects.equals(this.flexTrip, that.flexTrip));
   }
 
   @Override

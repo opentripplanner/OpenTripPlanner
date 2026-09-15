@@ -44,11 +44,13 @@ public class LegacyRouteRequestMapper {
 
     CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
-    callWith.argument("fromPlace", (String from) ->
-      LocationStringParser.fromOldStyleString(from).ifPresent(request::withFrom)
+    callWith.argument(
+      "fromPlace",
+      (String from) -> LocationStringParser.fromOldStyleString(from).ifPresent(request::withFrom)
     );
-    callWith.argument("toPlace", (String to) ->
-      LocationStringParser.fromOldStyleString(to).ifPresent(request::withTo)
+    callWith.argument(
+      "toPlace",
+      (String to) -> LocationStringParser.fromOldStyleString(to).ifPresent(request::withTo)
     );
 
     callWith.argument("from", (Map<String, Object> v) -> request.withFrom(toGenericLocation(v)));
@@ -128,9 +130,10 @@ public class LegacyRouteRequestMapper {
         callWith.argument("walkSafetyFactor", b::withSafetyFactor);
       });
       // TODO Add support for all debug filter variants
-      callWith.argument("debugItineraryFilter", (Boolean v) ->
-        preferences.withItineraryFilter(it ->
-          it.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
+      callWith.argument(
+        "debugItineraryFilter",
+        (Boolean v) -> preferences.withItineraryFilter(
+          it -> it.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
         )
       );
       preferences.withTransit(tr -> {
@@ -141,16 +144,17 @@ public class LegacyRouteRequestMapper {
           tr::withOtherThanPreferredRoutesPenalty
         );
         // This is deprecated, if both are set, the proper one will override this
-        callWith.argument("unpreferred.useUnpreferredRoutesPenalty", (Integer v) ->
-          tr.withUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
+        callWith.argument(
+          "unpreferred.useUnpreferredRoutesPenalty",
+          (Integer v) -> tr.withUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
         );
         callWith.argument("unpreferred.unpreferredCost", tr::withUnpreferredCostString);
         callWith.argument("ignoreRealtimeUpdates", tr::withIgnoreRealtimeUpdates);
         callWith.argument("omitCanceled", (Boolean b) -> tr.withIncludeRealtimeCancellations(!b));
-        callWith.argument("modeWeight", (Map<String, Object> modeWeights) ->
-          tr.withReluctanceForMode(
-            modeWeights
-              .entrySet()
+        callWith.argument(
+          "modeWeight",
+          (Map<String, Object> modeWeights) -> tr.withReluctanceForMode(
+            modeWeights.entrySet()
               .stream()
               .collect(
                 Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
@@ -165,8 +169,9 @@ public class LegacyRouteRequestMapper {
         callWith.argument("maxTransfers", tx::withMaxTransfers);
         callWith.argument("nonpreferredTransferPenalty", tx::withNonpreferredCost);
       });
-      callWith.argument("locale", (String v) ->
-        preferences.withLocale(GraphQLUtils.getLocale(environment, v))
+      callWith.argument(
+        "locale",
+        (String v) -> preferences.withLocale(GraphQLUtils.getLocale(environment, v))
       );
     });
 
@@ -176,11 +181,13 @@ public class LegacyRouteRequestMapper {
       callWith.argument("wheelchair", journeyBuilder::withWheelchair);
 
       journeyBuilder.withTransit(transitBuilder -> {
-        callWith.argument("unpreferred.routes", (String v) ->
-          transitBuilder.withUnpreferredRoutes(FeedScopedId.parseList(v))
+        callWith.argument(
+          "unpreferred.routes",
+          (String v) -> transitBuilder.withUnpreferredRoutes(FeedScopedId.parseList(v))
         );
-        callWith.argument("unpreferred.agencies", (String v) ->
-          transitBuilder.withUnpreferredAgencies(FeedScopedId.parseList(v))
+        callWith.argument(
+          "unpreferred.agencies",
+          (String v) -> transitBuilder.withUnpreferredAgencies(FeedScopedId.parseList(v))
         );
 
         var transitDisabled = false;
@@ -201,18 +208,18 @@ public class LegacyRouteRequestMapper {
             }
           });
 
-          callWith.argument("banned.trips", (String v) ->
-            transitBuilder.withBannedTrips(FeedScopedId.parseList(v))
+          callWith.argument(
+            "banned.trips",
+            (String v) -> transitBuilder.withBannedTrips(FeedScopedId.parseList(v))
           );
 
           if (hasArgument(environment, "transportModes")) {
             QualifiedModeSet modes = new QualifiedModeSet("WALK");
 
-            modes.qModes = environment
-              .<List<Map<String, String>>>getArgument("transportModes")
+            modes.qModes = environment.<List<Map<String, String>>>getArgument("transportModes")
               .stream()
-              .map(transportMode ->
-                new QualifiedMode(
+              .map(
+                transportMode -> new QualifiedMode(
                   transportMode.get("mode") +
                     (transportMode.get("qualifier") == null
                       ? ""
@@ -302,14 +309,17 @@ public class LegacyRouteRequestMapper {
     );
 
     // Deprecated, the next one will override this, if both are set
-    callWith.argument("allowedBikeRentalNetworks", (Collection<String> v) ->
-      rental.withAllowedNetworks(new HashSet<>(v))
+    callWith.argument(
+      "allowedBikeRentalNetworks",
+      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
     );
-    callWith.argument("allowedVehicleRentalNetworks", (Collection<String> v) ->
-      rental.withAllowedNetworks(new HashSet<>(v))
+    callWith.argument(
+      "allowedVehicleRentalNetworks",
+      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
     );
-    callWith.argument("bannedVehicleRentalNetworks", (Collection<String> v) ->
-      rental.withBannedNetworks(new HashSet<>(v))
+    callWith.argument(
+      "bannedVehicleRentalNetworks",
+      (Collection<String> v) -> rental.withBannedNetworks(new HashSet<>(v))
     );
   }
 
@@ -319,8 +329,9 @@ public class LegacyRouteRequestMapper {
   ) {
     callWith.argument("bikeWalkingReluctance", walking::withReluctance);
     callWith.argument("bikeWalkingSpeed", walking::withSpeed);
-    callWith.argument("bikeSwitchTime", time ->
-      walking.withMountDismountTime(Duration.ofSeconds((int) time))
+    callWith.argument(
+      "bikeSwitchTime",
+      time -> walking.withMountDismountTime(Duration.ofSeconds((int) time))
     );
     callWith.argument("bikeSwitchCost", cost -> walking.withMountDismountCost((int) cost));
   }

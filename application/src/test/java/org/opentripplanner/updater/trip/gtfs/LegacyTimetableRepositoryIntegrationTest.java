@@ -57,8 +57,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
     patternIndex = new HashMap<>();
     for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
-      tripPattern
-        .scheduledTripsAsStream()
+      tripPattern.scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
     }
   }
@@ -291,11 +290,8 @@ public class LegacyTimetableRepositoryIntegrationTest {
       ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
-    var realTimeTripUpdate = RealTimeTripUpdate.of(
-      pattern,
-      result.tripTimes(),
-      serviceDate
-    ).build();
+    var realTimeTripUpdate = RealTimeTripUpdate.of(pattern, result.tripTimes(), serviceDate)
+      .build();
     resolver.update(realTimeTripUpdate);
     return UpdateSuccess.of(realTimeTripUpdate.producer());
   }

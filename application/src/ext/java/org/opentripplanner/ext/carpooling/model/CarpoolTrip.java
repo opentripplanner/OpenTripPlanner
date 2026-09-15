@@ -53,10 +53,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * @see CarpoolTripBuilder for constructing trip instances
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for trip updates
  */
-public class CarpoolTrip
-  extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
-  implements LogInfo
-{
+public class CarpoolTrip extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder> implements
+  LogInfo {
 
   /** Default total capacity (including driver) when no capacity information is provided. */
   public static final int DEFAULT_TOTAL_CAPACITY = 5;
@@ -246,13 +244,11 @@ public class CarpoolTrip
 
   @Override
   public boolean sameAs(CarpoolTrip other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
       stops.equals(other.stops) &&
-      Objects.equals(publicContactInformation, other.publicContactInformation)
-    );
+      Objects.equals(publicContactInformation, other.publicContactInformation));
   }
 
   @Override

@@ -17,30 +17,30 @@ public class GtfsRealtimeCauseMapper {
       return AlertCause.UNKNOWN_CAUSE;
     }
     switch (cause) {
-      case OTHER_CAUSE:
+      case OTHER_CAUSE :
         return AlertCause.OTHER_CAUSE;
-      case TECHNICAL_PROBLEM:
+      case TECHNICAL_PROBLEM :
         return AlertCause.TECHNICAL_PROBLEM;
-      case STRIKE:
+      case STRIKE :
         return AlertCause.STRIKE;
-      case DEMONSTRATION:
+      case DEMONSTRATION :
         return AlertCause.DEMONSTRATION;
-      case ACCIDENT:
+      case ACCIDENT :
         return AlertCause.ACCIDENT;
-      case HOLIDAY:
+      case HOLIDAY :
         return AlertCause.HOLIDAY;
-      case WEATHER:
+      case WEATHER :
         return AlertCause.WEATHER;
-      case MAINTENANCE:
+      case MAINTENANCE :
         return AlertCause.MAINTENANCE;
-      case CONSTRUCTION:
+      case CONSTRUCTION :
         return AlertCause.CONSTRUCTION;
-      case POLICE_ACTIVITY:
+      case POLICE_ACTIVITY :
         return AlertCause.POLICE_ACTIVITY;
-      case MEDICAL_EMERGENCY:
+      case MEDICAL_EMERGENCY :
         return AlertCause.MEDICAL_EMERGENCY;
-      case UNKNOWN_CAUSE:
-      default: {
+      case UNKNOWN_CAUSE :
+      default : {
         return AlertCause.UNKNOWN_CAUSE;
       }
     }

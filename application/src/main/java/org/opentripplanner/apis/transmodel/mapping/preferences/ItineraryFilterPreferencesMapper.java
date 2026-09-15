@@ -13,8 +13,9 @@ public class ItineraryFilterPreferencesMapper {
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith
   ) {
-    callWith.argument("debugItineraryFilter", (Boolean v) ->
-      itineraryFilter.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
+    callWith.argument(
+      "debugItineraryFilter",
+      (Boolean v) -> itineraryFilter.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
     );
     ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
   }

@@ -263,10 +263,10 @@ public class AtlantaFareService extends DefaultFareService {
     FareType fareType
   ) {
     switch (toRideType) {
-      case STREETCAR:
-      case FREE_RIDE:
+      case STREETCAR :
+      case FREE_RIDE :
         return new TransferMeta(TransferType.NO_TRANSFER);
-      case COBB_LOCAL:
+      case COBB_LOCAL :
         if (!isElectronicPayment(fareType)) {
           if (fromRideType == RideType.COBB_LOCAL || fromRideType == RideType.COBB_EXPRESS) {
             return new TransferMeta(TransferType.FREE_TRANSFER);
@@ -277,7 +277,7 @@ public class AtlantaFareService extends DefaultFareService {
           case COBB_LOCAL, COBB_EXPRESS, MARTA -> new TransferMeta(TransferType.FREE_TRANSFER);
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
-      case COBB_EXPRESS:
+      case COBB_EXPRESS :
         if (!isElectronicPayment(fareType)) {
           return switch (fromRideType) {
             case COBB_EXPRESS -> new TransferMeta(TransferType.FREE_TRANSFER);
@@ -291,7 +291,7 @@ public class AtlantaFareService extends DefaultFareService {
           case COBB_LOCAL -> new TransferMeta(TransferType.TRANSFER_PAY_DIFFERENCE);
           default -> new TransferMeta(TransferType.NO_TRANSFER);
         };
-      case MARTA:
+      case MARTA :
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
@@ -307,8 +307,8 @@ public class AtlantaFareService extends DefaultFareService {
             GCT_LOCAL -> new TransferMeta(TransferType.FREE_TRANSFER);
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
-      case XPRESS_MORNING:
-      case XPRESS_AFTERNOON:
+      case XPRESS_MORNING :
+      case XPRESS_AFTERNOON :
         boolean payOnExit = toRideType == RideType.XPRESS_AFTERNOON;
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
@@ -321,10 +321,10 @@ public class AtlantaFareService extends DefaultFareService {
             GCT_EXPRESS_Z2,
             XPRESS_AFTERNOON,
             XPRESS_MORNING -> new TransferMeta(
-            TransferType.FREE_TRANSFER,
-            Money.ZERO_USD,
-            payOnExit
-          );
+              TransferType.FREE_TRANSFER,
+              Money.ZERO_USD,
+              payOnExit
+            );
           case COBB_LOCAL -> new TransferMeta(
             TransferType.TRANSFER_WITH_UPCHARGE,
             usDollars(1.50f),
@@ -337,7 +337,7 @@ public class AtlantaFareService extends DefaultFareService {
           );
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
-      case GCT_LOCAL:
+      case GCT_LOCAL :
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
@@ -347,8 +347,8 @@ public class AtlantaFareService extends DefaultFareService {
           );
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
-      case GCT_EXPRESS_Z1:
-      case GCT_EXPRESS_Z2:
+      case GCT_EXPRESS_Z1 :
+      case GCT_EXPRESS_Z2 :
         if (!isElectronicPayment(fareType)) {
           return new TransferMeta(TransferType.END_TRANSFER);
         }
@@ -359,18 +359,16 @@ public class AtlantaFareService extends DefaultFareService {
           );
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
-      default:
+      default :
         return new TransferMeta(TransferType.END_TRANSFER);
     }
   }
 
   private static boolean isElectronicPayment(FareType fareType) {
-    return (
-      fareType.equals(FareType.electronicRegular) ||
+    return (fareType.equals(FareType.electronicRegular) ||
       fareType.equals(FareType.electronicSenior) ||
       fareType.equals(FareType.electronicSpecial) ||
-      fareType.equals(FareType.electronicYouth)
-    );
+      fareType.equals(FareType.electronicYouth));
   }
 
   public AtlantaFareService(Collection<FareRuleSet> regularFareRules) {

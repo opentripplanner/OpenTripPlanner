@@ -73,8 +73,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
       .addText("default:")
       .addDuration(defaultValue);
 
-    var sortedEntryList = valueForEnum
-      .entrySet()
+    var sortedEntryList = valueForEnum.entrySet()
       .stream()
       .sorted(Comparator.comparingInt(e -> e.getKey().ordinal()))
       .toList();
@@ -98,11 +97,9 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
     DurationForEnum<?> that = (DurationForEnum<?>) o;
 
-    return (
-      type.equals(that.type) &&
+    return (type.equals(that.type) &&
       defaultValue.equals(that.defaultValue) &&
-      valueForEnum.equals(that.valueForEnum)
-    );
+      valueForEnum.equals(that.valueForEnum));
   }
 
   @Override

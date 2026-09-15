@@ -70,8 +70,9 @@ class TripAndServiceDateResolverTest {
     ).build();
 
     var reference = TripOnDateReference.ofTripIdAndServiceDate(id("unknown"), SERVICE_DATE);
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripAndServiceDateResolver(env.transitService()).resolve(reference)
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripAndServiceDateResolver(env.transitService()).resolve(reference)
     );
   }
 
@@ -82,8 +83,9 @@ class TripAndServiceDateResolverTest {
     ).build();
 
     var reference = TripOnDateReference.ofTripOnServiceDateId(id("nonexistent-tosd"));
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripAndServiceDateResolver(env.transitService()).resolve(reference)
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripAndServiceDateResolver(env.transitService()).resolve(reference)
     );
   }
 }

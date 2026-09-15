@@ -26,8 +26,7 @@ public class JsonSupport {
     // -Dline.seperator cannot be reliably overridden
     // 2 spaces + LF
     var lfOnlyIndenter = new DefaultIndenter("  ", "\n");
-    var pp = new DefaultPrettyPrinter()
-      .withObjectIndenter(lfOnlyIndenter)
+    var pp = new DefaultPrettyPrinter().withObjectIndenter(lfOnlyIndenter)
       .withArrayIndenter(lfOnlyIndenter);
     PRETTY_PRINTER = LENIENT_MAPPER.writer(pp);
   }
@@ -60,8 +59,9 @@ public class JsonSupport {
    */
   public static JsonNode jsonNodeFromResource(String path) {
     try {
-      @SuppressWarnings("ConstantConditions")
-      URI uri = ClassLoader.getSystemClassLoader().getResource(path).toURI();
+      @SuppressWarnings("ConstantConditions") URI uri = ClassLoader.getSystemClassLoader()
+        .getResource(path)
+        .toURI();
 
       return jsonNodeFromPath(Paths.get(uri));
     } catch (URISyntaxException e) {

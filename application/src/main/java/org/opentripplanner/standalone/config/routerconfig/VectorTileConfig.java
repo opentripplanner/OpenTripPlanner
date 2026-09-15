@@ -57,13 +57,11 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
   public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
     var root = node.of(paramName).summary("Vector tile configuration").asObject();
     return new VectorTileConfig(
-      root
-        .of("layers")
+      root.of("layers")
         .since(V2_0)
         .summary("Configuration of the individual layers for the Mapbox vector tiles.")
         .asObjects(VectorTileConfig::mapLayer),
-      root
-        .of("basePath")
+      root.of("basePath")
         .since(V2_5)
         .summary("The path of the vector tile source URLs in `tilejson.json`.")
         .description(
@@ -85,8 +83,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
           """
         )
         .asString(DEFAULT.basePath),
-      root
-        .of("attribution")
+      root.of("attribution")
         .since(V2_5)
         .summary("Custom attribution to be returned in `tilejson.json`")
         .description(
@@ -106,42 +103,35 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
 
   public static Layer mapLayer(NodeAdapter node) {
     return new Layer(
-      node
-        .of("name")
+      node.of("name")
         .since(V2_0)
         .summary("Used in the url to fetch tiles, and as the layer name in the vector tiles.")
         .asString(),
-      node
-        .of("type")
+      node.of("type")
         .since(V2_0)
         .summary("Type of the layer.")
         .asEnum(VectorTilesResource.LayerType.class),
-      node
-        .of("mapper")
+      node.of("mapper")
         .since(V2_0)
         .summary(
           "Describes the mapper converting from the OTP model entities to the vector tile properties."
         )
         .description("Currently `Digitransit` is supported for all layer types.")
         .asString(),
-      node
-        .of("maxZoom")
+      node.of("maxZoom")
         .since(V2_0)
         .summary("Maximum zoom levels the layer is active for.")
         .asInt(MAX_ZOOM),
-      node
-        .of("minZoom")
+      node.of("minZoom")
         .since(V2_0)
         .summary("Minimum zoom levels the layer is active for.")
         .asInt(MIN_ZOOM),
-      node
-        .of("cacheMaxSeconds")
+      node.of("cacheMaxSeconds")
         .since(V2_0)
         .summary("Sets the cache header in the response.")
         .description("The lowest value of the layers included is selected.")
         .asInt(CACHE_MAX_SECONDS),
-      node
-        .of("expansionFactor")
+      node.of("expansionFactor")
         .since(V2_0)
         .summary("How far outside its boundaries should the tile contain information.")
         .description(
@@ -149,8 +139,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
             "shapes being clipped at tile edges, then increase this number."
         )
         .asDouble(EXPANSION_FACTOR),
-      node
-        .of("filter")
+      node.of("filter")
         .since(V2_6)
         .summary("Reduce the result set of a layer further by a specific filter.")
         .description(

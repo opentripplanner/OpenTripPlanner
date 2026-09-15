@@ -55,8 +55,9 @@ public class TemporaryVerticesContainerTest {
         temporaryLocation,
         new TraverseModeSet(TraverseMode.WALK),
         LinkingDirection.OUTGOING,
-        (vertex, streetVertex) ->
-          List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryVertex) vertex, streetVertex))
+        (vertex, streetVertex) -> List.of(
+          TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryVertex) vertex, streetVertex)
+        )
       );
       container.addEdgeCollection(collection);
       // There should be vertices from B -> C and B -> to split edge

@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 
 class DocBuilderTest {
 
-  DocBuilder subject = new DocBuilder()
-    .addSection("Section")
+  DocBuilder subject = new DocBuilder().addSection("Section")
     .label("Label")
     .code("code")
     .dotSeparator()
@@ -37,7 +36,8 @@ class DocBuilderTest {
       Paragraph
 
       **Enums** `a` | `bar` | `boo-boo`
-      """,
+      """
+      ,
       subject.toDoc()
     );
   }

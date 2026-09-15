@@ -55,9 +55,7 @@ class OsmBoardingLocationsModuleTest {
           302563834L,
           768590748L,
           302563839L
-        )
-          .map(VertexLabel::osm)
-          .collect(Collectors.toSet())
+        ).map(VertexLabel::osm).collect(Collectors.toSet())
       ),
       Arguments.of(true, Set.of(VertexLabel.osm(768590748)))
     );
@@ -73,18 +71,15 @@ class OsmBoardingLocationsModuleTest {
   )
   @MethodSource("herrenbergTestCases")
   void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
-    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
-      "herrenberg-minimal.osm.pbf"
-    );
-    RegularStop platform = testModel
-      .stop("de:08115:4512:4:101")
+    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class)
+      .file("herrenberg-minimal.osm.pbf");
+    RegularStop platform = testModel.stop("de:08115:4512:4:101")
       .withCoordinate(48.59328, 8.86128)
       .build();
     RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
     RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
 
-    var siteRepo = testModel
-      .siteRepositoryBuilder()
+    var siteRepo = testModel.siteRepositoryBuilder()
       .withRegularStops(List.of(platform, busStop, floatingBusStop))
       .build();
 
@@ -142,13 +137,11 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(1, busVertex.getIncoming().size());
     assertEquals(1, busVertex.getOutgoing().size());
 
-    var platformCentroids = boardingLocations
-      .stream()
+    var platformCentroids = boardingLocations.stream()
       .filter(l -> l.references.contains(platform.getId().getId()))
       .toList();
 
-    var busBoardingLocation = boardingLocations
-      .stream()
+    var busBoardingLocation = boardingLocations.stream()
       .filter(b -> b.references.contains(busStop.getId().getId()))
       .findFirst()
       .orElseThrow();
@@ -171,8 +164,7 @@ class OsmBoardingLocationsModuleTest {
 
     assertEquals(
       linkedVertices,
-      platformCentroid
-        .getOutgoingStreetEdges()
+      platformCentroid.getOutgoingStreetEdges()
         .stream()
         .map(Edge::getToVertex)
         .map(Vertex::getLabel)
@@ -181,21 +173,18 @@ class OsmBoardingLocationsModuleTest {
 
     assertEquals(
       linkedVertices,
-      platformCentroid
-        .getIncomingStreetEdges()
+      platformCentroid.getIncomingStreetEdges()
         .stream()
         .map(Edge::getFromVertex)
         .map(Vertex::getLabel)
         .collect(Collectors.toSet())
     );
 
-    platformCentroids
-      .stream()
+    platformCentroids.stream()
       .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
       .forEach(e -> assertNotNull(e.getName(), "Edge " + e + " returns null for getName()"));
 
-    platformCentroids
-      .stream()
+    platformCentroids.stream()
       .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
       .filter(StreetEdge.class::isInstance)
       .forEach(e -> assertEquals("Platform 101;102", e.getName().toString()));
@@ -263,14 +252,12 @@ class OsmBoardingLocationsModuleTest {
       }
     }
 
-    var platform9 = testModel
-      .stop("9100MRGT9")
+    var platform9 = testModel.stop("9100MRGT9")
       .withName(I18NString.of("Moorgate (Platform 9)"))
       .withCoordinate(51.51922107872304, -0.08767468698832413)
       .withPlatformCode("9")
       .build();
-    var platform7 = testModel
-      .stop("9400ZZLUMGT3")
+    var platform7 = testModel.stop("9400ZZLUMGT3")
       .withName(I18NString.of("Moorgate (Platform 7)"))
       .withCoordinate(51.51919235051611, -0.08769925990953176)
       .withPlatformCode("7")
@@ -299,8 +286,7 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
-    var siteRepo = testModel
-      .siteRepositoryBuilder()
+    var siteRepo = testModel.siteRepositoryBuilder()
       .withRegularStops(List.of(platform9, platform7))
       .build();
     new OsmBoardingLocationsModule(
@@ -317,8 +303,7 @@ class OsmBoardingLocationsModuleTest {
       var fromVertex = Objects.requireNonNull(graph.getVertex(testCase.beginLabel));
       var toVertex = Objects.requireNonNull(graph.getVertex(testCase.endLabel));
 
-      var centroid = boardingLocations
-        .stream()
+      var centroid = boardingLocations.stream()
         .filter(b -> b.references.contains(testCase.platform.getId().getId()))
         .findFirst()
         .orElseThrow();
@@ -351,22 +336,18 @@ class OsmBoardingLocationsModuleTest {
    */
   @Test
   void testDeduplicationOfAreaBoardinglocations() {
-    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
-      "herrenberg-minimal.osm.pbf"
-    );
+    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class)
+      .file("herrenberg-minimal.osm.pbf");
 
     // Two stops that both match the same platform area via ref:IFOPT
-    RegularStop platform1 = testModel
-      .stop("de:08115:4512:4:101")
+    RegularStop platform1 = testModel.stop("de:08115:4512:4:101")
       .withCoordinate(48.59328, 8.86128)
       .build();
-    RegularStop platform2 = testModel
-      .stop("de:08115:4512:4:102")
+    RegularStop platform2 = testModel.stop("de:08115:4512:4:102")
       .withCoordinate(48.59328, 8.86128)
       .build();
 
-    var siteRepo = testModel
-      .siteRepositoryBuilder()
+    var siteRepo = testModel.siteRepositoryBuilder()
       .withRegularStops(List.of(platform1, platform2))
       .build();
 
@@ -414,11 +395,9 @@ class OsmBoardingLocationsModuleTest {
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
 
     // Only one centroid should exist for the shared platform area
-    var areaCentroids = boardingLocations
-      .stream()
+    var areaCentroids = boardingLocations.stream()
       .filter(
-        bl ->
-          bl.references.contains(platform1.getId().getId()) ||
+        bl -> bl.references.contains(platform1.getId().getId()) ||
           bl.references.contains(platform2.getId().getId())
       )
       .toList();
@@ -430,14 +409,12 @@ class OsmBoardingLocationsModuleTest {
     );
 
     // Both transit stop vertices should be connected to the same boarding location vertex
-    var linkedVertex1 = platformVertex1
-      .getOutgoing()
+    var linkedVertex1 = platformVertex1.getOutgoing()
       .stream()
       .findFirst()
       .orElseThrow()
       .getToVertex();
-    var linkedVertex2 = platformVertex2
-      .getOutgoing()
+    var linkedVertex2 = platformVertex2.getOutgoing()
       .stream()
       .findFirst()
       .orElseThrow()
@@ -469,15 +446,15 @@ class OsmBoardingLocationsModuleTest {
     assertConnections(splitVertex, begin, end);
 
     if (splitVertex != begin && splitVertex != end) {
-      var forwardEdges = getEdge(begin, splitVertex).flatMap(first ->
-        getEdge(splitVertex, end).map(second -> List.of(first, second))
+      var forwardEdges = getEdge(begin, splitVertex).flatMap(
+        first -> getEdge(splitVertex, end).map(second -> List.of(first, second))
       );
-      var backwardEdges = getEdge(end, splitVertex).flatMap(first ->
-        getEdge(splitVertex, begin).map(second -> List.of(first, second))
+      var backwardEdges = getEdge(end, splitVertex).flatMap(
+        first -> getEdge(splitVertex, begin).map(second -> List.of(first, second))
       );
       for (var edgeList : List.of(forwardEdges, backwardEdges)) {
-        edgeList.ifPresent(edges ->
-          assertEquals(
+        edgeList.ifPresent(
+          edges -> assertEquals(
             edges.getFirst().getOutAngle(),
             edges.getLast().getInAngle(),
             "The split vertex is not on a straight line between the connected vertices"
@@ -506,14 +483,17 @@ class OsmBoardingLocationsModuleTest {
     OsmBoardingLocationVertex busBoardingLocation,
     Set<Class<? extends Edge>> expected
   ) {
-    Stream.of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing()).forEach(edges ->
-      assertEquals(expected, edges.stream().map(Edge::getClass).collect(Collectors.toSet()))
-    );
+    Stream.of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing())
+      .forEach(
+        edges -> assertEquals(
+          expected,
+          edges.stream().map(Edge::getClass).collect(Collectors.toSet())
+        )
+      );
   }
 
   private static Optional<StreetEdge> getEdge(Vertex from, Vertex to) {
-    return from
-      .getOutgoingStreetEdges()
+    return from.getOutgoingStreetEdges()
       .stream()
       .filter(edge -> edge.getToVertex() == to)
       .findFirst();

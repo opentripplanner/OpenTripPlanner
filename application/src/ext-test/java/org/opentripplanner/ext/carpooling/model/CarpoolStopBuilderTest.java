@@ -55,8 +55,7 @@ public class CarpoolStopBuilderTest {
   @Test
   void buildFromValues_usingWith_buildToCorrectValues() {
     var builder = new CarpoolStopBuilder(new FeedScopedId("feed", "id"));
-    builder
-      .withOnboardCount(2)
+    builder.withOnboardCount(2)
       .withCoordinate(OSLO_NORTH)
       .withAimedArrivalTime(AIMED_ARRIVAL_TIME)
       .withExpectedArrivalTime(EXPECTED_ARRIVAL_TIME)
@@ -75,8 +74,7 @@ public class CarpoolStopBuilderTest {
   @Test
   void buildFromValues_usingCarPoolStop_buildsCorrectValues() {
     var originalBuilder = new CarpoolStopBuilder(new FeedScopedId("feed", "id"));
-    originalBuilder
-      .withOnboardCount(3)
+    originalBuilder.withOnboardCount(3)
       .withCoordinate(OSLO_CENTER)
       .withAimedArrivalTime(AIMED_ARRIVAL_TIME)
       .withExpectedArrivalTime(EXPECTED_ARRIVAL_TIME)

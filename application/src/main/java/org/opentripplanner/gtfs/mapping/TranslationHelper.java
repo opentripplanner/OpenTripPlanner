@@ -34,8 +34,7 @@ final class TranslationHelper {
       feedLanguage = feedInfos.iterator().next().getLang();
     }
 
-    Map<String, List<Translation>> byTableName = allTranslations
-      .stream()
+    Map<String, List<Translation>> byTableName = allTranslations.stream()
       .collect(Collectors.groupingBy(Translation::getTableName));
 
     for (Map.Entry<String, List<Translation>> i : byTableName.entrySet()) {
@@ -45,10 +44,7 @@ final class TranslationHelper {
         // {<tableName>={""=[Translation@1, ..., Translation@Z]}}
         translationMap.put(
           tableName,
-          i
-            .getValue()
-            .stream()
-            .collect(Collectors.groupingBy(t -> ""))
+          i.getValue().stream().collect(Collectors.groupingBy(t -> ""))
         );
       } else {
         // will create with following structure:
@@ -57,13 +53,12 @@ final class TranslationHelper {
         // {<tableName>_by_record={<recordId@1_recordSubId@1>=[Translation@1, ..., Translation@Z], ..., <recordId@Z_recordSubId@Z>=[Translation@1, ..., Translation@Z]}}
         translationMap.put(
           tableName + "_by_record",
-          i
-            .getValue()
+          i.getValue()
             .stream()
             .filter(t -> t.getFieldValue() == null)
             .collect(
-              Collectors.groupingBy(t ->
-                t.getRecordSubId() != null
+              Collectors.groupingBy(
+                t -> t.getRecordSubId() != null
                   ? String.join("_", t.getRecordId(), t.getRecordSubId())
                   : t.getRecordId()
               )
@@ -73,8 +68,7 @@ final class TranslationHelper {
         // {<tableName>_by_field={<field@1>=[Translation@1, ..., Translation@Z], ..., <field@Z>=[Translation@1, ..., Translation@Z]}}
         translationMap.put(
           tableName + "_by_field",
-          i
-            .getValue()
+          i.getValue()
             .stream()
             .filter(t -> t.getFieldValue() != null && t.getRecordId() == null)
             .collect(Collectors.groupingBy(Translation::getFieldValue))

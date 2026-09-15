@@ -90,13 +90,11 @@ public final class ScooterRequest {
       return false;
     }
     ScooterRequest that = (ScooterRequest) o;
-    return (
-      doubleEquals(that.speed, speed) &&
+    return (doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
-      optimizeTriangle.equals(that.optimizeTriangle)
-    );
+      optimizeTriangle.equals(that.optimizeTriangle));
   }
 
   @Override

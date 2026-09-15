@@ -42,11 +42,11 @@ public class WheelChairMapper {
     }
 
     switch (wheelChairLimitation.value()) {
-      case "true":
+      case "true" :
         return Accessibility.POSSIBLE;
-      case "false":
+      case "false" :
         return Accessibility.NOT_POSSIBLE;
-      default:
+      default :
         return Accessibility.NO_INFORMATION;
     }
   }

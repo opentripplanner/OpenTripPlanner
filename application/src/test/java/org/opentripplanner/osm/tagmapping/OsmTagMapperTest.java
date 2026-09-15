@@ -208,19 +208,13 @@ class OsmTagMapperTest {
     var rawScore = WPS.getDataForWay(WayTestData.highwayTrunk()).forward().walkSafety();
     var scoreWithLane = WPS.getDataForWay(
       WayTestData.highwayTrunk().copy().withTag("sidewalk", "lane").build()
-    )
-      .forward()
-      .walkSafety();
+    ).forward().walkSafety();
     var scoreWithSidewalk = WPS.getDataForWay(
       WayTestData.highwayTrunk().copy().withTag("sidewalk", "both").build()
-    )
-      .forward()
-      .walkSafety();
+    ).forward().walkSafety();
     var scoreWithSeparateSidewalk = WPS.getDataForWay(
       WayTestData.highwayTrunk().copy().withTag("sidewalk", "separate").build()
-    )
-      .forward()
-      .walkSafety();
+    ).forward().walkSafety();
     assertTrue(rawScore > 5);
     assertTrue(scoreWithLane < rawScore);
     assertTrue(scoreWithSidewalk < scoreWithLane);

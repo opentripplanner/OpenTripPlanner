@@ -101,18 +101,15 @@ abstract class AbstractFlexTemplate {
   Stream<FlexAccessEgress> createFlexAccessEgressStream(FlexAccessEgressCallbackAdapter callback) {
     if (transferStop instanceof RegularStop stop) {
       var flexVertex = callback.getStopVertex(stop.getId());
-      return Stream.of(createFlexAccessEgress(new ArrayList<>(), flexVertex, stop)).filter(
-        Objects::nonNull
-      );
+      return Stream.of(createFlexAccessEgress(new ArrayList<>(), flexVertex, stop))
+        .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
     else {
-      double maxDistanceMeters =
-        flexParameters.maxTransferDuration().getSeconds() *
+      double maxDistanceMeters = flexParameters.maxTransferDuration().getSeconds() *
         accessEgress.state.getRequest().walk().speed();
 
-      return getTransfersFromTransferStop(callback)
-        .stream()
+      return getTransfersFromTransferStop(callback).stream()
         .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= maxDistanceMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
         .map(transfer -> {
@@ -201,21 +198,19 @@ abstract class AbstractFlexTemplate {
 
     final var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], transferEdges);
 
-    return finalStateOpt
-      .map(finalState -> {
-        var durations = calculateFlexPathDurations(flexEdge, finalState);
+    return finalStateOpt.map(finalState -> {
+      var durations = calculateFlexPathDurations(flexEdge, finalState);
 
-        return new FlexAccessEgress(
-          stop,
-          durations,
-          boardStopPosition,
-          alightStopPosition,
-          trip,
-          finalState,
-          transferEdges.isEmpty(),
-          requestedBookingTime
-        );
-      })
-      .orElse(null);
+      return new FlexAccessEgress(
+        stop,
+        durations,
+        boardStopPosition,
+        alightStopPosition,
+        trip,
+        finalState,
+        transferEdges.isEmpty(),
+        requestedBookingTime
+      );
+    }).orElse(null);
   }
 }

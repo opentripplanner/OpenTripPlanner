@@ -19,11 +19,9 @@ public class AlertsFilter {
     var severities = args.getGraphQLSeverityLevel();
     var effects = args.getGraphQLEffect();
     var causes = args.getGraphQLCause();
-    return alerts
-      .stream()
+    return alerts.stream()
       .filter(
-        alert ->
-          args.getGraphQLFeeds() == null ||
+        alert -> args.getGraphQLFeeds() == null ||
           args.getGraphQLFeeds().contains(alert.getId().getFeedId())
       )
       .filter(
@@ -32,20 +30,16 @@ public class AlertsFilter {
       .filter(alert -> effects == null || effects.contains(getGraphQLEffect(alert.effect())))
       .filter(alert -> causes == null || causes.contains(getGraphQLCause(alert.cause())))
       .filter(
-        alert ->
-          args.getGraphQLRoute() == null ||
-          alert
-            .entities()
+        alert -> args.getGraphQLRoute() == null ||
+          alert.entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
             .map(EntitySelector.Route.class::cast)
             .anyMatch(route -> args.getGraphQLRoute().contains(route.routeId().toString()))
       )
       .filter(
-        alert ->
-          args.getGraphQLStop() == null ||
-          alert
-            .entities()
+        alert -> args.getGraphQLStop() == null ||
+          alert.entities()
             .stream()
             .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
             .map(EntitySelector.Stop.class::cast)

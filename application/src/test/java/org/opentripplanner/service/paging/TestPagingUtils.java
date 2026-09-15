@@ -20,8 +20,7 @@ class TestPagingUtils {
     if (value == null) {
       return "";
     }
-    return value
-      .toString()
+    return value.toString()
       .replaceAll("2020-02-01T(\\d\\d:\\d\\d:\\d\\d)Z", "$1-1d")
       .replaceAll("2020-02-02T(\\d\\d:\\d\\d:\\d\\d)Z", "$1")
       .replaceAll("2020-02-03T(\\d\\d:\\d\\d:\\d\\d)Z", "$1+1d")

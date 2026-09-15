@@ -222,8 +222,11 @@ public class OtpHttpClient {
     HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
-    return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response ->
-      mapResponse(response, responseMapper)
+    return executeAndMapWithResponseHandler(
+      httpRequest,
+      timeout,
+      headers,
+      response -> mapResponse(response, responseMapper)
     );
   }
 
@@ -391,10 +394,8 @@ public class OtpHttpClient {
    * NOT_MODIFIED which is not a failed request.
    */
   private static boolean isFailedRequest(org.apache.hc.core5.http.HttpResponse response) {
-    return (
-      (response.getCode() < SC_OK || response.getCode() >= SC_REDIRECTION) &&
-      response.getCode() != SC_NOT_MODIFIED
-    );
+    return ((response.getCode() < SC_OK || response.getCode() >= SC_REDIRECTION) &&
+      response.getCode() != SC_NOT_MODIFIED);
   }
 
   /**
@@ -408,12 +409,11 @@ public class OtpHttpClient {
     try {
       if (
         log.isTraceEnabled() &&
-        response.getEntity() != null &&
-        response.getEntity().getContent() != null
+          response.getEntity() != null &&
+          response.getEntity().getContent() != null
       ) {
         var entity = response.getEntity();
-        String content = new BufferedReader(new InputStreamReader(entity.getContent()))
-          .lines()
+        String content = new BufferedReader(new InputStreamReader(entity.getContent())).lines()
           .collect(Collectors.joining("\n"));
         log.trace("HTTP request failed with status code {}: \n{}", response.getCode(), content);
       }

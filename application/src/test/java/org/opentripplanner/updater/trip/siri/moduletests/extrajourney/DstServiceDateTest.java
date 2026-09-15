@@ -25,15 +25,12 @@ class DstServiceDateTest implements RealtimeTestConstants {
     var operator = envBuilder.operator(OPERATOR_ID);
     var route = envBuilder.route(ROUTE_ID, operator);
     // a scheduled trip is what puts the service date in the calendar
-    var env = envBuilder
-      .addTrip(
-        TripInput.of(TRIP_1_ID).withRoute(route).addStop(stopA, "12:00").addStop(stopB, "12:10")
-      )
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID).withRoute(route).addStop(stopA, "12:00").addStop(stopB, "12:10")
+    ).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)

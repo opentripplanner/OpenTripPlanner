@@ -75,14 +75,12 @@ public class TripRequest {
     if (!(o instanceof TripRequest that)) {
       return false;
     }
-    return (
-      Objects.equals(includeAgencies, that.includeAgencies) &&
+    return (Objects.equals(includeAgencies, that.includeAgencies) &&
       Objects.equals(includeRoutes, that.includeRoutes) &&
       Objects.equals(excludeAgencies, that.excludeAgencies) &&
       Objects.equals(excludeRoutes, that.excludeRoutes) &&
       Objects.equals(includeNetexInternalPlanningCodes, that.includeNetexInternalPlanningCodes) &&
-      Objects.equals(includeServiceDates, that.includeServiceDates)
-    );
+      Objects.equals(includeServiceDates, that.includeServiceDates));
   }
 
   @Override

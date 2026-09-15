@@ -29,8 +29,9 @@ class TripResponseContextMapper {
   }
 
   private Stream<PlaceStructure> place(StopLocation stopLocation) {
-    var stopPointStructure = new StopPointStructure()
-      .withStopPointRef(stopPointRefMapper.stopPointRef(stopLocation))
+    var stopPointStructure = new StopPointStructure().withStopPointRef(
+      stopPointRefMapper.stopPointRef(stopLocation)
+    )
       .withStopPointName(internationalText(stopLocation.getName()))
       .withPlannedQuay(internationalText(stopLocation.getPlatformCode()));
     if (stopLocation.isPartOfStation()) {
@@ -39,18 +40,18 @@ class TripResponseContextMapper {
       );
     }
 
-    var stopPoint = new PlaceStructure()
-      .withName(internationalText(stopLocation.getName()))
+    var stopPoint = new PlaceStructure().withName(internationalText(stopLocation.getName()))
       .withStopPoint(stopPointStructure)
       .withGeoPosition(LocationMapper.map(stopLocation.getCoordinate()));
 
     if (stopLocation.isPartOfStation()) {
-      var stopPlace = new PlaceStructure()
-        .withName(internationalText(stopLocation.getParentStation().getName()))
+      var stopPlace = new PlaceStructure().withName(
+        internationalText(stopLocation.getParentStation().getName())
+      )
         .withStopPlace(
-          new StopPlaceStructure()
-            .withStopPlaceRef(stopPointRefMapper.stopPlaceRef(stopLocation.getParentStation()))
-            .withStopPlaceName(internationalText(stopLocation.getName()))
+          new StopPlaceStructure().withStopPlaceRef(
+            stopPointRefMapper.stopPlaceRef(stopLocation.getParentStation())
+          ).withStopPlaceName(internationalText(stopLocation.getName()))
         )
         .withGeoPosition(LocationMapper.map(stopLocation.getCoordinate()));
 
@@ -61,8 +62,7 @@ class TripResponseContextMapper {
   }
 
   private static Stream<StopLocation> stopLocations(TripPlan tripPlan) {
-    return tripPlan.itineraries
-      .stream()
+    return tripPlan.itineraries.stream()
       .flatMap(TripResponseContextMapper::stopLocations)
       .filter(Objects::nonNull)
       .distinct();
@@ -74,9 +74,8 @@ class TripResponseContextMapper {
 
   private static Stream<StopLocation> stopLocations(Leg leg) {
     var fromTo = Stream.of(leg.from().stop, leg.to().stop);
-    var intermediate = StreamUtils.ofNullableCollection(leg.listIntermediateStops()).map(
-      sa -> sa.place.stop
-    );
+    var intermediate = StreamUtils.ofNullableCollection(leg.listIntermediateStops())
+      .map(sa -> sa.place.stop);
     return Stream.concat(fromTo, intermediate);
   }
 }

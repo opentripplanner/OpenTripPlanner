@@ -115,8 +115,7 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
 
       // A zone is a business area when all ride/traversal booleans are permissive
       // (null or false). Fields like maximum_speed_kph, station_parking are orthogonal.
-      boolean businessArea =
-        !Boolean.TRUE.equals(dropOffBanned) &&
+      boolean businessArea = !Boolean.TRUE.equals(dropOffBanned) &&
         !Boolean.TRUE.equals(traversalBanned) &&
         !Boolean.TRUE.equals(rideStartBanned);
 

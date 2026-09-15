@@ -20,7 +20,8 @@ public class SystemNoticeType {
         testers and developers.
 
         **NOTE!** _A SystemNotice is for debugging the system, avoid putting logic on it in the
-        client. The tags and usage may change without notice._"""
+        client. The tags and usage may change without notice._\
+        """
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()

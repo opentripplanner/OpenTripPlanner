@@ -148,9 +148,8 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
 
-    List<Entry<String, String>> translations = (
-      (TranslatedString) transitAlert.url().get()
-    ).getTranslations();
+    List<Entry<String, String>> translations = ((TranslatedString) transitAlert.url().get())
+      .getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("https://www.opentripplanner.org/", translations.get(0).getValue());
@@ -185,9 +184,8 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
 
-    List<Entry<String, String>> translations = (
-      (TranslatedString) transitAlert.headerText().get()
-    ).getTranslations();
+    List<Entry<String, String>> translations = ((TranslatedString) transitAlert.headerText().get())
+      .getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Title", translations.get(0).getValue());
@@ -228,9 +226,8 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
 
-    List<Entry<String, String>> translations = (
-      (TranslatedString) transitAlert.descriptionText().get()
-    ).getTranslations();
+    List<Entry<String, String>> translations = ((TranslatedString) transitAlert.descriptionText()
+      .get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Description", translations.get(0).getValue());
@@ -303,8 +300,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long agencySelectorCount = transitAlert
-      .entities()
+    long agencySelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
       .count();
@@ -319,8 +315,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long routeSelectorCount = transitAlert
-      .entities()
+    long routeSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
       .count();
@@ -331,16 +326,14 @@ public class AlertsUpdateHandlerTest {
   public void testTripSelectorWithTripId() {
     GtfsRealtime.Alert alert = Alert.newBuilder()
       .addInformedEntity(
-        GtfsRealtime.EntitySelector.newBuilder().setTrip(
-          TripDescriptor.newBuilder().setTripId("1").build()
-        )
+        GtfsRealtime.EntitySelector.newBuilder()
+          .setTrip(TripDescriptor.newBuilder().setTripId("1").build())
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long tripSelectorCount = transitAlert
-      .entities()
+    long tripSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
       .count();
@@ -355,8 +348,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long stopSelectorCount = transitAlert
-      .entities()
+    long stopSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
       .count();
@@ -371,8 +363,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long stopAndRouteSelectorCount = transitAlert
-      .entities()
+    long stopAndRouteSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.StopAndRoute)
       .count();
@@ -392,8 +383,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long stopAndTripSelectorCount = transitAlert
-      .entities()
+    long stopAndTripSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.StopAndTrip)
       .count();
@@ -410,14 +400,12 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(3l, totalSelectorCount);
-    long agencySelectorCount = transitAlert
-      .entities()
+    long agencySelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
       .count();
     assertEquals(2l, agencySelectorCount);
-    long routeSelectorCount = transitAlert
-      .entities()
+    long routeSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
       .count();
@@ -430,8 +418,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    List<EntitySelector> selectors = transitAlert
-      .entities()
+    List<EntitySelector> selectors = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
       .toList();
@@ -451,8 +438,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    List<EntitySelector> selectors = transitAlert
-      .entities()
+    List<EntitySelector> selectors = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
       .toList();
@@ -473,8 +459,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long directionAndRouteSelectorCount = transitAlert
-      .entities()
+    long directionAndRouteSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.DirectionAndRoute)
       .count();
@@ -489,8 +474,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long RouteTypeSelectorCount = transitAlert
-      .entities()
+    long RouteTypeSelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteType)
       .count();
@@ -507,8 +491,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
     long totalSelectorCount = transitAlert.entities().size();
     assertEquals(1l, totalSelectorCount);
-    long RouteTypeAndAgencySelectorCount = transitAlert
-      .entities()
+    long RouteTypeAndAgencySelectorCount = transitAlert.entities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteTypeAndAgency)
       .count();

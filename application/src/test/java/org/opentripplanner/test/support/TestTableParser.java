@@ -32,8 +32,7 @@ public class TestTableParser {
    * </ul>
    */
   public static Stream<Arguments> of(String text) {
-    return text
-      .lines()
+    return text.lines()
       .map(String::trim)
       .map(TestTableParser::stripComment)
       .filter(Predicate.not(String::isBlank))

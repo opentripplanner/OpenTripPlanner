@@ -140,8 +140,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
    */
   public List<LocalDate> getRunningPeriodDates() {
     // Add one day to ensure last day is included
-    return startOfRunningPeriod
-      .datesUntil(endOfRunningPeriod.plusDays(1))
+    return startOfRunningPeriod.datesUntil(endOfRunningPeriod.plusDays(1))
       .collect(Collectors.toList());
   }
 
@@ -180,9 +179,12 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   @Override
   public String toString() {
-    return (
-      "TripPatternForDate{" + "tripPattern=" + tripPattern + ", serviceDate=" + serviceDate + '}'
-    );
+    return ("TripPatternForDate{" +
+      "tripPattern=" +
+      tripPattern +
+      ", serviceDate=" +
+      serviceDate +
+      '}');
   }
 
   @Nullable
@@ -207,7 +209,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
     if (
       tripTimes.length == filteredTripTimes.size() &&
-      frequencies.length == filteredFrequencies.size()
+        frequencies.length == filteredFrequencies.size()
     ) {
       return this;
     }

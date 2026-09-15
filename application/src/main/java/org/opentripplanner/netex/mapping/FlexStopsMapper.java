@@ -104,8 +104,7 @@ class FlexStopsMapper {
     } else {
       // We create a new GroupStop, even if the stop place consists of a single area, in order to
       // get the ids for the area and stop place correct
-      var builder = siteRepositoryBuilder
-        .groupStop(idFactory.createId(flexibleStopPlace.getId()))
+      var builder = siteRepositoryBuilder.groupStop(idFactory.createId(flexibleStopPlace.getId()))
         .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()))
         .withEncompassingAreaGeometries(areaGeometries);
       stops.forEach(builder::addLocation);
@@ -123,8 +122,7 @@ class FlexStopsMapper {
     }
 
     var areaName = area.getName();
-    return siteRepositoryBuilder
-      .areaStop(idFactory.createId(area.getId()))
+    return siteRepositoryBuilder.areaStop(idFactory.createId(area.getId()))
       .withName(new NonLocalizedString(areaName != null ? areaName.getValue() : backupName))
       .withGeometry(geometry)
       .build();
@@ -142,8 +140,7 @@ class FlexStopsMapper {
     if (geometry == null || flexibleStopTransitMode == null) {
       return List.of();
     }
-    List<RegularStop> stops = stopsSpatialIndex
-      .query(geometry.getEnvelopeInternal())
+    List<RegularStop> stops = stopsSpatialIndex.query(geometry.getEnvelopeInternal())
       .stream()
       .filter(stop -> flexibleStopTransitMode == stop.getVehicleType())
       .filter(stop -> geometry.contains(stop.getGeometry()))
@@ -197,9 +194,8 @@ class FlexStopsMapper {
     if (UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(flexibleAreaType)) {
       return true;
     } else {
-      return (
-        UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(parentStopType) && flexibleAreaType == null
-      );
+      return (UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(parentStopType) &&
+        flexibleAreaType == null);
     }
   }
 

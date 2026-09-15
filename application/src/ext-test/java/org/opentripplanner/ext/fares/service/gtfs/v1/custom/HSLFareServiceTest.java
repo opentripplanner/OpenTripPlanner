@@ -41,8 +41,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
   ) {
     assertArrayEquals(
       expectedFareIds.toArray(),
-      fareService
-        .calculateFares(i)
+      fareService.calculateFares(i)
         .getLegProducts()
         .values()
         .stream()
@@ -114,12 +113,11 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .withTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeD =
-      FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
-        .withPrice(D_PRICE)
-        .withTransferDuration(fiveMinutes)
-        //.setAgency(agency1.getId().getId())
-        .build();
+    FareAttribute fareAttributeD = FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
+      .withPrice(D_PRICE)
+      .withTransferDuration(fiveMinutes)
+      //.setAgency(agency1.getId().getId())
+      .build();
 
     FareAttribute fareAttributeABC = FareAttribute.of(new FeedScopedId(FEED_ID, "ABC"))
       .withPrice(ABC_PRICE)
@@ -333,8 +331,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
       )
     );
 
-    Itinerary twoTicketsItinerary = newItinerary(A1, T11_20)
-      .bus(1, T11_20, T11_30, B1)
+    Itinerary twoTicketsItinerary = newItinerary(A1, T11_20).bus(1, T11_20, T11_30, B1)
       .bus(1, T11_33, T11_50, C1)
       .build();
 
@@ -359,8 +356,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     );
 
     // Itineraries within zone A
-    Itinerary A1_A2_F = newItinerary(A1, T11_06)
-      .bus(1, T11_06, T11_12, A2)
+    Itinerary A1_A2_F = newItinerary(A1, T11_06).bus(1, T11_06, T11_12, A2)
       .bus(1, T11_06, T11_12, F)
       .build();
 
@@ -374,8 +370,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     );
 
     // Multifeed case
-    Itinerary A1_A2_2 = newItinerary(A1, T11_06)
-      .bus(routeAgency3, 1, T11_06, T11_14, A2)
+    Itinerary A1_A2_2 = newItinerary(A1, T11_06).bus(routeAgency3, 1, T11_06, T11_14, A2)
       .bus(routeAgency1, 2, T11_30, T11_50, A1)
       .build();
 
@@ -388,8 +383,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
       )
     );
 
-    Itinerary i = newItinerary(D1, T11_06)
-      .bus(routeAgency1, 1, T11_06, T11_10, D2)
+    Itinerary i = newItinerary(D1, T11_06).bus(routeAgency1, 1, T11_06, T11_10, D2)
       .walk(10, D1)
       .bus(routeAgency2, 2, T11_20, T11_30, D2)
       .build();
@@ -403,8 +397,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
       )
     );
 
-    Itinerary i2 = newItinerary(B1)
-      .bus(routeAgency1, 1, T11_06, T11_12, B1)
+    Itinerary i2 = newItinerary(B1).bus(routeAgency1, 1, T11_06, T11_12, B1)
       .bus(routeAgency3, 1, T11_14, T11_15, B2)
       .build();
 
@@ -432,9 +425,12 @@ public class HSLFareServiceTest implements PlanTestConstants {
     service.addFareRules(FareType.regular, List.of(ruleSetAB));
 
     // outside HSL's fare zones, should return null
-    Itinerary outsideHsl = newItinerary(PlanTestConstants.D, T11_06)
-      .bus(1, T11_20, T11_30, PlanTestConstants.E)
-      .build();
+    Itinerary outsideHsl = newItinerary(PlanTestConstants.D, T11_06).bus(
+      1,
+      T11_20,
+      T11_30,
+      PlanTestConstants.E
+    ).build();
     var result = service.calculateFares(outsideHsl);
     assertTrue(result.isEmpty());
   }

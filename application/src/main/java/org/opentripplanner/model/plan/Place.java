@@ -212,8 +212,7 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    boolean realTime = vertex
-      .getVehicleParking()
+    boolean realTime = vertex.getVehicleParking()
       .hasRealTimeDataForMode(traverseMode, request.wheelchairEnabled());
     return new Place(
       vertex.getName(),

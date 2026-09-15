@@ -74,8 +74,7 @@ public class ParkAndRideResource {
       envelope = new Envelope(-180, 180, -90, 90);
     }
 
-    var prs = vehicleParkingService
-      .listCarParks()
+    var prs = vehicleParkingService.listCarParks()
       .stream()
       .filter(lot -> envelope.contains(lot.getCoordinate().asJtsCoordinate()))
       .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))

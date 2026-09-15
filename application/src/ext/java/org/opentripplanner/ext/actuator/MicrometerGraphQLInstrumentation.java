@@ -65,8 +65,8 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     Timer.Sample sample = Timer.start(meterRegistry);
-    return whenCompleted((res, err) ->
-      sample.stop(buildQueryTimer(((TraceState) state).operationName, "execution"))
+    return whenCompleted(
+      (res, err) -> sample.stop(buildQueryTimer(((TraceState) state).operationName, "execution"))
     );
   }
 
@@ -76,8 +76,8 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     Timer.Sample sample = Timer.start(meterRegistry);
-    return whenCompleted((res, err) ->
-      sample.stop(buildQueryTimer(((TraceState) state).operationName, "parse"))
+    return whenCompleted(
+      (res, err) -> sample.stop(buildQueryTimer(((TraceState) state).operationName, "parse"))
     );
   }
 
@@ -87,8 +87,8 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     Timer.Sample sample = Timer.start(meterRegistry);
-    return whenCompleted((res, err) ->
-      sample.stop(buildQueryTimer(((TraceState) state).operationName, "validation"))
+    return whenCompleted(
+      (res, err) -> sample.stop(buildQueryTimer(((TraceState) state).operationName, "validation"))
     );
   }
 

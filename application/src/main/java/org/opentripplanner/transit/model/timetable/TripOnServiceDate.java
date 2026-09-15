@@ -11,8 +11,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  * or an instance of a generic trip on a certain service date.
  */
 public class TripOnServiceDate
-  extends AbstractTransitEntity<TripOnServiceDate, TripOnServiceDateBuilder>
-{
+  extends
+  AbstractTransitEntity<TripOnServiceDate, TripOnServiceDateBuilder> {
 
   private final Trip trip;
   private final LocalDate serviceDate;
@@ -62,14 +62,12 @@ public class TripOnServiceDate
 
   @Override
   public boolean sameAs(TripOnServiceDate other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(this.trip, other.trip) &&
       Objects.equals(this.serviceDate, other.serviceDate) &&
       Objects.equals(this.tripAlteration, other.tripAlteration) &&
       this.realtimeExtraJourney == other.realtimeExtraJourney &&
-      Objects.equals(this.replacementFor, other.replacementFor)
-    );
+      Objects.equals(this.replacementFor, other.replacementFor));
   }
 
   @Override

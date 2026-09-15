@@ -87,8 +87,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   @Override
   public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
-    return geofencingZoneIndexes
-      .values()
+    return geofencingZoneIndexes.values()
       .stream()
       .flatMap(idx -> idx.findZonesContaining(coord).stream())
       .collect(Collectors.toSet());

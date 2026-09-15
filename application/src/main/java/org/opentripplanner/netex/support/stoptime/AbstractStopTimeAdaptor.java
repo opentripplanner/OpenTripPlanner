@@ -12,10 +12,8 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * This class does not take Daylight Saving Time transitions into account, this is an error and
  * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
-abstract sealed class AbstractStopTimeAdaptor
-  implements StopTimeAdaptor
-  permits AreaStopTimeAdaptor, RegularStopTimeAdaptor
-{
+abstract sealed class AbstractStopTimeAdaptor implements StopTimeAdaptor permits
+  AreaStopTimeAdaptor, RegularStopTimeAdaptor {
 
   private final TimetabledPassingTime timetabledPassingTime;
 
@@ -81,9 +79,8 @@ abstract sealed class AbstractStopTimeAdaptor
   }
 
   private boolean isRegularStopFollowedByRegularStopValid(StopTimeAdaptor next) {
-    return (
-      normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime()
-    );
+    return (normalizedDepartureTimeOrElseArrivalTime() <=
+      next.normalizedArrivalTimeOrElseDepartureTime());
   }
 
   private boolean isAreaStopFollowedByAreaStopValid(StopTimeAdaptor next) {
@@ -92,10 +89,8 @@ abstract sealed class AbstractStopTimeAdaptor
     int latestArrivalTime = normalizedLatestArrivalTime();
     int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
 
-    return (
-      earliestDepartureTime <= nextEarliestDepartureTime &&
-      latestArrivalTime <= nextLatestArrivalTime
-    );
+    return (earliestDepartureTime <= nextEarliestDepartureTime &&
+      latestArrivalTime <= nextLatestArrivalTime);
   }
 
   private boolean isRegularStopFollowedByAreaStopValid(StopTimeAdaptor next) {

@@ -45,8 +45,8 @@ class IsolatedAreaRemovedTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Expected empty graph — isolated area should be fully removed")
-      .that(summarizer.summarizeEdges())
-      .isEmpty();
+    assertWithMessage("Expected empty graph — isolated area should be fully removed").that(
+      summarizer.summarizeEdges()
+    ).isEmpty();
   }
 }

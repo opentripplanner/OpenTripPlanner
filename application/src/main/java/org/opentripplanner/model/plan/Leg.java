@@ -99,10 +99,8 @@ public interface Leg {
     }
 
     // Return true if legs overlap
-    return (
-      boardStopPosInPattern() < other.alightStopPosInPattern() &&
-      alightStopPosInPattern() > other.boardStopPosInPattern()
-    );
+    return (boardStopPosInPattern() < other.alightStopPosInPattern() &&
+      alightStopPosInPattern() > other.boardStopPosInPattern());
   }
 
   /**
@@ -141,11 +139,10 @@ public interface Leg {
    */
   default boolean overlapInTime(Leg other) {
     return (
-      // We convert to epoch seconds to ignore nanos (the times are normalized),
-      // in favor of using the methods isAfter(...) and isBefore(...)
-      startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
-      other.startTime().toEpochSecond() < endTime().toEpochSecond()
-    );
+    // We convert to epoch seconds to ignore nanos (the times are normalized),
+    // in favor of using the methods isAfter(...) and isBefore(...)
+    startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
+      other.startTime().toEpochSecond() < endTime().toEpochSecond());
   }
 
   /**
@@ -480,16 +477,13 @@ public interface Leg {
   }
 
   default Set<FareZone> fareZones() {
-    var intermediate = listIntermediateStops()
-      .stream()
+    var intermediate = listIntermediateStops().stream()
       .flatMap(stopArrival -> stopArrival.place.stop.getFareZones().stream());
 
     var start = fareZones(this.from());
     var end = fareZones(this.to());
 
-    return Stream.of(intermediate, start, end)
-      .flatMap(s -> s)
-      .collect(Collectors.toSet());
+    return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
 
   /**

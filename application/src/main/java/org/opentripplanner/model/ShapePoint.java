@@ -61,18 +61,15 @@ public final class ShapePoint implements Comparable<ShapePoint> {
       return false;
     }
     ShapePoint that = (ShapePoint) o;
-    return (
-      sequence == that.sequence &&
+    return (sequence == that.sequence &&
       DoubleUtils.doubleEquals(lat, that.lat) &&
       DoubleUtils.doubleEquals(lon, that.lon) &&
-      DoubleUtils.doubleEquals(distTraveled, that.distTraveled)
-    );
+      DoubleUtils.doubleEquals(distTraveled, that.distTraveled));
   }
 
   public boolean sameCoordinates(ShapePoint that) {
-    return (
-      DoubleUtils.doubleEquals(this.lat, that.lat) && DoubleUtils.doubleEquals(this.lon, that.lon)
-    );
+    return (DoubleUtils.doubleEquals(this.lat, that.lat) &&
+      DoubleUtils.doubleEquals(this.lon, that.lon));
   }
 
   @Override

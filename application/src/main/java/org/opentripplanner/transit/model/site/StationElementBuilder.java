@@ -12,10 +12,9 @@ import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
  * of the fields are shared between the types, and eg. in pathways the namespace any of them can be
  * used as from and to.
  */
-public abstract class StationElementBuilder<
-  E extends StationElement<E, B>,
-  B extends StationElementBuilder<E, B>
-> extends AbstractEntityBuilder<E, B> {
+public abstract class StationElementBuilder<E extends StationElement<E, B>, B extends StationElementBuilder<E, B>>
+  extends
+  AbstractEntityBuilder<E, B> {
 
   private I18NString name;
   private String code;

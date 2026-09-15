@@ -42,10 +42,14 @@ public class ConstrainedBoardingSearchTest {
   private static final TransferConstraint NOT_ALLOWED_CONSTRAINT = TransferConstraint.of()
     .notAllowed()
     .build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT =
-    TransferConstraint.of().minTransferTime(600).build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT =
-    TransferConstraint.of().minTransferTime(0).build();
+  private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT = TransferConstraint
+    .of()
+    .minTransferTime(600)
+    .build();
+  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT = TransferConstraint
+    .of()
+    .minTransferTime(0)
+    .build();
   private static final StopTransferPoint STOP_B_TX_POINT = new StopTransferPoint(STOP_B);
   private static final StopTransferPoint STOP_C_TX_POINT = new StopTransferPoint(STOP_C);
 

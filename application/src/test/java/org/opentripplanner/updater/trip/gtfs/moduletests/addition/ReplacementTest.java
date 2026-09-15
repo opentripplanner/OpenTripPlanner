@@ -33,8 +33,7 @@ public class ReplacementTest implements RealtimeTestConstants {
     var env = builder.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+    var tripUpdate = rt.tripUpdate(TRIP_1_ID, REPLACEMENT)
       .withTripProperties(
         "New Headsign",
         // we can't change trip short name at real-time yet
@@ -137,8 +136,7 @@ public class ReplacementTest implements RealtimeTestConstants {
     var env = builder.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdate(TRIP_1_ID, REPLACEMENT)
+    var tripUpdate = rt.tripUpdate(TRIP_1_ID, REPLACEMENT)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime("UNKNOWN_STOP_ID", "00:45")
       .addStopTime(STOP_B_ID, "01:00")

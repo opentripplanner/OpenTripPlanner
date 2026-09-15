@@ -22,9 +22,8 @@ public class StopArrivalStateParetoSetTest {
   private static final int ROUND_1 = 1;
   private static final int ROUND_2 = 2;
   private static final int ROUND_3 = 3;
-  private static final RaptorTripSchedule ANY_TRIP = TestTripSchedule.schedule(
-    "10:00 10:30"
-  ).build();
+  private static final RaptorTripSchedule ANY_TRIP = TestTripSchedule.schedule("10:00 10:30")
+    .build();
 
   // In this test, each stop is used to identify the pareto vector - it is just one
   // ParetoSet "subject" with multiple "stops" in it. The stop has no effect on
@@ -60,9 +59,8 @@ public class StopArrivalStateParetoSetTest {
     20,
     BASE_C1
   );
-  private static final ArrivalParetoSetComparatorFactory<
-    McStopArrival<RaptorTripSchedule>
-  > COMPARATOR_FACTORY = ArrivalParetoSetComparatorFactory.ofCompareC1();
+  private static final ArrivalParetoSetComparatorFactory<McStopArrival<RaptorTripSchedule>> COMPARATOR_FACTORY =
+    ArrivalParetoSetComparatorFactory.ofCompareC1();
 
   private ParetoSet<McStopArrival<RaptorTripSchedule>> subject = ParetoSet.of(
     COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost()

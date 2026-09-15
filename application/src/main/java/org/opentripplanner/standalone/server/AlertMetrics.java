@@ -68,24 +68,19 @@ public class AlertMetrics implements MeterBinder {
   private Iterable<MultiGauge.Row<Number>> summarizeAlerts(TransitAlertService alertService) {
     var alerts = alertService.getAllAlerts();
 
-    ImmutableMultimap<AlertTags, TransitAlert> taggedAlerts = alerts
-      .stream()
+    ImmutableMultimap<AlertTags, TransitAlert> taggedAlerts = alerts.stream()
       .collect(
-        ImmutableListMultimap.<
-          TransitAlert,
-          AlertTags,
-          TransitAlert
-        >flatteningToImmutableListMultimap(AlertTags::of, Stream::of)
+        ImmutableListMultimap
+          .<TransitAlert, AlertTags, TransitAlert>flatteningToImmutableListMultimap(
+            AlertTags::of,
+            Stream::of
+          )
       );
-    return taggedAlerts
-      .keySet()
-      .stream()
-      .map(alertTags -> {
-        var tags = alertTags.toTags();
-        var count = taggedAlerts.get(alertTags).size();
-        return MultiGauge.Row.of(tags, count);
-      })
-      .toList();
+    return taggedAlerts.keySet().stream().map(alertTags -> {
+      var tags = alertTags.toTags();
+      var count = taggedAlerts.get(alertTags).size();
+      return MultiGauge.Row.of(tags, count);
+    }).toList();
   }
 
   /**

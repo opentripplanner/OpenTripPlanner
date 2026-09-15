@@ -92,22 +92,27 @@ class AlertsConnectionFilterMapperTest {
 
   @Test
   void emptySelectorListIsRejected() {
-    assertThrows(IllegalArgumentException.class, () ->
-      AlertsConnectionFilterMapper.map(List.of(filter("include")))
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> AlertsConnectionFilterMapper.map(List.of(filter("include")))
     );
   }
 
   @Test
   void emptyDimensionListIsRejected() {
-    assertThrows(InvalidInputException.class, () ->
-      AlertsConnectionFilterMapper.map(List.of(filter("include", Map.of("causes", List.of()))))
+    assertThrows(
+      InvalidInputException.class,
+      () -> AlertsConnectionFilterMapper.map(
+        List.of(filter("include", Map.of("causes", List.of())))
+      )
     );
   }
 
   @Test
   void nullValueInDimensionListIsRejected() {
-    assertThrows(InvalidInputException.class, () ->
-      AlertsConnectionFilterMapper.map(
+    assertThrows(
+      InvalidInputException.class,
+      () -> AlertsConnectionFilterMapper.map(
         List.of(filter("include", mapOfNullableList("feeds", "test", null)))
       )
     );

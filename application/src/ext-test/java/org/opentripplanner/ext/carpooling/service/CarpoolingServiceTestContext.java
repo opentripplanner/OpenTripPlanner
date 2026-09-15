@@ -76,9 +76,8 @@ record CarpoolingServiceTestContext(
     var tripWithVertices = resolver.resolve(trip);
     if (tripWithVertices == null) {
       throw new IllegalStateException(
-        "Trip %s has a route point that does not resolve to a car-reachable vertex on the test graph".formatted(
-          trip.getId()
-        )
+        "Trip %s has a route point that does not resolve to a car-reachable vertex on the test graph"
+          .formatted(trip.getId())
       );
     }
     repository.upsertCarpoolTrip(tripWithVertices);

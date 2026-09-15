@@ -27,20 +27,16 @@ class RaptorViaLocationTest implements RaptorTestConstants {
 
   private final RaptorViaLocation subjectPassThrough = RaptorViaLocation.passThrough(
     PASS_THROUGH_LABEL
-  )
-    .addStop(STOP_D)
-    .build();
+  ).addStop(STOP_D).build();
 
-  private final RaptorTransferViaConnection transferConnection = subject
-    .connections()
+  private final RaptorTransferViaConnection transferConnection = subject.connections()
     .stream()
     .filter(it -> it instanceof RaptorTransferViaConnection)
     .findFirst()
     .map(it -> (RaptorTransferViaConnection) it)
     .orElseThrow();
 
-  private final RaptorVisitStopViaConnection stopConnection = subject
-    .connections()
+  private final RaptorVisitStopViaConnection stopConnection = subject.connections()
     .stream()
     .filter(it -> it instanceof RaptorVisitStopViaConnection)
     .findFirst()
@@ -56,8 +52,9 @@ class RaptorViaLocationTest implements RaptorTestConstants {
 
   @Test
   void atLeastOneConnectionMustExist() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      RaptorViaLocation.viaVisit(VIA_LABEL, MINIMUM_WAIT_TIME).build()
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> RaptorViaLocation.viaVisit(VIA_LABEL, MINIMUM_WAIT_TIME).build()
     );
     assertEquals("At least one connection must exist!", ex.getMessage());
   }
@@ -68,8 +65,9 @@ class RaptorViaLocationTest implements RaptorTestConstants {
       .addStop(STOP_A, STOP_B, STOP_A)
       .build();
 
-    var ex1 = assertThrows(IllegalArgumentException.class, () ->
-      passThroughLocation.validateDuplicateConnections()
+    var ex1 = assertThrows(
+      IllegalArgumentException.class,
+      () -> passThroughLocation.validateDuplicateConnections()
     );
     assertEquals("All connection need to be pareto-optimal: (stop 1) ≡ (stop 1)", ex1.getMessage());
 
@@ -79,8 +77,9 @@ class RaptorViaLocationTest implements RaptorTestConstants {
       .addStop(STOP_A)
       .build();
 
-    var ex2 = assertThrows(IllegalArgumentException.class, () ->
-      viaVisitLocation.validateDuplicateConnections()
+    var ex2 = assertThrows(
+      IllegalArgumentException.class,
+      () -> viaVisitLocation.validateDuplicateConnections()
     );
     assertEquals(
       "All connection need to be pareto-optimal: (transfer 1 ~ 2 [53s C₁60]) ≻ (transfer 1 ~ 2 [43s C₁40])",
@@ -138,15 +137,17 @@ class RaptorViaLocationTest implements RaptorTestConstants {
 
   @Test
   void testEquals() {
-    var ex = assertThrows(UnsupportedOperationException.class, () ->
-      subject.equals("<Any object>")
+    var ex = assertThrows(
+      UnsupportedOperationException.class,
+      () -> subject.equals("<Any object>")
     );
     assertEquals(
       "No need to compare class org.opentripplanner.raptor.api.request.via.RaptorViaLocation",
       ex.getMessage()
     );
-    ex = assertThrows(UnsupportedOperationException.class, () ->
-      subjectPassThrough.equals("<Any object>")
+    ex = assertThrows(
+      UnsupportedOperationException.class,
+      () -> subjectPassThrough.equals("<Any object>")
     );
     assertEquals(
       "No need to compare class org.opentripplanner.raptor.api.request.via.RaptorViaLocation",

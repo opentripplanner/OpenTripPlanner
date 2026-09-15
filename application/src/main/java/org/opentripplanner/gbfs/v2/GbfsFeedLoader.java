@@ -18,8 +18,8 @@ import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
  * updating them according to individual feed's TTL rules.
  */
 public class GbfsFeedLoader
-  extends GbfsFeedLoaderImpl<GBFSFeedName, GbfsFeedLoader.GBFSFeedV23Details>
-{
+  extends
+  GbfsFeedLoaderImpl<GBFSFeedName, GbfsFeedLoader.GBFSFeedV23Details> {
 
   /**
    * Sets up updaters for the feeds listed in the auto-configuration file.
@@ -33,10 +33,9 @@ public class GbfsFeedLoader
     GBFS data = autoConfiguration.mapTo(GBFS.class);
 
     // Pick first language if none defined
-    GBFSFeeds feeds =
-      languageCode == null
-        ? data.getFeedsData().values().iterator().next()
-        : data.getFeedsData().get(languageCode);
+    GBFSFeeds feeds = languageCode == null
+      ? data.getFeedsData().values().iterator().next()
+      : data.getFeedsData().get(languageCode);
     if (feeds == null) {
       throw new GbfsConstructionException(
         "Language " + languageCode + " does not exist in feed " + autoConfiguration.url()

@@ -51,11 +51,8 @@ public class StopsWithArriveByTransitCriteriaResolver {
     EgressPaths egressPaths,
     @Nullable ViaConnections viaConnections
   ) {
-    return new StopsWithArriveByTransitCriteriaResolver(
-      accessPaths,
-      egressPaths,
-      viaConnections
-    ).stops();
+    return new StopsWithArriveByTransitCriteriaResolver(accessPaths, egressPaths, viaConnections)
+      .stops();
   }
 
   private TIntSet stops() {
@@ -70,7 +67,7 @@ public class StopsWithArriveByTransitCriteriaResolver {
 
   private void addAllEgressStopsUsingStreetToDestination(EgressPaths egressPaths) {
     var egressByStop = egressPaths.byStop();
-    for (var it = egressByStop.keySet().iterator(); it.hasNext(); ) {
+    for (var it = egressByStop.keySet().iterator(); it.hasNext();) {
       int stop = it.next();
       var egressList = egressByStop.get(stop);
       if (egressList.stream().anyMatch(e -> e.arrivedOnStreet())) {
@@ -84,7 +81,7 @@ public class StopsWithArriveByTransitCriteriaResolver {
       return;
     }
 
-    for (var it = viaConnections.byFromStop().iterator(); it.hasNext(); ) {
+    for (var it = viaConnections.byFromStop().iterator(); it.hasNext();) {
       it.advance();
       var stop = it.key();
       var viaConnectionsFromStop = it.value();

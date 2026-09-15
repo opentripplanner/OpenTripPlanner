@@ -245,8 +245,7 @@ class TestPagingModel {
       if (nTransfers == 0) {
         builder.bus(10, departureTime, arrivalTime, B);
       } else if (nTransfers == 1) {
-        builder
-          .bus(20, departureTime, departureTime + 120, B)
+        builder.bus(20, departureTime, departureTime + 120, B)
           .bus(21, departureTime + 240, arrivalTime, B);
       } else {
         throw new IllegalArgumentException("nTransfers not supported: " + nTransfers);

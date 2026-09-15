@@ -47,8 +47,7 @@ class FreeTransferTimeLimitTest implements PlanTestConstants, FareTestConstants 
 
   @Test
   void twoLegsWithinLimit() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(R1, 1, time("10:00"), time("10:03"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(R1, 1, time("10:00"), time("10:03"), B)
       .bus(R1, 2, time("10:04"), time("10:08"), C)
       .bus(R1, 3, time("10:12"), time("10:22"), D)
       .build();

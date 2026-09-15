@@ -108,8 +108,8 @@ public class OrcaFareServiceTest {
         var product = offer.fareProduct();
         if (
           product.category().name().equals(expectedCategoryName) &&
-          product.medium().name().equals(expectedMediumName) &&
-          !seenFareOffers.contains(offer.uniqueId())
+            product.medium().name().equals(expectedMediumName) &&
+            !seenFareOffers.contains(offer.uniqueId())
         ) {
           validOffersForLeg.add(offer);
         }
@@ -117,8 +117,7 @@ public class OrcaFareServiceTest {
 
       // If multiple valid offers for this leg, select the cheapest one
       if (!validOffersForLeg.isEmpty()) {
-        var cheapestOffer = validOffersForLeg
-          .stream()
+        var cheapestOffer = validOffersForLeg.stream()
           .min(Comparator.comparing(o -> o.fareProduct().price()))
           .orElse(validOffersForLeg.get(0));
 
@@ -128,8 +127,7 @@ public class OrcaFareServiceTest {
     });
 
     // Calculate total fare by summing unique fare products
-    var totalFare = uniqueFareProducts
-      .stream()
+    var totalFare = uniqueFareProducts.stream()
       .reduce(Money.ZERO_USD, (sum, offer) -> sum.plus(offer.fareProduct().price()), Money::plus);
 
     assertEquals(expectedPrice, totalFare);
@@ -145,12 +143,10 @@ public class OrcaFareServiceTest {
   }
 
   private static boolean usesOrca(FareType fareType) {
-    return (
-      fareType.equals(FareType.electronicSpecial) ||
+    return (fareType.equals(FareType.electronicSpecial) ||
       fareType.equals(FareType.electronicSenior) ||
       fareType.equals(FareType.electronicRegular) ||
-      fareType.equals(FareType.electronicYouth)
-    );
+      fareType.equals(FareType.electronicYouth));
   }
 
   private static void assertLegFareEquals(int fare, Leg leg, ItineraryFare fares, boolean hasXfer) {
@@ -163,19 +159,13 @@ public class OrcaFareServiceTest {
 
     // Calculate the cost specific to this leg by only counting new fare products created for this leg
     // When a leg uses a transfer, existing fare products are applied but we should only count new costs
-    var newFareProducts = legFareProducts
-      .stream()
-      .filter(fpl -> {
-        var fp = fpl.fareProduct();
-        // Only count fare products created at this leg's start time
-        return (
-          fp.medium().name().equals("electronic") &&
-          fp.category().name().equals("regular") &&
-          fpl.startTime().equals(leg.startTime())
-        );
-      })
-      .mapToInt(fpl -> fpl.fareProduct().price().minorUnitAmount())
-      .sum();
+    var newFareProducts = legFareProducts.stream().filter(fpl -> {
+      var fp = fpl.fareProduct();
+      // Only count fare products created at this leg's start time
+      return (fp.medium().name().equals("electronic") &&
+        fp.category().name().equals("regular") &&
+        fpl.startTime().equals(leg.startTime()));
+    }).mapToInt(fpl -> fpl.fareProduct().price().minorUnitAmount()).sum();
 
     assertEquals(fare, newFareProducts, "Leg fare amount mismatch");
 
@@ -197,12 +187,10 @@ public class OrcaFareServiceTest {
 
     assertFalse(legFareProducts.isEmpty(), "No leg fare products found for leg.");
 
-    var hasMatchingProduct = legFareProducts
-      .stream()
+    var hasMatchingProduct = legFareProducts.stream()
       .map(FareOffer::fareProduct)
       .anyMatch(
-        product ->
-          product.category() != null &&
+        product -> product.category() != null &&
           product.medium() != null &&
           product.category().name().equals(expectedCategoryName) &&
           product.medium().name().equals(expectedMediumName)
@@ -686,8 +674,7 @@ public class OrcaFareServiceTest {
     var uses = fares.getLegProducts().get(firstLeg);
     assertEquals(7, uses.size());
 
-    var regular = uses
-      .stream()
+    var regular = uses.stream()
       .filter(u -> u.fareProduct().category().name().equals("regular"))
       .toList()
       .getFirst();
@@ -813,13 +800,11 @@ public class OrcaFareServiceTest {
     var siteRepositoryBuilder = SiteRepository.of();
 
     // Set up stops
-    RegularStop firstStop = siteRepositoryBuilder
-      .regularStop(new FeedScopedId(agencyId, "1"))
+    RegularStop firstStop = siteRepositoryBuilder.regularStop(new FeedScopedId(agencyId, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString(firstStopName))
       .build();
-    RegularStop lastStop = siteRepositoryBuilder
-      .regularStop(new FeedScopedId(agencyId, "2"))
+    RegularStop lastStop = siteRepositoryBuilder.regularStop(new FeedScopedId(agencyId, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString(lastStopName))
       .build();
@@ -840,9 +825,18 @@ public class OrcaFareServiceTest {
 
     int start = (int) (T11_00 + startTimeMins * 60);
     int end = (int) (T11_00 + (startTimeMins + 12) * 60);
-    return newItinerary(Place.forStop(firstStop), start)
-      .transit(route, tripId, start, end, 5, 7, Place.forStop(lastStop), null, null, null)
-      .build();
+    return newItinerary(Place.forStop(firstStop), start).transit(
+      route,
+      tripId,
+      start,
+      end,
+      5,
+      7,
+      Place.forStop(lastStop),
+      null,
+      null,
+      null
+    ).build();
   }
 
   private static class TestOrcaFareService extends OrcaFareService {
@@ -859,8 +853,8 @@ public class OrcaFareServiceTest {
     ) {
       if (
         rides.size() == 1 &&
-        rides.get(0).route() != null &&
-        LINK_SHUTTLE_SHORT_NAME.equals(rides.get(0).route().getShortName())
+          rides.get(0).route() != null &&
+          LINK_SHUTTLE_SHORT_NAME.equals(rides.get(0).route().getShortName())
       ) {
         return Optional.of(ZERO_USD);
       }

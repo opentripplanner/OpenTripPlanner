@@ -96,8 +96,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
       stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(transitRepository);
     }
 
-    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = transitRepository
+      .getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex stopVertex : vertices) {
       var stop = Objects.requireNonNull(
@@ -117,7 +117,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
       if (
         (OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(stop)) ||
-        stopLocationsUsedForCarsAllowedTrips.contains(stop)
+          stopLocationsUsedForCarsAllowedTrips.contains(stop)
       ) {
         linkType = StopLinkType.WALK_AND_CAR;
       }
@@ -188,8 +188,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
       tStop,
       CAR_ONLY,
       LinkingDirection.BIDIRECTIONAL,
-      (transitVertex, streetVertex) ->
-        createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
+      (transitVertex, streetVertex) -> createStopLinkEdges(
+        (TransitStopVertex) transitVertex,
+        streetVertex
+      )
     );
   }
 
@@ -209,17 +211,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
         vehicleParkingVertex,
         new TraverseModeSet(TraverseMode.WALK),
         LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              (VehicleParkingEntranceVertex) vertex,
-              streetVertex
-            ),
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              streetVertex,
-              (VehicleParkingEntranceVertex) vertex
-            )
+        (vertex, streetVertex) -> List.of(
+          StreetVehicleParkingLink.createStreetVehicleParkingLink(
+            (VehicleParkingEntranceVertex) vertex,
+            streetVertex
+          ),
+          StreetVehicleParkingLink.createStreetVehicleParkingLink(
+            streetVertex,
+            (VehicleParkingEntranceVertex) vertex
           )
+        )
       );
     }
 
@@ -228,17 +229,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
         vehicleParkingVertex,
         new TraverseModeSet(TraverseMode.CAR),
         LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              (VehicleParkingEntranceVertex) vertex,
-              streetVertex
-            ),
-            StreetVehicleParkingLink.createStreetVehicleParkingLink(
-              streetVertex,
-              (VehicleParkingEntranceVertex) vertex
-            )
+        (vertex, streetVertex) -> List.of(
+          StreetVehicleParkingLink.createStreetVehicleParkingLink(
+            (VehicleParkingEntranceVertex) vertex,
+            streetVertex
+          ),
+          StreetVehicleParkingLink.createStreetVehicleParkingLink(
+            streetVertex,
+            (VehicleParkingEntranceVertex) vertex
           )
+        )
       );
     }
   }
@@ -250,17 +250,16 @@ public class StreetLinkerModule implements GraphBuilderModule {
         tEntrance,
         new TraverseModeSet(TraverseMode.WALK),
         LinkingDirection.BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetTransitEntranceLink.createStreetTransitEntranceLink(
-              (TransitEntranceVertex) vertex,
-              streetVertex
-            ),
-            StreetTransitEntranceLink.createStreetTransitEntranceLink(
-              streetVertex,
-              (TransitEntranceVertex) vertex
-            )
+        (vertex, streetVertex) -> List.of(
+          StreetTransitEntranceLink.createStreetTransitEntranceLink(
+            (TransitEntranceVertex) vertex,
+            streetVertex
+          ),
+          StreetTransitEntranceLink.createStreetTransitEntranceLink(
+            streetVertex,
+            (TransitEntranceVertex) vertex
           )
+        )
       );
     }
   }
@@ -268,9 +267,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkStationCentroids(Graph graph) {
     BiFunction<Vertex, StreetVertex, List<Edge>> stationAndStreetVertexLinker = (
       theStation,
-      streetVertex
-    ) ->
-      List.of(
+      streetVertex) -> List.of(
         StreetStationCentroidLink.createStreetStationLink(
           (StationCentroidVertex) theStation,
           streetVertex
@@ -294,9 +291,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkVehicleParks(Graph graph, DataImportIssueStore issueStore) {
     LOG.info("Linking vehicle parks to graph...");
     List<VehicleParking> vehicleParkingToRemove = new ArrayList<>();
-    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
-      VehicleParkingEntranceVertex.class
-    )) {
+    for (
+      VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
+        VehicleParkingEntranceVertex.class
+      )
+    ) {
       if (vehicleParkingEntranceVertex.isLinkedToGraph()) {
         continue;
       }
@@ -336,14 +335,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
     VehicleParkingEntranceVertex vehicleParkingEntranceVertex,
     Graph graph
   ) {
-    var vehicleParkingEdge = vehicleParkingEntranceVertex
-      .getOutgoing()
+    var vehicleParkingEdge = vehicleParkingEntranceVertex.getOutgoing()
       .stream()
       .filter(VehicleParkingEdge.class::isInstance)
       .map(VehicleParkingEdge.class::cast)
       .findFirst()
-      .orElseThrow(() ->
-        new IllegalStateException(
+      .orElseThrow(
+        () -> new IllegalStateException(
           "VehicleParkingEdge missing from vertex: " + vehicleParkingEntranceVertex
         )
       );
@@ -352,8 +350,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     var vehicleParking = vehicleParkingEdge.getVehicleParking();
 
-    boolean removeVehicleParking =
-      vehicleParking.getEntrances().size() == 1 &&
+    boolean removeVehicleParking = vehicleParking.getEntrances().size() == 1 &&
       vehicleParking.getEntrances().get(0).equals(entrance);
 
     vehicleParkingEntranceVertex.getIncoming().forEach(graph::removeEdge);
@@ -369,15 +366,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private Set<StopLocation> getStopLocationsUsedForFlexTrips(TransitRepository transitRepository) {
-    Set<StopLocation> stopLocations = transitRepository
-      .getAllFlexTrips()
+    Set<StopLocation> stopLocations = transitRepository.getAllFlexTrips()
       .stream()
       .flatMap(t -> t.getStops().stream())
       .collect(Collectors.toSet());
 
     stopLocations.addAll(
-      stopLocations
-        .stream()
+      stopLocations.stream()
         .filter(GroupStop.class::isInstance)
         .map(GroupStop.class::cast)
         .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))

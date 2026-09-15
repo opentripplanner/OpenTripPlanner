@@ -106,8 +106,7 @@ class TimetableRepositoryLifecycleTest {
       snapshotA.resolve(PATTERN, YESTERDAY),
       snapshotB.resolve(PATTERN, YESTERDAY)
     );
-    expPatternAeqB
-      .not()
+    expPatternAeqB.not()
       .test(snapshotB.resolve(PATTERN, null), snapshotB.resolve(PATTERN, YESTERDAY));
 
     // Expect the same results regardless of the config for these

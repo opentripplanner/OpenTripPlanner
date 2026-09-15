@@ -48,19 +48,20 @@ class HttpTripUpdateSource {
     updateIncrementality = FULL_DATASET;
     try {
       // Decode message
-      feedMessage = otpHttpClient.getAndMap(URI.create(url), this.headers, response ->
-        FeedMessage.parseFrom(response.body(), registry)
+      feedMessage = otpHttpClient.getAndMap(
+        URI.create(url),
+        this.headers,
+        response -> FeedMessage.parseFrom(response.body(), registry)
       );
       feedEntityList = feedMessage.getEntityList();
 
       // Change fullDataset value if this is an incremental update
       if (
         feedMessage.hasHeader() &&
-        feedMessage.getHeader().hasIncrementality() &&
-        feedMessage
-          .getHeader()
-          .getIncrementality()
-          .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
+          feedMessage.getHeader().hasIncrementality() &&
+          feedMessage.getHeader()
+            .getIncrementality()
+            .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
       ) {
         updateIncrementality = DIFFERENTIAL;
       }

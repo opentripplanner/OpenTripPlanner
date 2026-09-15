@@ -10,9 +10,8 @@ import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.C
  * task fails - after a partial update of the repository. To get atomic-commit, a commit must follow
  * every task.
  */
-public class CustomerRepositoryLifecycle
-  implements RepositoryLifecycle<CustomerRepositorySnapshot, CustomerRepository>
-{
+public class CustomerRepositoryLifecycle implements
+  RepositoryLifecycle<CustomerRepositorySnapshot, CustomerRepository> {
 
   @Override
   public CustomerRepository copyOnWrite(CustomerRepositorySnapshot snapshot) {

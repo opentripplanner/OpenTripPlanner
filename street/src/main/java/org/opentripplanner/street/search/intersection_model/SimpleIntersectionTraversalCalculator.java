@@ -6,10 +6,8 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseMode;
 
-public class SimpleIntersectionTraversalCalculator
-  extends AbstractIntersectionTraversalCalculator
-  implements Serializable
-{
+public class SimpleIntersectionTraversalCalculator extends AbstractIntersectionTraversalCalculator
+  implements Serializable {
 
   private final DrivingDirection drivingDirection;
 
@@ -211,11 +209,10 @@ public class SimpleIntersectionTraversalCalculator
     if (!(o instanceof SimpleIntersectionTraversalCalculator that)) {
       return false;
     }
-    return (
-      Double.compare(acrossTrafficBicycleTurnMultiplier, that.acrossTrafficBicycleTurnMultiplier) ==
-        0 &&
-      drivingDirection == that.drivingDirection
-    );
+    return (Double.compare(
+      acrossTrafficBicycleTurnMultiplier,
+      that.acrossTrafficBicycleTurnMultiplier
+    ) == 0 && drivingDirection == that.drivingDirection);
   }
 
   @Override

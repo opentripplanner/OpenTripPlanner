@@ -10,9 +10,8 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-class TestTripScheduleSearch
-  implements RaptorTripScheduleSearch<TestTripSchedule>, RaptorBoardOrAlightEvent<TestTripSchedule>
-{
+class TestTripScheduleSearch implements RaptorTripScheduleSearch<TestTripSchedule>,
+  RaptorBoardOrAlightEvent<TestTripSchedule> {
 
   private final List<TestTripSchedule> trips;
   private final SearchDirection direction;

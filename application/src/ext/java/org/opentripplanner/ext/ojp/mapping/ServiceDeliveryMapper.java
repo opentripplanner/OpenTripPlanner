@@ -8,8 +8,7 @@ import org.opentripplanner.ojp.time.XmlDateTime;
 public class ServiceDeliveryMapper {
 
   static ServiceDelivery serviceDelivery(ZonedDateTime timestamp) {
-    return new ServiceDelivery()
-      .withResponseTimestamp(XmlDateTime.truncatedToMillis(timestamp))
+    return new ServiceDelivery().withResponseTimestamp(XmlDateTime.truncatedToMillis(timestamp))
       .withProducerRef(new ParticipantRefStructure().withValue("OpenTripPlanner"));
   }
 }

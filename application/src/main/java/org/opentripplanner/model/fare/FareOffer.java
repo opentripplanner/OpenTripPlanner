@@ -25,10 +25,7 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
       return new DependentFareOffer(
         startTime,
         product,
-        dependencies
-          .stream()
-          .map(fp -> FareOffer.of(startTime, fp))
-          .collect(Collectors.toSet())
+        dependencies.stream().map(fp -> FareOffer.of(startTime, fp)).collect(Collectors.toSet())
       );
     }
   }
@@ -71,11 +68,9 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
     }
 
     public Collection<FareOffer> dependenciesMatchingCategoryAndMedium() {
-      return dependencies
-        .stream()
+      return dependencies.stream()
         .filter(
-          fp ->
-            Objects.equals(fp.fareProduct().category(), fareProduct.category()) &&
+          fp -> Objects.equals(fp.fareProduct().category(), fareProduct.category()) &&
             Objects.equals(fp.fareProduct().medium(), fareProduct.medium())
         )
         .toList();

@@ -63,8 +63,8 @@ public class SafetyValueApplier {
   ) {
     OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
-    boolean motorVehicleNoThrough =
-      tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
+    boolean motorVehicleNoThrough = tagMapperForWay
+      .isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
     boolean bicycleNoThrough = tagMapperForWay.isBicycleThroughTrafficExplicitlyDisallowed(way);
     boolean walkNoThrough = tagMapperForWay.isWalkThroughTrafficExplicitlyDisallowed(way);
 

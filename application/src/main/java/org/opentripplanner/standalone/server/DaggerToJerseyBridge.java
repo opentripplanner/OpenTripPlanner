@@ -103,8 +103,6 @@ final class DaggerToJerseyBridge extends AbstractBinder {
     Function<RequestScopedFactory, T> accessor,
     Class<T> type
   ) {
-    bindFactory(() -> accessor.apply(factory.get()))
-      .to(type)
-      .in(RequestScoped.class);
+    bindFactory(() -> accessor.apply(factory.get())).to(type).in(RequestScoped.class);
   }
 }

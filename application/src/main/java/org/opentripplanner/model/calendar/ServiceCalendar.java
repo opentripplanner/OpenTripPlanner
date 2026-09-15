@@ -146,8 +146,7 @@ public final class ServiceCalendar implements Serializable {
       return false;
     }
     ServiceCalendar that = (ServiceCalendar) o;
-    return (
-      monday == that.monday &&
+    return (monday == that.monday &&
       tuesday == that.tuesday &&
       wednesday == that.wednesday &&
       thursday == that.thursday &&
@@ -155,13 +154,11 @@ public final class ServiceCalendar implements Serializable {
       saturday == that.saturday &&
       sunday == that.sunday &&
       Objects.equals(serviceId, that.serviceId) &&
-      Objects.equals(period, that.period)
-    );
+      Objects.equals(period, that.period));
   }
 
   public String toString() {
-    return (
-      "ServiceCalendar{" +
+    return ("ServiceCalendar{" +
       this.serviceId +
       " [" +
       this.monday +
@@ -171,7 +168,6 @@ public final class ServiceCalendar implements Serializable {
       this.friday +
       this.saturday +
       this.sunday +
-      "]}"
-    );
+      "]}");
   }
 }

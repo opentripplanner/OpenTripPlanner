@@ -114,8 +114,7 @@ class RealtimeVehiclePatternMatcher {
 
     // we take the list of vehicles and out of them create a MultiMap<TripPattern, RealtimeVehicle>
     // that makes it very easy to update the vehicles in the service
-    var vehicles = matchResults
-      .stream()
+    var vehicles = matchResults.stream()
       .collect(
         Multimaps.toMultimap(
           PatternAndRealtimeVehicle::pattern,
@@ -135,10 +134,7 @@ class RealtimeVehiclePatternMatcher {
     }
 
     // need to convert the sucess to the correct type.
-    var results = matchResults
-      .stream()
-      .map(ignored -> UpdateSuccess.of())
-      .toList();
+    var results = matchResults.stream().map(ignored -> UpdateSuccess.of()).toList();
     // needs to be put into a new list so the types are correct
     var updateResult = UpdateResult.of(results, errors);
     ResultLogger.logUpdateResult(feedId, "gtfs-rt-vehicle-positions", updateResult);
@@ -148,8 +144,7 @@ class RealtimeVehiclePatternMatcher {
 
   private LocalDate inferServiceDate(Trip trip) {
     // Use real-time timetable data, it is an overlay on the static data.
-    var tripTimes = getRealtimePattern
-      .apply(trip, LocalDate.now(timeZoneId))
+    var tripTimes = getRealtimePattern.apply(trip, LocalDate.now(timeZoneId))
       .getScheduledTimetable()
       .getTripTimes(trip);
     var dates = getServiceDatesForServiceId.apply(trip.getServiceId());
@@ -197,16 +192,15 @@ class RealtimeVehiclePatternMatcher {
     // yesterday, today or tomorrow. whichever one has the lowest "distance" to now is guessed to be
     // the service day of the undated vehicle position
     // if this is concerning to you, you should put a start_date in your feed.
-    return Stream.of(yesterday, today, tomorrow)
-      .flatMap(day -> {
-        var startTime = ServiceDateUtils.toZonedDateTime(day, zoneId, start).toInstant();
-        var endTime = ServiceDateUtils.toZonedDateTime(day, zoneId, end).toInstant();
+    return Stream.of(yesterday, today, tomorrow).flatMap(day -> {
+      var startTime = ServiceDateUtils.toZonedDateTime(day, zoneId, start).toInstant();
+      var endTime = ServiceDateUtils.toZonedDateTime(day, zoneId, end).toInstant();
 
-        // temporal "distances" can be positive and negative
-        return Stream.of(Duration.between(startTime, now), Duration.between(endTime, now))
-          .map(Duration::abs)
-          .map(duration -> new TemporalDistance(day, duration.toSeconds()));
-      })
+      // temporal "distances" can be positive and negative
+      return Stream.of(Duration.between(startTime, now), Duration.between(endTime, now))
+        .map(Duration::abs)
+        .map(duration -> new TemporalDistance(day, duration.toSeconds()));
+    })
       .min(Comparator.comparingLong(TemporalDistance::distance))
       .map(TemporalDistance::date)
       .orElse(today);
@@ -243,8 +237,7 @@ class RealtimeVehiclePatternMatcher {
     if (vehiclePosition.hasVehicle()) {
       var vehicle = vehiclePosition.getVehicle();
       var id = new FeedScopedId(feedId, vehicle.getId());
-      newVehicle
-        .withVehicleId(id)
+      newVehicle.withVehicleId(id)
         .withLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
     }
 
@@ -259,8 +252,7 @@ class RealtimeVehiclePatternMatcher {
 
       // we prefer the to get the current stop from the stop_id
       if (vehiclePosition.hasStopId()) {
-        var matchedStops = stopsOnVehicleTrip
-          .stream()
+        var matchedStops = stopsOnVehicleTrip.stream()
           .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
           .toList();
         if (matchedStops.size() == 1) {
@@ -275,8 +267,7 @@ class RealtimeVehiclePatternMatcher {
       }
       // but if stop_id isn't there we try current_stop_sequence
       else if (vehiclePosition.hasCurrentStopSequence()) {
-        stopIndexOfGtfsSequence
-          .apply(vehiclePosition.getCurrentStopSequence())
+        stopIndexOfGtfsSequence.apply(vehiclePosition.getCurrentStopSequence())
           .ifPresent(stopIndex -> {
             if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
               var stop = stopsOnVehicleTrip.get(stopIndex);
@@ -344,7 +335,8 @@ class RealtimeVehiclePatternMatcher {
   private PatternAndRealtimeVehicle toRealtimeVehicle(
     String feedId,
     VehiclePosition vehiclePosition
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     if (!vehiclePosition.hasTrip()) {
       LOG.debug(
         "Realtime vehicle positions {} has no trip ID. Ignoring.",
@@ -353,8 +345,9 @@ class RealtimeVehiclePatternMatcher {
       throw UpdateException.noTripId(INVALID_INPUT_STRUCTURE);
     }
 
-    var vehiclePositionWithTripId =
-      fuzzyTripMatcher == null ? vehiclePosition : fuzzilySetTrip(vehiclePosition);
+    var vehiclePositionWithTripId = fuzzyTripMatcher == null
+      ? vehiclePosition
+      : fuzzilySetTrip(vehiclePosition);
 
     var tripId = vehiclePositionWithTripId.getTrip().getTripId();
 
@@ -393,8 +386,8 @@ class RealtimeVehiclePatternMatcher {
     // no fixed trip found, try frequency-based one
     if (
       staticTripTimes == null &&
-      !scheduledTimetable.getFrequencyEntries().isEmpty() &&
-      vehiclePosition.getTrip().hasStartDate()
+        !scheduledTimetable.getFrequencyEntries().isEmpty() &&
+        vehiclePosition.getTrip().hasStartDate()
     ) {
       staticTripTimes = matchFrequencyTripTimes(vehiclePosition, scheduledTimetable);
     }
@@ -420,8 +413,7 @@ class RealtimeVehiclePatternMatcher {
     Timetable scheduledTimetable
   ) {
     var updateStartTime = LocalTime.parse(vehiclePosition.getTrip().getStartTime());
-    var tripTimes = scheduledTimetable
-      .getFrequencyEntries()
+    var tripTimes = scheduledTimetable.getFrequencyEntries()
       .stream()
       .map(FrequencyEntry::tripTimes)
       .filter(e -> {

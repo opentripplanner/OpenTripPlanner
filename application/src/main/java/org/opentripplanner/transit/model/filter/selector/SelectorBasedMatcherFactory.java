@@ -30,8 +30,7 @@ public class SelectorBasedMatcherFactory {
     List<FilterRequest<S>> filters,
     Function<S, Matcher<T>> selectorMatcherProvider
   ) {
-    List<Matcher<T>> filterMatchers = filters
-      .stream()
+    List<Matcher<T>> filterMatchers = filters.stream()
       .map(filter -> buildFilterMatcher(filter, selectorMatcherProvider))
       .toList();
 

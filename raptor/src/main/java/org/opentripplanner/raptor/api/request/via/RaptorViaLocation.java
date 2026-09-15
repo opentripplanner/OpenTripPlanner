@@ -76,8 +76,7 @@ public final class RaptorViaLocation {
    * bit-set. Add other access methods if needed.
    */
   public BitSet asBitSet() {
-    return connections
-      .stream()
+    return connections.stream()
       .mapToInt(ViaConnection::fromStop)
       .collect(BitSet::new, BitSet::set, BitSet::or);
   }
@@ -131,13 +130,8 @@ public final class RaptorViaLocation {
     if (label != null) {
       buf.append(label).append(" ");
     }
-    buf.append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ").append(
-      connections
-        .stream()
-        .limit(10)
-        .map(it -> it.toString(stopNameResolver))
-        .toList()
-    );
+    buf.append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ")
+      .append(connections.stream().limit(10).map(it -> it.toString(stopNameResolver)).toList());
     return buf.append("}").toString();
   }
 

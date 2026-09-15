@@ -17,13 +17,11 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 
 public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkingAndGroup> {
 
-  static Map<
-    VehicleParkingGroupsLayerBuilder.MapperType,
-    Function<Locale, PropertyMapper<VehicleParkingAndGroup>>
-  > mappers = Map.of(
-    VehicleParkingGroupsLayerBuilder.MapperType.Digitransit,
-    DigitransitVehicleParkingGroupPropertyMapper::create
-  );
+  static Map<VehicleParkingGroupsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParkingAndGroup>>> mappers =
+    Map.of(
+      VehicleParkingGroupsLayerBuilder.MapperType.Digitransit,
+      DigitransitVehicleParkingGroupPropertyMapper::create
+    );
   private final VehicleParkingService service;
 
   public VehicleParkingGroupsLayerBuilder(
@@ -41,8 +39,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
 
   @Override
   protected List<Geometry> findGeometries(Envelope query) {
-    return service
-      .listVehicleParkingGroups()
+    return service.listVehicleParkingGroups()
       .asMap()
       .entrySet()
       .stream()

@@ -84,24 +84,20 @@ public class GtfsRtTestHelper {
   ) {
     var resultRef = new AtomicReference<UpdateResult>();
     try {
-      transitTestEnvironment
-        .updateManager()
-        .submit(ctx -> {
-          var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
-          resultRef.set(
-            gtfsAdapter
-              .forUpdate(buffer)
-              .applyTripUpdates(
-                null,
-                ForwardsDelayPropagationType.DEFAULT,
-                BackwardsDelayPropagationType.REQUIRED_NO_DATA,
-                incrementality,
-                updates,
-                transitTestEnvironment.feedId()
-              )
-          );
-        })
-        .get();
+      transitTestEnvironment.updateManager().submit(ctx -> {
+        var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
+        resultRef.set(
+          gtfsAdapter.forUpdate(buffer)
+            .applyTripUpdates(
+              null,
+              ForwardsDelayPropagationType.DEFAULT,
+              BackwardsDelayPropagationType.REQUIRED_NO_DATA,
+              incrementality,
+              updates,
+              transitTestEnvironment.feedId()
+            )
+        );
+      }).get();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

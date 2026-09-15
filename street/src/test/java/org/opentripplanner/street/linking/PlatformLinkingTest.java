@@ -52,8 +52,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.001),
       new Coordinate(10.002, 60.001),
       new Coordinate(10.002, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform (this array defines indices)
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -82,8 +81,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.0006),
       new Coordinate(10.0008, 60.0006),
       new Coordinate(10.0008, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform (this array defines indices)
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -102,11 +100,7 @@ public class PlatformLinkingTest {
     // transit stop is connected in one rectangle corner only to walk no thru trafic edges
     // verify that new area edge connection is also walk no thru
     // otherwise connection cannot be used to exit the area
-    var noThruEdges = graph
-      .listAreaEdges()
-      .stream()
-      .filter(a -> a.isWalkNoThruTraffic())
-      .toList();
+    var noThruEdges = graph.listAreaEdges().stream().filter(a -> a.isWalkNoThruTraffic()).toList();
     // original platform has 4 nothru edges, now 2 more got added
     assertEquals(6, noThruEdges.size());
   }
@@ -121,8 +115,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -147,8 +140,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add one entrance to bottom left corner
     int[] visibilityPoints = { 3 };
 
@@ -201,8 +193,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -227,8 +218,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // entrance to every corner of the platform
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -284,8 +274,7 @@ public class PlatformLinkingTest {
       new Coordinate(10.010, 60),
       new Coordinate(10.006, 60),
       new Coordinate(10.006, 60.003),
-      new Coordinate(10, 60.003),
-    };
+      new Coordinate(10, 60.003), };
     // add entrances to corners 0 and 5
     int[] visibilityPoints = { 0, 5 };
 
@@ -320,8 +309,7 @@ public class PlatformLinkingTest {
       new Coordinate(10.006, 60.004),
       new Coordinate(10.006, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10.002, 60),
-    };
+      new Coordinate(10.002, 60), };
     // add 8 visibility points (max limit applied in linking is 6)
     int[] visibilityPoints = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
@@ -368,8 +356,7 @@ public class PlatformLinkingTest {
       // southeast
       new Coordinate(-0.7356841, 51.9950911),
       // southwest
-      new Coordinate(-0.7357458, 51.9950836),
-    };
+      new Coordinate(-0.7357458, 51.9950836), };
 
     // 1 visibility point at eastern exit
     int[] visibilityPoints = { 2 };
@@ -482,34 +469,32 @@ public class PlatformLinkingTest {
           tStop,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
             )
+          )
         );
       } else {
         linker.linkVertexForRealTime(
           tStop,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
             )
+          )
         );
       }
     }
@@ -521,13 +506,11 @@ public class PlatformLinkingTest {
     AreaGroup area,
     String nameString
   ) {
-    LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] {
-      v1.getCoordinate(),
-      v2.getCoordinate(),
-    });
+    LineString line = GEOMETRY_FACTORY.createLineString(
+      new Coordinate[] { v1.getCoordinate(), v2.getCoordinate(), }
+    );
     I18NString name = new LocalizedString(nameString);
-    return new AreaEdgeBuilder()
-      .withFromVertex(v1)
+    return new AreaEdgeBuilder().withFromVertex(v1)
       .withToVertex(v2)
       .withGeometry(line)
       .withName(name)

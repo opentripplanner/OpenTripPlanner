@@ -51,8 +51,7 @@ public class EnvironmentVariableReplacerTest {
   public void insertEnvironmentVariablesTest() {
     // Given: a text and a expected result
     String text = "Env.var: ${" + envName + "}, project branch: ${git.branch}.";
-    String expectedResult =
-      "Env.var: " +
+    String expectedResult = "Env.var: " +
       envValue +
       ", project branch: " +
       OtpProjectInfo.projectInfo().versionControl.branch +
@@ -120,8 +119,9 @@ public class EnvironmentVariableReplacerTest {
    */
   @Test
   public void testMissingEnvironmentVariable() {
-    assertThrows(OtpAppException.class, () ->
-      ConfigFileLoader.nodeFromString(
+    assertThrows(
+      OtpAppException.class,
+      () -> ConfigFileLoader.nodeFromString(
         "None existing env.var: '${none_existing_env_variable}'.",
         "test"
       )

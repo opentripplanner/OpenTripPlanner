@@ -57,10 +57,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
  * JourneyPattern id is used.
  */
-public final class TripPattern
-  extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
-  implements Cloneable, LogInfo
-{
+public final class TripPattern extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
+  implements Cloneable, LogInfo {
 
   private final Route route;
 
@@ -126,8 +124,7 @@ public final class TripPattern
       }
       this.scheduledTimetable = builder.getScheduledTimetable();
     } else {
-      this.scheduledTimetable = builder
-        .getScheduledTimetableBuilder()
+      this.scheduledTimetable = builder.getScheduledTimetableBuilder()
         .withTripPattern(this)
         .build();
     }
@@ -368,11 +365,9 @@ public final class TripPattern
    * stops (but not necessarily with same pickup and dropoff values).
    */
   public boolean isModifiedFromTripPatternWithEqualStops(TripPattern other) {
-    return (
-      isModified() &&
+    return (isModified() &&
       originalTripPattern.equals(other) &&
-      getStopPattern().stopsEqual(other.getStopPattern())
-    );
+      getStopPattern().stopsEqual(other.getStopPattern()));
   }
 
   /**
@@ -393,8 +388,7 @@ public final class TripPattern
    */
   public Stream<Trip> scheduledTripsAsStream() {
     var trips = scheduledTimetable.getTripTimes().stream().map(TripTimes::getTrip);
-    var freqTrips = scheduledTimetable
-      .getFrequencyEntries()
+    var freqTrips = scheduledTimetable.getFrequencyEntries()
       .stream()
       .map(e -> e.tripTimes().getTrip());
     return Stream.concat(trips, freqTrips).distinct();
@@ -506,11 +500,9 @@ public final class TripPattern
    * performance so don't use it where that is critical.
    */
   public boolean containsAnyStopId(Collection<FeedScopedId> ids) {
-    return ids
-      .stream()
-      .anyMatch(id ->
-        stopPattern
-          .getStops()
+    return ids.stream()
+      .anyMatch(
+        id -> stopPattern.getStops()
           .stream()
           .map(StopLocation::getId)
           .collect(Collectors.toUnmodifiableSet())
@@ -520,16 +512,14 @@ public final class TripPattern
 
   @Override
   public boolean sameAs(TripPattern other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(this.route, other.route) &&
       Objects.equals(this.mode, other.mode) &&
       Objects.equals(this.netexSubMode, other.netexSubMode) &&
       Objects.equals(this.containsMultipleModes, other.containsMultipleModes) &&
       Objects.equals(this.name, other.name) &&
       Objects.equals(this.stopPattern, other.stopPattern) &&
-      Objects.equals(this.scheduledTimetable, other.scheduledTimetable)
-    );
+      Objects.equals(this.scheduledTimetable, other.scheduledTimetable));
   }
 
   /**

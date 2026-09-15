@@ -49,7 +49,8 @@ class ScheduledTripHandler {
     TripUpdate tripUpdate,
     ForwardsDelayPropagationType forwardsDelayPropagationType,
     BackwardsDelayPropagationType backwardsDelayPropagationType
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     final TripPattern pattern = getPatternForTripId(tripUpdate.tripId());
 
     if (pattern == null) {
@@ -90,8 +91,7 @@ class ScheduledTripHandler {
 
     // If there are stops with different pickup / drop off, or replaced stops, we need to change the pattern from the scheduled one
     if (!updatedPickup.isEmpty() || !updatedDropoff.isEmpty() || !newStops.isEmpty()) {
-      StopPattern newStopPattern = pattern
-        .copyPlannedStopPattern()
+      StopPattern newStopPattern = pattern.copyPlannedStopPattern()
         .updatePickups(updatedPickup)
         .updateDropoffs(updatedDropoff)
         .replaceStops(newStops)

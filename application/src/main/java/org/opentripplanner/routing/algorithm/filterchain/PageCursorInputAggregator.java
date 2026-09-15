@@ -37,10 +37,9 @@ public class PageCursorInputAggregator {
     if (
       numItinerariesFilter != null && numItinerariesFilter.getNumItinerariesFilterResult() != null
     ) {
-      pageCursorInputBuilder = pageCursorInputBuilder
-        .withEarliestRemovedDeparture(
-          numItinerariesFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
-        )
+      pageCursorInputBuilder = pageCursorInputBuilder.withEarliestRemovedDeparture(
+        numItinerariesFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
+      )
         .withLatestRemovedDeparture(
           numItinerariesFilter.getNumItinerariesFilterResult().latestRemovedDeparture()
         )
@@ -48,11 +47,10 @@ public class PageCursorInputAggregator {
     }
     if (
       removeTransitIfStreetOnlyIsBetter != null &&
-      removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null
+        removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null
     ) {
       pageCursorInputBuilder = pageCursorInputBuilder.withGeneralizedCostMaxLimit(
-        removeTransitIfStreetOnlyIsBetter
-          .getRemoveTransitIfStreetOnlyIsBetterResult()
+        removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult()
           .generalizedCostMaxLimit()
       );
     }

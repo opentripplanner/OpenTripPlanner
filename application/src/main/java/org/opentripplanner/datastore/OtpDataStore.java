@@ -202,8 +202,7 @@ public class OtpDataStore {
   private LocalDataSourceRepository getLocalDataSourceRepo(
     List<DataSourceRepository> repositories
   ) {
-    List<LocalDataSourceRepository> localRepos = repositories
-      .stream()
+    List<LocalDataSourceRepository> localRepos = repositories.stream()
       .filter(it -> it instanceof LocalDataSourceRepository)
       .map(it -> (LocalDataSourceRepository) it)
       .toList();
@@ -249,8 +248,7 @@ public class OtpDataStore {
     FileType type
   ) {
     if (uris.isEmpty()) {
-      return localRepository
-        .listExistingSources(type)
+      return localRepository.listExistingSources(type)
         .stream()
         .map(it -> (CompositeDataSource) it)
         .collect(Collectors.toList());

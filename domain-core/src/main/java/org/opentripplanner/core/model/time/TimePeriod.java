@@ -80,20 +80,16 @@ public final class TimePeriod {
    * on either period are treated as extending indefinitely in that direction.
    */
   public boolean overlaps(TimePeriod other) {
-    return (
-      (hasUnboundedStart() || other.hasUnboundedEnd() || start.isBefore(other.end)) &&
-      (hasUnboundedEnd() || other.hasUnboundedStart() || other.start.isBefore(end))
-    );
+    return ((hasUnboundedStart() || other.hasUnboundedEnd() || start.isBefore(other.end)) &&
+      (hasUnboundedEnd() || other.hasUnboundedStart() || other.start.isBefore(end)));
   }
 
   /**
    * Returns {@code true} if the {@code instant} is within this period.
    */
   public boolean contains(Instant instant) {
-    return (
-      (hasUnboundedStart() || !instant.isBefore(start)) &&
-      (hasUnboundedEnd() || end.isAfter(instant))
-    );
+    return ((hasUnboundedStart() || !instant.isBefore(start)) &&
+      (hasUnboundedEnd() || end.isAfter(instant)));
   }
 
   @Override
@@ -101,11 +97,9 @@ public final class TimePeriod {
     if (this == o) {
       return true;
     }
-    return (
-      o instanceof TimePeriod other &&
+    return (o instanceof TimePeriod other &&
       Objects.equals(start, other.start) &&
-      Objects.equals(end, other.end)
-    );
+      Objects.equals(end, other.end));
   }
 
   @Override

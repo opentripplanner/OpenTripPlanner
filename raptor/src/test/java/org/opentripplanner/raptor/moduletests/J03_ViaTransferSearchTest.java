@@ -54,14 +54,12 @@ class J03_ViaTransferSearchTest {
   private RaptorRequestBuilder<TestTripSchedule> prepareRequest() {
     var builder = data.requestBuilder();
 
-    builder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    builder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: 2023-07-24 Currently heuristics does not work with pass-through so we
       //  have to turn them off. Make sure to re-enable optimization later when it's fixed
       .clearOptimizations();
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
@@ -86,8 +84,7 @@ class J03_ViaTransferSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocation(
         viaVisit("B").addTransfer(STOP_B, TestTransfer.transfer(STOP_B, D1_m)).build()
@@ -122,8 +119,7 @@ class J03_ViaTransferSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocation(viaVisit("BxC").addTransfer(STOP_B, transfer(STOP_C, D1_m)).build())
       .addEgressPaths(walk(STOP_E, D30_s));
@@ -144,27 +140,23 @@ class J03_ViaTransferSearchTest {
       "avoiding using a via-transfer followed by a regular transfer."
   )
   void viaTransferSearchNotFollowedByRegularTransfer() {
-    data
-      .withTimetables(
-        """
-        A     B
-        0:02  0:10
-        --
-        C     D
-        0:12  0:15
-        --
-        E     F
-        0:15  0:17
-        0:17  0:15
-        """
-      )
-      .withTransfer(STOP_C, transfer(STOP_E, D1_m))
-      .withTransfer(STOP_D, transfer(STOP_E, D1_m));
+    data.withTimetables(
+      """
+      A     B
+      0:02  0:10
+      --
+      C     D
+      0:12  0:15
+      --
+      E     F
+      0:15  0:17
+      0:17  0:15
+      """
+    ).withTransfer(STOP_C, transfer(STOP_E, D1_m)).withTransfer(STOP_D, transfer(STOP_E, D1_m));
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocation(
         viaVisit("BxC").addTransfer(STOP_B, TestTransfer.transfer(STOP_C, D1_m)).build()
@@ -202,8 +194,7 @@ class J03_ViaTransferSearchTest {
     var requestBuilder = prepareRequest();
     var minWaitTime = Duration.ofSeconds(25);
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(
         List.of(

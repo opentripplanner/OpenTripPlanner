@@ -82,15 +82,13 @@ public class LinkingContextRequest {
       return false;
     }
     var other = (LinkingContextRequest) o;
-    return (
-      Objects.equals(from, other.from) &&
+    return (Objects.equals(from, other.from) &&
       Objects.equals(to, other.to) &&
       Objects.equals(viaLocationsWithCoordinates, other.viaLocationsWithCoordinates) &&
       accessMode == other.accessMode &&
       egressMode == other.egressMode &&
       directMode == other.directMode &&
-      transferMode == other.transferMode
-    );
+      transferMode == other.transferMode);
   }
 
   @Override

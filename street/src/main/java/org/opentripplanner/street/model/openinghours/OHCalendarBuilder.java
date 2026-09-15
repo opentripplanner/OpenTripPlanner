@@ -129,10 +129,11 @@ public class OHCalendarBuilder {
       var shiftedDayOfWeek = dayOfWeek.plus(afterMidnight ? 1 : 0);
       // This counts how many days there are in between the startOfPeriod and
       // when the specified dayOfWeek occurs for the first time.
-      int rawWeekDayDifference =
-        shiftedDayOfWeek.getValue() - startOfPeriod.getDayOfWeek().getValue();
-      int firstOccurrenceDaysFromStart =
-        rawWeekDayDifference >= 0 ? rawWeekDayDifference : 7 - Math.abs(rawWeekDayDifference);
+      int rawWeekDayDifference = shiftedDayOfWeek.getValue() -
+        startOfPeriod.getDayOfWeek().getValue();
+      int firstOccurrenceDaysFromStart = rawWeekDayDifference >= 0
+        ? rawWeekDayDifference
+        : 7 - Math.abs(rawWeekDayDifference);
 
       for (int i = firstOccurrenceDaysFromStart; i < daysInPeriod; i += 7) {
         openingDays.set(i);
@@ -154,10 +155,9 @@ public class OHCalendarBuilder {
         return this;
       }
 
-      int untilAdjusted =
-        fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
-          ? untilDayOfWeek.getValue() + 7
-          : untilDayOfWeek.getValue();
+      int untilAdjusted = fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
+        ? untilDayOfWeek.getValue() + 7
+        : untilDayOfWeek.getValue();
       for (int i = fromDayOfWeek.getValue(); i <= untilAdjusted; i++) {
         int dayValue = i > 7 ? i - 7 : i;
         on(DayOfWeek.of(dayValue));
@@ -185,10 +185,9 @@ public class OHCalendarBuilder {
       if (untilMonth == null) {
         months.add(fromMonth);
       } else {
-        int untilMonthAdjusted =
-          fromMonth.getValue() > untilMonth.getValue()
-            ? untilMonth.getValue() + 12
-            : untilMonth.getValue();
+        int untilMonthAdjusted = fromMonth.getValue() > untilMonth.getValue()
+          ? untilMonth.getValue() + 12
+          : untilMonth.getValue();
         for (int i = fromMonth.getValue(); i <= untilMonthAdjusted; i++) {
           int monthValue = i > 12 ? i - 12 : i;
           months.add(Month.of(monthValue));
@@ -199,10 +198,9 @@ public class OHCalendarBuilder {
       if (untilDayOfWeek == null) {
         daysOfWeek.add(fromDayOfWeek);
       } else {
-        int untilDayAdjusted =
-          fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
-            ? untilDayOfWeek.getValue() + 7
-            : untilDayOfWeek.getValue();
+        int untilDayAdjusted = fromDayOfWeek.getValue() > untilDayOfWeek.getValue()
+          ? untilDayOfWeek.getValue() + 7
+          : untilDayOfWeek.getValue();
         for (int i = fromDayOfWeek.getValue(); i <= untilDayAdjusted; i++) {
           int dayValue = i > 7 ? i - 7 : i;
           daysOfWeek.add(DayOfWeek.of(dayValue));
@@ -219,8 +217,8 @@ public class OHCalendarBuilder {
           dateToProcess = dateToProcess.plusDays(1);
           i += 1;
         } else {
-          int daysToSkip =
-            YearMonth.of(dateToProcess.getYear(), dateToProcess.getMonth()).lengthOfMonth() -
+          int daysToSkip = YearMonth.of(dateToProcess.getYear(), dateToProcess.getMonth())
+            .lengthOfMonth() -
             dateToProcess.getDayOfMonth() +
             1;
           dateToProcess = dateToProcess.plusDays(daysToSkip);
@@ -288,16 +286,16 @@ public class OHCalendarBuilder {
       LocalTime otherEndTime = otherBuilder.getEndTime();
       if (
         otherEndTime.equals(startTime) ||
-        otherEndTime.isBefore(startTime) ||
-        endTime.equals(otherStartTime) ||
-        endTime.isBefore(otherStartTime)
+          otherEndTime.isBefore(startTime) ||
+          endTime.equals(otherStartTime) ||
+          endTime.isBefore(otherStartTime)
       ) {
         return new OpeningHoursBuilderAndNewBuilders(this, List.of());
       }
       String offDescription = otherBuilder.getPeriodDescription();
       if (
         (otherStartTime.isBefore(startTime) || otherStartTime.equals(startTime)) &&
-        (endTime.isBefore(otherEndTime) || endTime.equals(otherEndTime))
+          (endTime.isBefore(otherEndTime) || endTime.equals(otherEndTime))
       ) {
         off(otherBuilder.getOpeningDays(), offDescription);
         return new OpeningHoursBuilderAndNewBuilders(this, List.of());

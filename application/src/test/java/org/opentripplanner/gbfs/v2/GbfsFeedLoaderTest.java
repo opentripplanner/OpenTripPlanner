@@ -68,8 +68,9 @@ class GbfsFeedLoaderTest {
 
   @Test
   void getV22FeedWithWrongLanguage() {
-    assertThrows(RuntimeException.class, () ->
-      createLoader("file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json", LANGUAGE_EN)
+    assertThrows(
+      RuntimeException.class,
+      () -> createLoader("file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json", LANGUAGE_EN)
     );
   }
 
@@ -225,34 +226,10 @@ class GbfsFeedLoaderTest {
       .getData()
       .getStations();
     assertEquals(10, stationStatuses.size());
-    assertEquals(
-      1,
-      stationStatuses
-        .stream()
-        .filter(s -> s.getNumBikesAvailable() == 0)
-        .count()
-    );
-    assertEquals(
-      10,
-      stationStatuses
-        .stream()
-        .filter(s -> s.getNumBikesDisabled() == 0)
-        .count()
-    );
-    assertEquals(
-      1,
-      stationStatuses
-        .stream()
-        .filter(s -> !s.getIsRenting())
-        .count()
-    );
-    assertEquals(
-      1,
-      stationStatuses
-        .stream()
-        .filter(s -> !s.getIsReturning())
-        .count()
-    );
+    assertEquals(1, stationStatuses.stream().filter(s -> s.getNumBikesAvailable() == 0).count());
+    assertEquals(10, stationStatuses.stream().filter(s -> s.getNumBikesDisabled() == 0).count());
+    assertEquals(1, stationStatuses.stream().filter(s -> !s.getIsRenting()).count());
+    assertEquals(1, stationStatuses.stream().filter(s -> !s.getIsReturning()).count());
 
     assertNull(loader.getFeed(GBFSFreeBikeStatus.class));
     assertNull(loader.getFeed(GBFSSystemHours.class));

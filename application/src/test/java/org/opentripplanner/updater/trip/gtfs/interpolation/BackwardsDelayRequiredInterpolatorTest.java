@@ -26,10 +26,8 @@ class BackwardsDelayRequiredInterpolatorTest {
 
   @Test
   void noPropagation() {
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalDelay(
-      0,
-      -3
-    );
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalDelay(0, -3);
     assertThat(new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)).isEmpty();
     // nothing after the first given update should be touched, so it should be left null
     assertNull(builder.getDepartureDelay(0));
@@ -39,14 +37,10 @@ class BackwardsDelayRequiredInterpolatorTest {
   void propagateFromIntermediateStopWithPositiveDelay() {
     var firstUpdateIndex = 2;
     var delay = 3;
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalDelay(
-      firstUpdateIndex,
-      delay
-    );
-    var reference = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalDelay(
-      firstUpdateIndex,
-      delay
-    );
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalDelay(firstUpdateIndex, delay);
+    var reference = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
@@ -69,14 +63,10 @@ class BackwardsDelayRequiredInterpolatorTest {
   void propagateFromIntermediateStopWithPositiveDelayAndNoData() {
     var firstUpdateIndex = 2;
     var delay = 3;
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalDelay(
-      firstUpdateIndex,
-      delay
-    );
-    var reference = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalDelay(
-      firstUpdateIndex,
-      delay
-    );
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalDelay(firstUpdateIndex, delay);
+    var reference = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
@@ -124,10 +114,8 @@ class BackwardsDelayRequiredInterpolatorTest {
     // The journey takes 5 minutes to travel a stop, and it arrives stop position 2 at 2.5 minutes
     // Therefore we must propagate the earliness back such that the vehicle started "on time" at
     // the origin, arrived and departed at stop 1 at 2.5 minutes to make the time non-decreasing
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withArrivalTime(
-      2,
-      150
-    );
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withArrivalTime(2, 150);
     assertEquals(
       OptionalInt.of(2),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
@@ -147,14 +135,10 @@ class BackwardsDelayRequiredInterpolatorTest {
   void propagateWithDepartureAsFirstUpdateAndNoData() {
     var firstUpdateIndex = 2;
     var delay = 3;
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withDepartureDelay(
-      firstUpdateIndex,
-      delay
-    );
-    var reference = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withDepartureDelay(
-      firstUpdateIndex,
-      delay
-    );
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withDepartureDelay(firstUpdateIndex, delay);
+    var reference = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withDepartureDelay(firstUpdateIndex, delay);
     assertEquals(
       OptionalInt.of(firstUpdateIndex),
       new BackwardsDelayRequiredInterpolator(true).propagateBackwards(builder)
@@ -179,10 +163,8 @@ class BackwardsDelayRequiredInterpolatorTest {
 
   @Test
   void useScheduledTimeForMissingArrivalTime() {
-    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes().withDepartureTime(
-      0,
-      10
-    );
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes()
+      .withDepartureTime(0, 10);
     assertEquals(
       OptionalInt.of(0),
       new BackwardsDelayRequiredInterpolator(false).propagateBackwards(builder)
@@ -203,8 +185,7 @@ class BackwardsDelayRequiredInterpolatorTest {
       new Deduplicator()
     );
     var realTimeTime = 5;
-    var builder = tripTimes
-      .createRealTimeWithoutScheduledTimes()
+    var builder = tripTimes.createRealTimeWithoutScheduledTimes()
       .withDepartureTime(0, realTimeTime);
     assertEquals(
       OptionalInt.of(0),
@@ -221,8 +202,9 @@ class BackwardsDelayRequiredInterpolatorTest {
   @Test
   void noUpdatesAtAll() {
     var builder = SCHEDULED_TRIP_TIMES.createRealTimeWithoutScheduledTimes();
-    Assertions.assertThrows(IllegalArgumentException.class, () ->
-      new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
+    Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> new BackwardsDelayAlwaysInterpolator().propagateBackwards(builder)
     );
   }
 }

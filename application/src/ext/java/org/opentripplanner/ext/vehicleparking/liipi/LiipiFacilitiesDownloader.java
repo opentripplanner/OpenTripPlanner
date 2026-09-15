@@ -26,11 +26,7 @@ public class LiipiFacilitiesDownloader {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   private final String jsonParsePath;
-  private final BiFunction<
-    JsonNode,
-    Map<FeedScopedId, VehicleParkingGroup>,
-    VehicleParking
-  > facilitiesParser;
+  private final BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser;
   private final String url;
   private final OtpHttpClient otpHttpClient;
 
@@ -82,7 +78,9 @@ public class LiipiFacilitiesDownloader {
   private List<VehicleParking> parseJSON(
     InputStream dataStream,
     Map<FeedScopedId, VehicleParkingGroup> hubForPark
-  ) throws IllegalArgumentException, IOException {
+  )
+    throws IllegalArgumentException,
+    IOException {
     ArrayList<VehicleParking> out = new ArrayList<>();
 
     String facilitiesString = convertStreamToString(dataStream);

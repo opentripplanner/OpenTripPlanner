@@ -88,9 +88,7 @@ class DlugoszVarLenIntPackerTest {
         -67108864,
         67108864,
         Integer.MAX_VALUE,
-        Integer.MIN_VALUE,
-      },
-    };
+        Integer.MIN_VALUE, }, };
     for (int[] values : cases) {
       byte[] packed = DlugoszVarLenIntPacker.pack(values);
       assertEquals(
@@ -134,8 +132,7 @@ class DlugoszVarLenIntPackerTest {
       { 67108864, 5 },
       { -67108865, 5 },
       { Integer.MAX_VALUE, 5 },
-      { Integer.MIN_VALUE, 5 },
-    };
+      { Integer.MIN_VALUE, 5 }, };
     for (int[] c : cases) {
       int value = c[0];
       int expectedWidth = c[1];

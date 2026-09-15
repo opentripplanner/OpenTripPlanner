@@ -98,13 +98,11 @@ public final class VehicleRentalSystem {
       return false;
     }
     VehicleRentalSystem that = (VehicleRentalSystem) o;
-    return (
-      Objects.equals(systemId, that.systemId) &&
+    return (Objects.equals(systemId, that.systemId) &&
       Objects.equals(name, that.name) &&
       Objects.equals(shortName, that.shortName) &&
       Objects.equals(operator, that.operator) &&
-      Objects.equals(url, that.url)
-    );
+      Objects.equals(url, that.url));
   }
 
   @Override

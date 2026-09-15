@@ -55,8 +55,7 @@ public class TransitDataImportBuilderTest {
 
   @Test
   public void testGetAllFrequencies() {
-    List<Frequency> frequencies = subject
-      .getFrequencies()
+    List<Frequency> frequencies = subject.getFrequencies()
       .stream()
       .sorted(frequencyComp())
       .toList();
@@ -79,8 +78,7 @@ public class TransitDataImportBuilderTest {
 
   @Test
   public void testGetAllShapePoints() {
-    var shapePoints = subject
-      .getShapePoints()
+    var shapePoints = subject.getShapePoints()
       .values()
       .stream()
       .flatMap(p -> ImmutableList.copyOf(p).stream())
@@ -93,10 +91,8 @@ public class TransitDataImportBuilderTest {
   /* private methods */
 
   private static TransitDataImportBuilder createBuilder() throws IOException {
-    TransitDataImportBuilder builder = contextBuilder(
-      FEED_ID,
-      ConstantsForTests.SIMPLE_GTFS
-    ).getTransitBuilder();
+    TransitDataImportBuilder builder = contextBuilder(FEED_ID, ConstantsForTests.SIMPLE_GTFS)
+      .getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));

@@ -122,8 +122,7 @@ public class PagingService {
     }
     // (num-of-itineraries found <= numItineraries)  ->  increase or keep search-window
     else {
-      int nFound = (int) itineraries
-        .stream()
+      int nFound = (int) itineraries.stream()
         .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
         .count();
 
@@ -223,9 +222,9 @@ public class PagingService {
    * paging tokens.
    */
   private boolean noSuccessfulTransitSearchPerformed() {
-    return (
-      raptorSearchWindowUsed == null || earliestDepartureTime == null || pageCursorInput == null
-    );
+    return (raptorSearchWindowUsed == null ||
+      earliestDepartureTime == null ||
+      pageCursorInput == null);
   }
 
   @Override

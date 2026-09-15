@@ -7,18 +7,15 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.GeometryUtils;
 
-public record ContradictoryLevelAndInclineInfoForWay(
-  OsmWay way,
-  Coordinate from,
-  Coordinate to
-) implements DataImportIssue {
+public record ContradictoryLevelAndInclineInfoForWay(OsmWay way, Coordinate from, Coordinate to)
+  implements DataImportIssue {
   private static final String FMT =
     "Way %s has contradictory level information in the 'incline' and 'level'/'layer' tags. " +
-    "Please verify that the tags indicate the same vertical direction.";
+      "Please verify that the tags indicate the same vertical direction.";
 
   private static final String HTMLFMT =
     "<a href='%s'>Way %s</a> has contradictory level information in the 'incline' and 'level'/'layer' tags. " +
-    "Please verify that the tags indicate the same vertical direction.";
+      "Please verify that the tags indicate the same vertical direction.";
 
   @Override
   public String getMessage() {

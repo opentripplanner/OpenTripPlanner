@@ -111,15 +111,16 @@ public class LuceneIndex implements Serializable {
           iwcWithSuggestField(analyzer, Set.of(SUGGEST))
         )
       ) {
-        var regularStops = transitService
-          .listStopLocations()
+        var regularStops = transitService.listStopLocations()
           .stream()
           .filter(stopLocation -> stopLocation.getStopType() == StopType.REGULAR)
           .toList();
-        stopClusterMapper
-          .generateStopClusters(regularStops, transitService.listStopLocationGroups())
-          .forEach(stopCluster ->
-            addToIndex(
+        stopClusterMapper.generateStopClusters(
+          regularStops,
+          transitService.listStopLocationGroups()
+        )
+          .forEach(
+            stopCluster -> addToIndex(
               directoryWriter,
               StopCluster.class,
               stopCluster.primaryId(),
@@ -244,8 +245,7 @@ public class LuceneIndex implements Serializable {
 
       var boostedCodeQuery = new BoostQuery(codeQuery, 100.0f);
 
-      var builder = new BooleanQuery.Builder()
-        .setMinimumNumberShouldMatch(1)
+      var builder = new BooleanQuery.Builder().setMinimumNumberShouldMatch(1)
         .add(typeQuery, Occur.MUST)
         .add(boostedCodeQuery, Occur.SHOULD)
         .add(prefixCodeQuery, Occur.SHOULD)

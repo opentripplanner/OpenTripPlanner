@@ -70,7 +70,8 @@ class OjpToTriasTransformer {
   }
 
   static void ojpToTrias(Writer writer, StreamSource xmlSource)
-    throws IOException, TransformerException {
+    throws IOException,
+    TransformerException {
     var transformer = OJP_TO_TRIAS_TEMPLATE.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
     transformer.transform(xmlSource, new StreamResult(writer));

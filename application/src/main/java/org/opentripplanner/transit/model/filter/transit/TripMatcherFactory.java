@@ -71,11 +71,10 @@ public class TripMatcherFactory {
   static Function<LocalDate, Matcher<Trip>> serviceDate(
     Function<FeedScopedId, Set<LocalDate>> serviceDateProvider
   ) {
-    return date ->
-      new ContainsMatcher<>(
-        "serviceDate",
-        t -> serviceDateProvider.apply(t.getServiceId()),
-        new EqualityMatcher<>("serviceDate", date, dateToMatch -> dateToMatch)
-      );
+    return date -> new ContainsMatcher<>(
+      "serviceDate",
+      t -> serviceDateProvider.apply(t.getServiceId()),
+      new EqualityMatcher<>("serviceDate", date, dateToMatch -> dateToMatch)
+    );
   }
 }

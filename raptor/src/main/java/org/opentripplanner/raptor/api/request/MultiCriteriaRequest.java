@@ -67,10 +67,8 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       return false;
     }
     MultiCriteriaRequest<?> that = (MultiCriteriaRequest<?>) o;
-    return (
-      Objects.equals(relaxC1, that.relaxC1) &&
-      Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator)
-    );
+    return (Objects.equals(relaxC1, that.relaxC1) &&
+      Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator));
   }
 
   @Override

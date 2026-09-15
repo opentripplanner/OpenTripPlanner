@@ -13,13 +13,13 @@ class StopTransferPriorityMapper {
     }
 
     switch (value) {
-      case NO_INTERCHANGE:
+      case NO_INTERCHANGE :
         return StopTransferPriority.DISCOURAGED;
-      case INTERCHANGE_ALLOWED:
+      case INTERCHANGE_ALLOWED :
         return StopTransferPriority.ALLOWED;
-      case PREFERRED_INTERCHANGE:
+      case PREFERRED_INTERCHANGE :
         return StopTransferPriority.PREFERRED;
-      case RECOMMENDED_INTERCHANGE:
+      case RECOMMENDED_INTERCHANGE :
         return StopTransferPriority.RECOMMENDED;
     }
     throw new IllegalArgumentException("Unsupported interchange weight: " + value);

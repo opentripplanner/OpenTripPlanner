@@ -25,10 +25,8 @@ class StopCallImplTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 6, 3);
   private static final ZoneId TIME_ZONE = ZoneId.of("Europe/Paris");
-  private static final Instant MIDNIGHT = ServiceDateUtils.asStartOfService(
-    SERVICE_DATE,
-    TIME_ZONE
-  ).toInstant();
+  private static final Instant MIDNIGHT = ServiceDateUtils.asStartOfService(SERVICE_DATE, TIME_ZONE)
+    .toInstant();
   private static final String TRIP_ID = "Trip1";
   private static final String FLEX_TRIP_ID = "FlexTrip1";
 

@@ -52,8 +52,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
   private static final RaptorConstrainedTransfer EMPTY_CONSTRAINTS = null;
 
-  public static final String BASIC_PATH_AS_DETAILED_STRING =
-    "Walk 3m 10:00:15 10:03:15 C₁360 " +
+  public static final String BASIC_PATH_AS_DETAILED_STRING = "Walk 3m 10:00:15 10:03:15 C₁360 " +
     "~ A 45s ~ " +
     "BUS L11 10:04 10:35 31m C₁1_998 " +
     "~ B 15s ~ " +
@@ -66,8 +65,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     "Walk 7m45s 11:52:15 12:00 C₁930 " +
     "[10:00:15 12:00 1h59m45s Tₙ2 C₁8_154 C₂7]";
 
-  public static final String BASIC_PATH_AS_STRING =
-    "Walk 3m ~ A" +
+  public static final String BASIC_PATH_AS_STRING = "Walk 3m ~ A" +
     " ~ BUS L11 10:04 10:35 ~ B" +
     " ~ Walk 3m45s ~ C" +
     " ~ BUS L21 11:00 11:23 ~ D" +
@@ -109,8 +107,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final int L11_END = time("10:35");
   public static final int L11_DURATION = L11_END - L11_START;
   private static final int L11_WAIT_DURATION = L11_START - ACCESS_END + ALIGHT_SLACK;
-  public static final int LINE_11_C1 =
-    STOP_C1_S[STOP_A] +
+  public static final int LINE_11_C1 = STOP_C1_S[STOP_A] +
     STOP_C1_S[STOP_B] +
     toRaptorCost(BOARD_C1_SEC + WAIT_RELUCTANCE * L11_WAIT_DURATION + L11_DURATION);
 
@@ -126,8 +123,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final int L21_END = time("11:23");
   public static final int L21_DURATION = L21_END - L21_START;
   private static final int L21_WAIT_DURATION = L21_START - TX_END + ALIGHT_SLACK;
-  public static final int LINE_21_C1 =
-    STOP_C1_S[STOP_C] +
+  public static final int LINE_21_C1 = STOP_C1_S[STOP_C] +
     STOP_C1_S[STOP_D] +
     toRaptorCost(
       BOARD_C1_SEC + TRANSFER_C1_SEC + WAIT_RELUCTANCE * L21_WAIT_DURATION + L21_DURATION
@@ -138,8 +134,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final int L31_END = time("11:52");
   public static final int L31_DURATION = L31_END - L31_START;
   private static final int L31_WAIT_DURATION = L31_START - (L21_END + ALIGHT_SLACK) + ALIGHT_SLACK;
-  public static final int LINE_31_C1 =
-    STOP_C1_S[STOP_D] +
+  public static final int LINE_31_C1 = STOP_C1_S[STOP_D] +
     STOP_C1_S[STOP_E] +
     toRaptorCost(
       BOARD_C1_SEC + TRANSFER_C1_SEC + WAIT_RELUCTANCE * L31_WAIT_DURATION + L31_DURATION
@@ -178,17 +173,11 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
   public static final TestTripSchedule TRIP_1 = TestTripSchedule.schedule(
     TestTripPattern.pattern(LINE_11, STOP_A, STOP_B)
-  )
-    .times(L11_START, L11_END)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
-    .build();
+  ).times(L11_START, L11_END).transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX).build();
 
   public static final TestTripSchedule TRIP_2 = TestTripSchedule.schedule(
     TestTripPattern.pattern(LINE_21, STOP_C, STOP_D)
-  )
-    .times(L21_START, L21_END)
-    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
-    .build();
+  ).times(L21_START, L21_END).transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX).build();
 
   public static final TestTripSchedule TRIP_3 = TestTripSchedule.schedule(
     TestTripPattern.pattern(LINE_31, STOP_D, STOP_E)
@@ -208,8 +197,12 @@ public class BasicPathTestCase implements RaptorTestConstants {
       STOP_C1_S
     );
 
-  public static final int TOTAL_C1 =
-    ACCESS_C1 + LINE_11_C1 + TX_C1 + LINE_21_C1 + LINE_31_C1 + EGRESS_C1;
+  public static final int TOTAL_C1 = ACCESS_C1 +
+    LINE_11_C1 +
+    TX_C1 +
+    LINE_21_C1 +
+    LINE_31_C1 +
+    EGRESS_C1;
 
   public static RaptorPath<TestTripSchedule> basicTripAsPath() {
     PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(

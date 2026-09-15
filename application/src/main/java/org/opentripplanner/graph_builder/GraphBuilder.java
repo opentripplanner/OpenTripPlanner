@@ -95,8 +95,7 @@ public class GraphBuilder implements Runnable {
     transitRepository.initTimeZone(config.transitModelTimeZone);
 
     GraphBuilderFactory.Builder builder = DaggerGraphBuilderFactory.builder();
-    builder
-      .config(config)
+    builder.config(config)
       .gbfsNetworkOverrides(gbfsNetworkOverrides)
       .graph(graph)
       .osmInfoGraphBuildRepository(osmInfoGraphBuildRepository)

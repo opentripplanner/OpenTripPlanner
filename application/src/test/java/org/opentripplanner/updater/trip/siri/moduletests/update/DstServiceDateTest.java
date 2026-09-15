@@ -18,18 +18,15 @@ class DstServiceDateTest implements RealtimeTestConstants {
     var envBuilder = TransitTestEnvironment.of(serviceDate);
     var stopA = envBuilder.stop(STOP_A_ID);
     var stopB = envBuilder.stop(STOP_B_ID);
-    var env = envBuilder
-      .addTrip(
-        TripInput.of(TRIP_1_ID)
-          .withWithTripOnServiceDate(TRIP_1_ID)
-          .addStop(stopA, "10:00", "10:01")
-          .addStop(stopB, "10:20", "10:21")
-      )
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID)
+        .withWithTripOnServiceDate(TRIP_1_ID)
+        .addStop(stopA, "10:00", "10:01")
+        .addStop(stopB, "10:20", "10:21")
+    ).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(stopA).departAimedActual("10:01", "10:05"))
       .withEstimatedCalls(builder -> builder.call(stopB).arriveAimedExpected("10:20", "10:33"))

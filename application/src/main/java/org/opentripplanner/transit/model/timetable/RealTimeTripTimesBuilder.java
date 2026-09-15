@@ -355,8 +355,7 @@ public class RealTimeTripTimesBuilder {
   }
 
   public RealTimeTripTimesBuilder withServiceCode(int serviceCode) {
-    this.scheduledTripTimes = scheduledTripTimes
-      .copyOfNoDuplication()
+    this.scheduledTripTimes = scheduledTripTimes.copyOfNoDuplication()
       .withServiceCode(serviceCode)
       .build();
     return this;

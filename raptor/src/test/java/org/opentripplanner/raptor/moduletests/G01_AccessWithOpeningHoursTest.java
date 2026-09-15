@@ -59,24 +59,22 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    data
-      .withTimetables(
-        """
-        B      E
-        00:15  00:30
-        00:20  00:35
-        00:25  00:40
-        00:30  00:45
-        24:15  24:30
-        24:20  24:35
-        """ +
-          // Not within time-limit 24:42 (need 2 min for egress)
-          "24:25  24:40"
-      )
-      .egress("E ~ Walk 1m");
+    data.withTimetables(
+      """
+      B      E
+      00:15  00:30
+      00:20  00:35
+      00:25  00:40
+      00:30  00:45
+      24:15  24:30
+      24:20  24:35
+      """
+        +
+        // Not within time-limit 24:42 (need 2 min for egress)
+        "24:25  24:40"
+    ).egress("E ~ Walk 1m");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T24_40)
       .searchWindow(Duration.ofMinutes(30))
@@ -136,13 +134,11 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₙ0 C₁1_860]"
     );
 
-    return tcBuilderWithMinDuration(T24_10, T24_40)
-      .withRequest(r ->
-        r
-          .searchParams()
-          .earliestDepartureTime(T24_10)
-          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
-      )
+    return tcBuilderWithMinDuration(T24_10, T24_40).withRequest(
+      r -> r.searchParams()
+        .earliestDepartureTime(T24_10)
+        .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
+    )
       .add(standard().manyIterations(), withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV_ONE, withoutCost(expected.last()))
@@ -165,13 +161,11 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       access + EXP_24_20 + "[1:00 0:36+1d 23h36m Tₙ0 C₁0_000]"
     );
 
-    return tcBuilderWithMinDuration(T00_00, T24_40)
-      .withRequest(r ->
-        r
-          .searchParams()
-          .searchWindow(Duration.ofHours(1))
-          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_23, T01_00))
-      )
+    return tcBuilderWithMinDuration(T00_00, T24_40).withRequest(
+      r -> r.searchParams()
+        .searchWindow(Duration.ofHours(1))
+        .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_23, T01_00))
+    )
       .add(TC_STANDARD, withoutCost(expected.first(3)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.range(1, 3)))
@@ -197,13 +191,11 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       access + EXP_24_20 + "[0:18+1d 0:36+1d 18m Tₙ0 C₁1_860]"
     );
 
-    return tcBuilderWithMinDuration(T00_00, T24_40)
-      .withRequest(r ->
-        r
-          .searchParams()
-          .searchWindow(Duration.ofHours(1))
-          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T00_20))
-      )
+    return tcBuilderWithMinDuration(T00_00, T24_40).withRequest(
+      r -> r.searchParams()
+        .searchWindow(Duration.ofHours(1))
+        .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_00, T00_20))
+    )
       .add(TC_STANDARD, withoutCost(expected.get(0, 1, 2, 4)))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.range(3, 6)))
@@ -229,15 +221,13 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
       access + EXP_24_25 + "[0:20+1d 0:41+1d 21m Tₙ0 C₁2_040]"
     );
 
-    return tcBuilderWithMinDuration(T24_10, T25_00)
-      .withRequest(r ->
-        r
-          .searchParams()
-          .searchWindow(Duration.ofMinutes(30))
-          .earliestDepartureTime(T24_10)
-          .latestArrivalTime(T25_00)
-          .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_18, T00_20))
-      )
+    return tcBuilderWithMinDuration(T24_10, T25_00).withRequest(
+      r -> r.searchParams()
+        .searchWindow(Duration.ofMinutes(30))
+        .earliestDepartureTime(T24_10)
+        .latestArrivalTime(T25_00)
+        .addAccessPaths(walk(STOP_B, D2_m).openingHours(T00_18, T00_20))
+    )
       .add(TC_STANDARD, withoutCost(expected.all()))
       .add(TC_STANDARD_ONE, withoutCost(expected.first()))
       .add(TC_STANDARD_REV, withoutCost(expected.all()))
@@ -258,9 +248,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
 
   private static List<RaptorModuleTestCase> closedTestCase() {
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r
-          .searchParams()
+      .withRequest(
+        r -> r.searchParams()
           .searchWindow(Duration.ofHours(2))
           .addAccessPaths(free(STOP_B).openingHoursClosed())
       )
@@ -284,11 +273,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     int earliestDepartureTime,
     int latestArrivalTime
   ) {
-    return RaptorModuleTestCase.of().addMinDuration(
-      "18m",
-      TX_0,
-      earliestDepartureTime,
-      latestArrivalTime
-    );
+    return RaptorModuleTestCase.of()
+      .addMinDuration("18m", TX_0, earliestDepartureTime, latestArrivalTime);
   }
 }

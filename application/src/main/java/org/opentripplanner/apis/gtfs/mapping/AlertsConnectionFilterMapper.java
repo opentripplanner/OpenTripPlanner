@@ -46,14 +46,12 @@ public class AlertsConnectionFilterMapper {
 
     var builder = FilterRequest.<TransitAlertSelectRequest>of();
     if (includes != null) {
-      includes
-        .stream()
+      includes.stream()
         .map(select -> toSelectRequest(select, "filters.include"))
         .forEach(builder::addSelect);
     }
     if (excludes != null) {
-      excludes
-        .stream()
+      excludes.stream()
         .map(select -> toSelectRequest(select, "filters.exclude"))
         .forEach(builder::addNot);
     }
@@ -84,10 +82,7 @@ public class AlertsConnectionFilterMapper {
     requireNullOrNonEmpty(values, path);
     return values == null
       ? null
-      : values
-          .stream()
-          .flatMap(s -> SeverityMapper.getAlertSeverities(s).stream())
-          .toList();
+      : values.stream().flatMap(s -> SeverityMapper.getAlertSeverities(s).stream()).toList();
   }
 
   @Nullable

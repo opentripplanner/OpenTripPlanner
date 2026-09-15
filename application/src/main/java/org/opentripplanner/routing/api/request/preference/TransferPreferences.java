@@ -163,15 +163,13 @@ public final class TransferPreferences implements Serializable {
       return false;
     }
     TransferPreferences that = (TransferPreferences) o;
-    return (
-      cost.equals(that.cost) &&
+    return (cost.equals(that.cost) &&
       slack.equals(that.slack) &&
       doubleEquals(that.waitReluctance, waitReluctance) &&
       maxTransfers == that.maxTransfers &&
       maxAdditionalTransfers == that.maxAdditionalTransfers &&
       optimization.equals(that.optimization) &&
-      nonpreferredCost.equals(that.nonpreferredCost)
-    );
+      nonpreferredCost.equals(that.nonpreferredCost));
   }
 
   @Override

@@ -50,8 +50,7 @@ class J06_TransitAndTransferArrivalAtViaConnectionStopTest implements RaptorTest
 
   @Test
   void transitArrivalAtViaConnectionStopNotBlockedByEarlierWalkTransfer() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         -- R1
@@ -72,14 +71,12 @@ class J06_TransitAndTransferArrivalAtViaConnectionStopTest implements RaptorTest
       .withTransfer(STOP_B, transfer(STOP_D, D2_m));
 
     var requestBuilder = data.requestBuilder();
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    requestBuilder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: 2023-07-24 Currently heuristics does not work with via search so we
       //  have to turn them off. Make sure to re-enable optimization later when it's fixed.
       .clearOptimizations();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindow(Duration.ofMinutes(10))

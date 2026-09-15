@@ -96,7 +96,7 @@ public final class DirectionUtils {
     int minDistance_m = 10;
     while (
       SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m &&
-      i < line.getNumPoints()
+        i < line.getNumPoints()
     ) {
       coord1 = line.getCoordinateN(i++);
     }

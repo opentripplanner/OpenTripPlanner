@@ -103,11 +103,9 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     int fromStopIndex
   ) {
     if (minNumTransfers > -1) {
-      return (
-        boardCost +
+      return (boardCost +
         (boardCost + transferCost) * minNumTransfers +
-        TRANSIT_RELUCTANCE * minTravelDuration
-      );
+        TRANSIT_RELUCTANCE * minTravelDuration);
     } else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       return stopBoardAlightTransferCosts == null

@@ -108,15 +108,13 @@ public class OsmWay extends OsmEntity {
    * An area can be specified as such, or be one by default as an amenity.
    */
   public boolean isRoutableArea() {
-    return (
-      !isTag("area", "no") &&
+    return (!isTag("area", "no") &&
       (isTag("area", "yes") ||
         isParking() ||
         isBikeParking() ||
         isBoardingArea() ||
         isIndoorRoutable()) &&
-      getNodeRefs().size() > 2
-    );
+      getNodeRefs().size() > 2);
   }
 
   public boolean isBarrier() {
@@ -146,11 +144,9 @@ public class OsmWay extends OsmEntity {
   public boolean isTurnLane() {
     Optional<TraverseDirection> oneWayCar = isOneWay("motorcar");
     boolean oneWay = oneWayCar.isPresent();
-    return (
-      !isNamed() &&
+    return (!isNamed() &&
       oneWay &&
-      (!isMotorwayRamp() || isTag("turn:lanes", "right") || isTag("turn:lanes", "left"))
-    );
+      (!isMotorwayRamp() || isTag("turn:lanes", "right") || isTag("turn:lanes", "left")));
   }
 
   /** Whether this way is connected to the given way through their extremities. */
@@ -165,12 +161,10 @@ public class OsmWay extends OsmEntity {
     long firstNode = nodes.get(0);
     long lastNode = nodes.get(nodes.size() - 1);
 
-    return (
-      (firstNode == wayFirstNode && lastNode != wayLastNode) ||
+    return ((firstNode == wayFirstNode && lastNode != wayLastNode) ||
       (firstNode == wayLastNode && lastNode != wayFirstNode) ||
       (lastNode == wayFirstNode && firstNode != wayLastNode) ||
-      (lastNode == wayLastNode && firstNode != wayFirstNode)
-    );
+      (lastNode == wayLastNode && firstNode != wayFirstNode));
   }
 
   @Override

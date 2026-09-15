@@ -24,8 +24,7 @@ class ViaLocationDeprecatedMapper {
   ViaLocationDeprecated mapViaLocation(Map<String, Object> viaLocation) {
     try {
       return new ViaLocationDeprecated(
-        genericLocationMapper
-          .toGenericLocation(viaLocation)
+        genericLocationMapper.toGenericLocation(viaLocation)
           .orElseThrow(() -> new InvalidInputException("Invalid via location")),
         false,
         (Duration) viaLocation.get("minSlack"),

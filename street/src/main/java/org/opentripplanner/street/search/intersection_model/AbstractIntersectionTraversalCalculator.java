@@ -9,9 +9,8 @@ import org.opentripplanner.street.search.TraverseMode;
  *
  * @author avi
  */
-public abstract class AbstractIntersectionTraversalCalculator
-  implements IntersectionTraversalCalculator
-{
+public abstract class AbstractIntersectionTraversalCalculator implements
+  IntersectionTraversalCalculator {
 
   /**
    * Factor by which absolute turn angles are divided to get turn durations for non-driving

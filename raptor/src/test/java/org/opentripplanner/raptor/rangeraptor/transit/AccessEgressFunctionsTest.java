@@ -32,11 +32,8 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   );
   private static final RaptorAccessEgress WALK_8_m = TestAccessEgress.walk(STOP, D8_m, C1);
 
-  private static final RaptorAccessEgress WALK_10_m_VIA_1 = TestAccessEgress.walk(
-    STOP,
-    D10_m,
-    C1
-  ).withViaLocationsVisited(1);
+  private static final RaptorAccessEgress WALK_10_m_VIA_1 = TestAccessEgress.walk(STOP, D10_m, C1)
+    .withViaLocationsVisited(1);
 
   private static final RaptorAccessEgress FLEX_1x_10_m = flex(STOP, D10_m, 1, C1);
   private static final RaptorAccessEgress FLEX_1x_8_m = flex(STOP, D8_m, 1, C1);

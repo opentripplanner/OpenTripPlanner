@@ -207,16 +207,16 @@ public class RoutingWorker {
     }
 
     // Set C2 value for Street and FLEX if transit-group-priority is used
-    result.transform(list ->
-      new TransitGroupPriorityItineraryDecorator(transitGroupPriorityService).decorate(list)
+    result.transform(
+      list -> new TransitGroupPriorityItineraryDecorator(transitGroupPriorityService).decorate(list)
     );
 
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
     {
-      boolean removeWalkAllTheWayResultsFromDirectFlex =
-        request.journey().direct().mode() == StreetMode.FLEXIBLE;
+      boolean removeWalkAllTheWayResultsFromDirectFlex = request.journey().direct().mode() ==
+        StreetMode.FLEXIBLE;
 
       ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
         request,
@@ -240,11 +240,7 @@ public class RoutingWorker {
     if (LOG.isDebugEnabled()) {
       LOG.debug(
         "Return TripPlan with {} filtered itineraries out of {} total.",
-        result
-          .itineraries()
-          .stream()
-          .filter(it -> !it.isFlaggedForDeletion())
-          .count(),
+        result.itineraries().stream().filter(it -> !it.isFlaggedForDeletion()).count(),
         result.itineraries().size()
       );
     }
@@ -279,8 +275,7 @@ public class RoutingWorker {
     if (!raptorSearchParamsUsed.isEarliestDepartureTimeSet()) {
       return null;
     }
-    return transitSearchTimeZero
-      .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
+    return transitSearchTimeZero.plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
       .toInstant();
   }
 
@@ -316,8 +311,8 @@ public class RoutingWorker {
     );
     var directBuilder = request.copyOf();
 
-    directBuilder.withJourney(jb ->
-      jb.withDirect(
+    directBuilder.withJourney(
+      jb -> jb.withDirect(
         new StreetRequest(
           emptyDirectModeHandler.resolveDirectMode(),
           request.journey().direct().rentalDuration()
@@ -467,8 +462,8 @@ public class RoutingWorker {
   private Collection<RoutingError> checkForEmptyDirectModeResult(RoutingResult result) {
     if (
       !request.journey().transit().enabled() &&
-      result.errors().isEmpty() &&
-      result.itineraries().stream().allMatch(Itinerary::isFlaggedForDeletion)
+        result.errors().isEmpty() &&
+        result.itineraries().stream().allMatch(Itinerary::isFlaggedForDeletion)
     ) {
       return List.of(new RoutingError(RoutingErrorCode.NO_DIRECT_MODE_CONNECTION, null));
     }

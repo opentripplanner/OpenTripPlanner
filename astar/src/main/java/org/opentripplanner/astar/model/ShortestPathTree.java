@@ -25,11 +25,7 @@ import org.opentripplanner.astar.spi.DominanceFunction;
  * base dominance function implementation, and applies to all subclasses. It essentially splits each
  * vertex into N vertices depending on the incoming edge being taken.
  */
-public class ShortestPathTree<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class ShortestPathTree<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   public final DominanceFunction<State> dominanceFunction;
 

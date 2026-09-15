@@ -112,8 +112,7 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    var vehicleParkingInGraph = parkingRepository
-      .listVehicleParkings()
+    var vehicleParkingInGraph = parkingRepository.listVehicleParkings()
       .stream()
       .findFirst()
       .orElseThrow();
@@ -130,8 +129,7 @@ class VehicleParkingUpdaterTest {
 
     assertVehicleParkingsInGraph(1);
 
-    vehicleParkingInGraph = parkingRepository
-      .listVehicleParkings()
+    vehicleParkingInGraph = parkingRepository.listVehicleParkings()
       .stream()
       .findFirst()
       .orElseThrow();
@@ -237,8 +235,7 @@ class VehicleParkingUpdaterTest {
 
       assertEquals(
         1,
-        parkingVertex
-          .getIncoming()
+        parkingVertex.getIncoming()
           .stream()
           .filter(StreetVehicleParkingLink.class::isInstance)
           .count()
@@ -251,8 +248,7 @@ class VehicleParkingUpdaterTest {
 
       assertEquals(
         1,
-        parkingVertex
-          .getOutgoing()
+        parkingVertex.getOutgoing()
           .stream()
           .filter(StreetVehicleParkingLink.class::isInstance)
           .count()

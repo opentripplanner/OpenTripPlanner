@@ -25,8 +25,7 @@ public interface LookupStopIndexCallback {
    * Take a set of stop location ids and convert them into a sorted distinct list of stop indexes.
    */
   default int[] lookupStopLocationIndexes(Collection<FeedScopedId> stopLocationIds) {
-    return stopLocationIds
-      .stream()
+    return stopLocationIds.stream()
       .flatMapToInt(this::lookupStopLocationIndexes)
       .sorted()
       .distinct()

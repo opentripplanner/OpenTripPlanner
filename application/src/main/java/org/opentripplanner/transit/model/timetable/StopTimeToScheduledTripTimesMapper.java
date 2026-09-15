@@ -54,8 +54,7 @@ class StopTimeToScheduledTripTimesMapper {
       pickupBookingInfos.add(st.getPickupBookingInfo());
       s++;
     }
-    builder
-      .withDepartureTimes(departures)
+    builder.withDepartureTimes(departures)
       .withArrivalTimes(arrivals)
       .withGtfsSequenceOfStopIndex(sequences)
       .withHeadsigns(makeHeadsignsArray(stopTimes))
@@ -117,8 +116,7 @@ class StopTimeToScheduledTripTimesMapper {
   @Nullable
   private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
     if (
-      stopTimes
-        .stream()
+      stopTimes.stream()
         .allMatch(st -> st.getHeadsignVias() == null || st.getHeadsignVias().isEmpty())
     ) {
       return null;

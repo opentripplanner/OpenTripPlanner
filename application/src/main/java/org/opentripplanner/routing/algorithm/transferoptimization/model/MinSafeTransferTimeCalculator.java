@@ -96,8 +96,9 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
   }
 
   public int minSafeTransferTime(Collection<RaptorPath<T>> paths) {
-    ToIntFunction<RaptorPath<T>> totalTransitTimeOp = p ->
-      p.transitLegs().mapToInt(this::durationIncludingSlack).sum();
+    ToIntFunction<RaptorPath<T>> totalTransitTimeOp = p -> p.transitLegs()
+      .mapToInt(this::durationIncludingSlack)
+      .sum();
 
     return minSafeTransferTimeOp(paths, totalTransitTimeOp);
   }

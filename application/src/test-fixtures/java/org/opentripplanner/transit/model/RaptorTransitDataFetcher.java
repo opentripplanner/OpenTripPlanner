@@ -30,8 +30,7 @@ public class RaptorTransitDataFetcher {
   }
 
   private Collection<TripPatternForDate> list() {
-    return transitService
-      .getRealtimeRaptorTransitData()
+    return transitService.getRealtimeRaptorTransitData()
       .getTripPatternsForRunningDate(serviceDate)
       .stream()
       .sorted(Comparator.comparing(t -> t.getTripPattern().getPattern().getId().toString()))
@@ -39,8 +38,7 @@ public class RaptorTransitDataFetcher {
   }
 
   private static String summarise(TripPatternForDate t) {
-    var states = t
-      .tripTimes()
+    var states = t.tripTimes()
       .stream()
       .map(TripTimesStateDecoder::summarizeFromTripTimes)
       .collect(Collectors.joining(","));

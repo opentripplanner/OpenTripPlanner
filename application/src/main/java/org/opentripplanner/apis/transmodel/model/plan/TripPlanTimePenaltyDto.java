@@ -17,9 +17,7 @@ public record TripPlanTimePenaltyDto(String appliesTo, TimeAndCost penalty) {
     return Stream.of(
       of("access", itinerary.accessPenalty()),
       of("egress", itinerary.egressPenalty())
-    )
-      .filter(Objects::nonNull)
-      .toList();
+    ).filter(Objects::nonNull).toList();
   }
 
   /**

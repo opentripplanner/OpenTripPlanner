@@ -28,9 +28,7 @@ class TestStopConsolidationModel {
     .build();
   static final Route ROUTE = TransitRepositoryForTest.route(
     new FeedScopedId(SECONDARY_FEED_ID, "route-33")
-  )
-    .withAgency(AGENCY)
-    .build();
+  ).withAgency(AGENCY).build();
   static final RegularStop STOP_D = TEST_MODEL.stop("D")
     .withId(new FeedScopedId(SECONDARY_FEED_ID, "secondary-stop-D"))
     .build();

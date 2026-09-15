@@ -38,8 +38,7 @@ class DepartureToDepartureTimeLimitTest implements PlanTestConstants, FareTestCo
 
   @Test
   void twoLegs() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(1, time("10:00"), time("10:08"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(1, time("10:00"), time("10:08"), B)
       .bus(2, time("10:09"), time("10:15"), C)
       .build();
 
@@ -58,8 +57,7 @@ class DepartureToDepartureTimeLimitTest implements PlanTestConstants, FareTestCo
 
   @Test
   void twoLegsAboveLimit() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(1, time("10:00"), time("10:04"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(1, time("10:00"), time("10:04"), B)
       .bus(2, time("10:11"), time("10:15"), C)
       .build();
 

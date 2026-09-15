@@ -43,8 +43,7 @@ class StopTimesHelperTest {
     var tt = originalPattern.getScheduledTimetable();
     var newTripTimes = tt.getTripTimes().getFirst().createRealTimeFromScheduledTimes();
     newTripTimes.withCanceled();
-    pattern = originalPattern
-      .copy()
+    pattern = originalPattern.copy()
       .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes.build()))
       .build();
     // replace the original pattern by the updated pattern in the transit model
@@ -89,15 +88,8 @@ class StopTimesHelperTest {
       null
     );
 
-    assertEquals(
-      3,
-      result
-        .stream()
-        .mapToLong(s -> s.times.size())
-        .sum()
-    );
-    var stopTimesForPattern = result
-      .stream()
+    assertEquals(3, result.stream().mapToLong(s -> s.times.size()).sum());
+    var stopTimesForPattern = result.stream()
       .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
       .toList();
 
@@ -131,13 +123,7 @@ class StopTimesHelperTest {
       null
     );
 
-    assertEquals(
-      5,
-      result
-        .stream()
-        .mapToLong(s -> s.times.size())
-        .sum()
-    );
+    assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
     assertTrue(hasCancelledTrips(result));
   }
 
@@ -154,13 +140,7 @@ class StopTimesHelperTest {
       null
     );
 
-    assertEquals(
-      4,
-      result
-        .stream()
-        .mapToLong(s -> s.times.size())
-        .sum()
-    );
+    assertEquals(4, result.stream().mapToLong(s -> s.times.size()).sum());
     assertFalse(hasCancelledTrips(result));
   }
 
@@ -180,13 +160,7 @@ class StopTimesHelperTest {
       null
     );
 
-    assertEquals(
-      0,
-      result
-        .stream()
-        .mapToLong(s -> s.times.size())
-        .sum()
-    );
+    assertEquals(0, result.stream().mapToLong(s -> s.times.size()).sum());
   }
 
   /**
@@ -205,16 +179,9 @@ class StopTimesHelperTest {
       null
     );
 
-    assertEquals(
-      9,
-      result
-        .stream()
-        .mapToLong(s -> s.times.size())
-        .sum()
-    );
+    assertEquals(9, result.stream().mapToLong(s -> s.times.size()).sum());
 
-    var stopTimesForPattern = result
-      .stream()
+    var stopTimesForPattern = result.stream()
       .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
       .toList();
 
@@ -327,15 +294,8 @@ class StopTimesHelperTest {
       true
     );
 
-    assertEquals(
-      5,
-      result
-        .stream()
-        .mapToLong(s -> s.times.size())
-        .sum()
-    );
-    var stopTimesForPattern = result
-      .stream()
+    assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
+    var stopTimesForPattern = result.stream()
       .filter(s -> s.pattern.getRoute().getId().getId().equals("5"))
       .toList();
 
@@ -369,10 +329,9 @@ class StopTimesHelperTest {
   }
 
   boolean hasCancelledTrips(List<StopTimesInPattern> stopTimes) {
-    return !stopTimes
-      .stream()
-      .filter(s ->
-        s.times.stream().anyMatch(tripTimeOnDate -> tripTimeOnDate.isCanceledEffectively())
+    return !stopTimes.stream()
+      .filter(
+        s -> s.times.stream().anyMatch(tripTimeOnDate -> tripTimeOnDate.isCanceledEffectively())
       )
       .findAny()
       .isEmpty();

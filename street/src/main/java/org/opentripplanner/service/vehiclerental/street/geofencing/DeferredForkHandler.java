@@ -50,7 +50,7 @@ class DeferredForkHandler {
     for (var zone : backState.getCurrentGeofencingZones()) {
       if (
         (zone.hasRestriction() || zone.isBusinessArea()) &&
-        !s0.getCurrentGeofencingZones().contains(zone)
+          !s0.getCurrentGeofencingZones().contains(zone)
       ) {
         return true;
       }
@@ -147,7 +147,7 @@ class DeferredForkHandler {
     for (var zone : s0.getBackState().getCurrentGeofencingZones()) {
       if (
         (zone.hasRestriction() || zone.isBusinessArea()) &&
-        !s0.getCurrentGeofencingZones().contains(zone)
+          !s0.getCurrentGeofencingZones().contains(zone)
       ) {
         forkNetworks.add(zone.id().getFeedId());
       }

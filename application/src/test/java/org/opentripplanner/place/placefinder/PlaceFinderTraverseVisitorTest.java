@@ -39,13 +39,11 @@ public class PlaceFinderTraverseVisitorTest {
     .withName(new NonLocalizedString("Station 2"))
     .withCoordinate(1.1, 1.1)
     .build();
-  static final RegularStop STOP1 = model
-    .stop("stop-1")
+  static final RegularStop STOP1 = model.stop("stop-1")
     .withCoordinate(new WgsCoordinate(1, 1))
     .withParentStation(STATION1)
     .build();
-  static final RegularStop STOP2 = model
-    .stop("stop-2")
+  static final RegularStop STOP2 = model.stop("stop-2")
     .withCoordinate(1.001, 1.001)
     .withParentStation(STATION2)
     .build();
@@ -56,10 +54,7 @@ public class PlaceFinderTraverseVisitorTest {
   static final Route R = route("r").build();
 
   static final TransitRepository TIMETABLE_REPO = new TransitRepository(
-    model
-      .siteRepositoryBuilder()
-      .withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4))
-      .build()
+    model.siteRepositoryBuilder().withRegularStops(List.of(STOP1, STOP2, STOP3, STOP4)).build()
   );
 
   static {

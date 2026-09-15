@@ -220,12 +220,7 @@ public class Graph implements Serializable {
    * THREAD SAFTY - This method does not support concurent use. The behavior is undefined.
    */
   public Iterable<Edge> listEdges() {
-    return () ->
-      this.vertices
-        .values()
-        .stream()
-        .flatMap(v -> v.getOutgoing().stream())
-        .iterator();
+    return () -> this.vertices.values().stream().flatMap(v -> v.getOutgoing().stream()).iterator();
   }
 
   /**

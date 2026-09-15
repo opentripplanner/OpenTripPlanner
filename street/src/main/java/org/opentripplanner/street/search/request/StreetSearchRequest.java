@@ -192,8 +192,7 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   public StreetSearchRequestBuilder copyOfReversed(Instant time) {
-    return copyOf(this)
-      .withStartTime(time)
+    return copyOf(this).withStartTime(time)
       .withArriveBy(!arriveBy)
       .withArriveByDestinationZones(Set.of());
   }
@@ -212,10 +211,8 @@ public class StreetSearchRequest implements AStarRequest {
    * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {
-    return (
-      (fromEnvelope != null && fromEnvelope.intersects(vertex.getCoordinate())) ||
-      (toEnvelope != null && toEnvelope.intersects(vertex.getCoordinate()))
-    );
+    return ((fromEnvelope != null && fromEnvelope.intersects(vertex.getCoordinate())) ||
+      (toEnvelope != null && toEnvelope.intersects(vertex.getCoordinate())));
   }
 
   public WalkRequest walk() {

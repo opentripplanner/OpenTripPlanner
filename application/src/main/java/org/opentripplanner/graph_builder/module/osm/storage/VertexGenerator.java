@@ -164,7 +164,7 @@ public class VertexGenerator {
         );
         if (
           bv.wheelchairAccessibility() == Accessibility.NO_INFORMATION &&
-          !node.isWheelchairAccessible()
+            !node.isWheelchairAccessible()
         ) {
           bv.setWheelchairAccessibility(Accessibility.NOT_POSSIBLE);
         }
@@ -277,11 +277,13 @@ public class VertexGenerator {
       });
     }
     // Intersect ways at area boundaries if needed.
-    for (OsmArea area : Iterables.concat(
-      osmdb.getWalkableAreas(),
-      osmdb.getParkAndRideAreas(),
-      osmdb.getBikeParkingAreas()
-    )) {
+    for (
+      OsmArea area : Iterables.concat(
+        osmdb.getWalkableAreas(),
+        osmdb.getParkAndRideAreas(),
+        osmdb.getBikeParkingAreas()
+      )
+    ) {
       for (Ring outerRing : area.outermostRings) {
         intersectAreaRingNodes(possibleIntersectionNodes, outerRing);
       }

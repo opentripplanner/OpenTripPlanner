@@ -131,11 +131,10 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         var legOffers = new ArrayList<>(fare.getLegProducts().get(leg));
         // Itinerary-level products (e.g. day passes) only apply to transit legs
         var itineraryOffers = leg.isTransitLeg()
-          ? fare
-              .getItineraryProducts()
-              .stream()
-              .map(fp -> FareOffer.of(itinerary.legs().getFirst().startTime(), fp))
-              .toList()
+          ? fare.getItineraryProducts()
+            .stream()
+            .map(fp -> FareOffer.of(itinerary.legs().getFirst().startTime(), fp))
+            .toList()
           : List.<FareOffer>of();
         return (Iterable<FareOffer>) ListUtils.combine(itineraryOffers, legOffers);
       });
@@ -165,8 +164,10 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<String> headsign() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).headsign(), environment);
+    return environment -> GraphQLUtils.getTranslation(
+      getSource(environment).headsign(),
+      environment
+    );
   }
 
   @Override
@@ -194,8 +195,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       }
       var args = new GraphQLTypes.GraphQLLegIntermediateStopsArgs(env.getArguments());
       var filter = new StopArrivalByTypeFilter(args.getGraphQLInclude());
-      return filter
-        .filter(intermediateStops)
+      return filter.filter(intermediateStops)
         .stream()
         .map(intermediateStop -> intermediateStop.place.stop)
         .filter(Objects::nonNull)
@@ -341,9 +341,10 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       if (trip == null || leg.serviceDate() == null) {
         return null;
       }
-      return new ApiTransitService(transitService(environment))
-        .findOrCreateTripOnServiceDate(trip.getId(), leg.serviceDate())
-        .orElse(null);
+      return new ApiTransitService(transitService(environment)).findOrCreateTripOnServiceDate(
+        trip.getId(),
+        leg.serviceDate()
+      ).orElse(null);
     };
   }
 
@@ -372,18 +373,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         var originModesWithParentStation = args.getGraphQLOriginModesWithParentStation();
         var destinationModesWithParentStation = args.getGraphQLDestinationModesWithParentStation();
 
-        boolean limitToExactOriginStop =
-          originModesWithParentStation == null ||
-          !originModesWithParentStation
-            .stream()
+        boolean limitToExactOriginStop = originModesWithParentStation == null ||
+          !originModesWithParentStation.stream()
             .map(GraphQLTypes.GraphQLTransitMode::toString)
             .toList()
             .contains(originalLeg.mode().name());
 
-        boolean limitToExactDestinationStop =
-          destinationModesWithParentStation == null ||
-          !destinationModesWithParentStation
-            .stream()
+        boolean limitToExactDestinationStop = destinationModesWithParentStation == null ||
+          !destinationModesWithParentStation.stream()
             .map(GraphQLTypes.GraphQLTransitMode::toString)
             .toList()
             .contains(originalLeg.mode().name());
@@ -396,10 +393,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
           AlternativeLegsFilter.NO_FILTER,
           limitToExactOriginStop,
           limitToExactDestinationStop
-        )
-          .stream()
-          .map(Leg.class::cast)
-          .toList();
+        ).stream().map(Leg.class::cast).toList();
         return res;
       } else {
         return null;

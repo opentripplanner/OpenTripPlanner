@@ -122,8 +122,7 @@ public class OsmOpeningHoursParser {
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
     var parser = new OpeningHoursParser(new ByteArrayInputStream(openingHoursTag.getBytes()));
     var rules = parser.rules(false);
-    var rulesWithoutFallback = rules
-      .stream()
+    var rulesWithoutFallback = rules.stream()
       .filter(rule -> !rule.isFallBack())
       .collect(Collectors.toList());
     List<OHCalendarBuilder.OpeningHoursBuilder> openingHoursBuilders = new ArrayList<>();
@@ -147,25 +146,23 @@ public class OsmOpeningHoursParser {
       if (isClosedRule(rule) && hasTimes(rule)) {
         // Regardless if the rules is additive or not, we should handle it as such if it closes
         // the object for a time range https://github.com/opening-hours/opening_hours.js/issues/53.
-        openingHoursBuildersForRule.forEach(openingHoursBuilder ->
-          openingHoursBuilders.addAll(
+        openingHoursBuildersForRule.forEach(
+          openingHoursBuilder -> openingHoursBuilders.addAll(
             splitPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
           )
         );
       } else if (!rule.isAdditive()) {
-        openingHoursBuildersForRule
-          .stream()
+        openingHoursBuildersForRule.stream()
           // If a builder is after midnight, there is always another one that can be used to set days
           // off in other builders without having to shift the days in two directions
           .filter(openingHoursBuilder -> !openingHoursBuilder.isAfterMidnight())
-          .forEach(openingHoursBuilder ->
-            editPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
+          .forEach(
+            openingHoursBuilder -> editPreviousBuilders(openingHoursBuilder, openingHoursBuilders)
           );
       }
       if (isOpenRule(rule)) {
         openingHoursBuilders.addAll(
-          openingHoursBuildersForRule
-            .stream()
+          openingHoursBuildersForRule.stream()
             .filter(OHCalendarBuilder.OpeningHoursBuilder::isEverOn)
             .collect(Collectors.toList())
         );
@@ -183,10 +180,9 @@ public class OsmOpeningHoursParser {
     OHCalendarBuilder calendarBuilder,
     List<WeekDayRange> dayRanges
   ) {
-    return dayRanges
-      .stream()
-      .map(dayRange ->
-        setWeekDayRangeRangeForOpeningHoursBuilder(
+    return dayRanges.stream()
+      .map(
+        dayRange -> setWeekDayRangeRangeForOpeningHoursBuilder(
           calendarBuilder.openingHours(dayRange.toString(), LocalTime.MIN, LocalTime.MAX),
           dayRange
         )
@@ -205,42 +201,37 @@ public class OsmOpeningHoursParser {
     OHCalendarBuilder calendarBuilder,
     Rule rule
   ) {
-    return rule
-      .getDates()
-      .stream()
-      .flatMap(dateRange -> {
-        if (rule.getDays() != null) {
-          return rule
-            .getDays()
-            .stream()
-            .flatMap(weekDayRange -> {
-              String description = String.format(
-                "%s %s",
-                dateRange.toString(),
-                weekDayRange.toString()
+    return rule.getDates().stream().flatMap(dateRange -> {
+      if (rule.getDays() != null) {
+        return rule.getDays().stream().flatMap(weekDayRange -> {
+          String description = String.format(
+            "%s %s",
+            dateRange.toString(),
+            weekDayRange.toString()
+          );
+          if (rule.getTimes() != null) {
+            return rule.getTimes()
+              .stream()
+              .flatMap(
+                timeSpan -> createOHCalendarBuildersForTimeSpan(
+                  calendarBuilder,
+                  description,
+                  timeSpan
+                ).stream()
+                  .map(
+                    openingHoursBuilder -> setDateRangeForOpeningHoursBuilder(
+                      openingHoursBuilder,
+                      dateRange,
+                      weekDayRange
+                    )
+                  )
               );
-              if (rule.getTimes() != null) {
-                return rule
-                  .getTimes()
-                  .stream()
-                  .flatMap(timeSpan ->
-                    createOHCalendarBuildersForTimeSpan(calendarBuilder, description, timeSpan)
-                      .stream()
-                      .map(openingHoursBuilder ->
-                        setDateRangeForOpeningHoursBuilder(
-                          openingHoursBuilder,
-                          dateRange,
-                          weekDayRange
-                        )
-                      )
-                  );
-              }
-              return Stream.of();
-            });
-        }
-        return Stream.of();
-      })
-      .collect(Collectors.toList());
+          }
+          return Stream.of();
+        });
+      }
+      return Stream.of();
+    }).collect(Collectors.toList());
   }
 
   /**
@@ -261,15 +252,13 @@ public class OsmOpeningHoursParser {
         return openingHoursBuilder;
       }
       DayOfWeek startDayOfWeek = DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getStartDay(), null);
-      DayOfWeek endDayOfWeek =
-        weekDayRange.getEndDay() != null
-          ? DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getEndDay(), null)
-          : null;
+      DayOfWeek endDayOfWeek = weekDayRange.getEndDay() != null
+        ? DAY_OF_WEEK_MAP.getOrDefault(weekDayRange.getEndDay(), null)
+        : null;
       java.time.Month startMonth = MONTH_MAP.getOrDefault(startDate.getMonth(), null);
-      java.time.Month endMonth =
-        endDate != null && endDate.getMonth() != null
-          ? MONTH_MAP.getOrDefault(endDate.getMonth(), null)
-          : null;
+      java.time.Month endMonth = endDate != null && endDate.getMonth() != null
+        ? MONTH_MAP.getOrDefault(endDate.getMonth(), null)
+        : null;
       openingHoursBuilder.on(startMonth, endMonth, startDayOfWeek, endDayOfWeek);
     }
     return openingHoursBuilder;
@@ -287,23 +276,21 @@ public class OsmOpeningHoursParser {
     if (rule.getTimes() == null) {
       return createOHCalendarBuildersForOpen24DayRanges(calendarBuilder, rule.getDays());
     }
-    return rule
-      .getDays()
-      .stream()
-      .flatMap(dayRange -> {
-        String description = dayRange.toString();
-        return rule
-          .getTimes()
-          .stream()
-          .flatMap(timeSpan ->
-            createOHCalendarBuildersForTimeSpan(calendarBuilder, description, timeSpan)
-              .stream()
-              .map(openingHoursBuilder ->
-                setWeekDayRangeRangeForOpeningHoursBuilder(openingHoursBuilder, dayRange)
+    return rule.getDays().stream().flatMap(dayRange -> {
+      String description = dayRange.toString();
+      return rule.getTimes()
+        .stream()
+        .flatMap(
+          timeSpan -> createOHCalendarBuildersForTimeSpan(calendarBuilder, description, timeSpan)
+            .stream()
+            .map(
+              openingHoursBuilder -> setWeekDayRangeRangeForOpeningHoursBuilder(
+                openingHoursBuilder,
+                dayRange
               )
-          );
-      })
-      .collect(Collectors.toList());
+            )
+        );
+    }).collect(Collectors.toList());
   }
 
   /**
@@ -387,8 +374,7 @@ public class OsmOpeningHoursParser {
     OHCalendarBuilder.OpeningHoursBuilder newOpeningHoursBuilder,
     List<OHCalendarBuilder.OpeningHoursBuilder> previousOpeningHoursBuilders
   ) {
-    previousOpeningHoursBuilders
-      .stream()
+    previousOpeningHoursBuilders.stream()
       .forEach(openingHoursBuilder -> openingHoursBuilder.offWithTimeShift(newOpeningHoursBuilder));
   }
 
@@ -409,15 +395,11 @@ public class OsmOpeningHoursParser {
     OHCalendarBuilder.OpeningHoursBuilder closedOpeningHoursBuilder,
     List<OHCalendarBuilder.OpeningHoursBuilder> previousOpeningHoursBuilders
   ) {
-    return previousOpeningHoursBuilders
-      .stream()
-      .flatMap(openingHoursBuilder -> {
-        var openingHoursBuilderAndNewBuilders =
-          openingHoursBuilder.createBuildersForRelativeComplement(closedOpeningHoursBuilder);
-        return openingHoursBuilderAndNewBuilders.newBuilders().stream();
-      })
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+    return previousOpeningHoursBuilders.stream().flatMap(openingHoursBuilder -> {
+      var openingHoursBuilderAndNewBuilders = openingHoursBuilder
+        .createBuildersForRelativeComplement(closedOpeningHoursBuilder);
+      return openingHoursBuilderAndNewBuilders.newBuilders().stream();
+    }).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   /**
@@ -446,10 +428,8 @@ public class OsmOpeningHoursParser {
    */
   private boolean isOpenRule(Rule rule) {
     var modifier = rule.getModifier();
-    return (
-      modifier == null ||
-      (modifier.getModifier() != null && OPEN_MODIFIERS.contains(modifier.getModifier()))
-    );
+    return (modifier == null ||
+      (modifier.getModifier() != null && OPEN_MODIFIERS.contains(modifier.getModifier())));
   }
 
   /**
@@ -457,11 +437,9 @@ public class OsmOpeningHoursParser {
    */
   private boolean isClosedRule(Rule rule) {
     var modifier = rule.getModifier();
-    return (
-      modifier != null &&
+    return (modifier != null &&
       modifier.getModifier() != null &&
-      CLOSED_MODIFIERS.contains(modifier.getModifier())
-    );
+      CLOSED_MODIFIERS.contains(modifier.getModifier()));
   }
 
   /**
@@ -471,13 +449,8 @@ public class OsmOpeningHoursParser {
    * be implemented
    */
   private boolean hasTimes(Rule rule) {
-    return (
-      rule.getTimes() != null &&
-      rule
-        .getTimes()
-        .stream()
-        .anyMatch(timeSpan -> timeSpan.getStart() > 0)
-    );
+    return (rule.getTimes() != null &&
+      rule.getTimes().stream().anyMatch(timeSpan -> timeSpan.getStart() > 0));
   }
 
   /**
@@ -485,8 +458,7 @@ public class OsmOpeningHoursParser {
    * "by appointment", we don't consider it to be open 24/7.
    */
   private boolean is247Rule(Rule rule) {
-    return (
-      (isOpenRule(rule) || isClosedRule(rule)) &&
+    return ((isOpenRule(rule) || isClosedRule(rule)) &&
       (rule.isTwentyfourseven() ||
         (rule.getHolidays() == null &&
           rule.getYears() == null &&
@@ -494,29 +466,27 @@ public class OsmOpeningHoursParser {
           rule.getTimes() == null &&
           rule.getDates() == null &&
           rule.getWeeks() == null &&
-          rule.getComment() == null))
-    );
+          rule.getComment() == null)));
   }
 
   /**
    * Logs unhandled rule either with {@link Logger} or stores it in {@link DataImportIssueStore}.
    */
   private void logUnhandled(Rule rule, String ohTag, String id, String link) {
-    var message =
-      link != null
-        ? String.format(
-            "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
-            rule,
-            ohTag,
-            id,
-            link
-          )
-        : String.format(
-            "Rule %s is unhandled in the opening hours definition %s for %s",
-            rule,
-            ohTag,
-            id
-          );
+    var message = link != null
+      ? String.format(
+        "Rule %s is unhandled in the opening hours definition %s for %s (%s)",
+        rule,
+        ohTag,
+        id,
+        link
+      )
+      : String.format(
+        "Rule %s is unhandled in the opening hours definition %s for %s",
+        rule,
+        ohTag,
+        id
+      );
     if (issueStore != null) {
       issueStore.add("UnhandledOHRule", message);
     } else {

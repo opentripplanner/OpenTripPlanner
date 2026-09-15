@@ -167,16 +167,12 @@ abstract class AbstractCsvFile<T> {
   }
 
   protected static String col2Str(Collection<?> c) {
-    return c
-      .stream()
-      .map(Object::toString)
-      .peek(s -> {
-        // Prevent serialization if it can not be deserialized
-        if (s.contains(ARRAY_DELIMITER)) {
-          throw new IllegalArgumentException("Element contains " + ARRAY_DELIMITER + ": " + s);
-        }
-      })
-      .collect(Collectors.joining(ARRAY_DELIMITER));
+    return c.stream().map(Object::toString).peek(s -> {
+      // Prevent serialization if it can not be deserialized
+      if (s.contains(ARRAY_DELIMITER)) {
+        throw new IllegalArgumentException("Element contains " + ARRAY_DELIMITER + ": " + s);
+      }
+    }).collect(Collectors.joining(ARRAY_DELIMITER));
   }
 
   private boolean isCommentOrEmpty(String line) {

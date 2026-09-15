@@ -27,16 +27,11 @@ public class RentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
 
   @Override
   protected List<Geometry> findGeometries(Envelope env) {
-    return service
-      .getVehicleRentalPlacesForEnvelope(env)
-      .stream()
-      .map(place -> {
-        Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(
-          new Coordinate(place.longitude(), place.latitude())
-        );
-        geometry.setUserData(place);
-        return geometry;
-      })
-      .toList();
+    return service.getVehicleRentalPlacesForEnvelope(env).stream().map(place -> {
+      Geometry geometry = GeometryUtils.getGeometryFactory()
+        .createPoint(new Coordinate(place.longitude(), place.latitude()));
+      geometry.setUserData(place);
+      return geometry;
+    }).toList();
   }
 }

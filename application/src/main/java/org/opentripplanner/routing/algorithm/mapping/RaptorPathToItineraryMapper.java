@@ -126,7 +126,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       if (pathLeg.isTransitLeg()) {
         if (
           OTPFeature.ExtraTransferLegOnSameStop.isOn() &&
-          isPathTransferAtSameStop(previousLeg, pathLeg)
+            isPathTransferAtSameStop(previousLeg, pathLeg)
         ) {
           legs.add(createTransferLegAtSameStop(previousLeg, pathLeg));
         }
@@ -164,8 +164,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .withEgressPenalty(egressPenalty);
 
     // Map general itinerary fields
-    var arrivedOnRental = egressPathLeg
-      .egress()
+    var arrivedOnRental = egressPathLeg.egress()
       .findOriginal(RoutingAccessEgress.class)
       .stream()
       .anyMatch(leg -> leg.getFinalState().isRentingVehicleFromStation());
@@ -189,13 +188,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     PathLeg<T> previousLeg,
     PathLeg<T> currentLeg
   ) {
-    return (
-      previousLeg != null &&
+    return (previousLeg != null &&
       previousLeg.isTransitLeg() &&
       currentLeg.isTransitLeg() &&
       !previousLeg.asTransitLeg().isStaySeatedOntoNextLeg() &&
-      previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop()
-    );
+      previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop());
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
@@ -204,8 +201,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
 
     if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
-      return carpoolItineraryMapper
-        .toItinerary((CarpoolAccessEgress) accessPathLeg.access())
+      return carpoolItineraryMapper.toItinerary((CarpoolAccessEgress) accessPathLeg.access())
         .legs();
     }
 
@@ -231,8 +227,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     if (tripSchedule.isFrequencyBasedTrip()) {
       int frequencyHeadwayInSeconds = tripSchedule.frequencyHeadwayInSeconds();
-      return new FrequencyTransitLegBuilder()
-        .withTripTimes(tripSchedule.getOriginalTripTimes())
+      return new FrequencyTransitLegBuilder().withTripTimes(tripSchedule.getOriginalTripTimes())
         .withTripPattern(tripSchedule.getOriginalTripPattern())
         .withBoardStopIndexInPattern(boardStopIndexInPattern)
         .withAlightStopIndexInPattern(alightStopIndexInPattern)
@@ -263,8 +258,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     TripOnServiceDate tripOnServiceDate = getTripOnServiceDate(tripSchedule);
 
-    return new ScheduledTransitLegBuilder<>()
-      .withTripTimes(tripSchedule.getOriginalTripTimes())
+    return new ScheduledTransitLegBuilder<>().withTripTimes(tripSchedule.getOriginalTripTimes())
       .withTripPattern(tripSchedule.getOriginalTripPattern())
       .withBoardStopIndexInPattern(boardStopIndexInPattern)
       .withAlightStopIndexInPattern(alightStopIndexInPattern)
@@ -353,8 +347,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     if (egressPathLeg.egress() instanceof CarpoolAccessEgress) {
       // TODO refactor this to return legs directly
-      return carpoolItineraryMapper
-        .toItinerary((CarpoolAccessEgress) egressPathLeg.egress())
+      return carpoolItineraryMapper.toItinerary((CarpoolAccessEgress) egressPathLeg.egress())
         .legs();
     }
 
@@ -402,15 +395,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       );
     }
     // We need to timeshift the toLegs
-    long toDuration = toLegs
-      .stream()
-      .mapToLong(l -> l.duration().toSeconds())
-      .sum();
+    long toDuration = toLegs.stream().mapToLong(l -> l.duration().toSeconds()).sum();
 
-    toLegs = toLegs
-      .stream()
-      .map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration)))
-      .toList();
+    toLegs = toLegs.stream().map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration))).toList();
 
     return ListUtils.combine(fromLegs, toLegs);
   }
@@ -465,19 +452,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * revisited when adding support for transfer between on-board flex access and transit.
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
-    return (
-      transitLegBeforeTransfer == null ||
+    return (transitLegBeforeTransfer == null ||
       transitLegBeforeTransfer.transferToNextLeg() == null ||
-      !transitLegBeforeTransfer.transferToNextLeg().getTransferConstraint().isStaySeated()
-    );
+      !transitLegBeforeTransfer.transferToNextLeg().getTransferConstraint().isStaySeated());
   }
 
   private List<Leg> mapAccessEgressToLegs(
     RaptorAccessEgress accessEgress,
     ZonedDateTime startTime
   ) {
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
+    return accessEgress.findOriginal(RoutingAccessEgress.class)
       .map(RoutingAccessEgress::getFinalState)
       .map(StreetPath::new)
       .map(path -> streetPathToLegsMapper.map(path, request, startTime))
@@ -488,8 +472,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (accessEgress instanceof RaptorStartOnBoardAccess) {
       return TimeAndCost.ZERO;
     }
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
+    return accessEgress.findOriginal(RoutingAccessEgress.class)
       .map(RoutingAccessEgress::penalty)
       .orElseThrow();
   }

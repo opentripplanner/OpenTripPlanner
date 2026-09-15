@@ -62,11 +62,7 @@ public class StreetModeMapper {
       );
     }
     // Walk is currently always used as an implied mode when mode is not car.
-    return modes
-      .stream()
-      .filter(mode -> mode != StreetMode.WALK)
-      .findFirst()
-      .get();
+    return modes.stream().filter(mode -> mode != StreetMode.WALK).findFirst().get();
   }
 
   /**
@@ -103,12 +99,10 @@ public class StreetModeMapper {
   }
 
   private static boolean isAlwaysPresentInLeg(StreetMode mode) {
-    return (
-      mode == StreetMode.BIKE ||
+    return (mode == StreetMode.BIKE ||
       mode == StreetMode.CAR ||
       mode == StreetMode.WALK ||
       mode == StreetMode.CARPOOL ||
-      mode.includesParking()
-    );
+      mode.includesParking());
   }
 }

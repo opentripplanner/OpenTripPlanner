@@ -20,12 +20,13 @@ class ExpandingEnvelopeTest {
     // second step (100 m), so the expanding envelope must expand to find the edge
     env.linkVertexForRealTime(0.005, -0.000234);
 
-    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl())
-      .that(env.graph().summarizeTempEdges())
-      .containsExactly("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.01,0) ALL ♿✅");
+    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl()).that(
+      env.graph().summarizeTempEdges()
+    ).containsExactly("(0,0) → (0.005,0) ALL ♿✅", "(0.005,0) → (0.01,0) ALL ♿✅");
 
-    assertWithMessage("Inspect disposable edges at %s", env.disposable().geojsonUrl())
-      .that(env.disposable().summarize())
+    assertWithMessage("Inspect disposable edges at %s", env.disposable().geojsonUrl()).that(
+      env.disposable().summarize()
+    )
       .containsExactly(
         "(0,0) → (0.005,0) ALL ♿✅",
         "(0.005,0) → (0.01,0) ALL ♿✅",
@@ -45,12 +46,12 @@ class ExpandingEnvelopeTest {
     // so the edge must not be linked
     env.linkVertexForRealTime(0.005, -0.000907);
 
-    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl())
-      .that(env.graph().summarizeTempEdges())
-      .isEmpty();
+    assertWithMessage("Inspect graph at %s", env.graph().geoJsonUrl()).that(
+      env.graph().summarizeTempEdges()
+    ).isEmpty();
 
-    assertWithMessage("Inspect disposable edges at %s", env.disposable().geojsonUrl())
-      .that(env.disposable().summarize())
-      .isEmpty();
+    assertWithMessage("Inspect disposable edges at %s", env.disposable().geojsonUrl()).that(
+      env.disposable().summarize()
+    ).isEmpty();
   }
 }

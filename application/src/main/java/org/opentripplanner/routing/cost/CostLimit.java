@@ -69,8 +69,8 @@ public final class CostLimit {
     if (cost >= 0 && cost <= MAX_COST) {
       return cost;
     }
-    THROTTLE_COST_EXCEEDED.throttle(() ->
-      LOG.warn(
+    THROTTLE_COST_EXCEEDED.throttle(
+      () -> LOG.warn(
         "Generalized cost {} for a street access, egress or transfer leg exceeded the maximum of {} and was capped. Please consider changing the cost calculation. More information: https://github.com/opentripplanner/OpenTripPlanner/pull/5516#issuecomment-1819138078",
         cost,
         MAX_COST

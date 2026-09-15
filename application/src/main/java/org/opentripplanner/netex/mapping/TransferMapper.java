@@ -130,15 +130,15 @@ public class TransferMapper {
 
   private TransferPriority mapPriority(Number pri) {
     switch (pri.intValue()) {
-      case -1:
+      case -1 :
         return TransferPriority.NOT_ALLOWED;
-      case 0:
+      case 0 :
         return TransferPriority.ALLOWED;
-      case 1:
+      case 1 :
         return TransferPriority.RECOMMENDED;
-      case 2:
+      case 2 :
         return TransferPriority.PREFERRED;
-      default:
+      default :
         throw new IllegalArgumentException("Interchange priority unknown: " + pri);
     }
   }

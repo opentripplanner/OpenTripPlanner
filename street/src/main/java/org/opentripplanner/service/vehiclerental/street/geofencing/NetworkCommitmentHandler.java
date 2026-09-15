@@ -104,7 +104,7 @@ class NetworkCommitmentHandler {
         String network = zone.id().getFeedId();
         if (
           before.getCommittedNetworks().contains(network) ||
-          Boolean.TRUE.equals(zone.traversalBanned())
+            Boolean.TRUE.equals(zone.traversalBanned())
         ) {
           continue;
         }

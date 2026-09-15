@@ -29,8 +29,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements
-  ArrivedAtDestinationCheck,
-  DestinationArrivalListener {
+  ArrivedAtDestinationCheck, DestinationArrivalListener {
 
   private final DestinationArrivalPaths<T> paths;
   private final TransitCalculator<T> calculator;

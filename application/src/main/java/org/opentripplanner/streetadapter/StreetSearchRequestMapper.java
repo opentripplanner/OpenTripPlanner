@@ -91,8 +91,7 @@ public class StreetSearchRequestMapper {
   /// - their start time is always the epoch (0)
   ///
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
-    return map(request)
-      .withFromEnvelope(null)
+    return map(request).withFromEnvelope(null)
       .withToEnvelope(null)
       // transfer requests are always depart-at
       .withArriveBy(false)
@@ -214,8 +213,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static List<ParkingSelect> mapTagSelect(List<VehicleParkingSelect> selects) {
-    return selects
-      .stream()
+    return selects.stream()
       .map(s -> new TagsSelect(s.tags()))
       .map(ParkingSelect.class::cast)
       .toList();

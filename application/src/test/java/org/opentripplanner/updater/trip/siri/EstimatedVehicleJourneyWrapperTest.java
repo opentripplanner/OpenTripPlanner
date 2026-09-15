@@ -36,8 +36,7 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void acceptUnmonitoredCancellation() {
-    var journey = builder()
-      .withMonitored(false)
+    var journey = builder().withMonitored(false)
       .withCancellation(true)
       .buildEstimatedVehicleJourney();
 
@@ -49,12 +48,12 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void propagateInvalidCallFailure() {
-    var journey = builder()
-      .withEstimatedCalls(calls -> calls.call("STOP_A").clearOrder())
+    var journey = builder().withEstimatedCalls(calls -> calls.call("STOP_A").clearOrder())
       .buildEstimatedVehicleJourney();
 
-    assertFailure(UpdateErrorType.MISSING_CALL_ORDER, () ->
-      EstimatedVehicleJourneyWrapper.of(journey)
+    assertFailure(
+      UpdateErrorType.MISSING_CALL_ORDER,
+      () -> EstimatedVehicleJourneyWrapper.of(journey)
     );
   }
 
@@ -62,8 +61,7 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void calls() {
-    var journey = builder()
-      .withEstimatedCalls(calls -> calls.call("STOP_A").call("STOP_B"))
+    var journey = builder().withEstimatedCalls(calls -> calls.call("STOP_A").call("STOP_B"))
       .buildEstimatedVehicleJourney();
 
     var wrapper = EstimatedVehicleJourneyWrapper.of(journey);
@@ -76,14 +74,14 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void hasExtraCall() {
-    var withExtraCall = builder()
-      .withEstimatedCalls(calls -> calls.call("STOP_A").call("STOP_B").withIsExtraCall(true))
-      .buildEstimatedVehicleJourney();
+    var withExtraCall = builder().withEstimatedCalls(
+      calls -> calls.call("STOP_A").call("STOP_B").withIsExtraCall(true)
+    ).buildEstimatedVehicleJourney();
     assertTrue(EstimatedVehicleJourneyWrapper.of(withExtraCall).hasExtraCall());
 
-    var withoutExtraCall = builder()
-      .withEstimatedCalls(calls -> calls.call("STOP_A").call("STOP_B"))
-      .buildEstimatedVehicleJourney();
+    var withoutExtraCall = builder().withEstimatedCalls(
+      calls -> calls.call("STOP_A").call("STOP_B")
+    ).buildEstimatedVehicleJourney();
     assertFalse(EstimatedVehicleJourneyWrapper.of(withoutExtraCall).hasExtraCall());
   }
 
@@ -91,8 +89,7 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void journeyStatusFlags() {
-    var journey = builder()
-      .withCancellation(true)
+    var journey = builder().withCancellation(true)
       .withIsExtraJourney(true)
       .withPredictionInaccurate(true)
       .buildEstimatedVehicleJourney();
@@ -120,16 +117,14 @@ class EstimatedVehicleJourneyWrapperTest {
   void datedVehicleJourneyRef() {
     var journey = builder().withDatedVehicleJourneyRef("DSJ:1").buildEstimatedVehicleJourney();
 
-    Optional<String> datedVehicleJourneyRef = EstimatedVehicleJourneyWrapper.of(
-      journey
-    ).datedVehicleJourneyRef();
+    Optional<String> datedVehicleJourneyRef = EstimatedVehicleJourneyWrapper.of(journey)
+      .datedVehicleJourneyRef();
     assertThat(datedVehicleJourneyRef).hasValue("DSJ:1");
   }
 
   @Test
   void code() {
-    var journey = builder()
-      .withEstimatedVehicleJourneyCode("RUT:ServiceJourney:1234")
+    var journey = builder().withEstimatedVehicleJourneyCode("RUT:ServiceJourney:1234")
       .buildEstimatedVehicleJourney();
 
     var code = EstimatedVehicleJourneyWrapper.of(journey).code();
@@ -142,11 +137,9 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void vehicleJourneyIdAndServiceDate() {
-    var journey = builder()
-      .withFramedVehicleJourneyRef(ref ->
-        ref.withVehicleJourneyRef("SJ:1").withServiceDate(LocalDate.of(2024, 5, 7))
-      )
-      .buildEstimatedVehicleJourney();
+    var journey = builder().withFramedVehicleJourneyRef(
+      ref -> ref.withVehicleJourneyRef("SJ:1").withServiceDate(LocalDate.of(2024, 5, 7))
+    ).buildEstimatedVehicleJourney();
 
     var result = EstimatedVehicleJourneyWrapper.of(journey).vehicleJourneyIdAndServiceDate();
 
@@ -176,25 +169,23 @@ class EstimatedVehicleJourneyWrapperTest {
   void replacedDatedVehicleJourneyRef() {
     var journey = builder().withVehicleJourneyRef("REPLACED:1").buildEstimatedVehicleJourney();
 
-    var replacedDatedVehicleJourneyRef = EstimatedVehicleJourneyWrapper.of(
-      journey
-    ).replacedDatedVehicleJourneyRef();
+    var replacedDatedVehicleJourneyRef = EstimatedVehicleJourneyWrapper.of(journey)
+      .replacedDatedVehicleJourneyRef();
     assertThat(replacedDatedVehicleJourneyRef).hasValue("REPLACED:1");
   }
 
   @Test
   void additionalReplacedDatedVehicleJourneyRefs() {
     var journey = builder().buildEstimatedVehicleJourney();
-    journey.getAdditionalVehicleJourneyReves().add(
-      new SiriEtBuilder.FramedVehicleRefBuilder()
-        .withVehicleJourneyRef("REPLACED:2")
-        .withServiceDate(LocalDate.of(2024, 5, 7))
-        .build()
-    );
+    journey.getAdditionalVehicleJourneyReves()
+      .add(
+        new SiriEtBuilder.FramedVehicleRefBuilder().withVehicleJourneyRef("REPLACED:2")
+          .withServiceDate(LocalDate.of(2024, 5, 7))
+          .build()
+      );
 
-    var result = EstimatedVehicleJourneyWrapper.of(
-      journey
-    ).additionalReplacedDatedVehicleJourneyRefs();
+    var result = EstimatedVehicleJourneyWrapper.of(journey)
+      .additionalReplacedDatedVehicleJourneyRefs();
 
     assertEquals(1, result.size());
     assertEquals("REPLACED:2", result.getFirst().vehicleJourneyId());
@@ -213,8 +204,7 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void lineAndOperatorRef() {
-    var journey = builder()
-      .withLineRef("LINE:1")
+    var journey = builder().withLineRef("LINE:1")
       .withOperatorRef("OPERATOR:1")
       .buildEstimatedVehicleJourney();
 
@@ -226,8 +216,7 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void vehicleModes() {
-    var rail = builder()
-      .withVehicleMode(VehicleModesEnumeration.RAIL)
+    var rail = builder().withVehicleMode(VehicleModesEnumeration.RAIL)
       .buildEstimatedVehicleJourney();
     var railWrapper = EstimatedVehicleJourneyWrapper.of(rail);
     assertTrue(railWrapper.isRail());
@@ -243,8 +232,7 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void descriptiveInformation() {
-    var journey = builder()
-      .withPublishedLineName("Line 1")
+    var journey = builder().withPublishedLineName("Line 1")
       .withDestinationName("Central Station")
       .withOccupancy(OccupancyEnumeration.FULL)
       .buildEstimatedVehicleJourney();

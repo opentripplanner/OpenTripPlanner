@@ -52,8 +52,8 @@ class GbfsVehicleTypeMapper {
   }
 
   private void logIgnoredVehicleType(GBFSVehicleType vehicleType, String field) {
-    LOG_THROTTLE.throttle(() ->
-      LOG.info(
+    LOG_THROTTLE.throttle(
+      () -> LOG.info(
         "Ignoring rental vehicle type '{}' in feed '{}': missing or unrecognized {}. {}",
         vehicleType.getVehicleTypeId(),
         systemId,

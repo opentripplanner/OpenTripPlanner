@@ -138,7 +138,8 @@ public class ItineraryFiltersInputType {
             """
             Use this parameter to debug the itinerary-filter-chain. The default is `off`
             (itineraries are filtered and not returned). For all other values the unwanted
-            itineraries are returned with a system notice, and not deleted."""
+            itineraries are returned with a system notice, and not deleted.\
+            """
           )
           .defaultValue(dft.debug())
           .build()
@@ -165,8 +166,10 @@ public class ItineraryFiltersInputType {
       GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER,
       builder::withGroupedOtherThanSameLegsMaxCostMultiplier
     );
-    setField(callWith, TRANSIT_GENERALIZED_COST_LIMIT, (Map<String, ?> v) ->
-      builder.withTransitGeneralizedCostLimit(
+    setField(
+      callWith,
+      TRANSIT_GENERALIZED_COST_LIMIT,
+      (Map<String, ?> v) -> builder.withTransitGeneralizedCostLimit(
         new TransitGeneralizedCostFilterParams(
           ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
           (double) v.get("intervalRelaxFactor")

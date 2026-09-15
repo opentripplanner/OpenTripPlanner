@@ -28,8 +28,7 @@ public class ExampleConfigTest {
       "doc/user/examples/**/" + ROUTER_CONFIG_FILENAME,
       "test/performance/**/" + ROUTER_CONFIG_FILENAME,
       "application/src/test/resources/standalone/config/**/" + ROUTER_CONFIG_FILENAME,
-      "application/src/ext-test/resources/**/" + ROUTER_CONFIG_FILENAME,
-    }
+      "application/src/ext-test/resources/**/" + ROUTER_CONFIG_FILENAME, }
   )
   @ParameterizedTest(name = "Check validity of {0}")
   void routerConfig(Path filename) {
@@ -40,8 +39,7 @@ public class ExampleConfigTest {
     pattern = {
       "doc/user/examples/**/" + BUILD_CONFIG_FILENAME,
       "application/src/test/resources/standalone/config/**/" + BUILD_CONFIG_FILENAME,
-      "application/src/ext-test/resources/**/" + BUILD_CONFIG_FILENAME,
-    }
+      "application/src/ext-test/resources/**/" + BUILD_CONFIG_FILENAME, }
   )
   @ParameterizedTest(name = "Check validity of {0}")
   void buildConfig(Path filename) {
@@ -57,8 +55,7 @@ public class ExampleConfigTest {
   @FilePatternSource(
     pattern = {
       "test/performance/**/otp-config.json",
-      "doc/user/examples/**/" + OTP_CONFIG_FILENAME,
-    }
+      "doc/user/examples/**/" + OTP_CONFIG_FILENAME, }
   )
   @ParameterizedTest(name = "Check validity of {0}")
   void otpConfig(Path filename) {
@@ -68,8 +65,7 @@ public class ExampleConfigTest {
   @FilePatternSource(
     pattern = {
       "doc/user/examples/**/" + DEBUG_UI_CONFIG_FILENAME,
-      "application/src/test/resources/standalone/config/" + DEBUG_UI_CONFIG_FILENAME,
-    }
+      "application/src/test/resources/standalone/config/" + DEBUG_UI_CONFIG_FILENAME, }
   )
   @ParameterizedTest(name = "Check validity of {0}")
   void debugUiConfig(Path filename) {
@@ -81,8 +77,9 @@ public class ExampleConfigTest {
   )
   @ParameterizedTest(name = "Fail when parsing an invalid config from {0}")
   void failInvalidConfig(Path filename) {
-    Assertions.assertThrows(AssertionFailedError.class, () ->
-      testConfig(filename, a -> new BuildConfig(a, true))
+    Assertions.assertThrows(
+      AssertionFailedError.class,
+      () -> testConfig(filename, a -> new BuildConfig(a, true))
     );
   }
 

@@ -141,8 +141,7 @@ public class OsmAreaGroup {
         Set<OsmLevel> levelSet1 = areasLevels.get(area1);
         for (OsmArea area2 : areasForNodePair.get(nodePair)) {
           Set<OsmLevel> levelSet2 = areasLevels.get(area2);
-          boolean onSameLevels =
-            (levelSet1 == null && levelSet2 == null) ||
+          boolean onSameLevels = (levelSet1 == null && levelSet2 == null) ||
             (levelSet1 != null && levelSet1.equals(levelSet2));
           var crossablePermissions = Objects.requireNonNull(area1)
             .getPermission()
@@ -150,20 +149,16 @@ public class OsmAreaGroup {
           Collection<OsmWay> sharedBarriers = CollectionUtils.intersection(
             barriersForArea.getOrDefault(area1, Map.of()).keySet(),
             barriersForArea.getOrDefault(area2, Map.of()).keySet()
-          )
-            .stream()
-            .filter(barrier -> {
-              boolean blocksTraversal =
-                crossablePermissions.intersection(
-                  Objects.requireNonNull(barrier).getPermission()
-                ) != crossablePermissions;
-              boolean sharesEdgeWithBothAreas = !CollectionUtils.intersection(
-                barriersForArea.get(area1).get(barrier),
-                barriersForArea.get(area2).get(barrier)
-              ).isEmpty();
-              return blocksTraversal && sharesEdgeWithBothAreas;
-            })
-            .toList();
+          ).stream().filter(barrier -> {
+            boolean blocksTraversal = crossablePermissions.intersection(
+              Objects.requireNonNull(barrier).getPermission()
+            ) != crossablePermissions;
+            boolean sharesEdgeWithBothAreas = !CollectionUtils.intersection(
+              barriersForArea.get(area1).get(barrier),
+              barriersForArea.get(area2).get(barrier)
+            ).isEmpty();
+            return blocksTraversal && sharesEdgeWithBothAreas;
+          }).toList();
           boolean shareBarrier = area1 != area2 && !sharedBarriers.isEmpty();
           if (onSameLevels && !shareBarrier) {
             groups.union(area1, area2);
@@ -269,8 +264,7 @@ public class OsmAreaGroup {
    */
   public long cacheKey() {
     long hash = 1L;
-    long[] entityIds = this.areas
-      .stream()
+    long[] entityIds = this.areas.stream()
       .map(a -> a.parent)
       .mapToLong(OsmEntity::getId)
       .sorted()

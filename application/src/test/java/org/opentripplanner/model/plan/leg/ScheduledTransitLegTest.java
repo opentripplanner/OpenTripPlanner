@@ -32,19 +32,21 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class ScheduledTransitLegTest {
 
-  private static final ZonedDateTime START_TIME = OffsetDateTime.parse(
-    "2023-04-17T17:49:06+02:00"
-  ).toZonedDateTime();
+  private static final ZonedDateTime START_TIME = OffsetDateTime.parse("2023-04-17T17:49:06+02:00")
+    .toZonedDateTime();
   private static final ZonedDateTime END_TIME = START_TIME.plusMinutes(10);
   private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
-  private static final RegularStop STOP_0 = ENV_BUILDER.stop("Stop_0", b ->
-    b.withCoordinate(60.0, 10.0)
+  private static final RegularStop STOP_0 = ENV_BUILDER.stop(
+    "Stop_0",
+    b -> b.withCoordinate(60.0, 10.0)
   );
-  private static final RegularStop STOP_1 = ENV_BUILDER.stop("Stop_1", b ->
-    b.withCoordinate(60.0, 10.01)
+  private static final RegularStop STOP_1 = ENV_BUILDER.stop(
+    "Stop_1",
+    b -> b.withCoordinate(60.0, 10.01)
   );
-  private static final RegularStop STOP_2 = ENV_BUILDER.stop("Stop_2", b ->
-    b.withCoordinate(60.0, 10.02)
+  private static final RegularStop STOP_2 = ENV_BUILDER.stop(
+    "Stop_2",
+    b -> b.withCoordinate(60.0, 10.02)
   );
   private static final TransitTestEnvironment ENV = ENV_BUILDER.addTrip(
     TripInput.of("trip1")
@@ -64,13 +66,13 @@ class ScheduledTransitLegTest {
   private static final int GENERALIZED_COST = 980;
   private static final ZoneId ZONE_ID = ZoneIds.BERLIN;
   private static final Duration DELAY = Duration.ofMinutes(4);
-  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES =
-    TRIP_TIMES.createRealTimeFromScheduledTimes()
-      .withDepartureTime(
-        BOARD_STOP_INDEX_IN_PATTERN,
-        TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
-      )
-      .build();
+  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES = TRIP_TIMES
+    .createRealTimeFromScheduledTimes()
+    .withDepartureTime(
+      BOARD_STOP_INDEX_IN_PATTERN,
+      TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
+    )
+    .build();
   private static final ViaLocationType FROM_VIA_LOCATION_TYPE = ViaLocationType.PASS_THROUGH;
   private static final ViaLocationType TO_VIA_LOCATION_TYPE = ViaLocationType.VISIT;
 
@@ -83,8 +85,9 @@ class ScheduledTransitLegTest {
     FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
   );
 
-  private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder()
-    .withTripTimes(REAL_TIME_TRIP_TIMES)
+  private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder().withTripTimes(
+    REAL_TIME_TRIP_TIMES
+  )
     .withTripPattern(PATTERN)
     .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
     .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
@@ -102,8 +105,7 @@ class ScheduledTransitLegTest {
 
   @Test
   void testMinimalSetOfFieldsSet() {
-    var subject = new ScheduledTransitLegBuilder()
-      .withTripTimes(TRIP_TIMES)
+    var subject = new ScheduledTransitLegBuilder().withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
       .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
       .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)

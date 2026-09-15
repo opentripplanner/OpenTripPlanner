@@ -126,12 +126,11 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
    */
   private void applyQuayChange(TransitTestEnvironment env) {
     var siri = SiriTestHelper.of(env);
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(stopA).departAimedActual("00:00:11", "00:00:15"))
-      .withEstimatedCalls(builder ->
-        builder.call(stopC).arriveAimedExpected("00:00:20", "00:00:33")
+      .withEstimatedCalls(
+        builder -> builder.call(stopC).arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
     assertSuccess(siri.applyEstimatedTimetable(updates));

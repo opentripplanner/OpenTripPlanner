@@ -60,25 +60,24 @@ class GbfsFeedMapperTest {
     assertEquals(6, stations.size());
 
     assertTrue(
-      stations
-        .stream()
-        .allMatch(vehicleRentalPlace ->
-          vehicleRentalPlace.availablePickupFormFactors(true).equals(Set.of(RentalFormFactor.MOPED))
+      stations.stream()
+        .allMatch(
+          vehicleRentalPlace -> vehicleRentalPlace.availablePickupFormFactors(true)
+            .equals(Set.of(RentalFormFactor.MOPED))
         )
     );
     assertTrue(stations.stream().allMatch(VehicleRentalPlace::isFloatingVehicle));
     assertTrue(stations.stream().noneMatch(VehicleRentalPlace::isCarStation));
     assertTrue(stations.stream().noneMatch(VehicleRentalPlace::overloadingAllowed));
     assertTrue(
-      stations
-        .stream()
+      stations.stream()
         .allMatch(vehicleRentalStation -> vehicleRentalStation.network().equals("check_almere"))
     );
     assertTrue(
-      stations
-        .stream()
-        .noneMatch(vehicleRentalStation ->
-          vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
+      stations.stream()
+        .noneMatch(
+          vehicleRentalStation -> vehicleRentalStation
+            .isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
 
@@ -88,10 +87,9 @@ class GbfsFeedMapperTest {
     assertEquals(0, stations.stream().filter(VehicleRentalPlace::isAllowDropoff).count());
 
     assertTrue(
-      stations
-        .stream()
-        .allMatch(vehicleRentalPlace ->
-          vehicleRentalPlace.name().toString().equals("Default vehicle type")
+      stations.stream()
+        .allMatch(
+          vehicleRentalPlace -> vehicleRentalPlace.name().toString().equals("Default vehicle type")
         )
     );
 
@@ -170,8 +168,7 @@ class GbfsFeedMapperTest {
 
     assertEquals(14, zones.size());
 
-    var hubBergnet = zones
-      .stream()
+    var hubBergnet = zones.stream()
       .filter(z -> z.name().toString().equals("Hub Bergnet"))
       .findFirst()
       .get();
@@ -184,8 +181,7 @@ class GbfsFeedMapperTest {
     assertEquals(List.of("check_moped_almere_60"), hubBergnet.vehicleTypeIds());
     assertNull(hubBergnet.maximumSpeedKph());
 
-    var almereHaven = zones
-      .stream()
+    var almereHaven = zones.stream()
       .filter(z -> z.name().toString().equals("Almere Haven"))
       .findFirst()
       .get();
@@ -196,8 +192,7 @@ class GbfsFeedMapperTest {
     var businessAreas = zones.stream().filter(GeofencingZone::isBusinessArea).toList();
 
     assertEquals(12, businessAreas.size());
-    var almereStad = zones
-      .stream()
+    var almereStad = zones.stream()
       .filter(z -> z.name().toString().equals("Almere Stad"))
       .findFirst()
       .get();
@@ -269,8 +264,7 @@ class GbfsFeedMapperTest {
     assertEquals(3, stations.size());
 
     // Verify the duplicate station uses the first occurrence data (10 vehicles available)
-    var duplicateStation = stations
-      .stream()
+    var duplicateStation = stations.stream()
       .filter(s -> s.id().getId().contains("station_duplicate"))
       .findFirst()
       .orElseThrow();
@@ -299,8 +293,8 @@ class GbfsFeedMapperTest {
     missingPropulsion.setFormFactor(GBFSVehicleType.FormFactor.SCOOTER_STANDING);
     missingPropulsion.setPropulsionType(null);
 
-    Map<String, RentalVehicleType> vehicleTypes = assertDoesNotThrow(() ->
-      GbfsFeedMapper.mapVehicleTypes(
+    Map<String, RentalVehicleType> vehicleTypes = assertDoesNotThrow(
+      () -> GbfsFeedMapper.mapVehicleTypes(
         vehicleTypeMapper,
         List.of(valid, missingFormFactor, missingPropulsion)
       )

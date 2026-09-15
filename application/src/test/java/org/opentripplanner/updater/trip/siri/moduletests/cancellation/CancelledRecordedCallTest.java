@@ -31,14 +31,15 @@ class CancelledRecordedCallTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder.call(STOP_A).withIsCancellation(true).departAimedActual("00:01:01", "00:01:01")
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
+          .withIsCancellation(true)
+          .departAimedActual("00:01:01", "00:01:01")
       )
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_B).arriveAimedExpected("00:01:10", "00:01:10")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B).arriveAimedExpected("00:01:10", "00:01:10")
       )
       .buildEstimatedTimetableDeliveries();
 

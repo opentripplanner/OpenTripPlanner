@@ -33,11 +33,9 @@ class ElevatorHopEdgeTest {
   void shouldNotTraverse(Accessibility wheelchair) {
     var req = StreetSearchRequest.of();
     var feature = AccessibilityRequest.ofOnlyAccessible();
-    req
-      .withWheelchairEnabled(true)
-      .withWheelchair(b ->
-        b
-          .withStop(feature)
+    req.withWheelchairEnabled(true)
+      .withWheelchair(
+        b -> b.withStop(feature)
           .withElevator(feature)
           .withInaccessibleStreetReluctance(25)
           .withMaxSlope(0.5)

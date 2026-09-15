@@ -25,9 +25,9 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     throws IOException {
     if (
       isEligibleForEtag(request, response) &&
-      hasAllowedContentType(response) &&
-      response.getEntity() instanceof byte[] bytes &&
-      bytes.length > 0
+        hasAllowedContentType(response) &&
+        response.getEntity() instanceof byte[] bytes &&
+        bytes.length > 0
     ) {
       var clientEtag = request.getHeaderString(HEADER_IF_NONE_MATCH);
       var etag = generateETagHeaderValue(bytes);

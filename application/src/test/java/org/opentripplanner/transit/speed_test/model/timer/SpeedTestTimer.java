@@ -71,8 +71,7 @@ public class SpeedTestTimer {
   public void setUp(boolean logResultsByTestCaseCategory) {
     this.groupResultByTestCaseCategory = logResultsByTestCaseCategory;
     var location = Optional.ofNullable(System.getenv("SPEEDTEST_LOCATION")).orElse("unknown");
-    registry
-      .config()
+    registry.config()
       .commonTags(
         List.of(
           Tag.of("git.commit", projectInfo().versionControl.commit),
@@ -83,17 +82,15 @@ public class SpeedTestTimer {
 
     // record the lowest percentile of times
     //noinspection NullableProblems
-    registry.config().meterFilter(
-      new MeterFilter() {
-        @Override
-        public DistributionStatisticConfig configure(
-          Meter.Id id,
-          DistributionStatisticConfig config
-        ) {
-          return DistributionStatisticConfig.builder().percentiles(0.01).build().merge(config);
-        }
+    registry.config().meterFilter(new MeterFilter() {
+      @Override
+      public DistributionStatisticConfig configure(
+        Meter.Id id,
+        DistributionStatisticConfig config
+      ) {
+        return DistributionStatisticConfig.builder().percentiles(0.01).build().merge(config);
       }
-    );
+    });
   }
 
   public MeterRegistry getRegistry() {
@@ -120,7 +117,7 @@ public class SpeedTestTimer {
     // close() sends the results to influxdb
     if (
       uploadRegistry != null &&
-      uploadRegistry instanceof MeterRegistrySetup.CustomInfluxRegistry custom
+        uploadRegistry instanceof MeterRegistrySetup.CustomInfluxRegistry custom
     ) {
       custom.doPublish();
     }
@@ -158,8 +155,7 @@ public class SpeedTestTimer {
   }
 
   public int testTotalTimeMs(String timerName) {
-    return getTotalTimers(timerName)
-      .mapToInt(timer -> (int) timer.totalTime(TimeUnit.MILLISECONDS))
+    return getTotalTimers(timerName).mapToInt(timer -> (int) timer.totalTime(TimeUnit.MILLISECONDS))
       .sum();
   }
 
@@ -197,8 +193,7 @@ public class SpeedTestTimer {
   }
 
   private Stream<Timer> getTotalTimers(String timerName) {
-    return registry
-      .find(timerName)
+    return registry.find(timerName)
       .meters()
       .stream()
       .filter(Timer.class::isInstance)

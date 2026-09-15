@@ -154,8 +154,7 @@ public final class RoutingPreferences implements Serializable {
       return false;
     }
     RoutingPreferences that = (RoutingPreferences) o;
-    return (
-      Objects.equals(transit, that.transit) &&
+    return (Objects.equals(transit, that.transit) &&
       Objects.equals(transfer, that.transfer) &&
       Objects.equals(walk, that.walk) &&
       Objects.equals(street, that.street) &&
@@ -165,8 +164,7 @@ public final class RoutingPreferences implements Serializable {
       Objects.equals(scooter, that.scooter) &&
       Objects.equals(system, that.system) &&
       Objects.equals(itineraryFilter, that.itineraryFilter) &&
-      Objects.equals(locale, that.locale)
-    );
+      Objects.equals(locale, that.locale));
   }
 
   @Override

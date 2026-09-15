@@ -76,14 +76,12 @@ public class PathConfig<T extends RaptorTripSchedule> {
   /* private members */
 
   private ParetoSetTime paretoSetTimeConfig() {
-    boolean preferLatestDeparture =
-      ctx.searchParams().preferLateArrival() != ctx.searchDirection().isInReverse();
+    boolean preferLatestDeparture = ctx.searchParams().preferLateArrival() !=
+      ctx.searchDirection().isInReverse();
 
-    ParetoSetTime timeConfig = ctx.searchParams().timetable()
-      ? ParetoSetTime.USE_TIMETABLE
-      : preferLatestDeparture
-        ? ParetoSetTime.USE_DEPARTURE_TIME
-        : ParetoSetTime.USE_ARRIVAL_TIME;
+    ParetoSetTime timeConfig = ctx.searchParams().timetable() ? ParetoSetTime.USE_TIMETABLE
+      : preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME
+      : ParetoSetTime.USE_ARRIVAL_TIME;
     return timeConfig;
   }
 
@@ -108,17 +106,17 @@ public class PathConfig<T extends RaptorTripSchedule> {
   ) {
     return searchDirection.isForward()
       ? new ForwardPathMapper<>(
-          slackProvider,
-          costCalculator,
-          stopNameResolver,
-          txConstraintsSearch,
-          lifeCycle
-        )
+        slackProvider,
+        costCalculator,
+        stopNameResolver,
+        txConstraintsSearch,
+        lifeCycle
+      )
       : new ReversePathMapper<>(
-          slackProvider,
-          costCalculator,
-          stopNameResolver,
-          txConstraintsSearch
-        );
+        slackProvider,
+        costCalculator,
+        stopNameResolver,
+        txConstraintsSearch
+      );
   }
 }

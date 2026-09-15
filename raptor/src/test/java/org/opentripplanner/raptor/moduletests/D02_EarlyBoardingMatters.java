@@ -46,8 +46,7 @@ public class D02_EarlyBoardingMatters implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access("Free ~ A")
+    data.access("Free ~ A")
       .withTimetables(
         """
         -- R1
@@ -84,8 +83,7 @@ public class D02_EarlyBoardingMatters implements RaptorTestConstants {
       )
       .egress("F ~ Free");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
@@ -93,8 +91,7 @@ public class D02_EarlyBoardingMatters implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "A ~ BUS R3 0:02 0:04 ~ " +
+    var path = "A ~ BUS R3 0:02 0:04 ~ " +
       "B ~ BUS R5 0:05 0:07 ~ " +
       "C ~ BUS R7 0:08 0:10 ~ " +
       "D ~ BUS R8 0:11 0:13 ~ " +

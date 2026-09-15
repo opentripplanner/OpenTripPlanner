@@ -100,8 +100,9 @@ public class TripPatternNamer implements GraphBuilderModule {
       for (TripPattern pattern : routeTripPatterns) {
         StopLocation start = pattern.firstStop();
         StopLocation end = pattern.lastStop();
-        String headsign =
-          pattern.getTripHeadsign() != null ? pattern.getTripHeadsign().toString() : null;
+        String headsign = pattern.getTripHeadsign() != null
+          ? pattern.getTripHeadsign().toString()
+          : null;
         if (headsign != null) {
           signs.put(headsign, pattern);
         }
@@ -116,8 +117,9 @@ public class TripPatternNamer implements GraphBuilderModule {
           continue;
         }
         StringBuilder sb = new StringBuilder(routeName);
-        String headsign =
-          pattern.getTripHeadsign() != null ? pattern.getTripHeadsign().toString() : null;
+        String headsign = pattern.getTripHeadsign() != null
+          ? pattern.getTripHeadsign().toString()
+          : null;
         if (headsign != null && signs.get(headsign).size() == 1) {
           pattern.initName(sb.append(" ").append(headsign).toString());
           continue;

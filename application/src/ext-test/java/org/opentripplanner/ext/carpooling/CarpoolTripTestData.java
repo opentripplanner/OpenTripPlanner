@@ -55,8 +55,9 @@ public class CarpoolTripTestData {
   ) {
     var origin = createOriginStopWithTime(boarding, startTime, startTime);
     var destination = createDestinationStopWithTime(alighting, endTime, endTime);
-    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter))
-      .withStops(List.of(origin, destination))
+    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter)).withStops(
+      List.of(origin, destination)
+    )
       .withTotalCapacity(DEFAULT_TOTAL_CAPACITY)
       .withStartTime(origin.getAimedDepartureTime())
       .withEndTime(destination.getAimedArrivalTime())
@@ -263,8 +264,9 @@ public class CarpoolTripTestData {
     List<CarpoolStop> stops
   ) {
     var actualStartTime = startTime != null ? startTime : ZonedDateTime.now();
-    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter))
-      .withStops(stops)
+    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", "trip-" + ++idCounter)).withStops(
+      stops
+    )
       .withTotalCapacity(capacity)
       .withStartTime(actualStartTime)
       .withEndTime(actualStartTime.plusHours(1))

@@ -41,13 +41,11 @@ class J04_ViaVisitWithAccessTest {
   void setup() {
     var builder = data.requestBuilder();
 
-    builder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    builder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: Currently heuristics does not work with via-visit so we turn them off
       .clearOptimizations();
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
@@ -57,8 +55,7 @@ class J04_ViaVisitWithAccessTest {
   @Test
   @DisplayName("Access VIA stop A, no other options. Raptor should skip the first via point.")
   void accessViaVisit() {
-    data
-      .access("Walk 4m Vₙ1 ~ B")
+    data.access("Walk 4m Vₙ1 ~ B")
       .withTimetables(
         """
         B     C
@@ -82,15 +79,14 @@ class J04_ViaVisitWithAccessTest {
   @Test
   @DisplayName("Access VIA stop A, with other less optimal options.")
   void accessViaVisitWithFasterDirectAccess() {
-    data
-      .access(
-        // Higher cost
-        "Walk 2m ~ A",
-        // Does not visit B
-        "Walk 2m ~ C",
-        // Optimal
-        "Walk 4m Vₙ1 ~ C"
-      )
+    data.access(
+      // Higher cost
+      "Walk 2m ~ A",
+      // Does not visit B
+      "Walk 2m ~ C",
+      // Optimal
+      "Walk 4m Vₙ1 ~ C"
+    )
       .withTimetables(
         """
         A     B     C     D
@@ -116,8 +112,7 @@ class J04_ViaVisitWithAccessTest {
       "handle this gracefully."
   )
   void accessWithViaVisit() {
-    data
-      .access("Walk 4m Vₙ1 ~ B", "Walk 1m ~ B")
+    data.access("Walk 4m Vₙ1 ~ B", "Walk 1m ~ B")
       .withTimetables(
         """
         B     C
@@ -141,8 +136,7 @@ class J04_ViaVisitWithAccessTest {
     "Access visits first via location (A), then second via location C is visited using transit"
   )
   void accessVisitsFirstViaLocation() {
-    data
-      .access("Walk 2m Vₙ1 ~ B", "Walk 1m ~ B")
+    data.access("Walk 2m Vₙ1 ~ B", "Walk 1m ~ B")
       .withTimetables(
         """
          B    C
@@ -154,8 +148,7 @@ class J04_ViaVisitWithAccessTest {
       )
       .egress("D ~ Walk 1m");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       // Define two via locations - A is visited by the access and the other is visited with Raptor
       .addViaLocation(viaStop("Via-A", STOP_A))
       .addViaLocation(viaStop("Via-C", STOP_C));

@@ -40,8 +40,7 @@ class SkippedTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_2_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -74,8 +73,7 @@ class SkippedTest implements RealtimeTestConstants {
     var rt = GtfsRtTestHelper.of(env);
 
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_2_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)
@@ -86,8 +84,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[U]");
 
     // Create update to the same trip but now the skipped stop is no longer skipped
-    var scheduledBuilder = rt
-      .tripUpdateScheduled(TRIP_2_ID)
+    var scheduledBuilder = rt.tripUpdateScheduled(TRIP_2_ID)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 50)
       .addDelayedStopTime(2, 90);
@@ -127,8 +124,7 @@ class SkippedTest implements RealtimeTestConstants {
 
     String tripId = TRIP_2_ID;
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(tripId)
+    var tripUpdate = rt.tripUpdateScheduled(tripId)
       .addNoDataStop(0)
       .addSkippedStop(1)
       .addNoDataStop(2)

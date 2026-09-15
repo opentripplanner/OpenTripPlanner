@@ -32,8 +32,8 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 class CallAtStopServiceTest {
 
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
-  private static final NearbyStopFinder NEARBY_STOP_FINDER = new StraightLineNearbyStopFinder(e ->
-    List.of()
+  private static final NearbyStopFinder NEARBY_STOP_FINDER = new StraightLineNearbyStopFinder(
+    e -> List.of()
   );
 
   private static final String STOP_A_ID = "A";
@@ -88,8 +88,9 @@ class CallAtStopServiceTest {
   void notFound() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new CallAtStopService(env.transitService(), NEARBY_STOP_FINDER);
-    assertThrows(EntityNotFoundException.class, () ->
-      service.findCallsAtStop(id("unknown"), params(env, 100))
+    assertThrows(
+      EntityNotFoundException.class,
+      () -> service.findCallsAtStop(id("unknown"), params(env, 100))
     );
   }
 
@@ -152,8 +153,9 @@ class CallAtStopServiceTest {
   void tooManyDepartures() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new CallAtStopService(env.transitService(), NEARBY_STOP_FINDER);
-    assertThrows(IllegalArgumentException.class, () ->
-      service.findCallsAtStop(STOP_A.getId(), params(env, 101))
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> service.findCallsAtStop(STOP_A.getId(), params(env, 101))
     );
   }
 }

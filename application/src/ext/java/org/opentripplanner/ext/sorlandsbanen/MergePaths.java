@@ -46,13 +46,10 @@ class MergePaths<T extends RaptorTripSchedule> implements
   }
 
   private static boolean hasRail(RaptorPath<?> path) {
-    return path
-      .legStream()
-      .filter(PathLeg::isTransitLeg)
-      .anyMatch(leg -> {
-        var trip = (TripScheduleWithOffset) leg.asTransitLeg().trip();
-        var mode = trip.getOriginalTripPattern().getMode();
-        return mode == TransitMode.RAIL;
-      });
+    return path.legStream().filter(PathLeg::isTransitLeg).anyMatch(leg -> {
+      var trip = (TripScheduleWithOffset) leg.asTransitLeg().trip();
+      var mode = trip.getOriginalTripPattern().getMode();
+      return mode == TransitMode.RAIL;
+    });
   }
 }

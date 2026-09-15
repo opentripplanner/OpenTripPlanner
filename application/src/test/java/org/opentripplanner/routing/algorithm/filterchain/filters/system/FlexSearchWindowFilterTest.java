@@ -16,9 +16,8 @@ import org.opentripplanner.model.plan.TestItineraryBuilder;
 
 class FlexSearchWindowFilterTest implements PlanTestConstants {
 
-  private static final Instant LATEST_DEPARTURE_TIME = TestItineraryBuilder.newTime(
-    time("09:20")
-  ).toInstant();
+  private static final Instant LATEST_DEPARTURE_TIME = TestItineraryBuilder.newTime(time("09:20"))
+    .toInstant();
 
   @ParameterizedTest
   @ValueSource(strings = { "09:20", "09:21", "13:20" })
@@ -30,8 +29,7 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
       SortOrder.STREET_AND_DEPARTURE_TIME
     );
 
-    var itin = newItinerary(A, time(startTime))
-      .flex(T11_00, T11_30, B)
+    var itin = newItinerary(A, time(startTime)).flex(T11_00, T11_30, B)
       .withIsSearchWindowAware(false)
       .build();
 
@@ -47,8 +45,7 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
       SortOrder.STREET_AND_DEPARTURE_TIME
     );
 
-    var itin = newItinerary(A, time(startTime))
-      .flex(T11_00, T11_30, B)
+    var itin = newItinerary(A, time(startTime)).flex(T11_00, T11_30, B)
       .withIsSearchWindowAware(false)
       .build();
 
@@ -64,8 +61,7 @@ class FlexSearchWindowFilterTest implements PlanTestConstants {
       SortOrder.STREET_AND_ARRIVAL_TIME
     );
 
-    var itin = newItinerary(A, time(startTime))
-      .flex(T11_00, T11_30, B)
+    var itin = newItinerary(A, time(startTime)).flex(T11_00, T11_30, B)
       .withIsSearchWindowAware(false)
       .build();
 

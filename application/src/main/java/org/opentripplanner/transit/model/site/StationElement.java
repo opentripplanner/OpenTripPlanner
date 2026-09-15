@@ -14,10 +14,9 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  * of the fields are shared between the types, and eg. in pathways the namespace any of them can be
  * used as from and to.
  */
-public abstract class StationElement<
-  E extends StationElement<E, B>,
-  B extends StationElementBuilder<E, B>
-> extends AbstractTransitEntity<E, B> {
+public abstract class StationElement<E extends StationElement<E, B>, B extends StationElementBuilder<E, B>>
+  extends
+  AbstractTransitEntity<E, B> {
 
   private final I18NString name;
 
@@ -150,15 +149,13 @@ public abstract class StationElement<
 
   @Override
   public boolean sameAs(E other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
       Objects.equals(code, other.getCode()) &&
       Objects.equals(description, other.getDescription()) &&
       Objects.equals(coordinate, other.getCoordinate()) &&
       Objects.equals(wheelchairAccessibility, other.getWheelchairAccessibility()) &&
       Objects.equals(level, other.level()) &&
-      Objects.equals(parentStation, other.getParentStation())
-    );
+      Objects.equals(parentStation, other.getParentStation()));
   }
 }

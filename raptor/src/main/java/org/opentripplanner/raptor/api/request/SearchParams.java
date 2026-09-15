@@ -238,16 +238,14 @@ public class SearchParams {
       return false;
     }
     SearchParams that = (SearchParams) o;
-    return (
-      earliestDepartureTime == that.earliestDepartureTime &&
+    return (earliestDepartureTime == that.earliestDepartureTime &&
       latestArrivalTime == that.latestArrivalTime &&
       searchWindowInSeconds == that.searchWindowInSeconds &&
       preferLateArrival == that.preferLateArrival &&
       numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
       accessPaths.equals(that.accessPaths) &&
       egressPaths.equals(that.egressPaths) &&
-      viaLocations.equals(viaLocations)
-    );
+      viaLocations.equals(viaLocations));
   }
 
   @Override

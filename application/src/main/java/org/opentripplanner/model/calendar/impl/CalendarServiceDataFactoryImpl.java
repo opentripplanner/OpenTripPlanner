@@ -38,11 +38,9 @@ public class CalendarServiceDataFactoryImpl {
     Collection<ServiceCalendarDate> calendarDates,
     Collection<ServiceCalendar> serviceCalendars
   ) {
-    this.calendarDatesByServiceId = calendarDates
-      .stream()
+    this.calendarDatesByServiceId = calendarDates.stream()
       .collect(groupingBy(ServiceCalendarDate::getServiceId));
-    this.calendarsByServiceId = serviceCalendars
-      .stream()
+    this.calendarsByServiceId = serviceCalendars.stream()
       .collect(groupingBy(ServiceCalendar::getServiceId));
     this.serviceIds = merge(calendarDatesByServiceId.keySet(), calendarsByServiceId.keySet());
   }
@@ -115,17 +113,15 @@ public class CalendarServiceDataFactoryImpl {
     LocalDate endDate = calendar.getPeriod().getEndInclusive();
 
     for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-      if (
-        switch (date.getDayOfWeek()) {
-          case MONDAY -> calendar.getMonday() == 1;
-          case TUESDAY -> calendar.getTuesday() == 1;
-          case WEDNESDAY -> calendar.getWednesday() == 1;
-          case THURSDAY -> calendar.getThursday() == 1;
-          case FRIDAY -> calendar.getFriday() == 1;
-          case SATURDAY -> calendar.getSaturday() == 1;
-          case SUNDAY -> calendar.getSunday() == 1;
-        }
-      ) {
+      if (switch (date.getDayOfWeek()) {
+        case MONDAY -> calendar.getMonday() == 1;
+        case TUESDAY -> calendar.getTuesday() == 1;
+        case WEDNESDAY -> calendar.getWednesday() == 1;
+        case THURSDAY -> calendar.getThursday() == 1;
+        case FRIDAY -> calendar.getFriday() == 1;
+        case SATURDAY -> calendar.getSaturday() == 1;
+        case SUNDAY -> calendar.getSunday() == 1;
+      }) {
         addServiceDate(activeDates, date);
       }
     }

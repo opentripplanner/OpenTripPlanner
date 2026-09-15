@@ -80,7 +80,8 @@ class EgressPathsTest {
       Walk 1m C₁120 Open(11:30 12:30) ~ 6
       Walk 1m C₁120 ~ 2
       Walk 2m C₁240 ~ 6
-      """.strip(),
+      """
+        .strip(),
       subjectStd.listAll().stream().map(Object::toString).sorted().collect(Collectors.joining("\n"))
     );
 
@@ -93,7 +94,8 @@ class EgressPathsTest {
       Walk 1m C₁120 Open(11:30 12:30) ~ 6
       Walk 1m C₁120 ~ 2
       Walk 2m C₁240 ~ 6
-      """.strip(),
+      """
+        .strip(),
       subjectMc.listAll().stream().map(Object::toString).sorted().collect(Collectors.joining("\n"))
     );
   }

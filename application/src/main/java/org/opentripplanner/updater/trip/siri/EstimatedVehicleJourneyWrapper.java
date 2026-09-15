@@ -37,10 +37,9 @@ final class EstimatedVehicleJourneyWrapper {
   private EstimatedVehicleJourneyWrapper(EstimatedVehicleJourney journey, List<CallWrapper> calls) {
     this.journey = journey;
     this.calls = calls;
-    this.code =
-      journey.getEstimatedVehicleJourneyCode() != null
-        ? new EstimatedVehicleJourneyCode(journey.getEstimatedVehicleJourneyCode())
-        : null;
+    this.code = journey.getEstimatedVehicleJourneyCode() != null
+      ? new EstimatedVehicleJourneyCode(journey.getEstimatedVehicleJourneyCode())
+      : null;
   }
 
   /* Construction and validation */
@@ -114,9 +113,8 @@ final class EstimatedVehicleJourneyWrapper {
    * The dated vehicle journey identified by unique id.
    */
   Optional<String> datedVehicleJourneyRef() {
-    return Optional.ofNullable(journey.getDatedVehicleJourneyRef()).map(
-      DatedVehicleJourneyRef::getValue
-    );
+    return Optional.ofNullable(journey.getDatedVehicleJourneyRef())
+      .map(DatedVehicleJourneyRef::getValue);
   }
 
   /**
@@ -151,8 +149,7 @@ final class EstimatedVehicleJourneyWrapper {
    * {@link #replacedDatedVehicleJourneyRef()}).
    */
   List<VehicleJourneyIdAndServiceDate> additionalReplacedDatedVehicleJourneyRefs() {
-    return journey
-      .getAdditionalVehicleJourneyReves()
+    return journey.getAdditionalVehicleJourneyReves()
       .stream()
       .map(VehicleJourneyIdAndServiceDate::of)
       .toList();
@@ -212,8 +209,7 @@ final class EstimatedVehicleJourneyWrapper {
     if (journey.getJourneyRelations() == null) {
       return List.of();
     }
-    return journey
-      .getJourneyRelations()
+    return journey.getJourneyRelations()
       .getJourneyRelations()
       .stream()
       .map(relation -> new JourneyRelationWrapper(relation, calls))
@@ -233,8 +229,10 @@ final class EstimatedVehicleJourneyWrapper {
         journey.getDatedVehicleJourneyRef(),
         DatedVehicleJourneyRef::getValue
       )
-      .addObjOp("FramedVehicleJourney", journey.getFramedVehicleJourneyRef(), it ->
-        ToStringBuilder.of(it.getClass())
+      .addObjOp(
+        "FramedVehicleJourney",
+        journey.getFramedVehicleJourneyRef(),
+        it -> ToStringBuilder.of(it.getClass())
           .addStr("VehicleJourney", it.getDatedVehicleJourneyRef())
           .addObjOp("Date", it.getDataFrameRef(), DataFrameRefStructure::getValue)
           .toString()

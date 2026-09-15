@@ -13,24 +13,18 @@ class TransferRules {
       if (transferMatch.transferRule().fareProducts().isEmpty()) {
         return true;
       } else {
-        return transferMatch
-          .transferRule()
-          .fareProducts()
-          .stream()
-          .anyMatch(transferProduct -> {
-            if (
-              transferProduct.category() == null &&
+        return transferMatch.transferRule().fareProducts().stream().anyMatch(transferProduct -> {
+          if (
+            transferProduct.category() == null &&
               transferProduct.medium() == null &&
               transferProduct.isFree()
-            ) {
-              return true;
-            } else {
-              return (
-                mediaMatches(transferProduct.medium(), product.medium()) &&
-                categoryMatches(transferProduct.category(), product.category())
-              );
-            }
-          });
+          ) {
+            return true;
+          } else {
+            return (mediaMatches(transferProduct.medium(), product.medium()) &&
+              categoryMatches(transferProduct.category(), product.category()));
+          }
+        });
       }
     };
   }

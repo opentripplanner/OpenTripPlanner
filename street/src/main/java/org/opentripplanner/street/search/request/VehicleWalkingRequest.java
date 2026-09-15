@@ -94,13 +94,11 @@ public class VehicleWalkingRequest {
       return false;
     }
     VehicleWalkingRequest that = (VehicleWalkingRequest) o;
-    return (
-      speed == that.speed &&
+    return (speed == that.speed &&
       reluctance == that.reluctance &&
       Objects.equals(mountDismountTime, that.mountDismountTime) &&
       Objects.equals(mountDismountCost, that.mountDismountCost) &&
-      stairsReluctance == that.stairsReluctance
-    );
+      stairsReluctance == that.stairsReluctance);
   }
 
   @Override

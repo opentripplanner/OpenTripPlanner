@@ -191,8 +191,7 @@ public record ScheduledTransitLegReference(
     }
 
     if (
-      !transitService
-        .getServiceCodesRunningForDate(serviceDate)
+      !transitService.getServiceCodesRunningForDate(serviceDate)
         .contains(tripTimes.getServiceCode())
     ) {
       logInvalidLegRef("the trip '{}' does not run on service date {}", trip.getId(), serviceDate);
@@ -205,8 +204,7 @@ public record ScheduledTransitLegReference(
     int boardingTime = tripTimes.getDepartureTime(updatedFromStopPositionInPattern);
     int alightingTime = tripTimes.getArrivalTime(updatedToStopPositionInPattern);
 
-    ScheduledTransitLeg leg = new ScheduledTransitLegBuilder<>()
-      .withTripTimes(tripTimes)
+    ScheduledTransitLeg leg = new ScheduledTransitLegBuilder<>().withTripTimes(tripTimes)
       .withTripPattern(tripPattern)
       .withBoardStopIndexInPattern(updatedFromStopPositionInPattern)
       .withAlightStopIndexInPattern(updatedToStopPositionInPattern)
@@ -240,11 +238,15 @@ public record ScheduledTransitLegReference(
     TransitService transitService
   ) {
     var stop = transitService.getStopLocation(stopId);
-    OptionalInt exactMatch = findStopPositionInPattern(tripPattern, stopPosition, s ->
-      s.getId().equals(stopId)
+    OptionalInt exactMatch = findStopPositionInPattern(
+      tripPattern,
+      stopPosition,
+      s -> s.getId().equals(stopId)
     );
-    OptionalInt sameStationMatch = findStopPositionInPattern(tripPattern, stopPosition, s ->
-      s.isPartOfSameStationAs(stop)
+    OptionalInt sameStationMatch = findStopPositionInPattern(
+      tripPattern,
+      stopPosition,
+      s -> s.isPartOfSameStationAs(stop)
     );
 
     if (exactMatch.isPresent() && sameStationMatch.isPresent()) {
@@ -301,8 +303,11 @@ public record ScheduledTransitLegReference(
     int stopPosition,
     Predicate<StopLocation> matcher
   ) {
-    return TwoWayLinearSearch.findNearest(stopPosition, 0, tripPattern.numberOfStops(), i ->
-      matcher.test(tripPattern.getStops().get(i))
+    return TwoWayLinearSearch.findNearest(
+      stopPosition,
+      0,
+      tripPattern.numberOfStops(),
+      i -> matcher.test(tripPattern.getStops().get(i))
     );
   }
 

@@ -123,8 +123,9 @@ class RouteRequestMapperCarTest {
       )
     );
     var allowedEnv = testCtx.executionContext(carArgs);
-    assertThrows(InvalidInputException.class, () ->
-      RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
+    assertThrows(
+      InvalidInputException.class,
+      () -> RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
     );
 
     carArgs = testCtx.basicRequest();

@@ -204,12 +204,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
       return false;
     }
     Path<?> path = (Path<?>) o;
-    return (
-      startTime == path.startTime &&
+    return (startTime == path.startTime &&
       endTime == path.endTime &&
       numberOfTransfers == path.numberOfTransfers &&
-      Objects.equals(accessLeg, path.accessLeg)
-    );
+      Objects.equals(accessLeg, path.accessLeg));
   }
 
   @Override
@@ -257,8 +255,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
               buf.c1(leg.c1());
             }
             if (transitLeg.getConstrainedTransferAfterLeg() != null) {
-              constraintPrevLeg = transitLeg
-                .getConstrainedTransferAfterLeg()
+              constraintPrevLeg = transitLeg.getConstrainedTransferAfterLeg()
                 .getTransferConstraint();
             }
           } else if (leg.isTransferLeg()) {
@@ -284,10 +281,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   }
 
   private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
-    return (EgressPathLeg<S>) leg
-      .stream()
-      .reduce((_, b) -> b)
-      .orElseThrow();
+    return (EgressPathLeg<S>) leg.stream().reduce((_, b) -> b).orElseThrow();
   }
 
   /* private methods */
@@ -297,8 +291,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     EgressPathLeg<S> egressPathLeg
   ) {
     int nAccessRides = accessLeg.access().numberOfRides();
-    int nTransitRides = (int) accessLeg
-      .stream()
+    int nTransitRides = (int) accessLeg.stream()
       .filter(PathLeg::isTransitLeg)
       .map(PathLeg::asTransitLeg)
       .filter(Predicate.not(TransitPathLeg::isStaySeatedOntoNextLeg))

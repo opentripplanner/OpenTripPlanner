@@ -33,19 +33,17 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case AGENCIES:
+            case AGENCIES :
               List<Agency> agencies = getAgencies(environment);
-              agencies.forEach(agency ->
-                alerts.addAll(alertService.getAgencyAlerts(agency.getId()))
+              agencies.forEach(
+                agency -> alerts.addAll(alertService.getAgencyAlerts(agency.getId()))
               );
               break;
-            case ROUTE_TYPES:
-              alertService
-                .getAllAlerts()
+            case ROUTE_TYPES :
+              alertService.getAllAlerts()
                 .stream()
-                .filter(alert ->
-                  alert
-                    .entities()
+                .filter(
+                  alert -> alert.entities()
                     .stream()
                     .filter(EntitySelector.RouteType.class::isInstance)
                     .map(EntitySelector.RouteType.class::cast)
@@ -68,8 +66,8 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
 
   @Override
   public DataFetcher<String> version() {
-    return environment ->
-      getTransitService(environment).getFeedInfo(getSource(environment)).getVersion();
+    return environment -> getTransitService(environment).getFeedInfo(getSource(environment))
+      .getVersion();
   }
 
   @Override
@@ -85,8 +83,7 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
 
   private List<Agency> getAgencies(DataFetchingEnvironment environment) {
     String id = getSource(environment);
-    return getTransitService(environment)
-      .listAgencies()
+    return getTransitService(environment).listAgencies()
       .stream()
       .filter(agency -> agency.getId().getFeedId().equals(id))
       .collect(Collectors.toList());

@@ -56,12 +56,7 @@ public class StreetEdgeTest {
     this.proto = StreetSearchRequest.of()
       .withTurnReluctance(1.0)
       .withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0))
-      .withBike(it ->
-        it
-          .withSpeed(5.0f)
-          .withReluctance(1.0)
-          .withWalking(w -> w.withSpeed(0.8))
-      )
+      .withBike(it -> it.withSpeed(5.0f).withReluctance(1.0).withWalking(w -> w.withSpeed(0.8)))
       .withCar(c -> c.withReluctance(1.0))
       .build();
   }
@@ -237,11 +232,9 @@ public class StreetEdgeTest {
     StreetEdge e2 = streetEdge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
-    noPenalty.withBike(it ->
-      it.withWalking(w -> {
-        w.withMountDismountTime(Duration.ofSeconds(0)).withMountDismountTime(Duration.ofSeconds(0));
-      })
-    );
+    noPenalty.withBike(it -> it.withWalking(w -> {
+      w.withMountDismountTime(Duration.ofSeconds(0)).withMountDismountTime(Duration.ofSeconds(0));
+    }));
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0)[0];
@@ -249,10 +242,9 @@ public class StreetEdgeTest {
     State s3 = e2.traverse(s2)[0];
 
     StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
-    withPenalty.withBike(it ->
-      it.withWalking(w ->
-        w
-          .withMountDismountTime(Duration.ofSeconds(42))
+    withPenalty.withBike(
+      it -> it.withWalking(
+        w -> w.withMountDismountTime(Duration.ofSeconds(42))
           .withMountDismountCost(Cost.costOfSeconds(23))
       )
     );
@@ -328,8 +320,7 @@ public class StreetEdgeTest {
 
     double length = 650.0;
 
-    StreetEdge testStreet = new StreetEdgeBuilder<>()
-      .withFromVertex(v1)
+    StreetEdge testStreet = new StreetEdgeBuilder<>().withFromVertex(v1)
       .withToVertex(v2)
       .withGeometry(geometry)
       .withName("Test Lane")
@@ -345,8 +336,7 @@ public class StreetEdgeTest {
       new Coordinate(0, 0),
       new Coordinate(length / 2, length / 20.0),
       // slope = -0.1
-      new Coordinate(length, 0),
-    };
+      new Coordinate(length, 0), };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
     StreetElevationExtensionBuilder.of(testStreet)
       .withElevationProfile(elev)
@@ -361,16 +351,12 @@ public class StreetEdgeTest {
 
     var request = StreetSearchRequest.of().withMode(StreetMode.BIKE);
 
-    request
-      .withBike(bike ->
-        bike
-          .withSpeed(SPEED)
-          .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
-          .withOptimizeTriangle(it -> it.withTime(1))
-          .withReluctance(1)
-      )
-      .withWalk(walk -> walk.withReluctance(1))
-      .withCar(car -> car.withReluctance(1));
+    request.withBike(
+      bike -> bike.withSpeed(SPEED)
+        .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+        .withOptimizeTriangle(it -> it.withTime(1))
+        .withReluctance(1)
+    ).withWalk(walk -> walk.withReluctance(1)).withCar(car -> car.withReluctance(1));
 
     State startState = new State(v1, request.build());
     State result = testStreet.traverse(startState)[0];
@@ -395,8 +381,8 @@ public class StreetEdgeTest {
     double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / SPEED;
     assertEquals(expectedSafetyWeight, safetyWeight, DELTA);
 
-    request.withBike(bike ->
-      bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1))
+    request.withBike(
+      bike -> bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1))
     );
     startState = new State(v1, request.build());
     result = testStreet.traverse(startState)[0];
@@ -422,8 +408,7 @@ public class StreetEdgeTest {
   @ParameterizedTest
   @EnumSource(value = TraverseMode.class, names = { "BICYCLE", "SCOOTER" })
   void testBikeSpeedWithElevation(TraverseMode mode) {
-    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL)
-      .withCarSpeed(8.0f)
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(8.0f)
       .withElevationExtension(
         new StreetElevationExtension(
           100,
@@ -447,8 +432,7 @@ public class StreetEdgeTest {
   @Test
   void setName() {
     var path = I18NString.of("path");
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(v0)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(v0)
       .withToVertex(v1)
       .withPermission(ALL)
       .withGeometry(GeometryUtils.makeLineString(v0.getCoordinate(), v1.getCoordinate()))

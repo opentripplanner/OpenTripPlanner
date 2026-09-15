@@ -141,9 +141,8 @@ class TransitRepositoryIndex {
    */
   boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop) {
     LocalDate endOfServiceDate = endOfServiceDateForStop.get(stop);
-    return (
-      endOfServiceDate != null && (endOfServiceDate.isAfter(date) || endOfServiceDate.isEqual(date))
-    );
+    return (endOfServiceDate != null &&
+      (endOfServiceDate.isAfter(date) || endOfServiceDate.isEqual(date)));
   }
 
   Operator getOperatorForId(FeedScopedId operatorId) {
@@ -219,7 +218,7 @@ class TransitRepositoryIndex {
           LocalDate endOfServiceDate = endOfServiceDates.get(stop);
           if (
             tripEndDate != null &&
-            (endOfServiceDate == null || tripEndDate.isAfter(endOfServiceDate))
+              (endOfServiceDate == null || tripEndDate.isAfter(endOfServiceDate))
           ) {
             endOfServiceDates.put(stop, tripEndDate);
           }

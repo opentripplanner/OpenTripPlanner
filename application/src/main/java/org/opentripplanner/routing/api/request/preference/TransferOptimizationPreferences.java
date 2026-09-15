@@ -14,9 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public final class TransferOptimizationPreferences
-  implements Serializable, TransferOptimizationParameters
-{
+public final class TransferOptimizationPreferences implements Serializable,
+  TransferOptimizationParameters {
 
   private final boolean optimizeTransferWaitTime;
   private final double minSafeWaitTimeFactor;
@@ -84,12 +83,10 @@ public final class TransferOptimizationPreferences
       return false;
     }
     TransferOptimizationPreferences that = (TransferOptimizationPreferences) o;
-    return (
-      optimizeTransferWaitTime == that.optimizeTransferWaitTime &&
+    return (optimizeTransferWaitTime == that.optimizeTransferWaitTime &&
       doubleEquals(that.minSafeWaitTimeFactor, minSafeWaitTimeFactor) &&
       doubleEquals(that.backTravelWaitTimeFactor, backTravelWaitTimeFactor) &&
-      doubleEquals(that.extraStopBoardAlightCostsFactor, extraStopBoardAlightCostsFactor)
-    );
+      doubleEquals(that.extraStopBoardAlightCostsFactor, extraStopBoardAlightCostsFactor));
   }
 
   @Override

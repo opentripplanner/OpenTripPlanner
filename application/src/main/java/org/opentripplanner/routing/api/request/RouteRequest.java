@@ -99,10 +99,9 @@ public class RouteRequest implements Serializable {
     // The given dateTime will be set to a whole number of seconds. We don't do sub-second
     // accuracy, and if we set the millisecond part to a non-zero value, rounding will not be
     // guaranteed to be the same for departAt and arriveBy queries.
-    this.dateTime =
-      !builder.defaultRequest && builder.dateTime == null
-        ? normalizeNow()
-        : TimeUtils.truncateToSeconds(builder.dateTime);
+    this.dateTime = !builder.defaultRequest && builder.dateTime == null
+      ? normalizeNow()
+      : TimeUtils.truncateToSeconds(builder.dateTime);
 
     this.arriveBy = builder.arriveBy;
     this.timetableView = builder.timetableView;
@@ -206,8 +205,7 @@ public class RouteRequest implements Serializable {
       arriveBy = false;
     }
 
-    var request = copyOf()
-      .withArriveBy(arriveBy)
+    var request = copyOf().withArriveBy(arriveBy)
       .withDateTime(arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime())
       .withJourney(jb -> jb.withoutDirect())
       .buildRequest();
@@ -296,10 +294,10 @@ public class RouteRequest implements Serializable {
    * reachable since the traveler is already on a transit vehicle.
    */
   public boolean cannotReachTransit() {
-    boolean accessUnreachable =
-      journey.access().mode() == StreetMode.NOT_SET && (from == null || from.stopId() == null);
-    boolean egressUnreachable =
-      journey.egress().mode() == StreetMode.NOT_SET && (to == null || to.stopId() == null);
+    boolean accessUnreachable = journey.access().mode() == StreetMode.NOT_SET &&
+      (from == null || from.stopId() == null);
+    boolean egressUnreachable = journey.egress().mode() == StreetMode.NOT_SET &&
+      (to == null || to.stopId() == null);
     boolean isOnBoard = from != null && from.isOnBoard();
 
     return (accessUnreachable && !isOnBoard) || egressUnreachable;
@@ -328,8 +326,7 @@ public class RouteRequest implements Serializable {
    * Return the via locations that are of type {@link VisitViaLocation}.
    */
   public List<VisitViaLocation> listVisitViaLocations() {
-    return via
-      .stream()
+    return via.stream()
       .filter(VisitViaLocation.class::isInstance)
       .map(VisitViaLocation.class::cast)
       .toList();
@@ -340,8 +337,7 @@ public class RouteRequest implements Serializable {
    * {@link GenericLocation}.
    */
   public List<GenericLocation> listViaLocationsWithCoordinates() {
-    return listVisitViaLocations()
-      .stream()
+    return listVisitViaLocations().stream()
       .map(VisitViaLocation::coordinateLocation)
       .filter(Objects::nonNull)
       .toList();
@@ -460,8 +456,7 @@ public class RouteRequest implements Serializable {
     // because it is not possible to create the same object where only this field
     // is diffrent.
 
-    return (
-      arriveBy == other.arriveBy &&
+    return (arriveBy == other.arriveBy &&
       timetableView == other.timetableView &&
       numItineraries == other.numItineraries &&
       Objects.equals(from, other.from) &&
@@ -473,8 +468,7 @@ public class RouteRequest implements Serializable {
       Objects.equals(bookingTime, other.bookingTime) &&
       Objects.equals(pageCursor, other.pageCursor) &&
       Objects.equals(journey, other.journey) &&
-      Objects.equals(preferences, other.preferences)
-    );
+      Objects.equals(preferences, other.preferences));
   }
 
   @Override

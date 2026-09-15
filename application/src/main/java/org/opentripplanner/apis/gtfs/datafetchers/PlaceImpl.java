@@ -103,7 +103,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
       if (
         !place.vertexType.equals(VertexType.VEHICLERENTAL) ||
-        !(place.vehicleRentalPlace instanceof VehicleRentalVehicle)
+          !(place.vehicleRentalPlace instanceof VehicleRentalVehicle)
       ) {
         return null;
       }
@@ -146,7 +146,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
       if (
         !place.vertexType.equals(VertexType.VEHICLERENTAL) ||
-        !(place.vehicleRentalPlace instanceof VehicleRentalStation)
+          !(place.vehicleRentalPlace instanceof VehicleRentalStation)
       ) {
         return null;
       }
@@ -182,7 +182,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
     var vehicleParkingWithEntrance = stopArrival.place.vehicleParkingWithEntrance;
     if (
       vehicleParkingWithEntrance == null ||
-      !vehicleParkingWithEntrance.getVehicleParking().hasBicyclePlaces()
+        !vehicleParkingWithEntrance.getVehicleParking().hasBicyclePlaces()
     ) {
       return null;
     }
@@ -195,7 +195,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
     var vehicleParkingWithEntrance = stopArrival.place.vehicleParkingWithEntrance;
     if (
       vehicleParkingWithEntrance == null ||
-      !vehicleParkingWithEntrance.getVehicleParking().hasAnyCarPlaces()
+        !vehicleParkingWithEntrance.getVehicleParking().hasAnyCarPlaces()
     ) {
       return null;
     }

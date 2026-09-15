@@ -28,11 +28,14 @@ public enum GeofencingZoneOtpPhase implements DocumentedEnum<GeofencingZoneOtpPh
   @Override
   public String enumValueDescription() {
     return switch (this) {
-      case GRAPH_BUILD -> "The vehicle rental geofencing graph builder loads and applies the zones.";
+      case GRAPH_BUILD ->
+        "The vehicle rental geofencing graph builder loads and applies the zones.";
       case SERVE -> "The vehicle rental updater loads and applies the zones.";
-      case OFF -> """
-      The zones are not processed for this network. Use this to opt a single network out of a
-      `defaults` block that enables them.""";
+      case OFF ->
+        """
+        The zones are not processed for this network. Use this to opt a single network out of a
+        `defaults` block that enables them.\
+        """;
     };
   }
 }

@@ -208,8 +208,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       return calcRegularTransferEarliestBoardTime(from, regularTransferDurationInSec);
     }
 
-    return tx
-      .getTransferConstraint()
+    return tx.getTransferConstraint()
       .calculateTransferTargetTime(
         from.time(),
         slackProvider.transferSlack(),
@@ -235,8 +234,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   private TripStopTime<T> findMinimumToStopTime(List<TripToTripTransfer<T>> transfers) {
-    return transfers
-      .stream()
+    return transfers.stream()
       .map(TripToTripTransfer::to)
       .min(Comparator.comparingInt(TripStopTime::time))
       .orElseThrow();

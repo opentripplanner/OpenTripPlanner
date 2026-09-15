@@ -39,8 +39,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
   private static final TripPattern PATTERN = TRIP_DATA.tripPattern();
   private static final TripTimes TRIP_TIMES = TRIP_DATA.scheduledTripTimes();
   private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG =
-    new ScheduledTransitLegBuilder<>()
-      .withTripTimes(TRIP_TIMES)
+    new ScheduledTransitLegBuilder<>().withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
@@ -53,8 +52,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
   @Test
   void build() {
-    var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG)
-      .withFrom(E.stop)
+    var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG).withFrom(E.stop)
       .withTo(F.stop)
       .build();
     assertEquals(E.stop, leg.from().stop);
@@ -63,13 +61,11 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
   @Test
   void copyAttributesFromConsolidatedStopLeg() {
-    var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG)
-      .withFrom(E.stop)
+    var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG).withFrom(E.stop)
       .withTo(F.stop)
       .build();
 
-    var copy = leg
-      .copyOf()
+    var copy = leg.copyOf()
       .withAccessibilityScore(4f)
       .withFareProducts(FARES)
       .withAlerts(Set.of(ALERTS))
@@ -84,8 +80,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
   @Test
   void copyConsolidatedLeg() {
-    var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG)
-      .withFrom(E.stop)
+    var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG).withFrom(E.stop)
       .withTo(F.stop)
       .withAlerts(ALERTS)
       .build();

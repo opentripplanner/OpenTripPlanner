@@ -195,10 +195,7 @@ public class RequestScopedModule {
   @Provides
   @HttpRequestScoped
   static RealtimeVehicleService realtimeVehicleService(
-    RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
-    > realtimeVehicleRepositoryHandle,
+    RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle,
     TransactionScope transactionScope,
     TransitService transitService
   ) {

@@ -210,8 +210,7 @@ class MissingElevationHandlerTest {
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(from)
+    return new StreetEdgeBuilder<>().withFromVertex(from)
       .withToVertex(to)
       .withName(new LocalizedStringFormat("%s%s", from.getName(), to.getName()))
       .withMeterLength(length)
@@ -226,8 +225,7 @@ class MissingElevationHandlerTest {
 
     Coordinate[] coords = new Coordinate[] {
       new Coordinate(0, fromElevation),
-      new Coordinate(edge.getDistanceMeters(), toElevation),
-    };
+      new Coordinate(edge.getDistanceMeters(), toElevation), };
 
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 

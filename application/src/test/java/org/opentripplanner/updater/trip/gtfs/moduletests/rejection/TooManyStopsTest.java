@@ -24,8 +24,7 @@ class TooManyStopsTest implements RealtimeTestConstants {
   void tooManyUpdates() {
     var env = builder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
-    var update = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var update = rt.tripUpdateScheduled(TRIP_1_ID)
       .addStopTime(STOP_A_ID, "10:01")
       .addStopTime(STOP_B_ID, "10:21")
       .addStopTime(STOP_C_ID, "10:31")

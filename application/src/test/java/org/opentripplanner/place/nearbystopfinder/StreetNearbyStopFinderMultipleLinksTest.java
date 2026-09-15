@@ -27,33 +27,31 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
   @BeforeEach
   protected void setUp() throws Exception {
     // TODO this could be reimplemented to use StreetModelForTest
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(100));
-          var C = intersection("C", ORIGIN.moveEastMeters(200));
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(100));
+        var C = intersection("C", ORIGIN.moveEastMeters(200));
 
-          biStreet(A, B, 100);
-          biStreet(B, C, 100);
+        biStreet(A, B, 100);
+        biStreet(B, C, 100);
 
-          stopA = stop("StopA", A.toWgsCoordinate());
-          stopB = stop("StopB", B.toWgsCoordinate());
-          stopC = stop("StopC", C.toWgsCoordinate());
+        stopA = stop("StopA", A.toWgsCoordinate());
+        stopB = stop("StopB", B.toWgsCoordinate());
+        stopC = stop("StopC", C.toWgsCoordinate());
 
-          biLink(A, stopA);
+        biLink(A, stopA);
 
-          // B has many links
-          biLink(B, stopB);
-          biLink(B, stopB);
-          biLink(B, stopB);
-          biLink(B, stopB);
+        // B has many links
+        biLink(B, stopB);
+        biLink(B, stopB);
+        biLink(B, stopB);
+        biLink(B, stopB);
 
-          biLink(C, stopC);
-        }
+        biLink(C, stopC);
       }
-    );
+    });
   }
 
   @Test

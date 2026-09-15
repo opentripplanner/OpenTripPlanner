@@ -124,15 +124,13 @@ public class TransitRequest implements Serializable {
       return false;
     }
     TransitRequest that = (TransitRequest) o;
-    return (
-      Objects.equals(filters, that.filters) &&
+    return (Objects.equals(filters, that.filters) &&
       Objects.equals(unpreferredAgencies, that.unpreferredAgencies) &&
       Objects.equals(unpreferredRoutes, that.unpreferredRoutes) &&
       Objects.equals(bannedTrips, that.bannedTrips) &&
       Objects.equals(priorityGroupsByAgency, that.priorityGroupsByAgency) &&
       Objects.equals(priorityGroupsGlobal, that.priorityGroupsGlobal) &&
-      Objects.equals(raptorDebugging, that.raptorDebugging)
-    );
+      Objects.equals(raptorDebugging, that.raptorDebugging));
   }
 
   @Override

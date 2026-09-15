@@ -38,8 +38,7 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
 
   @Test
   void twoLegsAboveLimit() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(1, time("10:00"), time("10:11"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(1, time("10:00"), time("10:11"), B)
       .bus(2, time("10:12"), time("10:22"), C)
       .build();
 
@@ -57,8 +56,7 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
 
   @Test
   void twoLegsBelowLimit() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(1, time("10:00"), time("10:03"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(1, time("10:00"), time("10:03"), B)
       .bus(2, time("10:03"), time("10:06"), C)
       .build();
 
@@ -77,8 +75,7 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
 
   @Test
   void threeLegs() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(1, time("10:00"), time("10:03"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(1, time("10:00"), time("10:03"), B)
       .bus(2, time("10:03"), time("10:06"), C)
       .bus(2, time("10:09"), time("10:15"), D)
       .build();
@@ -102,8 +99,7 @@ class DepartureToArrivalTimeLimitTest implements PlanTestConstants, FareTestCons
 
   @Test
   void fourLegs() {
-    var i1 = newItinerary(A, time("10:00"))
-      .bus(1, time("10:00"), time("10:03"), B)
+    var i1 = newItinerary(A, time("10:00")).bus(1, time("10:00"), time("10:03"), B)
       .bus(2, time("10:03"), time("10:06"), C)
       .bus(3, time("10:09"), time("10:15"), D)
       .bus(4, time("10:15"), time("10:17"), E)

@@ -51,7 +51,9 @@ public class ActuatorAPI {
                 "templated" : false
               }
             }
-          }""",
+          }\
+          """
+          ,
           uriInfo.getRequestUri().toString().replace("$/", "")
         )
       )

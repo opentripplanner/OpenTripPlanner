@@ -52,8 +52,10 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("BikeRentalStation", getSource(environment).id().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "BikeRentalStation",
+      getSource(environment).id().toString()
+    );
   }
 
   @Override
@@ -78,8 +80,8 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
   @Override
   public DataFetcher<Boolean> operative() {
-    return environment ->
-      getSource(environment).isAllowPickup() && getSource(environment).isAllowDropoff();
+    return environment -> getSource(environment).isAllowPickup() &&
+      getSource(environment).isAllowDropoff();
   }
 
   @Override

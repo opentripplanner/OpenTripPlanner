@@ -92,9 +92,7 @@ class AddedTripBuilderTest {
     final TripPattern pattern = TransitRepositoryForTest.tripPattern(
       "REPLACED_ROUTE_PATTERN_ID",
       REPLACED_ROUTE
-    )
-      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
-      .build();
+    ).withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B)).build();
     TRANSIT_MODEL.addTripPattern(pattern.getId(), pattern);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
@@ -176,8 +174,7 @@ class AddedTripBuilderTest {
     assertNotNull(pattern);
     assertEquals(route, pattern.getRoute());
     assertTrue(
-      transitService
-        .getServiceCodesRunningForDate(SERVICE_DATE)
+      transitService.getServiceCodesRunningForDate(SERVICE_DATE)
         .contains(timetableRepository.getTripCalendars().getServiceCode(trip.getServiceId())),
       "serviceId should be running on service date"
     );
@@ -580,12 +577,13 @@ class AddedTripBuilderTest {
   }
 
   @ParameterizedTest
-  @CsvSource({
-    "air,AIRPLANE,AIRPLANE,",
-    "bus,BUS,RAIL,railReplacementBus",
-    "rail,RAIL,RAIL,replacementRailService",
-    "ferry,FERRY,RAIL,",
-  })
+  @CsvSource(
+    {
+      "air,AIRPLANE,AIRPLANE,",
+      "bus,BUS,RAIL,railReplacementBus",
+      "rail,RAIL,RAIL,replacementRailService",
+      "ferry,FERRY,RAIL,", }
+  )
   void testGetTransportMode(
     String siriMode,
     String internalMode,

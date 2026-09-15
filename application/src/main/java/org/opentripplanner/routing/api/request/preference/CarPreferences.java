@@ -120,16 +120,14 @@ public final class CarPreferences implements Serializable {
       return false;
     }
     CarPreferences that = (CarPreferences) o;
-    return (
-      DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
+    return (DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
       boardCost.equals(that.boardCost) &&
       parking.equals(that.parking) &&
       rental.equals(that.rental) &&
       Objects.equals(pickupTime, that.pickupTime) &&
       pickupCost.equals(that.pickupCost) &&
       DoubleUtils.doubleEquals(that.accelerationSpeed, accelerationSpeed) &&
-      DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed)
-    );
+      DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed));
   }
 
   @Override

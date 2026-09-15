@@ -36,8 +36,7 @@ public class ResultCsvFile extends AbstractCsvFile<Result> {
     MODES,
     ROUTES,
     STOPS,
-    DETAILS,
-  };
+    DETAILS, };
 
   public ResultCsvFile(File file) {
     super(file, HEADERS);

@@ -61,8 +61,7 @@ public abstract class StreetVertex extends Vertex {
     return this.getOutgoing()
       .stream()
       .anyMatch(
-        edge ->
-          edge instanceof StreetEdge &&
+        edge -> edge instanceof StreetEdge &&
           ((StreetEdge) edge).getPermission().allows(TraverseMode.WALK)
       );
   }
@@ -74,8 +73,8 @@ public abstract class StreetVertex extends Vertex {
     return this.getOutgoing()
       .stream()
       .anyMatch(
-        edge ->
-          edge instanceof StreetEdge && ((StreetEdge) edge).getPermission().allows(TraverseMode.CAR)
+        edge -> edge instanceof StreetEdge &&
+          ((StreetEdge) edge).getPermission().allows(TraverseMode.CAR)
       );
   }
 
@@ -100,9 +99,8 @@ public abstract class StreetVertex extends Vertex {
       if (areaStops == EMPTY_SET) {
         areaStops = Set.copyOf(toBeAdded);
       } else {
-        areaStops = Stream.concat(areaStops.stream(), toBeAdded.stream()).collect(
-          Collectors.toUnmodifiableSet()
-        );
+        areaStops = Stream.concat(areaStops.stream(), toBeAdded.stream())
+          .collect(Collectors.toUnmodifiableSet());
       }
     }
   }

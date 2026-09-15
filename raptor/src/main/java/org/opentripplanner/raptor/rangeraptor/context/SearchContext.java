@@ -337,8 +337,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (searchParams.timetable()) {
       return USE_TIMETABLE;
     }
-    boolean preferLatestDeparture =
-      searchParams.preferLateArrival() != searchDirection.isInReverse();
+    boolean preferLatestDeparture = searchParams.preferLateArrival() !=
+      searchDirection.isInReverse();
 
     return preferLatestDeparture ? USE_DEPARTURE_TIME : USE_ARRIVAL_TIME;
   }

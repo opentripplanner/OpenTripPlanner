@@ -51,8 +51,7 @@ public class EgressPaths {
   }
 
   public Collection<RaptorAccessEgress> listAll() {
-    return pathsByStop
-      .valueCollection()
+    return pathsByStop.valueCollection()
       .stream()
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
@@ -86,15 +85,11 @@ public class EgressPaths {
   private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths
-      .stream()
-      .map(it -> it.hasTimePenalty() ? new EgressWithPenalty(it) : it)
-      .toList();
+    return paths.stream().map(it -> it.hasTimePenalty() ? new EgressWithPenalty(it) : it).toList();
   }
 
   private int[] filterPathsAndGetStops(Predicate<RaptorAccessEgress> filter) {
-    return pathsByStop
-      .valueCollection()
+    return pathsByStop.valueCollection()
       .stream()
       .flatMap(Collection::stream)
       .filter(filter)

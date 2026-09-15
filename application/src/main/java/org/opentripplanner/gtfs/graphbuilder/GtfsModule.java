@@ -133,10 +133,12 @@ public class GtfsModule implements GraphBuilderModule {
 
         calendarServiceData.add(builder.buildCalendarServiceData());
 
-        calendarServiceData
-          .getServiceIds()
-          .forEach(sId ->
-            fareRulesData.putServiceIds(sId, calendarServiceData.getServiceDatesForServiceId(sId))
+        calendarServiceData.getServiceIds()
+          .forEach(
+            sId -> fareRulesData.putServiceIds(
+              sId,
+              calendarServiceData.getServiceDatesForServiceId(sId)
+            )
           );
 
         if (OTPFeature.FlexRouting.isOn()) {

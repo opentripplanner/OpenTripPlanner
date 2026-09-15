@@ -27,20 +27,24 @@ class TripPatternGeometryTest {
 
   // Three stops roughly 2 km apart along a north-south line at 60° N. Unique id prefix to avoid
   // fixture collisions.
-  private static final RegularStop STOP_A = TEST_ENV.stop("TPG-A", b ->
-    b.withCoordinate(60.0000, 10.0000)
+  private static final RegularStop STOP_A = TEST_ENV.stop(
+    "TPG-A",
+    b -> b.withCoordinate(60.0000, 10.0000)
   );
-  private static final RegularStop STOP_B = TEST_ENV.stop("TPG-B", b ->
-    b.withCoordinate(60.0180, 10.0000)
+  private static final RegularStop STOP_B = TEST_ENV.stop(
+    "TPG-B",
+    b -> b.withCoordinate(60.0180, 10.0000)
   );
-  private static final RegularStop STOP_C = TEST_ENV.stop("TPG-C", b ->
-    b.withCoordinate(60.0360, 10.0000)
+  private static final RegularStop STOP_C = TEST_ENV.stop(
+    "TPG-C",
+    b -> b.withCoordinate(60.0360, 10.0000)
   );
 
   // A point midway between A and B so the A→B hop geometry is a polyline of three points, not a
   // straight line, letting us exercise the haversine-over-intermediate-coordinates path.
-  private static final RegularStop STOP_MID_AB = TEST_ENV.stop("TPG-MID", b ->
-    b.withCoordinate(60.0090, 10.0000)
+  private static final RegularStop STOP_MID_AB = TEST_ENV.stop(
+    "TPG-MID",
+    b -> b.withCoordinate(60.0090, 10.0000)
   );
 
   private static final StopPattern STOP_PATTERN = stopPattern(STOP_A, STOP_B, STOP_C);
@@ -244,11 +248,13 @@ class TripPatternGeometryTest {
   void factoryRejectsHopGeometriesWithWrongSize() {
     // The number of hop geometries must match numberOfStops - 1; a mismatch is a caller bug
     // and must be flagged eagerly rather than silently producing an inconsistent table.
-    assertThrows(IllegalArgumentException.class, () ->
-      TripPatternBuilder.buildHopGeometries(STOP_PATTERN, List.of(HOP_GEOMETRIES.get(0)))
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> TripPatternBuilder.buildHopGeometries(STOP_PATTERN, List.of(HOP_GEOMETRIES.get(0)))
     );
-    assertThrows(IllegalArgumentException.class, () ->
-      TripPatternBuilder.buildHopGeometries(STOP_PATTERN, List.of())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> TripPatternBuilder.buildHopGeometries(STOP_PATTERN, List.of())
     );
   }
 

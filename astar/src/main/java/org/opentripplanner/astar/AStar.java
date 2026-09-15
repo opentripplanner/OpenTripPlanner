@@ -28,11 +28,7 @@ import org.slf4j.LoggerFactory;
  * Find the shortest path between graph vertices using A*. A basic Dijkstra search is a special case
  * of AStar where the heuristic is always zero.
  */
-public class AStar<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class AStar<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
@@ -96,8 +92,7 @@ public class AStar<
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
     this.traverseVisitor = traverseVisitor;
-    this.initialVertices = initialStates
-      .stream()
+    this.initialVertices = initialStates.stream()
       .map(AStarState::getVertex)
       .collect(Collectors.toSet());
     this.goalVertices = goalVertices;
@@ -130,8 +125,7 @@ public class AStar<
   public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
     runSearch();
 
-    return targetAcceptedStates
-      .stream()
+    return targetAcceptedStates.stream()
       .filter(State::isFinal)
       .map(GraphPath::new)
       .collect(Collectors.toList());

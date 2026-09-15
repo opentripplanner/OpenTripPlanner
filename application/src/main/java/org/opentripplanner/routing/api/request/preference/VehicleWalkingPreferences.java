@@ -95,13 +95,11 @@ public class VehicleWalkingPreferences implements Serializable {
       return false;
     }
     VehicleWalkingPreferences that = (VehicleWalkingPreferences) o;
-    return (
-      speed == that.speed &&
+    return (speed == that.speed &&
       reluctance == that.reluctance &&
       Objects.equals(mountDismountTime, that.mountDismountTime) &&
       Objects.equals(mountDismountCost, that.mountDismountCost) &&
-      stairsReluctance == that.stairsReluctance
-    );
+      stairsReluctance == that.stairsReluctance);
   }
 
   @Override

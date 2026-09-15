@@ -229,15 +229,13 @@ public class GTFSToTransitDataImportMapper {
     timeframeMapper.map(data.getAllTimeframes());
 
     fareRulesBuilder.fareLegRules().addAll(fareLegRuleMapper.map(data.getAllFareLegRules()));
-    fareRulesBuilder
-      .fareTransferRules()
+    fareRulesBuilder.fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
     fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
 
     tripSegmentMapper.map(data.getAllTripSegments(), builder.getStopTimesSortedByTrip());
     noticeMapper.map(data.getAllNotices());
-    builder
-      .getNoticeAssignments()
+    builder.getNoticeAssignments()
       .putAll(noticeAssignmentMapper.map(data.getAllNoticeAssignments()));
   }
 

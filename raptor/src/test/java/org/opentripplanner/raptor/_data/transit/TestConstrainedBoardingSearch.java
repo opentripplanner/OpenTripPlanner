@@ -14,9 +14,8 @@ import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public class TestConstrainedBoardingSearch
-  implements RaptorConstrainedBoardingSearch<TestTripSchedule>
-{
+public class TestConstrainedBoardingSearch implements
+  RaptorConstrainedBoardingSearch<TestTripSchedule> {
 
   /** Index of guaranteed transfers by fromStopPos */
   private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos =
@@ -68,8 +67,7 @@ public class TestConstrainedBoardingSearch
    * Return boardings as a result for constrained transfers like a guaranteed transfer.
    */
   public List<TestConstrainedTransfer> constrainedBoardings() {
-    return transfersByFromStopPos
-      .valueCollection()
+    return transfersByFromStopPos.valueCollection()
       .stream()
       .flatMap(Collection::stream)
       .collect(Collectors.toList());

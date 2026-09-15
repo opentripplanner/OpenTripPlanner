@@ -28,16 +28,14 @@ public class CarpoolingRequestTestData {
 
   /** Access routing request; the passenger's relevant coordinate is the pickup. */
   public static CarpoolingRequest accessRequest(WgsCoordinate passengerPickup) {
-    return baseBuilder()
-      .withPassengerPickup(passengerPickup)
+    return baseBuilder().withPassengerPickup(passengerPickup)
       .withAccessOrEgress(AccessEgressType.ACCESS)
       .build();
   }
 
   /** Egress routing request; the passenger's relevant coordinate is the dropoff. */
   public static CarpoolingRequest egressRequest(WgsCoordinate passengerDropoff) {
-    return baseBuilder()
-      .withPassengerDropoff(passengerDropoff)
+    return baseBuilder().withPassengerDropoff(passengerDropoff)
       .withAccessOrEgress(AccessEgressType.EGRESS)
       .build();
   }
@@ -79,16 +77,14 @@ public class CarpoolingRequestTestData {
     boolean arriveBy,
     AccessEgressType accessOrEgress
   ) {
-    return baseBuilder()
-      .withArriveBy(arriveBy)
+    return baseBuilder().withArriveBy(arriveBy)
       .withRequestedDateTime(T)
       .withAccessOrEgress(accessOrEgress)
       .build();
   }
 
   private static CarpoolingRequestBuilder baseBuilder() {
-    return new CarpoolingRequestBuilder()
-      .withMaxWalkTime(DEFAULT_MAX_WALK_TIME)
+    return new CarpoolingRequestBuilder().withMaxWalkTime(DEFAULT_MAX_WALK_TIME)
       .withSearchWindow(DEFAULT_SEARCH_WINDOW);
   }
 

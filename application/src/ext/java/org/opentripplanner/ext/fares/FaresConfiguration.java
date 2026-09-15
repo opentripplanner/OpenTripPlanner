@@ -19,8 +19,7 @@ public class FaresConfiguration {
     // Fares uses the raw node, not the types-safe adapter, but defining the fares root here
     // will cause fares to be added to the build-config configuration document with a link to the
     // Fares.md.
-    return root
-      .of(parameterName)
+    return root.of(parameterName)
       .summary("Fare configuration.")
       .since(OtpVersion.V2_0)
       .asObject()
@@ -70,9 +69,8 @@ public class FaresConfiguration {
     return switch (type) {
       case "off" -> new NoopFareServiceFactory();
       case "gtfs" -> new GtfsFareServiceFactory();
-      case
-        "highest-fare-in-free-transfer-window",
-        "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
+      case "highest-fare-in-free-transfer-window", "highestFareInFreeTransferWindow" ->
+        new HighestFareInFreeTransferWindowFareServiceFactory();
       case "hsl" -> new HSLFareServiceFactory();
       case "atlanta" -> new AtlantaFareServiceFactory();
       case "orca" -> new OrcaFareFactory();

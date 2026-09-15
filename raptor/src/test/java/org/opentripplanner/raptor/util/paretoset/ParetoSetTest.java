@@ -18,10 +18,10 @@ public class ParetoSetTest {
 
   private static final ParetoComparator<TestVector> DIFFERENT = (l, r) -> l.v1 != r.v1;
   private static final ParetoComparator<TestVector> LESS_THEN = (l, r) -> l.v1 < r.v1;
-  private static final ParetoComparator<TestVector> LESS_LESS_THEN = (l, r) ->
-    l.v1 < r.v1 || l.v2 < r.v2;
-  private static final ParetoComparator<TestVector> LESS_DIFFERENT_THEN = (l, r) ->
-    l.v1 < r.v1 || l.v2 != r.v2;
+  private static final ParetoComparator<TestVector> LESS_LESS_THEN = (l, r) -> l.v1 < r.v1 ||
+    l.v2 < r.v2;
+  private static final ParetoComparator<TestVector> LESS_DIFFERENT_THEN = (l, r) -> l.v1 < r.v1 ||
+    l.v2 != r.v2;
 
   // Used to stored dropped vectors (callback from set)
   private final List<TestVector> dropped = new ArrayList<>();
@@ -497,8 +497,7 @@ public class ParetoSetTest {
     TestCase(TestVector v0, TestVector v1, String description, TestVector... expected) {
       this.v0 = v0;
       this.v1 = v1;
-      this.expected =
-        "{" +
+      this.expected = "{" +
         Arrays.stream(expected).map(Objects::toString).collect(Collectors.joining(", ")) +
         "}";
       this.description = description;

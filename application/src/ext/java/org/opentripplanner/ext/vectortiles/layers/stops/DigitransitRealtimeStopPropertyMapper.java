@@ -40,28 +40,21 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
   protected Collection<KeyValue> map(RegularStop stop) {
     Instant currentTime = Instant.now();
     var stopAlerts = transitAlertService.getStopLocationsAlerts(stop.getIdAndParentStationId());
-    boolean noServiceAlert = stopAlerts
-      .stream()
+    boolean noServiceAlert = stopAlerts.stream()
       .anyMatch(alert -> alert.effect() == AlertEffect.NO_SERVICE && alert.isActiveAt(currentTime));
 
-    var validAlerts = stopAlerts
-      .stream()
-      .filter(alert -> alert.isActiveAt(currentTime))
-      .toList();
+    var validAlerts = stopAlerts.stream().filter(alert -> alert.isActiveAt(currentTime)).toList();
 
-    var mostSevereAlert = validAlerts
-      .stream()
+    var mostSevereAlert = validAlerts.stream()
       .filter(alert -> alert.severity() != null)
       .max(Comparator.comparingInt(alert -> alert.severity().sortingIndex()));
-    String mostSevereAlertSeverityLevel = mostSevereAlert
-      .map(alert -> AlertSeverityToStringMapper.map(alert.severity()))
-      .orElse(null);
+    String mostSevereAlertSeverityLevel = mostSevereAlert.map(
+      alert -> AlertSeverityToStringMapper.map(alert.severity())
+    ).orElse(null);
 
-    List<String> mostSevereAlertEffects = mostSevereAlert
-      .map(TransitAlert::severity)
-      .map(severity ->
-        validAlerts
-          .stream()
+    List<String> mostSevereAlertEffects = mostSevereAlert.map(TransitAlert::severity)
+      .map(
+        severity -> validAlerts.stream()
           .filter(alert -> severity.equals(alert.severity()))
           .filter(alert -> alert.effect() != null)
           .map(alert -> AlertEffectToStringMapper.map(alert.effect()))
@@ -72,10 +65,12 @@ public class DigitransitRealtimeStopPropertyMapper extends PropertyMapper<Regula
       .orElse(List.of());
 
     var serviceDate = LocalDate.now(transitService.getTimeZone());
-    boolean stopTimesExist = transitService
-      .findStopTimesInPattern(stop, serviceDate, ArrivalDeparture.BOTH, true)
-      .stream()
-      .anyMatch(stopTime -> stopTime.times.size() > 0);
+    boolean stopTimesExist = transitService.findStopTimesInPattern(
+      stop,
+      serviceDate,
+      ArrivalDeparture.BOTH,
+      true
+    ).stream().anyMatch(stopTime -> stopTime.times.size() > 0);
     var inService = transitService.hasScheduledServicesAfter(LocalDate.now(), stop);
 
     Collection<KeyValue> sharedKeyValues = getBaseKeyValues(stop, i18NStringMapper, transitService);

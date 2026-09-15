@@ -59,11 +59,9 @@ public class LocalizedString implements I18NString, Serializable {
 
   @Override
   public boolean equals(Object other) {
-    return (
-      other instanceof LocalizedString &&
+    return (other instanceof LocalizedString &&
       key.equals(((LocalizedString) other).key) &&
-      Arrays.equals(params, ((LocalizedString) other).params)
-    );
+      Arrays.equals(params, ((LocalizedString) other).params));
   }
 
   /**
@@ -91,9 +89,7 @@ public class LocalizedString implements I18NString, Serializable {
       translation = PATTERN_MATCHER.matcher(translation).replaceAll("%s");
       return String.format(
         translation,
-        Arrays.stream(params)
-          .map(i -> i.toString(locale))
-          .toArray(Object[]::new)
+        Arrays.stream(params).map(i -> i.toString(locale)).toArray(Object[]::new)
       );
     } else {
       return translation;

@@ -52,8 +52,7 @@ class CrosswalkNamer implements EdgeNamer {
   public void recordEdges(OsmWay way, StreetEdgePair pair, OsmDatabase osmdb) {
     // Record unnamed crossings to a list.
     if (way.isCrossing() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
-      pair
-        .asIterable()
+      pair.asIterable()
         .forEach(edge -> unnamedCrosswalks.add(new EdgeOnLevel(way, edge, Set.of())));
     }
     // Record (short) sidewalks to a geometric index
@@ -104,8 +103,7 @@ class CrosswalkNamer implements EdgeNamer {
         crosswalk.setName(I18NString.of(String.format("crosswalk %s", way.getId())));
       }
 
-      var adjacentSidewalks = sidewalkIndex
-        .query(buffer)
+      var adjacentSidewalks = sidewalkIndex.query(buffer)
         .stream()
         .filter(e -> e.way().isAdjacentTo(way))
         .filter(e -> e.edge().nameIsDerived())
@@ -131,8 +129,7 @@ class CrosswalkNamer implements EdgeNamer {
     I18NString crosswalkName,
     long nodeId
   ) {
-    List<EdgeOnLevel> sidewalks = adjacentSidewalks
-      .stream()
+    List<EdgeOnLevel> sidewalks = adjacentSidewalks.stream()
       .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
     if (sidewalks.size() == 1) {
@@ -150,8 +147,7 @@ class CrosswalkNamer implements EdgeNamer {
       // and one somewhere in the middle that joins the crossing with the street.
       // We exclude the first and last node which are on the sidewalk.
       long[] nodeRefsArray = nodeRefs.toArray(1, nodeRefs.size() - 2);
-      return streets
-        .stream()
+      return streets.stream()
         .filter(w -> Arrays.stream(nodeRefsArray).anyMatch(nid -> w.getNodeRefs().contains(nid)))
         .findFirst();
     }

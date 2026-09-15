@@ -250,8 +250,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   private void timeShiftAllStreetLegs() {
-    legsAsStream().forEach(leg ->
-      leg.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime)
+    legsAsStream().forEach(
+      leg -> leg.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime)
     );
   }
 
@@ -275,13 +275,8 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   }
 
   private void addTransferConstraints(PathBuilderLeg<T> from, PathBuilderLeg<T> to) {
-    @SuppressWarnings("ConstantConditions")
-    var tx = transferConstraintsSearch.findConstrainedTransfer(
-      from.trip(),
-      from.toStopPos(),
-      to.trip(),
-      to.fromStopPos()
-    );
+    @SuppressWarnings("ConstantConditions") var tx = transferConstraintsSearch
+      .findConstrainedTransfer(from.trip(), from.toStopPos(), to.trip(), to.fromStopPos());
     if (tx != null) {
       from.setConstrainedTransferAfterLeg(tx);
     }

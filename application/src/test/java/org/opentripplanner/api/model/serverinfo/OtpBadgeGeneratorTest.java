@@ -41,7 +41,8 @@ public class OtpBadgeGeneratorTest {
           <text x="2325" y="138" textLength="1410">2.8.0-SNAPSHOT-237</text>
         </g>
       </svg>
-      """,
+      """
+      ,
       result
     );
   }
@@ -62,8 +63,7 @@ public class OtpBadgeGeneratorTest {
   void testIsValidLabel() {
     assertTrue(isValidLabel(""));
     assertTrue(isValidLabel("A"));
-    String label120 =
-      "1234567 10 234567 20 234567 30 234567 40 234567 50 234567 60" +
+    String label120 = "1234567 10 234567 20 234567 30 234567 40 234567 50 234567 60" +
       " 234567 70 234567 80 234567 90 23456 100 23456 110 23456 120";
     assertTrue(isValidLabel(label120));
     assertFalse(isValidLabel(label120 + "1"));

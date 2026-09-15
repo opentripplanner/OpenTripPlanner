@@ -29,8 +29,7 @@ class MalformedStartDateTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var update = rt.tripUpdateScheduled(TRIP_1_ID)
       .withStartDate("January 24th 2026")
       .addDelayedStopTime(0, 60)
       .build();

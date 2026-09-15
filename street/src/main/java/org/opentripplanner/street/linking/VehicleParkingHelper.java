@@ -67,13 +67,11 @@ public class VehicleParkingHelper {
     VehicleParkingEntranceVertex from,
     VehicleParkingEntranceVertex to
   ) {
-    var usableForBikeParking =
-      from.getVehicleParking().hasBicyclePlaces() &&
+    var usableForBikeParking = from.getVehicleParking().hasBicyclePlaces() &&
       from.isWalkAccessible() &&
       to.isWalkAccessible();
 
-    var usableForCarParking =
-      from.getVehicleParking().hasAnyCarPlaces() &&
+    var usableForCarParking = from.getVehicleParking().hasAnyCarPlaces() &&
       ((from.isCarAccessible() && to.isWalkAccessible()) ||
         (from.isWalkAccessible() && to.isCarAccessible()));
 

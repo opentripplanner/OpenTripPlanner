@@ -32,10 +32,8 @@ public class TransitGroupPriorityReport {
         it.getNetexSubmode().name()
       );
     }
-    return (
-      "TRANSIT GROUPS PRIORITY" +
-      map.values().stream().map(DebugEntity::toString).sorted().collect(Collectors.joining(""))
-    );
+    return ("TRANSIT GROUPS PRIORITY" +
+      map.values().stream().map(DebugEntity::toString).sorted().collect(Collectors.joining("")));
   }
 
   private static class DebugEntity {

@@ -14,10 +14,9 @@ class StreetEdgeBuilderFactory {
   public static StreetEdgeBuilder<?> edgeBuilder(WgsCoordinate... c) {
     var coordinates = Arrays.stream(c).toList();
     var ls = GeometryUtils.makeLineString(c);
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(
-        StreetModelForTest.intersectionVertex(coordinates.getFirst().asJtsCoordinate())
-      )
+    return new StreetEdgeBuilder<>().withFromVertex(
+      StreetModelForTest.intersectionVertex(coordinates.getFirst().asJtsCoordinate())
+    )
       .withToVertex(StreetModelForTest.intersectionVertex(coordinates.getLast().asJtsCoordinate()))
       .withGeometry(ls);
   }

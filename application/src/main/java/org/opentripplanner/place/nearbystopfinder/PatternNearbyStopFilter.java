@@ -74,8 +74,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
    * we can board(forward direction) or alight(reverse direction) at the given stop.
    */
   private List<FeedScopedId> findPatternsForStop(RegularStop stop, boolean reverseDirection) {
-    return transitService
-      .findPatterns(stop)
+    return transitService.findPatterns(stop)
       .stream()
       .filter(reverseDirection ? p -> p.alightingExist(stop) : p -> p.boardingExist(stop))
       .map(TripPattern::getId)

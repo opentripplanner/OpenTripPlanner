@@ -49,12 +49,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorResponse<T> response;
 
     if (request.isDynamicSearch()) {
-      response = new RangeRaptorDynamicSearch<>(
-        config,
-        transitData,
-        extraMcSearch,
-        request
-      ).route();
+      response = new RangeRaptorDynamicSearch<>(config, transitData, extraMcSearch, request)
+        .route();
     } else {
       response = routeUsingStdWorker(transitData, request);
     }
@@ -114,8 +110,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorResponse<T> response
   ) {
     if (LOG.isDebugEnabled()) {
-      var pathsAsText = response
-        .paths()
+      var pathsAsText = response.paths()
         .stream()
         .map(p -> "\t\n" + p.toString(transitData.stopNameResolver()))
         .collect(Collectors.joining());

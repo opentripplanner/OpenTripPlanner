@@ -33,12 +33,11 @@ class QuayChangeTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:33")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -63,12 +62,11 @@ class QuayChangeTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     // Step 1: Change quay from B to C (same station)
-    var quayChange = siri
-      .etBuilder()
+    var quayChange = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:33")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -80,12 +78,11 @@ class QuayChangeTest implements RealtimeTestConstants {
     );
 
     // Step 2: Revert to original stop B with updated times
-    var revert = siri
-      .etBuilder()
+    var revert = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:16"))
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_B).arriveAimedExpected("00:00:20", "00:00:30")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B).arriveAimedExpected("00:00:20", "00:00:30")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -109,12 +106,11 @@ class QuayChangeTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     // Step 1: Change quay from B to C (same station) with delay
-    var quayChange = siri
-      .etBuilder()
+    var quayChange = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:33")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -127,12 +123,11 @@ class QuayChangeTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Route1::001:RT[P U]");
 
     // Step 2: Keep quay change (still C) but with different delay
-    var updatedTimes = siri
-      .etBuilder()
+    var updatedTimes = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:16"))
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:35")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C).arriveAimedExpected("00:00:20", "00:00:35")
       )
       .buildEstimatedTimetableDeliveries();
 

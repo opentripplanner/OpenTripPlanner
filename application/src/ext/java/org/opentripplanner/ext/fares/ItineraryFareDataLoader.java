@@ -17,10 +17,8 @@ public class ItineraryFareDataLoader {
   public static final String KEY = "itinerary-fare";
 
   public static DataLoader<Itinerary, ItineraryFare> create(FareService fareService) {
-    BatchLoader<Itinerary, ItineraryFare> batchLoader = itineraries ->
-      CompletableFuture.supplyAsync(() ->
-        itineraries.stream().map(fareService::calculateFares).toList()
-      );
+    BatchLoader<Itinerary, ItineraryFare> batchLoader = itineraries -> CompletableFuture
+      .supplyAsync(() -> itineraries.stream().map(fareService::calculateFares).toList());
     return DataLoaderFactory.newDataLoader(batchLoader);
   }
 }

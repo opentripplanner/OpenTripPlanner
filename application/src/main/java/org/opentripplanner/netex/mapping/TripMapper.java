@@ -37,10 +37,7 @@ class TripMapper {
   private final DataImportIssueStore issueStore;
   private final EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById;
   private final ReadOnlyHierarchicalMap<String, Route> routeById;
-  private final ReadOnlyHierarchicalMap<
-    String,
-    JourneyPattern_VersionStructure
-  > journeyPatternsById;
+  private final ReadOnlyHierarchicalMap<String, JourneyPattern_VersionStructure> journeyPatternsById;
   private final Map<String, FeedScopedId> serviceIds;
   private final EntityById<Operator> operatorsById;
   private final TransportModeMapper transportModeMapper = new TransportModeMapper();

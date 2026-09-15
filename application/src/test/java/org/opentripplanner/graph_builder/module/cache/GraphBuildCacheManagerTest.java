@@ -78,10 +78,8 @@ class GraphBuildCacheManagerTest {
     // older OTP build. The manager must reject it and return null rather than using stale data.
     var entry = new DirectoryDataSource(tempDir, FileType.UNKNOWN).entry(ELEVATION.cacheFileName());
     try (var output = new Output(entry.asOutputStream())) {
-      KryoBuilder.create().writeClassAndObject(
-        output,
-        new CacheSerializationObject<>(999, "stale-data")
-      );
+      KryoBuilder.create()
+        .writeClassAndObject(output, new CacheSerializationObject<>(999, "stale-data"));
     }
 
     var subject = newManager();

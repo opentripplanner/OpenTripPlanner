@@ -259,11 +259,8 @@ public class TripInput {
     }
   }
 
-  private record FlexStopCallInput(
-    AreaStop stop,
-    int windowStart,
-    int windowEnd
-  ) implements StopCallInput {
+  private record FlexStopCallInput(AreaStop stop, int windowStart, int windowEnd) implements
+    StopCallInput {
     public StopTime toStopTime(Trip trip, int stopSequence) {
       var st = new StopTime();
       st.setTrip(trip);

@@ -12,8 +12,7 @@ public class PolylineAssert {
   }
 
   public static void assertThatPolylinesAreEqual(String actual, String expected) {
-    var reason =
-      "Actual polyline is not equal to the expected one. View them on a map: \n" +
+    var reason = "Actual polyline is not equal to the expected one. View them on a map: \n" +
       "Expected:  " +
       makeUrl(expected) +
       "\n" +

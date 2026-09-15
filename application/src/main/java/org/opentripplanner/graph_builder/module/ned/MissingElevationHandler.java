@@ -73,11 +73,9 @@ class MissingElevationHandler {
 
     // Assign elevations to street edges based on the vertices
     elevations.keySet().forEach(vertex -> {
-      vertex
-        .getIncomingStreetEdges()
+      vertex.getIncomingStreetEdges()
         .forEach(edge -> assignElevationToEdgeIfPossible(elevations, edge));
-      vertex
-        .getOutgoingStreetEdges()
+      vertex.getOutgoingStreetEdges()
         .forEach(edge -> assignElevationToEdgeIfPossible(elevations, edge));
     });
   }
@@ -199,8 +197,8 @@ class MissingElevationHandler {
     var currentState = stateToBackTrack;
     while (currentState != null) {
       if (!elevations.containsKey(currentState.currentVertex)) {
-        var elevation =
-          currentState.initialElevation + elevationDiff * (currentState.distance / totalDistance);
+        var elevation = currentState.initialElevation +
+          elevationDiff * (currentState.distance / totalDistance);
         elevation = DoubleUtils.roundTo1Decimal(elevation);
 
         elevations.put(currentState.currentVertex, elevation);
@@ -228,8 +226,7 @@ class MissingElevationHandler {
 
     Coordinate[] coords = new Coordinate[] {
       new Coordinate(0, fromElevation),
-      new Coordinate(edge.getDistanceMeters(), toElevation),
-    };
+      new Coordinate(edge.getDistanceMeters(), toElevation), };
 
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
@@ -283,8 +280,7 @@ class MissingElevationHandler {
 
     @Override
     public String toString() {
-      return (
-        "ElevationRepairState{" +
+      return ("ElevationRepairState{" +
         "initialVertex=" +
         initialVertex +
         ", initialElevation=" +
@@ -293,8 +289,7 @@ class MissingElevationHandler {
         currentVertex +
         ", distance=" +
         distance +
-        '}'
-      );
+        '}');
     }
   }
 }

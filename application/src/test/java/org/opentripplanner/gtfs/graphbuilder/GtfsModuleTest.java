@@ -34,8 +34,7 @@ class GtfsModuleTest {
 
     module.buildGraph();
 
-    var frequencyTripPattern = model.transitRepository
-      .getAllTripPatterns()
+    var frequencyTripPattern = model.transitRepository.getAllTripPatterns()
       .stream()
       .filter(p -> !p.getScheduledTimetable().getFrequencyEntries().isEmpty())
       .toList();

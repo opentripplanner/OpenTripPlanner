@@ -205,8 +205,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
 
   @Override
   public boolean sameAs(TransitAlert other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(headerText, other.headerText) &&
       Objects.equals(descriptionText, other.descriptionText) &&
       Objects.equals(detailText, other.detailText) &&
@@ -223,8 +222,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&
-      Objects.equals(calendar, other.calendar)
-    );
+      Objects.equals(calendar, other.calendar));
   }
 
   @Override

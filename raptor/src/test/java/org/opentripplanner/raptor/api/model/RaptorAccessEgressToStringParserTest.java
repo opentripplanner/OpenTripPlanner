@@ -25,23 +25,17 @@ class RaptorAccessEgressToStringParserTest {
     DURATION
   );
   private static final TestAccessEgress FREE = TestAccessEgress.free(STOP);
-  private static final TestAccessEgress OPENING_HOURS = TestAccessEgress.walk(
-    STOP,
-    DURATION
-  ).openingHours(T10_30, T12_30);
+  private static final TestAccessEgress OPENING_HOURS = TestAccessEgress.walk(STOP, DURATION)
+    .openingHours(T10_30, T12_30);
   private static final TestAccessEgress VIA = TestAccessEgress.walk(STOP, DURATION);
-  private static final TestAccessEgress TIME_PENALTY = TestAccessEgress.walk(
-    STOP,
-    DURATION
-  ).withTimePenalty(TIME_PENALTY_VALUE);
+  private static final TestAccessEgress TIME_PENALTY = TestAccessEgress.walk(STOP, DURATION)
+    .withTimePenalty(TIME_PENALTY_VALUE);
   private static final TestAccessEgress EVERYTHING = TestAccessEgress.flexAndWalk(
     STOP,
     DURATION,
     N_RIDES,
     COST
-  )
-    .openingHours(T10_30, T12_30)
-    .withTimePenalty(TIME_PENALTY_VALUE);
+  ).openingHours(T10_30, T12_30).withTimePenalty(TIME_PENALTY_VALUE);
 
   static List<TestAccessEgress> parseAccessEgressTestCases() {
     return List.of(WALK, FLEX, FLEX_AND_WALK, FREE, OPENING_HOURS, VIA, TIME_PENALTY, EVERYTHING);

@@ -80,12 +80,10 @@ public final class ElevatorRequest implements Serializable {
       return false;
     }
     ElevatorRequest that = (ElevatorRequest) o;
-    return (
-      Objects.equals(boardCost, that.boardCost) &&
+    return (Objects.equals(boardCost, that.boardCost) &&
       Objects.equals(boardSlack, that.boardSlack) &&
       Objects.equals(hopTime, that.hopTime) &&
-      reluctance == that.reluctance
-    );
+      reluctance == that.reluctance);
   }
 
   @Override

@@ -49,8 +49,7 @@ class SidewalkNamerTest {
     private final List<EdgePair> pairs = new ArrayList<>();
 
     EdgePair addUnnamedSidewalk(WgsCoordinate... coordinates) {
-      var edge = edgeBuilder(coordinates)
-        .withName(SIDEWALK)
+      var edge = edgeBuilder(coordinates).withName(SIDEWALK)
         .withPermission(StreetTraversalPermission.PEDESTRIAN)
         .withBogusName(true)
         .buildAndConnect();
@@ -63,8 +62,7 @@ class SidewalkNamerTest {
     }
 
     EdgePair addStreetEdge(String name, WgsCoordinate... coordinates) {
-      var edge = edgeBuilder(coordinates)
-        .withName(I18NString.of(name))
+      var edge = edgeBuilder(coordinates).withName(I18NString.of(name))
         .withPermission(StreetTraversalPermission.ALL)
         .buildAndConnect();
       var way = WayTestData.highwayTertiary().copy().withTag("name", name).build();
@@ -76,8 +74,8 @@ class SidewalkNamerTest {
     }
 
     void finalizeNames(EdgeNamer namer) {
-      pairs.forEach(p ->
-        namer.recordEdges(
+      pairs.forEach(
+        p -> namer.recordEdges(
           p.way,
           new StreetEdgePair(p.edge, null),
           new OsmDatabase(DataImportIssueStore.NOOP)

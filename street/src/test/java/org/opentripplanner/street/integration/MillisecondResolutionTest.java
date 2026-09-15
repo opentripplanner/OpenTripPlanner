@@ -23,16 +23,14 @@ class MillisecondResolutionTest extends GraphRoutingTest {
 
   @BeforeEach
   void setUp() {
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.94646, 10.77511);
-          B = intersection("B", 59.94641, 10.77522);
-          street(A, B, 15, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.94646, 10.77511);
+        B = intersection("B", 59.94641, 10.77522);
+        street(A, B, 15, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
   }
 
   /**

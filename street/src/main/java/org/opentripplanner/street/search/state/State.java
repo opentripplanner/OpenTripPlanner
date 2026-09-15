@@ -108,11 +108,10 @@ public final class State implements AStarState<State, Edge, Vertex> {
     var destinationZones = streetSearchRequest.arriveByDestinationZones();
     var restrictedNetworks = destinationZones.isEmpty()
       ? Set.<String>of()
-      : destinationZones
-          .stream()
-          .filter(GeofencingZone::hasRestriction)
-          .map(z -> z.id().getFeedId())
-          .collect(Collectors.toSet());
+      : destinationZones.stream()
+        .filter(GeofencingZone::hasRestriction)
+        .map(z -> z.id().getFeedId())
+        .collect(Collectors.toSet());
 
     for (Vertex vertex : vertices) {
       for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
@@ -219,11 +218,9 @@ public final class State implements AStarState<State, Edge, Vertex> {
   }
 
   public boolean isCompatibleVehicleRentalState(State state) {
-    return (
-      stateData.vehicleRentalState == state.stateData.vehicleRentalState &&
+    return (stateData.vehicleRentalState == state.stateData.vehicleRentalState &&
       stateData.mayKeepRentedVehicleAtDestination ==
-        state.stateData.mayKeepRentedVehicleAtDestination
-    );
+        state.stateData.mayKeepRentedVehicleAtDestination);
   }
 
   public boolean isRentingVehicleFromStation() {
@@ -235,22 +232,18 @@ public final class State implements AStarState<State, Edge, Vertex> {
   }
 
   public boolean isRentingVehicle() {
-    return (
-      stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION ||
-      stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING
-    );
+    return (stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION ||
+      stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING);
   }
 
   private boolean vehicleRentalIsFinished() {
     boolean dropOffBanned = isDropOffBannedByCurrentZones();
-    return (
-      stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
+    return (stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING && !dropOffBanned) ||
       (getRequest().allowsArrivingInRentalAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION &&
-        !dropOffBanned)
-    );
+        !dropOffBanned));
   }
 
   private boolean vehicleRentalNotStarted() {
@@ -277,8 +270,9 @@ public final class State implements AStarState<State, Edge, Vertex> {
       vehicleRentingOk = !request.mode().includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
-      vehicleRentingOk =
-        !request.mode().includesRenting() || vehicleRentalNotStarted() || vehicleRentalIsFinished();
+      vehicleRentingOk = !request.mode().includesRenting() ||
+        vehicleRentalNotStarted() ||
+        vehicleRentalIsFinished();
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;

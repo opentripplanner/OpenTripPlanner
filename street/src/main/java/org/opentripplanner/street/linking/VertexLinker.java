@@ -68,14 +68,15 @@ public class VertexLinker {
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
    */
-  private static final double DUPLICATE_WAY_EPSILON_DEGREES =
-    SphericalDistanceLibrary.metersToDegrees(0.001);
+  private static final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary
+    .metersToDegrees(0.001);
 
   /**
    * Minimal distance for considering two nodes the same
    */
-  private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED =
-    SphericalDistanceLibrary.metersToDegrees(1) * SphericalDistanceLibrary.metersToDegrees(1);
+  private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED = SphericalDistanceLibrary
+    .metersToDegrees(1) *
+    SphericalDistanceLibrary.metersToDegrees(1);
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
@@ -200,8 +201,9 @@ public class VertexLinker {
     Scope scope,
     BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    DisposableEdgeCollection tempEdges =
-      scope != Scope.PERMANENT ? new DisposableEdgeCollection(graph, scope) : null;
+    DisposableEdgeCollection tempEdges = scope != Scope.PERMANENT
+      ? new DisposableEdgeCollection(graph, scope)
+      : null;
 
     try {
       // Expanding-envelope search: try each radius step (smallest first) and stop at the first that
@@ -259,10 +261,7 @@ public class VertexLinker {
       direction,
       Scope.PERMANENT,
       null,
-      edges
-        .stream()
-        .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
-        .toList(),
+      edges.stream().map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale))).toList(),
       xscale
     );
   }
@@ -290,8 +289,7 @@ public class VertexLinker {
     // Distances are squared (see squaredDistance), so compare against the squared radius.
     final double radiusDegSq = radiusDeg * radiusDeg;
     var candidateEdges = graph.findEdges(env, scope);
-    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges
-      .stream()
+    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges.stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
@@ -366,8 +364,7 @@ public class VertexLinker {
       candidateEdges
     );
     HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
-    return closestEdges
-      .stream()
+    return closestEdges.stream()
       .map(ce -> snapAndLink(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
       .filter(Objects::nonNull)
       .collect(Collectors.toSet());
@@ -398,8 +395,7 @@ public class VertexLinker {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
 
-      var candidateEdgesForMode = candidateEdges
-        .stream()
+      var candidateEdgesForMode = candidateEdges.stream()
         .filter(e -> e.item.canTraverse(modeSet))
         .toList();
 
@@ -407,8 +403,7 @@ public class VertexLinker {
         continue;
       }
 
-      double closestSquaredDistance = candidateEdgesForMode
-        .stream()
+      double closestSquaredDistance = candidateEdgesForMode.stream()
         .mapToDouble(ce -> ce.squaredDistanceDegreesLat)
         .min()
         .getAsDouble();
@@ -422,8 +417,7 @@ public class VertexLinker {
       // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
       // Note: add only closest edges of each mode
       closestEdges.addAll(
-        candidateEdgesForMode
-          .stream()
+        candidateEdgesForMode.stream()
           .filter(ce -> ce.squaredDistanceDegreesLat <= bandSquared)
           .collect(Collectors.toSet())
       );
@@ -449,7 +443,7 @@ public class VertexLinker {
     // check if vertex is inside an area
     if (
       this.visibilityMode == VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES &&
-      edge instanceof AreaEdge aEdge
+        edge instanceof AreaEdge aEdge
     ) {
       AreaGroup ag = aEdge.getArea();
       var area = new PreparedAreaGroup(ag);
@@ -490,8 +484,8 @@ public class VertexLinker {
 
     if (shouldLinkFlex) {
       var areaStops = Stream.concat(start.getIncoming().stream(), start.getOutgoing().stream())
-        .flatMap(e ->
-          Stream.concat(
+        .flatMap(
+          e -> Stream.concat(
             e.getFromVertex().areaStops().stream(),
             e.getToVertex().areaStops().stream()
           )
@@ -560,10 +554,9 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    var newEdges =
-      scope == Scope.PERMANENT
-        ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, direction);
+    var newEdges = scope == Scope.PERMANENT
+      ? originalEdge.splitDestructively(v)
+      : originalEdge.splitNonDestructively(v, direction);
 
     if (scope != Scope.PERMANENT) {
       newEdges.forEach(tempEdges::addEdge);
@@ -706,10 +699,9 @@ public class VertexLinker {
         Math.floor((2 * maxAreaNodes * maxAreaNodes) / areaComplexity)
       );
       if (appliedCount < totalCount) {
-        visibilityVertices = visibilityVertices
-          .stream()
-          .sorted((v1, v2) ->
-            Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+        visibilityVertices = visibilityVertices.stream()
+          .sorted(
+            (v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .limit(appliedCount)
           .collect(Collectors.toSet());
@@ -725,12 +717,11 @@ public class VertexLinker {
     if (added == 0) {
       if (force) {
         // link with nearest visibility vertex which does not overlap
-        var nearest = areaGroup
-          .visibilityVertices()
+        var nearest = areaGroup.visibilityVertices()
           .stream()
           .filter(v -> distSquared(v, newVertex) >= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED)
-          .sorted((v1, v2) ->
-            Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+          .sorted(
+            (v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .findFirst();
         if (!nearest.isPresent()) {
@@ -813,8 +804,7 @@ public class VertexLinker {
     // 'from' is the new vertex to be connected, so check the 'to' vertex connections
     var incomingNoThruModes = getNoThruModes(to.getIncoming());
     var outgoingNoThruModes = getNoThruModes(to.getOutgoing());
-    AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
-      .withFromVertex(from)
+    AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder().withFromVertex(from)
       .withToVertex(to)
       .withGeometry(line)
       .withName(hit.name())
@@ -833,8 +823,7 @@ public class VertexLinker {
       tempEdges.addEdge(areaEdge);
     }
 
-    AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder()
-      .withFromVertex(to)
+    AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder().withFromVertex(to)
       .withToVertex(from)
       .withGeometry(line.reverse())
       .withName(hit.name())

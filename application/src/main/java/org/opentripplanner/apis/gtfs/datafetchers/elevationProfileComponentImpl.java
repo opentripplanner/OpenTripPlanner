@@ -5,9 +5,8 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
 
-public class elevationProfileComponentImpl
-  implements GraphQLDataFetchers.GraphQLElevationProfileComponent
-{
+public class elevationProfileComponentImpl implements
+  GraphQLDataFetchers.GraphQLElevationProfileComponent {
 
   @Override
   public DataFetcher<Double> distance() {

@@ -52,10 +52,9 @@ class DefaultUpdateManager implements UpdateManager {
       new LinkedBlockingQueue<>(),
       threadFactory
     );
-    this.periodicCommitScheduler =
-      commitInterval != null && !commitInterval.isZero()
-        ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::submitCommit)
-        : null;
+    this.periodicCommitScheduler = commitInterval != null && !commitInterval.isZero()
+      ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::submitCommit)
+      : null;
   }
 
   @Override
@@ -63,8 +62,7 @@ class DefaultUpdateManager implements UpdateManager {
     EventHandler<E, M> handler,
     RepositoryHandle<?, M> repoHandle
   ) {
-    eventHandlers
-      .computeIfAbsent(handler.eventType(), k -> new ArrayList<>())
+    eventHandlers.computeIfAbsent(handler.eventType(), k -> new ArrayList<>())
       .add(new HandlerEntry<>(handler, repoHandle));
   }
 

@@ -16,20 +16,16 @@ class GroupBySameRoutesAndStopsTest implements PlanTestConstants {
   Route routeA = TransitRepositoryForTest.route("A").build();
   Route routeB = TransitRepositoryForTest.route("B").build();
 
-  Itinerary i1 = newItinerary(A)
-    .bus(routeA, 21, T11_06, T11_28, E)
+  Itinerary i1 = newItinerary(A).bus(routeA, 21, T11_06, T11_28, E)
     .bus(routeB, 41, T11_30, T11_32, D)
     .build();
-  Itinerary i2 = newItinerary(A)
-    .bus(routeA, 22, T11_09, T11_30, E)
+  Itinerary i2 = newItinerary(A).bus(routeA, 22, T11_09, T11_30, E)
     .bus(routeB, 42, T11_32, T11_33, D)
     .build();
-  Itinerary i3 = newItinerary(A)
-    .bus(routeA, 23, T11_10, T11_32, E)
+  Itinerary i3 = newItinerary(A).bus(routeA, 23, T11_10, T11_32, E)
     .bus(routeB, 43, T11_33, T11_50, D)
     .build();
-  Itinerary withWalking = newItinerary(F, T11_00)
-    .walk(D10_m, A)
+  Itinerary withWalking = newItinerary(F, T11_00).walk(D10_m, A)
     .bus(routeA, 23, T11_10, T11_32, E)
     .bus(routeB, 43, T11_33, T11_50, D)
     .build();

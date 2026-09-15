@@ -68,14 +68,14 @@ public class TransitRepositoryForTest {
   public static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
 
   // This is used to create valid objects - do not use it for verification
-  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory().createPolygon(
-    new Coordinate[] {
-      Coordinates.of(61.0, 10.0),
-      Coordinates.of(61.0, 12.0),
-      Coordinates.of(60.0, 11.0),
-      Coordinates.of(61.0, 10.0),
-    }
-  );
+  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
+    .createPolygon(
+      new Coordinate[] {
+        Coordinates.of(61.0, 10.0),
+        Coordinates.of(61.0, 12.0),
+        Coordinates.of(60.0, 11.0),
+        Coordinates.of(61.0, 10.0), }
+    );
 
   public static final Agency AGENCY = Agency.of(id("A1"))
     .withName("Agency Test")
@@ -112,10 +112,7 @@ public class TransitRepositoryForTest {
 
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(String id) {
-    return Route.of(id(id))
-      .withAgency(AGENCY)
-      .withShortName("R" + id)
-      .withMode(TransitMode.BUS);
+    return Route.of(id(id)).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
   }
 
   /**
@@ -127,10 +124,7 @@ public class TransitRepositoryForTest {
 
   /** Create a valid Bus Route to use in unit tests */
   public static RouteBuilder route(FeedScopedId id) {
-    return Route.of(id)
-      .withAgency(AGENCY)
-      .withShortName("R" + id)
-      .withMode(TransitMode.BUS);
+    return Route.of(id).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
   }
 
   public static TripPatternBuilder tripPattern(String id, Route route) {
@@ -154,8 +148,7 @@ public class TransitRepositoryForTest {
    * Create a stop with all required fields set.
    */
   public RegularStopBuilder stop(String idAndName) {
-    return siteRepositoryBuilder
-      .regularStop(id(idAndName))
+    return siteRepositoryBuilder.regularStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withCode(idAndName)
       .withCoordinate(ANY_COORDINATE);
@@ -183,8 +176,7 @@ public class TransitRepositoryForTest {
   }
 
   public GroupStop groupStop(String idAndName, RegularStop... stops) {
-    var builder = siteRepositoryBuilder
-      .groupStop(id(idAndName))
+    var builder = siteRepositoryBuilder.groupStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName));
 
     Stream.of(stops).forEach(builder::addLocation);
@@ -193,8 +185,7 @@ public class TransitRepositoryForTest {
   }
 
   public AreaStopBuilder areaStop(String idAndName) {
-    return siteRepositoryBuilder
-      .areaStop(id(idAndName))
+    return siteRepositoryBuilder.areaStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withGeometry(ANY_POLYGON);
   }
@@ -300,16 +291,14 @@ public class TransitRepositoryForTest {
   }
 
   public UnscheduledTrip unscheduledTrip(String id, StopLocation... stops) {
-    var stopTimes = Arrays.stream(stops)
-      .map(s -> {
-        var st = new StopTime();
-        st.setStop(s);
-        st.setFlexWindowStart(LocalTime.of(10, 0).toSecondOfDay());
-        st.setFlexWindowEnd(LocalTime.of(18, 0).toSecondOfDay());
+    var stopTimes = Arrays.stream(stops).map(s -> {
+      var st = new StopTime();
+      st.setStop(s);
+      st.setFlexWindowStart(LocalTime.of(10, 0).toSecondOfDay());
+      st.setFlexWindowEnd(LocalTime.of(18, 0).toSecondOfDay());
 
-        return st;
-      })
-      .toList();
+      return st;
+    }).toList();
     return unscheduledTrip(id, stopTimes);
   }
 

@@ -54,43 +54,31 @@ class SiriAzureUpdaterTest {
     when(mockConfig.isFuzzyTripMatching()).thenReturn(true);
 
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
-    spy(
-      new SiriAzureUpdater(
-        mockConfig,
-        new SiriAzureMessageHandler() {
-          @Override
-          public void setup(
-            WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
-          ) {}
+    spy(new SiriAzureUpdater(mockConfig, new SiriAzureMessageHandler() {
+      @Override
+      public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {}
 
-          @Override
-          @Nullable
-          public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
-            return null;
-          }
-        }
-      )
-    );
+      @Override
+      @Nullable
+      public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+        return null;
+      }
+    }));
 
     task = mock(Runnable.class);
   }
 
   private SiriAzureUpdater createUpdater(SiriAzureUpdaterParameters config) {
-    return new SiriAzureUpdater(
-      config,
-      new SiriAzureMessageHandler() {
-        @Override
-        public void setup(
-          WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
-        ) {}
+    return new SiriAzureUpdater(config, new SiriAzureMessageHandler() {
+      @Override
+      public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {}
 
-        @Override
-        @Nullable
-        public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
-          return null;
-        }
+      @Override
+      @Nullable
+      public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+        return null;
       }
-    );
+    });
   }
 
   @Test
@@ -164,26 +152,22 @@ class SiriAzureUpdaterTest {
 
     doReturn(otpRetry).when(errorUpdater).createOtpRetry(anyString());
 
-    doThrow(new OtpRetryException("Setup failed", new Exception()))
-      .when(otpRetry)
+    doThrow(new OtpRetryException("Setup failed", new Exception())).when(otpRetry)
       .execute(any(Runnable.class));
 
-    doThrow(new OtpRetryException("History failed", new Exception()))
-      .when(otpRetry)
+    doThrow(new OtpRetryException("History failed", new Exception())).when(otpRetry)
       .execute(any(Runnable.class));
 
     errorUpdater.run();
 
-    List<String> logMessages = listAppender.list
-      .stream()
+    List<String> logMessages = listAppender.list.stream()
       .map(ILoggingEvent::getFormattedMessage)
       .toList();
 
     assertTrue(
-      logMessages
-        .stream()
-        .anyMatch(msg ->
-          msg.contains(
+      logMessages.stream()
+        .anyMatch(
+          msg -> msg.contains(
             "REALTIME_STARTUP_FAILED_ALERT component=siri-azure-test-updater:ServiceBusSubscription status=FAILED error=History failed"
           )
         ),
@@ -191,10 +175,9 @@ class SiriAzureUpdaterTest {
     );
 
     assertTrue(
-      logMessages
-        .stream()
-        .anyMatch(msg ->
-          msg.contains(
+      logMessages.stream()
+        .anyMatch(
+          msg -> msg.contains(
             "REALTIME_STARTUP_FAILED_ALERT component=siri-azure-test-updater:ServiceBusSubscription status=FAILED error=History failed"
           )
         ),

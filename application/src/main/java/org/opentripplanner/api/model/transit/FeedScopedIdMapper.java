@@ -42,8 +42,7 @@ public interface FeedScopedIdMapper {
    *         collection are filtered out.
    */
   default List<FeedScopedId> parseList(Collection<String> ids) {
-    return ids
-      .stream()
+    return ids.stream()
       .map(this::parseNullSafe)
       .filter(Optional::isPresent)
       .map(Optional::get)

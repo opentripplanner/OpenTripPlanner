@@ -60,14 +60,12 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     // Grow a bit the envelope to prevent rendering glitches between tiles
     Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
 
-    Collection<Vertex> vertices = context.graph
-      .findVertices(bboxWithMargins)
+    Collection<Vertex> vertices = context.graph.findVertices(bboxWithMargins)
       .stream()
       .sorted(evRenderer::vertexSorter)
       .toList();
 
-    Collection<Edge> edges = context.graph
-      .findEdges(bboxWithMargins)
+    Collection<Edge> edges = context.graph.findEdges(bboxWithMargins)
       .stream()
       .distinct()
       .sorted(evRenderer::edgeSorter)
@@ -130,8 +128,7 @@ public class EdgeVertexTileRenderer implements TileRenderer {
       if (edgeGeom == null) {
         Coordinate[] coordinates = new Coordinate[] {
           edge.getFromVertex().getCoordinate(),
-          edge.getToVertex().getCoordinate(),
-        };
+          edge.getToVertex().getCoordinate(), };
         edgeGeom = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         hasGeom = false;
       }

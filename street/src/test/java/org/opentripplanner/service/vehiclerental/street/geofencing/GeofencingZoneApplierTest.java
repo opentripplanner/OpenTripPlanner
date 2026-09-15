@@ -71,11 +71,7 @@ class GeofencingZoneApplierTest {
     assertTrue(boundaryVertices.contains(insideFrognerPark2));
     assertTrue(boundaryVertices.contains(outsideFrognerPark1));
     // fromv (inside) should have entering=false (exiting when traversing fromv→tov)
-    var boundary = boundaries
-      .stream()
-      .filter(b -> b.zone().equals(zone))
-      .findFirst()
-      .orElseThrow();
+    var boundary = boundaries.stream().filter(b -> b.zone().equals(zone)).findFirst().orElseThrow();
     assertFalse(boundary.entering());
   }
 }

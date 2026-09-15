@@ -53,8 +53,9 @@ class StateEditorTest {
     StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
-    assertThrows(IllegalArgumentException.class, () ->
-      stateEditor.incrementWeight(Double.NEGATIVE_INFINITY)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> stateEditor.incrementWeight(Double.NEGATIVE_INFINITY)
     );
   }
 

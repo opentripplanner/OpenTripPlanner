@@ -13,14 +13,16 @@ public enum ItineraryFilterDebugProfile implements DocumentedEnum<ItineraryFilte
   LIMIT_TO_SEARCH_WINDOW(
     """
     Return all itineraries, including deleted ones, inside the actual search-window used
-    (the requested search-window may differ)."""
+    (the requested search-window may differ).\
+    """
   ),
   LIMIT_TO_NUM_OF_ITINERARIES(
     """
     Only return the requested number of itineraries, counting both actual and deleted ones.
     The top `numItineraries` using the request sort order is returned. This does not work
     with paging, itineraries after the limit, but inside the search-window are skipped when
-    moving to the next page."""
+    moving to the next page.\
+    """
   );
 
   private final String description;
@@ -43,9 +45,11 @@ public enum ItineraryFilterDebugProfile implements DocumentedEnum<ItineraryFilte
 
   @Override
   public String typeDescription() {
-    return """
+    return
+    """
     Enable this to attach a system notice to itineraries instead of removing them. This is very
-    convenient when tuning the itinerary-filter-chain.""";
+    convenient when tuning the itinerary-filter-chain.\
+    """;
   }
 
   @Override

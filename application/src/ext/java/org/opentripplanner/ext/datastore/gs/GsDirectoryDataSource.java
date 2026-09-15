@@ -28,15 +28,11 @@ public class GsDirectoryDataSource extends AbstractGsDataSource implements Compo
 
   @Override
   public boolean exists() {
-    return getBucket()
-      .list(
-        Storage.BlobListOption.prefix(name()),
-        Storage.BlobListOption.pageSize(1),
-        Storage.BlobListOption.currentDirectory()
-      )
-      .getValues()
-      .iterator()
-      .hasNext();
+    return getBucket().list(
+      Storage.BlobListOption.prefix(name()),
+      Storage.BlobListOption.pageSize(1),
+      Storage.BlobListOption.currentDirectory()
+    ).getValues().iterator().hasNext();
   }
 
   @Override

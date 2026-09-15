@@ -94,15 +94,13 @@ public class DefaultFareService implements FareService {
    * Takes a legs and returns a map of their agency's feed id and all corresponding legs.
    */
   protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
-    return fareLegs
-      .stream()
+    return fareLegs.stream()
       .collect(Collectors.groupingBy(leg -> leg.agency().getId().getFeedId()));
   }
 
   @Override
   public ItineraryFare calculateFares(Itinerary itinerary) {
-    var fareLegs = itinerary
-      .legs()
+    var fareLegs = itinerary.legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .toList();
@@ -142,13 +140,12 @@ public class DefaultFareService implements FareService {
    */
   @Nullable
   protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
-    var fareRulesByTypeAndFeed = fareRulesPerType
-      .entrySet()
+    var fareRulesByTypeAndFeed = fareRulesPerType.entrySet()
       .stream()
       .collect(
-        Collectors.toMap(Map.Entry::getKey, rules ->
-          rules
-            .getValue()
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules -> rules.getValue()
             .stream()
             .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
         )
@@ -272,10 +269,8 @@ public class DefaultFareService implements FareService {
       transfersUsed += 1;
     }
 
-    @Nullable
-    FareAttribute bestAttribute = null;
-    @Nullable
-    Money bestFare = null;
+    @Nullable FareAttribute bestAttribute = null;
+    @Nullable Money bestFare = null;
     Duration tripTime = Duration.between(startTime, lastRideStartTime);
     Duration journeyTime = Duration.between(startTime, lastRideEndTime);
 
@@ -309,9 +304,8 @@ public class DefaultFareService implements FareService {
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
     Money finalBestFare = bestFare;
-    return Optional.ofNullable(bestAttribute).map(attribute ->
-      new FareAndId(finalBestFare, attribute.getId())
-    );
+    return Optional.ofNullable(bestAttribute)
+      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 
   /**
@@ -343,9 +337,9 @@ public class DefaultFareService implements FareService {
     for (var leg : fareLegs) {
       if (
         leg.isInterlinedWithPreviousLeg() &&
-        leg instanceof ScheduledTransitLeg currentLeg &&
-        result.get(result.size() - 1) instanceof ScheduledTransitLeg previousLeg &&
-        shouldCombineInterlinedLegs(previousLeg, currentLeg)
+          leg instanceof ScheduledTransitLeg currentLeg &&
+          result.get(result.size() - 1) instanceof ScheduledTransitLeg previousLeg &&
+          shouldCombineInterlinedLegs(previousLeg, currentLeg)
       ) {
         var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
         // overwrite the previous leg with the combined one
@@ -376,8 +370,7 @@ public class DefaultFareService implements FareService {
           rides.subList(j, j + i + 1),
           fareRules
         );
-        float cost = best
-          .map(b -> b.fare().fractionalAmount().floatValue())
+        float cost = best.map(b -> b.fare().fractionalAmount().floatValue())
           .orElse(Float.POSITIVE_INFINITY);
         if (cost < 0) {
           LOG.error("negative cost for a ride sequence");

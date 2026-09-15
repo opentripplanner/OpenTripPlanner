@@ -22,13 +22,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of
  * tripSchedulesByDay refers to days in order.
  */
-public class TripPatternForDates
-  implements
-    RaptorRoute<TripSchedule>,
-    RaptorTimeTable<TripSchedule>,
-    RaptorTripPattern,
-    TripSearchTimetable<TripSchedule>
-{
+public class TripPatternForDates implements RaptorRoute<TripSchedule>,
+  RaptorTimeTable<TripSchedule>, RaptorTripPattern, TripSearchTimetable<TripSchedule> {
 
   private static final int FIRST_STOP_POS_IN_PATTERN = 0;
 
@@ -278,12 +273,7 @@ public class TripPatternForDates
   ) {
     var departureTimes = Arrays.stream(tripPatternForDates)
       .map(TripPatternForDate::tripTimes)
-      .map(l ->
-        l
-          .stream()
-          .mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN))
-          .toArray()
-      )
+      .map(l -> l.stream().mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN)).toArray())
       .toList();
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }

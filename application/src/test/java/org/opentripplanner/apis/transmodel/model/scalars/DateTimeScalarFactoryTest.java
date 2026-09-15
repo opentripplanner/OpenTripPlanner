@@ -41,8 +41,7 @@ class DateTimeScalarFactoryTest {
 
   @Test
   void serializeZonedDateTime() {
-    var result = subject
-      .getCoercing()
+    var result = subject.getCoercing()
       .serialize(Instant.parse(DATE_TIME).atZone(ZoneId.of("Australia/Sydney")));
     assertEquals(DATE_TIME, result);
   }

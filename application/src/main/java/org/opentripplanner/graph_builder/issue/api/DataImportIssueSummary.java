@@ -22,8 +22,7 @@ public class DataImportIssueSummary implements Serializable {
 
   public DataImportIssueSummary(List<DataImportIssue> issues) {
     this(
-      issues
-        .stream()
+      issues.stream()
         .map(DataImportIssue::getType)
         .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
     );
@@ -64,8 +63,7 @@ public class DataImportIssueSummary implements Serializable {
 
     ISSUE_LOG.info("Issue summary (number of each type):");
 
-    summary
-      .keySet()
+    summary.keySet()
       .stream()
       .sorted()
       .forEach(issueType -> ISSUE_LOG.info(String.format(FMT, issueType, summary.get(issueType))));

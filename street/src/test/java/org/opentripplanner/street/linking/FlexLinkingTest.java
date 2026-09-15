@@ -32,17 +32,15 @@ class FlexLinkingTest {
 
     var env = new LinkingEnvironment(v1, v2);
 
-    env
-      .linker()
+    env.linker()
       .linkVertexPermanently(
         toBeLinked,
         TraverseModeSet.allModes(),
         BIDIRECTIONAL,
-        (vertex, streetVertex) ->
-          List.of(
-            StreetModelFactory.streetEdge((StreetVertex) vertex, streetVertex),
-            StreetModelFactory.streetEdge(streetVertex, (StreetVertex) vertex)
-          )
+        (vertex, streetVertex) -> List.of(
+          StreetModelFactory.streetEdge((StreetVertex) vertex, streetVertex),
+          StreetModelFactory.streetEdge(streetVertex, (StreetVertex) vertex)
+        )
       );
 
     assertThat(env.graph().summarizeSplitVertices()).containsExactly(

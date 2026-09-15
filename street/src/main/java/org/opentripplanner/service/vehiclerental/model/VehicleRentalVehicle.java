@@ -212,8 +212,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       return false;
     }
     VehicleRentalVehicle that = (VehicleRentalVehicle) o;
-    return (
-      Double.compare(that.longitude, longitude) == 0 &&
+    return (Double.compare(that.longitude, longitude) == 0 &&
       Double.compare(that.latitude, latitude) == 0 &&
       isReserved == that.isReserved &&
       isDisabled == that.isDisabled &&
@@ -223,8 +222,7 @@ public final class VehicleRentalVehicle implements VehicleRentalPlace {
       Objects.equals(vehicleType, that.vehicleType) &&
       Objects.equals(rentalUris, that.rentalUris) &&
       Objects.equals(fuel, that.fuel) &&
-      Objects.equals(availableUntil, that.availableUntil)
-    );
+      Objects.equals(availableUntil, that.availableUntil));
   }
 
   @Override

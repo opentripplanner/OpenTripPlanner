@@ -46,26 +46,17 @@ class StreetEdgeGeofencingTest {
   static GeofencingZone NO_DROP_OFF_ZONE_TIER_2 = TestGeofencingZoneBuilder.of(
     NETWORK_TIER,
     "b-park"
-  )
-    .withGeometry(Polygons.OSLO)
-    .noDropOff()
-    .build();
+  ).withGeometry(Polygons.OSLO).noDropOff().build();
 
   static GeofencingZone NO_TRAVERSAL_ZONE = TestGeofencingZoneBuilder.of(
     NETWORK_TIER,
     "no-traverse"
-  )
-    .withGeometry(Polygons.OSLO)
-    .noTraversal()
-    .build();
+  ).withGeometry(Polygons.OSLO).noTraversal().build();
 
   static GeofencingZone BUSINESS_AREA_ZONE = TestGeofencingZoneBuilder.of(
     NETWORK_TIER,
     "business-area"
-  )
-    .withGeometry(Polygons.OSLO)
-    .asBusinessArea()
-    .build();
+  ).withGeometry(Polygons.OSLO).asBusinessArea().build();
 
   StreetVertex V1 = intersectionVertex("V1", 0, 0);
   StreetVertex V2 = intersectionVertex("V2", 1, 1);
@@ -787,9 +778,9 @@ class StreetEdgeGeofencingTest {
       Set<String> bannedNetworks
     ) {
       return StreetSearchRequest.of()
-        .withScooter(b ->
-          b.withRental(r ->
-            r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
+        .withScooter(
+          b -> b.withRental(
+            r -> r.withAllowedNetworks(allowedNetworks).withBannedNetworks(bannedNetworks)
           )
         )
         .withMode(StreetMode.SCOOTER_RENTAL)

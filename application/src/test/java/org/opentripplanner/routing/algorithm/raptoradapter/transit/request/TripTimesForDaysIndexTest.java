@@ -110,13 +110,14 @@ class TripTimesForDaysIndexTest {
       1 | 3 | 2 4 5  ->  0:0 2:0 1:0 2:1 2:2
       1 | 4 | 2 3 5  ->  0:0 2:0 2:1 1:0 2:2
       1 | 5 | 2 3 4  ->  0:0 2:0 2:1 2:2 1:0
-      """.split("\n")
+      """
+        .split("\n")
     )
       .map(String::trim)
       .filter(s -> !s.isEmpty())
       .filter(s -> !s.startsWith("#"))
-      .map(s ->
-        Arguments.of(
+      .map(
+        s -> Arguments.of(
           s.substring(0, 14).replaceAll("\\[empty]", "").trim(),
           s.substring(18).replaceAll("\\[empty]", "").trim()
         )
@@ -155,8 +156,8 @@ class TripTimesForDaysIndexTest {
     // https://errorprone.info/bugpattern/StringSplitter
     var args = list.split("\\|", -1);
     return Arrays.stream(args)
-      .map(it ->
-        it.trim().isEmpty()
+      .map(
+        it -> it.trim().isEmpty()
           ? new int[0]
           : Arrays.stream(it.trim().split(" ")).mapToInt(Integer::parseInt).toArray()
       )

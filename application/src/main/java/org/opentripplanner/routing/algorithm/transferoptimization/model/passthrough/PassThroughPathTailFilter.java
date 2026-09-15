@@ -66,8 +66,7 @@ public class PassThroughPathTailFilter<T extends RaptorTripSchedule> implements 
     Set<OptimizedPathTail<T>> elements,
     int boardStopPosition
   ) {
-    Map<Integer, Set<OptimizedPathTail<T>>> elementsByC2Value = elements
-      .stream()
+    Map<Integer, Set<OptimizedPathTail<T>>> elementsByC2Value = elements.stream()
       .collect(
         Collectors.groupingBy(
           it -> c2Calculator.calculateC2AtStopPos(it, boardStopPosition),
@@ -83,8 +82,7 @@ public class PassThroughPathTailFilter<T extends RaptorTripSchedule> implements 
 
   @Override
   public Set<OptimizedPathTail<T>> filterFinalResult(Set<OptimizedPathTail<T>> elements) {
-    Set<OptimizedPathTail<T>> result = elements
-      .stream()
+    Set<OptimizedPathTail<T>> result = elements.stream()
       .peek(c2Calculator::calculateC2)
       .filter(it -> it.head().c2() == 0)
       .collect(toSet());

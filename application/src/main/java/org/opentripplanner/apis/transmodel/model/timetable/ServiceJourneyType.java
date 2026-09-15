@@ -66,8 +66,8 @@ public class ServiceJourneyType {
           .name("activeDates")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(TransmodelScalars.DATE_SCALAR)))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getTripCalendars()
               .listServiceDates(trip(environment).getServiceId())
               .stream()
@@ -87,8 +87,8 @@ public class ServiceJourneyType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment ->
-            TransmodelTransportSubmode.fromValue(trip(environment).getNetexSubMode())
+          .dataFetcher(
+            environment -> TransmodelTransportSubmode.fromValue(trip(environment).getNetexSubMode())
           )
           .build()
       )
@@ -266,9 +266,8 @@ public class ServiceJourneyType {
             "Detailed path travelled by service journey. Not available for flexible trips."
           )
           .dataFetcher(environment -> {
-            TripPattern tripPattern = GqlUtil.getTransitService(environment).findPattern(
-              trip(environment)
-            );
+            TripPattern tripPattern = GqlUtil.getTransitService(environment)
+              .findPattern(trip(environment));
             if (tripPattern == null) {
               return null;
             }
@@ -294,8 +293,9 @@ public class ServiceJourneyType {
           .name("situations")
           .description("Get all situations active for the service journey.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitAlertService(environment).getTripAlerts(trip(environment).getId())
+          .dataFetcher(
+            environment -> GqlUtil.getTransitAlertService(environment)
+              .getTripAlerts(trip(environment).getId())
           )
           .build()
       )
@@ -320,8 +320,8 @@ public class ServiceJourneyType {
             """
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getReplacementHelper()
               .isReplacementTrip(trip(environment))
           )
@@ -332,8 +332,8 @@ public class ServiceJourneyType {
           .name("replacementsExist")
           .description("Are there replacement DatedServiceJourneys for this ServiceJourney?")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getReplacementHelper()
               .replacementsExist(trip(environment))
           )

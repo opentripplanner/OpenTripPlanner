@@ -99,9 +99,8 @@ public abstract class FilterValues<E> {
   public Collection<E> get() {
     if (includeEverything()) {
       throw new NoSuchElementException(
-        "Filter values for filter %s effectively don't filter, use includeEverything() before calling this method.".formatted(
-          name
-        )
+        "Filter values for filter %s effectively don't filter, use includeEverything() before calling this method."
+          .formatted(name)
       );
     }
     return values;

@@ -43,8 +43,7 @@ public class TestAccessEgress {
   }
 
   public static RoutingAccessEgress flexWithOnBoard(int stop, int durationInSeconds, int cost) {
-    return new Builder(stop, durationInSeconds)
-      .withCost(cost)
+    return new Builder(stop, durationInSeconds).withCost(cost)
       .withNRides(1)
       .stopReachedOnBoard()
       .build();
@@ -53,8 +52,7 @@ public class TestAccessEgress {
   /** Create a new flex access and arrive stop onBoard. */
   public static RoutingAccessEgress flex(int stop, int durationInSeconds, int nRides, int cost) {
     IntUtils.requireInRange(nRides, 1, 100);
-    return new Builder(stop, durationInSeconds)
-      .stopReachedOnBoard()
+    return new Builder(stop, durationInSeconds).stopReachedOnBoard()
       .withNRides(nRides)
       .withCost(cost)
       .build();

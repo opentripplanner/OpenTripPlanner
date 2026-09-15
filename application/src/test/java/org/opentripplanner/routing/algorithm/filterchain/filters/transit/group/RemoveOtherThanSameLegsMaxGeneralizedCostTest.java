@@ -12,8 +12,7 @@ class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants
 
   @Test
   public void testFilter() {
-    Itinerary first = newItinerary(A)
-      .rail(20, T11_05, T11_14, B)
+    Itinerary first = newItinerary(A).rail(20, T11_05, T11_14, B)
       .bus(30, T11_16, T11_20, C)
       .build();
 
@@ -25,8 +24,7 @@ class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants
 
   @Test
   public void testFilterNothingInCommon() {
-    Itinerary first = newItinerary(A)
-      .rail(20, T11_05, T11_14, B)
+    Itinerary first = newItinerary(A).rail(20, T11_05, T11_14, B)
       .bus(30, T11_16, T11_20, C)
       .build();
 
@@ -41,13 +39,11 @@ class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants
     // Regression test that verifies that we don't crash in the case where the sum of the leg costs
     // is larger than the itinerary cost.
     int itineraryCost = 100;
-    Itinerary first = newItinerary(A)
-      .rail(20, T11_05, T11_14, B, 400)
+    Itinerary first = newItinerary(A).rail(20, T11_05, T11_14, B, 400)
       .walk(60 * 4, C)
       .build(itineraryCost);
 
-    Itinerary second = newItinerary(A)
-      .rail(20, T11_05, T11_14, B, 400)
+    Itinerary second = newItinerary(A).rail(20, T11_05, T11_14, B, 400)
       .walk(D10_m, C)
       .build(itineraryCost);
 

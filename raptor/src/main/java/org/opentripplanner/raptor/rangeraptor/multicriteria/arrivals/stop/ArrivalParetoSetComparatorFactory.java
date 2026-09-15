@@ -31,8 +31,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   public static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<T> ofCompareC1AndC2(
     final DominanceFunction c2DominanceFunction
   ) {
-    return new ArrivalParetoSetComparatorFactory<>((l, r) ->
-      compareC1AndC2(c2DominanceFunction, l, r)
+    return new ArrivalParetoSetComparatorFactory<>(
+      (l, r) -> compareC1AndC2(c2DominanceFunction, l, r)
     );
   }
 
@@ -40,8 +40,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     final RelaxFunction relaxC1,
     final DominanceFunction c2DominanceFunction
   ) {
-    return new ArrivalParetoSetComparatorFactory<>((l, r) ->
-      compareC1RelaxedOnC2Dominance(relaxC1, c2DominanceFunction, l, r)
+    return new ArrivalParetoSetComparatorFactory<>(
+      (l, r) -> compareC1RelaxedOnC2Dominance(relaxC1, c2DominanceFunction, l, r)
     );
   }
 
@@ -70,8 +70,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   private static <T extends McStopArrival<?>> ParetoComparator<T> compareFunctionWithArrivedOnBoard(
     ParetoComparator<T> compareArrivalTimeRoundAndC1
   ) {
-    return (l, r) ->
-      compareArrivalTimeRoundAndC1.leftDominanceExist(l, r) || compareArrivedOnBoard(l, r);
+    return (l, r) -> compareArrivalTimeRoundAndC1.leftDominanceExist(l, r) ||
+      compareArrivedOnBoard(l, r);
   }
 
   /**
@@ -91,12 +91,10 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     T l,
     T r
   ) {
-    return (
-      l.arrivalTime() < r.arrivalTime() ||
+    return (l.arrivalTime() < r.arrivalTime() ||
       l.round() < r.round() ||
       l.c1() < r.c1() ||
-      c2Function.leftDominateRight(l.c2(), r.c2())
-    );
+      c2Function.leftDominateRight(l.c2(), r.c2()));
   }
 
   /**
@@ -107,9 +105,9 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     T l,
     T r
   ) {
-    return (
-      l.arrivalTime() < r.arrivalTime() || l.round() < r.round() || l.c1() < relaxC1.relax(r.c1())
-    );
+    return (l.arrivalTime() < r.arrivalTime() ||
+      l.round() < r.round() ||
+      l.c1() < relaxC1.relax(r.c1()));
   }
 
   /**

@@ -22,25 +22,21 @@ class DstServiceDateTest implements RealtimeTestConstants {
     var stopB = envBuilder.stopAtStation(STOP_B_ID, "B");
     var stopC = envBuilder.stopAtStation(STOP_C_ID, "C");
     var route = envBuilder.route(ROUTE_ID);
-    var env = envBuilder
-      .addTrip(
-        TripInput.of(TRIP_1_ID)
-          .withWithTripOnServiceDate(TRIP_1_ID)
-          .withRoute(route)
-          .addStop(stopA, "10:00", "10:01")
-          .addStop(stopB, "10:20", "10:21")
-      )
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID)
+        .withWithTripOnServiceDate(TRIP_1_ID)
+        .withRoute(route)
+        .addStop(stopA, "10:00", "10:01")
+        .addStop(stopB, "10:20", "10:21")
+    ).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withLineRef(ROUTE_ID)
       .withRecordedCalls(builder -> builder.call(stopA).departAimedActual("10:01", "10:05"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(stopC)
+      .withEstimatedCalls(
+        builder -> builder.call(stopC)
           .withIsExtraCall(true)
           .arriveAimedExpected("10:08", "10:10")
           .departAimedExpected("10:09", "10:15")

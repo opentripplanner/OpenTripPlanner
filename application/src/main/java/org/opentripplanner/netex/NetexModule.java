@@ -91,8 +91,7 @@ public class NetexModule implements GraphBuilderModule {
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
         if (OTPFeature.FlexRouting.isOn()) {
-          transitBuilder
-            .getFlexTripsById()
+          transitBuilder.getFlexTripsById()
             .addAll(FlexTripsMapper.createFlexTrips(transitBuilder, issueStore));
         }
 

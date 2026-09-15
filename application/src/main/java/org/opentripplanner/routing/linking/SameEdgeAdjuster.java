@@ -41,11 +41,10 @@ public class SameEdgeAdjuster {
         Vertex toVertex = outgoing.getToVertex();
         if (
           outgoing instanceof TemporaryFreeEdge &&
-          toVertex instanceof StreetVertex &&
-          toVertex
-            .getOutgoing()
-            .stream()
-            .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)
+            toVertex instanceof StreetVertex &&
+            toVertex.getOutgoing()
+              .stream()
+              .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)
         ) {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
@@ -61,8 +60,8 @@ public class SameEdgeAdjuster {
         Vertex fromVertex = incoming.getFromVertex();
         if (
           incoming instanceof TemporaryFreeEdge &&
-          fromVertex instanceof StreetVertex &&
-          fromVertex.hasAnyIncomingMatching(edge -> edge instanceof TemporaryPartialStreetEdge)
+            fromVertex instanceof StreetVertex &&
+            fromVertex.hasAnyIncomingMatching(edge -> edge instanceof TemporaryPartialStreetEdge)
         ) {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge

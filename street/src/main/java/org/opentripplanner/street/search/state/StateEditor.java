@@ -368,10 +368,9 @@ public class StateEditor {
     if (reverse) {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-      stateData.currentMode =
-        formFactor != null
-          ? formFactor.traverseMode
-          : StreetModeToRentalTraverseModeMapper.map(request.mode());
+      stateData.currentMode = formFactor != null
+        ? formFactor.traverseMode
+        : StreetModeToRentalTraverseModeMapper.map(request.mode());
       stateData.vehicleRentalNetwork = network;
       stateData.rentalVehicleFormFactor = formFactor;
       stateData.rentalVehiclePropulsionType = propulsionType;

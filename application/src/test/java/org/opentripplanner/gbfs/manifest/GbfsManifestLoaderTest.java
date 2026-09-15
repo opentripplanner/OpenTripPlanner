@@ -16,18 +16,16 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 class GbfsManifestLoaderTest {
 
-  private static final URI MANIFEST = ResourceLoader.of(GbfsManifestLoaderTest.class).uri(
-    "/gbfs/manifest.json"
-  );
+  private static final URI MANIFEST = ResourceLoader.of(GbfsManifestLoaderTest.class)
+    .uri("/gbfs/manifest.json");
 
   @Test
   void loadsAManifestFromAFile() {
     var manifest = GbfsManifestLoader.loadManifest(MANIFEST, HttpHeaders.empty());
 
     assertNotNull(manifest);
-    assertThat(
-      manifest.getData().getDatasets().stream().map(GBFSDataset::getSystemId).toList()
-    ).containsExactly("tieroslo", "duplicate-stations");
+    assertThat(manifest.getData().getDatasets().stream().map(GBFSDataset::getSystemId).toList())
+      .containsExactly("tieroslo", "duplicate-stations");
   }
 
   @Test

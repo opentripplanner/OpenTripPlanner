@@ -36,10 +36,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author novalis
  */
-public class StreetEdge
-  extends Edge
-  implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation
-{
+public class StreetEdge extends Edge implements BikeWalkableEdge, Cloneable, CarPickupableEdge,
+  WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
@@ -284,9 +282,9 @@ public class StreetEdge
 
   public String toString() {
     var nameString = name != null ? name.toString() : null;
-    return buildToString(nameString, b ->
-      b
-        .append(", length=")
+    return buildToString(
+      nameString,
+      b -> b.append(", length=")
         .append(this.getDistanceMeters())
         .append(", carSpeed=")
         .append(this.getCarSpeed())
@@ -344,8 +342,8 @@ public class StreetEdge
 
     if (
       canDropOffAfterDriving(s0) &&
-      !getPermission().allows(TraverseMode.CAR) &&
-      canTraverse(TraverseMode.WALK)
+        !getPermission().allows(TraverseMode.CAR) &&
+        canTraverse(TraverseMode.WALK)
     ) {
       StateEditor dropOff = doTraverse(s0, TraverseMode.WALK, false);
       if (dropOff != null) {
@@ -550,16 +548,14 @@ public class StreetEdge
   public SplitStreetEdge splitDestructively(SplitterVertex v) {
     SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
-    StreetEdgeBuilder<?> seb1 = new StreetEdgeBuilder<>()
-      .withFromVertex((StreetVertex) fromv)
+    StreetEdgeBuilder<?> seb1 = new StreetEdgeBuilder<>().withFromVertex((StreetVertex) fromv)
       .withToVertex(v)
       .withGeometry(geoms.beginning())
       .withName(name)
       .withPermission(permission)
       .withBack(isBack());
 
-    StreetEdgeBuilder<?> seb2 = new StreetEdgeBuilder<>()
-      .withFromVertex(v)
+    StreetEdgeBuilder<?> seb2 = new StreetEdgeBuilder<>().withFromVertex(v)
       .withToVertex((StreetVertex) tov)
       .withGeometry(geoms.ending())
       .withName(name)
@@ -626,8 +622,7 @@ public class StreetEdge
     StreetEdge e2 = null;
 
     if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BIDIRECTIONAL) {
-      var seb1 = new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(this)
+      var seb1 = new TemporaryPartialStreetEdgeBuilder().withParentEdge(this)
         .withFromVertex((StreetVertex) fromv)
         .withToVertex(v)
         .withGeometry(geoms.beginning())
@@ -637,8 +632,7 @@ public class StreetEdge
       e1 = seb1.buildAndConnect();
     }
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BIDIRECTIONAL) {
-      var seb2 = new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(this)
+      var seb2 = new TemporaryPartialStreetEdgeBuilder().withParentEdge(this)
         .withFromVertex(v)
         .withToVertex((StreetVertex) tov)
         .withGeometry(geoms.ending())
@@ -680,8 +674,7 @@ public class StreetEdge
       double lengthRatio = partial.getLength() / parent.getLength();
       double length = getDistanceMeters() * lengthRatio;
 
-      var tpseb = new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(this)
+      var tpseb = new TemporaryPartialStreetEdgeBuilder().withParentEdge(this)
         .withFromVertex(from)
         .withToVertex(to)
         .withGeometry(partial)
@@ -708,8 +701,9 @@ public class StreetEdge
     seb.withWalkSafetyFactor(walkSafetyFactor);
     seb.withCarSpeed(carSpeed);
 
-    var partialElevationProfileFromParent =
-      elevationExtension != null ? elevationExtension.partial(fromDistance, toDistance) : null;
+    var partialElevationProfileFromParent = elevationExtension != null
+      ? elevationExtension.partial(fromDistance, toDistance)
+      : null;
 
     StreetElevationExtensionBuilder.of(seb)
       .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
@@ -732,10 +726,8 @@ public class StreetEdge
       : builder.millimeterLength();
     if (
       lengthInMillimeter == 0 &&
-      !(
-        getFromVertex() instanceof BarrierPassThroughVertex ||
-        getToVertex() instanceof BarrierPassThroughVertex
-      )
+        !(getFromVertex() instanceof BarrierPassThroughVertex ||
+          getToVertex() instanceof BarrierPassThroughVertex)
     ) {
       LOG.warn(
         "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
@@ -851,8 +843,7 @@ public class StreetEdge
       boolean walkingBikeThroughIntersection = arriveBy ? s0.isBackWalkingBike() : walkingBike;
       if (arriveBy && tov instanceof IntersectionVertex traversedVertex) {
         // arrive-by search
-        turnDuration = s0
-          .intersectionTraversalCalculator()
+        turnDuration = s0.intersectionTraversalCalculator()
           .computeTraversalDuration(
             traversedVertex,
             this,
@@ -863,8 +854,7 @@ public class StreetEdge
           );
       } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) {
         // depart-after search
-        turnDuration = s0
-          .intersectionTraversalCalculator()
+        turnDuration = s0.intersectionTraversalCalculator()
           .computeTraversalDuration(
             traversedVertex,
             backPSE,
@@ -912,8 +902,7 @@ public class StreetEdge
     double speed
   ) {
     var time = getDistanceMeters() / speed;
-    var weight =
-      time *
+    var weight = time *
       StreetEdgeReluctanceCalculator.computeReluctance(
         request,
         traverseMode,
@@ -939,13 +928,13 @@ public class StreetEdge
     double time = effectiveTimeDistance / speed;
 
     double weight;
-    var optimizeType =
-      mode == TraverseMode.BICYCLE ? req.bike().optimizeType() : req.scooter().optimizeType();
+    var optimizeType = mode == TraverseMode.BICYCLE
+      ? req.bike().optimizeType()
+      : req.scooter().optimizeType();
     switch (optimizeType) {
       case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
-      case FLAT_STREETS ->
-        /* see notes in StreetVertex on speed overhead */ weight =
-          getEffectiveWorkDistanceForPropulsion(propulsion, electricAssistSlopeSensitivity) / speed;
+      case FLAT_STREETS -> /* see notes in StreetVertex on speed overhead */ weight =
+        getEffectiveWorkDistanceForPropulsion(propulsion, electricAssistSlopeSensitivity) / speed;
       case SHORTEST_DURATION -> weight = effectiveTimeDistance / speed;
       case TRIANGLE -> {
         double quick = effectiveTimeDistance;
@@ -954,10 +943,9 @@ public class StreetEdge
           propulsion,
           electricAssistSlopeSensitivity
         );
-        var triangle =
-          mode == TraverseMode.BICYCLE
-            ? req.bike().optimizeTriangle()
-            : req.scooter().optimizeTriangle();
+        var triangle = mode == TraverseMode.BICYCLE
+          ? req.bike().optimizeTriangle()
+          : req.scooter().optimizeTriangle();
         weight = quick * triangle.time() + slope * triangle.slope() + safety * triangle.safety();
         weight /= speed;
       }
@@ -1033,8 +1021,7 @@ public class StreetEdge
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
-      weight =
-        (getEffectiveBikeDistance() / speed) *
+      weight = (getEffectiveBikeDistance() / speed) *
         StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
           request,
           getMaxSlope(),
@@ -1048,8 +1035,7 @@ public class StreetEdge
       } else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;
-        weight =
-          getEffectiveWalkSafetyDistance() * request.walk().safetyFactor() +
+        weight = getEffectiveWalkSafetyDistance() * request.walk().safetyFactor() +
           getEffectiveWalkDistance() * (1 - request.walk().safetyFactor());
         weight /= speed;
       }

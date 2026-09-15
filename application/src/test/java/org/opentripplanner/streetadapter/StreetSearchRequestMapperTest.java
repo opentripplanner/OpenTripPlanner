@@ -86,9 +86,8 @@ class StreetSearchRequestMapperTest {
     builder.withTo(to);
     builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
 
-    builder.withJourney(jb ->
-      jb
-        .withWheelchair(true)
+    builder.withJourney(
+      jb -> jb.withWheelchair(true)
         .withModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build())
     );
 
@@ -104,8 +103,7 @@ class StreetSearchRequestMapperTest {
   void mapTransferRequest(boolean arriveBy) {
     var from = GenericLocation.fromStopId(id("STOP"));
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    var builder = builder()
-      .withArriveBy(arriveBy)
+    var builder = builder().withArriveBy(arriveBy)
       .withDateTime(INSTANT)
       .withFrom(from)
       .withTo(to)
@@ -127,10 +125,9 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapWalkRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref.withWalk(walk ->
-        walk
-          .withSpeed(1.5)
+    var builder = builder().withPreferences(
+      pref -> pref.withWalk(
+        walk -> walk.withSpeed(1.5)
           .withReluctance(2.5)
           .withStairsReluctance(3.5)
           .withStairsTimeFactor(4.5)
@@ -152,8 +149,8 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapEscalator() {
-    var builder = builder().withPreferences(pref ->
-      pref.withWalk(w -> w.withEscalator(e -> e.withReluctance(99).withSpeed(88)))
+    var builder = builder().withPreferences(
+      pref -> pref.withWalk(w -> w.withEscalator(e -> e.withReluctance(99).withSpeed(88)))
     );
 
     var subject = StreetSearchRequestMapper.map(builder.buildRequest()).build();
@@ -165,17 +162,15 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapBikeRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref.withBike(bike ->
-        bike
-          .withSpeed(5.0)
+    var builder = builder().withPreferences(
+      pref -> pref.withBike(
+        bike -> bike.withSpeed(5.0)
           .withReluctance(1.5)
           .withBoardCost(200)
           .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
           .withOptimizeTriangle(it -> it.withTime(0.8).withSafety(0.1).withSlope(0.1))
-          .withWalking(walking ->
-            walking
-              .withSpeed(1.2)
+          .withWalking(
+            walking -> walking.withSpeed(1.2)
               .withReluctance(2.0)
               .withStairsReluctance(5.0)
               .withMountDismountTime(Duration.ofSeconds(30))
@@ -205,10 +200,9 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void bikeTriangle() {
-    var builder = builder().withPreferences(pref ->
-      pref.withBike(bike ->
-        bike
-          .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+    var builder = builder().withPreferences(
+      pref -> pref.withBike(
+        bike -> bike.withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
           .withOptimizeTriangle(it -> it.withTime(1).withSafety(2).withSlope(3))
       )
     );
@@ -225,10 +219,9 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapCarRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref.withCar(car ->
-        car
-          .withReluctance(1.8)
+    var builder = builder().withPreferences(
+      pref -> pref.withCar(
+        car -> car.withReluctance(1.8)
           .withPickupTime(Duration.ofMinutes(5))
           .withPickupCost(10)
           .withAccelerationSpeed(2.5)
@@ -249,10 +242,9 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapScooterRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref.withScooter(scooter ->
-        scooter
-          .withSpeed(4.5)
+    var builder = builder().withPreferences(
+      pref -> pref.withScooter(
+        scooter -> scooter.withSpeed(4.5)
           .withReluctance(2.0)
           .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
           .withOptimizeTriangle(b -> b.withSafety(0.2).withSlope(0.2).withTime(0.6))
@@ -273,22 +265,19 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapRentalRequest() {
-    var request = builder()
-      .withPreferences(pref ->
-        pref.withBike(bike ->
-          bike.withRental(rental ->
-            rental
-              .withPickupTime(Duration.ofSeconds(120))
-              .withPickupCost(180)
-              .withDropOffTime(Duration.ofSeconds(90))
-              .withDropOffCost(150)
-              .withUseAvailabilityInformation(true)
-              .withAllowArrivingInRentedVehicleAtDestination(false)
-              .withArrivingInRentalVehicleAtDestinationCost(30)
-          )
+    var request = builder().withPreferences(
+      pref -> pref.withBike(
+        bike -> bike.withRental(
+          rental -> rental.withPickupTime(Duration.ofSeconds(120))
+            .withPickupCost(180)
+            .withDropOffTime(Duration.ofSeconds(90))
+            .withDropOffCost(150)
+            .withUseAvailabilityInformation(true)
+            .withAllowArrivingInRentedVehicleAtDestination(false)
+            .withArrivingInRentalVehicleAtDestinationCost(30)
         )
       )
-      .buildRequest();
+    ).buildRequest();
 
     var subject = StreetSearchRequestMapper.map(request).build();
 
@@ -309,9 +298,8 @@ class StreetSearchRequestMapperTest {
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
     var rentalDuration = Duration.ofHours(2);
     builder.withDateTime(dateTime);
-    builder.withJourney(jb ->
-      jb
-        .withModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build())
+    builder.withJourney(
+      jb -> jb.withModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build())
         .withDirect(new StreetRequest(StreetMode.CAR_RENTAL, rentalDuration))
     );
 
@@ -337,8 +325,8 @@ class StreetSearchRequestMapperTest {
     builder.withFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
     builder.withTo(to);
-    builder.withJourney(jb ->
-      jb.withDirect(new StreetRequest(StreetMode.CAR_RENTAL, rentalDuration))
+    builder.withJourney(
+      jb -> jb.withDirect(new StreetRequest(StreetMode.CAR_RENTAL, rentalDuration))
     );
 
     var request = builder.buildRequest();
@@ -353,8 +341,7 @@ class StreetSearchRequestMapperTest {
   void mapTimeout() {
     var timeout = Duration.ofSeconds(3);
 
-    var request = builder()
-      .withPreferences(p -> p.withStreet(s -> s.withRoutingTimeout(timeout)))
+    var request = builder().withPreferences(p -> p.withStreet(s -> s.withRoutingTimeout(timeout)))
       .buildRequest();
 
     var subject = StreetSearchRequestMapper.map(request).build();
@@ -367,11 +354,11 @@ class StreetSearchRequestMapperTest {
     var model = IntersectionTraversalModel.SIMPLE;
     var direction = DrivingDirection.RIGHT;
 
-    var request = builder()
-      .withPreferences(p ->
-        p.withStreet(s -> s.withIntersectionTraversalModel(model).withDrivingDirection(direction))
+    var request = builder().withPreferences(
+      p -> p.withStreet(
+        s -> s.withIntersectionTraversalModel(model).withDrivingDirection(direction)
       )
-      .buildRequest();
+    ).buildRequest();
 
     var subject = StreetSearchRequestMapper.map(request).build();
 
@@ -382,11 +369,10 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapParkingRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref.withCar(car ->
-        car.withParking(parking ->
-          parking
-            .withCost(15)
+    var builder = builder().withPreferences(
+      pref -> pref.withCar(
+        car -> car.withParking(
+          parking -> parking.withCost(15)
             .withTime(Duration.ofMinutes(5))
             .withUnpreferredVehicleParkingTagCost(20)
             .withPreferredVehicleParkingTags(Set.of("A"))
@@ -418,16 +404,13 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapAccessibilityRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref.withWheelchair(wheelchair -> {
-        wheelchair
-          .withMaxSlope(0.9)
-          .withInaccessibleStreetReluctance(3)
-          .withStairsReluctance(52.0)
-          .withElevator(e -> e.withAccessibleOnly())
-          .withStop(b -> b.withUnknownCost(100).withInaccessibleCost(200));
-      })
-    );
+    var builder = builder().withPreferences(pref -> pref.withWheelchair(wheelchair -> {
+      wheelchair.withMaxSlope(0.9)
+        .withInaccessibleStreetReluctance(3)
+        .withStairsReluctance(52.0)
+        .withElevator(e -> e.withAccessibleOnly())
+        .withStop(b -> b.withUnknownCost(100).withInaccessibleCost(200));
+    }));
 
     var request = builder.buildRequest();
     var subject = StreetSearchRequestMapper.map(request).build();
@@ -444,11 +427,10 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapElevator() {
-    var builder = builder().withPreferences(pref ->
-      pref.withStreet(s ->
-        s.withElevator(e ->
-          e
-            .withBoardSlack(Duration.ofSeconds(88))
+    var builder = builder().withPreferences(
+      pref -> pref.withStreet(
+        s -> s.withElevator(
+          e -> e.withBoardSlack(Duration.ofSeconds(88))
             .withBoardCost(77)
             .withHopTime(Duration.ofSeconds(66))
             .withReluctance(2.0)
@@ -468,9 +450,8 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void mapSystemRequest() {
-    var builder = builder().withPreferences(pref ->
-      pref
-        .withSystem(system -> system.withGeoidElevation(true))
+    var builder = builder().withPreferences(
+      pref -> pref.withSystem(system -> system.withGeoidElevation(true))
         .withStreet(street -> street.withTurnReluctance(3.5))
     );
 

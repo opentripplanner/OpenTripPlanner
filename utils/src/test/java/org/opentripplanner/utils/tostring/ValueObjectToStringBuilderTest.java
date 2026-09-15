@@ -16,8 +16,7 @@ public class ValueObjectToStringBuilderTest {
     assertEquals("3", subject().addNum(3L).toString());
     assertEquals(
       "(-null)",
-      subject()
-        .addText("(")
+      subject().addText("(")
         .skipNull()
         .addNum(null)
         .addText("-")
@@ -32,8 +31,7 @@ public class ValueObjectToStringBuilderTest {
   public void testAddNumWithUnit() {
     assertEquals(
       "3 minutes 7,000 seconds",
-      subject()
-        .addNum(3, " minutes")
+      subject().addNum(3, " minutes")
         .addNum(7000, " seconds")
         .skipNull()
         .addNum(null, "cows")
@@ -45,8 +43,7 @@ public class ValueObjectToStringBuilderTest {
   public void addBool() {
     assertEquals(
       "include nothing null",
-      subject()
-        .addBool(true, "include", "skip")
+      subject().addBool(true, "include", "skip")
         .addBool(false, "everything", "nothing")
         .addBool(null, "all", "nothing")
         .skipNull()
@@ -94,24 +91,14 @@ public class ValueObjectToStringBuilderTest {
   @Test
   public void addSecondsPastMidnight() {
     assertEquals("0:00:35", subject().addServiceTime(35).toString());
-    assertEquals(
-      "2:50:45+1d",
-      subject()
-        .addServiceTime((26 * 60 + 50) * 60 + 45)
-        .toString()
-    );
+    assertEquals("2:50:45+1d", subject().addServiceTime((26 * 60 + 50) * 60 + 45).toString());
     assertEquals("23:59:59-1d", subject().addServiceTime(-1).toString());
   }
 
   @Test
   public void addDuration() {
     assertEquals("35s", subject().addDurationSec(35).toString());
-    assertEquals(
-      "1d2h50m45s",
-      subject()
-        .addDurationSec((26 * 60 + 50) * 60 + 45)
-        .toString()
-    );
+    assertEquals("1d2h50m45s", subject().addDurationSec((26 * 60 + 50) * 60 + 45).toString());
     assertEquals("35s", subject().addDuration(Duration.ofSeconds(35)).toString());
 
     assertEquals("", subject().skipNull().addDurationSec(null).toString());

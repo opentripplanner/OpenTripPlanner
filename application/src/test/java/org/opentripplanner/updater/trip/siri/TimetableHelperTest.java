@@ -78,11 +78,8 @@ public class TimetableHelperTest {
       .build();
 
     Trip trip = Trip.of(new FeedScopedId(FEED_ID, "TRIP_ID")).withRoute(route).build();
-    builder = TripTimesFactory.tripTimes(
-      trip,
-      List.of(stopTime),
-      new Deduplicator()
-    ).createRealTimeFromScheduledTimes();
+    builder = TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator())
+      .createRealTimeFromScheduledTimes();
   }
 
   @Test
@@ -359,8 +356,7 @@ public class TimetableHelperTest {
 
   private String showStatuses(int index) {
     RealTimeTripTimes tripTimes = builder.build();
-    return (
-      "Occupancy:" +
+    return ("Occupancy:" +
       tripTimes.getOccupancyStatus(index) +
       " Cancelled:" +
       tripTimes.isCanceledStop(index) +
@@ -371,7 +367,6 @@ public class TimetableHelperTest {
       " Departed:" +
       tripTimes.hasDeparted(index) +
       " Inaccurate:" +
-      tripTimes.isPredictionInaccurate(index)
-    );
+      tripTimes.isPredictionInaccurate(index));
   }
 }

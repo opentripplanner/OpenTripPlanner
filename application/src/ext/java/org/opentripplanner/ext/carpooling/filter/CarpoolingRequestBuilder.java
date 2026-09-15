@@ -36,14 +36,14 @@ public class CarpoolingRequestBuilder {
     this.passengerPickup = new WgsCoordinate(request.from().getCoordinate());
     this.passengerDropoff = new WgsCoordinate(request.to().getCoordinate());
     this.requestedDateTime = request.dateTime();
-    this.maxWalkTime = request
-      .preferences()
+    this.maxWalkTime = request.preferences()
       .street()
       .accessEgress()
       .maxDuration()
       .valueOf(StreetMode.WALK);
-    this.searchWindow =
-      request.searchWindow() == null ? DEFAULT_SEARCH_WINDOW : request.searchWindow();
+    this.searchWindow = request.searchWindow() == null
+      ? DEFAULT_SEARCH_WINDOW
+      : request.searchWindow();
   }
 
   public CarpoolingRequestBuilder withAccessOrEgress(AccessEgressType accessOrEgress) {

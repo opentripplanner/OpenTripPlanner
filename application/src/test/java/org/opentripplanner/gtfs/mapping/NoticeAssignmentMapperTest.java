@@ -159,12 +159,7 @@ class NoticeAssignmentMapperTest {
   }
 
   private static List<String> sortedStopTimeKeyIds(Multimap<AbstractTransitEntity, Notice> result) {
-    return result
-      .keySet()
-      .stream()
-      .map(e -> e.getId().getId())
-      .sorted()
-      .toList();
+    return result.keySet().stream().map(e -> e.getId().getId()).sorted().toList();
   }
 
   @Test

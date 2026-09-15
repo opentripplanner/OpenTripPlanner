@@ -23,8 +23,7 @@ public class CompactElevationProfileTest {
       new Coordinate[] {
         new Coordinate(0.0, 0.0),
         new Coordinate(10.0, 0.0),
-        new Coordinate(19.0, 0.0),
-      },
+        new Coordinate(19.0, 0.0), },
       19
     );
   }

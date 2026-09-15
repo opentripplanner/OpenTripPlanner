@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
  * updater fetches data from a single {@link DataSource<VehicleParking>}.
  */
 public class VehicleParkingAvailabilityUpdater
-  extends PollingGraphUpdater<StreetRealTimeUpdateContext>
-{
+  extends
+  PollingGraphUpdater<StreetRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(
     VehicleParkingAvailabilityUpdater.class
@@ -66,8 +66,7 @@ public class VehicleParkingAvailabilityUpdater
 
     private AvailabilityUpdater(List<AvailabiltyUpdate> updates) {
       this.updates = List.copyOf(updates);
-      this.parkingById = repository
-        .listVehicleParkings()
+      this.parkingById = repository.listVehicleParkings()
         .stream()
         .collect(Collectors.toUnmodifiableMap(VehicleParking::getId, Function.identity()));
     }

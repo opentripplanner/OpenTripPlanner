@@ -44,8 +44,7 @@ public class EnumMapper {
   public static <T extends DocumentedEnum> String docEnumValueList(T[] enumValues) {
     var buf = new StringBuilder();
     for (T it : enumValues) {
-      buf
-        .append(" - `")
+      buf.append(" - `")
         .append(toString((Enum) it))
         .append("` ")
         .append(it.enumValueDescription().replace("\n", "\n   ").trim())

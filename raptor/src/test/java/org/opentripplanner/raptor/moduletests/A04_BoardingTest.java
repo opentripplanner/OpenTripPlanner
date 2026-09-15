@@ -48,8 +48,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         -- R1
@@ -78,8 +77,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
       )
       .egress("H ~ Walk 1m");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();

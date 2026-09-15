@@ -16,11 +16,9 @@ public class OtpFileNames {
    * true} if the file match {@code (otp|build|router|debug-ui)-config.json}.
    */
   public static boolean isConfigFile(String filename) {
-    return (
-      OTP_CONFIG_FILENAME.equals(filename) ||
+    return (OTP_CONFIG_FILENAME.equals(filename) ||
       BUILD_CONFIG_FILENAME.equals(filename) ||
       ROUTER_CONFIG_FILENAME.equals(filename) ||
-      DEBUG_UI_CONFIG_FILENAME.equals(filename)
-    );
+      DEBUG_UI_CONFIG_FILENAME.equals(filename));
   }
 }

@@ -167,14 +167,12 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   }
 
   default String asString() {
-    return (
-      TimeUtils.timeToStrCompact(fromTime()) +
+    return (TimeUtils.timeToStrCompact(fromTime()) +
       "-" +
       TimeUtils.timeToStrCompact(toTime()) +
       "(" +
       DurationUtils.durationToStr(duration()) +
-      ")"
-    );
+      ")");
   }
 
   /**
@@ -198,21 +196,20 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   }
 
   default Iterable<PathLeg<T>> iterator() {
-    return () ->
-      new Iterator<>() {
-        private PathLeg<T> currentLeg = PathLeg.this;
+    return () -> new Iterator<>() {
+      private PathLeg<T> currentLeg = PathLeg.this;
 
-        @Override
-        public boolean hasNext() {
-          return currentLeg != null;
-        }
+      @Override
+      public boolean hasNext() {
+        return currentLeg != null;
+      }
 
-        @Override
-        public PathLeg<T> next() {
-          var temp = currentLeg;
-          currentLeg = currentLeg.isEgressLeg() ? null : currentLeg.nextLeg();
-          return temp;
-        }
-      };
+      @Override
+      public PathLeg<T> next() {
+        var temp = currentLeg;
+        currentLeg = currentLeg.isEgressLeg() ? null : currentLeg.nextLeg();
+        return temp;
+      }
+    };
   }
 }

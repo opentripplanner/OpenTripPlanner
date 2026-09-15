@@ -41,8 +41,8 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
   /// For each of the 6 pareto-function variations we determine the dominance `NONE ≡ | LEFT ≺ |
   /// RIGHT ≻ | BOTH ∥`. The last column consist a string with the expected result for these
   /// 6 variants.
-  ///
-  ///
+  /// 
+  /// 
   @ParameterizedTest
   @CsvSource(
     value = {
@@ -86,8 +86,7 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
       "10:10 | 2 | 103 | 500 | true  |  ≻  ∥  ≻  ∥  ≻  ∥",
       "10:10 | 2 | 109 | 499 | true  |  ≻  ∥  ∥  ∥  ∥  ∥",
       "10:10 | 2 | 109 | 500 | true  |  ≻  ∥  ≻  ∥  ≻  ∥",
-      "10:10 | 2 | 110 | 499 | true  |  ≻  ∥  ∥  ∥  ≻  ∥",
-    },
+      "10:10 | 2 | 110 | 499 | true  |  ≻  ∥  ∥  ∥  ≻  ∥", },
     delimiter = '|'
   )
   void testCompareArrivalTimeRoundAndCost(
@@ -121,11 +120,9 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
     McStopArrival<?> left,
     McStopArrival<?> right
   ) {
-    return (
-      factory.compareArrivalTimeRoundAndCost().compare(left, right).symbol() +
+    return (factory.compareArrivalTimeRoundAndCost().compare(left, right).symbol() +
       "  " +
-      factory.compareArrivalTimeRoundCostAndOnBoardArrival().compare(left, right).symbol()
-    );
+      factory.compareArrivalTimeRoundCostAndOnBoardArrival().compare(left, right).symbol());
   }
 
   private static McStopArrival<TestTripSchedule> createStopArrival(

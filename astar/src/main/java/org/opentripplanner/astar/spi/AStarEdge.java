@@ -9,11 +9,7 @@ package org.opentripplanner.astar.spi;
  * edge that links the street network with a transit stop to prevent a straight transfer from car to
  * transit.
  */
-public interface AStarEdge<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public interface AStarEdge<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
   Vertex getFromVertex();
 
   Vertex getToVertex();

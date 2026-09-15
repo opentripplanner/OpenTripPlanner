@@ -60,8 +60,7 @@ public class CallAtStopService {
    * These are useful for departure/arrival boards.
    */
   public List<CallAtStop> findCallsAtStop(WgsCoordinate coordinate, StopEventRequestParams params) {
-    var calls = finder
-      .findNearbyStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
+    var calls = finder.findNearbyStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
       .stream()
       .flatMap(nearbyStop -> {
         List<StopLocation> stopLocations = List.of(
@@ -83,8 +82,7 @@ public class CallAtStopService {
   }
 
   private static List<CallAtStop> sort(int numResults, List<CallAtStop> stopTimesInPatterns) {
-    return stopTimesInPatterns
-      .stream()
+    return stopTimesInPatterns.stream()
       .sorted(CallAtStop.compareByScheduledDeparture())
       .limit(numResults)
       .toList();

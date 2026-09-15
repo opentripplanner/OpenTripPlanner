@@ -77,8 +77,10 @@ public class EnvironmentVariableReplacer {
     String source,
     Function<String, String> variableResolver
   ) {
-    return TextVariablesSubstitution.insertVariables(text, variableResolver, varName ->
-      errorVariableNameNotFound(varName, source)
+    return TextVariablesSubstitution.insertVariables(
+      text,
+      variableResolver,
+      varName -> errorVariableNameNotFound(varName, source)
     );
   }
 

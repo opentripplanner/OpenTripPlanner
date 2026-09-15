@@ -50,8 +50,7 @@ public class StopConsolidationModule implements GraphBuilderModule {
     var stopsToReplace = service.secondaryStops();
     var replacements = service.replacements();
 
-    transitRepository
-      .getAllTripPatterns()
+    transitRepository.getAllTripPatterns()
       .stream()
       .filter(pattern -> pattern.containsAnyStopId(stopsToReplace))
       .forEach(pattern -> {

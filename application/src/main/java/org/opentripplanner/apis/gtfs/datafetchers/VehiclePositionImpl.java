@@ -25,38 +25,27 @@ public class VehiclePositionImpl implements GraphQLDataFetchers.GraphQLVehiclePo
   public DataFetcher<OffsetDateTime> lastUpdate() {
     return env -> {
       var zoneId = env.<GtfsGraphQLRequestContext>getContext().transitService().getTimeZone();
-      return getSource(env)
-        .time()
-        .map(time -> OffsetDateTime.ofInstant(time, zoneId))
-        .orElse(null);
+      return getSource(env).time().map(time -> OffsetDateTime.ofInstant(time, zoneId)).orElse(null);
     };
   }
 
   @Override
   public DataFetcher<Long> lastUpdated() {
-    return env ->
-      getSource(env)
-        .time()
-        .map(time -> time.getEpochSecond())
-        .orElse(null);
+    return env -> getSource(env).time().map(time -> time.getEpochSecond()).orElse(null);
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return env ->
-      getSource(env)
-        .coordinates()
-        .map(coordinates -> coordinates.latitude())
-        .orElse(null);
+    return env -> getSource(env).coordinates()
+      .map(coordinates -> coordinates.latitude())
+      .orElse(null);
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return env ->
-      getSource(env)
-        .coordinates()
-        .map(coordinates -> coordinates.longitude())
-        .orElse(null);
+    return env -> getSource(env).coordinates()
+      .map(coordinates -> coordinates.longitude())
+      .orElse(null);
   }
 
   @Override
@@ -76,11 +65,7 @@ public class VehiclePositionImpl implements GraphQLDataFetchers.GraphQLVehiclePo
 
   @Override
   public DataFetcher<String> vehicleId() {
-    return env ->
-      getSource(env)
-        .vehicleId()
-        .map(vehicleId -> vehicleId.toString())
-        .orElse(null);
+    return env -> getSource(env).vehicleId().map(vehicleId -> vehicleId.toString()).orElse(null);
   }
 
   private RealtimeVehicle getSource(DataFetchingEnvironment environment) {

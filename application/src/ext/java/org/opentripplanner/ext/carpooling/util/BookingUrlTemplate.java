@@ -35,8 +35,7 @@ public final class BookingUrlTemplate {
   }
 
   public static String expand(String urlTemplate, WgsCoordinate from, WgsCoordinate to) {
-    return urlTemplate
-      .replace(FROM_PLACEHOLDER, formatCoordinate(from))
+    return urlTemplate.replace(FROM_PLACEHOLDER, formatCoordinate(from))
       .replace(TO_PLACEHOLDER, formatCoordinate(to));
   }
 

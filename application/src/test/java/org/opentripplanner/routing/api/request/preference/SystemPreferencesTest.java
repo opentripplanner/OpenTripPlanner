@@ -20,9 +20,11 @@ class SystemPreferencesTest {
   private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
   public static final Duration MAX_JOURNEY_DURATION = Duration.ofHours(5);
   public static final RoutingTag TAG_RENTAL = RoutingTag.testCaseCategory("rental");
-  public static final DataOverlayParameters DATA_OVERLAY = new DataOverlayParametersBuilder()
-    .add(ParameterName.LEAD, ParameterType.PENALTY, 17.3)
-    .build();
+  public static final DataOverlayParameters DATA_OVERLAY = new DataOverlayParametersBuilder().add(
+    ParameterName.LEAD,
+    ParameterType.PENALTY,
+    17.3
+  ).build();
 
   private final SystemPreferences subject = SystemPreferences.of()
     .withGeoidElevation(true)

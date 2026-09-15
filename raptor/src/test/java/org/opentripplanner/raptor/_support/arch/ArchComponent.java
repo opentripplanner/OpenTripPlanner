@@ -12,9 +12,9 @@ public interface ArchComponent {
    * annotation which cache and inject the classes, but the test become slightly more complex by
    * using it and chasing it here works fine.
    */
-  JavaClasses OTP_CLASSES = new ClassFileImporter()
-    .withImportOption(new ImportOption.DoNotIncludeTests())
-    .importPackages("org.opentripplanner");
+  JavaClasses OTP_CLASSES = new ClassFileImporter().withImportOption(
+    new ImportOption.DoNotIncludeTests()
+  ).importPackages("org.opentripplanner");
 
   /**
    * All Java packages in {@code java.*} and {@code javax.*}

@@ -213,8 +213,8 @@ class DefaultTransitDataProviderFilterTest {
       .withFilters(filterForMode(TransitMode.BUS))
       .build();
 
-    boolean valid =
-      filter.createTripFilter(tripPatternForDate.getTripPattern().getPattern()) != null;
+    boolean valid = filter.createTripFilter(tripPatternForDate.getTripPattern().getPattern()) !=
+      null;
 
     assertTrue(valid);
   }
@@ -231,8 +231,8 @@ class DefaultTransitDataProviderFilterTest {
       )
       .build();
 
-    boolean valid =
-      filter.createTripFilter(tripPatternForDate.getTripPattern().getPattern()) != null;
+    boolean valid = filter.createTripFilter(tripPatternForDate.getTripPattern().getPattern()) !=
+      null;
 
     assertFalse(valid);
   }
@@ -679,8 +679,7 @@ class DefaultTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
 
-    var cancelled = patternTimes
-      .tripTimes()
+    var cancelled = patternTimes.tripTimes()
       .createRealTimeFromScheduledTimes()
       .withCanceled()
       .build();

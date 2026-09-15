@@ -8,15 +8,14 @@ public record LevelAndLevelRefDifferentSizes(
   int nameListLength,
   OsmEntity entity
 ) implements DataImportIssue {
-  private static final String FMT =
-    "%s : 'level:ref' info can not be used because " +
+  private static final String FMT = "%s : 'level:ref' info can not be used because " +
     "the 'level' tag and 'level:ref' tag refer to a different amount of levels. " +
     "The 'level' tag contains %s levels while 'level:ref' contains %s.";
 
   private static final String HTMLFMT =
     "<a href='%s'>'%s'</a> : 'level:ref' info can not be used because " +
-    "the 'level' tag and 'level:ref' tag refer to a different amount of levels. " +
-    "The 'level' tag contains %s levels while 'level:ref' contains %s.";
+      "the 'level' tag and 'level:ref' tag refer to a different amount of levels. " +
+      "The 'level' tag contains %s levels while 'level:ref' contains %s.";
 
   @Override
   public String getMessage() {

@@ -26,14 +26,12 @@ public class InclinedEdgeLevelInfo implements Serializable {
    * be used for the given edge.
    */
   public boolean canBeAppliedToEdge(Edge edge) {
-    return (
-      edge.getToVertex() instanceof OsmVertex toVertex &&
+    return (edge.getToVertex() instanceof OsmVertex toVertex &&
       edge.getFromVertex() instanceof OsmVertex fromVertex &&
       ((lowerVertexInfo.osmNodeId() == fromVertex.nodeId() &&
         upperVertexInfo.osmNodeId() == toVertex.nodeId()) ||
         (lowerVertexInfo.osmNodeId() == toVertex.nodeId() &&
-          upperVertexInfo.osmNodeId() == fromVertex.nodeId()))
-    );
+          upperVertexInfo.osmNodeId() == fromVertex.nodeId())));
   }
 
   public VertexLevelInfo lowerVertexInfo() {
@@ -58,9 +56,7 @@ public class InclinedEdgeLevelInfo implements Serializable {
       return false;
     }
     InclinedEdgeLevelInfo that = (InclinedEdgeLevelInfo) o;
-    return (
-      Objects.equals(lowerVertexInfo, that.lowerVertexInfo) &&
-      Objects.equals(upperVertexInfo, that.upperVertexInfo)
-    );
+    return (Objects.equals(lowerVertexInfo, that.lowerVertexInfo) &&
+      Objects.equals(upperVertexInfo, that.upperVertexInfo));
   }
 }

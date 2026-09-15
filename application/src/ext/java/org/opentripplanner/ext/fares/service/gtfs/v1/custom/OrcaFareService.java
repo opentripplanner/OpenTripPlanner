@@ -327,21 +327,16 @@ public class OrcaFareService extends DefaultFareService {
       case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
         ? optionalUSD(5.25f)
         : optionalUSD(6.25f);
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
+      case WASHINGTON_STATE_FERRIES -> defaultFare.map(
+        df -> getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
       case KC_METRO, SEATTLE_STREET_CAR, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK -> optionalUSD(
         3.00f
       );
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(2.50f);
       case EVERETT_TRANSIT, PIERCE_COUNTY_TRANSIT -> optionalUSD(2.00f);
-      case
-        WHATCOM_LOCAL,
-        WHATCOM_CROSS_COUNTY,
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
-        ? Optional.empty()
-        : defaultFare;
+      case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY -> fareType
+        .equals(FareType.electronicRegular) ? Optional.empty() : defaultFare;
       case MONORAIL -> Optional.empty();
       default -> defaultFare;
     };
@@ -371,15 +366,12 @@ public class OrcaFareService extends DefaultFareService {
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR -> optionalUSD(1.00f);
       case MONORAIL -> Optional.empty();
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
+      case WASHINGTON_STATE_FERRIES -> defaultFare.map(
+        df -> getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
-      case
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY,
-        WHATCOM_CROSS_COUNTY,
-        WHATCOM_LOCAL -> Optional.empty();
+      case SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, WHATCOM_CROSS_COUNTY, WHATCOM_LOCAL -> Optional
+        .empty();
       default -> defaultFare;
     };
   }
@@ -415,8 +407,8 @@ public class OrcaFareService extends DefaultFareService {
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
       // Discount specific to Skagit transit and not Orca.
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
+      case WASHINGTON_STATE_FERRIES -> defaultFare.map(
+        df -> getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
       case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> defaultFare.map(Money::half);
       default -> defaultFare;
@@ -428,13 +420,8 @@ public class OrcaFareService extends DefaultFareService {
    */
   private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
     return switch (rideType) {
-      case
-        UNKNOWN,
-        SKAGIT_TRANSIT,
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY,
-        MONORAIL,
-        LINK_SHUTTLE -> Optional.empty();
+      case UNKNOWN, SKAGIT_TRANSIT, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, MONORAIL, LINK_SHUTTLE ->
+        Optional.empty();
       default -> Optional.of(ZERO_USD);
     };
   }
@@ -516,16 +503,14 @@ public class OrcaFareService extends DefaultFareService {
         continue;
       }
 
-      var validFareProducts = purchasedFareProducts
-        .stream()
+      var validFareProducts = purchasedFareProducts.stream()
         .filter(fp -> fp.isValidAt(leg.startTime()))
         .toList();
 
       var transferType = rideType.getTransferType(fareType, leg.startTime());
       if (transferType == TransferType.ORCA_INTERAGENCY_TRANSFER) {
         // Important to get transfer discount before calculating next leg price
-        var totalAlreadyPurchased = validFareProducts
-          .stream()
+        var totalAlreadyPurchased = validFareProducts.stream()
           .reduce(
             ZERO_USD,
             (subtotal, el) -> subtotal.plus(el.fareOffer.fareProduct().price()),
@@ -541,10 +526,7 @@ public class OrcaFareService extends DefaultFareService {
           new FeedScopedId(FEED_ID, UUID.randomUUID().toString()),
           "ORCA Fare",
           additionalFareRequired.isPositive() ? additionalFareRequired : Money.ZERO_USD
-        )
-          .withCategory(riderCategory)
-          .withMedium(ELECTRONIC_MEDIUM)
-          .build();
+        ).withCategory(riderCategory).withMedium(ELECTRONIC_MEDIUM).build();
 
         // Dependencies will be populated later if there is a discount getting applied.
         Collection<FareProduct> dependencies = new ArrayList<>();
@@ -557,10 +539,7 @@ public class OrcaFareService extends DefaultFareService {
             validFareProducts.getFirst().fareOffer.fareProduct().id(),
             "ORCA Fare",
             legFare
-          )
-            .withCategory(riderCategory)
-            .withMedium(ELECTRONIC_MEDIUM)
-            .build();
+          ).withCategory(riderCategory).withMedium(ELECTRONIC_MEDIUM).build();
           fare.addFareProduct(
             leg,
             FareOffer.of(
@@ -590,8 +569,7 @@ public class OrcaFareService extends DefaultFareService {
         );
 
         // Look for existing fare products with this medium ID
-        var validAgencyFareProducts = validFareProducts
-          .stream()
+        var validAgencyFareProducts = validFareProducts.stream()
           .map(ExtendedFareOffer::fareOffer)
           .filter(fp -> fp.fareProduct().medium().equals(agencyTransferMedium))
           .filter(fp -> fp.fareProduct().name().equals(agencySpecificFareProduct.name()))
@@ -603,8 +581,7 @@ public class OrcaFareService extends DefaultFareService {
         if (!hasValidTransfer) {
           // Create a new fare product for this agency transfer
           var riderCategory = getRiderCategory(fareType);
-          var newFareProduct = agencySpecificFareProduct
-            .withCategory(riderCategory)
+          var newFareProduct = agencySpecificFareProduct.withCategory(riderCategory)
             .withMedium(agencyTransferMedium)
             .build();
 
@@ -671,12 +648,10 @@ public class OrcaFareService extends DefaultFareService {
    * Define Orca fare types.
    */
   private static boolean usesOrca(FareType fareType) {
-    return (
-      fareType.equals(FareType.electronicSpecial) ||
+    return (fareType.equals(FareType.electronicSpecial) ||
       fareType.equals(FareType.electronicSenior) ||
       fareType.equals(FareType.electronicRegular) ||
-      fareType.equals(FareType.electronicYouth)
-    );
+      fareType.equals(FareType.electronicYouth));
   }
 
   private static RiderCategory getRiderCategory(FareType fareType) {

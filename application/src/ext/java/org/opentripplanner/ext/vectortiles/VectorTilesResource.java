@@ -113,19 +113,22 @@ public class VectorTilesResource {
     List<String> rLayers = Arrays.asList(requestedLayers.split(","));
 
     var config = vectorTileConfig;
-    var url = config
-      .basePath()
-      .map(overrideBasePath ->
-        TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, rLayers)
+    var url = config.basePath()
+      .map(
+        overrideBasePath -> TileJson.urlFromOverriddenBasePath(
+          uri,
+          headers,
+          overrideBasePath,
+          rLayers
+        )
       )
-      .orElseGet(() ->
-        TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
+      .orElseGet(
+        () -> TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
     int minZoom = config.minZoom(Set.copyOf(rLayers));
     int maxZoom = config.maxZoom(Set.copyOf(rLayers));
-    return config
-      .attribution()
+    return config.attribution()
       .map(attr -> new TileJson(url, envelope, attr, minZoom, maxZoom))
       .orElseGet(() -> {
         var feedInfos = getFeedInfos();
@@ -134,8 +137,7 @@ public class VectorTilesResource {
   }
 
   private List<FeedInfo> getFeedInfos() {
-    return transitService
-      .listFeedIds()
+    return transitService.listFeedIds()
       .stream()
       .map(transitService::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))

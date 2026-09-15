@@ -138,14 +138,12 @@ public class DefaultTransitService implements TransitService {
     TripTimes times = timetable.getTripTimes(trip);
     if (
       times == null ||
-      !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
+        !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
     ) {
       return Optional.empty();
     } else {
-      Instant midnight = ServiceDateUtils.asStartOfService(
-        serviceDate,
-        this.getTimeZone()
-      ).toInstant();
+      Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, this.getTimeZone())
+        .toInstant();
       return Optional.of(TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight));
     }
   }
@@ -212,8 +210,7 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
-    return getTripCalendars()
-      .getServiceCodesRunningForDate()
+    return getTripCalendars().getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
   }
 
@@ -450,8 +447,8 @@ public class DefaultTransitService implements TransitService {
       transitRepositoryIndex.getPatternsForRoute(route)
     );
     if (timetableSnapshot != null) {
-      Collection<TripPattern> realTimeAddedPatternForRoute =
-        timetableSnapshot.getRealTimeAddedPatternForRoute(route);
+      Collection<TripPattern> realTimeAddedPatternForRoute = timetableSnapshot
+        .getRealTimeAddedPatternForRoute(route);
       tripPatterns.addAll(realTimeAddedPatternForRoute);
     }
     return tripPatterns;
@@ -619,8 +616,8 @@ public class DefaultTransitService implements TransitService {
   @Override
   public TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate) {
     if (timetableSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate =
-        timetableSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
+      TripOnServiceDate tripOnServiceDate = timetableSnapshot
+        .getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
       if (tripOnServiceDate != null) {
         return tripOnServiceDate;
       }
@@ -724,8 +721,7 @@ public class DefaultTransitService implements TransitService {
     FindRegularStopsByBoundingBoxRequest request
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    Collection<RegularStop> stops = transitRepository
-      .getSiteRepository()
+    Collection<RegularStop> stops = transitRepository.getSiteRepository()
       .findRegularStops(request.envelope());
 
     Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
@@ -795,8 +791,7 @@ public class DefaultTransitService implements TransitService {
    * Example: [a,b,b,c,c,c] will return [c,b,a]
    */
   private static <T> Stream<T> sortByOccurrenceAndReduce(Stream<T> input) {
-    return input
-      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+    return input.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
       .entrySet()
       .stream()
       .sorted(Map.Entry.<T, Long>comparingByValue().reversed())

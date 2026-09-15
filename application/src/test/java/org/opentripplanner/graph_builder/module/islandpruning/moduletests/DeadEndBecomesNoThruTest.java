@@ -43,16 +43,18 @@ class DeadEndBecomesNoThruTest {
     streetEdgeBuilder(e, d, 1, PEDESTRIAN).withWalkNoThruTraffic(true).buildAndConnect();
 
     // Dead end has 2 street vertices (e, f), which is below the threshold of 3.
-    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f).prune(
-      IslandPruningParameters.of()
-        .withPruningThresholdIslandWithoutStops(3)
-        .withPruningThresholdIslandWithStops(3)
-        .withAdaptivePruningFactor(1)
-        .build()
-    );
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f)
+      .prune(
+        IslandPruningParameters.of()
+          .withPruningThresholdIslandWithoutStops(3)
+          .withPruningThresholdIslandWithStops(3)
+          .withAdaptivePruningFactor(1)
+          .build()
+      );
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // main square: untouched
         "(0,0) → (0,1) PEDESTRIAN ♿✅",

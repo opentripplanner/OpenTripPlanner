@@ -17,8 +17,8 @@ public enum VehicleRoutingOptimizeType {
   FLAT_STREETS,
   TRIANGLE;
 
-  private static final Set<VehicleRoutingOptimizeType> NON_TRIANGLE_VALUES =
-    Collections.unmodifiableSet(EnumSet.complementOf(EnumSet.of(TRIANGLE)));
+  private static final Set<VehicleRoutingOptimizeType> NON_TRIANGLE_VALUES = Collections
+    .unmodifiableSet(EnumSet.complementOf(EnumSet.of(TRIANGLE)));
 
   /**
    * Return all values that are not {@link VehicleRoutingOptimizeType#TRIANGLE}.

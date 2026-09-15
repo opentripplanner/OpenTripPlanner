@@ -99,8 +99,7 @@ class ServiceLinkMapper {
     for (int i = 0; i < linksInJourneyPattern.size(); i++) {
       var linkInLinkSequence = linksInJourneyPattern.get(i);
       if (
-        linkInLinkSequence instanceof
-          ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
+        linkInLinkSequence instanceof ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
       ) {
         String serviceLinkRef = serviceLinkInJourneyPattern.getServiceLinkRef().getRef();
         ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
@@ -128,7 +127,7 @@ class ServiceLinkMapper {
   ) {
     if (
       serviceLink.getProjections() == null ||
-      serviceLink.getProjections().getProjectionRefOrProjection() == null
+        serviceLink.getProjections().getProjectionRefOrProjection() == null
     ) {
       issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
       return null;
@@ -136,9 +135,9 @@ class ServiceLinkMapper {
       return null;
     }
 
-    for (JAXBElement<?> projectionElement : serviceLink
-      .getProjections()
-      .getProjectionRefOrProjection()) {
+    for (
+      JAXBElement<?> projectionElement : serviceLink.getProjections().getProjectionRefOrProjection()
+    ) {
       Object projectionObj = projectionElement.getValue();
       if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
         LineStringType lineString = linkSequenceProjection.getLineString();
@@ -155,12 +154,12 @@ class ServiceLinkMapper {
 
         if (
           !isGeometryValid(geometry, serviceLink.getId()) ||
-          !areEndpointsWithinTolerance(
-            geometry,
-            stopPattern.getStop(stopIndex),
-            stopPattern.getStop(stopIndex + 1),
-            serviceLink.getId()
-          )
+            !areEndpointsWithinTolerance(
+              geometry,
+              stopPattern.getStop(stopIndex),
+              stopPattern.getStop(stopIndex + 1),
+              serviceLink.getId()
+            )
         ) {
           return null;
         }
@@ -180,8 +179,7 @@ class ServiceLinkMapper {
   private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
     Coordinate[] coordinates = new Coordinate[] {
       s0.getCoordinate().asJtsCoordinate(),
-      s1.getCoordinate().asJtsCoordinate(),
-    };
+      s1.getCoordinate().asJtsCoordinate(), };
     CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
 
     return GEOMETRY_FACTORY.createLineString(sequence);
@@ -327,7 +325,7 @@ class ServiceLinkMapper {
     Coordinate endCoordinate = toStop.getCoordinate().asJtsCoordinate();
     if (
       SphericalDistanceLibrary.fastDistance(startCoordinate, geometryStartCoordinate) >
-      maxStopToShapeSnapDistance
+        maxStopToShapeSnapDistance
     ) {
       issueStore.add(
         "ServiceLinkGeometryTooFar",
@@ -340,7 +338,7 @@ class ServiceLinkMapper {
       return false;
     } else if (
       SphericalDistanceLibrary.fastDistance(endCoordinate, geometryEndCoordinate) >
-      maxStopToShapeSnapDistance
+        maxStopToShapeSnapDistance
     ) {
       issueStore.add(
         "ServiceLinkGeometryTooFar",

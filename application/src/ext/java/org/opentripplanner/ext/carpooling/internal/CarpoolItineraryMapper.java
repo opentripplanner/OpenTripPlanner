@@ -154,10 +154,7 @@ public class CarpoolItineraryMapper {
     Place toPlace,
     @Nullable BookingInfo bookingInfo
   ) {
-    var allEdges = sharedSegments
-      .stream()
-      .flatMap(seg -> seg.edges.stream())
-      .toList();
+    var allEdges = sharedSegments.stream().flatMap(seg -> seg.edges.stream()).toList();
 
     return CarpoolLeg.of()
       .withStartTime(startTime)
@@ -252,10 +249,12 @@ public class CarpoolItineraryMapper {
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
-    Vertex startBoundaryVertex =
-      walkToPickup != null ? walkToPickup.states.getFirst().getVertex() : pickupVertex;
-    Vertex endBoundaryVertex =
-      walkFromDropoff != null ? walkFromDropoff.states.getLast().getVertex() : dropoffVertex;
+    Vertex startBoundaryVertex = walkToPickup != null
+      ? walkToPickup.states.getFirst().getVertex()
+      : pickupVertex;
+    Vertex endBoundaryVertex = walkFromDropoff != null
+      ? walkFromDropoff.states.getLast().getVertex()
+      : dropoffVertex;
 
     Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
     Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
@@ -334,8 +333,9 @@ public class CarpoolItineraryMapper {
       bookingMethods.add(BookingMethod.CALL_OFFICE);
     }
     String bookingUrl = contact.getBookingUrl();
-    String expandedUrl =
-      bookingUrl == null ? null : BookingUrlTemplate.expand(bookingUrl, pickup, dropoff);
+    String expandedUrl = bookingUrl == null
+      ? null
+      : BookingUrlTemplate.expand(bookingUrl, pickup, dropoff);
     if (expandedUrl != null) {
       bookingMethods.add(BookingMethod.ONLINE);
     }

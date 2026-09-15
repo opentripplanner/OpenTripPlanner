@@ -156,9 +156,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   private List<TestCase> parseTestCases(String tokensAsText) {
     var tokens = tokensAsText.split("\\s+");
     var sequence = new StringBuilder();
-    return Arrays.stream(tokens)
-      .map(token -> parseToken(token, sequence))
-      .toList();
+    return Arrays.stream(tokens).map(token -> parseToken(token, sequence)).toList();
   }
 
   private TestCase parseToken(String token, StringBuilder sequence) {
@@ -170,10 +168,10 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
       timeShift = (int) DurationUtils.duration(matcher.group(2)).toSeconds();
     }
     switch (tokenWithTimeShiftRemoved) {
-      case "-":
+      case "-" :
         sequence.append(" > -");
         return new TestCase(sequence.substring(3), null, -1, EMPTY, SEARCH_WINDOW_SEC);
-      case "0", "1", "2", "3":
+      case "0", "1", "2", "3" :
         sequence.append(" > ").append(tokenWithTimeShiftRemoved);
         int i = Integer.parseInt(tokenWithTimeShiftRemoved);
         return new TestCase(
@@ -183,20 +181,19 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
           cleanStr(driver.all().get(i).keyAsString()),
           SEARCH_WINDOW_SEC
         );
-      case "N":
+      case "N" :
         sequence.append(" > NEXT");
         return new TestCase(sequence.substring(3), NEXT_PAGE, -1, EMPTY, timeShift);
-      case "P":
+      case "P" :
         sequence.append(" > PREV");
         return new TestCase(sequence.substring(3), PREVIOUS_PAGE, -1, EMPTY, timeShift);
-      default:
+      default :
         throw new IllegalArgumentException(tokenWithTimeShiftRemoved);
     }
   }
 
   private static String getResultAsString(List<Itinerary> kept) {
-    return kept
-      .stream()
+    return kept.stream()
       .map(ItinerarySortKey::keyAsString)
       .map(TestPagingUtils::cleanStr)
       .collect(Collectors.joining());

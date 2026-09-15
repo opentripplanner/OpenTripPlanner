@@ -71,27 +71,27 @@ public class PathParetoSetComparatorsTest {
     var comparator = paretoComparator(time, cost, relaxC1, comp2);
     verifyNumberOfTransfers(comparator);
     switch (time) {
-      case USE_ARRIVAL_TIME:
+      case USE_ARRIVAL_TIME :
         verifyEndTimeComparator(comparator);
         break;
-      case USE_DEPARTURE_TIME:
+      case USE_DEPARTURE_TIME :
         verifyStartTimeComparator(comparator);
         break;
-      case USE_TIMETABLE:
+      case USE_TIMETABLE :
         verifyIterationDepartureTime(comparator);
         verifyEndTimeComparator(comparator);
         break;
     }
 
     switch (cost) {
-      case USE_C1:
+      case USE_C1 :
         verifyC1Comparator(comparator);
         break;
-      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL:
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL :
         verifyRelaxedC1IfC2Optimal(comparator);
         break;
-      case NONE:
-      default:
+      case NONE :
+      default :
         break;
     }
   }

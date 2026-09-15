@@ -228,8 +228,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     RaptorPath<T> path
   ) {
     if (path.c1() != destArrival.c1()) {
-      THROTTLE_MISS_MATCH.throttle(() ->
-        LOG.warn(
+      THROTTLE_MISS_MATCH.throttle(
+        () -> LOG.warn(
           "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}  {}",
           OtpNumberFormat.formatCostCenti(path.c1()),
           raptorCostsAsString(destArrival),

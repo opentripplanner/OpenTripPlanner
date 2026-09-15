@@ -95,8 +95,7 @@ public class StopTimesMapperTest {
   public void testWaitPointMapping() {
     var netexSample = new NetexTestDataSample();
 
-    var points = netexSample
-      .getJourneyPattern()
+    var points = netexSample.getJourneyPattern()
       .getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .stream()
@@ -118,12 +117,10 @@ public class StopTimesMapperTest {
     );
 
     // Utility function to find TimetabledPassingTime by StopPointInJourneyPattern.Id
-    Function<String, TimetabledPassingTime> findPassingTime = pointId ->
-      passingTimes
-        .stream()
-        .filter(t -> pointId.equals(t.getPointInJourneyPatternRef().getValue().getRef()))
-        .findAny()
-        .orElseThrow();
+    Function<String, TimetabledPassingTime> findPassingTime = pointId -> passingTimes.stream()
+      .filter(t -> pointId.equals(t.getPointInJourneyPatternRef().getValue().getRef()))
+      .findAny()
+      .orElseThrow();
 
     var firstPassingTime = findPassingTime.apply(points.get(0).getId());
     var thirdPassingTime = findPassingTime.apply(points.get(2).getId());
@@ -162,20 +159,21 @@ public class StopTimesMapperTest {
 
     Assertions.assertAll(
       () -> assertEquals(1, stopTimes.get(0).getTimepoint(), "StopTime expected to be waitPoint"),
-      () ->
-        assertNotEquals(
-          1,
-          stopTimes.get(1).getTimepoint(),
-          "StopTime expected to not be waitPoint"
-        ),
-      () ->
-        assertNotEquals(
-          1,
-          stopTimes.get(2).getTimepoint(),
-          "StopTime expected to not be waitPoint"
-        ),
-      () ->
-        assertNotEquals(1, stopTimes.get(3).getTimepoint(), "StopTime expected to not be waitPoint")
+      () -> assertNotEquals(
+        1,
+        stopTimes.get(1).getTimepoint(),
+        "StopTime expected to not be waitPoint"
+      ),
+      () -> assertNotEquals(
+        1,
+        stopTimes.get(2).getTimepoint(),
+        "StopTime expected to not be waitPoint"
+      ),
+      () -> assertNotEquals(
+        1,
+        stopTimes.get(3).getTimepoint(),
+        "StopTime expected to not be waitPoint"
+      )
     );
   }
 

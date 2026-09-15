@@ -110,8 +110,7 @@ public class NetexNordicBundleSmokeTest {
   }
 
   private void assertMultiModalStations(Collection<MultiModalStation> multiModalStations) {
-    Map<FeedScopedId, MultiModalStation> map = multiModalStations
-      .stream()
+    Map<FeedScopedId, MultiModalStation> map = multiModalStations.stream()
       .collect(Collectors.toMap(MultiModalStation::getId, s -> s));
     MultiModalStation multiModalStation = map.get(fId("NSR:StopPlace:58243"));
     assertEquals("Bergkrystallen", multiModalStation.getName().toString());
@@ -130,8 +129,7 @@ public class NetexNordicBundleSmokeTest {
   }
 
   private void assertStops(Collection<RegularStop> stops) {
-    Map<FeedScopedId, RegularStop> map = stops
-      .stream()
+    Map<FeedScopedId, RegularStop> map = stops.stream()
       .collect(Collectors.toMap(RegularStop::getId, s -> s));
 
     RegularStop quay = map.get(fId("NSR:Quay:122003"));
@@ -144,8 +142,7 @@ public class NetexNordicBundleSmokeTest {
   }
 
   private void assertStations(Collection<Station> stations) {
-    Map<FeedScopedId, Station> map = stations
-      .stream()
+    Map<FeedScopedId, Station> map = stations.stream()
       .collect(Collectors.toMap(Station::getId, s -> s));
     Station station = map.get(fId("NSR:StopPlace:5825"));
     assertEquals("Bergkrystallen T", station.getName().toString());
@@ -155,8 +152,7 @@ public class NetexNordicBundleSmokeTest {
   }
 
   private void assertTripPatterns(Collection<TripPattern> patterns) {
-    Map<FeedScopedId, TripPattern> map = patterns
-      .stream()
+    Map<FeedScopedId, TripPattern> map = patterns.stream()
       .collect(Collectors.toMap(TripPattern::getId, s -> s));
     TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
     assertEquals("Jernbanetorget", p.getTripHeadsign().toString());
@@ -217,8 +213,7 @@ public class NetexNordicBundleSmokeTest {
     String code,
     String text
   ) {
-    AbstractTransitEntity key = map
-      .keySet()
+    AbstractTransitEntity key = map.keySet()
       .stream()
       .filter(it -> entityKey.equals(it.getId()))
       .findFirst()
@@ -238,8 +233,7 @@ public class NetexNordicBundleSmokeTest {
   }
 
   private void assertServiceIds(Collection<Trip> trips, Collection<FeedScopedId> serviceIds) {
-    Set<FeedScopedId> tripServiceIds = trips
-      .stream()
+    Set<FeedScopedId> tripServiceIds = trips.stream()
       .map(Trip::getServiceId)
       .collect(Collectors.toSet());
     assertEquals(tripServiceIds, Set.copyOf(serviceIds));
@@ -249,8 +243,7 @@ public class NetexNordicBundleSmokeTest {
     ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.getServiceIds());
     assertEquals(3, sIds.size());
 
-    var dates = sIds
-      .stream()
+    var dates = sIds.stream()
       .map(cal::getServiceDatesForServiceId)
       .sorted(Comparator.comparing(List::size))
       .toList();

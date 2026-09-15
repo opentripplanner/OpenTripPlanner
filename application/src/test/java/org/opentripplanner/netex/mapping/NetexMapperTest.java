@@ -154,8 +154,7 @@ class NetexMapperTest {
     var index = new NetexEntityIndex();
     index.timeZone.set("Europe/Oslo");
 
-    Line line = new Line()
-      .withId("RUT:Line:1")
+    Line line = new Line().withId("RUT:Line:1")
       .withName(new MultilingualString().withValue("Line 1"))
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
     index.lineById.add(line);
@@ -172,16 +171,14 @@ class NetexMapperTest {
     for (int i = 0; i < quayIds.length; i++) {
       String stopPointId = "RUT:StopPointInJourneyPattern:" + (i + 1);
       points.add(
-        new StopPointInJourneyPattern()
-          .withId(stopPointId)
+        new StopPointInJourneyPattern().withId(stopPointId)
           .withOrder(BigInteger.valueOf(i + 1))
           .withScheduledStopPointRef(
             MappingSupport.createWrappedRef(stopPointId, ScheduledStopPointRefStructure.class)
           )
       );
       passingTimes.add(
-        new TimetabledPassingTime()
-          .withId(passingTimeIds[i])
+        new TimetabledPassingTime().withId(passingTimeIds[i])
           .withDepartureTime(LocalTime.of(8, i))
           .withPointInJourneyPatternRef(
             MappingSupport.createWrappedRef(
@@ -193,18 +190,15 @@ class NetexMapperTest {
       index.quayIdByStopPointRef.add(stopPointId, quayIds[i]);
     }
 
-    var journeyPattern = new JourneyPattern()
-      .withId("RUT:JourneyPattern:1")
+    var journeyPattern = new JourneyPattern().withId("RUT:JourneyPattern:1")
       .withRouteRef(routeRef)
       .withPointsInSequence(
-        new PointsInJourneyPattern_RelStructure().withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
-          points
-        )
+        new PointsInJourneyPattern_RelStructure()
+          .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(points)
       );
     index.journeyPatternsById.add(journeyPattern);
 
-    var serviceJourney = new ServiceJourney()
-      .withId("RUT:ServiceJourney:1")
+    var serviceJourney = new ServiceJourney().withId("RUT:ServiceJourney:1")
       .withLineRef(lineRef)
       .withJourneyPatternRef(
         MappingSupport.createWrappedRef(journeyPattern.getId(), JourneyPatternRefStructure.class)
@@ -219,12 +213,10 @@ class NetexMapperTest {
 
   private static NetexEntityIndex fileWithNoticeAssignment(String noticedObjectId) {
     var index = new NetexEntityIndex();
-    var notice = new Notice()
-      .withId("RUT:Notice:1")
+    var notice = new Notice().withId("RUT:Notice:1")
       .withText(new MultilingualString().withValue("Notice text"));
 
-    var noticeAssignment = new NoticeAssignment()
-      .withId("RUT:NoticeAssignment:1")
+    var noticeAssignment = new NoticeAssignment().withId("RUT:NoticeAssignment:1")
       .withNoticedObjectRef(new VersionOfObjectRefStructure().withRef(noticedObjectId))
       .withNotice(notice);
     index.noticeAssignmentById.add(noticeAssignment);

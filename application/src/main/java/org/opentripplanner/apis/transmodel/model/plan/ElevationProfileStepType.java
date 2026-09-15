@@ -15,7 +15,8 @@ public class ElevationProfileStepType {
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
   static String makeDescription(String name) {
-    return """
+    return
+    """
     The %s's elevation profile. All elevation values, including the first one, are in meters
     above sea level. The elevation is negative for places below sea level. The profile
     includes both the start and end coordinate.
@@ -43,7 +44,8 @@ public class ElevationProfileStepType {
             """
             The elevation at this distance, in meters above sea level. It is negative if the
             location is below sea level.
-            """.stripIndent()
+            """
+              .stripIndent()
           )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> step(env).y())

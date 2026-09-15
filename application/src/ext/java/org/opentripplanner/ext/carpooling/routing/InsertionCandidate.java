@@ -159,9 +159,8 @@ public record InsertionCandidate(
     Duration stopDuration
   ) {
     long segmentSeconds = segments.stream().mapToLong(GraphPath::getDuration).sum();
-    return Duration.ofSeconds(segmentSeconds).plus(
-      stopDuration.multipliedBy(Math.max(0, segments.size() - 1))
-    );
+    return Duration.ofSeconds(segmentSeconds)
+      .plus(stopDuration.multipliedBy(Math.max(0, segments.size() - 1)));
   }
 
   @Override

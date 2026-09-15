@@ -63,8 +63,7 @@ public class DataStoreArchitectureTest {
 
   @Test
   void enforceNoCyclicDependencies() {
-    slices()
-      .matching(DATASTORE.packageIdentifierAllSubPackages())
+    slices().matching(DATASTORE.packageIdentifierAllSubPackages())
       .should()
       .beFreeOfCycles()
       .check(ArchComponent.OTP_CLASSES);

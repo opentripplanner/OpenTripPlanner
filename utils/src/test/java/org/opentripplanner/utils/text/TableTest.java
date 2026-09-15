@@ -20,7 +20,8 @@ public class TableTest {
       .addRow("\nNL Before", "NL\nin middle", "NL after\n")
       .addRow(null, "Short", 123);
 
-    var expected = """
+    var expected =
+    """
     LEFT      |    CENTER    |    RIGHT
     SPACE     |  Long-value  |        2
     NL Before | NL in middle | NL after
@@ -66,22 +67,25 @@ public class TableTest {
       |  100  | 2 |  102  |
       |  One  |   |       |
       | (A¦B) | ¦ |       |
-      """,
+      """
+      ,
       result
     );
   }
 
   @Test
   public void tableWithTooFewAlignsFails() {
-    assertThrows(IllegalStateException.class, () ->
-      Table.of().withHeaders("A", "B").withAlights(Center).build()
+    assertThrows(
+      IllegalStateException.class,
+      () -> Table.of().withHeaders("A", "B").withAlights(Center).build()
     );
   }
 
   @Test
   public void tableWithTooFewMinWidths() {
-    assertThrows(IllegalStateException.class, () ->
-      Table.of().withHeaders("A", "B").withMinWidths(20).build()
+    assertThrows(
+      IllegalStateException.class,
+      () -> Table.of().withHeaders("A", "B").withMinWidths(20).build()
     );
   }
 }

@@ -42,8 +42,8 @@ class SiriETCarpoolingUpdaterTest {
   void setUp() {
     repository = new DefaultCarpoolingRepository();
     resolver = mock(CarpoolTripVertexResolver.class);
-    when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+    when(resolver.resolve(any())).thenAnswer(
+      invocation -> CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );
     var params = new DefaultSiriETUpdaterParameters(
       "carpool-test",
@@ -122,11 +122,9 @@ class SiriETCarpoolingUpdaterTest {
     doReturn(null).when(resolver).resolve(any());
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
 
-    doAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
-    )
-      .when(resolver)
-      .resolve(any());
+    doAnswer(
+      invocation -> CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+    ).when(resolver).resolve(any());
     var changedJourney = journeyWithMovedDestination();
     updater.processEstimatedVehicleJourney(changedJourney);
 
@@ -174,8 +172,9 @@ class SiriETCarpoolingUpdaterTest {
   void processEstimatedVehicleJourney_malformedNonCancellation_doesNotRemoveOrReplaceExistingTrip() {
     // Sanity-check the fixture: a direct mapper call must throw, otherwise the updater test
     // below would silently degrade into "upsert replaces the seeded trip" and still pass.
-    assertThrows(Exception.class, () ->
-      mapper.mapSiriToCarpoolTrip(malformedNonCancelledJourney())
+    assertThrows(
+      Exception.class,
+      () -> mapper.mapSiriToCarpoolTrip(malformedNonCancelledJourney())
     );
 
     seedActiveTrip();
@@ -195,9 +194,6 @@ class SiriETCarpoolingUpdaterTest {
   }
 
   private boolean tripIsInRepository(FeedScopedId id) {
-    return repository
-      .getCarpoolTrips()
-      .stream()
-      .anyMatch(t -> t.trip().getId().equals(id));
+    return repository.getCarpoolTrips().stream().anyMatch(t -> t.trip().getId().equals(id));
   }
 }

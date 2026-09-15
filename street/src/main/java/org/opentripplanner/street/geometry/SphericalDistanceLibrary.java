@@ -112,8 +112,8 @@ public abstract class SphericalDistanceLibrary {
     // t = 0 means the projection is at segmentStart
     // t = 1 means the projection is at segmentEnd
     // 0 < t < 1 means the projection is between them
-    double t =
-      ((point.x - segmentStart.x) * dx + (point.y - segmentStart.y) * dy) / lineLengthSquared;
+    double t = ((point.x - segmentStart.x) * dx + (point.y - segmentStart.y) * dy) /
+      lineLengthSquared;
 
     // Clamp t to [0, 1] to ensure we stay on the segment
     t = Math.max(0, Math.min(1, t));

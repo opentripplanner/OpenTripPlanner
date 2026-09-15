@@ -25,8 +25,7 @@ public class TripPatternEmission implements Serializable {
    * {@code boardStopPosInPattern} and ending at the given {@code alightStopPosInPattern}.
    */
   public Emission section(int boardStopPosInPattern, int alightStopPosInPattern) {
-    return emissionsPerHop
-      .subList(boardStopPosInPattern, alightStopPosInPattern)
+    return emissionsPerHop.subList(boardStopPosInPattern, alightStopPosInPattern)
       .stream()
       .reduce(Emission.ZERO, Emission::plus);
   }

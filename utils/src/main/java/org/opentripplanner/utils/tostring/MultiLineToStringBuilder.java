@@ -76,19 +76,14 @@ public class MultiLineToStringBuilder {
   }
 
   private String colToString(Collection<?> c) {
-    return c
-      .stream()
+    return c.stream()
       .map(Object::toString)
       .collect(Collectors.joining(NL_INDENT_2, "[" + NL_INDENT_2, NL_INDENT_1 + "]"));
   }
 
   public String toString() {
     var buf = new StringBuilder(name).append(" {");
-    int labelSize = items
-      .stream()
-      .mapToInt(it -> it.key.length())
-      .max()
-      .orElse(0);
+    int labelSize = items.stream().mapToInt(it -> it.key.length()).max().orElse(0);
 
     for (Item item : items) {
       var labelTxt = padRight(item.key(), labelSize);

@@ -28,8 +28,7 @@ class NetworkMatcher {
    * result depends on the presence/absence of other rules with that network id.
    */
   boolean matchesNetworkId(TransitLeg leg, FareLegRule rule) {
-    var routesNetworkIds = leg
-      .route()
+    var routesNetworkIds = leg.route()
       .getGroupsOfRoutes()
       .stream()
       .map(AbstractTransitEntity::getId)
@@ -39,17 +38,14 @@ class NetworkMatcher {
     if (priorityMatcher.feedContainsRulePriority(rule.feedId())) {
       return rule.networkId() == null || routesNetworkIds.contains(rule.networkId());
     } else {
-      return (
-        (rule.networkId() == null &&
-          networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
-        routesNetworkIds.contains(rule.networkId())
-      );
+      return ((rule.networkId() == null &&
+        networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
+        routesNetworkIds.contains(rule.networkId()));
     }
   }
 
   private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
-    return legRules
-      .stream()
+    return legRules.stream()
       .map(FareLegRule::networkId)
       .filter(Objects::nonNull)
       .collect(Collectors.toUnmodifiableSet());

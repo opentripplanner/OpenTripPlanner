@@ -15,8 +15,7 @@ public class OsmConfig {
 
   public static OsmExtractParameters mapOsmDefaults(NodeAdapter root, String parameterName) {
     var baseDefaults = OsmExtractParameters.DEFAULT;
-    var osmDefaults = root
-      .of(parameterName)
+    var osmDefaults = root.of(parameterName)
       .since(V2_2)
       .summary("Default properties for OpenStreetMap feeds.")
       .asObject();
@@ -30,8 +29,7 @@ public class OsmConfig {
     OsmExtractParameters defaults
   ) {
     return new OsmExtractParametersList(
-      root
-        .of(parameterName)
+      root.of(parameterName)
         .since(V2_2)
         .summary("Configure properties for a given OpenStreetMap feed.")
         .description(
@@ -51,11 +49,9 @@ public class OsmConfig {
     OsmExtractParameters defaults
   ) {
     String documentationAddition = " Overrides the value specified in `osmDefaults`.";
-    return mapOsmGenericParameters(node, defaults, documentationAddition)
-      .withSource(
-        node.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
-      )
-      .build();
+    return mapOsmGenericParameters(node, defaults, documentationAddition).withSource(
+      node.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
+    ).build();
   }
 
   public static OsmExtractParametersBuilder mapOsmGenericParameters(
@@ -64,11 +60,9 @@ public class OsmConfig {
     String documentationAddition
   ) {
     var docDefaults = OsmExtractParameters.DEFAULT;
-    return defaults
-      .copyOf()
+    return defaults.copyOf()
       .withOsmTagMapper(
-        node
-          .of("osmTagMapping")
+        node.of("osmTagMapping")
           .since(V2_2)
           .summary(
             "The named set of mapping rules applied when parsing OSM tags." + documentationAddition
@@ -77,8 +71,7 @@ public class OsmConfig {
           .asEnum(defaults.osmTagMapper())
       )
       .withTimeZone(
-        node
-          .of("timeZone")
+        node.of("timeZone")
           .since(V2_2)
           .summary(
             "The timezone used to resolve opening hours in OSM data." + documentationAddition
@@ -87,8 +80,7 @@ public class OsmConfig {
           .asZoneId(defaults.timeZone())
       )
       .withIncludeOsmStationEntrances(
-        node
-          .of("includeOsmStationEntrances")
+        node.of("includeOsmStationEntrances")
           .since(V2_10)
           .summary(
             "Whether to include station entrances from the OSM data." + documentationAddition

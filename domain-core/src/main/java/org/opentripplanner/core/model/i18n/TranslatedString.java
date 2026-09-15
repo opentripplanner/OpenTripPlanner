@@ -123,8 +123,8 @@ public class TranslatedString implements I18NString, Serializable {
       // Check if we only have one name, even under multiple languages
       boolean allValuesEqual = new HashSet<>(translations.values()).size() == 1;
       var firstLanguage = translations.keySet().iterator().next();
-      boolean onlySingleUntranslatedLanguage =
-        translations.size() == 1 && (firstLanguage == null || firstLanguage.isBlank());
+      boolean onlySingleUntranslatedLanguage = translations.size() == 1 &&
+        (firstLanguage == null || firstLanguage.isBlank());
       if (forceTranslatedString && !onlySingleUntranslatedLanguage) {
         ret = new TranslatedString(translations);
       } else if (allValuesEqual) {
@@ -146,10 +146,8 @@ public class TranslatedString implements I18NString, Serializable {
 
   @Override
   public boolean equals(Object other) {
-    return (
-      other instanceof TranslatedString &&
-      this.translations.equals(((TranslatedString) other).translations)
-    );
+    return (other instanceof TranslatedString &&
+      this.translations.equals(((TranslatedString) other).translations));
   }
 
   /**

@@ -171,18 +171,16 @@ public class ParameterBuilder {
   }
 
   public Set<String> asStringSet(Collection<String> defaultValue) {
-    List<String> dft =
-      defaultValue instanceof List<String>
-        ? (List<String>) defaultValue
-        : List.copyOf(defaultValue);
+    List<String> dft = defaultValue instanceof List<String>
+      ? (List<String>) defaultValue
+      : List.copyOf(defaultValue);
     return Set.copyOf(ofArrayAsList(STRING, dft, JsonNode::asText));
   }
 
   public List<String> asStringList(Collection<String> defaultValue) {
-    List<String> dft =
-      defaultValue instanceof List<String>
-        ? (List<String>) defaultValue
-        : List.copyOf(defaultValue);
+    List<String> dft = defaultValue instanceof List<String>
+      ? (List<String>) defaultValue
+      : List.copyOf(defaultValue);
     return ofArrayAsList(STRING, dft, JsonNode::asText);
   }
 
@@ -241,8 +239,9 @@ public class ParameterBuilder {
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     info.withOptional().withEnumSet(enumClass);
-    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
-      parseOptionalEnum(it.asText(), enumClass)
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -250,11 +249,13 @@ public class ParameterBuilder {
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass, Collection<T> defaultValues) {
-    List<T> dft =
-      defaultValues instanceof List<T> ? (List<T>) defaultValues : List.copyOf(defaultValues);
+    List<T> dft = defaultValues instanceof List<T>
+      ? (List<T>) defaultValues
+      : List.copyOf(defaultValues);
     info.withOptional(dft.toString()).withEnumSet(enumClass);
-    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
-      parseOptionalEnum(it.asText(), enumClass)
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -448,8 +449,9 @@ public class ParameterBuilder {
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
-    return buildAndListSimpleArrayElements(defaultValues, it ->
-      FeedScopedId.parseStrict(it.asText())
+    return buildAndListSimpleArrayElements(
+      defaultValues,
+      it -> FeedScopedId.parseStrict(it.asText())
     );
   }
 
@@ -517,11 +519,9 @@ public class ParameterBuilder {
     info.withType(type);
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
-    return exist()
-      ? mapper.apply(node.asText())
-      : defaultValueAsString == null
-        ? null
-        : mapper.apply(defaultValueAsString);
+    return exist() ? mapper.apply(node.asText())
+      : defaultValueAsString == null ? null
+      : mapper.apply(defaultValueAsString);
   }
 
   private <T> List<T> ofArrayAsList(

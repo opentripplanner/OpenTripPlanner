@@ -39,12 +39,9 @@ class CompactShape implements Iterable<ShapePoint> {
 
   @Override
   public Iterator<ShapePoint> iterator() {
-    return IntStream.range(0, lats.size())
-      .mapToObj(i -> {
-        double dist = dists.get(i);
-        return new ShapePoint(seqs.get(i), lats.get(i), lons.get(i), dist < 0 ? null : dist);
-      })
-      .sorted()
-      .iterator();
+    return IntStream.range(0, lats.size()).mapToObj(i -> {
+      double dist = dists.get(i);
+      return new ShapePoint(seqs.get(i), lats.get(i), lons.get(i), dist < 0 ? null : dist);
+    }).sorted().iterator();
   }
 }

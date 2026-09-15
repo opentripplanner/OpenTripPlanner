@@ -21,9 +21,8 @@ import org.rutebanken.netex.model.VersionOfObjectRefStructure;
  * @param <V> the value type
  */
 public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
-  extends HierarchicalMultimap<String, V>
-  implements ReadOnlyHierarchicalVersionMapById<V>
-{
+  extends
+  HierarchicalMultimap<String, V> implements ReadOnlyHierarchicalVersionMapById<V> {
 
   /** Create a root for the hierarchy */
   public HierarchicalVersionMapById() {}
@@ -104,8 +103,7 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
 
   @Override
   public Collection<V> localListCurrentVersionEntities(final LocalDateTime timestamp) {
-    return localValues()
-      .stream()
+    return localValues().stream()
       .map(c -> firstValidBestVersion(c, timestamp))
       .filter(Objects::nonNull)
       .collect(Collectors.toUnmodifiableList());
@@ -117,8 +115,7 @@ public class HierarchicalVersionMapById<V extends EntityInVersionStructure>
   }
 
   private V firstValidBestVersion(Collection<V> entities, LocalDateTime timestamp) {
-    return entities
-      .stream()
+    return entities.stream()
       .map(it -> new ValidOnDate<>(it, timestamp))
       .filter(ValidOnDate::isValid)
       .reduce((a, b) -> a.bestVersion(b) ? a : b)

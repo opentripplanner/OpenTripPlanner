@@ -52,8 +52,9 @@ class CarpoolAccessEgressTest {
     );
 
     int rideSeconds = 60 + DWELL_SECONDS;
-    double expectedWeight =
-      walkToPickup.getWeight() + walkFromDropoff.getWeight() + rideSeconds * carpoolReluctance;
+    double expectedWeight = walkToPickup.getWeight() +
+      walkFromDropoff.getWeight() +
+      rideSeconds * carpoolReluctance;
     assertEquals(RaptorCostConverter.toRaptorCost(expectedWeight), accessEgress.c1());
   }
 

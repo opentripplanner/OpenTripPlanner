@@ -139,11 +139,9 @@ final class HttpsFileDataSource implements DataSource {
       return false;
     }
     var that = (HttpsFileDataSource) obj;
-    return (
-      Objects.equals(this.uri, that.uri) &&
+    return (Objects.equals(this.uri, that.uri) &&
       Objects.equals(this.type, that.type) &&
-      Objects.equals(this.httpsDataSourceMetadata, that.httpsDataSourceMetadata)
-    );
+      Objects.equals(this.httpsDataSourceMetadata, that.httpsDataSourceMetadata));
   }
 
   @Override
@@ -153,8 +151,7 @@ final class HttpsFileDataSource implements DataSource {
 
   @Override
   public String toString() {
-    return (
-      "HttpsFileDataSource[" +
+    return ("HttpsFileDataSource[" +
       "uri=" +
       uri +
       ", " +
@@ -163,7 +160,6 @@ final class HttpsFileDataSource implements DataSource {
       ", " +
       "httpsDataSourceMetadata=" +
       httpsDataSourceMetadata +
-      ']'
-    );
+      ']');
   }
 }

@@ -23,8 +23,7 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
   public void testSimplePathWithOneTransit() {
     int transitDuration = durationInSeconds("5m");
 
-    var path = subject
-      .access(time("10:00:15"), STOP_A, D1_m)
+    var path = subject.access(time("10:00:15"), STOP_A, D1_m)
       .bus("L1", time("10:02"), transitDuration, STOP_B)
       .egress(D2_m);
 
@@ -62,8 +61,7 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
 
   @Test
   public void testBasicPath() {
-    var path = subject
-      .c2(7)
+    var path = subject.c2(7)
       .access(BasicPathTestCase.ACCESS_START, STOP_A, BasicPathTestCase.ACCESS_DURATION)
       .bus(
         BasicPathTestCase.LINE_11,

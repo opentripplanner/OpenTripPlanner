@@ -48,12 +48,10 @@ class BoardingActivityWithCoordinateWithDriverTest implements RealtimeTestConsta
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, scheduledPattern.getBoardType(1));
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, scheduledPattern.getAlightType(1));
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:11")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:20")

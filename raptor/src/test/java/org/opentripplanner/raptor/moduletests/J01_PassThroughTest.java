@@ -63,14 +63,12 @@ class J01_PassThroughTest {
   private RaptorRequestBuilder<TestTripSchedule> prepareRequest() {
     var builder = data.requestBuilder();
 
-    builder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    builder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: 2023-07-24 Currently heuristics does not work with pass-through so we
       //  have to turn them off. Make sure to re-enable optimization later when it's fixed
       .clearOptimizations();
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(8))
@@ -114,8 +112,7 @@ class J01_PassThroughTest {
   @Test
   @DisplayName("Pass-through stop point as a first point in the journey.")
   void passThroughPointOnAccess() {
-    data
-      .access("Walk 30s ~ A", "Walk 30s ~ B")
+    data.access("Walk 30s ~ A", "Walk 30s ~ B")
       // Create two routes.
       // Only one of them includes required pass-through point.
       // Pass-through point is the first stop in the trip.
@@ -279,7 +276,8 @@ class J01_PassThroughTest {
       """
       Walk 2m ~ B ~ BUS R2 0:05 0:14 ~ E ~ Walk 30s [0:03 0:14:30 11m30s Tₙ0 C₁1_440]
       Walk 59s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:01 0:15:30 12m29s Tₙ0 C₁1_438]
-      """.trim(),
+      """
+        .trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -352,7 +350,8 @@ class J01_PassThroughTest {
     assertEquals(
       """
       A ~ BUS R2 0:00 0:15 ~ E [0:00 0:15 15m Tₙ0 C₁1_500]
-      """.trim(),
+      """
+        .trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }

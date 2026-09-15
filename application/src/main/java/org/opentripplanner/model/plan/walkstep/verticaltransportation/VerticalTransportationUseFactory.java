@@ -56,8 +56,8 @@ public class VerticalTransportationUseFactory {
   }
 
   public EscalatorUse createEscalatorUse(Edge edge) {
-    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional =
-      streetDetailsService.findInclinedEdgeLevelInfo(edge);
+    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional = streetDetailsService
+      .findInclinedEdgeLevelInfo(edge);
     if (inclinedEdgeLevelInfoOptional.isEmpty()) {
       return new EscalatorUse(null, null, VerticalDirection.UNKNOWN);
     }
@@ -83,8 +83,8 @@ public class VerticalTransportationUseFactory {
   }
 
   public StairsUse createStairsUse(Edge edge) {
-    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional =
-      streetDetailsService.findInclinedEdgeLevelInfo(edge);
+    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional = streetDetailsService
+      .findInclinedEdgeLevelInfo(edge);
     if (inclinedEdgeLevelInfoOptional.isEmpty()) {
       return new StairsUse(null, null, VerticalDirection.UNKNOWN);
     }
@@ -115,8 +115,8 @@ public class VerticalTransportationUseFactory {
   ) {
     return edge.getFromVertex() instanceof OsmVertex fromVertex &&
       fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
-      ? VerticalDirection.UP
-      : VerticalDirection.DOWN;
+        ? VerticalDirection.UP
+        : VerticalDirection.DOWN;
   }
 
   /**

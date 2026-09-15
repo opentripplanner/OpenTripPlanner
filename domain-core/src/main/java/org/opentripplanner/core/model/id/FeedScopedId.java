@@ -78,8 +78,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   /// @param value id of the form "feedId:entityId"
   /// @throws IllegalArgumentException if the input is not a valid FeedScopedId
   public static FeedScopedId parseStrict(String value) throws IllegalArgumentException {
-    return parseOptional(value).orElseThrow(() ->
-      new IllegalArgumentException("Invalid FeedScopedId: " + value)
+    return parseOptional(value).orElseThrow(
+      () -> new IllegalArgumentException("Invalid FeedScopedId: " + value)
     );
   }
 

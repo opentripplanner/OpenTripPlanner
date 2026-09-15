@@ -47,16 +47,14 @@ public class FlexIndex {
         }
       }
 
-      transitRepository
-        .getTripCalendar()
+      transitRepository.getTripCalendar()
         .listServiceDates(flexTrip.getTrip().getServiceId())
         .forEach(serviceDate -> {
           LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
           FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);
 
           serviceDate.datesUntil(maxDate.plusDays(1)).forEach(runningDate -> {
-            flexTripsRunningOnDate
-              .computeIfAbsent(runningDate, d -> new ArrayList<>())
+            flexTripsRunningOnDate.computeIfAbsent(runningDate, d -> new ArrayList<>())
               .add(flexTripForDate);
           });
         });

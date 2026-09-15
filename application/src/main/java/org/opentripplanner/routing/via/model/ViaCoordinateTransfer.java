@@ -91,8 +91,7 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
 
   @Override
   public String toString() {
-    return (
-      "{" +
+    return ("{" +
       coordinate +
       " " +
       fromStopIndex +
@@ -102,7 +101,6 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
       DurationUtils.durationToStr(durationInSeconds) +
       " " +
       RaptorValueType.C1.format(raptorCost) +
-      "}"
-    );
+      "}");
   }
 }

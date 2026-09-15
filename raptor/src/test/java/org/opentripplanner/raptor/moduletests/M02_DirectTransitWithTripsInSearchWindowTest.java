@@ -51,7 +51,9 @@ public class M02_DirectTransitWithTripsInSearchWindowTest implements RaptorTestC
     assertEquals(
       """
       Walk 30s ~ A ~ BUS R1 0:02 0:04 ~ B ~ Walk 20s [0:01:30 0:04:20 2m50s Tₙ0 C₁820]
-      Walk 30s ~ A ~ BUS R1 0:03 0:05 ~ B ~ Walk 20s [0:02:30 0:05:20 2m50s Tₙ0 C₁820]""",
+      Walk 30s ~ A ~ BUS R1 0:03 0:05 ~ B ~ Walk 20s [0:02:30 0:05:20 2m50s Tₙ0 C₁820]\
+      """
+      ,
       pathsToString(result)
     );
   }

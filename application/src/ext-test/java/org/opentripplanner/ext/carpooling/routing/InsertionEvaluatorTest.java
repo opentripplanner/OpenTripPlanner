@@ -46,17 +46,19 @@ class InsertionEvaluatorTest {
 
     vertexMap = new HashMap<>();
 
-    for (WgsCoordinate coord : List.of(
-      OSLO_CENTER,
-      OSLO_EAST,
-      OSLO_NORTH,
-      OSLO_SOUTH,
-      OSLO_WEST,
-      OSLO_MIDPOINT_NORTH,
-      OSLO_NORTHEAST,
-      getCoordinateBetween(OSLO_SOUTH, OSLO_CENTER),
-      getCoordinateBetween(OSLO_NORTHEAST, OSLO_NORTH)
-    )) {
+    for (
+      WgsCoordinate coord : List.of(
+        OSLO_CENTER,
+        OSLO_EAST,
+        OSLO_NORTH,
+        OSLO_SOUTH,
+        OSLO_WEST,
+        OSLO_MIDPOINT_NORTH,
+        OSLO_NORTHEAST,
+        getCoordinateBetween(OSLO_SOUTH, OSLO_CENTER),
+        getCoordinateBetween(OSLO_NORTHEAST, OSLO_NORTH)
+      )
+    ) {
       var vertex = new SimpleVertex(
         "test-" + coord.latitude() + "-" + coord.longitude(),
         coord.latitude(),
@@ -67,11 +69,7 @@ class InsertionEvaluatorTest {
   }
 
   private CarpoolTripWithVertices createTripWithVertices(CarpoolTrip trip) {
-    var vertices = trip
-      .stops()
-      .stream()
-      .map(stop -> vertexMap.get(stop.getCoordinate()))
-      .toList();
+    var vertices = trip.stops().stream().map(stop -> vertexMap.get(stop.getCoordinate())).toList();
     return new CarpoolTripWithVertices(trip, vertices);
   }
 
@@ -180,8 +178,7 @@ class InsertionEvaluatorTest {
     // 1. Baseline calculation (2 segments: OSLO_CENTER → OSLO_EAST → OSLO_NORTH) = mockPath x2
     // 2. First insertion attempt fails (null for first segment)
     // 3. Second insertion attempt succeeds (mockPath for all segments)
-    @SuppressWarnings("ConstantConditions")
-    CarpoolRouter routingFunction = (from, to) -> {
+    @SuppressWarnings("ConstantConditions") CarpoolRouter routingFunction = (from, to) -> {
       if (
         getCoordinate(from).equals(OSLO_CENTER) && getCoordinate(to).equals(OSLO_MIDPOINT_NORTH)
       ) {
@@ -231,8 +228,8 @@ class InsertionEvaluatorTest {
 
     CarpoolRouter routingFunction = (from, to) -> mockPath;
 
-    assertDoesNotThrow(() ->
-      findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction)
+    assertDoesNotThrow(
+      () -> findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction)
     );
   }
 
@@ -288,9 +285,8 @@ class InsertionEvaluatorTest {
       )
     );
 
-    @SuppressWarnings("ConstantConditions")
-    CarpoolRouter routingFunction = (from, to) ->
-      pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
+    @SuppressWarnings("ConstantConditions") CarpoolRouter routingFunction = (from, to) -> pathsMap
+      .get(new Pair<>(getCoordinate(from), getCoordinate(to)));
 
     var viablePositions = List.of(new InsertionPosition(1, 2), new InsertionPosition(2, 3));
 
@@ -361,8 +357,7 @@ class InsertionEvaluatorTest {
     );
 
     final int[] callCount = { 0 };
-    @SuppressWarnings("ConstantConditions")
-    CarpoolRouter routingFunction = (from, to) -> {
+    @SuppressWarnings("ConstantConditions") CarpoolRouter routingFunction = (from, to) -> {
       callCount[0]++;
       return pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
     };

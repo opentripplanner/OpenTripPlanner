@@ -46,8 +46,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
    */
   @BeforeEach
   public void setup() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         A     B
@@ -67,8 +66,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
     data.withTransferCost(100);
 
     // NOTE! No search-window is set.
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .constrainedTransfers(true)
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
@@ -82,7 +80,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ Walk 30s ~ C ~ BUS R2 0:05 0:10 ~ D ~ Walk 30s " +
-      "[0:01:10 0:10:40 9m30s Tₙ1 C₁1_260]";
+        "[0:01:10 0:10:40 9m30s Tₙ1 C₁1_260]";
     return RaptorModuleTestCase.of()
       // BUG! 10 minutes is wrong, it should be 9m30s - Raptor may drop optimal paths,
       // because of this!

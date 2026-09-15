@@ -70,8 +70,7 @@ public class TemporaryPartialStreetEdgeTest {
     var from = vertex("from", 0, 0);
     var to = vertex("to", 0.001, 0.002);
     var geom = GeometryUtils.makeLineString(0, 0, 0.001, 0.001, 0.002, 0.001);
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(from)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(from)
       .withToVertex(to)
       .withGeometry(geom)
       .withMeterLength(geom.getLength())
@@ -268,8 +267,7 @@ public class TemporaryPartialStreetEdgeTest {
     String name,
     double length
   ) {
-    return new TemporaryPartialStreetEdgeBuilder()
-      .withParentEdge(parentEdge)
+    return new TemporaryPartialStreetEdgeBuilder().withParentEdge(parentEdge)
       .withFromVertex(v1)
       .withToVertex(v2)
       .withGeometry(geometry)
@@ -299,8 +297,7 @@ public class TemporaryPartialStreetEdgeTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(vA)
+    return new StreetEdgeBuilder<>().withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withName(name)

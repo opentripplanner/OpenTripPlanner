@@ -28,8 +28,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * clean up of the internal OTP transit model.
  */
 abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule> implements
-  RaptorBoardOrAlightEvent<T>,
-  TripSchedule {
+  RaptorBoardOrAlightEvent<T>, TripSchedule {
 
   protected final TripPatternForDates raptorTripPattern;
   protected final TripTimes tripTimes;

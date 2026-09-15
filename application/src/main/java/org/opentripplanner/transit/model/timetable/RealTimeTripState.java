@@ -75,13 +75,11 @@ final class RealTimeTripState {
       return false;
     }
     RealTimeTripState that = (RealTimeTripState) o;
-    return (
-      timesModified == that.timesModified &&
+    return (timesModified == that.timesModified &&
       canceled == that.canceled &&
       added == that.added &&
       tripPatternModified == that.tripPatternModified &&
-      deleted == that.deleted
-    );
+      deleted == that.deleted);
   }
 
   @Override

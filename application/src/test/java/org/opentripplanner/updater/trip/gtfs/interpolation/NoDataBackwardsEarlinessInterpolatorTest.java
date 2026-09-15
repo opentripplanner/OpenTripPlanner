@@ -84,8 +84,7 @@ class NoDataBackwardsEarlinessInterpolatorTest {
 
     assertEquals(NO_DATA, builder.getStopRealTimeState(2));
 
-    assertThat(builder.stopRealTimeStates())
-      .asList()
+    assertThat(builder.stopRealTimeStates()).asList()
       .containsExactly(NO_DATA, CANCELLED, NO_DATA, DEFAULT, DEFAULT);
 
     assertNotNull(builder.build());

@@ -31,8 +31,10 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<String> headsign() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
+    return environment -> GraphQLUtils.getTranslation(
+      getSource(environment).getHeadsign(),
+      environment
+    );
   }
 
   @Override
@@ -57,10 +59,9 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<GraphQLTypes.GraphQLRealtimeState> realtimeState() {
-    return environment ->
-      getSource(environment).isCanceledEffectively()
-        ? GraphQLTypes.GraphQLRealtimeState.CANCELED
-        : RealtimeStateMapper.map(getSource(environment).getTripTimes());
+    return environment -> getSource(environment).isCanceledEffectively()
+      ? GraphQLTypes.GraphQLRealtimeState.CANCELED
+      : RealtimeStateMapper.map(getSource(environment).getTripTimes());
   }
 
   @Override

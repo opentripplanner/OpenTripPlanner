@@ -18,27 +18,23 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
   private final int maxNumberOfResultFields;
 
   public TransmodelAPIConfig(String parameterName, NodeAdapter root) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_1)
       .summary("Configuration for the Transmodel GraphQL API.")
       .asObject();
 
-    hideFeedId = c
-      .of("hideFeedId")
+    hideFeedId = c.of("hideFeedId")
       .summary("Hide the FeedId in all API output, and add it to input.")
       .description(
         "Only turn this feature on if you have unique ids across all feeds, without the " +
           "feedId prefix."
       )
       .asBoolean(false);
-    tracingHeaderTags = c
-      .of("tracingHeaderTags")
+    tracingHeaderTags = c.of("tracingHeaderTags")
       .summary("Used to group requests when monitoring OTP.")
       .asStringList(Set.of());
 
-    maxNumberOfResultFields = c
-      .of("maxNumberOfResultFields")
+    maxNumberOfResultFields = c.of("maxNumberOfResultFields")
       .since(V2_6)
       .summary("The maximum number of fields in a GraphQL result")
       .description(

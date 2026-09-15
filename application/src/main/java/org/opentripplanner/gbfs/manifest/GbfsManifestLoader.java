@@ -27,9 +27,9 @@ public class GbfsManifestLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsManifestLoader.class);
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-    .registerModule(new JavaTimeModule())
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(
+    new JavaTimeModule()
+  ).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   /**
    * Loads the manifest from a remote URL or a local {@code file:} path.
@@ -41,8 +41,7 @@ public class GbfsManifestLoader {
   @Nullable
   public static GBFSManifest loadManifest(URI url, HttpHeaders headers) {
     try (var httpClientFactory = new OtpHttpClientFactory()) {
-      var manifest = httpClientFactory
-        .create(LOG)
+      var manifest = httpClientFactory.create(LOG)
         .getAndMapAsJsonObject(url, headers, OBJECT_MAPPER, GBFSManifest.class);
       LOG.info("Loaded GBFS manifest from {}", url);
       return manifest;
@@ -61,8 +60,7 @@ public class GbfsManifestLoader {
     }
 
     // The generated version enum is declared oldest-first, so its natural order is ascending.
-    return dataset
-      .getVersions()
+    return dataset.getVersions()
       .stream()
       .sorted(Comparator.comparing(GBFSVersion::getVersion).reversed())
       .map(GBFSVersion::getUrl)

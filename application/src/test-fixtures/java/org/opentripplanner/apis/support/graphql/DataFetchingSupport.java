@@ -72,8 +72,7 @@ public class DataFetchingSupport {
   }
 
   private static ExecutionContextBuilder executionContextBuilder() {
-    return newExecutionContextBuilder()
-      .executionId(ExecutionId.from("test"))
+    return newExecutionContextBuilder().executionId(ExecutionId.from("test"))
       .graphQLContext(GraphQLContext.getDefault());
   }
 }

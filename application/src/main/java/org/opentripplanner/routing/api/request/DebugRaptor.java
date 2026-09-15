@@ -99,12 +99,10 @@ public class DebugRaptor implements Serializable {
       return false;
     }
     DebugRaptor that = (DebugRaptor) o;
-    return (
-      debugPathFromStopIndex == that.debugPathFromStopIndex &&
+    return (debugPathFromStopIndex == that.debugPathFromStopIndex &&
       Objects.equals(stops, that.stops) &&
       Objects.equals(path, that.path) &&
-      Objects.equals(eventTypes, that.eventTypes)
-    );
+      Objects.equals(eventTypes, that.eventTypes));
   }
 
   @Override

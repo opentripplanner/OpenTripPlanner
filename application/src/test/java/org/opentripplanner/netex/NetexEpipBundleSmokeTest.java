@@ -104,8 +104,7 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assertStops(Collection<RegularStop> stops) {
-    Map<FeedScopedId, RegularStop> map = stops
-      .stream()
+    Map<FeedScopedId, RegularStop> map = stops.stream()
       .collect(Collectors.toMap(RegularStop::getId, s -> s));
 
     RegularStop quay = map.get(fId("DE::Quay:800091_MastM::"));
@@ -120,8 +119,7 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assertStations(Collection<Station> stations) {
-    Map<FeedScopedId, Station> map = stations
-      .stream()
+    Map<FeedScopedId, Station> map = stations.stream()
       .collect(Collectors.toMap(Station::getId, s -> s));
     Station station = map.get(fId("DE::StopPlace:80026_Master::"));
     assertEquals("Bf. Altona", station.getName().toString());
@@ -133,8 +131,7 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assertTripPatterns(Collection<TripPattern> patterns) {
-    Map<FeedScopedId, TripPattern> map = patterns
-      .stream()
+    Map<FeedScopedId, TripPattern> map = patterns.stream()
       .collect(Collectors.toMap(TripPattern::getId, s -> s));
     TripPattern p = map.get(fId("DE::ServiceJourneyPattern:2234991_0::"));
     assertEquals("", p.getTripHeadsign().toString());
@@ -165,8 +162,7 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assertServiceIds(Collection<Trip> trips, Collection<FeedScopedId> serviceIds) {
-    Set<FeedScopedId> tripServiceIds = trips
-      .stream()
+    Set<FeedScopedId> tripServiceIds = trips.stream()
       .map(Trip::getServiceId)
       .collect(Collectors.toSet());
     assertEquals(tripServiceIds, Set.copyOf(serviceIds));

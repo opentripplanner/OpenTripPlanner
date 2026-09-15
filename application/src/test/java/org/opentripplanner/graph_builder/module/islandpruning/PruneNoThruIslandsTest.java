@@ -19,9 +19,8 @@ class PruneNoThruIslandsTest {
   @BeforeAll
   static void setup() {
     graph = buildOsmGraph(
-      ResourceLoader.of(PruneNoThruIslandsTest.class).file(
-        "herrenberg-island-prune-nothru.osm.pbf"
-      ),
+      ResourceLoader.of(PruneNoThruIslandsTest.class)
+        .file("herrenberg-island-prune-nothru.osm.pbf"),
       IslandPruningParameters.DEFAULTS
     );
   }
@@ -29,8 +28,7 @@ class PruneNoThruIslandsTest {
   @Test
   void bicycleIslandsBecomeNoThru() {
     assertTrue(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .filter(StreetEdge::isBicycleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
@@ -42,8 +40,7 @@ class PruneNoThruIslandsTest {
   @Test
   void carIslandsBecomeNoThru() {
     assertTrue(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .filter(StreetEdge::isMotorVehicleNoThruTraffic)
         .map(streetEdge -> streetEdge.getName().toString())
@@ -55,8 +52,7 @@ class PruneNoThruIslandsTest {
   @Test
   void pruneFloatingBikeAndWalkIsland() {
     assertFalse(
-      graph
-        .listStreetEdges()
+      graph.listStreetEdges()
         .stream()
         .map(streetEdge -> streetEdge.getName().toString())
         .collect(Collectors.toSet())

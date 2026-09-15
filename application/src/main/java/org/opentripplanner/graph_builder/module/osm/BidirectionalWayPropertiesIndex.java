@@ -55,10 +55,8 @@ class BidirectionalWayPropertiesIndex {
     var progress = ProgressTracker.track("Compute way properties", 5_000, ways.size());
     LOG.info(progress.startMessage());
 
-    var distinctProps = new ConcurrentHashMap<
-      BidirectionalWayProperties,
-      BidirectionalWayProperties
-    >();
+    var distinctProps =
+      new ConcurrentHashMap<BidirectionalWayProperties, BidirectionalWayProperties>();
     TLongObjectMap<BidirectionalWayProperties> index = new TLongObjectHashMap<>(ways.size());
     var synchronizedIndex = TCollections.synchronizedMap(index);
     ways.parallelStream().forEach(way -> {

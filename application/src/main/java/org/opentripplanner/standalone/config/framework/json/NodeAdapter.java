@@ -312,8 +312,7 @@ public class NodeAdapter {
   /* private methods */
 
   private Stream<String> allWarnings() {
-    Stream<String> childrenWarnings = childrenByName
-      .values()
+    Stream<String> childrenWarnings = childrenByName.values()
       .stream()
       .flatMap(NodeAdapter::allWarnings);
     return Stream.concat(childrenWarnings, warnings.stream());

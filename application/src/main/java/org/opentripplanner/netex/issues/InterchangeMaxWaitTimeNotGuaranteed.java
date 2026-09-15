@@ -7,7 +7,7 @@ public class InterchangeMaxWaitTimeNotGuaranteed implements DataImportIssue {
 
   private static final String MSG =
     "Interchange max-wait-time ignored. Max-wait-time is only supported for guaranteed " +
-    "interchanges. Interchange: %s";
+      "interchanges. Interchange: %s";
 
   private final ServiceJourneyInterchange interchange;
 

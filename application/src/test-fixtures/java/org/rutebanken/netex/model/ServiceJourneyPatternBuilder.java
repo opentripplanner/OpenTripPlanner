@@ -19,9 +19,7 @@ public class ServiceJourneyPatternBuilder {
    * Generates point in sequence and replaces the existing ones.
    */
   public ServiceJourneyPatternBuilder withPointsInSequence(int... orders) {
-    var items = Arrays.stream(orders)
-      .mapToObj(order -> pointInPattern(order, ACCESS))
-      .toList();
+    var items = Arrays.stream(orders).mapToObj(order -> pointInPattern(order, ACCESS)).toList();
     points.withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(items);
     return this;
   }
@@ -31,8 +29,7 @@ public class ServiceJourneyPatternBuilder {
     StopUseEnumeration stopUse
   ) {
     var point = pointInPattern(order, stopUse);
-    points
-      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+    points.getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .add(point);
     return this;
   }

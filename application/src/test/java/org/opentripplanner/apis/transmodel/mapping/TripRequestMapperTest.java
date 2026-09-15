@@ -86,10 +86,13 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private TransmodelGraphQLRequestContext context;
 
   static {
-    var itinerary = newItinerary(Place.forStop(STOP1), time("11:00"))
-      .bus(ROUTE1, 1, time("11:05"), time("11:20"), Place.forStop(STOP2))
-      .bus(ROUTE2, 2, time("11:20"), time("11:40"), Place.forStop(STOP3))
-      .build();
+    var itinerary = newItinerary(Place.forStop(STOP1), time("11:00")).bus(
+      ROUTE1,
+      1,
+      time("11:05"),
+      time("11:20"),
+      Place.forStop(STOP2)
+    ).bus(ROUTE2, 2, time("11:20"), time("11:40"), Place.forStop(STOP3)).build();
     var patterns = itineraryPatterns(itinerary);
 
     //TEST_MODEL.siteRepositoryBuilder()
@@ -104,8 +107,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
       TRANSIT_REPOSITORY.addTripPattern(pattern.getId(), pattern);
-      final int serviceCode = pattern
-        .getScheduledTimetable()
+      final int serviceCode = pattern.getScheduledTimetable()
         .getTripTimes()
         .getFirst()
         .getServiceCode();
@@ -122,13 +124,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
     // Change defaults for FLEXIBLE to a lower value than the default 45m. This should restrict the
     // input to be less than 20m, not 45m.
     final RouteRequest defaultRequest = RouteRequest.of()
-      .withPreferences(pb ->
-        pb.withStreet(sp ->
-          sp
-            .withAccessEgress(ae ->
-              ae.withMaxDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
-            )
-            .withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+      .withPreferences(
+        pb -> pb.withStreet(
+          sp -> sp.withAccessEgress(
+            ae -> ae.withMaxDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+          ).withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
         )
       )
       .buildDefault();
@@ -206,8 +206,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     Map<String, Object> arguments = arguments("maxAccessEgressDurationForMode", duration);
 
-    var ex = assertThrows(InvalidInputException.class, () ->
-      MAPPER.createRequest(executionContext(arguments))
+    var ex = assertThrows(
+      InvalidInputException.class,
+      () -> MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
       "Invalid duration for mode WALK. The value 45m1s is greater than the default 45m.",
@@ -221,8 +222,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "maxAccessEgressDurationForMode",
       List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
     );
-    var ex = assertThrows(InvalidInputException.class, () ->
-      MAPPER.createRequest(executionContext(arguments))
+    var ex = assertThrows(
+      InvalidInputException.class,
+      () -> MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
       "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
@@ -239,8 +241,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     Map<String, Object> arguments = arguments("maxDirectDurationForMode", duration);
 
-    var ex = assertThrows(InvalidInputException.class, () ->
-      MAPPER.createRequest(executionContext(arguments))
+    var ex = assertThrows(
+      InvalidInputException.class,
+      () -> MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
       "Invalid duration for mode WALK. The value 4h1s is greater than the default 4h.",
@@ -254,8 +257,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "maxDirectDurationForMode",
       List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
     );
-    var ex = assertThrows(InvalidInputException.class, () ->
-      MAPPER.createRequest(executionContext(arguments))
+    var ex = assertThrows(
+      InvalidInputException.class,
+      () -> MAPPER.createRequest(executionContext(arguments))
     );
     assertEquals(
       "Invalid duration for mode FLEXIBLE. The value 20m1s is greater than the default 20m.",
@@ -317,9 +321,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
     );
 
-    final List<ViaLocation> viaLocations = MAPPER.createRequest(
-      executionContext(arguments)
-    ).listViaLocations();
+    final List<ViaLocation> viaLocations = MAPPER.createRequest(executionContext(arguments))
+      .listViaLocations();
     assertEquals(
       "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
       viaLocations.get(0).toString()
@@ -451,8 +454,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   private static List<TripPattern> itineraryPatterns(final Itinerary itinerary) {
-    return itinerary
-      .legs()
+    return itinerary.legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)

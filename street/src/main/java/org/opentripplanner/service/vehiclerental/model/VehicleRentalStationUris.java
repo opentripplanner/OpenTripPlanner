@@ -102,11 +102,9 @@ public final class VehicleRentalStationUris {
       return false;
     }
     VehicleRentalStationUris that = (VehicleRentalStationUris) o;
-    return (
-      Objects.equals(android, that.android) &&
+    return (Objects.equals(android, that.android) &&
       Objects.equals(ios, that.ios) &&
-      Objects.equals(web, that.web)
-    );
+      Objects.equals(web, that.web));
   }
 
   @Override

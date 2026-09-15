@@ -71,8 +71,8 @@ class GraphPathFinder {
     // so initial renting states have correct zone membership for boundary-based tracking.
     if (
       request.arriveBy() &&
-      request.journey().direct().mode().includesRenting() &&
-      geofencingZoneService.hasIndexedZones()
+        request.journey().direct().mode().includesRenting() &&
+        geofencingZoneService.hasIndexedZones()
     ) {
       var destinationZones = computeZonesAtVertices(to);
       if (!destinationZones.isEmpty()) {

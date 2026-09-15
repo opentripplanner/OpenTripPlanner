@@ -25,8 +25,7 @@ public class LinkingNearEndTest {
   private static final Coordinate[] POINTS = {
     new Coordinate(25.007039006519058, 60.140565999664084),
     new Coordinate(25.007039, 60.140566),
-    new Coordinate(25.006999800000003, 60.1403405),
-  };
+    new Coordinate(25.006999800000003, 60.1403405), };
 
   private static final WgsCoordinate STOP = new WgsCoordinate(60.1405804, 25.007042);
 
@@ -60,9 +59,7 @@ public class LinkingNearEndTest {
       v2,
       SphericalDistanceLibrary.distance(v1.getCoordinate(), v2.getCoordinate()),
       StreetTraversalPermission.ALL
-    )
-      .withGeometry(geom)
-      .buildAndConnect();
+    ).withGeometry(geom).buildAndConnect();
     var env = new LinkingEnvironment(v1, v2);
 
     env.linkVertexPermanently(stopVertex);

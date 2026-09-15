@@ -42,8 +42,9 @@ class PlatformRelationWithTwoHolesAndStairsTest {
   void platformRelationConnectedToTwoStairways() {
     var summarizer = buildSummarizer(50);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // outer ring (5 segments × 2 directions) — ped splits the north side into two segments
         "(0,0) → (0.002,0) PEDESTRIAN ♿✅",
@@ -109,8 +110,9 @@ class PlatformRelationWithTwoHolesAndStairsTest {
     // order of the candidate set, which is not stable across JVM runs. We therefore only assert the
     // deterministic mandatory edges here; the point of this case is that a budget smaller than the
     // candidate count does not drop any of them.
-    assertWithMessage("Missing mandatory edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Missing mandatory edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsAtLeast(
         // outer ring (5 segments × 2 directions) — ped splits the north side into two segments
         "(0,0) → (0.002,0) PEDESTRIAN ♿✅",

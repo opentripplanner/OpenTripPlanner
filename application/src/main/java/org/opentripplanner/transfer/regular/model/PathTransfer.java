@@ -104,8 +104,8 @@ public class PathTransfer implements Serializable {
 
     var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
 
-    return state.map(s ->
-      new DefaultRaptorTransfer(
+    return state.map(
+      s -> new DefaultRaptorTransfer(
         to.getIndex(),
         (int) s.getElapsedTimeSeconds(),
         CostLimit.toRaptorCostWholeSeconds(s.getWeight()),

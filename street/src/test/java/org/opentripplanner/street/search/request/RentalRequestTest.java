@@ -26,8 +26,7 @@ class RentalRequestTest {
 
   {
     RentalRequest.Builder builder = RentalRequest.of();
-    subject = builder
-      .withPickupTime(Duration.ofSeconds(PICKUP_TIME))
+    subject = builder.withPickupTime(Duration.ofSeconds(PICKUP_TIME))
       .withPickupCost(costOfSeconds(PICKUP_COST))
       .withDropOffTime(Duration.ofSeconds(DROPOFF_TIME))
       .withDropOffCost(costOfSeconds(DROPOFF_COST))

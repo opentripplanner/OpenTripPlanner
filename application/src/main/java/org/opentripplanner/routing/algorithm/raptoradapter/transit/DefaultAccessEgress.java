@@ -163,12 +163,10 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     if (!(o instanceof RoutingAccessEgress that)) {
       return false;
     }
-    return (
-      stop() == that.stop() &&
+    return (stop() == that.stop() &&
       durationInSeconds() == that.durationInSeconds() &&
       c1() == that.c1() &&
-      penalty().equals(that.penalty())
-    );
+      penalty().equals(that.penalty()));
   }
 
   @Override

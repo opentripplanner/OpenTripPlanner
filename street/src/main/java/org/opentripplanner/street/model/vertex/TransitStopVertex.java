@@ -101,13 +101,10 @@ public class TransitStopVertex extends StationElementVertex {
   }
 
   private boolean isLinkedToEdgeWhichAllows(TraverseMode traverseMode) {
-    return getOutgoing()
-      .stream()
+    return getOutgoing().stream()
       .anyMatch(
-        edge ->
-          edge instanceof StreetTransitEntityLink<?> link &&
-          link
-            .getToVertex()
+        edge -> edge instanceof StreetTransitEntityLink<?> link &&
+          link.getToVertex()
             .getOutgoingStreetEdges()
             .stream()
             .anyMatch(se -> se.canTraverse(traverseMode))

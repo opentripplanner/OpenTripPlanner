@@ -29,11 +29,11 @@ public final class PatternRideC2<T extends RaptorTripSchedule> extends AbstractP
     this.c2 = c2;
   }
 
-  public static <T extends RaptorTripSchedule> ParetoComparator<
-    PatternRideC2<T>
-  > comparatorRelaxedC1IfC2IsOptimal(RelaxFunction relaxC1, DominanceFunction dominanceFunctionC2) {
-    return (l, r) ->
-      l.compareArrivalTime(r) ||
+  public static <T extends RaptorTripSchedule> ParetoComparator<PatternRideC2<T>> comparatorRelaxedC1IfC2IsOptimal(
+    RelaxFunction relaxC1,
+    DominanceFunction dominanceFunctionC2
+  ) {
+    return (l, r) -> l.compareArrivalTime(r) ||
       (dominanceFunctionC2.leftDominateRight(l.c2, r.c2)
         ? l.compareC1(relaxC1, r)
         : l.compareC1(r));

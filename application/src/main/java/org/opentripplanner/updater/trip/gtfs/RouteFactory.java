@@ -39,43 +39,38 @@ class RouteFactory {
     var tripId = update.tripId();
     // the route in this update doesn't already exist, but the update contains the information so it will be created
     var routeId = update.routeId();
-    return routeId
-      .map(id -> {
-        var builder = Route.of(id);
+    return routeId.map(id -> {
+      var builder = Route.of(id);
 
-        var addedRouteExtension = AddedRoute.ofTripDescriptor(update);
+      var addedRouteExtension = AddedRoute.ofTripDescriptor(update);
 
-        var agency = transitService
-          .findAgency(new FeedScopedId(tripId.getFeedId(), addedRouteExtension.agencyId()))
-          .orElseGet(() -> fallbackAgency(tripId.getFeedId()));
+      var agency = transitService.findAgency(
+        new FeedScopedId(tripId.getFeedId(), addedRouteExtension.agencyId())
+      ).orElseGet(() -> fallbackAgency(tripId.getFeedId()));
 
-        builder.withAgency(agency);
+      builder.withAgency(agency);
 
-        builder.withGtfsType(addedRouteExtension.routeType());
-        var mode = TransitModeMapper.mapMode(addedRouteExtension.routeType());
-        builder.withMode(mode);
+      builder.withGtfsType(addedRouteExtension.routeType());
+      var mode = TransitModeMapper.mapMode(addedRouteExtension.routeType());
+      builder.withMode(mode);
 
+      // Create route name
+      var name = Objects.requireNonNullElse(addedRouteExtension.routeLongName(), tripId.toString());
+      builder.withLongName(new NonLocalizedString(name));
+      builder.withUrl(addedRouteExtension.routeUrl());
+      return builder.build();
+    }).orElseGet(() -> {
+      I18NString longName = NonLocalizedString.ofNullable(tripId.getId());
+      return Route.of(tripId)
+        .withAgency(fallbackAgency(tripId.getFeedId()))
+        // Guess the route type as it doesn't exist yet in the specifications
+        // Bus. Used for short- and long-distance bus routes.
+        .withGtfsType(3)
+        .withMode(TransitMode.BUS)
         // Create route name
-        var name = Objects.requireNonNullElse(
-          addedRouteExtension.routeLongName(),
-          tripId.toString()
-        );
-        builder.withLongName(new NonLocalizedString(name));
-        builder.withUrl(addedRouteExtension.routeUrl());
-        return builder.build();
-      })
-      .orElseGet(() -> {
-        I18NString longName = NonLocalizedString.ofNullable(tripId.getId());
-        return Route.of(tripId)
-          .withAgency(fallbackAgency(tripId.getFeedId()))
-          // Guess the route type as it doesn't exist yet in the specifications
-          // Bus. Used for short- and long-distance bus routes.
-          .withGtfsType(3)
-          .withMode(TransitMode.BUS)
-          // Create route name
-          .withLongName(longName)
-          .build();
-      });
+        .withLongName(longName)
+        .build();
+    });
   }
 
   private Optional<Route> findRoute(TripUpdate tripUpdate) {

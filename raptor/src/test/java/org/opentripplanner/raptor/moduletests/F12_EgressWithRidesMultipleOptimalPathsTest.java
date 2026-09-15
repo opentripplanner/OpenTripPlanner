@@ -68,21 +68,21 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
   @BeforeEach
   public void setup() {
-    data.access("Free ~ A").withTimetables(
-      """
-      A     C
-      0:04  0:20
-      --
-      A     B
-      0:05  0:16
-      """
-    );
+    data.access("Free ~ A")
+      .withTimetables(
+        """
+        A     C
+        0:04  0:20
+        --
+        A     B
+        0:05  0:16
+        """
+      );
 
     // We will test board- and alight-slack in a separate test
     data.withSlackProvider(new TestSlackProvider(D1_m, D0_s, D0_s));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .searchWindowInSeconds(D20_m)
       .latestArrivalTime(T00_30);
@@ -93,8 +93,8 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
     return RaptorModuleTestCase.of()
       // with Flex egress as the best destination arrival-time
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D7_m))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D7_m))
       )
       .add(TC_MIN_DURATION, "[0:00 0:21 21m Tₙ1]", "[0:00 0:23 23m Tₙ0]")
       .add(TC_MIN_DURATION_REV, "[0:09 0:30 21m Tₙ0]")
@@ -115,8 +115,8 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
     return RaptorModuleTestCase.of()
       // with walk egress as the best destination arrival-time
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D5_m))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D5_m))
       )
       .addMinDuration("21m", TX_0, T00_00, T00_30)
       .add(standard().forwardOnly(), withoutCost(EXPECTED_PATH_WALK_5_m))

@@ -158,8 +158,12 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     Vertex vertex,
     Duration searchLimit
   ) {
-    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit), (existing, added) ->
-      existing.searchLimit().compareTo(added.searchLimit()) >= 0 ? existing : added
+    registrations.merge(
+      vertex,
+      new VertexRegistration(vertex, searchLimit),
+      (existing, added) -> existing.searchLimit().compareTo(added.searchLimit()) >= 0
+        ? existing
+        : added
     );
   }
 

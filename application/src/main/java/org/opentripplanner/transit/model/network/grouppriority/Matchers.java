@@ -58,8 +58,7 @@ final class Matchers {
 
   @SuppressWarnings("unchecked")
   static Matcher[] of(Collection<TransitGroupSelect> selectors) {
-    return selectors
-      .stream()
+    return selectors.stream()
       .map(Matchers::of)
       .filter(Predicate.not(Matcher::isEmpty))
       .toArray(Matcher[]::new);
@@ -70,10 +69,7 @@ final class Matchers {
   }
 
   private static <T> String colToString(BinarySetOperator op, Collection<T> values) {
-    return values
-      .stream()
-      .map(Objects::toString)
-      .collect(Collectors.joining(" " + op + " "));
+    return values.stream().map(Objects::toString).collect(Collectors.joining(" " + op + " "));
   }
 
   private static Matcher andOf(List<Matcher> list) {
@@ -139,10 +135,7 @@ final class Matchers {
       Function<EntityAdapter, String> toValue
     ) {
       this.typeName = typeName;
-      this.patterns = regexps
-        .stream()
-        .map(Pattern::compile)
-        .toArray(Pattern[]::new);
+      this.patterns = regexps.stream().map(Pattern::compile).toArray(Pattern[]::new);
       this.matchers = Arrays.stream(this.patterns)
         .map(p -> p.matcher(""))
         .toArray(java.util.regex.Matcher[]::new);

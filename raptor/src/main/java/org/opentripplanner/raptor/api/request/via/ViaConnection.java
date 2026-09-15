@@ -39,9 +39,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 /// The min-wait-time in the {@link RaptorViaLocation} is added to the transfers
 /// {@code durationInSeconds}. The calculation of `c1` should include the walk time, but not the
 /// min-wait-time (assuming all connections have the same minimum wait time).
-public abstract sealed class ViaConnection
-  permits RaptorPassThroughViaConnection, RaptorTransferViaConnection, RaptorVisitStopViaConnection
-{
+public abstract sealed class ViaConnection permits RaptorPassThroughViaConnection,
+  RaptorTransferViaConnection, RaptorVisitStopViaConnection {
 
   private final int fromStop;
 

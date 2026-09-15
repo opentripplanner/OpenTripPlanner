@@ -10,9 +10,8 @@ import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
  * buffer instance, and {@link #freeze} publishes an immutable snapshot of it (after optionally
  * purging expired data).
  */
-public class TimetableRepositoryLifecycle
-  implements RepositoryLifecycle<TimetableRepositorySnapshot, TimetableRepository>
-{
+public class TimetableRepositoryLifecycle implements
+  RepositoryLifecycle<TimetableRepositorySnapshot, TimetableRepository> {
 
   private final TimetableRepository buffer;
   private final boolean purgeExpiredData;

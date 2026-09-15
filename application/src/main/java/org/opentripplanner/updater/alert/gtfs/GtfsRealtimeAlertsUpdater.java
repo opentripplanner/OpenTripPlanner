@@ -20,10 +20,8 @@ import org.slf4j.LoggerFactory;
 /**
  * GTFS-RT alerts updater
  */
-public class GtfsRealtimeAlertsUpdater
-  extends PollingGraphUpdater<TransitRealTimeUpdateContext>
-  implements TransitAlertProvider
-{
+public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater<TransitRealTimeUpdateContext>
+  implements TransitAlertProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 
@@ -66,8 +64,10 @@ public class GtfsRealtimeAlertsUpdater
 
   @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
-    final FeedMessage feed = otpHttpClient.getAndMap(URI.create(url), this.headers, response ->
-      FeedMessage.parseFrom(response.body())
+    final FeedMessage feed = otpHttpClient.getAndMap(
+      URI.create(url),
+      this.headers,
+      response -> FeedMessage.parseFrom(response.body())
     );
 
     long feedTimestamp = feed.getHeader().getTimestamp();

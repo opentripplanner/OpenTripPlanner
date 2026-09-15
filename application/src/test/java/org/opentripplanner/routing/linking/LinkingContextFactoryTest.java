@@ -54,27 +54,22 @@ class LinkingContextFactoryTest {
 
   private final TransitRepositoryForTest testModel = TransitRepositoryForTest.of();
 
-  private final Station stationAlpha = testModel
-    .station("alpha")
+  private final Station stationAlpha = testModel.station("alpha")
     .withId(ALPHA_ID)
     .withCoordinate(CENTER)
     .withShouldRouteToCentroid(true)
     .build();
 
-  private final RegularStop stopA = testModel
-    .stop("A")
+  private final RegularStop stopA = testModel.stop("A")
     .withCoordinate(CENTER.moveEastMeters(DISTANCE))
     .build();
-  private final RegularStop stopB = testModel
-    .stop("B")
+  private final RegularStop stopB = testModel.stop("B")
     .withCoordinate(CENTER.moveSouthMeters(DISTANCE))
     .build();
-  private final RegularStop stopC = testModel
-    .stop("C")
+  private final RegularStop stopC = testModel.stop("C")
     .withCoordinate(CENTER.moveWestMeters(DISTANCE))
     .build();
-  private final RegularStop stopD = testModel
-    .stop("D")
+  private final RegularStop stopD = testModel.stop("D")
     .withCoordinate(CENTER.moveNorthMeters(DISTANCE))
     .build();
   private final Graph graph = buildGraph(stationAlpha, stopA, stopB, stopC, stopD);
@@ -86,8 +81,7 @@ class LinkingContextFactoryTest {
     vertexCreationService
   );
 
-  private final SiteRepository siteRepository = testModel
-    .siteRepositoryBuilder()
+  private final SiteRepository siteRepository = testModel.siteRepositoryBuilder()
     .withRegularStops(List.of(stopA, stopB, stopC, stopD))
     .build();
 
@@ -176,8 +170,7 @@ class LinkingContextFactoryTest {
 
   @Test
   void stationCentroidForCar() {
-    var multiModalStation = testModel
-      .multiModalStation("MultiModal")
+    var multiModalStation = testModel.multiModalStation("MultiModal")
       .withCoordinate(CENTER.moveEastMeters(DISTANCE))
       .withChildStations(List.of(stationAlpha))
       .build();
@@ -368,8 +361,9 @@ class LinkingContextFactoryTest {
       .withTo(to)
       .withDirectMode(StreetMode.WALK)
       .build();
-    var exception = assertThrows(RoutingValidationException.class, () ->
-      linkingContextFactory.create(container, viaRequest)
+    var exception = assertThrows(
+      RoutingValidationException.class,
+      () -> linkingContextFactory.create(container, viaRequest)
     );
     container.close();
     assertThat(exception.getRoutingErrors()).hasSize(1);
@@ -387,8 +381,9 @@ class LinkingContextFactoryTest {
       .withViaLocationsWithCoordinates(List.of(GenericLocation.fromCoordinate(87.0, 87.0, "Via1")))
       .withDirectMode(StreetMode.WALK)
       .build();
-    var exception = assertThrows(RoutingValidationException.class, () ->
-      linkingContextFactory.create(container, request)
+    var exception = assertThrows(
+      RoutingValidationException.class,
+      () -> linkingContextFactory.create(container, request)
     );
     container.close();
 
@@ -413,8 +408,9 @@ class LinkingContextFactoryTest {
       .withTo(sameLocation)
       .withDirectMode(StreetMode.WALK)
       .build();
-    var exception = assertThrows(RoutingValidationException.class, () ->
-      linkingContextFactory.create(container, request)
+    var exception = assertThrows(
+      RoutingValidationException.class,
+      () -> linkingContextFactory.create(container, request)
     );
     container.close();
 
@@ -512,8 +508,7 @@ class LinkingContextFactoryTest {
   }
 
   private Set<RegularStop> toStops(Set<? extends Vertex> fromVertices) {
-    return fromVertices
-      .stream()
+    return fromVertices.stream()
       .map(v -> ((TransitStopVertex) v).getId())
       .map(siteRepository::getRegularStop)
       .collect(Collectors.toUnmodifiableSet());
@@ -528,22 +523,22 @@ class LinkingContextFactoryTest {
   }
 
   private boolean outgoingEdgeIsTraversableWith(Collection<Edge> edges, TraverseMode mode) {
-    return edges.stream().anyMatch(outgoing ->
-      outgoing
-        .getToVertex()
-        .getOutgoingStreetEdges()
-        .stream()
-        .anyMatch(edge -> edge.canTraverse(mode))
-    );
+    return edges.stream()
+      .anyMatch(
+        outgoing -> outgoing.getToVertex()
+          .getOutgoingStreetEdges()
+          .stream()
+          .anyMatch(edge -> edge.canTraverse(mode))
+      );
   }
 
   private boolean incomingEdgeIsTraversableWith(Collection<Edge> edges, TraverseMode mode) {
-    return edges.stream().anyMatch(incoming ->
-      incoming
-        .getFromVertex()
-        .getIncomingStreetEdges()
-        .stream()
-        .anyMatch(edge -> edge.canTraverse(mode))
-    );
+    return edges.stream()
+      .anyMatch(
+        incoming -> incoming.getFromVertex()
+          .getIncomingStreetEdges()
+          .stream()
+          .anyMatch(edge -> edge.canTraverse(mode))
+      );
   }
 }

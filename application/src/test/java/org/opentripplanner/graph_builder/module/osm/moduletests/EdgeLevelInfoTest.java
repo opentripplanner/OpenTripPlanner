@@ -255,9 +255,8 @@ public class EdgeLevelInfoTest {
     StreetDetailsRepository streetDetailsRepository
   ) {
     return StreamSupport.stream(graph.listEdges().spliterator(), false)
-      .flatMap(edge ->
-        streetDetailsRepository
-          .findInclinedEdgeLevelInfo(edge)
+      .flatMap(
+        edge -> streetDetailsRepository.findInclinedEdgeLevelInfo(edge)
           .map(Stream::of)
           .orElseGet(Stream::empty)
       )
@@ -269,9 +268,8 @@ public class EdgeLevelInfoTest {
     StreetDetailsRepository streetDetailsRepository
   ) {
     return StreamSupport.stream(graph.listEdges().spliterator(), false)
-      .flatMap(edge ->
-        streetDetailsRepository
-          .findHorizontalEdgeLevelInfo(edge)
+      .flatMap(
+        edge -> streetDetailsRepository.findHorizontalEdgeLevelInfo(edge)
           .map(Stream::of)
           .orElseGet(Stream::empty)
       )

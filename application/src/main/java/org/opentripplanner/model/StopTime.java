@@ -242,8 +242,7 @@ public final class StopTime implements Comparable<StopTime> {
 
   @Override
   public String toString() {
-    return (
-      "StopTime(seq=" +
+    return ("StopTime(seq=" +
       getStopSequence() +
       " stop=" +
       getStop().getId() +
@@ -253,8 +252,7 @@ public final class StopTime implements Comparable<StopTime> {
       TimeUtils.timeToStrLong(getArrivalTime()) +
       "-" +
       TimeUtils.timeToStrLong(getDepartureTime()) +
-      ")"
-    );
+      ")");
   }
 
   private static int getAvailableTime(int... times) {

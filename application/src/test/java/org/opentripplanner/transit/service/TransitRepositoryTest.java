@@ -60,14 +60,13 @@ class TransitRepositoryTest {
     // Should throw on second bundle, with different agency time zone
     assertThrows(
       IllegalStateException.class,
-      () ->
-        ConstantsForTests.addGtfsToGraph(
-          graph,
-          transitRepository,
-          RESOURCE_LOADER.file("kcm_gtfs.zip"),
-          new GtfsFareServiceFactory(),
-          null
-        ),
+      () -> ConstantsForTests.addGtfsToGraph(
+        graph,
+        transitRepository,
+        RESOURCE_LOADER.file("kcm_gtfs.zip"),
+        new GtfsFareServiceFactory(),
+        null
+      ),
       "The graph contains agencies with different time zones. " +
         "Please configure the one to be used in the " +
         BUILD_CONFIG_FILENAME
@@ -134,10 +133,9 @@ class TransitRepositoryTest {
     var S23 = TransitRepositoryForTest.of().stop("S23").build();
     var R1 = route("R1").withMode(TransitMode.BUS).build();
     var R2 = route("R2").withMode(TransitMode.BUS).build();
-    var TP1 = tripPattern("TP1", R1)
-      .withStopPattern(stopPattern(S11, S12, S13))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
+    var TP1 = tripPattern("TP1", R1).withStopPattern(stopPattern(S11, S12, S13))
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(
           ScheduledTripTimes.of()
             .withTrip(TransitRepositoryForTest.trip("T1").build())
             .withDepartureTimes("00:00 01:00 02:00")
@@ -145,10 +143,9 @@ class TransitRepositoryTest {
         )
       )
       .build();
-    var TP2 = tripPattern("TP2", R2)
-      .withStopPattern(stopPattern(S21, S22, S23))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
+    var TP2 = tripPattern("TP2", R2).withStopPattern(stopPattern(S21, S22, S23))
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(
           ScheduledTripTimes.of()
             .withTrip(
               TransitRepositoryForTest.trip("T2").withBikesAllowed(BikeAccess.ALLOWED).build()
@@ -174,10 +171,9 @@ class TransitRepositoryTest {
     var S23 = TransitRepositoryForTest.of().stop("S23").build();
     var R1 = route("R1").withMode(TransitMode.RAIL).build();
     var R2 = route("R2").withMode(TransitMode.RAIL).build();
-    var TP1 = tripPattern("TP1", R1)
-      .withStopPattern(stopPattern(S11, S12, S13))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
+    var TP1 = tripPattern("TP1", R1).withStopPattern(stopPattern(S11, S12, S13))
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(
           ScheduledTripTimes.of()
             .withTrip(TransitRepositoryForTest.trip("T1").build())
             .withDepartureTimes("00:00 01:00 02:00")
@@ -185,10 +181,9 @@ class TransitRepositoryTest {
         )
       )
       .build();
-    var TP2 = tripPattern("TP2", R2)
-      .withStopPattern(stopPattern(S21, S22, S23))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
+    var TP2 = tripPattern("TP2", R2).withStopPattern(stopPattern(S21, S22, S23))
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(
           ScheduledTripTimes.of()
             .withTrip(
               TransitRepositoryForTest.trip("T2").withCarsAllowed(CarAccess.ALLOWED).build()

@@ -88,13 +88,11 @@ class LuceneIndexTest {
     .withCoordinate(52.52277, 13.41046)
     .build();
 
-  private static final RegularStop MERIDIAN_AVE = TEST_MODEL.stop(
-    "Meridian Ave N & N 148th St"
-  ).build();
+  private static final RegularStop MERIDIAN_AVE = TEST_MODEL.stop("Meridian Ave N & N 148th St")
+    .build();
   private static final RegularStop MERIDIAN_N1 = TEST_MODEL.stop("Meridian N & Spencer").build();
-  private static final RegularStop MERIDIAN_N2 = TEST_MODEL.stop(
-    "N 205th St & Meridian Ave N"
-  ).build();
+  private static final RegularStop MERIDIAN_N2 = TEST_MODEL.stop("N 205th St & Meridian Ave N")
+    .build();
 
   private static final String FLEX_ZONE_NAME = "CCCCC";
   private static final AreaStop FLEX_ZONE = TEST_MODEL.areaStop(FLEX_ZONE_NAME)
@@ -119,16 +117,13 @@ class LuceneIndexTest {
       MERIDIAN_AVE
     ).forEach(siteRepository::withRegularStop);
     siteRepository.withAreaStop(FLEX_ZONE);
-    List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION).forEach(
-      siteRepository::withStation
-    );
+    List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
+      .forEach(siteRepository::withStation);
     var transitRepository = new TransitRepository(siteRepository.build());
     transitRepository.index();
     var transitService = new DefaultTransitService(transitRepository) {
-      private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
-        StopLocation,
-        TransitMode
-      >builder()
+      private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap
+        .<StopLocation, TransitMode>builder()
         .putAll(WESTHAFEN, FERRY, BUS)
         .build();
 
@@ -195,8 +190,7 @@ class LuceneIndexTest {
         "alexand",
         "alexander platz",
         "alexander-platz",
-        "alexander",
-      }
+        "alexander", }
     )
     void stopClustersWithTypos(String searchTerm) {
       var results = index.queryStopClusters(searchTerm, null).toList();
@@ -242,8 +236,7 @@ class LuceneIndexTest {
         "five & points",
         "five and the points",
         "points five",
-        "points fife",
-      }
+        "points fife", }
     )
     void stopClustersWithSpace(String query) {
       var result = index.queryStopClusters(query, null).map(primaryId()).toList();
@@ -293,18 +286,12 @@ class LuceneIndexTest {
         "Meridian & N 148",
         "Meridian Ave 148",
         "Meridian Av 148",
-        "meridian av 148",
-      }
+        "meridian av 148", }
     )
     void numericAdjectives(String query) {
-      var names = index
-        .queryStopClusters(query, null)
-        .map(c -> c.primary().name())
-        .toList();
+      var names = index.queryStopClusters(query, null).map(c -> c.primary().name()).toList();
       assertEquals(
-        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1)
-          .map(s -> s.getName().toString())
-          .toList(),
+        Stream.of(MERIDIAN_AVE, MERIDIAN_N2, MERIDIAN_N1).map(s -> s.getName().toString()).toList(),
         names
       );
     }

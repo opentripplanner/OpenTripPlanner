@@ -29,8 +29,7 @@ public class B05_EgressStopBoardAlightTransferCostTest implements RaptorTestCons
 
   @BeforeEach
   void setup() {
-    data
-      .access("Free ~ B")
+    data.access("Free ~ B")
       .withTimetables(
         """
         B     C

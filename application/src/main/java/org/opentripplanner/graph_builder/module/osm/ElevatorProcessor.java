@@ -107,14 +107,13 @@ class ElevatorProcessor {
     this.osmdb = osmdb;
     this.vertexGenerator = vertexGenerator;
     this.vertexFactory = new VertexFactory(graph);
-    this.osmEntityDurationIssueConsumer = v ->
-      issueStore.add(
-        Issue.issue(
-          "InvalidDuration",
-          "Duration for osm node {} is not a valid duration: '{}'; the value is ignored.",
-          v
-        )
-      );
+    this.osmEntityDurationIssueConsumer = v -> issueStore.add(
+      Issue.issue(
+        "InvalidDuration",
+        "Duration for osm node {} is not a valid duration: '{}'; the value is ignored.",
+        v
+      )
+    );
     this.issueStore = issueStore;
     this.streetDetailsRepository = streetDetailsRepository;
     this.elevatorRefTags = elevatorRefTags;
@@ -146,13 +145,7 @@ class ElevatorProcessor {
       }
 
       List<OsmElevatorKey> osmElevatorKeys = new ArrayList<>(vertices.keySet());
-      if (
-        osmElevatorKeys
-          .stream()
-          .map(key -> verticeLevels.get(key))
-          .distinct()
-          .count() == 1
-      ) {
+      if (osmElevatorKeys.stream().map(key -> verticeLevels.get(key)).distinct().count() == 1) {
         issueStore.add(new AllWaysOfElevatorNodeOnSameLevel(node));
       }
       // Sort to make logic correct and create a deterministic order.
@@ -174,16 +167,12 @@ class ElevatorProcessor {
       }
 
       var wheelchair = node.explicitWheelchairAccessibility();
-      long travelTime = node
-        .getDuration(osmEntityDurationIssueConsumer)
+      long travelTime = node.getDuration(osmEntityDurationIssueConsumer)
         .map(Duration::toSeconds)
         .orElse(-1L);
       createElevatorHopEdges(
         elevatorHopVertices,
-        osmElevatorKeys
-          .stream()
-          .map(key -> verticeLevels.get(key))
-          .toList(),
+        osmElevatorKeys.stream().map(key -> verticeLevels.get(key)).toList(),
         wheelchair,
         !node.isBicycleDenied(),
         (int) travelTime,
@@ -262,8 +251,7 @@ class ElevatorProcessor {
       }
 
       var wheelchair = way.explicitWheelchairAccessibility();
-      long travelTime = way
-        .getDuration(osmEntityDurationIssueConsumer)
+      long travelTime = way.getDuration(osmEntityDurationIssueConsumer)
         .map(Duration::toSeconds)
         .orElse(-1L);
       createElevatorHopEdges(

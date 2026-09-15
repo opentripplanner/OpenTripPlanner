@@ -53,8 +53,9 @@ public class PageCursorFactory {
     Instant lat,
     Duration searchWindow
   ) {
-    this.currentPageType =
-      pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
+    this.currentPageType = pageType == null
+      ? resolvePageTypeForTheFirstSearch(sortOrder)
+      : pageType;
     this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
       pageType,
       firstItineraryResultDeparture,
@@ -165,8 +166,7 @@ public class PageCursorFactory {
         prevEdt = edtBeforeNewSw();
         nextEdt = pageCursorInput.earliestRemovedDeparture();
       } else {
-        prevEdt = pageCursorInput
-          .latestRemovedDeparture()
+        prevEdt = pageCursorInput.latestRemovedDeparture()
           .minus(newSearchWindow)
           .plus(SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION);
         nextEdt = edtAfterUsedSw();

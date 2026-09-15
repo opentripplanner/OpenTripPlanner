@@ -150,8 +150,9 @@ public class DefaultRoutingService implements RoutingService {
   public ViaRoutingResponse route(RouteViaRequest request) {
     LOG.debug("Request: {}", request);
     OTPRequestTimeoutException.checkForTimeout();
-    var viaRoutingWorker = new ViaRoutingWorker(request, req ->
-      newRoutingWorker(mapRequest(req)).route()
+    var viaRoutingWorker = new ViaRoutingWorker(
+      request,
+      req -> newRoutingWorker(mapRequest(req)).route()
     );
     // TODO: Add output logging here, see route(..) method
     return viaRoutingWorker.route();

@@ -69,8 +69,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private PathBuilderLeg(MyLeg leg) {
     this.leg = leg;
     if (leg.isTransit()) {
-      @SuppressWarnings("unchecked")
-      var transit = (MyTransitLeg<T>) leg;
+      @SuppressWarnings("unchecked") var transit = (MyTransitLeg<T>) leg;
       this.fromTime = transit.fromTime();
       this.toTime = transit.toTime();
     }
@@ -475,8 +474,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     boolean withTransferSlack
   ) {
     var leg = asTransitLeg();
-    int slack =
-      slackProvider.boardSlack(leg.trip.pattern().slackIndex()) +
+    int slack = slackProvider.boardSlack(leg.trip.pattern().slackIndex()) +
       (withTransferSlack ? slackProvider.transferSlack() : 0);
 
     return leg.fromTime() - slack;
@@ -527,8 +525,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private void setTransferTimeBasedOnPreviousLeg(RaptorSlackProvider slackProvider) {
     int newFromTime;
     if (prev.isTransit()) {
-      newFromTime =
-        prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
+      newFromTime = prev.toTime() +
+        slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
     } else if (prev.isAccess()) {
       newFromTime = prev.toTime();
     } else {
@@ -579,10 +577,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var prevTransit = prevTransitLeg();
     var txBeforeLeg = prevTransit == null ? null : prevTransit.constrainedTransferAfterLeg();
-    var transferConstraint =
-      txBeforeLeg == null
-        ? RaptorTransferConstraint.REGULAR_TRANSFER
-        : txBeforeLeg.getTransferConstraint();
+    var transferConstraint = txBeforeLeg == null
+      ? RaptorTransferConstraint.REGULAR_TRANSFER
+      : txBeforeLeg.getTransferConstraint();
     boolean firstBoarding = prev != null && prev.isAccessWithoutRides();
 
     int boardCost = costCalculator.boardingCost(
@@ -613,8 +610,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var egressPath = asEgressLeg().streetPath;
 
-    final int egressCost =
-      egressPath.c1() + costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
+    final int egressCost = egressPath.c1() +
+      costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
 
     if (prev == null) {
       return egressCost;

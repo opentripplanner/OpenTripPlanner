@@ -46,12 +46,10 @@ public class FareRuleSet implements Serializable {
    * @return True if any rules have been added.
    */
   public boolean hasRules() {
-    return (
-      !routes.isEmpty() ||
+    return (!routes.isEmpty() ||
       !originDestinations.isEmpty() ||
       !routeOriginDestinations.isEmpty() ||
-      !contains.isEmpty()
-    );
+      !contains.isEmpty());
   }
 
   public void addContains(String containsId) {
@@ -134,13 +132,13 @@ public class FareRuleSet implements Serializable {
     // as trimet does
     if (
       fareAttribute.isTransferDurationSet() &&
-      tripTime.getSeconds() > fareAttribute.getTransferDuration()
+        tripTime.getSeconds() > fareAttribute.getTransferDuration()
     ) {
       return false;
     }
     if (
       fareAttribute.isJourneyDurationSet() &&
-      journeyTime.getSeconds() > fareAttribute.getJourneyDuration()
+        journeyTime.getSeconds() > fareAttribute.getJourneyDuration()
     ) {
       return false;
     }

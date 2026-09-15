@@ -58,12 +58,8 @@ public final class CompactLineStringSequence implements Serializable {
     for (int i = 1; i < cumulativeDistanceMeters.length; i++) {
       if (cumulativeDistanceMeters[i] < cumulativeDistanceMeters[i - 1]) {
         throw new IllegalArgumentException(
-          "cumulativeDistanceMeters must be non-decreasing, but entry %d (%d) < entry %d (%d)".formatted(
-            i,
-            cumulativeDistanceMeters[i],
-            i - 1,
-            cumulativeDistanceMeters[i - 1]
-          )
+          "cumulativeDistanceMeters must be non-decreasing, but entry %d (%d) < entry %d (%d)"
+            .formatted(i, cumulativeDistanceMeters[i], i - 1, cumulativeDistanceMeters[i - 1])
         );
       }
     }

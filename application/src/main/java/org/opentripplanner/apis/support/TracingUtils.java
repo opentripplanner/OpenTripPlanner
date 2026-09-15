@@ -21,13 +21,10 @@ public final class TracingUtils {
     Collection<String> tracingHeaderTags,
     HttpHeaders headers
   ) {
-    return tracingHeaderTags
-      .stream()
-      .map(header -> {
-        String value = headers.getHeaderString(header);
-        return Tag.of(header, value == null ? UNKNOWN_VALUE : value);
-      })
-      .toList();
+    return tracingHeaderTags.stream().map(header -> {
+      String value = headers.getHeaderString(header);
+      return Tag.of(header, value == null ? UNKNOWN_VALUE : value);
+    }).toList();
   }
 
   /**
@@ -45,19 +42,16 @@ public final class TracingUtils {
     HttpHeaders headers,
     MultivaluedMap<String, String> queryParameters
   ) {
-    return tracingTags
-      .stream()
-      .map(header -> {
-        String headerValue = headers.getHeaderString(header);
-        String queryParameterValue = queryParameters.getFirst(header);
-        if (headerValue != null) {
-          return Tag.of(header, headerValue);
-        } else if (queryParameterValue != null) {
-          return Tag.of(header, queryParameterValue);
-        } else {
-          return Tag.of(header, UNKNOWN_VALUE);
-        }
-      })
-      .toList();
+    return tracingTags.stream().map(header -> {
+      String headerValue = headers.getHeaderString(header);
+      String queryParameterValue = queryParameters.getFirst(header);
+      if (headerValue != null) {
+        return Tag.of(header, headerValue);
+      } else if (queryParameterValue != null) {
+        return Tag.of(header, queryParameterValue);
+      } else {
+        return Tag.of(header, UNKNOWN_VALUE);
+      }
+    }).toList();
   }
 }

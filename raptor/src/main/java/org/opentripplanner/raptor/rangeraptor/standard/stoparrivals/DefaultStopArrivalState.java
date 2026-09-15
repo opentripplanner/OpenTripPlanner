@@ -21,10 +21,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
-  implements StopArrivalState<T>
-  permits EgressStopArrivalState
-{
+sealed class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T>
+  permits EgressStopArrivalState {
 
   /**
    * Used to initialize all none-time-based attributes.
@@ -153,8 +151,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
 
   /** This allows subclasses to attach content and type to their own toString() */
   ToStringBuilder toStringAddBody(ToStringBuilder builder) {
-    builder
-      .addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
+    builder.addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
       .addServiceTime("onBoardArrivalTime", onBoardArrivalTime, NOT_SET)
       .addNum("boardStopPosition", boardStopPosition, NOT_SET)
       .addObj("trip", tripInfo())
@@ -185,7 +182,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
     return boardStopPosition == NOT_SET
       ? null
       : trip.pattern().debugInfo() +
-          " @" +
-          TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
+        " @" +
+        TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
   }
 }

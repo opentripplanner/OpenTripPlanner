@@ -13,7 +13,8 @@ class ItineraryFareDataLoaderTest implements PlanTestConstants {
 
   @Test
   void batchesMultipleLegsFromTheSameItineraryIntoOneCall()
-    throws ExecutionException, InterruptedException {
+    throws ExecutionException,
+    InterruptedException {
     var callCount = new AtomicInteger(0);
     var loader = ItineraryFareDataLoader.create(itinerary -> {
       callCount.incrementAndGet();
@@ -35,7 +36,8 @@ class ItineraryFareDataLoaderTest implements PlanTestConstants {
 
   @Test
   void callsCalculateFaresForEachDistinctItinerary()
-    throws ExecutionException, InterruptedException {
+    throws ExecutionException,
+    InterruptedException {
     var callCount = new AtomicInteger(0);
     var loader = ItineraryFareDataLoader.create(itinerary -> {
       callCount.incrementAndGet();

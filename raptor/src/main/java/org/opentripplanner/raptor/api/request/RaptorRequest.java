@@ -166,12 +166,10 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
       return false;
     }
     RaptorRequest<?> that = (RaptorRequest<?>) o;
-    return (
-      profile == that.profile &&
+    return (profile == that.profile &&
       Objects.equals(searchParams, that.searchParams) &&
       Objects.equals(multiCriteria, that.multiCriteria) &&
-      Objects.equals(debug, that.debug)
-    );
+      Objects.equals(debug, that.debug));
   }
 
   @Override

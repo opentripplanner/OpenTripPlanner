@@ -104,15 +104,13 @@ public final class BikeRequest {
       return false;
     }
     BikeRequest that = (BikeRequest) o;
-    return (
-      doubleEquals(that.speed, speed) &&
+    return (doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       Objects.equals(parking, that.parking) &&
       Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
       optimizeTriangle.equals(that.optimizeTriangle) &&
-      Objects.equals(walking, that.walking)
-    );
+      Objects.equals(walking, that.walking));
   }
 
   @Override

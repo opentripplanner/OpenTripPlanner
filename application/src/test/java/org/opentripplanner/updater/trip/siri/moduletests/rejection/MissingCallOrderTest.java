@@ -32,12 +32,10 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .departAimedExpected("00:00:21", "00:00:25")
@@ -56,15 +54,13 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15").clearOrder()
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15").clearOrder()
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .departAimedExpected("00:00:21", "00:00:25")
           .call(STOP_C)
           .arriveAimedExpected("00:00:40", "00:00:45")
@@ -80,19 +76,16 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .clearOrder()
           .withVisitNumber(1)
           .departAimedActual("00:00:11", "00:00:15")
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .clearOrder()
           .withVisitNumber(2)
           .departAimedExpected("00:00:21", "00:00:25")
@@ -112,12 +105,10 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .withVisitNumber(1)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
@@ -142,12 +133,10 @@ class MissingCallOrderTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .departAimedExpected("00:00:21", "00:00:25")

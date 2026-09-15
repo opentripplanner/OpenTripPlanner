@@ -310,8 +310,7 @@ public class TransitRepository implements Serializable {
    * The time when the transit service start. Will return EPOCH if there is no transit.
    */
   public Instant getTransitServiceStarts() {
-    return tripCalendars
-      .startDate()
+    return tripCalendars.startDate()
       .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toInstant())
       .orElse(Instant.EPOCH);
   }
@@ -320,10 +319,10 @@ public class TransitRepository implements Serializable {
    * The time when the transit service ends. Will return EPOCH if there is no transit.
    */
   public Instant getTransitServiceEnds() {
-    return tripCalendars
-      .endDate()
-      .map(serviceDate ->
-        ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone()).toInstant()
+    return tripCalendars.endDate()
+      .map(
+        serviceDate -> ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone())
+          .toInstant()
       )
       .orElse(Instant.EPOCH);
   }
@@ -458,10 +457,7 @@ public class TransitRepository implements Serializable {
   }
 
   public Optional<Agency> findAgencyById(FeedScopedId id) {
-    return agencies
-      .stream()
-      .filter(a -> a.getId().equals(id))
-      .findAny();
+    return agencies.stream().filter(a -> a.getId().equals(id)).findAny();
   }
 
   /**
@@ -558,15 +554,13 @@ public class TransitRepository implements Serializable {
   private Set<StopLocation> getStopLocationsUsedByTripTimes(
     Predicate<TripTimes> tripTimesPredicate
   ) {
-    Set<StopLocation> stopLocations = getAllTripPatterns()
-      .stream()
+    Set<StopLocation> stopLocations = getAllTripPatterns().stream()
       .filter(t -> t.getScheduledTimetable().getTripTimes().stream().anyMatch(tripTimesPredicate))
       .flatMap(t -> t.getStops().stream())
       .collect(Collectors.toSet());
 
     stopLocations.addAll(
-      stopLocations
-        .stream()
+      stopLocations.stream()
         .filter(GroupStop.class::isInstance)
         .map(GroupStop.class::cast)
         .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
@@ -581,13 +575,14 @@ public class TransitRepository implements Serializable {
 
   private void assertModificationsAllowed() {
     if (frozen) {
-      FREEZE_LOG_THROTTLE.throttle(n ->
-        LOG.warn(
+      FREEZE_LOG_THROTTLE.throttle(
+        n -> LOG.warn(
           """
           THIS SHOULD NOT HAPPEN
           Attempting to modify TransitRepository after it has been frozen.
           Count: {}
-          """,
+          """
+          ,
           n,
           new RuntimeException("StackTrace included to trace the source of the error.")
         )

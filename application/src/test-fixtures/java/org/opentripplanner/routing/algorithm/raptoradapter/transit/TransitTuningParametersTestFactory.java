@@ -29,13 +29,13 @@ public class TransitTuningParametersTestFactory {
       @Override
       public Integer stopBoardAlightDuringTransferCost(StopTransferPriority key) {
         switch (key) {
-          case DISCOURAGED:
+          case DISCOURAGED :
             return 3600;
-          case ALLOWED:
+          case ALLOWED :
             return 60;
-          case RECOMMENDED:
+          case RECOMMENDED :
             return 20;
-          case PREFERRED:
+          case PREFERRED :
             return 0;
         }
         throw new IllegalArgumentException("Unknown key: " + key);

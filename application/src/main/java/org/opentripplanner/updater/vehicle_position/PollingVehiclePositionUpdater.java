@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
  * source.
  */
 public class PollingVehiclePositionUpdater
-  extends PollingGraphUpdater<TransitRealTimeUpdateContext>
-{
+  extends
+  PollingGraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
 

@@ -50,17 +50,11 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       case ElevatorBoardEdge e -> List.of(
         kv(
           "levelValue",
-          streetDetailsService
-            .findHorizontalEdgeLevelInfo(e)
-            .map(l -> l.level())
-            .orElse(null)
+          streetDetailsService.findHorizontalEdgeLevelInfo(e).map(l -> l.level()).orElse(null)
         ),
         kv(
           "levelName",
-          streetDetailsService
-            .findHorizontalEdgeLevelInfo(e)
-            .map(l -> l.name())
-            .orElse(null)
+          streetDetailsService.findHorizontalEdgeLevelInfo(e).map(l -> l.name()).orElse(null)
         ),
         kv("fromVertexLabel", e.getFromVertex().getLabel().toString()),
         kv("toVertexLabel", e.getToVertex().getLabel().toString())
@@ -131,7 +125,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
     String upperVertexLabel = edge.getFromVertex().getLabel().toString();
     if (
       edge.getFromVertex() instanceof OsmVertex fromVertex &&
-      fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
+        fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
     ) {
       lowerVertexLabel = edge.getFromVertex().getLabel().toString();
       upperVertexLabel = edge.getToVertex().getLabel().toString();

@@ -86,9 +86,6 @@ public class VehicleParkingFilter implements Serializable {
   }
 
   private static VehicleParkingSelect[] makeFilter(Collection<VehicleParkingSelect> select) {
-    return select
-      .stream()
-      .filter(f -> !f.isEmpty())
-      .toArray(VehicleParkingSelect[]::new);
+    return select.stream().filter(f -> !f.isEmpty()).toArray(VehicleParkingSelect[]::new);
   }
 }

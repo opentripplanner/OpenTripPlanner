@@ -100,13 +100,15 @@ class TwoWayLinearSearchTest {
 
   @Test
   void testOutOfBounds() {
-    var ex = assertThrows(ArrayIndexOutOfBoundsException.class, () ->
-      TwoWayLinearSearch.findNearest(0, -1, 3, i -> A001[i] == 1)
+    var ex = assertThrows(
+      ArrayIndexOutOfBoundsException.class,
+      () -> TwoWayLinearSearch.findNearest(0, -1, 3, i -> A001[i] == 1)
     );
     assertEquals("Index -1 out of bounds for length 3", ex.getMessage());
 
-    ex = assertThrows(ArrayIndexOutOfBoundsException.class, () ->
-      TwoWayLinearSearch.findNearest(2, 0, A100.length + 1, i -> A100[i] == 1)
+    ex = assertThrows(
+      ArrayIndexOutOfBoundsException.class,
+      () -> TwoWayLinearSearch.findNearest(2, 0, A100.length + 1, i -> A100[i] == 1)
     );
     assertEquals("Index 3 out of bounds for length 3", ex.getMessage());
   }

@@ -245,14 +245,7 @@ public class ToStringBuilder {
     if (array == null) {
       return this;
     }
-    return addIt(
-      name,
-      Arrays.stream(array)
-        .filter(t -> t != notSet)
-        .count() +
-        "/" +
-        array.length
-    );
+    return addIt(name, Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length);
   }
 
   /** Add the BitSet: name : {cardinality}/{logical size}/{size} */
@@ -309,8 +302,10 @@ public class ToStringBuilder {
    * Add times in seconds since midnight. Format: hh:mm. {@code null} value is ignored.
    */
   public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
-    return addIfNotNull(name, value, a ->
-      Arrays.stream(a)
+    return addIfNotNull(
+      name,
+      value,
+      a -> Arrays.stream(a)
         .mapToObj(TimeUtils::timeToStrCompact)
         .collect(Collectors.joining(" ", "[", "]"))
     );

@@ -26,25 +26,23 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
 
   @BeforeEach
   void setUp() {
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(500));
-          var C = intersection("C", ORIGIN.moveEastMeters(1000));
-          var Z = intersection("Z", ORIGIN.moveNorthMeters(500));
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(500));
+        var C = intersection("C", ORIGIN.moveEastMeters(1000));
+        var Z = intersection("Z", ORIGIN.moveNorthMeters(500));
 
-          biStreet(A, B, 500);
-          biStreet(B, C, 500);
-          // Z has no edges — disconnected from the rest of the graph
+        biStreet(A, B, 500);
+        biStreet(B, C, 500);
+        // Z has no edges — disconnected from the rest of the graph
 
-          vertexA = A;
-          vertexC = C;
-          vertexDisconnected = Z;
-        }
+        vertexA = A;
+        vertexC = C;
+        vertexDisconnected = Z;
       }
-    );
+    });
   }
 
   /**

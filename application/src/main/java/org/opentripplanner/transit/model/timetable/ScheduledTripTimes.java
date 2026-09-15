@@ -136,9 +136,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   @Override
   public ScheduledTripTimes withAdjustedTimes(Duration shiftDelta) {
-    return copyOfNoDuplication()
-      .plusTimeShift((int) shiftDelta.toSeconds())
-      .build();
+    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
   }
 
   @Override
@@ -351,8 +349,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
       return false;
     }
     ScheduledTripTimes that = (ScheduledTripTimes) o;
-    return (
-      timeShift == that.timeShift &&
+    return (timeShift == that.timeShift &&
       serviceCode == that.serviceCode &&
       Objects.deepEquals(arrivalTimes, that.arrivalTimes) &&
       Objects.deepEquals(departureTimes, that.departureTimes) &&
@@ -362,8 +359,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
       Objects.equals(pickupBookingInfos, that.pickupBookingInfos) &&
       Objects.deepEquals(headsigns, that.headsigns) &&
       Objects.deepEquals(headsignVias, that.headsignVias) &&
-      Objects.deepEquals(gtfsSequenceOfStopIndex, that.gtfsSequenceOfStopIndex)
-    );
+      Objects.deepEquals(gtfsSequenceOfStopIndex, that.gtfsSequenceOfStopIndex));
   }
 
   @Override

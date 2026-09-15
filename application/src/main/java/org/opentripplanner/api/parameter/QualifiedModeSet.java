@@ -38,10 +38,7 @@ public class QualifiedModeSet implements Serializable {
   }
 
   public List<TransitMode> getTransitModes() {
-    return qModes
-      .stream()
-      .flatMap(qMode -> qMode.mode.getTransitModes().stream())
-      .toList();
+    return qModes.stream().flatMap(qMode -> qMode.mode.getTransitModes().stream()).toList();
   }
 
   public RequestModes getRequestModes() {
@@ -52,11 +49,9 @@ public class QualifiedModeSet implements Serializable {
     //  TODO OTP2 Once all GraphQL queries have stopped using this logic, this class can be removed.
     QualifiedMode requestMode = null;
 
-    List<QualifiedMode> filteredModes = qModes
-      .stream()
+    List<QualifiedMode> filteredModes = qModes.stream()
       .filter(
-        m ->
-          m.mode == ApiRequestMode.WALK ||
+        m -> m.mode == ApiRequestMode.WALK ||
           m.mode == ApiRequestMode.BICYCLE ||
           m.mode == ApiRequestMode.SCOOTER ||
           m.mode == ApiRequestMode.CAR
@@ -64,8 +59,7 @@ public class QualifiedModeSet implements Serializable {
       .toList();
 
     if (filteredModes.size() > 1) {
-      List<QualifiedMode> filteredModesWithoutWalk = filteredModes
-        .stream()
+      List<QualifiedMode> filteredModesWithoutWalk = filteredModes.stream()
         .filter(Predicate.not(m -> m.mode == ApiRequestMode.WALK))
         .toList();
 

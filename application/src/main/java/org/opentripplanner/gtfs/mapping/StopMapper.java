@@ -51,8 +51,7 @@ class StopMapper {
 
     assertLocationTypeIsStop(gtfsStop);
     StopMappingWrapper base = new StopMappingWrapper(idFactory, gtfsStop);
-    RegularStopBuilder builder = siteRepositoryBuilder
-      .regularStop(base.getId())
+    RegularStopBuilder builder = siteRepositoryBuilder.regularStop(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())
       .withWheelchairAccessibility(base.getWheelchairAccessibility())
@@ -119,7 +118,7 @@ class StopMapper {
       // generating transfers as needed for realtime updates.
       else if (
         mode == TransitMode.BUS &&
-        TransitModeMapper.isRailReplacementBusService(gtfsStop.getVehicleType())
+          TransitModeMapper.isRailReplacementBusService(gtfsStop.getVehicleType())
       ) {
         return true;
       }

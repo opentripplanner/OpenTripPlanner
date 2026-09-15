@@ -54,9 +54,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
     .build();
   static final RiderCategory CATEGORY_HONOURED_CITIZEN = RiderCategory.of(
     ctranId("HONORED_CITIZEN")
-  )
-    .withName("Honored Citizen")
-    .build();
+  ).withName("Honored Citizen").build();
 
   // fare media
   static final FareMedium HOP_FASTPASS = new FareMedium(ctranId("2"), "HOP Fastpass");
@@ -90,8 +88,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // TriMet to C-TRAN
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("trimet-to-ctran-regional"))
+      defaultTransfer().withId(ctranId("trimet-to-ctran-regional"))
         .withFromLegGroup(LG_TRIMET_TRIMET)
         .withToLegGroup(LG_CTRAN_REGIONAL)
         .withFareProducts(
@@ -107,8 +104,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("trimet-to-ctran-local"))
+      defaultTransfer().withId(ctranId("trimet-to-ctran-local"))
         .withFromLegGroup(LG_TRIMET_TRIMET)
         .withToLegGroup(LG_CTRAN_LOCAL)
         .withFareProducts(
@@ -124,8 +120,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("trimet-to-ctran-flex"))
+      defaultTransfer().withId(ctranId("trimet-to-ctran-flex"))
         .withFromLegGroup(LG_TRIMET_TRIMET)
         .withToLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withFareProducts(
@@ -163,8 +158,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // PSC to C-TRAN
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("psc-to-ctran-regional"))
+      defaultTransfer().withId(ctranId("psc-to-ctran-regional"))
         .withFromLegGroup(LG_TRIMET_PSC)
         .withFareProducts(
           generateHopFareProducts(
@@ -179,8 +173,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("psc-to-ctran-local"))
+      defaultTransfer().withId(ctranId("psc-to-ctran-local"))
         .withFromLegGroup(LG_TRIMET_PSC)
         .withToLegGroup(LG_CTRAN_LOCAL)
         .withFareProducts(
@@ -196,8 +189,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("psc-to-ctran-flex"))
+      defaultTransfer().withId(ctranId("psc-to-ctran-flex"))
         .withFromLegGroup(LG_TRIMET_PSC)
         .withToLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withFareProducts(
@@ -213,8 +205,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("psc-to-ctran-express"))
+      defaultTransfer().withId(ctranId("psc-to-ctran-express"))
         .withFromLegGroup(LG_TRIMET_PSC)
         .withToLegGroup(LG_CTRAN_EXPRESS)
         .withFareProducts(
@@ -232,8 +223,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // C-TRAN to TriMet
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-regional-to-trimet"))
+      defaultTransfer().withId(trimetId("ctran-regional-to-trimet"))
         .withToLegGroup(LG_TRIMET_TRIMET)
         .withFromLegGroup(LG_CTRAN_REGIONAL)
         .withFareProducts(
@@ -249,8 +239,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-local-to-trimet"))
+      defaultTransfer().withId(trimetId("ctran-local-to-trimet"))
         .withToLegGroup(LG_TRIMET_TRIMET)
         .withFromLegGroup(LG_CTRAN_LOCAL)
         .withFareProducts(
@@ -266,8 +255,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-flex-to-trimet"))
+      defaultTransfer().withId(trimetId("ctran-flex-to-trimet"))
         .withToLegGroup(LG_TRIMET_TRIMET)
         .withFromLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withFareProducts(
@@ -293,8 +281,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // C-TRAN to PSC
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-regional-to-psc"))
+      defaultTransfer().withId(trimetId("ctran-regional-to-psc"))
         .withToLegGroup(LG_TRIMET_PSC)
         .withFromLegGroup(LG_CTRAN_REGIONAL)
         .withFareProducts(
@@ -310,8 +297,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-local-to-psc"))
+      defaultTransfer().withId(trimetId("ctran-local-to-psc"))
         .withToLegGroup(LG_TRIMET_PSC)
         .withFromLegGroup(LG_CTRAN_LOCAL)
         .withFareProducts(
@@ -327,8 +313,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-flex-to-psc"))
+      defaultTransfer().withId(trimetId("ctran-flex-to-psc"))
         .withToLegGroup(LG_TRIMET_PSC)
         .withFromLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withFareProducts(
@@ -345,8 +330,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
     );
 
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(trimetId("ctran-express-to-psc"))
+      defaultTransfer().withId(trimetId("ctran-express-to-psc"))
         .withToLegGroup(LG_TRIMET_PSC)
         .withFromLegGroup(LG_CTRAN_EXPRESS)
         .build()
@@ -354,22 +338,19 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // The C-TRAN Data fails to include unlimited free transfers. This corrects the data. TODO: is this correct?
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("EXP_TO_LOCAL_UNLIMITED"))
+      defaultTransfer().withId(ctranId("EXP_TO_LOCAL_UNLIMITED"))
         .withFromLegGroup(LG_CTRAN_EXPRESS)
         .withToLegGroup(LG_CTRAN_LOCAL)
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("EXP_TO_REGIONAL_UNLIMITED"))
+      defaultTransfer().withId(ctranId("EXP_TO_REGIONAL_UNLIMITED"))
         .withFromLegGroup(LG_CTRAN_EXPRESS)
         .withToLegGroup(LG_CTRAN_REGIONAL)
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("REGIONAL_TO_LOCAL_UNLIMITED"))
+      defaultTransfer().withId(ctranId("REGIONAL_TO_LOCAL_UNLIMITED"))
         .withFromLegGroup(LG_CTRAN_REGIONAL)
         .withToLegGroup(LG_CTRAN_LOCAL)
         .build()
@@ -377,22 +358,19 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // CTRAN to CTRAN Flex transfers
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("LOCAL_TO_FLEX"))
+      defaultTransfer().withId(ctranId("LOCAL_TO_FLEX"))
         .withFromLegGroup(LG_CTRAN_LOCAL)
         .withToLegGroup(LG_CTRAN_FLEX_LOCAL)
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("REGIONAL_TO_FLEX"))
+      defaultTransfer().withId(ctranId("REGIONAL_TO_FLEX"))
         .withFromLegGroup(LG_CTRAN_REGIONAL)
         .withToLegGroup(LG_CTRAN_FLEX_LOCAL)
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("EXPRESS_TO_FLEX"))
+      defaultTransfer().withId(ctranId("EXPRESS_TO_FLEX"))
         .withFromLegGroup(LG_CTRAN_EXPRESS)
         .withToLegGroup(LG_CTRAN_FLEX_LOCAL)
         .build()
@@ -400,15 +378,13 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
 
     // CTRAN Flex to CTRAN transfers
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("FLEX_TO_LOCAL"))
+      defaultTransfer().withId(ctranId("FLEX_TO_LOCAL"))
         .withFromLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withToLegGroup(LG_CTRAN_LOCAL)
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("FLEX_TO_REGIONAL"))
+      defaultTransfer().withId(ctranId("FLEX_TO_REGIONAL"))
         .withFromLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withToLegGroup(LG_CTRAN_REGIONAL)
         .withFareProducts(
@@ -424,8 +400,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         .build()
     );
     this.fareTransferRules.add(
-      defaultTransfer()
-        .withId(ctranId("FLEX_TO_EXPRESS"))
+      defaultTransfer().withId(ctranId("FLEX_TO_EXPRESS"))
         .withFromLegGroup(LG_CTRAN_FLEX_LOCAL)
         .withToLegGroup(LG_CTRAN_EXPRESS)
         .withFareProducts(
@@ -460,26 +435,13 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
    * @return The fare product from the GTFS, or a generated $0 fare product.
    */
   private Money findFareProduct(FeedScopedId fareProductId) {
-    Optional<FareLegRule> potentialRuleMatch = this.fareLegRules
-      .stream()
-      .filter(f ->
-        f
-          .fareProducts()
-          .stream()
-          .anyMatch(fp -> fp.id().equals(fareProductId))
-      )
+    Optional<FareLegRule> potentialRuleMatch = this.fareLegRules.stream()
+      .filter(f -> f.fareProducts().stream().anyMatch(fp -> fp.id().equals(fareProductId)))
       .findFirst();
 
-    return potentialRuleMatch
-      .flatMap(flr ->
-        flr
-          .fareProducts()
-          .stream()
-          .filter(fp -> fp.id().equals(fareProductId))
-          .findFirst()
-      )
-      .map(FareProduct::price)
-      .orElse(Money.ZERO_USD);
+    return potentialRuleMatch.flatMap(
+      flr -> flr.fareProducts().stream().filter(fp -> fp.id().equals(fareProductId)).findFirst()
+    ).map(FareProduct::price).orElse(Money.ZERO_USD);
   }
 
   /**
@@ -502,30 +464,21 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         TRIMET_TO_CTRAN_ADULT_TRANSFER,
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, adultLarger.minus(adultSmaller))
-      )
-        .withCategory(CATEGORY_ADULT)
-        .withMedium(HOP_FASTPASS)
-        .build()
+      ).withCategory(CATEGORY_ADULT).withMedium(HOP_FASTPASS).build()
     );
     hopFareProducts.add(
       FareProduct.of(
         TRIMET_TO_CTRAN_ADULT_TRANSFER,
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, adultLarger.minus(adultSmaller))
-      )
-        .withCategory(CATEGORY_ADULT)
-        .withMedium(OPEN_PAYMENT)
-        .build()
+      ).withCategory(CATEGORY_ADULT).withMedium(OPEN_PAYMENT).build()
     );
     hopFareProducts.add(
       FareProduct.of(
         TRIMET_TO_CTRAN_ADULT_TRANSFER,
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, adultLarger.minus(adultSmaller))
-      )
-        .withCategory(CATEGORY_ADULT)
-        .withMedium(VIRTUAL_HOP_FASTPASS)
-        .build()
+      ).withCategory(CATEGORY_ADULT).withMedium(VIRTUAL_HOP_FASTPASS).build()
     );
 
     // Senior
@@ -534,30 +487,21 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         ctranId("TRIMET_CTRAN_HC_TRANSFER"),
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, seniorLarger.minus(seniorSmaller))
-      )
-        .withCategory(CATEGORY_HONOURED_CITIZEN)
-        .withMedium(HOP_FASTPASS)
-        .build()
+      ).withCategory(CATEGORY_HONOURED_CITIZEN).withMedium(HOP_FASTPASS).build()
     );
     hopFareProducts.add(
       FareProduct.of(
         ctranId("TRIMET_CTRAN_HONORED_CITIZEN_TRANSFER"),
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, seniorLarger.minus(seniorSmaller))
-      )
-        .withCategory(CATEGORY_HONOURED_CITIZEN)
-        .withMedium(OPEN_PAYMENT)
-        .build()
+      ).withCategory(CATEGORY_HONOURED_CITIZEN).withMedium(OPEN_PAYMENT).build()
     );
     hopFareProducts.add(
       FareProduct.of(
         ctranId("TRIMET_CTRAN_HONORED_CITIZEN_TRANSFER"),
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, seniorLarger.minus(seniorSmaller))
-      )
-        .withCategory(CATEGORY_HONOURED_CITIZEN)
-        .withMedium(VIRTUAL_HOP_FASTPASS)
-        .build()
+      ).withCategory(CATEGORY_HONOURED_CITIZEN).withMedium(VIRTUAL_HOP_FASTPASS).build()
     );
 
     // Youth
@@ -566,30 +510,21 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
         TRIMET_TO_CTRAN_YOUTH_TRANSFER,
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, youthLarger.minus(youthSmaller))
-      )
-        .withCategory(CATEGORY_YOUTH)
-        .withMedium(HOP_FASTPASS)
-        .build()
+      ).withCategory(CATEGORY_YOUTH).withMedium(HOP_FASTPASS).build()
     );
     hopFareProducts.add(
       FareProduct.of(
         TRIMET_TO_CTRAN_YOUTH_TRANSFER,
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, youthLarger.minus(youthSmaller))
-      )
-        .withCategory(CATEGORY_YOUTH)
-        .withMedium(OPEN_PAYMENT)
-        .build()
+      ).withCategory(CATEGORY_YOUTH).withMedium(OPEN_PAYMENT).build()
     );
     hopFareProducts.add(
       FareProduct.of(
         TRIMET_TO_CTRAN_YOUTH_TRANSFER,
         "TriMet to C-TRAN",
         Money.max(Money.ZERO_USD, youthLarger.minus(youthSmaller))
-      )
-        .withCategory(CATEGORY_YOUTH)
-        .withMedium(VIRTUAL_HOP_FASTPASS)
-        .build()
+      ).withCategory(CATEGORY_YOUTH).withMedium(VIRTUAL_HOP_FASTPASS).build()
     );
 
     return hopFareProducts;

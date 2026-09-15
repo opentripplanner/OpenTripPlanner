@@ -3,13 +3,9 @@ package org.opentripplanner.transit.model.framework;
 import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
-public abstract class AbstractEntityBuilder<
-    E extends AbstractTransitEntity<E, B>,
-    B extends AbstractEntityBuilder<E, B>
-  >
-  extends AbstractBuilder<E, B>
-  implements TransitEntityBuilder<E, B>
-{
+public abstract class AbstractEntityBuilder<E extends AbstractTransitEntity<E, B>, B extends AbstractEntityBuilder<E, B>>
+  extends
+  AbstractBuilder<E, B> implements TransitEntityBuilder<E, B> {
 
   @SuppressWarnings("rawtypes")
   private static final EntityContext<?, ?> NOOP = new EntityContext() {};
@@ -55,10 +51,7 @@ public abstract class AbstractEntityBuilder<
   }
 
   @SuppressWarnings("unchecked")
-  private static <
-    E extends AbstractTransitEntity<E, B>,
-    B extends AbstractEntityBuilder<E, B>
-  > EntityContext<E, B> noopContext() {
+  private static <E extends AbstractTransitEntity<E, B>, B extends AbstractEntityBuilder<E, B>> EntityContext<E, B> noopContext() {
     return (EntityContext<E, B>) NOOP;
   }
 }

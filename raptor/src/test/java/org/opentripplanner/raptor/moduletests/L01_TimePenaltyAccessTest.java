@@ -51,8 +51,7 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     data.withRoute(route("R1", STOP_A, STOP_B).withTimetable(schedule("0:10 0:40").repeat(10, 60)));
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D2_m).withTimePenalty(D1_m))
       .addEgressPaths(walk(STOP_B, D1_m));
 
@@ -69,8 +68,8 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
+      .withRequest(
+        r -> r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
       )
       .addMinDuration("34m", TX_0, edt, lat)
       .add(TC_STANDARD, withoutCost(expected.all()))
@@ -104,8 +103,8 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
+      .withRequest(
+        r -> r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
       )
       .addMinDuration("34m", TX_0, edt, lat)
       .add(TC_STANDARD, withoutCost(expected.all()))
@@ -135,11 +134,9 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
     var p = Pattern.compile("(.+BUS R1 \\d+:\\d+).+(\\[.+)");
 
     String[] lines = path.split("\n");
-    return Stream.of(lines)
-      .map(s -> {
-        var m = p.matcher(s);
-        return m.find() ? m.group(1) + " .. " + m.group(2) : s;
-      })
-      .collect(Collectors.joining("\n"));
+    return Stream.of(lines).map(s -> {
+      var m = p.matcher(s);
+      return m.find() ? m.group(1) + " .. " + m.group(2) : s;
+    }).collect(Collectors.joining("\n"));
   }
 }

@@ -86,12 +86,10 @@ public class DirectTransitPreferences {
       return false;
     }
     DirectTransitPreferences that = (DirectTransitPreferences) o;
-    return (
-      enabled == that.enabled &&
+    return (enabled == that.enabled &&
       Double.compare(extraAccessEgressReluctance, that.extraAccessEgressReluctance) == 0 &&
       Objects.equals(maxAccessEgressDuration, that.maxAccessEgressDuration) &&
-      Objects.equals(costRelaxFunction, that.costRelaxFunction)
-    );
+      Objects.equals(costRelaxFunction, that.costRelaxFunction));
   }
 
   @Override

@@ -79,7 +79,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       this.arrivals[stop] = ParetoSet.of(comp, arrivalListeners.get(stop));
     }
 
-    for (var it = onBoardArrivalStops.iterator(); it.hasNext(); ) {
+    for (var it = onBoardArrivalStops.iterator(); it.hasNext();) {
       int stop = it.next();
       if (this.arrivals[stop] == null) {
         this.arrivals[stop] = ParetoSet.of(
@@ -110,10 +110,8 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * Slow — do not use during routing.
    */
   public boolean reachedByTransit(int stopIndex) {
-    return (
-      arrivals[stopIndex] != null &&
-      arrivals[stopIndex].stream().anyMatch(a -> a.arrivedBy(TRANSIT))
-    );
+    return (arrivals[stopIndex] != null &&
+      arrivals[stopIndex].stream().anyMatch(a -> a.arrivedBy(TRANSIT)));
   }
 
   /**

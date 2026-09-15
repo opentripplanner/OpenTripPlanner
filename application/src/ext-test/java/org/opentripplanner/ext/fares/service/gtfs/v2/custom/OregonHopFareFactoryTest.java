@@ -32,10 +32,7 @@ class OregonHopFareFactoryTest implements FareTestConstants {
     TRIMET_ADULT_SINGLE_RIDE,
     "regular",
     Money.usDollars(10)
-  )
-    .withCategory(CATEGORY_ADULT)
-    .withMedium(HOP_FASTPASS)
-    .build();
+  ).withCategory(CATEGORY_ADULT).withMedium(HOP_FASTPASS).build();
 
   private static final FareProduct FP_CTRAN_REGIONAL = FareProduct.of(
     ADULT_REGIONAL_SINGLE_RIDE,
@@ -47,10 +44,7 @@ class OregonHopFareFactoryTest implements FareTestConstants {
     OregonHopFareFactory.TRIMET_TO_CTRAN_ADULT_TRANSFER,
     "TriMet to C-TRAN",
     FP_CTRAN_REGIONAL.price()
-  )
-    .withCategory(CATEGORY_ADULT)
-    .withMedium(HOP_FASTPASS)
-    .build();
+  ).withCategory(CATEGORY_ADULT).withMedium(HOP_FASTPASS).build();
 
   @Test
   void trimetToCtranTransfer() {
@@ -93,8 +87,7 @@ class OregonHopFareFactoryTest implements FareTestConstants {
     var factory = new OregonHopFareFactory();
 
     var data = new FareRulesData();
-    data
-      .fareLegRules()
+    data.fareLegRules()
       .addAll(
         List.of(
           FareLegRule.of(id("trimet-local"), FP_TRIMET_REGULAR)

@@ -89,12 +89,10 @@ public class NearbyStop implements Comparable<NearbyStop> {
       return false;
     }
     final NearbyStop that = (NearbyStop) o;
-    return (
-      Double.compare(that.distance, distance) == 0 &&
+    return (Double.compare(that.distance, distance) == 0 &&
       stopId.equals(that.stopId) &&
       Objects.equals(edges, that.edges) &&
-      Objects.equals(state, that.state)
-    );
+      Objects.equals(state, that.state));
   }
 
   public String toString() {

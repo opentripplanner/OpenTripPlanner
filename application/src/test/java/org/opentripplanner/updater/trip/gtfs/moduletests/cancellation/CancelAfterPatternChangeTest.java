@@ -44,8 +44,7 @@ class CancelAfterPatternChangeTest implements RealtimeTestConstants {
     var rt = GtfsRtTestHelper.of(env);
 
     // Step 1: Skip stop B — creates a modified pattern
-    var skipUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var skipUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)

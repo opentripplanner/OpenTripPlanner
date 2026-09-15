@@ -85,20 +85,20 @@ public class OtpHttpClientFactory implements AutoCloseable {
     Objects.requireNonNull(timeout);
     Objects.requireNonNull(connectionTtl);
 
-    PoolingHttpClientConnectionManager connectionManager =
-      PoolingHttpClientConnectionManagerBuilder.create()
-        .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
-        .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
-        .setConnPoolPolicy(PoolReusePolicy.LIFO)
-        .setMaxConnTotal(maxConnections)
-        .setDefaultConnectionConfig(
-          ConnectionConfig.custom()
-            .setSocketTimeout(Timeout.of(timeout))
-            .setConnectTimeout(Timeout.of(timeout))
-            .setTimeToLive(TimeValue.of(connectionTtl))
-            .build()
-        )
-        .build();
+    PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder
+      .create()
+      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
+      .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
+      .setConnPoolPolicy(PoolReusePolicy.LIFO)
+      .setMaxConnTotal(maxConnections)
+      .setDefaultConnectionConfig(
+        ConnectionConfig.custom()
+          .setSocketTimeout(Timeout.of(timeout))
+          .setConnectTimeout(Timeout.of(timeout))
+          .setTimeToLive(TimeValue.of(connectionTtl))
+          .build()
+      )
+      .build();
 
     HttpClientBuilder httpClientBuilder = HttpClients.custom()
       .setUserAgent("OpenTripPlanner")

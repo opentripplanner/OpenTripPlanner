@@ -28,9 +28,8 @@ class LinkingContextRequestMapperTest {
     .withFrom(FROM)
     .withTo(TO)
     .withViaLocations(VIA)
-    .withJourney(journey ->
-      journey
-        .withDirect(new StreetRequest(DIRECT_MODE))
+    .withJourney(
+      journey -> journey.withDirect(new StreetRequest(DIRECT_MODE))
         .withAccess(new StreetRequest(ACCESS_MODE))
         .withEgress(new StreetRequest(EGRESS_MODE))
         .withTransfer(new StreetRequest(TRANSFER_MODE))

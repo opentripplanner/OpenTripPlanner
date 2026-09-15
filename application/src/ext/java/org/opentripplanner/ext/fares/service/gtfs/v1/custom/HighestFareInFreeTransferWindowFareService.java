@@ -78,8 +78,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       if (freeTransferWindowEndTimeEpochSeconds == -1) {
         // the new transfer window end time should be calculated by adding the ride's start time (which is in
         // seconds past the epoch) and the number of equivalent seconds in the free transfer window minutes.
-        freeTransferWindowEndTimeEpochSeconds = leg
-          .startTime()
+        freeTransferWindowEndTimeEpochSeconds = leg.startTime()
           .plus(freeTransferWindow)
           .toEpochSecond();
       }
@@ -87,11 +86,8 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));
     }
     cost = cost.plus(currentTransferWindowCost);
-    var fp = FareProduct.of(
-      new FeedScopedId("fares", fareType.name()),
-      fareType.name(),
-      cost
-    ).build();
+    var fp = FareProduct.of(new FeedScopedId("fares", fareType.name()), fareType.name(), cost)
+      .build();
     var fare = ItineraryFare.empty();
     if (cost.greaterThan(zero)) {
       fare.addItineraryProducts(List.of(fp));

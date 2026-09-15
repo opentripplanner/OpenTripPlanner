@@ -584,8 +584,7 @@ public class ItineraryListFilterChainBuilder {
   private List<ItineraryListFilter> buildGroupByTripIdAndDistanceFilters() {
     var sysTags = new ArrayList<String>();
 
-    List<GroupBySimilarity> groupBy = groupBySimilarity
-      .stream()
+    List<GroupBySimilarity> groupBy = groupBySimilarity.stream()
       .sorted(Comparator.comparingDouble(o -> o.groupByP))
       .toList();
 

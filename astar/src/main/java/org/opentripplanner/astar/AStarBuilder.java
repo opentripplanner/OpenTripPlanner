@@ -15,16 +15,13 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AStarBuilder<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class AStarBuilder<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   Logger LOG = LoggerFactory.getLogger(AStarBuilder.class);
 
-  private Runnable preStartHook = () ->
-    LOG.warn("No pre-start hook provided. Call withPreStartHook() to set one.");
+  private Runnable preStartHook = () -> LOG.warn(
+    "No pre-start hook provided. Call withPreStartHook() to set one."
+  );
   private RemainingWeightHeuristic<State> heuristic;
   private SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private TraverseVisitor<State, Edge> traverseVisitor;

@@ -21,31 +21,28 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 class StreetElevationExtensionBuilderTest {
 
   private static final Coordinate[] COORDINATES_ONE_POINT = new Coordinate[] {
-    new Coordinate(0, 0),
-  };
+    new Coordinate(0, 0), };
   private static final PackedCoordinateSequence ELEVATION_PROFILE_ONE_POINT =
     new PackedCoordinateSequence.Double(COORDINATES_ONE_POINT, 2);
 
   private static final Coordinate[] COORDINATES_TWO_POINTS = new Coordinate[] {
     new Coordinate(0, 0),
-    new Coordinate(1, 1),
-  };
+    new Coordinate(1, 1), };
   private static final PackedCoordinateSequence ELEVATION_PROFILE_TWO_POINTS =
     new PackedCoordinateSequence.Double(COORDINATES_TWO_POINTS, 2);
 
-  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory().createLineString(
-    new Coordinate[] {
-      StreetModelFactory.V1.getCoordinate(),
-      StreetModelFactory.V2.getCoordinate(),
-    }
-  );
+  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory()
+    .createLineString(
+      new Coordinate[] {
+        StreetModelFactory.V1.getCoordinate(),
+        StreetModelFactory.V2.getCoordinate(), }
+    );
 
   private StreetEdgeBuilder<?> streetEdgeBuilder;
 
   @BeforeEach
   void setup() {
-    streetEdgeBuilder = new StreetEdgeBuilder<>()
-      .withPermission(StreetTraversalPermission.ALL)
+    streetEdgeBuilder = new StreetEdgeBuilder<>().withPermission(StreetTraversalPermission.ALL)
       .withFromVertex(StreetModelFactory.V1)
       .withToVertex(StreetModelFactory.V2)
       .withGeometry(GEOMETRY);
@@ -71,9 +68,8 @@ class StreetElevationExtensionBuilderTest {
   @Test
   void testBuildFromStreetEdge() {
     StreetEdge se = streetEdgeBuilder.buildAndConnect();
-    StreetElevationExtensionBuilder seeb = StreetElevationExtensionBuilder.of(
-      se
-    ).withElevationProfile(ELEVATION_PROFILE_TWO_POINTS);
+    StreetElevationExtensionBuilder seeb = StreetElevationExtensionBuilder.of(se)
+      .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS);
     Optional<StreetElevationExtension> streetElevationExtension = seeb.build();
     assertFalse(streetElevationExtension.isEmpty());
   }
@@ -82,20 +78,16 @@ class StreetElevationExtensionBuilderTest {
   void testBuildFromStreetEdgeBuilder() {
     StreetElevationExtensionBuilder seebFromStreetEdgeBuilder = StreetElevationExtensionBuilder.of(
       streetEdgeBuilder
-    )
-      .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS)
-      .withDistanceInMeters(1);
+    ).withElevationProfile(ELEVATION_PROFILE_TWO_POINTS).withDistanceInMeters(1);
     Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdgeBuilder =
       seebFromStreetEdgeBuilder.build();
     assertFalse(streetElevationExtensionFromStreetEdgeBuilder.isEmpty());
 
     StreetElevationExtensionBuilder seebFromStreetEdge = StreetElevationExtensionBuilder.of(
       streetEdgeBuilder.buildAndConnect()
-    )
-      .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS)
-      .withDistanceInMeters(1);
-    Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdge =
-      seebFromStreetEdge.build();
+    ).withElevationProfile(ELEVATION_PROFILE_TWO_POINTS).withDistanceInMeters(1);
+    Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdge = seebFromStreetEdge
+      .build();
 
     assertEquals(
       streetElevationExtensionFromStreetEdge.orElseThrow().toString(),
@@ -113,11 +105,7 @@ class StreetElevationExtensionBuilderTest {
   void steepProfile(StreetTraversalPermission perm) {
     var extension = StreetElevationExtensionBuilder.of(
       streetEdgeBuilder.withPermission(perm).withBicycleSafetyFactor(3)
-    )
-      .withElevationProfile(STEEP_ELEVATION_PROFILE)
-      .withDistanceInMeters(50)
-      .build()
-      .orElseThrow();
+    ).withElevationProfile(STEEP_ELEVATION_PROFILE).withDistanceInMeters(50).build().orElseThrow();
 
     assertThat(extension.getEffectiveBikeDistance()).isGreaterThan(0);
   }

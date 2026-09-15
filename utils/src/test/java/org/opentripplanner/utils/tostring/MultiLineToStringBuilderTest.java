@@ -16,7 +16,8 @@ class MultiLineToStringBuilderTest {
         foo... : bar
         number : 500
       }
-      """.trim(),
+      """
+        .trim(),
       MultiLineToStringBuilder.of("Test")
         .add("foo", "bar")
         .add("number", 500)
@@ -32,7 +33,8 @@ class MultiLineToStringBuilderTest {
       Test {
         foo : 5m20s
       }
-      """.trim(),
+      """
+        .trim(),
       MultiLineToStringBuilder.of("Test").addDuration("foo", Duration.ofSeconds(320)).toString()
     );
   }
@@ -48,7 +50,8 @@ class MultiLineToStringBuilderTest {
           in list!
         ]
       }
-      """.trim(),
+      """
+        .trim(),
       MultiLineToStringBuilder.of("Test")
         .addColNl("foo", List.of("A new line", "for each entry", "in list!"))
         // These are not added:

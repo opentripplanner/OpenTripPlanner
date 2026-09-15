@@ -231,14 +231,14 @@ public class WalkableAreaBuilder {
       Set<Edge> surviving = pruneAreaEdges(ringSetData.startingVertices(), allEdges, edgesToKeep);
 
       if (visibilityCache != null) {
-        double[][] pairs = surviving
-          .stream()
-          .map(e -> new double[] {
-            e.getFromVertex().getX(),
-            e.getFromVertex().getY(),
-            e.getToVertex().getX(),
-            e.getToVertex().getY(),
-          })
+        double[][] pairs = surviving.stream()
+          .map(
+            e -> new double[] {
+              e.getFromVertex().getX(),
+              e.getFromVertex().getY(),
+              e.getToVertex().getX(),
+              e.getToVertex().getY(), }
+          )
           .toArray(double[][]::new);
         visibilityCache.put(cacheKey, pairs);
       }
@@ -299,8 +299,7 @@ public class WalkableAreaBuilder {
           for (int i = 0; i < outerRing.nodes.size(); ++i) {
             OsmNode node = outerRing.nodes.get(i);
             // Convex corners and mid-points when link points are present are visibility candidates.
-            boolean convex =
-              outerRing.isNodeConvex(i) ||
+            boolean convex = outerRing.isNodeConvex(i) ||
               (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2));
             boolean starting = isStartingNode(node, osmWayIds);
             if (convex || starting) {
@@ -340,9 +339,9 @@ public class WalkableAreaBuilder {
       }
 
       // Phase 1b: build immutable AreaGroup with areas and visibility vertices
-      AreaGroup areaGroup = createAreaGroupBuilder(polygon, group.areas)
-        .withVisibilityVertices(visibilityVertices)
-        .build();
+      AreaGroup areaGroup = createAreaGroupBuilder(polygon, group.areas).withVisibilityVertices(
+        visibilityVertices
+      ).build();
 
       for (IntersectionVertex v : visibilityVertices) {
         vertexToAreaGroup.putIfAbsent(v, areaGroup);
@@ -433,8 +432,7 @@ public class WalkableAreaBuilder {
           }
           var line = LineStringShrinker.shrink(vertex1.getCoordinate(), vertex2.getCoordinate());
           if (ringData.polygon().contains(line)) {
-            boolean platformLinked =
-              ringData.platformLinkingVertices().contains(vertex1) ||
+            boolean platformLinked = ringData.platformLinkingVertices().contains(vertex1) ||
               ringData.platformLinkingVertices().contains(vertex2);
             pairs.add(new VisibilityPair(vertex1, vertex2, ringData.areaGroup(), platformLinked));
           }
@@ -490,8 +488,7 @@ public class WalkableAreaBuilder {
       if (v1 == null || v2 == null) {
         continue;
       }
-      AreaGroup ag = ringSetData
-        .vertexToAreaGroup()
+      AreaGroup ag = ringSetData.vertexToAreaGroup()
         .getOrDefault(v1, ringSetData.vertexToAreaGroup().get(v2));
       if (ag != null) {
         createSegments(v1, v2, group.areas, ag, true);
@@ -558,11 +555,10 @@ public class WalkableAreaBuilder {
   // ---- Helpers -----------------------------------------------------------------------
 
   private Set<Long> collectOsmWayIds(OsmAreaGroup group) {
-    return group.areas
-      .stream()
+    return group.areas.stream()
       .map(area -> area.parent)
-      .flatMap(osmEntity ->
-        osmEntity instanceof OsmRelation relation
+      .flatMap(
+        osmEntity -> osmEntity instanceof OsmRelation relation
           ? relation.getMembers().stream().map(OsmRelationMember::getRef)
           : Stream.of(osmEntity.getId())
       )
@@ -570,20 +566,18 @@ public class WalkableAreaBuilder {
   }
 
   private boolean isStartingNode(OsmNode node, Set<Long> osmWayIds) {
-    return (
-      osmdb.isNodeBelongsToWay(node.getId()) ||
+    return (osmdb.isNodeBelongsToWay(node.getId()) ||
       // Do not add if part of same areaGroup
-      !osmdb
-        .getAreasForNode(node.getId())
+      !osmdb.getAreasForNode(node.getId())
         .stream()
         .allMatch(osmWay -> osmWayIds.contains(osmWay.getId())) ||
-      node.isBoardingLocation()
-    );
+      node.isBoardingLocation());
   }
 
   private WayProperties findAreaProperties(OsmEntity entity) {
-    return wayPropertiesCache.computeIfAbsent(entity, e ->
-      e.getOsmProvider().getWayPropertySet().getDataForEntity(e)
+    return wayPropertiesCache.computeIfAbsent(
+      entity,
+      e -> e.getOsmProvider().getWayPropertySet().getDataForEntity(e)
     );
   }
 
@@ -645,16 +639,13 @@ public class WalkableAreaBuilder {
     }
     final long parentId = parent.getId();
 
-    float carSpeed = parent
-      .getOsmProvider()
+    float carSpeed = parent.getOsmProvider()
       .getOsmTagMapper()
       .getCarSpeedForWay(parent, TraverseDirection.DIRECTIONLESS, issueStore);
 
-    var forwardName = namer
-      .getName(parent)
+    var forwardName = namer.getName(parent)
       .orElseGet(() -> fallbackName(vertex2, vertex1, parentId));
-    AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
-      .withFromVertex(vertex1)
+    AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder().withFromVertex(vertex1)
       .withToVertex(vertex2)
       .withGeometry(line)
       .withName(forwardName)
@@ -667,11 +658,9 @@ public class WalkableAreaBuilder {
       .withWheelchairAccessible(wheelchairAccessible)
       .withLink(parent.isLink());
 
-    var backwardName = namer
-      .getName(parent)
+    var backwardName = namer.getName(parent)
       .orElseGet(() -> fallbackName(vertex1, vertex2, parentId));
-    AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
-      .withFromVertex(vertex2)
+    AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder().withFromVertex(vertex2)
       .withToVertex(vertex1)
       .withGeometry(line.reverse())
       .withName(backwardName)
@@ -704,8 +693,7 @@ public class WalkableAreaBuilder {
       Geometry intersection = containingArea.intersection(area.jtsMultiPolygon.getGeometry());
       OsmEntity areaEntity = area.parent;
 
-      I18NString name = namer
-        .getName(areaEntity)
+      I18NString name = namer.getName(areaEntity)
         .orElseGet(() -> I18NString.of("way (area) " + areaEntity.getId()));
       WayProperties wayData = findAreaProperties(areaEntity);
 

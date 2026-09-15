@@ -120,7 +120,8 @@ public class GtfsRealTimeUpdateHandler {
     UpdateIncrementality updateIncrementality,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     ForwardsDelayPropagationType forwardsDelayPropagationType
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     // The GTFS-RT TripDescriptor.schedule_relationship field is a protobuf optional enum,
     // so a single TripUpdate message carries exactly one value — it is structurally impossible
     // for a message to express two states (e.g. ADDED and CANCELED) at the same time.

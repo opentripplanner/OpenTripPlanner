@@ -81,15 +81,13 @@ class AddedTripBuilder {
     this.deduplicator = deduplicator;
     // Verifying values required in SIRI Profile
     // Added ServiceJourneyId
-    EstimatedVehicleJourneyCode code = journey
-      .code()
+    EstimatedVehicleJourneyCode code = journey.code()
       .orElseThrow(() -> new NullPointerException("EstimatedVehicleJourneyCode is required"));
     tripId = entityResolver.resolveId(code.asServiceJourneyId());
     tripOnServiceDateId = entityResolver.resolveId(code.asDatedServiceJourneyId());
 
     // OperatorRef of added trip
-    String operatorRef = journey
-      .operatorRef()
+    String operatorRef = journey.operatorRef()
       .orElseThrow(() -> new NullPointerException("OperatorRef is required"));
     operator = entityResolver.resolveOperator(operatorRef);
 
@@ -233,9 +231,8 @@ class AddedTripBuilder {
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
-    var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
-      transitService.getTripCalendars().getServiceCode(trip.getServiceId())
-    );
+    var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator)
+      .withServiceCode(transitService.getTripCalendars().getServiceCode(trip.getServiceId()));
     tripTimes.validateNonIncreasingTimes();
 
     TripPattern pattern = TripPattern.of(getTripPatternId.apply(trip))
@@ -319,8 +316,7 @@ class AddedTripBuilder {
    */
   @Nullable
   private Agency resolveAgency() {
-    return transitService
-      .listRoutes()
+    return transitService.listRoutes()
       .stream()
       .filter(r -> r != null && r.getOperator() != null && r.getOperator().equals(operator))
       .findFirst()
@@ -377,14 +373,12 @@ class AddedTripBuilder {
   ) {
     List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
 
-    journey
-      .replacedDatedVehicleJourneyRef()
+    journey.replacedDatedVehicleJourneyRef()
       .map(entityResolver::resolveTripOnServiceDate)
       .ifPresent(listOfReplacedVehicleJourneys::add);
 
     // Add additional replaced service journeys if present.
-    journey
-      .additionalReplacedDatedVehicleJourneyRefs()
+    journey.additionalReplacedDatedVehicleJourneyRefs()
       .stream()
       .map(entityResolver::resolveTripOnServiceDate)
       .filter(Objects::nonNull)

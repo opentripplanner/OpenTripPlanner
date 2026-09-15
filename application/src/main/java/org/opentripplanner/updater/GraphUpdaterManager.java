@@ -145,8 +145,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     }
 
     try {
-      boolean ok =
-        pollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS) &&
+      boolean ok = pollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS) &&
         nonPollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS);
       if (!ok) {
         LOG.warn("Timeout waiting for updaters to finish.");
@@ -175,8 +174,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    */
   @Override
   public List<String> listUnprimedUpdaters() {
-    return updaterList
-      .stream()
+    return updaterList.stream()
       .filter(Predicate.not(GraphUpdater::isPrimed))
       .map(GraphUpdater::getConfigRef)
       .collect(Collectors.toList());
@@ -226,8 +224,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    * mostly idle, and it is short-lived, so the busy-wait is a compromise.
    */
   private void reportReadinessForUpdaters() {
-    Executors.newSingleThreadExecutor(Thread.ofPlatform().name("updater-ready").factory()).submit(
-      () -> {
+    Executors.newSingleThreadExecutor(Thread.ofPlatform().name("updater-ready").factory())
+      .submit(() -> {
         boolean otpIsShuttingDown = false;
 
         while (!otpIsShuttingDown) {
@@ -250,7 +248,6 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
             LOG.error(e.getMessage(), e);
           }
         }
-      }
-    );
+      });
   }
 }

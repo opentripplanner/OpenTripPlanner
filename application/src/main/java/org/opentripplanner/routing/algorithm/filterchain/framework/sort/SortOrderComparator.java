@@ -22,8 +22,10 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
    * with walking/bicycle/car from origin all the way to the destination, than it will be sorted
    * before any itineraries with one or more transit legs.
    */
-  static final Comparator<ItinerarySortKey> STREET_ONLY_FIRST_COMP = (a, b) ->
-    Boolean.compare(b.isStreetOnly(), a.isStreetOnly());
+  static final Comparator<ItinerarySortKey> STREET_ONLY_FIRST_COMP = (a, b) -> Boolean.compare(
+    b.isStreetOnly(),
+    a.isStreetOnly()
+  );
 
   /** Sort latest arrival-time first */
   static final Comparator<ItinerarySortKey> ARRIVAL_TIME_COMP = comparing(

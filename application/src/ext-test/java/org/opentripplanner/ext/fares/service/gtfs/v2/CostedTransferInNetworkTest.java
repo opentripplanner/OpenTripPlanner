@@ -75,8 +75,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
    */
   @Test
   void threeLegs() {
-    var i1 = newItinerary(A, 0)
-      .bus(ROUTE_1, 1, 0, 20, B)
+    var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B)
       .bus(ROUTE_2, 2, 21, 40, C)
       .bus(ROUTE_3, 3, 41, 45, D)
       .build();
@@ -105,8 +104,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
   @Test
   void threeLegsDifferentNetwork() {
-    var i1 = newItinerary(A, 0)
-      .bus(ROUTE_1, 1, 0, 20, B)
+    var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B)
       .bus(ROUTE_2, 2, 21, 40, C)
       .bus(ROUTE_4, 3, 41, 45, D)
       .build();

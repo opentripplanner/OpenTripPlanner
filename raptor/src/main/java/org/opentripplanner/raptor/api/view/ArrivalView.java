@@ -164,8 +164,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * Use this to create a {@code toString()} implementation.
    */
   default String asString() {
-    String vector =
-      TimeUtils.timeToStrCompact(arrivalTime()) +
+    String vector = TimeUtils.timeToStrCompact(arrivalTime()) +
       " " +
       ROUNDS.format(round()) +
       cost(c1(), RaptorCostCalculator.ZERO_COST, C1::format) +

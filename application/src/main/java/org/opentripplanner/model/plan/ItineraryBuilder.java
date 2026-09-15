@@ -164,16 +164,13 @@ public class ItineraryBuilder {
    * of this Itinerary.
    */
   public ItineraryBuilder transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
-    legs = legs
-      .stream()
-      .map(l -> {
-        if (l instanceof TransitLeg tl) {
-          return mapper.apply(tl);
-        } else {
-          return l;
-        }
-      })
-      .toList();
+    legs = legs.stream().map(l -> {
+      if (l instanceof TransitLeg tl) {
+        return mapper.apply(tl);
+      } else {
+        return l;
+      }
+    }).toList();
     return this;
   }
 

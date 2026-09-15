@@ -146,16 +146,14 @@ public class NetexFeedParameters implements DataSourceConfig {
       return false;
     }
     NetexFeedParameters that = (NetexFeedParameters) o;
-    return (
-      Objects.equals(source, that.source) &&
+    return (Objects.equals(source, that.source) &&
       feedId.equals(that.feedId) &&
       ignoreFilePattern.equals(that.ignoreFilePattern) &&
       sharedFilePattern.equals(that.sharedFilePattern) &&
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
       ignoredFeatures.equals(that.ignoredFeatures) &&
-      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
-    );
+      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle));
   }
 
   @Override

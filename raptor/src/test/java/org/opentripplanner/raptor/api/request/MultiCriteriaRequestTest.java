@@ -24,8 +24,7 @@ class MultiCriteriaRequestTest {
     // Change a filed - build - make a new copy and set same value => should be equal
     assertEquals(
       subject,
-      subject
-        .copyOf()
+      subject.copyOf()
         .withRelaxC1(RelaxFunction.NORMAL)
         .build()
         .copyOf()
@@ -35,8 +34,7 @@ class MultiCriteriaRequestTest {
     // Change another filed - build - make a new copy and set same value => should be equal
     assertEquals(
       subject,
-      subject
-        .copyOf()
+      subject.copyOf()
         .withRelaxC1(RelaxFunction.NORMAL)
         .build()
         .copyOf()

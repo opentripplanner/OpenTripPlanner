@@ -99,12 +99,12 @@ public class OsmDatabase {
   private final ArrayListMultimap<OsmEntity, OsmLevel> entityLevels = ArrayListMultimap.create();
 
   /* Set of turn restrictions for each turn "from" way ID */
-  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
-    ArrayListMultimap.create();
+  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap
+    .create();
 
   /* Set of turn restrictions for each turn "to" way ID */
-  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay =
-    ArrayListMultimap.create();
+  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap
+    .create();
 
   /*
    * Map of all transit stop nodes that lie within an area and which are connected to the area by
@@ -253,11 +253,9 @@ public class OsmDatabase {
       carParkingNodes.put(node.getId(), node);
     }
     if (
-      !(
-        waysNodeIds.contains(node.getId()) ||
+      !(waysNodeIds.contains(node.getId()) ||
         areaNodeIds.contains(node.getId()) ||
-        node.isBoardingLocation()
-      )
+        node.isBoardingLocation())
     ) {
       return;
     }
@@ -308,7 +306,7 @@ public class OsmDatabase {
 
     if (
       (relation.isMultiPolygon() && (relation.isRoutable() || relation.isParkAndRide())) ||
-      relation.isBikeParking()
+        relation.isBikeParking()
     ) {
       // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
       // without reference to the ways that compose them. Accordingly, we will merely
@@ -323,10 +321,10 @@ public class OsmDatabase {
       createLevelsForEntity(relation);
     } else if (
       !relation.isRestriction() &&
-      !relation.isRoadRoute() &&
-      !(relation.isMultiPolygon() && relation.isRoutable()) &&
-      !relation.isStopArea() &&
-      !(relation.isRoadRoute() || relation.isBicycleRoute())
+        !relation.isRoadRoute() &&
+        !(relation.isMultiPolygon() && relation.isRoutable()) &&
+        !relation.isStopArea() &&
+        !(relation.isRoadRoute() || relation.isBicycleRoute())
     ) {
       return;
     }
@@ -428,10 +426,8 @@ public class OsmDatabase {
         continue;
       }
       if (
-        !(
-          relation.isMultiPolygon() &&
-          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking())
-        )
+        !(relation.isMultiPolygon() &&
+          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking()))
       ) {
         continue;
       }
@@ -695,8 +691,7 @@ public class OsmDatabase {
       // a node inside it may specify several levels if it is an elevator
       // make sure each node has access to the current platform level
       Set<OsmLevel> areaLevelSet = getLevelSetForEntity(area);
-      platformNodes
-        .stream()
+      platformNodes.stream()
         .filter(node -> getLevelSetForEntity(node).containsAll(areaLevelSet))
         .forEach(node -> stopsInAreas.put(area, node));
     }

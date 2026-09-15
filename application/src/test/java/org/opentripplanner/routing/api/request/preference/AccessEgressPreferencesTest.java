@@ -49,8 +49,7 @@ public class AccessEgressPreferencesTest {
   void testEqualsAndHashCode() {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withMaxStopCount(20, Map.of()).build();
-    var copy = other
-      .copyOf()
+    var copy = other.copyOf()
       .withMaxStopCount(MAX_DEFAULT_STOP_COUNT, Map.of(StreetMode.CAR, MAX_CAR_STOP_COUNT))
       .build();
     assertEqualsAndHashCode(subject, other, copy);

@@ -149,8 +149,7 @@ public class NetexMapper {
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
     ServiceCalendar emptyCalendar = calendarServiceBuilder.createEmptyCalendar();
     if (
-      transitBuilder
-        .getTripsById()
+      transitBuilder.getTripsById()
         .values()
         .stream()
         .anyMatch(trip -> emptyCalendar.getServiceId().equals(trip.getServiceId()))
@@ -250,41 +249,39 @@ public class NetexMapper {
   private void mapGroupsOfLines() {
     GroupOfRoutesMapper mapper = new GroupOfRoutesMapper(idFactory);
 
-    currentNetexIndex
-      .getGroupsOfLinesById()
-      .localValues()
-      .forEach(gol -> {
-        GroupOfRoutes model = mapper.mapGroupOfRoutes(gol);
+    currentNetexIndex.getGroupsOfLinesById().localValues().forEach(gol -> {
+      GroupOfRoutes model = mapper.mapGroupOfRoutes(gol);
 
-        Optional.ofNullable(gol.getMembers())
-          .stream()
-          .map(LineRefs_RelStructure::getLineRef)
-          .filter(Objects::nonNull)
-          .flatMap(Collection::stream)
-          .filter(Objects::nonNull)
-          .map(JAXBElement::getValue)
-          .filter(Objects::nonNull)
-          .map(VersionOfObjectRefStructure::getRef)
-          .filter(Objects::nonNull)
-          .forEach(ref -> {
-            FeedScopedId routeId = idFactory.createId(ref);
-            // At this point no routes are created yet
-            // So we put all group of lines in multimap
-            // RouteMapper can then use this map to populate Routes with correct GroupsOfLines
-            transitBuilder.getGroupsOfRoutesByRouteId().put(routeId, model);
-          });
+      Optional.ofNullable(gol.getMembers())
+        .stream()
+        .map(LineRefs_RelStructure::getLineRef)
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .filter(Objects::nonNull)
+        .map(JAXBElement::getValue)
+        .filter(Objects::nonNull)
+        .map(VersionOfObjectRefStructure::getRef)
+        .filter(Objects::nonNull)
+        .forEach(ref -> {
+          FeedScopedId routeId = idFactory.createId(ref);
+          // At this point no routes are created yet
+          // So we put all group of lines in multimap
+          // RouteMapper can then use this map to populate Routes with correct GroupsOfLines
+          transitBuilder.getGroupsOfRoutesByRouteId().put(routeId, model);
+        });
 
-        // Create this index as well
-        // In case relation is set on Line
-        transitBuilder.getGroupOfRouteById().add(model);
-      });
+      // Create this index as well
+      // In case relation is set on Line
+      transitBuilder.getGroupOfRouteById().add(model);
+    });
   }
 
   private void mapOperators() {
     OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(issueStore, idFactory);
-    for (org.rutebanken.netex.model.Operator operator : currentNetexIndex
-      .getOperatorsById()
-      .localValues()) {
+    for (
+      org.rutebanken.netex.model.Operator operator : currentNetexIndex.getOperatorsById()
+        .localValues()
+    ) {
       transitBuilder.getOperatorsById().add(mapper.mapOperator(operator));
     }
   }
@@ -314,8 +311,7 @@ public class NetexMapper {
       routeToCentroidStopPlaceIds
     );
     for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
-      Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex
-        .getStopPlaceById()
+      Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex.getStopPlaceById()
         .lookup(stopPlaceId);
       stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
     }
@@ -329,11 +325,10 @@ public class NetexMapper {
   private void mapMultiModalStopPlaces() {
     MultiModalStationMapper mapper = new MultiModalStationMapper(issueStore, idFactory);
 
-    for (StopPlace multiModalStopPlace : currentNetexIndex
-      .getMultiModalStopPlaceById()
-      .localValues()) {
-      var stations = currentMapperIndexes
-        .getStationsByMultiModalStationRfs()
+    for (
+      StopPlace multiModalStopPlace : currentNetexIndex.getMultiModalStopPlaceById().localValues()
+    ) {
+      var stations = currentMapperIndexes.getStationsByMultiModalStationRfs()
         .get(multiModalStopPlace.getId());
       var multiModalStation = mapper.map(multiModalStopPlace, stations);
       if (multiModalStation != null) {
@@ -349,18 +344,17 @@ public class NetexMapper {
       transitBuilder.getMultiModalStationsById(),
       transitBuilder.getStations()
     );
-    for (GroupOfStopPlaces groupOfStopPlaces : currentNetexIndex
-      .getGroupOfStopPlacesById()
-      .localValues()) {
-      transitBuilder
-        .siteRepository()
+    for (
+      GroupOfStopPlaces groupOfStopPlaces : currentNetexIndex.getGroupOfStopPlacesById()
+        .localValues()
+    ) {
+      transitBuilder.siteRepository()
         .withGroupOfStation(groupOfStationsMapper.map(groupOfStopPlaces));
     }
   }
 
   private void mapFlexibleStopPlaces() {
-    Collection<FlexibleStopPlace> flexibleStopPlaces = currentNetexIndex
-      .getFlexibleStopPlacesById()
+    Collection<FlexibleStopPlace> flexibleStopPlaces = currentNetexIndex.getFlexibleStopPlacesById()
       .localValues();
 
     // Building the indices in FlexStopLocationMapper is expensive, so skip it if not needed
@@ -464,19 +458,18 @@ public class NetexMapper {
       maxStopToShapeSnapDistance
     );
 
-    for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
-      .getJourneyPatternsById()
-      .localValues()) {
-      tripPatternMapper
-        .mapTripPattern(journeyPattern)
+    for (
+      JourneyPattern_VersionStructure journeyPattern : currentNetexIndex.getJourneyPatternsById()
+        .localValues()
+    ) {
+      tripPatternMapper.mapTripPattern(journeyPattern)
         .ifPresent(this::applyTripPatternMapperResult);
     }
   }
 
   private void applyTripPatternMapperResult(TripPatternMapperResult result) {
     var stopPattern = result.tripPattern().getStopPattern();
-    var journeyPatternExists = transitBuilder
-      .getTripPatterns()
+    var journeyPatternExists = transitBuilder.getTripPatterns()
       .get(stopPattern)
       .stream()
       .anyMatch(tripPattern -> result.tripPattern().getId().equals(tripPattern.getId()));
@@ -509,9 +502,9 @@ public class NetexMapper {
       transitBuilder.getTripsById(),
       currentMapperIndexes.getStopTimesByNetexId()
     );
-    for (NoticeAssignment noticeAssignment : currentNetexIndex
-      .getNoticeAssignmentById()
-      .localValues()) {
+    for (
+      NoticeAssignment noticeAssignment : currentNetexIndex.getNoticeAssignmentById().localValues()
+    ) {
       Multimap<AbstractTransitEntity, Notice> noticesByElementId;
       noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
       transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
@@ -527,39 +520,33 @@ public class NetexMapper {
   }
 
   private void mapScheduledStopPointsToQuays() {
-    currentNetexIndex
-      .getQuayIdByStopPointRef()
-      .localKeys()
-      .forEach(id -> {
-        var sspid = idFactory.createId(id);
-        var quayId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
-        if (transitBuilder.getStops().containsKey(quayId)) {
-          var stop = transitBuilder.getStops().get(quayId);
-          transitBuilder.addStopByScheduledStopPoint(sspid, stop);
-        } else {
-          // it's debatable if this is actually a problem with the data set. there are legitimate
-          // cases where SSPs are not mapped, for example pass-through stops.
-          issueStore.add(
-            "ScheduledStopPointAssignedToUnknownQuay",
-            "Scheduled stop point %s been mapped to unknow quay %s.",
-            sspid,
-            quayId
-          );
-        }
-      });
+    currentNetexIndex.getQuayIdByStopPointRef().localKeys().forEach(id -> {
+      var sspid = idFactory.createId(id);
+      var quayId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
+      if (transitBuilder.getStops().containsKey(quayId)) {
+        var stop = transitBuilder.getStops().get(quayId);
+        transitBuilder.addStopByScheduledStopPoint(sspid, stop);
+      } else {
+        // it's debatable if this is actually a problem with the data set. there are legitimate
+        // cases where SSPs are not mapped, for example pass-through stops.
+        issueStore.add(
+          "ScheduledStopPointAssignedToUnknownQuay",
+          "Scheduled stop point %s been mapped to unknow quay %s.",
+          sspid,
+          quayId
+        );
+      }
+    });
   }
 
   private void mapVehicleParkings() {
     var mapper = new VehicleParkingMapper(idFactory, issueStore);
-    currentNetexIndex
-      .getParkingsById()
-      .localKeys()
-      .forEach(id -> {
-        var parking = mapper.map(currentNetexIndex.getParkingsById().lookup(id));
-        if (parking != null) {
-          transitBuilder.vehicleParkings().add(parking);
-        }
-      });
+    currentNetexIndex.getParkingsById().localKeys().forEach(id -> {
+      var parking = mapper.map(currentNetexIndex.getParkingsById().lookup(id));
+      if (parking != null) {
+        transitBuilder.vehicleParkings().add(parking);
+      }
+    });
   }
 
   /**

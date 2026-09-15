@@ -44,8 +44,7 @@ class MalformedElevatorWayTest {
     var elevatorHopEdges = graph.findEdges(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(0);
 
-    var issues = issueStore
-      .listIssues()
+    var issues = issueStore.listIssues()
       .stream()
       .filter(issue -> issue instanceof FewerThanTwoIntersectionNodesInElevatorWay)
       .map(FewerThanTwoIntersectionNodesInElevatorWay.class::cast)

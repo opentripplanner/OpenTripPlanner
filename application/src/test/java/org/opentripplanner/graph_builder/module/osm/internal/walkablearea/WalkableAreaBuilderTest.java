@@ -69,8 +69,7 @@ public class WalkableAreaBuilderTest {
       boardingAreaRefTags
     );
 
-    final Map<OsmArea, Set<OsmLevel>> areasLevels = osmdb
-      .getWalkableAreas()
+    final Map<OsmArea, Set<OsmLevel>> areasLevels = osmdb.getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelSetForEntity(a.parent)));
     final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(
@@ -94,8 +93,7 @@ public class WalkableAreaBuilderTest {
   @MaxAreaNodes(5)
   void testCalculateVerticesArea(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
-    var areas = graph
-      .listAreaEdges()
+    var areas = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(1025307935)))
       .map(AreaEdge::getArea)
@@ -111,8 +109,7 @@ public class WalkableAreaBuilderTest {
   @MaxAreaNodes(5)
   void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
-    var areas = graph
-      .listAreaEdges()
+    var areas = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(1025307935)))
       .map(AreaEdge::getArea)
@@ -131,8 +128,7 @@ public class WalkableAreaBuilderTest {
   void testEntranceStopAreaLinking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
-    var busStopConnection = graph
-      .listAreaEdges()
+    var busStopConnection = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143853)))
       .map(AreaEdge::getArea)
@@ -141,8 +137,7 @@ public class WalkableAreaBuilderTest {
     assertEquals(1, busStopConnection.size());
 
     // first platform has level 0, entrance below it has level -1 -> no links
-    var entranceAtWrongLevel = graph
-      .listAreaEdges()
+    var entranceAtWrongLevel = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143850)))
       .map(AreaEdge::getArea)
@@ -151,8 +146,7 @@ public class WalkableAreaBuilderTest {
     assertEquals(0, entranceAtWrongLevel.size());
 
     // second platform and its entrance both default to level zero, entrance gets connected
-    var entranceAtSameLevel = graph
-      .listAreaEdges()
+    var entranceAtSameLevel = graph.listAreaEdges()
       .stream()
       .filter(a -> elevatorVertexConnectedToAreaEdgeHasNodeId(a, 143832))
       .map(AreaEdge::getArea)
@@ -162,8 +156,7 @@ public class WalkableAreaBuilderTest {
 
     // second platform also contains a stop position which is not considered as an entrance
     // therefore it should not get linked
-    var stopPositionConnection = graph
-      .listAreaEdges()
+    var stopPositionConnection = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143863)))
       .map(AreaEdge::getArea)
@@ -174,8 +167,7 @@ public class WalkableAreaBuilderTest {
     // test that third platform and its entrance get connected
     // and there are not too many connections (to remote platforms)
     // third platform also tests the 'layer' tag
-    var connectionEdges = graph
-      .listAreaEdges()
+    var connectionEdges = graph.listAreaEdges()
       .stream()
       .filter(a -> elevatorVertexConnectedToAreaEdgeHasNodeId(a, 143845))
       .toList();
@@ -185,8 +177,7 @@ public class WalkableAreaBuilderTest {
 
     // test that semicolon separated list of elevator levals works in level matching
     // e.g. 'level'='0;1'
-    var elevatorConnection = graph
-      .listAreaEdges()
+    var elevatorConnection = graph.listAreaEdges()
       .stream()
       .filter(a -> elevatorVertexConnectedToAreaEdgeHasNodeId(a, 143861))
       .map(AreaEdge::getArea)
@@ -196,8 +187,7 @@ public class WalkableAreaBuilderTest {
 
     // first platform area has ref tag. Check that it is available in
     // DefaultOsmInfoGraphBuildRepository
-    var areaGroups = graph
-      .listAreaEdges()
+    var areaGroups = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143846)))
       .map(AreaEdge::getArea)
@@ -218,8 +208,7 @@ public class WalkableAreaBuilderTest {
   @MaxAreaNodes(50)
   void testSeveralIntersections(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
-    var areas = graph
-      .listAreaEdges()
+    var areas = graph.listAreaEdges()
       .stream()
       .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(2522105666L)))
       .map(AreaEdge::getArea)
@@ -230,9 +219,8 @@ public class WalkableAreaBuilderTest {
   }
 
   private static boolean elevatorVertexConnectedToAreaEdgeHasNodeId(AreaEdge a, long nodeId) {
-    return (
-      a.getToVertex().getLabel() instanceof VertexWithEntityLabel label && label.nodeId() == nodeId
-    );
+    return (a.getToVertex().getLabel() instanceof VertexWithEntityLabel label &&
+      label.nodeId() == nodeId);
   }
 
   // -- Infrastructure --

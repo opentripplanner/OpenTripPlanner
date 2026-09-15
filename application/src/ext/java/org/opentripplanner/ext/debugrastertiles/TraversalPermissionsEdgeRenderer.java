@@ -104,9 +104,9 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       return VertexVisualAttributes.optional(STREET_COLOR_VERTEX, null);
     } else if (
       v instanceof TransitStopVertex ||
-      v instanceof TransitEntranceVertex ||
-      v instanceof TransitPathwayNodeVertex ||
-      v instanceof TransitBoardingAreaVertex
+        v instanceof TransitEntranceVertex ||
+        v instanceof TransitPathwayNodeVertex ||
+        v instanceof TransitBoardingAreaVertex
     ) {
       return VertexVisualAttributes.optional(TRANSIT_STOP_COLOR_VERTEX, v.getDefaultName());
     } else if (v instanceof VehicleRentalPlaceVertex) {

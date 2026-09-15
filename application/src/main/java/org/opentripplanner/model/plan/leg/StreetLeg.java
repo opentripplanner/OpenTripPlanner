@@ -178,8 +178,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return copyOf()
-      .withStartTime(startTime.plus(duration))
+    return copyOf().withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
   }

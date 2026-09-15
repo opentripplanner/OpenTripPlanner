@@ -40,8 +40,7 @@ public class RemoveNonTransitItinerariesBasedOnGeneralizedCost implements Remove
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
-    OptionalInt minGeneralizedCost = itineraries
-      .stream()
+    OptionalInt minGeneralizedCost = itineraries.stream()
       .mapToInt(Itinerary::generalizedCost)
       .min();
 
@@ -51,12 +50,10 @@ public class RemoveNonTransitItinerariesBasedOnGeneralizedCost implements Remove
 
     // TODO: This is a bit ugly, but the filters should be refactored
     //       to use the Cost type and not int.
-    var maxLimit = costLimitFunction
-      .calculate(Cost.costOfSeconds(minGeneralizedCost.getAsInt()))
+    var maxLimit = costLimitFunction.calculate(Cost.costOfSeconds(minGeneralizedCost.getAsInt()))
       .toSeconds();
 
-    return itineraries
-      .stream()
+    return itineraries.stream()
       .filter(it -> !it.hasTransit() && it.generalizedCost() > maxLimit)
       .collect(Collectors.toList());
   }

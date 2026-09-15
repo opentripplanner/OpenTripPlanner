@@ -31,18 +31,14 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     STOP_D,
     t3.trip(),
     STOP_D
-  )
-    .staySeated()
-    .build();
+  ).staySeated().build();
 
   private final TripToTripTransfer<TestTripSchedule> tx12 = TestTransferBuilder.tx(
     t1.trip(),
     STOP_B,
     t2.trip(),
     STOP_C
-  )
-    .walk(D2_m)
-    .build();
+  ).walk(D2_m).build();
 
   private final TransferWaitTimeCostCalculator waitTimeCalc = new TransferWaitTimeCostCalculator(
     1.0,
@@ -85,8 +81,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.addTransitAndTransferLeg(t1, tx12);
     subject.access(orgPath.accessLeg().access());
 
-    var exp =
-      "Walk 3m ~ A " +
+    var exp = "Walk 3m ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 2m ~ C " +
       "~ BUS L21 11:00 11:23 ~ D " +
@@ -102,8 +97,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.addTransitTail(flexPath.accessLeg().nextTransitLeg());
     subject.access(orgPath.accessLeg().access());
 
-    var exp =
-      "Walk 3m ~ A " +
+    var exp = "Walk 3m ~ A " +
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 3m45s ~ E " +
       "~ Flex 7m45s Rₙ1 " +
@@ -147,8 +141,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     var path = subject.build();
 
     // We have replaced the first transfer with a 2 minute walk
-    var expPath =
-      "Walk 3m 10:00:15 10:03:15 C₁360 ~ A 45s " +
+    var expPath = "Walk 3m 10:00:15 10:03:15 C₁360 ~ A 45s " +
       "~ BUS L11 10:04 10:35 31m C₁1_998 ~ B 15s " +
       "~ Walk 2m 10:35:15 10:37:15 C₁240 ~ C 22m45s " +
       "~ BUS L21 11:00 11:23 23m C₁2_724 ~ D 17m (staySeated) " +

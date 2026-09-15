@@ -52,8 +52,9 @@ public class TripOnServiceDateMatcherFactory {
 
     if (!request.filters().isEmpty()) {
       expr.matches(
-        SelectorBasedMatcherFactory.of(request.filters(), selector ->
-          buildSelectorMatcher(selector, runningTimeResolver)
+        SelectorBasedMatcherFactory.of(
+          request.filters(),
+          selector -> buildSelectorMatcher(selector, runningTimeResolver)
         )
       );
     }
@@ -117,8 +118,9 @@ public class TripOnServiceDateMatcherFactory {
         selector.transportModes().get().stream().map(NarrowedTransitMode::of).toList()
       );
       expr.matches(
-        new GenericUnaryMatcher<>("transportMode", (TripOnServiceDate tripTime) ->
-          transportModeFilter.match(
+        new GenericUnaryMatcher<>(
+          "transportMode",
+          (TripOnServiceDate tripTime) -> transportModeFilter.match(
             tripTime.getTrip().getMode(),
             tripTime.getTrip().getNetexSubMode()
           )
@@ -160,8 +162,10 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   static Matcher<TripOnServiceDate> netexInternalPlanningCode(String code) {
-    return new EqualityMatcher<>("netexInternalPlanningCode", code, t ->
-      t.getTrip().getNetexInternalPlanningCode()
+    return new EqualityMatcher<>(
+      "netexInternalPlanningCode",
+      code,
+      t -> t.getTrip().getNetexInternalPlanningCode()
     );
   }
 
@@ -170,8 +174,9 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   static Matcher<TripOnServiceDate> serviceDateRange(LocalDateRange dateRange) {
-    return new GenericUnaryMatcher<>("serviceDateRange", date ->
-      dateRange.contains(date.getServiceDate())
+    return new GenericUnaryMatcher<>(
+      "serviceDateRange",
+      date -> dateRange.contains(date.getServiceDate())
     );
   }
 

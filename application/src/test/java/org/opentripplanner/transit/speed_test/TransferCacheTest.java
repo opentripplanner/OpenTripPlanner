@@ -64,8 +64,9 @@ public class TransferCacheTest {
       var routeRequest = RouteRequest.of()
         .withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)))
         .buildDefault();
-      timer.recordTimer("transfer_cache_computation", () ->
-        transitRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
+      timer.recordTimer(
+        "transfer_cache_computation",
+        () -> transitRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
       );
     });
   }

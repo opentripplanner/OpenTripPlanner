@@ -51,8 +51,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calcEarliestDeparture() {
-    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>().searchParams()
       .latestArrivalTime(3_000)
       .buildSearchParam();
 
@@ -84,8 +83,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calcEarliestDepartureExact() {
-    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>().searchParams()
       .latestArrivalTime(3_000)
       .buildSearchParam();
 
@@ -108,8 +106,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calcLatestArrivalTime() {
-    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>().searchParams()
       .earliestDepartureTime(10_200)
       .buildSearchParam();
 
@@ -134,8 +131,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calcSearchWindowLimitByMaxLength() {
-    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>().searchParams()
       .earliestDepartureTime(12_000)
       .buildSearchParam();
 
@@ -160,8 +156,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calcSearchWindowMin() {
-    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>().searchParams()
       .earliestDepartureTime(12_000)
       .buildSearchParam();
 
@@ -175,8 +170,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   public void calcSearchWindowFromLATAndEDT() {
-    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
-      .searchParams()
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>().searchParams()
       .earliestDepartureTime(12_000)
       .latestArrivalTime(18_000)
       .buildSearchParam();
@@ -211,8 +205,9 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   void roundUpToNearestMinuteNotDefinedForNegativeNumbers() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      subject.roundDownToNearestMinute(-1)
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> subject.roundDownToNearestMinute(-1)
     );
     assertEquals("This operation is not defined for negative numbers: -1", ex.getMessage());
   }

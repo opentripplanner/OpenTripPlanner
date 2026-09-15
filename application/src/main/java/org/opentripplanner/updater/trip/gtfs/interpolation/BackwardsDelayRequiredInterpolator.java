@@ -23,7 +23,7 @@ class BackwardsDelayRequiredInterpolator extends AbstractBackwardsDelayInterpola
   protected void fillInMissingTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
     while (
       builder.getArrivalDelay(firstUpdatedIndex) == null &&
-      builder.getDepartureDelay(firstUpdatedIndex) == null
+        builder.getDepartureDelay(firstUpdatedIndex) == null
     ) {
       ++firstUpdatedIndex;
     }

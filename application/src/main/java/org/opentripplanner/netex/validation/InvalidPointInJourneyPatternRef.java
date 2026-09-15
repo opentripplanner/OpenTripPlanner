@@ -20,15 +20,13 @@ class InvalidPointInJourneyPatternRef extends AbstractHMapValidationRule<String,
   public Status validate(ServiceJourney sj) {
     var journeyPattern = index.getJourneyPatternsById().lookup(getPatternId(sj));
 
-    var stopPointsInPattern = journeyPattern
-      .getPointsInSequence()
+    var stopPointsInPattern = journeyPattern.getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .stream()
       .map(EntityStructure::getId)
       .collect(Collectors.toSet());
 
-    var stopPointRefs = sj
-      .getPassingTimes()
+    var stopPointRefs = sj.getPassingTimes()
       .getTimetabledPassingTime()
       .stream()
       .map(p -> p.getPointInJourneyPatternRef().getValue().getRef())

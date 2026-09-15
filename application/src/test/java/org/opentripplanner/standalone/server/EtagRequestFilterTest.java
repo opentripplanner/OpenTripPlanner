@@ -50,7 +50,8 @@ class EtagRequestFilterTest {
     String responseContentType,
     byte[] entity,
     String expectedEtag
-  ) throws IOException {
+  )
+    throws IOException {
     var request = HttpForTest.containerRequest(method);
     var response = response(status, request);
     var headers = response.getHeaders();

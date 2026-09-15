@@ -32,32 +32,28 @@ class GroupByAllSameStationsTest implements PlanTestConstants {
   @Test
   public void testMatchingItineraries() {
     GroupByAllSameStations first = new GroupByAllSameStations(
-      newItinerary(P_A)
-        .rail(20, T11_05, T11_15, P_B)
+      newItinerary(P_A).rail(20, T11_05, T11_15, P_B)
         .walk(D5_m, P_C)
         .bus(30, T11_30, T11_50, P_D)
         .build()
     );
 
     GroupByAllSameStations second = new GroupByAllSameStations(
-      newItinerary(P_A)
-        .rail(20, T11_05, T11_15, P_B)
+      newItinerary(P_A).rail(20, T11_05, T11_15, P_B)
         .walk(D5_m, P_C)
         .bus(30, T11_30, T11_50, P_E)
         .build()
     );
 
     GroupByAllSameStations third = new GroupByAllSameStations(
-      newItinerary(P_A)
-        .rail(20, T11_05, T11_15, P_B)
+      newItinerary(P_A).rail(20, T11_05, T11_15, P_B)
         .walk(D5_m, P_C)
         .bus(30, T11_30, T11_50, P_F)
         .build()
     );
 
     GroupByAllSameStations fourth = new GroupByAllSameStations(
-      newItinerary(P_A)
-        .rail(20, T11_05, T11_15, P_B)
+      newItinerary(P_A).rail(20, T11_05, T11_15, P_B)
         .walk(D5_m, P_C)
         .bus(30, T11_30, T11_50, P_G)
         .build()
@@ -68,8 +64,7 @@ class GroupByAllSameStationsTest implements PlanTestConstants {
     );
 
     GroupByAllSameStations withAccessEgressWalk = new GroupByAllSameStations(
-      newItinerary(P_H, T11_01)
-        .walk(D2_m, P_A)
+      newItinerary(P_H, T11_01).walk(D2_m, P_A)
         .rail(20, T11_05, T11_15, P_B)
         .bus(30, T11_30, T11_50, P_E)
         .walk(D5_m, P_F)

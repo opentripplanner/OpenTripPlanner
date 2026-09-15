@@ -55,8 +55,8 @@ public class RealTimeTripStateType {
             "Has the quay sequence changed from the planned journey pattern? True if quays were added, removed, reordered, or reassigned to a different quay's location. False if the journey was cancelled"
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(env ->
-            ((TransmodelRealTimeTripStateModel) env.getSource()).journeyPatternModified()
+          .dataFetcher(
+            env -> ((TransmodelRealTimeTripStateModel) env.getSource()).journeyPatternModified()
           )
           .build()
       )

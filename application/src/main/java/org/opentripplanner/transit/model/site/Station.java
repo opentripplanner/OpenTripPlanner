@@ -25,10 +25,8 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  * bus terminal, or a bus station (with a bus stop at each side of the road). Equivalent to GTFS
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
-public class Station
-  extends AbstractTransitEntity<Station, StationBuilder>
-  implements StopLocationsGroup, LogInfo
-{
+public class Station extends AbstractTransitEntity<Station, StationBuilder> implements
+  StopLocationsGroup, LogInfo {
 
   private final I18NString name;
   private final String code;
@@ -177,8 +175,7 @@ public class Station
 
   @Override
   public boolean sameAs(Station other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(code, other.code) &&
       Objects.equals(description, other.description) &&
@@ -186,8 +183,7 @@ public class Station
       Objects.equals(shouldRouteToCentroid, other.shouldRouteToCentroid) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(url, other.url) &&
-      Objects.equals(timezone, other.timezone)
-    );
+      Objects.equals(timezone, other.timezone));
   }
 
   private static GeometryCollection computeGeometry(
@@ -195,8 +191,7 @@ public class Station
     Set<StopLocation> childStops
   ) {
     Point stationPoint = null;
-    var childGeometries = childStops
-      .stream()
+    var childGeometries = childStops.stream()
       .map(StopLocation::getGeometry)
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
@@ -209,10 +204,9 @@ public class Station
     );
     var convexHull = new ConvexHull(geometryCollection).getConvexHull();
 
-    var geometries =
-      stationPoint != null
-        ? new Geometry[] { stationPoint, convexHull }
-        : new Geometry[] { convexHull };
+    var geometries = stationPoint != null
+      ? new Geometry[] { stationPoint, convexHull }
+      : new Geometry[] { convexHull };
     return getGeometryFactory().createGeometryCollection(geometries);
   }
 }

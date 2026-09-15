@@ -60,8 +60,10 @@ public class CsvFileSupport {
     addFileToResultsMap(resultsById, expectedResultsFile, ExpectedResults::addDefault);
 
     for (var profile : SpeedTestProfile.values()) {
-      addFileToResultsMap(resultsById, expectedResultsFileByProfile.get(profile), (results, r) ->
-        results.add(profile, r)
+      addFileToResultsMap(
+        resultsById,
+        expectedResultsFileByProfile.get(profile),
+        (results, r) -> results.add(profile, r)
       );
     }
     return resultsById;
@@ -84,10 +86,7 @@ public class CsvFileSupport {
     }
 
     new ResultCsvFile(resultsFileByProfile.get(profile)).write(
-      testCases
-        .stream()
-        .flatMap(it -> it.actualResults().stream())
-        .toList()
+      testCases.stream().flatMap(it -> it.actualResults().stream()).toList()
     );
   }
 

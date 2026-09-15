@@ -52,16 +52,16 @@ class UnscheduledTripTest {
 
     private static final StopTime SCHEDULED_STOP = FlexStopTimesFactory.regularStop("10:00");
     private static final StopTime UNSCHEDULED_STOP = FlexStopTimesFactory.area("10:10", "10:20");
-    private static final StopTime CONTINUOUS_PICKUP_STOP =
-      FlexStopTimesFactory.regularStopWithContinuousPickup("10:30");
-    private static final StopTime CONTINUOUS_DROP_OFF_STOP =
-      FlexStopTimesFactory.regularStopWithContinuousDropOff("10:40");
+    private static final StopTime CONTINUOUS_PICKUP_STOP = FlexStopTimesFactory
+      .regularStopWithContinuousPickup("10:30");
+    private static final StopTime CONTINUOUS_DROP_OFF_STOP = FlexStopTimesFactory
+      .regularStopWithContinuousDropOff("10:40");
 
     // disallowed by the GTFS spec
-    private static final StopTime FLEX_AND_CONTINUOUS_PICKUP_STOP =
-      FlexStopTimesFactory.areaWithContinuousPickup("10:50");
-    private static final StopTime FLEX_AND_CONTINUOUS_DROP_OFF_STOP =
-      FlexStopTimesFactory.areaWithContinuousDropOff("11:00");
+    private static final StopTime FLEX_AND_CONTINUOUS_PICKUP_STOP = FlexStopTimesFactory
+      .areaWithContinuousPickup("10:50");
+    private static final StopTime FLEX_AND_CONTINUOUS_DROP_OFF_STOP = FlexStopTimesFactory
+      .areaWithContinuousDropOff("11:00");
 
     static List<List<StopTime>> notUnscheduled() {
       return List.of(
@@ -240,35 +240,23 @@ class UnscheduledTripTest {
     // REGULAR-STOP to AREA - (10:00-14:00) => (14:00)
     var tc = tc(regularDeparture("10:00"), area("10:00", "14:00"));
     return Stream.of(
-      tc
-        .expected("Requested departure time is before flex service departure time", "10:00")
+      tc.expected("Requested departure time is before flex service departure time", "10:00")
         .request("09:00", "1h")
         .build(),
-      tc
-        .expected(
-          "Requested departure time is before flex service departure time, max duration",
-          "10:00"
-        )
-        .request("09:00", "4h")
-        .build(),
-      tc
-        .expectedNotFound(
-          "Requested departure time is before flex service departure time, duration too long"
-        )
-        .request("09:00", "4h1s")
-        .build(),
-      tc
-        .expected("Requested departure time match flex service departure time", "10:00")
+      tc.expected(
+        "Requested departure time is before flex service departure time, max duration",
+        "10:00"
+      ).request("09:00", "4h").build(),
+      tc.expectedNotFound(
+        "Requested departure time is before flex service departure time, duration too long"
+      ).request("09:00", "4h1s").build(),
+      tc.expected("Requested departure time match flex service departure time", "10:00")
         .request("10:00", "1h")
         .build(),
-      tc
-        .expectedNotFound(
-          "Requested departure time match flex service departure time, duration too long"
-        )
-        .request("10:00", "4h1s")
-        .build(),
-      tc
-        .expectedNotFound("Requested departure time is after flex service departure time")
+      tc.expectedNotFound(
+        "Requested departure time match flex service departure time, duration too long"
+      ).request("10:00", "4h1s").build(),
+      tc.expectedNotFound("Requested departure time is after flex service departure time")
         .request("10:01", "0s")
         .build()
     );
@@ -289,50 +277,31 @@ class UnscheduledTripTest {
     // AREA TO REGULAR-STOP - (10:00-14:00) => (14:00)
     var tc = tc(area("10:00", "14:00"), regularArrival("14:00"));
     return Stream.of(
-      tc
-        .expected(
-          "Requested departure time is before flex service departure window start, no duration",
-          "14:00"
-        )
-        .request("09:59", "0s")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is before flex service departure window start, duration 1h",
-          "13:00"
-        )
-        .request("09:59", "1h")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is before flex service departure window start, max duration",
-          "10:00"
-        )
-        .request("09:59", "4h")
-        .build(),
-      tc
-        .expectedNotFound(
-          "Requested departure time is before flex service departure window start, duration to long"
-        )
-        .request("09:59", "4h1s")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is inside flex service departure window - time-shift to match fixed arrival time",
-          "13:00"
-        )
-        .request("11:00", "1h")
-        .build(),
-      tc
-        .expected("Requested departure time is match flex service departure end", "14:00")
+      tc.expected(
+        "Requested departure time is before flex service departure window start, no duration",
+        "14:00"
+      ).request("09:59", "0s").build(),
+      tc.expected(
+        "Requested departure time is before flex service departure window start, duration 1h",
+        "13:00"
+      ).request("09:59", "1h").build(),
+      tc.expected(
+        "Requested departure time is before flex service departure window start, max duration",
+        "10:00"
+      ).request("09:59", "4h").build(),
+      tc.expectedNotFound(
+        "Requested departure time is before flex service departure window start, duration to long"
+      ).request("09:59", "4h1s").build(),
+      tc.expected(
+        "Requested departure time is inside flex service departure window - time-shift to match fixed arrival time",
+        "13:00"
+      ).request("11:00", "1h").build(),
+      tc.expected("Requested departure time is match flex service departure end", "14:00")
         .request("14:00", "0s")
         .build(),
-      tc
-        .expectedNotFound(
-          "Requested departure time is match flex service departure end, duration too long"
-        )
-        .request("14:00", "1s")
-        .build()
+      tc.expectedNotFound(
+        "Requested departure time is match flex service departure end, duration too long"
+      ).request("14:00", "1s").build()
     );
   }
 
@@ -351,47 +320,29 @@ class UnscheduledTripTest {
     // AREA TO AREA - (10:00-14:00) => (11:00-15:00)
     var tc = tc(area("10:00", "14:00"), area("11:00", "15:00"));
     return Stream.of(
-      tc
-        .expected(
-          "Requested departure time is before flex service departure window start, duration 1h",
-          "10:00"
-        )
-        .request("09:23", "1h")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is before flex service departure window start, duration 5m, expect time-shift to match service arrival window",
-          "10:55"
-        )
-        .request("09:23", "5m")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is inside flex service departure window, duration is just enough",
-          "10:00"
-        )
-        .request("10:00", "1h")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is inside flex service departure window, duration is to small and requires time-shifting to match arrival time window",
-          "10:30"
-        )
-        .request("10:00", "30m")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time match latest flex service departure time, duration ok",
-          "14:00"
-        )
-        .request("14:00", "1h")
-        .build(),
-      tc
-        .expectedNotFound(
-          "Requested departure time match latest flex service departure time, duration to long"
-        )
-        .request("14:00", "1h1s")
-        .build()
+      tc.expected(
+        "Requested departure time is before flex service departure window start, duration 1h",
+        "10:00"
+      ).request("09:23", "1h").build(),
+      tc.expected(
+        "Requested departure time is before flex service departure window start, duration 5m, expect time-shift to match service arrival window",
+        "10:55"
+      ).request("09:23", "5m").build(),
+      tc.expected(
+        "Requested departure time is inside flex service departure window, duration is just enough",
+        "10:00"
+      ).request("10:00", "1h").build(),
+      tc.expected(
+        "Requested departure time is inside flex service departure window, duration is to small and requires time-shifting to match arrival time window",
+        "10:30"
+      ).request("10:00", "30m").build(),
+      tc.expected(
+        "Requested departure time match latest flex service departure time, duration ok",
+        "14:00"
+      ).request("14:00", "1h").build(),
+      tc.expectedNotFound(
+        "Requested departure time match latest flex service departure time, duration to long"
+      ).request("14:00", "1h1s").build()
     );
   }
 
@@ -410,45 +361,34 @@ class UnscheduledTripTest {
     // REGULAR-STOP to AREA - (10:00-14:00) => (14:00)
     var tc = tc(regularDeparture("10:00"), area("10:00", "14:00"));
     return Stream.of(
-      tc
-        .expectedNotFound("Requested arrival time is before flex service arrival window start")
+      tc.expectedNotFound("Requested arrival time is before flex service arrival window start")
         .request("09:59", "0s")
         .build(),
-      tc
-        .expected("Match flex service arrival window start", "10:00")
+      tc.expected("Match flex service arrival window start", "10:00")
         .request("10:00", "0s")
         .build(),
-      tc
-        .expectedNotFound("Match flex service arrival window start, but duration is to long")
+      tc.expectedNotFound("Match flex service arrival window start, but duration is to long")
         .request("10:00", "1s")
         .build(),
       tc.expected("Match flex service departure time", "11:00").request("11:00", "1h").build(),
-      tc
-        .expectedNotFound("Match flex service departure time, duration too long")
+      tc.expectedNotFound("Match flex service departure time, duration too long")
         .request("11:00", "1h1s")
         .build(),
-      tc
-        .expected("Match flex service arrival window end with matching duration", "14:00")
+      tc.expected("Match flex service arrival window end with matching duration", "14:00")
         .request("14:00", "4h")
         .build(),
-      tc
-        .expected("Match flex service arrival window end, duration too short", "13:00")
+      tc.expected("Match flex service arrival window end, duration too short", "13:00")
         .request("14:00", "3h")
         .build(),
-      tc
-        .expectedNotFound("Match flex service arrival window end, with duration too long")
+      tc.expectedNotFound("Match flex service arrival window end, with duration too long")
         .request("14:00", "4h1s")
         .build(),
-      tc
-        .expected("Request arrival after flex service arrival window end", "12:00")
+      tc.expected("Request arrival after flex service arrival window end", "12:00")
         .request("14:30", "2h")
         .build(),
-      tc
-        .expectedNotFound(
-          "Request arrival after flex service arrival window end, duration too long"
-        )
-        .request("14:01", "4h1s")
-        .build()
+      tc.expectedNotFound(
+        "Request arrival after flex service arrival window end, duration too long"
+      ).request("14:01", "4h1s").build()
     );
   }
 
@@ -465,43 +405,31 @@ class UnscheduledTripTest {
     // AREA TO REGULAR-STOP - (10:00-14:00) => (14:00)
     var tc = tc(area("10:00", "14:00"), regularArrival("14:00"));
     return Stream.of(
-      tc
-        .expectedNotFound("Requested arrival time is before flex service arrival window start")
+      tc.expectedNotFound("Requested arrival time is before flex service arrival window start")
         .request("13:59", "0s")
         .build(),
-      tc
-        .expected("Match flex service arrival time, no duration", "14:00")
+      tc.expected("Match flex service arrival time, no duration", "14:00")
         .request("14:00", "0s")
         .build(),
-      tc
-        .expected("Match flex service arrival time, 1h duration", "14:00")
+      tc.expected("Match flex service arrival time, 1h duration", "14:00")
         .request("14:00", "1h")
         .build(),
-      tc
-        .expected("Match flex service arrival time, max duration", "14:00")
+      tc.expected("Match flex service arrival time, max duration", "14:00")
         .request("14:00", "4h")
         .build(),
-      tc
-        .expectedNotFound("Match flex service arrival time, duration too long")
+      tc.expectedNotFound("Match flex service arrival time, duration too long")
         .request("14:00", "4h1s")
         .build(),
-      tc
-        .expected("Requested arrival time is after flex service arrival time", "14:00")
+      tc.expected("Requested arrival time is after flex service arrival time", "14:00")
         .request("14:01", "1h")
         .build(),
-      tc
-        .expected(
-          "Requested arrival time is after flex service arrival time, max duration",
-          "14:00"
-        )
-        .request("14:30", "4h")
-        .build(),
-      tc
-        .expectedNotFound(
-          "Requested arrival time is after flex service arrival time, duration to long"
-        )
-        .request("14:30", "4h1s")
-        .build()
+      tc.expected(
+        "Requested arrival time is after flex service arrival time, max duration",
+        "14:00"
+      ).request("14:30", "4h").build(),
+      tc.expectedNotFound(
+        "Requested arrival time is after flex service arrival time, duration to long"
+      ).request("14:30", "4h1s").build()
     );
   }
 
@@ -518,22 +446,18 @@ class UnscheduledTripTest {
     // AREA TO AREA - (10:00-14:00) => (11:00-15:00)
     var tc = tc(area("10:00", "14:00"), area("11:00", "15:00"));
     return Stream.of(
-      tc
-        .expectedNotFound("Requested arrival time is before flex service arrival window start")
+      tc.expectedNotFound("Requested arrival time is before flex service arrival window start")
         .request("10:59", "0s")
         .build(),
       tc.expected("Match flex service start of window", "11:00").request("11:00", "1h").build(),
-      tc
-        .expectedNotFound("Match flex service start of window, but duration is too long")
+      tc.expectedNotFound("Match flex service start of window, but duration is too long")
         .request("11:00", "1h1s")
         .build(),
       tc.expected("Match flex service end of window", "15:00").request("15:00", "1h").build(),
-      tc
-        .expected("Match flex service end of window, but duration is 1 minute too short", "14:59")
+      tc.expected("Match flex service end of window, but duration is 1 minute too short", "14:59")
         .request("15:00", "59m")
         .build(),
-      tc
-        .expected("Requested arrival time is after flex service end of window", "15:00")
+      tc.expected("Requested arrival time is after flex service end of window", "15:00")
         .request("15:01", "3h")
         .build(),
       tc.expected("Max duration", "15:00").request("16:00", "5h").build(),
@@ -558,20 +482,14 @@ class UnscheduledTripTest {
     var tc = new TestCase.Builder(from, to).withStopTimes(List.of(from, middle, to));
 
     return Stream.of(
-      tc
-        .expected(
-          "Requested departure time is after flex service departure window start, duration 21m",
-          "10:01"
-        )
-        .request("10:01", "21m")
-        .build(),
-      tc
-        .expected(
-          "Requested departure time is before flex service departure window start, duration 1h",
-          "10:00"
-        )
-        .request("09:50", "24m")
-        .build()
+      tc.expected(
+        "Requested departure time is after flex service departure window start, duration 21m",
+        "10:01"
+      ).request("10:01", "21m").build(),
+      tc.expected(
+        "Requested departure time is before flex service departure window start, duration 1h",
+        "10:00"
+      ).request("09:50", "24m").build()
     );
   }
 

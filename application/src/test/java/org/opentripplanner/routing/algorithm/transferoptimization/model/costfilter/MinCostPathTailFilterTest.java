@@ -27,9 +27,8 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
     // filter empty set
     assertEquals(
       Set.of(),
-      new MinCostPathTailFilter<TestTripSchedule>(
-        List.of(OptimizedPathTail::generalizedCost)
-      ).filterIntermediateResult(Set.of(), 0)
+      new MinCostPathTailFilter<TestTripSchedule>(List.of(OptimizedPathTail::generalizedCost))
+        .filterIntermediateResult(Set.of(), 0)
     );
   }
 

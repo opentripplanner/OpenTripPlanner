@@ -61,8 +61,16 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     T trip,
     boolean newBestOverall
   ) {
-    debug.dropOldStateAndAcceptNewOnBoardArrival(stop, newBestOverall, () ->
-      delegate.setNewBestTransitTime(stop, alightTime, boardStopPosition, trip, newBestOverall)
+    debug.dropOldStateAndAcceptNewOnBoardArrival(
+      stop,
+      newBestOverall,
+      () -> delegate.setNewBestTransitTime(
+        stop,
+        alightTime,
+        boardStopPosition,
+        trip,
+        newBestOverall
+      )
     );
   }
 
@@ -74,8 +82,9 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
 
   @Override
   public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
-    debug.dropOldStateAndAcceptNewOnStreetArrival(transfer.stop(), () ->
-      delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
+    debug.dropOldStateAndAcceptNewOnStreetArrival(
+      transfer.stop(),
+      () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
     );
   }
 

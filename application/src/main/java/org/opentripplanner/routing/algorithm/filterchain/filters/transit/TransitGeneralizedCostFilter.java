@@ -32,27 +32,23 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    List<Itinerary> transitItineraries = itineraries
-      .stream()
+    List<Itinerary> transitItineraries = itineraries.stream()
       .filter(Itinerary::hasTransit)
       .sorted(Comparator.comparing(Itinerary::generalizedCostIncludingPenalty))
       .toList();
 
-    return transitItineraries
-      .stream()
+    return transitItineraries.stream()
       .filter(it -> transitItineraries.stream().anyMatch(t -> generalizedCostExceedsLimit(it, t)))
       .collect(Collectors.toList());
   }
 
   private boolean generalizedCostExceedsLimit(Itinerary subject, Itinerary transitItinerary) {
-    return subject
-      .generalizedCostIncludingPenalty()
+    return subject.generalizedCostIncludingPenalty()
       .greaterThan(calculateLimit(subject, transitItinerary));
   }
 
   private Cost calculateLimit(Itinerary subject, Itinerary transitItinerary) {
-    return costLimitFunction
-      .calculate(transitItinerary.generalizedCostIncludingPenalty())
+    return costLimitFunction.calculate(transitItinerary.generalizedCostIncludingPenalty())
       .plus(getWaitTimeCost(transitItinerary, subject));
   }
 

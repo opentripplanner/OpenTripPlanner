@@ -34,14 +34,8 @@ public record OffsetDateTimeRange(@Nullable OffsetDateTime start, @Nullable Offs
    */
   public static OffsetDateTimeRange of(TimePeriod period, ZoneId zoneId) {
     return new OffsetDateTimeRange(
-      period
-        .start()
-        .map(start -> OffsetDateTime.ofInstant(start, zoneId))
-        .orElse(null),
-      period
-        .end()
-        .map(end -> OffsetDateTime.ofInstant(end, zoneId))
-        .orElse(null)
+      period.start().map(start -> OffsetDateTime.ofInstant(start, zoneId)).orElse(null),
+      period.end().map(end -> OffsetDateTime.ofInstant(end, zoneId)).orElse(null)
     );
   }
 }

@@ -240,12 +240,10 @@ public final class CarReachableVertexSnapper {
    * without routing.
    */
   private boolean computeCarReachable(Vertex vertex, SkipEdgeStrategy<State, Edge> skipEdges) {
-    return (
-      anyStreetEdgeAllowsCar(vertex.getOutgoing()) &&
+    return (anyStreetEdgeAllowsCar(vertex.getOutgoing()) &&
       anyStreetEdgeAllowsCar(vertex.getIncoming()) &&
       probeEscapes(vertex, false, skipEdges) &&
-      probeEscapes(vertex, true, skipEdges)
-    );
+      probeEscapes(vertex, true, skipEdges));
   }
 
   /**

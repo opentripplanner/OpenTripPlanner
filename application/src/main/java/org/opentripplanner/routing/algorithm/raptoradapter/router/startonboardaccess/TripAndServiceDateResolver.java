@@ -22,7 +22,7 @@ public class TripAndServiceDateResolver {
 
   public TripAndServiceDate resolve(TripOnDateReference reference) {
     switch (reference) {
-      case TripOnDateReferenceWithTripOnServiceDateId(FeedScopedId id):
+      case TripOnDateReferenceWithTripOnServiceDateId(FeedScopedId id) :
         var tripOnServiceDate = transitService.getTripOnServiceDate(id);
         if (tripOnServiceDate == null) {
           throw new InvalidRoutingInputException("TripOnServiceDate not found: " + id);
@@ -31,7 +31,7 @@ public class TripAndServiceDateResolver {
           tripOnServiceDate.getTrip(),
           tripOnServiceDate.getServiceDate()
         );
-      case TripOnDateReferenceWithTripAndDate(FeedScopedId id, LocalDate serviceDate):
+      case TripOnDateReferenceWithTripAndDate(FeedScopedId id, LocalDate serviceDate) :
         var trip = transitService.getTrip(id);
         if (trip == null) {
           throw new InvalidRoutingInputException("Trip not found: " + id);

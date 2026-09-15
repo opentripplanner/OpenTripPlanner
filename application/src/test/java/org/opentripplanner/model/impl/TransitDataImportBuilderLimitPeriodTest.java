@@ -143,8 +143,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
     assertTrue(patterns.contains(patternInT2), patterns.toString());
 
     // Verify patternInT1 is replaced by a copy that contains one less trip
-    TripPattern copyOfTripPattern1 = subject
-      .getTripPatterns()
+    TripPattern copyOfTripPattern1 = subject.getTripPatterns()
       .values()
       .stream()
       .filter(p -> p.getId().equals(patternInT1.getId()))
@@ -196,18 +195,15 @@ public class TransitDataImportBuilderLimitPeriodTest {
 
   private TripPattern createTripPattern(Collection<Trip> trips) {
     FeedScopedId patternId = FeedScopedIdForTestFactory.id(
-      trips
-        .stream()
-        .map(t -> t.getId().getId())
-        .collect(Collectors.joining(":"))
+      trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
     TripPatternBuilder tpb = TripPattern.of(patternId)
       .withRoute(route)
       .withStopPattern(STOP_PATTERN);
 
     for (Trip trip : trips) {
-      tpb.withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR))
+      tpb.withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR))
       );
     }
     return tpb.build();

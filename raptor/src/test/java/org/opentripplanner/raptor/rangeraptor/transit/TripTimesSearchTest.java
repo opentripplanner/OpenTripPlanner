@@ -27,10 +27,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   // Given a trip-schedule with board-times [110, 210, -] and alight-times [-, 200, 300].
   private TestTripSchedule schedule = TestTripSchedule.schedule(
     pattern("P1", STOP_A, STOP_B, STOP_C)
-  )
-    .departures(A_BOARD_TIME, 210, 310)
-    .arrivals(100, 200, C_ALIGHT_TIME)
-    .build();
+  ).departures(A_BOARD_TIME, 210, 310).arrivals(100, 200, C_ALIGHT_TIME).build();
 
   @Test
   public void findTripWithPlentySlack() {
@@ -67,9 +64,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     // Stops A - (B - C){2 times} - D
     var schedule = TestTripSchedule.schedule(
       pattern("P1", STOP_A, STOP_B, STOP_C, STOP_B, STOP_C, STOP_D)
-    )
-      .times("10:01 10:02 10:03 10:04 10:05 10:06")
-      .build();
+    ).times("10:01 10:02 10:03 10:04 10:05 10:06").build();
     // Time at stop
     int a = schedule.departure(0);
     int b1 = schedule.departure(1);

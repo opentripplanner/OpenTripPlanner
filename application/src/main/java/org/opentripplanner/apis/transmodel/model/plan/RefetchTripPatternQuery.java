@@ -196,12 +196,10 @@ public class RefetchTripPatternQuery {
     TransmodelGraphQLRequestContext ctx = environment.getContext();
     var routeRequest = createRouteRequest(environment);
     List<String> legsIds = Objects.requireNonNull(environment.getArgument("legs"));
-    var legs = legsIds
-      .stream()
-      .map(legId ->
-        Optional.ofNullable(LegReferenceSerializer.decode(legId)).orElseThrow(() ->
-          new InvalidInputException("Invalid leg id")
-        )
+    var legs = legsIds.stream()
+      .map(
+        legId -> Optional.ofNullable(LegReferenceSerializer.decode(legId))
+          .orElseThrow(() -> new InvalidInputException("Invalid leg id"))
       )
       .toList();
 
@@ -240,8 +238,7 @@ public class RefetchTripPatternQuery {
 
   private RouteRequest createRouteRequest(DataFetchingEnvironment environment) {
     var mapper = new TripRequestMapper(idMapper);
-    return mapper
-      .createRequestBuilder(environment)
+    return mapper.createRequestBuilder(environment)
       // The from and to parameters are ignored in the refetch service.
       .withFrom(GenericLocation.fromCoordinate(0.0, 0.0))
       .withTo(GenericLocation.fromCoordinate(1.0, 1.0))

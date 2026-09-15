@@ -152,8 +152,7 @@ class RealTimeTripTimesTest {
   @Test
   public void testOnlyScheduledTimesAreCopied() {
     var initialTripTimes = createInitialTripTimes();
-    var realTimeTripTimes = initialTripTimes
-      .createRealTimeFromScheduledTimes()
+    var realTimeTripTimes = initialTripTimes.createRealTimeFromScheduledTimes()
       .withArrivalDelay(3, -1)
       .build();
     assertEquals(
@@ -411,8 +410,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void vehicleIdIsStoredAndRetrieved() {
-    var tripTimes = (RealTimeTripTimes) createInitialTripTimes()
-      .createRealTimeFromScheduledTimes()
+    var tripTimes = (RealTimeTripTimes) createInitialTripTimes().createRealTimeFromScheduledTimes()
       .withVehicleId(id("BUS-42"))
       .build();
 
@@ -422,8 +420,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void vehicleIdIsEmptyByDefault() {
-    var tripTimes = (RealTimeTripTimes) createInitialTripTimes()
-      .createRealTimeFromScheduledTimes()
+    var tripTimes = (RealTimeTripTimes) createInitialTripTimes().createRealTimeFromScheduledTimes()
       .build();
 
     assertTrue(tripTimes.getVehicleId().isEmpty());

@@ -101,11 +101,9 @@ public final class AccessibilityPreferences {
       return false;
     }
     AccessibilityPreferences that = (AccessibilityPreferences) o;
-    return (
-      onlyConsiderAccessible == that.onlyConsiderAccessible &&
+    return (onlyConsiderAccessible == that.onlyConsiderAccessible &&
       Objects.equals(unknownCost, that.unknownCost) &&
-      Objects.equals(inaccessibleCost, that.inaccessibleCost)
-    );
+      Objects.equals(inaccessibleCost, that.inaccessibleCost));
   }
 
   @Override

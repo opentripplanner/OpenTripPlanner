@@ -316,10 +316,7 @@ class VehicleRentalEdgeTest {
     var noTraversalZone = TestGeofencingZoneBuilder.of(
       TestFreeFloatingRentalVehicleBuilder.NETWORK_1,
       "no-traverse"
-    )
-      .withGeometry(Polygons.OSLO)
-      .noTraversal()
-      .build();
+    ).withGeometry(Polygons.OSLO).noTraversal().build();
     vertex.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
 
     var result = rent();
@@ -387,9 +384,10 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
-      .withBike(bike ->
-        bike.withRental(rental ->
-          rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
+      .withBike(
+        bike -> bike.withRental(
+          rental -> rental.withUseAvailabilityInformation(useRealtime)
+            .withBannedNetworks(bannedNetworks)
         )
       )
       .build();
@@ -410,8 +408,8 @@ class VehicleRentalEdgeTest {
       .withMode(mode)
       .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
       .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-      .withScooter(scooter ->
-        scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
+      .withScooter(
+        scooter -> scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
       )
       .build();
   }

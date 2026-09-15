@@ -34,12 +34,7 @@ public class TableBuilder {
 
   List<Table.Align> aligns() {
     // if no alightment is set, default to left aligned
-    return aligns != null
-      ? aligns
-      : headers
-          .stream()
-          .map(it -> Table.Align.Left)
-          .toList();
+    return aligns != null ? aligns : headers.stream().map(it -> Table.Align.Left).toList();
   }
 
   /**
@@ -121,8 +116,7 @@ public class TableBuilder {
       width0 = Math.max(width0, minWidths.get(column));
     }
 
-    return rows
-      .stream()
+    return rows.stream()
       .map(it -> it.get(column))
       .mapToInt(it -> it == null ? 0 : it.length())
       .reduce(width0, Math::max);

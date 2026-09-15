@@ -29,16 +29,14 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case AGENCY:
+            case AGENCY :
               alerts.addAll(alertService.getAgencyAlerts(getSource(environment).getId()));
               break;
-            case ROUTE_TYPES:
-              alertService
-                .getAllAlerts()
+            case ROUTE_TYPES :
+              alertService.getAllAlerts()
                 .stream()
-                .filter(alert ->
-                  alert
-                    .entities()
+                .filter(
+                  alert -> alert.entities()
                     .stream()
                     .filter(EntitySelector.RouteTypeAndAgency.class::isInstance)
                     .map(EntitySelector.RouteTypeAndAgency.class::cast)
@@ -46,9 +44,9 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
                 )
                 .forEach(alerts::add);
               break;
-            case ROUTES:
-              getRoutes(environment).forEach(route ->
-                alerts.addAll(alertService.getRouteAlerts(route.getId()))
+            case ROUTES :
+              getRoutes(environment).forEach(
+                route -> alerts.addAll(alertService.getRouteAlerts(route.getId()))
               );
               break;
           }
@@ -72,8 +70,10 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("Agency", getSource(environment).getId().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "Agency",
+      getSource(environment).getId().toString()
+    );
   }
 
   @Override
@@ -107,8 +107,7 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
   }
 
   private List<Route> getRoutes(DataFetchingEnvironment environment) {
-    return getTransitService(environment)
-      .listRoutes()
+    return getTransitService(environment).listRoutes()
       .stream()
       .filter(route -> route.getAgency().equals(getSource(environment)))
       .collect(Collectors.toList());

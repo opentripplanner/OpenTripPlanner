@@ -72,16 +72,18 @@ class LinearFunctionSerializationTest {
 
   @Test
   void parseIllegalArgument() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      LinearFunctionSerialization.parse("foo", fail())
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> LinearFunctionSerialization.parse("foo", fail())
     );
     assertEquals("Unable to parse function: 'foo'", ex.getMessage());
   }
 
   @Test
   void parseIllegalDuration() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      LinearFunctionSerialization.parse("600ss + 1.3 t", fail())
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> LinearFunctionSerialization.parse("600ss + 1.3 t", fail())
     );
     assertEquals("Unable to parse duration: '600ss'", ex.getMessage());
   }

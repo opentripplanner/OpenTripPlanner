@@ -118,21 +118,19 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   protected void setUp() throws Exception {
     // Place stop in the middle of the lines(LATITUDE), and slightly above the first line
 
-    var otpModel = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
-          ALL_TC.createStreetEdgeBuilder(this).buildAndConnect();
-          PEDESTRIAN_TC.createStreetEdgeBuilder(this)
-            .withWheelchairAccessible(true)
-            .buildAndConnect();
-          PEDESTRIAN_BICYCLE_TC.createStreetEdgeBuilder(this).buildAndConnect();
-          BICYCLE_CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
-          stop = stop("STOP", LATITUDE_MIDDLE, LONGITUDE_LOCATION);
-        }
+    var otpModel = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
+        ALL_TC.createStreetEdgeBuilder(this).buildAndConnect();
+        PEDESTRIAN_TC.createStreetEdgeBuilder(this)
+          .withWheelchairAccessible(true)
+          .buildAndConnect();
+        PEDESTRIAN_BICYCLE_TC.createStreetEdgeBuilder(this).buildAndConnect();
+        BICYCLE_CAR_TC.createStreetEdgeBuilder(this).buildAndConnect();
+        stop = stop("STOP", LATITUDE_MIDDLE, LONGITUDE_LOCATION);
       }
-    );
+    });
     graph = otpModel.graph();
 
     graph.hasStreets = true;
@@ -259,8 +257,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   private void assertFromLink(String streetName, StreetMode streetMode, Vertex fromVertex) {
-    var outgoing = fromVertex
-      .getOutgoing()
+    var outgoing = fromVertex.getOutgoing()
       .iterator()
       .next()
       .getToVertex()
@@ -276,8 +273,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   private void assertToLink(String streetName, StreetMode streetMode, Vertex toVertex) {
-    var outgoing = toVertex
-      .getIncoming()
+    var outgoing = toVertex.getIncoming()
       .iterator()
       .next()
       .getFromVertex()
@@ -311,8 +307,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
      * about 10-11m apart (see {@link #STREET_DELTA}).
      */
     static LinkingTestCase of(StreetTraversalPermission permission) {
-      var name =
-        permission.name().charAt(0) +
+      var name = permission.name().charAt(0) +
         permission.name().substring(1).toLowerCase(Locale.ROOT).replace("_and_", " & ") +
         " st";
       int index = indexCounter++;
@@ -333,8 +328,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     StreetEdgeBuilder createStreetEdgeBuilder(GraphRoutingTest.Builder factory) {
       var from = factory.intersection("V" + index + "_START", LATITUDE_START, longitude);
       var to = factory.intersection("V" + index + "_END", LATITUDE_END, longitude);
-      return new StreetEdgeBuilder<>()
-        .withFromVertex(from)
+      return new StreetEdgeBuilder<>().withFromVertex(from)
         .withToVertex(to)
         .withGeometry(
           GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())

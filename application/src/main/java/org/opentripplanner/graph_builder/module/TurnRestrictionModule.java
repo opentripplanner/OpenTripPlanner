@@ -113,8 +113,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       var oldPermission = fromPermission.remove(restrictionPermission);
       var newPermission = fromPermission.intersection(restrictionPermission);
       if (newPermission.allowsAnything()) {
-        fromEdge
-          .toBuilder()
+        fromEdge.toBuilder()
           .withToVertex(splitVertex)
           .withPermission(newPermission)
           .buildAndConnect();
@@ -135,8 +134,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         if (newPermission.allowsAnything()) {
           if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
             if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-              toEdge
-                .toBuilder()
+              toEdge.toBuilder()
                 .withFromVertex(splitVertex)
                 .withPermission(newPermission)
                 .buildAndConnect();
@@ -144,8 +142,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
             }
           } else {
             if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-              toEdge
-                .toBuilder()
+              toEdge.toBuilder()
                 .withFromVertex(splitVertex)
                 .withPermission(newPermission)
                 .buildAndConnect();

@@ -170,14 +170,13 @@ class StatesToWalkStepsMapperTest {
   @ParameterizedTest
   @MethodSource("createIsOnSameStreetCases")
   void testIsOnSameStreet(List<String> streets, boolean expected, String message) {
-    List<WalkStepBuilder> steps = streets
-      .stream()
-      .map(s ->
-        s != null
+    List<WalkStepBuilder> steps = streets.stream()
+      .map(
+        s -> s != null
           ? WalkStep.builder()
-              .withCrossing(s.startsWith("crossing over ") || s.equals("derived name"))
-              .withNameIsDerived(s.equals("derived name"))
-              .withDirectionText(I18NString.of(s))
+            .withCrossing(s.startsWith("crossing over ") || s.equals("derived name"))
+            .withNameIsDerived(s.equals("derived name"))
+            .withDirectionText(I18NString.of(s))
           : WalkStep.builder()
       )
       .toList();

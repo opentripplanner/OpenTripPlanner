@@ -113,8 +113,7 @@ public class SpeedIntegrationTest {
   }
 
   private static SpeedTestCmdLineOpts speedTestOptions(SpeedTestProfile profile) {
-    return new SpeedTestCmdLineOptsBuilder()
-      .withRootDirectory(BASE_DIR)
+    return new SpeedTestCmdLineOptsBuilder().withRootDirectory(BASE_DIR)
       .withProfile(profile)
       .withNumberOfItineraries(3)
       .replaceExpectedResultsFile()

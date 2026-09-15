@@ -95,12 +95,11 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
   }
 
   protected ToStringBuilder toStringAppend(ToStringBuilder builder) {
-    return builder
-      .addEnum(
-        "stationTransferPreference",
-        stationTransferPreference,
-        StopTransferPriority.defaultValue()
-      )
+    return builder.addEnum(
+      "stationTransferPreference",
+      stationTransferPreference,
+      StopTransferPriority.defaultValue()
+    )
       .addBool(
         "discardMinTransferTimes",
         discardMinTransferTimes,

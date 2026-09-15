@@ -93,8 +93,9 @@ class StopAreaWithUnderpassAndElevatorTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stair meeting the bottom-left corner (wheelchair-inaccessible steps)
         "(0,0) → (-1,0) PEDESTRIAN ♿❌",

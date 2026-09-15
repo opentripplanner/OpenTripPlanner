@@ -88,9 +88,7 @@ public class StreetNearbyPlaceFinder implements NearbyPlaceFinder {
       // Make a normal OTP routing request so we can traverse edges and use GenericAStar
       // TODO make a function that builds normal routing requests from profile requests
       // TODO: This is incorrect, the configured defaults are not used.
-      var request = StreetSearchRequest.of()
-        .withWalk(it -> it.withSpeed(1))
-        .build();
+      var request = StreetSearchRequest.of().withWalk(it -> it.withSpeed(1)).build();
       StreetSearchBuilder.of()
         .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(skipEdgeStrategy)

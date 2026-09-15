@@ -40,8 +40,7 @@ class IssueColors {
     new Color(0x90FFE0),
     new Color(0xFF60B0),
     new Color(0x70FFB0),
-    new Color(0xFFFF40),
-  };
+    new Color(0xFFFF40), };
 
   /** Get and return color a in hex format: {@code "#FF00FF"} */
   static String rgb(String issueType) {

@@ -56,12 +56,10 @@ public class HSLFareService extends DefaultFareService {
     boolean singleAgency = true;
 
     // Do not consider fares for legs that do not have fare rules in the same feed
-    Set<String> fareRuleFeedIds = fareRules
-      .stream()
+    Set<String> fareRuleFeedIds = fareRules.stream()
       .map(fr -> fr.getFareAttribute().getId().getFeedId())
       .collect(Collectors.toSet());
-    Set<String> legFeedIds = legs
-      .stream()
+    Set<String> legFeedIds = legs.stream()
       .map(leg -> leg.agency().getId().getFeedId())
       .collect(Collectors.toSet());
     if (!Sets.difference(legFeedIds, fareRuleFeedIds).isEmpty()) {
@@ -96,25 +94,25 @@ public class HSLFareService extends DefaultFareService {
 
         if (
           !ruleSet.getRouteOriginDestinations().isEmpty() &&
-          ruleSet
-            .getRouteOriginDestinations()
-            .toString()
-            .indexOf(routeOriginDestination.toString()) != -1
+            ruleSet.getRouteOriginDestinations()
+              .toString()
+              .indexOf(routeOriginDestination.toString()) !=
+              -1
         ) {
           isSpecialRoute = true;
         }
         if (
           isSpecialRoute ||
-          (ruleSet.getRoutes().contains(leg.route().getId()) &&
-            ruleSet.getContains().contains(leg.from().stop.getFirstZoneAsString()) &&
-            ruleSet.getContains().contains(leg.to().stop.getFirstZoneAsString()))
+            (ruleSet.getRoutes().contains(leg.route().getId()) &&
+              ruleSet.getContains().contains(leg.from().stop.getFirstZoneAsString()) &&
+              ruleSet.getContains().contains(leg.to().stop.getFirstZoneAsString()))
         ) {
           // check validity of this special rule and that it is the cheapest applicable one
           FareAttribute attribute = ruleSet.getFareAttribute();
           if (
             !attribute.isTransferDurationSet() ||
-            Duration.between(lastRideStartTime, startTime).getSeconds() <
-              attribute.getTransferDuration()
+              Duration.between(lastRideStartTime, startTime).getSeconds() <
+                attribute.getTransferDuration()
           ) {
             Money newFare = attribute.getPrice();
             if (newFare.lessThan(bestSpecialFare)) {
@@ -132,23 +130,13 @@ public class HSLFareService extends DefaultFareService {
       if (ruleZones != null) {
         // evaluate boolean ride.zones AND rule.zones
         Set<String> zoneIntersection = new HashSet<String>(
-          leg
-            .fareZones()
-            .stream()
-            .map(z -> z.getId().getId())
-            .toList()
+          leg.fareZones().stream().map(z -> z.getId().getId()).toList()
         );
         // don't add temporarily visited zones
         zoneIntersection.retainAll(ruleZones);
         zones.addAll(zoneIntersection);
       } else {
-        zones.addAll(
-          leg
-            .fareZones()
-            .stream()
-            .map(z -> z.getId().getId())
-            .toList()
-        );
+        zones.addAll(leg.fareZones().stream().map(z -> z.getId().getId()).toList());
       }
     }
 
@@ -194,7 +182,7 @@ public class HSLFareService extends DefaultFareService {
           Money newFare = attribute.getPrice();
           if (
             newFare.lessThan(bestFare) ||
-            (newFare.equals(bestFare) && ruleSet.getContains().equals(zones))
+              (newFare.equals(bestFare) && ruleSet.getContains().equals(zones))
           ) {
             bestAttribute = attribute;
             bestFare = newFare;
@@ -207,8 +195,7 @@ public class HSLFareService extends DefaultFareService {
     }
     LOG.debug("HSL {} best for {}", bestAttribute, legs);
     final Money finalBestFare = bestFare;
-    return Optional.ofNullable(bestAttribute).map(attribute ->
-      new FareAndId(finalBestFare, attribute.getId())
-    );
+    return Optional.ofNullable(bestAttribute)
+      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 }

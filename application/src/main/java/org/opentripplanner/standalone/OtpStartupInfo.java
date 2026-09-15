@@ -24,15 +24,13 @@ public class OtpStartupInfo {
   );
 
   private static String info() {
-    return (
-      HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining()) +
+    return (HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining()) +
       line("Version:     " + projectInfo().version.version) +
       line("Ser.ver.id:  " + projectInfo().getOtpSerializationVersionId()) +
       line("Commit:      " + projectInfo().versionControl.commit) +
       line("Branch:      " + projectInfo().versionControl.branch) +
       line("Build:       " + projectInfo().versionControl.buildTime) +
-      (projectInfo().versionControl.dirty ? line("Dirty:       Local modification exist!") : "")
-    );
+      (projectInfo().versionControl.dirty ? line("Dirty:       Local modification exist!") : ""));
   }
 
   public static void logInfo(String cliTaskInfo) {
@@ -44,8 +42,9 @@ public class OtpStartupInfo {
       projectInfo().getVersionString(),
       javaVersion()
     );
-    ApplicationShutdownSupport.addShutdownHook("server-shutdown-info", () ->
-      LOG.info(
+    ApplicationShutdownSupport.addShutdownHook(
+      "server-shutdown-info",
+      () -> LOG.info(
         "OTP SHUTTING DOWN {} - {} - {}",
         DurationUtils.durationToStrMillisescond(System.currentTimeMillis() - START_UP_TIME),
         cliTaskInfo,

@@ -34,9 +34,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortArrivalAscending() {
-    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
-      .withOriginalSearch(null, null, T12_00, null, D1H)
-      .withPageCursorInput(new TestPageCursorInput());
+    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M).withOriginalSearch(
+      null,
+      null,
+      T12_00,
+      null,
+      D1H
+    ).withPageCursorInput(new TestPageCursorInput());
 
     var nextPage = factory.nextPageCursor();
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
@@ -47,8 +51,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortArrivalAscendingCropSearchWindow() {
-    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
-      .withOriginalSearch(NEXT_PAGE, null, T12_00, null, D1H)
+    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M).withOriginalSearch(
+      NEXT_PAGE,
+      null,
+      T12_00,
+      null,
+      D1H
+    )
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
@@ -65,9 +74,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortArrivalAscendingPreviousPage() {
-    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
-      .withOriginalSearch(PREVIOUS_PAGE, null, T12_00, null, D1H)
-      .withPageCursorInput(new TestPageCursorInput());
+    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M).withOriginalSearch(
+      PREVIOUS_PAGE,
+      null,
+      T12_00,
+      null,
+      D1H
+    ).withPageCursorInput(new TestPageCursorInput());
 
     var nextPage = factory.nextPageCursor();
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
@@ -78,8 +91,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortArrivalAscendingCropSearchWindowPreviousPage() {
-    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
-      .withOriginalSearch(PREVIOUS_PAGE, null, T12_00, null, D1H)
+    var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M).withOriginalSearch(
+      PREVIOUS_PAGE,
+      null,
+      T12_00,
+      null,
+      D1H
+    )
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
@@ -96,9 +114,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortDepartureDescending() {
-    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
-      .withOriginalSearch(null, null, T12_00, T13_30, D1H)
-      .withPageCursorInput(new TestPageCursorInput());
+    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M).withOriginalSearch(
+      null,
+      null,
+      T12_00,
+      T13_30,
+      D1H
+    ).withPageCursorInput(new TestPageCursorInput());
 
     var nextPage = factory.nextPageCursor();
     assertPageCursor(nextPage, T12_01, null, D90M, NEXT_PAGE, false, false);
@@ -109,8 +131,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortDepartureDescendingCropSearchWindow() {
-    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
-      .withOriginalSearch(PREVIOUS_PAGE, null, T12_00, T13_30, D1H)
+    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M).withOriginalSearch(
+      PREVIOUS_PAGE,
+      null,
+      T12_00,
+      T13_30,
+      D1H
+    )
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
@@ -127,9 +154,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortDepartureDescendingNextPage() {
-    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
-      .withOriginalSearch(NEXT_PAGE, null, T12_00, T13_30, D1H)
-      .withPageCursorInput(new TestPageCursorInput());
+    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M).withOriginalSearch(
+      NEXT_PAGE,
+      null,
+      T12_00,
+      T13_30,
+      D1H
+    ).withPageCursorInput(new TestPageCursorInput());
 
     var nextPage = factory.nextPageCursor();
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
@@ -140,8 +171,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void sortDepartureDescendingCropSearchWindowNextPage() {
-    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
-      .withOriginalSearch(NEXT_PAGE, null, T12_00, T13_30, D1H)
+    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M).withOriginalSearch(
+      NEXT_PAGE,
+      null,
+      T12_00,
+      T13_30,
+      D1H
+    )
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
@@ -158,8 +194,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   @Test
   public void testGeneralizedCostMaxLimit() {
-    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
-      .withOriginalSearch(NEXT_PAGE, null, T12_00, T13_30, D1H)
+    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M).withOriginalSearch(
+      NEXT_PAGE,
+      null,
+      T12_00,
+      T13_30,
+      D1H
+    )
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),

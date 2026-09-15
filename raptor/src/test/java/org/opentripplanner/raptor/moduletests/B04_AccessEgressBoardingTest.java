@@ -49,13 +49,12 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access(
-        "Walk 1s ~ A",
-        // Best option
-        "Walk 10s ~ B",
-        "Walk 5m ~ C"
-      )
+    data.access(
+      "Walk 1s ~ A",
+      // Best option
+      "Walk 10s ~ B",
+      "Walk 5m ~ C"
+    )
       .withTimetables(
         """
         A     B     C     D     E     F
@@ -69,8 +68,7 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
         "F ~ Walk 1s"
       );
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();

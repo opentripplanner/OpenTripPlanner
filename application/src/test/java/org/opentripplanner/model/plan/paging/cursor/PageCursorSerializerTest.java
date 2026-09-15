@@ -27,12 +27,12 @@ class PageCursorSerializerTest {
   private static final String TOKEN_V2 = "Mn";
   private static final String TOKEN_BODY =
     "xQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafDIwMjQtMDEtMTVUMDA6MDA6MDFafDVofFNUUkVFVF" +
-    "9BTkRfREVQQVJUVVJFX1RJTUV8dHJ1ZXwyMDI0LTAxLTEwVDEwOjAwOjAwWnwyMDI0LTAxLTEwVDEyOjAwOjAwWn" +
-    "wzfDEyMDB8";
+      "9BTkRfREVQQVJUVVJFX1RJTUV8dHJ1ZXwyMDI0LTAxLTEwVDEwOjAwOjAwWnwyMDI0LTAxLTEwVDEyOjAwOjAwWn" +
+      "wzfDEyMDB8";
 
   private static final String TOKEN_W_NULLS_BODY =
     "xQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafHw1aHxTVFJFRVRfQU5EX0RFUEFSVFVSRV9USU1FfH" +
-    "x8fHx8";
+      "x8fHx8";
 
   private static final String PREV_TOKEN = TOKEN_V1 + TOKEN_BODY;
   private static final String CURR_TOKEN = TOKEN_V2 + TOKEN_BODY + "MTc3fA==";

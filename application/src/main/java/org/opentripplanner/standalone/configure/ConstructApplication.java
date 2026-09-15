@@ -120,8 +120,7 @@ public class ConstructApplication {
     var scheduledTripCalendars = transitRepository.getTripCalendar();
 
     ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
-    this.factory = builder
-      .configModel(config)
+    this.factory = builder.configModel(config)
       .graph(graph)
       .streetDetailsRepository(streetDetailsRepository)
       .transitRepository(transitRepository)
@@ -309,10 +308,7 @@ public class ConstructApplication {
     return factory.streetRepository();
   }
 
-  public RepositoryHandle<
-    RealtimeVehicleRepositorySnapshot,
-    RealtimeVehicleRepository
-  > realtimeVehicleRepositoryHandle() {
+  public RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle() {
     return factory.realtimeVehicleRepositoryHandle();
   }
 

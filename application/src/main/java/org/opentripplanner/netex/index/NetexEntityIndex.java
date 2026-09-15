@@ -222,10 +222,9 @@ public class NetexEntityIndex {
       public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
         GroupOfLines groupOfLines = groupOfLinesById.lookup(groupOfLineOrNetworkId);
 
-        String networkId =
-          groupOfLines == null
-            ? groupOfLineOrNetworkId
-            : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
+        String networkId = groupOfLines == null
+          ? groupOfLineOrNetworkId
+          : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
 
         return networkById.lookup(networkId);
       }
@@ -250,10 +249,7 @@ public class NetexEntityIndex {
        *             responsible for indexing its data, except for entities by id.
        */
       @Deprecated
-      public ReadOnlyHierarchicalMap<
-        String,
-        Collection<DayTypeAssignment>
-      > getDayTypeAssignmentByDayTypeId() {
+      public ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId() {
         return dayTypeAssignmentByDayTypeId;
       }
 

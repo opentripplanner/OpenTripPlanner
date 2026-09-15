@@ -97,8 +97,7 @@ public class TestPathBuilder implements RaptorTestConstants {
     // testing routes visiting the same stop more than once. Create a new factory
     // method if this happens.
     int boardStopPosition = trip.findDepartureStopPosition(startTime, boardStop);
-    int alightStopPosition = trip
-      .pattern()
+    int alightStopPosition = trip.pattern()
       .findAlightStopPositionAfter(boardStopPosition, alightStop);
     var baTime = new BoardAndAlightTime(trip, boardStopPosition, alightStopPosition);
     builder.transit(trip, baTime);
@@ -111,10 +110,7 @@ public class TestPathBuilder implements RaptorTestConstants {
 
     TestTripSchedule trip = TestTripSchedule.schedule(
       TestTripPattern.pattern(patternName, fromStop, toStop)
-    )
-      .arrDepOffset(BOARD_ALIGHT_OFFSET)
-      .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
-      .build();
+    ).arrDepOffset(BOARD_ALIGHT_OFFSET).departures(fromTime, toTime + BOARD_ALIGHT_OFFSET).build();
 
     return bus(trip, toStop);
   }

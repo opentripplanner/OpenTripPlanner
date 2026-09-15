@@ -208,11 +208,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     assertTrue(fares.getLegProducts().isEmpty());
     var itineraryProducts = fares.getItineraryProducts();
     assertFalse(itineraryProducts.isEmpty());
-    var fp = itineraryProducts
-      .stream()
-      .filter(p -> p.name().equals("regular"))
-      .findAny()
-      .get();
+    var fp = itineraryProducts.stream().filter(p -> p.name().equals("regular")).findAny().get();
     assertEquals(Money.usDollars(3.49f), fp.price());
   }
 
@@ -227,8 +223,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     var fare = atlFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
     assertEquals(
       expectedFare,
-      fare
-        .getItineraryProducts()
+      fare.getItineraryProducts()
         .stream()
         .filter(fp -> fp.name().equals(FareType.electronicRegular.name()))
         .findFirst()
@@ -236,8 +231,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         .price()
     );
 
-    var fareProducts = fare
-      .getItineraryProducts()
+    var fareProducts = fare.getItineraryProducts()
       .stream()
       .filter(fp -> fp.id().getId().equals(FareType.electronicRegular.name()))
       .toList();
@@ -268,13 +262,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     // Set up stops
-    RegularStop firstStop = siteRepositoryBuilder
-      .regularStop(new FeedScopedId(FEED_ID, "1"))
+    RegularStop firstStop = siteRepositoryBuilder.regularStop(new FeedScopedId(FEED_ID, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString("first stop"))
       .build();
-    RegularStop lastStop = siteRepositoryBuilder
-      .regularStop(new FeedScopedId(FEED_ID, "2"))
+    RegularStop lastStop = siteRepositoryBuilder.regularStop(new FeedScopedId(FEED_ID, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString("last stop"))
       .build();
@@ -289,9 +281,13 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
     int start = (int) (T11_00 + startTimeMins * 60);
     int end = (int) (T11_00 + (startTimeMins + 12) * 60);
-    return newItinerary(Place.forStop(firstStop), start)
-      .bus(route, 1, start, end, Place.forStop(lastStop))
-      .build();
+    return newItinerary(Place.forStop(firstStop), start).bus(
+      route,
+      1,
+      start,
+      end,
+      Place.forStop(lastStop)
+    ).build();
   }
 
   private static class TestAtlantaFareService extends AtlantaFareService {

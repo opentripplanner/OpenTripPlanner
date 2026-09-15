@@ -36,8 +36,7 @@ public class NumItinerariesFilterResult {
     List<Itinerary> removedItineraries,
     ListSection cropSection
   ) {
-    List<Instant> removedDepartures = removedItineraries
-      .stream()
+    List<Instant> removedDepartures = removedItineraries.stream()
       .map(it -> it.startTime().toInstant())
       .toList();
     this.earliestRemovedDeparture = removedDepartures.stream().min(Instant::compareTo).orElse(null);

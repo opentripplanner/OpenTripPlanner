@@ -83,7 +83,8 @@ public class PenaltyForStreetModeType {
             """
                 This is used to take the time-penalty and multiply by the `{fieldCostFactorName}`.
                 The result is added to the generalized-cost.
-            """.replace("{fieldCostFactorName}", FIELD_COST_FACTOR)
+            """
+              .replace("{fieldCostFactorName}", FIELD_COST_FACTOR)
           )
       )
       .build();
@@ -91,16 +92,12 @@ public class PenaltyForStreetModeType {
 
   /** Return a list of access-egress penalties */
   public static Value mapToGraphQLValue(TimeAndCostPenaltyForEnum<StreetMode> accessEgressPenalty) {
-    List<Value> values = EnumTypes.STREET_MODE.getValues()
-      .stream()
-      .map(gqlModeType -> {
-        var mode = (StreetMode) gqlModeType.getValue();
-        return accessEgressPenalty.isSet(mode)
-          ? mapPenaltyForStreetMode(gqlModeType, accessEgressPenalty.valueOf(mode))
-          : null;
-      })
-      .filter(Objects::nonNull)
-      .toList();
+    List<Value> values = EnumTypes.STREET_MODE.getValues().stream().map(gqlModeType -> {
+      var mode = (StreetMode) gqlModeType.getValue();
+      return accessEgressPenalty.isSet(mode)
+        ? mapPenaltyForStreetMode(gqlModeType, accessEgressPenalty.valueOf(mode))
+        : null;
+    }).filter(Objects::nonNull).toList();
     return ArrayValue.newArrayValue().values(values).build();
   }
 

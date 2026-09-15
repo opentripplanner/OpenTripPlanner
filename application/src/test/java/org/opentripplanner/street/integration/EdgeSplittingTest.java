@@ -65,8 +65,7 @@ public class EdgeSplittingTest {
     bl = factory.intersection("bl", -74.01, 40.0);
     br = factory.intersection("br", -74.00, 40.0);
 
-    top = new StreetEdgeBuilder<>()
-      .withFromVertex(tl)
+    top = new StreetEdgeBuilder<>().withFromVertex(tl)
       .withToVertex(tr)
       .withGeometry(GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01))
       .withName("top")
@@ -74,8 +73,7 @@ public class EdgeSplittingTest {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(false)
       .buildAndConnect();
-    bottom = new StreetEdgeBuilder<>()
-      .withFromVertex(br)
+    bottom = new StreetEdgeBuilder<>().withFromVertex(br)
       .withToVertex(bl)
       .withGeometry(GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0))
       .withName("bottom")
@@ -83,8 +81,7 @@ public class EdgeSplittingTest {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(false)
       .buildAndConnect();
-    left = new StreetEdgeBuilder<>()
-      .withFromVertex(bl)
+    left = new StreetEdgeBuilder<>().withFromVertex(bl)
       .withToVertex(tl)
       .withGeometry(GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01))
       .withName("left")
@@ -92,8 +89,7 @@ public class EdgeSplittingTest {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(false)
       .buildAndConnect();
-    right = new StreetEdgeBuilder<>()
-      .withFromVertex(br)
+    right = new StreetEdgeBuilder<>().withFromVertex(br)
       .withToVertex(tr)
       .withGeometry(GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01))
       .withName("right")
@@ -102,8 +98,7 @@ public class EdgeSplittingTest {
       .withBack(false)
       .buildAndConnect();
 
-    new StreetEdgeBuilder<>()
-      .withFromVertex(tr)
+    new StreetEdgeBuilder<>().withFromVertex(tr)
       .withToVertex(tl)
       .withGeometry(top.getGeometry().reverse())
       .withName("topBack")
@@ -111,8 +106,7 @@ public class EdgeSplittingTest {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(true)
       .buildAndConnect();
-    new StreetEdgeBuilder<>()
-      .withFromVertex(br)
+    new StreetEdgeBuilder<>().withFromVertex(br)
       .withToVertex(bl)
       .withGeometry(bottom.getGeometry().reverse())
       .withName("bottomBack")
@@ -120,8 +114,7 @@ public class EdgeSplittingTest {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(true)
       .buildAndConnect();
-    leftBack = new StreetEdgeBuilder<>()
-      .withFromVertex(tl)
+    leftBack = new StreetEdgeBuilder<>().withFromVertex(tl)
       .withToVertex(bl)
       .withGeometry(left.getGeometry().reverse())
       .withName("leftBack")

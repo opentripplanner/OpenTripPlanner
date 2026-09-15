@@ -69,8 +69,7 @@ class ScheduledDeviatedTripIntegrationTest {
     );
 
     var trip = getFlexTrip();
-    var stop = trip
-      .getStops()
+    var stop = trip.getStops()
       .stream()
       .filter(s -> s.getId().getId().equals("cujv"))
       .findFirst()
@@ -78,8 +77,7 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals(33.85465, stop.getLat(), delta);
     assertEquals(-84.60039, stop.getLon(), delta);
 
-    var flexZone = trip
-      .getStops()
+    var flexZone = trip.getStops()
       .stream()
       .filter(s -> s.getId().getId().equals("zone_3"))
       .findFirst()
@@ -162,8 +160,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var leg = getItineraries(from, to, transitService).get(0).legs().get(0);
 
     // The flexible-area stop is exposed as an intermediate stop on the leg ...
-    var intermediateStopIds = leg
-      .listIntermediateStops()
+    var intermediateStopIds = leg.listIntermediateStops()
       .stream()
       .map(s -> s.place.stop.getId().getId())
       .collect(Collectors.toList());

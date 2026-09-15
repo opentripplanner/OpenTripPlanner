@@ -120,8 +120,7 @@ class Subgraph {
     }
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
-    return graph
-      .findVertices(envelope)
+    return graph.findVertices(envelope)
       .parallelStream()
       .filter(vx -> !contains(vx))
       .mapToDouble(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
@@ -136,8 +135,9 @@ class Subgraph {
     List<Point> points = new ArrayList<>();
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-    Consumer<Vertex> vertexAdder = vertex ->
-      points.add(geometryFactory.createPoint(vertex.getCoordinate()));
+    Consumer<Vertex> vertexAdder = vertex -> points.add(
+      geometryFactory.createPoint(vertex.getCoordinate())
+    );
     streetVertices().forEach(vertexAdder);
     stopVertices().forEach(vertexAdder);
 

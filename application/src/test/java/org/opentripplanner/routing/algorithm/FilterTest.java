@@ -97,11 +97,7 @@ public class FilterTest {
     );
 
     var filterRequest = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_1)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -143,11 +139,7 @@ public class FilterTest {
     );
 
     var filterRequest = TransitFilterRequest.of()
-      .addNot(
-        SelectRequest.of()
-          .withAgencies(List.of(id(AGENCY_ID_1)))
-          .build()
-      )
+      .addNot(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -254,19 +246,11 @@ public class FilterTest {
     );
 
     var filter1 = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_1)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     var filter2 = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_2)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_2))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter1, filter2), patterns);
@@ -306,19 +290,11 @@ public class FilterTest {
     );
 
     var filter1 = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_1)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     var filter2 = TransitFilterRequest.of()
-      .addNot(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_1)))
-          .build()
-      )
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter1, filter2), patterns);
@@ -359,16 +335,8 @@ public class FilterTest {
     );
 
     var filterRequest = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withAgencies(List.of(id(AGENCY_ID_1)))
-          .build()
-      )
-      .addNot(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_3)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -413,24 +381,12 @@ public class FilterTest {
     );
 
     var filter1 = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withAgencies(List.of(id(AGENCY_ID_1)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .build();
 
     var filter2 = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withAgencies(List.of(id(AGENCY_ID_2)))
-          .build()
-      )
-      .addNot(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_3)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_2))).build())
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter1, filter2), patterns);
@@ -550,11 +506,7 @@ public class FilterTest {
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
       )
-      .addNot(
-        SelectRequest.of()
-          .withRoutes(List.of(id(ROUTE_ID_3)))
-          .build()
-      )
+      .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filter), patterns);
@@ -611,11 +563,7 @@ public class FilterTest {
     );
 
     var filter = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withAgencies(List.of(id(AGENCY_ID_1)))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .addNot(
         SelectRequest.of()
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
@@ -667,10 +615,9 @@ public class FilterTest {
     List<TransitFilterRequest> filterRequest,
     Collection<TripPattern> patterns
   ) {
-    return patterns
-      .stream()
-      .filter(pattern ->
-        filterRequest.stream().noneMatch(filter -> filter.matchTripPattern(pattern))
+    return patterns.stream()
+      .filter(
+        pattern -> filterRequest.stream().noneMatch(filter -> filter.matchTripPattern(pattern))
       )
       .map(TripPattern::getId)
       .toList();

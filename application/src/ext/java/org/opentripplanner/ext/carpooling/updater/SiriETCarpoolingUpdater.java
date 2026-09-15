@@ -100,8 +100,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     var now = Instant.now();
     repository.removeExpiredTrips(now, TRIP_EXPIRY);
     var cutoff = now.minus(TRIP_EXPIRY);
-    failedResolutions
-      .values()
+    failedResolutions.values()
       .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));
   }
 

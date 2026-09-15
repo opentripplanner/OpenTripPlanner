@@ -121,9 +121,7 @@ public class TestStateBuilder {
       to,
       distance,
       StreetTraversalPermission.PEDESTRIAN
-    )
-      .withName(name)
-      .buildAndConnect();
+    ).withName(name).buildAndConnect();
 
     currentState = requireSingleState(edge.traverse(currentState));
     return this;
@@ -229,9 +227,7 @@ public class TestStateBuilder {
       to,
       30,
       StreetTraversalPermission.PEDESTRIAN
-    )
-      .withName(name)
-      .buildAndConnect();
+    ).withName(name).buildAndConnect();
     currentState = edge.traverse(currentState)[0];
     return this;
   }

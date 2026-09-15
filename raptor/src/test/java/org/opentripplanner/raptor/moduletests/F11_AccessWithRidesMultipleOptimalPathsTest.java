@@ -54,8 +54,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Free ~ A", "Flex 11m Rₙ1 ~ C")
+    data.access("Free ~ A", "Flex 11m Rₙ1 ~ C")
       .withTimetables(
         """
         A     B
@@ -71,8 +70,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       // We will test board- and alight-slack in a separate test
       .withSlackProvider(new TestSlackProvider(D1_m, D0_s, D0_s));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .timetable(true)
       .earliestDepartureTime(T00_02)
       .latestArrivalTime(T00_30);

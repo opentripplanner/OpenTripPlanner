@@ -125,8 +125,8 @@ public class SpeedTest {
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
       transitRepository.getTripCalendar()
     );
-    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
-      registry.registerRepositorySnapshot(
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle = registry
+      .registerRepositorySnapshot(
         timetableSnapshot,
         new TimetableRepositoryLifecycle(
           timetableSnapshot,

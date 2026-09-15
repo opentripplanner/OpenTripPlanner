@@ -31,8 +31,7 @@ public class B02_EgressTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access("Walk 20s ~ B")
+    data.access("Walk 20s ~ B")
       .withTimetables(
         """
         B     C     D     E     F     G

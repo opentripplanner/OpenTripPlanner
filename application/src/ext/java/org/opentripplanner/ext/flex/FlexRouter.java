@@ -154,22 +154,14 @@ public class FlexRouter {
   public Collection<FlexAccessEgress> createFlexAccesses() {
     OTPRequestTimeoutException.checkForTimeout();
 
-    return new FlexAccessFactory(
-      callbackService,
-      accessFlexPathCalculator,
-      matcher,
-      flexParameters
-    ).createFlexAccesses(streetAccesses, dates);
+    return new FlexAccessFactory(callbackService, accessFlexPathCalculator, matcher, flexParameters)
+      .createFlexAccesses(streetAccesses, dates);
   }
 
   public Collection<FlexAccessEgress> createFlexEgresses() {
     OTPRequestTimeoutException.checkForTimeout();
-    return new FlexEgressFactory(
-      callbackService,
-      egressFlexPathCalculator,
-      matcher,
-      flexParameters
-    ).createFlexEgresses(streetEgresses, dates);
+    return new FlexEgressFactory(callbackService, egressFlexPathCalculator, matcher, flexParameters)
+      .createFlexEgresses(streetEgresses, dates);
   }
 
   private List<FlexServiceDate> createFlexServiceDates(
@@ -183,32 +175,28 @@ public class FlexRouter {
 
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
-      transitService
-        .getFlexIndex()
+      transitService.getFlexIndex()
         .getFlexTripsForRunningDate(date)
         .stream()
         .filter(flexTripForDate -> matcher.match(flexTripForDate.flexTrip().getTrip()))
         .forEach(flexTripForDate -> {
-          flexTripsForServiceDate
-            .computeIfAbsent(flexTripForDate.serviceDate(), k -> new ArrayList<>())
-            .add(flexTripForDate.flexTrip());
+          flexTripsForServiceDate.computeIfAbsent(
+            flexTripForDate.serviceDate(),
+            k -> new ArrayList<>()
+          ).add(flexTripForDate.flexTrip());
         });
     }
 
-    return flexTripsForServiceDate
-      .entrySet()
-      .stream()
-      .map(entry -> {
-        var serviceDate = entry.getKey();
-        return FlexServiceDate.of(
-          serviceDate,
-          ServiceDateUtils.secondsSinceStartOfTime(startOfTime, serviceDate),
-          requestedBookingTimeInstant,
-          timeZone,
-          entry.getValue()
-        );
-      })
-      .toList();
+    return flexTripsForServiceDate.entrySet().stream().map(entry -> {
+      var serviceDate = entry.getKey();
+      return FlexServiceDate.of(
+        serviceDate,
+        ServiceDateUtils.secondsSinceStartOfTime(startOfTime, serviceDate),
+        requestedBookingTimeInstant,
+        timeZone,
+        entry.getValue()
+      );
+    }).toList();
   }
 
   Collection<FlexServiceDate> flexServiceDates() {

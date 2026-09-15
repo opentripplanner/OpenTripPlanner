@@ -133,9 +133,8 @@ public final class LocalDateRange {
    * @see #intersection(LocalDateRange)
    */
   public boolean overlap(LocalDateRange other) {
-    return (
-      inclusiveStart.isBefore(other.exclusiveEnd) && other.inclusiveStart.isBefore(exclusiveEnd)
-    );
+    return (inclusiveStart.isBefore(other.exclusiveEnd) &&
+      other.inclusiveStart.isBefore(exclusiveEnd));
   }
 
   /**

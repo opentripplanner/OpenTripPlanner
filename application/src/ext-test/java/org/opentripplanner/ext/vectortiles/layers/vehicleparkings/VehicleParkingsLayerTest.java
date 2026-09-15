@@ -51,8 +51,7 @@ public class VehicleParkingsLayerTest {
     var calBuilder = service.newBuilder(ZoneId.of("Europe/Berlin"));
 
     // Simple case 08:00- 16:30  April 1st to April 3rd
-    calBuilder
-      .openingHours("Mo-Fr", LocalTime.of(8, 0), LocalTime.of(16, 30))
+    calBuilder.openingHours("Mo-Fr", LocalTime.of(8, 0), LocalTime.of(16, 30))
       .on(LocalDate.of(2022, Month.APRIL, 1))
       .add();
 
@@ -83,7 +82,8 @@ public class VehicleParkingsLayerTest {
     var repo = new DefaultVehicleParkingRepository();
     repo.updateVehicleParking(List.of(vehicleParking), List.of());
 
-    var config = """
+    var config =
+    """
     {
       "vectorTiles": {
         "layers" : [

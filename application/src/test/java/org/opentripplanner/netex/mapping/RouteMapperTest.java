@@ -80,8 +80,7 @@ class RouteMapperTest {
       DataImportIssueStore.NOOP
     );
 
-    Network network = new Network()
-      .withId(NETWORK_ID)
+    Network network = new Network().withId(NETWORK_ID)
       .withTransportOrganisationRef(
         createJaxbElement(new TransportOrganisationRefStructure().withRef(AUTHORITY_ID))
       );
@@ -195,8 +194,7 @@ class RouteMapperTest {
       DataImportIssueStore.NOOP
     );
 
-    transitBuilder
-      .getBrandingsById()
+    transitBuilder.getBrandingsById()
       .add(Branding.of(MappingSupport.ID_FACTORY.createId(BRANDING_ID)).build());
 
     Line line = createExampleLine();
@@ -233,8 +231,7 @@ class RouteMapperTest {
 
     line.getRepresentedByGroupRef().setRef(GOL_ID_1);
     transitBuilder.getGroupOfRouteById().add(createGroupOfRoutes(GOL_ID_1, GOL_NAME_1));
-    transitBuilder
-      .getGroupsOfRoutesByRouteId()
+    transitBuilder.getGroupsOfRoutesByRouteId()
       .put(MappingSupport.ID_FACTORY.createId(LINE_ID), createGroupOfRoutes(GOL_ID_2, GOL_NAME_2));
 
     RouteMapper routeMapper = new RouteMapper(

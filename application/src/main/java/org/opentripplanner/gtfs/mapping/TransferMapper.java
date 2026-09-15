@@ -110,14 +110,14 @@ class TransferMapper {
 
   static TransferPriority mapTypeToPriority(int type) {
     switch (type) {
-      case FORBIDDEN:
+      case FORBIDDEN :
         return TransferPriority.NOT_ALLOWED;
-      case GUARANTEED:
-      case MIN_TIME:
-      case STAY_SEATED:
-      case STAY_SEATED_NOT_ALLOWED:
+      case GUARANTEED :
+      case MIN_TIME :
+      case STAY_SEATED :
+      case STAY_SEATED_NOT_ALLOWED :
         return TransferPriority.ALLOWED;
-      case RECOMMENDED:
+      case RECOMMENDED :
         return TransferPriority.RECOMMENDED;
     }
     throw new IllegalArgumentException("Mapping missing for type: " + type);
@@ -126,14 +126,12 @@ class TransferMapper {
   TransferMappingResult map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
     setup(!allTransfers.isEmpty());
 
-    List<ConstrainedTransfer> constrainedTransfers = allTransfers
-      .stream()
+    List<ConstrainedTransfer> constrainedTransfers = allTransfers.stream()
       .map(this::map)
       .filter(Objects::nonNull)
       .toList();
 
-    List<StaySeatedNotAllowed> staySeatedNotAllowed = allTransfers
-      .stream()
+    List<StaySeatedNotAllowed> staySeatedNotAllowed = allTransfers.stream()
       .map(this::toStaySeatedNotAllowed)
       .filter(Objects::nonNull)
       .toList();
@@ -264,10 +262,9 @@ class TransferMapper {
   private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
-    Predicate<StopLocation> stopMatches =
-      station != null
-        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
-        : s -> s == stop;
+    Predicate<StopLocation> stopMatches = station != null
+      ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
+      : s -> s == stop;
 
     for (int i = 0; i < stopTimes.size() - 1; i++) {
       StopTime stopTime = stopTimes.get(i);
@@ -285,10 +282,9 @@ class TransferMapper {
   private int alightStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
-    Predicate<StopLocation> stopMatches =
-      station != null
-        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
-        : s -> s == stop;
+    Predicate<StopLocation> stopMatches = station != null
+      ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
+      : s -> s == stop;
 
     for (int i = stopTimes.size() - 1; i > 0; i--) {
       StopTime stopTime = stopTimes.get(i);

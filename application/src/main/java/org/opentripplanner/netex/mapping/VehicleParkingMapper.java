@@ -71,12 +71,10 @@ class VehicleParkingMapper {
   }
 
   private VehicleParking.VehicleParkingEntranceCreator mapEntrance(Parking parking) {
-    return builder ->
-      builder
-        .entranceId(idFactory.createId(parking.getId() + "/entrance"))
-        .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
-        .walkAccessible(true)
-        .carAccessible(true);
+    return builder -> builder.entranceId(idFactory.createId(parking.getId() + "/entrance"))
+      .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
+      .walkAccessible(true)
+      .carAccessible(true);
   }
 
   private static VehicleParkingSpaces mapCapacity(Parking parking) {

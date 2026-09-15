@@ -52,13 +52,10 @@ public class PatternByServiceDatesFilter {
    * the specified dates.
    */
   public Collection<Route> filterRoutes(Collection<Route> routeStream) {
-    return routeStream
-      .stream()
-      .filter(r -> {
-        var patterns = getPatternsForRoute.apply(r);
-        return !this.filterPatterns(patterns).isEmpty();
-      })
-      .toList();
+    return routeStream.stream().filter(r -> {
+      var patterns = getPatternsForRoute.apply(r);
+      return !this.filterPatterns(patterns).isEmpty();
+    }).toList();
   }
 
   private boolean hasServicesOnDate(TripPattern pattern) {

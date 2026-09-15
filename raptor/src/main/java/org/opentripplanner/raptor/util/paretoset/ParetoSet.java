@@ -98,16 +98,16 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       T it = elements[i];
 
       switch (comparator.compare(newValue, it)) {
-        case MUTUAL:
+        case MUTUAL :
           continue loop;
-        case LEFT:
+        case LEFT :
           removeDominatedElementsFromRestOfSetAndAddNewElement(newValue, i);
           return true;
-        case RIGHT:
+        case RIGHT :
           goodElement = it;
           notifyElementRejected(newValue, it);
           return false;
-        case NONE:
+        case NONE :
           // newValue is strictly equal to an existing value
           notifyElementRejected(newValue, it);
           return false;
@@ -150,14 +150,14 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
       var it = elements[i];
 
       switch (comparator.compare(newValue, it)) {
-        case MUTUAL:
+        case MUTUAL :
           continue loop;
-        case LEFT:
+        case LEFT :
           return true;
-        case RIGHT:
+        case RIGHT :
           goodElement = it;
           return false;
-        case NONE:
+        case NONE :
           return false;
       }
     }
@@ -177,11 +177,9 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
    * in the set.
    */
   public String toString(Function<? super T, String> toStringMapper) {
-    return (
-      "{" +
+    return ("{" +
       Arrays.stream(elements, 0, size).map(toStringMapper).collect(Collectors.joining(", ")) +
-      "}"
-    );
+      "}");
   }
 
   private void notifyElementMoved(int fromIndex, int toIndex) {

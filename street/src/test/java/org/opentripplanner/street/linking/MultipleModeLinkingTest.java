@@ -20,8 +20,7 @@ class MultipleModeLinkingTest {
       StreetModelFactory.intersectionVertex(0.0, 0.0001),
       StreetModelFactory.intersectionVertex(0.01, 0.0001),
       StreetModelFactory.intersectionVertex(0.0, 0.0002),
-      StreetModelFactory.intersectionVertex(0.01, 0.0002),
-    };
+      StreetModelFactory.intersectionVertex(0.01, 0.0002), };
 
     StreetModelFactory.streetEdge(vertices[0], vertices[1], 0.01, PEDESTRIAN);
     StreetModelFactory.streetEdge(vertices[2], vertices[3], 0.01, PEDESTRIAN);
@@ -58,8 +57,6 @@ class MultipleModeLinkingTest {
     assertWithMessage(
       "Graph should not have any temporary edges. Inspect %s",
       env.graph().geoJsonUrl()
-    )
-      .that(env.graph().summarizeTempEdges())
-      .isEmpty();
+    ).that(env.graph().summarizeTempEdges()).isEmpty();
   }
 }

@@ -38,8 +38,8 @@ public record DebugRequest(
   /** List of stops in a particular path to debug. Only one path can be debugged per request. */
   List<Integer> path,
   /**
-   * The first stop to start recording debug information in the path specified in this request.
-   * This will filter away all events in the beginning of the path reducing the number of events
+   * The first stop to start recording debug information in the path specified in this request. This
+   * will filter away all events in the beginning of the path reducing the number of events
    * significantly; Hence make it easier to inspect events towards the end of the trip.
    */
   int debugPathFromStopIndex,
@@ -67,11 +67,9 @@ public record DebugRequest(
       return false;
     }
     DebugRequest that = (DebugRequest) o;
-    return (
-      debugPathFromStopIndex == that.debugPathFromStopIndex &&
+    return (debugPathFromStopIndex == that.debugPathFromStopIndex &&
       Objects.equals(stops, that.stops) &&
-      Objects.equals(path, that.path)
-    );
+      Objects.equals(path, that.path));
   }
 
   @Override

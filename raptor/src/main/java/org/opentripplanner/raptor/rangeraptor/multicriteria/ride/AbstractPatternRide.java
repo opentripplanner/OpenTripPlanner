@@ -55,10 +55,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
-  implements PatternRideView<T, McStopArrival<T>>
-  permits PatternRideC1, PatternRideC2
-{
+public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule> implements
+  PatternRideView<T, McStopArrival<T>> permits PatternRideC1, PatternRideC2 {
 
   private final McStopArrival<T> prevArrival;
   private final int boardStopPosition;
@@ -121,8 +119,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
   }
 
   protected String toString(ToStringBuilder builder, @Nullable Consumer<ToStringBuilder> addC2) {
-    builder
-      .addNum("prevArrival", prevArrival.stop())
+    builder.addNum("prevArrival", prevArrival.stop())
       .addNum("boardStopPosition", boardStopPosition)
       .addServiceTime("boardTime", boardTime)
       .addNum("boardC1", boardC1)
@@ -131,8 +128,7 @@ public abstract sealed class AbstractPatternRide<T extends RaptorTripSchedule>
     if (addC2 != null) {
       addC2.accept(builder);
     }
-    return builder
-      .addNum("tripSortIndex", tripSortIndex)
+    return builder.addNum("tripSortIndex", tripSortIndex)
       .addObj("trip", trip.pattern().debugInfo())
       .toString();
   }

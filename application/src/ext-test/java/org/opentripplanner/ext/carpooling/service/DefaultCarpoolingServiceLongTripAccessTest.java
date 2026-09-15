@@ -52,9 +52,8 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
 
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(59.9139, 10.7522);
   private static final ZoneId ZONE = ZoneId.of("Europe/Oslo");
-  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0).atZone(
-    ZONE
-  );
+  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0)
+    .atZone(ZONE);
 
   // 10 m/s car speed keeps the arithmetic obvious: seconds == meters / 10.
   private static final float CAR_SPEED_MPS = 10.0f;
@@ -70,34 +69,32 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
 
   @BeforeEach
   void setUp() {
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", ORIGIN);
-          // D is one long leg ~80 min from A — well beyond the 60-min nearby-stop radius.
-          var D = intersection("D", ORIGIN.moveEastMeters(48000));
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", ORIGIN);
+        // D is one long leg ~80 min from A — well beyond the 60-min nearby-stop radius.
+        var D = intersection("D", ORIGIN.moveEastMeters(48000));
 
-          coordA = A.toWgsCoordinate();
-          coordD = D.toWgsCoordinate();
+        coordA = A.toWgsCoordinate();
+        coordD = D.toWgsCoordinate();
 
-          // Bidirectional, speed-controlled car streets so A <-> D drives in ~80 min.
-          street(A, D, 48000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
-          street(D, A, 48000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
+        // Bidirectional, speed-controlled car streets so A <-> D drives in ~80 min.
+        street(A, D, 48000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
+        street(D, A, 48000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
 
-          // Passenger spur just north of A and a transit stop spur just south of A, both on the
-          // drivable network so pickup/dropoff need no walking.
-          var iP = intersection("iP", ORIGIN.moveNorthMeters(10));
-          biStreet(A, iP, 10);
-          coordP = iP.toWgsCoordinate();
+        // Passenger spur just north of A and a transit stop spur just south of A, both on the
+        // drivable network so pickup/dropoff need no walking.
+        var iP = intersection("iP", ORIGIN.moveNorthMeters(10));
+        biStreet(A, iP, 10);
+        coordP = iP.toWgsCoordinate();
 
-          var iS = intersection("iS", ORIGIN.moveSouthMeters(10));
-          biStreet(A, iS, 10);
-          stopS = stop("S", iS.toWgsCoordinate());
-          biLink(iS, stopS);
-        }
+        var iS = intersection("iS", ORIGIN.moveSouthMeters(10));
+        biStreet(A, iS, 10);
+        stopS = stop("S", iS.toWgsCoordinate());
+        biLink(iS, stopS);
       }
-    );
+    });
 
     context = CarpoolingServiceTestContext.of(model);
     service = context.service();

@@ -25,16 +25,14 @@ class StraightLineNearbyStopFinderTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    TestOtpModel model = modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          S1 = stop("S1", 47.500, 19);
-          S2 = stop("S2", 47.510, 19);
-          S3 = stop("S3", 47.520, 19);
-        }
+    TestOtpModel model = modelOf(new Builder() {
+      @Override
+      public void build() {
+        S1 = stop("S1", 47.500, 19);
+        S2 = stop("S2", 47.510, 19);
+        S3 = stop("S3", 47.520, 19);
       }
-    );
+    });
     siteRepository = model.transitRepository().getSiteRepository();
   }
 

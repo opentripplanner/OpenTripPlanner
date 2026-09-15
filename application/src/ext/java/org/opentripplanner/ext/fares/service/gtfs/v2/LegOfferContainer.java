@@ -51,8 +51,7 @@ class LegOfferContainer {
     List<TransitLeg> tail,
     Collection<LegOffer> limitedTransferOffers
   ) {
-    limitedTransferOffers
-      .stream()
+    limitedTransferOffers.stream()
       .filter(o -> containsNoTransferLimitedOffersAlready(head, o))
       .forEach(o -> transferLimitedOffers.add(new TransferLimitedOffer(head, tail, o)));
   }
@@ -67,8 +66,7 @@ class LegOfferContainer {
    * is removed.
    */
   private void addToLeg(TransitLeg leg, LegOffer legOffer) {
-    var legContainsItAlready = unlimitedTransferOffers
-      .get(leg)
+    var legContainsItAlready = unlimitedTransferOffers.get(leg)
       .stream()
       .filter(existingOffer -> existingOffer.fareProduct().equals(legOffer.fareProduct()))
       .findAny();
@@ -99,8 +97,7 @@ class LegOfferContainer {
 
   @Override
   public String toString() {
-    return unlimitedTransferOffers
-      .keys()
+    return unlimitedTransferOffers.keys()
       .stream()
       .sorted(Comparator.comparing(Leg::startTime))
       .map(l -> l.startTime().toString() + " -> " + unlimitedTransferOffers.get(l))
@@ -108,11 +105,10 @@ class LegOfferContainer {
   }
 
   private boolean containsNoTransferLimitedOffersAlready(TransitLeg head, LegOffer o) {
-    return transferLimitedOffers
-      .stream()
+    return transferLimitedOffers.stream()
       .noneMatch(
-        t ->
-          t.legOffer.offer().fareProduct().equals(o.offer().fareProduct()) && t.tail.contains(head)
+        t -> t.legOffer.offer().fareProduct().equals(o.offer().fareProduct()) &&
+          t.tail.contains(head)
       );
   }
 }

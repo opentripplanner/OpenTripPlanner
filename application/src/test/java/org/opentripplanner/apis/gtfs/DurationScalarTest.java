@@ -33,8 +33,9 @@ public class DurationScalarTest {
 
   @Test
   void nonDuration() {
-    Assertions.assertThrows(CoercingSerializeException.class, () ->
-      GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(new Object())
+    Assertions.assertThrows(
+      CoercingSerializeException.class,
+      () -> GraphQLScalars.DURATION_SCALAR.getCoercing().serialize(new Object())
     );
   }
 }

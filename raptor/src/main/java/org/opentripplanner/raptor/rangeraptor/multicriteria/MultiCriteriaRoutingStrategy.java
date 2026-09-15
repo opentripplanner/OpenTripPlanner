@@ -28,10 +28,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class MultiCriteriaRoutingStrategy<
-  T extends RaptorTripSchedule,
-  R extends AbstractPatternRide<T>
-> implements RoutingStrategy<T> {
+public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extends AbstractPatternRide<T>>
+  implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final TimeBasedBoardingSupport<T> boardingSupport;
@@ -210,8 +208,7 @@ public class MultiCriteriaRoutingStrategy<
     McStopArrival<T> prevArrival,
     final RaptorBoardOrAlightEvent<T> boardEvent
   ) {
-    return (
-      prevArrival.c1() +
+    return (prevArrival.c1() +
       c1Calculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),
@@ -219,8 +216,7 @@ public class MultiCriteriaRoutingStrategy<
         boardEvent.time(),
         boardEvent.trip(),
         boardEvent.transferConstraint()
-      )
-    );
+      ));
   }
 
   /**

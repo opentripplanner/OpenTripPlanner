@@ -88,11 +88,9 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
       return false;
     }
     AllowNarrowedTransitModeFilter that = (AllowNarrowedTransitModeFilter) o;
-    return (
-      Objects.equals(mode.getMode(), that.mode.getMode()) &&
+    return (Objects.equals(mode.getMode(), that.mode.getMode()) &&
       Objects.equals(mode.getSubMode(), that.mode.getSubMode()) &&
-      Objects.equals(mode.getReplacement(), that.mode.getReplacement())
-    );
+      Objects.equals(mode.getReplacement(), that.mode.getReplacement()));
   }
 
   @Override

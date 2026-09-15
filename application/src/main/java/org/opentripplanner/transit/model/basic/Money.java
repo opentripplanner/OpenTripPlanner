@@ -102,8 +102,7 @@ public class Money implements Comparable<Money>, Serializable {
   public BigDecimal fractionalAmount() {
     int fractionDigits = currency.getDefaultFractionDigits();
     var divisor = BigDecimal.valueOf(Math.pow(10, fractionDigits));
-    return new BigDecimal(amount)
-      .setScale(fractionDigits, RoundingMode.HALF_UP)
+    return new BigDecimal(amount).setScale(fractionDigits, RoundingMode.HALF_UP)
       .divide(divisor, RoundingMode.HALF_UP);
   }
 

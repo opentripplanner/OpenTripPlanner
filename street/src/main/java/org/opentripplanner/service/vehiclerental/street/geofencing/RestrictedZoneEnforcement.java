@@ -57,8 +57,8 @@ final class RestrictedZoneEnforcement implements GeofencingBoundaryEnforcement {
   public State[] arriveByCrossingExit(GeofencingZone zone, State state, EdgeTraversal edge) {
     if (
       state.isRentingVehicle() &&
-      state.getVehicleRentalNetwork() != null &&
-      Boolean.TRUE.equals(zone.traversalBanned())
+        state.getVehicleRentalNetwork() != null &&
+        Boolean.TRUE.equals(zone.traversalBanned())
     ) {
       return State.empty();
     }

@@ -50,8 +50,9 @@ class PlatformWithStairsTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stair edges — wheelchair-inaccessible, as expected for steps
         "(-1,2.5) → (2,2.5) PEDESTRIAN ♿❌",

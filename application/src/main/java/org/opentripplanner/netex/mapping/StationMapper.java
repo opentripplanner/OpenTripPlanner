@@ -58,8 +58,9 @@ class StationMapper {
 
   Station map(StopPlace stopPlace) {
     var id = idFactory.createId(stopPlace.getId());
-    return siteRepositoryBuilder.computeStationIfAbsent(id, it ->
-      mapStopPlaceToStation(it, stopPlace)
+    return siteRepositoryBuilder.computeStationIfAbsent(
+      id,
+      it -> mapStopPlaceToStation(it, stopPlace)
     );
   }
 
@@ -115,8 +116,9 @@ class StationMapper {
       translations.put(null, stopPlace.getName().getValue());
       for (var translation : stopPlace.getAlternativeNames().getAlternativeName()) {
         if (translation.getNameType() == NameTypeEnumeration.TRANSLATION) {
-          String lang =
-            translation.getLang() != null ? translation.getLang() : translation.getName().getLang();
+          String lang = translation.getLang() != null
+            ? translation.getLang()
+            : translation.getName().getLang();
           translations.put(lang, translation.getName().getValue());
         }
       }

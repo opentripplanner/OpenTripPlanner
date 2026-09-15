@@ -66,8 +66,9 @@ public class RealtimeResolver {
     ScheduledTransitLeg reference,
     ScheduledTransitLeg original
   ) {
-    return new ScheduledTransitLegBuilder<>(reference)
-      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
+    return new ScheduledTransitLegBuilder<>(reference).withTransferFromPreviousLeg(
+      original.transferFromPrevLeg()
+    )
       .withTransferToNextLeg(original.transferToNextLeg())
       .withGeneralizedCost(original.generalizedCost())
       .withAccessibilityScore(original.accessibilityScore())

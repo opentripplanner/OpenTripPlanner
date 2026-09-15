@@ -200,18 +200,16 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   private double getMaxSpeedForMode(TransitMode mode) {
     // The following numbers (except airplane) are copied from the GTFS validator
     // https://github.com/MobilityData/gtfs-validator/blob/master/main/src/main/java/org/mobilitydata/gtfsvalidator/validator/StopTimeTravelSpeedValidator.java#L310
-    return (
-      switch (mode) {
-        case AIRPLANE -> 1000;
-        case TRAM -> 100;
-        case RAIL -> 500;
-        case SUBWAY, MONORAIL, BUS, TROLLEYBUS, COACH -> 150;
-        case FERRY -> 80;
-        case CABLE_CAR -> 30;
-        case GONDOLA, FUNICULAR -> 50;
-        default -> 200;
-      } / 3.6
-    );
+    return (switch (mode) {
+      case AIRPLANE -> 1000;
+      case TRAM -> 100;
+      case RAIL -> 500;
+      case SUBWAY, MONORAIL, BUS, TROLLEYBUS, COACH -> 150;
+      case FERRY -> 80;
+      case CABLE_CAR -> 30;
+      case GONDOLA, FUNICULAR -> 50;
+      default -> 200;
+    } / 3.6);
   }
 
   /**
@@ -246,7 +244,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
           st = stopTimes.get(j);
           if (
             (st.isDepartureTimeSet() && st.getDepartureTime() != departureTime) ||
-            (st.isArrivalTimeSet() && st.getArrivalTime() != departureTime)
+              (st.isArrivalTimeSet() && st.getArrivalTime() != departureTime)
           ) {
             break;
           }

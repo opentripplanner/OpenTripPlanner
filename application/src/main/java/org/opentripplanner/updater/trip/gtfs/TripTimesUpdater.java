@@ -69,7 +69,8 @@ class TripTimesUpdater {
     TripUpdate tripUpdate,
     ForwardsDelayPropagationType forwardsDelay,
     BackwardsDelayPropagationType backwardsDelay
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     var tripId = tripUpdate.tripId();
 
     var tripTimes = timetable.getTripTimes(tripId);
@@ -85,10 +86,8 @@ class TripTimesUpdater {
     Map<Integer, PickDrop> updatedDropoffs = new HashMap<>();
     Map<Integer, String> replacedStopIndices = new HashMap<>();
 
-    final long today = ServiceDateUtils.asStartOfService(
-      tripUpdate.startDate(),
-      timeZone
-    ).toEpochSecond();
+    final long today = ServiceDateUtils.asStartOfService(tripUpdate.startDate(), timeZone)
+      .toEpochSecond();
 
     var mapper = new StopPositionMapper(tripId, tripTimes, timetable);
 
@@ -100,20 +99,14 @@ class TripTimesUpdater {
       var scheduledStopHeadsign = tripTimes.getHeadsign(pos);
       var scheduledPickup = timetable.getPattern().getBoardType(pos);
       var scheduledDropoff = timetable.getPattern().getAlightType(pos);
-      update
-        .stopHeadsign()
+      update.stopHeadsign()
         .filter(x -> !Objects.equals(x, scheduledStopHeadsign))
         .ifPresent(x -> builder.withStopHeadsign(pos, x));
-      update
-        .pickup()
-        .filter(x -> x != scheduledPickup)
-        .ifPresent(x -> updatedPickups.put(pos, x));
-      update
-        .dropoff()
+      update.pickup().filter(x -> x != scheduledPickup).ifPresent(x -> updatedPickups.put(pos, x));
+      update.dropoff()
         .filter(x -> x != scheduledDropoff)
         .ifPresent(x -> updatedDropoffs.put(pos, x));
-      update
-        .assignedStopId()
+      update.assignedStopId()
         .filter(x -> !Objects.equals(x, scheduledStopId))
         .ifPresent(x -> replacedStopIndices.put(pos, x));
 
@@ -177,7 +170,8 @@ class TripTimesUpdater {
     boolean added,
     boolean tripPatternModified,
     int serviceCode
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     // Calculate seconds since epoch on GTFS midnight (noon minus 12h) of service date
     final long midnightSecondsSinceEpoch = ServiceDateUtils.asStartOfService(
       tripUpdate.startDate(),
@@ -275,15 +269,20 @@ class TripTimesUpdater {
     var arrivalDelay = update.arrivalDelay();
     var departureDelay = update.departureDelay();
     arrivalTime.ifPresentOrElse(
-      time ->
-        builder.withArrivalTime(stopPositionInPattern, (int) (time - midnightSecondsSinceEpoch)),
+      time -> builder.withArrivalTime(
+        stopPositionInPattern,
+        (int) (time - midnightSecondsSinceEpoch)
+      ),
       () -> arrivalDelay.ifPresent(delay -> builder.withArrivalDelay(stopPositionInPattern, delay))
     );
     departureTime.ifPresentOrElse(
-      time ->
-        builder.withDepartureTime(stopPositionInPattern, (int) (time - midnightSecondsSinceEpoch)),
-      () ->
-        departureDelay.ifPresent(delay -> builder.withDepartureDelay(stopPositionInPattern, delay))
+      time -> builder.withDepartureTime(
+        stopPositionInPattern,
+        (int) (time - midnightSecondsSinceEpoch)
+      ),
+      () -> departureDelay.ifPresent(
+        delay -> builder.withDepartureDelay(stopPositionInPattern, delay)
+      )
     );
   }
 }

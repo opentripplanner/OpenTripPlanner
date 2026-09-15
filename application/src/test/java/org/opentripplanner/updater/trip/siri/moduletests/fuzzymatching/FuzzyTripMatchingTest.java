@@ -33,11 +33,9 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+    var updates = siri.etBuilder()
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -60,14 +58,12 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
-      .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef("XXX")
+    var updates = siri.etBuilder()
+      .withFramedVehicleJourneyRef(
+        builder -> builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef("XXX")
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected(null, "00:00:12")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:22")
@@ -104,16 +100,15 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
-      .withFramedVehicleJourneyRef(builder ->
-        builder.withServiceDate(env.defaultServiceDate()).withVehicleJourneyRef("NONEXISTENT")
+    var updates = siri.etBuilder()
+      .withFramedVehicleJourneyRef(
+        builder -> builder.withServiceDate(env.defaultServiceDate())
+          .withVehicleJourneyRef("NONEXISTENT")
       )
       .withVehicleRef("47")
       .withVehicleMode(VehicleModesEnumeration.RAIL)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -146,14 +141,12 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef("406:2026-02-17")
       .withVehicleRef("406")
       .withVehicleMode(VehicleModesEnumeration.RAIL)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -173,18 +166,15 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+    var updates = siri.etBuilder()
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .clearOrder()
           .withVisitNumber(1)
           .departAimedActual("00:00:11", "00:00:15")
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .clearOrder()
           .withVisitNumber(2)
           .arriveAimedExpected("00:00:20", "00:00:25")

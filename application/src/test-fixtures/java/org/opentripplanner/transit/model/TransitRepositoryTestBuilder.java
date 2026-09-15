@@ -146,9 +146,7 @@ public class TransitRepositoryTestBuilder {
   }
 
   public Operator operator(String operatorId) {
-    var operator = Operator.of(id(operatorId))
-      .withName(operatorId + " name")
-      .build();
+    var operator = Operator.of(id(operatorId)).withName(operatorId + " name").build();
     operators.add(operator);
     return operator;
   }
@@ -168,9 +166,8 @@ public class TransitRepositoryTestBuilder {
   }
 
   public Trip trip(TripInput tripInput, Consumer<TripBuilder> customizer) {
-    var serviceDates = Optional.ofNullable(tripInput.serviceDates()).orElse(
-      List.of(defaultServiceDate)
-    );
+    var serviceDates = Optional.ofNullable(tripInput.serviceDates())
+      .orElse(List.of(defaultServiceDate));
 
     var serviceId = getOrCreateServiceId(serviceDates);
 
@@ -226,8 +223,7 @@ public class TransitRepositoryTestBuilder {
   }
 
   private void addTripTimesToPattern(TripPattern tripPattern, TripTimes tripTimes) {
-    var newPattern = tripPattern
-      .copy()
+    var newPattern = tripPattern.copy()
       .withScheduledTimeTableBuilder(b -> b.addTripTimes(tripTimes))
       .build();
     tripPatterns.put(TripPatternKey.of(newPattern), newPattern);
@@ -247,8 +243,7 @@ public class TransitRepositoryTestBuilder {
   }
 
   private FeedScopedId getOrCreateServiceId(List<LocalDate> serviceDates) {
-    var key = serviceDates
-      .stream()
+    var key = serviceDates.stream()
       .map(LocalDate::toString)
       .sorted()
       .collect(Collectors.joining("|"));

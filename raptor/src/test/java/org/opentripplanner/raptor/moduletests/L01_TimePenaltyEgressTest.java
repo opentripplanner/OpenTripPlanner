@@ -53,8 +53,7 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     data.withRoute(route("R1", STOP_A, STOP_B).withTimetable(schedule("0:10 0:40").repeat(10, 60)));
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D1_m))
       .addEgressPaths(walk(STOP_B, D2_m).withTimePenalty(D1_m));
 
@@ -73,8 +72,8 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
+      .withRequest(
+        r -> r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
       )
       .addMinDuration("34m", TX_0, edt, lat)
       .add(TC_STANDARD, withoutCost(expected.all()))
@@ -106,8 +105,8 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
+      .withRequest(
+        r -> r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8_m)
       )
       .addMinDuration("34m", TX_0, edt, lat)
       // Note! this test that the time-penalty is removed from the "arrive-by" limit in the
@@ -134,12 +133,9 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
   public static String focusOnEgress(String path) {
     // BUS R1 0:18 0:48 30m ~ B 0s ~ Walk 1m 0:48 0:49  .. [0:16 0:49 33m Tₓ0]
     String[] lines = path.split("\n");
-    return Stream.of(lines)
-      .map(s -> {
-        int pos = s.indexOf("BUS");
-        return pos > 0 ? s.substring(pos) : s;
-      })
-      .map(PathUtils::withoutCost)
-      .collect(Collectors.joining("\n"));
+    return Stream.of(lines).map(s -> {
+      int pos = s.indexOf("BUS");
+      return pos > 0 ? s.substring(pos) : s;
+    }).map(PathUtils::withoutCost).collect(Collectors.joining("\n"));
   }
 }

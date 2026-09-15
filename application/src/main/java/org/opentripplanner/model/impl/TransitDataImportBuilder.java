@@ -77,8 +77,8 @@ public class TransitDataImportBuilder {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
-  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments =
-    ArrayListMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap
+    .create();
 
   private final EntityById<Operator> operatorsById = new DefaultEntityById<>();
 
@@ -110,8 +110,8 @@ public class TransitDataImportBuilder {
 
   private final EntityById<Branding> brandingsById = new DefaultEntityById<>();
 
-  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId =
-    ArrayListMultimap.create();
+  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap
+    .create();
 
   private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 
@@ -357,13 +357,12 @@ public class TransitDataImportBuilder {
     int orgSize = tripsById.size();
     tripsById.removeIf(
       t -> !serviceIds.contains(t.getServiceId()),
-      t ->
-        issueStore.add(
-          "RemovedMissingServiceIdTrip",
-          "Removed trip %s as service id %s does not exist",
-          t.getId(),
-          t.getServiceId()
-        )
+      t -> issueStore.add(
+        "RemovedMissingServiceIdTrip",
+        "Removed trip %s as service id %s does not exist",
+        t.getId(),
+        t.getServiceId()
+      )
     );
     logRemove("Trip", orgSize, tripsById.size(), "Trip service id does not exist.");
   }
@@ -383,16 +382,14 @@ public class TransitDataImportBuilder {
 
     for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
       TripPattern ptn = e.getValue();
-      Set<TripTimes> tripTimesToBeRemoved = ptn
-        .getScheduledTimetable()
+      Set<TripTimes> tripTimesToBeRemoved = ptn.getScheduledTimetable()
         .getTripTimes()
         .stream()
         .filter(tripTimes -> !tripsById.containsKey(tripTimes.getTrip().getId()))
         .collect(Collectors.toUnmodifiableSet());
       if (!tripTimesToBeRemoved.isEmpty()) {
         removePatterns.add(e);
-        Timetable updatedTimetable = ptn
-          .getScheduledTimetable()
+        Timetable updatedTimetable = ptn.getScheduledTimetable()
           .copyOf()
           .removeAllTripTimes(tripTimesToBeRemoved)
           .build();
@@ -443,10 +440,8 @@ public class TransitDataImportBuilder {
 
   /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
   private boolean transferTripReferencesDoNotExist(ConstrainedTransfer t) {
-    return (
-      transferPointTripReferenceDoesNotExist(t.getFrom()) ||
-      transferPointTripReferenceDoesNotExist(t.getTo())
-    );
+    return (transferPointTripReferenceDoesNotExist(t.getFrom()) ||
+      transferPointTripReferenceDoesNotExist(t.getTo()));
   }
 
   /**

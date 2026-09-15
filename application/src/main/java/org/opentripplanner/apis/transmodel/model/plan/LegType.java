@@ -83,9 +83,8 @@ public class LegType {
           .name("aimedStartTime")
           .description("The aimed date and time this leg starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env ->
-            leg(env)
-              .startTime()
+          .dataFetcher(
+            env -> leg(env).startTime()
               // startTime is already adjusted for real-time - need to subtract delay to get aimed time
               .minusSeconds(leg(env).departureDelay())
           )
@@ -135,11 +134,11 @@ public class LegType {
             "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride"
           )
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment ->
-            ((Leg) environment.getSource()).trip() != null
+          .dataFetcher(
+            environment -> ((Leg) environment.getSource()).trip() != null
               ? TransmodelTransportSubmode.fromValue(
-                  ((Leg) environment.getSource()).trip().getNetexSubMode()
-                )
+                ((Leg) environment.getSource()).trip().getNetexSubMode()
+              )
               : null
           )
           .build()
@@ -299,8 +298,8 @@ public class LegType {
             "For transit legs, the service date of the trip. For non-transit legs, null."
           )
           .type(TransmodelScalars.DATE_SCALAR)
-          .dataFetcher(environment ->
-            Optional.of((Leg) environment.getSource())
+          .dataFetcher(
+            environment -> Optional.of((Leg) environment.getSource())
               .map(Leg::serviceDate)
               .orElse(null)
           )
@@ -318,8 +317,7 @@ public class LegType {
             if (stops == null || stops.isEmpty()) {
               return List.of();
             } else {
-              return stops
-                .stream()
+              return stops.stream()
                 .map(stop -> stop.place.stop)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -335,8 +333,8 @@ public class LegType {
             "For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
-          .dataFetcher(env ->
-            TripTimeOnDateHelper.getIntermediateTripTimeOnDatesForLeg(env.getSource())
+          .dataFetcher(
+            env -> TripTimeOnDateHelper.getIntermediateTripTimeOnDatesForLeg(env.getSource())
           )
           .build()
       )
@@ -348,8 +346,8 @@ public class LegType {
             "For ride legs, all estimated calls for the service journey. For non-ride legs, empty list."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
-          .dataFetcher(env ->
-            TripTimeOnDateHelper.getAllTripTimeOnDatesForLegsTrip(env.getSource())
+          .dataFetcher(
+            env -> TripTimeOnDateHelper.getAllTripTimeOnDatesForLegsTrip(env.getSource())
           )
           .build()
       )
@@ -400,8 +398,8 @@ public class LegType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeRentalNetworks")
           .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-          .dataFetcher(env ->
-            leg(env).vehicleRentalNetwork() == null
+          .dataFetcher(
+            env -> leg(env).vehicleRentalNetwork() == null
               ? List.of()
               : List.of(leg(env).vehicleRentalNetwork())
           )
@@ -412,8 +410,8 @@ public class LegType {
           .description(ElevationProfileStepType.makeDescription("leg"))
           .name("elevationProfile")
           .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
-          .dataFetcher(env ->
-            ElevationProfileStepType.mapElevationProfile(leg(env).elevationProfile())
+          .dataFetcher(
+            env -> ElevationProfileStepType.mapElevationProfile(leg(env).elevationProfile())
           )
           .build()
       )

@@ -81,8 +81,9 @@ class ConcaveHoleTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // connecting ways from outside into two outer-ring corners
         "(0,0) → (-1,0) PEDESTRIAN ♿✅",

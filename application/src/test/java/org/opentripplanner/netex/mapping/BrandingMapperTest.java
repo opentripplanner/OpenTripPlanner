@@ -32,8 +32,7 @@ public class BrandingMapperTest {
   }
 
   public Branding createBranding() {
-    return new Branding()
-      .withId(ID)
+    return new Branding().withId(ID)
       .withName(new MultilingualString().withValue(NAME))
       .withShortName(new MultilingualString().withValue(SHORT_NAME))
       .withDescription(new MultilingualString().withValue(DESCRIPTION))

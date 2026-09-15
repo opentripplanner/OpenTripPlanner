@@ -66,11 +66,9 @@ public class WayProperties {
   @Override
   public boolean equals(Object o) {
     if (o instanceof WayProperties other) {
-      return (
-        Objects.equals(bicycleSafety, other.bicycleSafety) &&
+      return (Objects.equals(bicycleSafety, other.bicycleSafety) &&
         Objects.equals(walkSafety, other.walkSafety) &&
-        permission == other.permission
-      );
+        permission == other.permission);
     }
     return false;
   }

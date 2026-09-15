@@ -11,7 +11,8 @@ import org.opentripplanner.framework.json.ObjectMappers;
 
 class SerializationTest {
 
-  private static final String STOP_CLUSTER_JSON = """
+  private static final String STOP_CLUSTER_JSON =
+  """
     {
       "primary" : {
         "id" : "F:123",

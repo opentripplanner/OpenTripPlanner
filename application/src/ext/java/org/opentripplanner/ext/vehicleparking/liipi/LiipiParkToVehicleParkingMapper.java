@@ -96,13 +96,12 @@ public class LiipiParkToVehicleParkingMapper {
 
       var tags = parseTags(jsonNode);
       var maybeCapacity = Optional.ofNullable(capacity);
-      var bicyclePlaces = maybeCapacity
-        .map(c -> hasPlaces(capacity.getBicycleSpaces()))
+      var bicyclePlaces = maybeCapacity.map(c -> hasPlaces(capacity.getBicycleSpaces()))
         .orElse(false);
       var carPlaces = maybeCapacity.map(c -> hasPlaces(capacity.getCarSpaces())).orElse(false);
-      var wheelChairAccessiblePlaces = maybeCapacity
-        .map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
-        .orElse(false);
+      var wheelChairAccessiblePlaces = maybeCapacity.map(
+        c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces())
+      ).orElse(false);
       var openingHoursByDayType = jsonNode.path("openingHours").path("byDayType");
       var openingHoursCalendar = parseOpeningHours(openingHoursByDayType);
       VehicleParkingGroup vehicleParkingGroup = hubForPark.get(vehicleParkId);
@@ -118,9 +117,10 @@ public class LiipiParkToVehicleParkingMapper {
         .wheelchairAccessibleCarPlaces(wheelChairAccessiblePlaces)
         .tags(tags)
         .openingHoursCalendar(openingHoursCalendar)
-        .entrance(builder ->
-          builder
-            .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
+        .entrance(
+          builder -> builder.entranceId(
+            new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance")
+          )
             .name(name)
             .coordinate(new WgsCoordinate(geometry.getCentroid()))
             .walkAccessible(true)
@@ -168,13 +168,13 @@ public class LiipiParkToVehicleParkingMapper {
       return VehicleParkingState.OPERATIONAL;
     }
     switch (stateText) {
-      case "INACTIVE":
+      case "INACTIVE" :
         return VehicleParkingState.CLOSED;
-      case "TEMPORARILY_CLOSED":
+      case "TEMPORARILY_CLOSED" :
         return VehicleParkingState.TEMPORARILY_CLOSED;
-      case "IN_OPERATION":
-      case "EXCEPTIONAL_SITUATION":
-      default:
+      case "IN_OPERATION" :
+      case "EXCEPTIONAL_SITUATION" :
+      default :
         return VehicleParkingState.OPERATIONAL;
     }
   }

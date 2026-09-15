@@ -29,8 +29,7 @@ public final class RaptorPassThroughViaConnection extends ViaConnection {
   }
 
   public final String toString(RaptorStopNameResolver stopNameResolver) {
-    return new StringBuilder()
-      .append("(stop ")
+    return new StringBuilder().append("(stop ")
       .append(stopNameResolver.apply(fromStop()))
       .append(')')
       .toString();

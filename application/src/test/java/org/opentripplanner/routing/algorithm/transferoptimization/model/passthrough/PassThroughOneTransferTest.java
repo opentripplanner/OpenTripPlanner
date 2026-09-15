@@ -65,9 +65,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
       testCase().points(STOP_H).expectTransfer(STOP_C, STOP_G),
       testCase().points(STOP_I).expectTransfer(STOP_C, STOP_H),
       // Two stops in one pass-through point
-      testCase()
-        .points(STOP_B, STOP_C)
-        .expectTransfer(STOP_D, STOP_H),
+      testCase().points(STOP_B, STOP_C).expectTransfer(STOP_D, STOP_H),
       testCase().points(STOP_B, STOP_D).expectTransfer(STOP_C, STOP_H),
       testCase().points(STOP_B, STOP_G).expectTransfer(STOP_C, STOP_H),
       testCase().points(STOP_B, STOP_H).expectTransfer(STOP_C, STOP_G),
@@ -83,10 +81,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
       testCase().points(STOP_G, STOP_I).expectTransfer(STOP_C, STOP_H),
       testCase().points(STOP_H, STOP_I).expectTransfer(STOP_C, STOP_G),
       // Two stops in two pass-through points
-      testCase()
-        .points(STOP_B)
-        .points(STOP_C)
-        .expectTransfer(STOP_D, STOP_H),
+      testCase().points(STOP_B).points(STOP_C).expectTransfer(STOP_D, STOP_H),
       testCase().points(STOP_B).points(STOP_D).expectTransfer(STOP_D, STOP_H),
       testCase().points(STOP_B).points(STOP_G).expectTransfer(STOP_C, STOP_G),
       testCase().points(STOP_B).points(STOP_H).expectTransfer(STOP_C, STOP_G),
@@ -131,29 +126,25 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("tripWithOneTransferTestCases")
   public void tripWithOneTransfer(TestCase tc) {
-    var txCost =
-      new WalkDurationForStopCombinations(N_STOPS)
-        .withPassThroughPoints(tc.points(), 10)
-        // This transfer do not visit D
-        .addTxCost(STOP_C, STOP_G, 2)
-        // This transfer do not visit D and G; hence given the lowest cost
-        .addTxCost(STOP_C, STOP_H, 1)
-        // This transfer visit all stops; Hence given the highest cost
-        .addTxCost(STOP_D, STOP_G, 3)
-        // This transfer do not visit G
-        .addTxCost(STOP_D, STOP_H, 2);
+    var txCost = new WalkDurationForStopCombinations(N_STOPS).withPassThroughPoints(tc.points(), 10)
+      // This transfer do not visit D
+      .addTxCost(STOP_C, STOP_G, 2)
+      // This transfer do not visit D and G; hence given the lowest cost
+      .addTxCost(STOP_C, STOP_H, 1)
+      // This transfer visit all stops; Hence given the highest cost
+      .addTxCost(STOP_D, STOP_G, 3)
+      // This transfer do not visit G
+      .addTxCost(STOP_D, STOP_H, 2);
 
     // We need *a* path - the transfer here can be any.
-    var originalPath = pathBuilder()
-      .c2(tc.points().size())
+    var originalPath = pathBuilder().c2(tc.points().size())
       .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, STOP_D)
       .walk(txCost.walkDuration(STOP_D, STOP_F), STOP_F)
       .bus(trip2, STOP_I)
       .egress(D1_s);
 
-    var expectedPath = pathBuilder()
-      .c2(tc.points().size())
+    var expectedPath = pathBuilder().c2(tc.points().size())
       .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, tc.stopIndexA())
       .walk(txCost.walkDuration(tc.stopIndexA(), tc.stopIndexB()), tc.stopIndexB())
@@ -182,8 +173,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(originalPath);
 
     // Then expect a set containing the expected path only
-    var resultAsString = result
-      .stream()
+    var resultAsString = result.stream()
       .map(it -> it.toString(this::stopIndexToName))
       .collect(Collectors.joining(", "));
     assertEquals(

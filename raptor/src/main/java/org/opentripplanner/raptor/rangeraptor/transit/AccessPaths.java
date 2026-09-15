@@ -128,8 +128,7 @@ public class AccessPaths {
   }
 
   public List<RaptorAccessEgress> arrivedOnBoard() {
-    return arrivedOnBoardByNumOfRides
-      .valueCollection()
+    return arrivedOnBoardByNumOfRides.valueCollection()
       .stream()
       .flatMap(Collection::stream)
       .toList();
@@ -170,19 +169,16 @@ public class AccessPaths {
       @Override
       public int next() {
         AccessPaths.this.iterationTimePenaltyLimit += iterationStep;
-        return (
-          raptorIterationStartTime - signedIterationStep(AccessPaths.this.iterationTimePenaltyLimit)
-        );
+        return (raptorIterationStartTime -
+          signedIterationStep(AccessPaths.this.iterationTimePenaltyLimit));
       }
     };
   }
 
   /** Raptor uses this information to optimize boarding of the first trip */
   public boolean hasTimeDependentAccess() {
-    return (
-      hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
-      hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
-    );
+    return (hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
+      hasTimeDependentAccess(arrivedOnStreetByNumOfRides));
   }
 
   public AccessPaths filterOnSegment(int segment) {
@@ -200,8 +196,7 @@ public class AccessPaths {
   /* private methods */
 
   private static int maxTimePenalty(TIntObjectMap<List<RaptorAccessEgress>> col) {
-    return col
-      .valueCollection()
+    return col.valueCollection()
       .stream()
       .flatMapToInt(it -> it.stream().mapToInt(RaptorAccessEgress::timePenalty))
       .max()
@@ -220,10 +215,7 @@ public class AccessPaths {
   private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths
-      .stream()
-      .map(it -> it.hasTimePenalty() ? new AccessWithPenalty(it) : it)
-      .toList();
+    return paths.stream().map(it -> it.hasTimePenalty() ? new AccessWithPenalty(it) : it).toList();
   }
 
   private boolean hasTimePenalty() {
@@ -253,8 +245,7 @@ public class AccessPaths {
   private static Map<Boolean, List<RaptorAccessEgress>> partitioningByStartOnBoard(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths
-      .stream()
+    return paths.stream()
       .collect(Collectors.partitioningBy(RaptorStartOnBoardAccess.class::isInstance));
   }
 
@@ -271,10 +262,7 @@ public class AccessPaths {
       return List.of();
     }
     if (iterationTimePenaltyLimit != RaptorConstants.TIME_NOT_SET) {
-      return list
-        .stream()
-        .filter(e -> e.timePenalty() > iterationTimePenaltyLimit)
-        .toList();
+      return list.stream().filter(e -> e.timePenalty() > iterationTimePenaltyLimit).toList();
     }
     return list;
   }
