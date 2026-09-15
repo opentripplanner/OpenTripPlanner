@@ -79,18 +79,21 @@ This affects both GTFS service calendars and dates. The service calendar is redu
 outside the period are dropped. OTP2 will compute a transit schedule for every day for which it can
 find at least one trip running. On the other hand, OTP will waste resources if a service end date is
 _unbounded_ or very large (`9999-12-31`). To avoid this, limit the OTP service period. Also, if you
-provide a service with multiple feeds they may have different service end dates. To avoid
+provide a service with multiple feeds, they may have different service end dates. To avoid
 inconsistent results, the period can be limited, so all feeds have data for the entire period. The
-default is to use a period of 1 year before, and 3 years after the day the graph is built. Limiting
+default is to use a period of 1 year before and 3 years after the day the graph is built. Limiting
 the period will _not_ improve the search performance, but OTP will build faster and load faster in
 most cases.
 
+The transit service period is not allowed to be unbounded - the period from `transitServiceStart` to
+`transitServiceEnd` cannot exceed 10 years. The graph build will fail if this limit is exceeded.
+
 The `transitServiceStart` and `transitServiceEnd` parameters are set using an absolute date like
-`2020-12-31` or a period like `P1Y6M5D` relative to the graph build date. Negative periods is used
+`2020-12-31` or a period like `P1Y6M5D` relative to the graph build date. Negative periods are used
 to specify dates in the past. The period is computed using the system time-zone, not the feed
 time-zone. Also, remember that the service day might be more than 24 hours. So be sure to include
-enough slack to account for the this. Setting the limits too wide have very little impact and is in
-general better than trying to be exact. The period and date format follow the ISO 8601 standard.
+enough slack to account for this. Setting the limits too wide has very little impact and is, in
+general, better than trying to be exact. The period and date format follow the ISO 8601 standard.
 
 **Example**
 
