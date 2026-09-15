@@ -9,9 +9,7 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 
 /**
- * References to the vehicle expected to operate a journey, and to the type of that vehicle. The
- * references identify the vehicle in a register outside OTP, where clients can look up its
- * characteristics.
+ * References to the vehicle assigned to operate a journey.
  */
 public class VehicleAssignmentType {
 
@@ -23,9 +21,7 @@ public class VehicleAssignmentType {
   public static GraphQLObjectType create(FeedScopedIdMapper idMapper) {
     return GraphQLObjectType.newObject()
       .name(NAME)
-      .description(
-        "References to the vehicle expected to operate a journey, and to the type of that vehicle."
-      )
+      .description("References to the vehicle assigned to operate a journey.")
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("expectedVehicleId")

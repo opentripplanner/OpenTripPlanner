@@ -464,9 +464,9 @@ public interface TransitService {
   Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
 
   /**
-   * The vehicle assignment expected to operate a dated service journey: the planned assignment
-   * overlaid with the vehicle from a real-time update, which takes precedence. Empty when no vehicle
-   * information is available.
+   * The vehicle assignment expected to operate a dated service journey. If a real-time update
+   * contains updates about the assignment, this takes precedence over what's given in the planned
+   * data. Empty when no vehicle information is available.
    */
-  Optional<VehicleAssignment> findVehicleAssignment(TripOnServiceDate tripOnServiceDate);
+  Optional<VehicleAssignment> findExpectedVehicleAssignment(TripOnServiceDate tripOnServiceDate);
 }

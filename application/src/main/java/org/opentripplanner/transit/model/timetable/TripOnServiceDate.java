@@ -71,9 +71,9 @@ public class TripOnServiceDate
   }
 
   /**
-   * The vehicle expected to operate the trip on this service date, as given in the planned data.
-   * The vehicle type falls back to the one given for the trip when the service date has none of its
-   * own.
+   * The vehicle assigned to operate the trip on this service date, as given in the planned data.
+   * The assignment information falls back to what is given for the trip when the service date has
+   * none of its own.
    */
   @Nullable
   public VehicleAssignment getVehicleAssignment() {

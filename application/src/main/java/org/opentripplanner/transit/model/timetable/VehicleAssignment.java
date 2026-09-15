@@ -5,8 +5,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
- * References to the vehicle expected to operate a journey, and to the type of that
- * vehicle. Both references are independent, and either may be present without the other.
+ * References to the vehicle assigned to operate a journey.
  *
  * @param vehicleId     the vehicle itself.
  * @param vehicleTypeId the type of vehicle.
@@ -30,8 +29,8 @@ public record VehicleAssignment(
   }
 
   /**
-   * Combine the planned vehicle assignment with the vehicle from a real-time update. The real-time
-   * vehicle takes precedence over the planned one; the vehicle type is always the planned one.
+   * Combine the planned vehicle assignment with a vehicle id from a real-time update. The real-time
+   * vehicle takes precedence over the planned one.
    * Returns {@code null} when neither a vehicle nor a vehicle type is known.
    */
   @Nullable

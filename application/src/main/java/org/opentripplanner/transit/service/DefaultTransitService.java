@@ -159,7 +159,9 @@ public class DefaultTransitService implements TransitService {
   }
 
   @Override
-  public Optional<VehicleAssignment> findVehicleAssignment(TripOnServiceDate tripOnServiceDate) {
+  public Optional<VehicleAssignment> findExpectedVehicleAssignment(
+    TripOnServiceDate tripOnServiceDate
+  ) {
     var realTimeVehicleId = findTripTimes(
       tripOnServiceDate.getTrip(),
       tripOnServiceDate.getServiceDate()

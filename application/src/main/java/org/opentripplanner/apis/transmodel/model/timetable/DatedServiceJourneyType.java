@@ -95,14 +95,14 @@ public class DatedServiceJourneyType {
           .type(vehicleAssignmentType)
           .description(
             """
-            References to the vehicle expected to operate the dated service journey. The vehicle
-            type given for the operating day takes precedence over the one given for the service
-            journey.
+            References to the vehicle expected to operate the dated service journey. If no vehicle
+            assignment is given for the dated service journey, then this value falls back to what is
+            set for the service journey.
             """
           )
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment)
-              .findVehicleAssignment(tripOnServiceDate(environment))
+              .findExpectedVehicleAssignment(tripOnServiceDate(environment))
               .orElse(null)
           )
           .build()

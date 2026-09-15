@@ -189,7 +189,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
-   * The vehicle expected to operate the trip, as given in the planned data.
+   * The vehicle assigned to operate the trip, as given in the planned data.
    */
   @Nullable
   public VehicleAssignment getVehicleAssignment() {
