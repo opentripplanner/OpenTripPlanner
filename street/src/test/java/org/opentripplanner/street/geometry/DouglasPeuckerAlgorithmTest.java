@@ -1,17 +1,33 @@
 package org.opentripplanner.street.geometry;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.locationtech.jts.geom.Coordinate;
+
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.perpendicularDistance;
 
 class DouglasPeuckerAlgorithmTest {
 
-  private static final Coordinate BERLIN = new Coordinate(13.4105, 52.5212);
-  private static final Coordinate HAMBURG = new Coordinate(10.0003, 53.5566);
-  private static final Coordinate HANNOVER = new Coordinate(9.732, 52.376);
+  private static final String SP = "\\s+";
+  private static final String NUM = "(-?\\d+(?:\\.\\d+)?)";
+  private static final String COOR = "\\( ?" + NUM + " +" + NUM + "\\)";
+  private static final Pattern PERPENDICULAR_DISTANCE_PTN = Pattern.compile(
+    COOR + SP + COOR + SP + COOR + SP + NUM + SP + "=" + SP + NUM + ".*"
+  );
+
+  private static final Coordinate BERLIN = new WgsCoordinate(52.5212, 13.4105).asJtsCoordinate();
+  private static final Coordinate HAMBURG = new WgsCoordinate(53.5566, 10.0003).asJtsCoordinate();
+  private static final Coordinate HANNOVER = new WgsCoordinate(52.376, 9.732).asJtsCoordinate();
+
+  // 0.0000001 degrees is ~1 centimeter at the equator
+  private static final double ON_CENTI_METER_DEGREES = 0.0000001;
 
   @Test
   void simplifyDisabledWhenToleranceIsZero() {
@@ -33,23 +49,23 @@ class DouglasPeuckerAlgorithmTest {
 
   @Test
   void simplifyReducesPointsButKeepsEndpoints() {
-    // A near-straight line with a tiny zigzag - well within a 50 m tolerance, so every
-    // interior point should be removable, leaving just the two endpoints.
-    var zigzag = GeometryUtils.makeLineString(BERLIN, HANNOVER, HAMBURG);
-    var line = DouglasPeuckerAlgorithm.of(zigzag, 50.0);
+    // Hannover is ~125 km off the direct Berlin-Hamburg line, so it should survive a
+    // 120 km tolerance; only a larger 130 km tolerance removes it.
+    var route = GeometryUtils.makeLineString(BERLIN, HANNOVER, HAMBURG);
+    var line = DouglasPeuckerAlgorithm.of(route, 120_000.0);
 
     assertEquals(3, line.getNumPoints());
-    assertEquals(zigzag.getStartPoint().getCoordinate(), line.getStartPoint().getCoordinate());
-    assertEquals(zigzag.getEndPoint().getCoordinate(), line.getEndPoint().getCoordinate());
+    assertEquals(route.getStartPoint().getCoordinate(), line.getStartPoint().getCoordinate());
+    assertEquals(route.getEndPoint().getCoordinate(), line.getEndPoint().getCoordinate());
 
-    var simplified = DouglasPeuckerAlgorithm.of(zigzag, 250_000.0);
+    var simplified = DouglasPeuckerAlgorithm.of(route, 130_000.0);
 
     assertEquals(2, simplified.getNumPoints());
     assertEquals(
-      zigzag.getStartPoint().getCoordinate(),
+      route.getStartPoint().getCoordinate(),
       simplified.getStartPoint().getCoordinate()
     );
-    assertEquals(zigzag.getEndPoint().getCoordinate(), simplified.getEndPoint().getCoordinate());
+    assertEquals(route.getEndPoint().getCoordinate(), simplified.getEndPoint().getCoordinate());
   }
 
   /// At 60 degrees latitude a degree of longitude covers about half as many meters as a degree
@@ -103,5 +119,35 @@ class DouglasPeuckerAlgorithmTest {
     assertThat(simplified.getCoordinates())
       .asList()
       .containsExactly(start.asJtsCoordinate(), spikeTip.asJtsCoordinate(), end.asJtsCoordinate());
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "(60 10) (61 20) (60 30) 1.0 = 1.0  --  1º latitude",
+      "(-9  0) ( 0  1) ( 9  0) 1.0 = 1.0  --  1º longitude at equator",
+      "(57  0) (60  2) (63  0) 0.5 = 1.0  --  1º longitude at 60º North",
+      "(-59 0) (-60 2) (-61 0) 0.5 = 1.0  --  1º longitude at 60º South",
+      "( 0 10) ( 0 22) ( 0 20) 1.0 = 2.0  --  2º overshootingting the end point (longitude)",
+      "( 0 55) (-5 55) (30 55) 1.0 = 5.0  --  5º degrees overshootingting the start point (latitude)",
+      "( 0 50) (-4 47) (0  80) 1.0 = 5.0  --  4º by 2º overshootingting the start point",
+      "(58 10) (65 18) (62 10) 0.5 = 5.0  --  3º by 8º overshootingting the end point at 60º North",
+    }
+  )
+  void testPerpendicularDistance(String text) {
+    var m = PERPENDICULAR_DISTANCE_PTN.matcher(text);
+    assertTrue(m.matches(), text);
+
+    var a = new WgsCoordinate(num(m, 1), num(m, 2)).asJtsCoordinate();
+    var b = new WgsCoordinate(num(m, 3), num(m, 4)).asJtsCoordinate();
+    var c = new WgsCoordinate(num(m, 5), num(m, 6)).asJtsCoordinate();
+    double lonScale = num(m, 7);
+    double expected = num(m, 8);
+
+    assertEquals(  expected,  perpendicularDistance(a, c, b, lonScale), ON_CENTI_METER_DEGREES, text);
+  }
+
+  private static double num(Matcher m, int group) {
+    return Double.parseDouble(m.group(group));
   }
 }
