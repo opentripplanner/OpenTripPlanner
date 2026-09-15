@@ -19,6 +19,10 @@ class TripOnServiceDateTest {
   );
   public static final LocalDate SERVICE_DATE = LocalDate.now();
   public static final String TRIP_ID = "tripId";
+  private static final VehicleAssignment VEHICLE_ASSIGNMENT = new VehicleAssignment(
+    null,
+    "RUT:VehicleType:1"
+  );
   private static final TripOnServiceDate SUBJECT = TripOnServiceDate.of(
     FeedScopedIdForTestFactory.id(ID)
   )
@@ -26,6 +30,7 @@ class TripOnServiceDateTest {
     .withServiceDate(SERVICE_DATE)
     .withTripAlteration(TRIP_ALTERATION)
     .withReplacementFor(REPLACEMENT_FOR)
+    .withVehicleAssignment(VEHICLE_ASSIGNMENT)
     .build();
 
   @Test
@@ -40,6 +45,7 @@ class TripOnServiceDateTest {
     assertEquals(TRIP_ID, copy.getTrip().getId().getId());
     assertEquals(TRIP_ALTERATION, copy.getTripAlteration());
     assertEquals(REPLACEMENT_FOR, copy.getReplacementFor());
+    assertEquals(VEHICLE_ASSIGNMENT, copy.getVehicleAssignment());
   }
 
   @Test
@@ -52,6 +58,9 @@ class TripOnServiceDateTest {
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withTripAlteration(TripAlteration.PLANNED).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withRealtimeExtraJourney(true).build()));
     assertFalse(
+      SUBJECT.sameAs(SUBJECT.copy().withVehicleAssignment(new VehicleAssignment(null, "X")).build())
+    );
+    assertFalse(
       SUBJECT.sameAs(
         SUBJECT.copy()
           .withReplacementFor(
@@ -60,6 +69,34 @@ class TripOnServiceDateTest {
           .build()
       )
     );
+  }
+
+  @Test
+  void inheritsVehicleAssignmentFromTrip() {
+    var trip = TransitRepositoryForTest.trip(TRIP_ID)
+      .withVehicleAssignment(new VehicleAssignment(null, "RUT:VehicleType:SJ"))
+      .build();
+    var subject = TripOnServiceDate.of(FeedScopedIdForTestFactory.id(ID))
+      .withTrip(trip)
+      .withServiceDate(SERVICE_DATE)
+      .build();
+
+    assertEquals(new VehicleAssignment(null, "RUT:VehicleType:SJ"), subject.getVehicleAssignment());
+  }
+
+  @Test
+  void ownVehicleAssignmentOverridesTrip() {
+    var trip = TransitRepositoryForTest.trip(TRIP_ID)
+      .withVehicleAssignment(new VehicleAssignment(null, "RUT:VehicleType:SJ"))
+      .build();
+    var own = new VehicleAssignment(null, "RUT:VehicleType:DSJ");
+    var subject = TripOnServiceDate.of(FeedScopedIdForTestFactory.id(ID))
+      .withTrip(trip)
+      .withServiceDate(SERVICE_DATE)
+      .withVehicleAssignment(own)
+      .build();
+
+    assertEquals(own, subject.getVehicleAssignment());
   }
 
   @Test

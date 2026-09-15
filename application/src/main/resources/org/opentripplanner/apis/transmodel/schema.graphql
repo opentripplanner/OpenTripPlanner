@@ -197,6 +197,12 @@ type DatedServiceJourney {
   serviceJourney: ServiceJourney!
   "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
   tripAlteration: ServiceAlteration
+  """
+  References to the vehicle expected to operate the dated service journey. If no vehicle
+  assignment is given for the dated service journey, then this value falls back to what is
+  set for the service journey.
+  """
+  vehicleAssignment: VehicleAssignment
 }
 
 "An advertised destination of a specific journey pattern, usually displayed on a head sign or at other on-board locations."
@@ -1354,6 +1360,8 @@ type ServiceJourney {
   situations: [PtSituationElement!]!
   transportMode: TransportMode
   transportSubmode: TransportSubmode
+  "References to the vehicle expected to operate the service journey."
+  vehicleAssignment: VehicleAssignment
   "Whether service journey is accessible with wheelchair."
   wheelchairAccessible: WheelchairBoarding
 }
@@ -1647,6 +1655,14 @@ type ValidityPeriod {
   endTime: DateTime
   "The inclusive start of the validity period. Will return 'null' if the validity has an unbounded start."
   startTime: DateTime
+}
+
+"References to the vehicle assigned to operate a journey."
+type VehicleAssignment {
+  "Expected id of the vehicle. Updated with real time information if available."
+  expectedVehicleId: String
+  "Expected id of the type of vehicle."
+  expectedVehicleTypeId: String
 }
 
 "An acceptable combination of trip patterns between two segments of the via search"

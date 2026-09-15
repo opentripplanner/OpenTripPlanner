@@ -44,7 +44,8 @@ public class DatedServiceJourneyType {
     GraphQLType quayType,
     GraphQLOutputType replacedByType,
     GraphQLOutputType replacementForType,
-    GraphQLOutputType realTimeJourneyStateType
+    GraphQLOutputType realTimeJourneyStateType,
+    GraphQLOutputType vehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -87,6 +88,24 @@ public class DatedServiceJourneyType {
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(environment -> tripOnServiceDate(environment).isExtraJourney())
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleAssignment")
+          .type(vehicleAssignmentType)
+          .description(
+            """
+            References to the vehicle expected to operate the dated service journey. If no vehicle
+            assignment is given for the dated service journey, then this value falls back to what is
+            set for the service journey.
+            """
+          )
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .findExpectedVehicleAssignment(tripOnServiceDate(environment))
+              .orElse(null)
+          )
+          .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()

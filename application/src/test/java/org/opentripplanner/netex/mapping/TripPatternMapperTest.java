@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ArrayListMultimap;
+import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,10 +22,12 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.VehicleTypeRefStructure;
 
 class TripPatternMapperTest {
 
@@ -166,6 +169,49 @@ class TripPatternMapperTest {
       replacingTripOnServiceDate.get().getReplacementFor().getFirst().getTrip(),
       replacedTripOnServiceDate.get().getTrip()
     );
+  }
+
+  @Test
+  void testDatedServiceJourneyVehicleTypeRef() {
+    NetexTestDataSample sample = new NetexTestDataSample();
+    sample.getServiceJourney().setVehicleTypeRef(vehicleTypeRef("RUT:VehicleType:1"));
+    sample
+      .getDatedServiceJourneyById(NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2)
+      .setVehicleTypeRef(vehicleTypeRef("RUT:VehicleType:2"));
+
+    Optional<TripPatternMapperResult> res = mapTripPattern(sample);
+
+    assertTrue(res.isPresent());
+    var r = res.get();
+
+    Trip trip = r.tripPattern().scheduledTripsAsStream().findFirst().get();
+    assertEquals(new VehicleAssignment(null, "RUT:VehicleType:1"), trip.getVehicleAssignment());
+
+    // The vehicle type of the service journey applies to the date without one of its own
+    assertEquals(
+      new VehicleAssignment(null, "RUT:VehicleType:1"),
+      tripOnServiceDate(r, NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1).getVehicleAssignment()
+    );
+    assertEquals(
+      new VehicleAssignment(null, "RUT:VehicleType:2"),
+      tripOnServiceDate(r, NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2).getVehicleAssignment()
+    );
+  }
+
+  private static JAXBElement<VehicleTypeRefStructure> vehicleTypeRef(String id) {
+    return MappingSupport.createWrappedRef(id, VehicleTypeRefStructure.class);
+  }
+
+  private static TripOnServiceDate tripOnServiceDate(
+    TripPatternMapperResult result,
+    String datedServiceJourneyId
+  ) {
+    return result
+      .tripOnServiceDates()
+      .stream()
+      .filter(tripOnServiceDate -> datedServiceJourneyId.equals(tripOnServiceDate.getId().getId()))
+      .findFirst()
+      .orElseThrow();
   }
 
   private static Optional<TripPatternMapperResult> mapTripPattern(NetexTestDataSample sample) {
