@@ -1,17 +1,17 @@
 package org.opentripplanner.street.geometry;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.perpendicularDistance;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.locationtech.jts.geom.Coordinate;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.perpendicularDistance;
 
 class DouglasPeuckerAlgorithmTest {
 
@@ -61,10 +61,7 @@ class DouglasPeuckerAlgorithmTest {
     var simplified = DouglasPeuckerAlgorithm.of(route, 130_000.0);
 
     assertEquals(2, simplified.getNumPoints());
-    assertEquals(
-      route.getStartPoint().getCoordinate(),
-      simplified.getStartPoint().getCoordinate()
-    );
+    assertEquals(route.getStartPoint().getCoordinate(), simplified.getStartPoint().getCoordinate());
     assertEquals(route.getEndPoint().getCoordinate(), simplified.getEndPoint().getCoordinate());
   }
 
@@ -144,7 +141,7 @@ class DouglasPeuckerAlgorithmTest {
     double lonScale = num(m, 7);
     double expected = num(m, 8);
 
-    assertEquals(  expected,  perpendicularDistance(a, c, b, lonScale), ON_CENTI_METER_DEGREES, text);
+    assertEquals(expected, perpendicularDistance(a, c, b, lonScale), ON_CENTI_METER_DEGREES, text);
   }
 
   private static double num(Matcher m, int group) {
