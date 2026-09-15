@@ -14,6 +14,8 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /// A class for converting graph entities into human-readable strings, which help writing assertions
 /// in test. It does not create or manipulate any entities - it is purely read-only.
@@ -45,7 +47,7 @@ public class GraphSummarizer {
   }
 
   public List<TransitStopVertex> listStopVertices() {
-    return graph.getVerticesOfType(TransitStopVertex.class);
+    return ListUtils.ofIterable(graph.findVertices(TransitStopVertex.class));
   }
 
   /// Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges. This is a
@@ -73,11 +75,8 @@ public class GraphSummarizer {
   }
 
   public Collection<String> summarizeSplitVertices() {
-    return graph
-      .getVerticesOfType(SplitterVertex.class)
-      .stream()
-      .map(StreetSummarizer::summarizeVertex)
-      .toList();
+    var vertices = graph.findVertices(SplitterVertex.class);
+    return StreamUtils.ofIterable(vertices).map(StreetSummarizer::summarizeVertex).toList();
   }
 
   public Collection<String> summarizeEdges() {

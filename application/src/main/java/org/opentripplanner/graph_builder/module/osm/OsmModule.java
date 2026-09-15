@@ -602,7 +602,7 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private void validateBarriers() {
-    List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
+    var vertices = graph.findVertices(BarrierVertex.class);
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 

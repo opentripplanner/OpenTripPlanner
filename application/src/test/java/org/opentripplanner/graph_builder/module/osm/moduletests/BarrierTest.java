@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.moduletests;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
@@ -25,6 +26,7 @@ import org.opentripplanner.street.model.vertex.BarrierPassThroughVertex;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 public class BarrierTest {
 
@@ -59,8 +61,7 @@ public class BarrierTest {
       .buildGraph();
 
     assertEquals(3, graph.getVertices().size());
-    var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
-    assertEquals(0, barrierVertices.size());
+    assertThat(graph.findVertices(BarrierVertex.class)).isEmpty();
     var issues = issueStore
       .listIssues()
       .stream()
@@ -104,21 +105,17 @@ public class BarrierTest {
     // way
     Collection<Vertex> vertices = graph.getVertices();
     assertEquals(7, vertices.size());
-    assertEquals(3, graph.getVerticesOfType(BarrierPassThroughVertex.class).size());
+    assertThat(graph.findVertices(BarrierPassThroughVertex.class)).hasSize(3);
     assertEquals(
       2,
-      graph
-        .getVerticesOfType(OsmVertex.class)
-        .stream()
+      StreamUtils.ofIterable(graph.findVertices(OsmVertex.class))
         .filter(v -> v.nodeId() == 1)
         .toList()
         .size()
     );
 
     // check traversal permission starting from node 2
-    var v2 = graph
-      .getVerticesOfType(OsmVertex.class)
-      .stream()
+    var v2 = StreamUtils.ofIterable(graph.findVertices(OsmVertex.class))
       .filter(v -> v.nodeId() == 2)
       .findFirst()
       .orElseThrow();
