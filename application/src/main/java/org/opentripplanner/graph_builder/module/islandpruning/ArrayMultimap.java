@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,18 +11,21 @@ import java.util.Map;
  * operations that class actually needs are implemented: {@link #put}, {@link #containsKey} and
  * {@link #get}.
  * <p>
- * Values for a key are deduplicated and stored in an {@link ArraySet} for performance.
+ * Values for a key are deduplicated and stored in an {@link ArrayList} for performance.
  */
 class ArrayMultimap<K, V> {
 
   @SuppressWarnings("rawtypes")
-  private static final ArraySet EMPTY = new ArraySet();
+  private static final List EMPTY = List.of();
 
-  private final Map<K, ArraySet<V>> map = new HashMap<>();
+  private final Map<K, List<V>> map = new HashMap<>();
 
   /** Associates {@code value} with {@code key}, if not already present. */
   void put(K key, V value) {
-    map.computeIfAbsent(key, k -> new ArraySet<>()).add(value);
+    var list = map.computeIfAbsent(key, k -> new ArrayList<>(4));
+    if (!list.contains(value)) {
+      list.add(value);
+    }
   }
 
   boolean containsKey(K key) {
