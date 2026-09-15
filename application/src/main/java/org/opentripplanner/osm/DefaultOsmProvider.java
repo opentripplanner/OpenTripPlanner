@@ -37,8 +37,10 @@ public class DefaultOsmProvider implements OsmProvider {
   private final OsmTagMapper osmTagMapper;
 
   private final WayPropertySet wayPropertySet;
-  private final int parallelism = Math.max(4,  Runtime.getRuntime().availableProcessors());
-  private final ExecutorService executorService = Executors.newFixedThreadPool(parallelism);
+  /// since reading from disk is still serial, this only controls how many threads _decode_ the zip
+  /// stream. past 2-3, more threads don't make it faster any more.
+  private final int decodeParallelism = Math.max(4, Runtime.getRuntime().availableProcessors());
+  private final ExecutorService executorService = Executors.newFixedThreadPool(decodeParallelism);
   private byte[] cachedBytes = null;
 
   /** For tests */
@@ -73,8 +75,7 @@ public class DefaultOsmProvider implements OsmProvider {
       osmdb.doneThirdPhaseNodes();
     } catch (Exception ex) {
       throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
-    }
-    finally {
+    } finally {
       executorService.shutdown();
     }
   }
@@ -102,7 +103,14 @@ public class DefaultOsmProvider implements OsmProvider {
 
   private void parsePhase(OsmParser parser, OsmParserPhase phase) {
     parser.setPhase(phase);
-    try (var in = new ParallelBlockInputStream(createInputStream(phase), parser, executorService, parallelism)) {
+    try (
+      var in = new ParallelBlockInputStream(
+        createInputStream(phase),
+        parser,
+        executorService,
+        decodeParallelism
+      )
+    ) {
       in.process();
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
