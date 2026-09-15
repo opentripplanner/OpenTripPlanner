@@ -2065,7 +2065,7 @@ enum StreetMode {
   "Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the rest of the way. This can include scooter rental at fixed locations or free-floating services."
   scooter_rental
   "Traveling by taxi. This can include walking before being picked up and/or after being dropped off."
-  taxi
+  taxi @deprecated(reason : "This value is experimental.")
 }
 
 enum TransportMode {

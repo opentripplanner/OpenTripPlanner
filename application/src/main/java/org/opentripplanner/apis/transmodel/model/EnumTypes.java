@@ -481,10 +481,15 @@ public class EnumTypes {
         "the way."
     )
     .value(
-      "taxi",
-      StreetMode.TAXI,
-      "Traveling by taxi. This can include walking before being picked up and/or after being " +
-        "dropped off."
+      GraphQLEnumValueDefinition.newEnumValueDefinition()
+        .name("taxi")
+        .value(StreetMode.TAXI)
+        .description(
+          "Traveling by taxi. This can include walking before being picked up and/or after " +
+            "being dropped off."
+        )
+        .deprecationReason("This value is experimental.")
+        .build()
     )
     .build();
 
