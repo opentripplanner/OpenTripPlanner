@@ -15,6 +15,8 @@ import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.vertex.SimpleVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Unit tests for {@link DefaultCarpoolingService#driverLegTreeLimits}: each leg gets
@@ -116,6 +118,92 @@ class DefaultCarpoolingServiceTreeLimitTest {
     });
 
     assertEquals(CarpoolTrip.MAX_TRIP_DURATION, limits[0]);
+  }
+
+  /**
+   * The passenger's forward tree must reach {@code legLimit - beeline(legStart, passenger)} for
+   * the widest leg: the driver first has to get from the leg start to the passenger, which takes
+   * at least the beeline at the fastest speed, before the part the tree covers begins.
+   */
+  @Test
+  void passengerForwardTreeLimitSubtractsTheBeelineFromTheLegStart() {
+    double maxSpeed = 40.0;
+    var legStart = vertex("a0", COORD);
+    var legEnd = vertex("a1", COORD.moveEastMeters(20_000));
+    var passenger = vertex("p", COORD.moveEastMeters(4_000));
+    var legLimits = new Duration[] { Duration.ofMinutes(30) };
+
+    var limit = DefaultCarpoolingService.passengerForwardTreeLimit(
+      passenger,
+      List.of(legStart, legEnd),
+      legLimits,
+      maxSpeed
+    );
+
+    // 4 km at 40 m/s is 100 s the driver needs before reaching the passenger. The test
+    // coordinates are placed with a metres-to-degrees approximation, hence the tolerance.
+    assertWithinTwoSeconds(Duration.ofMinutes(30).minusSeconds(100), limit);
+  }
+
+  @Test
+  void passengerReverseTreeLimitSubtractsTheBeelineToTheLegEnd() {
+    double maxSpeed = 40.0;
+    var legStart = vertex("a0", COORD);
+    var legEnd = vertex("a1", COORD.moveEastMeters(20_000));
+    var passenger = vertex("p", COORD.moveEastMeters(12_000));
+    var legLimits = new Duration[] { Duration.ofMinutes(30) };
+
+    var limit = DefaultCarpoolingService.passengerReverseTreeLimit(
+      passenger,
+      List.of(legStart, legEnd),
+      legLimits,
+      maxSpeed
+    );
+
+    // 8 km at 40 m/s is 200 s the driver still needs after the passenger.
+    assertWithinTwoSeconds(Duration.ofMinutes(30).minusSeconds(200), limit);
+  }
+
+  /** The widest leg decides, and a passenger far beyond every leg's reach yields zero, not negative. */
+  @Test
+  void passengerTreeLimitsTakeTheWidestLegAndFloorAtZero() {
+    double maxSpeed = 40.0;
+    var a0 = vertex("a0", COORD);
+    var a1 = vertex("a1", COORD.moveEastMeters(1_000));
+    var a2 = vertex("a2", COORD.moveEastMeters(30_000));
+    var near = vertex("near", COORD.moveEastMeters(2_000));
+    var legLimits = new Duration[] { Duration.ofMinutes(2), Duration.ofMinutes(40) };
+
+    var forward = DefaultCarpoolingService.passengerForwardTreeLimit(
+      near,
+      List.of(a0, a1, a2),
+      legLimits,
+      maxSpeed
+    );
+    // Leg 0: 2 min - 50 s; leg 1: 40 min - 25 s. The second is wider.
+    assertWithinTwoSeconds(Duration.ofMinutes(40).minusSeconds(25), forward);
+
+    var far = vertex("far", COORD.moveEastMeters(200_000));
+    assertEquals(
+      Duration.ZERO,
+      DefaultCarpoolingService.passengerForwardTreeLimit(
+        far,
+        List.of(a0, a1, a2),
+        legLimits,
+        maxSpeed
+      )
+    );
+  }
+
+  private static void assertWithinTwoSeconds(Duration expected, Duration actual) {
+    assertTrue(
+      Math.abs(expected.minus(actual).toSeconds()) <= 2,
+      "expected about " + expected + " but was " + actual
+    );
+  }
+
+  private static Vertex vertex(String label, WgsCoordinate coordinate) {
+    return new SimpleVertex(label, coordinate.latitude(), coordinate.longitude());
   }
 
   private static CarpoolTrip trip(CarpoolStop... stops) {

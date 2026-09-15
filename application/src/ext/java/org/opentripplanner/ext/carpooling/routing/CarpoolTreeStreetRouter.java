@@ -1,36 +1,54 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link CarpoolRouter} implementation that lazily computes shortest-path trees (SPTs)
- * from/to registered vertices.
+ * A {@link CarpoolRouter} implementation that lazily computes one-to-many car trees from/to
+ * registered vertices.
  * <p>
  * This is more efficient than individual A* searches when many routes share common
- * origin or destination vertices, as each SPT is computed at most once and reused for all
+ * origin or destination vertices, as each tree is computed at most once and reused for all
  * queries involving that vertex. Trees are only computed when first needed by a
  * {@link #route} call, so vertices that are never routed through never incur the cost
  * of tree expansion. Results are cached to avoid redundant tree lookups.
  * <p>
- * Vertices must be registered via {@link #addVertex} before routing.
+ * The trees are {@link CompactCarTree}s: one integer label per reached vertex rather than a
+ * search state per settled vertex, so a request's trees cost tens of bytes per vertex instead of
+ * hundreds and leave almost nothing for the garbage collector. A {@link #route} answer is read
+ * straight off the tree; the full path is only assembled if {@link RoutedSegment#path()} is called
+ * — which happens for the few segments that make it into an itinerary, not for the thousands
+ * evaluated and discarded per request.
+ * <p>
+ * Vertices must be registered via {@link #addVertex} or {@link #addLeg} before routing.
  * The router first attempts to use a forward tree from the origin;
  * if unavailable, it falls back to a reverse tree to the destination.
+ * <p>
+ * A tree registered with {@link #addVertex} explores everything within its duration limit — a
+ * disc around the root. A tree registered with {@link #addLeg} is bounded to the ellipse in which
+ * a detour of the leg can still be feasible, see {@link EllipseBounds}; for long legs that is a
+ * small fraction of the disc.
+ * <p>
+ * Trees live until {@link #releaseTrees} drops them. A request evaluates its candidate trips one
+ * after the other and only ever queries a trip's trees while that trip is evaluated, so releasing
+ * them right after keeps one trip's trees in memory at a time instead of all of them. Registrations
+ * survive a release: a later query rebuilds the tree.
  * <p>
  * This class is not thread-safe. Each instance should be used from a single thread.
  */
@@ -38,11 +56,12 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolTreeStreetRouter.class);
 
+  private final double maxCarSpeedMetersPerSecond;
   private final Map<Vertex, VertexRegistration> forwardRegistrations = new HashMap<>();
   private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> forwardTrees = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> reverseTrees = new HashMap<>();
-  private final Map<Pair<Vertex>, GraphPath<State, Edge, Vertex>> pathCache = new HashMap<>();
+  private final Map<Vertex, CompactCarTree> forwardTrees = new HashMap<>();
+  private final Map<Vertex, CompactCarTree> reverseTrees = new HashMap<>();
+  private final Map<Pair<Vertex>, RoutedSegment> segmentCache = new HashMap<>();
   private boolean routingStarted = false;
 
   public enum Direction {
@@ -60,30 +79,70 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     BOTH,
   }
 
-  private record VertexRegistration(Vertex vertex, Duration searchLimit) {}
-
-  private ShortestPathTree<State, Edge, Vertex> createTree(
-    Vertex vertex,
-    boolean reverse,
-    Duration searchLimit
-  ) {
-    var streetSearchRequest = reverse
-      ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
-      : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
-    var builder = StreetSearchBuilder.of()
-      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(searchLimit))
-      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .withRequest(streetSearchRequest);
-
-    if (reverse) {
-      return builder.withTo(vertex).getShortestPathTree();
-    }
-
-    return builder.withFrom(vertex).getShortestPathTree();
+  /**
+   * Uses {@link StreetConstants#DEFAULT_MAX_CAR_SPEED} to bound leg trees. Prefer the constructor
+   * taking the graph's real maximum car speed, which prunes tighter while staying safe.
+   */
+  public CarpoolTreeStreetRouter() {
+    this(StreetConstants.DEFAULT_MAX_CAR_SPEED);
   }
 
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
+  /**
+   * @param maxCarSpeedMetersPerSecond the fastest speed any street in the graph can be driven at,
+   *        used to bound leg trees to their feasibility ellipse — see {@link #addLeg}.
+   */
+  public CarpoolTreeStreetRouter(double maxCarSpeedMetersPerSecond) {
+    if (maxCarSpeedMetersPerSecond <= 0) {
+      throw new IllegalArgumentException("maxCarSpeed must be positive");
+    }
+    this.maxCarSpeedMetersPerSecond = maxCarSpeedMetersPerSecond;
+  }
+
+  /**
+   * What a tree rooted at {@code vertex} has to cover. {@code foci} lists the far ends of the legs
+   * the tree serves, each with the most seconds that leg may take; the tree is then bounded to the
+   * union of the corresponding ellipses. A {@code null} {@code foci} means a plain disc of radius
+   * {@code searchLimit} — everything within the limit is wanted.
+   */
+  private record VertexRegistration(
+    Vertex vertex,
+    Duration searchLimit,
+    @Nullable List<EllipseBounds.Focus> foci
+  ) {
+    /**
+     * Combines two registrations of the same vertex and direction: the larger limit wins, and the
+     * ellipses are united. A disc absorbs any ellipse — everything a disc registration asks for
+     * must stay reachable.
+     */
+    VertexRegistration merge(VertexRegistration other) {
+      var limit = searchLimit.compareTo(other.searchLimit) >= 0 ? searchLimit : other.searchLimit;
+      if (foci == null || other.foci == null) {
+        return new VertexRegistration(vertex, limit, null);
+      }
+      var union = new ArrayList<EllipseBounds.Focus>(foci.size() + other.foci.size());
+      union.addAll(foci);
+      union.addAll(other.foci);
+      return new VertexRegistration(vertex, limit, union);
+    }
+  }
+
+  private CompactCarTree createTree(Vertex vertex, boolean reverse, VertexRegistration reg) {
+    var bounds =
+      reg.foci() == null ? null : new EllipseBounds(reg.foci(), maxCarSpeedMetersPerSecond);
+    var tree = CompactCarTree.build(vertex, reverse, reg.searchLimit(), bounds);
+    LOG.debug(
+      "Built {} carpool tree {} {} with {} labels (limit {}, {})",
+      reverse ? "reverse" : "forward",
+      reverse ? "to" : "from",
+      vertex,
+      tree.size(),
+      reg.searchLimit(),
+      bounds == null ? "disc" : "ellipse-bounded"
+    );
+    return tree;
+  }
+
+  private CompactCarTree getOrCreateForwardTree(Vertex vertex) {
     var tree = forwardTrees.get(vertex);
     if (tree != null) {
       return tree;
@@ -92,13 +151,12 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     if (reg == null) {
       return null;
     }
-    tree = createTree(vertex, false, reg.searchLimit());
+    tree = createTree(vertex, false, reg);
     forwardTrees.put(vertex, tree);
-    forwardRegistrations.remove(vertex);
     return tree;
   }
 
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateReverseTree(Vertex vertex) {
+  private CompactCarTree getOrCreateReverseTree(Vertex vertex) {
     var tree = reverseTrees.get(vertex);
     if (tree != null) {
       return tree;
@@ -107,18 +165,19 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     if (reg == null) {
       return null;
     }
-    tree = createTree(vertex, true, reg.searchLimit());
+    tree = createTree(vertex, true, reg);
     reverseTrees.put(vertex, tree);
-    reverseRegistrations.remove(vertex);
     return tree;
   }
 
   /**
-   * Register a vertex for tree computation in the given direction(s).
+   * Register a vertex for tree computation in the given direction(s). The tree explores everything
+   * within {@code searchLimit} of the vertex. Use {@link #addLeg} instead when the tree only has to
+   * serve detours of a known leg.
    * Tree computation is deferred until a {@link #route} call actually needs the tree.
    * Vertices whose trees are never needed incur no computation cost. Adding vertices after
    * routing has started is disallowed to ensure that all temporary vertices are linked to the
-   * graph before any SPT is created. Otherwise, a previously computed tree may not contain
+   * graph before any tree is created. Otherwise, a previously computed tree may not contain
    * edges leading to the late-added vertex, making it unreachable.
    *
    * @param vertex     the street vertex to build trees from/to
@@ -135,42 +194,122 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       );
     }
     if (direction == Direction.FROM || direction == Direction.BOTH) {
-      registerLargest(forwardRegistrations, vertex, searchLimit);
+      register(forwardRegistrations, new VertexRegistration(vertex, searchLimit, null));
     }
     if (direction == Direction.TO || direction == Direction.BOTH) {
-      registerLargest(reverseRegistrations, vertex, searchLimit);
+      register(reverseRegistrations, new VertexRegistration(vertex, searchLimit, null));
     }
   }
 
   /**
-   * Registers {@code vertex} keeping the larger of any already-registered limit and
-   * {@code searchLimit}. Distinct
+   * Register the two trees a driver leg needs — a forward tree from {@code from} and a reverse tree
+   * to {@code to} — bounded to the region where a detour of the leg can still be feasible.
+   * <p>
+   * {@code legLimit} is the most the leg may take once a passenger is inserted: its baseline
+   * duration plus the allowed deviation (and any slack). Every segment the trees are asked for —
+   * {@code from → pickup}, {@code from → stop}, {@code pickup → to}, {@code stop → to}, and the
+   * baseline itself — is part of a detour that starts at {@code from}, ends at {@code to} and takes
+   * at most {@code legLimit}, so no vertex outside the ellipse with those foci and that bound is
+   * ever needed. The plain duration limit is kept as well: the ellipse never reaches beyond it.
+   * <p>
+   * Registering the same vertex and direction again — for another leg, or via {@link #addVertex} —
+   * widens the tree: the limits are maxed and the ellipses united, and a disc registration turns
+   * the tree back into a plain disc.
+   *
+   * @throws IllegalStateException if called after {@link #route} has already been invoked, see
+   *         {@link #addVertex}
+   */
+  public void addLeg(Vertex from, Vertex to, Duration legLimit) {
+    if (routingStarted) {
+      throw new IllegalStateException(
+        "Cannot add legs after routing has started. Register all legs before calling route()."
+      );
+    }
+    long bound = legLimit.toSeconds();
+    register(
+      forwardRegistrations,
+      new VertexRegistration(
+        from,
+        legLimit,
+        List.of(new EllipseBounds.Focus(to.getCoordinate(), bound))
+      )
+    );
+    register(
+      reverseRegistrations,
+      new VertexRegistration(
+        to,
+        legLimit,
+        List.of(new EllipseBounds.Focus(from.getCoordinate(), bound))
+      )
+    );
+  }
+
+  /**
+   * Registers a tree, widening any registration already present for the same vertex — see
+   * {@link VertexRegistration#merge}. Distinct
    * {@link org.opentripplanner.street.model.vertex.TemporaryStreetLocation}s at the same
    * coordinate compare equal, so two trips — or two legs of one trip — routing through the same
    * point collapse to a single registration here. The shared tree must span the longest leg
    * registered at that point, so the largest limit wins: a smaller limit would build a tree too
    * short for a longer leg's baseline, making it unroutable. An over-large tree only widens the
-   * search — any insertion it would wrongly admit is rejected by the delay constraints — so taking
-   * the maximum is always safe.
+   * search — any insertion it would wrongly admit is rejected by the delay constraints — so
+   * widening is always safe.
    */
-  private static void registerLargest(
+  private static void register(
     Map<Vertex, VertexRegistration> registrations,
-    Vertex vertex,
-    Duration searchLimit
+    VertexRegistration registration
   ) {
-    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit), (existing, added) ->
-      existing.searchLimit().compareTo(added.searchLimit()) >= 0 ? existing : added
-    );
+    registrations.merge(registration.vertex(), registration, VertexRegistration::merge);
   }
 
-  /** Returns the total number of forward vertices (pending and computed). Package-private for testing. */
+  /**
+   * Drops the trees rooted at {@code vertices}, in both directions, and forgets the segments that
+   * were answered from them. Call it once a trip's insertions have been evaluated, after
+   * {@link RoutedSegment#detach() detaching} the segments that must stay reproducible (the shared
+   * segments of the winning candidates): a detached segment keeps its edge chain and rebuilds its
+   * path without the tree, while a segment that was not detached re-routes if its path is ever
+   * asked for. The registrations stay, so a later query for a released vertex — a co-located
+   * waypoint of another trip — rebuilds the tree.
+   */
+  public void releaseTrees(Collection<Vertex> vertices) {
+    Set<CompactCarTree> released = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+    for (Vertex vertex : vertices) {
+      var forward = forwardTrees.remove(vertex);
+      if (forward != null) {
+        released.add(forward);
+      }
+      var reverse = reverseTrees.remove(vertex);
+      if (reverse != null) {
+        released.add(reverse);
+      }
+    }
+    if (released.isEmpty()) {
+      return;
+    }
+    segmentCache
+      .values()
+      .removeIf(segment -> segment instanceof TreeSegment ts && released.contains(ts.tree));
+    released.forEach(CompactCarTree::release);
+    LOG.debug("Released {} carpool trees", released.size());
+  }
+
+  /** Returns the number of distinct forward vertices (pending and computed). Package-private for testing. */
   int forwardTreeCount() {
-    return forwardRegistrations.size() + forwardTrees.size();
+    Set<Vertex> vertices = new HashSet<>(forwardRegistrations.keySet());
+    vertices.addAll(forwardTrees.keySet());
+    return vertices.size();
   }
 
-  /** Returns the total number of reverse vertices (pending and computed). Package-private for testing. */
+  /** Returns the number of distinct reverse vertices (pending and computed). Package-private for testing. */
   int reverseTreeCount() {
-    return reverseRegistrations.size() + reverseTrees.size();
+    Set<Vertex> vertices = new HashSet<>(reverseRegistrations.keySet());
+    vertices.addAll(reverseTrees.keySet());
+    return vertices.size();
+  }
+
+  /** Number of trees currently held in memory. Package-private for testing. */
+  int liveTreeCount() {
+    return forwardTrees.size() + reverseTrees.size();
   }
 
   /**
@@ -183,14 +322,17 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * been registered with {@link #addVertex} in the matching direction; a call whose endpoints were
    * both left unregistered cannot be served and returns {@code null}. A registered endpoint whose
    * tree does not reach the other endpoint within its search limit returns {@code null} as well.
+   * <p>
+   * The returned segment's duration is the tree's elapsed time at the far end; its path is only
+   * assembled when {@link RoutedSegment#path()} is called.
    */
   @Override
-  public GraphPath<State, Edge, Vertex> route(Vertex from, Vertex to) {
+  public RoutedSegment route(Vertex from, Vertex to) {
     routingStarted = true;
 
     var key = new Pair<>(from, to);
-    if (pathCache.containsKey(key)) {
-      return pathCache.get(key);
+    if (segmentCache.containsKey(key)) {
+      return segmentCache.get(key);
     }
 
     var isReverse = false;
@@ -204,8 +346,95 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var path = isReverse ? tree.getPath(from) : tree.getPath(to);
-    pathCache.put(key, path);
-    return path;
+    var farEnd = isReverse ? from : to;
+    int seconds = tree.elapsedSeconds(farEnd);
+    var segment = seconds < 0 ? null : new TreeSegment(from, to, tree, farEnd, seconds);
+    segmentCache.put(key, segment);
+    return segment;
+  }
+
+  /**
+   * A segment answered from a tree. {@code farEnd} is the end of the segment that is not the
+   * tree's root: the segment's {@code to} for a forward tree, its {@code from} for a reverse tree.
+   * The duration was read off the tree when the segment was created; the path is built on demand
+   * and memoised — from the tree while it is alive, from the {@link #detach() detached} edge chain
+   * after the tree has been released.
+   */
+  static final class TreeSegment implements RoutedSegment {
+
+    private final Vertex from;
+    private final Vertex to;
+    private final CompactCarTree tree;
+    private final Vertex farEnd;
+    private final int durationSeconds;
+
+    @Nullable
+    private Edge[] detachedEdges;
+
+    @Nullable
+    private GraphPath<State, Edge, Vertex> path;
+
+    TreeSegment(Vertex from, Vertex to, CompactCarTree tree, Vertex farEnd, int durationSeconds) {
+      this.from = from;
+      this.to = to;
+      this.tree = tree;
+      this.farEnd = farEnd;
+      this.durationSeconds = durationSeconds;
+    }
+
+    @Override
+    public Vertex from() {
+      return from;
+    }
+
+    @Override
+    public Vertex to() {
+      return to;
+    }
+
+    @Override
+    public int durationSeconds() {
+      return durationSeconds;
+    }
+
+    @Override
+    public GraphPath<State, Edge, Vertex> path() {
+      if (path == null) {
+        path =
+          detachedEdges != null ? tree.pathFromEdges(detachedEdges, farEnd) : tree.path(farEnd);
+        if (path == null) {
+          throw new IllegalStateException(
+            "The tree answered a duration for " + from + " -> " + to + " but no path"
+          );
+        }
+      }
+      return path;
+    }
+
+    /**
+     * Takes the edge chain from the tree so the path stays reproducible after
+     * {@link #releaseTrees}. A no-op once the path exists or the tree is already released.
+     */
+    @Override
+    public void detach() {
+      if (path == null && detachedEdges == null && !tree.isReleased()) {
+        detachedEdges = tree.edgesTo(farEnd);
+      }
+    }
+
+    /** Whether {@link #path()} has been called. Package-private for testing. */
+    boolean isPathMaterialized() {
+      return path != null;
+    }
+
+    /** Whether {@link #detach()} took the edge chain. Package-private for testing. */
+    boolean isDetached() {
+      return detachedEdges != null;
+    }
+
+    @Override
+    public String toString() {
+      return "TreeSegment{" + from + " -> " + to + ", " + durationSeconds + "s}";
+    }
   }
 }

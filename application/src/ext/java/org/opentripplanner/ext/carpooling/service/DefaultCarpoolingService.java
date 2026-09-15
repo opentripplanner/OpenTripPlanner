@@ -29,6 +29,7 @@ import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
 import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
+import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
@@ -48,6 +49,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
@@ -405,7 +407,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
         temporaryVerticesContainer
       );
 
-      var carpoolTreeVertexRouter = new CarpoolTreeStreetRouter();
+      var maxCarSpeed = streetLimitationParametersService.maxCarSpeed();
+      var carpoolTreeVertexRouter = new CarpoolTreeStreetRouter(maxCarSpeed);
       var streetSearchRequest = StreetSearchRequestMapper.map(request).build();
       var maxWalkToCarpool = carpoolingRequest.getMaxWalkTime();
       Vertex passengerAccessEgressVertex = streetVertexUtils.createPassengerVertex(
@@ -505,10 +508,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // fallback below.
       var baselineRouter = new CarpoolStreetRouter(streetLimitationParametersService);
 
-      // Each waypoint's tree only has to span its own leg plus the feasible insertion detour —
-      // see driverLegTreeLimits.
+      // Each leg's trees only have to cover the ellipse in which a detour of that leg can still be
+      // feasible — see driverLegTreeLimits for the bound and CarpoolTreeStreetRouter#addLeg for the
+      // region.
       var routableTrips = new ArrayList<CarpoolTripWithVertices>(candidateTrips.size());
-      var passengerTreeLimit = Duration.ZERO;
+      var passengerForwardLimit = Duration.ZERO;
+      var passengerReverseLimit = Duration.ZERO;
       for (var tripWithVertices : candidateTrips) {
         var legDurations = resolveLegDurations(tripWithVertices, baselineRouter);
         // A trip whose baseline cannot be routed within the carpool bound cannot carry a passenger:
@@ -519,27 +524,31 @@ public class DefaultCarpoolingService implements CarpoolingService {
         var legLimits = driverLegTreeLimits(tripWithVertices.trip(), legDurations);
         var vertices = tripWithVertices.vertices();
         for (int leg = 0; leg < legLimits.length; leg++) {
-          carpoolTreeVertexRouter.addVertex(
-            vertices.get(leg),
-            CarpoolTreeStreetRouter.Direction.FROM,
-            legLimits[leg]
-          );
-          carpoolTreeVertexRouter.addVertex(
-            vertices.get(leg + 1),
-            CarpoolTreeStreetRouter.Direction.TO,
-            legLimits[leg]
-          );
-          passengerTreeLimit = max(passengerTreeLimit, legLimits[leg]);
+          carpoolTreeVertexRouter.addLeg(vertices.get(leg), vertices.get(leg + 1), legLimits[leg]);
         }
+        passengerForwardLimit = max(
+          passengerForwardLimit,
+          passengerForwardTreeLimit(passengerSnap.vertex(), vertices, legLimits, maxCarSpeed)
+        );
+        passengerReverseLimit = max(
+          passengerReverseLimit,
+          passengerReverseTreeLimit(passengerSnap.vertex(), vertices, legLimits, maxCarSpeed)
+        );
         routableTrips.add(tripWithVertices);
       }
-      // Every passenger segment lies on a single leg of some candidate trip, so the largest leg
-      // limit bounds them all. A smaller cap would silently drop feasible insertions: route()
-      // never falls back from the passenger's own forward tree.
+      // The passenger's trees serve every candidate trip, so they are plain discs, sized to the
+      // widest leg any of them can be part of — see passengerForwardTreeLimit. A smaller cap would
+      // silently drop feasible insertions: route() never falls back from the passenger's own
+      // forward tree.
       carpoolTreeVertexRouter.addVertex(
         passengerSnap.vertex(),
-        CarpoolTreeStreetRouter.Direction.BOTH,
-        passengerTreeLimit
+        CarpoolTreeStreetRouter.Direction.FROM,
+        passengerForwardLimit
+      );
+      carpoolTreeVertexRouter.addVertex(
+        passengerSnap.vertex(),
+        CarpoolTreeStreetRouter.Direction.TO,
+        passengerReverseLimit
       );
 
       var stopDuration = request.preferences().car().pickupTime();
@@ -584,10 +593,27 @@ public class DefaultCarpoolingService implements CarpoolingService {
         })
         .toList();
 
-      var insertionCandidates = candidateTripsWithViableStopsAndPositions
-        .stream()
-        .flatMap(it -> insertionEvaluator.findBestInsertions(it).stream())
-        .toList();
+      // A trip's trees are only queried while that trip is evaluated, so they are released right
+      // after: the request then holds one trip's trees (plus the passenger's) instead of every
+      // candidate trip's — memory no longer grows with the number of trips. The winning candidates
+      // detach their shared segments first so their paths stay reproducible (see
+      // RoutedSegment#detach); nothing else from the trip's trees is ever read again.
+      var insertionCandidates = new ArrayList<InsertionCandidate>();
+      for (var tripWithViableStops : candidateTripsWithViableStopsAndPositions) {
+        var candidates = insertionEvaluator.findBestInsertions(tripWithViableStops);
+        for (var candidate : candidates) {
+          candidate.getSharedSegments().forEach(RoutedSegment::detach);
+        }
+        insertionCandidates.addAll(candidates);
+        carpoolTreeVertexRouter.releaseTrees(
+          tripWithViableStops
+            .tripWithVertices()
+            .vertices()
+            .stream()
+            .filter(vertex -> !vertex.equals(passengerSnap.vertex()))
+            .toList()
+        );
+      }
 
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.
@@ -658,6 +684,61 @@ public class DefaultCarpoolingService implements CarpoolingService {
   }
 
   /**
+   * How far the passenger's forward tree has to reach for this trip. The forward tree answers
+   * {@code passenger → X} where {@code X} is a transit stop or a leg end and the passenger is
+   * picked up (or, for egress, dropped off) inside some leg {@code k}: the driver goes
+   * {@code a_k → passenger → … → a_(k+1)} in at most {@code legLimits[k]}. The stretch before the
+   * passenger takes at least the beeline from {@code a_k} at the fastest speed in the graph, so the
+   * part the tree has to cover is at most {@code legLimits[k]} minus that bound. The result is the
+   * largest such value over the trip's legs, floored at zero.
+   *
+   * @param passenger the passenger's snapped vertex
+   * @param vertices the trip's waypoints, one per stop
+   * @param legLimits the per-leg limits from {@link #driverLegTreeLimits}
+   * @param maxCarSpeed the graph's maximum car speed in m/s
+   */
+  static Duration passengerForwardTreeLimit(
+    Vertex passenger,
+    List<Vertex> vertices,
+    Duration[] legLimits,
+    double maxCarSpeed
+  ) {
+    var limit = Duration.ZERO;
+    for (int leg = 0; leg < legLimits.length; leg++) {
+      var before = beelineSeconds(vertices.get(leg), passenger, maxCarSpeed);
+      limit = max(limit, legLimits[leg].minus(before));
+    }
+    return limit;
+  }
+
+  /**
+   * Mirror image of {@link #passengerForwardTreeLimit}: the reverse tree answers
+   * {@code X → passenger}, after which the driver still has to reach the leg's end {@code a_(k+1)},
+   * which takes at least the beeline from the passenger at the fastest speed in the graph.
+   */
+  static Duration passengerReverseTreeLimit(
+    Vertex passenger,
+    List<Vertex> vertices,
+    Duration[] legLimits,
+    double maxCarSpeed
+  ) {
+    var limit = Duration.ZERO;
+    for (int leg = 0; leg < legLimits.length; leg++) {
+      var after = beelineSeconds(passenger, vertices.get(leg + 1), maxCarSpeed);
+      limit = max(limit, legLimits[leg].minus(after));
+    }
+    return limit;
+  }
+
+  /** A lower bound on the drive time between two vertices: the beeline at the fastest speed. */
+  private static Duration beelineSeconds(Vertex from, Vertex to, double maxCarSpeed) {
+    double meters =
+      SphericalDistanceLibrary.fastDistance(from.getCoordinate(), to.getCoordinate()) *
+      SphericalDistanceLibrary.MAX_ERR_INV;
+    return Duration.ofSeconds((long) Math.floor(meters / maxCarSpeed));
+  }
+
+  /**
    * Resolves the per-leg travel durations used to size a trip's routing trees, or {@code null}
    * when the trip's baseline cannot be routed and the trip should be skipped.
    * <p>
@@ -702,8 +783,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var vertices = tripWithVertices.vertices();
     var durations = new Duration[vertices.size() - 1];
     for (int leg = 0; leg < durations.length; leg++) {
-      var path = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
-      if (path == null) {
+      var segment = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
+      if (segment == null) {
         LOG.debug(
           "OTP could not route baseline leg {} of trip {} within the carpool bound; skipping it",
           leg,
@@ -711,7 +792,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         );
         return null;
       }
-      durations[leg] = GraphPathUtils.durationOrZero(path);
+      durations[leg] = segment.duration();
     }
     return durations;
   }
