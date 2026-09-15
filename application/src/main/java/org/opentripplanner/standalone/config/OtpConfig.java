@@ -19,7 +19,8 @@ public class OtpConfig {
   /**
    * This description is shared for otp-config, build-config and router-config.
    */
-  public static final String CONFIG_VERSION_DESCRIPTION = """
+  public static final String CONFIG_VERSION_DESCRIPTION =
+  """
   The config-version is a parameter which each OTP deployment may set to be able to query the
   OTP server and verify that it uses the correct version of the config. The version should be
   injected into the config in the (continuous) deployment pipeline. How this is done, is up to
@@ -38,20 +39,19 @@ public class OtpConfig {
   public final Map<OTPFeature, Boolean> otpFeatures;
 
   /**
-   * Per-network GBFS configuration shared by the vehicle rental graph builder (build phase) and
-   * the vehicle rental service directory (serve phase). It lives here because this is the only
-   * config file read in both phases.
+   * Per-network GBFS configuration shared by the vehicle rental graph builder (build phase) and the
+   * vehicle rental service directory (serve phase). It lives here because this is the only config
+   * file read in both phases.
    */
   public final GbfsNetworkOverrides gbfsNetworks;
 
   /**
    * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
    * server and verify that it uses the correct version of the config. The version must be injected
-   * into the config in the operation deployment pipeline. How this is done is up to the
-   * deployment.
+   * into the config in the operation deployment pipeline. How this is done is up to the deployment.
    * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
-   * or format check on the version and it can be any string.
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not
+   * syntax or format check on the version and it can be any string.
    * <p>
    * This parameter is optional, and the default is {@code null}.
    */
@@ -60,14 +60,12 @@ public class OtpConfig {
   public OtpConfig(NodeAdapter nodeAdapter, boolean logUnusedParams) {
     this.root = nodeAdapter;
 
-    this.configVersion = root
-      .of("configVersion")
+    this.configVersion = root.of("configVersion")
       .since(V2_1)
       .summary("Deployment version of the *" + OtpFileNames.OTP_CONFIG_FILENAME + "*.")
       .description(CONFIG_VERSION_DESCRIPTION)
       .asString(null);
-    this.otpFeatures = root
-      .of("otpFeatures")
+    this.otpFeatures = root.of("otpFeatures")
       .since(V2_0)
       .summary("Turn features on/off.")
       .asEnumMap(OTPFeature.class, Boolean.class);

@@ -70,25 +70,22 @@ class BookingInfoMapperTest {
     );
     assertEquals(
       FLEXIBLE_LINE_CONTACT,
-      subject
-        .map(emptyStopPoint, emptyServiceJourney, flexibleLine)
+      subject.map(emptyStopPoint, emptyServiceJourney, flexibleLine)
         .getContactInfo()
         .getContactPerson()
     );
   }
 
   /**
-   * When the contact details are set at the flexible line level, and bookWhen information is
-   * set at StopPoint level, the BookingInfo should contain both contact details and bookWhen
-   * information
+   * When the contact details are set at the flexible line level, and bookWhen information is set at
+   * StopPoint level, the BookingInfo should contain both contact details and bookWhen information
    */
   @Test
   void testBookingInfoMergingAndOverriding() {
     LocalTime stopPointLatestBookingTime = FIVE_THIRTY;
 
     StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern().withBookingArrangements(
-      new BookingArrangementsStructure()
-        .withLatestBookingTime(stopPointLatestBookingTime)
+      new BookingArrangementsStructure().withLatestBookingTime(stopPointLatestBookingTime)
         .withBookWhen(PurchaseWhenEnumeration.ADVANCE_AND_DAY_OF_TRAVEL)
     );
 

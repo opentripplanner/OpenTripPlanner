@@ -173,8 +173,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     int patternIndex,
     List<TripPatternForDates> list
   ) {
-    return list
-      .stream()
+    return list.stream()
       .filter(p -> patternIndex == p.getTripPattern().patternIndex())
       .findFirst()
       .orElseThrow();

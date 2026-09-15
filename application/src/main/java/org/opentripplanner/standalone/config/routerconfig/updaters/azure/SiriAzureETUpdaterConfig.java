@@ -12,20 +12,17 @@ public class SiriAzureETUpdaterConfig extends SiriAzureUpdaterConfig {
     populateConfig(parameters, configRef, c);
 
     if (c.exist("history")) {
-      NodeAdapter history = c
-        .of("history")
+      NodeAdapter history = c.of("history")
         .since(V2_2)
         .summary("Configuration for fetching historical data on startup")
         .asObject();
 
-      String fromDateTime = history
-        .of("fromDateTime")
+      String fromDateTime = history.of("fromDateTime")
         .since(V2_2)
         .summary("Datetime boundary for historical data")
         .asString("-P1D");
 
-      int customMidnight = c
-        .of("customMidnight")
+      int customMidnight = c.of("customMidnight")
         .since(V2_2)
         .summary("Time on which time breaks into new day.")
         .description(

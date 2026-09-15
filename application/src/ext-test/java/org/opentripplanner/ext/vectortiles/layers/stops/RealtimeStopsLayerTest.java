@@ -64,9 +64,13 @@ public class RealtimeStopsLayerTest {
     var transitAlertService = new TransitAlertServiceImpl();
 
     Route route = TransitRepositoryForTest.route("route").build();
-    var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
-      .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
-      .build();
+    var itinerary = newItinerary(Place.forStop(stop), time("11:00")).bus(
+      route,
+      1,
+      time("11:05"),
+      time("11:20"),
+      Place.forStop(stop2)
+    ).build();
     var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toInstant();
     var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toInstant();
     var calendar = AlertCalendar.of(TimePeriod.of(startDate, endDate));

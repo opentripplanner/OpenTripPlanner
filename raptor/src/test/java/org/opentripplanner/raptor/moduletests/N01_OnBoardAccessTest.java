@@ -48,8 +48,7 @@ class N01_OnBoardAccessTest {
 
     builder.profile(RaptorProfile.MULTI_CRITERIA);
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(60))
@@ -61,8 +60,7 @@ class N01_OnBoardAccessTest {
   @Test
   @DisplayName("On-board access with two routes boards the correct route")
   void onBoardAccess() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0))
       .withRoutes()
       .withTimetables(
         """
@@ -92,8 +90,7 @@ class N01_OnBoardAccessTest {
     "On-board access with two routes boards the correct route, then transfers at the first valid stop"
   )
   void transfer() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0))
       .withRoutes()
       .withTimetables(
         """
@@ -115,7 +112,9 @@ class N01_OnBoardAccessTest {
     assertEquals(
       """
       B ~ BUS R1 0:05 0:10 ~ C ~ BUS R2 0:12 0:15 ~ D ~ Walk 30s [0:05 0:15:30 10m30s Tₙ1 C₁1_860]
-      B ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:05 0:20:30 15m30s Tₙ0 C₁1_560]""",
+      B ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:05 0:20:30 15m30s Tₙ0 C₁1_560]\
+      """
+      ,
       pathsToString(raptorResponse)
     );
   }
@@ -123,8 +122,7 @@ class N01_OnBoardAccessTest {
   @Test
   @DisplayName("On-board access does not allow invalid boardings or transfers")
   void noInvalidTransfers() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0))
       .withRoutes()
       .withTimetables(
         """
@@ -156,8 +154,7 @@ class N01_OnBoardAccessTest {
   @Test
   @DisplayName("On-board access on a ring-line starts from the provided stop position")
   void ringLineBoardsCorrectStopPosition() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(0, 0, 5, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(0, 0, 5, STOP_B, 0))
       .withRoutes()
       .withTimetables(
         """
@@ -183,8 +180,7 @@ class N01_OnBoardAccessTest {
     "On-board access with a route with several trips boards the correct trip given by the trip index"
   )
   void correctTrip() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(0, 1, 1, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(0, 1, 1, STOP_B, 0))
       .withRoutes()
       .withTimetables(
         """
@@ -204,7 +200,9 @@ class N01_OnBoardAccessTest {
     // Since the access has a boarding time of 0:05 at B, we select the second trip in the pattern
     assertEquals(
       """
-      B ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:05 0:20:30 15m30s Tₙ0 C₁1_560]""",
+      B ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:05 0:20:30 15m30s Tₙ0 C₁1_560]\
+      """
+      ,
       pathsToString(raptorResponse)
     );
   }
@@ -212,8 +210,7 @@ class N01_OnBoardAccessTest {
   @Test
   @DisplayName("On-board access to a non-existing route results in exception")
   void nonExistentRoute() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(1, 1, 1, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(1, 1, 1, STOP_B, 0))
       .withTimetables(
         """
         R1
@@ -227,16 +224,16 @@ class N01_OnBoardAccessTest {
 
     var requestBuilder = prepareRequest();
 
-    assertThrows(IndexOutOfBoundsException.class, () ->
-      raptorService.route(requestBuilder.build(), data)
+    assertThrows(
+      IndexOutOfBoundsException.class,
+      () -> raptorService.route(requestBuilder.build(), data)
     );
   }
 
   @Test
   @DisplayName("On-board access to a non-existing trip in route results in exception")
   void nonExistentTrip() {
-    data
-      .access(new TestRaptorStartOnBoardAccess(0, 3, 1, STOP_B, 0))
+    data.access(new TestRaptorStartOnBoardAccess(0, 3, 1, STOP_B, 0))
       .withTimetables(
         """
         R1
@@ -250,23 +247,23 @@ class N01_OnBoardAccessTest {
 
     var requestBuilder = prepareRequest();
 
-    assertThrows(IndexOutOfBoundsException.class, () ->
-      raptorService.route(requestBuilder.build(), data)
+    assertThrows(
+      IndexOutOfBoundsException.class,
+      () -> raptorService.route(requestBuilder.build(), data)
     );
   }
 
   @Test
   @DisplayName("Multiple on-board accesses yields a pareto set of non-dominated paths")
   void multipleAccesses() {
-    data
-      .access(
-        // Pareto-optimal - best arrival-time
-        new TestRaptorStartOnBoardAccess(R2_INDEX, TRIP_0, STOP_POS_0, STOP_A, ZERO),
-        // Dominated by trip 1 @ C
-        new TestRaptorStartOnBoardAccess(R1_INDEX, TRIP_1, STOP_POS_1, STOP_B, ZERO),
-        // Pareto-optimal - best depature-time & c1
-        new TestRaptorStartOnBoardAccess(R1_INDEX, TRIP_1, STOP_POS_2, STOP_C, ZERO)
-      )
+    data.access(
+      // Pareto-optimal - best arrival-time
+      new TestRaptorStartOnBoardAccess(R2_INDEX, TRIP_0, STOP_POS_0, STOP_A, ZERO),
+      // Dominated by trip 1 @ C
+      new TestRaptorStartOnBoardAccess(R1_INDEX, TRIP_1, STOP_POS_1, STOP_B, ZERO),
+      // Pareto-optimal - best depature-time & c1
+      new TestRaptorStartOnBoardAccess(R1_INDEX, TRIP_1, STOP_POS_2, STOP_C, ZERO)
+    )
       .withRoutes()
       .withTimetables(
         """
@@ -290,7 +287,9 @@ class N01_OnBoardAccessTest {
     assertEquals(
       """
       A ~ BUS R2 0:02 0:04 ~ B ~ BUS R1 0:05 0:15 ~ D ~ Walk 1m [0:02 0:16 14m Tₙ1 C₁2_100]
-      C ~ BUS R1 0:15 0:20 ~ D ~ Walk 1m [0:15 0:21 6m Tₙ0 C₁1_020]""",
+      C ~ BUS R1 0:15 0:20 ~ D ~ Walk 1m [0:15 0:21 6m Tₙ0 C₁1_020]\
+      """
+      ,
       pathsToString(raptorResponse)
     );
   }
@@ -298,13 +297,12 @@ class N01_OnBoardAccessTest {
   @Test
   @DisplayName("Mixing walk and on-board accesses yields a pareto set of non-dominated paths")
   void walkAndOnBoard() {
-    data
-      .access(
-        // Walk to E to catch a trip that arrives earlier
-        TestAccessEgress.of("Walk 5m ~ E"),
-        // Or stay on board
-        new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0)
-      )
+    data.access(
+      // Walk to E to catch a trip that arrives earlier
+      TestAccessEgress.of("Walk 5m ~ E"),
+      // Or stay on board
+      new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0)
+    )
       .withRoutes()
       .withTimetables(
         """
@@ -327,7 +325,9 @@ class N01_OnBoardAccessTest {
     assertEquals(
       """
       Walk 5m ~ E ~ BUS R2 0:10 0:12 ~ D ~ Walk 30s [0:05 0:12:30 7m30s Tₙ0 C₁1_380]
-      B ~ BUS R1 0:05 0:15 ~ D ~ Walk 30s [0:05 0:15:30 10m30s Tₙ0 C₁1_260]""",
+      B ~ BUS R1 0:05 0:15 ~ D ~ Walk 30s [0:05 0:15:30 10m30s Tₙ0 C₁1_260]\
+      """
+      ,
       pathsToString(raptorResponse)
     );
   }
@@ -335,11 +335,10 @@ class N01_OnBoardAccessTest {
   @Test
   @DisplayName("Range query results in multiple consecutive paths")
   void rangeQuery() {
-    data
-      .access(
-        new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0),
-        new TestRaptorStartOnBoardAccess(0, 1, 1, STOP_B, 0)
-      )
+    data.access(
+      new TestRaptorStartOnBoardAccess(0, 0, 1, STOP_B, 0),
+      new TestRaptorStartOnBoardAccess(0, 1, 1, STOP_B, 0)
+    )
       .withRoutes()
       .withTimetables(
         """
@@ -359,7 +358,9 @@ class N01_OnBoardAccessTest {
     assertEquals(
       """
       B ~ BUS R1 0:05:05 0:15 ~ D ~ Walk 30s [0:05:05 0:15:30 10m25s Tₙ0 C₁1_255]
-      B ~ BUS R1 0:10 0:20 ~ D ~ Walk 30s [0:10 0:20:30 10m30s Tₙ0 C₁1_260]""",
+      B ~ BUS R1 0:10 0:20 ~ D ~ Walk 30s [0:10 0:20:30 10m30s Tₙ0 C₁1_260]\
+      """
+      ,
       pathsToString(raptorResponse)
     );
   }

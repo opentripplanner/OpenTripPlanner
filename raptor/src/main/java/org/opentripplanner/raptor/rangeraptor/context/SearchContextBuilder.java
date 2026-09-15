@@ -46,8 +46,7 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   }
 
   private List<ViaConnections> viaConnections() {
-    return request
-      .searchParams()
+    return request.searchParams()
       .viaLocations()
       .stream()
       .map(RaptorViaLocation::connections)

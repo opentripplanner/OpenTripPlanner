@@ -20,13 +20,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Evaluates pre-filtered insertion positions using A* routing.
  * <p>
- * This class is a pure evaluator that takes positions identified by heuristic
- * filtering and evaluates them using expensive A* street routing. It selects
- * the insertion that minimizes additional travel time while satisfying
- * passenger delay constraints.
+ * This class is a pure evaluator that takes positions identified by heuristic filtering and
+ * evaluates them using expensive A* street routing. It selects the insertion that minimizes
+ * additional travel time while satisfying passenger delay constraints.
  * <p>
- * This follows the established OTP pattern of separating candidate generation
- * from evaluation, similar to {@code TransferGenerator} and {@code OptimizePathDomainService}.
+ * This follows the established OTP pattern of separating candidate generation from evaluation,
+ * similar to {@code TransferGenerator} and {@code OptimizePathDomainService}.
  */
 public class InsertionEvaluator {
 
@@ -41,32 +40,34 @@ public class InsertionEvaluator {
 
   /**
    * @param carpoolRouter routes a single street segment between two vertices in the candidate
-   *        carpool route — used both to build the baseline route and to re-route only the
-   *        segments that change when a passenger pickup/dropoff is inserted.
-   * @param stopDuration duration added at each intermediate stop (from the car {@code pickupTime}
-   *        preference); applied between consecutive segments when computing total trip and
-   *        passenger-ride durations.
+   *                      carpool route — used both to build the baseline route and to re-route only
+   *                      the segments that change when a passenger pickup/dropoff is inserted.
+   * @param stopDuration  duration added at each intermediate stop (from the car {@code pickupTime}
+   *                      preference); applied between consecutive segments when computing total
+   *                      trip and passenger-ride durations.
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
     this(carpoolRouter, null, stopDuration);
   }
 
   /**
-   * @param carpoolRouter routes a single street segment between two vertices in the candidate
-   *        carpool route — used both to build the baseline route and to re-route only the
-   *        segments that change when a passenger pickup/dropoff is inserted.
-   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not,
-   *        or {@code null} for no fallback. Only the baseline route falls back. When
-   *        {@code carpoolRouter} is a tree router whose per-leg trees are sized to a bounded
-   *        per-leg limit, an underestimate of that limit would leave a waypoint outside its tree
-   *        and drop the whole trip; a goal-directed fallback re-routes just that leg instead.
-   *        Inserted passenger
-   *        segments deliberately do not fall back — a segment that cannot be routed within the
-   *        tree is an insertion the delay constraints reject anyway, so failing fast there is
-   *        correct and avoids a goal-directed search per nearby stop.
-   * @param stopDuration duration added at each intermediate stop (from the car {@code pickupTime}
-   *        preference); applied between consecutive segments when computing total trip and
-   *        passenger-ride durations.
+   * @param carpoolRouter          routes a single street segment between two vertices in the
+   *                               candidate carpool route — used both to build the baseline route
+   *                               and to re-route only the segments that change when a passenger
+   *                               pickup/dropoff is inserted.
+   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not, or
+   *                               {@code null} for no fallback. Only the baseline route falls back.
+   *                               When {@code carpoolRouter} is a tree router whose per-leg trees
+   *                               are sized to a bounded per-leg limit, an underestimate of that
+   *                               limit would leave a waypoint outside its tree and drop the whole
+   *                               trip; a goal-directed fallback re-routes just that leg instead.
+   *                               Inserted passenger segments deliberately do not fall back — a
+   *                               segment that cannot be routed within the tree is an insertion the
+   *                               delay constraints reject anyway, so failing fast there is correct
+   *                               and avoids a goal-directed search per nearby stop.
+   * @param stopDuration           duration added at each intermediate stop (from the car
+   *                               {@code pickupTime} preference); applied between consecutive
+   *                               segments when computing total trip and passenger-ride durations.
    */
   public InsertionEvaluator(
     CarpoolRouter carpoolRouter,
@@ -110,9 +111,9 @@ public class InsertionEvaluator {
   }
 
   /**
-   * @return A list containing the best insertion that can be found for every NearbyStop in
-   * the list tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions
-   * for a NearbyStop, then no candidate for that stop will be returned.
+   * @return A list containing the best insertion that can be found for every NearbyStop in the list
+   *         tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions for a
+   *         NearbyStop, then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
@@ -135,22 +136,17 @@ public class InsertionEvaluator {
 
     Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments, stopDuration);
 
-    return tripWithViableAccessEgress
-      .viableAccessEgress()
-      .stream()
-      .map(viableAccessEgress -> {
-        var snap = toPassengerSnap(viableAccessEgress);
-        return findBestInsertion(
-          tripWithVertices,
-          viableAccessEgress.insertionPositions(),
-          snap,
-          baselineSegments,
-          cumulativeDurations,
-          viableAccessEgress.transitStop()
-        );
-      })
-      .filter(Objects::nonNull)
-      .toList();
+    return tripWithViableAccessEgress.viableAccessEgress().stream().map(viableAccessEgress -> {
+      var snap = toPassengerSnap(viableAccessEgress);
+      return findBestInsertion(
+        tripWithVertices,
+        viableAccessEgress.insertionPositions(),
+        snap,
+        baselineSegments,
+        cumulativeDurations,
+        viableAccessEgress.transitStop()
+      );
+    }).filter(Objects::nonNull).toList();
   }
 
   private static PassengerSnap toPassengerSnap(ViableAccessEgress viableAccessEgress) {
@@ -172,15 +168,14 @@ public class InsertionEvaluator {
   /**
    * Evaluates pre-filtered insertion positions using A* routing.
    * <p>
-   * This method assumes the provided positions have already passed heuristic
-   * validation (capacity, direction, beeline delay). It performs expensive
-   * A* routing for each position and selects the one with minimum additional
-   * duration that satisfies delay constraints.
+   * This method assumes the provided positions have already passed heuristic validation
+   * (capacity, direction, beeline delay). It performs expensive A* routing for each position and
+   * selects the one with minimum additional duration that satisfies delay constraints.
    *
    * @param tripWithVertices The carpool trip with resolved vertices
-   * @param viablePositions Positions that passed heuristic checks (from InsertionPositionFinder)
-   * @param snap Pickup/dropoff vertices (already snapped to car-reachable vertices by the
-   *        caller) and the optional walk paths bracketing the carpool ride
+   * @param viablePositions  Positions that passed heuristic checks (from InsertionPositionFinder)
+   * @param snap             Pickup/dropoff vertices (already snapped to car-reachable vertices by
+   *                         the caller) and the optional walk paths bracketing the carpool ride
    * @return The best insertion candidate, or null if none are viable after routing
    */
   @Nullable
@@ -235,7 +230,7 @@ public class InsertionEvaluator {
 
       if (
         bestCandidate == null ||
-        candidate.totalTripDuration().compareTo(bestCandidate.totalTripDuration()) < 0
+          candidate.totalTripDuration().compareTo(bestCandidate.totalTripDuration()) < 0
       ) {
         bestCandidate = candidate;
         LOG.debug(
@@ -251,8 +246,8 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Evaluates a specific insertion configuration.
-   * Reuses cached baseline segments and only routes new segments involving the passenger.
+   * Evaluates a specific insertion configuration. Reuses cached baseline segments and only routes
+   * new segments involving the passenger.
    */
   private InsertionCandidate evaluateInsertion(
     CarpoolTripWithVertices tripWithVertices,
@@ -349,15 +344,14 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Maps a modified-route segment index to the corresponding baseline segment index, or
-   * {@code -1} if the modified segment touches the inserted pickup or dropoff and so cannot be
-   * reused.
+   * Maps a modified-route segment index to the corresponding baseline segment index, or {@code -1}
+   * if the modified segment touches the inserted pickup or dropoff and so cannot be reused.
    * <p>
    * The modified route is the original route with two insertions: pickup at {@code pickupPos}
-   * and dropoff at {@code dropoffPos} (List.add semantics, dropoffPos interpreted after the
-   * pickup insertion). A modified segment {@code [i, i+1)} either reuses an original segment
-   * (when both endpoints fall in original points) or is one of the four newly created segments
-   * around the inserted points.
+   * and dropoff at {@code dropoffPos} (List.add semantics, dropoffPos interpreted after the pickup
+   * insertion). A modified segment {@code [i, i+1)} either reuses an original segment (when both
+   * endpoints fall in original points) or is one of the four newly created segments around the
+   * inserted points.
    * <p>
    * Requires {@code pickupPos < dropoffPos} — the shift arithmetic depends on the pickup being
    * strictly before the dropoff, otherwise the result would silently describe a route with the

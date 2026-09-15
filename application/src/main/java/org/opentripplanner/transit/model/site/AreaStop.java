@@ -17,10 +17,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  * GTFS bundle.
  */
 
-public class AreaStop
-  extends AbstractTransitEntity<AreaStop, AreaStopBuilder>
-  implements StopLocation
-{
+public class AreaStop extends AbstractTransitEntity<AreaStop, AreaStopBuilder> implements
+  StopLocation {
 
   private final int index;
   private final I18NString name;
@@ -141,14 +139,12 @@ public class AreaStop
 
   @Override
   public boolean sameAs(AreaStop other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
       Objects.equals(description, other.getDescription()) &&
       Objects.equals(geometry, other.getGeometry()) &&
       Objects.equals(url, other.url) &&
-      Objects.equals(zoneId, other.zoneId)
-    );
+      Objects.equals(zoneId, other.zoneId));
   }
 
   @Override

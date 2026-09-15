@@ -17,23 +17,19 @@ import org.opentripplanner.utils.time.TimeUtils;
  * different implementations. The view hide the internal Raptor specific models, like the standard
  * and multi-criteria implementation. The internal models can be optimized for speed and/or memory
  * consumption, while the view provide one interface for mapping back to the users domain.
- * <p/>
- * The view is used by the debugging functionality and mapping to raptor paths (Raptor API).
- * <p/>
- * The view objects are only created to construct paths to be returned as part of debugging. This is
- * done for just a fraction of all stop arrivals, so there is no need to optimize performance nor
- * memory consumption fo view objects, but the view is designed with the Flyweight design pattern in
- * mind.
- * <p/>
- * NB! The scope of a view is only guaranteed to be valid for the duration of the method call - e.g.
- * debug callback.
- * <p/>
- * There is different kind of arrivals:
+ * <p/>The view is used by the debugging functionality and mapping to raptor paths (Raptor API).
+ * <p/>The view objects are only created to construct paths to be returned as part of debugging.
+ * This is done for just a fraction of all stop arrivals, so there is no need to optimize
+ * performance nor memory consumption fo view objects, but the view is designed with the Flyweight
+ * design pattern in mind.
+ * <p/>NB! The scope of a view is only guaranteed to be valid for the duration of the method call -
+ * e.g. debug callback.
+ * <p/>There is different kind of arrivals:
  * <ul>
- *     <li>Access - The first stop arrival, arriving after the access path.</li>
- *     <li>Transit - Arrived by transit</li>
- *     <li>Transfer - Arrived by transfer</li>
- *     <li>Egress - Arrived at destination</li>
+ *   <li>Access - The first stop arrival, arriving after the access path.</li>
+ *   <li>Transit - Arrived by transit</li>
+ *   <li>Transfer - Arrived by transfer</li>
+ *   <li>Egress - Arrived at destination</li>
  * </ul>
  * Use the "arrivedByX" methods before accessing the {@link #accessPath()}, {@link #transitPath()},
  * {@link #transfer()} and {@link #egressPath()}.
@@ -49,10 +45,10 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int stop();
 
   /**
-   * The RangeRaptor round. Transit arrivals increment the round by one; transfer arrivals
-   * stay in the same round as the transit they follow. Dominance of transits over transfers at
-   * via/access/egress stops is handled by event listeners, not by inflating the round counter.
-   * This gives better performance.
+   * The RangeRaptor round. Transit arrivals increment the round by one; transfer arrivals stay in
+   * the same round as the transit they follow. Dominance of transits over transfers at
+   * via/access/egress stops is handled by event listeners, not by inflating the round counter. This
+   * gives better performance.
    */
   int round();
 
@@ -80,18 +76,17 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int arrivalTime();
 
   /**
-   * The accumulated criteria ONE(usually used to store the generalized-cost, but is not
-   * limited to this). {@link RaptorCostCalculator#ZERO_COST} is returned if no cost exist.
+   * The accumulated criteria ONE(usually used to store the generalized-cost, but is not limited to
+   * this). {@link RaptorCostCalculator#ZERO_COST} is returned if no cost exist.
    */
   int c1();
 
   /**
-   * The accumulated criteria TWO. Can be used for any int criteria used during routing. A
-   * state with c1 and c2 is created dynamically if c2 is in use, if not this method will
-   * throw an exception.
+   * The accumulated criteria TWO. Can be used for any int criteria used during routing. A state
+   * with c1 and c2 is created dynamically if c2 is in use, if not this method will throw an
+   * exception.
    * <p>
-   * {@link RaptorConstants#NOT_SET} is returned if no criteria exist, but the model
-   * support it.
+   * {@link RaptorConstants#NOT_SET} is returned if no criteria exist, but the model support it.
    */
   int c2();
 
@@ -169,8 +164,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * Use this to create a {@code toString()} implementation.
    */
   default String asString() {
-    String vector =
-      TimeUtils.timeToStrCompact(arrivalTime()) +
+    String vector = TimeUtils.timeToStrCompact(arrivalTime()) +
       " " +
       ROUNDS.format(round()) +
       cost(c1(), RaptorCostCalculator.ZERO_COST, C1::format) +

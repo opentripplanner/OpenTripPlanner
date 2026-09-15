@@ -48,13 +48,11 @@ class VehicleParkingHelperTest {
       .entrances(
         IntStream.rangeClosed(1, 3)
           .<VehicleParkingEntranceCreator>mapToObj(
-            id -> builder ->
-              builder
-                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                .name(new NonLocalizedString("Entrance " + id))
-                .coordinate(new WgsCoordinate(id, id))
-                .carAccessible(id == 1 || id == 3)
-                .walkAccessible(id == 2 || id == 3)
+            id -> builder -> builder.entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+              .name(new NonLocalizedString("Entrance " + id))
+              .coordinate(new WgsCoordinate(id, id))
+              .carAccessible(id == 1 || id == 3)
+              .walkAccessible(id == 2 || id == 3)
           )
           .collect(Collectors.toList())
       )
@@ -73,12 +71,10 @@ class VehicleParkingHelperTest {
       .entrances(
         IntStream.rangeClosed(1, entranceNumber)
           .<VehicleParkingEntranceCreator>mapToObj(
-            id -> builder ->
-              builder
-                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                .name(new NonLocalizedString("Entrance " + id))
-                .coordinate(new WgsCoordinate(id, id))
-                .walkAccessible(true)
+            id -> builder -> builder.entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+              .name(new NonLocalizedString("Entrance " + id))
+              .coordinate(new WgsCoordinate(id, id))
+              .walkAccessible(true)
           )
           .collect(Collectors.toList())
       )
@@ -89,9 +85,11 @@ class VehicleParkingHelperTest {
     assertEquals(vertexNumber, graph.getVertices().size());
     assertEquals(vertexNumber, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
-    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
-      VehicleParkingEntranceVertex.class
-    )) {
+    for (
+      VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
+        VehicleParkingEntranceVertex.class
+      )
+    ) {
       assertEquals(vertexNumber, vehicleParkingEntranceVertex.getOutgoing().size());
       assertEquals(vertexNumber, vehicleParkingEntranceVertex.getIncoming().size());
 

@@ -47,11 +47,9 @@ public final class RaptorTripScheduleStopPosition {
       return false;
     }
     var that = (RaptorTripScheduleStopPosition) o;
-    return (
-      routeIndex == that.routeIndex &&
+    return (routeIndex == that.routeIndex &&
       tripScheduleIndex == that.tripScheduleIndex &&
-      stopPositionInPattern == that.stopPositionInPattern
-    );
+      stopPositionInPattern == that.stopPositionInPattern);
   }
 
   @Override
@@ -62,14 +60,12 @@ public final class RaptorTripScheduleStopPosition {
   @Override
   public String toString() {
     // The field labels are shortened to improve reading - should be easy to get in the context
-    return (
-      "[route: " +
+    return ("[route: " +
       routeIndex +
       ", trip: " +
       tripScheduleIndex +
       ", pos: " +
       stopPositionInPattern +
-      "]"
-    );
+      "]");
   }
 }

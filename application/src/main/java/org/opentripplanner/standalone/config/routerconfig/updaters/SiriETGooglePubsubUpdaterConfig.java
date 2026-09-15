@@ -13,13 +13,11 @@ public class SiriETGooglePubsubUpdaterConfig {
   public static SiriETGooglePubsubUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriETGooglePubsubUpdaterParameters(
       configRef,
-      c
-        .of("feedId")
+      c.of("feedId")
         .since(V2_1)
         .summary("The ID of the feed to apply the updates to.")
         .asString(null),
-      c
-        .of("subscriptionProjectName")
+      c.of("subscriptionProjectName")
         .since(V2_1)
         .summary("The Google Cloud project that hosts the PubSub subscription.")
         .description(
@@ -31,18 +29,15 @@ public class SiriETGooglePubsubUpdaterConfig {
           """
         )
         .asString(),
-      c
-        .of("topicProjectName")
+      c.of("topicProjectName")
         .since(V2_1)
         .summary("The Google Cloud project that hosts the PubSub topic that publishes the updates.")
         .asString(),
-      c
-        .of("topicName")
+      c.of("topicName")
         .since(V2_1)
         .summary("The name of the PubSub topic that publishes the updates.")
         .asString(),
-      c
-        .of("dataInitializationUrl")
+      c.of("dataInitializationUrl")
         .since(V2_1)
         .summary("URL used to download over HTTP the recent history of SIRI-ET messages.")
         .description(
@@ -53,8 +48,7 @@ public class SiriETGooglePubsubUpdaterConfig {
           """
         )
         .asString(null),
-      c
-        .of("reconnectPeriod")
+      c.of("reconnectPeriod")
         .since(V2_1)
         .summary("Wait this amount of time before trying to reconnect to the PubSub subscription.")
         .description(
@@ -64,8 +58,7 @@ public class SiriETGooglePubsubUpdaterConfig {
           """
         )
         .asDuration(RECONNECT_PERIOD),
-      c
-        .of("initialGetDataTimeout")
+      c.of("initialGetDataTimeout")
         .since(V2_1)
         .summary("Timeout for retrieving the recent history of SIRI-ET messages.")
         .description(
@@ -76,13 +69,11 @@ public class SiriETGooglePubsubUpdaterConfig {
           """
         )
         .asDuration(INITIAL_GET_DATA_TIMEOUT),
-      c
-        .of("fuzzyTripMatching")
+      c.of("fuzzyTripMatching")
         .since(V2_1)
         .summary("If the trips should be matched fuzzily.")
         .asBoolean(false),
-      c
-        .of("producerMetrics")
+      c.of("producerMetrics")
         .since(V2_7)
         .summary("If failure, success, and warning metrics should be collected per producer.")
         .asBoolean(false)

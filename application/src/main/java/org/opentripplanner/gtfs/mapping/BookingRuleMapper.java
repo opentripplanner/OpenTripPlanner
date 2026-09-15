@@ -24,8 +24,9 @@ class BookingRuleMapper {
       return null;
     }
 
-    return cachedBookingInfos.computeIfAbsent(rule.getId(), k ->
-      BookingInfo.of()
+    return cachedBookingInfos.computeIfAbsent(
+      rule.getId(),
+      k -> BookingInfo.of()
         .withContactInfo(contactInfo(rule))
         .withBookingMethods(bookingMethods())
         .withEarliestBookingTime(earliestBookingTime(rule))
@@ -62,8 +63,9 @@ class BookingRuleMapper {
   }
 
   /**
-   * If GTFS does not specify the latest booking time/day, the underlying values default to NO_VALUE.
-   * In that case, we do not set the booking time so that min/max booking notice can apply.
+   * If GTFS does not specify the latest booking time/day, the underlying values default to
+   * NO_VALUE. In that case, we do not set the booking time so that min/max booking notice can
+   * apply.
    *
    * @return null if either timeSeconds or day are NO_VALUE, otherwise a BookingTime instance
    */

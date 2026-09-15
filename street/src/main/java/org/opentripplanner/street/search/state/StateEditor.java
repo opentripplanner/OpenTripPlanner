@@ -121,8 +121,8 @@ public class StateEditor {
   }
 
   /**
-   * Calls {@link StateEditor#makeState()} and wraps the result in an array of {@link State}.
-   * If the state is null, then a zero-length array is returned.
+   * Calls {@link StateEditor#makeState()} and wraps the result in an array of {@link State}. If the
+   * state is null, then a zero-length array is returned.
    */
   public State[] makeStateArray() {
     return State.ofNullable(makeState());
@@ -212,8 +212,8 @@ public class StateEditor {
   }
 
   /**
-   * Whether drop-off is banned by the current geofencing zones in this editor's state data.
-   * Used to check zone state after traversal but before finalizing the state.
+   * Whether drop-off is banned by the current geofencing zones in this editor's state data. Used to
+   * check zone state after traversal but before finalizing the state.
    */
   public boolean isDropOffBannedByCurrentZones() {
     return GeofencingZone.resolveField(
@@ -224,8 +224,8 @@ public class StateEditor {
   }
 
   /**
-   * Whether drop-off is banned by the current geofencing zones for a specific network.
-   * Used in the arrive-by deferred renting fork where the network hasn't been bound yet.
+   * Whether drop-off is banned by the current geofencing zones for a specific network. Used in the
+   * arrive-by deferred renting fork where the network hasn't been bound yet.
    */
   public boolean isDropOffBannedForNetwork(String network) {
     return GeofencingZone.resolveField(
@@ -236,8 +236,8 @@ public class StateEditor {
   }
 
   /**
-   * Initialize geofencing zones from pre-resolved zones on a vehicle rental vertex.
-   * Called at vehicle pickup time.
+   * Initialize geofencing zones from pre-resolved zones on a vehicle rental vertex. Called at
+   * vehicle pickup time.
    */
   public void initializeGeofencingZones(Set<GeofencingZone> zones) {
     cloneStateDataAsNeeded();
@@ -368,10 +368,9 @@ public class StateEditor {
     if (reverse) {
       stateData.mayKeepRentedVehicleAtDestination = false;
       stateData.vehicleRentalState = VehicleRentalState.RENTING_FLOATING;
-      stateData.currentMode =
-        formFactor != null
-          ? formFactor.traverseMode
-          : StreetModeToRentalTraverseModeMapper.map(request.mode());
+      stateData.currentMode = formFactor != null
+        ? formFactor.traverseMode
+        : StreetModeToRentalTraverseModeMapper.map(request.mode());
       stateData.vehicleRentalNetwork = network;
       stateData.rentalVehicleFormFactor = formFactor;
       stateData.rentalVehiclePropulsionType = propulsionType;

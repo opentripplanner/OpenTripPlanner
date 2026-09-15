@@ -4,8 +4,8 @@ import org.opentripplanner.ext.fares.service.gtfs.v2.FreeTransferEligibility;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.RiderCategory;
 
-/// Special predicate for when free transfers apply in the HOP fare calculator. They apply when
-/// the transfer rule has no category or medium specified, or when the ID (ignoring feed id) matches.
+/// Special predicate for when free transfers apply in the HOP fare calculator. They apply when the
+/// transfer rule has no category or medium specified, or when the ID (ignoring feed id) matches.
 class TransferRules {
 
   static FreeTransferEligibility transferEligibility() {
@@ -13,24 +13,18 @@ class TransferRules {
       if (transferMatch.transferRule().fareProducts().isEmpty()) {
         return true;
       } else {
-        return transferMatch
-          .transferRule()
-          .fareProducts()
-          .stream()
-          .anyMatch(transferProduct -> {
-            if (
-              transferProduct.category() == null &&
+        return transferMatch.transferRule().fareProducts().stream().anyMatch(transferProduct -> {
+          if (
+            transferProduct.category() == null &&
               transferProduct.medium() == null &&
               transferProduct.isFree()
-            ) {
-              return true;
-            } else {
-              return (
-                mediaMatches(transferProduct.medium(), product.medium()) &&
-                categoryMatches(transferProduct.category(), product.category())
-              );
-            }
-          });
+          ) {
+            return true;
+          } else {
+            return (mediaMatches(transferProduct.medium(), product.medium()) &&
+              categoryMatches(transferProduct.category(), product.category()));
+          }
+        });
       }
     };
   }

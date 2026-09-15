@@ -30,8 +30,7 @@ public class ToblersHikingFunctionTest {
       tc(-30, 2.02),
       tc(-35, 2.40),
       tc(-40, 2.86),
-      tc(-45, CUT_OFF_LIMIT),
-    };
+      tc(-45, CUT_OFF_LIMIT), };
 
     ToblersHikingFunction f = new ToblersHikingFunction(CUT_OFF_LIMIT);
 

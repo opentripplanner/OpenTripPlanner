@@ -38,13 +38,15 @@ public class GraphQLUtils {
       case NO_DIRECT_MODE_CONNECTION -> GraphQLRoutingErrorCode.NO_DIRECT_MODE_CONNECTION;
       case NO_STOPS_IN_RANGE -> GraphQLRoutingErrorCode.NO_STOPS_IN_RANGE;
       case NO_TRANSIT_CONNECTION -> GraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION;
-      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> GraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
+      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW ->
+        GraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
       case OUTSIDE_BOUNDS -> GraphQLRoutingErrorCode.OUTSIDE_BOUNDS;
       case OUTSIDE_SERVICE_PERIOD -> GraphQLRoutingErrorCode.OUTSIDE_SERVICE_PERIOD;
       case WALKING_BETTER_THAN_TRANSIT -> GraphQLRoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
-      case TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME -> throw new UnsupportedOperationException(
-        "Start-on-board access is not supported in the GTFS GraphQL API yet."
-      );
+      case TRIP_LOCATION_MISSING_SCHEDULED_DEPARTURE_TIME ->
+        throw new UnsupportedOperationException(
+          "Start-on-board access is not supported in the GTFS GraphQL API yet."
+        );
     };
   }
 

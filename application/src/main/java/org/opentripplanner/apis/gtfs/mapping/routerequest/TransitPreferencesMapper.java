@@ -26,15 +26,13 @@ public class TransitPreferencesMapper {
     var modes = args.getGraphQLModes();
     var transit = getTransitModes(environment);
     if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && !CollectionUtils.isEmpty(transit)) {
-      var reluctanceForMode = transit
-        .stream()
+      var reluctanceForMode = transit.stream()
         .filter(mode -> mode.containsKey("cost"))
         .collect(
           Collectors.toMap(
-            mode ->
-              TransitModeMapper.map(
-                GraphQLTypes.GraphQLTransitMode.valueOf((String) mode.get("mode"))
-              ),
+            mode -> TransitModeMapper.map(
+              GraphQLTypes.GraphQLTransitMode.valueOf((String) mode.get("mode"))
+            ),
             mode -> (Double) ((Map<String, Object>) mode.get("cost")).get("reluctance")
           )
         );

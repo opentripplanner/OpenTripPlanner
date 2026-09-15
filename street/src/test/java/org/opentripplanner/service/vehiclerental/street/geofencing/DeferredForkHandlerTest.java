@@ -58,8 +58,8 @@ class DeferredForkHandlerTest {
   }
 
   /**
-   * Build a HAVE_RENTED state where backState had the given zone but current state doesn't.
-   * This simulates a walker that just exited a restricted zone.
+   * Build a HAVE_RENTED state where backState had the given zone but current state doesn't. This
+   * simulates a walker that just exited a restricted zone.
    *
    * Chain: v1 →(rent)→ v2 →(drop + set zones)→ v3 →(traverse, zones cleared)→ v4
    */
@@ -83,8 +83,8 @@ class DeferredForkHandlerTest {
   }
 
   /**
-   * Build a HAVE_RENTED state where s0 gained a BA zone that backState didn't have.
-   * This simulates a walker that just entered a BA in arrive-by (= exited in forward time).
+   * Build a HAVE_RENTED state where s0 gained a BA zone that backState didn't have. This simulates
+   * a walker that just entered a BA in arrive-by (= exited in forward time).
    *
    * Chain: v1 →(rent)→ v2 →(drop, no zones)→ v3 →(traverse, BA zone gained)→ v4
    */
@@ -227,13 +227,13 @@ class DeferredForkHandlerTest {
         }
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
-          NETWORK.equals(s.getVehicleRentalNetwork())
+            NETWORK.equals(s.getVehicleRentalNetwork())
         ) {
           hasRenting = true;
         }
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
-          s.getVehicleRentalNetwork() == null
+            s.getVehicleRentalNetwork() == null
         ) {
           hasGeneric = true;
         }
@@ -314,7 +314,7 @@ class DeferredForkHandlerTest {
       for (var s : result) {
         if (
           s.getVehicleRentalState() == VehicleRentalState.RENTING_FLOATING &&
-          NETWORK.equals(s.getVehicleRentalNetwork())
+            NETWORK.equals(s.getVehicleRentalNetwork())
         ) {
           fail("should not create renting branch for network inside adjacent no-drop-off zone");
         }

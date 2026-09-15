@@ -58,14 +58,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_TO_PARK")
   @Test
   public void directCarPark() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
-      .withJourney(jb -> {
-        jb.withDirect(new StreetRequest(StreetMode.CAR_TO_PARK));
-        jb.withTransit(b -> b.disable());
-      })
-      .withFrom(p1)
-      .withTo(p2)
-      .buildRequest();
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.CAR_TO_PARK));
+      jb.withTransit(b -> b.disable());
+    }).withFrom(p1).withTo(p2).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -73,14 +69,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (with walking both ends)")
   @Test
   public void directCarPickupWithWalking() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
-      .withJourney(jb -> {
-        jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
-        jb.withTransit(b -> b.disable());
-      })
-      .withFrom(p3)
-      .withTo(p4)
-      .buildRequest();
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
+      jb.withTransit(b -> b.disable());
+    }).withFrom(p3).withTo(p4).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -88,15 +80,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (with walking both ends) - arriveBy")
   @Test
   public void directCarPickupWithWalkingArriveBy() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 16, 54)
-      .withJourney(jb -> {
-        jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
-        jb.withTransit(b -> b.disable());
-      })
-      .withFrom(p3)
-      .withTo(p4)
-      .withArriveBy(true)
-      .buildRequest();
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 16, 54).withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
+      jb.withTransit(b -> b.disable());
+    }).withFrom(p3).withTo(p4).withArriveBy(true).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -104,11 +91,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (without walking at either end)")
   @Test
   public void directCarPickupWithoutWalking() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
-      .withJourney(jb -> {
-        jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
-        jb.withTransit(b -> b.disable());
-      })
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
+      jb.withTransit(b -> b.disable());
+    })
       .withFrom(p1)
       .withTo(p2)
       .withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)))

@@ -27,7 +27,8 @@ public class PassThroughPointInputType {
           """
           The list of *stop location ids* which define the pass-through point. At least one id is required.
           Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces are supported location types.
-          The journey must pass through at least one of these entities - not all of them."""
+          The journey must pass through at least one of these entities - not all of them.\
+          """
         )
         .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
         .build()

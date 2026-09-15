@@ -99,10 +99,8 @@ public interface Leg {
     }
 
     // Return true if legs overlap
-    return (
-      boardStopPosInPattern() < other.alightStopPosInPattern() &&
-      alightStopPosInPattern() > other.boardStopPosInPattern()
-    );
+    return (boardStopPosInPattern() < other.alightStopPosInPattern() &&
+      alightStopPosInPattern() > other.boardStopPosInPattern());
   }
 
   /**
@@ -136,16 +134,15 @@ public interface Leg {
   }
 
   /**
-   * Return true if this leg and the given {@code other} leg overlap in time. If the
-   * start-time equals the end-time this method returns false.
+   * Return true if this leg and the given {@code other} leg overlap in time. If the start-time
+   * equals the end-time this method returns false.
    */
   default boolean overlapInTime(Leg other) {
     return (
-      // We convert to epoch seconds to ignore nanos (the times are normalized),
-      // in favor of using the methods isAfter(...) and isBefore(...)
-      startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
-      other.startTime().toEpochSecond() < endTime().toEpochSecond()
-    );
+    // We convert to epoch seconds to ignore nanos (the times are normalized),
+    // in favor of using the methods isAfter(...) and isBefore(...)
+    startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
+      other.startTime().toEpochSecond() < endTime().toEpochSecond());
   }
 
   /**
@@ -207,14 +204,14 @@ public interface Leg {
   LegCallTime end();
 
   /**
-   * The date and time this leg begins. The time is normalized(rounded to closest second).
-   * TODO Does the start-time incorporate slack and/or wait-time? - This should be documented!
+   * The date and time this leg begins. The time is normalized(rounded to closest second). TODO Does
+   * the start-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime startTime();
 
   /**
-   * The date and time this leg ends. The time is normalized(rounded to closest second).
-   * TODO Does the end-time incorporate slack and/or wait-time? - This should be documented!
+   * The date and time this leg ends. The time is normalized(rounded to closest second). TODO Does
+   * the end-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime endTime();
 
@@ -425,12 +422,12 @@ public interface Leg {
   }
 
   /**
-   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates
-   * how accessible the itinerary is as a whole. This is not a very scientific method but just
-   * a rough guidance that expresses certainty or uncertainty about the accessibility.
+   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates how
+   * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
+   * guidance that expresses certainty or uncertainty about the accessibility.
    *
-   * The intended audience for this score are frontend developers wanting to show a simple UI
-   * rather than having to iterate over all the stops and trips.
+   * The intended audience for this score are frontend developers wanting to show a simple UI rather
+   * than having to iterate over all the stops and trips.
    *
    * Note: the information to calculate this score are all available to the frontend, however
    * calculating them on the backend makes life a little easier and changes are automatically
@@ -480,16 +477,13 @@ public interface Leg {
   }
 
   default Set<FareZone> fareZones() {
-    var intermediate = listIntermediateStops()
-      .stream()
+    var intermediate = listIntermediateStops().stream()
       .flatMap(stopArrival -> stopArrival.place.stop.getFareZones().stream());
 
     var start = fareZones(this.from());
     var end = fareZones(this.to());
 
-    return Stream.of(intermediate, start, end)
-      .flatMap(s -> s)
-      .collect(Collectors.toSet());
+    return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
 
   /**

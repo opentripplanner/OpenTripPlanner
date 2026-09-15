@@ -25,17 +25,15 @@ public class RouteToCentroidStationIdsValidator implements GraphBuilderModule {
   }
 
   private void validate() {
-    var stationIds = transitRepository
-      .getSiteRepository()
+    var stationIds = transitRepository.getSiteRepository()
       .listStations()
       .stream()
       .map(AbstractTransitEntity::getId)
       .collect(Collectors.toSet());
-    transitRouteToStationCentroid
-      .stream()
+    transitRouteToStationCentroid.stream()
       .filter(id -> !stationIds.contains(id))
-      .forEach(id ->
-        issueStore.add(
+      .forEach(
+        id -> issueStore.add(
           "UnknownStationId",
           "Config parameter 'transitRouteToStationCentroid' specified a station that does not exist: %s",
           id

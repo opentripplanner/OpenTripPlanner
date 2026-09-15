@@ -51,8 +51,9 @@ class GenericLocationTest {
   @Test
   void testInvalid() {
     assertThrows(NullPointerException.class, () -> GenericLocation.fromStopId(null));
-    assertThrows(NullPointerException.class, () ->
-      GenericLocation.fromStopIdWithFallback(null, 0.0, 0.0, "label")
+    assertThrows(
+      NullPointerException.class,
+      () -> GenericLocation.fromStopIdWithFallback(null, 0.0, 0.0, "label")
     );
   }
 

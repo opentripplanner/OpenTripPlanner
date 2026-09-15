@@ -32,17 +32,16 @@ public class B01_AccessTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access(
-        // Lowest cost
-        "Walk 1s ~ B",
-        // Best compromise of cost and time
-        "Walk 4m ~ C",
-        // Latest departure time
-        "Walk 7m ~ D",
-        // Not optimal
-        "Walk 13m ~ E"
-      )
+    data.access(
+      // Lowest cost
+      "Walk 1s ~ B",
+      // Best compromise of cost and time
+      "Walk 4m ~ C",
+      // Latest departure time
+      "Walk 7m ~ D",
+      // Not optimal
+      "Walk 13m ~ E"
+    )
       .withTimetables(
         """
         B     C     D     E     F
@@ -51,8 +50,7 @@ public class B01_AccessTest implements RaptorTestConstants {
       )
       .egress("F ~ Walk 1s");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .timetable(true)

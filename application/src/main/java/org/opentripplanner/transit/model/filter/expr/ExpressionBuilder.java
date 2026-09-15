@@ -7,9 +7,8 @@ import org.opentripplanner.transit.api.model.FilterValues;
 
 /**
  * A builder for creating complex matchers composed of other matchers.
- * <p/>
- * This builder contains convenience methods for creating complex matchers from simpler ones. The
- * resulting matcher "ands" together all the matchers it has built up. This supports the common
+ * <p/>This builder contains convenience methods for creating complex matchers from simpler ones.
+ * The resulting matcher "ands" together all the matchers it has built up. This supports the common
  * pattern of narrowing results with multiple filters.
  *
  * @param <T> The type of entity to match in the expression.

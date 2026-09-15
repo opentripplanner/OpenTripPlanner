@@ -12,9 +12,9 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /**
- * A disconnected street network that only serves a ferry stop is never pruned, no matter how
- * small it is: a ferry stop cannot be reached from elsewhere in the street network, so its
- * connecting street network is retained even below the pruning threshold.
+ * A disconnected street network that only serves a ferry stop is never pruned, no matter how small
+ * it is: a ferry stop cannot be reached from elsewhere in the street network, so its connecting
+ * street network is retained even below the pruning threshold.
  */
 class FerryStopIslandRetainedTest {
 
@@ -47,16 +47,18 @@ class FerryStopIslandRetainedTest {
 
     // Islands with stops smaller than 3 street vertices are normally pruned, but this island has
     // only a ferry stop, so it is exempt.
-    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, stopVertex).prune(
-      IslandPruningParameters.of()
-        .withPruningThresholdIslandWithoutStops(3)
-        .withPruningThresholdIslandWithStops(3)
-        .withAdaptivePruningFactor(1)
-        .build()
-    );
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, stopVertex)
+      .prune(
+        IslandPruningParameters.of()
+          .withPruningThresholdIslandWithoutStops(3)
+          .withPruningThresholdIslandWithStops(3)
+          .withAdaptivePruningFactor(1)
+          .build()
+      );
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // main square
         "(0,0) → (0,1) PEDESTRIAN ♿✅",

@@ -29,10 +29,10 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * <p>
  * At stop C, two arrivals compete:
  * <ol>
- *   <li>Walk-transfer via R1(A→B) + walk B→C: round=1, arrives ~0:09, cost low,
- *       arrivedOnBoard=false — does NOT fire walk egress</li>
- *   <li>Transit via R1(A→B) + R2(B→C): round=2, arrives 0:15, cost higher,
- *       arrivedOnBoard=true — fires walk egress</li>
+ *   <li>Walk-transfer via R1(A→B) + walk B→C: round=1, arrives ~0:09, cost low, arrivedOnBoard=false
+ *       — does NOT fire walk egress</li>
+ *   <li>Transit via R1(A→B) + R2(B→C): round=2, arrives 0:15, cost higher, arrivedOnBoard=true —
+ *       fires walk egress</li>
  * </ol>
  * Arrival 1 strictly dominates arrival 2 in all three base dimensions (3D), so under the 3D
  * comparator the transit is rejected and the walk egress never fires. The 4D comparator at C
@@ -46,8 +46,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         -- R1
@@ -62,16 +61,14 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       // We add a transfer here which arrive at C before R2, but it should not be used.
       .withTransfer(STOP_B, transfer(STOP_C, D1_m));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10_m);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "Walk 1m ~ A ~ " +
+    var path = "Walk 1m ~ A ~ " +
       "BUS R1 0:05 0:08 ~ B ~ " +
       "BUS R2 0:12 0:15 ~ C ~ " +
       "Walk 1m " +

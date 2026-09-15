@@ -34,12 +34,11 @@ class ServiceCalendarFrameParserTest {
       OBJECT_FACTORY.createOperatingPeriodsInFrame_RelStructure()
     );
 
-    OperatingPeriod_VersionStructure operatingPeriod =
-      OBJECT_FACTORY.createOperatingPeriod_VersionStructure()
-        .withFromDate(FROM_DATE)
-        .withToDate(TO_DATE);
-    serviceCalendarFrame
-      .getOperatingPeriods()
+    OperatingPeriod_VersionStructure operatingPeriod = OBJECT_FACTORY
+      .createOperatingPeriod_VersionStructure()
+      .withFromDate(FROM_DATE)
+      .withToDate(TO_DATE);
+    serviceCalendarFrame.getOperatingPeriods()
       .getOperatingPeriodOrUicOperatingPeriod()
       .add(operatingPeriod);
 
@@ -51,16 +50,14 @@ class ServiceCalendarFrameParserTest {
   @Test
   void testParseOperatingPeriodInServiceCalendar() {
     serviceCalendarFrame.setServiceCalendar(OBJECT_FACTORY.createServiceCalendar());
-    serviceCalendarFrame
-      .getServiceCalendar()
+    serviceCalendarFrame.getServiceCalendar()
       .setOperatingPeriods(OBJECT_FACTORY.createOperatingPeriods_RelStructure());
 
     OperatingPeriod operatingPeriod = OBJECT_FACTORY.createOperatingPeriod()
       .withFromDate(FROM_DATE)
       .withToDate(TO_DATE);
     JAXBElement<?> jaxbOperatingPeriod = OBJECT_FACTORY.createOperatingPeriod(operatingPeriod);
-    serviceCalendarFrame
-      .getServiceCalendar()
+    serviceCalendarFrame.getServiceCalendar()
       .getOperatingPeriods()
       .getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod()
       .add(jaxbOperatingPeriod);

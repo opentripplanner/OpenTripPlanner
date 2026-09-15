@@ -65,10 +65,11 @@ public final class ParkingRequest {
   }
 
   /**
-   * Which vehicle parking tags are preferred. Vehicle parking facilities that don't have one of these
-   * tags receive an extra cost.
+   * Which vehicle parking tags are preferred. Vehicle parking facilities that don't have one of
+   * these tags receive an extra cost.
    * <p>
-   * This is useful if you want to use certain kind of facilities, like lockers for expensive e-bikes.
+   * This is useful if you want to use certain kind of facilities, like lockers for expensive
+   * e-bikes.
    */
   public ParkingFilter preferred() {
     return preferred;
@@ -93,13 +94,14 @@ public final class ParkingRequest {
       return false;
     }
     ParkingRequest that = (ParkingRequest) o;
-    return (
-      Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&
+    return (Objects.equals(
+      unpreferredVehicleParkingTagCost,
+      that.unpreferredVehicleParkingTagCost
+    ) &&
       Objects.equals(filter, that.filter) &&
       Objects.equals(preferred, that.preferred) &&
       Objects.equals(cost, that.cost) &&
-      Objects.equals(time, that.time)
-    );
+      Objects.equals(time, that.time));
   }
 
   @Override

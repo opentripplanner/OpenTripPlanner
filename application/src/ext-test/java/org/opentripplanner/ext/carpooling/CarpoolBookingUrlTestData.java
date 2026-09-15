@@ -11,8 +11,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * mapper and service tests assert against.
  * <p>
  * The query parameter names carrying the placeholders ({@code from_coordinate},
- * {@code to_coordinate}) are the provider's own choice and form no part of OTP's contract; they
- * are here only to make the template realistic.
+ * {@code to_coordinate}) are the provider's own choice and form no part of OTP's contract; they are
+ * here only to make the template realistic.
  */
 public final class CarpoolBookingUrlTestData {
 
@@ -45,12 +45,10 @@ public final class CarpoolBookingUrlTestData {
     WgsCoordinate pickup,
     WgsCoordinate dropoff
   ) {
-    return (
-      baseUrl +
+    return (baseUrl +
       "?from_coordinate=" +
       expandedCoordinate(pickup) +
       "&to_coordinate=" +
-      expandedCoordinate(dropoff)
-    );
+      expandedCoordinate(dropoff));
   }
 }

@@ -34,8 +34,7 @@ public final class WarmupConfig {
       return null;
     }
 
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_10)
       .summary("Configure application warmup by running transit searches during startup.")
       .description(
@@ -50,8 +49,7 @@ public final class WarmupConfig {
       )
       .asObject();
 
-    WarmupApi api = c
-      .of("api")
+    WarmupApi api = c.of("api")
       .since(V2_10)
       .summary("Which GraphQL API to use for warmup queries.")
       .description(docEnumValueList(WarmupApi.values()))
@@ -65,8 +63,7 @@ public final class WarmupConfig {
       "destination"
     );
 
-    var accessModeStrings = c
-      .of("accessModes")
+    var accessModeStrings = c.of("accessModes")
       .since(V2_10)
       .summary("Access modes to cycle through in warmup queries.")
       .description(
@@ -75,13 +72,11 @@ public final class WarmupConfig {
           docEnumValueList(StreetMode.values())
       )
       .asStringList(DEFAULT_ACCESS_MODES.stream().map(Enum::name).toList());
-    List<StreetMode> accessModes = accessModeStrings
-      .stream()
+    List<StreetMode> accessModes = accessModeStrings.stream()
       .map(s -> StreetMode.valueOf(s))
       .toList();
 
-    var egressModeStrings = c
-      .of("egressModes")
+    var egressModeStrings = c.of("egressModes")
       .since(V2_10)
       .summary("Egress modes to cycle through in warmup queries.")
       .description(
@@ -90,8 +85,7 @@ public final class WarmupConfig {
           docEnumValueList(StreetMode.values())
       )
       .asStringList(DEFAULT_EGRESS_MODES.stream().map(Enum::name).toList());
-    List<StreetMode> egressModes = egressModeStrings
-      .stream()
+    List<StreetMode> egressModes = egressModeStrings.stream()
       .map(s -> StreetMode.valueOf(s))
       .toList();
 
@@ -115,16 +109,8 @@ public final class WarmupConfig {
     String noun
   ) {
     var node = parent.of(name).since(V2_10).summary(summary).asObject();
-    double lat = node
-      .of("lat")
-      .since(V2_10)
-      .summary("Latitude of the " + noun + ".")
-      .asDouble();
-    double lon = node
-      .of("lon")
-      .since(V2_10)
-      .summary("Longitude of the " + noun + ".")
-      .asDouble();
+    double lat = node.of("lat").since(V2_10).summary("Latitude of the " + noun + ".").asDouble();
+    double lon = node.of("lon").since(V2_10).summary("Longitude of the " + noun + ".").asDouble();
     return new WgsCoordinate(lat, lon);
   }
 }

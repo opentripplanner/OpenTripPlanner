@@ -20,16 +20,16 @@ import org.opentripplanner.street.search.state.State;
  * The portion of the street graph a search may traverse: the permanent graph, optionally plus the
  * temporary edges of one linking.
  * <p>
- * Request-scoped linking attaches temporary edges to permanent vertices, so a search over the shared
- * graph can reach another request's temporary subgraph. Some of those edges are mode-blind — a
- * {@code TemporaryFreeEdge} joining a location to its splitters carries no traversal permission — so
- * crossing one can make a vertex look car-reachable when no car could drive there. A scope pins down
- * which temporary edges a search is allowed to use, keeping foreign linkings out.
+ * Request-scoped linking attaches temporary edges to permanent vertices, so a search over the
+ * shared graph can reach another request's temporary subgraph. Some of those edges are mode-blind —
+ * a {@code TemporaryFreeEdge} joining a location to its splitters carries no traversal permission —
+ * so crossing one can make a vertex look car-reachable when no car could drive there. A scope pins
+ * down which temporary edges a search is allowed to use, keeping foreign linkings out.
  * <p>
- * {@link #STATIC_GRAPH} excludes every temporary edge and describes a graph that outlives any single
- * request. {@link #withOwnLinkingOf} additionally admits the temporary edges of the given vertex's
- * own linking, which a search departing from a temporary vertex needs in order to reach the permanent
- * graph at all.
+ * {@link #STATIC_GRAPH} excludes every temporary edge and describes a graph that outlives any
+ * single request. {@link #withOwnLinkingOf} additionally admits the temporary edges of the given
+ * vertex's own linking, which a search departing from a temporary vertex needs in order to reach
+ * the permanent graph at all.
  */
 final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
 
@@ -58,14 +58,14 @@ final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
     return !(vertex instanceof TemporaryVertex);
   }
 
-  /** Skips the temporary edges outside this scope: those with neither endpoint in its own linking. */
+  /**
+   * Skips the temporary edges outside this scope: those with neither endpoint in its own linking.
+   */
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    return (
-      edge instanceof TemporaryEdge &&
+    return (edge instanceof TemporaryEdge &&
       !ownTemporaryVertices.contains(edge.getFromVertex()) &&
-      !ownTemporaryVertices.contains(edge.getToVertex())
-    );
+      !ownTemporaryVertices.contains(edge.getToVertex()));
   }
 
   /**
@@ -84,16 +84,16 @@ final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
     }
     Coordinate originCoordinate = origin.getCoordinate();
     boundary.sort(
-      Comparator.comparingDouble(v ->
-        SphericalDistanceLibrary.fastDistance(originCoordinate, v.getCoordinate())
+      Comparator.comparingDouble(
+        v -> SphericalDistanceLibrary.fastDistance(originCoordinate, v.getCoordinate())
       )
     );
     return boundary;
   }
 
   /**
-   * Every temporary vertex reachable from {@code start} without crossing a permanent one. Empty when
-   * {@code start} is permanent.
+   * Every temporary vertex reachable from {@code start} without crossing a permanent one. Empty
+   * when {@code start} is permanent.
    */
   private static Set<Vertex> ownLinking(Vertex start) {
     if (isPermanent(start)) {

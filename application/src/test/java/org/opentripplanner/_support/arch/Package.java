@@ -47,8 +47,7 @@ public class Package implements ArchComponent {
   }
 
   public Package verify() {
-    ArchRule rule = classes()
-      .that()
+    ArchRule rule = classes().that()
       .resideInAPackage(packageIdentifier)
       .and()
       .doNotImplement(dagger.internal.Factory.class)

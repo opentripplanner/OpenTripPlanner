@@ -19,8 +19,7 @@ class GraphPathUtilsTest {
       TEN_MINUTES,
       TEN_MINUTES,
       TEN_MINUTES,
-      TEN_MINUTES,
-    };
+      TEN_MINUTES, };
 
     Duration[] result = GraphPathUtils.calculateCumulativeDurations(segments, ONE_MINUTE);
 
@@ -32,8 +31,7 @@ class GraphPathUtilsTest {
         Duration.ofMinutes(32),
         Duration.ofMinutes(43),
         Duration.ofMinutes(54),
-        Duration.ofMinutes(65),
-      },
+        Duration.ofMinutes(65), },
       result
     );
   }
@@ -49,8 +47,7 @@ class GraphPathUtilsTest {
         Duration.ofMinutes(0),
         Duration.ofMinutes(10),
         Duration.ofMinutes(20),
-        Duration.ofMinutes(30),
-      },
+        Duration.ofMinutes(30), },
       result
     );
   }

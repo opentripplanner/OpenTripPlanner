@@ -108,10 +108,8 @@ class AccessStopArrivalTest {
     McStopArrival<RaptorTripSchedule> original, result;
 
     // Allow time-shift, but only by dTime (a free edge has zero duration)
-    RaptorAccessEgress access = TestAccessEgress.free(ALIGHT_STOP).openingHours(
-      0,
-      ALIGHT_TIME + dTime
-    );
+    RaptorAccessEgress access = TestAccessEgress.free(ALIGHT_STOP)
+      .openingHours(0, ALIGHT_TIME + dTime);
 
     original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 

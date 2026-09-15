@@ -59,9 +59,9 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
     }
     TripStopTime<?> that = (TripStopTime<?>) o;
 
-    return (
-      stopPosition == that.stopPosition && departure == that.departure && trip.equals(that.trip)
-    );
+    return (stopPosition == that.stopPosition &&
+      departure == that.departure &&
+      trip.equals(that.trip));
   }
 
   @Override

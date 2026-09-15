@@ -10,8 +10,7 @@ public class TestAStarBuilder {
     TestVertex origin,
     TestVertex destination
   ) {
-    return new AStarBuilder<TestState, TestEdge, TestVertex>()
-      .withGoalVertices(Set.of(destination))
+    return new AStarBuilder<TestState, TestEdge, TestVertex>().withGoalVertices(Set.of(destination))
       .withTimeout(Duration.ofMinutes(5))
       .withDominanceFunction((a, b) -> a.getWeight() <= b.getWeight())
       .withInitialStates(List.of(createInitialState(origin)));

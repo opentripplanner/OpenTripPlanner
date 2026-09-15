@@ -31,8 +31,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Integration tests for {@link DefaultCarpoolingService#routeDirect}.
  * <p>
- * These tests use a real street graph to verify the full direct routing pipeline
- * including filtering, position finding, insertion evaluation, and itinerary mapping.
+ * These tests use a real street graph to verify the full direct routing pipeline including
+ * filtering, position finding, insertion evaluation, and itinerary mapping.
  * <p>
  * Graph layout (main road going east, P and Q sit south of the road):
  * <pre>
@@ -61,9 +61,8 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(59.9139, 10.7522);
   private static final ZoneId ZONE = ZoneId.of("Europe/Oslo");
-  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0).atZone(
-    ZONE
-  );
+  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0)
+    .atZone(ZONE);
 
   private DefaultCarpoolingService service;
   private CarpoolingServiceTestContext context;
@@ -87,49 +86,46 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
   @BeforeEach
   void setUp() {
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(500));
-          var C = intersection("C", ORIGIN.moveEastMeters(1500));
-          var D = intersection("D", ORIGIN.moveEastMeters(2000));
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(500));
+        var C = intersection("C", ORIGIN.moveEastMeters(1500));
+        var D = intersection("D", ORIGIN.moveEastMeters(2000));
 
-          var P = intersection("P", ORIGIN.moveEastMeters(250).moveSouthMeters(200));
-          var Q = intersection("Q", ORIGIN.moveEastMeters(1750).moveSouthMeters(200));
+        var P = intersection("P", ORIGIN.moveEastMeters(250).moveSouthMeters(200));
+        var Q = intersection("Q", ORIGIN.moveEastMeters(1750).moveSouthMeters(200));
 
-          var farNorth = Q.toWgsCoordinate().moveNorthMeters(
-            DistanceTripFilter.DEFAULT_MAX_DISTANCE_METERS + 10000
-          );
-          var F = intersection("F", farNorth);
+        var farNorth = Q.toWgsCoordinate()
+          .moveNorthMeters(DistanceTripFilter.DEFAULT_MAX_DISTANCE_METERS + 10000);
+        var F = intersection("F", farNorth);
 
-          coordB = B.toWgsCoordinate();
-          coordC = C.toWgsCoordinate();
-          tripStart = A.toWgsCoordinate();
-          tripEnd = D.toWgsCoordinate();
-          passengerPickup = P.toWgsCoordinate();
-          passengerDropoff = Q.toWgsCoordinate();
-          vertexTripStart = A;
-          vertexTripEnd = D;
-          vertexPickup = P;
-          vertexDropoff = Q;
-          farAwayDropoff = F.toWgsCoordinate();
-          vertexFarAway = F;
+        coordB = B.toWgsCoordinate();
+        coordC = C.toWgsCoordinate();
+        tripStart = A.toWgsCoordinate();
+        tripEnd = D.toWgsCoordinate();
+        passengerPickup = P.toWgsCoordinate();
+        passengerDropoff = Q.toWgsCoordinate();
+        vertexTripStart = A;
+        vertexTripEnd = D;
+        vertexPickup = P;
+        vertexDropoff = Q;
+        farAwayDropoff = F.toWgsCoordinate();
+        vertexFarAway = F;
 
-          biStreet(A, B, 500);
-          biStreet(B, C, 1000);
-          biStreet(C, D, 500);
-          biStreet(A, P, 255);
-          biStreet(B, P, 255);
-          biStreet(C, Q, 255);
-          biStreet(D, Q, 255);
-          biStreet(P, Q, 1400);
-          biStreet(A, Q, 1500);
-          biStreet(Q, F, (int) DistanceTripFilter.DEFAULT_MAX_DISTANCE_METERS + 10000);
-        }
+        biStreet(A, B, 500);
+        biStreet(B, C, 1000);
+        biStreet(C, D, 500);
+        biStreet(A, P, 255);
+        biStreet(B, P, 255);
+        biStreet(C, Q, 255);
+        biStreet(D, Q, 255);
+        biStreet(P, Q, 1400);
+        biStreet(A, Q, 1500);
+        biStreet(Q, F, (int) DistanceTripFilter.DEFAULT_MAX_DISTANCE_METERS + 10000);
       }
-    );
+    });
 
     context = CarpoolingServiceTestContext.of(model);
     service = context.service();
@@ -409,22 +405,20 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
   /**
    * Verifies that the booking URL template on the carpool leg has its {@code {from}} and
-   * {@code {to}} placeholders expanded with the passenger's carpool boarding and alighting
-   * points. In this graph the passenger's requested pickup is itself a graph vertex
-   * (P) and the carpool ride goes P → Q, so the URL coordinates equal P/Q (which are also the
-   * passenger's request endpoints here — distinguishing them from a separate walk leg is the job
-   * of {@link DefaultCarpoolingServiceWalkLegsTest}). The exact-equality assertion also pins
-   * down that the URL does NOT use the driver's origin (A) or destination (D).
+   * {@code {to}} placeholders expanded with the passenger's carpool boarding and alighting points.
+   * In this graph the passenger's requested pickup is itself a graph vertex (P) and the carpool
+   * ride goes P → Q, so the URL coordinates equal P/Q (which are also the passenger's request
+   * endpoints here — distinguishing them from a separate walk leg is the job of
+   * {@link DefaultCarpoolingServiceWalkLegsTest}). The exact-equality assertion also pins down that
+   * the URL does NOT use the driver's origin (A) or destination (D).
    */
   @Test
   void directItinerary_expandsCarpoolPickupAndDropoffCoordsIntoBookingUrl() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
-    var trip = new CarpoolTripBuilder(baseTrip)
-      .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
-      )
-      .build();
+    var trip = new CarpoolTripBuilder(baseTrip).withPublicContactInformation(
+      ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
+    ).build();
     context.upsertTrip(trip);
 
     var request = buildDirectCarpoolRequest(passengerPickup, passengerDropoff, SEARCH_TIME);
@@ -442,8 +436,8 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
   /**
    * When the trip has no {@code publicContactInformation} the carpool leg's
-   * {@code pickupBookingInfo} must be {@code null} — i.e. a {@code BookingInfo} is not
-   * fabricated out of thin air just because a trip is present.
+   * {@code pickupBookingInfo} must be {@code null} — i.e. a {@code BookingInfo} is not fabricated
+   * out of thin air just because a trip is present.
    */
   @Test
   void directItinerary_withoutPublicContact_hasNullPickupBookingInfo() {

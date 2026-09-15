@@ -19,8 +19,7 @@ public class LegTest implements PlanTestConstants {
 
   private static final int START_TIME = T11_00;
 
-  private final Itinerary ITINERARY = newItinerary(A, START_TIME)
-    .walk(D2_m, B)
+  private final Itinerary ITINERARY = newItinerary(A, START_TIME).walk(D2_m, B)
     .bus(21, T11_05, T11_15, C)
     .bicycle(T11_16, T11_20, E)
     .build();
@@ -119,8 +118,8 @@ public class LegTest implements PlanTestConstants {
 
     // Same values
     {
-      Leg busLegSame = leg(b ->
-        b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day)
+      Leg busLegSame = leg(
+        b -> b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day)
       );
       assertTrue(busLeg.isPartiallySameLeg(busLegSame));
 
@@ -144,8 +143,8 @@ public class LegTest implements PlanTestConstants {
     // Trip id do not overlap
     {
       int tripIdOther = tripId + 11;
-      Leg busLegOther = leg(b ->
-        b.bus(tripIdOther, startTime, endTime, fromStopIndex, toStopIndex, B, day)
+      Leg busLegOther = leg(
+        b -> b.bus(tripIdOther, startTime, endTime, fromStopIndex, toStopIndex, B, day)
       );
       assertFalse(busLeg.isPartiallySameLeg(busLegOther));
     }
@@ -160,8 +159,8 @@ public class LegTest implements PlanTestConstants {
     // Same trip id but on a different service day
     {
       Leg leg1 = leg(b -> b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day));
-      Leg leg2 = leg(b ->
-        b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day.plusDays(1))
+      Leg leg2 = leg(
+        b -> b.bus(tripId, startTime, endTime, fromStopIndex, toStopIndex, B, day.plusDays(1))
       );
       assertFalse(leg1.isPartiallySameLeg(leg2));
     }
@@ -174,8 +173,9 @@ public class LegTest implements PlanTestConstants {
     var overlappingStartTime = START_TIME + duration - 1;
 
     Leg subject = leg(b -> b.bus(11, START_TIME, endTime, B));
-    Leg overlappingLeg = leg(overlappingStartTime, b ->
-      b.walk(duration, B).build().legs().getFirst()
+    Leg overlappingLeg = leg(
+      overlappingStartTime,
+      b -> b.walk(duration, B).build().legs().getFirst()
     );
     Leg legAfter = leg(endTime, b -> b.walk(D12_m, B));
 
@@ -194,8 +194,8 @@ public class LegTest implements PlanTestConstants {
     int toStopIndex,
     LocalDate serviceDate
   ) {
-    return leg(b ->
-      b.bus(tripId, START_TIME, START_TIME + 99, fromStopIndex, toStopIndex, B, serviceDate)
+    return leg(
+      b -> b.bus(tripId, START_TIME, START_TIME + 99, fromStopIndex, toStopIndex, B, serviceDate)
     );
   }
 

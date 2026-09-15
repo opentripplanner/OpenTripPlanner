@@ -49,11 +49,7 @@ public class TestStopArivalFactory {
       nLegs = 1 + nRounds + (arriveOnBoard ? 0 : 1);
       this.trasitLegCoeficient = 1.0f / nRounds;
     }
-    this.stops = new ArrayDeque<>(
-      IntStream.range(1, nLegs + 1)
-        .boxed()
-        .toList()
-    );
+    this.stops = new ArrayDeque<>(IntStream.range(1, nLegs + 1).boxed().toList());
     this.legCoeficient = 1.0f / nLegs;
   }
 
@@ -151,8 +147,8 @@ public class TestStopArivalFactory {
   }
 
   /**
-   * This Test data factory is complex - so we have a test on it to verify that it produces
-   * the exact test data we want.
+   * This Test data factory is complex - so we have a test on it to verify that it produces the
+   * exact test data we want.
    */
   public static class Test {
 

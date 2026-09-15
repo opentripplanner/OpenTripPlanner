@@ -118,16 +118,14 @@ public final class BikePreferences implements Serializable {
       return false;
     }
     BikePreferences that = (BikePreferences) o;
-    return (
-      doubleEquals(that.speed, speed) &&
+    return (doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       boardCost.equals(that.boardCost) &&
       Objects.equals(parking, that.parking) &&
       Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
       optimizeTriangle.equals(that.optimizeTriangle) &&
-      Objects.equals(walking, that.walking)
-    );
+      Objects.equals(walking, that.walking));
   }
 
   @Override

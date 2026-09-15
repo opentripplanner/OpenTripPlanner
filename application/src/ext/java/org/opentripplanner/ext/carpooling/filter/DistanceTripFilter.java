@@ -61,7 +61,7 @@ public class DistanceTripFilter implements CarpoolTripFilter {
 
       if (
         pickupDistanceToSegment <= maxDistanceMeters ||
-        dropoffDistanceToSegment <= maxDistanceMeters
+          dropoffDistanceToSegment <= maxDistanceMeters
       ) {
         LOG.debug(
           "Trip {} accepted by distance filter: passenger journey close to segment {} ({} to {}). Pickup distance: {}m, Dropoff distance: {}m (max: {}m)",

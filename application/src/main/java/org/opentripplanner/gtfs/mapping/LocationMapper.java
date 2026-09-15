@@ -61,8 +61,7 @@ class LocationMapper {
           )
         );
       }
-      return siteRepositoryBuilder
-        .areaStop(id)
+      return siteRepositoryBuilder.areaStop(id)
         .withName(name)
         .withUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()))
         .withDescription(NonLocalizedString.ofNullable(gtfsLocation.getDescription()))

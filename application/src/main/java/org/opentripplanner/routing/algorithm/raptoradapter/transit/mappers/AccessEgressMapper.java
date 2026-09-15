@@ -21,8 +21,7 @@ public class AccessEgressMapper {
   }
 
   public List<RoutingAccessEgress> mapNearbyStops(Collection<NearbyStop> accessStops) {
-    return accessStops
-      .stream()
+    return accessStops.stream()
       .map(this::mapNearbyStop)
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
@@ -31,8 +30,7 @@ public class AccessEgressMapper {
   public static Collection<RoutingAccessEgress> mapFlexAccessEgresses(
     Collection<FlexAccessEgress> flexAccessEgresses
   ) {
-    return flexAccessEgresses
-      .stream()
+    return flexAccessEgresses.stream()
       .map(FlexAccessEgressAdapter::new)
       .collect(Collectors.toList());
   }

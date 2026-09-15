@@ -7,8 +7,8 @@ import org.opentripplanner.transit.model.network.Route;
 /**
  * A request for finding {@link Route}s.
  * <p>
- * This request is used to retrieve Routes that match the provided filter values.
- * At least one filter value must be provided.
+ * This request is used to retrieve Routes that match the provided filter values. At least one
+ * filter value must be provided.
  */
 public class FindRoutesRequest {
 

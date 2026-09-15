@@ -17,8 +17,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
  * <p>
- * All fields are immutable except for the availability, capacity which may be updated by updaters.
- * If any other properties change a new VehicleParking instance should be created.
+ * All fields are immutable except for the availability, capacity which may be updated by
+ * updaters. If any other properties change a new VehicleParking instance should be created.
  */
 public class VehicleParking implements Serializable {
 
@@ -222,15 +222,15 @@ public class VehicleParking implements Serializable {
 
   public boolean hasSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible) {
     switch (traverseMode) {
-      case BICYCLE:
+      case BICYCLE :
         return bicyclePlaces;
-      case CAR:
+      case CAR :
         if (wheelchairAccessible) {
           return wheelchairAccessibleCarPlaces;
         } else {
           return carPlaces;
         }
-      default:
+      default :
         return false;
     }
   }
@@ -257,9 +257,8 @@ public class VehicleParking implements Serializable {
 
   /**
    * The only mutable method in this class: it allows to update the available parking spaces during
-   * real-time updates.
-   * Since the entity is used both by writer threads (real-time updates) and reader threads
-   * (A* routing), the variable holding the information is marked as volatile.
+   * real-time updates. Since the entity is used both by writer threads (real-time updates) and
+   * reader threads (A* routing), the variable holding the information is marked as volatile.
    */
   public void updateAvailability(VehicleParkingSpaces vehicleParkingSpaces) {
     this.availability = vehicleParkingSpaces;
@@ -295,8 +294,7 @@ public class VehicleParking implements Serializable {
       return false;
     }
     final VehicleParking that = (VehicleParking) o;
-    return (
-      Objects.equals(coordinate, that.coordinate) &&
+    return (Objects.equals(coordinate, that.coordinate) &&
       bicyclePlaces == that.bicyclePlaces &&
       carPlaces == that.carPlaces &&
       wheelchairAccessibleCarPlaces == that.wheelchairAccessibleCarPlaces &&
@@ -310,8 +308,7 @@ public class VehicleParking implements Serializable {
       Objects.equals(note, that.note) &&
       Objects.equals(capacity, that.capacity) &&
       Objects.equals(entrances, that.entrances) &&
-      Objects.equals(vehicleParkingGroup, that.vehicleParkingGroup)
-    );
+      Objects.equals(vehicleParkingGroup, that.vehicleParkingGroup));
   }
 
   public String toString() {

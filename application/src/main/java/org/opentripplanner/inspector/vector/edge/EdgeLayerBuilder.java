@@ -31,8 +31,7 @@ public class EdgeLayerBuilder extends LayerBuilder<Edge> {
 
   @Override
   protected List<Geometry> findGeometries(Envelope query) {
-    return graph
-      .findEdges(query)
+    return graph.findEdges(query)
       .stream()
       .map(e -> new DebugEdge(e, EdgeGeometryMapper.map(e)))
       .filter(e -> e.geometry != null)

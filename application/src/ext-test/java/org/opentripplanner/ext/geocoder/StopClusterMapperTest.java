@@ -60,8 +60,9 @@ class StopClusterMapperTest {
 
     var mapper = buildMapper(repo);
 
-    var primaries = Iterables.transform(mapper.generateStopClusters(LOCATIONS, List.of()), c ->
-      FeedScopedId.parseStrict(c.primaryId())
+    var primaries = Iterables.transform(
+      mapper.generateStopClusters(LOCATIONS, List.of()),
+      c -> FeedScopedId.parseStrict(c.primaryId())
     );
 
     assertThat(primaries).containsExactly(STOP_A.getId(), STOP_B.getId(), STOP_C.getId());
@@ -74,8 +75,9 @@ class StopClusterMapperTest {
 
     var mapper = buildMapper(repo);
 
-    var primaries = Iterables.transform(mapper.generateStopClusters(LOCATIONS, List.of()), c ->
-      FeedScopedId.parseStrict(c.primaryId())
+    var primaries = Iterables.transform(
+      mapper.generateStopClusters(LOCATIONS, List.of()),
+      c -> FeedScopedId.parseStrict(c.primaryId())
     );
     assertThat(primaries).containsExactly(STOP_A.getId(), STOP_B.getId(), STOP_C.getId());
 

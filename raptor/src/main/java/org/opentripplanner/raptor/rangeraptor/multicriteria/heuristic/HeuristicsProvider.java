@@ -48,7 +48,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This is a very effective optimization, enabled by the {@link Optimization#PARETO_CHECK_AGAINST_DESTINATION}.
+   * This is a very effective optimization, enabled by the
+   * {@link Optimization#PARETO_CHECK_AGAINST_DESTINATION}.
    */
   public boolean rejectDestinationArrivalBasedOnHeuristic(McStopArrival<T> arrival) {
     if (heuristics == null || paths.isEmpty()) {
@@ -74,8 +75,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (debugHandlerFactory.isDebugStopArrival(arrival.stop())) {
       String details = rejectErrorMessage(arrival.stop()) + ", Existing paths: " + paths;
 
-      debugHandlerFactory
-        .debugStopArrival()
+      debugHandlerFactory.debugStopArrival()
         .reject(
           arrival,
           null,
@@ -91,8 +91,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
    * using the given arrival and a pre-calculated heuristics.
    * <p>
    * The C2 value is passed through since we don't have any clue on what it's used for. There is
-   * no heuristic calculation for the C2 value. Destination pruning can only be used if this
-   * is ok.
+   * no heuristic calculation for the C2 value. Destination pruning can only be used if this is ok.
    */
   private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost, int c2) {
     HeuristicAtStop h = get(stop);

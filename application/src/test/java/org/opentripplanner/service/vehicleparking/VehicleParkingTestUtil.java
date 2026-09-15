@@ -21,12 +21,12 @@ public class VehicleParkingTestUtil {
     double y,
     VehicleParkingSpaces vehiclePlaces
   ) {
-    VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
-      builder
-        .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-        .name(new NonLocalizedString("Entrance " + id))
-        .coordinate(new WgsCoordinate(y, x))
-        .walkAccessible(true);
+    VehicleParking.VehicleParkingEntranceCreator entrance = builder -> builder.entranceId(
+      new FeedScopedId(TEST_FEED_ID, "Entrance " + id)
+    )
+      .name(new NonLocalizedString("Entrance " + id))
+      .coordinate(new WgsCoordinate(y, x))
+      .walkAccessible(true);
 
     return StreetModelForTest.vehicleParking()
       .id(new FeedScopedId(TEST_FEED_ID, id))

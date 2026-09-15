@@ -67,7 +67,8 @@ public final class CarReachableVertexSnapper {
 
   /**
    * @param minCarEscapeMeters straight-line distance, in metres, a car must be able to drive both
-   *        to and from a candidate for it to be accepted; also caps the probe's exploration.
+   *                           to and from a candidate for it to be accepted; also caps the probe's
+   *                           exploration.
    */
   public CarReachableVertexSnapper(double minCarEscapeMeters) {
     this.minCarEscapeMeters = minCarEscapeMeters;
@@ -125,13 +126,13 @@ public final class CarReachableVertexSnapper {
   }
 
   /**
-   * @param baseRequest walk preferences for the walk A*; mode is forced to {@link StreetMode#WALK}
-   *        and {@code arriveBy} overridden. The reachability probe ignores it (always plain
-   *        {@link StreetMode#CAR}).
-   * @param vertexToSnap the vertex to snap; returned unchanged when it can already be snapped to.
-   * @param maxWalk walk budget for reaching a car-reachable vertex.
-   * @param arriveBy {@code false} to walk forward from {@code vertexToSnap}, {@code true} to walk
-   *        backward to it.
+   * @param baseRequest   walk preferences for the walk A*; mode is forced to
+   *                      {@link StreetMode#WALK} and {@code arriveBy} overridden. The reachability
+   *                      probe ignores it (always plain {@link StreetMode#CAR}).
+   * @param vertexToSnap  the vertex to snap; returned unchanged when it can already be snapped to.
+   * @param maxWalk       walk budget for reaching a car-reachable vertex.
+   * @param arriveBy      {@code false} to walk forward from {@code vertexToSnap}, {@code true} to
+   *                      walk backward to it.
    * @param permanentOnly reject temporary vertices.
    * @return the snap result, or {@code null} if none is reachable within {@code maxWalk}.
    */
@@ -205,12 +206,12 @@ public final class CarReachableVertexSnapper {
   }
 
   /**
-   * Whether {@code vertex} may be returned as the snap result: car-reachable, and permanent when the
-   * caller asked for {@code permanentOnly}.
+   * Whether {@code vertex} may be returned as the snap result: car-reachable, and permanent when
+   * the caller asked for {@code permanentOnly}.
    * <p>
-   * A permanent vertex's verdict rests on the static graph alone, so it is cached and shared across
-   * requests. A temporary vertex's rests on {@code scope}, which is specific to one linking, so it is
-   * computed fresh and never stored.
+   * A permanent vertex's verdict rests on the static graph alone, so it is cached and shared
+   * across requests. A temporary vertex's rests on {@code scope}, which is specific to one linking,
+   * so it is computed fresh and never stored.
    */
   private boolean canSnapTo(Vertex vertex, boolean permanentOnly, TraversalScope scope) {
     if (TraversalScope.isPermanent(vertex)) {
@@ -239,19 +240,17 @@ public final class CarReachableVertexSnapper {
    * without routing.
    */
   private boolean computeCarReachable(Vertex vertex, SkipEdgeStrategy<State, Edge> skipEdges) {
-    return (
-      anyStreetEdgeAllowsCar(vertex.getOutgoing()) &&
+    return (anyStreetEdgeAllowsCar(vertex.getOutgoing()) &&
       anyStreetEdgeAllowsCar(vertex.getIncoming()) &&
       probeEscapes(vertex, false, skipEdges) &&
-      probeEscapes(vertex, true, skipEdges)
-    );
+      probeEscapes(vertex, true, skipEdges));
   }
 
   /**
    * Bounded CAR search reporting whether any settled vertex lies at least
    * {@link #minCarEscapeMeters} away — outward when {@code arriveBy} is {@code false}, inward when
-   * {@code true}. Terminates as soon as one is far enough; a stranded vertex only exhausts its small
-   * pocket.
+   * {@code true}. Terminates as soon as one is far enough; a stranded vertex only exhausts its
+   * small pocket.
    */
   private boolean probeEscapes(
     Vertex origin,

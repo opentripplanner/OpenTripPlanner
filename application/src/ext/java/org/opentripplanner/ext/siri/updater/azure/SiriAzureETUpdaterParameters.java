@@ -9,10 +9,8 @@ import java.util.Optional;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
-public class SiriAzureETUpdaterParameters
-  extends SiriAzureUpdaterParameters
-  implements UrlUpdaterParameters
-{
+public class SiriAzureETUpdaterParameters extends SiriAzureUpdaterParameters implements
+  UrlUpdaterParameters {
 
   private LocalDate fromDateTime;
 
@@ -51,9 +49,10 @@ public class SiriAzureETUpdaterParameters
       return Optional.empty();
     }
     return Optional.of(
-      new URIBuilder(url)
-        .addParameter("fromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
-        .build()
+      new URIBuilder(url).addParameter(
+        "fromDateTime",
+        fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE)
+      ).build()
     );
   }
 }

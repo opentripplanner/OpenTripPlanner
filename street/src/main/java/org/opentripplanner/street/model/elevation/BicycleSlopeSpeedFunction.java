@@ -1,11 +1,11 @@
 package org.opentripplanner.street.model.elevation;
 
 /**
- * Cycling speed coefficient as a function of slope and altitude, modelled as a quadratic
- * B-spline fitted to data from
- * <a href="http://www.analyticcycling.com/ForcesSpeed_Page.html">analyticcycling.com</a>.
- * The coefficient is a multiplier on flat-ground cycling speed: greater than {@code 1.0} on
- * a downhill, less than {@code 1.0} on an uphill.
+ * Cycling speed coefficient as a function of slope and altitude, modelled as a quadratic B-spline
+ * fitted to data from
+ * <a href="http://www.analyticcycling.com/ForcesSpeed_Page.html">analyticcycling.com</a>. The
+ * coefficient is a multiplier on flat-ground cycling speed: greater than {@code 1.0} on a downhill,
+ * less than {@code 1.0} on an uphill.
  * <p>
  * The spline is defined on a bounded domain given by its knot vectors:
  * <ul>
@@ -33,8 +33,7 @@ public final class BicycleSlopeSpeedFunction {
     2.7987785324442748E+03,
     5.0000000000000000E+03,
     5.0000000000000000E+03,
-    5.0000000000000000E+03,
-  };
+    5.0000000000000000E+03, };
 
   /** Slope (y) knot vector. Bounds: {@code [-0.35, +0.35]}. */
   private static final double[] TY = {
@@ -47,8 +46,7 @@ public final class BicycleSlopeSpeedFunction {
     1.2191105175593375E-01,
     3.4999999999999998E-01,
     3.4999999999999998E-01,
-    3.4999999999999998E-01,
-  };
+    3.4999999999999998E-01, };
 
   /** Spline coefficient matrix (flattened, row-major over the TX x TY grid). */
   private static final double[] COEFF = {
@@ -79,15 +77,13 @@ public final class BicycleSlopeSpeedFunction {
     5.7862890496126462E-01,
     1.6358571778476885E-01,
     9.4846184210137130E-02,
-    5.5464612133430242E-02,
-  };
+    5.5464612133430242E-02, };
 
   private BicycleSlopeSpeedFunction() {}
 
   /**
    * Evaluate the spline at the given slope and altitude. The slope is clamped to
-   * {@code [MIN_SLOPE, MAX_SLOPE]} before evaluation to keep the spline inside its valid
-   * domain.
+   * {@code [MIN_SLOPE, MAX_SLOPE]} before evaluation to keep the spline inside its valid domain.
    *
    * @param slope    {@code rise / run} along the edge (no unit, e.g. {@code 0.05} for 5%)
    * @param altitude metres above sea level at the start of the segment

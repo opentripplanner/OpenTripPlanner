@@ -21,21 +21,24 @@ public class TransitPreferencesMapper {
     );
     transit.withBoardSlack(builder -> {
       callWith.argument("boardSlackDefault", builder::withDefaultSec);
-      callWith.argument("boardSlackList", (Object v) ->
-        TransportModeSlack.mapIntoDomain(builder, v)
+      callWith.argument(
+        "boardSlackList",
+        (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
       );
     });
     transit.withAlightSlack(builder -> {
       callWith.argument("alightSlackDefault", builder::withDefaultSec);
-      callWith.argument("alightSlackList", (Object v) ->
-        TransportModeSlack.mapIntoDomain(builder, v)
+      callWith.argument(
+        "alightSlackList",
+        (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
       );
     });
     callWith.argument("ignoreRealtimeUpdates", transit::withIgnoreRealtimeUpdates);
     callWith.argument("includePlannedCancellations", transit::withIncludePlannedCancellations);
     callWith.argument("includeRealtimeCancellations", transit::withIncludeRealtimeCancellations);
-    callWith.argument("relaxTransitGroupPriority", it ->
-      transit.withRelaxTransitGroupPriority(
+    callWith.argument(
+      "relaxTransitGroupPriority",
+      it -> transit.withRelaxTransitGroupPriority(
         RelaxCostType.mapToDomain((Map<String, Object>) it, CostLinearFunction.NORMAL)
       )
     );

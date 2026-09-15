@@ -15,13 +15,11 @@ public class RideHailingServicesConfig {
   private final Multimap<Type, Object> configList = ArrayListMultimap.create();
 
   public RideHailingServicesConfig(NodeAdapter rootAdapter) {
-    rootAdapter
-      .of("rideHailingServices")
+    rootAdapter.of("rideHailingServices")
       .since(V2_3)
       .summary("Configuration for interfaces to external ride hailing services like Uber.")
       .asObjects(it -> {
-        Type type = it
-          .of("type")
+        Type type = it.of("type")
           .since(V2_3)
           .summary("The type of the service.")
           .asEnum(Type.class);
@@ -33,8 +31,7 @@ public class RideHailingServicesConfig {
   }
 
   public List<RideHailingServiceParameters> rideHailingServiceParameters() {
-    return configList
-      .values()
+    return configList.values()
       .stream()
       .filter(RideHailingServiceParameters.class::isInstance)
       .map(RideHailingServiceParameters.class::cast)

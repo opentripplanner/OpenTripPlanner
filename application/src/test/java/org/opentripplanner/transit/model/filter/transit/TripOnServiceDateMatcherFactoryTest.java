@@ -99,15 +99,11 @@ class TripOnServiceDateMatcherFactoryTest {
     patternRut = TransitRepositoryForTest.tripPattern(
       "pattern:rut",
       tripOnServiceDateRut.getTrip().getRoute()
-    )
-      .withStopPattern(TEST_MODEL.stopPattern(2))
-      .build();
+    ).withStopPattern(TEST_MODEL.stopPattern(2)).build();
     patternAkt = TransitRepositoryForTest.tripPattern(
       "pattern:akt",
       tripOnServiceDateAkt.getTrip().getRoute()
-    )
-      .withStopPattern(TEST_MODEL.stopPattern(2))
-      .build();
+    ).withStopPattern(TEST_MODEL.stopPattern(2)).build();
     patternResolver = (trip, serviceDate) -> {
       if (trip.equals(tripOnServiceDateAkt.getTrip())) {
         return patternAkt;
@@ -119,8 +115,9 @@ class TripOnServiceDateMatcherFactoryTest {
       }
       return null;
     };
-    runningTimeResolver = tripOnServiceDate ->
-      tripOnServiceDate.equals(tripOnServiceDateRut) ? TimePeriod.of(RUT_START, RUT_END) : null;
+    runningTimeResolver = tripOnServiceDate -> tripOnServiceDate.equals(tripOnServiceDateRut)
+      ? TimePeriod.of(RUT_START, RUT_END)
+      : null;
   }
 
   @Test
@@ -267,11 +264,7 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void compositeFilterSelectByAgency() {
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("RUT:1")))
-          .build()
-      )
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -288,11 +281,7 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void compositeFilterNotByAgency() {
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addNot(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("RUT:1")))
-          .build()
-      )
+      .addNot(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -310,16 +299,8 @@ class TripOnServiceDateMatcherFactoryTest {
   void compositeFilterSelectIsOrBetweenSelectors() {
     // Two selectors in select — a trip matching either one should pass
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("RUT:1")))
-          .build()
-      )
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("AKT:1")))
-          .build()
-      )
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -337,21 +318,9 @@ class TripOnServiceDateMatcherFactoryTest {
   void compositeFilterNotOverridesSelect() {
     // select RUT:1 and AKT:1, but not AKT:1 — AKT:1 should be excluded despite being selected
     var filter = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("RUT:1")))
-          .build()
-      )
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("AKT:1")))
-          .build()
-      )
-      .addNot(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("AKT:1")))
-          .build()
-      )
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
+      .addNot(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filter)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -369,18 +338,10 @@ class TripOnServiceDateMatcherFactoryTest {
   void multipleFiltersAreOred() {
     // Two separate filters — a trip matching either filter should pass
     var filterRut = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("RUT:1")))
-          .build()
-      )
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("RUT:1"))).build())
       .build();
     var filterAkt = FilterRequest.<TripOnServiceDateSelectRequest>of()
-      .addSelect(
-        TripOnServiceDateSelectRequest.of()
-          .withAgencies(List.of(id("AKT:1")))
-          .build()
-      )
+      .addSelect(TripOnServiceDateSelectRequest.of().withAgencies(List.of(id("AKT:1"))).build())
       .build();
     var request = TripOnServiceDateRequest.of().withFilters(List.of(filterRut, filterAkt)).build();
     Matcher<TripOnServiceDate> matcher = TripOnServiceDateMatcherFactory.of(
@@ -510,8 +471,9 @@ class TripOnServiceDateMatcherFactoryTest {
   @Test
   void matchesTripWithOpenEndedRunningTime() {
     // A trip whose running time has no known end is running indefinitely
-    runningTimeResolver = tripOnServiceDate ->
-      tripOnServiceDate.equals(tripOnServiceDateRut) ? TimePeriod.of(RUT_START, null) : null;
+    runningTimeResolver = tripOnServiceDate -> tripOnServiceDate.equals(tripOnServiceDateRut)
+      ? TimePeriod.of(RUT_START, null)
+      : null;
 
     assertTrue(
       matcher(TimePeriod.of(RUT_END.plus(Duration.ofHours(1)), null)).match(tripOnServiceDateRut)

@@ -3,25 +3,23 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.List;
 
 /**
- * This class builds a tripIndex for {@link TripPatternForDates} to (day, tripIndexForDay).
- * In most cases concatenating the departure times would be correct, but the last departure on a
- * specific day, may depart after the first departure on the following day. In these cases we need
- * to swap the two departures in the timetable Raptor searches. The reason we need this, is that
- * trips on two different days may have overlapping trip-times. A night bus on Saturdays may leave
- * at 04:05+1d, while the first bus on Sundays may leave at 03:00. Be aware, these two trips may
- * not have the same service calendar, normally they are different. For example "Sundays" might be
- * all Sundays and public holidays.
+ * This class builds a tripIndex for {@link TripPatternForDates} to (day, tripIndexForDay). In most
+ * cases concatenating the departure times would be correct, but the last departure on a specific
+ * day, may depart after the first departure on the following day. In these cases we need to swap
+ * the two departures in the timetable Raptor searches. The reason we need this, is that trips on
+ * two different days may have overlapping trip-times. A night bus on Saturdays may leave at
+ * 04:05+1d, while the first bus on Sundays may leave at 03:00. Be aware, these two trips may not
+ * have the same service calendar, normally they are different. For example "Sundays" might be all
+ * Sundays and public holidays.
  * <p>
  * The trip index is a sorted list of trips based on the first stop departure time. The index
- * contains two pointers, the first is the day and the second is the trip index on that day:
- * ```
- *   tripIndexForTripPatternPerDates -> (day, tripIndexForTripPatternPerDate)
- * ```
+ * contains two pointers, the first is the day and the second is the trip index on that day: ```
+ * tripIndexForTripPatternPerDates -> (day, tripIndexForTripPatternPerDate) ```
  * <p>
  * This class might at first look a bit complicated. A much easier approach would be to just sort
- * on departure times using a Java built in sort, but sorting is expensive. This code will merge
- * the  timetables instead - which is faster. In 99% of the cases we will just do one extra
- * comparison for each departure time.
+ * on departure times using a Java built in sort, but sorting is expensive. This code will merge the
+ * timetables instead - which is faster. In 99% of the cases we will just do one extra comparison
+ * for each departure time.
  */
 final class TripTimesForDaysIndex {
 
@@ -41,18 +39,15 @@ final class TripTimesForDaysIndex {
    *
    * Implementation notes!
    * <p>
-   * We need to order trips based on the "actual" departure time, not day and departure-time. We do
-   * this by merging the trip-departure times for each day. Each day is already sorted, so we need
-   * to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
+   * We need to order trips based on the "actual" departure time, not day and departure-time. We
+   * do this by merging the trip-departure times for each day. Each day is already sorted, so we
+   * need to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
    * performance reasons.
    */
   TripTimesForDaysIndex(List<int[]> firstStopDepartureTimesPerDay) {
     // 'list' is an alias to make the logic below easier to read
     final List<int[]> list = firstStopDepartureTimesPerDay;
-    this.tripIndex = new int[list
-      .stream()
-      .mapToInt(a -> a.length)
-      .sum() * 2];
+    this.tripIndex = new int[list.stream().mapToInt(a -> a.length).sum() * 2];
     int[] a;
 
     // 'day' is the current day index
@@ -149,11 +144,7 @@ final class TripTimesForDaysIndex {
     }
     var buf = new StringBuilder();
     for (int i = 0; i < tripIndex.length; i += 2) {
-      buf
-        .append(tripIndex[i])
-        .append(':')
-        .append(tripIndex[i + 1])
-        .append(' ');
+      buf.append(tripIndex[i]).append(':').append(tripIndex[i + 1]).append(' ');
     }
     return buf.substring(0, buf.length() - 1);
   }

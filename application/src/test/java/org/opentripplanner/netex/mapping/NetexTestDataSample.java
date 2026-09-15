@@ -58,8 +58,7 @@ public class NetexTestDataSample {
     DATED_SERVICE_JOURNEY_ID_2
   );
   public static final List<String> OPERATING_DAYS = List.of("2022-02-28", "2022-02-29");
-  private static final DayType EVERYDAY = new DayType()
-    .withId("EVERYDAY")
+  private static final DayType EVERYDAY = new DayType().withId("EVERYDAY")
     .withName(new MultilingualString().withValue("everyday"));
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -87,8 +86,7 @@ public class NetexTestDataSample {
     final int[] stopTimes = { 0, 4, 10, 15 };
     final int NUM_OF_STOPS = stopTimes.length;
 
-    Line line = new Line()
-      .withId("RUT:Line:1")
+    Line line = new Line().withId("RUT:Line:1")
       .withName(new MultilingualString().withValue("Line 1"))
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
     JAXBElement<LineRefStructure> lineRef = createWrappedRef(line.getId(), LineRefStructure.class);
@@ -109,8 +107,7 @@ public class NetexTestDataSample {
     final String DESTINATION_DISPLAY_ID_1 = "NSR:DestinationDisplay:1";
     final String DESTINATION_DISPLAY_ID_2 = "NSR:DestinationDisplay:2";
 
-    DestinationDisplay destinationBergen = new DestinationDisplay()
-      .withId(DESTINATION_DISPLAY_ID_1)
+    DestinationDisplay destinationBergen = new DestinationDisplay().withId(DESTINATION_DISPLAY_ID_1)
       .withVias(
         new Vias_RelStructure().withVia(
           List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_2))
@@ -118,8 +115,9 @@ public class NetexTestDataSample {
       )
       .withFrontText(new MultilingualString().withValue("Bergen"));
 
-    DestinationDisplay destinationStavanger = new DestinationDisplay()
-      .withId(DESTINATION_DISPLAY_ID_2)
+    DestinationDisplay destinationStavanger = new DestinationDisplay().withId(
+      DESTINATION_DISPLAY_ID_2
+    )
       .withVias(
         new Vias_RelStructure().withVia(
           List.of(this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_1))
@@ -134,8 +132,7 @@ public class NetexTestDataSample {
 
     for (int i = 0; i < NUM_OF_STOPS; i++) {
       String stopPointId = "RUT:StopPointInJourneyPattern:" + (i + 1);
-      StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
-        .withId(stopPointId)
+      StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern().withId(stopPointId)
         .withOrder(BigInteger.valueOf(i + 1))
         .withScheduledStopPointRef(createScheduledStopPointRef(stopPointId));
 
@@ -155,20 +152,19 @@ public class NetexTestDataSample {
     }
 
     // Create Journey Pattern with route and points
-    journeyPattern = new JourneyPattern()
-      .withId("RUT:JourneyPattern:1")
+    journeyPattern = new JourneyPattern().withId("RUT:JourneyPattern:1")
       .withRouteRef(routeRef)
       .withPointsInSequence(
-        new PointsInJourneyPattern_RelStructure().withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
-          pointsInLink
-        )
+        new PointsInJourneyPattern_RelStructure()
+          .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
+            pointsInLink
+          )
       );
     journeyPatternById.add(journeyPattern);
 
     // Create a new Service Journey with line, dayType, journeyPattern and timetable from above
     {
-      ServiceJourney serviceJourney = new ServiceJourney()
-        .withId(SERVICE_JOURNEY_ID)
+      ServiceJourney serviceJourney = new ServiceJourney().withId(SERVICE_JOURNEY_ID)
         .withLineRef(lineRef)
         .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
@@ -180,13 +176,13 @@ public class NetexTestDataSample {
       serviceJourneyById.add(serviceJourney);
 
       for (int i = 0; i < DATED_SERVICE_JOURNEY_ID.size(); i++) {
-        OperatingDay operatingDay = new OperatingDay()
-          .withId(OPERATING_DAYS.get(i))
+        OperatingDay operatingDay = new OperatingDay().withId(OPERATING_DAYS.get(i))
           .withCalendarDate(LocalDate.parse(OPERATING_DAYS.get(i), DATE_FORMATTER).atStartOfDay());
         operatingDaysById.add(operatingDay);
 
-        DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
-          .withId(DATED_SERVICE_JOURNEY_ID.get(i))
+        DatedServiceJourney datedServiceJourney = new DatedServiceJourney().withId(
+          DATED_SERVICE_JOURNEY_ID.get(i)
+        )
           .withJourneyRef(
             List.of(
               MappingSupport.createWrappedRef(SERVICE_JOURNEY_ID, ServiceJourneyRefStructure.class)
@@ -238,8 +234,7 @@ public class NetexTestDataSample {
   }
 
   public DatedServiceJourney getDatedServiceJourneyById(String id) {
-    return datedServiceJourneyBySjId
-      .values()
+    return datedServiceJourneyBySjId.values()
       .stream()
       .filter(datedServiceJourney -> datedServiceJourney.getId().equals(id))
       .findFirst()

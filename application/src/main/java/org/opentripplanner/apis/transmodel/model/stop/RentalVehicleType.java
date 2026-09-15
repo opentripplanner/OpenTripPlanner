@@ -30,8 +30,8 @@ public class RentalVehicleType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("vehicleType")
           .type(new GraphQLNonNull(vehicleTypeType))
-          .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).vehicleType()
+          .dataFetcher(
+            environment -> ((VehicleRentalVehicle) environment.getSource()).vehicleType()
           )
           .build()
       )
@@ -60,8 +60,8 @@ public class RentalVehicleType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("currentRangeMeters")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).fuel().range()
+          .dataFetcher(
+            environment -> ((VehicleRentalVehicle) environment.getSource()).fuel().range()
           )
           .build()
       )

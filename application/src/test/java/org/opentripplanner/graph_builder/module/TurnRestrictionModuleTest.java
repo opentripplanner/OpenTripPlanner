@@ -50,8 +50,7 @@ public class TurnRestrictionModuleTest {
     double length,
     StreetTraversalPermission streetTraversalPermission
   ) {
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(a)
+    return new StreetEdgeBuilder<>().withFromVertex(a)
       .withToVertex(b)
       .withMeterLength(length)
       .withPermission(streetTraversalPermission)
@@ -70,8 +69,7 @@ public class TurnRestrictionModuleTest {
   ) {
     return new StreetEdge[] {
       streetEdge(a, b, length, streetTraversalPermission),
-      streetEdge(b, a, length, streetTraversalPermission),
-    };
+      streetEdge(b, a, length, streetTraversalPermission), };
   }
 
   private TurnRestriction turnRestriction(
@@ -135,8 +133,7 @@ public class TurnRestrictionModuleTest {
     assertEquals(6, graph.countVertices());
     assertEquals(11, graph.countEdges());
 
-    var newB = graph
-      .getVertices()
+    var newB = graph.getVertices()
       .stream()
       .filter(v -> v.sameLocation(B) && v != B)
       .findFirst()
@@ -182,11 +179,11 @@ public class TurnRestrictionModuleTest {
     //module.buildGraph();
     List<TurnRestriction> useTurnRestrictions = new ArrayList<>();
     switch (order) {
-      case 0:
+      case 0 :
         useTurnRestrictions.add(turnRestrictions.get(0));
         useTurnRestrictions.add(turnRestrictions.get(1));
         break;
-      case 1:
+      case 1 :
         useTurnRestrictions.add(turnRestrictions.get(1));
         useTurnRestrictions.add(turnRestrictions.get(0));
         break;
@@ -202,14 +199,12 @@ public class TurnRestrictionModuleTest {
     assertEquals(10, graph.countVertices());
     assertEquals(20, graph.countEdges());
 
-    var newB = graph
-      .getVertices()
+    var newB = graph.getVertices()
       .stream()
       .filter(v -> v.sameLocation(B) && v != B)
       .findFirst()
       .get();
-    var newE = graph
-      .getVertices()
+    var newE = graph.getVertices()
       .stream()
       .filter(v -> v.sameLocation(E) && v != E)
       .findFirst()
@@ -284,13 +279,8 @@ public class TurnRestrictionModuleTest {
     assertEquals(10, graph.countVertices());
     assertEquals(15, graph.countEdges());
 
-    var Bs = graph
-      .getVertices()
-      .stream()
-      .filter(v -> v.sameLocation(B) && v != B)
-      .toList();
-    var newE = graph
-      .getVertices()
+    var Bs = graph.getVertices().stream().filter(v -> v.sameLocation(B) && v != B).toList();
+    var newE = graph.getVertices()
       .stream()
       .filter(v -> v.sameLocation(E) && v != E)
       .findFirst()

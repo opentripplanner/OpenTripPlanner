@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OTP-specific exception handler for GraphQL data fetchers. Logs warnings for unexpected
- * exceptions and classifies {@link InvalidInputException} as client errors
- * ({@code BadRequestError}) logged at INFO level.
+ * OTP-specific exception handler for GraphQL data fetchers. Logs warnings for unexpected exceptions
+ * and classifies {@link InvalidInputException} as client errors ({@code BadRequestError}) logged at
+ * INFO level.
  */
 public class OtpDataFetcherExceptionHandler extends SimpleDataFetcherExceptionHandler {
 

@@ -23,8 +23,8 @@ public final class TimeScalarFactory {
   private TimeScalarFactory() {}
 
   public static GraphQLObjectType createSecondsSinceMidnightAsTimeObject() {
-    GraphQLScalarType secondsSinceMidnightAsTimeStringScalar =
-      TimeScalarFactory.createSecondsSinceMidnightAsTimeStringScalar();
+    GraphQLScalarType secondsSinceMidnightAsTimeStringScalar = TimeScalarFactory
+      .createSecondsSinceMidnightAsTimeStringScalar();
     return GraphQLObjectType.newObject()
       .name("TimeAndDayOffset")
       .field(
@@ -50,36 +50,32 @@ public final class TimeScalarFactory {
     return GraphQLScalarType.newScalar()
       .name("Time")
       .description(DOCUMENTATION)
-      .coercing(
-        new Coercing<>() {
-          @Override
-          public String serialize(Object input) {
-            if (input instanceof Integer) {
-              return LocalTime.ofSecondOfDay((Integer) input % SECONDS_PER_DAY).format(FORMATTER);
-            }
-            return null;
+      .coercing(new Coercing<>() {
+        @Override
+        public String serialize(Object input) {
+          if (input instanceof Integer) {
+            return LocalTime.ofSecondOfDay((Integer) input % SECONDS_PER_DAY).format(FORMATTER);
           }
+          return null;
+        }
 
-          @Override
-          public Integer parseValue(Object input) {
-            try {
-              return LocalTime.from(FORMATTER.parse((CharSequence) input)).toSecondOfDay();
-            } catch (DateTimeParseException dtpe) {
-              throw new CoercingParseValueException(
-                "Expected type 'Time' but was '" + input + "'."
-              );
-            }
-          }
-
-          @Override
-          public Integer parseLiteral(Object input) {
-            if (input instanceof StringValue) {
-              return parseValue(((StringValue) input).getValue());
-            }
-            return null;
+        @Override
+        public Integer parseValue(Object input) {
+          try {
+            return LocalTime.from(FORMATTER.parse((CharSequence) input)).toSecondOfDay();
+          } catch (DateTimeParseException dtpe) {
+            throw new CoercingParseValueException("Expected type 'Time' but was '" + input + "'.");
           }
         }
-      )
+
+        @Override
+        public Integer parseLiteral(Object input) {
+          if (input instanceof StringValue) {
+            return parseValue(((StringValue) input).getValue());
+          }
+          return null;
+        }
+      })
       .build();
   }
 }

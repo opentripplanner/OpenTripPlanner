@@ -62,11 +62,9 @@ public class VehicleParkingGroup {
       return false;
     }
     final VehicleParkingGroup that = (VehicleParkingGroup) o;
-    return (
-      Objects.equals(coordinate, that.coordinate) &&
+    return (Objects.equals(coordinate, that.coordinate) &&
       Objects.equals(id, that.id) &&
-      Objects.equals(name, that.name)
-    );
+      Objects.equals(name, that.name));
   }
 
   @Override

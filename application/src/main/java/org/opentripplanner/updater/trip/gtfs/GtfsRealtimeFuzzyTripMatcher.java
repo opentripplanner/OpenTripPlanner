@@ -20,8 +20,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
  * feed back that information into a new TripDescriptor with proper trip_id.
  * <p>
- * The class should only be used if we know that the feed producer is unable to produce trip_ids in
- * the GTFS-RT feed.
+ * The class should only be used if we know that the feed producer is unable to produce trip_ids
+ * in the GTFS-RT feed.
  */
 public class GtfsRealtimeFuzzyTripMatcher {
 
@@ -94,7 +94,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {
         if (
           times.getScheduledDepartureTime(0) == startTime &&
-          servicesRunningForDate.contains(times.getServiceCode())
+            servicesRunningForDate.contains(times.getServiceCode())
         ) {
           return times.getTrip();
         }

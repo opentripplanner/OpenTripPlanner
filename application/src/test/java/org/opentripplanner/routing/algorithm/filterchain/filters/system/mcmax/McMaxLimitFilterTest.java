@@ -155,10 +155,9 @@ class McMaxLimitFilterTest {
   }
 
   private static String toStr(List<Itinerary> list) {
-    return list
-      .stream()
-      .map(i ->
-        "[ %d %d %s ]".formatted(
+    return list.stream()
+      .map(
+        i -> "[ %d %d %s ]".formatted(
           i.generalizedCost(),
           i.numberOfTransfers(),
           groupsToString(i.generalizedCost2().orElse(-1))
@@ -180,8 +179,7 @@ class McMaxLimitFilterTest {
           builder.bus(1, ++start, ++start, PLACES[i + 2]);
         }
       }
-      return builder
-        .itineraryBuilder()
+      return builder.itineraryBuilder()
         .withGeneralizedCost(Cost.costOfSeconds(c1))
         .withGeneralizedCost2(transitGroupIds)
         .build();

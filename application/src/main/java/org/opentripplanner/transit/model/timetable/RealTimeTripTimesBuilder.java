@@ -43,8 +43,8 @@ public class RealTimeTripTimesBuilder {
 
   /**
    * This constructor takes a ScheduledTripTimes (not base TripTimes) to enforce creating a new
-   * RealTimeTripTimes based on the scheduled info. RT updates are  NOT cumulative and this
-   * enforces copying the scheduled information, not the previous real-time update.
+   * RealTimeTripTimes based on the scheduled info. RT updates are NOT cumulative and this enforces
+   * copying the scheduled information, not the previous real-time update.
    * <p>
    * The arrival and departure times are left uninitialized by this constructor, and they need to
    * be set explicitly.
@@ -91,8 +91,8 @@ public class RealTimeTripTimesBuilder {
   }
 
   /**
-   * Returns a stream of the positions of the stops in these trip times (starting at 0). Useful
-   * for iterating over them.
+   * Returns a stream of the positions of the stops in these trip times (starting at 0). Useful for
+   * iterating over them.
    */
   public IntStream listStopPositions() {
     return IntStream.range(0, numberOfStops());
@@ -355,8 +355,7 @@ public class RealTimeTripTimesBuilder {
   }
 
   public RealTimeTripTimesBuilder withServiceCode(int serviceCode) {
-    this.scheduledTripTimes = scheduledTripTimes
-      .copyOfNoDuplication()
+    this.scheduledTripTimes = scheduledTripTimes.copyOfNoDuplication()
       .withServiceCode(serviceCode)
       .build();
     return this;

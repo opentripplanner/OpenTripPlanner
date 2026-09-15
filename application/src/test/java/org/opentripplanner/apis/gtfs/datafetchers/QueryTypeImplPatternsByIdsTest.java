@@ -23,8 +23,7 @@ class QueryTypeImplPatternsByIdsTest {
     var transitService = env.transitService();
     var pattern = transitService.listTripPatterns().iterator().next();
 
-    var result = subject
-      .patternsByIds()
+    var result = subject.patternsByIds()
       .get(
         DataFetchingSupport.dataFetchingEnvironment(
           null,
@@ -44,8 +43,7 @@ class QueryTypeImplPatternsByIdsTest {
 
     var ids = List.of("test:does-not-exist");
 
-    var result = subject
-      .patternsByIds()
+    var result = subject.patternsByIds()
       .get(DataFetchingSupport.dataFetchingEnvironment(null, Map.of("ids", ids), transitService));
 
     assertThat(result).isEmpty();

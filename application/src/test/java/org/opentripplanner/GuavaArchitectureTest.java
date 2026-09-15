@@ -10,8 +10,8 @@ import org.opentripplanner._support.arch.ArchComponent;
 
 /**
  * Restrict the use of the Guava library to an explicit white-list of classes. Guava is a huge
- * library and we want to keep the usage of it to a minimum - prefer the JDK or the OTP utils
- * where they provide an equivalent. If you need another Guava class, add it to the white-list
+ * library and we want to keep the usage of it to a minimum - prefer the JDK or the OTP utils where
+ * they provide an equivalent. If you need another Guava class, add it to the white-list
  * deliberately - do not work around this test.
  */
 public class GuavaArchitectureTest {
@@ -61,25 +61,22 @@ public class GuavaArchitectureTest {
     new DescribedPredicate<>("a Guava class not in the white-list") {
       @Override
       public boolean test(JavaClass javaClass) {
-        return (
-          isInGuava(javaClass) && !WHITE_LISTED_GUAVA_CLASSES.contains(topLevelClassName(javaClass))
-        );
+        return (isInGuava(javaClass) &&
+          !WHITE_LISTED_GUAVA_CLASSES.contains(topLevelClassName(javaClass)));
       }
     };
 
   @Test
   void enforceGuavaClassWhiteList() {
-    noClasses()
-      .should()
+    noClasses().should()
       .dependOnClassesThat(A_GUAVA_CLASS_NOT_IN_THE_WHITE_LIST)
       .check(ArchComponent.OTP_CLASSES);
   }
 
   private static boolean isInGuava(JavaClass javaClass) {
     var packageName = javaClass.getPackageName();
-    return (
-      packageName.equals(GUAVA_ROOT_PACKAGE) || packageName.startsWith(GUAVA_ROOT_PACKAGE + ".")
-    );
+    return (packageName.equals(GUAVA_ROOT_PACKAGE) ||
+      packageName.startsWith(GUAVA_ROOT_PACKAGE + "."));
   }
 
   /**

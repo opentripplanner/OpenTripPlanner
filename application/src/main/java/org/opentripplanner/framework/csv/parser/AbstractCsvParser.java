@@ -164,7 +164,8 @@ public abstract class AbstractCsvParser<T> {
     T value,
     Predicate<T> inRange,
     Object expectedRange
-  ) throws HandledCsvParseException {
+  )
+    throws HandledCsvParseException {
     if (!inRange.test(value)) {
       issueStore.add(
         new ValueOutsideRangeIssue(columnName, value, type, expectedRange, line(), issueType)

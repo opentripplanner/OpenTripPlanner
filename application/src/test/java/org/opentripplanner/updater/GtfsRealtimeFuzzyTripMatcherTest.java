@@ -29,11 +29,9 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   private final RegularStop STOP_2 = builder.stop("s2");
   private final Route ROUTE_A = builder.route(ROUTE_ID);
 
-  private final TransitTestEnvironment env = builder
-    .addTrip(
-      TripInput.of(TRIP_ID).withRoute(ROUTE_A).addStop(STOP_1, START_TIME).addStop(STOP_2, "08:00")
-    )
-    .build();
+  private final TransitTestEnvironment env = builder.addTrip(
+    TripInput.of(TRIP_ID).withRoute(ROUTE_A).addStop(STOP_1, START_TIME).addStop(STOP_2, "08:00")
+  ).build();
 
   @Test
   void noTripId() {

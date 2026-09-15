@@ -125,8 +125,8 @@ public class SpeedTest {
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
       transitRepository.getTripCalendar()
     );
-    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
-      registry.registerRepositorySnapshot(
+    RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle = registry
+      .registerRepositorySnapshot(
         timetableSnapshot,
         new TimetableRepositoryLifecycle(
           timetableSnapshot,
@@ -387,8 +387,8 @@ public class SpeedTest {
 
   /**
    * Save the result for the last sample run for each profile. Nothing happens if not all test-cases
-   * are run. This prevents the excluded tests-cases in the result file to be deleted, and the result
-   * to be copied to the expected-results file by mistake.
+   * are run. This prevents the excluded tests-cases in the result file to be deleted, and the
+   * result to be copied to the expected-results file by mistake.
    */
   private void saveTestCasesToResultFile() {
     for (var p : opts.profiles()) {

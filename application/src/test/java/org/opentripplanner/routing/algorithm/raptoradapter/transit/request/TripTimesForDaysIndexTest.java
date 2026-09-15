@@ -33,13 +33,12 @@ class TripTimesForDaysIndexTest {
   }
 
   /**
-   * Return a list of test-cases with the input and the expected result, both as Strings.
-   *  - input format:  1 2 | 3 4  Trips times, where each day is separated by a '|'.
-   *  - expected format: (<day>:<tripIndex for day>) for each departure.
+   * Return a list of test-cases with the input and the expected result, both as Strings. - input
+   * format: 1 2 | 3 4 Trips times, where each day is separated by a '|'. - expected format:
+   * (<day>:<tripIndex for day>) for each departure.
    *
-   *  Note!
-   *    A case like "1 | 1 | 1" is not valid, only two following days may overlap in time, and
-   *    the behaviour of {@link TripTimesForDaysIndex} in such cases is undefined.
+   * Note! A case like "1 | 1 | 1" is not valid, only two following days may overlap in time, and
+   * the behaviour of {@link TripTimesForDaysIndex} in such cases is undefined.
    */
   static List<Arguments> initializationTestCases() {
     return Arrays.stream(
@@ -111,13 +110,14 @@ class TripTimesForDaysIndexTest {
       1 | 3 | 2 4 5  ->  0:0 2:0 1:0 2:1 2:2
       1 | 4 | 2 3 5  ->  0:0 2:0 2:1 1:0 2:2
       1 | 5 | 2 3 4  ->  0:0 2:0 2:1 2:2 1:0
-      """.split("\n")
+      """
+        .split("\n")
     )
       .map(String::trim)
       .filter(s -> !s.isEmpty())
       .filter(s -> !s.startsWith("#"))
-      .map(s ->
-        Arguments.of(
+      .map(
+        s -> Arguments.of(
           s.substring(0, 14).replaceAll("\\[empty]", "").trim(),
           s.substring(18).replaceAll("\\[empty]", "").trim()
         )
@@ -156,8 +156,8 @@ class TripTimesForDaysIndexTest {
     // https://errorprone.info/bugpattern/StringSplitter
     var args = list.split("\\|", -1);
     return Arrays.stream(args)
-      .map(it ->
-        it.trim().isEmpty()
+      .map(
+        it -> it.trim().isEmpty()
           ? new int[0]
           : Arrays.stream(it.trim().split(" ")).mapToInt(Integer::parseInt).toArray()
       )

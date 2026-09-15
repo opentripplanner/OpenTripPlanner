@@ -18,19 +18,17 @@ public class OsmLevelFactory {
   }
 
   /**
-   * Create a list of OsmLevel objects for an entity by parsing the 'level' and 'layer' tags.
-   * If the level is parsed from the 'level' tag, the 'level:ref' tag is used for naming.
+   * Create a list of OsmLevel objects for an entity by parsing the 'level' and 'layer' tags. If the
+   * level is parsed from the 'level' tag, the 'level:ref' tag is used for naming.
    * <p>
-   * The 'level' tag is a zero-based floor number of a feature
-   * (where 0 is the ground level and -1 is the basement).
-   * See https://wiki.openstreetmap.org/wiki/Key:level.
+   * The 'level' tag is a zero-based floor number of a feature (where 0 is the ground level and
+   * -1 is the basement). See https://wiki.openstreetmap.org/wiki/Key:level.
    * <p>
    * The 'layer' tag is used to mark the vertical relationship between two intersecting features.
    * See https://wiki.openstreetmap.org/wiki/Key:layer.
    * <p>
-   * The 'level:ref' tag marks the floor an object is located at,
-   * based on the locally used method of indicating a specific floor.
-   * See https://wiki.openstreetmap.org/wiki/Key:level:ref.
+   * The 'level:ref' tag marks the floor an object is located at, based on the locally used
+   * method of indicating a specific floor. See https://wiki.openstreetmap.org/wiki/Key:level:ref.
    */
   public List<OsmLevel> createOsmLevelsForEntity(OsmEntity entity) {
     if (entity.hasTag("level")) {
@@ -115,8 +113,7 @@ public class OsmLevelFactory {
   }
 
   /**
-   * Try to create an OsmLevel from part of a level tag
-   * with an optional name from part of a tag.
+   * Try to create an OsmLevel from part of a level tag with an optional name from part of a tag.
    */
   @Nullable
   private OsmLevel createOsmLevelFromTagSubstrings(

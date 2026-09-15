@@ -112,7 +112,8 @@ class RouteRequestConfigTest {
       {
         "transferSlack": %s
       }
-      """.formatted(input)
+      """
+        .formatted(input)
     );
 
     var subject = RouteRequestConfig.mapRouteRequest(nodeAdapter);

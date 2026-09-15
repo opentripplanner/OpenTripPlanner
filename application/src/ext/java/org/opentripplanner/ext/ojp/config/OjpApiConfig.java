@@ -10,8 +10,7 @@ public class OjpApiConfig {
   public static OjpApiParameters mapParameters(String parameterName, NodeAdapter root) {
     var c = root.of(parameterName).since(V2_9).summary("Configuration for the OJP API.").asObject();
 
-    var hideFeedId = c
-      .of("hideFeedId")
+    var hideFeedId = c.of("hideFeedId")
       .since(V2_9)
       .summary("Hide the feed id in all API output, and add it to input ids.")
       .description(
@@ -19,8 +18,7 @@ public class OjpApiConfig {
           "feedId prefix."
       )
       .asBoolean(false);
-    var hardcodedInputFeedId = c
-      .of("hardcodedInputFeedId")
+    var hardcodedInputFeedId = c.of("hardcodedInputFeedId")
       .since(V2_9)
       .summary("The hardcoded feedId to add to all input ids.")
       .description(

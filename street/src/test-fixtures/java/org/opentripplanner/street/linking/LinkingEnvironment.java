@@ -59,8 +59,9 @@ public class LinkingEnvironment {
       split,
       TraverseModeSet.allModes(),
       BIDIRECTIONAL,
-      (v1, v2) ->
-        List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2))
+      (v1, v2) -> List.of(
+        TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2)
+      )
     );
     return disposable;
   }
@@ -71,8 +72,9 @@ public class LinkingEnvironment {
       split,
       TraverseModeSet.allModes(),
       BIDIRECTIONAL,
-      (v1, v2) ->
-        List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2))
+      (v1, v2) -> List.of(
+        TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2)
+      )
     );
     return disposable;
   }

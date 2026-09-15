@@ -13,8 +13,8 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
  * <p>
  * For writing data see {@link VehicleRentalRepository}
  * <p>
- * Extends {@link GeofencingZoneService} so consumers that only need zone queries can depend on the
- * narrower interface — geofencing zones are part of rental data (registered per network by the
+ * Extends {@link GeofencingZoneService} so consumers that only need zone queries can depend on
+ * the narrower interface — geofencing zones are part of rental data (registered per network by the
  * GBFS updater) and the rental service is their natural owner.
  */
 public interface VehicleRentalService extends GeofencingZoneService {

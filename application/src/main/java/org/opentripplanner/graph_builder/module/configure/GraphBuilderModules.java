@@ -86,7 +86,10 @@ public class GraphBuilderModules {
     GraphBuildCacheManager cacheManager
   ) {
     List<OsmProvider> providers = new ArrayList<>();
-    for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
+    for (
+      ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources
+        .getOsmConfiguredDataSource()
+    ) {
       providers.add(
         new DefaultOsmProvider(
           osmConfiguredDataSource.dataSource(),
@@ -337,8 +340,7 @@ public class GraphBuilderModules {
     @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources
   ) {
-    return dataSources
-      .stopConsolidation()
+    return dataSources.stopConsolidation()
       .map(ds -> StopConsolidationModule.of(transitRepository, repo, ds))
       .orElse(null);
   }

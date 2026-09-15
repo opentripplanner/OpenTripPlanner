@@ -30,9 +30,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Integration tests that exercise the walk-to/from-carpool behavior added to
  * {@link DefaultCarpoolingService}. The graph places the passenger's origin and destination on
- * pedestrian-only edges, so the snapper must find a nearby car-reachable vertex and the
- * resulting itinerary must contain leading and trailing WALK {@link StreetLeg}s around the
- * carpool leg.
+ * pedestrian-only edges, so the snapper must find a nearby car-reachable vertex and the resulting
+ * itinerary must contain leading and trailing WALK {@link StreetLeg}s around the carpool leg.
  *
  * <pre>
  *   A ====== B ============= C ====== D          (=  biStreet: car + ped)
@@ -45,18 +44,18 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  *   <li>{@code A} — carpool trip origin (where the driver starts).
  *   <li>{@code D} — carpool trip destination (where the driver ends).
  *   <li>{@code B} — drivable mid-route intersection nearest to the passenger's origin; the snapper
- *       resolves it as the car-reachable pickup vertex because {@code P} sits on a
- *       pedestrian-only side branch the car cannot enter.
+ *       resolves it as the car-reachable pickup vertex because {@code P} sits on a pedestrian-only side
+ *       branch the car cannot enter.
  *   <li>{@code C} — drivable mid-route intersection nearest to the passenger's destination; the
  *       snapper resolves it as the car-reachable dropoff vertex for the same reason.
- *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch
- *       from B.
- *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side
- *       branch from C.
+ *   <li>{@code P} — passenger origin, off the drivable network on a pedestrian-only side branch from
+ *       B.
+ *   <li>{@code Q} — passenger destination, off the drivable network on a pedestrian-only side branch
+ *       from C.
  * </ul>
  *
- * The expected itinerary therefore walks {@code P → B}, drives {@code B → C} as a carpool leg,
- * and walks {@code C → Q}.
+ * The expected itinerary therefore walks {@code P → B}, drives {@code B → C} as a carpool leg, and
+ * walks {@code C → Q}.
  */
 class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
 
@@ -68,48 +67,45 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
   private static final WgsCoordinate PASSENGER_REQUESTED_PICKUP = B_COORD.moveSouthMeters(80);
   private static final WgsCoordinate PASSENGER_REQUESTED_DROPOFF = C_COORD.moveSouthMeters(80);
   private static final ZoneId ZONE = ZoneId.of("Europe/Oslo");
-  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0).atZone(
-    ZONE
-  );
+  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0)
+    .atZone(ZONE);
 
   private DefaultCarpoolingService service;
   private CarpoolingServiceTestContext context;
 
   @BeforeEach
   void setUp() {
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", TRIP_START);
-          var B = intersection("B", B_COORD);
-          var C = intersection("C", C_COORD);
-          var D = intersection("D", TRIP_END);
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", TRIP_START);
+        var B = intersection("B", B_COORD);
+        var C = intersection("C", C_COORD);
+        var D = intersection("D", TRIP_END);
 
-          var P = intersection("P", PASSENGER_REQUESTED_PICKUP);
-          var Q = intersection("Q", PASSENGER_REQUESTED_DROPOFF);
+        var P = intersection("P", PASSENGER_REQUESTED_PICKUP);
+        var Q = intersection("Q", PASSENGER_REQUESTED_DROPOFF);
 
-          biStreet(A, B, 500);
-          biStreet(B, C, 1000);
-          biStreet(C, D, 500);
-          // Passenger pickup and dropoff sit on pedestrian-only side branches off the main road.
-          street(
-            B,
-            P,
-            80,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(
-            C,
-            Q,
-            80,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-        }
+        biStreet(A, B, 500);
+        biStreet(B, C, 1000);
+        biStreet(C, D, 500);
+        // Passenger pickup and dropoff sit on pedestrian-only side branches off the main road.
+        street(
+          B,
+          P,
+          80,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(
+          C,
+          Q,
+          80,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
       }
-    );
+    });
 
     context = CarpoolingServiceTestContext.of(model);
     service = context.service();
@@ -178,16 +174,14 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
       );
       assertTrue(
         walkToPickup.from().coordinate.sameLocation(PASSENGER_REQUESTED_PICKUP),
-        () ->
-          "Walk-to-pickup should start at the passenger origin (P) " +
+        () -> "Walk-to-pickup should start at the passenger origin (P) " +
           PASSENGER_REQUESTED_PICKUP +
           " but started at " +
           walkToPickup.from().coordinate
       );
       assertTrue(
         walkToPickup.to().coordinate.sameLocation(B_COORD),
-        () ->
-          "Walk-to-pickup should end at the snapped pickup vertex B " +
+        () -> "Walk-to-pickup should end at the snapped pickup vertex B " +
           B_COORD +
           " but ended at " +
           walkToPickup.to().coordinate
@@ -204,16 +198,14 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
       );
       assertTrue(
         carpoolLeg.from().coordinate.sameLocation(B_COORD),
-        () ->
-          "Carpool leg should board at vertex B " +
+        () -> "Carpool leg should board at vertex B " +
           B_COORD +
           " but boarded at " +
           carpoolLeg.from().coordinate
       );
       assertTrue(
         carpoolLeg.to().coordinate.sameLocation(C_COORD),
-        () ->
-          "Carpool leg should alight at vertex C " +
+        () -> "Carpool leg should alight at vertex C " +
           C_COORD +
           " but alighted at " +
           carpoolLeg.to().coordinate
@@ -240,16 +232,14 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
       );
       assertTrue(
         walkFromDropoff.from().coordinate.sameLocation(C_COORD),
-        () ->
-          "Walk-from-dropoff should start at the snapped dropoff vertex C " +
+        () -> "Walk-from-dropoff should start at the snapped dropoff vertex C " +
           C_COORD +
           " but started at " +
           walkFromDropoff.from().coordinate
       );
       assertTrue(
         walkFromDropoff.to().coordinate.sameLocation(PASSENGER_REQUESTED_DROPOFF),
-        () ->
-          "Walk-from-dropoff should end at the passenger destination (Q) " +
+        () -> "Walk-from-dropoff should end at the passenger destination (Q) " +
           PASSENGER_REQUESTED_DROPOFF +
           " but ended at " +
           walkFromDropoff.to().coordinate
@@ -259,10 +249,9 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
 
   /**
    * Verifies that the {@code {from}} / {@code {to}} placeholders on the booking URL expand to the
-   * carpool boarding/alighting vertices (B and C — where the passenger actually gets in and out
-   * of the car) and NOT the passenger's walking endpoints (P and Q). This is the case the user's
-   * spec explicitly called out: the coordinates must not be where the passenger starts/finishes
-   * walking.
+   * carpool boarding/alighting vertices (B and C — where the passenger actually gets in and out of
+   * the car) and NOT the passenger's walking endpoints (P and Q). This is the case the user's spec
+   * explicitly called out: the coordinates must not be where the passenger starts/finishes walking.
    */
   @Test
   void walkLegItinerary_bookingUrlUsesCarpoolBoardingPoints_notPassengerWalkEndpoints() {
@@ -272,11 +261,9 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
       TRIP_END,
       departureTime
     );
-    var trip = new CarpoolTripBuilder(baseTrip)
-      .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
-      )
-      .build();
+    var trip = new CarpoolTripBuilder(baseTrip).withPublicContactInformation(
+      ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
+    ).build();
     context.upsertTrip(trip);
 
     var results = service.routeDirect(buildDirectCarpoolRequest(SEARCH_TIME));

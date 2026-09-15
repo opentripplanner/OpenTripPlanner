@@ -15,10 +15,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 /**
  * A group of stopLocations, which can share a common Stoptime
  */
-public class GroupStop
-  extends AbstractTransitEntity<GroupStop, GroupStopBuilder>
-  implements StopLocation
-{
+public class GroupStop extends AbstractTransitEntity<GroupStop, GroupStopBuilder> implements
+  StopLocation {
 
   private final int index;
   private final List<StopLocation> stopLocations;
@@ -125,11 +123,9 @@ public class GroupStop
 
   @Override
   public boolean sameAs(GroupStop other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
-      Objects.equals(stopLocations, other.getChildLocations())
-    );
+      Objects.equals(stopLocations, other.getChildLocations()));
   }
 
   @Override

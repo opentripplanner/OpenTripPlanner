@@ -32,13 +32,11 @@ public class GeoJsonWriter {
 
   /**
    * Write the issues to a GeoJSON file
+   *
    * @return true if a GeoJSON was written, false if not
    */
   boolean writeFile() {
-    var filteredIssues = issues
-      .stream()
-      .filter(issue -> issue.getGeometry() != null)
-      .toList();
+    var filteredIssues = issues.stream().filter(issue -> issue.getGeometry() != null).toList();
 
     if (filteredIssues.isEmpty()) {
       return false;
@@ -59,8 +57,8 @@ public class GeoJsonWriter {
   }
 
   /**
-   * Create a geotools feature collection from a list of data import issues.
-   * Once in a FeatureCollection, they can for example be exported as GeoJSON.
+   * Create a geotools feature collection from a list of data import issues. Once in a
+   * FeatureCollection, they can for example be exported as GeoJSON.
    */
   private static SimpleFeatureCollection makeContourFeatures(Collection<DataImportIssue> issues) {
     SimpleFeatureType schema = makeDataIssueSchema();

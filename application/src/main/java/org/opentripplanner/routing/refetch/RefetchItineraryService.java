@@ -83,16 +83,20 @@ public class RefetchItineraryService {
 
   /// Refetch an itinerary
   ///
-  /// @param from An optional from location. If null the first legReference will be the start of the itinerary.
-  /// @param to An optional to location. If null the last legReference will be the end of the itinerary.
+  /// @param from          An optional from location. If null the first legReference will be the
+  ///                      start of the itinerary.
+  /// @param to            An optional to location. If null the last legReference will be the end of
+  ///                      the itinerary.
   /// @param legReferences A list of leg references describing the parts of the itinerary.
-  /// @throws RefetchItineraryException If there is some issue with the input values that should be mapped so some kind of InvalidInput message to the user.
+  /// @throws RefetchItineraryException If there is some issue with the input values that should be
+  ///                                   mapped so some kind of InvalidInput message to the user.
   public Itinerary refetchItinerary(
     @Nullable GenericLocation from,
     @Nullable GenericLocation to,
     List<LegReference> legReferences,
     RouteRequest routeRequest
-  ) throws RefetchItineraryException {
+  )
+    throws RefetchItineraryException {
     if (legReferences.isEmpty()) {
       throw new IllegalArgumentException("legReferences must not be empty");
     }
@@ -142,10 +146,7 @@ public class RefetchItineraryService {
       return false;
     }
     // See if the location is a StopLocationGroup and contains the stop
-    return stopGroup
-      .getChildStops()
-      .stream()
-      .anyMatch(child -> child.getId().equals(stop.getId()));
+    return stopGroup.getChildStops().stream().anyMatch(child -> child.getId().equals(stop.getId()));
   }
 
   private List<ScheduledTransitLeg> getScheduledTransitLegs(List<LegReference> legReferences) {
@@ -181,14 +182,8 @@ public class RefetchItineraryService {
       var firstStop = findVertex(firstLeg.from());
       var boardSlack = routeRequest.preferences().transit().boardSlack().valueOf(firstLeg.mode());
       var time = firstLeg.startTime().toInstant().minus(boardSlack);
-      var access = accessEgress(
-        fromVertices,
-        Set.of(firstStop),
-        routeRequest,
-        mode,
-        time,
-        true
-      ).orElseThrow(() -> new RefetchItineraryException("Could not calculate access"));
+      var access = accessEgress(fromVertices, Set.of(firstStop), routeRequest, mode, time, true)
+        .orElseThrow(() -> new RefetchItineraryException("Could not calculate access"));
       legs.addAll(access);
     }
 
@@ -210,8 +205,8 @@ public class RefetchItineraryService {
           .withStartTime(transferStartTime)
           .build();
 
-        var transferLegs = transfer(transferFrom, transferTo, request).orElseThrow(() ->
-          new RefetchItineraryException(
+        var transferLegs = transfer(transferFrom, transferTo, request).orElseThrow(
+          () -> new RefetchItineraryException(
             "Could not transfer from " + transferFrom.getId() + " to " + transferTo.getId()
           )
         );
@@ -227,14 +222,8 @@ public class RefetchItineraryService {
       var lastStop = findVertex(lastLeg.to());
       var alightSlack = routeRequest.preferences().transit().alightSlack().valueOf(lastLeg.mode());
       var time = lastLeg.endTime().toInstant().plus(alightSlack);
-      var egress = accessEgress(
-        Set.of(lastStop),
-        toVertices,
-        routeRequest,
-        mode,
-        time,
-        false
-      ).orElseThrow(() -> new RefetchItineraryException("Could not calculate egress"));
+      var egress = accessEgress(Set.of(lastStop), toVertices, routeRequest, mode, time, false)
+        .orElseThrow(() -> new RefetchItineraryException("Could not calculate egress"));
       legs.addAll(egress);
     }
     return Itinerary.ofScheduledTransit(legs)
@@ -268,8 +257,7 @@ public class RefetchItineraryService {
       arriveBy
     );
 
-    return search
-      .getPathsToTarget()
+    return search.getPathsToTarget()
       .stream()
       .min(Comparator.comparing(StreetPath::weight))
       .map(this::streetPathToLegs);
@@ -283,8 +271,7 @@ public class RefetchItineraryService {
     Instant time,
     boolean arriveBy
   ) {
-    var maxDuration = routeRequest
-      .preferences()
+    var maxDuration = routeRequest.preferences()
       .street()
       .accessEgress()
       .maxDuration()
@@ -312,8 +299,7 @@ public class RefetchItineraryService {
     StreetSearchRequest transferRequest
   ) {
     var mode = transferRequest.mode();
-    return transferService
-      .findTransfersByStop(from)
+    return transferService.findTransfersByStop(from)
       .stream()
       .filter(pathTransfer -> pathTransfer.to.equals(to) && pathTransfer.getModes().contains(mode))
       .flatMap(pathTransfer -> mapPathTransferStreetPath(pathTransfer, transferRequest).stream())

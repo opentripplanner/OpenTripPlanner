@@ -10,9 +10,9 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 
 /**
  * Every binding in {@link RequestScopedModule} must be pinned to the {@link HttpRequestScoped}
- * scope — an unscoped {@code @Provides} method would be re-created on every injection point
- * instead of once per HTTP request, breaking the consistent view of real-time data the module is
- * meant to guarantee.
+ * scope — an unscoped {@code @Provides} method would be re-created on every injection point instead
+ * of once per HTTP request, breaking the consistent view of real-time data the module is meant to
+ * guarantee.
  */
 class RequestScopedModuleTest {
 
@@ -29,8 +29,6 @@ class RequestScopedModuleTest {
       "All @Provides methods in %s must also be annotated @HttpRequestScoped, but these are not: %s",
       RequestScopedModule.class.getSimpleName(),
       unscoped
-    )
-      .that(unscoped)
-      .isEmpty();
+    ).that(unscoped).isEmpty();
   }
 }

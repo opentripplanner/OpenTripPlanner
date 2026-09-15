@@ -175,8 +175,9 @@ class RouteRequestMapperScooterTest {
       )
     );
     var allowedEnv = testCtx.executionContext(scooterArgs);
-    assertThrows(InvalidInputException.class, () ->
-      RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
+    assertThrows(
+      InvalidInputException.class,
+      () -> RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
     );
 
     scooterArgs = testCtx.basicRequest();

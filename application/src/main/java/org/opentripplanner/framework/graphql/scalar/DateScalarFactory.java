@@ -42,40 +42,38 @@ public class DateScalarFactory {
     return GraphQLScalarType.newScalar()
       .name(scalarName)
       .description(description)
-      .coercing(
-        new Coercing<LocalDate, String>() {
-          @Override
-          public String serialize(Object input) throws CoercingSerializeException {
-            if (input instanceof LocalDate) {
-              return ((LocalDate) input).toString();
-            }
+      .coercing(new Coercing<LocalDate, String>() {
+        @Override
+        public String serialize(Object input) throws CoercingSerializeException {
+          if (input instanceof LocalDate) {
+            return ((LocalDate) input).toString();
+          }
 
-            throw new CoercingSerializeException(
-              "Only %s is supported to serialize but found %s".formatted(scalarName, input)
+          throw new CoercingSerializeException(
+            "Only %s is supported to serialize but found %s".formatted(scalarName, input)
+          );
+        }
+
+        @Override
+        public LocalDate parseValue(Object input) throws CoercingParseValueException {
+          try {
+            return LocalDate.from(FORMATTER.parse((String) input));
+          } catch (DateTimeParseException e) {
+            throw new CoercingParseValueException(
+              "Expected type '%s' but was '%s'.".formatted(scalarName, input)
             );
           }
-
-          @Override
-          public LocalDate parseValue(Object input) throws CoercingParseValueException {
-            try {
-              return LocalDate.from(FORMATTER.parse((String) input));
-            } catch (DateTimeParseException e) {
-              throw new CoercingParseValueException(
-                "Expected type '%s' but was '%s'.".formatted(scalarName, input)
-              );
-            }
-          }
-
-          @Override
-          public LocalDate parseLiteral(Object input) throws CoercingParseLiteralException {
-            if (input instanceof StringValue) {
-              return parseValue(((StringValue) input).getValue());
-            }
-
-            throw new CoercingParseLiteralException("Expected String type but found " + input);
-          }
         }
-      )
+
+        @Override
+        public LocalDate parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof StringValue) {
+            return parseValue(((StringValue) input).getValue());
+          }
+
+          throw new CoercingParseLiteralException("Expected String type but found " + input);
+        }
+      })
       .build();
   }
 }

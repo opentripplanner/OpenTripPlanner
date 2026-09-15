@@ -39,39 +39,37 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   @BeforeEach
   protected void setUp() throws Exception {
     // TODO this could be reimplemented to use StreetModelForTest
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          var isolated = intersection("isolated", ORIGIN.moveNorthMeters(1000));
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        var isolated = intersection("isolated", ORIGIN.moveNorthMeters(1000));
 
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(100));
-          var C = intersection("C", ORIGIN.moveEastMeters(200));
-          var D = intersection("D", ORIGIN.moveEastMeters(300));
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(100));
+        var C = intersection("C", ORIGIN.moveEastMeters(200));
+        var D = intersection("D", ORIGIN.moveEastMeters(300));
 
-          biStreet(A, B, 100);
-          biStreet(B, C, 100);
-          biStreet(C, D, 100);
+        biStreet(A, B, 100);
+        biStreet(B, C, 100);
+        biStreet(C, D, 100);
 
-          isolatedStop = stop("IsolatedStop", isolated.toWgsCoordinate());
-          stopA = stop("StopA", A.toWgsCoordinate());
-          stopB = stop("StopB", B.toWgsCoordinate());
-          stopC = stop("StopC", C.toWgsCoordinate());
-          stopD = stop("StopD", D.toWgsCoordinate());
+        isolatedStop = stop("IsolatedStop", isolated.toWgsCoordinate());
+        stopA = stop("StopA", A.toWgsCoordinate());
+        stopB = stop("StopB", B.toWgsCoordinate());
+        stopC = stop("StopC", C.toWgsCoordinate());
+        stopD = stop("StopD", D.toWgsCoordinate());
 
-          biLink(A, stopA);
-          biLink(B, stopB);
-          biLink(C, stopC);
-          biLink(D, stopD);
-          var vertexLinker = VertexLinkerTestFactory.of(graph());
-          linkingContextFactory = new LinkingContextFactory(
-            graph(),
-            new VertexCreationService(vertexLinker)
-          );
-        }
+        biLink(A, stopA);
+        biLink(B, stopB);
+        biLink(C, stopC);
+        biLink(D, stopD);
+        var vertexLinker = VertexLinkerTestFactory.of(graph());
+        linkingContextFactory = new LinkingContextFactory(
+          graph(),
+          new VertexCreationService(vertexLinker)
+        );
       }
-    );
+    });
   }
 
   @Test
@@ -229,10 +227,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   }
 
   static List<NearbyStop> sort(Collection<NearbyStop> stops) {
-    return stops
-      .stream()
-      .sorted(Comparator.comparing(x -> x.distance))
-      .toList();
+    return stops.stream().sorted(Comparator.comparing(x -> x.distance)).toList();
   }
 
   /**
@@ -262,8 +257,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   }
 
   private List<NearbyStop> simplify(List<NearbyStop> closestStops) {
-    return closestStops
-      .stream()
+    return closestStops.stream()
       .map(ns -> new NearbyStop(ns.stopId, ns.distance, null, null))
       .collect(Collectors.toList());
   }

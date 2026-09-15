@@ -78,7 +78,8 @@ public class ServerConfigTest {
           ]
         }
       }
-      """.replace("OBJECT", traceParameterJson)
+      """
+        .replace("OBJECT", traceParameterJson)
     );
     assertThrows(IllegalArgumentException.class, () -> new ServerConfig("server", root));
   }

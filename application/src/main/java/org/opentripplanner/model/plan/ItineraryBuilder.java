@@ -151,29 +151,26 @@ public class ItineraryBuilder {
   }
 
   /**
-   * Decorate the existing legs with new information. This method takes a lambda to make sure
-   * the caller uses the right set of legs as abase for the decoration, and not just set a
-   * new set of legs - which may lead to information loss.
+   * Decorate the existing legs with new information. This method takes a lambda to make sure the
+   * caller uses the right set of legs as abase for the decoration, and not just set a new set of
+   * legs - which may lead to information loss.
    */
   public ItineraryBuilder transformLegs(Function<Leg, Leg> legMapper) {
     return withLegs(legs.stream().map(legMapper).toList());
   }
 
   /**
-   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
-   * legs of this Itinerary.
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the legs
+   * of this Itinerary.
    */
   public ItineraryBuilder transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
-    legs = legs
-      .stream()
-      .map(l -> {
-        if (l instanceof TransitLeg tl) {
-          return mapper.apply(tl);
-        } else {
-          return l;
-        }
-      })
-      .toList();
+    legs = legs.stream().map(l -> {
+      if (l instanceof TransitLeg tl) {
+        return mapper.apply(tl);
+      } else {
+        return l;
+      }
+    }).toList();
     return this;
   }
 

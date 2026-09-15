@@ -55,14 +55,11 @@ class StopEventParamsMapperTest {
   void maxDistance() {
     var params = MAPPER.extractStopEventParams(
       new OJPStopEventRequestStructure().withLocation(
-        new PlaceContextStructure()
-          .withDepArrTime(new XmlDateTime(ZDT))
+        new PlaceContextStructure().withDepArrTime(new XmlDateTime(ZDT))
           .withIndividualTransportOption(
-            new IndividualTransportOptionStructure()
-              .withItModeAndModeOfOperation(
-                new ItModesStructure().withPersonalMode(PersonalModesEnumeration.FOOT)
-              )
-              .withMaxDistance(10)
+            new IndividualTransportOptionStructure().withItModeAndModeOfOperation(
+              new ItModesStructure().withPersonalMode(PersonalModesEnumeration.FOOT)
+            ).withMaxDistance(10)
           )
       )
     );
@@ -100,8 +97,7 @@ class StopEventParamsMapperTest {
   void lineFilterInclude() {
     var params = MAPPER.extractStopEventParams(
       lineFilter(
-        new LineDirectionFilterStructure()
-          .withExclude(true)
+        new LineDirectionFilterStructure().withExclude(true)
           .withLine(
             new LineDirectionStructure().withLineRef(
               new LineRefStructure().withValue(LINE_ID.toString())
@@ -121,8 +117,7 @@ class StopEventParamsMapperTest {
   void lineFilterExclude() {
     var params = MAPPER.extractStopEventParams(
       lineFilter(
-        new LineDirectionFilterStructure()
-          .withExclude(false)
+        new LineDirectionFilterStructure().withExclude(false)
           .withLine(
             new LineDirectionStructure().withLineRef(
               new LineRefStructure().withValue(LINE_ID.toString())
@@ -163,8 +158,7 @@ class StopEventParamsMapperTest {
     var params = MAPPER.extractStopEventParams(
       stopEvent(
         new StopEventParamStructure().withModeFilter(
-          new ModeFilterStructure()
-            .withExclude(false)
+          new ModeFilterStructure().withExclude(false)
             .withPtMode(VehicleModesOfTransportEnumeration.BUS)
         )
       )
@@ -193,8 +187,8 @@ class StopEventParamsMapperTest {
   }
 
   private static OJPStopEventRequestStructure stopEvent(StopEventParamStructure p) {
-    return new OJPStopEventRequestStructure()
-      .withLocation(new PlaceContextStructure().withDepArrTime(new XmlDateTime(ZDT)))
-      .withParams(p);
+    return new OJPStopEventRequestStructure().withLocation(
+      new PlaceContextStructure().withDepArrTime(new XmlDateTime(ZDT))
+    ).withParams(p);
   }
 }

@@ -175,8 +175,8 @@ public class OtpHttpClient {
   }
 
   /**
-   * Send an HTTP POST request with Content-Type: application/json. The body of the request
-   * is defined by {@code jsonBody}.
+   * Send an HTTP POST request with Content-Type: application/json. The body of the request is
+   * defined by {@code jsonBody}.
    */
   public <T> T postJsonAndMap(
     URI uri,
@@ -222,8 +222,11 @@ public class OtpHttpClient {
     HttpHeaders headers,
     ResponseMapper<T> responseMapper
   ) {
-    return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response ->
-      mapResponse(response, responseMapper)
+    return executeAndMapWithResponseHandler(
+      httpRequest,
+      timeout,
+      headers,
+      response -> mapResponse(response, responseMapper)
     );
   }
 
@@ -387,14 +390,12 @@ public class OtpHttpClient {
   }
 
   /**
-   * Returns true if the HTTP status code is not in the range [200,300[, except for the code
-   * 304 NOT_MODIFIED which is not a failed request.
+   * Returns true if the HTTP status code is not in the range [200,300[, except for the code 304
+   * NOT_MODIFIED which is not a failed request.
    */
   private static boolean isFailedRequest(org.apache.hc.core5.http.HttpResponse response) {
-    return (
-      (response.getCode() < SC_OK || response.getCode() >= SC_REDIRECTION) &&
-      response.getCode() != SC_NOT_MODIFIED
-    );
+    return ((response.getCode() < SC_OK || response.getCode() >= SC_REDIRECTION) &&
+      response.getCode() != SC_NOT_MODIFIED);
   }
 
   /**
@@ -408,12 +409,11 @@ public class OtpHttpClient {
     try {
       if (
         log.isTraceEnabled() &&
-        response.getEntity() != null &&
-        response.getEntity().getContent() != null
+          response.getEntity() != null &&
+          response.getEntity().getContent() != null
       ) {
         var entity = response.getEntity();
-        String content = new BufferedReader(new InputStreamReader(entity.getContent()))
-          .lines()
+        String content = new BufferedReader(new InputStreamReader(entity.getContent())).lines()
           .collect(Collectors.joining("\n"));
         log.trace("HTTP request failed with status code {}: \n{}", response.getCode(), content);
       }

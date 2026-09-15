@@ -32,20 +32,19 @@ class OffsetDateTimeRangeUtilTest {
       new GraphQLTypes.GraphQLOffsetDateTimeRangeInput(Map.of())
     );
 
-    assertThat(OffsetDateTimeRangeUtil.mapRanges(ranges, FIELD))
-      .containsExactly(
-        TimePeriod.of(START.toInstant(), END.toInstant()),
-        TimePeriod.of(START.toInstant(), null),
-        TimePeriod.of(null, END.toInstant()),
-        TimePeriod.ofUnbounded()
-      )
-      .inOrder();
+    assertThat(OffsetDateTimeRangeUtil.mapRanges(ranges, FIELD)).containsExactly(
+      TimePeriod.of(START.toInstant(), END.toInstant()),
+      TimePeriod.of(START.toInstant(), null),
+      TimePeriod.of(null, END.toInstant()),
+      TimePeriod.ofUnbounded()
+    ).inOrder();
   }
 
   @Test
   void emptyRangesAreForbidden() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      OffsetDateTimeRangeUtil.mapRanges(List.of(), FIELD)
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> OffsetDateTimeRangeUtil.mapRanges(List.of(), FIELD)
     );
     assertThat(exception.getMessage()).isEqualTo(
       "Time range filter 'runningTimeRanges' must be either null or have at least one entry."
@@ -54,8 +53,9 @@ class OffsetDateTimeRangeUtilTest {
 
   @Test
   void startAfterEndIsForbidden() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      OffsetDateTimeRangeUtil.mapRange(END, START, FIELD)
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> OffsetDateTimeRangeUtil.mapRange(END, START, FIELD)
     );
     assertThat(exception.getMessage()).isEqualTo(
       "The start of the time range 'runningTimeRanges' must not be after its end."

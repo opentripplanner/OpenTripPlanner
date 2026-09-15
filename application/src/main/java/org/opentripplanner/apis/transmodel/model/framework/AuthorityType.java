@@ -67,9 +67,8 @@ public class AuthorityType {
           .name("lines")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
-          .dataFetcher(environment ->
-            getTransitService(environment)
-              .listRoutes()
+          .dataFetcher(
+            environment -> getTransitService(environment).listRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getAgency(), environment.getSource()))
               .collect(Collectors.toList())
@@ -82,10 +81,9 @@ public class AuthorityType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("Get all situations active for the authority.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitAlertService(environment).getAgencyAlerts(
-              ((Agency) environment.getSource()).getId()
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getTransitAlertService(environment)
+              .getAgencyAlerts(((Agency) environment.getSource()).getId())
           )
           .build()
       )

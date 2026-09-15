@@ -6,13 +6,12 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySna
 
 /**
  * Copy-on-write / freeze lifecycle for the realtime-vehicle repository. Each transaction that
- * writes vehicles gets a new mutable repository initialized from the last committed snapshot, and
- * a new immutable snapshot is published when the transaction commits. Edits made to a repository
- * that is never frozen are simply discarded — this supports transaction rollback in the future.
+ * writes vehicles gets a new mutable repository initialized from the last committed snapshot, and a
+ * new immutable snapshot is published when the transaction commits. Edits made to a repository that
+ * is never frozen are simply discarded — this supports transaction rollback in the future.
  */
-public class RealtimeVehicleRepositoryLifecycle
-  implements RepositoryLifecycle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository>
-{
+public class RealtimeVehicleRepositoryLifecycle implements
+  RepositoryLifecycle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> {
 
   @Override
   public RealtimeVehicleRepository copyOnWrite(RealtimeVehicleRepositorySnapshot snapshot) {

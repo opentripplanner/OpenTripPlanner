@@ -38,8 +38,8 @@ public class RentalVehicleTypeType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("propulsionType")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
-          .dataFetcher(environment ->
-            ((RentalVehicleType) environment.getSource()).propulsionType()
+          .dataFetcher(
+            environment -> ((RentalVehicleType) environment.getSource()).propulsionType()
           )
           .build()
       )
@@ -47,8 +47,8 @@ public class RentalVehicleTypeType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("maxRangeMeters")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            ((RentalVehicleType) environment.getSource()).maxRangeMeters()
+          .dataFetcher(
+            environment -> ((RentalVehicleType) environment.getSource()).maxRangeMeters()
           )
           .build()
       )

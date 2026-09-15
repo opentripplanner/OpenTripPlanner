@@ -43,13 +43,11 @@ class CancellationTest implements RealtimeTestConstants {
 
     assertFalse(env.tripData(TRIP_1_ID).tripTimes().hasAnyUpdates());
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .arriveAimedExpected("0:00:10", "0:00:10")
           .departAimedExpected("0:00:11", "0:00:11")
           .call(STOP_B)
@@ -71,8 +69,7 @@ class CancellationTest implements RealtimeTestConstants {
 
     assertFalse(env.tripData(TRIP_1_ID).tripTimes().hasAnyUpdates());
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
@@ -84,8 +81,8 @@ class CancellationTest implements RealtimeTestConstants {
   }
 
   /**
-   * When a scheduled trip is modified (both trip times and stops) and subsequently cancelled,
-   * it should be marked as cancelled and reverted to its scheduled trip times and stops.
+   * When a scheduled trip is modified (both trip times and stops) and subsequently cancelled, it
+   * should be marked as cancelled and reverted to its scheduled trip times and stops.
    */
   @Test
   void testChangeQuayAndCancelScheduledTrip() {
@@ -105,8 +102,8 @@ class CancellationTest implements RealtimeTestConstants {
   }
 
   /**
-   * When an added trip is modified (both trip times and stops) and subsequently cancelled,
-   * it should be marked as cancelled and reverted to its initial trip times and stops
+   * When an added trip is modified (both trip times and stops) and subsequently cancelled, it
+   * should be marked as cancelled and reverted to its initial trip times and stops
    */
   @Test
   void testChangeQuayAndCancelAddedTrip() {
@@ -115,14 +112,14 @@ class CancellationTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
     var siri = SiriTestHelper.of(env);
 
-    var creation = new SiriEtBuilder(env.localTimeParser())
-      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+    var creation = new SiriEtBuilder(env.localTimeParser()).withEstimatedVehicleJourneyCode(
+      ADDED_TRIP_ID
+    )
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .arriveAimedExpected("0:00:10", "0:00:10")
           .departAimedExpected("0:00:11", "0:00:11")
           .call(STOP_B)
@@ -154,12 +151,10 @@ class CancellationTest implements RealtimeTestConstants {
   }
 
   private void changeQuayAndCancelTrip(SiriTestHelper siri, String tripId) {
-    var modification = siri
-      .etBuilder()
+    var modification = siri.etBuilder()
       .withDatedVehicleJourneyRef(tripId)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // change to another quay in the same station
           .call(STOP_C)
@@ -175,13 +170,11 @@ class CancellationTest implements RealtimeTestConstants {
       transitTestEnvironment.tripData(tripId).showTimetable()
     );
 
-    var cancellation = siri
-      .etBuilder()
+    var cancellation = siri.etBuilder()
       .withDatedVehicleJourneyRef(tripId)
       .withCancellation(true)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // change to another quay in the same station
           .call(STOP_C)

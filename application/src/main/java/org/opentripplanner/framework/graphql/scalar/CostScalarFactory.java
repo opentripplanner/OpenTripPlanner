@@ -20,7 +20,7 @@ public class CostScalarFactory {
 
   private static final String DOCUMENTATION =
     "A cost value, normally a value of 1 is equivalent to riding transit for 1 second, " +
-    "but it might not depending on the use-case. Format: 3665 = DT1h1m5s = 1h1m5s";
+      "but it might not depending on the use-case. Format: 3665 = DT1h1m5s = 1h1m5s";
 
   private static final GraphQLScalarType SCALAR_INSTANCE = createCostScalar();
 

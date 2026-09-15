@@ -31,14 +31,13 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
-   * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
+   * Schedule: Stop: 1 2 3 R1: 00:02 - 00:05 R2: 00:05 - 00:10
    * <p>
    * Access(stop 1) and egress(stop 3) is 30s.
    */
   @BeforeEach
   public void setup() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         --
@@ -66,8 +65,7 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
     data.withTransferCost(100);
 
     // NOTE! No search-window set
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .constrainedTransfers(true)
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
@@ -75,8 +73,7 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R3 0:15 0:20 ~ C ~ Walk 30s " +
+    var path = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R3 0:15 0:20 ~ C ~ Walk 30s " +
       "[0:01:30 0:20:30 19m Tₙ1 C₁2_500]";
     return RaptorModuleTestCase.of()
       .addMinDuration("9m", TX_1, T00_00, T00_30)

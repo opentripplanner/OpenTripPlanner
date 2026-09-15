@@ -51,9 +51,8 @@ public class FlexIntegrationTest {
     33.8694,
     -84.6233
   );
-  static Instant dateTime = ZonedDateTime.parse(
-    "2021-12-02T12:00:00-05:00[America/New_York]"
-  ).toInstant();
+  static Instant dateTime = ZonedDateTime.parse("2021-12-02T12:00:00-05:00[America/New_York]")
+    .toInstant();
 
   static Graph graph;
 
@@ -248,19 +247,16 @@ public class FlexIntegrationTest {
       .withTo(to)
       .withNumItineraries(10)
       .withSearchWindow(Duration.ofHours(2))
-      .withPreferences(p ->
-        p
-          .withStreet(s ->
-            s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
-          )
-          .withWalk(walk -> walk.withSafetyFactor(0))
+      .withPreferences(
+        p -> p.withStreet(
+          s -> s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+        ).withWalk(walk -> walk.withSafetyFactor(0))
       )
       .withJourney(journeyBuilder -> {
         var modes = JourneyRequest.DEFAULT.modes().copyOf();
 
         if (onlyDirect) {
-          modes
-            .withDirectMode(FLEXIBLE)
+          modes.withDirectMode(FLEXIBLE)
             .withAccessMode(StreetMode.WALK)
             .withEgressMode(StreetMode.WALK);
           journeyBuilder.withTransit(b -> b.disable());

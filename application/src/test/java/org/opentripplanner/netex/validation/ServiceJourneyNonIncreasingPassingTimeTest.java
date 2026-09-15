@@ -93,8 +93,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
 
     // remove arrival time and departure time and add flex window
     TimetabledPassingTime timetabledPassingTime = getFirstPassingTime(serviceJourney);
-    timetabledPassingTime
-      .withArrivalTime(null)
+    timetabledPassingTime.withArrivalTime(null)
       .withDepartureTime(null)
       .withEarliestDepartureTime(LocalTime.MIDNIGHT)
       .withLatestArrivalTime(LocalTime.MIDNIGHT.plusMinutes(1));
@@ -158,12 +157,10 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     HierarchicalMapById<ServiceJourney> serviceJourneyById = sample.getServiceJourneyById();
 
     // remove arrival time and departure time and add flex window
-    TimetabledPassingTime timetabledPassingTime = serviceJourney
-      .getPassingTimes()
+    TimetabledPassingTime timetabledPassingTime = serviceJourney.getPassingTimes()
       .getTimetabledPassingTime()
       .get(0);
-    timetabledPassingTime
-      .withArrivalTime(null)
+    timetabledPassingTime.withArrivalTime(null)
       .withDepartureTime(null)
       .withEarliestDepartureTime(LocalTime.MIDNIGHT.plusMinutes(1))
       .withLatestArrivalTime(LocalTime.MIDNIGHT);
@@ -243,8 +240,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
 
     // remove arrival time and departure time and add flex window on second stop
     TimetabledPassingTime timetabledPassingTime = getSecondPassingTime(serviceJourney);
-    timetabledPassingTime
-      .withEarliestDepartureTime(timetabledPassingTime.getDepartureTime())
+    timetabledPassingTime.withEarliestDepartureTime(timetabledPassingTime.getDepartureTime())
       .withLatestArrivalTime(timetabledPassingTime.getDepartureTime().plusMinutes(1))
       .withArrivalTime(null)
       .withDepartureTime(null);
@@ -276,8 +272,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     // remove arrival time and departure time and add flex window with decreasing time on second stop
     TimetabledPassingTime firstPassingTime = getFirstPassingTime(serviceJourney);
     TimetabledPassingTime secondPassingTime = getSecondPassingTime(serviceJourney);
-    secondPassingTime
-      .withEarliestDepartureTime(firstPassingTime.getDepartureTime().minusMinutes(1))
+    secondPassingTime.withEarliestDepartureTime(firstPassingTime.getDepartureTime().minusMinutes(1))
       .withArrivalTime(null)
       .withDepartureTime(null);
 
@@ -307,8 +302,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
 
     // remove arrival time and departure time and add flex window on first stop
     TimetabledPassingTime firstPassingTime = getFirstPassingTime(serviceJourney);
-    firstPassingTime
-      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+    firstPassingTime.withEarliestDepartureTime(firstPassingTime.getDepartureTime())
       .withLatestArrivalTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
@@ -339,15 +333,13 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
 
     // remove arrival time and departure time and add flex window on first stop
     TimetabledPassingTime firstPassingTime = getFirstPassingTime(serviceJourney);
-    firstPassingTime
-      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+    firstPassingTime.withEarliestDepartureTime(firstPassingTime.getDepartureTime())
       .withLatestArrivalTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
 
     TimetabledPassingTime secondPassingTime = getSecondPassingTime(serviceJourney);
-    secondPassingTime
-      .withEarliestDepartureTime(secondPassingTime.getDepartureTime())
+    secondPassingTime.withEarliestDepartureTime(secondPassingTime.getDepartureTime())
       .withLatestArrivalTime(secondPassingTime.getDepartureTime().plusMinutes(1))
       .withArrivalTime(null)
       .withDepartureTime(null);
@@ -382,15 +374,15 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     // remove arrival time and departure time and add flex window on first stop and second stop
     // and add decreasing time on second stop
     TimetabledPassingTime firstPassingTime = getFirstPassingTime(serviceJourney);
-    firstPassingTime
-      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+    firstPassingTime.withEarliestDepartureTime(firstPassingTime.getDepartureTime())
       .withLatestArrivalTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
 
     TimetabledPassingTime secondPassingTime = getSecondPassingTime(serviceJourney);
-    secondPassingTime
-      .withEarliestDepartureTime(firstPassingTime.getEarliestDepartureTime().minusMinutes(1))
+    secondPassingTime.withEarliestDepartureTime(
+      firstPassingTime.getEarliestDepartureTime().minusMinutes(1)
+    )
       .withLatestArrivalTime(secondPassingTime.getEarliestDepartureTime().plusMinutes(1))
       .withArrivalTime(null)
       .withDepartureTime(null);
@@ -425,15 +417,13 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     // remove arrival time and departure time and add flex window on first stop
     // and add decreasing time on second stop
     TimetabledPassingTime firstPassingTime = getFirstPassingTime(serviceJourney);
-    firstPassingTime
-      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+    firstPassingTime.withEarliestDepartureTime(firstPassingTime.getDepartureTime())
       .withLatestArrivalTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
 
     TimetabledPassingTime secondPassingTime = getSecondPassingTime(serviceJourney);
-    secondPassingTime
-      .withArrivalTime(firstPassingTime.getLatestArrivalTime().minusMinutes(1))
+    secondPassingTime.withArrivalTime(firstPassingTime.getLatestArrivalTime().minusMinutes(1))
       .withDepartureTime(null);
 
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
@@ -470,15 +460,9 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     JourneyPattern_VersionStructure journeyPattern,
     int order
   ) {
-    return (
-      (StopPointInJourneyPattern) journeyPattern
-        .getPointsInSequence()
-        .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-        .get(order)
-    )
-      .getScheduledStopPointRef()
-      .getValue()
-      .getRef();
+    return ((StopPointInJourneyPattern) journeyPattern.getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      .get(order)).getScheduledStopPointRef().getValue().getRef();
   }
 
   private String getFirstScheduledStopPointRef(JourneyPattern_VersionStructure journeyPattern) {

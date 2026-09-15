@@ -17,9 +17,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * the source trip stop arrival. The source is the "from" point in a transfer for a forward search,
  * and the "to" point in the reverse search.
  */
-public final class ConstrainedBoardingSearch
-  implements RaptorConstrainedBoardingSearch<TripSchedule>
-{
+public final class ConstrainedBoardingSearch implements
+  RaptorConstrainedBoardingSearch<TripSchedule> {
 
   /**
    * Abort the search after looking at 5 valid boardings. In the case where this happens, one of
@@ -148,9 +147,9 @@ public final class ConstrainedBoardingSearch
    * <p>
    * This method sets the following parameters if successful:
    * <ul>
-   *     <li>{@code onTripIndex}
-   *     <li>{@code onTripTxConstraint}
-   *     <li>{@code onTripEarliestBoardTime}
+   *   <li>{@code onTripIndex}
+   *   <li>{@code onTripTxConstraint}
+   *   <li>{@code onTripEarliestBoardTime}
    * </ul>
    *
    * @return {@code true} if a matching trip is found
@@ -221,9 +220,8 @@ public final class ConstrainedBoardingSearch
     return false;
   }
 
-  private static final class NoopRaptorConstrainedBoardingSearch
-    implements RaptorConstrainedBoardingSearch<TripSchedule>
-  {
+  private static final class NoopRaptorConstrainedBoardingSearch implements
+    RaptorConstrainedBoardingSearch<TripSchedule> {
 
     @Override
     public boolean transferExistTargetStop(int targetStopPos) {

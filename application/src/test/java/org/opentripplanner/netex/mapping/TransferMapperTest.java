@@ -40,8 +40,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -63,8 +62,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -83,8 +81,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -104,8 +101,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -124,8 +120,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -145,8 +140,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -165,8 +159,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -186,8 +179,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
       .withToPointRef(createStopRef(TO_STOP_ID))
@@ -205,8 +197,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
       .withToPointRef(createStopRef(TO_STOP_ID))
@@ -224,8 +215,7 @@ class TransferMapperTest {
     var issueStore = new DefaultDataImportIssueStore();
     var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -244,8 +234,7 @@ class TransferMapperTest {
     var issueStore = new DefaultDataImportIssueStore();
     var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -264,8 +253,7 @@ class TransferMapperTest {
     var issueStore = new DefaultDataImportIssueStore();
     var mapper = new TransferMapper(ID_FACTORY, issueStore, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -287,8 +275,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))
@@ -301,9 +288,9 @@ class TransferMapperTest {
   }
 
   /**
-   * When two visits to the same Quay use distinct ScheduledStopPoint IDs, the interchange
-   * reference is unambiguous — the SSP appears only once in the stop list, so both indexOf and
-   * lastIndexOf return the correct position. This is the ideal data modeling for loop patterns.
+   * When two visits to the same Quay use distinct ScheduledStopPoint IDs, the interchange reference
+   * is unambiguous — the SSP appears only once in the stop list, so both indexOf and lastIndexOf
+   * return the correct position. This is the ideal data modeling for loop patterns.
    */
   @Test
   void distinctSspPerVisitDisambiguatesLoopPattern() {
@@ -330,8 +317,7 @@ class TransferMapperTest {
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
     // Interchange references the first-visit SSP
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(transferStopVisit1))
@@ -360,8 +346,7 @@ class TransferMapperTest {
 
     var mapper = new TransferMapper(ID_FACTORY, DataImportIssueStore.NOOP, stopPointsIndex, trips);
 
-    var interchange = new ServiceJourneyInterchange()
-      .withId(INTERCHANGE_ID)
+    var interchange = new ServiceJourneyInterchange().withId(INTERCHANGE_ID)
       .withFromJourneyRef(createJourneyRef(FROM_JOURNEY_ID))
       .withToJourneyRef(createJourneyRef(TO_JOURNEY_ID))
       .withFromPointRef(createStopRef(FROM_STOP_ID))

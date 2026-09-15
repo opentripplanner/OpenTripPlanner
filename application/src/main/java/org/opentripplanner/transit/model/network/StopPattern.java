@@ -23,12 +23,12 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  * which a trip (GTFS) or vehicle journey (Transmodel) calls, irrespective of the day on which
  * service runs.
  * <p>
- * An important detail: Routes in GTFS are not a structurally important element, they just serve as
- * user-facing information. It is possible for the same journey pattern to appear in more than one
- * route.
+ * An important detail: Routes in GTFS are not a structurally important element, they just serve
+ * as user-facing information. It is possible for the same journey pattern to appear in more than
+ * one route.
  * <p>
- * OTP already has several classes that represent this same thing: A TripPattern in the context of
- * routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
+ * OTP already has several classes that represent this same thing: A TripPattern in the context
+ * of routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
  * loading process. A RouteVariant in the TransitIndex, which has a unique human-readable name and
  * belongs to a particular route.
  * <p>
@@ -39,8 +39,8 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  * complexity since we only consider the trip that departs soonest for each pattern. Field
  * calendarId has been removed. See issue #1320.
  * <p>
- * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key
- * for a TripPattern. Should the route be included in the StopPattern?
+ * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique
+ * key for a TripPattern. Should the route be included in the StopPattern?
  */
 public final class StopPattern implements Serializable {
 
@@ -87,8 +87,8 @@ public final class StopPattern implements Serializable {
   }
 
   /**
-   * This has package local access since a StopPattern is a part of a TripPattern. To change it
-   * use the {@link TripPattern#copyPlannedStopPattern()} method.
+   * This has package local access since a StopPattern is a part of a TripPattern. To change it use
+   * the {@link TripPattern#copyPlannedStopPattern()} method.
    */
   StopPatternBuilder copyOf() {
     return new StopPatternBuilder(this, null);
@@ -111,11 +111,9 @@ public final class StopPattern implements Serializable {
   public boolean equals(Object other) {
     if (other instanceof StopPattern) {
       StopPattern that = (StopPattern) other;
-      return (
-        Arrays.equals(this.stops, that.stops) &&
+      return (Arrays.equals(this.stops, that.stops) &&
         Arrays.equals(this.pickups, that.pickups) &&
-        Arrays.equals(this.dropoffs, that.dropoffs)
-      );
+        Arrays.equals(this.dropoffs, that.dropoffs));
     } else {
       return false;
     }
@@ -149,10 +147,8 @@ public final class StopPattern implements Serializable {
    * Checks that all stops ar non-routable.
    */
   public boolean isAllStopsNonRoutable() {
-    return (
-      Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
-      Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable)
-    );
+    return (Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
+      Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable));
   }
 
   /** Find the given stop position in the sequence, return -1 if not found. */
@@ -204,19 +200,17 @@ public final class StopPattern implements Serializable {
   }
 
   /**
-   * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given
-   * stop position, ONLY use this method if you would like to search the stop-pattern for a
-   * alighting.
+   * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given stop
+   * position, ONLY use this method if you would like to search the stop-pattern for a alighting.
    * <p>
-   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern,
-   * considering all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering
+   * all stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
-   * WARNING! This does not produce the same result as the {@link #canAlight(int)},
-   *          this method ALWAYS returns {@code false} for the first stop, while the
-   *          other method returns whatever is in the data. This method is probably the
-   *          correct way - but this is not a clear decision.
+   * WARNING! This does not produce the same result as the {@link #canAlight(int)}, this method
+   * ALWAYS returns {@code false} for the first stop, while the other method returns whatever is in
+   * the data. This method is probably the correct way - but this is not a clear decision.
    */
   boolean alightingExist(StopLocation stop) {
     // We skip the first stop, not allowed for alighting
@@ -234,19 +228,17 @@ public final class StopPattern implements Serializable {
   }
 
   /**
-   * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given
-   * stop position, ONLY use this method if you would like to search the stop-pattern for a
-   * boarding.
+   * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given stop
+   * position, ONLY use this method if you would like to search the stop-pattern for a boarding.
    * <p>
-   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern,
-   * considering all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering
+   * all stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
-   * WARNING! This does not produce the same result as the {@link #canBoard(int)},
-   *          this method ALWAYS returns {@code false} for the last stop, while the
-   *          other method returns whatever is in the data. This method is probably the
-   *          correct way - but this is not a clear decision.
+   * WARNING! This does not produce the same result as the {@link #canBoard(int)}, this method
+   * ALWAYS returns {@code false} for the last stop, while the other method returns whatever is in
+   * the data. This method is probably the correct way - but this is not a clear decision.
    */
   boolean boardingExist(StopLocation stop) {
     // We skip the last stop, not allowed for boarding
@@ -309,7 +301,7 @@ public final class StopPattern implements Serializable {
    * @param other Other instance of stop pattern with list of stops.
    * @param index Given index for stop
    * @return true if the stops have the same stations, else false. If any station is null then
-   * false.
+   *         false.
    */
   boolean sameStations(StopPattern other, int index) {
     var otherOrigin = other.getStop(index).getParentStation();
@@ -396,8 +388,8 @@ public final class StopPattern implements Serializable {
     }
 
     /**
-     * We want to deduplicate this as much as we can, since this is done
-     * millions of times during real-time updates.
+     * We want to deduplicate this as much as we can, since this is done millions of times during
+     * real-time updates.
      */
     public StopPattern build() {
       if (stops.isNotModified() && dropoffs.isNotModified() && pickups.isNotModified()) {

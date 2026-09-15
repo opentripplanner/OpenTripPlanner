@@ -12,8 +12,8 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
- * Checks that a platform (area) connects correctly to a stairway entering from outside.
- * The stair rises from below and meets the bottom-left corner of a square platform.
+ * Checks that a platform (area) connects correctly to a stairway entering from outside. The stair
+ * rises from below and meets the bottom-left corner of a square platform.
  */
 class PlatformWithStairsTest {
 
@@ -50,8 +50,9 @@ class PlatformWithStairsTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stair edges — wheelchair-inaccessible, as expected for steps
         "(-1,2.5) → (2,2.5) PEDESTRIAN ♿❌",

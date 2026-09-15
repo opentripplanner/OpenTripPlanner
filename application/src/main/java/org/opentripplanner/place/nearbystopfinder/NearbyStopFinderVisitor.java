@@ -26,14 +26,14 @@ import org.opentripplanner.utils.collection.MinMap;
  * A {@link TraverseVisitor} that collects transit stops and flex area stops during an A* search,
  * replacing the post-search scan of all SPT states in {@link StreetNearbyStopFinder}.
  * <p>
- * With {@code MinimumWeight} dominance and a trivial heuristic (Dijkstra), {@code visitVertex} is
- * called exactly once per vertex with the optimal state, producing the same result set as
+ * With {@code MinimumWeight} dominance and a trivial heuristic (Dijkstra), {@code visitVertex}
+ * is called exactly once per vertex with the optimal state, producing the same result set as
  * post-scan filtering of {@code getAllStates()}.
  */
 class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
 
-  private static final Predicate<Edge> CAN_BOARD_FLEX_PREDICATE = e ->
-    e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR);
+  private static final Predicate<Edge> CAN_BOARD_FLEX_PREDICATE = e -> e instanceof StreetEdge se &&
+    se.getPermission().allows(TraverseMode.CAR);
 
   private final Set<Vertex> originVertices;
   private final Set<Vertex> ignoreVertices;
@@ -68,8 +68,8 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
 
     if (
       OTPFeature.FlexRouting.isOn() &&
-      vertex instanceof StreetVertex streetVertex &&
-      !streetVertex.areaStops().isEmpty()
+        vertex instanceof StreetVertex streetVertex &&
+        !streetVertex.areaStops().isEmpty()
     ) {
       for (FeedScopedId id : streetVertex.areaStops()) {
         if (canBoardFlex(state)) {

@@ -18,9 +18,11 @@ public class TripOccupancyImpl implements GraphQLDataFetchers.GraphQLTripOccupan
         case MANY_SEATS_AVAILABLE -> GraphQLTypes.GraphQLOccupancyStatus.MANY_SEATS_AVAILABLE;
         case FEW_SEATS_AVAILABLE -> GraphQLTypes.GraphQLOccupancyStatus.FEW_SEATS_AVAILABLE;
         case STANDING_ROOM_ONLY -> GraphQLTypes.GraphQLOccupancyStatus.STANDING_ROOM_ONLY;
-        case CRUSHED_STANDING_ROOM_ONLY -> GraphQLTypes.GraphQLOccupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
+        case CRUSHED_STANDING_ROOM_ONLY ->
+          GraphQLTypes.GraphQLOccupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
         case FULL -> GraphQLTypes.GraphQLOccupancyStatus.FULL;
-        case NOT_ACCEPTING_PASSENGERS -> GraphQLTypes.GraphQLOccupancyStatus.NOT_ACCEPTING_PASSENGERS;
+        case NOT_ACCEPTING_PASSENGERS ->
+          GraphQLTypes.GraphQLOccupancyStatus.NOT_ACCEPTING_PASSENGERS;
       };
     };
   }

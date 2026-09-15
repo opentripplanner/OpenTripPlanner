@@ -7,21 +7,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Converts a street-search-derived generalized cost — the cost of an access, egress or transfer
- * leg — into a Raptor internal cost, clamping it to a sane maximum first.
+ * Converts a street-search-derived generalized cost — the cost of an access, egress or transfer leg
+ * — into a Raptor internal cost, clamping it to a sane maximum first.
  * <p>
- * These costs are produced by an A* search (or, for an edge-less transfer, a straight-line distance
- * estimate) and are not bounded by Raptor's own pruning. A leg over, for example, a steep,
- * wheelchair-inaccessible stairway can accumulate an extremely high generalized cost. Casting such a
- * cost straight to Raptor's 32-bit {@code int} representation overflows and wraps to a negative
+ * These costs are produced by an A* search (or, for an edge-less transfer, a straight-line
+ * distance estimate) and are not bounded by Raptor's own pruning. A leg over, for example, a steep,
+ * wheelchair-inaccessible stairway can accumulate an extremely high generalized cost. Casting such
+ * a cost straight to Raptor's 32-bit {@code int} representation overflows and wraps to a negative
  * value, which then makes the whole request fail (a negative cost is rejected when the path is
  * mapped back to an itinerary) and can corrupt the pareto search by making a path look artificially
  * cheap.
  * <p>
- * The limit is high enough — several days of transit-equivalent cost — that no legitimate journey
- * is affected, but far enough below {@link RaptorConstants#UNREACHED_HIGH} that summing a handful
- * of capped legs still cannot overflow. A capped leg ends up with a large-but-finite cost and is
- * dropped by the itinerary filters, so valid alternatives are returned instead of an error.
+ * The limit is high enough — several days of transit-equivalent cost — that no legitimate
+ * journey is affected, but far enough below {@link RaptorConstants#UNREACHED_HIGH} that summing a
+ * handful of capped legs still cannot overflow. A capped leg ends up with a large-but-finite cost
+ * and is dropped by the itinerary filters, so valid alternatives are returned instead of an error.
  * <p>
  * Transfers were the first place this overflow was observed and fixed
  * (<a href="https://github.com/opentripplanner/OpenTripPlanner/issues/5509">#5509</a>); access and
@@ -69,8 +69,8 @@ public final class CostLimit {
     if (cost >= 0 && cost <= MAX_COST) {
       return cost;
     }
-    THROTTLE_COST_EXCEEDED.throttle(() ->
-      LOG.warn(
+    THROTTLE_COST_EXCEEDED.throttle(
+      () -> LOG.warn(
         "Generalized cost {} for a street access, egress or transfer leg exceeded the maximum of {} and was capped. Please consider changing the cost calculation. More information: https://github.com/opentripplanner/OpenTripPlanner/pull/5516#issuecomment-1819138078",
         cost,
         MAX_COST

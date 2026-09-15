@@ -14,15 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * To abort fetching data when a request is unprocessable (either because the execution times
- * out or because the response is too large) we have to rethrow the exception.
- * This will prevent unresolved data-fetchers to be called. The exception is not handled
- * gracefully.
+ * To abort fetching data when a request is unprocessable (either because the execution times out or
+ * because the response is too large) we have to rethrow the exception. This will prevent unresolved
+ * data-fetchers to be called. The exception is not handled gracefully.
  */
-public class AbortOnUnprocessableRequestExecutionStrategy
-  extends AsyncExecutionStrategy
-  implements Closeable
-{
+public class AbortOnUnprocessableRequestExecutionStrategy extends AsyncExecutionStrategy implements
+  Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(
     AbortOnUnprocessableRequestExecutionStrategy.class

@@ -125,15 +125,13 @@ public class IslandPruningModule implements GraphBuilderModule {
   }
 
   /**
-   * Island pruning strategy:
-   * 1. Extract islands without using noThruTraffic edges at all.
-   * 2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across
-   *    original islands! Note: these expanded islands can overlap.
-   * 3. Relax connectivity even more: generate islands by allowing jumps between islands. Find out
-   *    unreachable edges of small islands.
-   * 4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via
-   *    noThruTraffic edges to noThruTraffic state. Remove traversal mode specific access from
-   *    unreachable edges. Remove unconnected edges.
+   * Island pruning strategy: 1. Extract islands without using noThruTraffic edges at all. 2. Then
+   * create expanded islands by accepting noThruTraffic edges, but do not jump across original
+   * islands! Note: these expanded islands can overlap. 3. Relax connectivity even more: generate
+   * islands by allowing jumps between islands. Find out unreachable edges of small islands. 4.
+   * Analyze small expanded islands (from step 2). Convert edges which are reachable only via
+   * noThruTraffic edges to noThruTraffic state. Remove traversal mode specific access from
+   * unreachable edges. Remove unconnected edges.
    */
   private void pruneIslands(TraverseMode traverseMode) {
     LOG.debug("nothru pruning");
@@ -216,11 +214,10 @@ public class IslandPruningModule implements GraphBuilderModule {
         int pruningThresholdWithStops = parameters.pruningThresholdIslandWithStops();
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
-          double sizeCoeff =
-            adaptivePruningFactor > 1.0
-              ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-                adaptivePruningDistance
-              : 1.0;
+          double sizeCoeff = adaptivePruningFactor > 1.0
+            ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
+              adaptivePruningDistance
+            : 1.0;
 
           if (island.streetSize() * sizeCoeff < pruningThresholdWithStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
@@ -233,11 +230,10 @@ public class IslandPruningModule implements GraphBuilderModule {
         //for islands without stops
         int pruningThresholdWithoutStops = parameters.pruningThresholdIslandWithoutStops();
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
-          double sizeCoeff =
-            adaptivePruningFactor > 1.0
-              ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
-                adaptivePruningDistance
-              : 1.0;
+          double sizeCoeff = adaptivePruningFactor > 1.0
+            ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
+              adaptivePruningDistance
+            : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {
             if (restrictOrRemove(island, isolated, stats, markIsolated, traverseMode)) {
               stats.incrementModifiedIslands();
@@ -291,7 +287,7 @@ public class IslandPruningModule implements GraphBuilderModule {
       for (Edge e : gv.getOutgoing()) {
         if (
           e instanceof StreetEdge &&
-          shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
+            shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
         ) {
           continue;
         }
@@ -299,16 +295,14 @@ public class IslandPruningModule implements GraphBuilderModule {
         if (State.isEmpty(states)) {
           continue;
         }
-        Arrays.stream(states)
-          .map(State::getVertex)
-          .forEach(out -> {
-            var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
-            vertexList.add(out);
+        Arrays.stream(states).map(State::getVertex).forEach(out -> {
+          var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
+          vertexList.add(out);
 
-            // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-            vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
-            vertexList.add(gv);
-          });
+          // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
+          vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
+          vertexList.add(gv);
+        });
       }
     }
   }

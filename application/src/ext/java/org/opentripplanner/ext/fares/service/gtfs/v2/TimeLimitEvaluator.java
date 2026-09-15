@@ -8,10 +8,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 class TimeLimitEvaluator {
 
   static boolean withinTimeLimit(FareTransferRule r, TransitLeg from, TransitLeg to) {
-    return r
-      .timeLimit()
-      .map(limit -> withinTimeLimit(limit, from, to))
-      .orElse(true);
+    return r.timeLimit().map(limit -> withinTimeLimit(limit, from, to)).orElse(true);
   }
 
   static boolean withinTimeLimit(TimeLimit limit, TransitLeg from, TransitLeg to) {

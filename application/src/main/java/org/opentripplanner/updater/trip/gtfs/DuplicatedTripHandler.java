@@ -18,8 +18,8 @@ import org.opentripplanner.updater.trip.TripUpdateApplier;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
-/// Handles GTFS-RT TripUpdates for trips with schedule relationship `DUPLICATED`.
-/// Creates a copy of a scheduled trip shifted to a new start time (and service date).
+/// Handles GTFS-RT TripUpdates for trips with schedule relationship `DUPLICATED`. Creates a copy of
+/// a scheduled trip shifted to a new start time (and service date).
 class DuplicatedTripHandler {
 
   private final TransitService transitService;
@@ -60,8 +60,7 @@ class DuplicatedTripHandler {
     // Look up the original trip's pattern and scheduled times
 
     var originalPattern = transitService.findPattern(originalTrip);
-    var originalScheduledTimes = (ScheduledTripTimes) originalPattern
-      .getScheduledTimetable()
+    var originalScheduledTimes = (ScheduledTripTimes) originalPattern.getScheduledTimetable()
       .getTripTimes(tripUpdate.tripId());
 
     // Calculate how many seconds to shift all stop times
@@ -78,16 +77,14 @@ class DuplicatedTripHandler {
 
     // Shift all scheduled times and rebind to the new trip
     int serviceCode = transitService.getTripCalendars().getServiceCode(serviceId);
-    var newScheduledTimes = originalScheduledTimes
-      .copyOf(deduplicator)
+    var newScheduledTimes = originalScheduledTimes.copyOf(deduplicator)
       .withTrip(newTrip)
       .withServiceCode(serviceCode)
       .plusTimeShift(offsetSeconds)
       .build();
 
     // Produce real-time trip times marked as an added trip
-    var newTripTimes = newScheduledTimes
-      .createRealTimeFromScheduledTimes()
+    var newTripTimes = newScheduledTimes.createRealTimeFromScheduledTimes()
       .withServiceCode(serviceCode)
       .withAdded()
       .withRealTimeUpdated()
@@ -105,10 +102,9 @@ class DuplicatedTripHandler {
     return TripUpdateApplier.apply(buffer, update);
   }
 
-  /// The spec is silent about how these ids should be constructed, so we create a new ID
-  /// ourselves.
-  /// It is therefore not possible to send a spec-compliant vehicle position update for this
-  /// trip. If this is a requirement, then we need to update the spec.
+  /// The spec is silent about how these ids should be constructed, so we create a new ID ourselves.
+  /// It is therefore not possible to send a spec-compliant vehicle position update for this trip. If
+  /// this is a requirement, then we need to update the spec.
   private static FeedScopedId duplicatedTripId(TripUpdate tripUpdate) {
     var localDateTime = tripUpdate.startDate().atTime(tripUpdate.startTime().orElseThrow());
     return new FeedScopedId(

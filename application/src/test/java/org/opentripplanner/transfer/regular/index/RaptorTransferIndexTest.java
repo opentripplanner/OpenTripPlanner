@@ -120,10 +120,12 @@ class RaptorTransferIndexTest {
     StreetSearchRequest streetSearchRequest,
     Consumer<RaptorTransferIndex> verifier
   ) {
-    for (var index : List.of(
-      new PreCachedRaptorTransferIndex(DATA, streetSearchRequest, false),
-      new OnDemandRaptorTransferIndex(DATA, streetSearchRequest)
-    )) {
+    for (
+      var index : List.of(
+        new PreCachedRaptorTransferIndex(DATA, streetSearchRequest, false),
+        new OnDemandRaptorTransferIndex(DATA, streetSearchRequest)
+      )
+    ) {
       verifier.accept(index);
     }
   }
@@ -143,11 +145,8 @@ class RaptorTransferIndexTest {
     PathTransfer... transfers
   ) {
     return Arrays.stream(transfers)
-      .flatMap(t ->
-        t
-          .asRaptorTransfer(streetSearchRequest)
-          .map(x -> x.reverseOf(fromStopIndex))
-          .stream()
+      .flatMap(
+        t -> t.asRaptorTransfer(streetSearchRequest).map(x -> x.reverseOf(fromStopIndex)).stream()
       )
       .toList();
   }

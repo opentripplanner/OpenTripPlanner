@@ -17,15 +17,13 @@ class InvalidPointInJourneyPatternRefTest {
 
   @Test
   void validRef() {
-    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID)
-      .withPointsInSequence(1, 2, 3)
+    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID).withPointsInSequence(1, 2, 3)
       .build();
 
     var index = new NetexEntityIndex();
     index.journeyPatternsById.add(pattern);
 
-    var journey = new ServiceJourneyBuilder(JOURNEY_ID)
-      .withPatternId(PATTERN_ID)
+    var journey = new ServiceJourneyBuilder(JOURNEY_ID).withPatternId(PATTERN_ID)
       .withPassingTimes(List.of("P-1", "P-2", "P-3"))
       .build();
 
@@ -37,15 +35,13 @@ class InvalidPointInJourneyPatternRefTest {
 
   @Test
   void invalidRef() {
-    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID)
-      .withPointsInSequence(1, 2, 3)
+    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID).withPointsInSequence(1, 2, 3)
       .build();
 
     var index = new NetexEntityIndex();
     index.journeyPatternsById.add(pattern);
 
-    var journey = new ServiceJourneyBuilder(JOURNEY_ID)
-      .withPatternId(PATTERN_ID)
+    var journey = new ServiceJourneyBuilder(JOURNEY_ID).withPatternId(PATTERN_ID)
       .withPassingTimes(List.of("P-1", "P-2", "P-4"))
       .build();
 

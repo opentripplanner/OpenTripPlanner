@@ -22,8 +22,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
  * This class is responsible for creating a a result collector - the set of paths.
- * <p/>
- * This class has REQUEST scope, so a new instance should be created for each new request/travel
+ * <p/>This class has REQUEST scope, so a new instance should be created for each new request/travel
  * search.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -45,9 +44,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   /**
    * Create a new {@link DestinationArrivalPaths}.
+   *
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param c2Comp c2 comparator function to be used in the pareto set criteria. If c2 comparator is null
-   *               then no c2 comparison will be used.
+   * @param c2Comp     c2 comparator function to be used in the pareto set criteria. If c2
+   *                   comparator is null then no c2 comparison will be used.
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
     ParetoSetCost costConfig,
@@ -76,14 +76,12 @@ public class PathConfig<T extends RaptorTripSchedule> {
   /* private members */
 
   private ParetoSetTime paretoSetTimeConfig() {
-    boolean preferLatestDeparture =
-      ctx.searchParams().preferLateArrival() != ctx.searchDirection().isInReverse();
+    boolean preferLatestDeparture = ctx.searchParams().preferLateArrival() !=
+      ctx.searchDirection().isInReverse();
 
-    ParetoSetTime timeConfig = ctx.searchParams().timetable()
-      ? ParetoSetTime.USE_TIMETABLE
-      : preferLatestDeparture
-        ? ParetoSetTime.USE_DEPARTURE_TIME
-        : ParetoSetTime.USE_ARRIVAL_TIME;
+    ParetoSetTime timeConfig = ctx.searchParams().timetable() ? ParetoSetTime.USE_TIMETABLE
+      : preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME
+      : ParetoSetTime.USE_ARRIVAL_TIME;
     return timeConfig;
   }
 
@@ -108,17 +106,17 @@ public class PathConfig<T extends RaptorTripSchedule> {
   ) {
     return searchDirection.isForward()
       ? new ForwardPathMapper<>(
-          slackProvider,
-          costCalculator,
-          stopNameResolver,
-          txConstraintsSearch,
-          lifeCycle
-        )
+        slackProvider,
+        costCalculator,
+        stopNameResolver,
+        txConstraintsSearch,
+        lifeCycle
+      )
       : new ReversePathMapper<>(
-          slackProvider,
-          costCalculator,
-          stopNameResolver,
-          txConstraintsSearch
-        );
+        slackProvider,
+        costCalculator,
+        stopNameResolver,
+        txConstraintsSearch
+      );
   }
 }

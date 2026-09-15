@@ -13,15 +13,14 @@ public record MoreThanTwoIntersectionNodesInElevatorWay(
   Coordinate to,
   int intersectionNodes
 ) implements DataImportIssue {
-  private static final String FMT =
-    "Elevator way %s has more than two intersection nodes: %s. " +
+  private static final String FMT = "Elevator way %s has more than two intersection nodes: %s. " +
     "This is likely a tagging mistake, but can be correct in rare cases. " +
     "Please check whether the elevator way is correctly modeled.";
 
   private static final String HTMLFMT =
     "<a href='%s'>Elevator way %s</a> has more than two intersection nodes: %s. " +
-    "This is likely a tagging mistake, but can be correct in rare cases. " +
-    "Please check whether the elevator way is correctly modeled.";
+      "This is likely a tagging mistake, but can be correct in rare cases. " +
+      "Please check whether the elevator way is correctly modeled.";
 
   @Override
   public String getMessage() {

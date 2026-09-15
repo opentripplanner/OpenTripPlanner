@@ -91,8 +91,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
    * Time shift all the times, including scheduled and real times. Used to change time zone.
    */
   private RealTimeTripTimes(RealTimeTripTimes original, int timeShift) {
-    this.scheduledTripTimes = original.scheduledTripTimes
-      .copyOfNoDuplication()
+    this.scheduledTripTimes = original.scheduledTripTimes.copyOfNoDuplication()
       .plusTimeShift(timeShift)
       .build();
     this.arrivalTimes = IntUtils.shiftArray(timeShift, original.arrivalTimes);
@@ -397,8 +396,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       return false;
     }
     RealTimeTripTimes that = (RealTimeTripTimes) o;
-    return (
-      Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&
+    return (Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&
       Objects.deepEquals(arrivalTimes, that.arrivalTimes) &&
       Objects.deepEquals(departureTimes, that.departureTimes) &&
       Objects.deepEquals(stopRealTimeStates, that.stopRealTimeStates) &&
@@ -408,8 +406,7 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
       wheelchairAccessibility == that.wheelchairAccessibility &&
       Objects.equals(state, that.state) &&
       Objects.equals(partialReplacedBys, that.partialReplacedBys) &&
-      Objects.equals(vehicleId, that.vehicleId)
-    );
+      Objects.equals(vehicleId, that.vehicleId));
   }
 
   @Override

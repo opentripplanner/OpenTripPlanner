@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
 
 /**
- * Note: The unit tests relies on mocks to abstract out the micrometer API (request and response objects).
+ * Note: The unit tests relies on mocks to abstract out the micrometer API (request and response
+ * objects).
  */
 class HttpResponseTimeMetricsFilterTest {
 
@@ -161,8 +162,7 @@ class HttpResponseTimeMetricsFilterTest {
   }
 
   private Timer findTotalTimer(String client, String endpoint) {
-    return registry
-      .find(METRIC_NAME + ".total.time")
+    return registry.find(METRIC_NAME + ".total.time")
       .tag(CLIENT_TAG, client)
       .tag(URI_TAG, endpoint)
       .timer();

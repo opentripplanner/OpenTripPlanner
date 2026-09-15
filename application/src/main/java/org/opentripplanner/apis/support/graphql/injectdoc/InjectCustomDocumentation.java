@@ -23,10 +23,8 @@ import java.util.function.BiFunction;
 /**
  * This is GraphQL visitor which injects custom documentation on types and fields.
  */
-public class InjectCustomDocumentation
-  extends GraphQLTypeVisitorStub
-  implements GraphQLTypeVisitor
-{
+public class InjectCustomDocumentation extends GraphQLTypeVisitorStub implements
+  GraphQLTypeVisitor {
 
   private final CustomDocumentation customDocumentation;
 
@@ -134,16 +132,15 @@ public class InjectCustomDocumentation
     T element,
     BiFunction<T, String, T> setDescription
   ) {
-    customDocumentation
-      .typeDescription(element.getName(), element.getDescription())
+    customDocumentation.typeDescription(element.getName(), element.getDescription())
       .map(doc -> setDescription.apply(element, doc))
       .ifPresent(f -> changeNode(context, f));
     return CONTINUE;
   }
 
   /**
-   * Set or append description and deprecated reason on a field [Object, InputType, Interface,
-   * Union or Enum].
+   * Set or append description and deprecated reason on a field [Object, InputType, Interface, Union
+   * or Enum].
    */
   private <T extends GraphQLNamedSchemaElement> TraversalControl fieldDoc(
     TraverserContext<GraphQLSchemaElement> context,
@@ -159,13 +156,17 @@ public class InjectCustomDocumentation
     var fieldName = field.getName();
     var typeName = parent.getName();
 
-    Optional<T> withDescription = customDocumentation
-      .fieldDescription(typeName, fieldName, field.getDescription())
-      .map(doc -> setDescription.apply(field, doc));
+    Optional<T> withDescription = customDocumentation.fieldDescription(
+      typeName,
+      fieldName,
+      field.getDescription()
+    ).map(doc -> setDescription.apply(field, doc));
 
-    Optional<T> withDeprecated = customDocumentation
-      .fieldDeprecatedReason(typeName, fieldName, originalDeprecatedReason)
-      .map(doc -> setDeprecatedReason.apply(withDescription.orElse(field), doc));
+    Optional<T> withDeprecated = customDocumentation.fieldDeprecatedReason(
+      typeName,
+      fieldName,
+      originalDeprecatedReason
+    ).map(doc -> setDeprecatedReason.apply(withDescription.orElse(field), doc));
 
     withDeprecated.or(() -> withDescription).ifPresent(f -> changeNode(context, f));
 

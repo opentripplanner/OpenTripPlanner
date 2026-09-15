@@ -61,38 +61,33 @@ public class TripResponseMapper {
   }
 
   public OJP mapTripPlan(RoutingResponse otpResponse, ZonedDateTime timestamp) {
-    List<JAXBElement<?>> tripResults = otpResponse
-      .getTripPlan()
-      .itineraries.stream()
+    List<JAXBElement<?>> tripResults = otpResponse.getTripPlan().itineraries.stream()
       .map(this::mapItinerary)
       .map(JaxbElementMapper::jaxbElement)
       .collect(Collectors.toList());
 
     var context = jaxbElement(contextMapper.map(otpResponse.getTripPlan()), TRIP_RESPONSE_CONTEXT);
-    var tripDelivery = new OJPTripDeliveryStructure()
-      .withResponseTimestamp(XmlDateTime.truncatedToMillis(timestamp))
-      .withRest(context)
-      .withRest(tripResults);
+    var tripDelivery = new OJPTripDeliveryStructure().withResponseTimestamp(
+      XmlDateTime.truncatedToMillis(timestamp)
+    ).withRest(context).withRest(tripResults);
 
-    var serviceDelivery = ServiceDeliveryMapper.serviceDelivery(
-      timestamp
-    ).withAbstractFunctionalServiceDelivery(jaxbElement(tripDelivery));
+    var serviceDelivery = ServiceDeliveryMapper.serviceDelivery(timestamp)
+      .withAbstractFunctionalServiceDelivery(jaxbElement(tripDelivery));
 
-    return new OJP()
-      .withVersion("2.0")
+    return new OJP().withVersion("2.0")
       .withOJPResponse(new OJPResponseStructure().withServiceDelivery(serviceDelivery));
   }
 
   private TripResultStructure mapItinerary(Itinerary itinerary) {
-    return new TripResultStructure().withId(tripId(itinerary)).withTrip(
-      new TripStructure()
-        .withId(tripId(itinerary))
-        .withDuration(Duration.between(itinerary.startTime(), itinerary.endTime()))
-        .withTransfers(itinerary.legs().size() - 1)
-        .withStartTime(new XmlDateTime(itinerary.startTime()))
-        .withEndTime(new XmlDateTime(itinerary.endTime()))
-        .withLeg(mapLegs(itinerary))
-    );
+    return new TripResultStructure().withId(tripId(itinerary))
+      .withTrip(
+        new TripStructure().withId(tripId(itinerary))
+          .withDuration(Duration.between(itinerary.startTime(), itinerary.endTime()))
+          .withTransfers(itinerary.legs().size() - 1)
+          .withStartTime(new XmlDateTime(itinerary.startTime()))
+          .withEndTime(new XmlDateTime(itinerary.endTime()))
+          .withLeg(mapLegs(itinerary))
+      );
   }
 
   private List<LegStructure> mapLegs(Itinerary itinerary) {
@@ -116,8 +111,7 @@ public class TripResponseMapper {
 
   private LegStructure mapStreetLeg(int index, StreetLeg sl) {
     return baseLeg(index, sl).withContinuousLeg(
-      new ContinuousLegStructure()
-        .withLegStart(placeRef(sl.from()))
+      new ContinuousLegStructure().withLegStart(placeRef(sl.from()))
         .withLegEnd(placeRef(sl.to()))
         .withTimeWindowStart(new XmlDateTime(sl.startTime()))
         .withTimeWindowEnd(new XmlDateTime(sl.endTime()))
@@ -128,9 +122,9 @@ public class TripResponseMapper {
   }
 
   private static ContinuousServiceStructure mapContinuousService(StreetLeg sl) {
-    return new ContinuousServiceStructure()
-      .withPersonalModeOfOperation(PersonalModesOfOperationEnumeration.OWN)
-      .withPersonalMode(PersonalModeMapper.mapToOjp(sl.getMode()));
+    return new ContinuousServiceStructure().withPersonalModeOfOperation(
+      PersonalModesOfOperationEnumeration.OWN
+    ).withPersonalMode(PersonalModeMapper.mapToOjp(sl.getMode()));
   }
 
   private LegStructure mapTransitLeg(int index, ScheduledTransitLeg tl) {
@@ -139,24 +133,19 @@ public class TripResponseMapper {
     var scheduledArrival = new XmlDateTime(tl.end().scheduledTime());
     var realtimeArrival = estimatedTime(tl.end());
 
-    var timedLeg = new TimedLegStructure()
-      .withLegBoard(
-        new LegBoardStructure()
-          .withStopPointRef(stopPointRefMapper.stopPointRef(tl.from().stop))
-          .withStopPointName(internationalText(tl.from().stop.getName()))
-          .withServiceDeparture(
-            new ServiceDepartureStructure()
-              .withTimetabledTime(scheduledDeparture)
-              .withEstimatedTime(realtimeDeparture)
-          )
-      )
+    var timedLeg = new TimedLegStructure().withLegBoard(
+      new LegBoardStructure().withStopPointRef(stopPointRefMapper.stopPointRef(tl.from().stop))
+        .withStopPointName(internationalText(tl.from().stop.getName()))
+        .withServiceDeparture(
+          new ServiceDepartureStructure().withTimetabledTime(scheduledDeparture)
+            .withEstimatedTime(realtimeDeparture)
+        )
+    )
       .withLegAlight(
-        new LegAlightStructure()
-          .withStopPointRef(stopPointRefMapper.stopPointRef(tl.to().stop))
+        new LegAlightStructure().withStopPointRef(stopPointRefMapper.stopPointRef(tl.to().stop))
           .withStopPointName(internationalText(tl.to().stop.getName()))
           .withServiceArrival(
-            new ServiceArrivalStructure()
-              .withTimetabledTime(scheduledArrival)
+            new ServiceArrivalStructure().withTimetabledTime(scheduledArrival)
               .withEstimatedTime(realtimeArrival)
           )
       )
@@ -168,11 +157,11 @@ public class TripResponseMapper {
   }
 
   private List<LegIntermediateStructure> mapIntermediateStops(List<StopArrival> sas) {
-    return sas
-      .stream()
-      .map(sa ->
-        new LegIntermediateStructure()
-          .withStopPointRef(stopPointRefMapper.stopPointRef(sa.place.stop))
+    return sas.stream()
+      .map(
+        sa -> new LegIntermediateStructure().withStopPointRef(
+          stopPointRefMapper.stopPointRef(sa.place.stop)
+        )
           .withStopPointName(internationalText(sa.place.stop.getName()))
           .withServiceArrival(
             new ServiceArrivalStructure().withTimetabledTime(

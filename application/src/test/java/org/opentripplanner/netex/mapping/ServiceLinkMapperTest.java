@@ -49,8 +49,7 @@ class ServiceLinkMapperTest {
     59.90893,
     10.74493,
     59.90870,
-    10.74585,
-  };
+    10.74585, };
 
   private static final Double[] QUAY1_COORDINATES = { 59.9093, 10.7453 };
   private static final Double[] QUAY2_COORDINATES = { 59.9089, 10.7449 };
@@ -70,8 +69,7 @@ class ServiceLinkMapperTest {
         SERVICE_LINKS_COORDINATES[0],
         SERVICE_LINKS_COORDINATES[1],
         SERVICE_LINKS_COORDINATES[2],
-        SERVICE_LINKS_COORDINATES[3],
-      }
+        SERVICE_LINKS_COORDINATES[3], }
     );
     ServiceLink serviceLink2 = createAlternativeServiceLink(
       "RUT:ServiceLink:2",
@@ -81,22 +79,18 @@ class ServiceLinkMapperTest {
         SERVICE_LINKS_COORDINATES[2],
         SERVICE_LINKS_COORDINATES[3],
         SERVICE_LINKS_COORDINATES[4],
-        SERVICE_LINKS_COORDINATES[5],
-      }
+        SERVICE_LINKS_COORDINATES[5], }
     );
 
     HierarchicalMapById<ServiceLink> serviceLinksById = new HierarchicalMapById<>();
     serviceLinksById.add(serviceLink1);
     serviceLinksById.add(serviceLink2);
 
-    Quay quay1 = new Quay()
-      .withId("NSR:Quay:1")
+    Quay quay1 = new Quay().withId("NSR:Quay:1")
       .withCentroid(getLocation(QUAY1_COORDINATES[0], QUAY1_COORDINATES[1]));
-    Quay quay2 = new Quay()
-      .withId("NSR:Quay:2")
+    Quay quay2 = new Quay().withId("NSR:Quay:2")
       .withCentroid(getLocation(QUAY2_COORDINATES[0], QUAY2_COORDINATES[1]));
-    Quay quay3 = new Quay()
-      .withId("NSR:Quay:3")
+    Quay quay3 = new Quay().withId("NSR:Quay:3")
       .withCentroid(getLocation(QUAY3_COORDINATES[0], QUAY3_COORDINATES[1]));
 
     List<Quay> quaysById = List.of(quay1, quay2, quay3);
@@ -263,8 +257,7 @@ class ServiceLinkMapperTest {
 
   private SimplePoint_VersionStructure getLocation(double latitude, double longitude) {
     return new SimplePoint_VersionStructure().withLocation(
-      new LocationStructure()
-        .withLongitude(BigDecimal.valueOf(longitude))
+      new LocationStructure().withLongitude(BigDecimal.valueOf(longitude))
         .withLatitude(BigDecimal.valueOf(latitude))
     );
   }
@@ -278,13 +271,10 @@ class ServiceLinkMapperTest {
     );
     JAXBElement<LinkSequenceProjection_VersionStructure> linkSequenceProjection_versionStructure =
       MappingSupport.createJaxbElement(linkSequenceProjection);
-    Projections_RelStructure projections_relStructure =
-      new Projections_RelStructure().withProjectionRefOrProjection(
-        linkSequenceProjection_versionStructure
-      );
+    Projections_RelStructure projections_relStructure = new Projections_RelStructure()
+      .withProjectionRefOrProjection(linkSequenceProjection_versionStructure);
 
-    return new ServiceLink()
-      .withId(id)
+    return new ServiceLink().withId(id)
       .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
       .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
       .withProjections(projections_relStructure);
@@ -309,8 +299,7 @@ class ServiceLinkMapperTest {
       linkSequenceProjection_versionStructure
     );
 
-    return new ServiceLink()
-      .withId(id)
+    return new ServiceLink().withId(id)
       .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
       .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
       .withProjections(projections_relStructure);

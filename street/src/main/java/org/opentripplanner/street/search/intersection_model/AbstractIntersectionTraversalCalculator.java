@@ -9,11 +9,13 @@ import org.opentripplanner.street.search.TraverseMode;
  *
  * @author avi
  */
-public abstract class AbstractIntersectionTraversalCalculator
-  implements IntersectionTraversalCalculator
-{
+public abstract class AbstractIntersectionTraversalCalculator implements
+  IntersectionTraversalCalculator {
 
-  /** Factor by which absolute turn angles are divided to get turn durations for non-driving scenarios. */
+  /**
+   * Factor by which absolute turn angles are divided to get turn durations for non-driving
+   * scenarios.
+   */
   protected double nonDrivingTurnDurationFactor = 1.0 / 20.0;
 
   /* Concrete subclasses must implement this */
@@ -45,8 +47,8 @@ public abstract class AbstractIntersectionTraversalCalculator
   /**
    * Calculates the turn angle from the incoming/outgoing edges and routing request.
    * <p>
-   * The turn angle is specified as negative for left turn, positive for right turn, between
-   * -180 and 180.
+   * The turn angle is specified as negative for left turn, positive for right turn, between -180
+   * and 180.
    */
   public static int calculateTurnAngle(StreetEdge from, StreetEdge to) {
     int angleOutOfIntersection = to.getInAngle();

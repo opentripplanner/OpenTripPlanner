@@ -72,8 +72,7 @@ public final class AlertCalendar {
     if (timePeriods.stream().anyMatch(TimePeriod::hasUnboundedStart)) {
       return Optional.empty();
     }
-    return timePeriods
-      .stream()
+    return timePeriods.stream()
       .map(TimePeriod::start)
       .flatMap(Optional::stream)
       .min(Comparator.naturalOrder());
@@ -86,8 +85,7 @@ public final class AlertCalendar {
     if (timePeriods.stream().anyMatch(TimePeriod::hasUnboundedEnd)) {
       return Optional.empty();
     }
-    return timePeriods
-      .stream()
+    return timePeriods.stream()
       .map(TimePeriod::end)
       .flatMap(Optional::stream)
       .max(Comparator.naturalOrder());

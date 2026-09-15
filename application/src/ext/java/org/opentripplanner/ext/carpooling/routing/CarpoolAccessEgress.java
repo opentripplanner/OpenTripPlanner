@@ -19,9 +19,9 @@ import org.opentripplanner.street.search.state.State;
  * carpool-side data (walks, shared segments, ride duration) and this class adds the Raptor framing
  * (stop index, departure time anchor, c1, penalty, reluctance).
  * <p>
- * The walk paths' A* weights are used as-is for the walk portion of the cost; they already encode
- * the user's walk preferences (reluctance, safety, slope, ...) from the search that produced them.
- * The ride portion is weighted by {@code carpoolReluctance}.
+ * The walk paths' A* weights are used as-is for the walk portion of the cost; they already
+ * encode the user's walk preferences (reluctance, safety, slope, ...) from the search that produced
+ * them. The ride portion is weighted by {@code carpoolReluctance}.
  */
 public class CarpoolAccessEgress implements RoutingAccessEgress {
 
@@ -38,9 +38,9 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   /**
    * The Raptor arrival time of this access/egress leg, in seconds since
-   * {@code transitSearchTimeZero}. This is the moment the passenger reaches the destination side
-   * of the leg: the end of an optional walk from the carpool dropoff, or — when no walk is needed
-   * — the moment the carpool reaches the dropoff. Equal to {@code passengerDepartureTime +
+   * {@code transitSearchTimeZero}. This is the moment the passenger reaches the destination side of
+   * the leg: the end of an optional walk from the carpool dropoff, or — when no walk is needed —
+   * the moment the carpool reaches the dropoff. Equal to {@code passengerDepartureTime +
    * walkToPickupSeconds + rideSeconds + walkFromDropoffSeconds}.
    */
   private final int passengerArrivalTime;
@@ -57,23 +57,28 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   private final EndpointLabel endLabel;
 
   /**
-   * @param stop Raptor stop index of the transit-side endpoint — the stop the passenger boards
-   *        transit at (for access) or alights from transit at (for egress).
+   * @param stop                   Raptor stop index of the transit-side endpoint — the stop the
+   *                               passenger boards transit at (for access) or alights from transit
+   *                               at (for egress).
    * @param passengerDepartureTime see {@link #passengerDepartureTime}.
-   * @param insertionCandidate the carpool-side data: walks bracketing the ride, the shared ride
-   *        itself, the trip and pickup/dropoff positions. Everything except Raptor framing flows
-   *        from here.
-   * @param penalty optional Raptor time/cost penalty added on top of the leg, applied via
-   *        {@link #withPenalty(TimeAndCost)}; pass {@link TimeAndCost#ZERO} for no penalty.
-   * @param carpoolReluctance multiplier on ride seconds when computing {@link #c1()}; the walk
-   *        portions are billed at the walks' own A* weights and are not multiplied by this.
-   * @param startLabel label data for the first leg's {@code from} place. For an access this is
-   *        the passenger origin ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)});
-   *        for an egress it is the transit stop the passenger alighted from
-   *        ({@link EndpointLabel#forStop(org.opentripplanner.transit.model.site.StopLocation)}).
-   *        The mapper resolves the label into a {@code Place}.
-   * @param endLabel symmetric to {@code startLabel}: label data for the last leg's {@code to}
-   *        place. Transit stop for an access, passenger destination for an egress.
+   * @param insertionCandidate     the carpool-side data: walks bracketing the ride, the shared ride
+   *                               itself, the trip and pickup/dropoff positions. Everything except
+   *                               Raptor framing flows from here.
+   * @param penalty                optional Raptor time/cost penalty added on top of the leg,
+   *                               applied via {@link #withPenalty(TimeAndCost)}; pass
+   *                               {@link TimeAndCost#ZERO} for no penalty.
+   * @param carpoolReluctance      multiplier on ride seconds when computing {@link #c1()}; the walk
+   *                               portions are billed at the walks' own A* weights and are not
+   *                               multiplied by this.
+   * @param startLabel             label data for the first leg's {@code from} place. For an access
+   *                               this is the passenger origin
+   *                               ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)});
+   *                               for an egress it is the transit stop the passenger alighted from
+   *                               ({@link EndpointLabel#forStop(org.opentripplanner.transit.model.site.StopLocation)}).
+   *                               The mapper resolves the label into a {@code Place}.
+   * @param endLabel               symmetric to {@code startLabel}: label data for the last leg's
+   *                               {@code to} place. Transit stop for an access, passenger
+   *                               destination for an egress.
    */
   public CarpoolAccessEgress(
     int stop,
@@ -101,8 +106,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     this.durationInSeconds = walkSeconds + rideSeconds;
     this.passengerArrivalTime = passengerDepartureTime + this.durationInSeconds;
 
-    double walkWeight =
-      GraphPathUtils.weightOrZero(walkToPickup) + GraphPathUtils.weightOrZero(walkFromDropoff);
+    double walkWeight = GraphPathUtils.weightOrZero(walkToPickup) +
+      GraphPathUtils.weightOrZero(walkFromDropoff);
     double totalWeight = walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance);
     this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
   }
@@ -124,8 +129,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * Total wall-clock duration of the leg (walk + ride + walk), in seconds. Constant — Raptor
-   * cannot stretch or shrink this since the carpool runs on a fixed schedule.
+   * Total wall-clock duration of the leg (walk + ride + walk), in seconds. Constant — Raptor cannot
+   * stretch or shrink this since the carpool runs on a fixed schedule.
    */
   @Override
   public int durationInSeconds() {
@@ -140,8 +145,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   /**
    * The carpool's departure time is fixed by the driver's schedule. Returns
    * {@link #passengerDepartureTime} if the requested time is at or before it, otherwise
-   * {@link RaptorConstants#TIME_NOT_SET} — the passenger can't be picked up later than the
-   * driver passes.
+   * {@link RaptorConstants#TIME_NOT_SET} — the passenger can't be picked up later than the driver
+   * passes.
    */
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
@@ -152,8 +157,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * Symmetric to {@link #earliestDepartureTime(int)}: the carpool's arrival time is fixed.
-   * Returns {@link #passengerArrivalTime} if the requested time is at or after it, otherwise
+   * Symmetric to {@link #earliestDepartureTime(int)}: the carpool's arrival time is fixed. Returns
+   * {@link #passengerArrivalTime} if the requested time is at or after it, otherwise
    * {@link RaptorConstants#TIME_NOT_SET}.
    */
   @Override
@@ -236,38 +241,38 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   /**
    * The A* state sitting at the transit-stop endpoint of the passenger leg.
    * <p>
-   * The transit stop is the chain's far end — its end for an access (passenger origin → … → stop)
-   * and its start for an egress (stop → … → passenger destination). The transit side is identified
-   * from the labels, which carry the stop on the end label for an access and on the start label
-   * for an egress; the returned state is the segment endpoint touching the stop. When neither
-   * label carries a stop (e.g. a direct itinerary), the chain end is used.
+   * The transit stop is the chain's far end — its end for an access (passenger origin → … →
+   * stop) and its start for an egress (stop → … → passenger destination). The transit side is
+   * identified from the labels, which carry the stop on the end label for an access and on the
+   * start label for an egress; the returned state is the segment endpoint touching the stop. When
+   * neither label carries a stop (e.g. a direct itinerary), the chain end is used.
    *
    * <h4>Limitation: this state does not head a full-leg pointer chain</h4>
    * <p>
-   * The {@link RoutingAccessEgress#getFinalState()} contract expects the returned state to head a
-   * {@link State#getBackState()} chain that reconstructs the <em>entire</em> street search — that
+   * The {@link RoutingAccessEgress#getFinalState()} contract expects the returned state to head
+   * a {@link State#getBackState()} chain that reconstructs the <em>entire</em> street search — that
    * is the assumption behind callers such as {@code RaptorPathToItineraryMapper}, which wrap the
    * state in a {@link org.opentripplanner.street.model.path.StreetPath} to rebuild the leg.
    * <p>
    * A carpool leg does not honour that assumption today. It is not one A* search but several
    * independent ones stitched together in the domain layer: an optional walk to the pickup, the
    * shared ride (segments taken off the driver's committed route), and an optional walk from the
-   * dropoff. These chains are not linked — the first state of each segment is a fresh search
-   * origin with a {@code null} back state, and nothing points across the pickup/dropoff vertices
-   * from one segment into the next. Following {@code getBackState()} from the returned state
-   * therefore reconstructs only the single terminal segment, not the whole walk + ride + walk leg.
-   * Splicing the segments into one continuous back-state chain is possible but not yet done, since
-   * no caller needs it.
+   * dropoff. These chains are not linked — the first state of each segment is a fresh search origin
+   * with a {@code null} back state, and nothing points across the pickup/dropoff vertices from one
+   * segment into the next. Following {@code getBackState()} from the returned state therefore
+   * reconstructs only the single terminal segment, not the whole walk + ride + walk leg. Splicing
+   * the segments into one continuous back-state chain is possible but not yet done, since no caller
+   * needs it.
    * <p>
    * This is sound only because no caller reconstructs a carpool leg from this state. Itinerary
-   * mapping for carpool legs is routed through {@link org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper}
-   * instead, which rebuilds the WALK + CARPOOL + WALK legs directly from the segments and times
-   * via the public accessors. The state returned here is consumed only for the
-   * direction-independent scalar checks performed on every access/egress — notably
-   * {@link State#isRentingVehicleFromStation()}, which is always {@code false} since a passenger
-   * rides in the driver's car rather than a station-rented vehicle. Do not wrap this state in a
-   * {@code StreetPath} expecting the full leg; that path would silently omit the ride and the
-   * other walk.
+   * mapping for carpool legs is routed through
+   * {@link org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper} instead, which
+   * rebuilds the WALK + CARPOOL + WALK legs directly from the segments and times via the public
+   * accessors. The state returned here is consumed only for the direction-independent scalar checks
+   * performed on every access/egress — notably {@link State#isRentingVehicleFromStation()}, which
+   * is always {@code false} since a passenger rides in the driver's car rather than a
+   * station-rented vehicle. Do not wrap this state in a {@code StreetPath} expecting the full leg;
+   * that path would silently omit the ride and the other walk.
    */
   @Override
   public State getFinalState() {
@@ -293,8 +298,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   /**
    * Walk path from the passenger's origin (or transit stop, for egress) to the snapped pickup
-   * vertex. {@code null} when the origin/stop is already on a car-reachable vertex and no walk
-   * is needed.
+   * vertex. {@code null} when the origin/stop is already on a car-reachable vertex and no walk is
+   * needed.
    */
   @Nullable
   public GraphPath<State, Edge, Vertex> walkToPickup() {
@@ -321,13 +326,12 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * Absolute wall-clock time at which the carpool arrives at the pickup vertex — i.e. the start
-   * of the shared ride. Computed from the driver's trip start time plus the duration of all
-   * segments preceding the passenger's pickup; independent of {@code transitSearchTimeZero}.
+   * Absolute wall-clock time at which the carpool arrives at the pickup vertex — i.e. the start of
+   * the shared ride. Computed from the driver's trip start time plus the duration of all segments
+   * preceding the passenger's pickup; independent of {@code transitSearchTimeZero}.
    */
   public ZonedDateTime getCarpoolStart() {
-    return insertionCandidate
-      .trip()
+    return insertionCandidate.trip()
       .startTime()
       .plus(insertionCandidate.getDurationUntilPickupArrival());
   }

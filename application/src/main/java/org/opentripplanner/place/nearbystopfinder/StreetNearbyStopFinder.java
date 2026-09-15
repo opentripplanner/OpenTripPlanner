@@ -44,7 +44,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
-   * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
+   * @param ignoreVertices A set of stop vertices to ignore and not return NearbyStops for.
    */
   private StreetNearbyStopFinder(
     @Nullable LinkingContextFactory linkingContextFactory,
@@ -120,9 +120,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       // Make a normal OTP routing request so we can traverse edges and use GenericAStar
       // TODO make a function that builds normal routing requests from profile requests
       // TODO: This is incorrect, the configured defaults are not used.
-      var request = StreetSearchRequest.of()
-        .withWalk(it -> it.withSpeed(1))
-        .build();
+      var request = StreetSearchRequest.of().withWalk(it -> it.withSpeed(1)).build();
       StreetSearchBuilder.of()
         .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(skipEdgeStrategy)
@@ -141,8 +139,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    * @param originVertices   the origin point of the street search.
    * @param reverseDirection if true the paths returned instead originate at the nearby stops and
    *                         have the originVertex as the destination.
-   * @param maxStopCount The maximum stops to return. 0 means no limit. Regardless of the maxStopCount
-   *                         we will always return all the directly connected stops.
+   * @param maxStopCount     The maximum stops to return. 0 means no limit. Regardless of the
+   *                         maxStopCount we will always return all the directly connected stops.
    */
   public Collection<NearbyStop> findNearbyStops(
     Set<Vertex> originVertices,
@@ -216,22 +214,23 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   }
 
   /**
-   * Checks if the {@code state} is at a transit vertex and if it's final, which means that the state
-   * can actually board a vehicle.
+   * Checks if the {@code state} is at a transit vertex and if it's final, which means that the
+   * state can actually board a vehicle.
    * <p>
-   * This is important because there can be cases where states that cannot actually board the vehicle
-   * can dominate those that can thereby leading to zero found stops when this predicate is used with
-   * the {@link MaxCountTerminationStrategy}.
+   * This is important because there can be cases where states that cannot actually board the
+   * vehicle can dominate those that can thereby leading to zero found stops when this predicate is
+   * used with the {@link MaxCountTerminationStrategy}.
    * <p>
-   * An example of this would be an egress/reverse search with a very high walk reluctance where the
-   * states that speculatively rent a vehicle move the walk states down the A* priority queue until
-   * the required number of stops are reached to abort the search, leading to zero egress results.
+   * An example of this would be an egress/reverse search with a very high walk reluctance where
+   * the states that speculatively rent a vehicle move the walk states down the A* priority queue
+   * until the required number of stops are reached to abort the search, leading to zero egress
+   * results.
    */
   private boolean hasReachedStop(State state) {
     var vertex = state.getVertex();
-    return (
-      vertex instanceof TransitStopVertex && state.isFinal() && !ignoreVertices.contains(vertex)
-    );
+    return (vertex instanceof TransitStopVertex &&
+      state.isFinal() &&
+      !ignoreVertices.contains(vertex));
   }
 
   public static class Builder {
@@ -248,6 +247,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
      * The search can adjusted using extensions. Each extention may provide its own request context.
      * Set the context here.
      * <p>
+     *
      * @see org.opentripplanner.street.model.edge.StreetEdgeCostExtension
      */
     public Builder withExtensionRequestContexts(

@@ -21,18 +21,10 @@ public class WayPropertySetBuilder {
   final List<SlopeOverridePicker> slopeOverrides = new ArrayList<>();
   final List<SpeedPicker> speedPickers = new ArrayList<>();
   final List<MixinProperties> mixins = new ArrayList<>();
-  FunctionUtils.TriFunction<
-    StreetTraversalPermission,
-    Float,
-    OsmEntity,
-    Double
-  > defaultWalkSafetyForPermission = WayPropertySet.DEFAULT_WALK_SAFETY_RESOLVER;
-  FunctionUtils.TriFunction<
-    StreetTraversalPermission,
-    Float,
-    OsmEntity,
-    Double
-  > defaultBicycleSafetyForPermission = WayPropertySet.DEFAULT_BICYCLE_SAFETY_RESOLVER;
+  FunctionUtils.TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultWalkSafetyForPermission =
+    WayPropertySet.DEFAULT_WALK_SAFETY_RESOLVER;
+  FunctionUtils.TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultBicycleSafetyForPermission =
+    WayPropertySet.DEFAULT_BICYCLE_SAFETY_RESOLVER;
 
   WayPropertySetBuilder() {}
 
@@ -73,12 +65,7 @@ public class WayPropertySetBuilder {
   }
 
   public void setDefaultWalkSafetyForPermission(
-    FunctionUtils.TriFunction<
-      StreetTraversalPermission,
-      Float,
-      OsmEntity,
-      Double
-    > defaultWalkSafetyForPermission
+    FunctionUtils.TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultWalkSafetyForPermission
   ) {
     if (!this.defaultWalkSafetyForPermission.equals(WayPropertySet.DEFAULT_WALK_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
@@ -87,12 +74,7 @@ public class WayPropertySetBuilder {
   }
 
   public void setDefaultBicycleSafetyForPermission(
-    FunctionUtils.TriFunction<
-      StreetTraversalPermission,
-      Float,
-      OsmEntity,
-      Double
-    > defaultBicycleSafetyForPermission
+    FunctionUtils.TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultBicycleSafetyForPermission
   ) {
     if (
       !this.defaultBicycleSafetyForPermission.equals(WayPropertySet.DEFAULT_BICYCLE_SAFETY_RESOLVER)
@@ -161,9 +143,8 @@ public class WayPropertySetBuilder {
   }
 
   /**
-   * Takes another way property set and adds its pickers to this builder.
-   * Note: It does not add the max car speed, default car speed or the function for the default
-   * safety resolver.
+   * Takes another way property set and adds its pickers to this builder. Note: It does not add the
+   * max car speed, default car speed or the function for the default safety resolver.
    */
   public WayPropertySetBuilder addPickers(WayPropertySet other) {
     this.wayProperties.addAll(other.listWayProperties());

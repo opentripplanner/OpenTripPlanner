@@ -21,8 +21,7 @@ public class EmpiricalDelayConfig {
   }
 
   private static List<EmpiricalDelayFeedParameters> mapFeeds(NodeAdapter c) {
-    return c
-      .of("feeds")
+    return c.of("feeds")
       .since(V2_9)
       .summary("List of feeds.")
       .asObjects(List.of(), EmpiricalDelayConfig::mapFeed);
@@ -30,8 +29,7 @@ public class EmpiricalDelayConfig {
 
   private static EmpiricalDelayFeedParameters mapFeed(NodeAdapter c) {
     return new EmpiricalDelayFeedParameters(
-      c
-        .of("feedId")
+      c.of("feedId")
         .since(V2_9)
         .summary("Specify the feed id to use for matching transit ids in input data.")
         .asString(),

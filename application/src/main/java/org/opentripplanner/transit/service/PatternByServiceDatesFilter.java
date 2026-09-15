@@ -10,8 +10,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * Encapsulates the logic to filter patterns by the service dates that they operate on. It also
- * has a method to filter routes by checking if their patterns operate on the required days.
+ * Encapsulates the logic to filter patterns by the service dates that they operate on. It also has
+ * a method to filter routes by checking if their patterns operate on the required days.
  * <p>
  * Once a more complete filtering engine is in place in the core data model, this code should be
  * there rather than a separate class in the API package.
@@ -48,17 +48,14 @@ public class PatternByServiceDatesFilter {
   }
 
   /**
-   * Filter the routes by listing all their patterns' service dates and checking if they
-   * operate on the specified dates.
+   * Filter the routes by listing all their patterns' service dates and checking if they operate on
+   * the specified dates.
    */
   public Collection<Route> filterRoutes(Collection<Route> routeStream) {
-    return routeStream
-      .stream()
-      .filter(r -> {
-        var patterns = getPatternsForRoute.apply(r);
-        return !this.filterPatterns(patterns).isEmpty();
-      })
-      .toList();
+    return routeStream.stream().filter(r -> {
+      var patterns = getPatternsForRoute.apply(r);
+      return !this.filterPatterns(patterns).isEmpty();
+    }).toList();
   }
 
   private boolean hasServicesOnDate(TripPattern pattern) {

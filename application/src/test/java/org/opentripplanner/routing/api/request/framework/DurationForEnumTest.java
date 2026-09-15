@@ -48,8 +48,9 @@ class DurationForEnumTest {
     assertEquals(DEFAULT, subject.defaultValue());
     assertEquals(DEFAULT.toSeconds(), subject.defaultValueSeconds());
 
-    assertThrows(NullPointerException.class, () ->
-      DurationForEnum.of(StreetMode.class).withDefault(null).build()
+    assertThrows(
+      NullPointerException.class,
+      () -> DurationForEnum.of(StreetMode.class).withDefault(null).build()
     );
   }
 
@@ -94,32 +95,22 @@ class DurationForEnumTest {
   @Test
   void copyOf() {
     // with new default, keep map
-    var copy = subject
-      .copyOf()
-      .apply(b3 -> b3.withDefaultSec(10))
-      .build();
+    var copy = subject.copyOf().apply(b3 -> b3.withDefaultSec(10)).build();
     assertEquals(D10_s, copy.valueOf(StreetMode.BIKE));
     assertEquals(WALK_VALUE, copy.valueOf(StreetMode.WALK));
 
     // with new map values, keep walk and default
-    copy = subject
-      .copyOf()
-      .apply(b2 -> b2.with(StreetMode.BIKE, D10_s))
-      .build();
+    copy = subject.copyOf().apply(b2 -> b2.with(StreetMode.BIKE, D10_s)).build();
     assertEquals(WALK_VALUE, copy.valueOf(StreetMode.WALK));
     assertEquals(D10_s, copy.valueOf(StreetMode.BIKE));
     assertEquals(DEFAULT, copy.valueOf(StreetMode.CAR));
 
     // with override map value
-    copy = subject
-      .copyOf()
-      .apply(b1 -> b1.with(StreetMode.WALK, D10_s))
-      .build();
+    copy = subject.copyOf().apply(b1 -> b1.with(StreetMode.WALK, D10_s)).build();
     assertEquals(D10_s, copy.valueOf(StreetMode.WALK));
 
     // with no "real" changes -> return original
-    copy = subject
-      .copyOf()
+    copy = subject.copyOf()
       .apply(b -> b.withDefault(DEFAULT).with(StreetMode.WALK, WALK_VALUE))
       .build();
     assertSame(subject, copy);

@@ -18,10 +18,9 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
-///
-/// In this test boarding a pattern at stop 1 is the only valid path to the destination via
-/// stop 2. But the pattern can be reached in earlier rounds at later stops. The point is to
-/// show that early round pattern arrivals does not dominate boarding early in the pattern.
+/// In this test boarding a pattern at stop 1 is the only valid path to the destination via stop 2.
+/// But the pattern can be reached in earlier rounds at later stops. The point is to show that early
+/// round pattern arrivals does not dominate boarding early in the pattern.
 ///
 /// **Network**
 /// ```
@@ -33,17 +32,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 ///     D ——————————————————— C ———————— B ———————— A (Origin)
 ///                R7              R5         R3
 /// ```
-/// **Origin:** Stop A
-/// **Destination:** Stop F
-/// **Routes:**
-///    - R1 : E - F - G - H - I - J
-///    - R2 : A - I
-///    - R3 : A - B
-///    - R4 : B - H
-///    - R5 : B - C
-///    - R6 : C - G
-///    - R7 : C - D
-///    - R8 : D - E
+/// **Origin:** Stop A **Destination:** Stop F **Routes:** - R1 : E - F - G - H - I - J - R2 : A - I
+/// - R3 : A - B - R4 : B - H - R5 : B - C - R6 : C - G - R7 : C - D - R8 : D - E
 ///
 /// **Only path to destination:** A ~ R3 ~ B ~ R5 ~ C ~ R7 ~ D ~ R8 ~ E ~ R1 ~ F
 public class D02_EarlyBoardingMatters implements RaptorTestConstants {
@@ -56,8 +46,7 @@ public class D02_EarlyBoardingMatters implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access("Free ~ A")
+    data.access("Free ~ A")
       .withTimetables(
         """
         -- R1
@@ -94,8 +83,7 @@ public class D02_EarlyBoardingMatters implements RaptorTestConstants {
       )
       .egress("F ~ Free");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
@@ -103,8 +91,7 @@ public class D02_EarlyBoardingMatters implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "A ~ BUS R3 0:02 0:04 ~ " +
+    var path = "A ~ BUS R3 0:02 0:04 ~ " +
       "B ~ BUS R5 0:05 0:07 ~ " +
       "C ~ BUS R7 0:08 0:10 ~ " +
       "D ~ BUS R8 0:11 0:13 ~ " +

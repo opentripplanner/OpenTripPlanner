@@ -139,10 +139,9 @@ public class LinkingContextFactory {
     if (from == null) {
       return Set.of();
     }
-    var modes =
-      request.accessMode() != StreetMode.NOT_SET
-        ? EnumSet.of(request.accessMode())
-        : EnumSet.noneOf(StreetMode.class);
+    var modes = request.accessMode() != StreetMode.NOT_SET
+      ? EnumSet.of(request.accessMode())
+      : EnumSet.noneOf(StreetMode.class);
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
@@ -157,10 +156,9 @@ public class LinkingContextFactory {
     if (to == null) {
       return Set.of();
     }
-    var modes =
-      request.egressMode() != StreetMode.NOT_SET
-        ? EnumSet.of(request.egressMode())
-        : EnumSet.noneOf(StreetMode.class);
+    var modes = request.egressMode() != StreetMode.NOT_SET
+      ? EnumSet.of(request.egressMode())
+      : EnumSet.noneOf(StreetMode.class);
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
@@ -188,18 +186,16 @@ public class LinkingContextFactory {
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
-    return visitViaLocationsWithCoordinates
-      .stream()
+    return visitViaLocationsWithCoordinates.stream()
       .collect(
         Collectors.toMap(
           location -> location,
-          location ->
-            getStreetVerticesForLocation(
-              container,
-              location,
-              modes,
-              LocationType.VISIT_VIA_LOCATION
-            )
+          location -> getStreetVerticesForLocation(
+            container,
+            location,
+            modes,
+            LocationType.VISIT_VIA_LOCATION
+          )
         )
       );
   }
@@ -282,8 +278,7 @@ public class LinkingContextFactory {
     LocationType type
   ) {
     // Differentiate between driving and non-driving, as driving is not available from transit stops
-    List<TraverseMode> modes = streetModes
-      .stream()
+    List<TraverseMode> modes = streetModes.stream()
       .map(streetMode -> vertexCreationService.getTraverseModeForLinker(streetMode, type))
       .distinct()
       .toList();
@@ -356,8 +351,7 @@ public class LinkingContextFactory {
       } else {
         // For car routing, we use station's coordinate instead of child stops' if stop location is
         // a station.
-        coordinate = findStopLocationsGroupCentroid
-          .apply(location.stopId())
+        coordinate = findStopLocationsGroupCentroid.apply(location.stopId())
           .map(WgsCoordinate::asJtsCoordinate)
           .orElse(null);
       }
@@ -391,8 +385,8 @@ public class LinkingContextFactory {
     // check that vertices where found if from-location was specified
     if (
       !from.isOnBoard() &&
-      fromStopVertices.isEmpty() &&
-      isDisconnected(fromVertices, LocationType.FROM)
+        fromStopVertices.isEmpty() &&
+        isDisconnected(fromVertices, LocationType.FROM)
     ) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(from), InputField.FROM_PLACE)
@@ -408,12 +402,11 @@ public class LinkingContextFactory {
 
     // check that vertices were found if visit via locations with coordinates were specified
     if (!visitViaLocationsWithCoordinates.isEmpty()) {
-      var errors = visitViaLocationVertices
-        .entrySet()
+      var errors = visitViaLocationVertices.entrySet()
         .stream()
         .filter(entry -> isDisconnected(entry.getValue(), LocationType.VISIT_VIA_LOCATION))
-        .map(entry ->
-          new RoutingError(
+        .map(
+          entry -> new RoutingError(
             getRoutingErrorCodeForDisconnected(entry.getKey()),
             InputField.INTERMEDIATE_PLACE
           )
@@ -458,8 +451,7 @@ public class LinkingContextFactory {
   }
 
   private Set<TransitStopVertex> findStopOrChildStopVertices(FeedScopedId stopId) {
-    return resolveSiteIds
-      .apply(stopId)
+    return resolveSiteIds.apply(stopId)
       .stream()
       .flatMap(id -> graph.findStopVertex(id).stream())
       .collect(Collectors.toUnmodifiableSet());

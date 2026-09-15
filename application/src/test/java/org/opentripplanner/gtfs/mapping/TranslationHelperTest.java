@@ -37,8 +37,7 @@ public class TranslationHelperTest {
     { "stops", "stop_url", "sv", "http://sv-url2", "2", null, null },
     { "stop_times", "stop_headsign", "sv", "SV headsign rec 1 sub 1", "1", "1", null },
     { "stop_times", "stop_headsign", "sv", "SV headsign rec 1 sub 2", "1", "2", null },
-    { "stop_times", "stop_headsign", "sv", "SV headsign field value", null, null, "SHS" },
-  };
+    { "stop_times", "stop_headsign", "sv", "SV headsign field value", null, null, "SHS" }, };
 
   static {
     FeedInfo feedInfo = new FeedInfo();
@@ -108,7 +107,7 @@ public class TranslationHelperTest {
 
       String id = stop.getId().getId();
       switch (id) {
-        case "1":
+        case "1" :
           assertEquals("Stop 1", nameTranslation.toString());
           assertEquals("http://url1", urlTranslation.toString());
           assertEquals("Stop 1", nameTranslation.toString(LOCALE_FEED));
@@ -116,7 +115,7 @@ public class TranslationHelperTest {
           assertEquals("SV stop rec 1", nameTranslation.toString(LOCALE_SV));
           assertEquals("http://url1", urlTranslation.toString(LOCALE_SV));
           break;
-        case "2":
+        case "2" :
           assertEquals("Stop 2", nameTranslation.toString());
           assertEquals("http://url2", urlTranslation.toString());
           assertEquals("Stop 2", nameTranslation.toString(LOCALE_FEED));
@@ -124,13 +123,13 @@ public class TranslationHelperTest {
           assertEquals("SV stop 2", nameTranslation.toString(LOCALE_SV));
           assertEquals("http://sv-url2", urlTranslation.toString(LOCALE_SV));
           break;
-        case "3":
-        case "4":
+        case "3" :
+        case "4" :
           assertEquals("SFV", nameTranslation.toString());
           assertEquals("SFV", nameTranslation.toString(LOCALE_FEED));
           assertEquals("SV field value", nameTranslation.toString(LOCALE_SV));
           break;
-        case "5":
+        case "5" :
           assertEquals("1", nameTranslation.toString());
           assertEquals("1", nameTranslation.toString(LOCALE_FEED));
           assertEquals("SV stop field value 1", nameTranslation.toString(LOCALE_SV));
@@ -211,18 +210,18 @@ public class TranslationHelperTest {
       );
 
       switch (id) {
-        case "1_1":
+        case "1_1" :
           assertEquals("Dest via 1", headSignTranslation.toString());
           assertEquals("Dest via 1", headSignTranslation.toString(LOCALE_FEED));
           assertEquals("SV headsign rec 1 sub 1", headSignTranslation.toString(LOCALE_SV));
           break;
-        case "1_2":
+        case "1_2" :
           assertEquals("Dest via 2", headSignTranslation.toString());
           assertEquals("Dest via 2", headSignTranslation.toString(LOCALE_FEED));
           assertEquals("SV headsign rec 1 sub 2", headSignTranslation.toString(LOCALE_SV));
           break;
-        case "3_1":
-        case "4_1":
+        case "3_1" :
+        case "4_1" :
           assertEquals("SHS", headSignTranslation.toString());
           assertEquals("SHS", headSignTranslation.toString(LOCALE_FEED));
           assertEquals("SV headsign field value", headSignTranslation.toString(LOCALE_SV));

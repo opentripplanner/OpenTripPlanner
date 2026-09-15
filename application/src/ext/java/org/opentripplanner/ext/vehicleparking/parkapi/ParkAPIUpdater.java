@@ -73,13 +73,13 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     double x = jsonNode.path("coords").path("lng").asDouble();
     double y = jsonNode.path("coords").path("lat").asDouble();
 
-    VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
-      builder
-        .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
-        .name(new NonLocalizedString(jsonNode.path("name").asText()))
-        .coordinate(new WgsCoordinate(y, x))
-        .walkAccessible(true)
-        .carAccessible(true);
+    VehicleParking.VehicleParkingEntranceCreator entrance = builder -> builder.entranceId(
+      new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance")
+    )
+      .name(new NonLocalizedString(jsonNode.path("name").asText()))
+      .coordinate(new WgsCoordinate(y, x))
+      .walkAccessible(true)
+      .carAccessible(true);
 
     var stateText = jsonNode.get("state").asText();
     var state = stateText.equals("closed")
@@ -90,13 +90,12 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     tags.addAll(staticTags);
 
     var maybeCapacity = Optional.ofNullable(capacity);
-    var bicyclePlaces = maybeCapacity
-      .map(c -> hasPlaces(capacity.getBicycleSpaces()))
+    var bicyclePlaces = maybeCapacity.map(c -> hasPlaces(capacity.getBicycleSpaces()))
       .orElse(false);
     var carPlaces = maybeCapacity.map(c -> hasPlaces(capacity.getCarSpaces())).orElse(true);
-    var wheelChairAccessiblePlaces = maybeCapacity
-      .map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
-      .orElse(false);
+    var wheelChairAccessiblePlaces = maybeCapacity.map(
+      c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces())
+    ).orElse(false);
 
     return VehicleParking.of()
       .id(vehicleParkId)

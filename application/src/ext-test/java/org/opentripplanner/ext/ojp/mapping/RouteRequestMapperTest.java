@@ -56,8 +56,7 @@ class RouteRequestMapperTest {
 
   @Test
   void mapWithStopPlaceRef() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(stopPlaceRef("F:stop1"))
+    var tripRequest = new OJPTripRequestStructure().withOrigin(stopPlaceRef("F:stop1"))
       .withDestination(stopPlaceRef("F:stop2"));
 
     var routeRequest = mapper.map(tripRequest);
@@ -68,8 +67,7 @@ class RouteRequestMapperTest {
 
   @Test
   void mapWithStopPointRef() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(stopPointRef("F:stopPoint1"))
+    var tripRequest = new OJPTripRequestStructure().withOrigin(stopPointRef("F:stopPoint1"))
       .withDestination(stopPointRef("F:stopPoint2"));
 
     var routeRequest = mapper.map(tripRequest);
@@ -81,8 +79,7 @@ class RouteRequestMapperTest {
 
   @Test
   void mapWithMixedLocationTypes() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(geoPosition(47.3769, 8.5417))
+    var tripRequest = new OJPTripRequestStructure().withOrigin(geoPosition(47.3769, 8.5417))
       .withDestination(stopPlaceRef("F:stop1"));
 
     var routeRequest = mapper.map(tripRequest);
@@ -94,9 +91,10 @@ class RouteRequestMapperTest {
 
   @Test
   void throwsExceptionForMultipleOrigins() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(geoPosition(47.3769, 8.5417), geoPosition(47.5, 8.5))
-      .withDestination(geoPosition(46.9480, 7.4474));
+    var tripRequest = new OJPTripRequestStructure().withOrigin(
+      geoPosition(47.3769, 8.5417),
+      geoPosition(47.5, 8.5)
+    ).withDestination(geoPosition(46.9480, 7.4474));
 
     var exception = assertThrows(IllegalArgumentException.class, () -> mapper.map(tripRequest));
     assertThat(exception.getMessage()).contains("one origin and one destination");
@@ -104,8 +102,7 @@ class RouteRequestMapperTest {
 
   @Test
   void throwsExceptionForMultipleDestinations() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(geoPosition(47.3769, 8.5417))
+    var tripRequest = new OJPTripRequestStructure().withOrigin(geoPosition(47.3769, 8.5417))
       .withDestination(geoPosition(46.9480, 7.4474), geoPosition(46.5, 7.5));
 
     var exception = assertThrows(IllegalArgumentException.class, () -> mapper.map(tripRequest));
@@ -130,8 +127,7 @@ class RouteRequestMapperTest {
 
   @Test
   void throwsExceptionForNullPlaceRef() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(new PlaceContextStructure())
+    var tripRequest = new OJPTripRequestStructure().withOrigin(new PlaceContextStructure())
       .withDestination(geoPosition(46.9480, 7.4474));
 
     var exception = assertThrows(IllegalArgumentException.class, () -> mapper.map(tripRequest));
@@ -140,8 +136,7 @@ class RouteRequestMapperTest {
 
   @Test
   void throwsExceptionForEmptyPlaceRef() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(geoPosition(47.3769, 8.5417))
+    var tripRequest = new OJPTripRequestStructure().withOrigin(geoPosition(47.3769, 8.5417))
       .withDestination(new PlaceContextStructure().withPlaceRef(new PlaceRefStructure()));
 
     var exception = assertThrows(IllegalArgumentException.class, () -> mapper.map(tripRequest));
@@ -161,13 +156,11 @@ class RouteRequestMapperTest {
 
   @Test
   void excludeMode() {
-    var tripRequest = new OJPTripRequestStructure()
-      .withOrigin(geoPosition(47.3769, 8.5417))
+    var tripRequest = new OJPTripRequestStructure().withOrigin(geoPosition(47.3769, 8.5417))
       .withDestination(geoPosition(46.9480, 7.4474))
       .withParams(
         new TripParamStructure().withModeAndModeOfOperationFilter(
-          new ModeAndModeOfOperationFilterStructure()
-            .withExclude(true)
+          new ModeAndModeOfOperationFilterStructure().withExclude(true)
             .withPtMode(VehicleModesOfTransportEnumeration.RAIL)
         )
       );
@@ -182,24 +175,21 @@ class RouteRequestMapperTest {
       Arguments.of(
         "[(select: [(transportModes: EMPTY, agencies: [F:agency1])])]",
         new TripParamStructure().withOperatorFilter(
-          new OperatorFilterStructure()
-            .withExclude(false)
+          new OperatorFilterStructure().withExclude(false)
             .withOperatorRef(List.of(new OperatorRefStructure().withValue("F:agency1")))
         )
       ),
       Arguments.of(
         "[(not: [(transportModes: EMPTY, agencies: [F:agency1])])]",
         new TripParamStructure().withOperatorFilter(
-          new OperatorFilterStructure()
-            .withExclude(true)
+          new OperatorFilterStructure().withExclude(true)
             .withOperatorRef(List.of(new OperatorRefStructure().withValue("F:agency1")))
         )
       ),
       Arguments.of(
         "[(select: [(transportModes: EMPTY, routes: [F:route1])])]",
         new TripParamStructure().withLineFilter(
-          new LineDirectionFilterStructure()
-            .withExclude(false)
+          new LineDirectionFilterStructure().withExclude(false)
             .withLine(
               new LineDirectionStructure().withLineRef(new LineRefStructure().withValue("F:route1"))
             )
@@ -208,8 +198,7 @@ class RouteRequestMapperTest {
       Arguments.of(
         "[(not: [(transportModes: EMPTY, routes: [F:agency1])])]",
         new TripParamStructure().withLineFilter(
-          new LineDirectionFilterStructure()
-            .withExclude(true)
+          new LineDirectionFilterStructure().withExclude(true)
             .withLine(
               new LineDirectionStructure().withLineRef(
                 new LineRefStructure().withValue("F:agency1")
@@ -220,8 +209,7 @@ class RouteRequestMapperTest {
       Arguments.of(
         "[(not: [(transportModes: EMPTY, routes: [B:route2, A:route1])])]",
         new TripParamStructure().withLineFilter(
-          new LineDirectionFilterStructure()
-            .withExclude(true)
+          new LineDirectionFilterStructure().withExclude(true)
             .withLine(
               new LineDirectionStructure().withLineRef(
                 new LineRefStructure().withValue("A:route1")
@@ -264,8 +252,7 @@ class RouteRequestMapperTest {
   void personalMode(PersonalModesEnumeration personalMode, StreetMode expectedMode) {
     var tripRequest = baseRequest().withParams(
       new TripParamStructure().withModeAndModeOfOperationFilter(
-        new ModeAndModeOfOperationFilterStructure()
-          .withExclude(false)
+        new ModeAndModeOfOperationFilterStructure().withExclude(false)
           .withPersonalMode(personalMode)
       )
     );
@@ -278,21 +265,17 @@ class RouteRequestMapperTest {
   private static Stream<TripParamStructure> invalidPersonalModeCases() {
     return Stream.of(
       new TripParamStructure().withModeAndModeOfOperationFilter(
-        new ModeAndModeOfOperationFilterStructure()
-          .withExclude(true)
+        new ModeAndModeOfOperationFilterStructure().withExclude(true)
           .withPersonalMode(PersonalModesEnumeration.BICYCLE)
       ),
       new TripParamStructure().withModeAndModeOfOperationFilter(
-        new ModeAndModeOfOperationFilterStructure()
-          .withExclude(false)
+        new ModeAndModeOfOperationFilterStructure().withExclude(false)
           .withPersonalMode(PersonalModesEnumeration.BICYCLE, PersonalModesEnumeration.CAR)
       ),
       new TripParamStructure().withModeAndModeOfOperationFilter(
-        new ModeAndModeOfOperationFilterStructure()
-          .withExclude(false)
+        new ModeAndModeOfOperationFilterStructure().withExclude(false)
           .withPersonalMode(PersonalModesEnumeration.BICYCLE),
-        new ModeAndModeOfOperationFilterStructure()
-          .withExclude(false)
+        new ModeAndModeOfOperationFilterStructure().withExclude(false)
           .withPersonalMode(PersonalModesEnumeration.FOOT)
       )
     );
@@ -307,8 +290,7 @@ class RouteRequestMapperTest {
   }
 
   private static OJPTripRequestStructure baseRequest() {
-    return new OJPTripRequestStructure()
-      .withOrigin(geoPosition(47.3769, 8.5417))
+    return new OJPTripRequestStructure().withOrigin(geoPosition(47.3769, 8.5417))
       .withDestination(geoPosition(46.9480, 7.4474));
   }
 

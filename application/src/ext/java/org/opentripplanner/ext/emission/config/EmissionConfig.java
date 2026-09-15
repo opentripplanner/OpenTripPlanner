@@ -16,8 +16,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class EmissionConfig {
 
   public static EmissionParameters mapEmissionsConfig(String parameterName, NodeAdapter root) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_5)
       .summary("Emissions configuration.")
       .description(
@@ -33,13 +32,11 @@ public class EmissionConfig {
 
   private static EmissionVehicleParameters mapCar(NodeAdapter c) {
     return new EmissionVehicleParameters(
-      c
-        .of("carAvgCo2PerKm")
+      c.of("carAvgCo2PerKm")
         .since(V2_5)
         .summary("The average CO₂ emissions of a car in grams per kilometer.")
         .asGram(CAR_DEFAULTS.avgCo2PerKm()),
-      c
-        .of("carAvgOccupancy")
+      c.of("carAvgOccupancy")
         .since(V2_5)
         .summary("The average number of passengers in a car.")
         .asDouble(CAR_DEFAULTS.avgOccupancy())
@@ -47,8 +44,7 @@ public class EmissionConfig {
   }
 
   private static List<EmissionFeedParameters> mapFeeds(NodeAdapter c) {
-    return c
-      .of("feeds")
+    return c.of("feeds")
       .since(V2_8)
       .summary("List of emission feeds.")
       .asObjects(List.of(), EmissionConfig::mapFeed);
@@ -56,8 +52,7 @@ public class EmissionConfig {
 
   private static EmissionFeedParameters mapFeed(NodeAdapter c) {
     return new EmissionFeedParameters(
-      c
-        .of("feedId")
+      c.of("feedId")
         .since(V2_8)
         .summary("Specify the feed id to use for matching transit ids in the emission input data.")
         .asString(),

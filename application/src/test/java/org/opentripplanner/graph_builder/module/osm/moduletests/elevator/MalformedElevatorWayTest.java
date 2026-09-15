@@ -20,8 +20,8 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 class MalformedElevatorWayTest {
 
   /**
-   * If the connected nodes of an elevator way have been modeled as elevators, they do not appear
-   * as intersection nodes. OTP should create an issue, but it should not cause errors.
+   * If the connected nodes of an elevator way have been modeled as elevators, they do not appear as
+   * intersection nodes. OTP should create an issue, but it should not cause errors.
    */
   @Test
   void elevatorWayWithFewerThanTwoIntersectionNodes() {
@@ -44,8 +44,7 @@ class MalformedElevatorWayTest {
     var elevatorHopEdges = graph.findEdges(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(0);
 
-    var issues = issueStore
-      .listIssues()
+    var issues = issueStore.listIssues()
       .stream()
       .filter(issue -> issue instanceof FewerThanTwoIntersectionNodesInElevatorWay)
       .map(FewerThanTwoIntersectionNodesInElevatorWay.class::cast)
@@ -60,9 +59,9 @@ class MalformedElevatorWayTest {
    * (because it is referenced by a second way) without ever getting a real graph vertex built for
    * it.
    * <p>
-   * In this test, node {@code b} sits at the same coordinate as the elevator way's other endpoint
-   * {@code a} - a mapping error rather than a legitimate way of tagging an elevator, but one that
-   * does occur in real OSM data - and carries no node-level "level" tag itself, so the
+   * In this test, node {@code b} sits at the same coordinate as the elevator way's other
+   * endpoint {@code a} - a mapping error rather than a legitimate way of tagging an elevator, but
+   * one that does occur in real OSM data - and carries no node-level "level" tag itself, so the
    * duplicate-node handling in OsmModule's street-graph-building loop drops it while processing the
    * elevator way: it never becomes the "from" or "to" node of a street edge there. Node {@code b}
    * is also referenced by a second way that is relevant for routing (it's a bicycle parking way)
@@ -73,8 +72,8 @@ class MalformedElevatorWayTest {
    * list of candidate intersection nodes for the elevator way, then failed to look up a vertex that
    * was never built.
    * <p>
-   * The vertex-generator's intersection-node check must distinguish "candidate, not yet built" from
-   * "has a real vertex" so that elevator-way processing degrades gracefully (reporting a
+   * The vertex-generator's intersection-node check must distinguish "candidate, not yet built"
+   * from "has a real vertex" so that elevator-way processing degrades gracefully (reporting a
    * {@link FewerThanTwoIntersectionNodesInElevatorWay} issue) instead of crashing with a
    * NullPointerException when it looks up the vertex.
    */

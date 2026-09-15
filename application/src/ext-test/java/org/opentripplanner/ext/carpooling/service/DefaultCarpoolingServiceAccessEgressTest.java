@@ -42,9 +42,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Integration tests for {@link DefaultCarpoolingService#routeAccessEgress}.
  * <p>
- * These tests use a real street graph with transit stops to verify the full
- * access/egress routing pipeline including nearby stop finding, insertion
- * evaluation, and result mapping.
+ * These tests use a real street graph with transit stops to verify the full access/egress
+ * routing pipeline including nearby stop finding, insertion evaluation, and result mapping.
  * <p>
  * Graph layout (going east):
  * <pre>
@@ -76,9 +75,8 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(59.9139, 10.7522);
   private static final ZoneId ZONE = ZoneId.of("Europe/Oslo");
-  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0).atZone(
-    ZONE
-  );
+  private static final ZonedDateTime SEARCH_TIME = LocalDateTime.of(2025, 6, 15, 12, 0)
+    .atZone(ZONE);
 
   private DefaultCarpoolingService service;
   private CarpoolingServiceTestContext context;
@@ -103,94 +101,92 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   @BeforeEach
   void setUp() {
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          // Main road intersections going east, same as DirectTest
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(500));
-          var C = intersection("C", ORIGIN.moveEastMeters(1500));
-          var D = intersection("D", ORIGIN.moveEastMeters(2000));
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        // Main road intersections going east, same as DirectTest
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(500));
+        var C = intersection("C", ORIGIN.moveEastMeters(1500));
+        var D = intersection("D", ORIGIN.moveEastMeters(2000));
 
-          coordA = A.toWgsCoordinate();
-          coordB = B.toWgsCoordinate();
-          coordC = C.toWgsCoordinate();
-          coordD = D.toWgsCoordinate();
+        coordA = A.toWgsCoordinate();
+        coordB = B.toWgsCoordinate();
+        coordC = C.toWgsCoordinate();
+        coordD = D.toWgsCoordinate();
 
-          // Main road streets
-          biStreet(A, B, 500);
-          biStreet(B, C, 1000);
-          biStreet(C, D, 500);
+        // Main road streets
+        biStreet(A, B, 500);
+        biStreet(B, C, 1000);
+        biStreet(C, D, 500);
 
-          // Transit stop intersections
-          var iT1 = intersection("iT1", ORIGIN.moveEastMeters(250).moveNorthMeters(200));
-          var iT2 = intersection("iT2", ORIGIN.moveEastMeters(250).moveSouthMeters(200));
-          var iT3 = intersection("iT3", ORIGIN.moveEastMeters(1750).moveNorthMeters(200));
-          var iT4 = intersection("iT4", ORIGIN.moveEastMeters(1750).moveSouthMeters(200));
+        // Transit stop intersections
+        var iT1 = intersection("iT1", ORIGIN.moveEastMeters(250).moveNorthMeters(200));
+        var iT2 = intersection("iT2", ORIGIN.moveEastMeters(250).moveSouthMeters(200));
+        var iT3 = intersection("iT3", ORIGIN.moveEastMeters(1750).moveNorthMeters(200));
+        var iT4 = intersection("iT4", ORIGIN.moveEastMeters(1750).moveSouthMeters(200));
 
-          // Connect transit stop intersections to main road
-          biStreet(A, iT1, 320);
-          biStreet(B, iT1, 320);
-          biStreet(A, iT2, 320);
-          biStreet(B, iT2, 320);
-          biStreet(C, iT3, 320);
-          biStreet(D, iT3, 320);
-          biStreet(C, iT4, 320);
-          biStreet(D, iT4, 320);
+        // Connect transit stop intersections to main road
+        biStreet(A, iT1, 320);
+        biStreet(B, iT1, 320);
+        biStreet(A, iT2, 320);
+        biStreet(B, iT2, 320);
+        biStreet(C, iT3, 320);
+        biStreet(D, iT3, 320);
+        biStreet(C, iT4, 320);
+        biStreet(D, iT4, 320);
 
-          // Transit stops at each transit intersection
-          stopT1 = stop("T1", iT1.toWgsCoordinate());
-          stopT2 = stop("T2", iT2.toWgsCoordinate());
-          stopT3 = stop("T3", iT3.toWgsCoordinate());
-          stopT4 = stop("T4", iT4.toWgsCoordinate());
+        // Transit stops at each transit intersection
+        stopT1 = stop("T1", iT1.toWgsCoordinate());
+        stopT2 = stop("T2", iT2.toWgsCoordinate());
+        stopT3 = stop("T3", iT3.toWgsCoordinate());
+        stopT4 = stop("T4", iT4.toWgsCoordinate());
 
-          biLink(iT1, stopT1);
-          biLink(iT2, stopT2);
-          biLink(iT3, stopT3);
-          biLink(iT4, stopT4);
+        biLink(iT1, stopT1);
+        biLink(iT2, stopT2);
+        biLink(iT3, stopT3);
+        biLink(iT4, stopT4);
 
-          // T5 sits on a pedestrian-only side branch off the drivable network: a car can drive
-          // to D but cannot continue to iT5, so a pure CAR nearby-stop search misses it.
-          // CAR_PICKUP, which models walk -> drive -> walk, can drive to D and walk the
-          // final stretch to reach stopT5.
-          var iT5 = intersection("iT5", ORIGIN.moveEastMeters(2000).moveNorthMeters(200));
-          street(
-            D,
-            iT5,
-            200,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          stopT5 = stop("T5", iT5.toWgsCoordinate());
-          biLink(iT5, stopT5);
+        // T5 sits on a pedestrian-only side branch off the drivable network: a car can drive
+        // to D but cannot continue to iT5, so a pure CAR nearby-stop search misses it.
+        // CAR_PICKUP, which models walk -> drive -> walk, can drive to D and walk the
+        // final stretch to reach stopT5.
+        var iT5 = intersection("iT5", ORIGIN.moveEastMeters(2000).moveNorthMeters(200));
+        street(
+          D,
+          iT5,
+          200,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        stopT5 = stop("T5", iT5.toWgsCoordinate());
+        biLink(iT5, stopT5);
 
-          // Passenger locations
-          var iP1 = intersection("P1", ORIGIN.moveWestMeters(50000));
-          biStreet(iP1, A, 50000);
+        // Passenger locations
+        var iP1 = intersection("P1", ORIGIN.moveWestMeters(50000));
+        biStreet(iP1, A, 50000);
 
-          var iP2 = intersection("P2", ORIGIN.moveEastMeters(1000).moveNorthMeters(200));
-          biStreet(B, iP2, 539);
-          biStreet(C, iP2, 539);
+        var iP2 = intersection("P2", ORIGIN.moveEastMeters(1000).moveNorthMeters(200));
+        biStreet(B, iP2, 539);
+        biStreet(C, iP2, 539);
 
-          var iP3 = intersection("P3", ORIGIN.moveEastMeters(52000));
-          biStreet(D, iP3, 50000);
+        var iP3 = intersection("P3", ORIGIN.moveEastMeters(52000));
+        biStreet(D, iP3, 50000);
 
-          // Passenger coordinates
-          coordP1 = iP1.toWgsCoordinate();
-          coordP2 = iP2.toWgsCoordinate();
-          coordP3 = iP3.toWgsCoordinate();
+        // Passenger coordinates
+        coordP1 = iP1.toWgsCoordinate();
+        coordP2 = iP2.toWgsCoordinate();
+        coordP3 = iP3.toWgsCoordinate();
 
-          // Store vertices for linking context and independent routing
-          DefaultCarpoolingServiceAccessEgressTest.this.vertexA = A;
-          DefaultCarpoolingServiceAccessEgressTest.this.vertexP1 = iP1;
-          DefaultCarpoolingServiceAccessEgressTest.this.vertexP2 = iP2;
-          DefaultCarpoolingServiceAccessEgressTest.this.vertexP3 = iP3;
-          DefaultCarpoolingServiceAccessEgressTest.this.vertexIT3 = iT3;
-          DefaultCarpoolingServiceAccessEgressTest.this.vertexIT4 = iT4;
-        }
+        // Store vertices for linking context and independent routing
+        DefaultCarpoolingServiceAccessEgressTest.this.vertexA = A;
+        DefaultCarpoolingServiceAccessEgressTest.this.vertexP1 = iP1;
+        DefaultCarpoolingServiceAccessEgressTest.this.vertexP2 = iP2;
+        DefaultCarpoolingServiceAccessEgressTest.this.vertexP3 = iP3;
+        DefaultCarpoolingServiceAccessEgressTest.this.vertexIT3 = iT3;
+        DefaultCarpoolingServiceAccessEgressTest.this.vertexIT4 = iT4;
       }
-    );
+    });
 
     context = CarpoolingServiceTestContext.of(model);
     service = context.service();
@@ -213,9 +209,8 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       .withFrom(GenericLocation.fromCoordinate(from.latitude(), from.longitude()))
       .withTo(GenericLocation.fromCoordinate(to.latitude(), to.longitude()))
       .withDateTime(dateTime.toInstant())
-      .withJourney(j ->
-        j
-          .withAccess(new StreetRequest(StreetMode.CARPOOL))
+      .withJourney(
+        j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL))
           .withEgress(new StreetRequest(StreetMode.CARPOOL))
       )
       .buildRequest();
@@ -550,13 +545,13 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   /**
    * Regression test: {@code routeAccessEgress} must call {@code findNearbyStops} with
-   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search
-   * to leave the drivable network and walk the last stretch to a transit stop whose link
-   * endpoint is reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
+   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search to
+   * leave the drivable network and walk the last stretch to a transit stop whose link endpoint is
+   * reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
    * <p>
    * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A pure CAR
-   * search would never reach it, so it would not appear in any access result. If the
-   * implementation regresses to using CAR here, this assertion will fail.
+   * search would never reach it, so it would not appear in any access result. If the implementation
+   * regresses to using CAR here, this assertion will fail.
    */
   @Test
   void accessFindsTransitStopReachableOnlyViaWalkOnlySideBranchFromDrivableNetwork() {
@@ -575,8 +570,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     );
 
     int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
-    var stopT5Result = results
-      .stream()
+    var stopT5Result = results.stream()
       .filter(r -> r.stop() == stopT5Index)
       .findFirst()
       .orElse(null);
@@ -604,11 +598,11 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   }
 
   /**
-   * Counterpart to the walk-only-side-branch test: when both the passenger and the transit stop sit on
-   * the drivable network, the carpool can pick up at the passenger's location and drop off at
+   * Counterpart to the walk-only-side-branch test: when both the passenger and the transit stop sit
+   * on the drivable network, the carpool can pick up at the passenger's location and drop off at
    * the stop's link vertex without any walking. Both {@code walkToPickup} and
-   * {@code walkFromDropoff} must therefore be {@code null} (rather than zero-duration
-   * placeholders) so the itinerary mapper can tell the walking and no-walking cases apart.
+   * {@code walkFromDropoff} must therefore be {@code null} (rather than zero-duration placeholders)
+   * so the itinerary mapper can tell the walking and no-walking cases apart.
    */
   @Test
   void accessResultForStopOnDrivableNetworkHasNullWalkSegments() {
@@ -627,8 +621,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     );
 
     int stopT3Index = transitServiceResolver.getStop(stopT3.getId()).getIndex();
-    var stopT3Result = results
-      .stream()
+    var stopT3Result = results.stream()
       .filter(r -> r.stop() == stopT3Index)
       .findFirst()
       .orElse(null);
@@ -722,8 +715,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       drivingDurationP2ToIT4
     );
 
-    var filteredResults = results
-      .stream()
+    var filteredResults = results.stream()
       .filter(r -> targetStopIndices.contains(r.stop()))
       .toList();
     assertEquals(
@@ -750,8 +742,9 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       var drivingP2ToStop = expectedDrivingP2ToStop.get(accessEgress.stop());
       // Boarding dwell at P2 is now part of the passenger's ride duration, so the arrival
       // time is the departure (arrival at P2) plus boarding plus driving from P2 to the stop.
-      var expectedArrival =
-        expectedDeparture + (int) pickupTime.getSeconds() + (int) drivingP2ToStop.getSeconds();
+      var expectedArrival = expectedDeparture +
+        (int) pickupTime.getSeconds() +
+        (int) drivingP2ToStop.getSeconds();
       assertEquals(
         expectedArrival,
         accessEgress.getPassengerArrivalTime(),
@@ -763,22 +756,20 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
   /**
    * Verifies the booking URL is rewritten with passenger pickup/dropoff query parameters when an
-   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial,
-   * the {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
+   * access leg is mapped to an itinerary. To make the walk-vs-carpool distinction non-trivial, the
+   * {@code stopT5} access path is targeted: the carpool drops at {@code D} (the only drivable
    * vertex incident to T5's pedestrian-only side branch) and the passenger then walks
-   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg,
-   * so the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the
-   * walking endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
+   * {@code D → T5}. The resulting itinerary therefore contains a walk leg after the carpool leg, so
+   * the URL must use the carpool's <em>alighting</em> coordinate ({@code D}) and not the walking
+   * endpoint ({@code T5}), and equally not the driver's trip origin ({@code A}).
    */
   @Test
   void accessItinerary_expandsCarpoolBoardingAndAlightingCoords_notWalkLegCoords() {
     var departureTime = SEARCH_TIME.plusMinutes(30);
     var baseTrip = CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime);
-    var trip = new CarpoolTripBuilder(baseTrip)
-      .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
-      )
-      .build();
+    var trip = new CarpoolTripBuilder(baseTrip).withPublicContactInformation(
+      ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
+    ).build();
     context.upsertTrip(trip);
 
     var request = buildCarpoolRequest(coordP2, coordP3, SEARCH_TIME);
@@ -791,12 +782,13 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     );
 
     int stopT5Index = transitServiceResolver.getStop(stopT5.getId()).getIndex();
-    var stopT5Result = results
-      .stream()
+    var stopT5Result = results.stream()
       .filter(r -> r.stop() == stopT5Index)
       .findFirst()
-      .orElseThrow(() ->
-        new AssertionError("Expected an access result for stopT5 (forces a walk-from-dropoff leg)")
+      .orElseThrow(
+        () -> new AssertionError(
+          "Expected an access result for stopT5 (forces a walk-from-dropoff leg)"
+        )
       );
 
     var mapper = new CarpoolItineraryMapper();
@@ -806,14 +798,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     // Sanity: the test only distinguishes carpool alighting (D) from the walk-leg endpoint
     // (T5) if a WALK leg is actually present.
     assertTrue(
-      itinerary
-        .legs()
+      itinerary.legs()
         .stream()
         .anyMatch(l -> l instanceof StreetLeg sl && sl.getMode() == TraverseMode.WALK)
     );
 
-    var carpoolLeg = itinerary
-      .legs()
+    var carpoolLeg = itinerary.legs()
       .stream()
       .filter(l -> l instanceof CarpoolLeg)
       .findFirst()

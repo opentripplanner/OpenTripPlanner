@@ -9,16 +9,17 @@ import org.opentripplanner.street.search.state.State;
 /**
  * Default implementation of the RaptorAccessEgress interface.
  * <p>
- * Implementation note: As stated in the RoutingAccessEgress interface contract {@link RoutingAccessEgress#getFinalState()},
- * this class exposes the final A* state in search order, not in chronological order. For egress searches this State is
- * unreversed ({@code request.arriveBy() == true}) — reversal is deferred to
- * {@link org.opentripplanner.astar.model.GraphPath} construction, which only happens for
- * winning paths during itinerary mapping. This avoids the cost of cloning and reversing the entire State
+ * Implementation note: As stated in the RoutingAccessEgress interface contract
+ * {@link RoutingAccessEgress#getFinalState()}, this class exposes the final A* state in search
+ * order, not in chronological order. For egress searches this State is unreversed
+ * ({@code request.arriveBy() == true}) — reversal is deferred to
+ * {@link org.opentripplanner.astar.model.GraphPath} construction, which only happens for winning
+ * paths during itinerary mapping. This avoids the cost of cloning and reversing the entire State
  * chain for every egress candidate.
  * <p>
  * The scalar values extracted below ({@code getElapsedTimeSeconds}, {@code getWeight},
- * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on
- * both reversed and unreversed State chains.
+ * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on both
+ * reversed and unreversed State chains.
  */
 public class DefaultAccessEgress implements RoutingAccessEgress {
 
@@ -104,13 +105,13 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   /**
    * The final state from the access/egress street search. For egress searches this State is
    * unreversed ({@code request.arriveBy() == true}) — reversal is deferred to
-   * {@link org.opentripplanner.astar.model.GraphPath} construction, which only happens for
-   * winning paths during itinerary mapping. This avoids the cost of cloning and reversing the entire State
+   * {@link org.opentripplanner.astar.model.GraphPath} construction, which only happens for winning
+   * paths during itinerary mapping. This avoids the cost of cloning and reversing the entire State
    * chain for every egress candidate.
    * <p>
    * The scalar values extracted below ({@code getElapsedTimeSeconds}, {@code getWeight},
-   * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on
-   * both reversed and unreversed State chains.
+   * {@code containsOnlyWalkMode}) are direction-independent and produce identical results on both
+   * reversed and unreversed State chains.
    */
   @Override
   public State getFinalState() {
@@ -162,12 +163,10 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     if (!(o instanceof RoutingAccessEgress that)) {
       return false;
     }
-    return (
-      stop() == that.stop() &&
+    return (stop() == that.stop() &&
       durationInSeconds() == that.durationInSeconds() &&
       c1() == that.c1() &&
-      penalty().equals(that.penalty())
-    );
+      penalty().equals(that.penalty()));
   }
 
   @Override
@@ -176,8 +175,8 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * Include summary information in toString. We only include information relevant for using this
-   * in routing (not latestState).
+   * Include summary information in toString. We only include information relevant for using this in
+   * routing (not latestState).
    */
   private String summary() {
     return penalty.isZero() ? null : "w/penalty" + penalty;

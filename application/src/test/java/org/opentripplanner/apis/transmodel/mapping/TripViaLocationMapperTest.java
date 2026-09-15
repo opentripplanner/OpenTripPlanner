@@ -30,7 +30,8 @@ class TripViaLocationMapperTest {
   private static final Duration MIN_WAIT_TIME = Duration.ofMinutes(5);
   private static final List<String> LIST_IDS_INPUT = List.of("F:ID1", "F:ID2");
   private static final String EXPECTED_IDS_AS_STRING = "[F:ID1, F:ID2]";
-  private static final String REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH = """
+  private static final String REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH =
+  """
   Unfortunately the 'placeIds' is not required. Making it required would be a breaking change,
   so wee just ignore it."
   """;
@@ -74,8 +75,9 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithoutIdsOrCoordinates() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, null));
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      MAPPER.mapToViaLocations(List.of(input))
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -86,8 +88,9 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithAnEmptyListOfIds() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of()));
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      MAPPER.mapToViaLocations(List.of(input))
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -130,8 +133,9 @@ class TripViaLocationMapperTest {
       FIELD_PASS_THROUGH,
       mapOf(FIELD_STOP_LOCATION_IDS, List.of())
     );
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      MAPPER.mapToViaLocations(List.of(input))
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A pass-through via-location must have at least one stop location.",
@@ -145,16 +149,18 @@ class TripViaLocationMapperTest {
       entry(FIELD_VISIT, visitInput("A", D1_m, List.of("F:99"), null)),
       entry(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT))
     );
-    var ex = assertThrows(InvalidInputException.class, () ->
-      MAPPER.mapToViaLocations(List.of(input))
+    var ex = assertThrows(
+      InvalidInputException.class,
+      () -> MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "Only one entry in 'via @oneOf' is allowed. Set: 'visit', 'passThrough'",
       ex.getMessage()
     );
 
-    ex = assertThrows(InvalidInputException.class, () ->
-      MAPPER.mapToViaLocations(List.of(Map.of()))
+    ex = assertThrows(
+      InvalidInputException.class,
+      () -> MAPPER.mapToViaLocations(List.of(Map.of()))
     );
     assertEquals(
       "No entries in 'via @oneOf'. One of 'visit', 'passThrough' must be set.",
@@ -229,8 +235,8 @@ class TripViaLocationMapperTest {
   }
 
   /**
-   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}.
-   * The {@link Map#of(Object, Object)} does not support {@code null} values.
+   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}. The
+   * {@link Map#of(Object, Object)} does not support {@code null} values.
    */
   private static Map<String, Object> mapOf(String key, Object value) {
     var map = new HashMap<String, Object>();

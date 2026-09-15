@@ -27,8 +27,7 @@ class NoArrivalTimeTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addStopTimeWithArrivalAndDeparture(0, null, "10:00")
       .build();
 
@@ -40,8 +39,7 @@ class NoArrivalTimeTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addStopTimeWithArrivalAndDeparture(0, "10:00", "10:00")
       .addStopTimeWithArrivalAndDeparture(1, null, "10:09")
       .addStopTimeWithArrivalAndDeparture(2, "10:20", "10:20")

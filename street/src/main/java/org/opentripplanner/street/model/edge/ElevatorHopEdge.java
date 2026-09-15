@@ -114,11 +114,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
-   * The id of the elevator, as extracted from OSM tags configured via the
-   * {@code elevatorRefTags} build-config option. Will be used for #6533.
+   * The id of the elevator, as extracted from OSM tags configured via the {@code elevatorRefTags}
+   * build-config option. Will be used for #6533.
    * <p>
-   * If multiple configured tag groups resolve to a value, the first one (in configured order)
-   * is used.
+   * If multiple configured tag groups resolve to a value, the first one (in configured order) is
+   * used.
    */
   public Optional<String> id() {
     return Optional.ofNullable(id);
@@ -132,8 +132,8 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
-   * Returns the travel time of the elevator.
-   * If travelTime is 0 or below, returns an empty Optional.
+   * Returns the travel time of the elevator. If travelTime is 0 or below, returns an empty
+   * Optional.
    */
   public Optional<Duration> getTravelTime() {
     return travelTime > 0 ? Optional.of(Duration.ofSeconds(travelTime)) : Optional.empty();
@@ -148,7 +148,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     if (s0.getRequest().wheelchairEnabled()) {
       if (
         wheelchairAccessibility != Accessibility.POSSIBLE &&
-        request.wheelchair().elevator().onlyConsiderAccessible()
+          request.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
@@ -183,10 +183,9 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     //
     // X   ElevatorHopVertex
     // --- ElevatorHopEdge
-    int time =
-      this.travelTime > 0
-        ? this.travelTime
-        : (int) (request.elevator().hopTime().toSeconds() * this.levels);
+    int time = this.travelTime > 0
+      ? this.travelTime
+      : (int) (request.elevator().hopTime().toSeconds() * this.levels);
     s1.incrementWeight(request.elevator().reluctance() * time);
     s1.incrementTimeInSeconds(time);
     return s1.makeStateArray();

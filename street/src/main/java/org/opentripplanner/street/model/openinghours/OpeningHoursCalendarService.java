@@ -51,10 +51,8 @@ public class OpeningHoursCalendarService implements Serializable {
       return false;
     }
     final OpeningHoursCalendarService that = (OpeningHoursCalendarService) o;
-    return (
-      deduplicator.equals(that.deduplicator) &&
+    return (deduplicator.equals(that.deduplicator) &&
       startOfPeriod.equals(that.startOfPeriod) &&
-      daysInPeriod == that.daysInPeriod
-    );
+      daysInPeriod == that.daysInPeriod);
   }
 }

@@ -50,8 +50,7 @@ class NoticeAssignmentMapper {
   Multimap<AbstractTransitEntity, Notice> map(Collection<NoticeAssignment> assignments) {
     Multimap<AbstractTransitEntity, Notice> result = ArrayListMultimap.create();
     var notices = noticeMapper.mappedNotices();
-    var trips = tripMapper
-      .getMappedTrips()
+    var trips = tripMapper.getMappedTrips()
       .stream()
       .collect(Collectors.toMap(Trip::getId, Function.identity()));
     var routes = routeMapper.mappedRoutes();

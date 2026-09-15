@@ -1,15 +1,14 @@
 package org.opentripplanner.utils.text;
 
 /**
- * This class is used to escape characters in a string, removing a special character from
- * the string. For example, if you want to make sure a string does not contain {@code ';'},
- * the {@code ';'} can be replaced with {@code '\+'}. The slash({@code '\'}) is used as an
- * escape character, so we need to escape all {@code '\'} as well. Now, the escaped string
- * does not contain the special character anymore. The original string can be computed by
- * reversing the process.
+ * This class is used to escape characters in a string, removing a special character from the
+ * string. For example, if you want to make sure a string does not contain {@code ';'}, the
+ * {@code ';'} can be replaced with {@code '\+'}. The slash({@code '\'}) is used as an escape
+ * character, so we need to escape all {@code '\'} as well. Now, the escaped string does not contain
+ * the special character anymore. The original string can be computed by reversing the process.
  * <p>
- * A "special-character" is removed from a text using an escape character and
- * a substitution character. For example, if:
+ * A "special-character" is removed from a text using an escape character and a substitution
+ * character. For example, if:
  * <ul>
  *   <li>the escape char is '\'</li>
  *   <li>the special char is ';'</li>
@@ -36,8 +35,8 @@ public class CharacterEscapeFormatter {
   private final char substitutionChar;
 
   /**
-   * @param escapeChar the character used as an escape character.
-   * @param specialChar the character to be removed/replaced in the encoded text.
+   * @param escapeChar       the character used as an escape character.
+   * @param specialChar      the character to be removed/replaced in the encoded text.
    * @param substitutionChar the character used together with the escape character to put in the
    *                         encoded text as a placeholder for the special character.
    */
@@ -48,8 +47,9 @@ public class CharacterEscapeFormatter {
   }
 
   /**
-   * Encode the given text and replace the {@code specialChar} with a placeholder. The original
-   * text can be retrieved by using {@link #decode(String)}.
+   * Encode the given text and replace the {@code specialChar} with a placeholder. The original text
+   * can be retrieved by using {@link #decode(String)}.
+   *
    * @param text the text to encode.
    * @return the encoded text without the {@code specialChar}.
    */
@@ -70,6 +70,7 @@ public class CharacterEscapeFormatter {
 
   /**
    * Return the original text by decoding the encoded text.
+   *
    * @see #encode(String)
    */
   public String decode(String encodedText) {
@@ -87,12 +88,8 @@ public class CharacterEscapeFormatter {
           buf.append(specialChar);
         } else {
           throw new IllegalStateException(
-            "Unexpected combination of escape-char '%c' and '%c' character at position %d. Text: '%s'.".formatted(
-              escapeChar,
-              ch,
-              i,
-              encodedText
-            )
+            "Unexpected combination of escape-char '%c' and '%c' character at position %d. Text: '%s'."
+              .formatted(escapeChar, ch, i, encodedText)
           );
         }
         prevEsc = false;

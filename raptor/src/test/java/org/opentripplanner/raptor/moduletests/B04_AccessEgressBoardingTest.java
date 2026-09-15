@@ -23,9 +23,9 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * after access and alighting before egress, not after/before other transit legs. The setup is a bit
  * simpler since we only need one Route with three access and egress paths.
  * <p>
- * The routing strategies do not board at the same stop, they should board at the optimal stop for
- * the criterion which they optimize on. Read the doc for {@link A04_BoardingTest} which describe
- * the expected behavior with respect to boarding.
+ * The routing strategies do not board at the same stop, they should board at the optimal stop
+ * for the criterion which they optimize on. Read the doc for {@link A04_BoardingTest} which
+ * describe the expected behavior with respect to boarding.
  * <p>
  * Note! This test run one iteration. It does not run RangeRaptor over a time window.
  */
@@ -49,13 +49,12 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access(
-        "Walk 1s ~ A",
-        // Best option
-        "Walk 10s ~ B",
-        "Walk 5m ~ C"
-      )
+    data.access(
+      "Walk 1s ~ A",
+      // Best option
+      "Walk 10s ~ B",
+      "Walk 5m ~ C"
+    )
       .withTimetables(
         """
         A     B     C     D     E     F
@@ -69,8 +68,7 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
         "F ~ Walk 1s"
       );
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();

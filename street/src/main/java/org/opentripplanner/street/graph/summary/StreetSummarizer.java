@@ -90,8 +90,7 @@ class StreetSummarizer {
     }
 
     if (!v.areaStops().isEmpty()) {
-      var ids = v
-        .areaStops()
+      var ids = v.areaStops()
         .stream()
         .map(FeedScopedId::toString)
         .sorted()
@@ -107,8 +106,8 @@ class StreetSummarizer {
     return "-0".equals(s) ? "0" : s;
   }
 
-  /// Lists the traverse modes for which the edge is marked as no-thru-traffic, e.g. `" noThru=WALK,CAR"`.
-  /// Returns an empty string if the edge is not restricted for any mode.
+  /// Lists the traverse modes for which the edge is marked as no-thru-traffic, e.g. `"
+  /// noThru=WALK,CAR"`. Returns an empty string if the edge is not restricted for any mode.
   private static String summarizeNoThru(StreetEdge e) {
     var modes = new ArrayList<String>();
     if (e.isWalkNoThruTraffic()) {

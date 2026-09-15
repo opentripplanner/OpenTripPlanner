@@ -40,15 +40,15 @@ import uk.org.siri.siri21.WorkflowStatusEnumeration;
  * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange (SX) feeds.
  * As the incoming SIRI SX messages are mapped to internal TransitAlerts, their FeedScopedIds will
  * be the single feed ID associated with this update handler, plus the situation number provided in
- * the SIRI SX message.
- * This class cannot handle situations where incoming messages are being applied to multiple static
- * feeds with different IDs. For now it may only work in single-feed regions. A possible workaround
- * is to assign the same feed ID to multiple static feeds where it is known that their entity IDs
- * are all drawn from the same namespace (i.e. they are functionally fragments of the same feed).
- * TODO RT_AB: Internal FeedScopedId creation strategy should probably be pluggable or configurable.
- *   TG has indicated this is a necessary condition for moving this updater out of sandbox.
- * TODO RT_AB: The name should be clarified, as there is no such thing as "SIRI Alerts", and it
- *   is referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
+ * the SIRI SX message. This class cannot handle situations where incoming messages are being
+ * applied to multiple static feeds with different IDs. For now it may only work in single-feed
+ * regions. A possible workaround is to assign the same feed ID to multiple static feeds where it is
+ * known that their entity IDs are all drawn from the same namespace (i.e. they are functionally
+ * fragments of the same feed). TODO RT_AB: Internal FeedScopedId creation strategy should probably
+ * be pluggable or configurable. TG has indicated this is a necessary condition for moving this
+ * updater out of sandbox. TODO RT_AB: The name should be clarified, as there is no such thing as
+ * "SIRI Alerts", and it is referencing the internal model concept of "Alerts" which are derived
+ * from GTFS terminology.
  */
 public class SiriAlertsUpdateHandler {
 
@@ -77,15 +77,16 @@ public class SiriAlertsUpdateHandler {
   }
 
   public void update(ServiceDelivery delivery, TransitRealTimeUpdateContext context) {
-    for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
+    for (
+      SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()
+    ) {
       SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
       if (situations != null) {
         long t1 = System.currentTimeMillis();
         int addedCounter = 0;
         int expiredCounter = 0;
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
-          boolean expireSituation =
-            sxElement.getProgress() != null &&
+          boolean expireSituation = sxElement.getProgress() != null &&
             sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED);
 
           if (sxElement.getSituationNumber() == null) {
@@ -131,9 +132,9 @@ public class SiriAlertsUpdateHandler {
   }
 
   /**
-   * Build an internal model Alert from an incoming SIRI situation exchange element.
-   * May return null if the header, description, and detail text are all empty or missing in the
-   * SIRI message. In all other cases it will return a valid TransitAlert instance.
+   * Build an internal model Alert from an incoming SIRI situation exchange element. May return null
+   * if the header, description, and detail text are all empty or missing in the SIRI message. In
+   * all other cases it will return a valid TransitAlert instance.
    */
   private TransitAlert mapSituationToAlert(
     PtSituationElement situation,
@@ -143,8 +144,8 @@ public class SiriAlertsUpdateHandler {
 
     if (
       I18NString.hasNoValue(alert.headerText()) &&
-      I18NString.hasNoValue(alert.descriptionText()) &&
-      I18NString.hasNoValue(alert.detailText())
+        I18NString.hasNoValue(alert.descriptionText()) &&
+        I18NString.hasNoValue(alert.detailText())
     ) {
       LOG.debug(
         "Empty Alert - ignoring situationNumber: {}",
@@ -166,12 +167,12 @@ public class SiriAlertsUpdateHandler {
     if (situation.getValidityPeriods().size() > 0) {
       ArrayList<TimePeriod> periods = new ArrayList<>();
       for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
-        final Instant start =
-          activePeriod.getStartTime() != null
-            ? activePeriod.getStartTime().toInstant().minus(earlyStart)
-            : null;
-        final Instant end =
-          activePeriod.getEndTime() != null ? activePeriod.getEndTime().toInstant() : null;
+        final Instant start = activePeriod.getStartTime() != null
+          ? activePeriod.getStartTime().toInstant().minus(earlyStart)
+          : null;
+        final Instant end = activePeriod.getEndTime() != null
+          ? activePeriod.getEndTime().toInstant()
+          : null;
 
         periods.add(TimePeriod.of(start, end));
       }
@@ -185,10 +186,9 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
-    var fuzzyTripMatcher =
-      siriFuzzyTripMatcherCache != null
-        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
-        : null;
+    var fuzzyTripMatcher = siriFuzzyTripMatcherCache != null
+      ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, context.transitService())
+      : null;
     alert.addEntites(
       new AffectsMapper(feedId, fuzzyTripMatcher, context.transitService()).mapAffects(
         situation.getAffects()
@@ -284,7 +284,7 @@ public class SiriAlertsUpdateHandler {
 
   /**
    * @return True if list have at least one element. {@code false} is returned if the given list is
-   * empty or {@code null}.
+   *         empty or {@code null}.
    */
   private boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();

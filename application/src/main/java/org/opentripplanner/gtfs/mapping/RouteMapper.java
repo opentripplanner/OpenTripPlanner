@@ -108,8 +108,7 @@ class RouteMapper {
   }
 
   Map<FeedScopedId, Route> mappedRoutes() {
-    return mappedRoutes
-      .values()
+    return mappedRoutes.values()
       .stream()
       .collect(Collectors.toMap(Route::getId, Function.identity()));
   }

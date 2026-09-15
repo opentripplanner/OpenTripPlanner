@@ -28,8 +28,8 @@ public class QuayAtDistanceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment ->
-            relay.toGlobalId(
+          .dataFetcher(
+            environment -> relay.toGlobalId(
               "QAD",
               Optional.ofNullable((NearbyStop) environment.getSource())
                 .map(nearbyStop -> nearbyStop.distance + ";" + idMapper.mapToApi(nearbyStop.stopId))
@@ -42,8 +42,8 @@ public class QuayAtDistanceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(quayType)
-          .dataFetcher(environment ->
-            getTransitService(environment).getStopLocation(
+          .dataFetcher(
+            environment -> getTransitService(environment).getStopLocation(
               ((NearbyStop) environment.getSource()).stopId
             )
           )

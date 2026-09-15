@@ -33,8 +33,8 @@ public class VehicleWalkingPreferences implements Serializable {
   }
 
   /**
-   * Sets the vehicle walking preferences, does some input value validation and rounds
-   * reluctances and speed to not have too many decimals.
+   * Sets the vehicle walking preferences, does some input value validation and rounds reluctances
+   * and speed to not have too many decimals.
    */
   private VehicleWalkingPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
@@ -60,13 +60,12 @@ public class VehicleWalkingPreferences implements Serializable {
   }
 
   /**
-   * A multiplier for how bad walking is, compared to being in transit for equal
-   * lengths of time. Empirically, values between 2 and 4 seem to correspond
-   * well to the concept of not wanting to walk too much without asking for
-   * totally ridiculous itineraries, but this observation should in no way be
-   * taken as scientific or definitive. Your mileage may vary. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
-   * performance with high values. Default value: 2.0
+   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+   * Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to
+   * walk too much without asking for totally ridiculous itineraries, but this observation should in
+   * no way be taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
+   * high values. Default value: 2.0
    */
   public double reluctance() {
     return reluctance;
@@ -96,13 +95,11 @@ public class VehicleWalkingPreferences implements Serializable {
       return false;
     }
     VehicleWalkingPreferences that = (VehicleWalkingPreferences) o;
-    return (
-      speed == that.speed &&
+    return (speed == that.speed &&
       reluctance == that.reluctance &&
       Objects.equals(mountDismountTime, that.mountDismountTime) &&
       Objects.equals(mountDismountCost, that.mountDismountCost) &&
-      stairsReluctance == that.stairsReluctance
-    );
+      stairsReluctance == that.stairsReluctance);
   }
 
   @Override

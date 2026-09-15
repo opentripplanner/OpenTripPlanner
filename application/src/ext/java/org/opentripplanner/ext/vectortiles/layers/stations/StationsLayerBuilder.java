@@ -19,8 +19,8 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class StationsLayerBuilder extends LayerBuilder<Station> {
 
-  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<Station>>> mappers =
-    Map.of(MapperType.Digitransit, DigitransitStationPropertyMapper::create);
+  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<Station>>> mappers = Map
+    .of(MapperType.Digitransit, DigitransitStationPropertyMapper::create);
   private final TransitService transitService;
 
   public StationsLayerBuilder(
@@ -37,16 +37,12 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
   }
 
   protected List<Geometry> findGeometries(Envelope query) {
-    return transitService
-      .listStations()
-      .stream()
-      .map(station -> {
-        Coordinate coordinate = station.getCoordinate().asJtsCoordinate();
-        Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        point.setUserData(station);
-        return point;
-      })
-      .collect(Collectors.toList());
+    return transitService.listStations().stream().map(station -> {
+      Coordinate coordinate = station.getCoordinate().asJtsCoordinate();
+      Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
+      point.setUserData(station);
+      return point;
+    }).collect(Collectors.toList());
   }
 
   enum MapperType {

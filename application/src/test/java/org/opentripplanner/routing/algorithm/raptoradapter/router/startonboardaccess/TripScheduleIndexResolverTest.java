@@ -81,8 +81,9 @@ class TripScheduleIndexResolverTest {
     // A1 is not visited by the trip
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
     var location = new LocationInTripPatternReference(stopA1.getIndex(), 0, 0);
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripScheduleIndexResolver(env.raptorRoutingRequestTransitData()).resolve(
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripScheduleIndexResolver(env.raptorRoutingRequestTransitData()).resolve(
         tripAndServiceDate,
         location
       )
@@ -104,8 +105,9 @@ class TripScheduleIndexResolverTest {
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
     var patternSearch = env.raptorRoutingRequestTransitData();
     var location = new LocationInTripPatternReference(STOP_B.getIndex(), 1, 0);
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripScheduleIndexResolver(patternSearch).resolve(tripAndServiceDate, location)
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripScheduleIndexResolver(patternSearch).resolve(tripAndServiceDate, location)
     );
   }
 
@@ -129,16 +131,17 @@ class TripScheduleIndexResolverTest {
     var patternSearch = env.raptorRoutingRequestTransitData();
 
     // Position 1 does not allow boarding
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripScheduleIndexResolver(patternSearch).resolve(
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripScheduleIndexResolver(patternSearch).resolve(
         tripAndServiceDate,
         new LocationInTripPatternReference(STOP_B.getIndex(), 1, 0)
       )
     );
 
     // Position 4 does allow boarding
-    assertDoesNotThrow(() ->
-      new TripScheduleIndexResolver(patternSearch).resolve(
+    assertDoesNotThrow(
+      () -> new TripScheduleIndexResolver(patternSearch).resolve(
         tripAndServiceDate,
         new LocationInTripPatternReference(STOP_B.getIndex(), 4, 0)
       )

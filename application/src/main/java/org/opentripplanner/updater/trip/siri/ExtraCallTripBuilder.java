@@ -135,7 +135,7 @@ class ExtraCallTripBuilder {
         StopLocation stopInNewPattern = stopTime.getStop();
         if (
           !stopInNewPattern.equals(stopInOriginalPattern) &&
-          !stopInNewPattern.isPartOfSameStationAs(stopInOriginalPattern)
+            !stopInNewPattern.isPartOfSameStationAs(stopInOriginalPattern)
         ) {
           throw UpdateException.of(trip.getId(), STOP_MISMATCH);
         }
@@ -147,9 +147,8 @@ class ExtraCallTripBuilder {
     // TODO: We always create a new TripPattern to be able to modify its scheduled timetable
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
-    var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
-      transitService.getTripCalendars().getServiceCode(trip.getServiceId())
-    );
+    var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator)
+      .withServiceCode(transitService.getTripCalendars().getServiceCode(trip.getServiceId()));
     // validate the scheduled trip times
     // they are in general superseded by real-time trip times
     // but in case of trip cancellation, OTP will fall back to scheduled trip times

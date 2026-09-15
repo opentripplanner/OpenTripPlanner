@@ -94,8 +94,7 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
 
   @Override
   public boolean sameAs(Pathway other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(pathwayMode, other.getPathwayMode()) &&
       Objects.equals(fromStop, other.getFromStop()) &&
       Objects.equals(toStop, other.getToStop()) &&
@@ -105,8 +104,7 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
       Objects.equals(length, other.getLength()) &&
       Objects.equals(stairCount, other.getStairCount()) &&
       Objects.equals(slope, other.getSlope()) &&
-      Objects.equals(isBidirectional, other.isBidirectional())
-    );
+      Objects.equals(isBidirectional, other.isBidirectional()));
   }
 
   @Override

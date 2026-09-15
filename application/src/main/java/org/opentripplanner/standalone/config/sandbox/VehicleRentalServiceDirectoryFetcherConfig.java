@@ -13,8 +13,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     String parameterName,
     NodeAdapter root
   ) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_0)
       .summary("Configuration for the vehicle rental service directory using GBFS v3 manifest.")
       .description(
@@ -31,8 +30,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     }
 
     return new VehicleRentalServiceDirectoryFetcherParameters(
-      c
-        .of("url")
+      c.of("url")
         .since(V2_1)
         .summary("URL of the GBFS v3 manifest.json")
         .description(

@@ -44,16 +44,14 @@ public class EntityResolver {
       return trip.get();
     }
 
-    Optional<TripOnServiceDate> tripOnServiceDate = journey
-      .datedVehicleJourneyRef()
+    Optional<TripOnServiceDate> tripOnServiceDate = journey.datedVehicleJourneyRef()
       .map(jf -> transitService.getTripOnServiceDate(resolveId(jf)));
     if (tripOnServiceDate.isPresent()) {
       return tripOnServiceDate.get().getTrip();
     }
 
     // It is possible that the trip has previously been added, resolve the added trip
-    return journey
-      .code()
+    return journey.code()
       .map(c -> transitService.getTrip(resolveId(c.asServiceJourneyId())))
       .orElse(null);
   }
@@ -97,10 +95,11 @@ public class EntityResolver {
 
     // The added TripOnServiceDate is registered under the DatedServiceJourney-normalized id, so the
     // code must be viewed the same way here for the read path to match the write path.
-    return journey
-      .code()
-      .map(estimatedVehicleJourneyCode ->
-        resolveId(estimatedVehicleJourneyCode.asDatedServiceJourneyId())
+    return journey.code()
+      .map(
+        estimatedVehicleJourneyCode -> resolveId(
+          estimatedVehicleJourneyCode.asDatedServiceJourneyId()
+        )
       )
       .orElse(null);
   }
@@ -116,8 +115,7 @@ public class EntityResolver {
    */
   RegularStop resolveQuay(String stopPointRef) {
     var id = resolveId(stopPointRef);
-    return transitService
-      .findStopByScheduledStopPoint(id)
+    return transitService.findStopByScheduledStopPoint(id)
       .orElseGet(() -> transitService.getRegularStop(id));
   }
 
@@ -138,16 +136,15 @@ public class EntityResolver {
    *   <li>the service date given by the journey's FramedVehicleJourneyRef -> DataFrameRef,</li>
    *   <li>the service date of the DatedServiceJourney referenced by the journey's
    *       DatedVehicleJourneyRef or EstimatedVehicleJourneyCode,</li>
-   *   <li>the date of the aimed departure time at the first call, shifted back by the number of
-   *       days the scheduled trip's first departure lies after midnight (for trips running past
+   *   <li>the date of the aimed departure time at the first call, shifted back by the number of days
+   *       the scheduled trip's first departure lies after midnight (for trips running past
    *       midnight).</li>
    * </ol>
    * Return {@code null} if none of these strategies succeed.
    */
   @Nullable
   LocalDate resolveServiceDate(EstimatedVehicleJourneyWrapper journey) {
-    var serviceDate = journey
-      .vehicleJourneyIdAndServiceDate()
+    var serviceDate = journey.vehicleJourneyIdAndServiceDate()
       .map(VehicleJourneyIdAndServiceDate::serviceDate);
     if (serviceDate.isPresent()) {
       return serviceDate.get();

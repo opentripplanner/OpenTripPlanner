@@ -76,9 +76,9 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
   /**
    * Update the data from the sources. It first fetches parks from the facilities URL and park
-   * groups from hubs URL and then real-time updates from utilizations URL. If facilitiesFrequencySec
-   * is configured to be over 0, it also occasionally retches the parks as new parks might have been
-   * added or the state of the old parks might have changed.
+   * groups from hubs URL and then real-time updates from utilizations URL. If
+   * facilitiesFrequencySec is configured to be over 0, it also occasionally retches the parks as
+   * new parks might have been added or the state of the old parks might have changed.
    *
    * @return true if there might have been changes
    */
@@ -101,8 +101,7 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
     if (parks != null) {
       List<LiipiParkPatch> utilizations = utilizationsDownloader.download();
       if (utilizations != null) {
-        Map<FeedScopedId, List<LiipiParkPatch>> patches = utilizations
-          .stream()
+        Map<FeedScopedId, List<LiipiParkPatch>> patches = utilizations.stream()
           .collect(Collectors.groupingBy(utilization -> utilization.getId()));
         parks.forEach(park -> {
           List<LiipiParkPatch> patchesForPark = patches.get(park.getId());
@@ -139,15 +138,15 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
         Integer spaces = patch.getSpacesAvailable();
 
         switch (type) {
-          case "CAR":
+          case "CAR" :
             availabilityBuilder.carSpaces(spaces);
             hasHandledSpaces = true;
             break;
-          case "BICYCLE":
+          case "BICYCLE" :
             availabilityBuilder.bicycleSpaces(spaces);
             hasHandledSpaces = true;
             break;
-          case "DISABLED":
+          case "DISABLED" :
             availabilityBuilder.wheelchairAccessibleCarSpaces(spaces);
             hasHandledSpaces = true;
             break;
@@ -160,8 +159,8 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
   /**
    * @return true if facilities and hubs have not been successfully downloaded before, or
-   * facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
-   * fetch
+   *         facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last
+   *         successful fetch
    */
   private boolean fetchFacilitiesAndHubsNow() {
     if (parks == null) {

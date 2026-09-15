@@ -24,8 +24,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should add transit-slack + board-slack after flex access, and transit-slack + alight-slack
- * before flex egress.
+ * Raptor should add transit-slack + board-slack after flex access, and transit-slack +
+ * alight-slack before flex egress.
  */
 public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorTestConstants {
 
@@ -47,9 +47,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
           // --> 00:00:00 + flex 30s + slack(1m + 30s) = 00:02:00
           schedule().departures("0:03:29  0:05:29"),
           // This is the trip we expect to board
-          schedule()
-            .departures("0:04:00 0:10:00")
-            .arrivals("0  00:06:00"),
+          schedule().departures("0:04:00 0:10:00").arrivals("0  00:06:00"),
           // REVERSE SEARCH: The last trip arrives too late: It takes 1m40s to get to the
           // point of "boarding" in the reverse search:
           // --> 00:10:00 - (flex 20s + slack(1m + 10s)) = 00:08:30  (arrival time)
@@ -59,8 +57,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
       // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .egress("C ~ Flex 2m Rₙ1");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       // Only one iteration is needed - the access should be time-shifted
@@ -68,8 +65,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "Flex+Walk 2m Rₙ1 ~ B ~ BUS R1 0:04 0:06 ~ C ~ Flex 2m Rₙ1 " +
+    var path = "Flex+Walk 2m Rₙ1 ~ B ~ BUS R1 0:04 0:06 ~ C ~ Flex 2m Rₙ1 " +
       "[0:00:30 0:09:10 8m40s Tₙ2 C₁1_360]";
     return RaptorModuleTestCase.of()
       // TODO - Alight slack is missing

@@ -33,10 +33,9 @@ class AbstractCsvParserTest {
     BOOLEAN_COLUMN,
     LOCAL_DATE_COLUMN
   );
-  private static final String FILE_HEADER =
-    HEADERS.stream().collect(Collectors.joining(", ")) + "\n";
-  private static final String VALID_DATA =
-    FILE_HEADER +
+  private static final String FILE_HEADER = HEADERS.stream().collect(Collectors.joining(", ")) +
+    "\n";
+  private static final String VALID_DATA = FILE_HEADER +
     """
     F:1, 1, 28.0, 1, 2025-10-31
     F:2, 2, 38.0, 0, 20250101
@@ -280,8 +279,9 @@ class AbstractCsvParserTest {
 
   @Test
   void testToString() {
-    assertThrows(UnsupportedOperationException.class, () ->
-      new TestCsvParser(VALID_DATA).toString()
+    assertThrows(
+      UnsupportedOperationException.class,
+      () -> new TestCsvParser(VALID_DATA).toString()
     );
   }
 

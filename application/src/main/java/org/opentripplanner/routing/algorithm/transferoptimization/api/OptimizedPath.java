@@ -17,10 +17,8 @@ import org.opentripplanner.transfer.constrained.model.TransferConstraint;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class OptimizedPath<T extends RaptorTripSchedule>
-  extends Path<T>
-  implements TransferOptimized
-{
+public class OptimizedPath<T extends RaptorTripSchedule> extends Path<T> implements
+  TransferOptimized {
 
   private final int transferPriorityCost;
   private final int waitTimeOptimizedCost;
@@ -105,8 +103,9 @@ public class OptimizedPath<T extends RaptorTripSchedule>
   private static int priorityCost(PathLeg<?> leg) {
     // Only calculate priority cost for transit legs which are followed by at least one
     // other transit leg.
-    return priorityCost(leg.isTransitLeg() && leg.nextTransitLeg() != null, () ->
-      leg.asTransitLeg().getConstrainedTransferAfterLeg()
+    return priorityCost(
+      leg.isTransitLeg() && leg.nextTransitLeg() != null,
+      () -> leg.asTransitLeg().getConstrainedTransferAfterLeg()
     );
   }
 

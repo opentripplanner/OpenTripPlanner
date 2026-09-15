@@ -89,8 +89,7 @@ class GbfsStationInformationMapperTest {
   }
 
   private static GBFSStation validStation() {
-    return new GBFSStation()
-      .withLat(0d)
+    return new GBFSStation().withLat(0d)
       .withLon(0d)
       .withStationId(TEST_STATION_ID)
       .withName(List.of(new GBFSName().withText(TEST_STATION_NAME).withLanguage("EN")));

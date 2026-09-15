@@ -20,8 +20,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return a path if it exists for a basic case with one route with one trip including
- * boarding/alighting restrictions and, an access and an egress path.
+ * Raptor should return a path if it exists for a basic case with one route with one trip
+ * including boarding/alighting restrictions and, an access and an egress path.
  */
 public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestConstants {
 
@@ -32,25 +32,18 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
   /**
    * Stops: 0..3
    *
-   * Route restrictions at stop (B:Board, A:Alight, W:Wheelchair):
-   *   Stop:  B   C   D
-   *     R1:  BW  BA  AW
+   * Route restrictions at stop (B:Board, A:Alight, W:Wheelchair): Stop: B C D R1: BW BA AW
    *
-   * Schedule:
-   *   Stop:     B      C      D
-   *     R1:   00:01  00:03  00:05
+   * Schedule: Stop: B C D R1: 00:01 00:03 00:05
    *
-   * Access (toStop & duration):
-   *   1  30s
+   * Access (toStop & duration): 1 30s
    *
-   * Egress (fromStop & duration):
-   *   3  20s
+   * Egress (fromStop & duration): 3 20s
    *
    */
   @BeforeEach
   void setup() {
-    data
-      .access("Walk 30s ~ B")
+    data.access("Walk 30s ~ B")
       .withTimetables(
         """
         B      C      D
@@ -59,8 +52,7 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
       )
       .egress("D ~ Walk 20s");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetable(true);

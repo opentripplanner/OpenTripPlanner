@@ -20,14 +20,16 @@ import org.opentripplanner.street.search.state.VehicleRentalState;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 /**
- * <p>A Euclidean remaining weight strategy.</p>
+ * <p>
+ * A Euclidean remaining weight strategy.</p>
  *
- * <p>Generates an admissible heuristic by simply calculating the direct distance to the target,
- * and calculating the minimum possible weight for that. Any path which diverts from the straight
- * line or does not travel at the maximum possible "speed" for the given modes will have a larger
- * weight. "Speed" is in scare quotes because we have to consider the effect of safety on the
- * cost for non-car modes, so instead of maximum speed we actually use minimum cost per distance,
- * where cost is calculated in a mode-appropriate way.</p>
+ * <p>
+ * Generates an admissible heuristic by simply calculating the direct distance to the target, and
+ * calculating the minimum possible weight for that. Any path which diverts from the straight line
+ * or does not travel at the maximum possible "speed" for the given modes will have a larger weight.
+ * "Speed" is in scare quotes because we have to consider the effect of safety on the cost for
+ * non-car modes, so instead of maximum speed we actually use minimum cost per distance, where cost
+ * is calculated in a mode-appropriate way.</p>
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 
@@ -86,8 +88,8 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     if (arriveBy) {
       useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
     } else {
-      useWalkSpeed =
-        s.isVehicleParked() || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
+      useWalkSpeed = s.isVehicleParked() ||
+        s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
     }
 
     final double costPerDistance = useWalkSpeed ? walkingCostPerDistance : minimumCostPerDistance;

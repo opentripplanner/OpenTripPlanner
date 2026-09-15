@@ -63,8 +63,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var transfers = dummyTransferGenerator();
 
     // and a path: Walk ~ B ~ T1 ~ C ~ Walk
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1_m)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_B, D1_m)
       .bus(trip1, STOP_C)
       .c2(345)
       .egress(D1_m);
@@ -106,8 +105,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     );
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_B, D1_m)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_B, D1_m)
       .bus(trip1, STOP_C)
       .walk(D30_s, STOP_F)
       .bus(trip2, STOP_G)
@@ -119,8 +117,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     // Insert wait-time cost summary info
-    var expected = original
-      .toStringDetailed(this::stopIndexToName)
+    var expected = original.toStringDetailed(this::stopIndexToName)
       .replace("C₁2_770]", "C₁2_770 Tₚ3_300 Wₜ3_103.81]");
 
     assertEquals(expected, PathUtils.pathsToStringDetailed(result));
@@ -165,8 +162,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       )
     );
 
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_A)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .walk(D30_s, STOP_E)
@@ -213,8 +209,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
    * Trip 1    10:02  10:10  10:15
    * Trip 2           10:13  10:17  10:30
    * </pre>
-   * Case: Transfer at stop B is returned, but transfer at stop C i guaranteed
-   * Expect: Transfer at C and transfer info attached
+   * Case: Transfer at stop B is returned, but transfer at stop C i guaranteed Expect:
+   * Transfer at C and transfer info attached
    */
   @Test
   public void testConstrainedTransferIsPreferred() {
@@ -236,8 +232,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       )
     );
 
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_A)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .egress(D0_s);
@@ -269,10 +264,10 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
    * Trip 1    10:10  10:10  10:15
    * Trip 2           10:13  10:13  10:30
    * </pre>
-   * Case: A trip may have the exact same times for more than one stop. This is a regression test
-   *       see https://github.com/opentripplanner/OpenTripPlanner/issues/5444.
-   *       The following transfers exist: A-B, A-C, B-B, B-C, C-B and C-C.
-   * Expect: Transfer B-B, the earliest transfer with the lowest transfer time and cost.
+   * Case: A trip may have the exact same times for more than one stop. This is a regression
+   * test see https://github.com/opentripplanner/OpenTripPlanner/issues/5444. The following
+   * transfers exist: A-B, A-C, B-B, B-C, C-B and C-C. Expect: Transfer B-B, the earliest transfer
+   * with the lowest transfer time and cost.
    */
   @Test
   public void testSameStopTimesInPattern() {
@@ -296,8 +291,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       )
     );
 
-    var original = pathBuilder()
-      .access(ITERATION_START_TIME, STOP_A)
+    var original = pathBuilder().access(ITERATION_START_TIME, STOP_A)
       .bus(trip1, STOP_B)
       .bus(trip2, STOP_D)
       .egress(D0_s);

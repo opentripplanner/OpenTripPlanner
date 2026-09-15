@@ -247,9 +247,8 @@ public class OsmEntityTest {
   void getCompoundTagValueEmptyWhenNoGroupResolves() {
     var osm = new OsmTestEntity("ref", "12345");
 
-    assertThat(
-      osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("manufacturer", "ref")))
-    ).isEmpty();
+    assertThat(osm.getCompoundTagValue(List.of(CompoundRefTagGroup.of("manufacturer", "ref"))))
+      .isEmpty();
   }
 
   @Test

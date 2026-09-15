@@ -36,8 +36,7 @@ class InvalidStopRefTest implements RealtimeTestConstants {
   void knownAndUnknownStopId() {
     var env = builder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
-    var update = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var update = rt.tripUpdateScheduled(TRIP_1_ID)
       .addStopTime(STOP_A_ID, "10:00")
       .addStopTime("unknown stop", "10:00")
       .build();
@@ -57,8 +56,7 @@ class InvalidStopRefTest implements RealtimeTestConstants {
   void validAndInvalidStopSequence() {
     var env = builder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
-    var update = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var update = rt.tripUpdateScheduled(TRIP_1_ID)
       .addDelayedStopTime(0, 60)
       .addDelayedStopTime(100, 60)
       .build();
@@ -72,8 +70,7 @@ class InvalidStopRefTest implements RealtimeTestConstants {
   void noStopRef() {
     var env = builder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
-    var update = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var update = rt.tripUpdateScheduled(TRIP_1_ID)
       .addRawStopTime(
         StopTimeUpdate.newBuilder().setDeparture(StopTimeEvent.newBuilder().setDelay(60)).build()
       )

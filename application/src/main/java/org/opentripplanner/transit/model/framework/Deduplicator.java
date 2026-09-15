@@ -17,9 +17,9 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Object deduplicator used to reduce memory footprint.
- * Deduplication is based on the hashcode/equals method of the target object. Some Java data
- * structures that do not have proper native equality (int[], ...) are wrapped.
+ * Object deduplicator used to reduce memory footprint. Deduplication is based on the
+ * hashcode/equals method of the target object. Some Java data structures that do not have proper
+ * native equality (int[], ...) are wrapped.
  * <p>
  * In older JVMs, this deduplicator used to be more efficient for deduplicating String than
  * String.intern() (not tested with recent JVMs).
@@ -172,12 +172,12 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       return null;
     }
 
-    Map<List<?>, List<?>> canonicalLists = this.canonicalLists.computeIfAbsent(clazz, key ->
-      new HashMap<>()
+    Map<List<?>, List<?>> canonicalLists = this.canonicalLists.computeIfAbsent(
+      clazz,
+      key -> new HashMap<>()
     );
 
-    @SuppressWarnings("unchecked")
-    List<T> canonical = (List<T>) canonicalLists.get(original);
+    @SuppressWarnings("unchecked") List<T> canonical = (List<T>) canonicalLists.get(original);
     if (canonical == null) {
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
       boolean containsNull = original.stream().anyMatch(Objects::isNull);
@@ -238,8 +238,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
     Map<K, V> map,
     Function<K, String> toName
   ) {
-    map
-      .entrySet()
+    map.entrySet()
       .stream()
       .map(e -> new NameSize(toName.apply(e.getKey()), e.getValue().size()))
       .sorted(Comparator.comparing(NameSize::name))
@@ -287,8 +286,8 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   /**
-   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements
-   * as well.
+   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements as
+   * well.
    */
   private record ObjArray<T>(T[] array) implements Serializable {
     private static <E> ObjArray<E> deepDeduplicateOf(

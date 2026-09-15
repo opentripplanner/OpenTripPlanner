@@ -43,8 +43,8 @@ public class DefaultInclinedEdgeLevelInfoProcessor implements InclinedEdgeLevelI
 
     if (
       levelInfo != null &&
-      inclineInfo != null &&
-      levelInfo.lowerVertexInfo().osmNodeId() != inclineInfo.lowerVertexInfo().osmNodeId()
+        inclineInfo != null &&
+        levelInfo.lowerVertexInfo().osmNodeId() != inclineInfo.lowerVertexInfo().osmNodeId()
     ) {
       issueStore.add(
         new ContradictoryLevelAndInclineInfoForWay(

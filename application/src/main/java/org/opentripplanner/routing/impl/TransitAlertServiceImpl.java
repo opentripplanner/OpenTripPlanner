@@ -17,15 +17,14 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
- * This is the primary implementation of TransitAlertService, which actually retains its own set
- * of TransitAlerts and indexes them for fast lookup by which transit entity is affected.
- * The only other implementation exists just to combine several instances of this primary
- * implementation into one.
- * TODO RT_AB: investigate why each updater has its own service instead of taking turns
- *   sequentially writing to a single service. Original design was for all data and indexes to be
- *   associated with the Graph or transit model (i.e. the object graph of instances of the transit
- *   model) and for updaters to submit write tasks that would patch the current version in a
- *   sequential way, e.g. "add these 10 alerts", "remove these 5 alerts", etc.
+ * This is the primary implementation of TransitAlertService, which actually retains its own set of
+ * TransitAlerts and indexes them for fast lookup by which transit entity is affected. The only
+ * other implementation exists just to combine several instances of this primary implementation into
+ * one. TODO RT_AB: investigate why each updater has its own service instead of taking turns
+ * sequentially writing to a single service. Original design was for all data and indexes to be
+ * associated with the Graph or transit model (i.e. the object graph of instances of the transit
+ * model) and for updaters to submit write tasks that would patch the current version in a
+ * sequential way, e.g. "add these 10 alerts", "remove these 5 alerts", etc.
  *
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
  * must be met for the alert to be displayed. This is the case in both the Norwegian interpretation
@@ -58,8 +57,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public TransitAlert getAlertById(FeedScopedId id) {
-    return alerts
-      .values()
+    return alerts.values()
       .stream()
       .filter(transitAlert -> transitAlert.getId().equals(id))
       .findAny()
@@ -76,10 +74,9 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Set<TransitAlert> getStopLocationsAlerts(List<FeedScopedId> stopLocationIds) {
-    return stopLocationIds
-      .stream()
-      .flatMap(stopLocationId ->
-        findMatchingAlerts(new EntitySelector.Stop(stopLocationId)).stream()
+    return stopLocationIds.stream()
+      .flatMap(
+        stopLocationId -> findMatchingAlerts(new EntitySelector.Stop(stopLocationId)).stream()
       )
       .collect(Collectors.toSet());
   }
@@ -157,12 +154,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   private Collection<TransitAlert> findMatchingAlerts(EntitySelector entitySelector) {
     Set<TransitAlert> result = new HashSet<>();
     for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (
-        alert
-          .entities()
-          .stream()
-          .anyMatch(selector -> selector.matches(entitySelector))
-      ) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
         result.add(alert);
       }
     }

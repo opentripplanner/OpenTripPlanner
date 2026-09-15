@@ -56,13 +56,11 @@ public final class Frequency implements Serializable {
       return false;
     }
     Frequency frequency = (Frequency) o;
-    return (
-      startTime == frequency.startTime &&
+    return (startTime == frequency.startTime &&
       endTime == frequency.endTime &&
       headwaySecs == frequency.headwaySecs &&
       exactTimes == frequency.exactTimes &&
-      Objects.equals(trip, frequency.trip)
-    );
+      Objects.equals(trip, frequency.trip));
   }
 
   public String toString() {

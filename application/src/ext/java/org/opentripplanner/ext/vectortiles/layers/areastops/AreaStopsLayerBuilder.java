@@ -15,8 +15,8 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
 
-  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<AreaStop>>> mappers =
-    Map.of(MapperType.OTPRR, AreaStopPropertyMapper::create);
+  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<AreaStop>>> mappers = Map
+    .of(MapperType.OTPRR, AreaStopPropertyMapper::create);
   private final TransitService transitService;
 
   public AreaStopsLayerBuilder(
@@ -33,8 +33,7 @@ public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
   }
 
   protected List<Geometry> findGeometries(Envelope query) {
-    return transitService
-      .findAreaStops(query)
+    return transitService.findAreaStops(query)
       .stream()
       .filter(g -> g.getGeometry() != null)
       .map(stop -> {

@@ -21,8 +21,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class GbfsNetworksConfig {
 
   public static GbfsNetworkOverrides map(String parameterName, NodeAdapter root) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_10)
       .summary("Per-network GBFS configuration shared by the vehicle rental sandboxes.")
       .description(
@@ -41,8 +40,7 @@ public class GbfsNetworksConfig {
     }
 
     var defaults = mapNetworkParameters(
-      c
-        .of("defaults")
+      c.of("defaults")
         .since(V2_10)
         .summary("Values applied to every network that does not set them itself.")
         .description(
@@ -56,8 +54,7 @@ public class GbfsNetworksConfig {
       GbfsNetworkParameters.DEFAULT
     );
 
-    var includeUnlistedNetworks = c
-      .of("includeUnlistedNetworks")
+    var includeUnlistedNetworks = c.of("includeUnlistedNetworks")
       .since(V2_10)
       .summary("Whether networks in the GBFS manifest but absent from `networks` are loaded.")
       .description(
@@ -75,14 +72,13 @@ public class GbfsNetworksConfig {
     NodeAdapter config,
     GbfsNetworkParameters defaults
   ) {
-    var networks = config
-      .of("networks")
+    var networks = config.of("networks")
       .since(V2_10)
       .summary("Per-network overrides, keyed by the GBFS `system_id`.")
-      .asObjects(List.of(), node ->
-        new NamedNetwork(
-          node
-            .of("network")
+      .asObjects(
+        List.of(),
+        node -> new NamedNetwork(
+          node.of("network")
             .since(V2_10)
             .summary("The GBFS `system_id` of the network these values apply to.")
             .asString(),
@@ -102,14 +98,12 @@ public class GbfsNetworksConfig {
     GbfsNetworkParameters defaults
   ) {
     return new GbfsNetworkParameters(
-      node
-        .of("applyGeofencingZones")
+      node.of("applyGeofencingZones")
         .since(V2_10)
         .summary(GeofencingZoneOtpPhase.OFF.typeDescription())
         .description(docEnumValueList(GeofencingZoneOtpPhase.values()))
         .asEnum(defaults.geofencingZonePhase()),
-      node
-        .of("requireDropOffInsideBusinessArea")
+      node.of("requireDropOffInsideBusinessArea")
         .since(V2_10)
         .summary("Whether a rented vehicle must be dropped off before leaving the business area.")
         .description(
@@ -122,8 +116,7 @@ public class GbfsNetworksConfig {
           """
         )
         .asBoolean(defaults.requireDropOffInsideBusinessArea()),
-      node
-        .of("allowKeepingVehicleAtDestination")
+      node.of("allowKeepingVehicleAtDestination")
         .since(V2_10)
         .summary("Whether a vehicle rented from a station may be kept at the destination.")
         .description(

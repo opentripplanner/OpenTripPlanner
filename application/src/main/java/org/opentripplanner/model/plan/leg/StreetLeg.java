@@ -178,8 +178,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return copyOf()
-      .withStartTime(startTime.plus(duration))
+    return copyOf().withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
   }
@@ -208,8 +207,8 @@ public class StreetLeg implements Leg {
   /**
    * Should be used for debug logging only.
    * <p>
-   * The {@code legGeometry}, {@code elevationProfile}, and {@code walkSteps} are skipped to avoid
-   * spamming logs. Explicit access should be used if needed.
+   * The {@code legGeometry}, {@code elevationProfile}, and {@code walkSteps} are skipped to
+   * avoid spamming logs. Explicit access should be used if needed.
    */
   @Override
   public String toString() {

@@ -93,8 +93,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   @Test
   void networkId() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, B)
+    Itinerary i1 = newItinerary(A, 0).walk(20, B)
       .faresV2Rail(ID, 0, 50, C, EXPRESS_NETWORK)
       .build();
 
@@ -111,8 +110,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
    */
   @Test
   void separateFares() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, A)
+    Itinerary i1 = newItinerary(A, 0).walk(20, A)
       .faresV2Rail(ID, 0, 50, B, LOCAL_NETWORK)
       .faresV2Rail(ID, 60, 100, C, EXPRESS_NETWORK)
       .build();

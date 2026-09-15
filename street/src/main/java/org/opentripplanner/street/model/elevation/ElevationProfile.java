@@ -9,15 +9,15 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * Represents an elevation profile as a list of {@code x,y} coordinates. The {@code x} is the
- * horizontal position/distance from the first position. The {@code y} is the vertical position
- * at {@code x}.
+ * horizontal position/distance from the first position. The {@code y} is the vertical position at
+ * {@code x}.
  * <p>
- * The unit is meters and the resolution is centimeters. The profile is normalized to centi-meters.
+ * The unit is meters and the resolution is centimeters. The profile is normalized to
+ * centi-meters.
  * <p>
  * This class is immutable, but NOT THREAD-SAFE. This is because the gained/lost properties are
- * lazy initialized. The risk of using this in a multithreaded setting in minimal, since setting
- * the gained/lost fields should be atomic and calculating it twice should result in the same
- * value.
+ * lazy initialized. The risk of using this in a multithreaded setting in minimal, since setting the
+ * gained/lost fields should be atomic and calculating it twice should result in the same value.
  */
 public class ElevationProfile {
 
@@ -102,10 +102,7 @@ public class ElevationProfile {
    * @return The list of elevation steps but without those elements where the y value is unknown.
    */
   public List<Step> stepsWithoutUnknowns() {
-    return steps
-      .stream()
-      .filter(step -> !step.isYUnknown())
-      .toList();
+    return steps.stream().filter(step -> !step.isYUnknown()).toList();
   }
 
   @Override
@@ -259,8 +256,8 @@ public class ElevationProfile {
     }
 
     /**
-     * Add the given offset({@code dx}) to all x values in current set of steps in the builder.
-     * Any steps added later is not transformed.
+     * Add the given offset({@code dx}) to all x values in current set of steps in the builder. Any
+     * steps added later is not transformed.
      */
     public Builder transformX(double dx) {
       steps.replaceAll(s -> s.transformX(dx));

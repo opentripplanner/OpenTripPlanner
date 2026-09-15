@@ -8,8 +8,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 /**
  * The booking URL a carpool provider publishes, holding {@code {from}} and {@code {to}}
  * placeholders for the passenger's carpool boarding and alighting points. Each is expanded to
- * {@code "latitude,longitude"} at six decimals, wherever in the URL it appears. Both are
- * optional: a URL holding neither is returned unchanged.
+ * {@code "latitude,longitude"} at six decimals, wherever in the URL it appears. Both are optional:
+ * a URL holding neither is returned unchanged.
  */
 public final class BookingUrlTemplate {
 
@@ -22,8 +22,8 @@ public final class BookingUrlTemplate {
   private BookingUrlTemplate() {}
 
   /**
-   * Checks that the template expands to a parseable URI. Curly braces are not legal URI
-   * characters, so it is the expansion that is parsed, not the template as published.
+   * Checks that the template expands to a parseable URI. Curly braces are not legal URI characters,
+   * so it is the expansion that is parsed, not the template as published.
    */
   public static boolean isUsable(String urlTemplate) {
     try {
@@ -35,8 +35,7 @@ public final class BookingUrlTemplate {
   }
 
   public static String expand(String urlTemplate, WgsCoordinate from, WgsCoordinate to) {
-    return urlTemplate
-      .replace(FROM_PLACEHOLDER, formatCoordinate(from))
+    return urlTemplate.replace(FROM_PLACEHOLDER, formatCoordinate(from))
       .replace(TO_PLACEHOLDER, formatCoordinate(to));
   }
 

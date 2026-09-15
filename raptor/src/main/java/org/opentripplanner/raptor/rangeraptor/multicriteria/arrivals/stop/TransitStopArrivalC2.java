@@ -10,10 +10,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final class TransitStopArrivalC2<T extends RaptorTripSchedule>
-  extends AbstractStopArrivalC2<T>
-  implements TransitPathView<T>, TransitArrival<T>
-{
+final class TransitStopArrivalC2<T extends RaptorTripSchedule> extends AbstractStopArrivalC2<T>
+  implements TransitPathView<T>, TransitArrival<T> {
 
   private final T trip;
   private final int boardStopPosition;

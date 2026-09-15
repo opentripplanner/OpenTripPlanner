@@ -45,8 +45,10 @@ public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehi
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("VehicleRentalStation", getSource(environment).id().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "VehicleRentalStation",
+      getSource(environment).id().toString()
+    );
   }
 
   @Override
@@ -71,8 +73,8 @@ public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehi
 
   @Override
   public DataFetcher<Boolean> operative() {
-    return environment ->
-      getSource(environment).isAllowPickup() && getSource(environment).isAllowDropoff();
+    return environment -> getSource(environment).isAllowPickup() &&
+      getSource(environment).isAllowDropoff();
   }
 
   @Override

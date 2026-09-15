@@ -16,8 +16,9 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<GraphQLTypes.GraphQLAbsoluteDirection> absoluteDirection() {
-    return environment ->
-      getSource(environment).getAbsoluteDirection().map(DirectionMapper::map).orElse(null);
+    return environment -> getSource(environment).getAbsoluteDirection()
+      .map(DirectionMapper::map)
+      .orElse(null);
   }
 
   @Override
@@ -86,8 +87,8 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<String> streetName() {
-    return environment ->
-      getSource(environment).getDirectionText().toString(getLocale(environment));
+    return environment -> getSource(environment).getDirectionText()
+      .toString(getLocale(environment));
   }
 
   @Override

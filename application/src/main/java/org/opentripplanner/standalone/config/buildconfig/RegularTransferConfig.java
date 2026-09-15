@@ -21,8 +21,7 @@ public class RegularTransferConfig {
     var dft = RegularTransferParameters.DEFAULT;
 
     builder.withMaxDuration(
-      root
-        .of("maxTransferDuration")
+      root.of("maxTransferDuration")
         .since(V2_1)
         .summary(
           "Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph."
@@ -31,8 +30,7 @@ public class RegularTransferConfig {
     );
 
     builder.withParametersForMode(
-      root
-        .of("transferParametersForMode")
+      root.of("transferParametersForMode")
         .since(V2_7)
         .summary("Configures mode-specific properties for transfer calculations.")
         .description(
@@ -67,8 +65,7 @@ public class RegularTransferConfig {
     );
 
     builder.withRequests(
-      root
-        .of("transferRequests")
+      root.of("transferRequests")
         .since(OtpVersion.V2_1)
         .summary("Routing requests to use for pre-calculating stop-to-stop transfers.")
         .description(
@@ -101,8 +98,7 @@ public class RegularTransferConfig {
   private static TransferParametersForMode mapParametersForMode(NodeAdapter c) {
     TransferParametersForMode.Builder builder = new TransferParametersForMode.Builder();
     builder.withMaxDuration(
-      c
-        .of("maxTransferDuration")
+      c.of("maxTransferDuration")
         .summary("This overwrites the default `maxTransferDuration` for the given mode.")
         .description(
           """
@@ -120,8 +116,7 @@ public class RegularTransferConfig {
         .asDuration(TransferParametersForMode.DEFAULT_MAX_DURATION)
     );
     builder.withCarsAllowedStopMaxDuration(
-      c
-        .of("carsAllowedStopMaxTransferDuration")
+      c.of("carsAllowedStopMaxTransferDuration")
         .summary(
           """
           This is used for specifying a `maxTransferDuration` value to use with transfers between
@@ -144,8 +139,7 @@ public class RegularTransferConfig {
         .asDuration(TransferParametersForMode.DEFAULT_CARS_ALLOWED_STOP_MAX_DURATION)
     );
     builder.withBikesAllowedStopMaxDuration(
-      c
-        .of("bikesAllowedStopMaxTransferDuration")
+      c.of("bikesAllowedStopMaxTransferDuration")
         .summary(
           """
           This is used for specifying a `maxTransferDuration` value to use with transfers between
@@ -168,8 +162,7 @@ public class RegularTransferConfig {
     );
 
     builder.withDisableDefaultTransfers(
-      c
-        .of("disableDefaultTransfers")
+      c.of("disableDefaultTransfers")
         .summary("This disables default transfer calculations.")
         .description(
           """

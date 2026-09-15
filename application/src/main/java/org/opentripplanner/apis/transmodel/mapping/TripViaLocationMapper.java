@@ -40,8 +40,7 @@ class TripViaLocationMapper {
   List<ViaLocation> toLegacyPassThroughLocations(
     final List<Map<String, Object>> passThroughPoints
   ) {
-    return passThroughPoints
-      .stream()
+    return passThroughPoints.stream()
       .map(this::mapLegacyPassThroughViaLocation)
       .filter(Objects::nonNull)
       .collect(toList());
@@ -85,10 +84,8 @@ class TripViaLocationMapper {
 
   @Nullable
   private static WgsCoordinate mapCoordinate(Map<String, Object> map) {
-    return CoordinateInputType.mapToWgsCoordinate(
-      ViaLocationInputType.FIELD_COORDINATE,
-      map
-    ).orElse(null);
+    return CoordinateInputType.mapToWgsCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
+      .orElse(null);
   }
 
   /**

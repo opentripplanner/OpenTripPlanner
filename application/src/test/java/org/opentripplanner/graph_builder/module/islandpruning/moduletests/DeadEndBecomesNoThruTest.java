@@ -13,8 +13,8 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParam
 /**
  * A dead-end street network that is too small to stand on its own, but is reachable from the main
  * street network via a "no thru traffic" connector (e.g. `foot=destination`), is not removed.
- * Instead its own edges are converted to no-thru-traffic, so it remains reachable as a
- * destination without becoming a shortcut for through traffic.
+ * Instead its own edges are converted to no-thru-traffic, so it remains reachable as a destination
+ * without becoming a shortcut for through traffic.
  */
 class DeadEndBecomesNoThruTest {
 
@@ -43,16 +43,18 @@ class DeadEndBecomesNoThruTest {
     streetEdgeBuilder(e, d, 1, PEDESTRIAN).withWalkNoThruTraffic(true).buildAndConnect();
 
     // Dead end has 2 street vertices (e, f), which is below the threshold of 3.
-    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f).prune(
-      IslandPruningParameters.of()
-        .withPruningThresholdIslandWithoutStops(3)
-        .withPruningThresholdIslandWithStops(3)
-        .withAdaptivePruningFactor(1)
-        .build()
-    );
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, e, f)
+      .prune(
+        IslandPruningParameters.of()
+          .withPruningThresholdIslandWithoutStops(3)
+          .withPruningThresholdIslandWithStops(3)
+          .withAdaptivePruningFactor(1)
+          .build()
+      );
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // main square: untouched
         "(0,0) → (0,1) PEDESTRIAN ♿✅",

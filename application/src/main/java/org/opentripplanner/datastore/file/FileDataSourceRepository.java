@@ -168,10 +168,8 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
   }
 
   private static boolean isTransitFile(File file, Pattern pattern) {
-    return (
-      pattern.matcher(file.getName()).find() &&
-      (file.isDirectory() || file.getName().endsWith(".zip"))
-    );
+    return (pattern.matcher(file.getName()).find() &&
+      (file.isDirectory() || file.getName().endsWith(".zip")));
   }
 
   private boolean isCompositeDataSource(File file) {

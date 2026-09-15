@@ -19,26 +19,19 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc.
  * to edges based on OSM tags.
  * <p>
- * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to ways based on how well
- * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
- * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
+ * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to
+ * ways based on how well their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will
+ * win out over all the others based on the number of exact, partial, and wildcard tag matches. See
+ * OSMSpecifier for more details on the matching process.
  */
 public class WayPropertySet {
 
   /** Sets 1.0 as default safety value for all permissions. */
-  public static final TriFunction<
-    StreetTraversalPermission,
-    Float,
-    OsmEntity,
-    Double
-  > DEFAULT_BICYCLE_SAFETY_RESOLVER = (permission, speedLimit, osmWay) -> 1.0;
+  public static final TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> DEFAULT_BICYCLE_SAFETY_RESOLVER =
+    (permission, speedLimit, osmWay) -> 1.0;
 
-  public static final TriFunction<
-    StreetTraversalPermission,
-    Float,
-    OsmEntity,
-    Double
-  > DEFAULT_WALK_SAFETY_RESOLVER = (permission, speedLimit, osmWay) -> 1.25;
+  public static final TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> DEFAULT_WALK_SAFETY_RESOLVER =
+    (permission, speedLimit, osmWay) -> 1.25;
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -62,20 +55,10 @@ public class WayPropertySet {
   private final Float maxPossibleCarSpeed;
 
   /** Resolves walk safety value for each {@link StreetTraversalPermission}. */
-  private final TriFunction<
-    StreetTraversalPermission,
-    Float,
-    OsmEntity,
-    Double
-  > defaultWalkSafetyForPermission;
+  private final TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultWalkSafetyForPermission;
 
   /** Resolves bicycle safety value for each {@link StreetTraversalPermission}. */
-  private final TriFunction<
-    StreetTraversalPermission,
-    Float,
-    OsmEntity,
-    Double
-  > defaultBicycleSafetyForPermission;
+  private final TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultBicycleSafetyForPermission;
 
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
@@ -155,17 +138,14 @@ public class WayPropertySet {
 
     var permission = entity.overridePermissions(result.getPermission(), direction);
 
-    result = result
-      .mutate()
+    result = result.mutate()
       .withPermission(permission)
       .bicycleSafety(
-        result
-          .bicycleSafetyOpt()
+        result.bicycleSafetyOpt()
           .orElseGet(() -> defaultBicycleSafetyForPermission.apply(permission, speed, entity))
       )
       .walkSafety(
-        result
-          .walkSafetyOpt()
+        result.walkSafetyOpt()
           .orElseGet(() -> defaultWalkSafetyForPermission.apply(permission, speed, entity))
       )
       .build();
@@ -297,23 +277,19 @@ public class WayPropertySet {
 
   @Override
   public int hashCode() {
-    return (
-      defaultProperties.hashCode() +
+    return (defaultProperties.hashCode() +
       wayProperties.hashCode() +
       creativeNamers.hashCode() +
-      slopeOverrides.hashCode()
-    );
+      slopeOverrides.hashCode());
   }
 
   @Override
   public boolean equals(Object o) {
     if (o instanceof WayPropertySet other) {
-      return (
-        defaultProperties.equals(other.defaultProperties) &&
+      return (defaultProperties.equals(other.defaultProperties) &&
         wayProperties.equals(other.wayProperties) &&
         creativeNamers.equals(other.creativeNamers) &&
-        slopeOverrides.equals(other.slopeOverrides)
-      );
+        slopeOverrides.equals(other.slopeOverrides));
     }
     return false;
   }
@@ -350,12 +326,10 @@ public class WayPropertySet {
       var properties = mixin.getDirectionalProperties(direction);
       bicycle *= properties.bicycleSafety();
       walk *= properties.walkSafety();
-      permission = permission
-        .add(properties.addedPermission())
+      permission = permission.add(properties.addedPermission())
         .remove(properties.removedPermission());
     }
-    return result
-      .mutate()
+    return result.mutate()
       .bicycleSafety(bicycle)
       .walkSafety(walk)
       .withPermission(permission)

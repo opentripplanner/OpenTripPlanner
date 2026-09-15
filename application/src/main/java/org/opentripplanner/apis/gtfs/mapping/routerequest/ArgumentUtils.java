@@ -39,8 +39,7 @@ public class ArgumentUtils {
   ) {
     var transitModes = getTransitModes(environment);
     if (transitModes != null) {
-      return transitModes
-        .stream()
+      return transitModes.stream()
         .map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput::new)
         .collect(Collectors.toList());
     } else {
@@ -58,13 +57,8 @@ public class ArgumentUtils {
    */
   @Nullable
   static Map<String, Object> getParking(DataFetchingEnvironment environment, String type) {
-    return (Map<String, Object>) (
-      (Map<String, Object>) (
-        (Map<String, Object>) ((Map<String, Object>) environment.getArgument("preferences")).get(
-          "street"
-        )
-      ).get(type)
-    ).get("parking");
+    return (Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) ((Map<String, Object>) environment
+      .getArgument("preferences")).get("street")).get(type)).get("parking");
   }
 
   /**
@@ -80,10 +74,9 @@ public class ArgumentUtils {
     String type
   ) {
     var parking = getParking(environment, type);
-    var filters =
-      parking != null && parking.containsKey("filters")
-        ? getParking(environment, type).get("filters")
-        : null;
+    var filters = parking != null && parking.containsKey("filters")
+      ? getParking(environment, type).get("filters")
+      : null;
     return filters != null ? (Collection<Map<String, Object>>) filters : List.of();
   }
 
@@ -100,10 +93,9 @@ public class ArgumentUtils {
     String type
   ) {
     var parking = getParking(environment, type);
-    var preferred =
-      parking != null && parking.containsKey("preferred")
-        ? getParking(environment, type).get("preferred")
-        : null;
+    var preferred = parking != null && parking.containsKey("preferred")
+      ? getParking(environment, type).get("preferred")
+      : null;
     return preferred != null ? (Collection<Map<String, Object>>) preferred : List.of();
   }
 
@@ -116,10 +108,11 @@ public class ArgumentUtils {
   }
 
   private static Set<String> parseFilters(Collection<Map<String, Object>> filters, String key) {
-    return filters
-      .stream()
-      .flatMap(f ->
-        parseOperation((Collection<Map<String, Collection<String>>>) f.getOrDefault(key, List.of()))
+    return filters.stream()
+      .flatMap(
+        f -> parseOperation(
+          (Collection<Map<String, Collection<String>>>) f.getOrDefault(key, List.of())
+        )
       )
       .collect(Collectors.toSet());
   }

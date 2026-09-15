@@ -45,9 +45,9 @@ import org.rutebanken.netex.model.Vias_RelStructure;
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the
  * StopTime has a reference to the correct stop. DestinationDisplay is mapped to HeadSign. There is
  * logic to take care of the the fact that DestinationsDisplay is also valid for each subsequent
- * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime.
- * This class does not take Daylight Saving Time transitions into account, this is an error and
- * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
+ * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime. This class
+ * does not take Daylight Saving Time transitions into account, this is an error and should be
+ * fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
 class StopTimesMapper {
 
@@ -125,8 +125,7 @@ class StopTimesMapper {
     for (int i = 0; i < passingTimes.size(); i++) {
       TimetabledPassingTime currentPassingTime = passingTimes.get(i);
 
-      String pointInJourneyPattern = currentPassingTime
-        .getPointInJourneyPatternRef()
+      String pointInJourneyPattern = currentPassingTime.getPointInJourneyPatternRef()
         .getValue()
         .getRef();
 
@@ -137,8 +136,8 @@ class StopTimesMapper {
       if (stop == null) {
         if (
           stopPoint != null &&
-          isFalse(stopPoint.isForAlighting()) &&
-          isFalse(stopPoint.isForBoarding())
+            isFalse(stopPoint.isForAlighting()) &&
+            isFalse(stopPoint.isForBoarding())
         ) {
           continue;
         }
@@ -186,8 +185,7 @@ class StopTimesMapper {
     JourneyPattern_VersionStructure journeyPattern,
     TimetabledPassingTime firstPassingTime
   ) {
-    String pointInJourneyPattern = firstPassingTime
-      .getPointInJourneyPatternRef()
+    String pointInJourneyPattern = firstPassingTime.getPointInJourneyPatternRef()
       .getValue()
       .getRef();
 
@@ -215,8 +213,7 @@ class StopTimesMapper {
     String pointInJourneyPatterRef,
     JourneyPattern_VersionStructure journeyPattern
   ) {
-    var points = journeyPattern
-      .getPointsInSequence()
+    var points = journeyPattern.getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern();
 
     for (PointInLinkSequence_VersionedChildStructure point : points) {
@@ -322,8 +319,7 @@ class StopTimesMapper {
           currentHeadSign = headsignMapper.map(destinationDisplay);
           Vias_RelStructure viaValues = destinationDisplay.getVias();
           if (viaValues != null && viaValues.getVia() != null) {
-            currentHeadSignVias = viaValues
-              .getVia()
+            currentHeadSignVias = viaValues.getVia()
               .stream()
               .map(Via_VersionedChildStructure::getDestinationDisplayRef)
               .filter(Objects::nonNull)
@@ -349,9 +345,9 @@ class StopTimesMapper {
 
     if (
       passingTime.getArrivalTime() == null &&
-      passingTime.getDepartureTime() == null &&
-      passingTime.getEarliestDepartureTime() == null &&
-      passingTime.getLatestArrivalTime() == null
+        passingTime.getDepartureTime() == null &&
+        passingTime.getEarliestDepartureTime() == null &&
+        passingTime.getLatestArrivalTime() == null
     ) {
       issueStore.add("TripWithoutTime", "Time missing for trip %s", trip.getId());
     }

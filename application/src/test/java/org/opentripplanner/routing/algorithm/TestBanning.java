@@ -17,8 +17,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 
 /**
- * Test the banning and whitelisting functionality in the RouteRequest.
- * TODO This does not test the that banning/whitelisting affects the routing correctly.
+ * Test the banning and whitelisting functionality in the RouteRequest. TODO This does not test the
+ * that banning/whitelisting affects the routing correctly.
  */
 public class TestBanning {
 
@@ -27,16 +27,8 @@ public class TestBanning {
     Collection<TripPattern> patterns = getTestPatterns();
 
     var filterRequest = TransitFilterRequest.of()
-      .addNot(
-        SelectRequest.of()
-          .withRoutes(List.of(id("RUT:Route:1")))
-          .build()
-      )
-      .addNot(
-        SelectRequest.of()
-          .withAgencies(List.of(id("RUT:Agency:2")))
-          .build()
-      )
+      .addNot(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
+      .addNot(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -51,16 +43,8 @@ public class TestBanning {
     Collection<TripPattern> patterns = getTestPatterns();
 
     var filterRequest = TransitFilterRequest.of()
-      .addSelect(
-        SelectRequest.of()
-          .withRoutes(List.of(id("RUT:Route:1")))
-          .build()
-      )
-      .addSelect(
-        SelectRequest.of()
-          .withAgencies(List.of(id("RUT:Agency:2")))
-          .build()
-      )
+      .addSelect(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
+      .addSelect(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
       .build();
 
     Collection<FeedScopedId> bannedPatterns = bannedPatterns(List.of(filterRequest), patterns);
@@ -95,10 +79,9 @@ public class TestBanning {
     List<TransitFilterRequest> filterRequest,
     Collection<TripPattern> patterns
   ) {
-    return patterns
-      .stream()
-      .filter(pattern ->
-        filterRequest.stream().noneMatch(filter -> filter.matchTripPattern(pattern))
+    return patterns.stream()
+      .filter(
+        pattern -> filterRequest.stream().noneMatch(filter -> filter.matchTripPattern(pattern))
       )
       .map(TripPattern::getId)
       .toList();

@@ -53,8 +53,9 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     .addStop(STOP_A, "0:00:10", "0:00:11")
     .addStop(STOP_B, "0:00:20", "0:00:21");
 
-  private final Route RAIL_ROUTE = ENV_BUILDER.route(RAIL_ROUTE_ID, r ->
-    r.withMode(TransitMode.RAIL)
+  private final Route RAIL_ROUTE = ENV_BUILDER.route(
+    RAIL_ROUTE_ID,
+    r -> r.withMode(TransitMode.RAIL)
   );
 
   private final TripInput RAIL_TRIP_INPUT = TripInput.of("railTrip1")
@@ -120,8 +121,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "new route ref";
-    var updates = createValidAddedJourney(siri)
-      .withLineRef(newRouteRef)
+    var updates = createValidAddedJourney(siri).withLineRef(newRouteRef)
       .buildEstimatedTimetableDeliveries();
 
     int numRoutes = env.transitService().listRoutes().size();
@@ -177,15 +177,13 @@ class ExtraJourneyTest implements RealtimeTestConstants {
 
     // Create an extra journey with invalid planned data (travel back in time)
     // and valid real time data
-    var createExtraJourney = siri
-      .etBuilder()
+    var createExtraJourney = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("10:58", "10:48")
           .call(STOP_B)
           .arriveAimedExpected("10:08", "10:58")
@@ -208,15 +206,13 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_C)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C)
           // the aimed arrival at the origin is after the aimed departure
           .arriveAimedExpected("00:05", null)
           .departAimedExpected("00:02", "00:02")
@@ -240,15 +236,13 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var creation = siri
-      .etBuilder()
+    var creation = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_C)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C)
           .arriveAimedExpected("00:01", "00:02")
           .departAimedExpected("00:02", "00:03")
           .call(STOP_D)
@@ -258,8 +252,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .buildEstimatedTimetableDeliveries();
     assertSuccess(siri.applyEstimatedTimetable(creation));
 
-    var cancellation = siri
-      .etBuilder()
+    var cancellation = siri.etBuilder()
       .withDatedVehicleJourneyRef(ADDED_TRIP_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
@@ -276,8 +269,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = createValidAddedJourney(siri)
-      .withMonitored(false)
+    var updates = createValidAddedJourney(siri).withMonitored(false)
       .buildEstimatedTimetableDeliveries();
 
     var result = siri.applyEstimatedTimetable(updates);
@@ -299,8 +291,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = createValidAddedJourney(siri)
-      .withMonitored(false)
+    var updates = createValidAddedJourney(siri).withMonitored(false)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();
 
@@ -319,8 +310,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       // replace trip1
@@ -356,16 +346,14 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:01", "00:02")
           .call(STOP_C)
           .arriveAimedExpected("00:03", "00:04")
@@ -386,16 +374,14 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .arriveAimedExpected("00:03", "00:04")
           .departAimedExpected("00:05", "00:06")
           .call(STOP_C)
@@ -424,15 +410,13 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_C)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C)
           // the vehicle is ready for boarding at the origin one minute before it departs
           .arriveAimedExpected("00:01", "00:02")
           .departAimedExpected("00:02", "00:03")
@@ -462,15 +446,13 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_C)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C)
           .departAimedExpected("00:01", "00:02")
           .call(STOP_D)
           .arriveAimedExpected("00:03", "00:04")
@@ -487,24 +469,22 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   }
 
   /**
-   * When SIRI does not explicitly set boarding/alighting activity, the default rules should
-   * apply: no alighting at the first stop and no boarding at the last stop.
+   * When SIRI does not explicitly set boarding/alighting activity, the default rules should apply:
+   * no alighting at the first stop and no boarding at the last stop.
    */
   @Test
   void testExtraJourneyDefaultBoardingAlighting() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)
       .withLineRef(ROUTE_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .arriveAimedExpected("00:03", "00:04")
           .departAimedExpected("00:05", "00:06")
           .call(STOP_C)
@@ -534,8 +514,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = createValidAddedJourney(siri)
-      .withOccupancy(OccupancyEnumeration.SEATS_AVAILABLE)
+    var updates = createValidAddedJourney(siri).withOccupancy(OccupancyEnumeration.SEATS_AVAILABLE)
       .buildEstimatedTimetableDeliveries();
 
     assertSuccess(siri.applyEstimatedTimetable(updates));
@@ -550,8 +529,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = createValidAddedJourney(siri)
-      .withPredictionInaccurate(true)
+    var updates = createValidAddedJourney(siri).withPredictionInaccurate(true)
       .buildEstimatedTimetableDeliveries();
 
     assertSuccess(siri.applyEstimatedTimetable(updates));
@@ -566,8 +544,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = createValidAddedJourney(siri)
-      .withDestinationName("Hogwarts")
+    var updates = createValidAddedJourney(siri).withDestinationName("Hogwarts")
       .buildEstimatedTimetableDeliveries();
 
     assertSuccess(siri.applyEstimatedTimetable(updates));
@@ -587,8 +564,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(tripInput).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withVehicleJourneyRef(TRIP_1_ID)
@@ -610,8 +586,8 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   }
 
   /**
-   * First add a trip via extra journey, then send a regular update referencing the added trip.
-   * The added trip should be updated with the new times.
+   * First add a trip via extra journey, then send a regular update referencing the added trip. The
+   * added trip should be updated with the new times.
    */
   @Test
   void testUpdateTimesOnAddedJourney() {
@@ -628,12 +604,10 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     );
 
     // Step 2: Send a regular update with new times for the added trip
-    var update = siri
-      .etBuilder()
+    var update = siri.etBuilder()
       .withDatedVehicleJourneyRef(ADDED_TRIP_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_C)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C)
           .departAimedExpected("00:01", "00:05")
           .call(STOP_D)
           .arriveAimedExpected("00:03", "00:07")
@@ -651,8 +625,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "newRouteForShortName";
-    var updates = createValidAddedJourney(siri)
-      .withLineRef(newRouteRef)
+    var updates = createValidAddedJourney(siri).withLineRef(newRouteRef)
       .withPublishedLineName("L1")
       .buildEstimatedTimetableDeliveries();
 
@@ -672,8 +645,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "newRouteForOperator";
-    var updates = createValidAddedJourney(siri)
-      .withLineRef(newRouteRef)
+    var updates = createValidAddedJourney(siri).withLineRef(newRouteRef)
       .buildEstimatedTimetableDeliveries();
 
     assertSuccess(siri.applyEstimatedTimetable(updates));
@@ -693,8 +665,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "newRouteForAgency";
-    var updates = createValidAddedJourney(siri)
-      .withLineRef(newRouteRef)
+    var updates = createValidAddedJourney(siri).withLineRef(newRouteRef)
       .buildEstimatedTimetableDeliveries();
 
     var result = siri.applyEstimatedTimetable(updates);
@@ -715,8 +686,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "busReplacementRoute";
-    var updates = createValidAddedJourney(siri)
-      .withLineRef(newRouteRef)
+    var updates = createValidAddedJourney(siri).withLineRef(newRouteRef)
       .withExternalLineRef(RAIL_ROUTE_ID)
       .withVehicleMode(VehicleModesEnumeration.BUS)
       .buildEstimatedTimetableDeliveries();
@@ -739,8 +709,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var siri = SiriTestHelper.of(env);
 
     String newRouteRef = "railReplacementRoute";
-    var updates = createValidAddedJourney(siri)
-      .withLineRef(newRouteRef)
+    var updates = createValidAddedJourney(siri).withLineRef(newRouteRef)
       .withExternalLineRef(RAIL_ROUTE_ID)
       .withVehicleMode(VehicleModesEnumeration.RAIL)
       .buildEstimatedTimetableDeliveries();
@@ -758,8 +727,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   }
 
   private SiriEtBuilder createValidAddedJourney(SiriTestHelper siri) {
-    return siri
-      .etBuilder()
+    return siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_ID)

@@ -30,16 +30,14 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   private static final LocalDate ADDED_DATE = START_DATE.plusDays(1);
   private static final LocalDate END_DATE = START_DATE.plusDays(2);
 
-  private final TransitTestEnvironment env = envBuilder
-    .addTrip(
-      TripInput.of(TRIP_1_ID)
-        // on either side of added date, but not on it
-        .withServiceDates(START_DATE, END_DATE)
-        .addStop(STOP_A, "12:00")
-        .addStop(STOP_B, "12:10")
-        .addStop(STOP_C, "12:20")
-    )
-    .build();
+  private final TransitTestEnvironment env = envBuilder.addTrip(
+    TripInput.of(TRIP_1_ID)
+      // on either side of added date, but not on it
+      .withServiceDates(START_DATE, END_DATE)
+      .addStop(STOP_A, "12:00")
+      .addStop(STOP_B, "12:10")
+      .addStop(STOP_C, "12:20")
+  ).build();
   private final GtfsRtTestHelper rt = GtfsRtTestHelper.of(env);
 
   private static List<LocalDate> serviceDates() {
@@ -49,11 +47,10 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("serviceDates")
   void addedTrip(LocalDate date) {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, NEW, env.timeZone())
-      .addStopTime(STOP_A_ID, "10:30")
-      .addStopTime(STOP_B_ID, "10:40")
-      .addStopTime(STOP_C_ID, "10:55")
-      .build();
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, NEW, env.timeZone()).addStopTime(
+      STOP_A_ID,
+      "10:30"
+    ).addStopTime(STOP_B_ID, "10:40").addStopTime(STOP_C_ID, "10:55").build();
 
     assertSuccess(rt.applyTripUpdate(tripUpdate));
     var tripFetcher = env.tripData(ADDED_TRIP_ID, date);
@@ -74,11 +71,10 @@ class AddedOnServiceDateTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("outsidePeriod")
   void rejectOutsideSchedulePeriod(LocalDate date) {
-    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, NEW, env.timeZone())
-      .addStopTime(STOP_A_ID, "10:30")
-      .addStopTime(STOP_B_ID, "10:40")
-      .addStopTime(STOP_C_ID, "10:55")
-      .build();
+    var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, date, NEW, env.timeZone()).addStopTime(
+      STOP_A_ID,
+      "10:30"
+    ).addStopTime(STOP_B_ID, "10:40").addStopTime(STOP_C_ID, "10:55").build();
 
     assertFailure(OUTSIDE_SERVICE_PERIOD, rt.applyTripUpdate(tripUpdate));
   }

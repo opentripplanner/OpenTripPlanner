@@ -54,15 +54,12 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
       .addScheduledStopPointMapping(id(scheduledStopPointId), STOP_B)
       .build();
 
-    var journey = new SiriEtBuilder(env.localTimeParser())
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
-          .departAimedExpected("00:10:00", "00:10:00")
-          .call(scheduledStopPointId)
-          .arriveAimedExpected("00:20:00", "00:20:00")
-      )
-      .buildEstimatedVehicleJourney();
+    var journey = new SiriEtBuilder(env.localTimeParser()).withEstimatedCalls(
+      builder -> builder.call(STOP_A)
+        .departAimedExpected("00:10:00", "00:10:00")
+        .call(scheduledStopPointId)
+        .arriveAimedExpected("00:20:00", "00:20:00")
+    ).buildEstimatedVehicleJourney();
 
     var result = match(journey, env);
     assertEquals(TRIP_1_ID, result.trip().getId().getId());
@@ -74,15 +71,12 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
     var env = ENV_BUILDER.addTrip(trip1input).build();
 
-    var journey = new SiriEtBuilder(env.localTimeParser())
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
-          .departAimedExpected("00:10:00", "00:10:00")
-          .call("SOME_MADE_UP_ID")
-          .arriveAimedExpected("00:20:00", "00:20:00")
-      )
-      .buildEstimatedVehicleJourney();
+    var journey = new SiriEtBuilder(env.localTimeParser()).withEstimatedCalls(
+      builder -> builder.call(STOP_A)
+        .departAimedExpected("00:10:00", "00:10:00")
+        .call("SOME_MADE_UP_ID")
+        .arriveAimedExpected("00:20:00", "00:20:00")
+    ).buildEstimatedVehicleJourney();
 
     assertFailure(UNKNOWN_STOP, () -> match(journey, env));
   }
@@ -93,15 +87,12 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
     var env = ENV_BUILDER.addTrip(trip1input).build();
 
-    var journey = new SiriEtBuilder(env.localTimeParser())
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
-          .departAimedExpected(null, null)
-          .call("SOME_MADE_UP_ID")
-          .arriveAimedExpected("00:20:00", "00:20:00")
-      )
-      .buildEstimatedVehicleJourney();
+    var journey = new SiriEtBuilder(env.localTimeParser()).withEstimatedCalls(
+      builder -> builder.call(STOP_A)
+        .departAimedExpected(null, null)
+        .call("SOME_MADE_UP_ID")
+        .arriveAimedExpected("00:20:00", "00:20:00")
+    ).buildEstimatedVehicleJourney();
 
     assertFailure(INVALID_DEPARTURE_TIME, () -> match(journey, env));
   }
@@ -120,15 +111,12 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   }
 
   private EstimatedVehicleJourney estimatedVehicleJourney(TransitTestEnvironment env) {
-    return new SiriEtBuilder(env.localTimeParser())
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
-          .departAimedExpected("00:10:00", "00:10:00")
-          .call(STOP_B)
-          .arriveAimedExpected("00:20:00", "00:20:00")
-      )
-      .buildEstimatedVehicleJourney();
+    return new SiriEtBuilder(env.localTimeParser()).withEstimatedCalls(
+      builder -> builder.call(STOP_A)
+        .departAimedExpected("00:10:00", "00:10:00")
+        .call(STOP_B)
+        .arriveAimedExpected("00:20:00", "00:20:00")
+    ).buildEstimatedVehicleJourney();
   }
 
   private TripInput tripInput(String trip1Id) {

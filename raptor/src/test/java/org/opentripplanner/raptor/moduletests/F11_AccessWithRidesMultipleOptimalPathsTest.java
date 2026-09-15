@@ -33,9 +33,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * get both paths (start with flex access or trip R1) as optimal results by changing the egress,
  * then we have proven that both these results are kept in stop arrival at stop C.
  * <p>
- * Further this test also makes sure the path is constructed correctly when we have a mix of access,
- * transfer and transit at the same stop, in the same Raptor round. Two walking legs are not allowed
- * after each other.
+ * Further this test also makes sure the path is constructed correctly when we have a mix of
+ * access, transfer and transit at the same stop, in the same Raptor round. Two walking legs are not
+ * allowed after each other.
  * <p>
  * <img src="images/F11.svg" width="548" height="206"/>
  * <p>
@@ -54,8 +54,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Free ~ A", "Flex 11m Rₙ1 ~ C")
+    data.access("Free ~ A", "Flex 11m Rₙ1 ~ C")
       .withTimetables(
         """
         A     B
@@ -71,8 +70,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       // We will test board- and alight-slack in a separate test
       .withSlackProvider(new TestSlackProvider(D1_m, D0_s, D0_s));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .timetable(true)
       .earliestDepartureTime(T00_02)
       .latestArrivalTime(T00_30);

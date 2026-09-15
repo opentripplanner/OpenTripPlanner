@@ -35,42 +35,33 @@ public class RoutingErrorsAttacher {
     final List<RoutingError> routingErrors = new ArrayList<>();
     Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isStreetOnly;
 
-    boolean hasTransitItineraries = originalItineraries
-      .stream()
+    boolean hasTransitItineraries = originalItineraries.stream()
       .anyMatch(Predicate.not(isOnStreetAllTheWay));
 
-    boolean allTransitItinerariesDeleted = filteredItineraries
-      .stream()
+    boolean allTransitItinerariesDeleted = filteredItineraries.stream()
       .filter(Predicate.not(isOnStreetAllTheWay))
       .allMatch(Itinerary::isFlaggedForDeletion);
 
     // Add errors, if there were any itineraries, but they were all filtered away
     if (hasTransitItineraries && allTransitItinerariesDeleted) {
-      Predicate<Itinerary> isWorseThanStreet = it ->
-        it
-          .systemNotices()
-          .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetter.TAG));
-      Predicate<Itinerary> isWorseThanWalking = it ->
-        it
-          .systemNotices()
-          .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
+      Predicate<Itinerary> isWorseThanStreet = it -> it.systemNotices()
+        .stream()
+        .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetter.TAG));
+      Predicate<Itinerary> isWorseThanWalking = it -> it.systemNotices()
+        .stream()
+        .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
       if (
-        filteredItineraries
-          .stream()
+        filteredItineraries.stream()
           .allMatch(isOnStreetAllTheWay.or(isWorseThanStreet).or(isWorseThanWalking))
       ) {
-        var nonTransitIsWalking = filteredItineraries
-          .stream()
+        var nonTransitIsWalking = filteredItineraries.stream()
           .flatMap(Itinerary::streetLegs)
           .allMatch(StreetLeg::isWalkingLeg);
         if (nonTransitIsWalking) {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
         }
       } else if (
-        filteredItineraries
-          .stream()
+        filteredItineraries.stream()
           .allMatch(isOnStreetAllTheWay.or(OutsideSearchWindowFilter::taggedBy))
       ) {
         routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));

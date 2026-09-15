@@ -7,8 +7,8 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 public final class FareAttribute
-  extends AbstractTransitEntity<FareAttribute, FareAttributeBuilder>
-{
+  extends
+  AbstractTransitEntity<FareAttribute, FareAttributeBuilder> {
 
   private FeedScopedId agency;
   private final Money price;
@@ -78,14 +78,12 @@ public final class FareAttribute
 
   @Override
   public boolean sameAs(FareAttribute other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       getPrice().equals(other.getPrice()) &&
       paymentMethod == other.getPaymentMethod() &&
       Objects.equals(transfers, other.getTransfers()) &&
       Objects.equals(transferDuration, other.getTransferDuration()) &&
-      Objects.equals(journeyDuration, other.getJourneyDuration())
-    );
+      Objects.equals(journeyDuration, other.getJourneyDuration()));
   }
 
   @Override

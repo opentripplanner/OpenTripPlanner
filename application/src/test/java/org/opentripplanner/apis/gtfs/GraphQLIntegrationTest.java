@@ -154,8 +154,7 @@ class GraphQLIntegrationTest {
   public static final String FEED_ID = TransitRepositoryForTest.FEED_ID;
 
   private static final VehicleRentalStation VEHICLE_RENTAL_STATION =
-    new TestVehicleRentalStationBuilder()
-      .withVehicles(10)
+    new TestVehicleRentalStationBuilder().withVehicles(10)
       .withSpaces(10)
       .withVehicleTypeBicycle(5, 7)
       .withVehicleTypeElectricBicycle(5, 3)
@@ -166,17 +165,15 @@ class GraphQLIntegrationTest {
     new TestFreeFloatingRentalVehicleBuilder().withSystem("Network-1", "https://foo.bar").build();
 
   private static final VehicleRentalVehicle RENTAL_VEHICLE_2 =
-    new TestFreeFloatingRentalVehicleBuilder()
-      .withSystem("Network-2", "https://foo.bar.baz")
+    new TestFreeFloatingRentalVehicleBuilder().withSystem("Network-2", "https://foo.bar.baz")
       .withNetwork("Network-2")
       .withCurrentRangeMeters(null)
       .withCurrentFuelPercent(null)
       .withAvailableUntil(null)
       .build();
 
-  static final Instant ALERT_START_TIME = OffsetDateTime.parse(
-    "2023-02-15T12:03:28+01:00"
-  ).toInstant();
+  static final Instant ALERT_START_TIME = OffsetDateTime.parse("2023-02-15T12:03:28+01:00")
+    .toInstant();
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
   private static final int TEN_MINUTES = 10 * 60;
 
@@ -238,9 +235,8 @@ class GraphQLIntegrationTest {
       .withServiceId(cal_id)
       .build();
     final TripPattern pattern = TEST_MODEL.pattern(BUS)
-      .withScheduledTimeTableBuilder(builder ->
-        builder
-          .addTripTimes(tripTimes)
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(tripTimes)
           .addTripTimes(tripTimes2)
           .addTripTimes(
             TripTimesFactory.tripTimes(
@@ -325,8 +321,8 @@ class GraphQLIntegrationTest {
     var routes = Stream.concat(
       Arrays.stream(TransitMode.values())
         .sorted(Comparator.comparing(Enum::name))
-        .map(m ->
-          TransitRepositoryForTest.route(m.name())
+        .map(
+          m -> TransitRepositoryForTest.route(m.name())
             .withMode(m)
             .withLongName(I18NString.of("Long name for %s".formatted(m)))
             .withGtfsSortOrder(sortOrder(m))
@@ -342,11 +338,7 @@ class GraphQLIntegrationTest {
       )
     ).toList();
 
-    var busRoute = routes
-      .stream()
-      .filter(r -> r.getMode().equals(BUS))
-      .findFirst()
-      .get();
+    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
 
     final Trip addedTrip = Trip.of(new FeedScopedId(FEED_ID, ADDED_TRIP_ID))
       .withRoute(busRoute)
@@ -367,9 +359,7 @@ class GraphQLIntegrationTest {
             .build(),
           realTimeTripTimes,
           SERVICE_DATE
-        )
-          .withTripCreation(t == addedTrip)
-          .build()
+        ).withTripCreation(t == addedTrip).build()
       );
     }
 
@@ -397,21 +387,18 @@ class GraphQLIntegrationTest {
         new DefaultStreetDetailsService(streetDetailsRepository)
       );
 
-    var step1 = walkStep("street")
-      .withRelativeDirection(RelativeDirection.DEPART)
+    var step1 = walkStep("street").withRelativeDirection(RelativeDirection.DEPART)
       .withAbsoluteDirection(20)
       .build();
 
     var elevatorState = TestStateBuilder.ofWalking().elevator().build();
-    ElevatorBoardEdge elevatorBoardEdge = (ElevatorBoardEdge) elevatorState
-      .getBackState()
+    ElevatorBoardEdge elevatorBoardEdge = (ElevatorBoardEdge) elevatorState.getBackState()
       .getBackState()
       .getBackEdge();
     ElevatorAlightEdge elevatorAlightEdge = (ElevatorAlightEdge) elevatorState.getBackEdge();
     streetDetailsRepository.addHorizontalEdgeLevelInfo(elevatorBoardEdge, new Level(-2.0, "-2"));
     streetDetailsRepository.addHorizontalEdgeLevelInfo(elevatorAlightEdge, new Level(-1.0, "-1"));
-    var step2 = walkStep("elevator")
-      .withRelativeDirection(RelativeDirection.ELEVATOR)
+    var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR)
       .withVerticalTransportationUse(
         verticalTransportationUseFactory.createElevatorUse(
           elevatorState.getBackState(),
@@ -426,8 +413,7 @@ class GraphQLIntegrationTest {
       .withCode("A")
       .withWheelchairAccessibility(Accessibility.POSSIBLE)
       .build();
-    var step3 = walkStep("entrance")
-      .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+    var step3 = walkStep("entrance").withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
       .withEntrance(entrance)
       .build();
 
@@ -438,8 +424,7 @@ class GraphQLIntegrationTest {
       new VertexLevelInfo(new Level(2.0, "2"), 2)
     );
     streetDetailsRepository.addInclinedEdgeLevelInfo(stairsEdge, inclinedEdgeLevelInfo);
-    var step4 = walkStep("stairs")
-      .withRelativeDirection(RelativeDirection.CONTINUE)
+    var step4 = walkStep("stairs").withRelativeDirection(RelativeDirection.CONTINUE)
       .withVerticalTransportationUse(verticalTransportationUseFactory.createStairsUse(stairsEdge))
       .addEdge(stairsEdge)
       .build();
@@ -447,8 +432,7 @@ class GraphQLIntegrationTest {
     var escalatorState = TestStateBuilder.ofWalking().escalatorEdge().build();
     var escalatorEdge = escalatorState.getBackEdge();
     streetDetailsRepository.addInclinedEdgeLevelInfo(escalatorEdge, inclinedEdgeLevelInfo);
-    var step5 = walkStep("escalator")
-      .withRelativeDirection(RelativeDirection.CONTINUE)
+    var step5 = walkStep("escalator").withRelativeDirection(RelativeDirection.CONTINUE)
       .withVerticalTransportationUse(
         verticalTransportationUseFactory.createEscalatorUse(escalatorEdge)
       )
@@ -485,8 +469,7 @@ class GraphQLIntegrationTest {
     // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
     //        the ItineraryBuilder and not going back and forth between the Itinerary and the
     //        builder.
-    var i1 = newItinerary(A, T11_00)
-      .walk(20, B, List.of(step1, step2, step3, step4, step5))
+    var i1 = newItinerary(A, T11_00).walk(20, B, List.of(step1, step2, step3, step4, step5))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .carHail(D10_m, E)
@@ -541,9 +524,10 @@ class GraphQLIntegrationTest {
       .build();
     realtimeVehicleRepository.setRealtimeVehiclesForFeed(
       pattern.getId().getFeedId(),
-      new ImmutableListMultimap.Builder()
-        .putAll(pattern, List.of(occypancyVehicle, positionVehicle))
-        .build()
+      new ImmutableListMultimap.Builder().putAll(
+        pattern,
+        List.of(occypancyVehicle, positionVehicle)
+      ).build()
     );
     var realtimeVehicleService = new DefaultRealtimeVehicleService(
       new RealtimeVehicleRepositoryLifecycle().freeze(realtimeVehicleRepository),
@@ -595,23 +579,20 @@ class GraphQLIntegrationTest {
   }
 
   private static Itinerary add10MinuteDelay(Itinerary i1) {
-    return i1
-      .copyOf()
-      .transformTransitLegs(tl -> {
-        if (tl instanceof ScheduledTransitLeg stl) {
-          TripTimes scheduledTimes = stl.tripTimes();
-          var builder = scheduledTimes.createRealTimeFromScheduledTimes();
+    return i1.copyOf().transformTransitLegs(tl -> {
+      if (tl instanceof ScheduledTransitLeg stl) {
+        TripTimes scheduledTimes = stl.tripTimes();
+        var builder = scheduledTimes.createRealTimeFromScheduledTimes();
 
-          for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
-            builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);
-            builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
-          }
-
-          return stl.copyOf().withTripTimes(builder.build()).build();
+        for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
+          builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);
+          builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
         }
-        return tl;
-      })
-      .build();
+
+        return stl.copyOf().withTripTimes(builder.build()).build();
+      }
+      return tl;
+    }).build();
   }
 
   @FilePatternSource(
@@ -658,9 +639,8 @@ class GraphQLIntegrationTest {
     var alertWithoutHeader = TransitAlert.of(id("no-header"))
       .withDescriptionText(I18NStrings.TRANSLATED_STRING_2)
       .addEntity(entitySelector);
-    var alertWithNothing = TransitAlert.of(id("neither-header-nor-description")).addEntity(
-      entitySelector
-    );
+    var alertWithNothing = TransitAlert.of(id("neither-header-nor-description"))
+      .addEntity(entitySelector);
 
     return Stream.of(alertWithoutDescription, alertWithoutHeader, alertWithNothing)
       .map(AbstractBuilder::build)
@@ -693,8 +673,7 @@ class GraphQLIntegrationTest {
    * subdirectories are expected to be in the same directory.
    */
   private static Path getExpectation(Path path) {
-    return path
-      .getParent()
+    return path.getParent()
       .getParent()
       .resolve("expectations")
       .resolve(path.getFileName().toString().replace(".graphql", ".json"));

@@ -46,14 +46,12 @@ public class AlertsConnectionFilterMapper {
 
     var builder = FilterRequest.<TransitAlertSelectRequest>of();
     if (includes != null) {
-      includes
-        .stream()
+      includes.stream()
         .map(select -> toSelectRequest(select, "filters.include"))
         .forEach(builder::addSelect);
     }
     if (excludes != null) {
-      excludes
-        .stream()
+      excludes.stream()
         .map(select -> toSelectRequest(select, "filters.exclude"))
         .forEach(builder::addNot);
     }
@@ -84,10 +82,7 @@ public class AlertsConnectionFilterMapper {
     requireNullOrNonEmpty(values, path);
     return values == null
       ? null
-      : values
-          .stream()
-          .flatMap(s -> SeverityMapper.getAlertSeverities(s).stream())
-          .toList();
+      : values.stream().flatMap(s -> SeverityMapper.getAlertSeverities(s).stream()).toList();
   }
 
   @Nullable
@@ -126,8 +121,8 @@ public class AlertsConnectionFilterMapper {
   }
 
   /**
-   * A dimension is either unset or has at least one non-null value. An empty list would filter
-   * away everything, which is never what the caller wants, so it is rejected.
+   * A dimension is either unset or has at least one non-null value. An empty list would filter away
+   * everything, which is never what the caller wants, so it is rejected.
    */
   @Nullable
   private static <T> List<T> requireNullOrNonEmpty(@Nullable List<T> values, String path) {

@@ -302,8 +302,7 @@ class GeometryProcessorTest {
     stopTimes.get(2).setShapeDistTraveled(4);
     builder.getStopTimesSortedByTrip().put(trip, stopTimes);
 
-    builder
-      .getShapePoints()
+    builder.getShapePoints()
       .put(
         SHAPE_ID,
         List.of(
@@ -349,8 +348,7 @@ class GeometryProcessorTest {
   void ignoreInvalidReference() {
     var issueStore = new DefaultDataImportIssueStore();
     var builder = new TransitDataImportBuilder(REPO, issueStore);
-    builder
-      .getShapePoints()
+    builder.getShapePoints()
       .put(SHAPE_ID, List.of(new ShapePoint(0, 0, 0, 0.0), new ShapePoint(1, 1, 1, 1.0)));
 
     var invalidRef = id("unknown");
@@ -386,7 +384,7 @@ class GeometryProcessorTest {
       for (int j = 0; j < expectedLineString.getNumPoints(); j++) {
         if (
           distance(expectedLineString.getCoordinateN(j), actualLineString.getCoordinateN(j)) >
-          TOLERANCE
+            TOLERANCE
         ) {
           throw new AssertionFailedError(null, expected, actual);
         }

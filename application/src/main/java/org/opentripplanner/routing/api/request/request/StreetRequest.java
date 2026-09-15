@@ -31,8 +31,9 @@ public class StreetRequest implements Serializable {
   }
 
   /**
-   * An assumed duration of the car rental trip, to make sure the vehicle is available during this time.
-   * The rentalDuration only apply to free-floating vehicles in a direct search. Access and egress is not supported.
+   * An assumed duration of the car rental trip, to make sure the vehicle is available during this
+   * time. The rentalDuration only apply to free-floating vehicles in a direct search. Access and
+   * egress is not supported.
    */
   @Nullable
   public Duration rentalDuration() {

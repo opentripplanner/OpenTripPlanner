@@ -36,15 +36,16 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
  * starting point for others to use, but they are to some extent tailored to the situation in
  * Portland and people shouldn't hesitate to adjust them to for their own instance.
  * <p>
- * The rules for assigning WayProperties to OSM ways are explained in. The final tie breaker if two
- * Pickers both match is the sequence that the properties are added in this file: if all else is
+ * The rules for assigning WayProperties to OSM ways are explained in. The final tie breaker if
+ * two Pickers both match is the sequence that the properties are added in this file: if all else is
  * equal the 'props.setProperties' statement that is closer to the top of the page will prevail over
  * those lower down the page.
  * <p>
- * Foot and bicycle permissions are also addressed in OpenStreetMapGraphBuilderImpl.Handler#getPermissionsForEntity().
- * For instance, if a way that normally does not permit walking based on its tag matches (the
- * prevailing 'props.setProperties' statement) has a 'foot=yes' tag the permissions are overridden
- * and walking is allowed on that way.
+ * Foot and bicycle permissions are also addressed in
+ * OpenStreetMapGraphBuilderImpl.Handler#getPermissionsForEntity(). For instance, if a way that
+ * normally does not permit walking based on its tag matches (the prevailing 'props.setProperties'
+ * statement) has a 'foot=yes' tag the permissions are overridden and walking is allowed on that
+ * way.
  * <p>
  *
  * @author bdferris, novalis
@@ -158,8 +159,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite_lane"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(0.87).addPermission(BICYCLE)
+      new MixinPropertiesBuilder().directional(
+        TraverseDirection.BACKWARD,
+        builder -> builder.withBicycleSafety(0.87).addPermission(BICYCLE)
       )
     );
 
@@ -178,8 +180,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite_track"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(0.75).addPermission(BICYCLE)
+      new MixinPropertiesBuilder().directional(
+        TraverseDirection.BACKWARD,
+        builder -> builder.withBicycleSafety(0.75).addPermission(BICYCLE)
       )
     );
 
@@ -198,8 +201,9 @@ public class OsmTagMapper {
         new Equals("cycleway", "opposite"),
         new Not(new Equals("highway", "cycleway"))
       ),
-      new MixinPropertiesBuilder().directional(TraverseDirection.BACKWARD, builder ->
-        builder.withBicycleSafety(1.4).addPermission(BICYCLE)
+      new MixinPropertiesBuilder().directional(
+        TraverseDirection.BACKWARD,
+        builder -> builder.withBicycleSafety(1.4).addPermission(BICYCLE)
       )
     );
 
@@ -490,13 +494,11 @@ public class OsmTagMapper {
   }
 
   public boolean doesTagValueDisallowThroughTraffic(String tagValue) {
-    return (
-      "no".equals(tagValue) ||
+    return ("no".equals(tagValue) ||
       "destination".equals(tagValue) ||
       "private".equals(tagValue) ||
       "customers".equals(tagValue) ||
-      "delivery".equals(tagValue)
-    );
+      "delivery".equals(tagValue));
   }
 
   public float getCarSpeedForWay(

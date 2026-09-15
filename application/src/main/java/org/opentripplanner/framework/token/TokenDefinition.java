@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A token definition is an ordered list of fields. A field has a name and a type. The
- * definition is used to encode/decode a token.
+ * A token definition is an ordered list of fields. A field has a name and a type. The definition is
+ * used to encode/decode a token.
  */
 public class TokenDefinition {
 
@@ -78,10 +78,7 @@ public class TokenDefinition {
   }
 
   List<FieldDefinition> listNonDeprecatedFields() {
-    return listFields()
-      .stream()
-      .filter(it -> !it.deprecated())
-      .toList();
+    return listFields().stream().filter(it -> !it.deprecated()).toList();
   }
 
   List<FieldDefinition> listFields() {

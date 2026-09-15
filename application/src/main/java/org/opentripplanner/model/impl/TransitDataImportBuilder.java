@@ -77,8 +77,8 @@ public class TransitDataImportBuilder {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
-  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments =
-    ArrayListMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap
+    .create();
 
   private final EntityById<Operator> operatorsById = new DefaultEntityById<>();
 
@@ -110,8 +110,8 @@ public class TransitDataImportBuilder {
 
   private final EntityById<Branding> brandingsById = new DefaultEntityById<>();
 
-  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId =
-    ArrayListMultimap.create();
+  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap
+    .create();
 
   private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 
@@ -258,8 +258,8 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * The list of parking lots contained in the transit data (so far only NeTEx).
-   * Note that parking lots can also be sourced from OSM data as well as realtime updaters.
+   * The list of parking lots contained in the transit data (so far only NeTEx). Note that parking
+   * lots can also be sourced from OSM data as well as realtime updaters.
    */
   public List<VehicleParking> vehicleParkings() {
     return vehicleParkings;
@@ -357,13 +357,12 @@ public class TransitDataImportBuilder {
     int orgSize = tripsById.size();
     tripsById.removeIf(
       t -> !serviceIds.contains(t.getServiceId()),
-      t ->
-        issueStore.add(
-          "RemovedMissingServiceIdTrip",
-          "Removed trip %s as service id %s does not exist",
-          t.getId(),
-          t.getServiceId()
-        )
+      t -> issueStore.add(
+        "RemovedMissingServiceIdTrip",
+        "Removed trip %s as service id %s does not exist",
+        t.getId(),
+        t.getServiceId()
+      )
     );
     logRemove("Trip", orgSize, tripsById.size(), "Trip service id does not exist.");
   }
@@ -383,16 +382,14 @@ public class TransitDataImportBuilder {
 
     for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
       TripPattern ptn = e.getValue();
-      Set<TripTimes> tripTimesToBeRemoved = ptn
-        .getScheduledTimetable()
+      Set<TripTimes> tripTimesToBeRemoved = ptn.getScheduledTimetable()
         .getTripTimes()
         .stream()
         .filter(tripTimes -> !tripsById.containsKey(tripTimes.getTrip().getId()))
         .collect(Collectors.toUnmodifiableSet());
       if (!tripTimesToBeRemoved.isEmpty()) {
         removePatterns.add(e);
-        Timetable updatedTimetable = ptn
-          .getScheduledTimetable()
+        Timetable updatedTimetable = ptn.getScheduledTimetable()
           .copyOf()
           .removeAllTripTimes(tripTimesToBeRemoved)
           .build();
@@ -443,15 +440,12 @@ public class TransitDataImportBuilder {
 
   /** Return {@code true} if the from/to trip reference is none null, but do not exist. */
   private boolean transferTripReferencesDoNotExist(ConstrainedTransfer t) {
-    return (
-      transferPointTripReferenceDoesNotExist(t.getFrom()) ||
-      transferPointTripReferenceDoesNotExist(t.getTo())
-    );
+    return (transferPointTripReferenceDoesNotExist(t.getFrom()) ||
+      transferPointTripReferenceDoesNotExist(t.getTo()));
   }
 
   /**
-   * Return {@code true} if the point is a trip-transfer-point and the trip reference is
-   * missing.
+   * Return {@code true} if the point is a trip-transfer-point and the trip reference is missing.
    */
   private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {
     if (!point.isTripTransferPoint()) {

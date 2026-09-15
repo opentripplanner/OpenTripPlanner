@@ -59,20 +59,16 @@ class TransitAlertMatcherFactoryTest {
   @Test
   void dimensionsWithinASelectorAreCombinedWithAnd() {
     var matching = request(
-      select ->
-        select
-          .withSeverityLevels(List.of(AlertSeverity.SEVERE))
-          .withCauses(List.of(AlertCause.WEATHER))
-          .withEffects(List.of(AlertEffect.NO_SERVICE)),
+      select -> select.withSeverityLevels(List.of(AlertSeverity.SEVERE))
+        .withCauses(List.of(AlertCause.WEATHER))
+        .withEffects(List.of(AlertEffect.NO_SERVICE)),
       null
     );
     assertTrue(TransitAlertMatcherFactory.of(matching).match(alert()));
 
     var notMatching = request(
-      select ->
-        select
-          .withSeverityLevels(List.of(AlertSeverity.SEVERE))
-          .withCauses(List.of(AlertCause.ACCIDENT)),
+      select -> select.withSeverityLevels(List.of(AlertSeverity.SEVERE))
+        .withCauses(List.of(AlertCause.ACCIDENT)),
       null
     );
     assertFalse(TransitAlertMatcherFactory.of(notMatching).match(alert()));

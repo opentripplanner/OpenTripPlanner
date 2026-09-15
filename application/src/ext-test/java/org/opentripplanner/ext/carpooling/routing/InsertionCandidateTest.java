@@ -64,8 +64,9 @@ class InsertionCandidateTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     var segments = createGraphPaths(3);
 
-    assertThrows(IllegalArgumentException.class, () ->
-      new InsertionCandidate(trip, 0, 2, segments, STOP_DURATION, null, null, null)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new InsertionCandidate(trip, 0, 2, segments, STOP_DURATION, null, null, null)
     );
   }
 
@@ -75,8 +76,9 @@ class InsertionCandidateTest {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     var segments = createGraphPaths(3);
 
-    assertThrows(IllegalArgumentException.class, () ->
-      new InsertionCandidate(trip, 2, 2, segments, STOP_DURATION, null, null, null)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new InsertionCandidate(trip, 2, 2, segments, STOP_DURATION, null, null, null)
     );
   }
 
@@ -141,8 +143,8 @@ class InsertionCandidateTest {
   }
 
   /**
-   * Single pickup segment → durationUntilPickup = segment duration (boarding excluded).
-   * Single shared segment → passengerRideDuration = boarding time + segment duration.
+   * Single pickup segment → durationUntilPickup = segment duration (boarding excluded). Single
+   * shared segment → passengerRideDuration = boarding time + segment duration.
    */
   @Test
   void durations_onePickupSegment_singleSharedSegment() {
@@ -170,8 +172,8 @@ class InsertionCandidateTest {
   }
 
   /**
-   * Two pickup segments → travel + 1 intermediate stop, no boarding dwell.
-   * Two shared segments → boarding dwell + travel + 1 intermediate stop.
+   * Two pickup segments → travel + 1 intermediate stop, no boarding dwell. Two shared segments →
+   * boarding dwell + travel + 1 intermediate stop.
    */
   @Test
   void durations_multiplePickupAndSharedSegments() {
@@ -241,8 +243,7 @@ class InsertionCandidateTest {
 
     // Boarding dwell + 1 intermediate stop between the 2 shared segments scales: 2x stopDuration
     // difference.
-    var difference = candidateLarge
-      .getPassengerRideDuration()
+    var difference = candidateLarge.getPassengerRideDuration()
       .minus(candidateSmall.getPassengerRideDuration());
     assertEquals(Duration.ofMinutes(8), difference);
   }

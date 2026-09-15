@@ -41,29 +41,33 @@ public class CarpoolSiriMapperTest {
 
   @Test
   void mapSiriToCarpoolTrip_arrivalIsAfterDepartureTime_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(arrivalIsAfterDepartureTime())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(arrivalIsAfterDepartureTime())
     );
   }
 
   @Test
   void mapSiriToCarpoolTrip_lessThanTwoStops_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(lessThanTwoStops())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(lessThanTwoStops())
     );
   }
 
   @Test
   void mapSiriToCarpoolTrip_tripExceedsMaxDuration_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(tripExceedingMaxDuration())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(tripExceedingMaxDuration())
     );
   }
 
   @Test
   void mapSiriToCarpoolTrip_tripExceedsMaxDurationViaDefaultDeviationBudget_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(tripExceedingMaxDurationViaDefaultDeviationBudget())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(tripExceedingMaxDurationViaDefaultDeviationBudget())
     );
   }
 
@@ -71,8 +75,9 @@ public class CarpoolSiriMapperTest {
   void mapSiriToCarpoolTrip_waypointsTooFarApart_throwsIllegalArgumentException() {
     // Short claimed times but waypoints ~450 km apart: the timetable check passes, the geometry
     // check rejects it.
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(tripWithWaypointsTooFarApart())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(tripWithWaypointsTooFarApart())
     );
   }
 
@@ -81,15 +86,13 @@ public class CarpoolSiriMapperTest {
     var journey = minimalCompleteJourney();
     var mapped = mapper.mapSiriToCarpoolTrip(journey);
 
-    var expectedStartTime = journey
-      .getEstimatedCalls()
+    var expectedStartTime = journey.getEstimatedCalls()
       .getEstimatedCalls()
       .stream()
       .findFirst()
       .map(EstimatedCall::getAimedDepartureTime)
       .orElseThrow();
-    var expectedEndTime = journey
-      .getEstimatedCalls()
+    var expectedEndTime = journey.getEstimatedCalls()
       .getEstimatedCalls()
       .stream()
       .reduce((a, b) -> b)
@@ -98,15 +101,13 @@ public class CarpoolSiriMapperTest {
     assertEquals(expectedStartTime, mapped.startTime());
     assertEquals(expectedEndTime, mapped.endTime());
 
-    var startName = journey
-      .getEstimatedCalls()
+    var startName = journey.getEstimatedCalls()
       .getEstimatedCalls()
       .getFirst()
       .getStopPointNames()
       .getFirst()
       .getValue();
-    var endName = journey
-      .getEstimatedCalls()
+    var endName = journey.getEstimatedCalls()
       .getEstimatedCalls()
       .getLast()
       .getStopPointNames()
@@ -148,15 +149,17 @@ public class CarpoolSiriMapperTest {
 
   @Test
   void mapSiriToCarpoolTrip_stopTimesAreOutOfOrder_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(stopTimesAreOutOfOrder())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(stopTimesAreOutOfOrder())
     );
   }
 
   @Test
   void mapSiriToCarpoolTrip_expectedArrivalBeforeExpectedDeparture_throwsIllegalArgumentException() {
-    assertThrows(IllegalArgumentException.class, () ->
-      mapper.mapSiriToCarpoolTrip(expectedArrivalBeforeExpectedDeparture())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> mapper.mapSiriToCarpoolTrip(expectedArrivalBeforeExpectedDeparture())
     );
   }
 
@@ -276,11 +279,7 @@ public class CarpoolSiriMapperTest {
     var mapped = mapper.mapSiriToCarpoolTrip(journeyWithCancelledIntermediateCall());
 
     assertNotNull(mapped);
-    var stopIds = mapped
-      .stops()
-      .stream()
-      .map(s -> s.getId().getId())
-      .toList();
+    var stopIds = mapped.stops().stream().map(s -> s.getId().getId()).toList();
     assertEquals(List.of("unittest_trip_origin", "unittest_trip_destination"), stopIds);
   }
 

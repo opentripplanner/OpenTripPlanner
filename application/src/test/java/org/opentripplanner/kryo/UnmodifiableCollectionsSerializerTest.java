@@ -113,8 +113,9 @@ class UnmodifiableCollectionsSerializerTest {
   void writeRejectsUnsupportedType() {
     var serializer = new UnmodifiableCollectionsSerializer();
     try (Output output = new Output(64, -1)) {
-      assertThrows(IllegalArgumentException.class, () ->
-        serializer.write(kryo, output, "not a wrapped collection")
+      assertThrows(
+        IllegalArgumentException.class,
+        () -> serializer.write(kryo, output, "not a wrapped collection")
       );
     }
   }

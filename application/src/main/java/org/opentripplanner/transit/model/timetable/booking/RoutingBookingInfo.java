@@ -6,11 +6,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * This is the contract between booking info and the router. The router will enforce
- * this information if the request sets the earliest-booking-time request parameter.
+ * This is the contract between booking info and the router. The router will enforce this
+ * information if the request sets the earliest-booking-time request parameter.
  * <p>
- * Either {@code latestBookingTime} and {@code minimumBookingNotice} must be set to
- * an actual value, both can not be set to {@NOT_SET} simultaneously.
+ * Either {@code latestBookingTime} and {@code minimumBookingNotice} must be set to an actual
+ * value, both can not be set to {@NOT_SET} simultaneously.
  * <p>
  * This class is not used by Raptor directly, but used by the BookingTimeAccessEgress which
  * implements the RaptorAccessEgress interface.
@@ -65,11 +65,11 @@ public final class RoutingBookingInfo {
   }
 
   /**
-   * Time-shift departureTime if the minimum-booking-notice requires it. If required, the
-   * new time-shifted departureTime is returned, if not the given {@code departureTime} is
-   * returned as is. For example, if a service is available between 12:00 and 15:00 and the
-   * minimum booking notice is 30 minutes, the first available trip at 13:00
-   * ({@code requestedBookingTime}) is 13:30.
+   * Time-shift departureTime if the minimum-booking-notice requires it. If required, the new
+   * time-shifted departureTime is returned, if not the given {@code departureTime} is returned as
+   * is. For example, if a service is available between 12:00 and 15:00 and the minimum booking
+   * notice is 30 minutes, the first available trip at 13:00 ({@code requestedBookingTime}) is
+   * 13:30.
    */
   public int earliestDepartureTime(int departureTime) {
     return notSet(minimumBookingNotice)
@@ -98,10 +98,8 @@ public final class RoutingBookingInfo {
       return false;
     }
     var other = (RoutingBookingInfo) o;
-    return (
-      Objects.equals(latestBookingTime, other.latestBookingTime) &&
-      Objects.equals(minimumBookingNotice, other.minimumBookingNotice)
-    );
+    return (Objects.equals(latestBookingTime, other.latestBookingTime) &&
+      Objects.equals(minimumBookingNotice, other.minimumBookingNotice));
   }
 
   @Override
@@ -155,14 +153,16 @@ public final class RoutingBookingInfo {
     }
 
     public Builder withLatestBookingTime(@Nullable BookingTime latestBookingTime) {
-      this.latestBookingTime =
-        latestBookingTime == null ? NOT_SET : latestBookingTime.relativeTimeSeconds();
+      this.latestBookingTime = latestBookingTime == null
+        ? NOT_SET
+        : latestBookingTime.relativeTimeSeconds();
       return this;
     }
 
     public Builder withMinimumBookingNotice(@Nullable Duration minimumBookingNotice) {
-      this.minimumBookingNotice =
-        minimumBookingNotice == null ? NOT_SET : (int) minimumBookingNotice.toSeconds();
+      this.minimumBookingNotice = minimumBookingNotice == null
+        ? NOT_SET
+        : (int) minimumBookingNotice.toSeconds();
       return this;
     }
 

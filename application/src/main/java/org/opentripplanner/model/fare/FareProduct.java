@@ -64,8 +64,7 @@ public final class FareProduct implements Serializable {
    */
   public String uniqueInstanceId(ZonedDateTime startTime) {
     var buf = new StringBuilder();
-    buf
-      .append(startTime.toEpochSecond())
+    buf.append(startTime.toEpochSecond())
       .append(id)
       .append(price.currency().getCurrencyCode())
       .append(price.minorUnitAmount());
@@ -119,13 +118,11 @@ public final class FareProduct implements Serializable {
       return false;
     }
     var that = (FareProduct) obj;
-    return (
-      Objects.equals(this.id, that.id) &&
+    return (Objects.equals(this.id, that.id) &&
       Objects.equals(this.name, that.name) &&
       Objects.equals(this.price, that.price) &&
       Objects.equals(this.category, that.category) &&
-      Objects.equals(this.medium, that.medium)
-    );
+      Objects.equals(this.medium, that.medium));
   }
 
   @Override

@@ -40,8 +40,7 @@ class JourneyRelationWrapperTest {
     var relation = new JourneyRelationStructure();
     var related = new RelatedJourney();
     related.setFramedVehicleJourneyRef(
-      new SiriEtBuilder.FramedVehicleRefBuilder()
-        .withVehicleJourneyRef(id)
+      new SiriEtBuilder.FramedVehicleRefBuilder().withVehicleJourneyRef(id)
         .withServiceDate(DATE)
         .build()
     );
@@ -92,14 +91,12 @@ class JourneyRelationWrapperTest {
   }
 
   private List<CallWrapper> calls(String... stopRefs) {
-    var journey = new SiriEtBuilder(TIME_PARSER)
-      .withEstimatedCalls(b -> {
-        for (var stop : stopRefs) {
-          b.call(stop);
-        }
-        return b;
-      })
-      .buildEstimatedVehicleJourney();
+    var journey = new SiriEtBuilder(TIME_PARSER).withEstimatedCalls(b -> {
+      for (var stop : stopRefs) {
+        b.call(stop);
+      }
+      return b;
+    }).buildEstimatedVehicleJourney();
     return CallWrapper.of(journey);
   }
 

@@ -71,17 +71,11 @@ class GbfsStationInformationMapper {
 
     if (station.getVehicleTypesCapacity() != null && vehicleTypes != null) {
       builder.withVehicleTypeAreaCapacity(
-        station
-          .getVehicleTypesCapacity()
+        station.getVehicleTypesCapacity()
           .stream()
-          .flatMap(e ->
-            e
-              .getVehicleTypeIds()
-              .stream()
-              .map(t -> Map.entry(t, e.getCount()))
-          )
-          .filter(e ->
-            vehicleTypeFilter.filterUnknownVehicleType(
+          .flatMap(e -> e.getVehicleTypeIds().stream().map(t -> Map.entry(t, e.getCount())))
+          .filter(
+            e -> vehicleTypeFilter.filterUnknownVehicleType(
               e.getKey(),
               station.getStationId(),
               "vehicle_types_capacity"
@@ -93,17 +87,11 @@ class GbfsStationInformationMapper {
 
     if (station.getVehicleDocksCapacity() != null && vehicleTypes != null) {
       builder.withVehicleTypeDockCapacity(
-        station
-          .getVehicleDocksCapacity()
+        station.getVehicleDocksCapacity()
           .stream()
-          .flatMap(e ->
-            e
-              .getVehicleTypeIds()
-              .stream()
-              .map(t -> Map.entry(t, e.getCount()))
-          )
-          .filter(e ->
-            vehicleTypeFilter.filterUnknownVehicleType(
+          .flatMap(e -> e.getVehicleTypeIds().stream().map(t -> Map.entry(t, e.getCount())))
+          .filter(
+            e -> vehicleTypeFilter.filterUnknownVehicleType(
               e.getKey(),
               station.getStationId(),
               "vehicle_docks_capacity"
@@ -134,22 +122,16 @@ class GbfsStationInformationMapper {
    * Return true if the station is valid.
    */
   static boolean isValid(GBFSStation station) {
-    return (
-      station.getStationId() != null &&
+    return (station.getStationId() != null &&
       !station.getStationId().isBlank() &&
       station.getName() != null &&
       !station.getName().isEmpty() &&
       station.getName().stream().allMatch(Objects::nonNull) &&
-      station
-        .getName()
-        .stream()
-        .allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getText())) &&
-      station
-        .getName()
+      station.getName().stream().allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getText())) &&
+      station.getName()
         .stream()
         .allMatch(gbfsName -> StringUtils.hasValue(gbfsName.getLanguage())) &&
       station.getLon() != null &&
-      station.getLat() != null
-    );
+      station.getLat() != null);
   }
 }

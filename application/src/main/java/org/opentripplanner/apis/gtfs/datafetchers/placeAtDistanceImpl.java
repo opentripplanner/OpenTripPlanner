@@ -26,12 +26,10 @@ public class placeAtDistanceImpl implements GraphQLDataFetchers.GraphQLPlaceAtDi
       Object place = placeAtDistance.place();
       TypeResolver typeResolver = new PlaceInterfaceTypeResolver();
 
-      GraphQLInterfaceType placeInterface = (GraphQLInterfaceType) environment
-        .getGraphQLSchema()
+      GraphQLInterfaceType placeInterface = (GraphQLInterfaceType) environment.getGraphQLSchema()
         .getType("PlaceInterface");
 
-      var resolution = new TypeResolutionParameters.Builder()
-        .value(place)
+      var resolution = new TypeResolutionParameters.Builder().value(place)
         .argumentValues(environment::getArguments)
         .field(environment.getMergedField())
         .fieldType(placeInterface)
@@ -41,8 +39,7 @@ public class placeAtDistanceImpl implements GraphQLDataFetchers.GraphQLPlaceAtDi
 
       GraphQLObjectType placeType = typeResolver.getType(resolution);
 
-      Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) environment
-        .getGraphQLSchema()
+      Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) environment.getGraphQLSchema()
         .getCodeRegistry()
         .getDataFetcher(
           FieldCoordinates.coordinates(placeType.getName(), "id"),

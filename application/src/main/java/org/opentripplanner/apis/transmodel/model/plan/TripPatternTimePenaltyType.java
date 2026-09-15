@@ -44,8 +44,8 @@ public class TripPatternTimePenaltyType {
             """
           )
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment ->
-            DurationUtils.durationToStr(penalty(environment).penalty().time())
+          .dataFetcher(
+            environment -> DurationUtils.durationToStr(penalty(environment).penalty().time())
           )
           .build()
       )

@@ -29,8 +29,10 @@ import java.util.List;
  * There are two types of metrics: one for query execution, and another for resolver timing. The
  * timers are registered to micrometer using graphql.timer.query and graphql.timer.resolver.
  * <p>
- * ### See also: - https://github.com/symbaloo/graphql-micrometer/blob/main/src/main/kotlin/com/symbaloo/graphqlmicrometer/MicrometerInstrumentation.kt
- * - https://github.com/graphql-java-kickstart/graphql-spring-boot/blob/master/graphql-spring-boot-autoconfigure/src/main/java/graphql/kickstart/autoconfigure/web/servlet/metrics/MetricsInstrumentation.java
+ * ### See also: -
+ * https://github.com/symbaloo/graphql-micrometer/blob/main/src/main/kotlin/com/symbaloo/graphqlmicrometer/MicrometerInstrumentation.kt
+ * -
+ * https://github.com/graphql-java-kickstart/graphql-spring-boot/blob/master/graphql-spring-boot-autoconfigure/src/main/java/graphql/kickstart/autoconfigure/web/servlet/metrics/MetricsInstrumentation.java
  * - https://github.com/apollographql/apollo-tracing - [TracingInstrumentation]
  */
 public class MicrometerGraphQLInstrumentation implements Instrumentation {
@@ -63,8 +65,8 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     Timer.Sample sample = Timer.start(meterRegistry);
-    return whenCompleted((res, err) ->
-      sample.stop(buildQueryTimer(((TraceState) state).operationName, "execution"))
+    return whenCompleted(
+      (res, err) -> sample.stop(buildQueryTimer(((TraceState) state).operationName, "execution"))
     );
   }
 
@@ -74,8 +76,8 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     Timer.Sample sample = Timer.start(meterRegistry);
-    return whenCompleted((res, err) ->
-      sample.stop(buildQueryTimer(((TraceState) state).operationName, "parse"))
+    return whenCompleted(
+      (res, err) -> sample.stop(buildQueryTimer(((TraceState) state).operationName, "parse"))
     );
   }
 
@@ -85,8 +87,8 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
     InstrumentationState state
   ) {
     Timer.Sample sample = Timer.start(meterRegistry);
-    return whenCompleted((res, err) ->
-      sample.stop(buildQueryTimer(((TraceState) state).operationName, "validation"))
+    return whenCompleted(
+      (res, err) -> sample.stop(buildQueryTimer(((TraceState) state).operationName, "validation"))
     );
   }
 

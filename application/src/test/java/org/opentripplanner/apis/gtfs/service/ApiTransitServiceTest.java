@@ -32,10 +32,10 @@ import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 import org.opentripplanner.updater.trip.gtfs.TripUpdateBuilder;
 
 /**
- * This test uses the real-time test environment to establish the condition under test.
- * This pulls in a bunch of dependencies, namely on GTFS-RT classes, that go a bit beyond the scope
- * of this test, however, the other option is to write to the timetable snapshot/repository directly.
- * In a dev meeting this was considered "white box testing" and worse than pulling these dependencies.
+ * This test uses the real-time test environment to establish the condition under test. This pulls
+ * in a bunch of dependencies, namely on GTFS-RT classes, that go a bit beyond the scope of this
+ * test, however, the other option is to write to the timetable snapshot/repository directly. In a
+ * dev meeting this was considered "white box testing" and worse than pulling these dependencies.
  * <p>
  * The core problem is that OTP doesn't have a clear internal API for applying real-time updates.
  */
@@ -85,10 +85,7 @@ class ApiTransitServiceTest {
       ArrivalDeparture.BOTH
     );
 
-    var tripIds = calls
-      .stream()
-      .map(t -> t.getTrip().getId().getId())
-      .toList();
+    var tripIds = calls.stream().map(t -> t.getTrip().getId().getId()).toList();
     assertEquals(List.of(TRIP_1_ID, TRIP_2_ID), tripIds);
   }
 
@@ -125,10 +122,7 @@ class ApiTransitServiceTest {
       ArrivalDeparture.BOTH
     );
 
-    var tripIds = calls
-      .stream()
-      .map(t -> t.getTrip().getId().getId())
-      .toList();
+    var tripIds = calls.stream().map(t -> t.getTrip().getId().getId()).toList();
     assertEquals(List.of(TRIP_1_ID, TRIP_2_ID), tripIds);
   }
 
@@ -141,8 +135,7 @@ class ApiTransitServiceTest {
     var tripTimes = tripData.tripTimes();
     var pattern = tripData.tripPattern();
 
-    var leg = new ScheduledTransitLegBuilder()
-      .withTripPattern(pattern)
+    var leg = new ScheduledTransitLegBuilder().withTripPattern(pattern)
       .withTripTimes(tripTimes)
       .withStartTime(ANY_TIME)
       .withEndTime(ANY_TIME)
@@ -253,17 +246,15 @@ class ApiTransitServiceTest {
     var outsideRange = List.of(
       LocalDateRange.ofExclusiveEnd(SERVICE_DATE.plusDays(1), SERVICE_DATE.plusDays(2))
     );
-    assertThat(
-      service.findCanceledStopCalls(STOP_B, outsideRange, null, ArrivalDeparture.BOTH)
-    ).isEmpty();
+    assertThat(service.findCanceledStopCalls(STOP_B, outsideRange, null, ArrivalDeparture.BOTH))
+      .isEmpty();
 
     // Range that includes the service date returns the canceled call
     var insideRange = List.of(
       LocalDateRange.ofExclusiveEnd(SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    assertThat(
-      service.findCanceledStopCalls(STOP_B, insideRange, null, ArrivalDeparture.BOTH)
-    ).hasSize(1);
+    assertThat(service.findCanceledStopCalls(STOP_B, insideRange, null, ArrivalDeparture.BOTH))
+      .hasSize(1);
   }
 
   @Test
@@ -354,9 +345,8 @@ class ApiTransitServiceTest {
     var env = envBuilder.addTrip(TRIP1_INPUT).build();
     var service = new ApiTransitService(env.transitService());
 
-    assertThat(
-      service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE.plusDays(1))
-    ).isEmpty();
+    assertThat(service.findOrCreateTripOnServiceDate(id(TRIP_1_ID), SERVICE_DATE.plusDays(1)))
+      .isEmpty();
   }
 
   @Test

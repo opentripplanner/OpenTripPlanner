@@ -44,8 +44,7 @@ public class StopEventParamsMapper {
     var time = Optional.ofNullable(ser.getLocation().getDepArrTime())
       .map(t -> t.atZone(zoneId).toInstant())
       .orElse(Instant.now());
-    int numResults = params(ser)
-      .map(s -> s.getNumberOfResults())
+    int numResults = params(ser).map(s -> s.getNumberOfResults())
       .map(i -> i.intValue())
       .orElse(DEFAULT_NUM_DEPARTURES);
 
@@ -58,9 +57,8 @@ public class StopEventParamsMapper {
     Set<TransitMode> includedModes = modeFilter(ser, m -> !isExclude(m.isExclude()));
     Set<TransitMode> excludedModes = modeFilter(ser, m -> isExclude(m.isExclude()));
     int maxWalkDistance = Optional.ofNullable(ser.getLocation())
-      .flatMap(l ->
-        l
-          .getIndividualTransportOption()
+      .flatMap(
+        l -> l.getIndividualTransportOption()
           .stream()
           .filter(
             o -> o.getItModeAndModeOfOperation().getPersonalMode() == PersonalModesEnumeration.FOOT
@@ -110,8 +108,7 @@ public class StopEventParamsMapper {
     OJPStopEventRequestStructure ser,
     Predicate<ModeFilterStructure> predicate
   ) {
-    return params(ser)
-      .map(StopEventParamStructure::getModeFilter)
+    return params(ser).map(StopEventParamStructure::getModeFilter)
       .filter(predicate)
       .map(ModeFilterStructure::getPtMode)
       .stream()
@@ -120,8 +117,7 @@ public class StopEventParamsMapper {
   }
 
   private static ArrivalDeparture arrivalDeparture(OJPStopEventRequestStructure ser) {
-    return params(ser)
-      .map(StopEventParamStructure::getStopEventType)
+    return params(ser).map(StopEventParamStructure::getStopEventType)
       .map(StopEventParamsMapper::mapType)
       .orElse(ArrivalDeparture.BOTH);
   }

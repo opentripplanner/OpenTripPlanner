@@ -32,49 +32,37 @@ public final class AccessEgressFunctions {
    * Filter standard (not multi-criteria) Raptor access and egress paths. A path is pareto optimal
    * for a given stop if
    * <ol>
-   *     <li>
-   *         time duration is lower
-   *     </li>
-   *     <li>
-   *         number of rides is lower
-   *     </li>
-   *     <li>
-   *         number of via locations is higher
-   *     </li>
-   *     <li>
-   *         reached the stop on-board, and not on foot. This is optimal because arriving on foot
-   *         limits your options, you are not allowed to continue on foot and transfer(walk) to
-   *         a nearby stop.
-   *     </li>
-   *     <li>
-   *         No opening hours is better than being restricted
-   *     </li>
-   *     <li>
-   *         If both have opening hours, both need to be accepted
-   *     </li>
+   *   <li>time duration is lower</li>
+   *   <li>number of rides is lower</li>
+   *   <li>number of via locations is higher</li>
+   *   <li>reached the stop on-board, and not on foot. This is optimal because arriving on foot limits
+   *       your options, you are not allowed to continue on foot and transfer(walk) to a nearby stop.</li>
+   *   <li>No opening hours is better than being restricted</li>
+   *   <li>If both have opening hours, both need to be accepted</li>
    * </ol>
    */
-  private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
-    (l.arrivedOnBoard() && !r.arrivedOnBoard()) ||
+  private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) -> (l
+    .arrivedOnBoard() &&
+    !r.arrivedOnBoard()) ||
     r.hasOpeningHours() ||
     l.numberOfRides() < r.numberOfRides() ||
     l.durationInSeconds() < r.durationInSeconds() ||
     l.numberOfViaLocationsVisited() > r.numberOfViaLocationsVisited();
 
   /**
-   * Filter Multi-criteria Raptor access and egress paths. This can be used to wash
-   * access/egress paths - paths that are not optimal using this should not be passed into
-   * Raptor - it is a bug.
+   * Filter Multi-criteria Raptor access and egress paths. This can be used to wash access/egress
+   * paths - paths that are not optimal using this should not be passed into Raptor - it is a bug.
    */
-  private static final ParetoComparator<RaptorAccessEgress> MC_COMPARATOR = (l, r) ->
-    STANDARD_COMPARATOR.leftDominanceExist(l, r) || l.c1() < r.c1();
+  private static final ParetoComparator<RaptorAccessEgress> MC_COMPARATOR = (
+    l,
+    r) -> STANDARD_COMPARATOR.leftDominanceExist(l, r) || l.c1() < r.c1();
 
   /** private constructor to prevent instantiation of utils class. */
   private AccessEgressFunctions() {}
 
   /**
-   * Filter non-optimal paths away for the standard search. This method does not
-   * look at the c1 value.
+   * Filter non-optimal paths away for the standard search. This method does not look at the c1
+   * value.
    */
   static Collection<RaptorAccessEgress> removeNonOptimalPathsForStandardRaptor(
     Collection<RaptorAccessEgress> paths
@@ -83,9 +71,9 @@ public final class AccessEgressFunctions {
   }
 
   /**
-   * Filter non-optimal paths away for the multi-criteria search. This method should in theory
-   * not remove any paths since the caller should not pass in duplicates, but it turns out that
-   * this happens, so we do it.
+   * Filter non-optimal paths away for the multi-criteria search. This method should in theory not
+   * remove any paths since the caller should not pass in duplicates, but it turns out that this
+   * happens, so we do it.
    */
   static Collection<RaptorAccessEgress> removeNonOptimalPathsForMcRaptor(
     Collection<RaptorAccessEgress> paths
@@ -109,8 +97,8 @@ public final class AccessEgressFunctions {
   }
 
   /**
-   * Filter the given input keeping all elements satisfying the given include predicate and
-   * then group them by number-of-rides.
+   * Filter the given input keeping all elements satisfying the given include predicate and then
+   * group them by number-of-rides.
    */
   static TIntObjectMap<List<RaptorAccessEgress>> groupByRound(
     Collection<RaptorAccessEgress> input,
@@ -147,17 +135,14 @@ public final class AccessEgressFunctions {
   }
 
   static <T extends RaptorAccessEgress> List<T> filterOnSegment(List<T> list, int segment) {
-    return list
-      .stream()
-      .filter(it -> it.numberOfViaLocationsVisited() == segment)
-      .toList();
+    return list.stream().filter(it -> it.numberOfViaLocationsVisited() == segment).toList();
   }
 
   /* private methods */
 
   /**
-   * Remove relevant access/egress paths. The given set of paths are grouped by stop and
-   * the filtered based on the given pareto comparator.
+   * Remove relevant access/egress paths. The given set of paths are grouped by stop and the
+   * filtered based on the given pareto comparator.
    */
   private static Collection<RaptorAccessEgress> removeNonOptimalPaths(
     Collection<RaptorAccessEgress> paths,

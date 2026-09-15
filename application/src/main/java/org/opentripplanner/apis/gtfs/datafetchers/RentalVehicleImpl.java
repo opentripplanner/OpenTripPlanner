@@ -38,8 +38,10 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("RentalVehicle", getSource(environment).id().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "RentalVehicle",
+      getSource(environment).id().toString()
+    );
   }
 
   @Override

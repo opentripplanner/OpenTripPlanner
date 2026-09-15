@@ -20,16 +20,15 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * <p>
  * Implementation Notes!
  * <p>
- * This class is both a board-or-alight event and a {code RaptorTripSchedule}. The board-and-alight
- * is used to board a Trip in Raptor and then thrown away, while the Raptor trip schedule is kept
- * for later to construct the itinerary. The event is used frequently, while the trip is used
- * infrequently. So splitting this into two classes and do lazy materialization of the trip would
- * save some resources. This kind of optimization is probably easier to do after a a clean up of the
- * internal OTP transit model.
+ * This class is both a board-or-alight event and a {code RaptorTripSchedule}. The
+ * board-and-alight is used to board a Trip in Raptor and then thrown away, while the Raptor trip
+ * schedule is kept for later to construct the itinerary. The event is used frequently, while the
+ * trip is used infrequently. So splitting this into two classes and do lazy materialization of the
+ * trip would save some resources. This kind of optimization is probably easier to do after a a
+ * clean up of the internal OTP transit model.
  */
 abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule> implements
-  RaptorBoardOrAlightEvent<T>,
-  TripSchedule {
+  RaptorBoardOrAlightEvent<T>, TripSchedule {
 
   protected final TripPatternForDates raptorTripPattern;
   protected final TripTimes tripTimes;

@@ -31,8 +31,8 @@ public class GroupOfLinesType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(env ->
-            Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
+          .dataFetcher(
+            env -> Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
               .map(AbstractTransitEntity::getId)
               .map(idMapper::mapToApi)
               .orElse(null)
@@ -76,8 +76,8 @@ public class GroupOfLinesType {
           .name("lines")
           .description("All lines part of this group of lines")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(LineType.REF))))
-          .dataFetcher(env ->
-            GqlUtil.getTransitService(env).findRoutes((GroupOfRoutes) env.getSource())
+          .dataFetcher(
+            env -> GqlUtil.getTransitService(env).findRoutes((GroupOfRoutes) env.getSource())
           )
           .build()
       )

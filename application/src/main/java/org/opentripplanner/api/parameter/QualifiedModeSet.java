@@ -17,10 +17,11 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * transit modes in separate parameters. So now this only contains one mode set rather than a
  * sequence of them.
  * <p>
- * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical combinations
- * like renting and parking a subway. They are not intended for use in routing. Rather, they simply
- * parse the language of mode specifications that may be given in the mode query parameter. They are
- * then converted into more efficient and useful representation in the routing request.
+ * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical
+ * combinations like renting and parking a subway. They are not intended for use in routing. Rather,
+ * they simply parse the language of mode specifications that may be given in the mode query
+ * parameter. They are then converted into more efficient and useful representation in the routing
+ * request.
  */
 public class QualifiedModeSet implements Serializable {
 
@@ -37,10 +38,7 @@ public class QualifiedModeSet implements Serializable {
   }
 
   public List<TransitMode> getTransitModes() {
-    return qModes
-      .stream()
-      .flatMap(qMode -> qMode.mode.getTransitModes().stream())
-      .toList();
+    return qModes.stream().flatMap(qMode -> qMode.mode.getTransitModes().stream()).toList();
   }
 
   public RequestModes getRequestModes() {
@@ -51,11 +49,9 @@ public class QualifiedModeSet implements Serializable {
     //  TODO OTP2 Once all GraphQL queries have stopped using this logic, this class can be removed.
     QualifiedMode requestMode = null;
 
-    List<QualifiedMode> filteredModes = qModes
-      .stream()
+    List<QualifiedMode> filteredModes = qModes.stream()
       .filter(
-        m ->
-          m.mode == ApiRequestMode.WALK ||
+        m -> m.mode == ApiRequestMode.WALK ||
           m.mode == ApiRequestMode.BICYCLE ||
           m.mode == ApiRequestMode.SCOOTER ||
           m.mode == ApiRequestMode.CAR
@@ -63,8 +59,7 @@ public class QualifiedModeSet implements Serializable {
       .toList();
 
     if (filteredModes.size() > 1) {
-      List<QualifiedMode> filteredModesWithoutWalk = filteredModes
-        .stream()
+      List<QualifiedMode> filteredModesWithoutWalk = filteredModes.stream()
         .filter(Predicate.not(m -> m.mode == ApiRequestMode.WALK))
         .toList();
 

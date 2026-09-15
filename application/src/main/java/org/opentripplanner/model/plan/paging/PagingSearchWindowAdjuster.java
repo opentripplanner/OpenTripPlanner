@@ -30,8 +30,7 @@ public final class PagingSearchWindowAdjuster {
   ) {
     this.minSearchWindow = minSearchWindow;
     this.maxSearchWindow = maxSearchWindow;
-    this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments
-      .stream()
+    this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments.stream()
       .mapToInt(d -> (int) d.toMinutes())
       .toArray();
   }
@@ -105,10 +104,10 @@ public final class PagingSearchWindowAdjuster {
   /**
    * Round search-window({@code sw}) up:
    * <ul>
-   *     <li>if {@code sw < minSearchWindow } then search-window is set to `minSearchWindow`
-   *     <li>if {@code sw > maxSearchWindow} then return `maxSearchWindow`
-   *     <li>if {@code sw <= 4h} then round search-window up to closest 10 minutes
-   *     <li>if {@code sw > 4h} then round search-window up to closest 30 minutes
+   *   <li>if {@code sw < minSearchWindow } then search-window is set to `minSearchWindow`
+   *   <li>if {@code sw > maxSearchWindow} then return `maxSearchWindow`
+   *   <li>if {@code sw <= 4h} then round search-window up to closest 10 minutes
+   *   <li>if {@code sw > 4h} then round search-window up to closest 30 minutes
    * </ul>
    */
   Duration normalizeSearchWindow(int seconds) {

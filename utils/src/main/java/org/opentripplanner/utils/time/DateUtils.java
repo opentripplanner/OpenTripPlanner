@@ -81,8 +81,7 @@ public class DateUtils {
   public static LocalDate parseDate(String input) {
     LocalDate retVal = null;
     try {
-      String newString = input
-        .trim()
+      String newString = input.trim()
         .replace('_', '.')
         .replace('-', '.')
         .replace(':', '.')
@@ -92,8 +91,7 @@ public class DateUtils {
       if (newString.length() <= 8) {
         if (newString.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
           // Accept dates without punctuation if they consist of exactly eight digits.
-          newString =
-            newString.substring(0, 4) +
+          newString = newString.substring(0, 4) +
             '.' +
             newString.substring(4, 6) +
             '.' +

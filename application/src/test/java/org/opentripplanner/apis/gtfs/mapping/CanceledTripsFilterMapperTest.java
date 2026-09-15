@@ -129,8 +129,9 @@ class CanceledTripsFilterMapperTest {
   void testEmptyInclude() {
     Map<String, Object> args = Map.of("filters", List.of(Map.of("include", List.of())));
     var environment = getEnvironment(args);
-    var exception = assertThrows(IllegalArgumentException.class, () ->
-      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    var exception = assertThrows(
+      IllegalArgumentException.class,
+      () -> CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals("'filters.include' must not be empty.", exception.getMessage());
   }
@@ -139,8 +140,9 @@ class CanceledTripsFilterMapperTest {
   void testEmptyExclude() {
     Map<String, Object> args = Map.of("filters", List.of(Map.of("exclude", List.of())));
     var environment = getEnvironment(args);
-    var exception = assertThrows(IllegalArgumentException.class, () ->
-      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    var exception = assertThrows(
+      IllegalArgumentException.class,
+      () -> CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals("'filters.exclude' must not be empty.", exception.getMessage());
   }
@@ -152,8 +154,9 @@ class CanceledTripsFilterMapperTest {
       List.of(Map.of("include", List.of(Map.of("modes", List.of()))))
     );
     var environment = getEnvironment(args);
-    var exception = assertThrows(InvalidInputException.class, () ->
-      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals(
       "Mode filter must be either null or have at least one entry.",
@@ -211,8 +214,9 @@ class CanceledTripsFilterMapperTest {
       List.of(Map.of("include", List.of(Map.of("serviceDateRanges", List.of()))))
     );
     var environment = getEnvironment(args);
-    var exception = assertThrows(InvalidInputException.class, () ->
-      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals(
       "Service date range filter must be either null or have at least one entry.",
@@ -267,8 +271,9 @@ class CanceledTripsFilterMapperTest {
       List.of(Map.of("include", List.of(Map.of("runningTimeRanges", List.of()))))
     );
     var environment = getEnvironment(args);
-    var exception = assertThrows(InvalidInputException.class, () ->
-      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals(
       "Time range filter 'filters.*.runningTimeRanges' must be either null or have at least one entry.",
@@ -300,8 +305,9 @@ class CanceledTripsFilterMapperTest {
       )
     );
     var environment = getEnvironment(args);
-    var exception = assertThrows(InvalidInputException.class, () ->
-      CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> CanceledTripsFilterMapper.mapToTripOnServiceDateRequest(environment)
     );
     assertEquals(
       "The start of the time range 'filters.*.runningTimeRanges' must not be after its end.",

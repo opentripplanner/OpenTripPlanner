@@ -93,7 +93,7 @@ public interface VehicleRentalPlace {
   default boolean networkIsNotAllowed(RentalRequest preferences) {
     if (
       network() == null &&
-      (!preferences.allowedNetworks().isEmpty() || !preferences.bannedNetworks().isEmpty())
+        (!preferences.allowedNetworks().isEmpty() || !preferences.bannedNetworks().isEmpty())
     ) {
       return false;
     }

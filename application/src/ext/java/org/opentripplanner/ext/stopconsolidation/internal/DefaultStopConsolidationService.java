@@ -33,26 +33,19 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public List<StopReplacement> replacements() {
-    return repo
-      .groups()
-      .stream()
-      .flatMap(group -> {
-        var primaryStop = transitRepository.getSiteRepository().getRegularStop(group.primary());
-        if (primaryStop == null) {
-          LOG.error(
-            "Could not find primary stop with id {}. Ignoring stop group {}.",
-            group.primary(),
-            group
-          );
-          return Stream.empty();
-        } else {
-          return group
-            .secondaries()
-            .stream()
-            .map(r -> new StopReplacement(primaryStop, r));
-        }
-      })
-      .toList();
+    return repo.groups().stream().flatMap(group -> {
+      var primaryStop = transitRepository.getSiteRepository().getRegularStop(group.primary());
+      if (primaryStop == null) {
+        LOG.error(
+          "Could not find primary stop with id {}. Ignoring stop group {}.",
+          group.primary(),
+          group
+        );
+        return Stream.empty();
+      } else {
+        return group.secondaries().stream().map(r -> new StopReplacement(primaryStop, r));
+      }
+    }).toList();
   }
 
   @Override
@@ -62,18 +55,12 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public boolean isPrimaryStop(StopLocation stop) {
-    return repo
-      .groups()
-      .stream()
-      .anyMatch(r -> r.primary().equals(stop.getId()));
+    return repo.groups().stream().anyMatch(r -> r.primary().equals(stop.getId()));
   }
 
   @Override
   public boolean isSecondaryStop(StopLocation stop) {
-    return repo
-      .groups()
-      .stream()
-      .anyMatch(r -> r.secondaries().contains(stop.getId()));
+    return repo.groups().stream().anyMatch(r -> r.secondaries().contains(stop.getId()));
   }
 
   @Override
@@ -100,8 +87,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   }
 
   private Optional<StopLocation> findAgencySpecificStop(StopLocation stop, Agency agency) {
-    return repo
-      .groups()
+    return repo.groups()
       .stream()
       .filter(r -> r.primary().equals(stop.getId()))
       .flatMap(g -> g.secondaries().stream())
@@ -112,8 +98,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public Optional<StopLocation> primaryStop(FeedScopedId id) {
-    var primaryId = repo
-      .groups()
+    var primaryId = repo.groups()
       .stream()
       .filter(g -> g.secondaries().contains(id))
       .map(ConsolidatedStopGroup::primary)

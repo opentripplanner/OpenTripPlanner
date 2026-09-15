@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 import org.opentripplanner.routing.api.request.DebugEventType;
 
 /**
- * This UI is used to set Raptor debug parameters, instrument the Raptor
- * search, and log event at decision points during routing.
+ * This UI is used to set Raptor debug parameters, instrument the Raptor search, and log event at
+ * decision points during routing.
  */
 public class RaptorDebugView {
 
@@ -75,13 +75,11 @@ public class RaptorDebugView {
   }
 
   private static void setupActionListenerTextField(JTextField txtField, Consumer<String> model) {
-    txtField.addFocusListener(
-      new FocusAdapter() {
-        @Override
-        public void focusLost(FocusEvent e) {
-          model.accept(txtField.getText());
-        }
+    txtField.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        model.accept(txtField.getText());
       }
-    );
+    });
   }
 }

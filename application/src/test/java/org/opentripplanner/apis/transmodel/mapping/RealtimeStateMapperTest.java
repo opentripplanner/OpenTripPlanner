@@ -90,15 +90,10 @@ class RealtimeStateMapperTest {
    */
   @Test
   void canceledTakesPriorityOverAdded() {
-    assertEquals(
-      CANCELED,
-      RealtimeStateMapper.map(
-        TripTimesForTest.realTime(b -> {
-          b.withAdded();
-          b.withCanceled();
-        })
-      )
-    );
+    assertEquals(CANCELED, RealtimeStateMapper.map(TripTimesForTest.realTime(b -> {
+      b.withAdded();
+      b.withCanceled();
+    })));
   }
 
   /**
@@ -106,15 +101,10 @@ class RealtimeStateMapperTest {
    */
   @Test
   void deletedTakesPriorityOverModified() {
-    assertEquals(
-      CANCELED,
-      RealtimeStateMapper.map(
-        TripTimesForTest.realTime(b -> {
-          b.withModifiedTripPattern();
-          b.withDeleted();
-        })
-      )
-    );
+    assertEquals(CANCELED, RealtimeStateMapper.map(TripTimesForTest.realTime(b -> {
+      b.withModifiedTripPattern();
+      b.withDeleted();
+    })));
   }
 
   /**
@@ -122,15 +112,10 @@ class RealtimeStateMapperTest {
    */
   @Test
   void addedTakesPriorityOverModified() {
-    assertEquals(
-      ADDED,
-      RealtimeStateMapper.map(
-        TripTimesForTest.realTime(b -> {
-          b.withAdded();
-          b.withModifiedTripPattern();
-        })
-      )
-    );
+    assertEquals(ADDED, RealtimeStateMapper.map(TripTimesForTest.realTime(b -> {
+      b.withAdded();
+      b.withModifiedTripPattern();
+    })));
   }
 
   /**
@@ -138,14 +123,9 @@ class RealtimeStateMapperTest {
    */
   @Test
   void canceledTakesPriorityOverModified() {
-    assertEquals(
-      CANCELED,
-      RealtimeStateMapper.map(
-        TripTimesForTest.realTime(b -> {
-          b.withModifiedTripPattern();
-          b.withCanceled();
-        })
-      )
-    );
+    assertEquals(CANCELED, RealtimeStateMapper.map(TripTimesForTest.realTime(b -> {
+      b.withModifiedTripPattern();
+      b.withCanceled();
+    })));
   }
 }

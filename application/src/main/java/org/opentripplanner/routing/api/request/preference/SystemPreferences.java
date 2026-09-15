@@ -13,8 +13,8 @@ import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Configure system related features - a system feature is a non-functional feature. It
- * describes how the system should work, but not change the output of a travel request.
+ * Configure system related features - a system feature is a non-functional feature. It describes
+ * how the system should work, but not change the output of a travel request.
  * <p>
  * Some parameters in this class are related to functional-features, but does not have a clear
  * place where they belong. We should refactor and move these.
@@ -84,12 +84,10 @@ public class SystemPreferences implements Serializable {
       return false;
     }
     SystemPreferences that = (SystemPreferences) o;
-    return (
-      geoidElevation == that.geoidElevation &&
+    return (geoidElevation == that.geoidElevation &&
       tags.equals(that.tags) &&
       Objects.equals(dataOverlay, that.dataOverlay) &&
-      maxJourneyDuration.equals(that.maxJourneyDuration)
-    );
+      maxJourneyDuration.equals(that.maxJourneyDuration));
   }
 
   @Override

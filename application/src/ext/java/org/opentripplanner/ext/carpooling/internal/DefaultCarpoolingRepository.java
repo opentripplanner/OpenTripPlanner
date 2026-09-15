@@ -93,7 +93,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
       CarpoolTrip trip = tripWithVertices.trip();
       if (
         trip.latestEndTime().toInstant().isBefore(expiryThreshold) &&
-        trips.remove(trip.getId(), tripWithVertices)
+          trips.remove(trip.getId(), tripWithVertices)
       ) {
         baselineRouting.remove(trip.getId());
         removed++;

@@ -10,10 +10,11 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * latest-alight-time - this is done to avoid boarding at the correct stop, but at the wrong time.
  * This can happen, for patterns go in a loop, visit the same stop more than once.
  * <p>
- * This class is used to find board- and alight-times for transfer paths when mapping stop-arrivals
- * to paths. The board and alight times are not stored in the stop-arrival state to save memory and
- * to speed up the search. Searching for this after the search is done to create paths is ok, since
- * the number of paths is a very small number compared to stop-arrivals during the search.
+ * This class is used to find board- and alight-times for transfer paths when mapping
+ * stop-arrivals to paths. The board and alight times are not stored in the stop-arrival state to
+ * save memory and to speed up the search. Searching for this after the search is done to create
+ * paths is ok, since the number of paths is a very small number compared to stop-arrivals during
+ * the search.
  */
 public final class TripTimesSearch<T extends RaptorTripSchedule> {
 
@@ -29,8 +30,7 @@ public final class TripTimesSearch<T extends RaptorTripSchedule> {
     var transit = arrival.transitPath();
     var trip = transit.trip();
     int boardStopPos = transit.boardStopPosition();
-    int alightStopPosition = trip
-      .pattern()
+    int alightStopPosition = trip.pattern()
       .findAlightStopPositionAfter(boardStopPos, arrival.stop());
 
     if (alightStopPosition == -1) {
@@ -59,8 +59,7 @@ public final class TripTimesSearch<T extends RaptorTripSchedule> {
     var transit = arrival.transitPath();
     var trip = transit.trip();
     int alightStopPosition = transit.boardStopPosition();
-    int boardStopPos = trip
-      .pattern()
+    int boardStopPos = trip.pattern()
       .findBoardStopPositionBefore(alightStopPosition, arrival.stop());
 
     if (boardStopPos == -1) {

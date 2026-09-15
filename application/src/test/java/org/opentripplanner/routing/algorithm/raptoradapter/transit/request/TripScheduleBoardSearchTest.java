@@ -53,11 +53,12 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
   private static final int TRIP_C = 2;
 
   // Route with trip A, B, C.
-  private TestRoute route = TestRoute.route(pattern).withTimetable(
-    schedule().departures(TIME_A1, TIME_A2),
-    schedule().departures(TIME_B1, TIME_B2),
-    schedule().departures(TIME_C1, TIME_C2)
-  );
+  private TestRoute route = TestRoute.route(pattern)
+    .withTimetable(
+      schedule().departures(TIME_A1, TIME_A2),
+      schedule().departures(TIME_B1, TIME_B2),
+      schedule().departures(TIME_C1, TIME_C2)
+    );
 
   // Trips in service
   private final TestTripSchedule tripA = route.timetable().getTripSchedule(TRIP_A);
@@ -94,16 +95,12 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     searchForTrip(TIME_A1, STOP_POS_0).assertTripFound().withIndex(TRIP_A).withBoardTime(TIME_A1);
 
     // Assert board next trip for: time + 1 second
-    searchForTrip(TIME_A1 + 1, STOP_POS_0)
-      .assertTripFound()
-      .withIndex(TRIP_B);
+    searchForTrip(TIME_A1 + 1, STOP_POS_0).assertTripFound().withIndex(TRIP_B);
 
     searchForTrip(TIME_A2, STOP_POS_1).assertTripFound().withIndex(TRIP_A).withBoardTime(TIME_A2);
 
     // Assert board next trip for: time + 1 second
-    searchForTrip(TIME_A2 + 1, STOP_POS_1)
-      .assertTripFound()
-      .withIndex(TRIP_B);
+    searchForTrip(TIME_A2 + 1, STOP_POS_1).assertTripFound().withIndex(TRIP_B);
   }
 
   @Test
@@ -122,8 +119,7 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
     withTrips(tripA, tripB);
 
     // Then we expect to find trip A when `tripIndexUpperBound` is B´s index
-    searchForTrip(TIME_0, STOP_POS_0, TRIP_INDEX_B)
-      .assertTripFound()
+    searchForTrip(TIME_0, STOP_POS_0, TRIP_INDEX_B).assertTripFound()
       .withBoardTime(TIME_A1)
       .withIndex(TRIP_INDEX_A);
 
@@ -156,15 +152,12 @@ public class TripScheduleBoardSearchTest implements RaptorTestConstants {
       int tripBoardTime = dT * (i + 1);
 
       // Search and find trip 'i'
-      searchForTrip(tripBoardTime, STOP_POS_0)
-        .assertTripFound()
+      searchForTrip(tripBoardTime, STOP_POS_0).assertTripFound()
         .withIndex(i)
         .withBoardTime(tripBoardTime);
 
       // Search and find trip 'i' using the next trip index
-      searchForTrip(tripBoardTime, STOP_POS_0, i + 1)
-        .assertTripFound()
-        .withIndex(i);
+      searchForTrip(tripBoardTime, STOP_POS_0, i + 1).assertTripFound().withIndex(i);
 
       // Search with a time and index that together exclude trip 'i'
       searchForTrip(tripBoardTime, STOP_POS_0, i).assertNoTripFound();

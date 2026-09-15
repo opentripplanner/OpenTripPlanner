@@ -22,8 +22,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
   private final HttpResponseTimeMetricsParameters httpResponseTimeMetrics;
 
   public ServerConfig(String parameterName, NodeAdapter root) {
-    NodeAdapter c = root
-      .of(parameterName)
+    NodeAdapter c = root.of(parameterName)
       .since(V2_4)
       .summary("Configuration for router server.")
       .description(
@@ -34,8 +33,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
       )
       .asObject();
 
-    this.apiProcessingTimeout = c
-      .of("apiProcessingTimeout")
+    this.apiProcessingTimeout = c.of("apiProcessingTimeout")
       .since(V2_4)
       .summary("Maximum processing time for an API request")
       .description(
@@ -48,15 +46,13 @@ public class ServerConfig implements OTPWebApplicationParameters {
       )
       .asDuration(Duration.ofSeconds(-1));
 
-    this.apiDocumentationProfile = c
-      .of("apiDocumentationProfile")
+    this.apiDocumentationProfile = c.of("apiDocumentationProfile")
       .since(V2_7)
       .summary(ApiDocumentationProfile.DEFAULT.typeDescription())
       .description(docEnumValueList(ApiDocumentationProfile.values()))
       .asEnum(ApiDocumentationProfile.DEFAULT);
 
-    this.traceParameters = c
-      .of("traceParameters")
+    this.traceParameters = c.of("traceParameters")
       .since(V2_4)
       .summary("Trace OTP request using HTTP request/response parameter(s) combined with logging.")
       .description(
@@ -75,20 +71,17 @@ public class ServerConfig implements OTPWebApplicationParameters {
         on how-to configure the "server.traceParameters" instance.
         """
       )
-      .asObjects(t ->
-        new RequestTraceParameter(
-          t
-            .of("httpRequestHeader")
+      .asObjects(
+        t -> new RequestTraceParameter(
+          t.of("httpRequestHeader")
             .since(V2_4)
             .summary("The header-key to use when fetching the trace parameter value")
             .asString(null),
-          t
-            .of("httpResponseHeader")
+          t.of("httpResponseHeader")
             .since(V2_4)
             .summary("The header-key to use when saving the value back into the http response")
             .asString(null),
-          t
-            .of("logKey")
+          t.of("logKey")
             .since(V2_4)
             .summary("The log event key used.")
             .description(
@@ -99,8 +92,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
               """
             )
             .asString(null),
-          t
-            .of("generateIdIfMissing")
+          t.of("generateIdIfMissing")
             .since(V2_4)
             .summary(
               "If `true` a unique value is generated if no http request header is provided, or " +
@@ -137,7 +129,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
   public void validate(Duration streetRoutingTimeout) {
     if (
       !apiProcessingTimeout.isNegative() &&
-      streetRoutingTimeout.toSeconds() > apiProcessingTimeout.toSeconds()
+        streetRoutingTimeout.toSeconds() > apiProcessingTimeout.toSeconds()
     ) {
       throw new OtpAppException(
         "streetRoutingTimeout (" +

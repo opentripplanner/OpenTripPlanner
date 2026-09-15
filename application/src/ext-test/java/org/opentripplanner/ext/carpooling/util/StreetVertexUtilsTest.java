@@ -80,12 +80,11 @@ class StreetVertexUtilsTest {
     // is car-routable in both directions. On a walk-only edge the splitter would be walk-only —
     // also correct behavior per the createPassengerVertex Javadoc, just not what this test
     // exercises.
-    boolean foundBidirectionalCarSplitter = outgoingSplitters
-      .stream()
+    boolean foundBidirectionalCarSplitter = outgoingSplitters.stream()
       .filter(incomingSplitters::contains)
       .anyMatch(
-        v ->
-          hasCarPermittingStreetEdge(v.getOutgoing()) && hasCarPermittingStreetEdge(v.getIncoming())
+        v -> hasCarPermittingStreetEdge(v.getOutgoing()) &&
+          hasCarPermittingStreetEdge(v.getIncoming())
       );
     assertTrue(
       foundBidirectionalCarSplitter,

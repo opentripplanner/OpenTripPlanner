@@ -6,9 +6,8 @@ import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
- * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
- * <p/>
- * This class is immutable and thread safe.
+ * The responsibility for the cost calculator is to calculate the default multi-criteria cost.
+ * <p/>This class is immutable and thread safe.
  */
 public final class TestCostCalculator implements RaptorCostCalculator<TestTripSchedule> {
 
@@ -19,8 +18,8 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
   private final int waitFactor;
 
   /**
-   * Costs for boarding and alighting at a given stop during transfer.
-   * See RaptorTransitData.getStopBoardAlightTransferCosts()
+   * Costs for boarding and alighting at a given stop during transfer. See
+   * RaptorTransitData.getStopBoardAlightTransferCosts()
    */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;
@@ -30,8 +29,9 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
    * (in Raptor the unit for cost is centi-seconds).
    *
    * @param stopBoardAlightTransferCosts Unit centi-seconds. This parameter is used "as-is" and not
-   *                      transformed into the Raptor cast unit to avoid the transformation for each
-   *                      request. Use {@code null} to ignore stop cost.
+   *                                     transformed into the Raptor cast unit to avoid the
+   *                                     transformation for each request. Use {@code null} to ignore
+   *                                     stop cost.
    */
   public TestCostCalculator(
     int boardCost,
@@ -103,11 +103,9 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     int fromStopIndex
   ) {
     if (minNumTransfers > -1) {
-      return (
-        boardCost +
+      return (boardCost +
         (boardCost + transferCost) * minNumTransfers +
-        TRANSIT_RELUCTANCE * minTravelDuration
-      );
+        TRANSIT_RELUCTANCE * minTravelDuration);
     } else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       return stopBoardAlightTransferCosts == null

@@ -67,44 +67,37 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
   }
 
   /**
-   * <a href="https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
-   * Specificity of a transfer
-   * </a>
+   * <a href=
+   * "https://developers.google.com/transit/gtfs/reference/gtfs-extensions#specificity-of-a-transfer">
+   * Specificity of a transfer </a>
    * <p>
    * The ranking implemented here is slightly modified:
    * <ul>
-   *     <li>
-   *         The specification do not say anything about Stations even if Stations can be used to
-   *         specify a transfer-point. In OTP stops are more specific than station, so we use the
-   *         following transfer-point ranking:
-   *         <ol>
-   *             <li>Station: 0 (zero)</li>
-   *             <li>Stop: 1</li>
-   *             <li>Route: 2</li>
-   *             <li>Trip: 3</li>
-   *         </ol>
-   *     </li>
-   *     <li>
-   *         Two transfers may have the same ranking if we add together the from-point and
-   *         to-point ranking.
-   *         For example, {@code from trip(3) + to stop(1) == from route(2) + to route(2)}
-   *         have the same ranking. To avoid this problem, we give the from-point a small
-   *         advantage. We multiply the from point with 11 and the to point with 10, this
-   *         break the ties in favor of the from point. In the example above the
-   *         ConstrainedTransfer specificityRanking is:
+   *   <li>The specification do not say anything about Stations even if Stations can be used to
+   *       specify a transfer-point. In OTP stops are more specific than station, so we use the following
+   *       transfer-point ranking:
+   *   <ol>
+   *     <li>Station: 0 (zero)</li>
+   *     <li>Stop: 1</li>
+   *     <li>Route: 2</li>
+   *     <li>Trip: 3</li>
+   * </ol>
+   * </li>
+   * <li>Two transfers may have the same ranking if we add together the from-point and to-point
+   * ranking. For example, {@code from trip(3) + to stop(1) == from route(2) + to route(2)} have the
+   * same ranking. To avoid this problem, we give the from-point a small advantage. We multiply the
+   * from point with 11 and the to point with 10, this break the ties in favor of the from point. In
+   * the example above the ConstrainedTransfer specificityRanking is:
    * <pre>
    * Case 1: from trip to stop :=  11 * 3 + 10 * 1 = 43
    * Case 2: from route to route :=  11 * 2 + 10 * 2 = 42
    * </pre>
-   *         Case 1 has the highest ranking.
-   *     </li>
+   * Case 1 has the highest ranking.</li>
    * </ul>
    */
   public int getSpecificityRanking() {
-    return (
-      from.getSpecificityRanking() * FROM_RANKING_COEFFICIENT +
-      to.getSpecificityRanking() * TO_RANKING_COEFFICIENT
-    );
+    return (from.getSpecificityRanking() * FROM_RANKING_COEFFICIENT +
+      to.getSpecificityRanking() * TO_RANKING_COEFFICIENT);
   }
 
   @Override
@@ -121,11 +114,9 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
       return false;
     }
     final ConstrainedTransfer transfer = (ConstrainedTransfer) o;
-    return (
-      Objects.equals(constraint, transfer.constraint) &&
+    return (Objects.equals(constraint, transfer.constraint) &&
       Objects.equals(from, transfer.from) &&
-      Objects.equals(to, transfer.to)
-    );
+      Objects.equals(to, transfer.to));
   }
 
   public String toString() {

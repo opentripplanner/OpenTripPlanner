@@ -12,15 +12,13 @@ class TransferConfig {
   static void mapTransferPreferences(NodeAdapter c, TransferPreferences.Builder tx) {
     var dft = tx.original();
     tx.withNonpreferredCost(
-      c
-        .of("nonpreferredTransferPenalty")
+      c.of("nonpreferredTransferPenalty")
         .since(V2_0)
         .summary("Penalty (in seconds) for using a non-preferred transfer.")
         .asInt(dft.nonpreferredCost())
     )
       .withCost(
-        c
-          .of("transferPenalty")
+        c.of("transferPenalty")
           .since(V2_0)
           .summary("An additional penalty added to boardings after the first.")
           .description(
@@ -33,8 +31,7 @@ class TransferConfig {
           .asInt(dft.cost())
       )
       .withSlack(
-        c
-          .of("transferSlack")
+        c.of("transferSlack")
           .since(V2_0)
           .summary("The extra time needed to make a safe transfer.")
           .description(
@@ -50,8 +47,7 @@ class TransferConfig {
           .asDurationOrSeconds(dft.slack())
       )
       .withWaitReluctance(
-        c
-          .of("waitReluctance")
+        c.of("waitReluctance")
           .since(V2_0)
           .summary(
             "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
@@ -60,8 +56,7 @@ class TransferConfig {
       )
       .withOptimization(
         mapTransferOptimization(
-          c
-            .of("transferOptimization")
+          c.of("transferOptimization")
             .since(V2_1)
             .summary("Optimize where a transfer between to trip happens. ")
             .description(
@@ -106,8 +101,7 @@ class TransferConfig {
     var dft = TransferOptimizationPreferences.DEFAULT;
     return TransferOptimizationPreferences.of()
       .withOptimizeTransferWaitTime(
-        c
-          .of("optimizeTransferWaitTime")
+        c.of("optimizeTransferWaitTime")
           .since(V2_1)
           .summary("This enables the transfer wait time optimization.")
           .description(
@@ -116,8 +110,7 @@ class TransferConfig {
           .asBoolean(dft.optimizeTransferWaitTime())
       )
       .withMinSafeWaitTimeFactor(
-        c
-          .of("minSafeWaitTimeFactor")
+        c.of("minSafeWaitTimeFactor")
           .since(V2_1)
           .summary("Used to set a maximum wait-time cost, base on min-safe-transfer-time.")
           .description(
@@ -127,8 +120,7 @@ class TransferConfig {
           .asDouble(dft.minSafeWaitTimeFactor())
       )
       .withBackTravelWaitTimeFactor(
-        c
-          .of("backTravelWaitTimeFactor")
+        c.of("backTravelWaitTimeFactor")
           .since(V2_1)
           .summary("To reduce back-travel we favor waiting, this reduces the cost of waiting.")
           .description(
@@ -138,8 +130,7 @@ class TransferConfig {
           .asDouble(dft.backTravelWaitTimeFactor())
       )
       .withExtraStopBoardAlightCostsFactor(
-        c
-          .of("extraStopBoardAlightCostsFactor")
+        c.of("extraStopBoardAlightCostsFactor")
           .since(V2_1)
           .summary("Add an extra board- and alight-cost for prioritized stops.")
           .description(

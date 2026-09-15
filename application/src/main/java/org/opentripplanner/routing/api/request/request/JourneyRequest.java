@@ -89,14 +89,12 @@ public class JourneyRequest implements Serializable {
       return false;
     }
     JourneyRequest that = (JourneyRequest) o;
-    return (
-      wheelchair == that.wheelchair &&
+    return (wheelchair == that.wheelchair &&
       Objects.equals(transit, that.transit) &&
       Objects.equals(access, that.access) &&
       Objects.equals(egress, that.egress) &&
       Objects.equals(transfer, that.transfer) &&
-      Objects.equals(direct, that.direct)
-    );
+      Objects.equals(direct, that.direct));
   }
 
   @Override

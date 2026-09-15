@@ -6,9 +6,9 @@ import java.util.List;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A token schema contains a set of token definitions, one for each version. This is
- * used to decode a token - the same version used to encode a token is used to
- * decode it. When encoding a token the latest version is always used.
+ * A token schema contains a set of token definitions, one for each version. This is used to decode
+ * a token - the same version used to encode a token is used to decode it. When encoding a token the
+ * latest version is always used.
  * <p>
  * OTP only need to be backward compatible with the last version of otp. So, for each release of
  * OTP the schema that is older than the previous version can be merged. By doing so, you do not
@@ -26,8 +26,8 @@ public class TokenSchema {
   }
 
   /**
-   * Define a set of versioned tokens. The version number for each will be auto-incremented.
-   * The provided {@code baseVersion} specify the version for the first token defined.
+   * Define a set of versioned tokens. The version number for each will be auto-incremented. The
+   * provided {@code baseVersion} specify the version for the first token defined.
    * <p>
    * Old unused tokens definitions can merged into the first used definition. When this is done
    * the "new" base should be given the exact same version number as it had before. The best way to
@@ -36,6 +36,7 @@ public class TokenSchema {
    * <p>
    * Take a look at the unit tests to see an example on merging a schema.
    * <p>
+   *
    * @param baseVersion The initial version for the first definition. The version number is
    *                    automatically incremented when new definitions are added. If there is many
    *                    definitions, the oldest definitions can be merged into one. The new
@@ -64,8 +65,7 @@ public class TokenSchema {
   }
 
   /**
-   * We iterate over definitions in REVERSE order, because we want to use the
-   * latest version.
+   * We iterate over definitions in REVERSE order, because we want to use the latest version.
    */
   public TokenDefinition currentDefinition() {
     return definitions.get(0);

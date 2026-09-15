@@ -56,13 +56,14 @@ public class GtfsRealTimeUpdateHandler {
    * Method to apply a trip update list to the most recent version of the timetable snapshot. A
    * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
    * <p>
-   * However, multi-feed support is not completed, and we currently assume there is only one static
-   * feed when matching IDs.
+   * However, multi-feed support is not completed, and we currently assume there is only one
+   * static feed when matching IDs.
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag.
-   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates clear the buffer
-   *                                      of all previous updates for the given feed id.
+   * @param updateIncrementality          Determines the incrementality of the updates. FULL updates
+   *                                      clear the buffer of all previous updates for the given
+   *                                      feed id.
    * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
@@ -119,7 +120,8 @@ public class GtfsRealTimeUpdateHandler {
     UpdateIncrementality updateIncrementality,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     ForwardsDelayPropagationType forwardsDelayPropagationType
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     // The GTFS-RT TripDescriptor.schedule_relationship field is a protobuf optional enum,
     // so a single TripUpdate message carries exactly one value — it is structurally impossible
     // for a message to express two states (e.g. ADDED and CANCELED) at the same time.

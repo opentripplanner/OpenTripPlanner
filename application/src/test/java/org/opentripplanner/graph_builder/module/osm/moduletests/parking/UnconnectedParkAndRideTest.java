@@ -14,8 +14,8 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
-/// Tests that an entrance vertex is created for parking lots that are not connected to the rest
-/// of the street network.
+/// Tests that an entrance vertex is created for parking lots that are not connected to the rest of
+/// the street network.
 class UnconnectedParkAndRideTest {
 
   @Test
@@ -56,8 +56,9 @@ class UnconnectedParkAndRideTest {
 
     var fetcher = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl())
-      .that(fetcher.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl()).that(
+      fetcher.summarizeEdges()
+    )
       .containsExactly(
         "(0,-0.001) → (0.001,0.002) ALL ♿✅",
         "(0.001,0.002) → (0,-0.001) ALL ♿✅",

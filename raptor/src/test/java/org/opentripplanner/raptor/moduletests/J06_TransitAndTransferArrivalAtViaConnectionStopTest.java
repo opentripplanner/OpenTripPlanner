@@ -18,9 +18,9 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * FEATURE UNDER TEST
  * <p>
  * Via-connection stops (the FROM-stop of a cross-stop via transfer) must use the 4D Pareto
- * comparator (arrivalTime, paretoRound, cost, arrivedOnBoard), for the same reason as egress
- * stops: the via-transfer-connection is only triggered by a TRANSIT arrival (arrivedOnBoard=true),
- * not by a walk-transfer arrival (arrivedOnBoard=false).
+ * comparator (arrivalTime, paretoRound, cost, arrivedOnBoard), for the same reason as egress stops:
+ * the via-transfer-connection is only triggered by a TRANSIT arrival (arrivedOnBoard=true), not by
+ * a walk-transfer arrival (arrivedOnBoard=false).
  * <p>
  * <b>The bug scenario (3D at via-connection stop D):</b> A walk-transfer arrival at D is
  * established in round 1, arriving earlier and cheaper than the round-2 transit arrival via R2.
@@ -29,15 +29,15 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * empty result.
  * <p>
  * <b>The fix (4D at via-connection stop D):</b> The transit arrival wins on
- * {@code arrivedOnBoard=true}, creating mutual dominance. Both arrivals coexist. The transit
- * fires the via connection and the path is found.
+ * {@code arrivedOnBoard=true}, creating mutual dominance. Both arrivals coexist. The transit fires
+ * the via connection and the path is found.
  * <p>
  * At stop D (the via FROM-stop), two arrivals compete:
  * <ol>
- *   <li>Walk-transfer via R1(A→B) + walk B→D: round=1, arrives 0:09, cost low,
- *       arrivedOnBoard=false — does NOT fire the via connection to F</li>
- *   <li>Transit via R1(A→C) + R2(C→D): round=2, arrives 0:15, cost higher,
- *       arrivedOnBoard=true — fires the via connection to F</li>
+ *   <li>Walk-transfer via R1(A→B) + walk B→D: round=1, arrives 0:09, cost low, arrivedOnBoard=false —
+ *       does NOT fire the via connection to F</li>
+ *   <li>Transit via R1(A→C) + R2(C→D): round=2, arrives 0:15, cost higher, arrivedOnBoard=true —
+ *       fires the via connection to F</li>
  * </ol>
  * Arrival 1 strictly dominates arrival 2 in all three base dimensions (3D), so under the 3D
  * comparator the transit is rejected and the via connection never fires. The 4D comparator at D
@@ -50,8 +50,7 @@ class J06_TransitAndTransferArrivalAtViaConnectionStopTest implements RaptorTest
 
   @Test
   void transitArrivalAtViaConnectionStopNotBlockedByEarlierWalkTransfer() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         -- R1
@@ -72,14 +71,12 @@ class J06_TransitAndTransferArrivalAtViaConnectionStopTest implements RaptorTest
       .withTransfer(STOP_B, transfer(STOP_D, D2_m));
 
     var requestBuilder = data.requestBuilder();
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    requestBuilder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: 2023-07-24 Currently heuristics does not work with via search so we
       //  have to turn them off. Make sure to re-enable optimization later when it's fixed.
       .clearOptimizations();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindow(Duration.ofMinutes(10))

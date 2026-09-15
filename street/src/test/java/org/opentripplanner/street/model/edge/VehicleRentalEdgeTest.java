@@ -286,8 +286,8 @@ class VehicleRentalEdgeTest {
   }
 
   /**
-   * When a generic RENTING_FLOATING state does NOT have the network committed,
-   * VehicleRentalEdge should allow picking up the vehicle.
+   * When a generic RENTING_FLOATING state does NOT have the network committed, VehicleRentalEdge
+   * should allow picking up the vehicle.
    */
   @Test
   void uncommittedNetworkAllowsGenericPickup() {
@@ -306,8 +306,8 @@ class VehicleRentalEdgeTest {
   }
 
   /**
-   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce
-   * both RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
+   * When a floating vehicle is at a no-traversal zone boundary vertex, pickup should produce both
+   * RENTING_FLOATING (for riding away from zone) and HAVE_RENTED (for walking into zone).
    */
   @Test
   void pickupAtNoTraversalBoundaryVertexShouldFork() {
@@ -316,10 +316,7 @@ class VehicleRentalEdgeTest {
     var noTraversalZone = TestGeofencingZoneBuilder.of(
       TestFreeFloatingRentalVehicleBuilder.NETWORK_1,
       "no-traverse"
-    )
-      .withGeometry(Polygons.OSLO)
-      .noTraversal()
-      .build();
+    ).withGeometry(Polygons.OSLO).noTraversal().build();
     vertex.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
 
     var result = rent();
@@ -387,9 +384,10 @@ class VehicleRentalEdgeTest {
 
     this.request = StreetSearchRequest.of()
       .withMode(mode)
-      .withBike(bike ->
-        bike.withRental(rental ->
-          rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
+      .withBike(
+        bike -> bike.withRental(
+          rental -> rental.withUseAvailabilityInformation(useRealtime)
+            .withBannedNetworks(bannedNetworks)
         )
       )
       .build();
@@ -410,8 +408,8 @@ class VehicleRentalEdgeTest {
       .withMode(mode)
       .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
       .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-      .withScooter(scooter ->
-        scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
+      .withScooter(
+        scooter -> scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
       )
       .build();
   }

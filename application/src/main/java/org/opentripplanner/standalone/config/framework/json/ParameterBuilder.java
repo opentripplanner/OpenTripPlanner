@@ -46,8 +46,8 @@ import org.opentripplanner.utils.time.LocalDateUtils;
 
 /**
  * TODO RT_AB: add Javadoc to clarify whether this is building a declarative representation of the
- *   parameter, or building a concrete key-value pair for a parameter in a config file being read
- *   at server startup, or both.
+ * parameter, or building a concrete key-value pair for a parameter in a config file being read at
+ * server startup, or both.
  */
 public class ParameterBuilder {
 
@@ -61,16 +61,16 @@ public class ParameterBuilder {
   private final NodeInfoBuilder info = NodeInfo.of();
 
   /**
-   * The parameter "under construction" belong to the {@code target} node-adaptor. The parameter
-   * is stored on the target when it is build.
+   * The parameter "under construction" belong to the {@code target} node-adaptor. The parameter is
+   * stored on the target when it is build.
    */
   private final NodeAdapter target;
 
   /**
-   * Sometimes we want to use a different default value in the documentation than in the
-   * returned parameters. This is the case when the default value is derived from other
-   * parameters, and the default value is just a fallback. In these cases we temporarily need to
-   * keep the doc-default-value.
+   * Sometimes we want to use a different default value in the documentation than in the returned
+   * parameters. This is the case when the default value is derived from other parameters, and the
+   * default value is just a fallback. In these cases we temporarily need to keep the
+   * doc-default-value.
    */
   private Object docDefaultValue = UNDEFINED;
 
@@ -171,18 +171,16 @@ public class ParameterBuilder {
   }
 
   public Set<String> asStringSet(Collection<String> defaultValue) {
-    List<String> dft =
-      defaultValue instanceof List<String>
-        ? (List<String>) defaultValue
-        : List.copyOf(defaultValue);
+    List<String> dft = defaultValue instanceof List<String>
+      ? (List<String>) defaultValue
+      : List.copyOf(defaultValue);
     return Set.copyOf(ofArrayAsList(STRING, dft, JsonNode::asText));
   }
 
   public List<String> asStringList(Collection<String> defaultValue) {
-    List<String> dft =
-      defaultValue instanceof List<String>
-        ? (List<String>) defaultValue
-        : List.copyOf(defaultValue);
+    List<String> dft = defaultValue instanceof List<String>
+      ? (List<String>) defaultValue
+      : List.copyOf(defaultValue);
     return ofArrayAsList(STRING, dft, JsonNode::asText);
   }
 
@@ -196,8 +194,8 @@ public class ParameterBuilder {
   }
 
   /**
-   * Return a list with objects of type {@code T}. The given {@code mapper} is used to map
-   * the nested child JSON nodes into elements.
+   * Return a list with objects of type {@code T}. The given {@code mapper} is used to map the
+   * nested child JSON nodes into elements.
    * <p>
    * An empty list is returned if there is no elements in the list or the list is not present.
    */
@@ -212,10 +210,9 @@ public class ParameterBuilder {
   }
 
   /**
-   * @deprecated Avoid using required enum types, when adding/removing new Enum values
-   *             you potentially break forward/backward compatibility. If the new enum
-   *             value is used in the config, an earlier version of OTP can not read
-   *             the required value.
+   * @deprecated Avoid using required enum types, when adding/removing new Enum values you
+   *             potentially break forward/backward compatibility. If the new enum value is used in
+   *             the config, an earlier version of OTP can not read the required value.
    */
   @Deprecated
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
@@ -242,8 +239,9 @@ public class ParameterBuilder {
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     info.withOptional().withEnumSet(enumClass);
-    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
-      parseOptionalEnum(it.asText(), enumClass)
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -251,11 +249,13 @@ public class ParameterBuilder {
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass, Collection<T> defaultValues) {
-    List<T> dft =
-      defaultValues instanceof List<T> ? (List<T>) defaultValues : List.copyOf(defaultValues);
+    List<T> dft = defaultValues instanceof List<T>
+      ? (List<T>) defaultValues
+      : List.copyOf(defaultValues);
     info.withOptional(dft.toString()).withEnumSet(enumClass);
-    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
-      parseOptionalEnum(it.asText(), enumClass)
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -273,8 +273,8 @@ public class ParameterBuilder {
    * }
    * </pre>
    *
-   * @param <E>  The enum type
-   * @param <T>  The map value type.
+   * @param <E> The enum type
+   * @param <T> The map value type.
    * @return a map of listed enum values as keys with value, or an empty map if not set.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(Class<E> enumType, Class<T> elementJavaType) {
@@ -301,11 +301,11 @@ public class ParameterBuilder {
   }
 
   /**
-   * Add a map of a custom type with an enum as the key. You must provide a mapper for the
-   * custom type.
+   * Add a map of a custom type with an enum as the key. You must provide a mapper for the custom
+   * type.
    *
-   * @param <E>  The enum type
-   * @param <T>  The map value type.
+   * @param <E> The enum type
+   * @param <T> The map value type.
    * @return a map of T by enum values as keys, or an empty map if not set.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(
@@ -360,9 +360,9 @@ public class ParameterBuilder {
 
   /**
    * This method provide support for custom types. If the type is used in one place, then this
-   * method provide an easy way to support it. Be aware that custom types are not documented in
-   * the type section in the configuration documents. Also, providing user-friendly messages
-   * is left to the caller.
+   * method provide an easy way to support it. Be aware that custom types are not documented in the
+   * type section in the configuration documents. Also, providing user-friendly messages is left to
+   * the caller.
    */
   public <T> T asCustomStringType(
     T defaultValue,
@@ -380,8 +380,8 @@ public class ParameterBuilder {
   /* Java util/time types */
 
   /**
-   * Parses the sting using {@link LocalDateUtils#asRelativeLocalDate(String, LocalDate)} and
-   * return a new (relative) LocalDate.
+   * Parses the sting using {@link LocalDateUtils#asRelativeLocalDate(String, LocalDate)} and return
+   * a new (relative) LocalDate.
    */
   public LocalDate asDateOrRelativePeriod(String defaultValue, ZoneId timeZone) {
     return ofOptionalString(DURATION, defaultValue, s -> parseRelativeLocalDate(s, timeZone));
@@ -396,9 +396,9 @@ public class ParameterBuilder {
   }
 
   /**
-   * Accepts both a string-formatted duration or a number of seconds as a number.
-   * In the documentation it will claim that it only accepts durations as the number is only for
-   * backwards compatibility.
+   * Accepts both a string-formatted duration or a number of seconds as a number. In the
+   * documentation it will claim that it only accepts durations as the number is only for backwards
+   * compatibility.
    */
   public Duration asDurationOrSeconds(Duration defaultValue) {
     info.withType(DURATION);
@@ -449,8 +449,9 @@ public class ParameterBuilder {
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
-    return buildAndListSimpleArrayElements(defaultValues, it ->
-      FeedScopedId.parseStrict(it.asText())
+    return buildAndListSimpleArrayElements(
+      defaultValues,
+      it -> FeedScopedId.parseStrict(it.asText())
     );
   }
 
@@ -518,11 +519,9 @@ public class ParameterBuilder {
     info.withType(type);
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
-    return exist()
-      ? mapper.apply(node.asText())
-      : defaultValueAsString == null
-        ? null
-        : mapper.apply(defaultValueAsString);
+    return exist() ? mapper.apply(node.asText())
+      : defaultValueAsString == null ? null
+      : mapper.apply(defaultValueAsString);
   }
 
   private <T> List<T> ofArrayAsList(
@@ -694,8 +693,8 @@ public class ParameterBuilder {
 
   /**
    * Somehow Java do not provide a parse method for parsing Locale on the standard form
-   * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that.
-   * The separator used should be underscore({@code '_'}), space({@code ' '}) or hyphen({@code '-'}).
+   * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that. The
+   * separator used should be underscore({@code '_'}), space({@code ' '}) or hyphen({@code '-'}).
    */
   private Locale parseLocale(String text) {
     String[] parts = text.split("[-_ ]+");

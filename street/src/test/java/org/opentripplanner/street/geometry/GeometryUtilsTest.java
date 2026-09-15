@@ -92,8 +92,8 @@ public class GeometryUtilsTest {
     referenceCoordinates[8][0] = coordinates;
 
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    CoordinateSequenceFactory coordinateSequenceFactory =
-      geometryFactory.getCoordinateSequenceFactory();
+    CoordinateSequenceFactory coordinateSequenceFactory = geometryFactory
+      .getCoordinateSequenceFactory();
     CoordinateSequence sequence = coordinateSequenceFactory.create(coordinates);
     LineString geometry = new LineString(sequence, geometryFactory);
 
@@ -253,9 +253,8 @@ public class GeometryUtilsTest {
 
   @Test
   void sumDistancesNonLineStringGeometry() {
-    var multiPoint = GeometryUtils.getGeometryFactory().createMultiPointFromCoords(
-      new Coordinate[] { BERLIN, HAMBURG }
-    );
+    var multiPoint = GeometryUtils.getGeometryFactory()
+      .createMultiPointFromCoords(new Coordinate[] { BERLIN, HAMBURG });
     var meters = GeometryUtils.sumDistances(multiPoint);
     assertEquals(255_384.0, meters, 0.5);
   }

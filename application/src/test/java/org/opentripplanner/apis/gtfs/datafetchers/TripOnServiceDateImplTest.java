@@ -56,8 +56,7 @@ class TripOnServiceDateImplTest {
   void canceledTrip_canceledAndUpdatedFlagsTrue() throws Exception {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = env.tripData(TRIP_ID);
-    var canceledTripTimes = tripData
-      .scheduledTripTimes()
+    var canceledTripTimes = tripData.scheduledTripTimes()
       .createRealTimeFromScheduledTimes()
       .withCanceled()
       .build();
@@ -79,8 +78,7 @@ class TripOnServiceDateImplTest {
   void delayedTrip_timesModifiedAndUpdatedFlagsTrue() throws Exception {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var tripData = env.tripData(TRIP_ID);
-    var delayedTripTimes = tripData
-      .scheduledTripTimes()
+    var delayedTripTimes = tripData.scheduledTripTimes()
       .createRealTimeFromScheduledTimes()
       .withRealTimeUpdated()
       .build();

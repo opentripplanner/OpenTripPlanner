@@ -19,9 +19,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
- * This is a replica of public transportation data already present in TransitRepository, but rearranged
- * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
- * by days, retaining only the services actually running on any particular day.
+ * This is a replica of public transportation data already present in TransitRepository, but
+ * rearranged and indexed differently for efficient use by the Raptor router. Patterns and trips are
+ * split out by days, retaining only the services actually running on any particular day.
  *
  */
 public class RaptorTransitData {
@@ -57,9 +57,9 @@ public class RaptorTransitData {
   private final int[] stopBoardAlightTransferCosts;
 
   /**
-   * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a shallow
-   * copy of the HashMap is made. This is sufficient, as the RealTimeRaptorTransitDataUpdater will replace entire
-   * keys and their values in the map.
+   * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a
+   * shallow copy of the HashMap is made. This is sufficient, as the
+   * RealTimeRaptorTransitDataUpdater will replace entire keys and their values in the map.
    */
   public RaptorTransitData(RaptorTransitData raptorTransitData) {
     this(
@@ -100,8 +100,8 @@ public class RaptorTransitData {
   }
 
   /**
-   * Returns trip patterns for the given running date. Running date is not necessarily the same
-   * as the service date. A Trip "runs through" a date if any of its arrivals or departures is
+   * Returns trip patterns for the given running date. Running date is not necessarily the same as
+   * the service date. A Trip "runs through" a date if any of its arrivals or departures is
    * happening on that date. Trip pattern can have multiple running dates.
    */
   public Collection<TripPatternForDate> getTripPatternsForRunningDate(LocalDate date) {
@@ -131,8 +131,7 @@ public class RaptorTransitData {
     // Trip pattern can run only after midnight. Therefore, we need to get the trip pattern's for
     // the next running date as well and filter out duplicates.
     tripPatternsRunningOnDates.addAll(getTripPatternsRunningOnDateCopy(date.plusDays(1)));
-    return tripPatternsRunningOnDates
-      .stream()
+    return tripPatternsRunningOnDates.stream()
       .filter(t -> t.getServiceDate().equals(date))
       .distinct()
       .collect(Collectors.toList());

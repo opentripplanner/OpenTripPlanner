@@ -19,8 +19,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
  * guidance that expresses certainty or uncertainty about the accessibility.
  * <p>
- * The intended audience for this score are frontend developers wanting to show a simple UI rather
- * than having to iterate over all the stops and trips.
+ * The intended audience for this score are frontend developers wanting to show a simple UI
+ * rather than having to iterate over all the stops and trips.
  * <p>
  * Note: the information to calculate this score are all available to the frontend, however
  * calculating them on the backend makes life a little easier and changes are automatically applied
@@ -63,16 +63,14 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
     var trip = leg.tripWheelchairAccessibility();
 
     var values = List.of(trip, fromStop, toStop);
-    var sum = (float) values
-      .stream()
+    var sum = (float) values.stream()
       .mapToDouble(DecorateWithAccessibilityScore::accessibilityScore)
       .sum();
     return sum / values.size();
   }
 
   private static Float compute(List<Leg> legs) {
-    return legs
-      .stream()
+    return legs.stream()
       .map(Leg::accessibilityScore)
       .filter(Objects::nonNull)
       .min(Comparator.comparingDouble(Float::doubleValue))
@@ -89,14 +87,12 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
 
   private float compute(StreetLeg leg) {
     var edges = leg.listWalkSteps().stream().map(WalkStep::getEdges).toList();
-    var streetEdges = edges
-      .stream()
+    var streetEdges = edges.stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .toList();
 
-    var maxSlope = streetEdges
-      .stream()
+    var maxSlope = streetEdges.stream()
       .filter(StreetEdge::hasElevationExtension)
       .mapToDouble(StreetEdge::getMaxSlope)
       .max()
@@ -106,8 +102,7 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
 
     // calculate the worst percentage we go over the max slope
     // max slope is always above 0
-    double maxSlopeExceeded = streetEdges
-      .stream()
+    double maxSlopeExceeded = streetEdges.stream()
       .filter(s -> s.getMaxSlope() > maxSlope)
       .mapToDouble(s -> s.getMaxSlope() - maxSlope)
       .map(d -> d * 100)
@@ -122,8 +117,7 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
 
     score += 0.5 - slopeMalus;
 
-    boolean allEdgesAreAccessible = edges
-      .stream()
+    boolean allEdgesAreAccessible = edges.stream()
       .filter(WheelchairTraversalInformation.class::isInstance)
       .map(WheelchairTraversalInformation.class::cast)
       .allMatch(WheelchairTraversalInformation::isWheelchairAccessible);

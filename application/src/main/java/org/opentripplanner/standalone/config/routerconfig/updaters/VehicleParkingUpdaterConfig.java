@@ -20,13 +20,11 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
 public class VehicleParkingUpdaterConfig {
 
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var sourceType = c
-      .of("sourceType")
+    var sourceType = c.of("sourceType")
       .since(V2_2)
       .summary("The source of the vehicle updates.")
       .asEnum(VehicleParkingSourceType.class);
-    var feedId = c
-      .of("feedId")
+    var feedId = c.of("feedId")
       .since(V2_2)
       .summary("The id of the data source, which will be the prefix of the parking lot's id.")
       .description("This will end up in the API responses as the feed id of the parking lot.")
@@ -34,16 +32,14 @@ public class VehicleParkingUpdaterConfig {
     return switch (sourceType) {
       case LIIPI -> new LiipiParkUpdaterParameters(
         updaterRef,
-        c
-          .of("facilitiesFrequencySec")
+        c.of("facilitiesFrequencySec")
           .since(V2_2)
           .summary("How often the facilities should be updated.")
           .asInt(3600),
         c.of("facilitiesUrl").since(V2_2).summary("URL of the facilities.").asString(null),
         feedId,
         sourceType,
-        c
-          .of("utilizationsFrequencySec")
+        c.of("utilizationsFrequencySec")
           .since(V2_2)
           .summary("How often the utilization should be updated.")
           .asInt(600),
@@ -55,8 +51,7 @@ public class VehicleParkingUpdaterConfig {
         updaterRef,
         c.of("url").since(V2_2).summary("URL of the resource.").asString(),
         feedId,
-        c
-          .of("frequency")
+        c.of("frequency")
           .since(V2_2)
           .summary("How often to update the source.")
           .asDuration(Duration.ofMinutes(1)),
@@ -71,8 +66,7 @@ public class VehicleParkingUpdaterConfig {
         updaterRef,
         c.of("url").since(V2_3).summary("URL of the locations endpoint.").asUri(),
         feedId,
-        c
-          .of("frequency")
+        c.of("frequency")
           .since(V2_3)
           .summary("How often to update the source.")
           .asDuration(Duration.ofMinutes(1)),
@@ -82,8 +76,7 @@ public class VehicleParkingUpdaterConfig {
         updaterRef,
         c.of("url").since(V2_6).summary("URL of the locations endpoint.").asUri(),
         feedId,
-        c
-          .of("frequency")
+        c.of("frequency")
           .since(V2_6)
           .summary("How often to update the source.")
           .asDuration(Duration.ofMinutes(1)),
@@ -91,8 +84,7 @@ public class VehicleParkingUpdaterConfig {
       );
       case SIRI_FM -> new SiriFmUpdaterParameters(
         updaterRef,
-        c
-          .of("url")
+        c.of("url")
           .since(V2_6)
           .summary("URL of the SIRI-FM Light endpoint.")
           .description(
@@ -106,8 +98,7 @@ public class VehicleParkingUpdaterConfig {
           )
           .asUri(),
         feedId,
-        c
-          .of("frequency")
+        c.of("frequency")
           .since(V2_6)
           .summary("How often to update the source.")
           .asDuration(Duration.ofMinutes(1)),
@@ -117,8 +108,7 @@ public class VehicleParkingUpdaterConfig {
   }
 
   private static ZoneId getTimeZone(NodeAdapter c) {
-    return c
-      .of("timeZone")
+    return c.of("timeZone")
       .since(V2_2)
       .summary("The time zone of the feed.")
       .description("Used for converting abstract opening hours into concrete points in time.")

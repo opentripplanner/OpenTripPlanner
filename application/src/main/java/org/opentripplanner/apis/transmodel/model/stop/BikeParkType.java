@@ -26,8 +26,8 @@ public class BikeParkType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment ->
-            idMapper.mapToApi(((VehicleParking) environment.getSource()).getId())
+          .dataFetcher(
+            environment -> idMapper.mapToApi(((VehicleParking) environment.getSource()).getId())
           )
           .build()
       )
@@ -35,8 +35,8 @@ public class BikeParkType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
-          .dataFetcher(environment ->
-            ((VehicleParking) environment.getSource()).getName().toString()
+          .dataFetcher(
+            environment -> ((VehicleParking) environment.getSource()).getName().toString()
           )
           .build()
       )
@@ -66,8 +66,8 @@ public class BikeParkType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            ((VehicleParking) environment.getSource()).getCoordinate().longitude()
+          .dataFetcher(
+            environment -> ((VehicleParking) environment.getSource()).getCoordinate().longitude()
           )
           .build()
       )
@@ -75,8 +75,8 @@ public class BikeParkType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            ((VehicleParking) environment.getSource()).getCoordinate().latitude()
+          .dataFetcher(
+            environment -> ((VehicleParking) environment.getSource()).getCoordinate().latitude()
           )
           .build()
       )

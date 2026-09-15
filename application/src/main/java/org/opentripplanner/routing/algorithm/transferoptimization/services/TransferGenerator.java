@@ -23,9 +23,9 @@ import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedBoardin
  * passed in. The configured slack should be respected, and the transfers found here should be
  * equivalent to the transfers explored during routing (in Raptor).
  * <p>
- * This class also filters away transfers which cannot be used due to time constraints. For example,
- * if a transfer point is before the earliest possible boarding or after the latest possible
- * arrival. Transfer constraints should also be respected.
+ * This class also filters away transfers which cannot be used due to time constraints. For
+ * example, if a transfer point is before the earliest possible boarding or after the latest
+ * possible arrival. Transfer constraints should also be respected.
  * <p>
  * This service does NOT combine transfers between various trips to form full paths. There are
  * potentially millions of permutations, so we do that later when we can prune the result.
@@ -196,8 +196,8 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   /**
-   * This code duplicates the logic in {@link ConstrainedBoardingSearch},
-   * see the {@code findTimetableTripInfo(RaptorTimeTable, Iterable, int, int, int)}) method.
+   * This code duplicates the logic in {@link ConstrainedBoardingSearch}, see the
+   * {@code findTimetableTripInfo(RaptorTimeTable, Iterable, int, int, int)}) method.
    */
   private int calculateEarliestBoardTime(
     TripStopTime<T> from,
@@ -208,8 +208,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
       return calcRegularTransferEarliestBoardTime(from, regularTransferDurationInSec);
     }
 
-    return tx
-      .getTransferConstraint()
+    return tx.getTransferConstraint()
       .calculateTransferTargetTime(
         from.time(),
         slackProvider.transferSlack(),
@@ -235,8 +234,7 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
   }
 
   private TripStopTime<T> findMinimumToStopTime(List<TripToTripTransfer<T>> transfers) {
-    return transfers
-      .stream()
+    return transfers.stream()
       .map(TripToTripTransfer::to)
       .min(Comparator.comparingInt(TripStopTime::time))
       .orElseThrow();
@@ -264,8 +262,9 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   /**
    * Based on trip pattern and transfer constraint check whether transfer at this point is possible
+   *
    * @param stopPosition stop position in destination trip pattern
-   * @param tx optional transfer constraint
+   * @param tx           optional transfer constraint
    * @return whether this transfer is possible
    */
   private boolean transferNotAllowed(int stopPosition, ConstrainedTransfer tx) {

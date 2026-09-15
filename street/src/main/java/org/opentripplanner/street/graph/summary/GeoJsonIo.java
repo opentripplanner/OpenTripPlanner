@@ -35,8 +35,7 @@ public class GeoJsonIo {
 
   public static String toUrl(Collection<Edge> edges, Collection<Vertex> vertices) {
     var edgeGeoms = edges.stream().map(GeoJsonIo::geom).toList();
-    var vertexGeoms = vertices
-      .stream()
+    var vertexGeoms = vertices.stream()
       .map(v -> GeometryUtils.getGeometryFactory().createPoint(v.getCoordinate()))
       .map(Geometry.class::cast)
       .toList();

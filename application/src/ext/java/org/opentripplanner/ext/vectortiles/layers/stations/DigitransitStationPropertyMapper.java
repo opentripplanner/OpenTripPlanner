@@ -45,8 +45,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         new KeyValue("name", i18NStringMapper.mapNonnullToApi(station.getName())),
         new KeyValue(
           "type",
-          childStops
-            .stream()
+          childStops.stream()
             .flatMap(stop -> transitService.findPatterns(stop).stream())
             .map(tripPattern -> tripPattern.getMode().name())
             .distinct()
@@ -61,8 +60,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
         new KeyValue(
           "routes",
           OBJECT_MAPPER.writeValueAsString(
-            childStops
-              .stream()
+            childStops.stream()
               .flatMap(stop -> transitService.findRoutes(stop).stream())
               .distinct()
               .map(route -> {

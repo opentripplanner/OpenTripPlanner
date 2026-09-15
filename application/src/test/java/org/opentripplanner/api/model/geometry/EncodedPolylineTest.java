@@ -10,9 +10,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 
 class EncodedPolylineTest {
 
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createLineString(
-    new Coordinate[] { new Coordinate(60.0, 9.0), new Coordinate(63.1, 10.3) }
-  );
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
+    .createLineString(new Coordinate[] { new Coordinate(60.0, 9.0), new Coordinate(63.1, 10.3) });
 
   private EncodedPolyline subject = EncodedPolyline.of(GEOMETRY);
 

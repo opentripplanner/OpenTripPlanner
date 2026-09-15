@@ -33,34 +33,34 @@ class TripPatternForDatesTest {
 
   @Test
   void forwardSearchInRange() {
-    var result = getTestSubjectWithExactFrequency()
-      .createCustomizedTripSearch(SearchDirection.FORWARD)
-      .search(FREQUENCY_END - HEADWAY, 0);
+    var result = getTestSubjectWithExactFrequency().createCustomizedTripSearch(
+      SearchDirection.FORWARD
+    ).search(FREQUENCY_END - HEADWAY, 0);
     assertTrue(result.time() >= FREQUENCY_END - HEADWAY);
     assertTrue(result.time() < FREQUENCY_END);
   }
 
   @Test
   void forwardSearchOutOfRange() {
-    var result = getTestSubjectWithExactFrequency()
-      .createCustomizedTripSearch(SearchDirection.FORWARD)
-      .search(FREQUENCY_END, 0);
+    var result = getTestSubjectWithExactFrequency().createCustomizedTripSearch(
+      SearchDirection.FORWARD
+    ).search(FREQUENCY_END, 0);
     assertTrue(result.empty());
   }
 
   @Test
   void reverseSearchInRange() {
-    var result = getTestSubjectWithExactFrequency()
-      .createCustomizedTripSearch(SearchDirection.REVERSE)
-      .search(FREQUENCY_START, 0);
+    var result = getTestSubjectWithExactFrequency().createCustomizedTripSearch(
+      SearchDirection.REVERSE
+    ).search(FREQUENCY_START, 0);
     assertEquals(FREQUENCY_START, result.time());
   }
 
   @Test
   void reverseSearchOutOfRange() {
-    var result = getTestSubjectWithExactFrequency()
-      .createCustomizedTripSearch(SearchDirection.REVERSE)
-      .search(FREQUENCY_START - 1, 0);
+    var result = getTestSubjectWithExactFrequency().createCustomizedTripSearch(
+      SearchDirection.REVERSE
+    ).search(FREQUENCY_START - 1, 0);
     assertTrue(result.empty());
   }
 
@@ -107,8 +107,7 @@ class TripPatternForDatesTest {
           List.of(tripTimes),
           List.of(new FrequencyEntry(frequency, tripTimes)),
           SERVICE_DATE
-        ),
-      },
+        ), },
       new int[] { 0 },
       boardingAndAlightingPossible,
       boardingAndAlightingPossible,

@@ -22,17 +22,10 @@ class WorldEnvelopeTest {
   private static final int W170 = -170;
 
   /**
-   * To make sure we cover all cases we add a case for each combination of:
-   *  - latitude
-   *    - south hemisphere
-   *    - north hemisphere
-   *    - both sides of the equator
-   *  - longitude
-   *    - east side of 0º (Greenwich)
-   *    - west side of 0º
-   *    - both sides of 0º
-   *    - both sides of 180º
-   * Skip cases for North- and South-pole - not relevant - obscure cases)
+   * To make sure we cover all cases we add a case for each combination of: - latitude - south
+   * hemisphere - north hemisphere - both sides of the equator - longitude - east side of 0º
+   * (Greenwich) - west side of 0º - both sides of 0º - both sides of 180º Skip cases for North- and
+   * South-pole - not relevant - obscure cases)
    */
   static List<Arguments> testCases() {
     return List.of(

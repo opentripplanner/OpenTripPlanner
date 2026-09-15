@@ -30,16 +30,13 @@ class TripTimeOnDateMatcherFactoryTest {
   private static final RegularStop STOP = TransitRepositoryForTest.of().stop("1").build();
   private static final LocalDate DATE = LocalDate.of(2025, 3, 2);
 
-  private static final Route ROUTE_1 = route("r1")
-    .withAgency(agency("a1"))
+  private static final Route ROUTE_1 = route("r1").withAgency(agency("a1"))
     .withMode(TransitMode.RAIL)
     .build();
-  private static final Route ROUTE_2 = route("r2")
-    .withAgency(agency("a2"))
+  private static final Route ROUTE_2 = route("r2").withAgency(agency("a2"))
     .withMode(TransitMode.BUS)
     .build();
-  private static final Route ROUTE_3 = route("r2")
-    .withAgency(agency("a3"))
+  private static final Route ROUTE_3 = route("r2").withAgency(agency("a3"))
     .withMode(TransitMode.FERRY)
     .build();
 
@@ -114,8 +111,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeModeAndRoute() {
-    var request = request()
-      .withExcludeModes(List.of(ROUTE_1.getMode()))
+    var request = request().withExcludeModes(List.of(ROUTE_1.getMode()))
       .withExcludeRoutes(List.of(ROUTE_2.getId()))
       .build();
 
@@ -127,8 +123,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeAgencyAndRoute() {
-    var request = request()
-      .withExcludeModes(List.of(ROUTE_1.getMode()))
+    var request = request().withExcludeModes(List.of(ROUTE_1.getMode()))
       .withExcludeAgencies(List.of(ROUTE_2.getAgency().getId()))
       .build();
 
@@ -556,8 +551,7 @@ class TripTimeOnDateMatcherFactoryTest {
         )
         .build();
 
-      var matcherRequest = request()
-        .withTransitFilters(List.of(filter))
+      var matcherRequest = request().withTransitFilters(List.of(filter))
         .withExcludeModes(List.of(ROUTE_1.getMode()))
         .build();
       var matcher = TripTimeOnDateMatcherFactory.of(matcherRequest);
@@ -579,8 +573,7 @@ class TripTimeOnDateMatcherFactoryTest {
         )
         .build();
 
-      var matcherRequest = request()
-        .withTransitFilters(List.of(filter))
+      var matcherRequest = request().withTransitFilters(List.of(filter))
         .withIncludeAgencies(List.of(ROUTE_2.getAgency().getId()))
         .build();
       var matcher = TripTimeOnDateMatcherFactory.of(matcherRequest);
@@ -603,8 +596,7 @@ class TripTimeOnDateMatcherFactoryTest {
         )
         .build();
 
-      var matcherRequest = request()
-        .withTransitFilters(List.of(filter))
+      var matcherRequest = request().withTransitFilters(List.of(filter))
         .withIncludeRoutes(List.of(ROUTE_1.getId()))
         .build();
       var matcher = TripTimeOnDateMatcherFactory.of(matcherRequest);
@@ -626,8 +618,7 @@ class TripTimeOnDateMatcherFactoryTest {
         )
         .build();
 
-      var matcherRequest = request()
-        .withTransitFilters(List.of(filter))
+      var matcherRequest = request().withTransitFilters(List.of(filter))
         .withExcludeAgencies(List.of(ROUTE_1.getAgency().getId()))
         .build();
       var matcher = TripTimeOnDateMatcherFactory.of(matcherRequest);
@@ -652,16 +643,14 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeCallTimePeriodOverlapping() {
-    var request = request()
-      .withIncludeCallTimePeriods(
-        List.of(
-          TimePeriod.of(
-            Instant.EPOCH.plus(Duration.ofHours(9)),
-            Instant.EPOCH.plus(Duration.ofHours(11))
-          )
+    var request = request().withIncludeCallTimePeriods(
+      List.of(
+        TimePeriod.of(
+          Instant.EPOCH.plus(Duration.ofHours(9)),
+          Instant.EPOCH.plus(Duration.ofHours(11))
         )
       )
-      .build();
+    ).build();
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     // The vehicle visits the first stop at 10:00 after the epoch
@@ -670,16 +659,14 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeCallTimePeriodNotOverlapping() {
-    var request = request()
-      .withIncludeCallTimePeriods(
-        List.of(
-          TimePeriod.of(
-            Instant.EPOCH.plus(Duration.ofHours(11)),
-            Instant.EPOCH.plus(Duration.ofHours(12))
-          )
+    var request = request().withIncludeCallTimePeriods(
+      List.of(
+        TimePeriod.of(
+          Instant.EPOCH.plus(Duration.ofHours(11)),
+          Instant.EPOCH.plus(Duration.ofHours(12))
         )
       )
-      .build();
+    ).build();
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
@@ -689,16 +676,14 @@ class TripTimeOnDateMatcherFactoryTest {
   void includeCallTimePeriodMatchesVisitAtStopAndNotWholeTrip() {
     // The trip runs from 10:00 to 10:05, so the period is within the trip's running time but the
     // vehicle visits neither of the stops during it.
-    var request = request()
-      .withIncludeCallTimePeriods(
-        List.of(
-          TimePeriod.of(
-            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(1)),
-            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(4))
-          )
+    var request = request().withIncludeCallTimePeriods(
+      List.of(
+        TimePeriod.of(
+          Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(1)),
+          Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(4))
         )
       )
-      .build();
+    ).build();
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_1, 0)));
@@ -708,16 +693,14 @@ class TripTimeOnDateMatcherFactoryTest {
   @Test
   void includeCallTimePeriodMatchesLaterStopOnly() {
     // The period only contains the visit at the second stop at 10:05
-    var request = request()
-      .withIncludeCallTimePeriods(
-        List.of(
-          TimePeriod.of(
-            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(1)),
-            Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(10))
-          )
+    var request = request().withIncludeCallTimePeriods(
+      List.of(
+        TimePeriod.of(
+          Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(1)),
+          Instant.EPOCH.plus(Duration.ofHours(10)).plus(Duration.ofMinutes(10))
         )
       )
-      .build();
+    ).build();
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_1, 0)));

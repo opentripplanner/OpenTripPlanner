@@ -8,8 +8,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 
 /**
- * Keep a list of items, groups and the result in progress. This is just a class for
- * simple bookkeeping for the state of the filter.
+ * Keep a list of items, groups and the result in progress. This is just a class for simple
+ * bookkeeping for the state of the filter.
  */
 class State {
 
@@ -108,8 +108,7 @@ class State {
    */
   @Nullable
   private static Item findItemInFirstSingleItemGroup(List<Group> groups) {
-    return groups
-      .stream()
+    return groups.stream()
       .filter(Group::isSingleItemGroup)
       .findFirst()
       .map(Group::first)

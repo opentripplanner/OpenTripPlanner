@@ -48,8 +48,8 @@ public class CalendarServiceData implements Serializable {
   }
 
   /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   *           - this when doing the issue #3030.
+   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix -
+   * this when doing the issue #3030.
    */
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     FeedScopedId serviceId = new FeedScopedId(
@@ -89,8 +89,9 @@ public class CalendarServiceData implements Serializable {
 
   private void addDatesToServiceIdsByDate(FeedScopedId serviceId, List<LocalDate> serviceDates) {
     for (LocalDate serviceDate : serviceDates) {
-      Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(serviceDate, k ->
-        new HashSet<>()
+      Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(
+        serviceDate,
+        k -> new HashSet<>()
       );
       serviceIds.add(serviceId);
     }

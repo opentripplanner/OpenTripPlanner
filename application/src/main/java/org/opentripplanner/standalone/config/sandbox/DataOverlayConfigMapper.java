@@ -13,8 +13,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class DataOverlayConfigMapper {
 
   public static DataOverlayConfig map(NodeAdapter root, String dataOverlayName) {
-    var node = root
-      .of(dataOverlayName)
+    var node = root.of(dataOverlayName)
       .since(V2_2)
       .summary("Config for the DataOverlay Sandbox module")
       .asObject();
@@ -28,14 +27,12 @@ public class DataOverlayConfigMapper {
       node.of("longitudeVariable").since(NA).summary("TODO").asString(),
       node.of("timeVariable").since(NA).summary("TODO").asString(),
       node.of("timeFormat").since(NA).summary("TODO").asEnum(TimeUnit.class),
-      node
-        .of("indexVariables")
+      node.of("indexVariables")
         .since(NA)
         .summary("TODO")
         .description(/*TODO DOC*/ "TODO")
         .asObjects(DataOverlayConfigMapper::mapIndexVariable),
-      node
-        .of("requestParameters")
+      node.of("requestParameters")
         .since(NA)
         .summary("TODO")
         .description(/*TODO DOC*/ "TODO")

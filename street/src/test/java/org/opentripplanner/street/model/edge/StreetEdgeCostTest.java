@@ -29,8 +29,7 @@ class StreetEdgeCostTest {
   @MethodSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("edge")
       .withMeterLength(length)
@@ -60,8 +59,7 @@ class StreetEdgeCostTest {
   @MethodSource("bikeReluctanceCases")
   public void bikeReluctance(double bikeReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("edge")
       .withMeterLength(length)
@@ -92,8 +90,7 @@ class StreetEdgeCostTest {
   @MethodSource("carReluctanceCases")
   public void carReluctance(double carReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("edge")
       .withMeterLength(length)
@@ -119,8 +116,7 @@ class StreetEdgeCostTest {
   @MethodSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var stairsEdge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var stairsEdge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("stairs")
       .withMeterLength(length)
@@ -153,8 +149,7 @@ class StreetEdgeCostTest {
   @MethodSource("bikeStairsCases")
   public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var stairsEdge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var stairsEdge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("stairs")
       .withMeterLength(length)
@@ -187,8 +182,7 @@ class StreetEdgeCostTest {
   @MethodSource("walkSafetyCases")
   public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
     double length = 10;
-    var safeEdge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var safeEdge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("test edge")
       .withMeterLength(length)

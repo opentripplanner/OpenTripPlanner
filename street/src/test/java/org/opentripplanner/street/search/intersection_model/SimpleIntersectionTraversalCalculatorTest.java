@@ -246,9 +246,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
       new Coordinate(0.0001, 0.0009),
       new Coordinate(-0.0001, 0.0009),
       new Coordinate(-0.0009, 0.0001)
-    )
-      .map(x -> vertex("to", x, false, false))
-      .toArray(StreetVertex[]::new);
+    ).map(x -> vertex("to", x, false, false)).toArray(StreetVertex[]::new);
     return Stream.of(
       Arguments.of(vertices[0], false, true),
       Arguments.of(vertices[1], false, true),
@@ -504,8 +502,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(vA)
+    return new StreetEdgeBuilder<>().withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withName(name)

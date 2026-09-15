@@ -31,8 +31,8 @@ class EscalatorProcessor {
     IntersectionVertex fromVertex,
     IntersectionVertex toVertex
   ) {
-    Optional<Duration> duration = escalatorWay.getDuration(v ->
-      issueStore.add(
+    Optional<Duration> duration = escalatorWay.getDuration(
+      v -> issueStore.add(
         Issue.issue(
           "InvalidDuration",
           "Duration for osm node {} is not a valid duration: '{}'; the value is ignored.",

@@ -7,16 +7,14 @@ import org.opentripplanner.utils.lang.Units;
 
 /**
  * This is a data-transfer-object representing a linear function(constant and coefficient) of time.
- * This class does not implement the function itself, so the calculated result can be any type,
- * like a duration or a generalized-cost. The class only holds the constant time part and the
+ * This class does not implement the function itself, so the calculated result can be any type, like
+ * a duration or a generalized-cost. The class only holds the constant time part and the
  * time-coefficient. A function implementation may transform or scale the result as well.
  * <p>
  * The class is a thread-safe, immutable value-object.
  */
-abstract sealed class AbstractLinearFunction<T>
-  implements Serializable
-  permits CostLinearFunction, TimePenalty
-{
+abstract sealed class AbstractLinearFunction<T> implements Serializable permits CostLinearFunction,
+  TimePenalty {
 
   private final T constant;
 
@@ -33,8 +31,8 @@ abstract sealed class AbstractLinearFunction<T>
   }
 
   /**
-   * The coefficient part of the function. When multiplied with time in seconds the result
-   * is cost in "centi-seconds".
+   * The coefficient part of the function. When multiplied with time in seconds the result is cost
+   * in "centi-seconds".
    */
   public final double coefficient() {
     return coefficient;
@@ -48,7 +46,8 @@ abstract sealed class AbstractLinearFunction<T>
   }
 
   /**
-   * Return true if the {@code f(x) = x} for all times (constant is zero and the coefficient is one).
+   * Return true if the {@code f(x) = x} for all times (constant is zero and the coefficient is
+   * one).
    */
   public final boolean isNormal() {
     return isZero(constant) && coefficient == 1.0;

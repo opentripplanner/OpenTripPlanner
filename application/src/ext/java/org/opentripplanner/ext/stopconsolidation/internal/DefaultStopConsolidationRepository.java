@@ -10,9 +10,8 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 
 @Singleton
-public class DefaultStopConsolidationRepository
-  implements Serializable, StopConsolidationRepository
-{
+public class DefaultStopConsolidationRepository implements Serializable,
+  StopConsolidationRepository {
 
   private final List<ConsolidatedStopGroup> groups = new ArrayList<>();
 

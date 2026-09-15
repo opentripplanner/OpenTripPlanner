@@ -7,10 +7,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * Used to calculate times in a forward trip search.
  */
-public class ForwardTransitCalculator<T extends RaptorTripSchedule>
-  extends ForwardTimeCalculator
-  implements TransitCalculator<T>
-{
+public class ForwardTransitCalculator<T extends RaptorTripSchedule> extends ForwardTimeCalculator
+  implements TransitCalculator<T> {
 
   public ForwardTransitCalculator() {}
 

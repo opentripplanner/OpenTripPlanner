@@ -21,8 +21,10 @@ class HttpsFileDataSourceTest {
   public static final String TEST_NAME = "dataset.zip";
   public static final String TEST_DIRECTORY = TEST_HOST + '/' + TEST_RELATIVE_PATH;
   public static final String TEST_URI = TEST_DIRECTORY + '/' + TEST_NAME;
-  public static final String TEST_URI_WITH_PARAMETERS =
-    TEST_DIRECTORY + '/' + TEST_NAME + "?key=value";
+  public static final String TEST_URI_WITH_PARAMETERS = TEST_DIRECTORY +
+    '/' +
+    TEST_NAME +
+    "?key=value";
 
   @Test
   void testNotWritable() throws URISyntaxException {

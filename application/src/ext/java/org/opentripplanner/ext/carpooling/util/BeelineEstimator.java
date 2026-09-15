@@ -9,23 +9,22 @@ import org.opentripplanner.street.model.StreetConstants;
 /**
  * Provides fast, low-resolution travel time estimates based on beeline (straight-line) distances.
  * <p>
- * Used as a heuristic to quickly reject incompatible insertion positions before
- * performing expensive A* street routing. The estimates are intentionally optimistic
- * (lower bounds) so that valid insertions are never incorrectly rejected.
+ * Used as a heuristic to quickly reject incompatible insertion positions before performing
+ * expensive A* street routing. The estimates are intentionally optimistic (lower bounds) so that
+ * valid insertions are never incorrectly rejected.
  * <p>
  * Formula: duration = beeline_distance / speed (in m/s)
  * <p>
  * No street route is shorter than the beeline, so dividing it by the fastest speed any street
- * can be driven yields a guaranteed lower bound on the real drive time, whatever the road
- * geometry.
+ * can be driven yields a guaranteed lower bound on the real drive time, whatever the road geometry.
  */
 public class BeelineEstimator {
 
   /**
    * Fallback speed for the no-arg constructor when no graph-derived speed is supplied
    * ({@link StreetConstants#DEFAULT_MAX_CAR_SPEED}, 40 m/s ≈ 144 km/h). Production passes the
-   * graph's actual maximum car speed instead — the tightest divisor that still keeps the estimate
-   * a lower bound, since dividing by anything slower would over-estimate and discard feasible
+   * graph's actual maximum car speed instead — the tightest divisor that still keeps the estimate a
+   * lower bound, since dividing by anything slower would over-estimate and discard feasible
    * insertions on fast roads.
    */
   public static final double DEFAULT_SPEED_MPS = StreetConstants.DEFAULT_MAX_CAR_SPEED;
@@ -41,7 +40,7 @@ public class BeelineEstimator {
 
   /**
    * @param speed Travel speed in meters per second; must be at least the fastest speed a car can
-   *        reach in the street model to preserve the lower-bound guarantee
+   *              reach in the street model to preserve the lower-bound guarantee
    */
   public BeelineEstimator(double speed) {
     if (speed <= 0) {
@@ -58,7 +57,7 @@ public class BeelineEstimator {
    * Estimates travel duration between two points using beeline distance.
    *
    * @param from Starting coordinate
-   * @param to Ending coordinate
+   * @param to   Ending coordinate
    * @return Estimated duration
    */
   public Duration estimateDuration(WgsCoordinate from, WgsCoordinate to) {
@@ -71,10 +70,10 @@ public class BeelineEstimator {
   }
 
   /**
-   * Calculates cumulative travel times to each point in a route, including stop duration
-   * at each intermediate point.
+   * Calculates cumulative travel times to each point in a route, including stop duration at each
+   * intermediate point.
    *
-   * @param points Route points in order
+   * @param points       Route points in order
    * @param stopDuration Duration added at each intermediate stop (not at the first point)
    * @return Array of cumulative durations (first element is always Duration.ZERO)
    */

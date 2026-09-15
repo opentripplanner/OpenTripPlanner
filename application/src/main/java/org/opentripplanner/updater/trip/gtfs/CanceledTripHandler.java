@@ -44,7 +44,8 @@ class CanceledTripHandler {
     TripUpdate tripUpdate,
     CancelationType cancelationType,
     UpdateIncrementality incrementality
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     // For DIFFERENTIAL updates, try to cancel a previously added trip
     if (incrementality != FULL_DATASET) {
       var addedPattern = buffer.getNewTripPatternForModifiedTrip(

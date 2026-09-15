@@ -44,8 +44,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
 
   @Override
   public List<VehicleRentalVehicle> getVehicleRentalVehicles() {
-    return repository
-      .listRentalPlaces()
+    return repository.listRentalPlaces()
       .stream()
       .filter(VehicleRentalVehicle.class::isInstance)
       .map(VehicleRentalVehicle.class::cast)
@@ -75,22 +74,18 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
 
   @Override
   public boolean hasRentalBikes() {
-    return repository
-      .listRentalPlaces()
-      .stream()
-      .anyMatch(place -> {
-        if (place instanceof VehicleRentalVehicle vehicle) {
-          return vehicle.vehicleType().formFactor() == RentalFormFactor.BICYCLE;
-        } else if (place instanceof VehicleRentalStation station) {
-          return station
-            .vehicleTypesAvailable()
-            .keySet()
-            .stream()
-            .anyMatch(t -> t.formFactor() == RentalFormFactor.BICYCLE);
-        } else {
-          return false;
-        }
-      });
+    return repository.listRentalPlaces().stream().anyMatch(place -> {
+      if (place instanceof VehicleRentalVehicle vehicle) {
+        return vehicle.vehicleType().formFactor() == RentalFormFactor.BICYCLE;
+      } else if (place instanceof VehicleRentalStation station) {
+        return station.vehicleTypesAvailable()
+          .keySet()
+          .stream()
+          .anyMatch(t -> t.formFactor() == RentalFormFactor.BICYCLE);
+      } else {
+        return false;
+      }
+    });
   }
 
   @Override
@@ -98,11 +93,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
     return Stream.concat(
       repository.listRentalPlaces().stream().map(VehicleRentalPlace::network),
       repository.listZoneNetworks().stream()
-    )
-      .filter(Objects::nonNull)
-      .distinct()
-      .sorted()
-      .toList();
+    ).filter(Objects::nonNull).distinct().sorted().toList();
   }
 
   @Override
@@ -117,23 +108,21 @@ public class DefaultVehicleRentalService implements VehicleRentalService {
       new Coordinate(maxLon, maxLat)
     );
 
-    return getVehicleRentalStationsAsStream()
-      .filter(b -> envelope.contains(new Coordinate(b.longitude(), b.latitude())))
-      .toList();
+    return getVehicleRentalStationsAsStream().filter(
+      b -> envelope.contains(new Coordinate(b.longitude(), b.latitude()))
+    ).toList();
   }
 
   @Override
   public List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(Envelope envelope) {
-    return repository
-      .listRentalPlaces()
+    return repository.listRentalPlaces()
       .stream()
       .filter(vr -> envelope.contains(new Coordinate(vr.longitude(), vr.latitude())))
       .toList();
   }
 
   private Stream<VehicleRentalStation> getVehicleRentalStationsAsStream() {
-    return repository
-      .listRentalPlaces()
+    return repository.listRentalPlaces()
       .stream()
       .filter(VehicleRentalStation.class::isInstance)
       .map(VehicleRentalStation.class::cast);

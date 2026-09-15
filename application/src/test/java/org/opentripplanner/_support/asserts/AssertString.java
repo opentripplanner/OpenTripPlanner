@@ -21,7 +21,8 @@ public class AssertString {
       multi
        line
       string
-      """,
+      """
+      ,
       "multi line string"
     );
   }

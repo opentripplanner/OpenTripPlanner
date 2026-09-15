@@ -42,17 +42,18 @@ class GbfsFreeVehicleStatusMapper {
   public VehicleRentalVehicle mapFreeVehicleStatus(GBFSBike vehicle) {
     if (
       (vehicle.getStationId() == null || vehicle.getStationId().isBlank()) &&
-      vehicle.getLon() != null &&
-      vehicle.getLat() != null
+        vehicle.getLon() != null &&
+        vehicle.getLat() != null
     ) {
-      var fuelRatio = Ratio.ofBoxed(vehicle.getCurrentFuelPercent(), validationErrorMessage ->
-        LOG_THROTTLE.throttle(() ->
-          LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
+      var fuelRatio = Ratio.ofBoxed(
+        vehicle.getCurrentFuelPercent(),
+        validationErrorMessage -> LOG_THROTTLE.throttle(
+          () -> LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
         )
       ).orElse(null);
       var rangeMeters = Distance.ofMetersBoxed(vehicle.getCurrentRangeMeters(), error -> {
-        LOG_THROTTLE.throttle(() ->
-          LOG.warn(
+        LOG_THROTTLE.throttle(
+          () -> LOG.warn(
             "Current range meter value not valid: {} - {}",
             vehicle.getCurrentRangeMeters(),
             error
@@ -63,10 +64,10 @@ class GbfsFreeVehicleStatusMapper {
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&
-        vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
-        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() !=
-          RentalVehicleType.PropulsionType.HUMAN &&
-        rangeMeters == null
+          vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
+          vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType() !=
+            RentalVehicleType.PropulsionType.HUMAN &&
+          rangeMeters == null
       ) {
         return null;
       }

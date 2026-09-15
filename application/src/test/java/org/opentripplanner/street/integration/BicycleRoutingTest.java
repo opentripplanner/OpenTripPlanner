@@ -81,8 +81,8 @@ public class BicycleRoutingTest {
       .withDateTime(DATE_TIME)
       .withFrom(from)
       .withTo(to)
-      .withPreferences(p ->
-        p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
+      .withPreferences(
+        p -> p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
       )
       .withJourney(jb -> {
         jb.withDirect(new StreetRequest(StreetMode.BIKE));
@@ -114,15 +114,13 @@ public class BicycleRoutingTest {
     temporaryVerticesContainer.close();
 
     // make sure that we only get BICYCLE legs
-    itineraries.forEach(i ->
-      i.legs().forEach(l -> {
-        if (l instanceof StreetLeg stLeg) {
-          assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
-        } else {
-          fail("Expected StreetLeg (BICYCLE): " + l);
-        }
-      })
-    );
+    itineraries.forEach(i -> i.legs().forEach(l -> {
+      if (l instanceof StreetLeg stLeg) {
+        assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
+      } else {
+        fail("Expected StreetLeg (BICYCLE): " + l);
+      }
+    }));
     Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.of(legGeometry).points();
   }

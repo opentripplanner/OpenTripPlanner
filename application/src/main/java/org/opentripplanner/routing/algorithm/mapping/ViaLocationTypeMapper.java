@@ -15,23 +15,17 @@ public class ViaLocationTypeMapper {
 
   @Nullable
   public static ViaLocationType map(List<ViaLocation> viaLocations, StopLocation stop) {
-    return viaLocations
-      .stream()
-      .flatMap(viaLocation ->
-        viaLocation
-          .stopLocationIds()
-          .stream()
-          .map(stopId -> {
-            // This might yield to false positive matches (stop location is visited multiple times
-            // in an itinerary), but those cases should be quite rare.
-            if (stopId.equals(stop.getId()) || stopId.equals(stop.getStationOrStopId())) {
-              return viaLocation.isPassThroughLocation()
-                ? ViaLocationType.PASS_THROUGH
-                : ViaLocationType.VISIT;
-            }
-            return null;
-          })
-      )
+    return viaLocations.stream()
+      .flatMap(viaLocation -> viaLocation.stopLocationIds().stream().map(stopId -> {
+        // This might yield to false positive matches (stop location is visited multiple times
+        // in an itinerary), but those cases should be quite rare.
+        if (stopId.equals(stop.getId()) || stopId.equals(stop.getStationOrStopId())) {
+          return viaLocation.isPassThroughLocation()
+            ? ViaLocationType.PASS_THROUGH
+            : ViaLocationType.VISIT;
+        }
+        return null;
+      }))
       .filter(Objects::nonNull)
       .findFirst()
       .orElse(null);
@@ -42,12 +36,12 @@ public class ViaLocationTypeMapper {
     List<ViaLocation> viaLocations,
     TemporaryStreetLocation location
   ) {
-    var isViaLocation = viaLocations.stream().anyMatch(viaLocation ->
-      viaLocation
-        .coordinate()
-        .stream()
-        .anyMatch(coordinate -> coordinate.asJtsCoordinate().equals(location.getCoordinate()))
-    );
+    var isViaLocation = viaLocations.stream()
+      .anyMatch(
+        viaLocation -> viaLocation.coordinate()
+          .stream()
+          .anyMatch(coordinate -> coordinate.asJtsCoordinate().equals(location.getCoordinate()))
+      );
     return isViaLocation ? ViaLocationType.VISIT : null;
   }
 }

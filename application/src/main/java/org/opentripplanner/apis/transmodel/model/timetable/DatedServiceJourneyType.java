@@ -57,8 +57,8 @@ public class DatedServiceJourneyType {
             "The date this service runs. The date used is based on the service date as opposed to calendar date."
           )
           .type(TransmodelScalars.DATE_SCALAR)
-          .dataFetcher(environment ->
-            Optional.of(tripOnServiceDate(environment))
+          .dataFetcher(
+            environment -> Optional.of(tripOnServiceDate(environment))
               .map(TripOnServiceDate::getServiceDate)
               .orElse(null)
           )
@@ -103,8 +103,8 @@ public class DatedServiceJourneyType {
             "Dated service journeys this dated service journey replaces with full replacement information"
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacementForType))))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getReplacementHelper()
               .getReplacementFor(tripOnServiceDate(environment))
           )
@@ -114,8 +114,8 @@ public class DatedServiceJourneyType {
           .name("replacedByRelation")
           .description("Dated service journeys this dated service journey is replaced by")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(replacedByType))))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getReplacementHelper()
               .getReplacedBy(tripOnServiceDate(environment))
           )
@@ -202,23 +202,23 @@ public class DatedServiceJourneyType {
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return transitService
-              .findTripTimes(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
-              .map(tripTimes -> {
-                if (tripTimes.isDeleted()) {
-                  throw new RuntimeException(
-                    "Trip has been deleted. this should not be exposed to the API and is probably a bug"
-                  );
-                }
-                return new TransmodelRealTimeTripStateModel(
-                  tripTimes.isAdded(),
-                  tripTimes.isCanceled(),
-                  tripTimes.isTimesModified(),
-                  tripTimes.isTripPatternModified(),
-                  tripTimes.hasAnyUpdates()
+            return transitService.findTripTimes(
+              tripOnServiceDate.getTrip(),
+              tripOnServiceDate.getServiceDate()
+            ).map(tripTimes -> {
+              if (tripTimes.isDeleted()) {
+                throw new RuntimeException(
+                  "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                 );
-              })
-              .orElse(null);
+              }
+              return new TransmodelRealTimeTripStateModel(
+                tripTimes.isAdded(),
+                tripTimes.isCanceled(),
+                tripTimes.isTimesModified(),
+                tripTimes.isTripPatternModified(),
+                tripTimes.hasAnyUpdates()
+              );
+            }).orElse(null);
           })
           .build()
       )

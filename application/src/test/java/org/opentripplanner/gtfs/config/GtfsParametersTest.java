@@ -23,8 +23,7 @@ class GtfsParametersTest {
   private final String FEED = "FEED";
   private final URI SOURCE;
 
-  private final String EXPECTED_BODY_STRING =
-    "stationTransferPreference: " +
+  private final String EXPECTED_BODY_STRING = "stationTransferPreference: " +
     STATION_TRANSFER_PREFERENCE +
     ", " +
     "discardMinTransferTimes: " +
@@ -35,8 +34,9 @@ class GtfsParametersTest {
     ", " +
     "maxInterlineDistance: " +
     MAX_INTERLINE_DISTANCE;
-  private final String EXPECTED_DEFAULT_TO_STRING =
-    "GtfsDefaultParameters{" + EXPECTED_BODY_STRING + "}";
+  private final String EXPECTED_DEFAULT_TO_STRING = "GtfsDefaultParameters{" +
+    EXPECTED_BODY_STRING +
+    "}";
 
   private final String EXPECTED_FEED_TO_STRING;
   private final String EXPECTED_FEED_WITHOUT_FEED_ID_TO_STRING;
@@ -51,8 +51,7 @@ class GtfsParametersTest {
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
-    EXPECTED_FEED_TO_STRING =
-      "GtfsFeedParameters{" +
+    EXPECTED_FEED_TO_STRING = "GtfsFeedParameters{" +
       "feedId: '" +
       FEED +
       "', " +
@@ -61,8 +60,12 @@ class GtfsParametersTest {
       ", " +
       EXPECTED_BODY_STRING +
       "}";
-    EXPECTED_FEED_WITHOUT_FEED_ID_TO_STRING =
-      "GtfsFeedParameters{" + "source: " + SOURCE + ", " + EXPECTED_BODY_STRING + "}";
+    EXPECTED_FEED_WITHOUT_FEED_ID_TO_STRING = "GtfsFeedParameters{" +
+      "source: " +
+      SOURCE +
+      ", " +
+      EXPECTED_BODY_STRING +
+      "}";
 
     SUBJECT_DEFAULT = DEFAULT.copyOf()
       .withBlockBasedInterlining(BLOCK_BASED_INTERLINEING)

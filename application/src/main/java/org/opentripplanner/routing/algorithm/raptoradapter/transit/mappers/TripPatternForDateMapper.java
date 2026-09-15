@@ -76,8 +76,7 @@ public class TripPatternForDateMapper {
       times.add(tripTimes);
     }
 
-    List<FrequencyEntry> frequencies = timetable
-      .getFrequencyEntries()
+    List<FrequencyEntry> frequencies = timetable.getFrequencyEntries()
       .stream()
       .filter(frequency -> serviceCodesRunning.contains(frequency.tripTimes().getServiceCode()))
       .sorted(Comparator.comparing(frequencyEntry -> frequencyEntry.startTime()))
@@ -104,8 +103,8 @@ public class TripPatternForDateMapper {
 
   /**
    * Calls {@link TripPatternForDateMapper#map(Timetable, LocalDate)} and validates that the result
-   * is valid. Since it would cause exceptions with flex trips during start up this method should
-   * be used during real-time updates as flex trip cannot have real-time (as of now).
+   * is valid. Since it would cause exceptions with flex trips during start up this method should be
+   * used during real-time updates as flex trip cannot have real-time (as of now).
    *
    * @throws IllegalArgumentException
    */

@@ -29,8 +29,8 @@ public class FareRuleSet implements Serializable {
   }
 
   /**
-   * Used for checking ticket validity on HSL special routes on which some tickets are valid
-   * outside their normal validity zones
+   * Used for checking ticket validity on HSL special routes on which some tickets are valid outside
+   * their normal validity zones
    */
   public void addRouteOriginDestination(String route, String origin, String destination) {
     routeOriginDestinations.add(new RouteOriginDestination(route, origin, destination));
@@ -42,15 +42,14 @@ public class FareRuleSet implements Serializable {
 
   /**
    * Determine whether the FareRuleSet has any rules added.
+   *
    * @return True if any rules have been added.
    */
   public boolean hasRules() {
-    return (
-      !routes.isEmpty() ||
+    return (!routes.isEmpty() ||
       !originDestinations.isEmpty() ||
       !routeOriginDestinations.isEmpty() ||
-      !contains.isEmpty()
-    );
+      !contains.isEmpty());
   }
 
   public void addContains(String containsId) {
@@ -74,16 +73,18 @@ public class FareRuleSet implements Serializable {
   }
 
   /**
-   * Determines whether the FareRuleSet matches against a set of itinerary parameters
-   * based on the added rules and fare attribute
-   * @param startZone Origin zone
-   * @param endZone End zone
-   * @param zonesVisited A set containing the names of zones visited on the fare
+   * Determines whether the FareRuleSet matches against a set of itinerary parameters based on the
+   * added rules and fare attribute
+   *
+   * @param startZone     Origin zone
+   * @param endZone       End zone
+   * @param zonesVisited  A set containing the names of zones visited on the fare
    * @param routesVisited A set containing the route IDs visited
-   * @param tripsVisited [Not implemented] A set containing the trip IDs visited
+   * @param tripsVisited  [Not implemented] A set containing the trip IDs visited
    * @param transfersUsed Number of transfers already used
-   * @param tripTime Time from beginning of first leg to beginning of current leg to be evaluated
-   * @param journeyTime Total journey time from beginning of first leg to end of current leg
+   * @param tripTime      Time from beginning of first leg to beginning of current leg to be
+   *                      evaluated
+   * @param journeyTime   Total journey time from beginning of first leg to end of current leg
    * @return True if this FareAttribute should apply to this leg
    */
   public boolean matches(
@@ -131,13 +132,13 @@ public class FareRuleSet implements Serializable {
     // as trimet does
     if (
       fareAttribute.isTransferDurationSet() &&
-      tripTime.getSeconds() > fareAttribute.getTransferDuration()
+        tripTime.getSeconds() > fareAttribute.getTransferDuration()
     ) {
       return false;
     }
     if (
       fareAttribute.isJourneyDurationSet() &&
-      journeyTime.getSeconds() > fareAttribute.getJourneyDuration()
+        journeyTime.getSeconds() > fareAttribute.getJourneyDuration()
     ) {
       return false;
     }

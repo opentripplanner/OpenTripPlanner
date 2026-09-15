@@ -84,8 +84,7 @@ class StateTest {
 
     var states = State.getInitialStates(Set.of(v1), req);
 
-    var vehicleRentalStates = states
-      .stream()
+    var vehicleRentalStates = states.stream()
       .map(State::getVehicleRentalState)
       .collect(Collectors.toSet());
     assertEquals(expectedRentalStates, vehicleRentalStates);

@@ -64,11 +64,11 @@ class FareSearch {
 }
 
 /**
- * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute
- * is only applicable for legs that operated by an agency within the same feed. Interfeed transfer rules
- * are not considered in this fare service and for those situations you get to implement your own Fare Service
- * See this thread on gtfs-changes explaining the proper interpretation of
- * fares.txt:
+ * This fare service module handles GTFS fares in multiple feeds separately so that each fare
+ * attribute is only applicable for legs that operated by an agency within the same feed. Interfeed
+ * transfer rules are not considered in this fare service and for those situations you get to
+ * implement your own Fare Service See this thread on gtfs-changes explaining the proper
+ * interpretation of fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
 public class DefaultFareService implements FareService {
@@ -94,15 +94,13 @@ public class DefaultFareService implements FareService {
    * Takes a legs and returns a map of their agency's feed id and all corresponding legs.
    */
   protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
-    return fareLegs
-      .stream()
+    return fareLegs.stream()
       .collect(Collectors.groupingBy(leg -> leg.agency().getId().getFeedId()));
   }
 
   @Override
   public ItineraryFare calculateFares(Itinerary itinerary) {
-    var fareLegs = itinerary
-      .legs()
+    var fareLegs = itinerary.legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .toList();
@@ -142,13 +140,12 @@ public class DefaultFareService implements FareService {
    */
   @Nullable
   protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
-    var fareRulesByTypeAndFeed = fareRulesPerType
-      .entrySet()
+    var fareRulesByTypeAndFeed = fareRulesPerType.entrySet()
       .stream()
       .collect(
-        Collectors.toMap(Map.Entry::getKey, rules ->
-          rules
-            .getValue()
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules -> rules.getValue()
             .stream()
             .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
         )
@@ -159,9 +156,9 @@ public class DefaultFareService implements FareService {
   /**
    * Builds the Fare object for the given currency, fareType and fareRules.
    * <p>
-   * Besides calculating the lowest fare, we also break down the fare and which routes correspond to
-   * which components. Note that even if we cannot get a lowest fare (if some rides don't have fare
-   * rules), there will still be a breakdown for those parts which have fares.
+   * Besides calculating the lowest fare, we also break down the fare and which routes correspond
+   * to which components. Note that even if we cannot get a lowest fare (if some rides don't have
+   * fare rules), there will still be a breakdown for those parts which have fares.
    * <p>
    * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10 each, 2 fare
    * detail objects are added, one with fare 10 for A-B and one with fare 10 for B-C.
@@ -272,10 +269,8 @@ public class DefaultFareService implements FareService {
       transfersUsed += 1;
     }
 
-    @Nullable
-    FareAttribute bestAttribute = null;
-    @Nullable
-    Money bestFare = null;
+    @Nullable FareAttribute bestAttribute = null;
+    @Nullable Money bestFare = null;
     Duration tripTime = Duration.between(startTime, lastRideStartTime);
     Duration journeyTime = Duration.between(startTime, lastRideEndTime);
 
@@ -309,9 +304,8 @@ public class DefaultFareService implements FareService {
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
     Money finalBestFare = bestFare;
-    return Optional.ofNullable(bestAttribute).map(attribute ->
-      new FareAndId(finalBestFare, attribute.getId())
-    );
+    return Optional.ofNullable(bestAttribute)
+      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 
   /**
@@ -321,7 +315,8 @@ public class DefaultFareService implements FareService {
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
    * @see DefaultFareService#combineInterlinedLegs(List)
-   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
+   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg,
+   *      ScheduledTransitLeg)
    * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(
@@ -342,9 +337,9 @@ public class DefaultFareService implements FareService {
     for (var leg : fareLegs) {
       if (
         leg.isInterlinedWithPreviousLeg() &&
-        leg instanceof ScheduledTransitLeg currentLeg &&
-        result.get(result.size() - 1) instanceof ScheduledTransitLeg previousLeg &&
-        shouldCombineInterlinedLegs(previousLeg, currentLeg)
+          leg instanceof ScheduledTransitLeg currentLeg &&
+          result.get(result.size() - 1) instanceof ScheduledTransitLeg previousLeg &&
+          shouldCombineInterlinedLegs(previousLeg, currentLeg)
       ) {
         var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
         // overwrite the previous leg with the combined one
@@ -375,8 +370,7 @@ public class DefaultFareService implements FareService {
           rides.subList(j, j + i + 1),
           fareRules
         );
-        float cost = best
-          .map(b -> b.fare().fractionalAmount().floatValue())
+        float cost = best.map(b -> b.fare().fractionalAmount().floatValue())
           .orElse(Float.POSITIVE_INFINITY);
         if (cost < 0) {
           LOG.error("negative cost for a ride sequence");

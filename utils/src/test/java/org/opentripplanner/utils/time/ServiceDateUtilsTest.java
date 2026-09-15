@@ -150,38 +150,36 @@ public class ServiceDateUtilsTest {
     );
   }
 
-  /// The input time is in UTC and the the transit service time zone(Europe/Oslo) which is
-  /// +1 hour in winter and +2 in summer. This means that we switch to a new service-day at
-  /// 23:00Z in winter time and at 22:00Z in summer time.
+  /// The input time is in UTC and the the transit service time zone(Europe/Oslo) which is +1 hour
+  /// in winter and +2 in summer. This means that we switch to a new service-day at 23:00Z in winter
+  /// time and at 22:00Z in summer time.
   ///
-  /// Note! The last test cases test the transition from summer-time to winter-time and back.
-  /// Day light savings is adjusted:
-  /// - 29. March 2026    02:00 -> 03:00  First summer service-day start at 23:00, 1h overlap
-  /// - 25. October 2026  03:00 -> 02:00  First winter service-day start at 01:00, 1h gap
+  /// Note! The last test cases test the transition from summer-time to winter-time and back. Day
+  /// light savings is adjusted:
+  /// - 29. March 2026 02:00 -> 03:00 First summer service-day start at 23:00, 1h overlap
+  /// - 25. October 2026 03:00 -> 02:00 First winter service-day start at 01:00, 1h gap
   ///
   @ParameterizedTest
-  @CsvSource(
-    value = """
-    Start time           | Window | days | Expected
-    2026-02-10T12:00:00Z | 60m    | 0    | 2026-02-10
-    2026-02-10T12:00:00Z | 60m    | 1    | 2026-02-09, 2026-02-10
-    2026-02-10T12:00:00Z | 60m    | 3    | 2026-02-07, 2026-02-08, 2026-02-09, 2026-02-10
-    2026-02-10T22:29:59Z | 30m    | 0    | 2026-02-10
-    2026-02-10T22:30:00Z | 30m    | 0    | 2026-02-10, 2026-02-11
-    2026-02-10T22:59:59Z | 30m    | 0    | 2026-02-10, 2026-02-11
-    2026-02-10T23:00:00Z | 30m    | 0    | 2026-02-11
-    2026-08-10T21:39:59Z | 20m    | 0    | 2026-08-10
-    2026-08-10T21:40:00Z | 20m    | 0    | 2026-08-10, 2026-08-11
-    2026-08-10T21:59:59Z | 20m    | 0    | 2026-08-10, 2026-08-11
-    2026-08-10T22:00:00Z | 20m    | 0    | 2026-08-11
-    2026-03-28T21:49:59Z | 10m    | 0    | 2026-03-28
-    2026-03-28T21:50:00Z | 10m    | 0    | 2026-03-28, 2026-03-29
-    2026-10-23T21:49:59Z | 10m    | 0    | 2026-10-23
-    2026-10-23T21:50:00Z | 10m    | 0    | 2026-10-23, 2026-10-24
-    """,
-    delimiter = '|',
-    useHeadersInDisplayName = true
-  )
+  @CsvSource(value =
+  """
+  Start time           | Window | days | Expected
+  2026-02-10T12:00:00Z | 60m    | 0    | 2026-02-10
+  2026-02-10T12:00:00Z | 60m    | 1    | 2026-02-09, 2026-02-10
+  2026-02-10T12:00:00Z | 60m    | 3    | 2026-02-07, 2026-02-08, 2026-02-09, 2026-02-10
+  2026-02-10T22:29:59Z | 30m    | 0    | 2026-02-10
+  2026-02-10T22:30:00Z | 30m    | 0    | 2026-02-10, 2026-02-11
+  2026-02-10T22:59:59Z | 30m    | 0    | 2026-02-10, 2026-02-11
+  2026-02-10T23:00:00Z | 30m    | 0    | 2026-02-11
+  2026-08-10T21:39:59Z | 20m    | 0    | 2026-08-10
+  2026-08-10T21:40:00Z | 20m    | 0    | 2026-08-10, 2026-08-11
+  2026-08-10T21:59:59Z | 20m    | 0    | 2026-08-10, 2026-08-11
+  2026-08-10T22:00:00Z | 20m    | 0    | 2026-08-11
+  2026-03-28T21:49:59Z | 10m    | 0    | 2026-03-28
+  2026-03-28T21:50:00Z | 10m    | 0    | 2026-03-28, 2026-03-29
+  2026-10-23T21:49:59Z | 10m    | 0    | 2026-10-23
+  2026-10-23T21:50:00Z | 10m    | 0    | 2026-10-23, 2026-10-24
+  """
+    , delimiter = '|', useHeadersInDisplayName = true)
   public void testCalculateRunningDates(
     Instant startTime,
     String window,

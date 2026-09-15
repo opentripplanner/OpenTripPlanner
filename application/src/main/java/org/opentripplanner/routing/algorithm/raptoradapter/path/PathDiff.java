@@ -45,17 +45,11 @@ public class PathDiff<T extends RaptorTripSchedule> {
 
   private PathDiff(RaptorPath<T> path) {
     this.path = path;
-    this.walkDuration = path
-      .legStream()
+    this.walkDuration = path.legStream()
       .filter(l -> l.isAccessLeg() || l.isTransferLeg() || l.isEgressLeg())
       .mapToInt(PathLeg::duration)
       .sum();
-    this.routes.addAll(
-      path
-        .transitLegs()
-        .map(l -> l.trip().pattern().debugInfo())
-        .toList()
-    );
+    this.routes.addAll(path.transitLegs().map(l -> l.trip().pattern().debugInfo()).toList());
     this.stops.addAll(path.listStops());
   }
 
@@ -101,14 +95,8 @@ public class PathDiff<T extends RaptorTripSchedule> {
     boolean skipCost
   ) {
     return DiffTool.diff(
-      left
-        .stream()
-        .map(PathDiff<T>::new)
-        .collect(Collectors.toList()),
-      right
-        .stream()
-        .map(PathDiff<T>::new)
-        .collect(Collectors.toList()),
+      left.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
+      right.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
       comparator(skipCost)
     );
   }

@@ -46,9 +46,9 @@ public class NearbyStop implements Comparable<NearbyStop> {
   }
 
   /**
-   * Return {@code true} if this instance has a lower weight/cost than the given {@code other}.
-   * If the state is not set, the distance is used for comparison instead. If the
-   * weight/cost/distance is equals (or worse) this method returns {@code false}.
+   * Return {@code true} if this instance has a lower weight/cost than the given {@code other}. If
+   * the state is not set, the distance is used for comparison instead. If the weight/cost/distance
+   * is equals (or worse) this method returns {@code false}.
    */
   public boolean isBetter(NearbyStop other) {
     return compareTo(other) < 0;
@@ -89,12 +89,10 @@ public class NearbyStop implements Comparable<NearbyStop> {
       return false;
     }
     final NearbyStop that = (NearbyStop) o;
-    return (
-      Double.compare(that.distance, distance) == 0 &&
+    return (Double.compare(that.distance, distance) == 0 &&
       stopId.equals(that.stopId) &&
       Objects.equals(edges, that.edges) &&
-      Objects.equals(state, that.state)
-    );
+      Objects.equals(state, that.state));
   }
 
   public String toString() {

@@ -17,28 +17,28 @@ public class GtfsRealtimeEffectMapper {
       return AlertEffect.UNKNOWN_EFFECT;
     }
     switch (effect) {
-      case NO_SERVICE:
+      case NO_SERVICE :
         return AlertEffect.NO_SERVICE;
-      case REDUCED_SERVICE:
+      case REDUCED_SERVICE :
         return AlertEffect.REDUCED_SERVICE;
-      case SIGNIFICANT_DELAYS:
+      case SIGNIFICANT_DELAYS :
         return AlertEffect.SIGNIFICANT_DELAYS;
-      case DETOUR:
+      case DETOUR :
         return AlertEffect.DETOUR;
-      case ADDITIONAL_SERVICE:
+      case ADDITIONAL_SERVICE :
         return AlertEffect.ADDITIONAL_SERVICE;
-      case MODIFIED_SERVICE:
+      case MODIFIED_SERVICE :
         return AlertEffect.MODIFIED_SERVICE;
-      case OTHER_EFFECT:
+      case OTHER_EFFECT :
         return AlertEffect.OTHER_EFFECT;
-      case STOP_MOVED:
+      case STOP_MOVED :
         return AlertEffect.STOP_MOVED;
-      case NO_EFFECT:
+      case NO_EFFECT :
         return AlertEffect.NO_EFFECT;
-      case ACCESSIBILITY_ISSUE:
+      case ACCESSIBILITY_ISSUE :
         return AlertEffect.ACCESSIBILITY_ISSUE;
-      case UNKNOWN_EFFECT:
-      default: {
+      case UNKNOWN_EFFECT :
+      default : {
         return AlertEffect.UNKNOWN_EFFECT;
       }
     }

@@ -59,8 +59,7 @@ class GbfsFeedMapperTest {
     List<VehicleRentalPlace> stations = mapper.getUpdates();
     assertEquals(6, stations.size());
     assertTrue(
-      stations
-        .stream()
+      stations.stream()
         .anyMatch(vehicleRentalStation -> vehicleRentalStation.name().toString().equals("TORVGATA"))
     );
     assertTrue(
@@ -73,17 +72,16 @@ class GbfsFeedMapperTest {
       stations.stream().noneMatch(vehicleRentalStation -> vehicleRentalStation.isCarStation())
     );
     assertTrue(
-      stations
-        .stream()
-        .allMatch(vehicleRentalStation ->
-          vehicleRentalStation.network().equals("lillestrombysykkel")
+      stations.stream()
+        .allMatch(
+          vehicleRentalStation -> vehicleRentalStation.network().equals("lillestrombysykkel")
         )
     );
     assertTrue(
-      stations
-        .stream()
-        .noneMatch(vehicleRentalStation ->
-          vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
+      stations.stream()
+        .noneMatch(
+          vehicleRentalStation -> vehicleRentalStation
+            .isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
 
@@ -173,8 +171,7 @@ class GbfsFeedMapperTest {
 
     assertEquals(2, zones.size());
 
-    var frognerPark = zones
-      .stream()
+    var frognerPark = zones.stream()
       .filter(z -> z.name().toString().equals("NP Frogner og vigelandsparken"))
       .findFirst()
       .get();
@@ -224,16 +221,14 @@ class GbfsFeedMapperTest {
     var zones = dataSource.getGeofencingZones();
 
     // First zone ("OSLO Summer 2021") should have priority 0
-    var osloZone = zones
-      .stream()
+    var osloZone = zones.stream()
       .filter(z -> z.name().toString().equals("OSLO Summer 2021"))
       .findFirst()
       .get();
     assertEquals(0, osloZone.priority());
 
     // Second zone ("NP Frogner og vigelandsparken") should have priority 1
-    var frognerPark = zones
-      .stream()
+    var frognerPark = zones.stream()
       .filter(z -> z.name().toString().equals("NP Frogner og vigelandsparken"))
       .findFirst()
       .get();
@@ -271,10 +266,9 @@ class GbfsFeedMapperTest {
     // There are 10 stations in the data but 5 are missing required data
     assertEquals(5, stations.size());
     assertTrue(
-      stations
-        .stream()
-        .anyMatch(vehicleRentalStation ->
-          vehicleRentalStation.name().toString().equals("Viiskulma")
+      stations.stream()
+        .anyMatch(
+          vehicleRentalStation -> vehicleRentalStation.name().toString().equals("Viiskulma")
         )
     );
     assertTrue(
@@ -293,10 +287,10 @@ class GbfsFeedMapperTest {
       stations.stream().allMatch(vehicleRentalStation -> vehicleRentalStation.network() == network)
     );
     assertTrue(
-      stations
-        .stream()
-        .noneMatch(vehicleRentalStation ->
-          vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
+      stations.stream()
+        .noneMatch(
+          vehicleRentalStation -> vehicleRentalStation
+            .isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
     assertTrue(
@@ -368,8 +362,7 @@ class GbfsFeedMapperTest {
     assertEquals(3, stations.size());
 
     // Verify the duplicate station uses the first occurrence data (10 bikes available)
-    var duplicateStation = stations
-      .stream()
+    var duplicateStation = stations.stream()
       .filter(s -> s.id().getId().contains("station_duplicate"))
       .findFirst()
       .orElseThrow();
@@ -398,8 +391,8 @@ class GbfsFeedMapperTest {
     missingPropulsion.setFormFactor(GBFSVehicleType.FormFactor.BICYCLE);
     missingPropulsion.setPropulsionType(null);
 
-    Map<String, RentalVehicleType> vehicleTypes = assertDoesNotThrow(() ->
-      GbfsFeedMapper.mapVehicleTypes(
+    Map<String, RentalVehicleType> vehicleTypes = assertDoesNotThrow(
+      () -> GbfsFeedMapper.mapVehicleTypes(
         vehicleTypeMapper,
         List.of(valid, missingFormFactor, missingPropulsion)
       )

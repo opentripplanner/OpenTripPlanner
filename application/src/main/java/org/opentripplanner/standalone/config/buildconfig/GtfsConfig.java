@@ -17,8 +17,7 @@ public class GtfsConfig {
     String parameterName
   ) {
     var baseDefaults = GtfsFeedParameters.DEFAULT;
-    var node = root
-      .of(parameterName)
+    var node = root.of(parameterName)
       .since(V2_3)
       .summary("The gtfsDefaults section allows you to specify default properties for GTFS files.")
       .asObject();
@@ -29,11 +28,9 @@ public class GtfsConfig {
   public static GtfsFeedParameters mapGtfsFeed(NodeAdapter node, GtfsDefaultParameters defaults) {
     String documentationAddition = " Overrides the value specified in `gtfsDefaults`.";
     var genericParameters = mapGenericParameters(node, defaults, documentationAddition);
-    return genericParameters
-      .withFeedInfo()
+    return genericParameters.withFeedInfo()
       .withFeedId(
-        node
-          .of("feedId")
+        node.of("feedId")
           .since(V2_2)
           .summary(
             "The unique ID for this feed. This overrides any feed ID defined within the feed itself."
@@ -52,11 +49,9 @@ public class GtfsConfig {
     String documentationAddition
   ) {
     var docDefaults = GtfsFeedParameters.DEFAULT;
-    return defaults
-      .copyOf()
+    return defaults.copyOf()
       .withStationTransferPreference(
-        node
-          .of("stationTransferPreference")
+        node.of("stationTransferPreference")
           .since(V2_3)
           .summary(
             "Should there be some preference or aversion for transfers at stops that are part of a station." +
@@ -72,8 +67,7 @@ public class GtfsConfig {
           .asEnum(defaults.stationTransferPreference())
       )
       .withDiscardMinTransferTimes(
-        node
-          .of("discardMinTransferTimes")
+        node.of("discardMinTransferTimes")
           .since(V2_3)
           .summary(
             "Should minimum transfer times in GTFS files be discarded." + documentationAddition
@@ -88,8 +82,7 @@ public class GtfsConfig {
           .asBoolean(defaults.discardMinTransferTimes())
       )
       .withBlockBasedInterlining(
-        node
-          .of("blockBasedInterlining")
+        node.of("blockBasedInterlining")
           .since(V2_3)
           .summary(
             "Whether to create stay-seated transfers in between two trips with the same block id." +
@@ -99,8 +92,7 @@ public class GtfsConfig {
           .asBoolean(defaults.blockBasedInterlining())
       )
       .withMaxInterlineDistance(
-        node
-          .of("maxInterlineDistance")
+        node.of("maxInterlineDistance")
           .since(V2_3)
           .summary(
             "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle." +

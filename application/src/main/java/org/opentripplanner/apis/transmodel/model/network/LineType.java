@@ -52,11 +52,10 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment ->
-            Optional.ofNullable((AbstractTransitEntity<?, ?>) environment.getSource())
-              .map(AbstractTransitEntity::getId)
-              .map(idMapper::mapToApi)
-              .orElse(null)
+          .dataFetcher(
+            environment -> Optional.ofNullable(
+              (AbstractTransitEntity<?, ?>) environment.getSource()
+            ).map(AbstractTransitEntity::getId).map(idMapper::mapToApi).orElse(null)
           )
           .build()
       )
@@ -108,8 +107,10 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment ->
-            TransmodelTransportSubmode.fromValue(getSource(environment).getNetexSubmode())
+          .dataFetcher(
+            environment -> TransmodelTransportSubmode.fromValue(
+              getSource(environment).getNetexSubmode()
+            )
           )
           .build()
       )
@@ -140,8 +141,9 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("journeyPatterns")
           .type(new GraphQLList(journeyPatternType))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).findPatterns(getSource(environment))
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
+              .findPatterns(getSource(environment))
           )
           .build()
       )
@@ -149,8 +151,8 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .findPatterns(getSource(environment))
               .stream()
               .map(TripPattern::getStops)
@@ -164,8 +166,8 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .findPatterns(getSource(environment))
               .stream()
               .flatMap(TripPattern::scheduledTripsAsStream)
@@ -189,10 +191,9 @@ public class LineType {
           .name("situations")
           .description("Get all situations active for the line.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitAlertService(environment).getRouteAlerts(
-              getSource(environment).getId()
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getTransitAlertService(environment)
+              .getRouteAlerts(getSource(environment).getId())
           )
           .build()
       )
@@ -234,8 +235,8 @@ public class LineType {
             """
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getReplacementHelper()
               .isReplacementRoute(getSource(environment))
           )
@@ -246,8 +247,8 @@ public class LineType {
           .name("replacementsExist")
           .description("Are there replacement DatedServiceJourneys for this Line?")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .getReplacementHelper()
               .replacementsExist(getSource(environment))
           )

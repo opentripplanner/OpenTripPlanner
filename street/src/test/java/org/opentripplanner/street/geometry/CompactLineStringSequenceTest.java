@@ -99,24 +99,33 @@ class CompactLineStringSequenceTest {
 
   @Test
   void ofRejectsWrongLengthCumulative() {
-    assertThrows(IllegalArgumentException.class, () ->
-      CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 0, 100, 250 })
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 0, 100, 250 })
     );
   }
 
   @Test
   void ofRejectsNonZeroFirstCumulative() {
     // Entry 0 must be 0 by contract (distance from the start of the sequence to itself).
-    assertThrows(IllegalArgumentException.class, () ->
-      CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 50, 150, 300, 400 })
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> CompactLineStringSequence.of(
+        List.of(HOP_0, HOP_1, HOP_2),
+        new int[] { 50, 150, 300, 400 }
+      )
     );
   }
 
   @Test
   void ofRejectsNonMonotonicCumulative() {
     // Cumulative arc length cannot shrink; a decreasing entry is a caller bug.
-    assertThrows(IllegalArgumentException.class, () ->
-      CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 0, 100, 80, 300 })
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> CompactLineStringSequence.of(
+        List.of(HOP_0, HOP_1, HOP_2),
+        new int[] { 0, 100, 80, 300 }
+      )
     );
   }
 }

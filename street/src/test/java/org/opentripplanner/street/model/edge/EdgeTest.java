@@ -27,24 +27,21 @@ public class EdgeTest {
     StreetVertex vb = intersectionVertex("B", 10.1, 10.1);
     StreetVertex vc = intersectionVertex("C", 10.2, 10.2);
     StreetVertex vd = intersectionVertex("D", 10.3, 10.3);
-    Edge eab = new StreetEdgeBuilder<>()
-      .withFromVertex(va)
+    Edge eab = new StreetEdgeBuilder<>().withFromVertex(va)
       .withToVertex(vb)
       .withName("AB")
       .withMeterLength(10)
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(false)
       .buildAndConnect();
-    Edge ebc = new StreetEdgeBuilder<>()
-      .withFromVertex(vb)
+    Edge ebc = new StreetEdgeBuilder<>().withFromVertex(vb)
       .withToVertex(vc)
       .withName("BC")
       .withMeterLength(10)
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(false)
       .buildAndConnect();
-    Edge ecd = new StreetEdgeBuilder<>()
-      .withFromVertex(vc)
+    Edge ecd = new StreetEdgeBuilder<>().withFromVertex(vc)
       .withToVertex(vd)
       .withName("CD")
       .withMeterLength(10)

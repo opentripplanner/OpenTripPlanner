@@ -19,16 +19,16 @@ import org.slf4j.LoggerFactory;
 /// CPU cores.
 ///
 /// Most ways in a graph share the same permissions and safety values (e.g. plain
-/// `highway=residential` ways with no overrides), so the resulting [BidirectionalWayProperties]
-/// instances are interned/deduplicated. The index is backed by a primitive-long-keyed map, which
-/// avoids the overhead of boxing millions of `Long` keys in a graph with a large number of ways.
+/// `highway=residential` ways with no overrides), so the resulting
+/// [BidirectionalWayProperties] instances are interned/deduplicated. The index is backed by a
+/// primitive-long-keyed map, which avoids the overhead of boxing millions of `Long` keys in a graph
+/// with a large number of ways.
 ///
 /// ### Memory consumption
 ///
-/// The map is backed by Trove's open-addressing `TLongObjectHashMap`, sized upfront to the number
-/// of ways at its default 0.5 load factor, so it never shrinks below that once built. For a graph
-/// with 2 million ways that means a capacity of roughly 4 million slots, backed by three parallel
-/// arrays:
+/// The map is backed by Trove's open-addressing `TLongObjectHashMap`, sized upfront to the number of
+/// ways at its default 0.5 load factor, so it never shrinks below that once built. For a graph with
+/// 2 million ways that means a capacity of roughly 4 million slots, backed by three parallel arrays:
 ///
 /// | Array | Purpose | Size |
 /// |---|---|---|
@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
 /// | `byte[]` | slot state (FREE/FULL/REMOVED) | ~3.8 MB |
 /// | **Total** | | **~50 MB** |
 ///
-/// The deduplicated [BidirectionalWayProperties]/`WayProperties` payload itself is negligible
-/// (well under 1 MB) since a typical way-property configuration only produces a few hundred to a
-/// few thousand distinct combinations, regardless of how many ways reference them.
+/// The deduplicated [BidirectionalWayProperties]/`WayProperties` payload itself is negligible (well
+/// under 1 MB) since a typical way-property configuration only produces a few hundred to a few
+/// thousand distinct combinations, regardless of how many ways reference them.
 class BidirectionalWayPropertiesIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(BidirectionalWayPropertiesIndex.class);
@@ -55,10 +55,8 @@ class BidirectionalWayPropertiesIndex {
     var progress = ProgressTracker.track("Compute way properties", 5_000, ways.size());
     LOG.info(progress.startMessage());
 
-    var distinctProps = new ConcurrentHashMap<
-      BidirectionalWayProperties,
-      BidirectionalWayProperties
-    >();
+    var distinctProps =
+      new ConcurrentHashMap<BidirectionalWayProperties, BidirectionalWayProperties>();
     TLongObjectMap<BidirectionalWayProperties> index = new TLongObjectHashMap<>(ways.size());
     var synchronizedIndex = TCollections.synchronizedMap(index);
     ways.parallelStream().forEach(way -> {

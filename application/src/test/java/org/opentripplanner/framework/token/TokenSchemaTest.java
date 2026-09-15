@@ -118,28 +118,32 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
 
   @Test
   public void encodeUndefinedFields() {
-    var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
-      INT_SCHEMA.encode().withString("foo", "A")
+    var ex = Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> INT_SCHEMA.encode().withString("foo", "A")
     );
     assertEquals("Unknown field: 'foo'", ex.getMessage());
 
-    Assertions.assertThrows(NullPointerException.class, () ->
-      INT_SCHEMA.encode().withString(null, "A")
+    Assertions.assertThrows(
+      NullPointerException.class,
+      () -> INT_SCHEMA.encode().withString(null, "A")
     );
   }
 
   @Test
   public void encodeFieldValueWithTypeMismatch() {
-    var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
-      STRING_SCHEMA.encode().withInt(STRING_FIELD, 12)
+    var ex = Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> STRING_SCHEMA.encode().withInt(STRING_FIELD, 12)
     );
     assertEquals("The defined type for 'AStr' is STRING not INT.", ex.getMessage());
   }
 
   @Test
   public void decodeUndefinedToken() {
-    var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
-      INT_SCHEMA.decode("foo")
+    var ex = Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> INT_SCHEMA.decode("foo")
     );
     assertEquals("Token is not valid. Unable to parse token: 'foo'.", ex.getMessage());
   }

@@ -37,8 +37,7 @@ public interface RaptorSlackProvider {
   int alightSlack(int slackIndex);
 
   /**
-   * Return the {@link #boardSlack(int)} plus {@link #alightSlack(int)}
-   * slack.
+   * Return the {@link #boardSlack(int)} plus {@link #alightSlack(int)} slack.
    * <p>
    * Unit: seconds.
    */
@@ -54,11 +53,9 @@ public interface RaptorSlackProvider {
     int fromTripAlightSlackIndex,
     int toTripBoardSlackIndex
   ) {
-    return (
-      alightSlack(fromTripAlightSlackIndex) +
+    return (alightSlack(fromTripAlightSlackIndex) +
       transferDurationInSeconds +
       transferSlack() +
-      boardSlack(toTripBoardSlackIndex)
-    );
+      boardSlack(toTripBoardSlackIndex));
   }
 }

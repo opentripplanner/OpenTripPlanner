@@ -44,10 +44,13 @@ class RealtimeResolverTest {
 
   @Test
   void testPopulateLegsWithRealtime() {
-    var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
-      .bus(route1, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
-      .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
-      .build();
+    var itinerary = newItinerary(Place.forStop(stop1), time("11:00")).bus(
+      route1,
+      1,
+      time("11:05"),
+      time("11:20"),
+      Place.forStop(stop2)
+    ).bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3)).build();
 
     // Put a delay on trip 1
     var serviceDate = itinerary.startTime().toLocalDate();
@@ -72,8 +75,7 @@ class RealtimeResolverTest {
     assertFalse(itinerariesWithRealtime.isEmpty());
 
     var legs = itinerariesWithRealtime.getFirst().legs();
-    var leg1ArrivalDelay = legs
-      .get(0)
+    var leg1ArrivalDelay = legs.get(0)
       .asScheduledTransitLeg()
       .tripPattern()
       .getScheduledTimetable()
@@ -89,10 +91,10 @@ class RealtimeResolverTest {
   @Test
   void testPopulateLegsWithRealtimeNonTransit() {
     // Test walk leg and transit leg that doesn't have a corresponding realtime leg
-    var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
-      .walk(300, Place.forStop(stop2))
-      .bus(route1, 1, time("11:20"), time("11:40"), Place.forStop(stop3))
-      .build();
+    var itinerary = newItinerary(Place.forStop(stop1), time("11:00")).walk(
+      300,
+      Place.forStop(stop2)
+    ).bus(route1, 1, time("11:20"), time("11:40"), Place.forStop(stop3)).build();
 
     var model = new TransitRepository();
     model.index();
@@ -115,10 +117,13 @@ class RealtimeResolverTest {
 
   @Test
   void testPopulateLegsWithRealtimeKeepStaySeated() {
-    var staySeatedItinerary = newItinerary(Place.forStop(stop1), time("11:00"))
-      .bus(route1, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
-      .staySeatedBus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
-      .build();
+    var staySeatedItinerary = newItinerary(Place.forStop(stop1), time("11:00")).bus(
+      route1,
+      1,
+      time("11:05"),
+      time("11:20"),
+      Place.forStop(stop2)
+    ).staySeatedBus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3)).build();
 
     var serviceDate = staySeatedItinerary.startTime().toLocalDate();
     var patterns = itineraryPatterns(staySeatedItinerary);
@@ -160,8 +165,7 @@ class RealtimeResolverTest {
   }
 
   private static List<TripPattern> itineraryPatterns(Itinerary itinerary) {
-    return itinerary
-      .legs()
+    return itinerary.legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)

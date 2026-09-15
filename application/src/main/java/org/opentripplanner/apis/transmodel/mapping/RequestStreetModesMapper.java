@@ -10,8 +10,8 @@ import org.opentripplanner.street.model.StreetMode;
 
 class RequestStreetModesMapper {
 
-  private static final Predicate<StreetMode> IS_BIKE_OR_CAR = m ->
-    m == StreetMode.BIKE || m == StreetMode.CAR;
+  private static final Predicate<StreetMode> IS_BIKE_OR_CAR = m -> m == StreetMode.BIKE ||
+    m == StreetMode.CAR;
   private static final String ACCESS_MODE_KEY = "accessMode";
   private static final String EGRESS_MODE_KEY = "egressMode";
   private static final String DIRECT_MODE_KEY = "directMode";
@@ -19,7 +19,8 @@ class RequestStreetModesMapper {
   /**
    * Maps GraphQL Modes input type to RequestModes.
    * <p>
-   * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
+   * This only maps access, egress, direct & transfer modes. Transport modes are set using
+   * filters.
    */
   static RequestModes mapRequestStreetModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();

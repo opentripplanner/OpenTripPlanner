@@ -37,8 +37,7 @@ class TileJsonTest {
       "/otp_ct/vectorTiles",
       "otp_ct/vectorTiles/",
       "otp_ct/vectorTiles///",
-      "///otp_ct/vectorTiles/",
-    }
+      "///otp_ct/vectorTiles/", }
   )
   void overrideBasePath(String basePath) {
     var req = HttpForTest.containerRequest();

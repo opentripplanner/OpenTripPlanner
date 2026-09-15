@@ -24,9 +24,9 @@ public class SameEdgeAdjuster {
   private SameEdgeAdjuster() {}
 
   /**
-   * Utility class. If the from, to or via vertices are generated and lie along some of the same edges,
-   * we need to wire them up along those edges so that we don't get odd circuitous routes for really
-   * short trips.
+   * Utility class. If the from, to or via vertices are generated and lie along some of the same
+   * edges, we need to wire them up along those edges so that we don't get odd circuitous routes for
+   * really short trips.
    */
   public static DisposableEdgeCollection adjust(Vertex from, Vertex to, Graph graph) {
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph, Scope.REQUEST);
@@ -41,11 +41,10 @@ public class SameEdgeAdjuster {
         Vertex toVertex = outgoing.getToVertex();
         if (
           outgoing instanceof TemporaryFreeEdge &&
-          toVertex instanceof StreetVertex &&
-          toVertex
-            .getOutgoing()
-            .stream()
-            .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)
+            toVertex instanceof StreetVertex &&
+            toVertex.getOutgoing()
+              .stream()
+              .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)
         ) {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
@@ -61,8 +60,8 @@ public class SameEdgeAdjuster {
         Vertex fromVertex = incoming.getFromVertex();
         if (
           incoming instanceof TemporaryFreeEdge &&
-          fromVertex instanceof StreetVertex &&
-          fromVertex.hasAnyIncomingMatching(edge -> edge instanceof TemporaryPartialStreetEdge)
+            fromVertex instanceof StreetVertex &&
+            fromVertex.hasAnyIncomingMatching(edge -> edge instanceof TemporaryPartialStreetEdge)
         ) {
           // The vertex is connected with an TemporaryFreeEdge connector to the
           // TemporaryPartialStreetEdge
@@ -100,8 +99,8 @@ public class SameEdgeAdjuster {
   }
 
   /**
-   * Find all parent edges ({@link TemporaryPartialStreetEdge#getParentEdge()}) for {@link
-   * Vertex#getIncoming()} and {@link Vertex#getIncoming()} edges. Edges of other types are
+   * Find all parent edges ({@link TemporaryPartialStreetEdge#getParentEdge()}) for
+   * {@link Vertex#getIncoming()} and {@link Vertex#getIncoming()} edges. Edges of other types are
    * ignored.
    */
   private static Set<StreetEdge> getConnectedParentEdges(Vertex loc) {

@@ -77,7 +77,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   /**
    * Constructs an itinerary mapper for a request and a set of results
    *
-   * @param raptorTransitData          the currently active transit layer (may have real-time data
+   * @param raptorTransitData     the currently active transit layer (may have real-time data
    *                              applied)
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
@@ -126,7 +126,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       if (pathLeg.isTransitLeg()) {
         if (
           OTPFeature.ExtraTransferLegOnSameStop.isOn() &&
-          isPathTransferAtSameStop(previousLeg, pathLeg)
+            isPathTransferAtSameStop(previousLeg, pathLeg)
         ) {
           legs.add(createTransferLegAtSameStop(previousLeg, pathLeg));
         }
@@ -164,8 +164,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .withEgressPenalty(egressPenalty);
 
     // Map general itinerary fields
-    var arrivedOnRental = egressPathLeg
-      .egress()
+    var arrivedOnRental = egressPathLeg.egress()
       .findOriginal(RoutingAccessEgress.class)
       .stream()
       .anyMatch(leg -> leg.getFinalState().isRentingVehicleFromStation());
@@ -189,13 +188,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     PathLeg<T> previousLeg,
     PathLeg<T> currentLeg
   ) {
-    return (
-      previousLeg != null &&
+    return (previousLeg != null &&
       previousLeg.isTransitLeg() &&
       currentLeg.isTransitLeg() &&
       !previousLeg.asTransitLeg().isStaySeatedOntoNextLeg() &&
-      previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop()
-    );
+      previousLeg.asTransitLeg().toStop() == currentLeg.asTransitLeg().fromStop());
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
@@ -204,8 +201,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
 
     if (accessPathLeg.access() instanceof CarpoolAccessEgress) {
-      return carpoolItineraryMapper
-        .toItinerary((CarpoolAccessEgress) accessPathLeg.access())
+      return carpoolItineraryMapper.toItinerary((CarpoolAccessEgress) accessPathLeg.access())
         .legs();
     }
 
@@ -231,8 +227,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     if (tripSchedule.isFrequencyBasedTrip()) {
       int frequencyHeadwayInSeconds = tripSchedule.frequencyHeadwayInSeconds();
-      return new FrequencyTransitLegBuilder()
-        .withTripTimes(tripSchedule.getOriginalTripTimes())
+      return new FrequencyTransitLegBuilder().withTripTimes(tripSchedule.getOriginalTripTimes())
         .withTripPattern(tripSchedule.getOriginalTripPattern())
         .withBoardStopIndexInPattern(boardStopIndexInPattern)
         .withAlightStopIndexInPattern(alightStopIndexInPattern)
@@ -263,8 +258,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     TripOnServiceDate tripOnServiceDate = getTripOnServiceDate(tripSchedule);
 
-    return new ScheduledTransitLegBuilder<>()
-      .withTripTimes(tripSchedule.getOriginalTripTimes())
+    return new ScheduledTransitLegBuilder<>().withTripTimes(tripSchedule.getOriginalTripTimes())
       .withTripPattern(tripSchedule.getOriginalTripPattern())
       .withBoardStopIndexInPattern(boardStopIndexInPattern)
       .withAlightStopIndexInPattern(alightStopIndexInPattern)
@@ -310,8 +304,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   /**
    * If a routing result transfers at the very same stop, RAPTOR doesn't add a path leg. However,
-   * sometimes we want to create a zero distance leg so a UI can show a transfer. Since it would
-   * be considered backwards-incompatible, this is an opt-in feature.
+   * sometimes we want to create a zero distance leg so a UI can show a transfer. Since it would be
+   * considered backwards-incompatible, this is an opt-in feature.
    */
   private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
     var transferStop = Place.forStop(raptorTransitData.getStopByIndex(previousLeg.toStop()));
@@ -353,8 +347,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     if (egressPathLeg.egress() instanceof CarpoolAccessEgress) {
       // TODO refactor this to return legs directly
-      return carpoolItineraryMapper
-        .toItinerary((CarpoolAccessEgress) egressPathLeg.egress())
+      return carpoolItineraryMapper.toItinerary((CarpoolAccessEgress) egressPathLeg.egress())
         .legs();
     }
 
@@ -402,15 +395,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       );
     }
     // We need to timeshift the toLegs
-    long toDuration = toLegs
-      .stream()
-      .mapToLong(l -> l.duration().toSeconds())
-      .sum();
+    long toDuration = toLegs.stream().mapToLong(l -> l.duration().toSeconds()).sum();
 
-    toLegs = toLegs
-      .stream()
-      .map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration)))
-      .toList();
+    toLegs = toLegs.stream().map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration))).toList();
 
     return ListUtils.combine(fromLegs, toLegs);
   }
@@ -461,24 +448,20 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   /**
    * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
    * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
-   * TODO: the logic should be revisited when adding support for transfer between on-board flex
-   *       access and transit.
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/5086. TODO: the logic should be
+   * revisited when adding support for transfer between on-board flex access and transit.
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
-    return (
-      transitLegBeforeTransfer == null ||
+    return (transitLegBeforeTransfer == null ||
       transitLegBeforeTransfer.transferToNextLeg() == null ||
-      !transitLegBeforeTransfer.transferToNextLeg().getTransferConstraint().isStaySeated()
-    );
+      !transitLegBeforeTransfer.transferToNextLeg().getTransferConstraint().isStaySeated());
   }
 
   private List<Leg> mapAccessEgressToLegs(
     RaptorAccessEgress accessEgress,
     ZonedDateTime startTime
   ) {
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
+    return accessEgress.findOriginal(RoutingAccessEgress.class)
       .map(RoutingAccessEgress::getFinalState)
       .map(StreetPath::new)
       .map(path -> streetPathToLegsMapper.map(path, request, startTime))
@@ -489,8 +472,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (accessEgress instanceof RaptorStartOnBoardAccess) {
       return TimeAndCost.ZERO;
     }
-    return accessEgress
-      .findOriginal(RoutingAccessEgress.class)
+    return accessEgress.findOriginal(RoutingAccessEgress.class)
       .map(RoutingAccessEgress::penalty)
       .orElseThrow();
   }

@@ -55,8 +55,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     TransferRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
     FareModule.class,
-    DeduplicatorServiceModule.class,
-  }
+    DeduplicatorServiceModule.class, }
 )
 public interface LoadApplicationFactory {
   OtpDataStore datastore();

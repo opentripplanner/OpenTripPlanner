@@ -23,8 +23,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   private final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
-  private final Route RAIL_ROUTE = ENV_BUILDER.route("RailRoute", r ->
-    r.withMode(TransitMode.RAIL)
+  private final Route RAIL_ROUTE = ENV_BUILDER.route(
+    "RailRoute",
+    r -> r.withMode(TransitMode.RAIL)
   );
 
   @Test
@@ -55,8 +56,7 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   @Test
   void nonRailTripIsNotIndexedByInternalPlanningCode() {
     var busRoute = ENV_BUILDER.route("BusRoute", r -> r.withMode(TransitMode.BUS));
-    var busTrip = tripInput(TRIP_1_ID)
-      .withRoute(busRoute)
+    var busTrip = tripInput(TRIP_1_ID).withRoute(busRoute)
       .withNetexInternalPlanningCode(PLANNING_CODE);
     var env = ENV_BUILDER.addTrip(busTrip).build();
 
@@ -108,8 +108,7 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   }
 
   private TripInput railTrip(String tripId, String internalPlanningCode) {
-    return tripInput(tripId)
-      .withRoute(RAIL_ROUTE)
+    return tripInput(tripId).withRoute(RAIL_ROUTE)
       .withNetexInternalPlanningCode(internalPlanningCode);
   }
 
@@ -120,9 +119,6 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   }
 
   private static Set<String> tripIds(Set<Trip> trips) {
-    return trips
-      .stream()
-      .map(trip -> trip.getId().getId())
-      .collect(Collectors.toSet());
+    return trips.stream().map(trip -> trip.getId().getId()).collect(Collectors.toSet());
   }
 }

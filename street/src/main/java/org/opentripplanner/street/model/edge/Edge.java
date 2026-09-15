@@ -27,9 +27,9 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   protected final Vertex tov;
 
   /**
-   * Create an edge from the origin vertex to the destination vertex.
-   * The created edge is disconnected from the graph.
-   * Call {@link #connectToGraph()} to connect the edge to the graph.
+   * Create an edge from the origin vertex to the destination vertex. The created edge is
+   * disconnected from the graph. Call {@link #connectToGraph()} to connect the edge to the graph.
+   *
    * @param v1 origin vertex
    * @param v2 destination vertex
    */
@@ -59,10 +59,8 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * Returns true if this edge is the reverse of another.
    */
   public final boolean isReverseOf(Edge e) {
-    return (
-      this.getFromVertex().getParent() == e.getToVertex().getParent() &&
-      this.getToVertex().getParent() == e.getFromVertex().getParent()
-    );
+    return (this.getFromVertex().getParent() == e.getToVertex().getParent() &&
+      this.getToVertex().getParent() == e.getFromVertex().getParent());
   }
 
   /**
@@ -100,9 +98,9 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   /**
-   * Edges use object identity (reference equality) for {@code equals} and {@code hashCode}.
-   * This makes edge lookups in sets and maps efficient and avoids ambiguity during graph
-   * construction, where structurally similar edges may coexist.
+   * Edges use object identity (reference equality) for {@code equals} and {@code hashCode}. This
+   * makes edge lookups in sets and maps efficient and avoids ambiguity during graph construction,
+   * where structurally similar edges may coexist.
    * <p>
    * <strong>Do not use this method to test whether two edges represent the same street segment
    * or share the same content.</strong>
@@ -164,11 +162,11 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   public abstract I18NString getName();
 
   /**
-   * Returns true if this edge has a generated name that is derived from its properties,
-   * like "path", "stairs" or "tunnel".
+   * Returns true if this edge has a generated name that is derived from its properties, like
+   * "path", "stairs" or "tunnel".
    * <p>
-   * Returns false if the field reflects the real world name, like "Fifth Avenue",
-   * "Hauptstraße" or "Øvre Holmegate".
+   * Returns false if the field reflects the real world name, like "Fifth Avenue", "Hauptstraße"
+   * or "Øvre Holmegate".
    */
   public boolean nameIsDerived() {
     return false;
@@ -178,8 +176,8 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     return null;
   }
 
-  /// Whether this geometry should be included in the final path geometry presented to the user.
-  /// Set this to false for geometries that we only want to display in the debug ui.
+  /// Whether this geometry should be included in the final path geometry presented to the user. Set
+  /// this to false for geometries that we only want to display in the debug ui.
   public boolean includeGeometryInPath() {
     return true;
   }
@@ -194,9 +192,9 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
 
   /**
    * The distance to walk adjusted for elevation and obstacles. This is used together with the
-   * walking speed to find the actual walking transfer time. This plus {@link
-   * #getDistanceIndependentTime()} is used to calculate the actual-transfer-time given a walking
-   * speed.
+   * walking speed to find the actual walking transfer time. This plus
+   * {@link #getDistanceIndependentTime()} is used to calculate the actual-transfer-time given a
+   * walking speed.
    * <p>
    * Unit: meters. Default: 0.
    */

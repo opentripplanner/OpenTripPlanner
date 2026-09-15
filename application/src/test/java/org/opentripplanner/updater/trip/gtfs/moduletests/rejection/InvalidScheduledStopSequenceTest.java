@@ -38,8 +38,7 @@ class InvalidScheduledStopSequenceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var update = rt.tripUpdateScheduled(TRIP_1_ID)
       .addDelayedStopTime(2, 10)
       .addDelayedStopTime(1, 10)
       .build();

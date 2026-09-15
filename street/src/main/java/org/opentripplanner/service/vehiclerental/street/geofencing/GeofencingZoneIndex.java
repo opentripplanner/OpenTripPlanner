@@ -16,8 +16,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 
 /**
  * Spatial index for efficient geofencing zone containment queries. Uses an STRtree for
- * envelope-based candidate filtering, then precise geometry containment checks via
- * PreparedGeometry for performance.
+ * envelope-based candidate filtering, then precise geometry containment checks via PreparedGeometry
+ * for performance.
  */
 public class GeofencingZoneIndex {
 
@@ -50,8 +50,7 @@ public class GeofencingZoneIndex {
   public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
     var point = GeometryUtils.getGeometryFactory().createPoint(coord);
     List<GeofencingZone> candidates = index.query(new Envelope(coord));
-    return candidates
-      .stream()
+    return candidates.stream()
       .filter(z -> preparedGeometries.get(z).covers(point))
       .collect(Collectors.toSet());
   }

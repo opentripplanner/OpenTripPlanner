@@ -50,11 +50,11 @@ public class WordList {
   @Override
   public String toString() {
     switch (words.size()) {
-      case 0:
+      case 0 :
         return "";
-      case 1:
+      case 1 :
         return words.getFirst();
-      default:
+      default :
         var buf = new StringBuilder(words.get(0));
         for (int i = 1; i < words.size() - 1; i++) {
           buf.append(", ").append(words.get(i));

@@ -79,8 +79,7 @@ public class StreetModelFactory {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(vA)
+    return new StreetEdgeBuilder<>().withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withName(name)
@@ -111,8 +110,7 @@ public class StreetModelFactory {
 
     AreaGroup AREA = AreaGroup.of(null).build();
 
-    return new AreaEdgeBuilder()
-      .withFromVertex(vA)
+    return new AreaEdgeBuilder().withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withPermission(perm)
@@ -133,9 +131,8 @@ public class StreetModelFactory {
     RentalFormFactor formFactor,
     Instant availableUntil
   ) {
-    TestFreeFloatingRentalVehicleBuilder vehicleBuilder = getTestRentalVehicleBuilder(
-      formFactor
-    ).withAvailableUntil(availableUntil);
+    TestFreeFloatingRentalVehicleBuilder vehicleBuilder = getTestRentalVehicleBuilder(formFactor)
+      .withAvailableUntil(availableUntil);
     return new VehicleRentalPlaceVertex(vehicleBuilder.build());
   }
 
@@ -214,8 +211,7 @@ public class StreetModelFactory {
     double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
 
     if (endVertex) {
-      new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(street)
+      new TemporaryPartialStreetEdgeBuilder().withParentEdge(street)
         .withFromVertex(fromv)
         .withToVertex(base)
         .withGeometry(geometries.beginning())
@@ -227,8 +223,7 @@ public class StreetModelFactory {
         .withLink(street.isLink())
         .buildAndConnect();
     } else {
-      new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(street)
+      new TemporaryPartialStreetEdgeBuilder().withParentEdge(street)
         .withFromVertex(base)
         .withToVertex(tov)
         .withGeometry(geometries.ending())

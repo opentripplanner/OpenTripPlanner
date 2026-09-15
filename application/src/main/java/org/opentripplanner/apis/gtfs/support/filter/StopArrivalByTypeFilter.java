@@ -25,16 +25,15 @@ public class StopArrivalByTypeFilter {
   }
 
   /**
-   * Filters a list of {@link StopArrival} objects based on allowed stop types.
-   * If the list of arrivals is null or no allowed stop types are configured, the
-   * original list of arrivals is returned.
+   * Filters a list of {@link StopArrival} objects based on allowed stop types. If the list of
+   * arrivals is null or no allowed stop types are configured, the original list of arrivals is
+   * returned.
    */
   public List<StopArrival> filter(@Nullable List<StopArrival> arrivals) {
     if (allowedTypes == null || arrivals == null) {
       return arrivals;
     } else {
-      return arrivals
-        .stream()
+      return arrivals.stream()
         .filter(arrival -> allowedTypes.contains(arrival.place.stop.getStopType()))
         .toList();
     }
@@ -44,17 +43,11 @@ public class StopArrivalByTypeFilter {
     if (types == null) {
       return null;
     } else {
-      var allowed = types
-        .stream()
-        .map(
-          type ->
-            switch (type) {
-              case LOCATION -> StopType.FLEXIBLE_AREA;
-              case LOCATION_GROUP -> StopType.FLEXIBLE_GROUP;
-              case STOP -> StopType.REGULAR;
-            }
-        )
-        .collect(Collectors.toSet());
+      var allowed = types.stream().map(type -> switch (type) {
+        case LOCATION -> StopType.FLEXIBLE_AREA;
+        case LOCATION_GROUP -> StopType.FLEXIBLE_GROUP;
+        case STOP -> StopType.REGULAR;
+      }).collect(Collectors.toSet());
       return EnumSetUtils.unmodifiableEnumSet(allowed, StopType.class);
     }
   }

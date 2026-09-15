@@ -20,8 +20,7 @@ public class StreetElevationExtensionBuilder {
   private boolean isSlopeOverride;
 
   public static StreetElevationExtensionBuilder of(StreetEdge streetEdge) {
-    return new StreetElevationExtensionBuilder()
-      .withComputed(true)
+    return new StreetElevationExtensionBuilder().withComputed(true)
       .withDistanceInMeters(streetEdge.getDistanceMeters())
       .withSlopeOverride(streetEdge.isSlopeOverride())
       .withStairs(streetEdge.isStairs())
@@ -30,8 +29,7 @@ public class StreetElevationExtensionBuilder {
   }
 
   public static StreetElevationExtensionBuilder of(StreetEdgeBuilder<?> seb) {
-    return new StreetElevationExtensionBuilder()
-      .withComputed(true)
+    return new StreetElevationExtensionBuilder().withComputed(true)
       .withSlopeOverride(seb.slopeOverride())
       .withStairs(seb.stairs())
       .withWalkSafetyFactor(seb.walkSafetyFactor())

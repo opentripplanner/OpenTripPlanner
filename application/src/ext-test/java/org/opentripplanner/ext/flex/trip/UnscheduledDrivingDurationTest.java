@@ -21,8 +21,11 @@ class UnscheduledDrivingDurationTest {
     fromv,
     tov,
     boardStopPosition,
-    alightStopPosition
-  ) -> new FlexPath(10_000, (int) Duration.ofMinutes(10).toSeconds(), () -> LineStrings.SIMPLE);
+    alightStopPosition) -> new FlexPath(
+      10_000,
+      (int) Duration.ofMinutes(10).toSeconds(),
+      () -> LineStrings.SIMPLE
+    );
   private static final StopTime STOP_TIME = FlexStopTimesFactory.area("10:00", "18:00");
 
   @Test

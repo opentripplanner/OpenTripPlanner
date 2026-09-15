@@ -101,8 +101,9 @@ class ScheduledTripTimesTest {
 
   @Test
   void validateLastArrivalTimeIsNotMoreThan20DaysAfterFirstDepartureTime() {
-    var ex = assertThrows(DataValidationException.class, () ->
-      ScheduledTripTimes.of()
+    var ex = assertThrows(
+      DataValidationException.class,
+      () -> ScheduledTripTimes.of()
         .withDepartureTimes("10:00 12:00 10:00:01+20d")
         .withServiceCode(SERVICE_CODE)
         .withTrip(TRIP)

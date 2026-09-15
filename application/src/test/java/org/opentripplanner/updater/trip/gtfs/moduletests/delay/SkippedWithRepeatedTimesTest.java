@@ -33,8 +33,7 @@ class SkippedWithRepeatedTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var tripUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addStopTime(STOP_A_ID, "10:00:00")
       .addSkippedStop(STOP_B_ID, "10:01:00")
       .addStopTime(STOP_C_ID, "10:01:00")

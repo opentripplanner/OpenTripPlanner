@@ -34,8 +34,7 @@ public class NoticeAssignmentMapperTest {
   private static final String TIMETABLED_PASSING_TIME1 = "RUT:TimetabledPassingTime:1";
   private static final String TIMETABLED_PASSING_TIME2 = "RUT:TimetabledPassingTime:2";
 
-  private static final Notice NOTICE = new org.rutebanken.netex.model.Notice()
-    .withId(NOTICE_ID)
+  private static final Notice NOTICE = new org.rutebanken.netex.model.Notice().withId(NOTICE_ID)
     .withPublicCode("Notice Code")
     .withText(new MultilingualString().withValue("Notice text"));
 
@@ -61,13 +60,10 @@ public class NoticeAssignmentMapperTest {
       new HierarchicalMap<>()
     );
 
-    Multimap<
-      AbstractTransitEntity,
-      org.opentripplanner.transit.model.basic.Notice
-    > noticesByElement = noticeAssignmentMapper.map(noticeAssignment);
+    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement =
+      noticeAssignmentMapper.map(noticeAssignment);
 
-    org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement
-      .get(route)
+    org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement.get(route)
       .iterator()
       .next();
 
@@ -97,9 +93,9 @@ public class NoticeAssignmentMapperTest {
 
     noticesById.add(NOTICE);
 
-    NoticeAssignment noticeAssignment = new NoticeAssignment()
-      .withNoticedObjectRef(new VersionOfObjectRefStructure().withRef(STOP_POINT_ID))
-      .withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
+    NoticeAssignment noticeAssignment = new NoticeAssignment().withNoticedObjectRef(
+      new VersionOfObjectRefStructure().withRef(STOP_POINT_ID)
+    ).withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
       DataImportIssueStore.NOOP,
@@ -111,30 +107,23 @@ public class NoticeAssignmentMapperTest {
       stopTimesById
     );
 
-    Multimap<
-      AbstractTransitEntity,
-      org.opentripplanner.transit.model.basic.Notice
-    > noticesByElement = noticeAssignmentMapper.map(noticeAssignment);
+    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement =
+      noticeAssignmentMapper.map(noticeAssignment);
 
-    org.opentripplanner.transit.model.basic.Notice notice2a = noticesByElement
-      .get(stopTime1.getId())
-      .stream()
-      .findFirst()
-      .orElseThrow(IllegalStateException::new);
+    org.opentripplanner.transit.model.basic.Notice notice2a = noticesByElement.get(
+      stopTime1.getId()
+    ).stream().findFirst().orElseThrow(IllegalStateException::new);
 
-    org.opentripplanner.transit.model.basic.Notice notice2b = noticesByElement
-      .get(stopTime2.getId())
-      .stream()
-      .findFirst()
-      .orElseThrow(IllegalStateException::new);
+    org.opentripplanner.transit.model.basic.Notice notice2b = noticesByElement.get(
+      stopTime2.getId()
+    ).stream().findFirst().orElseThrow(IllegalStateException::new);
 
     assertEquals(NOTICE_ID, notice2a.getId().getId());
     assertEquals(NOTICE_ID, notice2b.getId().getId());
   }
 
   private static TimetabledPassingTime createTimetabledPassingTime(String id, String stopPointId) {
-    return new TimetabledPassingTime()
-      .withId(id)
+    return new TimetabledPassingTime().withId(id)
       .withPointInJourneyPatternRef(
         MappingSupport.createJaxbElement(
           new PointInJourneyPatternRefStructure().withRef(stopPointId)

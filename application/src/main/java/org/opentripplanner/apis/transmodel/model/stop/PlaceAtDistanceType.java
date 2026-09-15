@@ -73,8 +73,7 @@ public class PlaceAtDistanceType {
 
     if (placeTypes == null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
       // Convert quays to stop places
-      List<PlaceAtDistance> stations = places
-        .stream()
+      List<PlaceAtDistance> stations = places.stream()
         // Find all stops
         .filter(p -> p.place() instanceof RegularStop)
         // Get their parent stations (possibly including multimodal parents)
@@ -89,8 +88,7 @@ public class PlaceAtDistanceType {
 
       if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
         // Remove quays if only stop places are requested
-        places = places
-          .stream()
+        places = places.stream()
           .filter(p -> !(p.place() instanceof RegularStop))
           .collect(Collectors.toList());
       }
@@ -98,10 +96,7 @@ public class PlaceAtDistanceType {
     places.sort(Comparator.comparing(PlaceAtDistance::distance));
 
     Set<Object> uniquePlaces = new HashSet<>();
-    return places
-      .stream()
-      .filter(s -> uniquePlaces.add(s.place()))
-      .collect(Collectors.toList());
+    return places.stream().filter(s -> uniquePlaces.add(s.place())).collect(Collectors.toList());
   }
 
   private static Stream<PlaceAtDistance> getStopPlaces(

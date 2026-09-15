@@ -41,13 +41,11 @@ class CancellationDeletionTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, boolean cancelled, boolean deleted) {
-    var env = envBuilder
-      .addTrip(
-        TripInput.of(TRIP_1_ID)
-          .addStop(STOP_A, "0:00:10", "0:00:11")
-          .addStop(STOP_B, "0:00:20", "0:00:21")
-      )
-      .build();
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID)
+        .addStop(STOP_A, "0:00:10", "0:00:11")
+        .addStop(STOP_B, "0:00:20", "0:00:21")
+    ).build();
     var rt = GtfsRtTestHelper.of(env);
 
     var update = rt.tripUpdate(TRIP_1_ID, relationship).build();
@@ -64,34 +62,32 @@ class CancellationDeletionTest implements RealtimeTestConstants {
 
   /**
    * Test behavior of the realtime system in a case related to #5725 that is discussed at:
-   * https://github.com/opentripplanner/OpenTripPlanner/pull/5726#discussion_r1521653840
-   * When a trip is added by a realtime message, in the realtime data indexes a corresponding
-   * trip pattern should be associated with the stops that trip visits. When a subsequent
-   * realtime message cancels or deletes that trip, the pattern should continue to be present in
-   * the realtime data indexes, and it should still contain the previously added trip, but that
-   * trip should be marked as having canceled or deleted status. At no point should the trip
-   * added by realtime data be present in the trip pattern for scheduled service.
+   * https://github.com/opentripplanner/OpenTripPlanner/pull/5726#discussion_r1521653840 When a trip
+   * is added by a realtime message, in the realtime data indexes a corresponding trip pattern
+   * should be associated with the stops that trip visits. When a subsequent realtime message
+   * cancels or deletes that trip, the pattern should continue to be present in the realtime data
+   * indexes, and it should still contain the previously added trip, but that trip should be marked
+   * as having canceled or deleted status. At no point should the trip added by realtime data be
+   * present in the trip pattern for scheduled service.
    */
   @ParameterizedTest
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, boolean cancelled, boolean deleted) {
     // just to set the scheduling period
-    var env = envBuilder
-      .addTrip(
-        TripInput.of(TRIP_1_ID)
-          // just to set the scheduling period
-          .withServiceDates(envBuilder.defaultServiceDate())
-          .addStop(STOP_A, "0:00:10", "0:00:11")
-          .addStop(STOP_B, "0:00:20", "0:00:21")
-      )
+    var env = envBuilder.addTrip(
+      TripInput.of(TRIP_1_ID)
+        // just to set the scheduling period
+        .withServiceDates(envBuilder.defaultServiceDate())
+        .addStop(STOP_A, "0:00:10", "0:00:11")
+        .addStop(STOP_B, "0:00:20", "0:00:21")
+    )
       // the added trip below also visits stop C
       .addStops(STOP_C_ID)
       .build();
     var rt = GtfsRtTestHelper.of(env);
     var addedTripId = "added-trip";
     // First add ADDED trip
-    var update = rt
-      .tripUpdate(addedTripId, ScheduleRelationship.ADDED)
+    var update = rt.tripUpdate(addedTripId, ScheduleRelationship.ADDED)
       .addStopTime(STOP_A_ID, "00:30")
       .addStopTime(STOP_B_ID, "00:40")
       .addStopTime(STOP_C_ID, "00:55")

@@ -79,8 +79,8 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(env ->
-            idMapper.mapToApi(((MonoOrMultiModalStation) env.getSource()).getId())
+          .dataFetcher(
+            env -> idMapper.mapToApi(((MonoOrMultiModalStation) env.getSource()).getId())
           )
           .build()
       )
@@ -107,9 +107,8 @@ public class StopPlaceType {
               .type(Scalars.GraphQLString)
               .build()
           )
-          .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource())
-              .getName()
+          .dataFetcher(
+            environment -> ((MonoOrMultiModalStation) environment.getSource()).getName()
               .toString(GqlUtil.getLocale(environment))
           )
           .build()
@@ -132,8 +131,8 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment ->
-            GraphQLUtils.getTranslation(
+          .dataFetcher(
+            environment -> GraphQLUtils.getTranslation(
               ((MonoOrMultiModalStation) environment.getSource()).getDescription(),
               environment
             )
@@ -156,8 +155,8 @@ public class StopPlaceType {
           .name("stopInterchangePriority")
           .description("Specify the priority of interchanges at this stop")
           .type(EnumTypes.STOP_INTERCHANGE_PRIORITY)
-          .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource()).getPriority()
+          .dataFetcher(
+            environment -> ((MonoOrMultiModalStation) environment.getSource()).getPriority()
           )
           .build()
       )
@@ -174,9 +173,8 @@ public class StopPlaceType {
           .name("transportMode")
           .description("The transport modes of quays under this stop place.")
           .type(new GraphQLList(EnumTypes.TRANSPORT_MODE))
-          .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource())
-              .getChildStops()
+          .dataFetcher(
+            environment -> ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
               .map(StopLocation::getVehicleType)
               .filter(Objects::nonNull)
@@ -189,9 +187,8 @@ public class StopPlaceType {
           .name("transportSubmode")
           .description("The transport submode serviced by this stop place.")
           .type(new GraphQLList(EnumTypes.TRANSPORT_SUBMODE))
-          .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource())
-              .getChildStops()
+          .dataFetcher(
+            environment -> ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
               .map(StopLocation::getNetexVehicleSubmode)
               .filter(it -> it != SubMode.UNKNOWN)
@@ -212,8 +209,8 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("timeZone")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment ->
-            Optional.ofNullable(
+          .dataFetcher(
+            environment -> Optional.ofNullable(
               ((MonoOrMultiModalStation) environment.getSource()).getTimezone()
             ).map(ZoneId::getId)
           )
@@ -236,12 +233,9 @@ public class StopPlaceType {
           .dataFetcher(environment -> {
             var quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
             if (TRUE.equals(environment.getArgument("filterByInUse"))) {
-              quays = quays
-                .stream()
-                .filter(stop -> {
-                  return !GqlUtil.getTransitService(environment).findPatterns(stop, true).isEmpty();
-                })
-                .collect(Collectors.toList());
+              quays = quays.stream().filter(stop -> {
+                return !GqlUtil.getTransitService(environment).findPatterns(stop, true).isEmpty();
+              }).collect(Collectors.toList());
             }
             return quays;
           })
@@ -252,8 +246,8 @@ public class StopPlaceType {
           .name("parent")
           .description("Returns parent stop for this stop")
           .type(new GraphQLTypeReference(NAME))
-          .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource()).getParentStation()
+          .dataFetcher(
+            environment -> ((MonoOrMultiModalStation) environment.getSource()).getParentStation()
           )
           .build()
       )
@@ -261,9 +255,8 @@ public class StopPlaceType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tariffZones")
           .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-          .dataFetcher(environment ->
-            ((MonoOrMultiModalStation) environment.getSource())
-              .getChildStops()
+          .dataFetcher(
+            environment -> ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
               .stream()
               .flatMap(s -> s.getFareZones().stream())
               .distinct()
@@ -396,16 +389,14 @@ public class StopPlaceType {
               var mapper = new TripTimeOnDateFilterMapper(idMapper);
               requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
             }
-            requestBuilder
-              .withIncludeAgencies(
-                whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
-              )
+            requestBuilder.withIncludeAgencies(
+              whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
+            )
               .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
               .withIncludeModes(transitModes);
 
-            var tripTimes = GqlUtil.getTransitService(environment).findTripTimesOnDate(
-              requestBuilder.build()
-            );
+            var tripTimes = GqlUtil.getTransitService(environment)
+              .findTripTimesOnDate(requestBuilder.build());
 
             return EstimatedCallHelper.limitPerLineAndDestinationDisplay(
               tripTimes,
@@ -421,10 +412,9 @@ public class StopPlaceType {
             "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
-          .dataFetcher(env ->
-            GqlUtil.getTransitAlertService(env).getStopAlerts(
-              ((MonoOrMultiModalStation) env.getSource()).getId()
-            )
+          .dataFetcher(
+            env -> GqlUtil.getTransitAlertService(env)
+              .getStopAlerts(((MonoOrMultiModalStation) env.getSource()).getId())
           )
           .build()
       )
@@ -472,8 +462,7 @@ public class StopPlaceType {
       new Coordinate(maxLon, maxLat)
     );
 
-    Stream<Station> stations = transitService
-      .findRegularStopsByBoundingBox(envelope)
+    Stream<Station> stations = transitService.findRegularStopsByBoundingBox(envelope)
       .stream()
       .map(StopLocation::getParentStation)
       .filter(Objects::nonNull)
@@ -489,12 +478,10 @@ public class StopPlaceType {
 
     // "child" - Only mono modal children stop places, not their multi modal parent stop
     if ("child".equals(multiModalMode)) {
-      return stations
-        .map(s -> {
-          MultiModalStation parent = transitService.findMultiModalStation(s);
-          return new MonoOrMultiModalStation(s, parent);
-        })
-        .collect(Collectors.toList());
+      return stations.map(s -> {
+        MultiModalStation parent = transitService.findMultiModalStation(s);
+        return new MonoOrMultiModalStation(s, parent);
+      }).collect(Collectors.toList());
     }
     // "all" - Both multiModal parents and their mono modal child stop places
     else if ("all".equals(multiModalMode)) {

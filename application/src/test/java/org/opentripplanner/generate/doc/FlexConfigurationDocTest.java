@@ -58,14 +58,12 @@ public class FlexConfigurationDocTest {
   }
 
   private void addParameterSummaryTable(DocBuilder buf, NodeAdapter node) {
-    buf
-      .header(3, "Overview", null)
+    buf.header(3, "Overview", null)
       .addSection(new ParameterSummaryTable(SKIP_NODES).createTable(node).toMarkdownTable());
   }
 
   private void addDetailsSection(DocBuilder buf, NodeAdapter node) {
-    buf
-      .header(3, "Details", null)
+    buf.header(3, "Details", null)
       .addSection(ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_4));
   }
 

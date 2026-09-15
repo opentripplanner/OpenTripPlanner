@@ -11,9 +11,8 @@ import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 /**
  * Wires one {@code (RepositoryRegistry, UpdateManager)} pair per write domain. Each pair has its
  * own transaction sequence and its own single writer thread, so updaters working on unrelated
- * domains run in parallel. Within one registry there must be exactly one {@link UpdateManager} —
- * a second one would break the exclusive access to the mutable repository buffers between
- * commits.
+ * domains run in parallel. Within one registry there must be exactly one {@link UpdateManager} — a
+ * second one would break the exclusive access to the mutable repository buffers between commits.
  */
 @Module
 public abstract class TransactionModule {
@@ -50,14 +49,14 @@ public abstract class TransactionModule {
 
   /**
    * The street domain has no transactional repositories yet, so commits are cheap no-ops and the
-   * manager commits atomically after each task. Its value today is the dedicated writer thread:
-   * the expensive vehicle-rental linking and geofencing work no longer delays timetable updates.
+   * manager commits atomically after each task. Its value today is the dedicated writer thread: the
+   * expensive vehicle-rental linking and geofencing work no longer delays timetable updates.
    * <p>
    * Note that a no-op commit performs no volatile write. Until street repositories join the
    * transaction framework, cross-thread visibility of street-model mutations (edge lists,
    * geofencing boundaries, rental and parking state) relies on the publication built into the
-   * street model itself, not on any commit fence — the same guarantees the street model gave
-   * before the write-domain split.
+   * street model itself, not on any commit fence — the same guarantees the street model gave before
+   * the write-domain split.
    */
   @Provides
   @Singleton

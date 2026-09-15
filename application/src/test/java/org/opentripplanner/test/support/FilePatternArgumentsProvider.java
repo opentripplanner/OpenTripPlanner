@@ -24,9 +24,8 @@ import org.junit.jupiter.params.support.AnnotationConsumer;
  * <p>
  * Check the usages of {@link FilePatternSource} to see examples for how to use.
  */
-class FilePatternArgumentsProvider
-  implements ArgumentsProvider, AnnotationConsumer<FilePatternSource>
-{
+class FilePatternArgumentsProvider implements ArgumentsProvider,
+  AnnotationConsumer<FilePatternSource> {
 
   private List<String> patterns;
 
@@ -40,23 +39,20 @@ class FilePatternArgumentsProvider
 
     var pathsFound = new ArrayList<Path>();
     try {
-      Files.walkFileTree(
-        Paths.get(".."),
-        new SimpleFileVisitor<>() {
-          @Override
-          public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-            if (pathMatcher.matches(path)) {
-              pathsFound.add(path);
-            }
-            return FileVisitResult.CONTINUE;
+      Files.walkFileTree(Paths.get(".."), new SimpleFileVisitor<>() {
+        @Override
+        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+          if (pathMatcher.matches(path)) {
+            pathsFound.add(path);
           }
-
-          @Override
-          public FileVisitResult visitFileFailed(Path file, IOException exc) {
-            return FileVisitResult.CONTINUE;
-          }
+          return FileVisitResult.CONTINUE;
         }
-      );
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) {
+          return FileVisitResult.CONTINUE;
+        }
+      });
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -53,10 +53,10 @@ import org.slf4j.LoggerFactory;
  * gives the corresponding GTFS stop ID for the stop but the exact tag name is configurable. See
  * <a href="https://wiki.openstreetmap.org/wiki/Key:public_transport">the OSM wiki page</a>.
  * <p>
- * This module will attempt to link all transit stops and platforms to such nodes or way centroids
- * in the OSM data, based on the stop ID or stop code and ref tag. It is run before the main transit
- * stop linker, and if no linkage was created here, the main linker should create one based on
- * distance or other heuristics.
+ * This module will attempt to link all transit stops and platforms to such nodes or way
+ * centroids in the OSM data, based on the stop ID or stop code and ref tag. It is run before the
+ * main transit stop linker, and if no linkage was created here, the main linker should create one
+ * based on distance or other heuristics.
  */
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
@@ -76,8 +76,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final Map<Platform, OsmBoardingLocationVertex> existingBoardingLocationsAtAreas;
 
   /**
-   * @param transitRepository This module requires the timetable repository because at the time
-   *                            of the instantiation the site repository is empty.
+   * @param transitRepository This module requires the timetable repository because at the time of
+   *                          the instantiation the site repository is empty.
    */
   @Inject
   public OsmBoardingLocationsModule(
@@ -87,8 +87,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     OsmInfoGraphBuildService osmInfoGraphBuildService
   ) {
     this.graph = graph;
-    this.stopResolver = id ->
-      Objects.requireNonNull(transitRepository.getSiteRepository().getRegularStop(id));
+    this.stopResolver = id -> Objects.requireNonNull(
+      transitRepository.getSiteRepository().getRegularStop(id)
+    );
     this.osmInfoGraphBuildService = osmInfoGraphBuildService;
     this.vertexFactory = new VertexFactory(graph);
     this.linker = linker;
@@ -150,8 +151,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    */
   private boolean connectVertexToArea(TransitStopVertex ts, Graph graph) {
     var stop = stopResolver.getStop(ts.getId());
-    var nearbyAreaGroups = graph
-      .findEdges(getEnvelope(ts))
+    var nearbyAreaGroups = graph.findEdges(getEnvelope(ts))
       .stream()
       .filter(AreaEdge.class::isInstance)
       .map(AreaEdge.class::cast)
@@ -199,32 +199,24 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       });
     }
 
-    return nearbyEdges
-      .entrySet()
-      .stream()
-      .findFirst()
-      .map(platformEdgeList -> {
-        Platform platform = platformEdgeList.getKey();
-        var boardingLocation = getOrMakeBoardingLocationForPlatform(
-          stop,
-          platform,
-          platform.name()
-        );
-        for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
+    return nearbyEdges.entrySet().stream().findFirst().map(platformEdgeList -> {
+      Platform platform = platformEdgeList.getKey();
+      var boardingLocation = getOrMakeBoardingLocationForPlatform(stop, platform, platform.name());
+      for (
+        var vertex : linker.linkToSpecificStreetEdgesPermanently(
           boardingLocation,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          platformEdgeList
-            .getValue()
+          platformEdgeList.getValue()
             .stream()
             .map(StreetEdge.class::cast)
             .collect(Collectors.toSet())
-        )) {
-          linkBoardingLocationToStop(ts, stop.getCode(), vertex);
-        }
-        return true;
-      })
-      .orElse(false);
+        )
+      ) {
+        linkBoardingLocationToStop(ts, stop.getCode(), vertex);
+      }
+      return true;
+    }).orElse(false);
   }
 
   /**
@@ -235,8 +227,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * @return If the vertex has been connected.
    */
   private boolean connectVertexToNode(TransitStopVertex ts, RegularStop stop, Graph graph) {
-    var nearbyBoardingLocations = graph
-      .findVertices(getEnvelope(ts))
+    var nearbyBoardingLocations = graph.findVertices(getEnvelope(ts))
       .stream()
       .filter(OsmBoardingLocationVertex.class::isInstance)
       .map(OsmBoardingLocationVertex.class::cast)
@@ -249,8 +240,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             boardingLocation,
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BIDIRECTIONAL,
-            (osmBoardingLocationVertex, splitVertex) ->
-              getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
+            (osmBoardingLocationVertex, splitVertex) -> getConnectingEdges(
+              boardingLocation,
+              osmBoardingLocationVertex,
+              splitVertex
+            )
           );
         }
         linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
@@ -269,8 +263,14 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     Platform platform,
     I18NString name
   ) {
-    return existingBoardingLocationsAtAreas.computeIfAbsent(platform, _ ->
-      makeBoardingLocation(stop, platform.geometry().getCentroid(), platform.references(), name)
+    return existingBoardingLocationsAtAreas.computeIfAbsent(
+      platform,
+      _ -> makeBoardingLocation(
+        stop,
+        platform.geometry().getCentroid(),
+        platform.references(),
+        name
+      )
     );
   }
 
@@ -307,8 +307,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(from)
+    return new StreetEdgeBuilder<>().withFromVertex(from)
       .withToVertex(to)
       .withGeometry(line)
       .withName(LOCALIZED_PLATFORM_NAME)

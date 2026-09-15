@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verify that {@link TestTripSchedule} satisfies the {@code relativeTravelDuration} contract defined
- * in {@link org.opentripplanner.raptor.spi.RaptorTripSchedule#relativeTravelDuration(int)}.
+ * Verify that {@link TestTripSchedule} satisfies the {@code relativeTravelDuration} contract
+ * defined in {@link org.opentripplanner.raptor.spi.RaptorTripSchedule#relativeTravelDuration(int)}.
  */
 class TestTripScheduleTest {
 

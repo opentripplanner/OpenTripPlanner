@@ -12,20 +12,17 @@ import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters
 public class VehicleRentalUpdaterConfig {
 
   public static VehicleRentalUpdaterParameters create(String configRef, NodeAdapter c) {
-    var sourceType = c
-      .of("sourceType")
+    var sourceType = c.of("sourceType")
       .since(V1_5)
       .summary("What source of vehicle rental updater to use.")
       .asEnum(VehicleRentalSourceType.class);
     return new VehicleRentalUpdaterParameters(
       configRef + "." + sourceType,
-      c
-        .of("frequency")
+      c.of("frequency")
         .since(V1_5)
         .summary("How often the data should be updated.")
         .asDuration(Duration.ofMinutes(1)),
-      c
-        .of("startupRetryPeriod")
+      c.of("startupRetryPeriod")
         .since(V2_10)
         .summary(
           "How long to retry loading the vehicle rental data source on startup if it initially fails."

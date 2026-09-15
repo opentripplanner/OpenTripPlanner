@@ -40,46 +40,48 @@ class AccessEgressRouterTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    var otpModel = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(100));
-          var C = intersection("C", ORIGIN.moveEastMeters(200));
-          var D = intersection("D", ORIGIN.moveEastMeters(300));
-          var farAway = intersection("FarAway", FAR_AWAY_COORDINATE);
+    var otpModel = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(100));
+        var C = intersection("C", ORIGIN.moveEastMeters(200));
+        var D = intersection("D", ORIGIN.moveEastMeters(300));
+        var farAway = intersection("FarAway", FAR_AWAY_COORDINATE);
 
-          biStreet(A, B, 100);
-          biStreet(B, C, 100);
-          biStreet(C, D, 100);
-          biStreet(farAway, A, 1000000);
+        biStreet(A, B, 100);
+        biStreet(B, C, 100);
+        biStreet(C, D, 100);
+        biStreet(farAway, A, 1000000);
 
-          var centroidRoutingStation = stationEntity("CentroidRoutingStation", b ->
-            b.withCoordinate(A.toWgsCoordinate()).withShouldRouteToCentroid(true)
-          );
-          var centroidRoutingStationVertex = stationCentroid(centroidRoutingStation);
+        var centroidRoutingStation = stationEntity(
+          "CentroidRoutingStation",
+          b -> b.withCoordinate(A.toWgsCoordinate()).withShouldRouteToCentroid(true)
+        );
+        var centroidRoutingStationVertex = stationCentroid(centroidRoutingStation);
 
-          var noCentroidRoutingStation = stationEntity("NoCentroidRoutingStation", b ->
-            b.withCoordinate(D.toWgsCoordinate())
-          );
+        var noCentroidRoutingStation = stationEntity(
+          "NoCentroidRoutingStation",
+          b -> b.withCoordinate(D.toWgsCoordinate())
+        );
 
-          // StopForCentroidRoutingStation is a child of centroidRoutingStation
-          stopForCentroidRoutingStation = stop("StopForCentroidRoutingStation", b ->
-            b.withCoordinate(B.toWgsCoordinate()).withParentStation(centroidRoutingStation)
-          );
+        // StopForCentroidRoutingStation is a child of centroidRoutingStation
+        stopForCentroidRoutingStation = stop(
+          "StopForCentroidRoutingStation",
+          b -> b.withCoordinate(B.toWgsCoordinate()).withParentStation(centroidRoutingStation)
+        );
 
-          // StopForNoCentroidRoutingStation is a child of noCentroidRoutingStation
-          stopForNoCentroidRoutingStation = stop("StopForNoCentroidRoutingStation", b ->
-            b.withCoordinate(C.toWgsCoordinate()).withParentStation(noCentroidRoutingStation)
-          );
+        // StopForNoCentroidRoutingStation is a child of noCentroidRoutingStation
+        stopForNoCentroidRoutingStation = stop(
+          "StopForNoCentroidRoutingStation",
+          b -> b.withCoordinate(C.toWgsCoordinate()).withParentStation(noCentroidRoutingStation)
+        );
 
-          biLink(A, centroidRoutingStationVertex);
-          biLink(B, stopForCentroidRoutingStation);
-          biLink(C, stopForNoCentroidRoutingStation);
-        }
+        biLink(A, centroidRoutingStationVertex);
+        biLink(B, stopForCentroidRoutingStation);
+        biLink(C, stopForNoCentroidRoutingStation);
       }
-    );
+    });
     graph = otpModel.graph();
     transitRepository = otpModel.transitRepository();
   }
@@ -226,11 +228,9 @@ class AccessEgressRouterTest extends GraphRoutingTest {
 
   private String nearbyStopDescription(NearbyStop nearbyStop) {
     if (nearbyStop.edges.isEmpty()) {
-      return (
-        "direct[" +
+      return ("direct[" +
         transitRepository.getSiteRepository().getStopLocation(nearbyStop.stopId).getName() +
-        "]"
-      );
+        "]");
     } else {
       return "street[" + stateDescription(nearbyStop.state) + "]";
     }

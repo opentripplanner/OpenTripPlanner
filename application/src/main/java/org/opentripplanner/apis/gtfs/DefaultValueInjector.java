@@ -103,9 +103,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   }
 
   private static Map<String, Value<?>> createDefaultMapping(RouteRequest defaultRouteRequest) {
-    var builder = new DefaultMappingBuilder()
-      .intReq("planConnection.first", defaultRouteRequest.numItineraries())
-      .stringOpt("planConnection.searchWindow", defaultRouteRequest.searchWindow());
+    var builder = new DefaultMappingBuilder().intReq(
+      "planConnection.first",
+      defaultRouteRequest.numItineraries()
+    ).stringOpt("planConnection.searchWindow", defaultRouteRequest.searchWindow());
     setBikeDefaults(defaultRouteRequest.preferences().bike(), builder);
     setCarDefaults(defaultRouteRequest.preferences().car(), builder);
     setModeDefaults(
@@ -122,8 +123,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   }
 
   private static void setBikeDefaults(BikePreferences bike, DefaultMappingBuilder builder) {
-    builder
-      .intReq("BicyclePreferencesInput.boardCost", bike.boardCost())
+    builder.intReq("BicyclePreferencesInput.boardCost", bike.boardCost())
       .floatReq("BicyclePreferencesInput.reluctance", bike.reluctance())
       .floatReq("BicyclePreferencesInput.speed", bike.speed())
       .objectReq(
@@ -143,11 +143,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleParkingPreferences parking,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .intReq(
-        "BicycleParkingPreferencesInput.unpreferredCost",
-        parking.unpreferredVehicleParkingTagCost().toSeconds()
-      )
+    builder.intReq(
+      "BicycleParkingPreferencesInput.unpreferredCost",
+      parking.unpreferredVehicleParkingTagCost().toSeconds()
+    )
       .arrayReq("BicycleParkingPreferencesInput.filters", mapVehicleParkingFilter(parking.filter()))
       .arrayReq(
         "BicycleParkingPreferencesInput.preferred",
@@ -159,11 +158,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleRentalPreferences rental,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .arrayStringsOpt(
-        "BicycleRentalPreferencesInput.allowedNetworks",
-        rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
-      )
+    builder.arrayStringsOpt(
+      "BicycleRentalPreferencesInput.allowedNetworks",
+      rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
+    )
       .arrayStringsReq("BicycleRentalPreferencesInput.bannedNetworks", rental.bannedNetworks())
       .boolReq(
         "DestinationBicyclePolicyInput.allowKeeping",
@@ -179,19 +177,17 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleWalkingPreferences walking,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .intReq(
-        "BicycleWalkPreferencesCostInput.mountDismountCost",
-        walking.mountDismountCost().toSeconds()
-      )
+    builder.intReq(
+      "BicycleWalkPreferencesCostInput.mountDismountCost",
+      walking.mountDismountCost().toSeconds()
+    )
       .floatReq("BicycleWalkPreferencesCostInput.reluctance", walking.reluctance())
       .stringReq("BicycleWalkPreferencesInput.mountDismountTime", walking.mountDismountTime())
       .floatReq("BicycleWalkPreferencesInput.speed", walking.speed());
   }
 
   private static void setCarDefaults(CarPreferences car, DefaultMappingBuilder builder) {
-    builder
-      .floatReq("CarPreferencesInput.reluctance", car.reluctance())
+    builder.floatReq("CarPreferencesInput.reluctance", car.reluctance())
       .intReq("CarPreferencesInput.boardCost", car.boardCost());
     setCarParkingDefaults(car.parking(), builder);
     setCarRentalDefaults(car.rental(), builder);
@@ -201,11 +197,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleParkingPreferences parking,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .intReq(
-        "CarParkingPreferencesInput.unpreferredCost",
-        parking.unpreferredVehicleParkingTagCost().toSeconds()
-      )
+    builder.intReq(
+      "CarParkingPreferencesInput.unpreferredCost",
+      parking.unpreferredVehicleParkingTagCost().toSeconds()
+    )
       .arrayReq("CarParkingPreferencesInput.filters", mapVehicleParkingFilter(parking.filter()))
       .arrayReq(
         "CarParkingPreferencesInput.preferred",
@@ -217,12 +212,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleRentalPreferences rental,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .arrayStringsOpt(
-        "CarRentalPreferencesInput.allowedNetworks",
-        rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
-      )
-      .arrayStringsReq("CarRentalPreferencesInput.bannedNetworks", rental.bannedNetworks());
+    builder.arrayStringsOpt(
+      "CarRentalPreferencesInput.allowedNetworks",
+      rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
+    ).arrayStringsReq("CarRentalPreferencesInput.bannedNetworks", rental.bannedNetworks());
   }
 
   private static void setModeDefaults(
@@ -230,14 +223,13 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     TransitPreferences transit,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .enumListReq(
-        "PlanModesInput.direct",
-        StreetModeMapper.getStreetModesForApi(journey.direct().mode())
-          .stream()
-          .map(mode -> (Enum) DirectModeMapper.map(mode))
-          .toList()
-      )
+    builder.enumListReq(
+      "PlanModesInput.direct",
+      StreetModeMapper.getStreetModesForApi(journey.direct().mode())
+        .stream()
+        .map(mode -> (Enum) DirectModeMapper.map(mode))
+        .toList()
+    )
       .enumListReq(
         "PlanTransitModesInput.access",
         StreetModeMapper.getStreetModesForApi(journey.access().mode())
@@ -266,8 +258,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     ScooterPreferences scooter,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .floatReq("ScooterPreferencesInput.reluctance", scooter.reluctance())
+    builder.floatReq("ScooterPreferencesInput.reluctance", scooter.reluctance())
       .floatReq("ScooterPreferencesInput.speed", scooter.speed())
       .objectReq(
         "ScooterPreferencesInput.optimization",
@@ -284,11 +275,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleRentalPreferences rental,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .arrayStringsOpt(
-        "ScooterRentalPreferencesInput.allowedNetworks",
-        rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
-      )
+    builder.arrayStringsOpt(
+      "ScooterRentalPreferencesInput.allowedNetworks",
+      rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
+    )
       .arrayStringsReq("ScooterRentalPreferencesInput.bannedNetworks", rental.bannedNetworks())
       .boolReq(
         "DestinationScooterPolicyInput.allowKeeping",
@@ -304,8 +294,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     TransitPreferences transit,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .stringReq("AlightPreferencesInput.slack", transit.alightSlack().defaultValue())
+    builder.stringReq("AlightPreferencesInput.slack", transit.alightSlack().defaultValue())
       .stringReq("BoardPreferencesInput.slack", transit.boardSlack().defaultValue())
       .boolReq("TimetablePreferencesInput.excludeRealTimeUpdates", transit.ignoreRealtimeUpdates())
       .boolReq(
@@ -339,8 +328,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     TransferPreferences transfer,
     DefaultMappingBuilder builder
   ) {
-    builder
-      .floatReq("BoardPreferencesInput.waitReluctance", transfer.waitReluctance())
+    builder.floatReq("BoardPreferencesInput.waitReluctance", transfer.waitReluctance())
       .intReq("TransferPreferencesInput.cost", transfer.cost())
       .intReq(
         "TransferPreferencesInput.maximumAdditionalTransfers",
@@ -352,8 +340,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   }
 
   private static void setWalkDefaults(WalkPreferences walk, DefaultMappingBuilder builder) {
-    builder
-      .intReq("WalkPreferencesInput.boardCost", walk.boardCost())
+    builder.intReq("WalkPreferencesInput.boardCost", walk.boardCost())
       .floatReq("WalkPreferencesInput.reluctance", walk.reluctance())
       .floatReq("WalkPreferencesInput.safetyFactor", walk.safetyFactor())
       .floatReq("WalkPreferencesInput.speed", walk.speed());
@@ -380,9 +367,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     GraphQLTypes.GraphQLTransitMode mode,
     @Nullable Double reluctance
   ) {
-    var objectBuilder = ObjectValue.newObjectValue().objectField(
-      ObjectField.newObjectField().name("mode").value(EnumValue.of(mode.name())).build()
-    );
+    var objectBuilder = ObjectValue.newObjectValue()
+      .objectField(
+        ObjectField.newObjectField().name("mode").value(EnumValue.of(mode.name())).build()
+      );
     if (reluctance != null) {
       objectBuilder.objectField(
         ObjectField.newObjectField()
@@ -408,37 +396,36 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     TimeSlopeSafetyTriangle triangle,
     Function<VehicleRoutingOptimizeType, Enum> typeMapper
   ) {
-    var optimizationField =
-      type == VehicleRoutingOptimizeType.TRIANGLE
-        ? ObjectField.newObjectField()
-            .name("triangle")
-            .value(
-              ObjectValue.newObjectValue()
-                .objectField(
-                  ObjectField.newObjectField()
-                    .name("flatness")
-                    .value(FloatValue.of(triangle.slope()))
-                    .build()
-                )
-                .objectField(
-                  ObjectField.newObjectField()
-                    .name("safety")
-                    .value(FloatValue.of(triangle.safety()))
-                    .build()
-                )
-                .objectField(
-                  ObjectField.newObjectField()
-                    .name("time")
-                    .value(FloatValue.of(triangle.time()))
-                    .build()
-                )
+    var optimizationField = type == VehicleRoutingOptimizeType.TRIANGLE
+      ? ObjectField.newObjectField()
+        .name("triangle")
+        .value(
+          ObjectValue.newObjectValue()
+            .objectField(
+              ObjectField.newObjectField()
+                .name("flatness")
+                .value(FloatValue.of(triangle.slope()))
+                .build()
+            )
+            .objectField(
+              ObjectField.newObjectField()
+                .name("safety")
+                .value(FloatValue.of(triangle.safety()))
+                .build()
+            )
+            .objectField(
+              ObjectField.newObjectField()
+                .name("time")
+                .value(FloatValue.of(triangle.time()))
                 .build()
             )
             .build()
-        : ObjectField.newObjectField()
-            .name("type")
-            .value(EnumValue.of(typeMapper.apply(type).name()))
-            .build();
+        )
+        .build()
+      : ObjectField.newObjectField()
+        .name("type")
+        .value(EnumValue.of(typeMapper.apply(type).name()))
+        .build();
     return ObjectValue.newObjectValue().objectField(optimizationField).build();
   }
 
@@ -459,28 +446,20 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     String fieldName,
     List<VehicleParkingSelect> selectList
   ) {
-    var selects = selectList
-      .stream()
+    var selects = selectList.stream()
       .map(
-        select ->
-          (Value) ObjectValue.newObjectValue()
-            .objectField(
-              ObjectField.newObjectField()
-                .name("tags")
-                .value(
-                  ArrayValue.newArrayValue()
-                    .values(
-                      select
-                        .tags()
-                        .stream()
-                        .map(tag -> (Value) StringValue.of(tag))
-                        .toList()
-                    )
-                    .build()
-                )
-                .build()
-            )
-            .build()
+        select -> (Value) ObjectValue.newObjectValue()
+          .objectField(
+            ObjectField.newObjectField()
+              .name("tags")
+              .value(
+                ArrayValue.newArrayValue()
+                  .values(select.tags().stream().map(tag -> (Value) StringValue.of(tag)).toList())
+                  .build()
+              )
+              .build()
+          )
+          .build()
       )
       .toList();
     return ObjectField.newObjectField()
@@ -524,12 +503,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       defaultValueForKey.put(
         key,
         ArrayValue.newArrayValue()
-          .values(
-            valueList
-              .stream()
-              .map(value -> (Value) new EnumValue(value.name()))
-              .toList()
-          )
+          .values(valueList.stream().map(value -> (Value) new EnumValue(value.name())).toList())
           .build()
       );
       return this;
@@ -549,12 +523,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       defaultValueForKey.put(
         key,
         ArrayValue.newArrayValue()
-          .values(
-            values
-              .stream()
-              .map(value -> (Value) StringValue.of(value))
-              .toList()
-          )
+          .values(values.stream().map(value -> (Value) StringValue.of(value)).toList())
           .build()
       );
       return this;
@@ -565,12 +534,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
         defaultValueForKey.put(
           key,
           ArrayValue.newArrayValue()
-            .values(
-              values
-                .stream()
-                .map(value -> (Value) StringValue.of(value))
-                .toList()
-            )
+            .values(values.stream().map(value -> (Value) StringValue.of(value)).toList())
             .build()
         );
       }

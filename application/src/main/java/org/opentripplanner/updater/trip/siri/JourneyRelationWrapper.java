@@ -30,11 +30,12 @@ final class JourneyRelationWrapper {
     if (relation.getRelatedJourneies() == null) {
       return List.of();
     }
-    return relation
-      .getRelatedJourneies()
+    return relation.getRelatedJourneies()
       .stream()
-      .map(relatedJourney ->
-        VehicleJourneyIdAndServiceDate.of(relatedJourney.getFramedVehicleJourneyRef())
+      .map(
+        relatedJourney -> VehicleJourneyIdAndServiceDate.of(
+          relatedJourney.getFramedVehicleJourneyRef()
+        )
       )
       .filter(Objects::nonNull)
       .toList();

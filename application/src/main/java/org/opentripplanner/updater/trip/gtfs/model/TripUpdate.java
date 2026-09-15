@@ -21,8 +21,8 @@ import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
- * A real-time update for trip, which may contain updated stop times and trip properties.
- * Instances of this class are validated and ready for further processing.
+ * A real-time update for trip, which may contain updated stop times and trip properties. Instances
+ * of this class are validated and ready for further processing.
  */
 public final class TripUpdate {
 
@@ -48,30 +48,25 @@ public final class TripUpdate {
   }
 
   public List<StopTimeUpdate> stopTimeUpdates() {
-    return tripUpdate
-      .getStopTimeUpdateList()
+    return tripUpdate.getStopTimeUpdateList()
       .stream()
       .map(StopTimeUpdate::new)
       .collect(Collectors.toList());
   }
 
   public Optional<I18NString> tripHeadsign() {
-    return tripProperties()
-      .filter(p -> p.hasTripHeadsign())
+    return tripProperties().filter(p -> p.hasTripHeadsign())
       .map(p -> I18NString.of(p.getTripHeadsign()));
   }
 
   public Optional<String> tripShortName() {
-    return tripProperties()
-      .filter(p -> p.hasTripShortName())
-      .map(p -> p.getTripShortName());
+    return tripProperties().filter(p -> p.hasTripShortName()).map(p -> p.getTripShortName());
   }
 
   public Optional<Accessibility> wheelchairAccessibility() {
-    return vehicle()
-      .filter(d -> d.hasWheelchairAccessible())
-      .flatMap(vehicleDescriptor ->
-        mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
+    return vehicle().filter(d -> d.hasWheelchairAccessible())
+      .flatMap(
+        vehicleDescriptor -> mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
       );
   }
 
@@ -90,18 +85,15 @@ public final class TripUpdate {
   }
 
   public FeedScopedId tripId() {
-    return (
-      tripDescriptor
-        .tripId()
-        .map(id -> new FeedScopedId(feedId, id))
-        // this should never happen because an empty trip id will lead to an exception in the
-        // constructor.
-        .orElseThrow(() ->
-          new IllegalStateException(
-            "Trip ID is missing from trip update. This indicates a programming error."
-          )
+    return (tripDescriptor.tripId()
+      .map(id -> new FeedScopedId(feedId, id))
+      // this should never happen because an empty trip id will lead to an exception in the
+      // constructor.
+      .orElseThrow(
+        () -> new IllegalStateException(
+          "Trip ID is missing from trip update. This indicates a programming error."
         )
-    );
+      ));
   }
 
   public void validate() throws DataValidationException, UpdateException {
@@ -155,8 +147,7 @@ public final class TripUpdate {
   }
 
   public Optional<FeedScopedId> vehicleId() {
-    return vehicle()
-      .filter(v -> StringUtils.hasValue(v.getId()))
+    return vehicle().filter(v -> StringUtils.hasValue(v.getId()))
       .map(v -> new FeedScopedId(feedId, v.getId()));
   }
 }

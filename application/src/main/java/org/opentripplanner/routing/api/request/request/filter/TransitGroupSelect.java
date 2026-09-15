@@ -10,10 +10,9 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Select a given set of transit routes base on the list of
- * modes, sub-modes, agencies and routes. A transit entity matches
- * if mode, sub-mode, agencyId or routeId matches - only one
- * "thing" needs to match.
+ * Select a given set of transit routes base on the list of modes, sub-modes, agencies and routes. A
+ * transit entity matches if mode, sub-mode, agencyId or routeId matches - only one "thing" needs to
+ * match.
  * <p>
  * The {@code TransitGroupSelect(modes:[BUS, TRAM], agencyIds:[A1, A3])} matches both:
  * <ul>
@@ -81,12 +80,10 @@ public class TransitGroupSelect {
       return false;
     }
     TransitGroupSelect that = (TransitGroupSelect) o;
-    return (
-      Objects.equals(modes, that.modes) &&
+    return (Objects.equals(modes, that.modes) &&
       Objects.equals(subModeRegexp, that.subModeRegexp) &&
       Objects.equals(agencyIds, that.agencyIds) &&
-      Objects.equals(routeIds, that.routeIds)
-    );
+      Objects.equals(routeIds, that.routeIds));
   }
 
   @Override
@@ -99,11 +96,11 @@ public class TransitGroupSelect {
     return isEmpty()
       ? "EMPTY"
       : ToStringBuilder.ofEmbeddedType()
-          .addCol("modes", modes)
-          .addCol("subModeRegexp", subModeRegexp)
-          .addCol("agencyIds", agencyIds)
-          .addCol("routeIds", routeIds)
-          .toString();
+        .addCol("modes", modes)
+        .addCol("subModeRegexp", subModeRegexp)
+        .addCol("agencyIds", agencyIds)
+        .addCol("routeIds", routeIds)
+        .toString();
   }
 
   public static class Builder {

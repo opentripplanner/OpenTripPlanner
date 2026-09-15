@@ -35,8 +35,7 @@ class WalkStepMapper {
     api.distance = domain.getDistance();
     api.relativeDirection = mapRelativeDirection(domain.getRelativeDirection());
     api.streetName = domain.getDirectionText().toString(locale);
-    api.absoluteDirection = domain
-      .getAbsoluteDirection()
+    api.absoluteDirection = domain.getAbsoluteDirection()
       .map(AbsoluteDirectionMapper::mapAbsoluteDirection)
       .orElse(null);
     api.exit = domain.highwayExit().orElse(null);

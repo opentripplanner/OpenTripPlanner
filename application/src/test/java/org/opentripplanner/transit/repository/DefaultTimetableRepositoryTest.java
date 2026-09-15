@@ -61,8 +61,7 @@ public class DefaultTimetableRepositoryTest {
 
     patternIndex = new HashMap<>();
     for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
-      tripPattern
-        .scheduledTripsAsStream()
+      tripPattern.scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
     }
   }
@@ -97,13 +96,11 @@ public class DefaultTimetableRepositoryTest {
     LocalDate today = LocalDate.now(TIME_ZONE);
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     TripTimes tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
-    RealTimeTripUpdate realTimeTripUpdate = RealTimeTripUpdate.of(
-      pattern,
-      tripTimes,
-      today
-    ).build();
-    assertThrows(ConcurrentModificationException.class, () ->
-      committedSnapshot.update(realTimeTripUpdate)
+    RealTimeTripUpdate realTimeTripUpdate = RealTimeTripUpdate.of(pattern, tripTimes, today)
+      .build();
+    assertThrows(
+      ConcurrentModificationException.class,
+      () -> committedSnapshot.update(realTimeTripUpdate)
     );
   }
 
@@ -122,16 +119,18 @@ public class DefaultTimetableRepositoryTest {
   @Test
   void testCannotPurgeTimetableRepositorySnapshot() {
     DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
-    assertThrows(ConcurrentModificationException.class, () ->
-      committedSnapshot.purgeExpiredData(null)
+    assertThrows(
+      ConcurrentModificationException.class,
+      () -> committedSnapshot.purgeExpiredData(null)
     );
   }
 
   @Test
   void testCannotRevertTimetableRepositorySnapshot() {
     DefaultTimetableRepository committedSnapshot = createCommittedSnapshot();
-    assertThrows(ConcurrentModificationException.class, () ->
-      committedSnapshot.revertTripToScheduledTripPattern(null, null)
+    assertThrows(
+      ConcurrentModificationException.class,
+      () -> committedSnapshot.revertTripToScheduledTripPattern(null, null)
     );
   }
 
@@ -198,12 +197,9 @@ public class DefaultTimetableRepositoryTest {
     TripPattern tripPattern = TripPattern.of(new FeedScopedId(feedId, "tripPatternId"))
       .withRoute(route)
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
-          ScheduledTripTimes.of()
-            .withTrip(trip)
-            .withDepartureTimes(new int[] { 0, 1 })
-            .build()
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addTripTimes(
+          ScheduledTripTimes.of().withTrip(trip).withDepartureTimes(new int[] { 0, 1 }).build()
         )
       )
       .build();

@@ -8,8 +8,7 @@ import org.opentripplanner.routing.api.request.RoutingTag;
 public class MicrometerUtils {
 
   public static List<Tag> mapTimingTags(Collection<RoutingTag> tags) {
-    return tags
-      .stream()
+    return tags.stream()
       .filter(RoutingTag::includeInMicrometerTiming)
       .map(t -> Tag.of(t.getCategory().name(), t.getTag()))
       .toList();

@@ -34,12 +34,10 @@ class NegativeTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedActual("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedActual("00:00:20", "00:00:14")
@@ -56,12 +54,10 @@ class NegativeTimesTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_2_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_2_ID)
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedActual("00:01:01", "00:01:01")
           .call(STOP_B)
           .arriveAimedActual("00:01:10", "00:01:13")

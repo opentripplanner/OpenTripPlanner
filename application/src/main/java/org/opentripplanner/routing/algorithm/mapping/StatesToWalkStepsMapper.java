@@ -130,12 +130,10 @@ public class StatesToWalkStepsMapper {
   private static boolean isUTurn(WalkStepBuilder twoBack, WalkStepBuilder lastStep) {
     RelativeDirection d1 = lastStep.relativeDirection();
     RelativeDirection d2 = twoBack.relativeDirection();
-    return (
-      ((d1 == RelativeDirection.RIGHT || d1 == RelativeDirection.HARD_RIGHT) &&
-        (d2 == RelativeDirection.RIGHT || d2 == RelativeDirection.HARD_RIGHT)) ||
+    return (((d1 == RelativeDirection.RIGHT || d1 == RelativeDirection.HARD_RIGHT) &&
+      (d2 == RelativeDirection.RIGHT || d2 == RelativeDirection.HARD_RIGHT)) ||
       ((d1 == RelativeDirection.LEFT || d1 == RelativeDirection.HARD_LEFT) &&
-        (d2 == RelativeDirection.LEFT || d2 == RelativeDirection.HARD_LEFT))
-    );
+        (d2 == RelativeDirection.LEFT || d2 == RelativeDirection.HARD_LEFT)));
   }
 
   private static double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
@@ -231,10 +229,10 @@ public class StatesToWalkStepsMapper {
       createdNewStep = true;
     } else if (
       modeTransition ||
-      !continueOnSameStreet(edge, streetNameNoParens) ||
-      // went on to or off of a roundabout
-      edge.isRoundabout() != roundaboutExit > 0 ||
-      (isLink(edge) && !isLink(backState.getBackEdge()))
+        !continueOnSameStreet(edge, streetNameNoParens) ||
+        // went on to or off of a roundabout
+        edge.isRoundabout() != roundaboutExit > 0 ||
+        (isLink(edge) && !isLink(backState.getBackEdge()))
     ) {
       // Street name has changed, or we've gone on to or off of a roundabout.
 
@@ -331,10 +329,12 @@ public class StatesToWalkStepsMapper {
   }
 
   /**
-   * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the same street.
-   * The purposes of this check are (i) to give a separate instruction when crossing to the other side of the same street, if a crosswalk namer is iin use
-   * (an instruction can be given to cross at a particular location because others may not be accessible, practical, etc.),
-   * and (ii) to remove trivial turns when a given street briefly merges with another.
+   * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the
+   * same street. The purposes of this check are (i) to give a separate instruction when crossing to
+   * the other side of the same street, if a crosswalk namer is iin use (an instruction can be given
+   * to cross at a particular location because others may not be accessible, practical, etc.), and
+   * (ii) to remove trivial turns when a given street briefly merges with another.
+   *
    * @return true if the walk steps refer to the same street, false otherwise.
    */
   public static boolean isOnSameStreet(
@@ -349,11 +349,9 @@ public class StatesToWalkStepsMapper {
       return false;
     }
 
-    return (
-      (!lastStep.isCrossing() || lastStep.nameIsDerived()) &&
+    return ((!lastStep.isCrossing() || lastStep.nameIsDerived()) &&
       (!twoBack.isCrossing() || twoBack.nameIsDerived()) &&
-      lastStepName.equals(threeBackStepName)
-    );
+      lastStepName.equals(threeBackStepName));
   }
 
   private static RelativeDirection relativeDirectionForTransitLink(StreetTransitEntranceLink link) {
@@ -404,12 +402,10 @@ public class StatesToWalkStepsMapper {
   }
 
   private boolean canZagBeRemoved(WalkStepBuilder walkStepBuilder) {
-    return (
-      !walkStepBuilder.hasEntrance() &&
+    return (!walkStepBuilder.hasEntrance() &&
       !(walkStepBuilder.verticalTransportationUse() instanceof ElevatorUse) &&
       !(walkStepBuilder.verticalTransportationUse() instanceof EscalatorUse) &&
-      !(walkStepBuilder.verticalTransportationUse() instanceof StairsUse)
-    );
+      !(walkStepBuilder.verticalTransportationUse() instanceof StairsUse));
   }
 
   private void processUTurn(WalkStepBuilder lastStep, WalkStepBuilder twoBack) {
@@ -421,7 +417,7 @@ public class StatesToWalkStepsMapper {
     // A U-turn to the left, typical in the US.
     if (
       lastStep.relativeDirection() == RelativeDirection.LEFT ||
-      lastStep.relativeDirection() == RelativeDirection.HARD_LEFT
+        lastStep.relativeDirection() == RelativeDirection.HARD_LEFT
     ) {
       lastStep.withRelativeDirection(RelativeDirection.UTURN_LEFT);
     } else {
@@ -497,11 +493,9 @@ public class StatesToWalkStepsMapper {
   }
 
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
-    return !(
-      current.directionText().toString() != null &&
+    return !(current.directionText().toString() != null &&
       !java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
-      (!current.nameIsDerived() || !edge.nameIsDerived())
-    );
+      (!current.nameIsDerived() || !edge.nameIsDerived()));
   }
 
   private static boolean multipleTurnOptionsInPreviousState(State state) {
@@ -575,8 +569,7 @@ public class StatesToWalkStepsMapper {
   ) {
     // don't care what came before or comes after
     addStep(
-      createWalkStep(forwardState, backState)
-        .withRelativeDirection(RelativeDirection.ELEVATOR)
+      createWalkStep(forwardState, backState).withRelativeDirection(RelativeDirection.ELEVATOR)
         .withVerticalTransportationUse(
           verticalTransportationUseFactory.createElevatorUse(backState, elevatorAlightEdge)
         )
@@ -590,8 +583,7 @@ public class StatesToWalkStepsMapper {
     Geometry geom
   ) {
     addStep(
-      createWalkStep(forwardState, backState)
-        .withRelativeDirection(RelativeDirection.CONTINUE)
+      createWalkStep(forwardState, backState).withRelativeDirection(RelativeDirection.CONTINUE)
         .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
         .addDistance(edge.getDistanceMeters())
         .withVerticalTransportationUse(verticalTransportationUseFactory.createStairsUse(edge))
@@ -609,8 +601,7 @@ public class StatesToWalkStepsMapper {
     Geometry geom
   ) {
     addStep(
-      createWalkStep(forwardState, backState)
-        .withRelativeDirection(RelativeDirection.CONTINUE)
+      createWalkStep(forwardState, backState).withRelativeDirection(RelativeDirection.CONTINUE)
         .withAbsoluteDirection(DirectionUtils.getFirstAngle(geom))
         .addDistance(edge.getDistanceMeters())
         .withVerticalTransportationUse(verticalTransportationUseFactory.createEscalatorUse(edge))
@@ -655,8 +646,7 @@ public class StatesToWalkStepsMapper {
     @Nullable Entrance entrance
   ) {
     addStep(
-      createWalkStep(forwardState, backState)
-        .withDirectionText(name)
+      createWalkStep(forwardState, backState).withDirectionText(name)
         .withNameIsDerived(false)
         .withDirections(lastAngle, DirectionUtils.getFirstAngle(edge.getGeometry()), false)
         .withRelativeDirection(direction)

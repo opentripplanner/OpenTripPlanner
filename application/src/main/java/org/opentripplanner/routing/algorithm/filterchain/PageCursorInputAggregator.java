@@ -7,7 +7,8 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
 import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 
 /**
- * This class aggregates results from NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter for PageCursorInput.
+ * This class aggregates results from NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter for
+ * PageCursorInput.
  */
 public class PageCursorInputAggregator {
 
@@ -36,10 +37,9 @@ public class PageCursorInputAggregator {
     if (
       numItinerariesFilter != null && numItinerariesFilter.getNumItinerariesFilterResult() != null
     ) {
-      pageCursorInputBuilder = pageCursorInputBuilder
-        .withEarliestRemovedDeparture(
-          numItinerariesFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
-        )
+      pageCursorInputBuilder = pageCursorInputBuilder.withEarliestRemovedDeparture(
+        numItinerariesFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
+      )
         .withLatestRemovedDeparture(
           numItinerariesFilter.getNumItinerariesFilterResult().latestRemovedDeparture()
         )
@@ -47,11 +47,10 @@ public class PageCursorInputAggregator {
     }
     if (
       removeTransitIfStreetOnlyIsBetter != null &&
-      removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null
+        removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null
     ) {
       pageCursorInputBuilder = pageCursorInputBuilder.withGeneralizedCostMaxLimit(
-        removeTransitIfStreetOnlyIsBetter
-          .getRemoveTransitIfStreetOnlyIsBetterResult()
+        removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult()
           .generalizedCostMaxLimit()
       );
     }

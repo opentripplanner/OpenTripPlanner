@@ -14,8 +14,7 @@ public class ViaConnections {
 
   public ViaConnections(Collection<ViaConnection> viaConnections) {
     this.groupByFromStop = new TIntObjectHashMap<>();
-    viaConnections
-      .stream()
+    viaConnections.stream()
       .collect(groupingBy(ViaConnection::fromStop))
       .forEach(groupByFromStop::put);
   }

@@ -16,12 +16,13 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * A {@link NearbyStopFinder} that filters nearby stops based on trip patterns and flex trips.
  * <p>
- * This finder delegates to another NearbyStopFinder to find physically nearby stops, then filters
- * them to include only stops that:
+ * This finder delegates to another NearbyStopFinder to find physically nearby stops, then
+ * filters them to include only stops that:
  * <ul>
  *   <li>Are served by trip patterns where boarding/alighting is possible, OR</li>
  *   <li>Are served by flex trips (if FlexRouting is enabled), OR</li>
- *   <li>Are sometimes used by real-time trips (if IncludeStopsUsedRealTimeInTransfers is enabled)</li>
+ *   <li>Are sometimes used by real-time trips (if IncludeStopsUsedRealTimeInTransfers is
+ *       enabled)</li>
  * </ul>
  * <p>
  * For each trip pattern, only the closest stop is included to reduce the number of transfers
@@ -97,8 +98,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   }
 
   private Collection<NearbyStop> removeTransferNotAllowedStops(Collection<NearbyStop> nearbyStops) {
-    return nearbyStops
-      .stream()
+    return nearbyStops.stream()
       .filter(s -> !transitService.getStopLocation(s.stopId).transfersNotAllowed())
       .toList();
   }

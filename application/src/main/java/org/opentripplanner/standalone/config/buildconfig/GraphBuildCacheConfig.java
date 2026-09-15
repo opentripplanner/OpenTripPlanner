@@ -38,8 +38,7 @@ public class GraphBuildCacheConfig {
 
   public static GraphBuildCacheConfig fromConfig(NodeAdapter root) {
     return fromSubConfig(
-      root
-        .of("cache")
+      root.of("cache")
         .since(V2_10)
         .summary("Configuration for the graph-build file cache.")
         .description(
@@ -64,15 +63,13 @@ public class GraphBuildCacheConfig {
   }
 
   public static GraphBuildCacheConfig fromSubConfig(NodeAdapter c) {
-    var enabled = c
-      .of("enabled")
+    var enabled = c.of("enabled")
       .since(V2_10)
       .summary("Master switch for the graph-build cache.")
       .description("When `false` no cache files are read or written during graph builds.")
       .asBoolean(false);
 
-    var path = c
-      .of("path")
+    var path = c.of("path")
       .since(V2_10)
       .summary("Root directory for cache files.")
       .description(
@@ -83,8 +80,7 @@ public class GraphBuildCacheConfig {
       )
       .asUri(null);
 
-    var tasks = c
-      .of("tasks")
+    var tasks = c.of("tasks")
       .since(V2_10)
       .summary(CacheTask.ELEVATION.typeDescription())
       .description(

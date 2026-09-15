@@ -142,11 +142,9 @@ class VehicleParkingEdgeTest {
 
   private VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance() {
     String id = "Entrance";
-    return builder ->
-      builder
-        .entranceId(id(id))
-        .name(new NonLocalizedString(id))
-        .coordinate(new WgsCoordinate(0, 0));
+    return builder -> builder.entranceId(id(id))
+      .name(new NonLocalizedString(id))
+      .coordinate(new WgsCoordinate(0, 0));
   }
 
   private State[] traverse() {

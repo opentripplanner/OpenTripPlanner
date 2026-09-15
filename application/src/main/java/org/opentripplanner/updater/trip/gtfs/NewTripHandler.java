@@ -89,8 +89,7 @@ class NewTripHandler {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
     }
 
-    final Set<FeedScopedId> serviceIds = transitService
-      .getTripCalendars()
+    final Set<FeedScopedId> serviceIds = transitService.getTripCalendars()
       .listServiceIdsOnServiceDate(tripUpdate.startDate());
     if (!serviceIds.contains(trip.getServiceId())) {
       // TODO: should we support this and change service id of trip?
@@ -109,7 +108,8 @@ class NewTripHandler {
     boolean added,
     boolean modified,
     boolean hasANewRouteBeenCreated
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     FeedScopedId tripId = trip.getId();
     var stopTimeUpdates = tripUpdate.stopTimeUpdates();
 
@@ -146,7 +146,8 @@ class NewTripHandler {
     final boolean added,
     final boolean modified,
     final boolean hasANewRouteBeenCreated
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     RealTimeTripTimes tripTimes = tripTimesWithStopPattern.tripTimes();
     Trip trip = tripTimes.getTrip();
 
@@ -167,11 +168,9 @@ class NewTripHandler {
       .withRevertPreviousRealTimeUpdates(true)
       .withHideTripInScheduledPattern(hideTripInScheduledPattern);
     if (added) {
-      builder
-        .withAddedTripOnServiceDate(
-          TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build()
-        )
-        .withTripCreation(true);
+      builder.withAddedTripOnServiceDate(
+        TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build()
+      ).withTripCreation(true);
     }
     return TripUpdateApplier.apply(buffer, builder.build());
   }
@@ -181,15 +180,16 @@ class NewTripHandler {
    * <p>
    * The whole update is rejected if a single stop cannot be resolved.
    *
-   * @throws UpdateException {@code INVALID_STOP_REFERENCE} if a stop time update has no stop id -
-   *                         a new trip has no pattern yet, so a stop sequence alone cannot be
+   * @throws UpdateException {@code INVALID_STOP_REFERENCE} if a stop time update has no stop id - a
+   *                         new trip has no pattern yet, so a stop sequence alone cannot be
    *                         resolved to a stop - or {@code UNKNOWN_STOP} if the stop id is not
    *                         present in the site repository.
    */
   private List<StopAndStopTimeUpdate> resolveStops(
     FeedScopedId tripId,
     List<StopTimeUpdate> stopTimeUpdates
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     var stops = new ArrayList<StopAndStopTimeUpdate>(stopTimeUpdates.size());
     for (int listIndex = 0; listIndex < stopTimeUpdates.size(); listIndex++) {
       var stopTimeUpdate = stopTimeUpdates.get(listIndex);

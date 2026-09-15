@@ -118,11 +118,9 @@ public class GeneralizedCostParameters {
     }
     GeneralizedCostParameters that = (GeneralizedCostParameters) o;
     // TODO - Why is not all parameters included here, doc if on purpose or add parameters
-    return (
-      boardCost == that.boardCost &&
+    return (boardCost == that.boardCost &&
       transferCost == that.transferCost &&
-      Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0
-    );
+      Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0);
   }
 
   @Override

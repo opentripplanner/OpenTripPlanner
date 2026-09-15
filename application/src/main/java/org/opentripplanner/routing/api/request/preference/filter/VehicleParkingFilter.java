@@ -8,8 +8,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A filter class that checks if parking facilities match certain conditions for
- * inclusion/exclusion or preference/unpreference.
+ * A filter class that checks if parking facilities match certain conditions for inclusion/exclusion
+ * or preference/unpreference.
  */
 public class VehicleParkingFilter implements Serializable {
 
@@ -86,9 +86,6 @@ public class VehicleParkingFilter implements Serializable {
   }
 
   private static VehicleParkingSelect[] makeFilter(Collection<VehicleParkingSelect> select) {
-    return select
-      .stream()
-      .filter(f -> !f.isEmpty())
-      .toArray(VehicleParkingSelect[]::new);
+    return select.stream().filter(f -> !f.isEmpty()).toArray(VehicleParkingSelect[]::new);
   }
 }

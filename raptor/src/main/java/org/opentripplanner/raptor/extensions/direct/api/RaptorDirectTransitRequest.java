@@ -120,13 +120,11 @@ public final class RaptorDirectTransitRequest {
       return true;
     }
     if (o instanceof RaptorDirectTransitRequest that) {
-      return (
-        earliestDepartureTime == that.earliestDepartureTime &&
+      return (earliestDepartureTime == that.earliestDepartureTime &&
         searchWindowInSeconds == that.searchWindowInSeconds &&
         relaxC1.equals(that.relaxC1) &&
         accessPaths.equals(that.accessPaths) &&
-        egressPaths.equals(that.egressPaths)
-      );
+        egressPaths.equals(that.egressPaths));
     }
     return false;
   }

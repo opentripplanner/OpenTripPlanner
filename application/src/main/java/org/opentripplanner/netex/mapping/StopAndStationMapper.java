@@ -43,8 +43,8 @@ import org.rutebanken.netex.model.TariffZoneRef;
  * present in the OTP model we have to choose which version should be mapped based on both of these
  * parameters.
  * <p>
- * To ensure compatibility with older data sets, we also have to keep quays that are only present in
- * older versions of the StopPlace.
+ * To ensure compatibility with older data sets, we also have to keep quays that are only present
+ * in older versions of the StopPlace.
  */
 class StopAndStationMapper {
 
@@ -130,8 +130,7 @@ class StopAndStationMapper {
       return List.of();
     }
 
-    return stopPlace
-      .getTariffZones()
+    return stopPlace.getTariffZones()
       .getTariffZoneRef_()
       .stream()
       .map(ref -> findTariffZone(stopPlace, (TariffZoneRef) ref.getValue()))
@@ -162,8 +161,7 @@ class StopAndStationMapper {
    * Sort stop places on version with latest version first (descending order).
    */
   private List<StopPlace> sortStopPlacesByValidityAndVersionDesc(Collection<StopPlace> stopPlaces) {
-    return stopPlaces
-      .stream()
+    return stopPlaces.stream()
       .sorted(new StopPlaceVersionAndValidityComparator())
       .collect(toList());
   }
@@ -200,7 +198,8 @@ class StopAndStationMapper {
   /**
    * Return the list of quays for the given {@code stopPlace} or an empty list if no quays exist.
    * <p>
-   * We do not support quay references, all quays must be included as part of the given stopPlace.
+   * We do not support quay references, all quays must be included as part of the given
+   * stopPlace.
    */
   private List<Quay> listOfQuays(StopPlace stopPlace) {
     Quays_RelStructure quays = stopPlace.getQuays();

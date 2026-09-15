@@ -52,8 +52,7 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
       testCase("at board stop B & intermediate stop C").points(STOP_B).points(STOP_C).build(),
       testCase("at intermediate stop C & alight stop D").points(STOP_C).points(STOP_D).build(),
       testCase("at board stop C & the alight stop D").points(STOP_C).points(STOP_D).build(),
-      testCase("at B, C, and D")
-        .points(STOP_A, STOP_B)
+      testCase("at B, C, and D").points(STOP_A, STOP_B)
         .points(STOP_C, STOP_I)
         .points(STOP_D)
         .build()
@@ -68,14 +67,13 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
    * <pre>
    * Origin ~ walk ~ B ~ Trip 1 ~ D ~ walk ~ Destination
    * </pre>
-   * Note! Stop A and E is not visited. Stop I is part of one transfer-point, but not part of the
-   * trip.
+   * Note! Stop A and E is not visited. Stop I is part of one transfer-point, but not part of
+   * the trip.
    */
   @ParameterizedTest
   @MethodSource("tripWithoutTransfersTestCases")
   public void tripWithoutTransfers(TestCase tc) {
-    var originalPath = pathBuilder()
-      .c2(tc.points().size())
+    var originalPath = pathBuilder().c2(tc.points().size())
       .access(ITERATION_START_TIME, STOP_B, D1_s)
       .bus(trip1, STOP_D)
       .egress(D1_s);

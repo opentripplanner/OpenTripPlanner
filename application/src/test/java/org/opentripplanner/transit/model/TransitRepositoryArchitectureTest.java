@@ -98,8 +98,7 @@ public class TransitRepositoryArchitectureTest {
   // TODO OTP2 temporarily allow circular dependency between network and timetable
   @Disabled
   void enforceNoCyclicDependencies() {
-    slices()
-      .matching(TRANSIT_MODEL.packageIdentifierAllSubPackages())
+    slices().matching(TRANSIT_MODEL.packageIdentifierAllSubPackages())
       .should()
       .beFreeOfCycles()
       .check(ArchComponent.OTP_CLASSES);

@@ -56,21 +56,18 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
     data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10_m));
     data.withTransferCost(100);
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(flex(STOP_A, D3_m, ONE_RIDE, 2 * C1_ONE_STOP))
       .addEgressPaths(walk(STOP_D, D1_m));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .constrainedTransfers(true);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expected =
-      "Flex 3m Rₙ1 ~ A " +
+    var expected = "Flex 3m Rₙ1 ~ A " +
       "~ Walk 10m ~ B " +
       "~ BUS R1 0:30 0:45 ~ C " +
       "~ BUS R2 0:45 0:55 ~ D " +

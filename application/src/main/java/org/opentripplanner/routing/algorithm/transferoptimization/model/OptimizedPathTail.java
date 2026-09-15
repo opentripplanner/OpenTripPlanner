@@ -26,10 +26,8 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class OptimizedPathTail<T extends RaptorTripSchedule>
-  extends PathBuilder<T>
-  implements TransferOptimized
-{
+public class OptimizedPathTail<T extends RaptorTripSchedule> extends PathBuilder<T> implements
+  TransferOptimized {
 
   @Nullable
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
@@ -52,12 +50,12 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   ) {
     super(slackProvider, iterationDepartureTime, costCalculator, stopNameResolver, null);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
-    this.stopPriorityCostCalculator =
-      stopBoardAlightTransferCosts != null && extraStopBoardAlightCostsFactor > 0.01
+    this.stopPriorityCostCalculator = stopBoardAlightTransferCosts != null &&
+      extraStopBoardAlightCostsFactor > 0.01
         ? new StopPriorityCostCalculator(
-            extraStopBoardAlightCostsFactor,
-            stopBoardAlightTransferCosts
-          )
+          extraStopBoardAlightCostsFactor,
+          stopBoardAlightTransferCosts
+        )
         : null;
   }
 
@@ -216,8 +214,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     if (skipCostCalc()) {
       return;
     }
-    this.generalizedCost = legsAsStream()
-      .mapToInt(it -> it.c1(costCalculator(), slackProvider()))
+    this.generalizedCost = legsAsStream().mapToInt(it -> it.c1(costCalculator(), slackProvider()))
       .sum();
   }
 

@@ -104,14 +104,12 @@ public final class FareTransferRule implements Serializable {
       return false;
     }
     var that = (FareTransferRule) obj;
-    return (
-      Objects.equals(this.id, that.id) &&
+    return (Objects.equals(this.id, that.id) &&
       Objects.equals(this.fromLegGroup, that.fromLegGroup) &&
       Objects.equals(this.toLegGroup, that.toLegGroup) &&
       this.transferCount == that.transferCount &&
       Objects.equals(this.timeLimit, that.timeLimit) &&
-      Objects.equals(this.fareProducts, that.fareProducts)
-    );
+      Objects.equals(this.fareProducts, that.fareProducts));
   }
 
   @Override

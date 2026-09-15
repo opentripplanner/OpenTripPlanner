@@ -21,10 +21,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.text.TextAssertions;
 
 /**
- * This test reads in a schema file, injects documentation and convert the
- * new schema to an SDL text string. The result is then compared to the
- * "expected" SDL file. The input and expected files are found in the
- * resources - with the same name as this test.
+ * This test reads in a schema file, injects documentation and convert the new schema to an SDL text
+ * string. The result is then compared to the "expected" SDL file. The input and expected files are
+ * found in the resources - with the same name as this test.
  */
 class InjectCustomDocumentationTest {
 
@@ -58,8 +57,8 @@ class InjectCustomDocumentationTest {
   }
 
   /**
-   * Return a map of documentation key/values. The
-   * value is the same as the key for easy recognition.
+   * Return a map of documentation key/values. The value is the same as the key for easy
+   * recognition.
    */
   static Map<String, String> text() {
     return Stream.of(
@@ -97,8 +96,7 @@ class InjectCustomDocumentationTest {
     var p = new SchemaPrinter();
     var result = p.print(newSchema);
 
-    var missingValues = texts
-      .values()
+    var missingValues = texts.values()
       .stream()
       .sorted()
       .filter(it -> !result.contains(it))

@@ -52,8 +52,9 @@ class WalkOnlyConnectedBikeParkingTest {
 
     var fetcher = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl())
-      .that(fetcher.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", fetcher.geoJsonUrl()).that(
+      fetcher.summarizeEdges()
+    )
       .containsExactly(
         "(0,-0.001) → (0,0) PEDESTRIAN ♿✅",
         "(0,0) → (0,-0.001) PEDESTRIAN ♿✅",

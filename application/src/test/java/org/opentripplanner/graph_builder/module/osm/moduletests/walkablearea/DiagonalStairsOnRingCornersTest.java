@@ -12,13 +12,14 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
- * Tests that stair connections at two diagonally opposite ring corners produce a surviving
- * diagonal visibility edge via the SPT pruning step.
+ * Tests that stair connections at two diagonally opposite ring corners produce a surviving diagonal
+ * visibility edge via the SPT pruning step.
  *
- * <p>Both corners are {@code isStartingNode} (shared with a stair way), so they enter
+ * <p>
+ * Both corners are {@code isStartingNode} (shared with a stair way), so they enter
  * {@code visibilityVertices} and {@code startingVertices}. The diagonal visibility edge between
- * them is shorter than the two-segment ring path, so it survives the SPT pruning that
- * retains only edges on shortest paths between starting vertices.
+ * them is shorter than the two-segment ring path, so it survives the SPT pruning that retains only
+ * edges on shortest paths between starting vertices.
  */
 class DiagonalStairsOnRingCornersTest {
 
@@ -51,8 +52,9 @@ class DiagonalStairsOnRingCornersTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stairs at bl and tr (wheelchair-inaccessible steps)
         "(0,0) → (-0.001,0) PEDESTRIAN ♿❌",

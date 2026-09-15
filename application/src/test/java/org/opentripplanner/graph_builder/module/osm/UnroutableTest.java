@@ -20,8 +20,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 /**
  * Verify that OSM ways that represent proposed or as yet unbuilt roads are not used for routing.
- * This tests functionality in or around the method isWayRoutable() in the OSM graph builder
- * module.
+ * This tests functionality in or around the method isWayRoutable() in the OSM graph builder module.
  *
  * @author abyrd
  */
@@ -46,8 +45,8 @@ class UnroutableTest {
 
   /**
    * Search for a path across the Willamette river. This OSM data includes a bridge that is not yet
-   * built and is therefore tagged highway=construction.
-   * TODO also test unbuilt, proposed, raceways etc.
+   * built and is therefore tagged highway=construction. TODO also test unbuilt, proposed, raceways
+   * etc.
    */
   @Test
   public void testOnBoardRouting() {

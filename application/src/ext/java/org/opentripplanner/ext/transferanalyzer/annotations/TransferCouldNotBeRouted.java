@@ -11,11 +11,10 @@ import org.opentripplanner.transit.model.site.RegularStop;
  */
 public class TransferCouldNotBeRouted implements DataImportIssue {
 
-  private static final String FMT =
-    "Connection between stop %s and stop %s could not be routed. " + "Euclidean distance is %.0f.";
+  private static final String FMT = "Connection between stop %s and stop %s could not be routed. " +
+    "Euclidean distance is %.0f.";
 
-  private static final String HTMLFMT =
-    "Connection between stop " +
+  private static final String HTMLFMT = "Connection between stop " +
     "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> and stop " +
     "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> could not be routed. " +
     "Euclidean distance is %.0f.";

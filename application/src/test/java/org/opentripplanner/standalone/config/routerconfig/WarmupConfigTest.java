@@ -44,8 +44,9 @@ class WarmupConfigTest {
       }
       """
     );
-    assertThrows(IllegalArgumentException.class, () ->
-      WarmupConfig.mapWarmupConfig("warmup", root)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> WarmupConfig.mapWarmupConfig("warmup", root)
     );
   }
 

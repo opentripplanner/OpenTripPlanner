@@ -26,25 +26,22 @@ class ArrivalStatusTest implements RealtimeTestConstants {
     .addStop(STOP_B, "0:20", "0:20")
     .addStop(STOP_C, "0:30", "0:30");
 
-  /// Verify that a RecordedCall with ActualArrivalTime but no ActualDepartureTime
-  /// is treated as arrived but NOT departed. This matches the SIRI-ET semantics where
-  /// a vehicle can be at the platform (arrived) but not yet have left (not departed).
+  /// Verify that a RecordedCall with ActualArrivalTime but no ActualDepartureTime is treated as
+  /// arrived but NOT departed. This matches the SIRI-ET semantics where a vehicle can be at the
+  /// platform (arrived) but not yet have left (not departed).
   @Test
   void testRecordedCallWithArrivalButNoDeparture() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
-    var update = siri
-      .etBuilder()
+    var update = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .arriveAimedActual("00:10", "00:10")
           .departAimedExpected("00:10", "00:11")
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .arriveAimedExpected("00:20", "00:20")
           .departAimedExpected("00:20", "00:20")
           .call(STOP_C)
@@ -69,13 +66,11 @@ class ArrivalStatusTest implements RealtimeTestConstants {
   void testUpdateJourneyWithArrivalStatusArrived() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
-    var update = siri
-      .etBuilder()
+    var update = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:10", "00:10"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_B)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B)
           .departAimedExpected("00:20", "00:20")
           .withArrivalStatus(CallStatusEnumeration.ARRIVED)
           .call(STOP_C)

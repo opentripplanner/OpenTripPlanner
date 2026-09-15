@@ -98,8 +98,7 @@ abstract class GraphRoutingTest {
       StreetTraversalPermission reversePermissions
     ) {
       return List.of(
-        new StreetEdgeBuilder<>()
-          .withFromVertex(from)
+        new StreetEdgeBuilder<>().withFromVertex(from)
           .withToVertex(to)
           .withGeometry(
             GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
@@ -109,8 +108,7 @@ abstract class GraphRoutingTest {
           .withPermission(forwardPermissions)
           .withBack(false)
           .buildAndConnect(),
-        new StreetEdgeBuilder<>()
-          .withFromVertex(to)
+        new StreetEdgeBuilder<>().withFromVertex(to)
           .withToVertex(from)
           .withGeometry(
             GeometryUtils.makeLineString(to.getLat(), to.getLon(), from.getLat(), from.getLon())
@@ -282,14 +280,12 @@ abstract class GraphRoutingTest {
       boolean carAccessible,
       boolean walkAccessible
     ) {
-      return builder ->
-        builder
-          .entranceId(id(id))
-          .name(new NonLocalizedString(id))
-          .coordinate(new WgsCoordinate(streetVertex.getCoordinate()))
-          .vertex(streetVertex)
-          .carAccessible(carAccessible)
-          .walkAccessible(walkAccessible);
+      return builder -> builder.entranceId(id(id))
+        .name(new NonLocalizedString(id))
+        .coordinate(new WgsCoordinate(streetVertex.getCoordinate()))
+        .vertex(streetVertex)
+        .carAccessible(carAccessible)
+        .walkAccessible(walkAccessible);
     }
 
     private VehicleRentalPlace vehicleRentalStationEntity(
@@ -318,8 +314,7 @@ abstract class GraphRoutingTest {
       int length,
       StreetTraversalPermission permissions
     ) {
-      return new StreetEdgeBuilder<>()
-        .withFromVertex(from)
+      return new StreetEdgeBuilder<>().withFromVertex(from)
         .withToVertex(to)
         .withGeometry(
           GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())

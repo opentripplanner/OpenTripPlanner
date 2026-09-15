@@ -20,8 +20,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
   private static final String JSON_PARSE_PATH = "features";
-  private static final ObjectReader STRING_LIST_READER =
-    ObjectMappers.ignoringExtraFields().readerForListOf(String.class);
+  private static final ObjectReader STRING_LIST_READER = ObjectMappers.ignoringExtraFields()
+    .readerForListOf(String.class);
   private final BikeepUpdaterParameters params;
 
   public BikeepUpdater(BikeepUpdaterParameters parameters) {
@@ -47,12 +47,9 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
         .build();
       var capacity = VehicleParkingSpaces.of().bicycleSpaces(parking.get("total").asInt()).build();
 
-      VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
-        builder
-          .entranceId(new FeedScopedId(params.feedId(), vehicleParkId.getId() + "/entrance"))
-          .coordinate(coordinate)
-          .walkAccessible(true)
-          .carAccessible(true);
+      VehicleParking.VehicleParkingEntranceCreator entrance = builder -> builder.entranceId(
+        new FeedScopedId(params.feedId(), vehicleParkId.getId() + "/entrance")
+      ).coordinate(coordinate).walkAccessible(true).carAccessible(true);
 
       return VehicleParking.of()
         .id(vehicleParkId)

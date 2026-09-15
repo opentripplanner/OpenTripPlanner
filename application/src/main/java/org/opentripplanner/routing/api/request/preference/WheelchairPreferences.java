@@ -130,15 +130,13 @@ public class WheelchairPreferences implements Serializable {
       return false;
     }
     WheelchairPreferences that = (WheelchairPreferences) o;
-    return (
-      Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&
+    return (Double.compare(that.inaccessibleStreetReluctance, inaccessibleStreetReluctance) == 0 &&
       Double.compare(that.maxSlope, maxSlope) == 0 &&
       Double.compare(that.slopeExceededReluctance, slopeExceededReluctance) == 0 &&
       Double.compare(that.stairsReluctance, stairsReluctance) == 0 &&
       trip.equals(that.trip) &&
       stop.equals(that.stop) &&
-      elevator.equals(that.elevator)
-    );
+      elevator.equals(that.elevator));
   }
 
   @Override
@@ -243,8 +241,7 @@ public class WheelchairPreferences implements Serializable {
     }
 
     public Builder withElevator(Consumer<AccessibilityPreferences.Builder> body) {
-      this.elevator = this.elevator
-        .copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
+      this.elevator = this.elevator.copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
         .apply(body)
         .build();
       return this;

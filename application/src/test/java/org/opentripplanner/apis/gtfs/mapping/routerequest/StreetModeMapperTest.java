@@ -41,8 +41,9 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithRentalOnly() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.BIKE_RENTAL))
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.BIKE_RENTAL))
     );
     assertEquals(
       "For the time being, BIKE_RENTAL needs to be combined with WALK mode for the same leg.",
@@ -60,8 +61,9 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithTwoModesAndNoWalk() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      StreetModeMapper.getStreetModeForRouting(
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> StreetModeMapper.getStreetModeForRouting(
         List.of(StreetMode.BIKE_RENTAL, StreetMode.SCOOTER_RENTAL)
       )
     );
@@ -73,8 +75,9 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithCarAndWalk() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.CAR, StreetMode.WALK))
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.CAR, StreetMode.WALK))
     );
     assertEquals(
       "Car can't be combined with other modes for the same leg: [CAR, WALK].",
@@ -84,8 +87,9 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithBicycleAndWalk() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.BIKE, StreetMode.WALK))
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> StreetModeMapper.getStreetModeForRouting(List.of(StreetMode.BIKE, StreetMode.WALK))
     );
     assertEquals(
       "Bicycle can't be combined with other modes for the same leg: [BIKE, WALK].",
@@ -95,8 +99,9 @@ class StreetModeMapperTest {
 
   @Test
   void testGetStreetModeForRoutingWithMoreThanTwoModes() {
-    var exception = assertThrows(InvalidInputException.class, () ->
-      StreetModeMapper.getStreetModeForRouting(
+    var exception = assertThrows(
+      InvalidInputException.class,
+      () -> StreetModeMapper.getStreetModeForRouting(
         List.of(StreetMode.WALK, StreetMode.BIKE_TO_PARK, StreetMode.CAR_TO_PARK)
       )
     );

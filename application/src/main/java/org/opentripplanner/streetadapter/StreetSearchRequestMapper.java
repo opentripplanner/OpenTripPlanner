@@ -45,8 +45,8 @@ public class StreetSearchRequestMapper {
   /// How close to do you have to be to the start or end to be considered "close".
   private static final int MAX_CLOSENESS_METERS = 500;
 
-  /// Maps a [RouteRequest] to a [StreetSearchRequestBuilder] transferring all parameters
-  /// relevant for street routing.
+  /// Maps a [RouteRequest] to a [StreetSearchRequestBuilder] transferring all parameters relevant
+  /// for street routing.
   public static StreetSearchRequestBuilder map(RouteRequest request) {
     var time = request.dateTime() == null ? RouteRequest.normalizeNow() : request.dateTime();
     var preferences = request.preferences();
@@ -87,12 +87,11 @@ public class StreetSearchRequestMapper {
   /// Maps a [RouteRequest] to a [StreetSearchRequestBuilder] for transfer requests, where some
   /// special rules apply:
   ///
-  ///  - they are always depart-at
-  ///  - their start time is always the epoch (0)
+  /// - they are always depart-at
+  /// - their start time is always the epoch (0)
   ///
   public static StreetSearchRequestBuilder mapToTransferRequest(RouteRequest request) {
-    return map(request)
-      .withFromEnvelope(null)
+    return map(request).withFromEnvelope(null)
       .withToEnvelope(null)
       // transfer requests are always depart-at
       .withArriveBy(false)
@@ -214,8 +213,7 @@ public class StreetSearchRequestMapper {
   }
 
   private static List<ParkingSelect> mapTagSelect(List<VehicleParkingSelect> selects) {
-    return selects
-      .stream()
+    return selects.stream()
       .map(s -> new TagsSelect(s.tags()))
       .map(ParkingSelect.class::cast)
       .toList();

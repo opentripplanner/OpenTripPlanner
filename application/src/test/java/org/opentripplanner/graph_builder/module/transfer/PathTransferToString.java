@@ -10,10 +10,9 @@ class PathTransferToString {
     if (transfers.isEmpty()) {
       return "<Empty>";
     }
-    return transfers
-      .stream()
-      .map(tx ->
-        "%3s - %3s, %dm".formatted(
+    return transfers.stream()
+      .map(
+        tx -> "%3s - %3s, %dm".formatted(
           tx.from.getName(),
           tx.to.getName(),
           Math.round(tx.getDistanceMeters())

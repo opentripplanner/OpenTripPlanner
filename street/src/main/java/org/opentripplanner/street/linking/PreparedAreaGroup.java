@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An {@link AreaGroup} together with lazily built, reusable spatial indexes over its polygons, used
- * to answer the repeated geometric queries performed while linking a vertex to the area's visibility
- * vertices. An instance is created once per linking call and reused across all candidate visibility
- * edges, so each index is built a single time and amortized over those edges. It never escapes the
- * linking thread, so the unsynchronized lazy fields are not a concern.
+ * to answer the repeated geometric queries performed while linking a vertex to the area's
+ * visibility vertices. An instance is created once per linking call and reused across all candidate
+ * visibility edges, so each index is built a single time and amortized over those edges. It never
+ * escapes the linking thread, so the unsynchronized lazy fields are not a concern.
  */
 final class PreparedAreaGroup {
 
@@ -66,17 +66,17 @@ final class PreparedAreaGroup {
 
   /**
    * The sub-areas of this group that the visibility {@code line} crosses. A multi-area group's
-   * sub-areas tile/overlap to cover the group, so a visibility edge routinely crosses more than one;
-   * the caller merges their properties (see {@link AreaEdgeProperties#merge(List)}). The crossing test
-   * uses a per-sub-area {@link PreparedGeometry}, built once and reused across the group's edges; it
-   * allocates no overlay geometry. The line is shrunk slightly at both ends first (as
-   * {@link #containsSegment} does): its endpoints are visibility vertices sitting on the area boundary,
-   * so an un-shrunk {@code intersects} would also match any neighbouring sub-area the edge merely
-   * touches at that shared endpoint without ever crossing its interior — grafting that neighbour's
-   * (worse) properties onto the edge. Shrinking removes those 0-D boundary touches while keeping every
-   * genuine 1-D crossing. The returned list is never empty: if no sub-area is actually crossed (a point
-   * force-linked from outside the group) the first sub-area is returned as a fallback so the edge still
-   * receives some properties.
+   * sub-areas tile/overlap to cover the group, so a visibility edge routinely crosses more than
+   * one; the caller merges their properties (see {@link AreaEdgeProperties#merge(List)}). The
+   * crossing test uses a per-sub-area {@link PreparedGeometry}, built once and reused across the
+   * group's edges; it allocates no overlay geometry. The line is shrunk slightly at both ends first
+   * (as {@link #containsSegment} does): its endpoints are visibility vertices sitting on the area
+   * boundary, so an un-shrunk {@code intersects} would also match any neighbouring sub-area the
+   * edge merely touches at that shared endpoint without ever crossing its interior — grafting that
+   * neighbour's (worse) properties onto the edge. Shrinking removes those 0-D boundary touches
+   * while keeping every genuine 1-D crossing. The returned list is never empty: if no sub-area is
+   * actually crossed (a point force-linked from outside the group) the first sub-area is returned
+   * as a fallback so the edge still receives some properties.
    *
    * @param line the visibility edge segment
    */

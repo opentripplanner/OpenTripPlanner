@@ -14,8 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class AccessibilityPreferences {
 
   /**
-   * Set the unknown cost to a very high number, so in case it is used accidentally it
-   * will not cause any harm.
+   * Set the unknown cost to a very high number, so in case it is used accidentally it will not
+   * cause any harm.
    */
   private static final Cost NOT_SET = Cost.costOfSeconds(9_999_999);
 
@@ -101,11 +101,9 @@ public final class AccessibilityPreferences {
       return false;
     }
     AccessibilityPreferences that = (AccessibilityPreferences) o;
-    return (
-      onlyConsiderAccessible == that.onlyConsiderAccessible &&
+    return (onlyConsiderAccessible == that.onlyConsiderAccessible &&
       Objects.equals(unknownCost, that.unknownCost) &&
-      Objects.equals(inaccessibleCost, that.inaccessibleCost)
-    );
+      Objects.equals(inaccessibleCost, that.inaccessibleCost));
   }
 
   @Override

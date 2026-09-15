@@ -15,8 +15,7 @@ public class WalkStepTest {
 
   @Test
   public void testRelativeDirection() {
-    WalkStepBuilder builder = new WalkStepBuilder()
-      .withDirectionText(new NonLocalizedString("Any"))
+    WalkStepBuilder builder = new WalkStepBuilder().withDirectionText(new NonLocalizedString("Any"))
       .withStartLocation(new WgsCoordinate(3.0, 4.0))
       .withNameIsDerived(false)
       .withAngle(0.0)

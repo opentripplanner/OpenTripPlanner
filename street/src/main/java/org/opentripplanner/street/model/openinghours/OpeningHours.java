@@ -46,13 +46,11 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
 
   @Override
   public String toString() {
-    return (
-      periodDescription +
+    return (periodDescription +
       " " +
       TimeUtils.timeToStrCompact(startTime) +
       "-" +
-      TimeUtils.timeToStrCompact(endTime)
-    );
+      TimeUtils.timeToStrCompact(endTime));
   }
 
   @Override
@@ -68,9 +66,9 @@ public class OpeningHours implements Comparable<OpeningHours>, Serializable {
   }
 
   public boolean isOpen(int day, int secondsSinceMidnight) {
-    return (
-      days.get(day) && this.startTime <= secondsSinceMidnight && secondsSinceMidnight <= endTime
-    );
+    return (days.get(day) &&
+      this.startTime <= secondsSinceMidnight &&
+      secondsSinceMidnight <= endTime);
   }
 
   public String periodDescription() {

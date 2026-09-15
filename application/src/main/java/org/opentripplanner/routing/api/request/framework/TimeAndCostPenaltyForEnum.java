@@ -98,8 +98,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
   ) {
     var builder = ToStringBuilder.of(clazz);
 
-    var sortedEntryList = values
-      .entrySet()
+    var sortedEntryList = values.entrySet()
       .stream()
       .sorted(Comparator.comparingInt(e -> e.getKey().ordinal()))
       .toList();

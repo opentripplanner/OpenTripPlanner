@@ -134,10 +134,9 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
     variables.put("VALUE", (double) value);
 
     try {
-      Expression expression = new ExpressionBuilder(formula)
-        .variables(variables.keySet().toArray(new String[0]))
-        .build()
-        .setVariables(variables);
+      Expression expression = new ExpressionBuilder(formula).variables(
+        variables.keySet().toArray(new String[0])
+      ).build().setVariables(variables);
       return expression.evaluate();
     } catch (UnknownFunctionOrVariableException ex) {
       throw new IllegalArgumentException(

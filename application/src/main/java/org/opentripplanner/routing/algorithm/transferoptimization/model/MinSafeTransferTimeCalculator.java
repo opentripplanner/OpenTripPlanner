@@ -14,9 +14,9 @@ import org.opentripplanner.utils.lang.IntUtils;
  * This is a calculator to calculate a min-safe-transfer-time. The min-safe-transfer-time is used to
  * apply extra cost to tight transfers.
  * <p>
- * The min-safe-transfer-time is calculated using the <em>minimum transit time</em> across the list
- * of journeys passed in. The transit time is used because we do not want to include waiting time,
- * which variate more from search to search.
+ * The min-safe-transfer-time is calculated using the <em>minimum transit time</em> across the
+ * list of journeys passed in. The transit time is used because we do not want to include waiting
+ * time, which variate more from search to search.
  * <p>
  * Example:
  * <pre>
@@ -46,8 +46,8 @@ import org.opentripplanner.utils.lang.IntUtils;
  *  |    5h    |     20m       |
  *  | > 10h    |     40m       |
  * </pre>
- * Note! Normally the board-/alight-/transfer-slack serve as a lower bound for the transfer time;
- * Hence also for the min-safe-transfer-time for short journeys.
+ * Note! Normally the board-/alight-/transfer-slack serve as a lower bound for the transfer
+ * time; Hence also for the min-safe-transfer-time for short journeys.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -96,8 +96,9 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
   }
 
   public int minSafeTransferTime(Collection<RaptorPath<T>> paths) {
-    ToIntFunction<RaptorPath<T>> totalTransitTimeOp = p ->
-      p.transitLegs().mapToInt(this::durationIncludingSlack).sum();
+    ToIntFunction<RaptorPath<T>> totalTransitTimeOp = p -> p.transitLegs()
+      .mapToInt(this::durationIncludingSlack)
+      .sum();
 
     return minSafeTransferTimeOp(paths, totalTransitTimeOp);
   }

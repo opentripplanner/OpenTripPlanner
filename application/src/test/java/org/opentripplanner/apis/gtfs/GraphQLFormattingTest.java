@@ -11,9 +11,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 public class GraphQLFormattingTest {
 
-  public static final File SCHEMA_FILE = ResourceLoader.of(
-    GraphQLFormattingTest.class
-  ).mainResourceFile("schema.graphqls");
+  public static final File SCHEMA_FILE = ResourceLoader.of(GraphQLFormattingTest.class)
+    .mainResourceFile("schema.graphqls");
 
   @Test
   public void format() {

@@ -18,9 +18,9 @@ import org.opentripplanner.osm.model.RelationBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Checks that turn restrictions are processed even if they don't strictly adhere to their
- * stated type, for example that a "no straight on" restriction is added to two edges even if
- * - geometrically speaking - you are not going straight.
+ * Checks that turn restrictions are processed even if they don't strictly adhere to their stated
+ * type, for example that a "no straight on" restriction is added to two edges even if -
+ * geometrically speaking - you are not going straight.
  * <p>
  * https://github.com/opentripplanner/OpenTripPlanner/issues/6536
  */
@@ -82,8 +82,7 @@ class TurnRestrictionsTest {
     osmModule.buildGraph();
 
     assertThat(
-      issueStore
-        .listIssues()
+      issueStore.listIssues()
         .stream()
         .filter(i -> i instanceof TurnRestrictionBad || i instanceof TurnRestrictionUnknown)
         .toList()

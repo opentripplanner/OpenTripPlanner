@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * Write tasks submitted by updaters are serialised per {@link WriteDomain} by the
  * {@link WriteToGraphCallback}s passed at construction — currently {@link GraphWriterService}
  * instances, which will be replaced by the new
- * {@link org.opentripplanner.framework.transaction.UpdateManager} framework. Each updater is
- * routed to the callback of its declared write domain, so updaters working on unrelated domains
- * run in parallel.
+ * {@link org.opentripplanner.framework.transaction.UpdateManager} framework. Each updater is routed
+ * to the callback of its declared write domain, so updaters working on unrelated domains run in
+ * parallel.
  */
 public class GraphUpdaterManager implements GraphUpdaterStatus {
 
@@ -122,18 +122,16 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
   }
 
   /**
-   * Initiate the graceful shutdown of thread pools.
-   * Running tasks will be cancelled.
-   * Pending tasks will be ignored.
+   * Initiate the graceful shutdown of thread pools. Running tasks will be cancelled. Pending tasks
+   * will be ignored.
    */
   public void stop() {
     stop(true);
   }
 
   /**
-   * Initiate the graceful shutdown of thread pools.
-   * Optionally wait for running tasks to be processed before stopping (useful in tests).
-   * Pending tasks will be ignored.
+   * Initiate the graceful shutdown of thread pools. Optionally wait for running tasks to be
+   * processed before stopping (useful in tests). Pending tasks will be ignored.
    */
   public void stop(boolean cancelRunningTasks) {
     // TODO: find a better way to stop these threads
@@ -147,8 +145,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
     }
 
     try {
-      boolean ok =
-        pollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS) &&
+      boolean ok = pollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS) &&
         nonPollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS);
       if (!ok) {
         LOG.warn("Timeout waiting for updaters to finish.");
@@ -177,8 +174,7 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    */
   @Override
   public List<String> listUnprimedUpdaters() {
-    return updaterList
-      .stream()
+    return updaterList.stream()
       .filter(Predicate.not(GraphUpdater::isPrimed))
       .map(GraphUpdater::getConfigRef)
       .collect(Collectors.toList());
@@ -228,8 +224,8 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
    * mostly idle, and it is short-lived, so the busy-wait is a compromise.
    */
   private void reportReadinessForUpdaters() {
-    Executors.newSingleThreadExecutor(Thread.ofPlatform().name("updater-ready").factory()).submit(
-      () -> {
+    Executors.newSingleThreadExecutor(Thread.ofPlatform().name("updater-ready").factory())
+      .submit(() -> {
         boolean otpIsShuttingDown = false;
 
         while (!otpIsShuttingDown) {
@@ -252,7 +248,6 @@ public class GraphUpdaterManager implements GraphUpdaterStatus {
             LOG.error(e.getMessage(), e);
           }
         }
-      }
-    );
+      });
   }
 }

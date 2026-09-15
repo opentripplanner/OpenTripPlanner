@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
  * Abstract mapper for GBFS geofencing zones. Subclasses implement version-specific access to GBFS
  * feature properties and rules.
  * <p>
- * Per the GBFS spec, a zone can contain multiple rules. Rules within the same zone are resolved by
- * vehicle type scope: rules with the same {@code vehicle_type_ids} are grouped, and only the first
- * (highest-precedence) rule per group is kept. Each distinct vehicle type scope produces one
+ * Per the GBFS spec, a zone can contain multiple rules. Rules within the same zone are resolved
+ * by vehicle type scope: rules with the same {@code vehicle_type_ids} are grouped, and only the
+ * first (highest-precedence) rule per group is kept. Each distinct vehicle type scope produces one
  * {@link GeofencingZone}.
  *
  * @param <F> The GBFS feature type (zone)
@@ -61,10 +61,10 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
 
   /**
    * Convert a GBFS feature to internal model(s). Rules within the zone are grouped by
-   * {@code vehicle_type_ids} scope — the first rule per scope wins (GBFS precedence semantic).
-   * Each distinct scope produces one {@link GeofencingZone}.
+   * {@code vehicle_type_ids} scope — the first rule per scope wins (GBFS precedence semantic). Each
+   * distinct scope produces one {@link GeofencingZone}.
    *
-   * @param feature The GBFS feature (zone)
+   * @param feature   The GBFS feature (zone)
    * @param zoneIndex Position in GBFS feature array (used as inter-zone priority)
    * @return List of GeofencingZone objects, one per distinct vehicle type scope
    */
@@ -115,8 +115,7 @@ public abstract class GbfsGeofencingZoneMapper<F, R> {
 
       // A zone is a business area when all ride/traversal booleans are permissive
       // (null or false). Fields like maximum_speed_kph, station_parking are orthogonal.
-      boolean businessArea =
-        !Boolean.TRUE.equals(dropOffBanned) &&
+      boolean businessArea = !Boolean.TRUE.equals(dropOffBanned) &&
         !Boolean.TRUE.equals(traversalBanned) &&
         !Boolean.TRUE.equals(rideStartBanned);
 

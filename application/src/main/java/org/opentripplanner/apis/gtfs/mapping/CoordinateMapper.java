@@ -12,8 +12,8 @@ public class CoordinateMapper {
   ) {
     if (
       coordinate == null ||
-      coordinate.getGraphQLLatitude() == null ||
-      coordinate.getGraphQLLongitude() == null
+        coordinate.getGraphQLLatitude() == null ||
+        coordinate.getGraphQLLongitude() == null
     ) {
       return Optional.empty();
     }

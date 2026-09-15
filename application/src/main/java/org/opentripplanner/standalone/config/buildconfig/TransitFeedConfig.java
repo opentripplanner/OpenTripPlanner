@@ -17,8 +17,7 @@ public class TransitFeedConfig {
     NetexFeedParameters netexDefaults,
     GtfsDefaultParameters gtfsDefaults
   ) {
-    List<DataSourceConfig> list = root
-      .of(parameterName)
+    List<DataSourceConfig> list = root.of(parameterName)
       .since(V2_2)
       .summary("Scan for transit data files")
       .description(
@@ -45,8 +44,7 @@ public class TransitFeedConfig {
     NetexFeedParameters netexDefaults,
     GtfsDefaultParameters gtfsDefaults
   ) {
-    var type = feedNode
-      .of("type")
+    var type = feedNode.of("type")
       .since(V2_2)
       .summary("The feed input format.")
       .asEnum(TransitFeedType.class);
@@ -58,8 +56,7 @@ public class TransitFeedConfig {
 
   @SuppressWarnings("unchecked")
   private static <T> List<T> filterListOnSubType(List<? super T> list, Class<T> type) {
-    return list
-      .stream()
+    return list.stream()
       .filter(it -> type.isAssignableFrom(it.getClass()))
       .map(it -> (T) it)
       .toList();

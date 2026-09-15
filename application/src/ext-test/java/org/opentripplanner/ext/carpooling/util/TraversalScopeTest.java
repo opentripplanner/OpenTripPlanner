@@ -22,32 +22,28 @@ class TraversalScopeTest extends GraphRoutingTest {
 
   /**
    * Every candidate {@code permanentBoundary} offers must be permanent, because
-   * {@code snapToPermanentVertex} accepts one without re-checking permanence — a temporary candidate
-   * would be stored in the carpooling repository and die with the request that produced it. Graph:
-   * {@code A --(100 m, all modes)-- B}, linked ~30 % along so A is the nearer endpoint.
+   * {@code snapToPermanentVertex} accepts one without re-checking permanence — a temporary
+   * candidate would be stored in the carpooling repository and die with the request that produced
+   * it. Graph: {@code A --(100 m, all modes)-- B}, linked ~30 % along so A is the nearer endpoint.
    */
   @Test
   void permanentBoundary_offersOnlyPermanentVertices_nearestFirst() {
     var v = new IntersectionVertex[2];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("A", 60.0000, 10.0000);
-          v[1] = intersection("B", 60.0000, 10.0018);
-          street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("A", 60.0000, 10.0000);
+        v[1] = intersection("B", 60.0000, 10.0018);
+        street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
 
     try (var container = new TemporaryVerticesContainer()) {
-      var linked = new StreetVertexUtils(
-        vertexCreationService,
-        container
-      ).createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
+      var linked = new StreetVertexUtils(vertexCreationService, container)
+        .createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
       assertNotNull(linked);
 
       var boundary = TraversalScope.withOwnLinkingOf(linked).permanentBoundary(linked);
@@ -64,8 +60,8 @@ class TraversalScopeTest extends GraphRoutingTest {
 
   /**
    * A scope admits the temporary edges of its own linking — a search starting on a temporary vertex
-   * needs them to reach the permanent graph at all — but not those of a foreign one, whose mode-blind
-   * free edges would let a car cross between networks it cannot drive between.
+   * needs them to reach the permanent graph at all — but not those of a foreign one, whose
+   * mode-blind free edges would let a car cross between networks it cannot drive between.
    * {@link TraversalScope#STATIC_GRAPH} admits neither. Graph:
    * <pre>
    *   A --(100 m, all modes)-- B
@@ -76,29 +72,25 @@ class TraversalScopeTest extends GraphRoutingTest {
   void shouldSkipEdge_admitsOwnLinkingButNotForeign() {
     var v = new IntersectionVertex[2];
     var hub = new TemporaryStreetLocation[1];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("A", 60.0000, 10.0000);
-          v[1] = intersection("B", 60.0000, 10.0018);
-          street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          // Stands in for another in-flight request's linking.
-          hub[0] = streetLocation("foreign-hub", 60.0001, 10.0004);
-          link(v[0], hub[0]);
-          link(hub[0], v[0]);
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("A", 60.0000, 10.0000);
+        v[1] = intersection("B", 60.0000, 10.0018);
+        street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        // Stands in for another in-flight request's linking.
+        hub[0] = streetLocation("foreign-hub", 60.0001, 10.0004);
+        link(v[0], hub[0]);
+        link(hub[0], v[0]);
       }
-    );
+    });
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
 
     try (var container = new TemporaryVerticesContainer()) {
-      var linked = new StreetVertexUtils(
-        vertexCreationService,
-        container
-      ).createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
+      var linked = new StreetVertexUtils(vertexCreationService, container)
+        .createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
       assertNotNull(linked);
 
       var scope = TraversalScope.withOwnLinkingOf(linked);

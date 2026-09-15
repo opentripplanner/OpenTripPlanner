@@ -46,10 +46,8 @@ public class StreetLocation extends StreetVertex {
   public boolean equals(Object o) {
     if (o instanceof StreetLocation other) {
       // avoid allocations of Coordinate by comparing the doubles directly
-      return (
-        DoubleUtils.doubleEquals(other.getLat(), this.getLat()) &&
-        DoubleUtils.doubleEquals(other.getLon(), this.getLon())
-      );
+      return (DoubleUtils.doubleEquals(other.getLat(), this.getLat()) &&
+        DoubleUtils.doubleEquals(other.getLon(), this.getLon()));
     }
     return false;
   }

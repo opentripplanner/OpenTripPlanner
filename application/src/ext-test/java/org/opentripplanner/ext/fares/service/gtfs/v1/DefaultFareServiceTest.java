@@ -55,9 +55,12 @@ class DefaultFareServiceTest implements PlanTestConstants {
   void simpleZoneBasedFare() {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET));
-    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
-      .bus(1, T11_00, T11_12, Place.forStop(CITY_CENTER_A_STOP))
-      .build();
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00).bus(
+      1,
+      T11_00,
+      T11_12,
+      Place.forStop(CITY_CENTER_A_STOP)
+    ).build();
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
@@ -72,10 +75,12 @@ class DefaultFareServiceTest implements PlanTestConstants {
   void applyToSeveralLegs() {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of(FREE_TRANSFERS_IN_CITY_SET));
-    var itin = newItinerary(Place.forStop(CITY_CENTER_A_STOP), T11_00)
-      .bus(1, T11_00, T11_12, Place.forStop(CITY_CENTER_B_STOP))
-      .bus(1, T11_16, T11_20, Place.forStop(CITY_CENTER_C_STOP))
-      .build();
+    var itin = newItinerary(Place.forStop(CITY_CENTER_A_STOP), T11_00).bus(
+      1,
+      T11_00,
+      T11_12,
+      Place.forStop(CITY_CENTER_B_STOP)
+    ).bus(1, T11_16, T11_20, Place.forStop(CITY_CENTER_C_STOP)).build();
 
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
@@ -105,8 +110,12 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(AIRPORT_TO_CITY_CENTER_SET, INSIDE_CITY_CENTER_SET)
     );
 
-    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
-      .bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00).bus(
+      1,
+      T11_05,
+      T11_12,
+      Place.forStop(CITY_CENTER_A_STOP)
+    )
       .staySeatedBus(
         TransitRepositoryForTest.route("123").build(),
         2,
@@ -138,10 +147,12 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET));
 
-    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
-      .bus(1, T11_00, T11_12, Place.forStop(CITY_CENTER_A_STOP))
-      .bus(3, T11_20, T11_33, Place.forStop(SUBURB_STOP))
-      .build();
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00).bus(
+      1,
+      T11_00,
+      T11_12,
+      Place.forStop(CITY_CENTER_A_STOP)
+    ).bus(3, T11_20, T11_33, Place.forStop(SUBURB_STOP)).build();
 
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
@@ -161,15 +172,18 @@ class DefaultFareServiceTest implements PlanTestConstants {
   void multipleFeeds() {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET, OTHER_FEED_SET));
-    var itin = newItinerary(Place.forStop(AIRPORT_STOP))
-      .bus(1, T11_00, T11_05, Place.forStop(CITY_CENTER_A_STOP))
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP)).bus(
+      1,
+      T11_00,
+      T11_05,
+      Place.forStop(CITY_CENTER_A_STOP)
+    )
       .walk(10, Place.forStop(OTHER_FEED_STOP))
       .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
       .build();
     var result = service.calculateFares(itin);
 
-    var fareProductIds = result
-      .getLegProducts()
+    var fareProductIds = result.getLegProducts()
       .values()
       .stream()
       .map(r -> r.fareProduct().id())
@@ -197,8 +211,13 @@ class DefaultFareServiceTest implements PlanTestConstants {
   void multipleFeedsWithTransfersWithinFeed() {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of(INSIDE_CITY_CENTER_SET, OTHER_FEED_SET));
-    var itin = newItinerary(Place.forStop(OTHER_FEED_STOP))
-      .bus(OTHER_FEED_ROUTE, 2, T11_00, T11_05, Place.forStop(OTHER_FEED_STOP))
+    var itin = newItinerary(Place.forStop(OTHER_FEED_STOP)).bus(
+      OTHER_FEED_ROUTE,
+      2,
+      T11_00,
+      T11_05,
+      Place.forStop(OTHER_FEED_STOP)
+    )
       .walk(10, Place.forStop(CITY_CENTER_A_STOP))
       .bus(1, T11_00, T11_05, Place.forStop(CITY_CENTER_A_STOP))
       .walk(10, Place.forStop(OTHER_FEED_STOP))
@@ -230,14 +249,17 @@ class DefaultFareServiceTest implements PlanTestConstants {
   void multipleFeedsWithUnknownFareLegs() {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET, OTHER_FEED_SET));
-    var itin = newItinerary(Place.forStop(AIRPORT_STOP))
-      .bus(1, T11_00, T11_05, Place.forStop(OTHER_FEED_STOP))
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP)).bus(
+      1,
+      T11_00,
+      T11_05,
+      Place.forStop(OTHER_FEED_STOP)
+    )
       .walk(10, Place.forStop(OTHER_FEED_STOP))
       .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
       .build();
     var result = service.calculateFares(itin);
-    var resultProductIds = result
-      .getLegProducts()
+    var resultProductIds = result.getLegProducts()
       .values()
       .stream()
       .map(r -> r.fareProduct().id())

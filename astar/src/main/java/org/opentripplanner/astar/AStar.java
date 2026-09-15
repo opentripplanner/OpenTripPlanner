@@ -28,11 +28,7 @@ import org.slf4j.LoggerFactory;
  * Find the shortest path between graph vertices using A*. A basic Dijkstra search is a special case
  * of AStar where the heuristic is always zero.
  */
-public class AStar<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class AStar<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AStar.class);
 
@@ -67,13 +63,18 @@ public class AStar<
   private int nVisited;
 
   /// Create an AStar search
-  /// @param initialStates The initial states to start the search from.
-  /// @param arriveBy If set to true we will do a backwards search by traversing the incoming edges from each vertex.
-  /// @param dominanceFunction A dominance function that determines which states we should keep during the search.
-  /// @param goalVertices The search stops once the first goal vertex is reached.
-  /// @param heuristic An astar heuristic that estimates a lower bound of the weight to the destination. If set to null the search will be a basic Dijkstra search.
-  /// @param timeout A timeout that exits the search.
-  /// @param preSearchHook A runnable that is run before the search starts.
+  ///
+  /// @param initialStates      The initial states to start the search from.
+  /// @param arriveBy           If set to true we will do a backwards search by traversing the
+  ///                           incoming edges from each vertex.
+  /// @param dominanceFunction  A dominance function that determines which states we should keep
+  ///                           during the search.
+  /// @param goalVertices       The search stops once the first goal vertex is reached.
+  /// @param heuristic          An astar heuristic that estimates a lower bound of the weight to the
+  ///                           destination. If set to null the search will be a basic Dijkstra
+  ///                           search.
+  /// @param timeout            A timeout that exits the search.
+  /// @param preSearchHook      A runnable that is run before the search starts.
   /// @param statisticsCallback A pluggable callback for logging metrics.
   AStar(
     Collection<State> initialStates,
@@ -91,8 +92,7 @@ public class AStar<
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
     this.traverseVisitor = traverseVisitor;
-    this.initialVertices = initialStates
-      .stream()
+    this.initialVertices = initialStates.stream()
       .map(AStarState::getVertex)
       .collect(Collectors.toSet());
     this.goalVertices = goalVertices;
@@ -125,8 +125,7 @@ public class AStar<
   public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
     runSearch();
 
-    return targetAcceptedStates
-      .stream()
+    return targetAcceptedStates.stream()
       .filter(State::isFinal)
       .map(GraphPath::new)
       .collect(Collectors.toList());

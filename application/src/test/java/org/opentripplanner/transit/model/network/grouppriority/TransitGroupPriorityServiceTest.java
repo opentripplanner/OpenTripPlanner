@@ -146,8 +146,7 @@ class TransitGroupPriorityServiceTest {
     List<RegularStop> stops,
     String times
   ) {
-    return new TestRouteData.Builder(route)
-      .withMode(mode)
+    return new TestRouteData.Builder(route).withMode(mode)
       .withAgency(agency)
       .withStops(stops)
       .build();

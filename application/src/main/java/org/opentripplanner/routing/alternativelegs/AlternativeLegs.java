@@ -31,9 +31,9 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * A helper class to fetch previous/next alternative legs for a scheduled transit leg.
- * The replacement legs arrive/depart from/to the same station as the original leg, but uses other
- * trips for the leg.
+ * A helper class to fetch previous/next alternative legs for a scheduled transit leg. The
+ * replacement legs arrive/depart from/to the same station as the original leg, but uses other trips
+ * for the leg.
  *
  * Generalized cost and constrained transfers are not included in the alternative legs.
  */
@@ -84,11 +84,13 @@ public class AlternativeLegs {
     Station fromStation = fromStop.getParentStation();
     Station toStation = toStop.getParentStation();
 
-    Collection<StopLocation> origins =
-      fromStation == null || exactOriginStop ? List.of(fromStop) : fromStation.getChildStops();
+    Collection<StopLocation> origins = fromStation == null || exactOriginStop
+      ? List.of(fromStop)
+      : fromStation.getChildStops();
 
-    Collection<StopLocation> destinations =
-      toStation == null || exactDestinationStop ? List.of(toStop) : toStation.getChildStops();
+    Collection<StopLocation> destinations = toStation == null || exactDestinationStop
+      ? List.of(toStop)
+      : toStation.getChildStops();
 
     Comparator<ScheduledTransitLeg> legComparator = Comparator.comparing(
       ScheduledTransitLeg::startTime
@@ -100,8 +102,7 @@ public class AlternativeLegs {
 
     Predicate<TripPattern> tripPatternPredicate = filter.getFilter(leg);
 
-    return origins
-      .stream()
+    return origins.stream()
       .flatMap(stop -> transitService.findPatterns(stop, true).stream())
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
       .filter(tripPatternPredicate)
@@ -115,8 +116,8 @@ public class AlternativeLegs {
   }
 
   /**
-   * This has been copied and slightly modified from StopTimesHelper.
-   * TODO: Adapt after new transit model is in place
+   * This has been copied and slightly modified from StopTimesHelper. TODO: Adapt after new transit
+   * model is in place
    */
   private static Stream<ScheduledTransitLeg> generateLegs(
     TransitService transitService,
@@ -166,10 +167,9 @@ public class AlternativeLegs {
           continue;
         }
 
-        boolean departureTimeInRange =
-          direction == NavigationDirection.PREVIOUS
-            ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
-            : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
+        boolean departureTimeInRange = direction == NavigationDirection.PREVIOUS
+          ? tripTimes.getDepartureTime(boardingPosition) <= secondsSinceMidnight
+          : tripTimes.getDepartureTime(boardingPosition) >= secondsSinceMidnight;
 
         if (departureTimeInRange) {
           pq.add(
@@ -230,8 +230,7 @@ public class AlternativeLegs {
       new TripIdAndServiceDate(tripTimeOnDate.getTrip().getId(), tripTimeOnDate.getServiceDay())
     );
 
-    return new ScheduledTransitLegBuilder<>()
-      .withTripTimes(tripTimes)
+    return new ScheduledTransitLegBuilder<>().withTripTimes(tripTimes)
       .withTripPattern(pattern)
       .withBoardStopIndexInPattern(boardingPosition)
       .withAlightStopIndexInPattern(alightingPosition)
@@ -260,14 +259,14 @@ public class AlternativeLegs {
     return IntStream.range(0, stops.size())
       .filter(i -> origins.contains(stops.get(i)) && tripPattern.canBoard(i))
       .boxed()
-      .flatMap(boardingPosition ->
-        Arrays.stream(alightingPositions)
+      .flatMap(
+        boardingPosition -> Arrays.stream(alightingPositions)
           // Filter out the impossible combinations
           .filter(alightingPosition -> boardingPosition < alightingPosition)
           .min()
           .stream()
-          .mapToObj(alightingPosition ->
-            new BoardingAlightingPositions(boardingPosition, alightingPosition)
+          .mapToObj(
+            alightingPosition -> new BoardingAlightingPositions(boardingPosition, alightingPosition)
           )
       )
       // Group by alighting position
@@ -275,9 +274,8 @@ public class AlternativeLegs {
       .values()
       .stream()
       // Find the shortest leg in each group
-      .flatMap(legGroup ->
-        legGroup
-          .stream()
+      .flatMap(
+        legGroup -> legGroup.stream()
           .min(Comparator.comparing(ba -> ba.alightingPosition - ba.boardingPosition))
           .stream()
       )

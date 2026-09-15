@@ -13,16 +13,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * This class configure the amount of debugging you want for your request. Debugging is supported by
  * an event model and event listeners must be provided to receive any debug info.
- * <p/>
- * To debug unexpected results is sometimes very time-consuming. This class make it possible to list
- * all stop arrival events during the search for a given list of stops and/or a path.
- * <p/>
- * The debug events are not returned as part of the result, instead they are posted to registered
- * listeners. The events are temporary objects; hence you should not hold a reference to the event
- * elements or to any part of it after the listener callback completes.
- * <p/>
- * One of the benefits of the event based return strategy is that the events are returned even in
- * the case of an exception or entering a endless loop. You don´t need to wait for the result to
+ * <p/>To debug unexpected results is sometimes very time-consuming. This class make it possible to
+ * list all stop arrival events during the search for a given list of stops and/or a path.
+ * <p/>The debug events are not returned as part of the result, instead they are posted to
+ * registered listeners. The events are temporary objects; hence you should not hold a reference to
+ * the event elements or to any part of it after the listener callback completes.
+ * <p/>One of the benefits of the event based return strategy is that the events are returned even
+ * in the case of an exception or entering a endless loop. You don´t need to wait for the result to
  * start analyze the results.
  *
  * <h3>Debugging stops</h3>
@@ -41,8 +38,8 @@ public record DebugRequest(
   /** List of stops in a particular path to debug. Only one path can be debugged per request. */
   List<Integer> path,
   /**
-   * The first stop to start recording debug information in the path specified in this request.
-   * This will filter away all events in the beginning of the path reducing the number of events
+   * The first stop to start recording debug information in the path specified in this request. This
+   * will filter away all events in the beginning of the path reducing the number of events
    * significantly; Hence make it easier to inspect events towards the end of the trip.
    */
   int debugPathFromStopIndex,
@@ -70,11 +67,9 @@ public record DebugRequest(
       return false;
     }
     DebugRequest that = (DebugRequest) o;
-    return (
-      debugPathFromStopIndex == that.debugPathFromStopIndex &&
+    return (debugPathFromStopIndex == that.debugPathFromStopIndex &&
       Objects.equals(stops, that.stops) &&
-      Objects.equals(path, that.path)
-    );
+      Objects.equals(path, that.path));
   }
 
   @Override

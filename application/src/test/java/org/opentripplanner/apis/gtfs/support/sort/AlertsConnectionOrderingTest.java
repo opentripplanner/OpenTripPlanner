@@ -23,9 +23,11 @@ class AlertsConnectionOrderingTest {
     var severe = alert("severe", AlertSeverity.SEVERE, EARLY);
     var verySevere = alert("very-severe", AlertSeverity.VERY_SEVERE, EARLY);
 
-    assertThat(AlertsConnectionOrdering.sort(List.of(info, verySevere, severe)))
-      .containsExactly(verySevere, severe, info)
-      .inOrder();
+    assertThat(AlertsConnectionOrdering.sort(List.of(info, verySevere, severe))).containsExactly(
+      verySevere,
+      severe,
+      info
+    ).inOrder();
   }
 
   @Test
@@ -33,8 +35,7 @@ class AlertsConnectionOrderingTest {
     var late = alert("late", AlertSeverity.WARNING, LATE);
     var early = alert("early", AlertSeverity.WARNING, EARLY);
 
-    assertThat(AlertsConnectionOrdering.sort(List.of(late, early)))
-      .containsExactly(early, late)
+    assertThat(AlertsConnectionOrdering.sort(List.of(late, early))).containsExactly(early, late)
       .inOrder();
   }
 
@@ -57,9 +58,7 @@ class AlertsConnectionOrderingTest {
     var a = alert("a", AlertSeverity.WARNING, EARLY);
     var c = alert("c", AlertSeverity.WARNING, EARLY);
 
-    assertThat(AlertsConnectionOrdering.sort(List.of(c, b, a)))
-      .containsExactly(a, b, c)
-      .inOrder();
+    assertThat(AlertsConnectionOrdering.sort(List.of(c, b, a))).containsExactly(a, b, c).inOrder();
   }
 
   @Test

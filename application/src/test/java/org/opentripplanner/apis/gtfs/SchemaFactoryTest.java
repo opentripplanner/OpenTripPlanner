@@ -38,13 +38,10 @@ public class SchemaFactoryTest {
     var relaxCoefficient = 1;
     var relaxConstant = 0;
 
-    var routeRequest = RouteRequest.of()
-      .withPreferences(preferences -> {
-        preferences.withWalk(walk -> walk.withSpeed(walkSpeed));
-        preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1));
-      })
-      .withNumItineraries(numItineraries)
-      .buildDefault();
+    var routeRequest = RouteRequest.of().withPreferences(preferences -> {
+      preferences.withWalk(walk -> walk.withSpeed(walkSpeed));
+      preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1));
+    }).withNumItineraries(numItineraries).buildDefault();
 
     var schema = SchemaFactory.createSchemaWithDefaultInjection(routeRequest);
     assertNotNull(schema);
@@ -68,16 +65,14 @@ public class SchemaFactoryTest {
       "TransitPreferencesInput",
       "relaxTransitGroupPriority"
     );
-    var defaultRelaxCoefficient = (FloatValue) defaultRelax
-      .getObjectFields()
+    var defaultRelaxCoefficient = (FloatValue) defaultRelax.getObjectFields()
       .stream()
       .filter(f -> f.getName().equals("coefficient"))
       .findFirst()
       .orElseThrow()
       .getValue();
     assertEquals(relaxCoefficient, defaultRelaxCoefficient.getValue().doubleValue());
-    var defaultRelaxConstant = (IntValue) defaultRelax
-      .getObjectFields()
+    var defaultRelaxConstant = (IntValue) defaultRelax.getObjectFields()
       .stream()
       .filter(f -> f.getName().equals("constant"))
       .findFirst()
@@ -109,8 +104,7 @@ public class SchemaFactoryTest {
   }
 
   private static DataFetcher<?> getQueryType(String fieldName, GraphQLSchema schema) {
-    return schema
-      .getCodeRegistry()
+    return schema.getCodeRegistry()
       .getDataFetcher(
         FieldCoordinates.coordinates("QueryType", fieldName),
         GraphQLFieldDefinition.newFieldDefinition()

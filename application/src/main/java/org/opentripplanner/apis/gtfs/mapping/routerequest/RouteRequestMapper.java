@@ -70,12 +70,12 @@ public class RouteRequestMapper {
       request.withNumItineraries(args.getGraphQLFirst());
     }
 
-    request.withPreferences(preferences ->
-      setPreferences(preferences, request, isTripPlannedForNow, args, environment)
+    request.withPreferences(
+      preferences -> setPreferences(preferences, request, isTripPlannedForNow, args, environment)
     );
 
-    request.withJourney(journeyRequestBuilder ->
-      setModes(journeyRequestBuilder, args, environment)
+    request.withJourney(
+      journeyRequestBuilder -> setModes(journeyRequestBuilder, args, environment)
     );
 
     // sadly we need to use the raw collection because it is cast to the wrong type
@@ -92,8 +92,8 @@ public class RouteRequestMapper {
     DataFetchingEnvironment environment
   ) {
     var preferenceArgs = args.getGraphQLPreferences();
-    prefs.withItineraryFilter(filters ->
-      setItineraryFilters(filters, args.getGraphQLItineraryFilter())
+    prefs.withItineraryFilter(
+      filters -> setItineraryFilters(filters, args.getGraphQLItineraryFilter())
     );
     prefs.withTransit(transit -> {
       prefs.withTransfer(transfer -> setTransitPreferences(transit, transfer, args, environment));
@@ -142,8 +142,8 @@ public class RouteRequestMapper {
       return;
     }
 
-    preferences.withBike(bicycle ->
-      setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
+    preferences.withBike(
+      bicycle -> setBicyclePreferences(bicycle, args.getGraphQLBicycle(), environment)
     );
     preferences.withCar(car -> setCarPreferences(car, args.getGraphQLCar(), environment));
     preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
@@ -154,14 +154,16 @@ public class RouteRequestMapper {
     RoutingPreferencesBuilder preferences,
     boolean isTripPlannedForNow
   ) {
-    preferences.withBike(bike ->
-      bike.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
+    preferences.withBike(
+      bike -> bike.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
     );
-    preferences.withCar(car ->
-      car.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
+    preferences.withCar(
+      car -> car.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
     );
-    preferences.withScooter(scooter ->
-      scooter.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
+    preferences.withScooter(
+      scooter -> scooter.withRental(
+        rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow)
+      )
     );
   }
 
@@ -170,8 +172,8 @@ public class RouteRequestMapper {
     @Nullable GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
   ) {
     if (preferenceArgs != null && preferenceArgs.getGraphQLWheelchair() != null) {
-      requestBuilder.withJourney(j ->
-        j.withWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled())
+      requestBuilder.withJourney(
+        j -> j.withWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled())
       );
     }
   }
@@ -183,11 +185,11 @@ public class RouteRequestMapper {
     if (stopLocation.getGraphQLStopLocationId() != null) {
       var stopId = stopLocation.getGraphQLStopLocationId();
       return FeedScopedId.parseOptional(stopId)
-        .map(feedScopedId ->
-          GenericLocation.fromStopId(feedScopedId, locationInput.getGraphQLLabel())
+        .map(
+          feedScopedId -> GenericLocation.fromStopId(feedScopedId, locationInput.getGraphQLLabel())
         )
-        .orElseThrow(() ->
-          new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId))
+        .orElseThrow(
+          () -> new IllegalArgumentException("Stop id %s is not of valid format.".formatted(stopId))
         );
     }
 

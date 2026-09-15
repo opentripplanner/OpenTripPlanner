@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 class DlugoszVarLenIntPackerTest {
 
   /**
-   * Pack/unpack round-trip across the boundary values of every varint width. Each width (7, 14,
-   * 21, 27, 35 bits) is exercised at its upper limit and at the next value that forces a promotion
-   * to the wider encoding, in both signs. The expected packed length asserts that the promotion
+   * Pack/unpack round-trip across the boundary values of every varint width. Each width (7, 14, 21,
+   * 27, 35 bits) is exercised at its upper limit and at the next value that forces a promotion to
+   * the wider encoding, in both signs. The expected packed length asserts that the promotion
    * happens at the documented boundary.
    */
   @Test
@@ -68,9 +68,8 @@ class DlugoszVarLenIntPackerTest {
 
   /**
    * {@link DlugoszVarLenIntPacker#countValues(byte[])} must yield the same count that
-   * {@link DlugoszVarLenIntPacker#unpack(byte[])} would have produced, without decoding any
-   * values. Allocation-free streaming decoders rely on this contract to pre-size their output
-   * buffer.
+   * {@link DlugoszVarLenIntPacker#unpack(byte[])} would have produced, without decoding any values.
+   * Allocation-free streaming decoders rely on this contract to pre-size their output buffer.
    */
   @Test
   void countValuesMatchesUnpackLengthAcrossWidths() {
@@ -89,9 +88,7 @@ class DlugoszVarLenIntPackerTest {
         -67108864,
         67108864,
         Integer.MAX_VALUE,
-        Integer.MIN_VALUE,
-      },
-    };
+        Integer.MIN_VALUE, }, };
     for (int[] values : cases) {
       byte[] packed = DlugoszVarLenIntPacker.pack(values);
       assertEquals(
@@ -135,8 +132,7 @@ class DlugoszVarLenIntPackerTest {
       { 67108864, 5 },
       { -67108865, 5 },
       { Integer.MAX_VALUE, 5 },
-      { Integer.MIN_VALUE, 5 },
-    };
+      { Integer.MIN_VALUE, 5 }, };
     for (int[] c : cases) {
       int value = c[0];
       int expectedWidth = c[1];

@@ -24,9 +24,9 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Test that the c2 cost criterion is correctly used in destination pruning with heuristics.
- * The HeuristicsProvider should pass c2 values through to the DestinationArrivalPaths.qualify()
- * method, which uses c2 in pareto comparison to determine if a path is dominated.
+ * Test that the c2 cost criterion is correctly used in destination pruning with heuristics. The
+ * HeuristicsProvider should pass c2 values through to the DestinationArrivalPaths.qualify() method,
+ * which uses c2 in pareto comparison to determine if a path is dominated.
  * <p>
  * This test verifies that paths are correctly qualified based on c2 values when using
  * multi-criteria search with destination pruning optimization (PARETO_CHECK_AGAINST_DESTINATION).
@@ -38,17 +38,16 @@ public class I02_C2DestinationPruningTest implements RaptorTestConstants {
     new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
-  /// Test scenario with four routes that create paths with different c2 values.
-  /// The `relaxC1` is set to 10% with TransitPriorityCalculator enabled.
+  /// Test scenario with four routes that create paths with different c2 values. The `relaxC1` is
+  /// set to 10% with TransitPriorityCalculator enabled.
   ///
   /// - R1 is the best option based on time and c1.
   /// - R1 & R2 both have the same priorityGroup; Hence, R1 dominates R2 since it is 1s faster.
   /// - R1 & R3 have different priorityGroups and c2 for R3 is 9.9% worse => R1 does not dominate R3.
   /// - R1 & R4 have different priorityGroups and c2 for R4 is 10.2% worse => R1 does dominate R4.
   ///
-  /// With destination pruning enabled, the heuristics should correctly pass c2 values
-  /// to qualify paths, ensuring that paths are not incorrectly pruned based on incomplete
-  /// cost information.
+  /// With destination pruning enabled, the heuristics should correctly pass c2 values to qualify
+  /// paths, ensuring that paths are not incorrectly pruned based on incomplete cost information.
   @Test
   @DisplayName("C2 destination pruning with transit priority groups")
   void c2DestinationPruningWithTransitPriority() {
@@ -59,16 +58,14 @@ public class I02_C2DestinationPruningTest implements RaptorTestConstants {
 
     data.withRoutes(r1, r2, r3, r4).withBoardCost(0);
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .addAccessPaths(free(STOP_A))
       .addEgressPaths(free(STOP_B));
 
-    requestBuilder.withMultiCriteria(mc ->
-      mc
-        .withRelaxC1(value -> (value * 110) / 100)
+    requestBuilder.withMultiCriteria(
+      mc -> mc.withRelaxC1(value -> (value * 110) / 100)
         .withTransitPriorityCalculator(new TestGroupPriorityCalculator())
     );
 
@@ -76,14 +73,15 @@ public class I02_C2DestinationPruningTest implements RaptorTestConstants {
     assertEquals(
       """
       A ~ BUS R1 0:05 0:10:01 ~ B [0:05 0:10:01 5m1s Tₙ0 C₁301 C₂2]
-      A ~ BUS R3 0:05 0:10:31 ~ B [0:05 0:10:31 5m31s Tₙ0 C₁331 C₂4]""",
+      A ~ BUS R3 0:05 0:10:31 ~ B [0:05 0:10:31 5m31s Tₙ0 C₁331 C₂4]\
+      """
+      ,
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
 
   private static TestRoute routeA2B(String name, int priorityGroup, String timetable) {
-    return route(
-      TestTripPattern.of(name, STOP_A, STOP_B).priorityGroup(priorityGroup).build()
-    ).withTimetable(schedule(timetable));
+    return route(TestTripPattern.of(name, STOP_A, STOP_B).priorityGroup(priorityGroup).build())
+      .withTimetable(schedule(timetable));
   }
 }

@@ -22,13 +22,14 @@ class LookupStopIndexCallbackTest {
   );
 
   /**
-   * This mostly verifies that the test is set up correctly, the code tested is the dummy inside
-   * the test.
+   * This mostly verifies that the test is set up correctly, the code tested is the dummy inside the
+   * test.
    */
   void lookupStopLocationIndexesSingleIdInput() {
     assertArrayEquals(new int[] { 1, 7, 13 }, subject.lookupStopLocationIndexes(ID_1).toArray());
-    var ex = Assertions.assertThrows(EntityNotFoundException.class, () ->
-      subject.lookupStopLocationIndexes(ID_3).toArray()
+    var ex = Assertions.assertThrows(
+      EntityNotFoundException.class,
+      () -> subject.lookupStopLocationIndexes(ID_3).toArray()
     );
     assertEquals("StopLocation does not exist for id F:3", ex.getMessage());
   }
@@ -43,8 +44,9 @@ class LookupStopIndexCallbackTest {
     );
 
     // Should throw exception?
-    var ex = assertThrows(EntityNotFoundException.class, () ->
-      subject.lookupStopLocationIndexes(List.of(ID_1, ID_3))
+    var ex = assertThrows(
+      EntityNotFoundException.class,
+      () -> subject.lookupStopLocationIndexes(List.of(ID_1, ID_3))
     );
     assertEquals("StopLocation entity not found: F:3", ex.getMessage());
   }

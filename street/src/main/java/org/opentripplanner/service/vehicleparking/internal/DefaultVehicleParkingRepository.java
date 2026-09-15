@@ -44,8 +44,8 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
     Collection<VehicleParking> parkingToAdd,
     Collection<VehicleParking> parkingToRemove
   ) {
-    Multimap<VehicleParkingGroup, VehicleParking> updatedVehicleParkingGroups =
-      ArrayListMultimap.create(vehicleParkingGroups);
+    Multimap<VehicleParkingGroup, VehicleParking> updatedVehicleParkingGroups = ArrayListMultimap
+      .create(vehicleParkingGroups);
     parkingToRemove.forEach(vehicleParking -> {
       var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
       if (vehicleParkingGroup != null) {

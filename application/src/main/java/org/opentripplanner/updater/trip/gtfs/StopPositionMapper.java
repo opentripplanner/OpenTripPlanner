@@ -12,8 +12,8 @@ import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 
 /**
- * Takes a trip and a list of stop times and maps the stop times to the stop positions in the
- * trip's pattern.
+ * Takes a trip and a list of stop times and maps the stop times to the stop positions in the trip's
+ * pattern.
  */
 class StopPositionMapper {
 
@@ -24,12 +24,7 @@ class StopPositionMapper {
   StopPositionMapper(FeedScopedId tripId, TripTimes tripTimes, Timetable timetable) {
     this.tripId = tripId;
     this.tripTimes = tripTimes;
-    this.stopIds = timetable
-      .getPattern()
-      .getStops()
-      .stream()
-      .map(s -> s.getId().getId())
-      .toList();
+    this.stopIds = timetable.getPattern().getStops().stream().map(s -> s.getId().getId()).toList();
   }
 
   /**

@@ -60,8 +60,8 @@ public class TestServerContext {
   private TestServerContext() {}
 
   /**
-   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds
-   * raptor transit data, and wraps a pinned timetable snapshot.
+   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds raptor
+   * transit data, and wraps a pinned timetable snapshot.
    */
   public static TransitService createTransitService(
     TransitRepository transitRepository,
@@ -79,10 +79,7 @@ public class TestServerContext {
     );
   }
 
-  private static RepositoryHandle<
-    TimetableRepositorySnapshot,
-    TimetableRepository
-  > indexAndRegisterTimetableSnapshot(
+  private static RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> indexAndRegisterTimetableSnapshot(
     TransitRepository transitRepository,
     TransferRepository transferRepository,
     RepositoryRegistry registry

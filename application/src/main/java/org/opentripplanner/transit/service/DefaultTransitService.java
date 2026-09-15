@@ -72,9 +72,9 @@ import org.opentripplanner.utils.collection.SetUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * A new instance of this class should be created for each request.
- * This ensures that the same TimetableRepositorySnapshot is used for the
- * duration of the request (which may involve several method calls).
+ * A new instance of this class should be created for each request. This ensures that the same
+ * TimetableRepositorySnapshot is used for the duration of the request (which may involve several
+ * method calls).
  */
 public class DefaultTransitService implements TransitService {
 
@@ -87,8 +87,8 @@ public class DefaultTransitService implements TransitService {
   private final TransitRepositoryIndex transitRepositoryIndex;
 
   /**
-   * A nullable timetable snapshot containing real-time updates. If {@code null} then this
-   * instance does not contain any real-time information.
+   * A nullable timetable snapshot containing real-time updates. If {@code null} then this instance
+   * does not contain any real-time information.
    */
   @Nullable
   private final TimetableRepositorySnapshot timetableSnapshot;
@@ -101,8 +101,8 @@ public class DefaultTransitService implements TransitService {
   private final ReplacementHelper replacementHelper;
 
   /**
-   * Create a service without a real-time snapshot (and therefore without any real-time data).
-   * This is the constructor used by Dagger injection.
+   * Create a service without a real-time snapshot (and therefore without any real-time data). This
+   * is the constructor used by Dagger injection.
    */
   @Inject
   public DefaultTransitService(TransitRepository transitRepository) {
@@ -138,14 +138,12 @@ public class DefaultTransitService implements TransitService {
     TripTimes times = timetable.getTripTimes(trip);
     if (
       times == null ||
-      !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
+        !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
     ) {
       return Optional.empty();
     } else {
-      Instant midnight = ServiceDateUtils.asStartOfService(
-        serviceDate,
-        this.getTimeZone()
-      ).toInstant();
+      Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, this.getTimeZone())
+        .toInstant();
       return Optional.of(TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight));
     }
   }
@@ -212,8 +210,7 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
-    return getTripCalendars()
-      .getServiceCodesRunningForDate()
+    return getTripCalendars().getServiceCodesRunningForDate()
       .getOrDefault(serviceDate, EMPTY_SERVICE_CODES);
   }
 
@@ -374,8 +371,7 @@ public class DefaultTransitService implements TransitService {
 
   /**
    * Resolves a trip's runtime on its service date according to its schedule. The period starts at
-   * the scheduled departure from the first stop and ends at the scheduled arrival at the last
-   * stop.
+   * the scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
    *
    * @return {@code null} if the schedule of the trip cannot be resolved.
    */
@@ -451,8 +447,8 @@ public class DefaultTransitService implements TransitService {
       transitRepositoryIndex.getPatternsForRoute(route)
     );
     if (timetableSnapshot != null) {
-      Collection<TripPattern> realTimeAddedPatternForRoute =
-        timetableSnapshot.getRealTimeAddedPatternForRoute(route);
+      Collection<TripPattern> realTimeAddedPatternForRoute = timetableSnapshot
+        .getRealTimeAddedPatternForRoute(route);
       tripPatterns.addAll(realTimeAddedPatternForRoute);
     }
     return tripPatterns;
@@ -531,9 +527,9 @@ public class DefaultTransitService implements TransitService {
 
   /**
    * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
-   * added by realtime updates are added to the collection.
-   * A set is used here because trip patterns
-   * that were updated by realtime data is both part of the TransitRepositoryIndex and the TimetableRepositorySnapshot
+   * added by realtime updates are added to the collection. A set is used here because trip patterns
+   * that were updated by realtime data is both part of the TransitRepositoryIndex and the
+   * TimetableRepositorySnapshot
    */
   @Override
   public Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates) {
@@ -620,8 +616,8 @@ public class DefaultTransitService implements TransitService {
   @Override
   public TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate) {
     if (timetableSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate =
-        timetableSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
+      TripOnServiceDate tripOnServiceDate = timetableSnapshot
+        .getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
       if (tripOnServiceDate != null) {
         return tripOnServiceDate;
       }
@@ -725,8 +721,7 @@ public class DefaultTransitService implements TransitService {
     FindRegularStopsByBoundingBoxRequest request
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    Collection<RegularStop> stops = transitRepository
-      .getSiteRepository()
+    Collection<RegularStop> stops = transitRepository.getSiteRepository()
       .findRegularStops(request.envelope());
 
     Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
@@ -796,8 +791,7 @@ public class DefaultTransitService implements TransitService {
    * Example: [a,b,b,c,c,c] will return [c,b,a]
    */
   private static <T> Stream<T> sortByOccurrenceAndReduce(Stream<T> input) {
-    return input
-      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+    return input.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
       .entrySet()
       .stream()
       .sorted(Map.Entry.<T, Long>comparingByValue().reversed())

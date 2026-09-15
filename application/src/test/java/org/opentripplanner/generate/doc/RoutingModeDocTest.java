@@ -50,12 +50,10 @@ public class RoutingModeDocTest {
 
     transitBuilder.addSection(TransitMode.BUS.typeDescription());
 
-    Arrays.stream(TransitMode.values())
-      .sorted(Comparator.comparing(Enum::name))
-      .forEach(m -> {
-        transitBuilder.header(4, m.name(), m.name());
-        transitBuilder.addSection(m.enumValueDescription());
-      });
+    Arrays.stream(TransitMode.values()).sorted(Comparator.comparing(Enum::name)).forEach(m -> {
+      transitBuilder.header(4, m.name(), m.name());
+      transitBuilder.addSection(m.enumValueDescription());
+    });
 
     doc = replaceSection(doc, "transit-modes", transitBuilder.toString());
 

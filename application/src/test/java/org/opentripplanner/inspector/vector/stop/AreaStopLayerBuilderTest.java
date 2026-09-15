@@ -19,8 +19,7 @@ class AreaStopLayerBuilderTest {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
-  private final AreaStop areaStop = siteRepositoryBuilder
-    .areaStop(ID)
+  private final AreaStop areaStop = siteRepositoryBuilder.areaStop(ID)
     .withName(NAME)
     .withGeometry(Polygons.BERLIN)
     .build();

@@ -32,8 +32,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private static final int NOT_SET = -999_999_999;
 
   /**
-   * The path is not reversed, so we can use the forward transit calculator to calculate the
-   * egress board-time (egress with rides).
+   * The path is not reversed, so we can use the forward transit calculator to calculate the egress
+   * board-time (egress with rides).
    */
   private static final TransitCalculator<?> TRANSIT_CALCULATOR = new ForwardTransitCalculator<>();
 
@@ -69,8 +69,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private PathBuilderLeg(MyLeg leg) {
     this.leg = leg;
     if (leg.isTransit()) {
-      @SuppressWarnings("unchecked")
-      var transit = (MyTransitLeg<T>) leg;
+      @SuppressWarnings("unchecked") var transit = (MyTransitLeg<T>) leg;
       this.fromTime = transit.fromTime();
       this.toTime = transit.toTime();
     }
@@ -254,9 +253,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * <p>
    * {@code -1} is returned:
    * <ul>
-   *     <li>if this leg is not a transit leg</li>
-   *     <li>no transit leg exist after this leg</li>
-   * <ul>
+   *   <li>if this leg is not a transit leg</li>
+   *   <li>no transit leg exist after this leg</li>
+   *   <ul>
    */
   public int waitTimeBeforeNextTransitIncludingSlack() {
     if (next.hasRides()) {
@@ -475,8 +474,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     boolean withTransferSlack
   ) {
     var leg = asTransitLeg();
-    int slack =
-      slackProvider.boardSlack(leg.trip.pattern().slackIndex()) +
+    int slack = slackProvider.boardSlack(leg.trip.pattern().slackIndex()) +
       (withTransferSlack ? slackProvider.transferSlack() : 0);
 
     return leg.fromTime() - slack;
@@ -485,10 +483,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /**
    * We need to calculate the access-arrival-time. There are 3 cases:
    * <ol>
-   *     <li>Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)</li>
-   *     <li>Flex and transit: Flex ~ (transferSlack + boardSlack) ~ transit</li>
-   *     <li>Flex, walk and transit: Flex ~ Walk ~ (transferSlack + boardSlack) ~ transit</li>
-   *     <li>Flex, walk and Flex: Flex ~ Walk ~ Flex (will be timeshifted in relation to the iteration departure time)</li>
+   *   <li>Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)</li>
+   *   <li>Flex and transit: Flex ~ (transferSlack + boardSlack) ~ transit</li>
+   *   <li>Flex, walk and transit: Flex ~ Walk ~ (transferSlack + boardSlack) ~ transit</li>
+   *   <li>Flex, walk and Flex: Flex ~ Walk ~ Flex (will be timeshifted in relation to the iteration
+   *       departure time)</li>
    * </ol>
    * Flex access may or may not be time-shifted.
    */
@@ -526,8 +525,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private void setTransferTimeBasedOnPreviousLeg(RaptorSlackProvider slackProvider) {
     int newFromTime;
     if (prev.isTransit()) {
-      newFromTime =
-        prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
+      newFromTime = prev.toTime() +
+        slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
     } else if (prev.isAccess()) {
       newFromTime = prev.toTime();
     } else {
@@ -578,10 +577,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var prevTransit = prevTransitLeg();
     var txBeforeLeg = prevTransit == null ? null : prevTransit.constrainedTransferAfterLeg();
-    var transferConstraint =
-      txBeforeLeg == null
-        ? RaptorTransferConstraint.REGULAR_TRANSFER
-        : txBeforeLeg.getTransferConstraint();
+    var transferConstraint = txBeforeLeg == null
+      ? RaptorTransferConstraint.REGULAR_TRANSFER
+      : txBeforeLeg.getTransferConstraint();
     boolean firstBoarding = prev != null && prev.isAccessWithoutRides();
 
     int boardCost = costCalculator.boardingCost(
@@ -612,8 +610,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     var egressPath = asEgressLeg().streetPath;
 
-    final int egressCost =
-      egressPath.c1() + costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
+    final int egressCost = egressPath.c1() +
+      costCalculator.costEgress(egressPath.stop(), egressPath.hasRides());
 
     if (prev == null) {
       return egressCost;

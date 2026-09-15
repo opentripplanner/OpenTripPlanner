@@ -69,8 +69,7 @@ class StopAndStationMapperTest {
     );
 
     stopPlace.setQuays(
-      new Quays_RelStructure()
-        .withQuayRefOrQuay(objectFactory.createQuay(quay1))
+      new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(quay1))
         .withQuayRefOrQuay(objectFactory.createQuay(quay2))
         .withQuayRefOrQuay(objectFactory.createQuay(quay3))
     );
@@ -138,14 +137,12 @@ class StopAndStationMapperTest {
     Quay quay3 = createQuay("NSR:Quay:3", "", "1", 59.909911, 10.753008, "C");
 
     stopPlaceNew.setQuays(
-      new Quays_RelStructure()
-        .withQuayRefOrQuay(objectFactory.createQuay(quay1b))
+      new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(quay1b))
         .withQuayRefOrQuay(objectFactory.createQuay(quay2))
     );
 
     stopPlaceOld.setQuays(
-      new Quays_RelStructure()
-        .withQuayRefOrQuay(objectFactory.createQuay(quay1a))
+      new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(quay1a))
         .withQuayRefOrQuay(objectFactory.createQuay(quay3))
     );
 
@@ -174,23 +171,19 @@ class StopAndStationMapperTest {
     assertEquals(3, stops.size());
     assertEquals(1, stations.size());
 
-    Station parentStop = stations
-      .stream()
+    Station parentStop = stations.stream()
       .filter(s -> s.getId().getId().equals("NSR:StopPlace:1"))
       .findFirst()
       .get();
-    RegularStop childStop1 = stops
-      .stream()
+    RegularStop childStop1 = stops.stream()
       .filter(s -> s.getId().getId().equals("NSR:Quay:1"))
       .findFirst()
       .get();
-    RegularStop childStop2 = stops
-      .stream()
+    RegularStop childStop2 = stops.stream()
       .filter(s -> s.getId().getId().equals("NSR:Quay:2"))
       .findFirst()
       .get();
-    RegularStop childStop3 = stops
-      .stream()
+    RegularStop childStop3 = stops.stream()
       .filter(s -> s.getId().getId().equals("NSR:Quay:3"))
       .findFirst()
       .get();
@@ -276,8 +269,7 @@ class StopAndStationMapperTest {
     assertEquals(1, siteRepositoryBuilder.regularStopsById().size());
     assertEquals(
       0,
-      siteRepositoryBuilder
-        .regularStopsById()
+      siteRepositoryBuilder.regularStopsById()
         .get(MappingSupport.ID_FACTORY.createId("ST:Quay:1"))
         .getIndex()
     );
@@ -337,8 +329,7 @@ class StopAndStationMapperTest {
     Accessibility expected,
     List<RegularStop> stops
   ) {
-    var wheelchairAccessibility = stops
-      .stream()
+    var wheelchairAccessibility = stops.stream()
       .filter(s -> s.getId().getId().equals(quayId))
       .findAny()
       .map(RegularStop::getWheelchairAccessibility)
@@ -348,8 +339,7 @@ class StopAndStationMapperTest {
     assertEquals(
       expected,
       wheelchairAccessibility,
-      () ->
-        "wheelchairAccessibility should be " +
+      () -> "wheelchairAccessibility should be " +
         expected +
         " found " +
         wheelchairAccessibility +

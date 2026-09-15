@@ -103,10 +103,8 @@ public class VisitViaLocation extends AbstractViaLocation {
       return false;
     }
     VisitViaLocation that = (VisitViaLocation) o;
-    return (
-      Objects.equals(minimumWaitTime, that.minimumWaitTime) &&
-      Objects.equals(coordinate, that.coordinate)
-    );
+    return (Objects.equals(minimumWaitTime, that.minimumWaitTime) &&
+      Objects.equals(coordinate, that.coordinate));
   }
 
   @Override

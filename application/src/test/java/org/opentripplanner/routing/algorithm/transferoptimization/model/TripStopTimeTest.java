@@ -15,10 +15,7 @@ public class TripStopTimeTest {
 
   TestTripSchedule trip = TestTripSchedule.schedule(
     TestTripPattern.pattern("L31", STOP_1, STOP_2, STOP_3)
-  )
-    .arrivals("10:00 10:05 10:20")
-    .departures("10:01 10:06 10:21")
-    .build();
+  ).arrivals("10:00 10:05 10:20").departures("10:01 10:06 10:21").build();
 
   private final TripStopTime<TestTripSchedule> arrivalStop2 = TripStopTime.arrival(trip, 1);
   private final TripStopTime<TestTripSchedule> arrivalStop3 = TripStopTime.arrival(trip, 2);

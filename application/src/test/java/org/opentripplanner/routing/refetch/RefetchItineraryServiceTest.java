@@ -142,9 +142,9 @@ class RefetchItineraryServiceTest {
     assertEquals("11:00:10", itinerary.legs().get(1).endTime().toLocalTime().toString());
   }
 
-  /// It should be possible to fetch an itinerary that has a leg that ends after the later one starts.
-  /// This is needed to be able to refetch an itinerary that has a delay on an earlier leg that makes
-  /// a transfer impossible to make.
+  /// It should be possible to fetch an itinerary that has a leg that ends after the later one
+  /// starts. This is needed to be able to refetch an itinerary that has a delay on an earlier leg
+  /// that makes a transfer impossible to make.
   @Test
   void refetchWithImpossibleTransfer() {
     var refetch = createRefetchService();
@@ -215,8 +215,9 @@ class RefetchItineraryServiceTest {
     var start = GenericLocation.fromCoordinate(V1.coord().moveNorthMeters(10000));
     var leg1 = legRef("trip1", STOP_A, STOP_B);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
-      refetch.refetchItinerary(start, null, List.of(leg1), routeRequest())
+    var e = assertThrows(
+      RefetchItineraryException.class,
+      () -> refetch.refetchItinerary(start, null, List.of(leg1), routeRequest())
     );
     assertEquals("Could not calculate access", e.getMessage());
   }
@@ -228,8 +229,9 @@ class RefetchItineraryServiceTest {
     var leg1 = legRef("trip3", STOP_C, STOP_D);
     var leg2 = legRef("trip1", STOP_A, STOP_B);
 
-    var e = assertThrows(RefetchItineraryException.class, () ->
-      refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest())
+    var e = assertThrows(
+      RefetchItineraryException.class,
+      () -> refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest())
     );
     assertEquals("Could not transfer from F:D to F:A", e.getMessage());
   }
@@ -238,8 +240,9 @@ class RefetchItineraryServiceTest {
   void refetchEmptyLegs() {
     var refetch = createRefetchService();
 
-    assertThrows(IllegalArgumentException.class, () ->
-      refetch.refetchItinerary(null, null, List.of(), routeRequest())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> refetch.refetchItinerary(null, null, List.of(), routeRequest())
     );
   }
 
@@ -252,11 +255,10 @@ class RefetchItineraryServiceTest {
     var start = GenericLocation.fromCoordinate(V1.coord());
     var end = GenericLocation.fromCoordinate(V2.coord());
 
-    var request = routeRequest()
-      .copyOf()
-      .withPreferences(p ->
-        p.withTransit(transit ->
-          transit.withDefaultBoardSlackSec(2 * 60).withDefaultAlightSlackSec(3 * 60)
+    var request = routeRequest().copyOf()
+      .withPreferences(
+        p -> p.withTransit(
+          transit -> transit.withDefaultBoardSlackSec(2 * 60).withDefaultAlightSlackSec(3 * 60)
         )
       )
       .buildRequest();
@@ -373,8 +375,7 @@ class RefetchItineraryServiceTest {
     var linkFrom = vFrom.getOutgoing().stream().findFirst().orElseThrow();
     var vTo = graph.getStopVertex(to.getId());
     var linkTo = vTo.getIncoming().stream().findFirst().orElseThrow();
-    var edge = linkFrom
-      .getToVertex()
+    var edge = linkFrom.getToVertex()
       .getOutgoingStreetEdges()
       .stream()
       .filter(e -> e.getToVertex().equals(linkTo.getFromVertex()))
@@ -441,8 +442,7 @@ class RefetchItineraryServiceTest {
 
     private void createEdge(StreetVertex v1, StreetVertex v2, int meters) {
       var geom = GeometryUtils.makeLineString(v1.toWgsCoordinate(), v2.toWgsCoordinate());
-      new StreetEdgeBuilder<>()
-        .withFromVertex(v1)
+      new StreetEdgeBuilder<>().withFromVertex(v1)
         .withToVertex(v2)
         .withGeometry(geom)
         .withName("TestEdge")

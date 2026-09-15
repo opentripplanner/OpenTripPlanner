@@ -51,12 +51,12 @@ public class SpeedTestConfig {
   }
 
   /**
-   * Load SpeedTest configuration form the given JSON Adaptor. If a routerConfig is provided
-   * that config is used, if not relevant router config nodes are loaded from the   the config is loaded from the
+   * Load SpeedTest configuration form the given JSON Adaptor. If a routerConfig is provided that
+   * config is used, if not relevant router config nodes are loaded from the the config is loaded
+   * from the
    */
   public static SpeedTestConfig createFromConfig(NodeAdapter adapter) {
-    var builder = of()
-      .withFeedId(adapter.of("feedId").asString())
+    var builder = of().withFeedId(adapter.of("feedId").asString())
       .withTestDate(adapter.of("testDate").asDateOrRelativePeriod("PT0D", ZoneId.of("UTC")))
       .withIgnoreStreetResults(adapter.of("ignoreStreetResults").asBoolean(false))
       .withGraph(adapter.of("graph").asUri(null));

@@ -53,11 +53,8 @@ class LocalizedStringTest {
     assertEquals("névtelen", new LocalizedString("unnamedStreet").toString(new Locale("hu")));
     assertEquals(
       "A (B része)",
-      new LocalizedString(
-        "partOf",
-        new NonLocalizedString("A"),
-        new NonLocalizedString("B")
-      ).toString(new Locale("hu"))
+      new LocalizedString("partOf", new NonLocalizedString("A"), new NonLocalizedString("B"))
+        .toString(new Locale("hu"))
     );
   }
 

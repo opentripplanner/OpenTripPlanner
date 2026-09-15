@@ -82,18 +82,16 @@ class ParkingProcessor {
 
       I18NString creativeName = nameParkAndRideEntity(node);
 
-      VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
-        builder
-          .entranceId(
-            new FeedScopedId(
-              VEHICLE_PARKING_OSM_FEED_ID,
-              String.format("%s/%s/entrance", node.getClass().getSimpleName(), node.getId())
-            )
-          )
-          .name(creativeName)
-          .coordinate(new WgsCoordinate(node.getCoordinate()))
-          .walkAccessible(true)
-          .carAccessible(isCarParkAndRide);
+      VehicleParking.VehicleParkingEntranceCreator entrance = builder -> builder.entranceId(
+        new FeedScopedId(
+          VEHICLE_PARKING_OSM_FEED_ID,
+          String.format("%s/%s/entrance", node.getClass().getSimpleName(), node.getId())
+        )
+      )
+        .name(creativeName)
+        .coordinate(new WgsCoordinate(node.getCoordinate()))
+        .walkAccessible(true)
+        .carAccessible(isCarParkAndRide);
 
       var vehicleParking = createVehicleParkingObjectFromOsmEntity(
         isCarParkAndRide,
@@ -163,8 +161,7 @@ class ParkingProcessor {
   }
 
   private List<VertexAndName> processVehicleParkingArea(OsmArea area, Envelope envelope) {
-    return area.outermostRings
-      .stream()
+    return area.outermostRings.stream()
       .flatMap(ring -> processVehicleParkingArea(ring, area.parent, envelope).stream())
       .toList();
   }
@@ -185,8 +182,7 @@ class ParkingProcessor {
     }
 
     accessVertices.addAll(
-      ring
-        .getHoles()
+      ring.getHoles()
         .stream()
         .flatMap(innerRing -> processVehicleParkingArea(innerRing, entity, envelope).stream())
         .toList()
@@ -255,8 +251,8 @@ class ParkingProcessor {
   /**
    * Creates an artificial entrance to a parking facility's centroid.
    * <p>
-   * This is useful if the facility is not linked to the street network in OSM. Without this method
-   * it would not be usable by the routing algorithm as it's unreachable.
+   * This is useful if the facility is not linked to the street network in OSM. Without this
+   * method it would not be usable by the routing algorithm as it's unreachable.
    */
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
     OsmAreaGroup group,
@@ -264,14 +260,13 @@ class ParkingProcessor {
     OsmEntity entity,
     boolean isCarPark
   ) {
-    return List.of(builder ->
-      builder
-        .entranceId(
-          new FeedScopedId(
-            VEHICLE_PARKING_OSM_FEED_ID,
-            String.format("%s/%d/centroid", entity.getClass().getSimpleName(), entity.getId())
-          )
+    return List.of(
+      builder -> builder.entranceId(
+        new FeedScopedId(
+          VEHICLE_PARKING_OSM_FEED_ID,
+          String.format("%s/%d/centroid", entity.getClass().getSimpleName(), entity.getId())
         )
+      )
         .name(vehicleParkingName)
         .coordinate(new WgsCoordinate(group.union.getInteriorPoint()))
         // setting the vertex to null signals the rest of the build process that this needs to be linked to the street network
@@ -302,8 +297,8 @@ class ParkingProcessor {
     VehicleParkingSpaces vehicleParkingSpaces = null;
     if (
       bicycleCapacity.isPresent() ||
-      carCapacity.isPresent() ||
-      wheelchairAccessibleCarCapacity.isPresent()
+        carCapacity.isPresent() ||
+        wheelchairAccessibleCarCapacity.isPresent()
     ) {
       vehicleParkingSpaces = VehicleParkingSpaces.of()
         .bicycleSpaces(bicycleCapacity.isPresent() ? bicycleCapacity.getAsInt() : null)
@@ -317,9 +312,9 @@ class ParkingProcessor {
     }
 
     var bicyclePlaces = !isCarParkAndRide || bicycleCapacity.orElse(0) > 0;
-    var carPlaces =
-      (isCarParkAndRide && wheelchairAccessibleCarCapacity.isEmpty() && carCapacity.isEmpty()) ||
-      carCapacity.orElse(0) > 0;
+    var carPlaces = (isCarParkAndRide &&
+      wheelchairAccessibleCarCapacity.isEmpty() &&
+      carCapacity.isEmpty()) || carCapacity.orElse(0) > 0;
     var wheelchairAccessibleCarPlaces = wheelchairAccessibleCarCapacity.orElse(0) > 0;
 
     var openingHours = parseOpeningHours(entity);
@@ -382,8 +377,9 @@ class ParkingProcessor {
   }
 
   private OptionalInt parseCapacity(OsmEntity element, String capacityTag) {
-    return element.parseIntOrBoolean(capacityTag, v ->
-      issueStore.add(new InvalidVehicleParkingCapacity(element, v))
+    return element.parseIntOrBoolean(
+      capacityTag,
+      v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
     );
   }
 
@@ -393,8 +389,7 @@ class ParkingProcessor {
     OsmEntity entity
   ) {
     List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
-    var sortedAccessVertices = accessVertices
-      .stream()
+    var sortedAccessVertices = accessVertices.stream()
       .sorted(Comparator.comparing(vn -> vn.vertex().getLabelString()))
       .toList();
 
@@ -410,19 +405,18 @@ class ParkingProcessor {
 
       var entranceName = new LocalizedStringFormat("%s (%s)", vehicleParkingName, suffix);
 
-      entrances.add(builder ->
-        builder
-          .entranceId(
-            new FeedScopedId(
-              VEHICLE_PARKING_OSM_FEED_ID,
-              String.format(
-                "%s/%d/%s",
-                entity.getClass().getSimpleName(),
-                entity.getId(),
-                access.vertex().getLabel()
-              )
+      entrances.add(
+        builder -> builder.entranceId(
+          new FeedScopedId(
+            VEHICLE_PARKING_OSM_FEED_ID,
+            String.format(
+              "%s/%d/%s",
+              entity.getClass().getSimpleName(),
+              entity.getId(),
+              access.vertex().getLabel()
             )
           )
+        )
           .name(entranceName)
           .coordinate(new WgsCoordinate(access.vertex().getCoordinate()))
           .vertex(access.vertex())
@@ -438,26 +432,21 @@ class ParkingProcessor {
 record VertexAndName(I18NString name, IntersectionVertex vertex) {}
 
 record ParkingAreaAccessibility(Set<VertexAndName> accessVertices) {
-  private static final Predicate<Edge> PREDICATE_DRIVABLE = e ->
-    e instanceof StreetEdge se && se.canTraverse(TraverseMode.CAR);
-  private static final Predicate<Edge> PREDICATE_WALKABLE = e ->
-    e instanceof StreetEdge se && se.canTraverse(TraverseMode.WALK);
+  private static final Predicate<Edge> PREDICATE_DRIVABLE = e -> e instanceof StreetEdge se &&
+    se.canTraverse(TraverseMode.CAR);
+  private static final Predicate<Edge> PREDICATE_WALKABLE = e -> e instanceof StreetEdge se &&
+    se.canTraverse(TraverseMode.WALK);
 
   boolean carAccessible() {
-    return (
-      accessVertices
-        .stream()
-        .anyMatch(a -> a.vertex().hasAnyIncomingMatching(PREDICATE_DRIVABLE)) &&
-      accessVertices.stream().anyMatch(a -> a.vertex().hasAnyOutgoingMatching(PREDICATE_DRIVABLE))
-    );
+    return (accessVertices.stream()
+      .anyMatch(a -> a.vertex().hasAnyIncomingMatching(PREDICATE_DRIVABLE)) &&
+      accessVertices.stream().anyMatch(a -> a.vertex().hasAnyOutgoingMatching(PREDICATE_DRIVABLE)));
   }
 
   boolean walkMismatch() {
-    return (
-      accessVertices
-        .stream()
-        .anyMatch(a -> a.vertex().hasAnyIncomingMatching(PREDICATE_WALKABLE)) !=
-      accessVertices.stream().anyMatch(a1 -> a1.vertex().hasAnyOutgoingMatching(PREDICATE_WALKABLE))
-    );
+    return (accessVertices.stream()
+      .anyMatch(a -> a.vertex().hasAnyIncomingMatching(PREDICATE_WALKABLE)) !=
+      accessVertices.stream()
+        .anyMatch(a1 -> a1.vertex().hasAnyOutgoingMatching(PREDICATE_WALKABLE)));
   }
 }

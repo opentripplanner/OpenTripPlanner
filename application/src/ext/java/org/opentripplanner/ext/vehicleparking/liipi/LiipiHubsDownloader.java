@@ -71,7 +71,8 @@ public class LiipiHubsDownloader {
   }
 
   private Map<FeedScopedId, VehicleParkingGroup> parseJSON(InputStream dataStream)
-    throws IllegalArgumentException, IOException {
+    throws IllegalArgumentException,
+    IOException {
     Map<FeedScopedId, VehicleParkingGroup> out = new HashMap<>();
 
     String hubsString = convertStreamToString(dataStream);

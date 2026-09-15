@@ -99,8 +99,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
       radiusAsDuration,
       0
     );
-    return r
-      .stream()
+    return r.stream()
       .filter(it -> !transitService.getStopLocation(it.stopId).transfersNotAllowed())
       .toList();
   }

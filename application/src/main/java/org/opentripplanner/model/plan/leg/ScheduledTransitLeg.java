@@ -232,24 +232,22 @@ public class ScheduledTransitLeg implements TransitLeg {
   public int departureDelay() {
     return tripTimes.isCanceledStop(boardStopPosInPattern) ||
       tripTimes.isNoDataStop(boardStopPosInPattern)
-      ? 0
-      : tripTimes.getDepartureDelay(boardStopPosInPattern);
+        ? 0
+        : tripTimes.getDepartureDelay(boardStopPosInPattern);
   }
 
   @Override
   public int arrivalDelay() {
     return tripTimes.isCanceledStop(alightStopPosInPattern) ||
       tripTimes.isNoDataStop(alightStopPosInPattern)
-      ? 0
-      : tripTimes.getArrivalDelay(alightStopPosInPattern);
+        ? 0
+        : tripTimes.getArrivalDelay(alightStopPosInPattern);
   }
 
   @Override
   public boolean isRealTimeUpdated() {
-    return (
-      tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
-      tripTimes.isRealTimeUpdated(alightStopPosInPattern)
-    );
+    return (tripTimes.isRealTimeUpdated(boardStopPosInPattern) ||
+      tripTimes.isRealTimeUpdated(alightStopPosInPattern));
   }
 
   @Override
@@ -302,8 +300,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   /**
-   * The leg geometry is built lazily by concatenating the trip pattern's hop geometries between
-   * the board and alight stops. It is not cached: each call recomputes it.
+   * The leg geometry is built lazily by concatenating the trip pattern's hop geometries between the
+   * board and alight stops. It is not cached: each call recomputes it.
    */
   @Override
   public LineString legGeometry() {
@@ -384,9 +382,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   /**
-   * Construct a leg reference from this leg.
-   * If the trip is based on a TripOnServiceDate, the leg reference will contain the
-   * TripOnServiceDate id instead of the Trip id.
+   * Construct a leg reference from this leg. If the trip is based on a TripOnServiceDate, the leg
+   * reference will contain the TripOnServiceDate id instead of the Trip id.
    */
   @Override
   public LegReference legReference() {
@@ -428,8 +425,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   /**
    * Should be used for debug logging only
    * <p>
-   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid
-   * spamming logs. Explicit access should be used if needed.
+   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid spamming logs.
+   * Explicit access should be used if needed.
    */
   @Override
   public String toString() {

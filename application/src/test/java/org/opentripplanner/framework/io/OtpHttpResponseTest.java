@@ -33,8 +33,7 @@ class OtpHttpResponseTest {
     InputStream body = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
     Header[] headers = new Header[] {
       new BasicHeader("Content-Type", "application/json"),
-      new BasicHeader("ETag", "\"12345\""),
-    };
+      new BasicHeader("ETag", "\"12345\""), };
 
     OtpHttpResponse response = new OtpHttpResponse(body, headers, HttpStatus.SC_OK);
 
@@ -62,8 +61,7 @@ class OtpHttpResponseTest {
     InputStream body = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
     Header[] headers = new Header[] {
       new BasicHeader("Content-Type", "application/json"),
-      new BasicHeader("ETag", "\"12345\""),
-    };
+      new BasicHeader("ETag", "\"12345\""), };
 
     OtpHttpResponse response = new OtpHttpResponse(body, headers, HttpStatus.SC_OK);
 
@@ -96,8 +94,7 @@ class OtpHttpResponseTest {
     Header[] headers = new Header[] {
       new BasicHeader("Set-Cookie", "cookie1=value1"),
       new BasicHeader("Set-Cookie", "cookie2=value2"),
-      new BasicHeader("Set-Cookie", "cookie3=value3"),
-    };
+      new BasicHeader("Set-Cookie", "cookie3=value3"), };
 
     OtpHttpResponse response = new OtpHttpResponse(body, headers, HttpStatus.SC_OK);
 
@@ -114,8 +111,7 @@ class OtpHttpResponseTest {
     InputStream body = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
     Header[] headers = new Header[] {
       new BasicHeader("Set-Cookie", "cookie1=value1"),
-      new BasicHeader("Set-Cookie", "cookie2=value2"),
-    };
+      new BasicHeader("Set-Cookie", "cookie2=value2"), };
 
     OtpHttpResponse response = new OtpHttpResponse(body, headers, HttpStatus.SC_OK);
 
@@ -140,8 +136,7 @@ class OtpHttpResponseTest {
     InputStream body = new ByteArrayInputStream("test".getBytes(StandardCharsets.UTF_8));
     Header[] headers = new Header[] {
       new BasicHeader("Accept-Encoding", "gzip"),
-      new BasicHeader("Accept-Encoding", "deflate"),
-    };
+      new BasicHeader("Accept-Encoding", "deflate"), };
 
     OtpHttpResponse response = new OtpHttpResponse(body, headers, HttpStatus.SC_OK);
 

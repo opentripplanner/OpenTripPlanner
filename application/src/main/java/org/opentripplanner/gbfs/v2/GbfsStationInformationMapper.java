@@ -40,11 +40,11 @@ class GbfsStationInformationMapper {
   public VehicleRentalStation mapStationInformation(GBFSStation station) {
     if (
       station.getStationId() == null ||
-      station.getStationId().isBlank() ||
-      station.getName() == null ||
-      station.getName().isBlank() ||
-      station.getLon() == null ||
-      station.getLat() == null
+        station.getStationId().isBlank() ||
+        station.getName() == null ||
+        station.getName().isBlank() ||
+        station.getLon() == null ||
+        station.getLat() == null
     ) {
       LOG.debug(
         "GBFS station for {} system has issues with required fields: \n{}",
@@ -67,13 +67,12 @@ class GbfsStationInformationMapper {
 
     if (station.getVehicleCapacity() != null && vehicleTypes != null) {
       builder.withVehicleTypeAreaCapacity(
-        station
-          .getVehicleCapacity()
+        station.getVehicleCapacity()
           .getAdditionalProperties()
           .entrySet()
           .stream()
-          .filter(e ->
-            vehicleTypeFilter.filterUnknownVehicleType(
+          .filter(
+            e -> vehicleTypeFilter.filterUnknownVehicleType(
               e.getKey(),
               station.getStationId(),
               "vehicle_capacity"
@@ -87,13 +86,12 @@ class GbfsStationInformationMapper {
 
     if (station.getVehicleTypeCapacity() != null && vehicleTypes != null) {
       builder.withVehicleTypeDockCapacity(
-        station
-          .getVehicleTypeCapacity()
+        station.getVehicleTypeCapacity()
           .getAdditionalProperties()
           .entrySet()
           .stream()
-          .filter(e ->
-            vehicleTypeFilter.filterUnknownVehicleType(
+          .filter(
+            e -> vehicleTypeFilter.filterUnknownVehicleType(
               e.getKey(),
               station.getStationId(),
               "vehicle_type_capacity"

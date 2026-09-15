@@ -24,9 +24,8 @@ class SiteRepositoryTest {
 
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
-  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory().createPoint(
-    COOR_A.asJtsCoordinate()
-  );
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
+    .createPoint(COOR_A.asJtsCoordinate());
   public static final NonLocalizedString NAME = NonLocalizedString.ofNullable("Name");
   private static final FeedScopedId ID = FeedScopedIdForTestFactory.id("A");
   private static final Station STATION = Station.of(ID)
@@ -36,15 +35,13 @@ class SiteRepositoryTest {
   private static final String EXP_STATIONS = List.of(STATION).toString();
 
   private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
-  private final RegularStop stop = siteRepositoryBuilder
-    .regularStop(ID)
+  private final RegularStop stop = siteRepositoryBuilder.regularStop(ID)
     .withCoordinate(COOR_A)
     .withName(NAME)
     .withParentStation(STATION)
     .build();
   private final String expStops = List.of(stop).toString();
-  private final AreaStop STOP_AREA = siteRepositoryBuilder
-    .areaStop(ID)
+  private final AreaStop STOP_AREA = siteRepositoryBuilder.areaStop(ID)
     .withName(NAME)
     .withGeometry(GEOMETRY)
     .build();

@@ -10,8 +10,8 @@ import org.rutebanken.netex.model.ServiceJourney;
 
 /**
  * Validates that a JourneyPattern does not contain duplicate StopPointInJourneyPattern IDs.
- * Duplicate stop point IDs in a journey pattern indicate invalid NeTEx data and will cause
- * failures when creating lookup maps.
+ * Duplicate stop point IDs in a journey pattern indicate invalid NeTEx data and will cause failures
+ * when creating lookup maps.
  */
 class JourneyPatternDuplicateStopPoints extends AbstractHMapValidationRule<String, ServiceJourney> {
 
@@ -21,15 +21,15 @@ class JourneyPatternDuplicateStopPoints extends AbstractHMapValidationRule<Strin
   @Override
   public Status validate(ServiceJourney sj) {
     journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
-    JourneyPattern_VersionStructure journeyPattern = index
-      .getJourneyPatternsById()
+    JourneyPattern_VersionStructure journeyPattern = index.getJourneyPatternsById()
       .lookup(journeyPatternId);
 
     Set<String> seenIds = new HashSet<>();
 
-    for (var point : journeyPattern
-      .getPointsInSequence()
-      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()) {
+    for (
+      var point : journeyPattern.getPointsInSequence()
+        .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+    ) {
       String pointId = ((EntityStructure) point).getId();
       if (!seenIds.add(pointId)) {
         duplicateStopPointId = pointId;

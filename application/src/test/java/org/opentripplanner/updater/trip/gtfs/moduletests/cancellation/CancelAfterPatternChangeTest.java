@@ -18,9 +18,9 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
 
 /**
- * Test canceling a trip after a pattern change (skipped stop). This exercises the revert path
- * where a modified pattern must be cleaned up before the cancellation is applied to the
- * scheduled pattern.
+ * Test canceling a trip after a pattern change (skipped stop). This exercises the revert path where
+ * a modified pattern must be cleaned up before the cancellation is applied to the scheduled
+ * pattern.
  */
 class CancelAfterPatternChangeTest implements RealtimeTestConstants {
 
@@ -35,8 +35,8 @@ class CancelAfterPatternChangeTest implements RealtimeTestConstants {
     .addStop(STOP_C, "0:01:20", "0:01:21");
 
   /**
-   * First skip a stop (creating a modified pattern), then cancel the trip. The cancellation
-   * should revert the pattern change and mark the trip as CANCELED on the scheduled pattern.
+   * First skip a stop (creating a modified pattern), then cancel the trip. The cancellation should
+   * revert the pattern change and mark the trip as CANCELED on the scheduled pattern.
    */
   @Test
   void cancelScheduledTripAfterSkippedStop() {
@@ -44,8 +44,7 @@ class CancelAfterPatternChangeTest implements RealtimeTestConstants {
     var rt = GtfsRtTestHelper.of(env);
 
     // Step 1: Skip stop B — creates a modified pattern
-    var skipUpdate = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var skipUpdate = rt.tripUpdateScheduled(TRIP_1_ID)
       .addDelayedStopTime(0, 0)
       .addSkippedStop(1)
       .addDelayedStopTime(2, 90)

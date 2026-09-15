@@ -31,8 +31,7 @@ public class GroupStopLayerBuilder extends LayerBuilder<StopLocation> {
     );
     // Because there are very few GroupStops with relevant geometries, we can precompute the
     // geometries and store them in a list at the time of construction.
-    this.geometries = groupStops
-      .stream()
+    this.geometries = groupStops.stream()
       .filter(groupStop -> groupStop.getEncompassingAreaGeometry().isPresent())
       .map(stop -> {
         Geometry geometry = stop.getEncompassingAreaGeometry().get().copy();

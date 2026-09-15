@@ -12,8 +12,8 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 
 public class DigitransitVehicleRentalStationPropertyMapper
-  extends PropertyMapper<VehicleRentalStation>
-{
+  extends
+  PropertyMapper<VehicleRentalStation> {
 
   private final I18NStringMapper i18NStringMapper;
 
@@ -45,8 +45,7 @@ public class DigitransitVehicleRentalStationPropertyMapper
       // a station can potentially have multiple form factors that's why this is plural
       new KeyValue(
         "formFactors",
-        vehicleRentalStation
-          .formFactors()
+        vehicleRentalStation.formFactors()
           .stream()
           .map(Enum::name)
           .sorted()

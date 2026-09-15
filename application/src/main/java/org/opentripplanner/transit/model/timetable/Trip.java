@@ -23,15 +23,19 @@ import org.opentripplanner.utils.lang.StringUtils;
 /**
  * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a
  * given {@link TransitMode}, on a given sequence of stops served at given passing times.
- * <p>A scheduled Trip can run at most once per service date,
- * while a frequency-based Trip runs several times on a given service date.
- * <p>A Trip can run on multiple service dates.
- * <p>The service dates on which a trip is running are identified
- * by its service id and can be looked up with
- * {@link org.opentripplanner.model.calendar.CalendarService}.
- * <p>Trips that follow the same sequence of stops are grouped under a {@link org.opentripplanner.transit.model.network.TripPattern}
- * via a {@link Timetable}
- * <p>A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
+ * <p>
+ * A scheduled Trip can run at most once per service date, while a frequency-based Trip runs
+ * several times on a given service date.
+ * <p>
+ * A Trip can run on multiple service dates.
+ * <p>
+ * The service dates on which a trip is running are identified by its service id and can be
+ * looked up with {@link org.opentripplanner.model.calendar.CalendarService}.
+ * <p>
+ * Trips that follow the same sequence of stops are grouped under a
+ * {@link org.opentripplanner.transit.model.network.TripPattern} via a {@link Timetable}
+ * <p>
+ * A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
  */
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
@@ -72,10 +76,9 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     // Route is done first, it is used as a fallback for some fields
     this.route = requireNonNull(builder.getRoute());
     this.mode = requireNonNullElse(builder.getMode(), route.getMode());
-    this.netexSubmode =
-      builder.getNetexSubmode() != null
-        ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
-        : route.getNetexSubmode();
+    this.netexSubmode = builder.getNetexSubmode() != null
+      ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
+      : route.getNetexSubmode();
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
     this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
     this.carsAllowed = requireNonNullElse(builder.getCarsAllowed(), CarAccess.UNKNOWN);
@@ -194,8 +197,8 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
-   * Return human friendly name to identify the trip when mode, from/to stop and times are
-   * known. This method is meant for debug/logging, and should not be exposed in any API.
+   * Return human friendly name to identify the trip when mode, from/to stop and times are known.
+   * This method is meant for debug/logging, and should not be exposed in any API.
    */
   public String logName() {
     if (StringUtils.hasValue(shortName)) {
@@ -212,8 +215,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
 
   @Override
   public boolean sameAs(Trip other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(this.operator, other.operator) &&
       Objects.equals(this.route, other.route) &&
       Objects.equals(this.shortName, other.shortName) &&
@@ -228,8 +230,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
       Objects.equals(this.bikesAllowed, other.bikesAllowed) &&
       Objects.equals(this.carsAllowed, other.carsAllowed) &&
       Objects.equals(this.wheelchairBoarding, other.wheelchairBoarding) &&
-      Objects.equals(this.netexAlteration, other.netexAlteration)
-    );
+      Objects.equals(this.netexAlteration, other.netexAlteration));
   }
 
   @Override

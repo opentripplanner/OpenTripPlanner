@@ -83,11 +83,8 @@ class StreetLinkerModuleTest {
   void linkFlexStop() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel();
-      var flexTrip = TransitRepositoryForTest.of().unscheduledTrip(
-        "flex",
-        model.stop(),
-        model.stop()
-      );
+      var flexTrip = TransitRepositoryForTest.of()
+        .unscheduledTrip("flex", model.stop(), model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -116,11 +113,8 @@ class StreetLinkerModuleTest {
   void linkFlexStopWithBoardingLocation() {
     OTPFeature.FlexRouting.testOn(() -> {
       var model = new TestModel().withStopLinkedToBoardingLocation();
-      var flexTrip = TransitRepositoryForTest.of().unscheduledTrip(
-        "flex",
-        model.stop(),
-        model.stop()
-      );
+      var flexTrip = TransitRepositoryForTest.of()
+        .unscheduledTrip("flex", model.stop(), model.stop());
       model.withFlexTrip(flexTrip);
 
       var module = model.streetLinkerModule();
@@ -212,8 +206,7 @@ class StreetLinkerModuleTest {
       StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
       StreetModelForTest.streetEdge(from, to, CAR);
       var builder = SiteRepository.of();
-      stop = builder
-        .regularStop(id("platform-1"))
+      stop = builder.regularStop(id("platform-1"))
         .withCoordinate(new WgsCoordinate(KONGSBERG_PLATFORM_1))
         .build();
       builder.withRegularStop(stop);
@@ -263,16 +256,14 @@ class StreetLinkerModuleTest {
 
     public void withCarsAllowedTrip(Trip trip, StopLocation... stops) {
       Route route = TransitRepositoryForTest.route("carsAllowedRoute").build();
-      var stopTimes = Arrays.stream(stops)
-        .map(s -> {
-          var stopTime = new StopTime();
-          stopTime.setStop(s);
-          stopTime.setArrivalTime(30);
-          stopTime.setDepartureTime(60);
-          stopTime.setTrip(trip);
-          return stopTime;
-        })
-        .toList();
+      var stopTimes = Arrays.stream(stops).map(s -> {
+        var stopTime = new StopTime();
+        stopTime.setStop(s);
+        stopTime.setArrivalTime(30);
+        stopTime.setDepartureTime(60);
+        stopTime.setTrip(trip);
+        return stopTime;
+      }).toList();
       StopPattern stopPattern = new StopPattern(stopTimes);
       var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DeduplicatorService.NOOP);
       TripPattern tripPattern = TransitRepositoryForTest.tripPattern(

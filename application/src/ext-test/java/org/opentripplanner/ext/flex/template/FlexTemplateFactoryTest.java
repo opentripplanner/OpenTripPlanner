@@ -42,8 +42,8 @@ class FlexTemplateFactoryTest {
   private static final TransitRepositoryForTest MODEL = TransitRepositoryForTest.of();
 
   /**
-   * Any calculator will do. The only thing we will test here is that a new scheduled calculator
-   * is created for scheduled-flex-trips.
+   * Any calculator will do. The only thing we will test here is that a new scheduled calculator is
+   * created for scheduled-flex-trips.
    */
   private static final FlexPathCalculator CALCULATOR = new StreetFlexPathCalculator(
     false,
@@ -356,10 +356,10 @@ class FlexTemplateFactoryTest {
   ) {
     var st = MODEL.stopTime(TRIP, seqNr, stop);
     switch (boardAlight) {
-      case BOARD_ONLY:
+      case BOARD_ONLY :
         st.setDropOffType(PickDrop.NONE);
         break;
-      case ALIGHT_ONLY:
+      case ALIGHT_ONLY :
         st.setPickupType(PickDrop.NONE);
         break;
     }

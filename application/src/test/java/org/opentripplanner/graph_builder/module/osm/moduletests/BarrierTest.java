@@ -39,12 +39,7 @@ public class BarrierTest {
       List.of(way, barrier),
       Set.of(1, 2, 3, 4, 98, 99)
         .stream()
-        .map(id ->
-          OsmNode.of()
-            .withId(id)
-            .withLatLon((double) id / 1000, 0)
-            .build()
-        )
+        .map(id -> OsmNode.of().withId(id).withLatLon((double) id / 1000, 0).build())
         .toList()
     );
 
@@ -61,8 +56,7 @@ public class BarrierTest {
     assertEquals(3, graph.getVertices().size());
     var barrierVertices = graph.getVerticesOfType(BarrierVertex.class);
     assertEquals(0, barrierVertices.size());
-    var issues = issueStore
-      .listIssues()
+    var issues = issueStore.listIssues()
       .stream()
       .filter(issue -> issue instanceof BarrierIntersectingHighway);
     assertEquals(1, issues.count());
@@ -107,17 +101,11 @@ public class BarrierTest {
     assertEquals(3, graph.getVerticesOfType(BarrierPassThroughVertex.class).size());
     assertEquals(
       2,
-      graph
-        .getVerticesOfType(OsmVertex.class)
-        .stream()
-        .filter(v -> v.nodeId() == 1)
-        .toList()
-        .size()
+      graph.getVerticesOfType(OsmVertex.class).stream().filter(v -> v.nodeId() == 1).toList().size()
     );
 
     // check traversal permission starting from node 2
-    var v2 = graph
-      .getVerticesOfType(OsmVertex.class)
+    var v2 = graph.getVerticesOfType(OsmVertex.class)
       .stream()
       .filter(v -> v.nodeId() == 2)
       .findFirst()
@@ -129,8 +117,7 @@ public class BarrierTest {
     // at that barrier crossing, we can either return to the origin or enter the area
     assertEquals(2, v1OnPath.getOutgoing().size());
     // we then enter the area
-    var barrierCrossing = v1OnPath
-      .getOutgoingStreetEdges()
+    var barrierCrossing = v1OnPath.getOutgoingStreetEdges()
       .stream()
       .filter(e -> e.getToVertex() instanceof BarrierPassThroughVertex)
       .findFirst()
@@ -203,8 +190,7 @@ public class BarrierTest {
   }
 
   static DifferentLevelsSharingBarrier[] getBarrierLevelIssues(DataImportIssueStore issueStore) {
-    return issueStore
-      .listIssues()
+    return issueStore.listIssues()
       .stream()
       .filter(issue -> issue instanceof DifferentLevelsSharingBarrier)
       .map(x -> (DifferentLevelsSharingBarrier) x)

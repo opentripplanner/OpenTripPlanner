@@ -22,9 +22,9 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should be able to route Access arriving on-board and egress departing on-board connecting
- * to transit by transfers. Access and egress which arrive/depart at/from the same stops by
- * walking should not be possible.
+ * Raptor should be able to route Access arriving on-board and egress departing on-board
+ * connecting to transit by transfers. Access and egress which arrive/depart at/from the same stops
+ * by walking should not be possible.
  */
 public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConstants {
 
@@ -34,20 +34,18 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
 
   @BeforeEach
   public void setup() {
-    data
-      .withTimetables(
-        """
-        B     C
-        0:10  0:20
-        """
-      )
+    data.withTimetables(
+      """
+      B     C
+      0:10  0:20
+      """
+    )
       .access("Flex+Walk 2m Rₙ1 ~ A", "Flex 5m Rₙ1 ~ A")
       .egress("D ~ Flex+Walk 2m Rₙ1", "D ~ Flex 5m Rₙ1")
       .withTransfer(STOP_A, transfer(STOP_B, D10_s))
       .withTransfer(STOP_C, transfer(STOP_D, D10_s));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D10_m);

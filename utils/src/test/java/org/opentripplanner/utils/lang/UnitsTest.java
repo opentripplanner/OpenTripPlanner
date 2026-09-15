@@ -42,8 +42,9 @@ class UnitsTest {
     assertEquals(-2.0, Units.normalizedFactor(-2.05, -10.0, 0.0));
     assertEquals(-3.5, Units.normalizedFactor(-3.3, -10.0, 0.0));
     assertEquals(-10.0, Units.normalizedFactor(-10.5, -100.0, 0.0));
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      Units.normalizedFactor(0.999, 1.0, 8.0)
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> Units.normalizedFactor(0.999, 1.0, 8.0)
     );
     assertEquals("The value is not in range[1.0, 8.0]: 1.0", ex.getMessage());
   }

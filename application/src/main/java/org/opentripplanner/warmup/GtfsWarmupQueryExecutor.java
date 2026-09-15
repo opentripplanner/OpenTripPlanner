@@ -21,7 +21,8 @@ class GtfsWarmupQueryExecutor implements WarmupQueryStrategy {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsWarmupQueryExecutor.class);
 
-  static final String QUERY = """
+  static final String QUERY =
+  """
   query(
     $fromLat: CoordinateValue!, $fromLon: CoordinateValue!,
     $toLat: CoordinateValue!, $toLon: CoordinateValue!,

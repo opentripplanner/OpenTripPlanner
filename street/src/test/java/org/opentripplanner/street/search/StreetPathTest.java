@@ -23,8 +23,7 @@ class StreetPathTest {
 
   @Test
   void endTime() {
-    var state = startState()
-      .testEdge(b -> b.withDurationSeconds(10))
+    var state = startState().testEdge(b -> b.withDurationSeconds(10))
       .testEdge(b -> b.withDurationSeconds(10))
       .build();
     var path = new StreetPath(state);
@@ -34,8 +33,7 @@ class StreetPathTest {
 
   @Test
   void weight() {
-    var state = startState()
-      .testEdge(b -> b.withWeight(10))
+    var state = startState().testEdge(b -> b.withWeight(10))
       .testEdge(b -> b.withWeight(10))
       .build();
     var path = new StreetPath(state);
@@ -45,8 +43,7 @@ class StreetPathTest {
 
   @Test
   void distanceMeters() {
-    var state = startState()
-      .testEdge(b -> b.withDistanceMeters(10))
+    var state = startState().testEdge(b -> b.withDistanceMeters(10))
       .testEdge(b -> b.withDistanceMeters(10))
       .build();
     var path = new StreetPath(state);
@@ -55,8 +52,7 @@ class StreetPathTest {
 
   @Test
   void duration() {
-    var state = startState()
-      .testEdge(b -> b.withDurationSeconds(1))
+    var state = startState().testEdge(b -> b.withDurationSeconds(1))
       .testEdge(b -> b.withDurationSeconds(2))
       .testEdge(b -> b.withDurationSeconds(3))
       .testEdge(b -> b.withDurationSeconds(4))
@@ -68,10 +64,7 @@ class StreetPathTest {
 
   @Test
   void geometry() {
-    var state = startState()
-      .testEdge()
-      .testEdge(b -> b.withIncludeGeometryInPath(false))
-      .build();
+    var state = startState().testEdge().testEdge(b -> b.withIncludeGeometryInPath(false)).build();
     var path = new StreetPath(state);
 
     // Make sure we ignore the last leg
@@ -80,8 +73,9 @@ class StreetPathTest {
 
   @Test
   void subPath() {
-    var state = startState()
-      .testEdge(b -> b.withDurationSeconds(10).withWeight(10).withDistanceMeters(10))
+    var state = startState().testEdge(
+      b -> b.withDurationSeconds(10).withWeight(10).withDistanceMeters(10)
+    )
       .testEdge(b -> b.withDurationSeconds(5).withWeight(5).withDistanceMeters(5))
       .testEdge(b -> b.withDurationSeconds(10).withWeight(10).withDistanceMeters(10))
       .build();

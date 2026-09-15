@@ -75,8 +75,9 @@ public class TransitAlertMatcherFactory {
   }
 
   static Matcher<TransitAlert> timePeriod(TimePeriod timePeriod) {
-    return new GenericUnaryMatcher<>("timePeriod", alert ->
-      alert.calendar().isActiveDuring(timePeriod)
+    return new GenericUnaryMatcher<>(
+      "timePeriod",
+      alert -> alert.calendar().isActiveDuring(timePeriod)
     );
   }
 }

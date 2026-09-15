@@ -48,17 +48,17 @@ import org.opentripplanner.street.search.TraverseModeSet;
  * independent of the order in which the JVM decides to iterate over Maps and even in the presence
  * of points that are exactly halfway between multiple candidate linking points.
  * <p>
- * It would be wise to keep this new incarnation of the linking code relatively simple, considering
- * what happened before.
+ * It would be wise to keep this new incarnation of the linking code relatively simple,
+ * considering what happened before.
  * <p>
- * See discussion in pull request #1922, follow up issue #1934, and the original issue calling for
- * replacement of the stop linker, #1305.
+ * See discussion in pull request #1922, follow up issue #1934, and the original issue calling
+ * for replacement of the stop linker, #1305.
  * <p>
  * <b>Expanding-envelope search.</b> Linking searches for nearby street edges with an expanding
  * envelope: a small radius is tried first and widened only if nothing is found. This keeps the
  * common case cheap, because the spatial index ({@code HashGridSpatialIndex}) returns whole grid
- * cells as candidates, so a smaller envelope touches fewer cells and yields fewer candidate edges to
- * distance-check, filter and dedup. The per-scope radius steps are defined in {@link SearchPlan}
+ * cells as candidates, so a smaller envelope touches fewer cells and yields fewer candidate edges
+ * to distance-check, filter and dedup. The per-scope radius steps are defined in {@link SearchPlan}
  * (e.g. real-time GBFS rental linking starts at 25 m — the vast majority of rental vehicles sit
  * within ~25 m of a street — and expands to 100 m).
  */
@@ -68,14 +68,15 @@ public class VertexLinker {
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
    */
-  private static final double DUPLICATE_WAY_EPSILON_DEGREES =
-    SphericalDistanceLibrary.metersToDegrees(0.001);
+  private static final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary
+    .metersToDegrees(0.001);
 
   /**
    * Minimal distance for considering two nodes the same
    */
-  private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED =
-    SphericalDistanceLibrary.metersToDegrees(1) * SphericalDistanceLibrary.metersToDegrees(1);
+  private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED = SphericalDistanceLibrary
+    .metersToDegrees(1) *
+    SphericalDistanceLibrary.metersToDegrees(1);
 
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
@@ -86,8 +87,8 @@ public class VertexLinker {
   );
 
   /**
-   * If vertex linking tries to split an edge very close to the endpoint, do not split the edge,
-   * use the existing edge endpoint instead. This is the limit of how far we still use the endpoint.
+   * If vertex linking tries to split an edge very close to the endpoint, do not split the edge, use
+   * the existing edge endpoint instead. This is the limit of how far we still use the endpoint.
    */
   private static final double EDGE_SPLIT_END_TOLERANCE_METERS = 0.1;
 
@@ -179,10 +180,10 @@ public class VertexLinker {
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
    * <p>
-   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be a
-   * significant fraction of response time. Hannes Junnila has reported >70% speedups in searches by
-   * making the search radius smaller. Therefore we use an expanding-envelope search, which is more
-   * efficient in dense areas.
+   * In OTP2 where the transit search can be quite fast, searching for a good linking point can
+   * be a significant fraction of response time. Hannes Junnila has reported >70% speedups in
+   * searches by making the search radius smaller. Therefore we use an expanding-envelope search,
+   * which is more efficient in dense areas.
    *
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseModes Only street edges allowing one of these modes will be linked
@@ -190,7 +191,8 @@ public class VertexLinker {
    * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
    * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
-   * responsibility to call the dispose method on this object when the edges are no longer needed.
+   *         responsibility to call the dispose method on this object when the edges are no longer
+   *         needed.
    */
   private DisposableEdgeCollection link(
     Vertex vertex,
@@ -199,8 +201,9 @@ public class VertexLinker {
     Scope scope,
     BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
   ) {
-    DisposableEdgeCollection tempEdges =
-      scope != Scope.PERMANENT ? new DisposableEdgeCollection(graph, scope) : null;
+    DisposableEdgeCollection tempEdges = scope != Scope.PERMANENT
+      ? new DisposableEdgeCollection(graph, scope)
+      : null;
 
     try {
       // Expanding-envelope search: try each radius step (smallest first) and stop at the first that
@@ -242,7 +245,8 @@ public class VertexLinker {
   /**
    * Link a boarding location vertex to specific street edges.
    * <p>
-   * This is used if a platform is mapped as a linear way, where the given edges form the platform.
+   * This is used if a platform is mapped as a linear way, where the given edges form the
+   * platform.
    */
   public Set<StreetVertex> linkToSpecificStreetEdgesPermanently(
     Vertex vertex,
@@ -257,10 +261,7 @@ public class VertexLinker {
       direction,
       Scope.PERMANENT,
       null,
-      edges
-        .stream()
-        .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
-        .toList(),
+      edges.stream().map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale))).toList(),
       xscale
     );
   }
@@ -288,8 +289,7 @@ public class VertexLinker {
     // Distances are squared (see squaredDistance), so compare against the squared radius.
     final double radiusDegSq = radiusDeg * radiusDeg;
     var candidateEdges = graph.findEdges(env, scope);
-    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges
-      .stream()
+    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges.stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
@@ -315,8 +315,8 @@ public class VertexLinker {
   /**
    * Expanding-envelope search: the radius steps (smallest first) to try per linking {@link Scope}.
    * {@link #link} tries each step in turn and stops at the first that links, so a wider (more
-   * expensive) search only runs when the smaller one finds nothing; the largest step is that scope's
-   * maximum reach, so the set of vertices that link at all is unchanged.
+   * expensive) search only runs when the smaller one finds nothing; the largest step is that
+   * scope's maximum reach, so the set of vertices that link at all is unchanged.
    */
   private enum SearchPlan {
     /** GBFS rental — the vast majority of rental vehicles sit within ~25 m of a street. */
@@ -364,8 +364,7 @@ public class VertexLinker {
       candidateEdges
     );
     HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
-    return closestEdges
-      .stream()
+    return closestEdges.stream()
       .map(ce -> snapAndLink(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
       .filter(Objects::nonNull)
       .collect(Collectors.toSet());
@@ -396,8 +395,7 @@ public class VertexLinker {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
 
-      var candidateEdgesForMode = candidateEdges
-        .stream()
+      var candidateEdgesForMode = candidateEdges.stream()
         .filter(e -> e.item.canTraverse(modeSet))
         .toList();
 
@@ -405,8 +403,7 @@ public class VertexLinker {
         continue;
       }
 
-      double closestSquaredDistance = candidateEdgesForMode
-        .stream()
+      double closestSquaredDistance = candidateEdgesForMode.stream()
         .mapToDouble(ce -> ce.squaredDistanceDegreesLat)
         .min()
         .getAsDouble();
@@ -420,8 +417,7 @@ public class VertexLinker {
       // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
       // Note: add only closest edges of each mode
       closestEdges.addAll(
-        candidateEdgesForMode
-          .stream()
+        candidateEdgesForMode.stream()
           .filter(ce -> ce.squaredDistanceDegreesLat <= bandSquared)
           .collect(Collectors.toSet())
       );
@@ -447,7 +443,7 @@ public class VertexLinker {
     // check if vertex is inside an area
     if (
       this.visibilityMode == VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES &&
-      edge instanceof AreaEdge aEdge
+        edge instanceof AreaEdge aEdge
     ) {
       AreaGroup ag = aEdge.getArea();
       var area = new PreparedAreaGroup(ag);
@@ -488,8 +484,8 @@ public class VertexLinker {
 
     if (shouldLinkFlex) {
       var areaStops = Stream.concat(start.getIncoming().stream(), start.getOutgoing().stream())
-        .flatMap(e ->
-          Stream.concat(
+        .flatMap(
+          e -> Stream.concat(
             e.getFromVertex().areaStops().stream(),
             e.getToVertex().areaStops().stream()
           )
@@ -558,10 +554,9 @@ public class VertexLinker {
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
-    var newEdges =
-      scope == Scope.PERMANENT
-        ? originalEdge.splitDestructively(v)
-        : originalEdge.splitNonDestructively(v, direction);
+    var newEdges = scope == Scope.PERMANENT
+      ? originalEdge.splitDestructively(v)
+      : originalEdge.splitNonDestructively(v, direction);
 
     if (scope != Scope.PERMANENT) {
       newEdges.forEach(tempEdges::addEdge);
@@ -677,8 +672,8 @@ public class VertexLinker {
   }
 
   /**
-   * Add a vertex to an area. This creates edges to all visibility vertices
-   * unless those edges would cross one of the area boundary edges
+   * Add a vertex to an area. This creates edges to all visibility vertices unless those edges would
+   * cross one of the area boundary edges
    */
   private boolean addAreaVertex(
     IntersectionVertex newVertex,
@@ -704,10 +699,9 @@ public class VertexLinker {
         Math.floor((2 * maxAreaNodes * maxAreaNodes) / areaComplexity)
       );
       if (appliedCount < totalCount) {
-        visibilityVertices = visibilityVertices
-          .stream()
-          .sorted((v1, v2) ->
-            Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+        visibilityVertices = visibilityVertices.stream()
+          .sorted(
+            (v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .limit(appliedCount)
           .collect(Collectors.toSet());
@@ -723,12 +717,11 @@ public class VertexLinker {
     if (added == 0) {
       if (force) {
         // link with nearest visibility vertex which does not overlap
-        var nearest = areaGroup
-          .visibilityVertices()
+        var nearest = areaGroup.visibilityVertices()
           .stream()
           .filter(v -> distSquared(v, newVertex) >= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED)
-          .sorted((v1, v2) ->
-            Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+          .sorted(
+            (v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .findFirst();
         if (!nearest.isPresent()) {
@@ -811,8 +804,7 @@ public class VertexLinker {
     // 'from' is the new vertex to be connected, so check the 'to' vertex connections
     var incomingNoThruModes = getNoThruModes(to.getIncoming());
     var outgoingNoThruModes = getNoThruModes(to.getOutgoing());
-    AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
-      .withFromVertex(from)
+    AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder().withFromVertex(from)
       .withToVertex(to)
       .withGeometry(line)
       .withName(hit.name())
@@ -831,8 +823,7 @@ public class VertexLinker {
       tempEdges.addEdge(areaEdge);
     }
 
-    AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder()
-      .withFromVertex(to)
+    AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder().withFromVertex(to)
       .withToVertex(from)
       .withGeometry(line.reverse())
       .withName(hit.name())

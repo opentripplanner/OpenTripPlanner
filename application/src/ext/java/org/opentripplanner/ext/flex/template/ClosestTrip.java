@@ -46,9 +46,9 @@ record ClosestTrip(
   }
 
   /**
-   * Create a set of the closest trips running on the dates provided. Only the
-   * combination of the closest nearby-stop and trip is kept. For each combination,
-   * the set of dates is checked, and an instance with each active date is returned.
+   * Create a set of the closest trips running on the dates provided. Only the combination of the
+   * closest nearby-stop and trip is kept. For each combination, the set of dates is checked, and an
+   * instance with each active date is returned.
    */
   static Collection<ClosestTrip> of(
     FlexAccessEgressCallbackAdapter callbackService,
@@ -136,9 +136,7 @@ record ClosestTrip(
     FlexServiceDate date,
     int stopPos
   ) {
-    return RoutingBookingInfo.of(
-      date.requestedBookingTime(),
-      trip.getPickupBookingInfo(stopPos)
-    ).exceedsLatestBookingTime();
+    return RoutingBookingInfo.of(date.requestedBookingTime(), trip.getPickupBookingInfo(stopPos))
+      .exceedsLatestBookingTime();
   }
 }

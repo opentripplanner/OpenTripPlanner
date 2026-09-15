@@ -23,15 +23,16 @@ import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParamet
 
 /**
  * Verifies that two {@link SiriETCarpoolingUpdater} instances can share a single
- * {@link DefaultCarpoolingRepository} without colliding when both receive a SIRI journey
- * with the same {@code EstimatedVehicleJourneyCode}. The two updaters represent two
- * independent SIRI-ET feeds; their feedIds are the only thing that should keep their
- * trips apart in the shared repository.
+ * {@link DefaultCarpoolingRepository} without colliding when both receive a SIRI journey with the
+ * same {@code EstimatedVehicleJourneyCode}. The two updaters represent two independent SIRI-ET
+ * feeds; their feedIds are the only thing that should keep their trips apart in the shared
+ * repository.
  *
- * <p>The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater
- * per polling cycle and receives only the deliveries fetched from that updater's source
- * URL — there is no per-call feed multiplexing inside a single delivery list, so the
- * tests below invoke each updater explicitly.
+ * <p>
+ * The {@code processEstimatedTimetableDeliveries} pipeline is called once per updater per
+ * polling cycle and receives only the deliveries fetched from that updater's source URL — there is
+ * no per-call feed multiplexing inside a single delivery list, so the tests below invoke each
+ * updater explicitly.
  */
 class MultiFeedSiriETCarpoolingUpdaterTest {
 
@@ -48,8 +49,8 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   void setUp() {
     repository = new DefaultCarpoolingRepository();
     var resolver = mock(CarpoolTripVertexResolver.class);
-    when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+    when(resolver.resolve(any())).thenAnswer(
+      invocation -> CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );
     updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
     updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
@@ -70,8 +71,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     assertEquals(FEED_A, idA.getFeedId());
     assertEquals(FEED_B, idB.getFeedId());
 
-    Set<FeedScopedId> ids = repository
-      .getCarpoolTrips()
+    Set<FeedScopedId> ids = repository.getCarpoolTrips()
       .stream()
       .map(t -> t.trip().getId())
       .collect(Collectors.toSet());
@@ -102,8 +102,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     updaterA.processEstimatedVehicleJourney(journey);
     updaterB.processEstimatedVehicleJourney(journey);
 
-    var feedPrefixes = repository
-      .getCarpoolTrips()
+    var feedPrefixes = repository.getCarpoolTrips()
       .stream()
       .map(t -> t.trip().getId().getFeedId())
       .collect(Collectors.toSet());
@@ -146,9 +145,6 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   }
 
   private boolean tripIsInRepository(FeedScopedId id) {
-    return repository
-      .getCarpoolTrips()
-      .stream()
-      .anyMatch(t -> t.trip().getId().equals(id));
+    return repository.getCarpoolTrips().stream().anyMatch(t -> t.trip().getId().equals(id));
   }
 }

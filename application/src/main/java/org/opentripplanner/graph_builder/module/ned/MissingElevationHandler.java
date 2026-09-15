@@ -23,28 +23,18 @@ import org.slf4j.LoggerFactory;
  * Elevation may be missing from a {@link StreetEdge} for two reasons: 1. the source DEM files
  * contained no data for the whole geometry 2. {@link StreetEdge#isSlopeOverride()} is set
  * <p>
- * The elevation for missing edges is set through its vertices, with the elevation for the from/to
- * vertices being used to set the elevation profile.
+ * The elevation for missing edges is set through its vertices, with the elevation for the
+ * from/to vertices being used to set the elevation profile.
  * <ol>
- * <li>
- *   The source elevations are determined for vertices using edges with an existing elevation
- *   profile, along with values from the {@code ele} tag
- * </li>
- * <li>
- *   All vertices within {@code maxElevationPropagationMeters} of vertices with elevation
- *   without elevation are visited
- * </li>
- * <li>
- *   Foreach vertex without elevation the first two paths from a vertex with elevation are used
- *   to interpolate elevations
- * </li>
- * <li>
- *   If a vertex only had a single path, then the last known elevation is used
- * </li>
- * <li>
- *   Once elevations for vertices are interpolated they are used to set the elevation profile
- *   for the incoming / outgoing StreetEdges
- * </li>
+ *   <li>The source elevations are determined for vertices using edges with an existing elevation
+ *       profile, along with values from the {@code ele} tag</li>
+ *   <li>All vertices within {@code maxElevationPropagationMeters} of vertices with elevation without
+ *       elevation are visited</li>
+ *   <li>Foreach vertex without elevation the first two paths from a vertex with elevation are used to
+ *       interpolate elevations</li>
+ *   <li>If a vertex only had a single path, then the last known elevation is used</li>
+ *   <li>Once elevations for vertices are interpolated they are used to set the elevation profile for
+ *       the incoming / outgoing StreetEdges</li>
  * </ol>
  */
 class MissingElevationHandler {
@@ -83,11 +73,9 @@ class MissingElevationHandler {
 
     // Assign elevations to street edges based on the vertices
     elevations.keySet().forEach(vertex -> {
-      vertex
-        .getIncomingStreetEdges()
+      vertex.getIncomingStreetEdges()
         .forEach(edge -> assignElevationToEdgeIfPossible(elevations, edge));
-      vertex
-        .getOutgoingStreetEdges()
+      vertex.getOutgoingStreetEdges()
         .forEach(edge -> assignElevationToEdgeIfPossible(elevations, edge));
     });
   }
@@ -209,8 +197,8 @@ class MissingElevationHandler {
     var currentState = stateToBackTrack;
     while (currentState != null) {
       if (!elevations.containsKey(currentState.currentVertex)) {
-        var elevation =
-          currentState.initialElevation + elevationDiff * (currentState.distance / totalDistance);
+        var elevation = currentState.initialElevation +
+          elevationDiff * (currentState.distance / totalDistance);
         elevation = DoubleUtils.roundTo1Decimal(elevation);
 
         elevations.put(currentState.currentVertex, elevation);
@@ -238,8 +226,7 @@ class MissingElevationHandler {
 
     Coordinate[] coords = new Coordinate[] {
       new Coordinate(0, fromElevation),
-      new Coordinate(edge.getDistanceMeters(), toElevation),
-    };
+      new Coordinate(edge.getDistanceMeters(), toElevation), };
 
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
@@ -293,8 +280,7 @@ class MissingElevationHandler {
 
     @Override
     public String toString() {
-      return (
-        "ElevationRepairState{" +
+      return ("ElevationRepairState{" +
         "initialVertex=" +
         initialVertex +
         ", initialElevation=" +
@@ -303,8 +289,7 @@ class MissingElevationHandler {
         currentVertex +
         ", distance=" +
         distance +
-        '}'
-      );
+        '}');
     }
   }
 }

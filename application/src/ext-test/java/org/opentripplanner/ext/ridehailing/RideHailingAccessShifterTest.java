@@ -63,8 +63,8 @@ class RideHailingAccessShifterTest {
       .withTo(FROM)
       .withFrom(TO)
       .withDateTime(searchTime)
-      .withJourney(jb ->
-        jb.withModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+      .withJourney(
+        jb -> jb.withModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
       )
       .buildRequest();
 
@@ -133,8 +133,8 @@ class RideHailingAccessShifterTest {
       .withDateTime(time)
       .withFrom(FROM)
       .withTo(TO)
-      .withJourney(jb ->
-        jb.withModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+      .withJourney(
+        jb -> jb.withModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
       )
       .buildRequest();
   }

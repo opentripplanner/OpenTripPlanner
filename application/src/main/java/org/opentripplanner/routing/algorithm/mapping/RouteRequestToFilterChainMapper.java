@@ -79,8 +79,9 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    builder
-      .withMaxNumberOfItineraries(Math.min(request.numItineraries(), MAX_NUMBER_OF_ITINERARIES))
+    builder.withMaxNumberOfItineraries(
+      Math.min(request.numItineraries(), MAX_NUMBER_OF_ITINERARIES)
+    )
       .withMaxNumberOfItinerariesCropSection(request.cropItinerariesAt())
       .withTransitGeneralizedCostLimit(params.transitGeneralizedCostLimit())
       .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())
@@ -131,9 +132,8 @@ public class RouteRequestToFilterChainMapper {
 
   private static double minBikeParkingDistance(RouteRequest request) {
     var modes = request.journey().modes();
-    boolean hasBikePark = List.of(modes.accessMode, modes.egressMode).contains(
-      StreetMode.BIKE_TO_PARK
-    );
+    boolean hasBikePark = List.of(modes.accessMode, modes.egressMode)
+      .contains(StreetMode.BIKE_TO_PARK);
 
     double minBikeParkingDistance = 0;
     if (hasBikePark) {

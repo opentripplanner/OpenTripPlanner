@@ -42,13 +42,12 @@ import uk.org.siri.siri21.Siri;
 /**
  * A source of estimated timetables that reads SIRI-ET messages from a Google PubSub subscription.
  * <p>
- *   This class starts a Google PubSub subscription
+ * This class starts a Google PubSub subscription
  * <p>
  * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
  * "GOOGLE_APPLICATION_CREDENTIALS" as described here:
  * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access
- * to
- * create subscription ("editor")</a>
+ * to create subscription ("editor")</a>
  * <p>
  * <p>
  * <p>
@@ -80,10 +79,9 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private static final int RETRY_BACKOFF = 2;
 
   /**
-   * The URL used to fetch all initial updates.
-   * The URL responds to HTTP GET and returns all initial data in xml-format. It will be
-   * called once to initialize real-time-data.
-   * All subsequent updates will be received from Google Cloud Pubsub.
+   * The URL used to fetch all initial updates. The URL responds to HTTP GET and returns all initial
+   * data in xml-format. It will be called once to initialize real-time-data. All subsequent updates
+   * will be received from Google Cloud Pubsub.
    */
   private final URI dataInitializationUrl;
 
@@ -123,19 +121,14 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     this.initialGetDataTimeout = initialGetDataTimeout;
 
     String subscriptionId = buildSubscriptionId();
-    subscriptionName = ProjectSubscriptionName.of(
-      subscriptionProjectName,
-      subscriptionId
-    ).toString();
-    subscriber = Subscriber.newBuilder(
-      subscriptionName,
-      new EstimatedTimetableMessageReceiver()
-    ).build();
+    subscriptionName = ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId)
+      .toString();
+    subscriber = Subscriber.newBuilder(subscriptionName, new EstimatedTimetableMessageReceiver())
+      .build();
     this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
 
-    retry = new OtpRetryBuilder()
-      .withName("SIRI-ET Google PubSub Updater setup")
+    retry = new OtpRetryBuilder().withName("SIRI-ET Google PubSub Updater setup")
       .withMaxAttempts(RETRY_MAX_ATTEMPTS)
       .withInitialRetryInterval(RETRY_INITIAL_DELAY)
       .withBackoffMultiplier(RETRY_BACKOFF)
@@ -146,8 +139,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   /**
    * Create a PubSub subscription, read the backlog of messages and start listening to the
-   * subscription.
-   * Enter an infinite loop waiting for messages. An interruption sent at server
+   * subscription. Enter an infinite loop waiting for messages. An interruption sent at server
    * shutdown will cause the loop to stop.
    */
   @Override
@@ -184,9 +176,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   }
 
   /**
-   * Build a unique name for the subscription.
-   * This ensures that if the subscription is not properly deleted during shutdown,
-   * a restarted instance will get a fresh subscription.
+   * Build a unique name for the subscription. This ensures that if the subscription is not properly
+   * deleted during shutdown, a restarted instance will get a fresh subscription.
    */
   private static String buildSubscriptionId() {
     String hostname = System.getenv("HOSTNAME");
@@ -206,9 +197,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
           .setPushConfig(pushConfig)
           .setMessageRetentionDuration(
             // How long will an unprocessed message be kept - minimum 10 minutes
-            com.google.protobuf.Duration.newBuilder()
-              .setSeconds(600)
-              .build()
+            com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
           )
           .setExpirationPolicy(
             ExpirationPolicy.newBuilder()
@@ -262,8 +251,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   }
 
   /**
-   * Fetch the backlog of messages and apply the changes to the transit model.
-   * Block until the backlog is applied.
+   * Fetch the backlog of messages and apply the changes to the transit model. Block until the
+   * backlog is applied.
    */
   private void initializeData() {
     if (dataInitializationUrl != null) {
@@ -348,8 +337,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private void logPubsubMessage(ServiceDelivery serviceDelivery) {
     int numberOfUpdatedTrips = 0;
     try {
-      numberOfUpdatedTrips = serviceDelivery
-        .getEstimatedTimetableDeliveries()
+      numberOfUpdatedTrips = serviceDelivery.getEstimatedTimetableDeliveries()
         .getFirst()
         .getEstimatedJourneyVersionFrames()
         .getFirst()
@@ -367,10 +355,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         numberOfMessages,
         numberOfUpdates,
         FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-        Duration.between(
-          serviceDelivery.getResponseTimestamp().toInstant(),
-          Instant.now()
-        ).toMillis(),
+        Duration.between(serviceDelivery.getResponseTimestamp().toInstant(), Instant.now())
+          .toMillis(),
         getTimeSinceStartupString()
       );
     }

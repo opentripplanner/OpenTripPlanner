@@ -13,8 +13,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 public class TransitGroupPriorityConfig {
 
   public static void mapTransitRequest(NodeAdapter root, TransitRequestBuilder transit) {
-    var c = root
-      .of("transitGroupPriority")
+    var c = root.of("transitGroupPriority")
       .since(OtpVersion.V2_5)
       .summary(
         "Group transit patterns and give each group a mutual advantage in the Raptor search."
@@ -56,8 +55,7 @@ public class TransitGroupPriorityConfig {
     String parameterName,
     String description
   ) {
-    return root
-      .of(parameterName)
+    return root.of(parameterName)
       .since(V2_5)
       .summary("List of transit groups.")
       .description(description + " The max total number of group-ids are 32, so be careful.")
@@ -67,15 +65,13 @@ public class TransitGroupPriorityConfig {
   private static TransitGroupSelect mapTransitGroupSelect(NodeAdapter c) {
     return TransitGroupSelect.of()
       .addModes(
-        c
-          .of("modes")
+        c.of("modes")
           .since(V2_5)
           .summary("List all modes to select for this group.")
           .asEnumSet(TransitMode.class)
       )
       .addSubModeRegexp(
-        c
-          .of("subModes")
+        c.of("subModes")
           .since(V2_5)
           .summary("List a set of regular expressions for matching sub-modes.")
           .asStringList(List.of())

@@ -23,7 +23,7 @@ public class Money implements Comparable<Money>, Serializable {
 
   /**
    *
-   * @param currency The currency of the money amount
+   * @param currency        The currency of the money amount
    * @param minorUnitAmount The amount in the smaller currency unit, so for 1.50 EUR pass 150.
    */
   private Money(Currency currency, int minorUnitAmount) {
@@ -33,6 +33,7 @@ public class Money implements Comparable<Money>, Serializable {
 
   /**
    * Creates a Euro money object.
+   *
    * @param amount Amount in fractional euro, so 1.5 for 1.50 EUR
    */
   public static Money euros(float amount) {
@@ -41,6 +42,7 @@ public class Money implements Comparable<Money>, Serializable {
 
   /**
    * Creates a US dollar money object.
+   *
    * @param amount Amount in fractional dollars, so 1.5 for 1.50 USD
    */
   public static Money usDollars(float amount) {
@@ -100,8 +102,7 @@ public class Money implements Comparable<Money>, Serializable {
   public BigDecimal fractionalAmount() {
     int fractionDigits = currency.getDefaultFractionDigits();
     var divisor = BigDecimal.valueOf(Math.pow(10, fractionDigits));
-    return new BigDecimal(amount)
-      .setScale(fractionDigits, RoundingMode.HALF_UP)
+    return new BigDecimal(amount).setScale(fractionDigits, RoundingMode.HALF_UP)
       .divide(divisor, RoundingMode.HALF_UP);
   }
 
@@ -141,16 +142,15 @@ public class Money implements Comparable<Money>, Serializable {
   }
 
   /**
-   * Returns half this instance's amount
-   * Amounts in minor currency unit is rounded to nearest integer, so $0.99/2 becomes $0.50
+   * Returns half this instance's amount Amounts in minor currency unit is rounded to nearest
+   * integer, so $0.99/2 becomes $0.50
    */
   public Money half() {
     return new Money(currency, IntUtils.round(amount / 2f));
   }
 
   /**
-   * Returns the instance rounded down to the nearest multiple of 5 cents
-   * So $0.14 becomes $0.10
+   * Returns the instance rounded down to the nearest multiple of 5 cents So $0.14 becomes $0.10
    */
   public Money roundDownToNearestFiveMinorUnits() {
     int rounded = (this.minorUnitAmount() / 5) * 5;

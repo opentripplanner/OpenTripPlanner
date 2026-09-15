@@ -19,8 +19,9 @@ public class RoutingErrorImpl implements GraphQLDataFetchers.GraphQLRoutingError
 
   @Override
   public DataFetcher<String> description() {
-    return environment ->
-      PlannerErrorMapper.mapMessage(getSource(environment)).message.get(getLocale(environment));
+    return environment -> PlannerErrorMapper.mapMessage(getSource(environment)).message.get(
+      getLocale(environment)
+    );
   }
 
   @Override

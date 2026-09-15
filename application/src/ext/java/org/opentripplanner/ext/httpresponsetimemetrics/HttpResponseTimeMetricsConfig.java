@@ -7,7 +7,8 @@ import java.util.Set;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
- * This class is responsible for mapping HTTP response time metrics JSON configuration into parameters.
+ * This class is responsible for mapping HTTP response time metrics JSON configuration into
+ * parameters.
  */
 public class HttpResponseTimeMetricsConfig {
 
@@ -17,8 +18,7 @@ public class HttpResponseTimeMetricsConfig {
     String parameterName,
     NodeAdapter root
   ) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_9)
       .summary("Configuration for HTTP response time metrics.")
       .description(
@@ -31,14 +31,12 @@ public class HttpResponseTimeMetricsConfig {
       )
       .asObject();
     return new HttpResponseTimeMetricsParameters(
-      c
-        .of("clientHeader")
+      c.of("clientHeader")
         .since(V2_9)
         .summary("HTTP header name used to identify the client.")
         .asString(HttpResponseTimeMetricsParameters.DEFAULT_CLIENT_HEADER),
       Set.copyOf(
-        c
-          .of("monitoredClients")
+        c.of("monitoredClients")
           .since(V2_9)
           .summary("List of client names to track individually.")
           .description(
@@ -50,8 +48,7 @@ public class HttpResponseTimeMetricsConfig {
           .asStringList(List.of())
       ),
       Set.copyOf(
-        c
-          .of("monitoredEndpoints")
+        c.of("monitoredEndpoints")
           .since(V2_9)
           .summary("List of endpoint paths to monitor for metrics.")
           .description(
@@ -64,13 +61,11 @@ public class HttpResponseTimeMetricsConfig {
             HttpResponseTimeMetricsParameters.DEFAULT_MONITORED_ENDPOINTS.stream().toList()
           )
       ),
-      c
-        .of("metricName")
+      c.of("metricName")
         .since(V2_9)
         .summary("Name of the metric to record.")
         .asString(HttpResponseTimeMetricsParameters.DEFAULT_METRIC_NAME),
-      c
-        .of("minExpectedResponseTime")
+      c.of("minExpectedResponseTime")
         .since(V2_9)
         .summary("Minimum expected response time for histogram buckets.")
         .description(
@@ -80,8 +75,7 @@ public class HttpResponseTimeMetricsConfig {
           """
         )
         .asDuration(HttpResponseTimeMetricsParameters.DEFAULT_MIN_EXPECTED_RESPONSE_TIME),
-      c
-        .of("maxExpectedResponseTime")
+      c.of("maxExpectedResponseTime")
         .since(V2_9)
         .summary("Maximum expected response time for histogram buckets.")
         .description(

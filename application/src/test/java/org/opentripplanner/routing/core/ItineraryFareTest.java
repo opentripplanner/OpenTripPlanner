@@ -29,8 +29,7 @@ class ItineraryFareTest {
 
   @Test
   void legProduct() {
-    Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B)
+    Itinerary i1 = newItinerary(A, T11_00).walk(20, B)
       .bus(122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .build();

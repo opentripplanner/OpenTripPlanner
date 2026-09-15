@@ -17,7 +17,8 @@ class TransmodelWarmupQueryExecutor implements WarmupQueryStrategy {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelWarmupQueryExecutor.class);
 
-  static final String QUERY = """
+  static final String QUERY =
+  """
   query(
     $fromLat: Float!, $fromLon: Float!,
     $toLat: Float!, $toLon: Float!,

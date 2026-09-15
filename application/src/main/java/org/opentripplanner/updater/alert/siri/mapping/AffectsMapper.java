@@ -85,7 +85,9 @@ public class AffectsMapper {
     }
 
     List<EntitySelector> selectors = new ArrayList<>();
-    for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
+    for (
+      AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()
+    ) {
       List<AffectedStopPointStructure> affectedStops = new ArrayList<>();
 
       List<AffectedRouteStructure> routes = affectedVehicleJourney.getRoutes();
@@ -93,8 +95,7 @@ public class AffectsMapper {
       if (routes != null) {
         for (AffectedRouteStructure route : routes) {
           if (route.getStopPoints() != null) {
-            List<Serializable> stopPointsList = route
-              .getStopPoints()
+            List<Serializable> stopPointsList = route.getStopPoints()
               .getAffectedStopPointsAndLinkProjectionToNextStopPoints();
             for (Serializable serializable : stopPointsList) {
               if (serializable instanceof AffectedStopPointStructure stopPointStructure) {
@@ -145,8 +146,8 @@ public class AffectsMapper {
         );
       }
 
-      final FramedVehicleJourneyRefStructure framedVehicleJourneyRef =
-        affectedVehicleJourney.getFramedVehicleJourneyRef();
+      final FramedVehicleJourneyRefStructure framedVehicleJourneyRef = affectedVehicleJourney
+        .getFramedVehicleJourneyRef();
       if (framedVehicleJourneyRef != null) {
         selectors.addAll(
           mapTripSelectors(
@@ -157,8 +158,8 @@ public class AffectsMapper {
         );
       }
 
-      final List<DatedVehicleJourneyRef> datedVehicleJourneyReves =
-        affectedVehicleJourney.getDatedVehicleJourneyReves();
+      final List<DatedVehicleJourneyRef> datedVehicleJourneyReves = affectedVehicleJourney
+        .getDatedVehicleJourneyReves();
       if (isNotEmpty(datedVehicleJourneyReves)) {
         for (DatedVehicleJourneyRef datedVehicleJourneyRef : datedVehicleJourneyReves) {
           // Lookup provided reference as if it is a DSJ
@@ -230,7 +231,10 @@ public class AffectsMapper {
 
     List<EntitySelector> selectors = new ArrayList<>();
 
-    for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
+    for (
+      AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks
+        .getAffectedNetworks()
+    ) {
       List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
       if (isNotEmpty(affectedLines)) {
         for (AffectedLineStructure line : affectedLines) {
@@ -248,8 +252,7 @@ public class AffectsMapper {
           if (routes != null) {
             for (AffectedRouteStructure route : routes.getAffectedRoutes()) {
               if (route.getStopPoints() != null) {
-                List<Serializable> stopPointsList = route
-                  .getStopPoints()
+                List<Serializable> stopPointsList = route.getStopPoints()
                   .getAffectedStopPointsAndLinkProjectionToNextStopPoints();
                 for (Serializable serializable : stopPointsList) {
                   if (serializable instanceof AffectedStopPointStructure stopPointStructure) {
@@ -306,8 +309,7 @@ public class AffectsMapper {
 
   @Nullable
   private List<Direction> mapDirections(List<DirectionStructure> directionStructures) {
-    var res = directionStructures
-      .stream()
+    var res = directionStructures.stream()
       .flatMap(d -> mapDirection(d.getDirectionRef().getValue()).stream())
       .toList();
     return res.isEmpty() ? null : res;
@@ -403,8 +405,8 @@ public class AffectsMapper {
   /**
    * Resolve serviceDate. For legacy reasons this is provided in originAimedDepartureTime - in lack
    * of alternatives. Even though the field's name indicates that the timestamp represents the
-   * departure from the first stop, only the Date-part is actually used, and is defined to
-   * represent the actual serviceDate. The time and zone part is ignored.
+   * departure from the first stop, only the Date-part is actually used, and is defined to represent
+   * the actual serviceDate. The time and zone part is ignored.
    */
   @Nullable
   private static LocalDate resolveServiceDate(@Nullable ZonedDateTime originAimedDepartureTime) {
@@ -474,7 +476,7 @@ public class AffectsMapper {
 
   /**
    * @return True if list have at least one element. {@code false} is returned if the given list is
-   * empty or {@code null}.
+   *         empty or {@code null}.
    */
   private static boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();

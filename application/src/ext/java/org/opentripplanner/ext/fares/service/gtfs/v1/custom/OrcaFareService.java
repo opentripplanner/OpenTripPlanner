@@ -31,10 +31,11 @@ import org.opentripplanner.transit.model.network.Route;
 public class OrcaFareService extends DefaultFareService {
 
   /***
-   * FareOfferExtended is used to store a FareOffer along with a separate start time that is used for the validity period.
-   * This is intended to allow us to extend the expiry time without affecting the FareOffer's start time, because that would
-   * cause the unique ID to change. The ID needs to stay consistent to indicate that this isn't a new fare product that the user
-   * has to buy.
+   * FareOfferExtended is used to store a FareOffer along with a separate start time that is used
+   * for the validity period. This is intended to allow us to extend the expiry time without
+   * affecting the FareOffer's start time, because that would cause the unique ID to change. The ID
+   * needs to stay consistent to indicate that this isn't a new fare product that the user has to
+   * buy.
    */
   private static class ExtendedFareOffer {
 
@@ -51,8 +52,8 @@ public class OrcaFareService extends DefaultFareService {
     }
 
     /**
-     * Check if a FareOffer is valid at a given time based on the transfer window.
-     * For ORCA transfers, fare products are valid for the MAX_TRANSFER_DISCOUNT_DURATION.
+     * Check if a FareOffer is valid at a given time based on the transfer window. For ORCA
+     * transfers, fare products are valid for the MAX_TRANSFER_DISCOUNT_DURATION.
      */
     public boolean isValidAt(ZonedDateTime checkTime) {
       return this.extendedStartTime.plus(MAX_TRANSFER_DISCOUNT_DURATION).isAfter(checkTime);
@@ -185,8 +186,9 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Categorizes a leg based on various parameters.
-   * The classifications determine the various rules and fares applied to the leg.
+   * Categorizes a leg based on various parameters. The classifications determine the various rules
+   * and fares applied to the leg.
+   *
    * @param leg Leg to be classified.
    * @return RideType classification
    */
@@ -325,21 +327,16 @@ public class OrcaFareService extends DefaultFareService {
       case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
         ? optionalUSD(5.25f)
         : optionalUSD(6.25f);
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
+      case WASHINGTON_STATE_FERRIES -> defaultFare.map(
+        df -> getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
       case KC_METRO, SEATTLE_STREET_CAR, SOUND_TRANSIT_BUS, SOUND_TRANSIT_LINK -> optionalUSD(
         3.00f
       );
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(2.50f);
       case EVERETT_TRANSIT, PIERCE_COUNTY_TRANSIT -> optionalUSD(2.00f);
-      case
-        WHATCOM_LOCAL,
-        WHATCOM_CROSS_COUNTY,
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
-        ? Optional.empty()
-        : defaultFare;
+      case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY -> fareType
+        .equals(FareType.electronicRegular) ? Optional.empty() : defaultFare;
       case MONORAIL -> Optional.empty();
       default -> defaultFare;
     };
@@ -369,15 +366,12 @@ public class OrcaFareService extends DefaultFareService {
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR -> optionalUSD(1.00f);
       case MONORAIL -> Optional.empty();
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
+      case WASHINGTON_STATE_FERRIES -> defaultFare.map(
+        df -> getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
-      case
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY,
-        WHATCOM_CROSS_COUNTY,
-        WHATCOM_LOCAL -> Optional.empty();
+      case SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, WHATCOM_CROSS_COUNTY, WHATCOM_LOCAL -> Optional
+        .empty();
       default -> defaultFare;
     };
   }
@@ -413,8 +407,8 @@ public class OrcaFareService extends DefaultFareService {
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
       // Discount specific to Skagit transit and not Orca.
-      case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
-        getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
+      case WASHINGTON_STATE_FERRIES -> defaultFare.map(
+        df -> getWashingtonStateFerriesFare(route.getLongName(), fareType, df)
       );
       case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> defaultFare.map(Money::half);
       default -> defaultFare;
@@ -426,13 +420,8 @@ public class OrcaFareService extends DefaultFareService {
    */
   private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
     return switch (rideType) {
-      case
-        UNKNOWN,
-        SKAGIT_TRANSIT,
-        SKAGIT_LOCAL,
-        SKAGIT_CROSS_COUNTY,
-        MONORAIL,
-        LINK_SHUTTLE -> Optional.empty();
+      case UNKNOWN, SKAGIT_TRANSIT, SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, MONORAIL, LINK_SHUTTLE ->
+        Optional.empty();
       default -> Optional.of(ZERO_USD);
     };
   }
@@ -459,8 +448,7 @@ public class OrcaFareService extends DefaultFareService {
 
   /**
    * Get the ride price for a single leg. If testing, this class is being called directly so the
-   * required agency cash values are not available therefore the default test price is used
-   * instead.
+   * required agency cash values are not available therefore the default test price is used instead.
    */
   protected Optional<Money> getRidePrice(
     Leg leg,
@@ -475,10 +463,10 @@ public class OrcaFareService extends DefaultFareService {
    * If free transfers are applicable, the most expensive discount fare across all legs is added to
    * the final cumulative price.
    * <p>
-   * The computed fare for Orca card users takes into account real-time trip updates where available,
-   * so that, for instance, when a leg on a long itinerary is delayed to begin after the initial two
-   * hour window has expired, the calculated fare for that trip will be two one-way fares instead of
-   * one.
+   * The computed fare for Orca card users takes into account real-time trip updates where
+   * available, so that, for instance, when a leg on a long itinerary is delayed to begin after the
+   * initial two hour window has expired, the calculated fare for that trip will be two one-way
+   * fares instead of one.
    */
   @Override
   public ItineraryFare calculateFaresForType(
@@ -515,16 +503,14 @@ public class OrcaFareService extends DefaultFareService {
         continue;
       }
 
-      var validFareProducts = purchasedFareProducts
-        .stream()
+      var validFareProducts = purchasedFareProducts.stream()
         .filter(fp -> fp.isValidAt(leg.startTime()))
         .toList();
 
       var transferType = rideType.getTransferType(fareType, leg.startTime());
       if (transferType == TransferType.ORCA_INTERAGENCY_TRANSFER) {
         // Important to get transfer discount before calculating next leg price
-        var totalAlreadyPurchased = validFareProducts
-          .stream()
+        var totalAlreadyPurchased = validFareProducts.stream()
           .reduce(
             ZERO_USD,
             (subtotal, el) -> subtotal.plus(el.fareOffer.fareProduct().price()),
@@ -540,10 +526,7 @@ public class OrcaFareService extends DefaultFareService {
           new FeedScopedId(FEED_ID, UUID.randomUUID().toString()),
           "ORCA Fare",
           additionalFareRequired.isPositive() ? additionalFareRequired : Money.ZERO_USD
-        )
-          .withCategory(riderCategory)
-          .withMedium(ELECTRONIC_MEDIUM)
-          .build();
+        ).withCategory(riderCategory).withMedium(ELECTRONIC_MEDIUM).build();
 
         // Dependencies will be populated later if there is a discount getting applied.
         Collection<FareProduct> dependencies = new ArrayList<>();
@@ -556,10 +539,7 @@ public class OrcaFareService extends DefaultFareService {
             validFareProducts.getFirst().fareOffer.fareProduct().id(),
             "ORCA Fare",
             legFare
-          )
-            .withCategory(riderCategory)
-            .withMedium(ELECTRONIC_MEDIUM)
-            .build();
+          ).withCategory(riderCategory).withMedium(ELECTRONIC_MEDIUM).build();
           fare.addFareProduct(
             leg,
             FareOffer.of(
@@ -589,8 +569,7 @@ public class OrcaFareService extends DefaultFareService {
         );
 
         // Look for existing fare products with this medium ID
-        var validAgencyFareProducts = validFareProducts
-          .stream()
+        var validAgencyFareProducts = validFareProducts.stream()
           .map(ExtendedFareOffer::fareOffer)
           .filter(fp -> fp.fareProduct().medium().equals(agencyTransferMedium))
           .filter(fp -> fp.fareProduct().name().equals(agencySpecificFareProduct.name()))
@@ -602,8 +581,7 @@ public class OrcaFareService extends DefaultFareService {
         if (!hasValidTransfer) {
           // Create a new fare product for this agency transfer
           var riderCategory = getRiderCategory(fareType);
-          var newFareProduct = agencySpecificFareProduct
-            .withCategory(riderCategory)
+          var newFareProduct = agencySpecificFareProduct.withCategory(riderCategory)
             .withMedium(agencyTransferMedium)
             .build();
 
@@ -633,8 +611,8 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * In the base class only the rules for a specific feed are selected and then passed to the
-   * fare engine, however here we want to explicitly compute fares across feed boundaries.
+   * In the base class only the rules for a specific feed are selected and then passed to the fare
+   * engine, however here we want to explicitly compute fares across feed boundaries.
    */
   @Nullable
   @Override
@@ -643,8 +621,8 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Disables functionality grouping legs by their feed.
-   * This ensures we can calculate transfers between agencies/feeds.
+   * Disables functionality grouping legs by their feed. This ensures we can calculate transfers
+   * between agencies/feeds.
    */
   @Override
   protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
@@ -670,12 +648,10 @@ public class OrcaFareService extends DefaultFareService {
    * Define Orca fare types.
    */
   private static boolean usesOrca(FareType fareType) {
-    return (
-      fareType.equals(FareType.electronicSpecial) ||
+    return (fareType.equals(FareType.electronicSpecial) ||
       fareType.equals(FareType.electronicSenior) ||
       fareType.equals(FareType.electronicRegular) ||
-      fareType.equals(FareType.electronicYouth)
-    );
+      fareType.equals(FareType.electronicYouth));
   }
 
   private static RiderCategory getRiderCategory(FareType fareType) {

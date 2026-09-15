@@ -48,9 +48,8 @@ public class TripPatternType {
           .name("aimedStartTime")
           .description("The aimed date and time the trip starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env ->
-            itinerary(env)
-              .startTime()
+          .dataFetcher(
+            env -> itinerary(env).startTime()
               // startTime is already adjusted for real-time - need to subtract delay to get aimed time
               .minusSeconds(itinerary(env).departureDelay())
           )
@@ -69,9 +68,8 @@ public class TripPatternType {
           .name("aimedEndTime")
           .description("The aimed date and time the trip ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
-          .dataFetcher(env ->
-            itinerary(env)
-              .endTime()
+          .dataFetcher(
+            env -> itinerary(env).endTime()
               // endTime is already adjusted for real-time - need to subtract delay to get aimed time
               .minusSeconds(itinerary(env).arrivalDelay())
           )

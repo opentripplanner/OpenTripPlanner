@@ -52,8 +52,8 @@ public class OperatorType {
           .name("lines")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .listRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getOperator(), environment.getSource()))
@@ -66,8 +66,8 @@ public class OperatorType {
           .name("serviceJourney")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment)
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
               .listTrips()
               .stream()
               .filter(trip -> Objects.equals(trip.getOperator(), environment.getSource()))

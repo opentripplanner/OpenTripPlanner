@@ -38,10 +38,9 @@ public class OHCalendar implements Serializable {
       return false;
     }
     int secondsFromMidnight = searchDateTime.toLocalTime().toSecondOfDay();
-    return openingHours
-      .stream()
-      .anyMatch(openingHoursDefinition ->
-        openingHoursDefinition.isOpen(daysFromStart, secondsFromMidnight)
+    return openingHours.stream()
+      .anyMatch(
+        openingHoursDefinition -> openingHoursDefinition.isOpen(daysFromStart, secondsFromMidnight)
       );
   }
 
@@ -59,12 +58,10 @@ public class OHCalendar implements Serializable {
       return false;
     }
     final OHCalendar that = (OHCalendar) o;
-    return (
-      openingHours.equals(that.openingHours) &&
+    return (openingHours.equals(that.openingHours) &&
       zoneId.equals(that.zoneId) &&
       startOfCalendar.equals(that.startOfCalendar) &&
-      endOfCalendar.equals(that.endOfCalendar)
-    );
+      endOfCalendar.equals(that.endOfCalendar));
   }
 
   @Override

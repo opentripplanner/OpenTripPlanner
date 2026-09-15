@@ -26,15 +26,15 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * {@code ClassName{field1:value, field2:value, ...}}
  * <p>
- * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and easy
- * to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
+ * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and
+ * easy to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
  * <p>
  * The naming of the 'add' methods should give a hint to which type the value have, this make it
  * easier to choose the right method and less error prune as compared with relaying on pure
  * override, which often result in a wrong method call.
  * <p>
- * The builder should be independent of locale, the value should always be formatted the same way,
- * this allows us to use the toString in unit tests.
+ * The builder should be independent of locale, the value should always be formatted the same
+ * way, this allows us to use the toString in unit tests.
  */
 public class ToStringBuilder {
 
@@ -67,8 +67,8 @@ public class ToStringBuilder {
   }
 
   /**
-   * Create a ToStringBuilder for a "named" type. The preferred method is {@link #of(Class)},
-   * but this can be used if the type is unknown or irrelevant.
+   * Create a ToStringBuilder for a "named" type. The preferred method is {@link #of(Class)}, but
+   * this can be used if the type is unknown or irrelevant.
    */
   public static ToStringBuilder of(String name) {
     return new ToStringBuilder(name, '{', '}');
@@ -148,8 +148,8 @@ public class ToStringBuilder {
   }
 
   /**
-   * Add the result of the given supplier. If the supplier return {@code null} or an exceptions
-   * is thrown, then nothing is added - the result is ignored.
+   * Add the result of the given supplier. If the supplier return {@code null} or an exceptions is
+   * thrown, then nothing is added - the result is ignored.
    */
   public ToStringBuilder addObjOpSafe(String name, Supplier<?> body) {
     return addObj(name, ObjectUtils.safeGetOrNull(body));
@@ -245,14 +245,7 @@ public class ToStringBuilder {
     if (array == null) {
       return this;
     }
-    return addIt(
-      name,
-      Arrays.stream(array)
-        .filter(t -> t != notSet)
-        .count() +
-        "/" +
-        array.length
-    );
+    return addIt(name, Arrays.stream(array).filter(t -> t != notSet).count() + "/" + array.length);
   }
 
   /** Add the BitSet: name : {cardinality}/{logical size}/{size} */
@@ -279,22 +272,22 @@ public class ToStringBuilder {
   }
 
   /**
-   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
-   * DATE is not printed. {@code null} value is ignored.
+   * Add the TIME part in the local system timezone using 24 hours. Format: HH:mm:ss. Note! The DATE
+   * is not printed. {@code null} value is ignored.
    */
   public ToStringBuilder addTime(String name, ZonedDateTime time) {
     return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format);
   }
 
   /**
-   * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
+   * Add time in seconds since midnight. Format: hh:mm:ss. Ignore default values.
    */
   public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int ignoreValue) {
     return addIfNotIgnored(name, timeSecondsPastMidnight, ignoreValue, TimeUtils::timeToStrCompact);
   }
 
   /**
-   * Add time in seconds since midnight. Format:  hh:mm:ss.
+   * Add time in seconds since midnight. Format: hh:mm:ss.
    */
   public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight) {
     return addIfNotIgnored(
@@ -306,19 +299,21 @@ public class ToStringBuilder {
   }
 
   /**
-   * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
+   * Add times in seconds since midnight. Format: hh:mm. {@code null} value is ignored.
    */
   public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
-    return addIfNotNull(name, value, a ->
-      Arrays.stream(a)
+    return addIfNotNull(
+      name,
+      value,
+      a -> Arrays.stream(a)
         .mapToObj(TimeUtils::timeToStrCompact)
         .collect(Collectors.joining(" ", "[", "]"))
     );
   }
 
   /**
-   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
-   * DATE is not printed. {@code null} value is ignored.
+   * Add the TIME part in the local system timezone using 24 hours. Format: HH:mm:ss. Note! The DATE
+   * is not printed. {@code null} value is ignored.
    */
   public ToStringBuilder addDate(String name, LocalDate time) {
     return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_DATE::format);
@@ -326,8 +321,8 @@ public class ToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
-   * Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+   * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
    */
   public ToStringBuilder addDurationSec(String name, Integer durationSeconds) {
     return addDurationSec(name, durationSeconds, null);
@@ -335,8 +330,8 @@ public class ToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
-   * Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+   * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
    */
   public ToStringBuilder addDurationSec(String name, Integer durationSeconds, Integer ignoreValue) {
     return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
@@ -351,8 +346,8 @@ public class ToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
-   * Duration#toString()}, but without the 'PT' prefix.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+   * {@link Duration#toString()}, but without the 'PT' prefix.
    */
   public ToStringBuilder addDuration(String name, Duration duration, Duration ignoreValue) {
     return addIfNotIgnored(name, duration, ignoreValue, d -> durationToStr((int) d.toSeconds()));
@@ -411,8 +406,8 @@ public class ToStringBuilder {
   }
 
   /**
-   * Map the given object to a String. If the input object is {@code null} the string
-   * {@code "null"} is returned if not the {@link Object#toString()} method is called.
+   * Map the given object to a String. If the input object is {@code null} the string {@code "null"}
+   * is returned if not the {@link Object#toString()} method is called.
    */
   static String nullSafeToString(@Nullable Object object) {
     if (object == null) {

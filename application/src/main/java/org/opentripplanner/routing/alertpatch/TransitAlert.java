@@ -14,13 +14,13 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 
 /**
- * Internal representation of a GTFS-RT Service Alert or SIRI Situation Exchange (SX) message.
- * These are text descriptions of problems affecting specific stops, routes, or other components
- * of the transit system which will be displayed to users as text.
- * Although they have flags describing the effect of the problem described in the text, these
- * messages do not currently modify routing behavior on their own. They must be accompanied by
- * messages of other types to actually impact routing. However, there is ongoing discussion about
- * allowing Alerts to affect routing, especially for cases such as stop closure messages.
+ * Internal representation of a GTFS-RT Service Alert or SIRI Situation Exchange (SX) message. These
+ * are text descriptions of problems affecting specific stops, routes, or other components of the
+ * transit system which will be displayed to users as text. Although they have flags describing the
+ * effect of the problem described in the text, these messages do not currently modify routing
+ * behavior on their own. They must be accompanied by messages of other types to actually impact
+ * routing. However, there is ongoing discussion about allowing Alerts to affect routing, especially
+ * for cases such as stop closure messages.
  */
 public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAlertBuilder> {
 
@@ -193,8 +193,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   }
 
   /**
-   * Finds the last validity end from all timePeriods for this alert. Returns <code>null</code>
-   * if any period has an unbounded end.
+   * Finds the last validity end from all timePeriods for this alert. Returns <code>null</code> if
+   * any period has an unbounded end.
    *
    * @return Last end for this Alert, <code>null</code> if any period has an unbounded end
    */
@@ -205,8 +205,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
 
   @Override
   public boolean sameAs(TransitAlert other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(headerText, other.headerText) &&
       Objects.equals(descriptionText, other.descriptionText) &&
       Objects.equals(detailText, other.detailText) &&
@@ -223,8 +222,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&
-      Objects.equals(calendar, other.calendar)
-    );
+      Objects.equals(calendar, other.calendar));
   }
 
   @Override

@@ -29,9 +29,8 @@ class MeterRegistrySetup {
   }
 
   static Optional<String> influxPassword() {
-    return Optional.ofNullable(System.getenv(INFLUX_PASSWORD_ENV_VARIABLE)).filter(
-      s -> !s.isBlank()
-    );
+    return Optional.ofNullable(System.getenv(INFLUX_PASSWORD_ENV_VARIABLE))
+      .filter(s -> !s.isBlank());
   }
 
   static MeterRegistry influxRegistry(String password) {

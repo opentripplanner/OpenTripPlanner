@@ -94,8 +94,8 @@ public class StreetSearchBuilder {
   }
 
   /**
-   * Set a function that will be called before the search begins. Useful for checking that
-   * a timeout has not been reached before the search begins.
+   * Set a function that will be called before the search begins. Useful for checking that a timeout
+   * has not been reached before the search begins.
    */
   public StreetSearchBuilder withPreStartHook(Runnable hook) {
     aStarBuilder.withPreStartHook(hook);
@@ -114,8 +114,7 @@ public class StreetSearchBuilder {
 
   /// Run the street search, returning all paths found
   public List<StreetPath> getPathsToTarget() {
-    return buildAstar()
-      .getPathsToTarget()
+    return buildAstar().getPathsToTarget()
       .stream()
       .sorted(new PathComparator(request.arriveBy()))
       .map(StreetPath::new)
@@ -130,8 +129,7 @@ public class StreetSearchBuilder {
     var initialStates = State.getInitialStates(originVertices, request);
     var heuristic = initializedHeuristic(goalVertices);
 
-    return aStarBuilder
-      .withGoalVertices(goalVertices)
+    return aStarBuilder.withGoalVertices(goalVertices)
       .withInitialStates(initialStates)
       .withHeuristic(heuristic)
       .build();

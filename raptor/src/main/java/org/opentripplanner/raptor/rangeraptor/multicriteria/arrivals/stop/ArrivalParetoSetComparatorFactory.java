@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * search.
  *
  * The creation of the two {@link ParetoComparator}s should be done in such way that the JIT
- * compiler can inline all lamdas for the best possible performance. Changes to this class
- * should be checked with the SpeedTest to avoid degration in performance.
+ * compiler can inline all lamdas for the best possible performance. Changes to this class should be
+ * checked with the SpeedTest to avoid degration in performance.
  */
 public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
 
@@ -31,8 +31,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   public static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<T> ofCompareC1AndC2(
     final DominanceFunction c2DominanceFunction
   ) {
-    return new ArrivalParetoSetComparatorFactory<>((l, r) ->
-      compareC1AndC2(c2DominanceFunction, l, r)
+    return new ArrivalParetoSetComparatorFactory<>(
+      (l, r) -> compareC1AndC2(c2DominanceFunction, l, r)
     );
   }
 
@@ -40,18 +40,18 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     final RelaxFunction relaxC1,
     final DominanceFunction c2DominanceFunction
   ) {
-    return new ArrivalParetoSetComparatorFactory<>((l, r) ->
-      compareC1RelaxedOnC2Dominance(relaxC1, c2DominanceFunction, l, r)
+    return new ArrivalParetoSetComparatorFactory<>(
+      (l, r) -> compareC1RelaxedOnC2Dominance(relaxC1, c2DominanceFunction, l, r)
     );
   }
 
   /**
-   * This comparator is used to compareFunction regular stop arrivals.
-   *  It uses {@code arrivalTime}, {@code paretoRound} and {@code c1} to compareFunction arrivals. It
-   *  does NOT include {@code arrivedOnBoard}. Normally arriving on-board should give the
-   *  arrival an advantage - you can continue on foot, walking to the next stop. But, we only
-   *  do this if it happens in the same Raptor iteration and round - if it does, it is taken
-   *  care of by the order which the algorithm works - not by this comparator.
+   * This comparator is used to compareFunction regular stop arrivals. It uses {@code arrivalTime},
+   * {@code paretoRound} and {@code c1} to compareFunction arrivals. It does NOT include
+   * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage - you
+   * can continue on foot, walking to the next stop. But, we only do this if it happens in the same
+   * Raptor iteration and round - if it does, it is taken care of by the order which the algorithm
+   * works - not by this comparator.
    */
   public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
     return compareRegularStopArrivals;
@@ -70,8 +70,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   private static <T extends McStopArrival<?>> ParetoComparator<T> compareFunctionWithArrivedOnBoard(
     ParetoComparator<T> compareArrivalTimeRoundAndC1
   ) {
-    return (l, r) ->
-      compareArrivalTimeRoundAndC1.leftDominanceExist(l, r) || compareArrivedOnBoard(l, r);
+    return (l, r) -> compareArrivalTimeRoundAndC1.leftDominanceExist(l, r) ||
+      compareArrivedOnBoard(l, r);
   }
 
   /**
@@ -91,12 +91,10 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     T l,
     T r
   ) {
-    return (
-      l.arrivalTime() < r.arrivalTime() ||
+    return (l.arrivalTime() < r.arrivalTime() ||
       l.round() < r.round() ||
       l.c1() < r.c1() ||
-      c2Function.leftDominateRight(l.c2(), r.c2())
-    );
+      c2Function.leftDominateRight(l.c2(), r.c2()));
   }
 
   /**
@@ -107,9 +105,9 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
     T l,
     T r
   ) {
-    return (
-      l.arrivalTime() < r.arrivalTime() || l.round() < r.round() || l.c1() < relaxC1.relax(r.c1())
-    );
+    return (l.arrivalTime() < r.arrivalTime() ||
+      l.round() < r.round() ||
+      l.c1() < relaxC1.relax(r.c1()));
   }
 
   /**
@@ -127,8 +125,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   }
 
   /**
-   * Compare arrivedOnBoard. On-board arrival dominate arrive by transfer(foot) since
-   * you can continue on foot; hence has more options.
+   * Compare arrivedOnBoard. On-board arrival dominate arrive by transfer(foot) since you can
+   * continue on foot; hence has more options.
    */
   private static <T extends McStopArrival<?>> boolean compareArrivedOnBoard(T l, T r) {
     return l.arrivedOnBoard() && !r.arrivedOnBoard();

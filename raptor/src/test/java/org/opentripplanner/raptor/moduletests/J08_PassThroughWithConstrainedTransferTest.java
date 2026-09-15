@@ -33,13 +33,12 @@ class J08_PassThroughWithConstrainedTransferTest implements RaptorTestConstants 
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
-   * Stay-seated pass-through: a feeder trip (R1) connects via a stay-seated transfer to a main
-   * trip (R2). The main trip passes through the via point C before reaching the destination D.
+   * Stay-seated pass-through: a feeder trip (R1) connects via a stay-seated transfer to a main trip
+   * (R2). The main trip passes through the via point C before reaching the destination D.
    */
   @Test
   void staySeatedTransferWithPassThrough() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         -- R1
@@ -66,8 +65,7 @@ class J08_PassThroughWithConstrainedTransferTest implements RaptorTestConstants 
 
     var requestBuilder = data.requestBuilder();
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).clearOptimizations();
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .constrainedTransfers(true)
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
@@ -92,8 +90,7 @@ class J08_PassThroughWithConstrainedTransferTest implements RaptorTestConstants 
    */
   @Test
   void guaranteedWalkTransferWithPassThrough() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         -- R1
@@ -115,8 +112,7 @@ class J08_PassThroughWithConstrainedTransferTest implements RaptorTestConstants 
 
     var requestBuilder = data.requestBuilder();
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA).clearOptimizations();
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .constrainedTransfers(true)
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)

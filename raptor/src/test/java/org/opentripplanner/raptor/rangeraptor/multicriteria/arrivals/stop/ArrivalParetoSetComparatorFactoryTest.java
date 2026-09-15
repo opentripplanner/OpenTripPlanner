@@ -19,31 +19,30 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
 
   /// INPUT CRITERIA
   ///
-  /// This test tests the pareto-comparator produced by the factory. The 5 first colums are
-  /// input (criteria to compare) with a given value(same as the first row).
+  /// This test tests the pareto-comparator produced by the factory. The 5 first colums are input
+  /// (criteria to compare) with a given value(same as the first row).
   ///
   /// - `arrivalTime` : Arrive early is better
-  /// - ´round´ : The second column is the Raptor round, but it is the pareto-round which is used
-  ///   in the pareto-set compare function.
+  /// - ´round´ : The second column is the Raptor round, but it is the pareto-round which is used in
+  ///   the pareto-set compare function.
   /// - `c1` : Lower c1 is better
   /// - `c2` : Lower c2 is better or used to relax c1
-  /// - `arriveOnBoard` : arrive-on-board is better then arrive-on-street. It allowes you to
-  ///    continue with a transfer
+  /// - `arriveOnBoard` : arrive-on-board is better then arrive-on-street. It allowes you to continue
+  ///   with a transfer
   ///
   /// EXPECTED
   ///
-  /// The last column is the expected result. The factory can create 4 variants of the factory with
-  /// 2 pareto-comparators in each (with and without arrive-on-board `...]` or `...,
-  /// arriveOnBoard]`):
+  /// The last column is the expected result. The factory can create 4 variants of the factory with 2
+  /// pareto-comparators in each (with and without arrive-on-board `...]` or `..., arriveOnBoard]`):
   /// - With c1 `[arrivalTime, round, c1, ...`
   /// - With c1 & c2 `[arrivalTime, round, c1, c2, ...`
   /// - With c2 enable relaxed c1(+10) `[arrivalTime, round, c2 ? c1(+10) : c1, ...`
   ///
-  /// For each of the 6 pareto-function variations we determine the dominance
-  /// `NONE ≡ | LEFT ≺ | RIGHT ≻ | BOTH ∥`. The last column consist a string with the expected result
-  ///  for these 6 variants.
-  ///
-  ///
+  /// For each of the 6 pareto-function variations we determine the dominance `NONE ≡ | LEFT ≺ |
+  /// RIGHT ≻ | BOTH ∥`. The last column consist a string with the expected result for these
+  /// 6 variants.
+  /// 
+  /// 
   @ParameterizedTest
   @CsvSource(
     value = {
@@ -87,8 +86,7 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
       "10:10 | 2 | 103 | 500 | true  |  ≻  ∥  ≻  ∥  ≻  ∥",
       "10:10 | 2 | 109 | 499 | true  |  ≻  ∥  ∥  ∥  ∥  ∥",
       "10:10 | 2 | 109 | 500 | true  |  ≻  ∥  ≻  ∥  ≻  ∥",
-      "10:10 | 2 | 110 | 499 | true  |  ≻  ∥  ∥  ∥  ≻  ∥",
-    },
+      "10:10 | 2 | 110 | 499 | true  |  ≻  ∥  ∥  ∥  ≻  ∥", },
     delimiter = '|'
   )
   void testCompareArrivalTimeRoundAndCost(
@@ -122,11 +120,9 @@ class ArrivalParetoSetComparatorFactoryTest implements RaptorTestConstants {
     McStopArrival<?> left,
     McStopArrival<?> right
   ) {
-    return (
-      factory.compareArrivalTimeRoundAndCost().compare(left, right).symbol() +
+    return (factory.compareArrivalTimeRoundAndCost().compare(left, right).symbol() +
       "  " +
-      factory.compareArrivalTimeRoundCostAndOnBoardArrival().compare(left, right).symbol()
-    );
+      factory.compareArrivalTimeRoundCostAndOnBoardArrival().compare(left, right).symbol());
   }
 
   private static McStopArrival<TestTripSchedule> createStopArrival(

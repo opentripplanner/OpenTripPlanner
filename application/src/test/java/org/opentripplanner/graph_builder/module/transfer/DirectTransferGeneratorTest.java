@@ -12,9 +12,9 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 
 /**
- * This test uses the following graph/network for testing the DirectTransfer generation. The
- * focus is on the filtering of the transfers, not on testing that the NearBySearch return the
- * correct set of nearby stops.
+ * This test uses the following graph/network for testing the DirectTransfer generation. The focus
+ * is on the filtering of the transfers, not on testing that the NearBySearch return the correct set
+ * of nearby stops.
  * <p>
  * <img src=DirectTransferGeneratorTest.drawio.png />
  */
@@ -82,7 +82,9 @@ class DirectTransferGeneratorTest {
         S23 - S12, 2347m
         S23 - S13, 751m
         S23 - S21, 4448m
-        S23 - S22, 2224m""",
+        S23 - S22, 2224m\
+        """
+        ,
         pathToString(repository.listPathTransfers())
       );
     });
@@ -105,7 +107,9 @@ class DirectTransferGeneratorTest {
        S0 - S21, 1829m
       S12 - S11, 2224m
       S12 - S22, 751m
-      S22 - S11, 2347m""",
+      S22 - S11, 2347m\
+      """
+      ,
       pathToString(repository.listPathTransfers())
     );
   }
@@ -124,7 +128,9 @@ class DirectTransferGeneratorTest {
       // * -> S0, S12, S23    No patterns board here
       """
        S0 - S21, 1829m
-      S12 - S22, 751m""",
+      S12 - S22, 751m\
+      """
+      ,
       pathToString(repository.listPathTransfers())
     );
   }
@@ -165,7 +171,9 @@ class DirectTransferGeneratorTest {
         S13 - S12, 100m
         S13 - S22, 210m
         S13 - S23, 310m
-        S22 - S23, 100m""",
+        S22 - S23, 100m\
+        """
+        ,
         pathToString(repository.listPathTransfers())
       );
     });
@@ -186,7 +194,9 @@ class DirectTransferGeneratorTest {
       """
        S0 - S11, 100m
        S0 - S21, 100m
-      S12 - S22, 110m""",
+      S12 - S22, 110m\
+      """
+      ,
       pathToString(repository.listPathTransfers())
     );
   }
@@ -213,7 +223,9 @@ class DirectTransferGeneratorTest {
         S12 - S23, 210m
         S13 - S22, 210m
         S13 - S23, 310m
-        S22 - S23, 100m""",
+        S22 - S23, 100m\
+        """
+        ,
         pathToString(repository.listPathTransfers())
       );
     });
@@ -234,10 +246,12 @@ class DirectTransferGeneratorTest {
     // Best transfers between patterns; Hence S0 - S22 removed
     // S11, S13, S21 -> *   No patterns alight here
     // * -> S0, S12, S23    No patterns board here
-    String expectedWalkAndBike = """
+    String expectedWalkAndBike =
+    """
      S0 - S11, 100m
      S0 - S21, 100m
-    S12 - S22, 110m""";
+    S12 - S22, 110m\
+    """;
     assertEquals(expectedWalkAndBike, pathToString(walkTransfers));
     assertEquals(expectedWalkAndBike, pathToString(bikeTransfers));
     assertEquals("<Empty>", pathToString(carTransfers));
@@ -266,7 +280,9 @@ class DirectTransferGeneratorTest {
         S12 - S23, 210m
         S13 - S22, 210m
         S13 - S23, 310m
-        S22 - S23, 100m""",
+        S22 - S23, 100m\
+        """
+        ,
         pathToString(repository.listPathTransfers())
       );
     });
@@ -287,7 +303,9 @@ class DirectTransferGeneratorTest {
         """
         S13 - S22, 210m
         S13 - S23, 310m
-        S22 - S23, 100m""",
+        S22 - S23, 100m\
+        """
+        ,
         pathToString(bikeTransfers)
       );
     });
@@ -308,7 +326,9 @@ class DirectTransferGeneratorTest {
         """
         S13 - S22, 210m
         S13 - S23, 310m
-        S22 - S23, 100m""",
+        S22 - S23, 100m\
+        """
+        ,
         pathToString(bikeTransfers)
       );
     });

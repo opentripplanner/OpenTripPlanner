@@ -10,8 +10,8 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParam
 
 /**
  * A disconnected street network is only pruned if its size, measured in street vertices, is
- * strictly below the configured threshold. A disconnected network that meets the threshold is
- * left untouched, even though it has no connection to the rest of the graph.
+ * strictly below the configured threshold. A disconnected network that meets the threshold is left
+ * untouched, even though it has no connection to the rest of the graph.
  */
 class IslandAboveThresholdRetainedTest {
 
@@ -38,16 +38,18 @@ class IslandAboveThresholdRetainedTest {
     bidirectional(i1, i2);
 
     // Islands without stops smaller than 3 street vertices are pruned; this island has exactly 3.
-    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, i2).prune(
-      IslandPruningParameters.of()
-        .withPruningThresholdIslandWithoutStops(3)
-        .withPruningThresholdIslandWithStops(3)
-        .withAdaptivePruningFactor(1)
-        .build()
-    );
+    var summarizer = IslandPruningEnvironment.of(a, b, c, d, i0, i1, i2)
+      .prune(
+        IslandPruningParameters.of()
+          .withPruningThresholdIslandWithoutStops(3)
+          .withPruningThresholdIslandWithStops(3)
+          .withAdaptivePruningFactor(1)
+          .build()
+      );
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // main square
         "(0,0) → (0,1) PEDESTRIAN ♿✅",

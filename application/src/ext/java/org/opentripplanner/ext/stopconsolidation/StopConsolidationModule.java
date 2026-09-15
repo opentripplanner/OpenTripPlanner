@@ -15,13 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A graph build module that takes a list of "consolidated" stops (stops from several feeds
- * that represent the same stop place) and swaps the "secondary" stops in patterns with their
- * "primary" equivalent.
+ * A graph build module that takes a list of "consolidated" stops (stops from several feeds that
+ * represent the same stop place) and swaps the "secondary" stops in patterns with their "primary"
+ * equivalent.
  * <p>
  * NOTE: This will make real-time trip updates for a modified pattern a lot harder. For Arcadis'
- * initial implementation this is acceptable and will serve as encouragement for the data producers to
- * produce a consolidated transit feed rather than relying on this feature.
+ * initial implementation this is acceptable and will serve as encouragement for the data producers
+ * to produce a consolidated transit feed rather than relying on this feature.
  */
 public class StopConsolidationModule implements GraphBuilderModule {
 
@@ -50,8 +50,7 @@ public class StopConsolidationModule implements GraphBuilderModule {
     var stopsToReplace = service.secondaryStops();
     var replacements = service.replacements();
 
-    transitRepository
-      .getAllTripPatterns()
+    transitRepository.getAllTripPatterns()
       .stream()
       .filter(pattern -> pattern.containsAnyStopId(stopsToReplace))
       .forEach(pattern -> {

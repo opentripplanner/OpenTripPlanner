@@ -34,10 +34,9 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return rideHailingServices
-      .parallelStream()
-      .flatMap(service ->
-        itineraries.parallelStream().map(i -> addRideHailingInformation(i, service))
+    return rideHailingServices.parallelStream()
+      .flatMap(
+        service -> itineraries.parallelStream().map(i -> addRideHailingInformation(i, service))
       )
       .toList();
   }
@@ -54,8 +53,7 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
   private Itinerary addRideHailingInformation(Itinerary i, RideHailingService service) {
     if (!i.isFlaggedForDeletion()) {
       ItineraryBuilder builder = i.copyOf();
-      var legs = builder
-        .legs()
+      var legs = builder.legs()
         .parallelStream()
         .map(leg -> decorateLegWithRideEstimate(i, leg, service))
         .toList();

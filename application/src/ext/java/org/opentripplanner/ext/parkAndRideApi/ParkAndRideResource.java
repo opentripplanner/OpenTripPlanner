@@ -32,8 +32,8 @@ public class ParkAndRideResource {
     @Context VehicleParkingService vehicleParkingService,
     @Context TransitService transitService,
     /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     * @deprecated The support for multiple routers are removed from OTP2. See
+     *             https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
@@ -74,8 +74,7 @@ public class ParkAndRideResource {
       envelope = new Envelope(-180, 180, -90, 90);
     }
 
-    var prs = vehicleParkingService
-      .listCarParks()
+    var prs = vehicleParkingService.listCarParks()
       .stream()
       .filter(lot -> envelope.contains(lot.getCoordinate().asJtsCoordinate()))
       .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))

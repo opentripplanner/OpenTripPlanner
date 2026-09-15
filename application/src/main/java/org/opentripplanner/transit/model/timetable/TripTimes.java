@@ -22,19 +22,17 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
  * A TripTimes represents the arrival and departure times for a single trip in a timetable. It is
- * one of the core class used for transit routing. This interface allows different kind of trip
- * to implement their own trip times. Scheduled/planned trips should be immutable, real-time
- * trip times should allow updates and more info, frequency-based trips can use a more compact
- * implementation, and Flex may expose part of the trip as a "scheduled/regular" stop-to-stop
- * trip using this interface. All times are expressed as seconds since midnight (as in
- * GTFS). Unless stated otherwise, accessor methods which take an integer stop parameter refer to
- * the position within the trip's TripPattern, not its GTFS stop sequence for example or Raptor
- * stop index. The stop position is 0(zero) based.
+ * one of the core class used for transit routing. This interface allows different kind of trip to
+ * implement their own trip times. Scheduled/planned trips should be immutable, real-time trip times
+ * should allow updates and more info, frequency-based trips can use a more compact implementation,
+ * and Flex may expose part of the trip as a "scheduled/regular" stop-to-stop trip using this
+ * interface. All times are expressed as seconds since midnight (as in GTFS). Unless stated
+ * otherwise, accessor methods which take an integer stop parameter refer to the position within the
+ * trip's TripPattern, not its GTFS stop sequence for example or Raptor stop index. The stop
+ * position is 0(zero) based.
  */
-public sealed interface TripTimes<T extends TripTimes>
-  extends Serializable, Comparable<TripTimes>
-  permits RealTimeTripTimes, ScheduledTripTimes
-{
+public sealed interface TripTimes<T extends TripTimes> extends Serializable, Comparable<TripTimes>
+  permits RealTimeTripTimes, ScheduledTripTimes {
   /**
    * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
    * TripTimes.
@@ -50,7 +48,9 @@ public sealed interface TripTimes<T extends TripTimes>
   /** The code for the service on which this trip runs. For departure search optimizations. */
   int getServiceCode();
 
-  /** Make a copy of the TripTimes with the new service code, for use while adding trips to Timetable */
+  /**
+   * Make a copy of the TripTimes with the new service code, for use while adding trips to Timetable
+   */
   T withServiceCode(int serviceCode);
 
   /**
@@ -182,7 +182,7 @@ public sealed interface TripTimes<T extends TripTimes>
 
   /**
    * @return the id of the vehicle operating this trip, as supplied by real-time updates, or empty
-   * if no vehicle has been reported.
+   *         if no vehicle has been reported.
    */
   Optional<FeedScopedId> getVehicleId();
 
@@ -202,8 +202,9 @@ public sealed interface TripTimes<T extends TripTimes>
    * terminus, which are displayed alongside the terminus headsign. Vias often change or are
    * displayed only at certain stops along the way. While the concept of Headsigns exists in both
    * GTFS (Headsign) and Netex (DestinationDisplay), the Via concept is only present in Transmodel.
+   *
    * @return a list of via names visible at the given stop position, or an empty list if there are
-   * no vias.
+   *         no vias.
    */
   List<String> getHeadsignVias(int stopPos);
 
@@ -215,11 +216,10 @@ public sealed interface TripTimes<T extends TripTimes>
    * <p>
    *
    * @param startOfService the start of the service day the trip is running on, see
-   *                       {@link
-   *                       org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
+   *                       {@link org.opentripplanner.utils.time.ServiceDateUtils#asStartOfService}.
    * @return {@code null} if the schedule of the trip cannot be resolved, either because the trip
-   * has no stops or because the departure from the first stop or the arrival at the last stop is
-   * missing or inconsistent.
+   *         has no stops or because the departure from the first stop or the arrival at the last
+   *         stop is missing or inconsistent.
    */
   @Nullable
   default TimePeriod scheduledRunningTime(Instant startOfService) {
@@ -231,8 +231,8 @@ public sealed interface TripTimes<T extends TripTimes>
     int arrival = getScheduledArrivalTime(numStops - 1);
     if (
       departure == StopTime.MISSING_VALUE ||
-      arrival == StopTime.MISSING_VALUE ||
-      departure > arrival
+        arrival == StopTime.MISSING_VALUE ||
+        departure > arrival
     ) {
       return null;
     }
@@ -248,9 +248,9 @@ public sealed interface TripTimes<T extends TripTimes>
    * that the times are increasing at every stop. It should therefore be used at the end of updating
    * trip times, after any propagating or interpolating delay operations.
    * <p>
-   * The dwell time at the first and at the last stop is checked as well, even though raptor ignores
-   * those times. Scheduled times of a real-time added trip are used as-is when the trip is later
-   * cancelled, so they must pass the very same validation as the real-time times, or the
+   * The dwell time at the first and at the last stop is checked as well, even though raptor
+   * ignores those times. Scheduled times of a real-time added trip are used as-is when the trip is
+   * later cancelled, so they must pass the very same validation as the real-time times, or the
    * cancellation would be rejected and the trip would be stuck in the graph as running.
    *
    * @throws DataValidationException of the first error found.
@@ -290,8 +290,9 @@ public sealed interface TripTimes<T extends TripTimes>
   OccupancyStatus getOccupancyStatus(int stopPos);
 
   /**
-   * A list of partial replacements for this trip at the particular stop. this will return whether the
-   * <strong>arrival</strong> of the trip is replaced. For example if the trip is replaced by trip2 at stops B - D:
+   * A list of partial replacements for this trip at the particular stop. this will return whether
+   * the <strong>arrival</strong> of the trip is replaced. For example if the trip is replaced by
+   * trip2 at stops B - D:
    *
    * <pre>
    * stop:                A  B  C       D       E
@@ -303,8 +304,9 @@ public sealed interface TripTimes<T extends TripTimes>
   }
 
   /**
-   * A list of partial replacements for this trip at the particular stop. this will return whether the
-   * <strong>departure</strong> of the trip is replaced. For example if the trip is replaced by trip2 at stops B - D:
+   * A list of partial replacements for this trip at the particular stop. this will return whether
+   * the <strong>departure</strong> of the trip is replaced. For example if the trip is replaced by
+   * trip2 at stops B - D:
    *
    * <pre>
    * stop:                  A  B       C       D  E
@@ -318,9 +320,9 @@ public sealed interface TripTimes<T extends TripTimes>
   /**
    * Returns the GTFS sequence number of the given 0-based stop position within the pattern.
    * <p>
-   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
-   * stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides an
-   * ordered list of Stops, the original stop sequence numbers may still be needed for matching
+   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
+   * the stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides
+   * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
    * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
    * sequence numbers for the same stops, so we need to store them at the individual trip level. An
    * effort is made to re-use the sequence number arrays when they are the same across different

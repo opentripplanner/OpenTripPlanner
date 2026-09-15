@@ -58,25 +58,19 @@ class EuclideanRemainingWeightHeuristicTest {
       Arguments.argumentSet(
         "slow walk",
         StreetModelDetails.DEFAULT,
-        StreetSearchRequest.of()
-          .withWalk(w -> w.withSpeed(1))
-          .build(),
+        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1)).build(),
         200
       ),
       Arguments.argumentSet(
         "slow preferred walk",
         StreetModelDetails.DEFAULT,
-        StreetSearchRequest.of()
-          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
-          .build(),
+        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
         50
       ),
       Arguments.argumentSet(
         "slow preferred safe walk",
         safeStreets,
-        StreetSearchRequest.of()
-          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
-          .build(),
+        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
         40
       ),
       Arguments.argumentSet(
@@ -90,9 +84,7 @@ class EuclideanRemainingWeightHeuristicTest {
       Arguments.argumentSet(
         "slow preferred unsafe walk",
         unsafeStreets,
-        StreetSearchRequest.of()
-          .withWalk(w -> w.withSpeed(1).withReluctance(0.5))
-          .build(),
+        StreetSearchRequest.of().withWalk(w -> w.withSpeed(1).withReluctance(0.5)).build(),
         100
       ),
       // safe bike
@@ -107,9 +99,8 @@ class EuclideanRemainingWeightHeuristicTest {
         safeStreets,
         StreetSearchRequest.of()
           .withMode(StreetMode.BIKE)
-          .withBike(b ->
-            b
-              .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+          .withBike(
+            b -> b.withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
               .withOptimizeTriangle(t -> t.withSafety(0.75).withTime(0.25))
           )
           .build(),
@@ -139,29 +130,27 @@ class EuclideanRemainingWeightHeuristicTest {
     StreetSearchRequest req,
     double expected
   ) {
-    var subject = new EuclideanRemainingWeightHeuristic(
-      new StreetLimitationParametersService() {
-        @Override
-        public float maxCarSpeed() {
-          return streetModelDetails.maxCarSpeed();
-        }
-
-        @Override
-        public int maxAreaNodes() {
-          return streetModelDetails.maxAreaNodes();
-        }
-
-        @Override
-        public float getBestWalkSafety() {
-          return streetModelDetails.bestWalkSafety();
-        }
-
-        @Override
-        public float getBestBikeSafety() {
-          return streetModelDetails.bestBikeSafety();
-        }
+    var subject = new EuclideanRemainingWeightHeuristic(new StreetLimitationParametersService() {
+      @Override
+      public float maxCarSpeed() {
+        return streetModelDetails.maxCarSpeed();
       }
-    );
+
+      @Override
+      public int maxAreaNodes() {
+        return streetModelDetails.maxAreaNodes();
+      }
+
+      @Override
+      public float getBestWalkSafety() {
+        return streetModelDetails.bestWalkSafety();
+      }
+
+      @Override
+      public float getBestBikeSafety() {
+        return streetModelDetails.bestBikeSafety();
+      }
+    });
     var fromVertex = new SimpleVertex("origin", 0, 0);
     var toCoordinate = SphericalDistanceLibrary.moveMeters(new WgsCoordinate(0, 0), 100, 0);
     var toVertex = new SimpleVertex(

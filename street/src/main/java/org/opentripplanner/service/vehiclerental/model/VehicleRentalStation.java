@@ -95,8 +95,8 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
     this.isRenting = builder.isRenting();
     this.isReturning = builder.isReturning();
     this.overloadingAllowed = builder.isOverloadingAllowed();
-    this.isArrivingInRentalVehicleAtDestinationAllowed =
-      builder.isArrivingInRentalVehicleAtDestinationAllowed();
+    this.isArrivingInRentalVehicleAtDestinationAllowed = builder
+      .isArrivingInRentalVehicleAtDestinationAllowed();
     this.realTimeData = builder.isRealTimeData();
     this.returnPolicy = builder.returnPolicy();
   }
@@ -227,8 +227,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   @Override
   public Set<RentalFormFactor> availablePickupFormFactors(boolean includeRealtimeAvailability) {
-    return vehicleTypesAvailable
-      .entrySet()
+    return vehicleTypesAvailable.entrySet()
       .stream()
       .filter(e -> !includeRealtimeAvailability || e.getValue() > 0)
       .map(e -> e.getKey().formFactor())
@@ -237,8 +236,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   @Override
   public Set<RentalFormFactor> availableDropoffFormFactors(boolean includeRealtimeAvailability) {
-    return vehicleSpacesAvailable
-      .entrySet()
+    return vehicleSpacesAvailable.entrySet()
       .stream()
       .filter(e -> !includeRealtimeAvailability || overloadingAllowed || e.getValue() > 0)
       .map(e -> e.getKey().formFactor())
@@ -305,7 +303,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   /**
    * @return Counts of available vehicle spaces by type as well as the total number of available
-   * vehicle spaces.
+   *         vehicle spaces.
    */
   public RentalVehicleEntityCounts vehicleSpaceCounts() {
     return new RentalVehicleEntityCounts(
@@ -321,8 +319,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
   private List<RentalVehicleTypeCount> vehicleRentalTypeMapToList(
     Map<RentalVehicleType, Integer> vehicleTypeMap
   ) {
-    return vehicleTypeMap
-      .entrySet()
+    return vehicleTypeMap.entrySet()
       .stream()
       .map(vtc -> new RentalVehicleTypeCount(vtc.getKey(), vtc.getValue()))
       // we sort to have reproducible results in tests
@@ -339,8 +336,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       return false;
     }
     VehicleRentalStation that = (VehicleRentalStation) o;
-    return (
-      Double.compare(that.longitude, longitude) == 0 &&
+    return (Double.compare(that.longitude, longitude) == 0 &&
       Double.compare(that.latitude, latitude) == 0 &&
       vehiclesAvailable == that.vehiclesAvailable &&
       vehiclesDisabled == that.vehiclesDisabled &&
@@ -360,8 +356,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
       Objects.equals(system, that.system) &&
       Objects.equals(rentalUris, that.rentalUris) &&
       Objects.equals(vehicleTypesAvailable, that.vehicleTypesAvailable) &&
-      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable)
-    );
+      Objects.equals(vehicleSpacesAvailable, that.vehicleSpacesAvailable));
   }
 
   @Override

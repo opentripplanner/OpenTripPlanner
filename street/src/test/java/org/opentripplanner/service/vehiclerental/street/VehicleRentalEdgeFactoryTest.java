@@ -46,8 +46,7 @@ class VehicleRentalEdgeFactoryTest {
     VehicleRentalEdge.createRentalEdgesForStation(vertex, station, edges);
 
     assertEquals(2, vertex.getOutgoing().size());
-    var formFactors = vertex
-      .getOutgoing()
+    var formFactors = vertex.getOutgoing()
       .stream()
       .map(e -> ((VehicleRentalEdge) e).formFactor)
       .collect(java.util.stream.Collectors.toSet());
@@ -87,8 +86,7 @@ class VehicleRentalEdgeFactoryTest {
     VehicleRentalEdge.createRentalEdgesForStation(vertex, station, edges);
 
     // Default vehicle type is BICYCLE, even with 0 count it's still in the type map
-    var formFactors = vertex
-      .getOutgoing()
+    var formFactors = vertex.getOutgoing()
       .stream()
       .map(e -> ((VehicleRentalEdge) e).formFactor)
       .collect(java.util.stream.Collectors.toSet());

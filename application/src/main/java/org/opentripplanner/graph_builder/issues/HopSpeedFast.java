@@ -15,8 +15,7 @@ public record HopSpeedFast(
   StopLocation fromStop,
   StopLocation toStop
 ) implements DataImportIssue {
-  private static final String FMT =
-    "Excessive speed of %d kph over %.1fm on route %s trip %s " +
+  private static final String FMT = "Excessive speed of %d kph over %.1fm on route %s trip %s " +
     "stop sequence %d between %s and %s.";
 
   @Override

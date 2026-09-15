@@ -50,8 +50,10 @@ public class GenerateTripPatternsOperation {
 
   // TODO the linked hashset configuration ensures that TripPatterns are created in the same order
   //  as Trips are imported, as a workaround for issue #6067
-  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders =
-    MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
+  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders = MultimapBuilder
+    .linkedHashKeys()
+    .linkedHashSetValues()
+    .build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
   private int freqCount = 0;
@@ -89,12 +91,12 @@ public class GenerateTripPatternsOperation {
       }
     }
 
-    tripPatternBuilders
-      .values()
+    tripPatternBuilders.values()
       .stream()
       .map(TripPatternBuilder::build)
-      .forEach(tripPattern ->
-        transitServiceBuilder.getTripPatterns().put(tripPattern.getStopPattern(), tripPattern)
+      .forEach(
+        tripPattern -> transitServiceBuilder.getTripPatterns()
+          .put(tripPattern.getStopPattern(), tripPattern)
       );
 
     LOG.info(progressLogger.completeMessage());
@@ -135,8 +137,8 @@ public class GenerateTripPatternsOperation {
     List<StopTime> stopTimes = transitServiceBuilder.getStopTimesSortedByTrip().get(trip);
 
     // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
-    var staticTripWithFewerThan2Stops =
-      !FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 2;
+    var staticTripWithFewerThan2Stops = !FlexTrip.containsFlexStops(stopTimes) &&
+      stopTimes.size() < 2;
     // flex trips are allowed to have a single stop because that can be an area or a group of stops
     var flexTripWithZeroStops = FlexTrip.containsFlexStops(stopTimes) && stopTimes.size() < 1;
     if (staticTripWithFewerThan2Stops || flexTripWithZeroStops) {
@@ -156,8 +158,8 @@ public class GenerateTripPatternsOperation {
     List<Frequency> frequencies = frequenciesForTrip.get(trip);
     if (!frequencies.isEmpty()) {
       for (Frequency freq : frequencies) {
-        tripPatternBuilder.withScheduledTimeTableBuilder(builder ->
-          builder.addFrequencyEntry(new FrequencyEntry(freq, tripTimes))
+        tripPatternBuilder.withScheduledTimeTableBuilder(
+          builder -> builder.addFrequencyEntry(new FrequencyEntry(freq, tripTimes))
         );
         freqCount++;
       }
@@ -175,9 +177,9 @@ public class GenerateTripPatternsOperation {
     for (TripPatternBuilder tripPatternBuilder : tripPatternBuilders.get(stopPattern)) {
       if (
         tripPatternBuilder.getRoute().equals(route) &&
-        tripPatternBuilder.getDirection().equals(direction) &&
-        tripPatternBuilder.getMode().equals(trip.getMode()) &&
-        tripPatternBuilder.getNetexSubmode().equals(trip.getNetexSubMode())
+          tripPatternBuilder.getDirection().equals(direction) &&
+          tripPatternBuilder.getMode().equals(trip.getMode()) &&
+          tripPatternBuilder.getNetexSubmode().equals(trip.getNetexSubMode())
       ) {
         return tripPatternBuilder;
       }

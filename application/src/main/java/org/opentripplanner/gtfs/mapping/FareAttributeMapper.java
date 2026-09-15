@@ -37,9 +37,7 @@ class FareAttributeMapper {
     );
     FareAttributeBuilder builder = FareAttribute.of(
       idFactory.createId(rhs.getId(), "fare attribute")
-    )
-      .withPrice(price)
-      .withPaymentMethod(rhs.getPaymentMethod());
+    ).withPrice(price).withPaymentMethod(rhs.getPaymentMethod());
 
     if (rhs.getId().getAgencyId() != null && rhs.getAgencyId() != null) {
       builder.withAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));

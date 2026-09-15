@@ -24,8 +24,7 @@ public class GeneralizedCostParametersMapper {
     var builder = GeneralizedCostParameters.of();
     var preferences = request.preferences();
 
-    builder
-      .transferCost(preferences.transfer().cost())
+    builder.transferCost(preferences.transfer().cost())
       .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
     StreetMode mode = request.journey().transfer().mode();
@@ -55,8 +54,8 @@ public class GeneralizedCostParametersMapper {
       for (var pattern : patternIndex) {
         if (
           pattern != null &&
-          (unpreferredRoutes.contains(resolveRouteId.apply(pattern)) ||
-            unpreferredAgencies.contains(resolveAgencyId.apply(pattern)))
+            (unpreferredRoutes.contains(resolveRouteId.apply(pattern)) ||
+              unpreferredAgencies.contains(resolveAgencyId.apply(pattern)))
         ) {
           unpreferredPatterns.set(pattern.patternIndex());
         }

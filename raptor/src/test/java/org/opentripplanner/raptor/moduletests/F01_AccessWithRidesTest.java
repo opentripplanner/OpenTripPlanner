@@ -23,8 +23,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * With FLEX access Raptor must support access paths with more than one leg. These access paths have
- * more transfers that regular paths, hence should not dominate access walking, but only get
+ * With FLEX access Raptor must support access paths with more than one leg. These access paths
+ * have more transfers that regular paths, hence should not dominate access walking, but only get
  * accepted when they are better on time and/or cost.
  */
 public class F01_AccessWithRidesTest implements RaptorTestConstants {
@@ -37,17 +37,16 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access(
-        // lowest num-of-transfers (0)
-        "Walk 10m C₁180 ~ B",
-        // lowest cost
-        "Flex+Walk 2m Rₙ2 C₁239 ~ C",
-        // latest departure time
-        "Flex 3m Rₙ2 C₁360 ~ D",
-        // best on combination of transfers and time
-        "Flex+Walk 7m Rₙ1 C₁480 ~ E"
-      )
+    data.access(
+      // lowest num-of-transfers (0)
+      "Walk 10m C₁180 ~ B",
+      // lowest cost
+      "Flex+Walk 2m Rₙ2 C₁239 ~ C",
+      // latest departure time
+      "Flex 3m Rₙ2 C₁360 ~ D",
+      // best on combination of transfers and time
+      "Flex+Walk 7m Rₙ1 C₁480 ~ E"
+    )
       .withTimetables(
         """
         B     C     D     E     F

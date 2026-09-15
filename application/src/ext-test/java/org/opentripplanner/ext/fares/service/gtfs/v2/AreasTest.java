@@ -75,8 +75,7 @@ class AreasTest implements PlanTestConstants {
 
   @Test
   void twoAreaIds() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, INNER_ZONE_PLACE)
+    Itinerary i1 = newItinerary(A, 0).walk(20, INNER_ZONE_PLACE)
       .faresV2Rail(ID, 0, 50, OUTER_ZONE_PLACE, null)
       .build();
 
@@ -89,8 +88,7 @@ class AreasTest implements PlanTestConstants {
 
   @Test
   void onlyToAreaId() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, B)
+    Itinerary i1 = newItinerary(A, 0).walk(20, B)
       .faresV2Rail(ID, 0, 50, OUTER_ZONE_PLACE, null)
       .build();
 
@@ -103,8 +101,7 @@ class AreasTest implements PlanTestConstants {
 
   @Test
   void onlyFromAreaId() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, OUTER_ZONE_PLACE)
+    Itinerary i1 = newItinerary(A, 0).walk(20, OUTER_ZONE_PLACE)
       .faresV2Rail(ID, 0, 50, B, null)
       .build();
 

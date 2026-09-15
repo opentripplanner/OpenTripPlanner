@@ -40,8 +40,9 @@ class RaptorPreferencesTest {
 
   @Test
   void optimizationsShouldNotBeModifiable() {
-    assertThrows(UnsupportedOperationException.class, () ->
-      subject.optimizations().add(Optimization.PARALLEL)
+    assertThrows(
+      UnsupportedOperationException.class,
+      () -> subject.optimizations().add(Optimization.PARALLEL)
     );
   }
 

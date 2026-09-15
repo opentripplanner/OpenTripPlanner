@@ -13,8 +13,8 @@ class AccessibilityRequestTest {
 
   public static final int UNKNOWN_COST = 190;
   public static final int INACCESSIBLE_COST = 350;
-  private final AccessibilityRequest subjectOnlyAccessible =
-    AccessibilityRequest.ofOnlyAccessible();
+  private final AccessibilityRequest subjectOnlyAccessible = AccessibilityRequest
+    .ofOnlyAccessible();
   private final AccessibilityRequest subject = AccessibilityRequest.ofCost(
     UNKNOWN_COST,
     INACCESSIBLE_COST

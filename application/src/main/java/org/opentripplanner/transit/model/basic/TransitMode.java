@@ -44,8 +44,7 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
   }
 
   /**
-   * This method returns the list of modes that are considered 'transit' by users, removing
-   * carpool.
+   * This method returns the list of modes that are considered 'transit' by users, removing carpool.
    */
   public static TransitMode[] modesConsideredTransitByUsers() {
     return NO_CARPOOL_MODES.toArray(TransitMode[]::new);
@@ -65,25 +64,31 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
     return switch (this) {
       case RAIL -> "Used for intercity or long-distance travel.";
       case COACH -> "Used for long-distance bus routes.";
-      case SUBWAY -> "Subway or Metro, used for any underground rail system within a metropolitan area.";
+      case SUBWAY ->
+        "Subway or Metro, used for any underground rail system within a metropolitan area.";
       case BUS -> "Used for short- and long-distance bus routes.";
-      case TRAM -> "Tram, streetcar or light rail. Used for any light rail or street level system within a metropolitan area.";
+      case TRAM ->
+        "Tram, streetcar or light rail. Used for any light rail or street level system within a metropolitan area.";
       case FERRY -> "Used for short- and long-distance boat service.";
       case AIRPLANE -> "Taking an airplane";
       case CABLE_CAR -> "Used for street-level rail cars where the cable runs beneath the vehicle.";
-      case GONDOLA -> "Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.";
-      case FUNICULAR -> "Used for any rail system that moves on steep inclines with a cable traction system.";
-      case TROLLEYBUS -> "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";
+      case GONDOLA ->
+        "Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.";
+      case FUNICULAR ->
+        "Used for any rail system that moves on steep inclines with a cable traction system.";
+      case TROLLEYBUS ->
+        "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";
       case MONORAIL -> "Used for any rail system that runs on a single rail.";
-      case CARPOOL -> """
-      Private car trips shared with others, operating on scheduled routes similar to transit.
+      case CARPOOL ->
+        """
+        Private car trips shared with others, operating on scheduled routes similar to transit.
 
-      Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
-      static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
-      which are in the range of private taxis.
+        Use the _transit mode_, as opposed to the street mode `CARPOOL`, if your data source comes from
+        static GTFS feeds. This is currently not part of the specification, so we use the mode type values 1550-1560
+        which are in the range of private taxis.
 
-      If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
-      """;
+        If your data source for the carpool trips is SIRI use the `CARPOOL` street mode instead.
+        """;
       case TAXI -> "Using a taxi service";
       case SNOW_AND_ICE -> "Used for off-road snow and ice vehicles";
     };

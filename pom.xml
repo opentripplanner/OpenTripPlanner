@@ -88,10 +88,9 @@
         <plugin.spotless.version>3.10.1</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
-        <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
-             other; prettier-plugin-java only supports a limited range of prettier versions. -->
+        <!-- The npm package used by the Spotless 'prettier' step, which formats the Markdown and
+             JSON files. Java is formatted by the Eclipse JDT formatter. -->
         <prettier.version>3.9.6</prettier.version>
-        <prettier.java.version>2.10.3</prettier.java.version>
         <plugin.rewrite.skip>true</plugin.rewrite.skip>
         <skip-source-and-javadoc>true</skip-source-and-javadoc>
         <tests.excludedGroups>integration</tests.excludedGroups>
@@ -121,8 +120,10 @@
                 </plugin>
                 <plugin>
                     <!--
-                      Spotless runs Prettier (with the prettier-java plugin) to format the code.
-                      Note! Spotless requires node/npm to be available on the PATH.
+                      Spotless runs the Eclipse JDT formatter to format the Java code and the
+                      Javadoc, and Prettier to format the Markdown and JSON files.
+                      Note! Spotless requires node/npm to be available on the PATH for the
+                      Markdown/JSON formatting.
 
                       The Prettier options are configured inline below. Spotless resolves the
                       options up-front, without a file path, so a Prettier config file with
@@ -157,20 +158,84 @@
                             <removeUnusedImports>
                                 <engine>cleanthat-javaparser-unnecessaryimport</engine>
                             </removeUnusedImports>
-                            <prettier>
-                                <devDependencies>
-                                    <prettier>${prettier.version}</prettier>
-                                    <prettier-plugin-java>${prettier.java.version}</prettier-plugin-java>
-                                </devDependencies>
-                                <config>
-                                    <plugins>prettier-plugin-java</plugins>
-                                    <parser>java</parser>
-                                    <printWidth>100</printWidth>
-                                    <tabWidth>2</tabWidth>
-                                    <useTabs>false</useTabs>
-                                    <endOfLine>lf</endOfLine>
-                                </config>
-                            </prettier>
+                            <!--
+                              The Eclipse JDT formatter formats both the Java code and the Javadoc
+                              comments, see eclipse-formatter.properties.
+                            -->
+                            <eclipse>
+                                <file>${maven.multiModuleProjectDirectory}/eclipse-formatter.properties</file>
+                            </eclipse>
+                            <!--
+                              The Eclipse formatter re-flows a paragraph as one unit, which moves
+                              an opening <p>/<pre> onto the neighbouring text line, a closing
+                              </ul>/</ol> onto the last list item, and text up onto a closing
+                              </pre>, </ul> or </ol> line. OTP keeps these tags on separate lines,
+                              so the four rules below move them back. They only match inside
+                              comments ('*' as the first character on the line).
+                            -->
+                            <replaceRegex>
+                                <name>Javadoc: &lt;p&gt; on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)([ \t]+)&lt;p&gt;(\S)</searchRegex>
+                                <replacement>$1$2&lt;p&gt;
+$1$2$3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: &lt;pre&gt; on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)( .*\S) &lt;pre&gt;$</searchRegex>
+                                <replacement>$1$2
+$1 &lt;pre&gt;</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: text after a closing block tag on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)([ \t]+&lt;/(?:pre|ul|ol)&gt;) (\S)</searchRegex>
+                                <replacement>$1$2
+$1 $3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: closing list tag on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)([ \t]+.*[^ \t])[ \t]?(&lt;/(?:ul|ol)&gt;)$</searchRegex>
+                                <replacement>$1$2
+$1 $3</replacement>
+                            </replaceRegex>
+                            <!--
+                              The Eclipse formatter puts all list content in the same column as the
+                              surrounding text. These two rules indent the content of a &lt;ul&gt;/&lt;ol&gt;
+                              block by two spaces per nesting level (the second rule handles lists
+                              nested inside a list that the first rule has already indented). The
+                              match starts at the end of the opening tag line and then chains from
+                              line to line (\G) until the closing tag is reached.
+                            -->
+                            <replaceRegex>
+                                <name>Javadoc: indent list content (level 1)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]&lt;(?:ul|ol)&gt;)|\G)\R([ \t]*\*)[ \t](?!&lt;/(?:ul|ol)&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2   $3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: indent list content (level 2)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]{3}&lt;(?:ul|ol)&gt;)|\G)\R([ \t]*\*)[ \t]{3}(?!&lt;/(?:ul|ol)&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2     $3</replacement>
+                            </replaceRegex>
+                            <!--
+                              Wrapped list items continue in the same column as the <li> tag, which
+                              makes it hard to see where an item ends. These two rules indent the
+                              continuation lines of an item by four more spaces, so that they line
+                              up with the item text. The chain starts at a <li> line (indented by
+                              the rules above) and stops at the next tag line.
+                            -->
+                            <replaceRegex>
+                                <name>Javadoc: indent wrapped list items (level 1)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]{3}&lt;li&gt;.*)|\G)\R([ \t]*\*)[ \t]{3}(?!&lt;/|&lt;li&gt;|&lt;ul&gt;|&lt;ol&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2       $3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: indent wrapped list items (level 2)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]{5}&lt;li&gt;.*)|\G)\R([ \t]*\*)[ \t]{5}(?!&lt;/|&lt;li&gt;|&lt;ul&gt;|&lt;ol&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2         $3</replacement>
+                            </replaceRegex>
                         </java>
                         <formats>
                             <format>

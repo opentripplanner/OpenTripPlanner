@@ -14,10 +14,9 @@ public class TransferRoutingDistanceTooLong implements DataImportIssue {
 
   private static final String FMT =
     "Routing distance between stop %s and stop %s is %.0f times longer than the " +
-    "euclidean distance. Street distance: %.2f, direct distance: %.2f.";
+      "euclidean distance. Street distance: %.2f, direct distance: %.2f.";
 
-  private static final String HTMLFMT =
-    "Routing distance between stop " +
+  private static final String HTMLFMT = "Routing distance between stop " +
     "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> and stop " +
     "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> is %.0f times longer than " +
     "the euclidean distance. Street distance: %.2f, direct distance: %.2f.";

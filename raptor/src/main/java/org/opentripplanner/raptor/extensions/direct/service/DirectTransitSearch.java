@@ -20,9 +20,9 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
-/// The direct transit search finds paths using a single transit leg, limited to a
-/// specified cost window. It will find paths even if they are not optimal in regard to the criteria
-/// in the main raptor search.
+/// The direct transit search finds paths using a single transit leg, limited to a specified cost
+/// window. It will find paths even if they are not optimal in regard to the criteria in the main
+/// raptor search.
 public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
   private final int earliestDepartureTime;
@@ -74,11 +74,11 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     return IntIterators.of(accessStopBitSet);
   }
 
-  /// First, find ONE path for each combination of access/egress. This corresponds to the
-  /// first iteration of a RangeRaptor search. We will later expand this to all trip schedules
-  /// within the search-window. All paths with the same (route, access, and egress) will have
-  /// almost identical cost, so we can use this to prune the set of paths before expanding the
-  /// timetable. For each route/pattern we only want the best combination of access and egress.
+  /// First, find ONE path for each combination of access/egress. This corresponds to the first
+  /// iteration of a RangeRaptor search. We will later expand this to all trip schedules within the
+  /// search-window. All paths with the same (route, access, and egress) will have almost identical
+  /// cost, so we can use this to prune the set of paths before expanding the timetable. For each
+  /// route/pattern we only want the best combination of access and egress.
   private List<RaptorPath<T>> routeSearch(RaptorRoute<T> route) {
     this.currentRouteBoardSlack = data.slackProvider().boardSlack(route.pattern().slackIndex());
     PathAndTripIndex<T> bestPath = null;
@@ -221,11 +221,9 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
     @Override
     public boolean leftDominanceExist(RaptorPath<T> left, RaptorPath<T> right) {
-      return (
-        left.startTime() > right.startTime() ||
+      return (left.startTime() > right.startTime() ||
         left.endTime() < right.endTime() ||
-        left.c1() < relaxFunction.relax(right.c1())
-      );
+        left.c1() < relaxFunction.relax(right.c1()));
     }
   }
 

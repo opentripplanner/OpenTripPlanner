@@ -29,9 +29,8 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.raptor.spi.TestSlackProvider;
 
 @SuppressWarnings("UnusedReturnValue")
-public class TestTransitData
-  implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants
-{
+public class TestTransitData implements RaptorTransitDataProvider<TestTripSchedule>,
+  RaptorTestConstants {
 
   private static final AtomicInteger WARNING_COUNTER = new AtomicInteger(0);
 
@@ -66,11 +65,7 @@ public class TestTransitData
   }
 
   public TestTransitData access(String... accessList) {
-    access(
-      Arrays.stream(accessList)
-        .map(TestAccessEgress::of)
-        .toArray(TestAccessEgress[]::new)
-    );
+    access(Arrays.stream(accessList).map(TestAccessEgress::of).toArray(TestAccessEgress[]::new));
     return this;
   }
 
@@ -156,8 +151,7 @@ public class TestTransitData
   @Override
   public RaptorPathConstrainedTransferSearch<TestTripSchedule> transferConstraintsSearch() {
     return (fromTrip, fromStopPosition, toTrip, toStopPosition) -> {
-      var list = routes
-        .stream()
+      var list = routes.stream()
         .flatMap(r -> r.listTransferConstraintsForwardSearch().stream())
         .filter(tx -> tx.match(fromTrip, fromStopPosition, toTrip, toStopPosition))
         .toList();
@@ -180,8 +174,7 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataStartTime() {
-    return this.routes
-      .stream()
+    return this.routes.stream()
       .mapToInt(route -> route.timetable().getTripSchedule(0).departure(0))
       .min()
       .orElseThrow();
@@ -189,17 +182,12 @@ public class TestTransitData
 
   @Override
   public int getValidTransitDataEndTime() {
-    return this.routes
-      .stream()
-      .mapToInt(route -> {
-        RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
-        RaptorTripPattern pattern = route.pattern();
-        return timetable
-          .getTripSchedule(timetable.numberOfTripSchedules() - 1)
-          .departure(pattern.numberOfStopsInPattern() - 1);
-      })
-      .max()
-      .orElseThrow();
+    return this.routes.stream().mapToInt(route -> {
+      RaptorTimeTable<TestTripSchedule> timetable = route.timetable();
+      RaptorTripPattern pattern = route.pattern();
+      return timetable.getTripSchedule(timetable.numberOfTripSchedules() - 1)
+        .departure(pattern.numberOfStopsInPattern() - 1);
+    }).max().orElseThrow();
   }
 
   @Override
@@ -238,7 +226,7 @@ public class TestTransitData
   }
 
   /// Build a test data with multiple routes. The route name is generated(R1, R2 ...) if not
-  /// provided. See  {@link TestRoute#withTimetable(String)} for timetable format.
+  /// provided. See {@link TestRoute#withTimetable(String)} for timetable format.
   ///
   /// For exampe, creating R1 and Route-55:
   /// ```
@@ -249,7 +237,8 @@ public class TestTransitData
   /// B     C
   /// 10:05 11:05
   /// 11:05 12:05
-  ///```
+  /// ```
+  ///
   public TestTransitData withTimetables(String routeTimetables) {
     int routeIndex = 0;
     for (String timetable : routeTimetables.split("\s*--.*\n")) {
@@ -377,8 +366,7 @@ public class TestTransitData
 
   private void addAccessEgressStopsToDebugger(RaptorAccessEgress[] accessList) {
     if (enableDebugLogging) {
-      requestBuilder
-        .debug()
+      requestBuilder.debug()
         .withStops(Arrays.stream(accessList).map(RaptorAccessEgress::stop).toList());
     }
   }
@@ -388,8 +376,7 @@ public class TestTransitData
       var debug = requestBuilder.debug();
       var logger = new SystemErrDebugLogger(stopNameResolver(), enableDebugLogging);
 
-      debug
-        .withStopArrivalListener(logger::stopArrivalLister)
+      debug.withStopArrivalListener(logger::stopArrivalLister)
         .withPatternRideDebugListener(logger::patternRideLister)
         .withPathFilteringListener(logger::pathFilteringListener)
         .withLogger(logger);

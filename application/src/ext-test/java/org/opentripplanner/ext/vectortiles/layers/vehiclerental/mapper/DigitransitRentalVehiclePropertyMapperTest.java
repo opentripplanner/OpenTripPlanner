@@ -38,8 +38,7 @@ class DigitransitRentalVehiclePropertyMapperTest {
   @Test
   void fuelPercentage() {
     var mapper = new DigitransitRentalVehiclePropertyMapper();
-    var vehicle = builder()
-      .withFuel(RentalVehicleFuel.of().withPercent(Ratio.of(0.3)).build())
+    var vehicle = builder().withFuel(RentalVehicleFuel.of().withPercent(Ratio.of(0.3)).build())
       .build();
 
     Map<String, Object> map = new HashMap<>();

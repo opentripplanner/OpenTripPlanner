@@ -61,8 +61,7 @@ class StreetEdgeWheelchairCostTest {
   @MethodSource("slopeCases")
   public void shouldScaleCostWithMaxSlope(double slope, double reluctance, long expectedCost) {
     double length = 1000;
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("edge with elevation")
       .withMeterLength(length)
@@ -72,8 +71,7 @@ class StreetEdgeWheelchairCostTest {
 
     Coordinate[] profile = new Coordinate[] {
       new Coordinate(0, 0),
-      new Coordinate(length, slope * length),
-    };
+      new Coordinate(length, slope * length), };
 
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
     StreetElevationExtensionBuilder.of(edge)
@@ -85,9 +83,8 @@ class StreetEdgeWheelchairCostTest {
 
     var req = StreetSearchRequest.of();
     req.withWheelchairEnabled(true);
-    req.withWheelchair(b ->
-      b
-        .withStopOnlyAccessible()
+    req.withWheelchair(
+      b -> b.withStopOnlyAccessible()
         .withElevatorOnlyAccessible()
         .withInaccessibleStreetReluctance(25)
         .withMaxSlope(0.09)
@@ -110,8 +107,7 @@ class StreetEdgeWheelchairCostTest {
   @MethodSource("wheelchairStairsCases")
   public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var stairEdge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var stairEdge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("stairs")
       .withMeterLength(length)
@@ -122,9 +118,8 @@ class StreetEdgeWheelchairCostTest {
 
     var req = StreetSearchRequest.of();
     req.withWheelchairEnabled(true);
-    req.withWheelchair(b ->
-      b
-        .withStopOnlyAccessible()
+    req.withWheelchair(
+      b -> b.withStopOnlyAccessible()
         .withElevatorOnlyAccessible()
         .withInaccessibleStreetReluctance(25)
         .withMaxSlope(0)
@@ -153,8 +148,7 @@ class StreetEdgeWheelchairCostTest {
   @MethodSource("inaccessibleStreetCases")
   public void inaccessibleStreet(float inaccessibleStreetReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("stairs")
       .withMeterLength(length)
@@ -165,9 +159,8 @@ class StreetEdgeWheelchairCostTest {
 
     var req = StreetSearchRequest.of();
     req.withWheelchairEnabled(true);
-    req.withWheelchair(b ->
-      b
-        .withStopOnlyAccessible()
+    req.withWheelchair(
+      b -> b.withStopOnlyAccessible()
         .withElevatorOnlyAccessible()
         .withInaccessibleStreetReluctance(inaccessibleStreetReluctance)
         .withMaxSlope(0)
@@ -200,8 +193,7 @@ class StreetEdgeWheelchairCostTest {
   @MethodSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdgeBuilder<>()
-      .withFromVertex(V1)
+    var edge = new StreetEdgeBuilder<>().withFromVertex(V1)
       .withToVertex(V2)
       .withName("stairs")
       .withMeterLength(length)

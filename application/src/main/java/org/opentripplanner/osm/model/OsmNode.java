@@ -64,9 +64,8 @@ public class OsmNode extends OsmEntity {
    * @return true if it is
    */
   public boolean isStationEntrance() {
-    return (
-      isOneOfTags("railway", RAILWAY_STATION_ENTRANCE_TAGS) || isTag("public_transport", "entrance")
-    );
+    return (isOneOfTags("railway", RAILWAY_STATION_ENTRANCE_TAGS) ||
+      isTag("public_transport", "entrance"));
   }
 
   /**
@@ -77,11 +76,9 @@ public class OsmNode extends OsmEntity {
     if (this.isTagless()) {
       return false;
     }
-    return (
-      (isStationEntrance() || isTag("entrance", "yes") || isTag("entrance", "main")) &&
+    return ((isStationEntrance() || isTag("entrance", "yes") || isTag("entrance", "main")) &&
       !isTag("access", "private") &&
-      !isTag("access", "no")
-    );
+      !isTag("access", "no"));
   }
 
   /** checks for units (m/ft) in an OSM ele tag value, and returns the value in meters */
@@ -117,20 +114,18 @@ public class OsmNode extends OsmEntity {
    * @return true if it has a barrier tag, or if it explicitly overrides permissions.
    */
   public boolean isTaggedBarrierCrossing() {
-    return (
-      hasTag("barrier") ||
+    return (hasTag("barrier") ||
       hasTag("access") ||
       hasTag("entrance") ||
       overridePermissions(ALL) != ALL ||
-      overridePermissions(NONE) != NONE
-    );
+      overridePermissions(NONE) != NONE);
   }
 
   /**
    * Check if this node represents access to a platform.
    * <p>
-   * If this node appears inside a platform area and belongs to the same public transport relation,
-   * the platform will be kept even if it isn't physically linked to this node so that
+   * If this node appears inside a platform area and belongs to the same public transport
+   * relation, the platform will be kept even if it isn't physically linked to this node so that
    * {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule} can associate the
    * transit stop with the physical platform.
    */

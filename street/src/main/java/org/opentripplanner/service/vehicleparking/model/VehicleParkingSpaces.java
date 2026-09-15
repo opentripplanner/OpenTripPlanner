@@ -64,11 +64,9 @@ public class VehicleParkingSpaces implements Serializable {
       return false;
     }
     final VehicleParkingSpaces that = (VehicleParkingSpaces) o;
-    return (
-      Objects.equals(bicycleSpaces, that.bicycleSpaces) &&
+    return (Objects.equals(bicycleSpaces, that.bicycleSpaces) &&
       Objects.equals(carSpaces, that.carSpaces) &&
-      Objects.equals(wheelchairAccessibleCarSpaces, that.wheelchairAccessibleCarSpaces)
-    );
+      Objects.equals(wheelchairAccessibleCarSpaces, that.wheelchairAccessibleCarSpaces));
   }
 
   @Override

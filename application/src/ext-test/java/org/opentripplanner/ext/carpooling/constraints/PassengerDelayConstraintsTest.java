@@ -43,8 +43,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -71,8 +70,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -99,8 +97,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -128,8 +125,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -148,8 +144,7 @@ class PassengerDelayConstraintsTest {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
+      Duration.ofMinutes(30), };
     var stops = List.of(
       stopWithBudget(FIVE_MINUTES),
       stopWithBudget(FIVE_MINUTES),
@@ -164,8 +159,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(9)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -184,8 +178,7 @@ class PassengerDelayConstraintsTest {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
+      Duration.ofMinutes(30), };
     var stops = List.of(
       stopWithBudget(FIVE_MINUTES),
       stopWithBudget(FIVE_MINUTES),
@@ -198,8 +191,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -227,8 +219,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -254,8 +245,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -282,8 +272,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -310,8 +299,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
     Duration[] cumulativeDurations = calculateCumulativeDurations(modifiedSegments, Duration.ZERO);
 
     // originalTimes = modified times at the original stop positions
@@ -319,8 +307,7 @@ class PassengerDelayConstraintsTest {
     Duration[] originalTimes = {
       cumulativeDurations[0],
       cumulativeDurations[2],
-      cumulativeDurations[4],
-    };
+      cumulativeDurations[4], };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -347,8 +334,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(35)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -377,8 +363,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(30)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(30)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -397,8 +382,7 @@ class PassengerDelayConstraintsTest {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
+      Duration.ofMinutes(30), };
     var stops = List.of(
       stopWithBudget(FIVE_MINUTES),
       stopWithBudget(FIVE_MINUTES),
@@ -415,8 +399,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -444,8 +427,7 @@ class PassengerDelayConstraintsTest {
     // Baseline: 2 segments of 10min. With 1-min dwell: cumulative = [0, 10, 21]
     GraphPath<State, Edge, Vertex>[] baselineSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)), };
     Duration[] originalTimes = calculateCumulativeDurations(baselineSegments, stopDuration);
 
     // Modified (pickup=1, dropoff=3): 4 segments of 6min. With 1-min dwell: cumulative = [0, 6, 13, 20, 27]
@@ -454,8 +436,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -473,8 +454,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)), };
 
     assertTrue(
       PassengerDelayConstraints.satisfiesConstraints(
@@ -493,8 +473,7 @@ class PassengerDelayConstraintsTest {
       Duration.ZERO,
       Duration.ofMinutes(10),
       Duration.ofMinutes(20),
-      Duration.ofMinutes(30),
-    };
+      Duration.ofMinutes(30), };
     var stops = List.of(
       stopWithBudget(FIVE_MINUTES),
       stopWithBudget(FIVE_MINUTES),
@@ -511,8 +490,7 @@ class PassengerDelayConstraintsTest {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)),
-    };
+      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)), };
 
     assertFalse(
       PassengerDelayConstraints.satisfiesConstraints(

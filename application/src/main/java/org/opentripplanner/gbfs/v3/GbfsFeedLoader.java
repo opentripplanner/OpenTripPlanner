@@ -12,12 +12,12 @@ import org.opentripplanner.gbfs.GbfsFeedDetails;
 import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
 
 /**
- * Class for managing the state and loading of complete GBFS version 3.0 datasets, and updating them according
- * to individual feed's TTL rules.
+ * Class for managing the state and loading of complete GBFS version 3.0 datasets, and updating them
+ * according to individual feed's TTL rules.
  */
 public class GbfsFeedLoader
-  extends GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details>
-{
+  extends
+  GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details> {
 
   /**
    * Sets up updaters for the feeds listed in the auto-configuration file.
@@ -27,8 +27,7 @@ public class GbfsFeedLoader
     HttpHeaders httpHeaders,
     OtpHttpClient otpHttpClient
   ) {
-    var feeds = autoConfiguration
-      .mapTo(GBFSGbfs.class)
+    var feeds = autoConfiguration.mapTo(GBFSGbfs.class)
       .getData()
       .getFeeds()
       .stream()

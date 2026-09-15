@@ -24,9 +24,7 @@ public class PerformanceTimersForRaptor implements RaptorTimers {
     this.registry = registry;
     this.routingTags = routingTags;
     var tags = MicrometerUtils.mapTimingTags(routingTags);
-    timerRoute = Timer.builder("raptor." + namePrefix + ".route")
-      .tags(tags)
-      .register(registry);
+    timerRoute = Timer.builder("raptor." + namePrefix + ".route").tags(tags).register(registry);
     routeTransitTimer = Timer.builder("raptor." + namePrefix + ".minute.transit")
       .tags(tags)
       .register(registry);

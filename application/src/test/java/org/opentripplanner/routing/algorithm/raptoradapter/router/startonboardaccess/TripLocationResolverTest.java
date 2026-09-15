@@ -73,8 +73,9 @@ class TripLocationResolverTest {
 
     // STOP_B departs at 10:05, but we provide 10:00 — should fail
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripLocationResolver(env.transitService()).resolve(
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripLocationResolver(env.transitService()).resolve(
         tripAndServiceDate,
         STOP_B.getId(),
         T10_00
@@ -89,8 +90,9 @@ class TripLocationResolverTest {
     ).build();
 
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripLocationResolver(env.transitService()).resolve(
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripLocationResolver(env.transitService()).resolve(
         tripAndServiceDate,
         STOP_C.getId(),
         null
@@ -105,8 +107,9 @@ class TripLocationResolverTest {
     ).build();
 
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
-    assertThrows(InvalidRoutingInputException.class, () ->
-      new TripLocationResolver(env.transitService()).resolve(
+    assertThrows(
+      InvalidRoutingInputException.class,
+      () -> new TripLocationResolver(env.transitService()).resolve(
         tripAndServiceDate,
         STOP_C.getId(),
         T10_10
@@ -147,11 +150,9 @@ class TripLocationResolverTest {
     var stopB = dstEnvBuilder.stop("B");
     var stopC = dstEnvBuilder.stop("C");
 
-    var env = dstEnvBuilder
-      .addTrip(
-        TripInput.of("T1").addStop(stopA, "10:00").addStop(stopB, "10:05").addStop(stopC, "10:10")
-      )
-      .build();
+    var env = dstEnvBuilder.addTrip(
+      TripInput.of("T1").addStop(stopA, "10:00").addStop(stopB, "10:05").addStop(stopC, "10:10")
+    ).build();
 
     var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), dstDate);
     var result = new TripLocationResolver(env.transitService()).resolve(
@@ -205,8 +206,9 @@ class TripLocationResolverTest {
       ).build();
 
       var tripAndServiceDate = new TripAndServiceDate(env.tripData("T1").trip(), SERVICE_DATE);
-      assertThrows(RoutingValidationException.class, () ->
-        new TripLocationResolver(env.transitService()).resolve(
+      assertThrows(
+        RoutingValidationException.class,
+        () -> new TripLocationResolver(env.transitService()).resolve(
           tripAndServiceDate,
           STOP_A.getId(),
           null

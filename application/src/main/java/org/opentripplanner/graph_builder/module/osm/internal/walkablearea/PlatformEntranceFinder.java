@@ -15,13 +15,12 @@ import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /// Efficient lookup class of the spatial index of [OsmVertex]es in a graph that are candidate
-/// platform-linking points:
-/// single-entry, non-motorized street stubs that a nearby platform's visibility graph may want to
-/// link into (for example a stairway landing under a platform).
+/// platform-linking points: single-entry, non-motorized street stubs that a nearby platform's
+/// visibility graph may want to link into (for example a stairway landing under a platform).
 ///
 /// The candidate test ([#isPlatformEntranceCandidate]) is a pure edge-topology check that knows
-/// nothing about area polygons, so the index can be built once, up front, over every [OsmVertex]
-/// in the graph, before any platform's visibility graph exists.
+/// nothing about area polygons, so the index can be built once, up front, over every [OsmVertex] in
+/// the graph, before any platform's visibility graph exists.
 class PlatformEntranceFinder {
 
   private final SpatialIndex index;
@@ -33,8 +32,7 @@ class PlatformEntranceFinder {
   /// Build the index of platform entrance candidates among `vertices`.
   static PlatformEntranceFinder of(Collection<Vertex> vertices) {
     var index = new STRtree();
-    vertices
-      .stream()
+    vertices.stream()
       .filter(OsmVertex.class::isInstance)
       .map(OsmVertex.class::cast)
       .filter(PlatformEntranceFinder::isPlatformEntranceCandidate)
@@ -51,8 +49,7 @@ class PlatformEntranceFinder {
   /// Return the platform entrance vertices that lie within `polygon`.
   List<OsmVertex> findPlatformVerticesWithin(Polygon polygon) {
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    return query(polygon.getEnvelopeInternal())
-      .stream()
+    return query(polygon.getEnvelopeInternal()).stream()
       .filter(v -> polygon.contains(geometryFactory.createPoint(v.getCoordinate())))
       .toList();
   }
@@ -62,11 +59,9 @@ class PlatformEntranceFinder {
     return index.query(envelope);
   }
 
-  /// Tests whether `osmVertex` is a candidate single-entry stub into the street network:
-  /// exactly one non-motorized edge (see
-  /// [#allowsOnlyNonMotorizedModes]) connects it to one
-  /// other vertex, and every other non-[AreaEdge] edge at this vertex leads back to that same
-  /// vertex.
+  /// Tests whether `osmVertex` is a candidate single-entry stub into the street network: exactly
+  /// one non-motorized edge (see [#allowsOnlyNonMotorizedModes]) connects it to one other vertex,
+  /// and every other non-[AreaEdge] edge at this vertex leads back to that same vertex.
   ///
   /// @return `true` if the vertex is a single-entry, non-motorized street stub
   private static boolean isPlatformEntranceCandidate(OsmVertex osmVertex) {

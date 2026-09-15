@@ -17,14 +17,14 @@ public class GtfsRealtimeSeverityMapper {
       return AlertSeverity.UNKNOWN_SEVERITY;
     }
     switch (severity) {
-      case INFO:
+      case INFO :
         return AlertSeverity.INFO;
-      case WARNING:
+      case WARNING :
         return AlertSeverity.WARNING;
-      case SEVERE:
+      case SEVERE :
         return AlertSeverity.SEVERE;
-      case UNKNOWN_SEVERITY:
-      default: {
+      case UNKNOWN_SEVERITY :
+      default : {
         return AlertSeverity.UNKNOWN_SEVERITY;
       }
     }

@@ -155,8 +155,8 @@ class RaptorRequestMapperTest {
     var req = requestBuilder();
 
     // Set relax transit-group-priority
-    req.withPreferences(p ->
-      p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
+    req.withPreferences(
+      p -> p.withTransit(t -> t.withRelaxTransitGroupPriority(CostLinearFunction.of("30m + 1.2t")))
     );
 
     var result = map(req.buildRequest());
@@ -166,13 +166,13 @@ class RaptorRequestMapperTest {
 
   @Test
   void testRaptorDegugRequest() {
-    var request = requestBuilder()
-      .withJourney(jb ->
-        jb.withTransit(tb ->
-          tb.withRaptorDebugging(db -> db.withStops(STOP_A.getId().toString()).withPath("2 3* 4"))
+    var request = requestBuilder().withJourney(
+      jb -> jb.withTransit(
+        tb -> tb.withRaptorDebugging(
+          db -> db.withStops(STOP_A.getId().toString()).withPath("2 3* 4")
         )
       )
-      .buildRequest();
+    ).buildRequest();
 
     var result = map(request);
     var subject = result.debug();

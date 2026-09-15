@@ -29,8 +29,7 @@ class CharacterEscapeFormatterTest {
       "%^",
       ";^;",
       "^;",
-      ";^",
-    }
+      ";^", }
   )
   public void encodeDecode(String original) {
     var subject = new CharacterEscapeFormatter('^', ';', '%');

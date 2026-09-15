@@ -33,8 +33,8 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.SimpleContactStructure;
 
 /**
- * Maps SIRI EstimatedVehicleJourney messages to {@link CarpoolTrip} instances.
- * Extracts stop geometry, timing, capacity and occupancy from the SIRI data.
+ * Maps SIRI EstimatedVehicleJourney messages to {@link CarpoolTrip} instances. Extracts stop
+ * geometry, timing, capacity and occupancy from the SIRI data.
  */
 public class CarpoolSiriMapper {
 
@@ -44,10 +44,10 @@ public class CarpoolSiriMapper {
   private final String feedId;
 
   /**
-   * @param feedId the feed prefix used for every {@link FeedScopedId} this mapper produces.
-   *        Owned by the enclosing updater instance and supplied from
-   *        {@code router-config.json}, so one OTP can run multiple carpool updaters
-   *        side-by-side without trip-id collisions across feeds.
+   * @param feedId the feed prefix used for every {@link FeedScopedId} this mapper produces. Owned
+   *               by the enclosing updater instance and supplied from {@code router-config.json},
+   *               so one OTP can run multiple carpool updaters side-by-side without trip-id
+   *               collisions across feeds.
    */
   public CarpoolSiriMapper(String feedId) {
     this.feedId = feedId;
@@ -66,14 +66,15 @@ public class CarpoolSiriMapper {
 
   /**
    * Maps a SIRI {@link EstimatedVehicleJourney} to a {@link CarpoolTrip}. Calls flagged as
-   * cancelled are filtered out before stops are built. Returns {@code null} when fewer than
-   * 2 non-cancelled calls remain.
+   * cancelled are filtered out before stops are built. Returns {@code null} when fewer than 2
+   * non-cancelled calls remain.
    *
-   * @throws IllegalArgumentException if the raw message is malformed (fewer than 2 calls
-   *         before filtering, calls out of order, missing flexible areas, no departure time
-   *         on the first call or no arrival time on the last call, end time not after start
-   *         time, etc.) or if the trip span or its straight-line drive time exceeds
-   *         {@link CarpoolTrip#MAX_TRIP_DURATION}
+   * @throws IllegalArgumentException if the raw message is malformed (fewer than 2 calls before
+   *                                  filtering, calls out of order, missing flexible areas, no
+   *                                  departure time on the first call or no arrival time on the
+   *                                  last call, end time not after start time, etc.) or if the trip
+   *                                  span or its straight-line drive time exceeds
+   *                                  {@link CarpoolTrip#MAX_TRIP_DURATION}
    */
   @Nullable
   public CarpoolTrip mapSiriToCarpoolTrip(EstimatedVehicleJourney journey) {
@@ -85,10 +86,7 @@ public class CarpoolSiriMapper {
     }
 
     var tripId = journey.getEstimatedVehicleJourneyCode();
-    var activeCalls = calls
-      .stream()
-      .filter(c -> !isCancelled(c))
-      .toList();
+    var activeCalls = calls.stream().filter(c -> !isCancelled(c)).toList();
     if (activeCalls.size() < 2) {
       LOG.info(
         "Trip {}: fewer than 2 non-cancelled calls remain ({} of {}), treating as cancellation",
@@ -146,10 +144,9 @@ public class CarpoolSiriMapper {
     // trees across the network and degrades every later request. When the destination has no
     // latest expected arrival, its scheduled arrival plus the default deviation budget is used —
     // the same default the destination stop itself receives when the feed omits a latest arrival.
-    var latestArrival =
-      lastStop.getLatestExpectedArrivalTime() != null
-        ? lastStop.getLatestExpectedArrivalTime()
-        : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
+    var latestArrival = lastStop.getLatestExpectedArrivalTime() != null
+      ? lastStop.getLatestExpectedArrivalTime()
+      : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
     var tripDuration = Duration.between(startTime, latestArrival);
     if (tripDuration.compareTo(CarpoolTrip.MAX_TRIP_DURATION) > 0) {
       throw new IllegalArgumentException(
@@ -183,8 +180,7 @@ public class CarpoolSiriMapper {
 
     int totalCapacity = extractTotalCapacity(tripId, activeCalls);
 
-    var builder = new CarpoolTripBuilder(new FeedScopedId(feedId, tripId))
-      .withStartTime(startTime)
+    var builder = new CarpoolTripBuilder(new FeedScopedId(feedId, tripId)).withStartTime(startTime)
       .withEndTime(endTime)
       .withProvider(journey.getOperatorRef().getValue())
       .withTotalCapacity(totalCapacity)
@@ -237,9 +233,9 @@ public class CarpoolSiriMapper {
    * Lower bound on the time needed to drive the trip's waypoints in order, summing the straight-
    * line distance between consecutive stops at {@link StreetConstants#DEFAULT_MAX_CAR_SPEED}. No
    * street route is shorter than the beeline and no car drives faster than the modelled maximum, so
-   * the real drive can only take longer; a value above {@link CarpoolTrip#MAX_TRIP_DURATION} therefore proves
-   * the trip cannot be driven within the cap whatever its claimed timetable says, with no risk of
-   * rejecting a trip that actually could.
+   * the real drive can only take longer; a value above {@link CarpoolTrip#MAX_TRIP_DURATION}
+   * therefore proves the trip cannot be driven within the cap whatever its claimed timetable says,
+   * with no risk of rejecting a trip that actually could.
    */
   private static Duration minimumDriveDuration(List<CarpoolStop> stops) {
     var estimator = new BeelineEstimator();
@@ -255,11 +251,11 @@ public class CarpoolSiriMapper {
   /**
    * Build a CarpoolStop from an EstimatedCall with special handling for first/last positions.
    *
-   * @param call The SIRI EstimatedCall containing stop information
-   * @param tripId The trip ID for generating unique stop IDs
+   * @param call      The SIRI EstimatedCall containing stop information
+   * @param tripId    The trip ID for generating unique stop IDs
    * @param stopIndex The 0-based index of this stop in the call list
-   * @param isFirst true if this is the first stop (origin)
-   * @param isLast true if this is the last stop (destination)
+   * @param isFirst   true if this is the first stop (origin)
+   * @param isLast    true if this is the last stop (destination)
    * @return A CarpoolStop representing the stop
    */
   private CarpoolStop buildCarpoolStopForPosition(
@@ -269,22 +265,20 @@ public class CarpoolSiriMapper {
     boolean isFirst,
     boolean isLast
   ) {
-    var stopId = isFirst
-      ? tripId + "_trip_origin"
-      : isLast
-        ? tripId + "_trip_destination"
-        : tripId + "_stop_" + stopIndex;
+    var stopId = isFirst ? tripId + "_trip_origin"
+      : isLast ? tripId + "_trip_destination"
+      : tripId + "_stop_" + stopIndex;
 
     return toCarpoolStop(call, stopId, tripId, isFirst, isLast);
   }
 
   /**
-   * Extracts the total capacity from the EstimatedCalls' ExpectedDepartureCapacities.
-   * Expects the cancelled calls to have already been filtered out. Only the first element
-   * of each call's capacities list is inspected; additional entries are ignored. Uses the
-   * value from the first call that has it; a differing value in a later call is ignored.
-   * Returns {@link CarpoolTrip#DEFAULT_TOTAL_CAPACITY} if no call has capacity data or if
-   * the value is invalid.
+   * Extracts the total capacity from the EstimatedCalls' ExpectedDepartureCapacities. Expects the
+   * cancelled calls to have already been filtered out. Only the first element of each call's
+   * capacities list is inspected; additional entries are ignored. Uses the value from the first
+   * call that has it; a differing value in a later call is ignored. Returns
+   * {@link CarpoolTrip#DEFAULT_TOTAL_CAPACITY} if no call has capacity data or if the value is
+   * invalid.
    */
   private int extractTotalCapacity(String tripId, List<EstimatedCall> calls) {
     Integer firstCapacity = null;
@@ -332,9 +326,9 @@ public class CarpoolSiriMapper {
   }
 
   /**
-   * Extracts the onboard count from the EstimatedCall's ExpectedDepartureOccupancies.
-   * Only the first element of the occupancies list is inspected; additional entries are
-   * ignored. Returns {@link CarpoolStop#DEFAULT_ONBOARD_COUNT} if not present or if the value is invalid.
+   * Extracts the onboard count from the EstimatedCall's ExpectedDepartureOccupancies. Only the
+   * first element of the occupancies list is inspected; additional entries are ignored. Returns
+   * {@link CarpoolStop#DEFAULT_ONBOARD_COUNT} if not present or if the value is invalid.
    */
   private int extractOnboardCount(String tripId, EstimatedCall call) {
     var occupancies = call.getExpectedDepartureOccupancies();
@@ -359,31 +353,29 @@ public class CarpoolSiriMapper {
 
   /**
    * Extracts the deviation budget from the EstimatedCall by computing the difference between
-   * {@code latestExpectedArrivalTime} and the arrival time ({@code expectedArrivalTime} if
-   * present, otherwise {@code aimedArrivalTime}).
+   * {@code latestExpectedArrivalTime} and the arrival time ({@code expectedArrivalTime} if present,
+   * otherwise {@code aimedArrivalTime}).
    * <p>
    * The result is the <em>remaining</em> slack at this stop, not an initial contract:
-   * {@code expectedArrivalTime} already reflects detours committed by prior passenger
-   * insertions, and {@code latestExpectedArrivalTime} is the unchanged commitment to the
-   * passenger at this stop. Each time this mapper runs against a fresh SIRI snapshot, the
-   * extracted value therefore shrinks in step with the consumed slack.
+   * {@code expectedArrivalTime} already reflects detours committed by prior passenger insertions,
+   * and {@code latestExpectedArrivalTime} is the unchanged commitment to the passenger at this
+   * stop. Each time this mapper runs against a fresh SIRI snapshot, the extracted value therefore
+   * shrinks in step with the consumed slack.
    * <p>
    * Fallbacks:
    * <ul>
-   *   <li>Returns {@link CarpoolStop#DEFAULT_DEVIATION_BUDGET} if either timestamp is missing.
-   *       This is intentionally permissive — the absence of a commitment should not block
-   *       insertions.</li>
-   *   <li>Returns {@link Duration#ZERO} if {@code latestExpectedArrivalTime} is before the
-   *       arrival time — the schedule has slipped past the commitment, so no further deviation
-   *       is acceptable.</li>
+   *   <li>Returns {@link CarpoolStop#DEFAULT_DEVIATION_BUDGET} if either timestamp is missing. This
+   *       is intentionally permissive — the absence of a commitment should not block insertions.</li>
+   *   <li>Returns {@link Duration#ZERO} if {@code latestExpectedArrivalTime} is before the arrival
+   *       time — the schedule has slipped past the commitment, so no further deviation is
+   *       acceptable.</li>
    * </ul>
    */
   private Duration extractDeviationBudget(EstimatedCall call) {
     var latestExpected = call.getLatestExpectedArrivalTime();
-    var arrivalTime =
-      call.getExpectedArrivalTime() != null
-        ? call.getExpectedArrivalTime()
-        : call.getAimedArrivalTime();
+    var arrivalTime = call.getExpectedArrivalTime() != null
+      ? call.getExpectedArrivalTime()
+      : call.getAimedArrivalTime();
 
     if (latestExpected == null || arrivalTime == null) {
       return CarpoolStop.DEFAULT_DEVIATION_BUDGET;
@@ -402,8 +394,8 @@ public class CarpoolSiriMapper {
   }
 
   /**
-   * Validates that the EstimatedCalls are properly ordered in time.
-   * Ensures intermediate stops occur between the first (boarding) and last (alighting) calls.
+   * Validates that the EstimatedCalls are properly ordered in time. Ensures intermediate stops
+   * occur between the first (boarding) and last (alighting) calls.
    */
   private void validateEstimatedCallOrder(List<EstimatedCall> calls) {
     if (calls.size() < 2) {
@@ -431,10 +423,9 @@ public class CarpoolSiriMapper {
     // Validate intermediate calls are between first and last
     for (int i = 1; i < calls.size() - 1; i++) {
       EstimatedCall intermediateCall = calls.get(i);
-      ZonedDateTime intermediateTime =
-        intermediateCall.getAimedDepartureTime() != null
-          ? intermediateCall.getAimedDepartureTime()
-          : intermediateCall.getAimedArrivalTime();
+      ZonedDateTime intermediateTime = intermediateCall.getAimedDepartureTime() != null
+        ? intermediateCall.getAimedDepartureTime()
+        : intermediateCall.getAimedArrivalTime();
 
       if (intermediateTime == null) {
         LOG.info("Intermediate call at index {} has no timing information", i);
@@ -456,9 +447,9 @@ public class CarpoolSiriMapper {
   }
 
   /**
-   * Builds a {@link CarpoolStop} from a SIRI call. The origin (when {@code isFirst} is true)
-   * always gets {@link Duration#ZERO} as its deviation budget — the trip cannot start later
-   * than scheduled — regardless of any value extracted from the call.
+   * Builds a {@link CarpoolStop} from a SIRI call. The origin (when {@code isFirst} is true) always
+   * gets {@link Duration#ZERO} as its deviation budget — the trip cannot start later than scheduled
+   * — regardless of any value extracted from the call.
    */
   private CarpoolStop toCarpoolStop(
     EstimatedCall call,
@@ -470,10 +461,9 @@ public class CarpoolSiriMapper {
     var flexibleArea = toFlexibleArea(call);
     var circleLocation = flexibleArea.getCircularArea();
     var legacyGeometry = flexibleArea.getPolygon();
-    var centroid =
-      circleLocation == null
-        ? toWgsCoordinate(toPolygon(legacyGeometry))
-        : toWgsCoordinate(circleLocation);
+    var centroid = circleLocation == null
+      ? toWgsCoordinate(toPolygon(legacyGeometry))
+      : toWgsCoordinate(circleLocation);
 
     return CarpoolStop.of(new FeedScopedId(feedId, id))
       .withCoordinate(centroid)
@@ -500,7 +490,7 @@ public class CarpoolSiriMapper {
 
     if (
       flexibleArea == null ||
-      (flexibleArea.getPolygon() == null && flexibleArea.getCircularArea() == null)
+        (flexibleArea.getPolygon() == null && flexibleArea.getCircularArea() == null)
     ) {
       throw new IllegalArgumentException("Missing flexible area for stop");
     }

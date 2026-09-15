@@ -33,16 +33,14 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
   static final Itinerary INTERLINED_WITH_DIFFERENT_ROUTE = newItinerary(
     Place.forStop(AIRPORT_STOP),
     T11_00
-  )
-    .bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+  ).bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
     .staySeatedBus(ROUTE, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
     .build();
 
   static final Itinerary INTERLINED_WITH_SAME_ROUTE = newItinerary(
     Place.forStop(AIRPORT_STOP),
     T11_00
-  )
-    .bus(ROUTE, 1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+  ).bus(ROUTE, 1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
     .staySeatedBus(ROUTE, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
     .build();
   static Money tenDollars = Money.usDollars(10);
@@ -79,8 +77,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     uses = fare.getLegProducts().get(secondLeg);
     assertEquals(1, uses.size());
 
-    var sum = fare
-      .getLegProducts()
+    var sum = fare.getLegProducts()
       .values()
       .stream()
       .distinct()

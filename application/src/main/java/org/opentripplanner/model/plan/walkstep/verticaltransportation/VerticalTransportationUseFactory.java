@@ -12,8 +12,8 @@ import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.search.state.State;
 
 /**
- * This factory is responsible for creating {@link VerticalTransportationUse} objects.
- * This applies to inclined edges and elevators.
+ * This factory is responsible for creating {@link VerticalTransportationUse} objects. This applies
+ * to inclined edges and elevators.
  */
 public class VerticalTransportationUseFactory {
 
@@ -56,8 +56,8 @@ public class VerticalTransportationUseFactory {
   }
 
   public EscalatorUse createEscalatorUse(Edge edge) {
-    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional =
-      streetDetailsService.findInclinedEdgeLevelInfo(edge);
+    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional = streetDetailsService
+      .findInclinedEdgeLevelInfo(edge);
     if (inclinedEdgeLevelInfoOptional.isEmpty()) {
       return new EscalatorUse(null, null, VerticalDirection.UNKNOWN);
     }
@@ -83,8 +83,8 @@ public class VerticalTransportationUseFactory {
   }
 
   public StairsUse createStairsUse(Edge edge) {
-    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional =
-      streetDetailsService.findInclinedEdgeLevelInfo(edge);
+    Optional<InclinedEdgeLevelInfo> inclinedEdgeLevelInfoOptional = streetDetailsService
+      .findInclinedEdgeLevelInfo(edge);
     if (inclinedEdgeLevelInfoOptional.isEmpty()) {
       return new StairsUse(null, null, VerticalDirection.UNKNOWN);
     }
@@ -115,13 +115,13 @@ public class VerticalTransportationUseFactory {
   ) {
     return edge.getFromVertex() instanceof OsmVertex fromVertex &&
       fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
-      ? VerticalDirection.UP
-      : VerticalDirection.DOWN;
+        ? VerticalDirection.UP
+        : VerticalDirection.DOWN;
   }
 
   /**
-   * Find the ElevatorBoardEdge that was used from the backState of an ElevatorAlightEdge.
-   * This function should never return null unless the graph is broken.
+   * Find the ElevatorBoardEdge that was used from the backState of an ElevatorAlightEdge. This
+   * function should never return null unless the graph is broken.
    */
   @Nullable
   private ElevatorBoardEdge findElevatorBoardEdge(State backState) {

@@ -15,16 +15,16 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Represents a driver's carpool journey with planned route, timing, and passenger capacity.
  * <p>
- * A carpool trip models a driver offering their vehicle journey for passengers to join. It includes
- * the driver's planned route as a sequence of stops, total vehicle capacity, and timing
- * constraints including a deviation budget that allows the driver to slightly adjust their route
- * to accommodate passengers.
+ * A carpool trip models a driver offering their vehicle journey for passengers to join. It
+ * includes the driver's planned route as a sequence of stops, total vehicle capacity, and timing
+ * constraints including a deviation budget that allows the driver to slightly adjust their route to
+ * accommodate passengers.
  *
  * <h2>Core Concepts</h2>
  * <ul>
  *   <li><strong>Origin/Destination Areas:</strong> Start and end zones for the driver's journey</li>
- *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers
- *       can be picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
+ *   <li><strong>Stops:</strong> Ordered sequence of waypoints along the route where passengers can be
+ *       picked up or dropped off. Stops are dynamically updated as bookings occur.</li>
  *   <li><strong>Total Capacity:</strong> Number of seats in the car, including the driver seat</li>
  * </ul>
  *
@@ -53,18 +53,16 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * @see CarpoolTripBuilder for constructing trip instances
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for trip updates
  */
-public class CarpoolTrip
-  extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
-  implements LogInfo
-{
+public class CarpoolTrip extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder> implements
+  LogInfo {
 
   /** Default total capacity (including driver) when no capacity information is provided. */
   public static final int DEFAULT_TOTAL_CAPACITY = 5;
 
   /**
-   * The longest span a carpool trip may have — from the first stop's departure to the
-   * destination's latest expected arrival. A trip longer than this is not shaped like a carpool
-   * journey and is not modelled as one.
+   * The longest span a carpool trip may have — from the first stop's departure to the destination's
+   * latest expected arrival. A trip longer than this is not shaped like a carpool journey and is
+   * not modelled as one.
    */
   public static final Duration MAX_TRIP_DURATION = Duration.ofHours(2).plusMinutes(30);
 
@@ -117,8 +115,8 @@ public class CarpoolTrip
   }
 
   /**
-   * Returns the latest expected arrival time of the destination stop if available, otherwise
-   * falls back to {@link #endTime()}.
+   * Returns the latest expected arrival time of the destination stop if available, otherwise falls
+   * back to {@link #endTime()}.
    *
    * @return the latest expected end time of the trip
    */
@@ -141,12 +139,12 @@ public class CarpoolTrip
   /**
    * Returns the ordered sequence of stops along the carpool route.
    * <p>
-   * Stops include both the driver's originally planned stops and any dynamically added stops
-   * for passenger pickups and dropoffs. The list is ordered by visit order along the route:
-   * the first element is the origin and the last is the destination.
+   * Stops include both the driver's originally planned stops and any dynamically added stops for
+   * passenger pickups and dropoffs. The list is ordered by visit order along the route: the first
+   * element is the origin and the last is the destination.
    *
-   * @return an immutable list of stops along the carpool route, in visit order; never null,
-   *         and always contains at least the origin and destination
+   * @return an immutable list of stops along the carpool route, in visit order; never null, and
+   *         always contains at least the origin and destination
    */
   public List<CarpoolStop> stops() {
     return stops;
@@ -187,22 +185,22 @@ public class CarpoolTrip
   }
 
   /**
-   * Checks if there's capacity to insert a passenger at the given pickup and dropoff positions
-   * in the modified route.
+   * Checks if there's capacity to insert a passenger at the given pickup and dropoff positions in
+   * the modified route.
    * <p>
    * The positions are 0-based indices of the passenger's pickup and dropoff stops in the
-   * modified route (the route after the passenger's stops have been inserted). For example,
-   * with original stops [Origin, A, B, Destination] and pickupPosition=1, dropoffPosition=3:
-   * the modified route is [Origin, Pickup, A, Dropoff, B, Destination].
-   * All stops between (inclusive) pickupPosition - 1 and dropoffPosition - 2 are checked for capacity.
-   * In the example this is between stops 0 and 1, meaning that stops Origin and A need to have sufficient
-   * capacity for {@code additionalPassengers} extra passengers.
+   * modified route (the route after the passenger's stops have been inserted). For example, with
+   * original stops [Origin, A, B, Destination] and pickupPosition=1, dropoffPosition=3: the
+   * modified route is [Origin, Pickup, A, Dropoff, B, Destination]. All stops between (inclusive)
+   * pickupPosition - 1 and dropoffPosition - 2 are checked for capacity. In the example this is
+   * between stops 0 and 1, meaning that stops Origin and A need to have sufficient capacity for
+   * {@code additionalPassengers} extra passengers.
    * <p>
    *
-   * @param pickupPosition 0-based index of the passenger's pickup in the modified route.
-   *        Must be >= 1 (position 0 is the driver's origin).
-   * @param dropoffPosition 0-based index of the passenger's dropoff in the modified route.
-   *        Must be > pickupPosition.
+   * @param pickupPosition       0-based index of the passenger's pickup in the modified route. Must
+   *                             be >= 1 (position 0 is the driver's origin).
+   * @param dropoffPosition      0-based index of the passenger's dropoff in the modified route.
+   *                             Must be > pickupPosition.
    * @param additionalPassengers Number of passengers to add (typically 1)
    * @return true if capacity is available throughout the entire range, false otherwise
    * @throws IllegalArgumentException if pickupPosition < 1 or dropoffPosition <= pickupPosition
@@ -246,13 +244,11 @@ public class CarpoolTrip
 
   @Override
   public boolean sameAs(CarpoolTrip other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
       stops.equals(other.stops) &&
-      Objects.equals(publicContactInformation, other.publicContactInformation)
-    );
+      Objects.equals(publicContactInformation, other.publicContactInformation));
   }
 
   @Override

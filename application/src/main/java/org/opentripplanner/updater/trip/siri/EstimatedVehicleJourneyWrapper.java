@@ -37,10 +37,9 @@ final class EstimatedVehicleJourneyWrapper {
   private EstimatedVehicleJourneyWrapper(EstimatedVehicleJourney journey, List<CallWrapper> calls) {
     this.journey = journey;
     this.calls = calls;
-    this.code =
-      journey.getEstimatedVehicleJourneyCode() != null
-        ? new EstimatedVehicleJourneyCode(journey.getEstimatedVehicleJourneyCode())
-        : null;
+    this.code = journey.getEstimatedVehicleJourneyCode() != null
+      ? new EstimatedVehicleJourneyCode(journey.getEstimatedVehicleJourneyCode())
+      : null;
   }
 
   /* Construction and validation */
@@ -60,9 +59,9 @@ final class EstimatedVehicleJourneyWrapper {
   /**
    * Whether this journey must be rejected because it is not monitored.
    * <p>
-   * A journey reported as not monitored is normally rejected, but the not-monitored flag is ignored
-   * when the journey is a cancellation: a cancelled journey is no longer monitored, yet must still
-   * be processed so that the cancellation is applied.
+   * A journey reported as not monitored is normally rejected, but the not-monitored flag is
+   * ignored when the journey is a cancellation: a cancelled journey is no longer monitored, yet
+   * must still be processed so that the cancellation is applied.
    */
   private boolean mustBeRejectedAsUnmonitored() {
     return !isMonitored() && !isCancellation();
@@ -103,8 +102,8 @@ final class EstimatedVehicleJourneyWrapper {
 
   /**
    * The EstimatedVehicleJourneyCode of an extra journey, used to identify the added trip. It can be
-   * viewed as either a {@code ServiceJourney} or a {@code DatedServiceJourney} id. {@code empty} when
-   * the journey carries no code.
+   * viewed as either a {@code ServiceJourney} or a {@code DatedServiceJourney} id. {@code empty}
+   * when the journey carries no code.
    */
   Optional<EstimatedVehicleJourneyCode> code() {
     return Optional.ofNullable(code);
@@ -114,9 +113,8 @@ final class EstimatedVehicleJourneyWrapper {
    * The dated vehicle journey identified by unique id.
    */
   Optional<String> datedVehicleJourneyRef() {
-    return Optional.ofNullable(journey.getDatedVehicleJourneyRef()).map(
-      DatedVehicleJourneyRef::getValue
-    );
+    return Optional.ofNullable(journey.getDatedVehicleJourneyRef())
+      .map(DatedVehicleJourneyRef::getValue);
   }
 
   /**
@@ -129,8 +127,7 @@ final class EstimatedVehicleJourneyWrapper {
   }
 
   /**
-   * The reference to the vehicle operating this journey.
-   * Also used for fuzzy matching
+   * The reference to the vehicle operating this journey. Also used for fuzzy matching
    */
   Optional<String> vehicleRef() {
     return Optional.ofNullable(journey.getVehicleRef())
@@ -148,11 +145,11 @@ final class EstimatedVehicleJourneyWrapper {
   }
 
   /**
-   * Additional dated vehicle journeys this journey replaces (beyond {@link #replacedDatedVehicleJourneyRef()}).
+   * Additional dated vehicle journeys this journey replaces (beyond
+   * {@link #replacedDatedVehicleJourneyRef()}).
    */
   List<VehicleJourneyIdAndServiceDate> additionalReplacedDatedVehicleJourneyRefs() {
-    return journey
-      .getAdditionalVehicleJourneyReves()
+    return journey.getAdditionalVehicleJourneyReves()
       .stream()
       .map(VehicleJourneyIdAndServiceDate::of)
       .toList();
@@ -212,8 +209,7 @@ final class EstimatedVehicleJourneyWrapper {
     if (journey.getJourneyRelations() == null) {
       return List.of();
     }
-    return journey
-      .getJourneyRelations()
+    return journey.getJourneyRelations()
       .getJourneyRelations()
       .stream()
       .map(relation -> new JourneyRelationWrapper(relation, calls))
@@ -233,8 +229,10 @@ final class EstimatedVehicleJourneyWrapper {
         journey.getDatedVehicleJourneyRef(),
         DatedVehicleJourneyRef::getValue
       )
-      .addObjOp("FramedVehicleJourney", journey.getFramedVehicleJourneyRef(), it ->
-        ToStringBuilder.of(it.getClass())
+      .addObjOp(
+        "FramedVehicleJourney",
+        journey.getFramedVehicleJourneyRef(),
+        it -> ToStringBuilder.of(it.getClass())
           .addStr("VehicleJourney", it.getDatedVehicleJourneyRef())
           .addObjOp("Date", it.getDataFrameRef(), DataFrameRefStructure::getValue)
           .toString()

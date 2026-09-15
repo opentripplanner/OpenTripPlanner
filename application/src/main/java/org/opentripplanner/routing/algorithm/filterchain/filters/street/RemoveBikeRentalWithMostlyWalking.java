@@ -32,17 +32,15 @@ public class RemoveBikeRentalWithMostlyWalking implements RemoveItineraryFlagger
         return false;
       }
 
-      double bikeRentalDistance = itinerary
-        .legs()
+      double bikeRentalDistance = itinerary.legs()
         .stream()
         .filter(l -> l.rentedVehicle() != null && l.rentedVehicle())
         .mapToDouble(Leg::distanceMeters)
         .sum();
 
       double totalDistance = itinerary.distanceMeters();
-      return (
-        bikeRentalDistance != 0 && bikeRentalDistance / totalDistance <= bikeRentalDistanceRatio
-      );
+      return (bikeRentalDistance != 0 &&
+        bikeRentalDistance / totalDistance <= bikeRentalDistanceRatio);
     };
   }
 }

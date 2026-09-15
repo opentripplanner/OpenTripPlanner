@@ -62,8 +62,7 @@ class FeedScopedIdTest {
       "\u200Btrimet:123",
       "\u200B\u200Btri\u200Bmet:123\u200B",
       "\ntrimet:123\t",
-      "\ntri\nmet:123\t",
-    }
+      "\ntri\nmet:123\t", }
   )
   void throwExceptionForInvisibleChar(String input) {
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -82,8 +81,9 @@ class FeedScopedIdTest {
 
   @Test
   void requireSameFeedId() {
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      new FeedScopedId("F", "1").requireSameFeedId(new FeedScopedId("E", "1"))
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> new FeedScopedId("F", "1").requireSameFeedId(new FeedScopedId("E", "1"))
     );
     assertEquals("FeedIds do not match: 'F' != 'E'", ex.getMessage());
   }

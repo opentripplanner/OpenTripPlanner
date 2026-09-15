@@ -27,8 +27,7 @@ public class CanceledTripsSummaryRoute {
   }
 
   public List<CanceledTripsSummaryPattern> patterns() {
-    return cancellationCountsForPatterns
-      .entrySet()
+    return cancellationCountsForPatterns.entrySet()
       .stream()
       .map(e -> new CanceledTripsSummaryPattern(e.getKey(), e.getValue()))
       .toList();

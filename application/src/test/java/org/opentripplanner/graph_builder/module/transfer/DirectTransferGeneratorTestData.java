@@ -34,8 +34,9 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
   private boolean noTransfersOnStationA = false;
   private boolean graphHasStreets = false;
   private boolean includeCarFerryTrips = false;
-  private RegularTransferParameters.Builder regularTransferParameters =
-    RegularTransferParameters.of().withMaxDuration(MAX_TRANSFER_DURATION);
+  private RegularTransferParameters.Builder regularTransferParameters = RegularTransferParameters
+    .of()
+    .withMaxDuration(MAX_TRANSFER_DURATION);
 
   public DirectTransferGeneratorTestData withPatterns() {
     this.addPatterns = true;
@@ -113,9 +114,9 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
       S12 = stop("S12", 47.520, 19.001);
       S13 = stop("S13", b -> b.withCoordinate(47.540, 19.001).withSometimesUsedRealtime(true));
       S21 = stop("S21", 47.500, 19.011, stationA);
-      S22 = stop("S22", b ->
-        b
-          .withCoordinate(47.520, 19.011)
+      S22 = stop(
+        "S22",
+        b -> b.withCoordinate(47.520, 19.011)
           .withVehicleType(TransitMode.BUS)
           .withSometimesUsedRealtime(true)
       );
@@ -171,8 +172,8 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
           TripPattern.of(FeedScopedIdForTestFactory.id("TP2"))
             .withRoute(route("R2", TransitMode.BUS, agency))
             .withStopPattern(new StopPattern(List.of(st(S21), st(S22), st(S_FAR_AWAY))))
-            .withScheduledTimeTableBuilder(builder ->
-              builder.addTripTimes(
+            .withScheduledTimeTableBuilder(
+              builder -> builder.addTripTimes(
                 ScheduledTripTimes.of()
                   .withTrip(
                     TransitRepositoryForTest.trip("bikesAllowedTrip")
@@ -191,8 +192,8 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
             TripPattern.of(FeedScopedIdForTestFactory.id("TP4"))
               .withRoute(route("R4", TransitMode.FERRY, agency))
               .withStopPattern(new StopPattern(List.of(st(S_FAR_AWAY), st(S0), st(S12))))
-              .withScheduledTimeTableBuilder(b ->
-                b.addTripTimes(createCarsAllowedTripTimesWithTwoStops())
+              .withScheduledTimeTableBuilder(
+                b -> b.addTripTimes(createCarsAllowedTripTimesWithTwoStops())
               )
               .build()
           );
@@ -200,8 +201,8 @@ class DirectTransferGeneratorTestData extends GraphRoutingTest {
             TripPattern.of(FeedScopedIdForTestFactory.id("TP5"))
               .withRoute(route("R5", TransitMode.FERRY, agency))
               .withStopPattern(new StopPattern(List.of(st(S22), st(S23))))
-              .withScheduledTimeTableBuilder(b ->
-                b.addTripTimes(createCarsAllowedTripTimesWithTwoStops())
+              .withScheduledTimeTableBuilder(
+                b -> b.addTripTimes(createCarsAllowedTripTimesWithTwoStops())
               )
               .build()
           );

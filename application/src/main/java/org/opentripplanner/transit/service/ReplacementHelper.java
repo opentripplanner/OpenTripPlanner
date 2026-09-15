@@ -13,13 +13,15 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 
 /**
- * <p>Encapsulates the part of Transit Service which deals with Route/Trip/TripOnServiceDate
- * replacement logic. Has the same lifecycle as Transit Service, so a new instance of this
- * class is created for each request. This ensures that the same Timetable Snapshot is used
- * for the duration of the request, but new requests get the current Timetable Snapshot.</p>
+ * <p>
+ * Encapsulates the part of Transit Service which deals with Route/Trip/TripOnServiceDate
+ * replacement logic. Has the same lifecycle as Transit Service, so a new instance of this class is
+ * created for each request. This ensures that the same Timetable Snapshot is used for the duration
+ * of the request, but new requests get the current Timetable Snapshot.</p>
  *
- * <p>Shared by the GTFS and Transmodel query APIs, which have different names but the same
- * concepts (Route/Line, Trip/ServiceJourney, TripOnServiceDate/DatedServiceJourney).</p>
+ * <p>
+ * Shared by the GTFS and Transmodel query APIs, which have different names but the same concepts
+ * (Route/Line, Trip/ServiceJourney, TripOnServiceDate/DatedServiceJourney).</p>
  */
 public class ReplacementHelper {
 
@@ -87,39 +89,31 @@ public class ReplacementHelper {
   }
 
   public boolean isReplacementTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
-    return (
-      !tripOnServiceDate.getReplacementFor().isEmpty() ||
-      isReplacementTrip(tripOnServiceDate.getTrip())
-    );
+    return (!tripOnServiceDate.getReplacementFor().isEmpty() ||
+      isReplacementTrip(tripOnServiceDate.getTrip()));
   }
 
   private boolean hasReplacedByTripOnServiceDates(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
-    return (
-      !transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
+    return (!transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
       (timetableSnapshot != null &&
-        timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
-    );
+        timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty()));
   }
 
   public boolean replacementsExist(Route route) {
-    return transitService
-      .listTripsOnServiceDate()
+    return transitService.listTripsOnServiceDate()
       .stream()
       .anyMatch(
-        tripOnServiceDate ->
-          tripOnServiceDate.getTrip().getRoute().getId().equals(route.getId()) &&
+        tripOnServiceDate -> tripOnServiceDate.getTrip().getRoute().getId().equals(route.getId()) &&
           hasReplacedByTripOnServiceDates(tripOnServiceDate)
       );
   }
 
   public boolean replacementsExist(Trip trip) {
-    return transitService
-      .listTripsOnServiceDate()
+    return transitService.listTripsOnServiceDate()
       .stream()
       .anyMatch(
-        tripOnServiceDate ->
-          tripOnServiceDate.getTrip().getId().equals(trip.getId()) &&
+        tripOnServiceDate -> tripOnServiceDate.getTrip().getId().equals(trip.getId()) &&
           hasReplacedByTripOnServiceDates(tripOnServiceDate)
       );
   }

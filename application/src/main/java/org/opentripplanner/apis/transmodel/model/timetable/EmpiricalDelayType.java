@@ -59,13 +59,11 @@ public class EmpiricalDelayType {
     if (parent == null || service == null) {
       return null;
     }
-    return service
-      .findEmpiricalDelay(
-        parent.getTrip().getId(),
-        parent.getServiceDay(),
-        parent.getStopPosition()
-      )
-      .orElse(null);
+    return service.findEmpiricalDelay(
+      parent.getTrip().getId(),
+      parent.getServiceDay(),
+      parent.getStopPosition()
+    ).orElse(null);
   }
 
   private static EmpiricalDelay empiricalDelay(DataFetchingEnvironment environment) {

@@ -43,8 +43,10 @@ public class TimetabledPassingTimeType {
           .name("arrival")
           .type(TransmodelScalars.TIME_SCALAR)
           .description("Scheduled time of arrival at quay")
-          .dataFetcher(environment ->
-            missingValueToNull(((TripTimeOnDate) environment.getSource()).getScheduledArrival())
+          .dataFetcher(
+            environment -> missingValueToNull(
+              ((TripTimeOnDate) environment.getSource()).getScheduledArrival()
+            )
           )
           .build()
       )
@@ -53,8 +55,10 @@ public class TimetabledPassingTimeType {
           .name("departure")
           .type(TransmodelScalars.TIME_SCALAR)
           .description("Scheduled time of departure from quay")
-          .dataFetcher(environment ->
-            missingValueToNull(((TripTimeOnDate) environment.getSource()).getScheduledDeparture())
+          .dataFetcher(
+            environment -> missingValueToNull(
+              ((TripTimeOnDate) environment.getSource()).getScheduledDeparture()
+            )
           )
           .build()
       )
@@ -74,8 +78,8 @@ public class TimetabledPassingTimeType {
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle may be boarded at quay.")
           .dataFetcher(
-            environment ->
-              ((TripTimeOnDate) environment.getSource()).getPickupType() != PickDrop.NONE
+            environment -> ((TripTimeOnDate) environment.getSource()).getPickupType() !=
+              PickDrop.NONE
           )
           .build()
       )
@@ -85,8 +89,8 @@ public class TimetabledPassingTimeType {
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle may be alighted at quay.")
           .dataFetcher(
-            environment ->
-              ((TripTimeOnDate) environment.getSource()).getDropoffType() != PickDrop.NONE
+            environment -> ((TripTimeOnDate) environment.getSource()).getDropoffType() !=
+              PickDrop.NONE
           )
           .build()
       )
@@ -96,8 +100,7 @@ public class TimetabledPassingTimeType {
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .description("Whether vehicle will only stop on request.")
           .dataFetcher(
-            environment ->
-              ((TripTimeOnDate) environment.getSource()).getDropoffType() ==
+            environment -> ((TripTimeOnDate) environment.getSource()).getDropoffType() ==
               PickDrop.COORDINATE_WITH_DRIVER
           )
           .build()
@@ -158,9 +161,8 @@ public class TimetabledPassingTimeType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
-            return GqlUtil.getTransitService(environment).findNotices(
-              tripTimeOnDate.getStopTimeKey()
-            );
+            return GqlUtil.getTransitService(environment)
+              .findNotices(tripTimeOnDate.getStopTimeKey());
           })
           .build()
       )
@@ -169,8 +171,8 @@ public class TimetabledPassingTimeType {
           .name("bookingArrangements")
           .description("Booking arrangements for this passing time.")
           .type(bookingArrangementType)
-          .dataFetcher(environment ->
-            environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
+          .dataFetcher(
+            environment -> environment.<TripTimeOnDate>getSource().getPickupBookingInfo()
           )
           .build()
       )

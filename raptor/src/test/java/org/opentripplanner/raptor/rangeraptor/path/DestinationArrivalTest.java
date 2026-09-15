@@ -42,11 +42,11 @@ public class DestinationArrivalTest {
   /**
    * Setup a simple journey with an access leg, one transit and a egress leg.
    */
-  private static final McStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL =
-    STOP_ARRIVAL_FACTORY.createAccessStopArrival(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
+  private static final McStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = STOP_ARRIVAL_FACTORY
+    .createAccessStopArrival(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
 
-  private static final ArrivalView<RaptorTripSchedule> TRANSIT_ARRIVAL =
-    STOP_ARRIVAL_FACTORY.createTransitStopArrival(
+  private static final ArrivalView<RaptorTripSchedule> TRANSIT_ARRIVAL = STOP_ARRIVAL_FACTORY
+    .createTransitStopArrival(
       new PatternRideC1<>(ACCESS_ARRIVAL, ANY, ANY, ANY, ANY, ANY, A_TRIP),
       TRANSIT_STOP,
       TRANSIT_ALIGHT_TIME,

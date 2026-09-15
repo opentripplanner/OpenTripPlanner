@@ -17,8 +17,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * <p>
  * Specifically this means that:
  * <p>
- *  - if a stop has a parent station only the parent is returned
- *  - if stops are closer than 10 meters to each and have an identical name, only one is returned
+ * - if a stop has a parent station only the parent is returned - if stops are closer than 10
+ * meters to each and have an identical name, only one is returned
  */
 record StopCluster(Location primary, Collection<Location> secondaries) {
   /**

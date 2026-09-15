@@ -90,14 +90,12 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
 
   @Override
   public boolean sameAs(Agency other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(timezone, other.timezone) &&
       Objects.equals(url, other.url) &&
       Objects.equals(lang, other.lang) &&
       Objects.equals(phone, other.phone) &&
-      Objects.equals(fareUrl, other.fareUrl)
-    );
+      Objects.equals(fareUrl, other.fareUrl));
   }
 }

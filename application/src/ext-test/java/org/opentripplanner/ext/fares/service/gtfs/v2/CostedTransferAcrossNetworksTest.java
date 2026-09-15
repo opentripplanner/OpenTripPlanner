@@ -68,8 +68,7 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
   @Test
   void AAB() {
-    var itin = newItinerary(A, 0)
-      .bus(ROUTE_A, 1, 0, 10, A)
+    var itin = newItinerary(A, 0).bus(ROUTE_A, 1, 0, 10, A)
       .bus(ROUTE_A, 2, 11, 20, A)
       .bus(ROUTE_B, 3, 21, 25, A)
       .build();
@@ -94,8 +93,7 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
   @Test
   void AABA() {
-    var itin = newItinerary(A, 0)
-      .bus(ROUTE_A, 1, 0, 10, A)
+    var itin = newItinerary(A, 0).bus(ROUTE_A, 1, 0, 10, A)
       .bus(ROUTE_A, 2, 11, 20, A)
       .bus(ROUTE_B, 3, 21, 25, A)
       .bus(ROUTE_A, 4, 26, 30, A)
@@ -126,13 +124,12 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
   }
 
   /**
-   * Taking route A, then transferring to B and then another B should lead to a single
-   * dependent fare product for the second and third leg.
+   * Taking route A, then transferring to B and then another B should lead to a single dependent
+   * fare product for the second and third leg.
    */
   @Test
   void ABB() {
-    var itin = newItinerary(A, 0)
-      .bus(ROUTE_A, 1, 0, 10, A)
+    var itin = newItinerary(A, 0).bus(ROUTE_A, 1, 0, 10, A)
       .bus(ROUTE_B, 2, 11, 20, A)
       .bus(ROUTE_B, 3, 21, 25, A)
       .build();
@@ -157,8 +154,7 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
   @Test
   void ABA() {
-    var itin = newItinerary(A, 0)
-      .bus(ROUTE_A, 1, 0, 10, B)
+    var itin = newItinerary(A, 0).bus(ROUTE_A, 1, 0, 10, B)
       .bus(ROUTE_B, 2, 11, 20, C)
       .bus(ROUTE_A, 3, 21, 25, D)
       .build();
@@ -185,8 +181,7 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
   @Test
   void ABAB() {
-    var itin = newItinerary(A, 0)
-      .bus(ROUTE_A, 1, 0, 10, B)
+    var itin = newItinerary(A, 0).bus(ROUTE_A, 1, 0, 10, B)
       .bus(ROUTE_B, 2, 11, 20, C)
       .bus(ROUTE_A, 3, 21, 25, D)
       .bus(ROUTE_B, 4, 25, 30, E)
@@ -219,8 +214,7 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
   @Test
   void BAB() {
-    var itin = newItinerary(A, 0)
-      .bus(ROUTE_B, 1, 0, 10, B)
+    var itin = newItinerary(A, 0).bus(ROUTE_B, 1, 0, 10, B)
       .bus(ROUTE_A, 2, 11, 20, C)
       .bus(ROUTE_B, 3, 21, 25, D)
       .build();

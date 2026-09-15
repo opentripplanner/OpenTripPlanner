@@ -5,16 +5,16 @@ package org.opentripplanner._support.debug;
  * {@code System.err} for logging - to make sure the output is flushed. Using the standard logging
  * framework for this is a bit unnecessary. Use this class instead of System err/out.
  * <p>
- * To turn on debugging set {@code testDebug} as an environment variable or system property -
- * if set this class will print debug info to the console. Use:
+ * To turn on debugging set {@code testDebug} as an environment variable or system property - if
+ * set this class will print debug info to the console. Use:
  * <pre>
  * $ export testDebug=true | java ...
  * or
  * $ java -DtestDebug ..
  * </pre>
- * In IntelliJ it's recommended to add the system property in the <em>JUnit template</em>. In the test
- * drop down, choose <b>Edit Configuration...</b> then <b>Edit Configuration Templates..</b> and
- * choose <b>JUnit</b>.
+ * In IntelliJ it's recommended to add the system property in the <em>JUnit template</em>. In
+ * the test drop down, choose <b>Edit Configuration...</b> then <b>Edit Configuration
+ * Templates..</b> and choose <b>JUnit</b>.
  */
 public class TestDebug {
 

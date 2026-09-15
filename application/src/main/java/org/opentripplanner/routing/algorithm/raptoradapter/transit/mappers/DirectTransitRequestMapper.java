@@ -12,8 +12,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class DirectTransitRequestMapper {
 
-  /// Map the request into a request object for the direct transit search. Will return empty if
-  /// the direct transit search shouldn't be run.
+  /// Map the request into a request object for the direct transit search. Will return empty if the
+  /// direct transit search shouldn't be run.
   public static Optional<RaptorDirectTransitRequest> map(
     RouteRequest request,
     SearchParams searchParamsUsed
@@ -60,28 +60,19 @@ public class DirectTransitRequestMapper {
     Collection<? extends RaptorAccessEgress> list,
     Duration maxDuration
   ) {
-    return list
-      .stream()
-      .filter(ae -> ae.durationInSeconds() <= maxDuration.toSeconds())
-      .toList();
+    return list.stream().filter(ae -> ae.durationInSeconds() <= maxDuration.toSeconds()).toList();
   }
 
   private static List<? extends RaptorAccessEgress> filterAccessEgressNoOpeningHours(
     Collection<? extends RaptorAccessEgress> list
   ) {
-    return list
-      .stream()
-      .filter(it -> !it.hasOpeningHours())
-      .toList();
+    return list.stream().filter(it -> !it.hasOpeningHours()).toList();
   }
 
   private static List<? extends RaptorAccessEgress> decorateAccessEgressWithExtraCost(
     Collection<? extends RaptorAccessEgress> list,
     double costFactor
   ) {
-    return list
-      .stream()
-      .map(it -> new AccessEgressWithExtraCost(it, costFactor))
-      .toList();
+    return list.stream().map(it -> new AccessEgressWithExtraCost(it, costFactor)).toList();
   }
 }

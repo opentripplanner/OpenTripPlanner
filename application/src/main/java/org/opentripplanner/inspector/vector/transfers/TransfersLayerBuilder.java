@@ -31,8 +31,7 @@ public class TransfersLayerBuilder extends LayerBuilder<PathTransfer> {
 
   @Override
   protected List<Geometry> findGeometries(Envelope envelope) {
-    return transitService
-      .findAreaStops(envelope)
+    return transitService.findAreaStops(envelope)
       .stream()
       .flatMap(stop -> transferService.findWalkTransfersFromStop(stop).stream())
       .map(p -> {

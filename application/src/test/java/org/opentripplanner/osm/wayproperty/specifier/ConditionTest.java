@@ -114,8 +114,9 @@ class ConditionTest {
 
   @Test
   void assertThrowsOnLowerLowerThanUpperLimit() {
-    Assertions.assertThrows(IllegalArgumentException.class, () ->
-      new InclusiveRange("lanes", 4, 6)
+    Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> new InclusiveRange("lanes", 4, 6)
     );
   }
 }

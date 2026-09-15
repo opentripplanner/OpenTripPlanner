@@ -79,9 +79,7 @@ public class VehicleRentalEdge extends Edge {
     boolean pickedUp;
     if (s0.getRequest().arriveBy()) {
       switch (s0.getVehicleRentalState()) {
-        case BEFORE_RENTING -> {
-          return State.empty();
-        }
+        case BEFORE_RENTING -> { return State.empty(); }
         case HAVE_RENTED -> {
           if (!station.canDropOffFormFactor(formFactor, realtimeAvailability)) {
             return State.empty();
@@ -94,7 +92,7 @@ public class VehicleRentalEdge extends Edge {
           // boundary fork — the committed branch already handles this network.
           if (
             s0.getCommittedNetworks().contains(network) ||
-            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
+              !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -111,7 +109,7 @@ public class VehicleRentalEdge extends Edge {
         case RENTING_FROM_STATION -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
+              !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -119,7 +117,7 @@ public class VehicleRentalEdge extends Edge {
           // and so here it is checked if this bicycle could have been kept at the destination
           if (
             s0.mayKeepRentedVehicleAtDestination() &&
-            !station.isArrivingInRentalVehicleAtDestinationAllowed()
+              !station.isArrivingInRentalVehicleAtDestinationAllowed()
           ) {
             return State.empty();
           }
@@ -142,7 +140,7 @@ public class VehicleRentalEdge extends Edge {
         case BEFORE_RENTING -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
+              !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -152,8 +150,7 @@ public class VehicleRentalEdge extends Edge {
             }
             s1.beginFloatingVehicleRenting(formFactor, getPropulsionType(station), network, false);
           } else {
-            boolean mayKeep =
-              request.allowArrivingInRentedVehicleAtDestination() &&
+            boolean mayKeep = request.allowArrivingInRentedVehicleAtDestination() &&
               station.isArrivingInRentalVehicleAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(
               formFactor,
@@ -165,9 +162,7 @@ public class VehicleRentalEdge extends Edge {
           }
           pickedUp = true;
         }
-        case HAVE_RENTED -> {
-          return State.empty();
-        }
+        case HAVE_RENTED -> { return State.empty(); }
         case RENTING_FLOATING, RENTING_FROM_STATION -> {
           if (!hasCompatibleNetworks(network, s0.getVehicleRentalNetwork())) {
             return State.empty();
@@ -201,10 +196,10 @@ public class VehicleRentalEdge extends Edge {
       State rentingState = s1.makeState();
       if (
         rentingState != null &&
-        GeofencingBoundaryExtension.hasNoTraversalEntry(
-          stationVertex.listGeofencingBoundaries(),
-          rentingState.getVehicleRentalNetwork()
-        )
+          GeofencingBoundaryExtension.hasNoTraversalEntry(
+            stationVertex.listGeofencingBoundaries(),
+            rentingState.getVehicleRentalNetwork()
+          )
       ) {
         StateEditor dropEditor = s0.edit(this);
         dropEditor.beginFloatingVehicleRenting(
@@ -234,12 +229,10 @@ public class VehicleRentalEdge extends Edge {
     if (s0.getRequest().rentalPeriod() != null && place.isCarStation()) {
       var vehicleRentalVehicle = (VehicleRentalVehicle) place;
       var availableUntil = vehicleRentalVehicle.availableUntil();
-      return availableUntil
-        .map(instant -> {
-          Instant rentalEndTime = s0.getRequest().rentalPeriod().end();
-          return !instant.isBefore(rentalEndTime);
-        })
-        .orElse(true);
+      return availableUntil.map(instant -> {
+        Instant rentalEndTime = s0.getRequest().rentalPeriod().end();
+        return !instant.isBefore(rentalEndTime);
+      }).orElse(true);
     }
     return true;
   }
@@ -270,9 +263,8 @@ public class VehicleRentalEdge extends Edge {
   }
 
   /**
-   * Extract the propulsion type from the rental place.
-   * For floating vehicles, this comes from the vehicle type.
-   * For stations, we use the propulsion type of the first matching vehicle type,
+   * Extract the propulsion type from the rental place. For floating vehicles, this comes from the
+   * vehicle type. For stations, we use the propulsion type of the first matching vehicle type,
    * defaulting to HUMAN if none is specified.
    */
   private PropulsionType getPropulsionType(VehicleRentalPlace place) {
@@ -282,8 +274,7 @@ public class VehicleRentalEdge extends Edge {
     }
     if (place instanceof VehicleRentalStation station) {
       // For stations, find a matching vehicle type for this form factor
-      return station
-        .vehicleTypesAvailable()
+      return station.vehicleTypesAvailable()
         .keySet()
         .stream()
         .filter(vt -> vt.formFactor() == formFactor)

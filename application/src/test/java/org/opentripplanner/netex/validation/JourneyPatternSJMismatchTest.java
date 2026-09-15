@@ -19,15 +19,13 @@ class JourneyPatternSJMismatchTest {
 
   @Test
   void patternAndJourneyMatch() {
-    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID)
-      .withPointsInSequence(1, 2, 3)
+    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID).withPointsInSequence(1, 2, 3)
       .build();
 
     var index = new NetexEntityIndex();
     index.journeyPatternsById.add(pattern);
 
-    var journey = new ServiceJourneyBuilder(JOURNEY_ID)
-      .withPatternId(PATTERN_ID)
+    var journey = new ServiceJourneyBuilder(JOURNEY_ID).withPatternId(PATTERN_ID)
       .withPassingTimes(pattern.getPointsInSequence())
       .build();
 
@@ -39,15 +37,13 @@ class JourneyPatternSJMismatchTest {
 
   @Test
   void differentNumberOfPassingTimes() {
-    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID)
-      .withPointsInSequence(1, 2, 3)
+    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID).withPointsInSequence(1, 2, 3)
       .build();
 
     var index = new NetexEntityIndex();
     index.journeyPatternsById.add(pattern);
 
-    var journey = new ServiceJourneyBuilder(JOURNEY_ID)
-      .withPatternId(PATTERN_ID)
+    var journey = new ServiceJourneyBuilder(JOURNEY_ID).withPatternId(PATTERN_ID)
       .withPassingTimes(List.of("P-1", "P-2"))
       .build();
 
@@ -59,8 +55,7 @@ class JourneyPatternSJMismatchTest {
 
   @Test
   void passThrough() {
-    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID)
-      .addStopPointInSequence(1, ACCESS)
+    var pattern = new ServiceJourneyPatternBuilder(PATTERN_ID).addStopPointInSequence(1, ACCESS)
       .addStopPointInSequence(2, PASSTHROUGH)
       .addStopPointInSequence(3, ACCESS)
       .build();
@@ -68,8 +63,7 @@ class JourneyPatternSJMismatchTest {
     var index = new NetexEntityIndex();
     index.journeyPatternsById.add(pattern);
 
-    var journey = new ServiceJourneyBuilder(JOURNEY_ID)
-      .withPatternId(PATTERN_ID)
+    var journey = new ServiceJourneyBuilder(JOURNEY_ID).withPatternId(PATTERN_ID)
       .withPassingTimes(List.of("P-1", "P-3"))
       .build();
 

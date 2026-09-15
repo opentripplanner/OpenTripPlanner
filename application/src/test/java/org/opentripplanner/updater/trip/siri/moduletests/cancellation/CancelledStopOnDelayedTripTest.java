@@ -14,10 +14,10 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 /**
  * Tests that a cancelled stop on a delayed trip gets correct real-time times applied.
  * <p>
- * When a stop is cancelled on a delayed trip, the real-time times from the SIRI message must still
- * be applied to avoid NEGATIVE_HOP_TIME errors. Otherwise, the cancelled stop retains
- * scheduled times while surrounding stops have delayed times, causing the previous stop's
- * departure to exceed the cancelled stop's arrival.
+ * When a stop is cancelled on a delayed trip, the real-time times from the SIRI message must
+ * still be applied to avoid NEGATIVE_HOP_TIME errors. Otherwise, the cancelled stop retains
+ * scheduled times while surrounding stops have delayed times, causing the previous stop's departure
+ * to exceed the cancelled stop's arrival.
  */
 class CancelledStopOnDelayedTripTest implements RealtimeTestConstants {
 
@@ -41,12 +41,10 @@ class CancelledStopOnDelayedTripTest implements RealtimeTestConstants {
 
     // Trip is delayed ~5 minutes. Stop C is cancelled but has expected times in the message.
     // Without applying the RT times, C would retain scheduled arrival 0:06 while B departs at 0:09 -> NEGATIVE_HOP_TIME
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .arriveAimedExpected("00:02:00", "00:02:00")
           .departAimedExpected("00:02:00", "00:07:00")
           .call(STOP_B)

@@ -24,56 +24,56 @@ public final class StopTimeUpdate {
   }
 
   public Optional<PickDrop> pickup() {
-    return stopTimeProperties()
-      .flatMap(p ->
-        p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
-      )
-      .or(() ->
-        stopTimePropertiesExtension().flatMap(p ->
-          p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
+    return stopTimeProperties().flatMap(
+      p -> p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
+    )
+      .or(
+        () -> stopTimePropertiesExtension().flatMap(
+          p -> p.hasPickupType() ? Optional.of(p.getPickupType().getNumber()) : Optional.empty()
         )
       )
       .map(PickDropMapper::map);
   }
 
   public Optional<PickDrop> dropoff() {
-    return stopTimeProperties()
-      .flatMap(p ->
-        p.hasDropOffType() ? Optional.of(p.getDropOffType().getNumber()) : Optional.empty()
-      )
-      .or(() ->
-        stopTimePropertiesExtension().flatMap(p ->
-          p.hasDropoffType() ? Optional.of(p.getDropoffType().getNumber()) : Optional.empty()
+    return stopTimeProperties().flatMap(
+      p -> p.hasDropOffType() ? Optional.of(p.getDropOffType().getNumber()) : Optional.empty()
+    )
+      .or(
+        () -> stopTimePropertiesExtension().flatMap(
+          p -> p.hasDropoffType() ? Optional.of(p.getDropoffType().getNumber()) : Optional.empty()
         )
       )
       .map(PickDropMapper::map);
   }
 
   /**
-   * @return the effective pickup type even if it is not explicitly specified, for the use in NEW trips.
+   * @return the effective pickup type even if it is not explicitly specified, for the use in NEW
+   *         trips.
    */
   public PickDrop effectivePickup() {
     return getEffectivePickDrop(
-      stopTimeProperties()
-        .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
-        .orElse(null),
-      stopTimePropertiesExtension()
-        .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
-        .orElse(null)
+      stopTimeProperties().map(
+        properties -> properties.hasPickupType() ? properties.getPickupType() : null
+      ).orElse(null),
+      stopTimePropertiesExtension().map(
+        properties -> properties.hasPickupType() ? properties.getPickupType() : null
+      ).orElse(null)
     );
   }
 
   /**
-   * @return the effective dropoff type even if it is not explicitly specified, for the use in NEW trips.
+   * @return the effective dropoff type even if it is not explicitly specified, for the use in NEW
+   *         trips.
    */
   public PickDrop effectiveDropoff() {
     return getEffectivePickDrop(
-      stopTimeProperties()
-        .map(properties -> properties.hasDropOffType() ? properties.getDropOffType() : null)
-        .orElse(null),
-      stopTimePropertiesExtension()
-        .map(properties -> properties.hasDropoffType() ? properties.getDropoffType() : null)
-        .orElse(null)
+      stopTimeProperties().map(
+        properties -> properties.hasDropOffType() ? properties.getDropOffType() : null
+      ).orElse(null),
+      stopTimePropertiesExtension().map(
+        properties -> properties.hasDropoffType() ? properties.getDropoffType() : null
+      ).orElse(null)
     );
   }
 
@@ -118,36 +118,30 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * Check if the arrival for a SCHEDULED trip update is valid.
-   * If it is provided, it must either contain a time or delay.
-   * This check does not apply to a NEW trip update where it is possible to provide only a scheduled time.
+   * Check if the arrival for a SCHEDULED trip update is valid. If it is provided, it must either
+   * contain a time or delay. This check does not apply to a NEW trip update where it is possible to
+   * provide only a scheduled time.
    */
   public boolean isArrivalValid() {
-    return (
-      !stopTimeUpdate.hasArrival() ||
+    return (!stopTimeUpdate.hasArrival() ||
       stopTimeUpdate.getArrival().hasTime() ||
-      stopTimeUpdate.getArrival().hasDelay()
-    );
+      stopTimeUpdate.getArrival().hasDelay());
   }
 
   /**
-   * Check if the departure for a SCHEDULED trip update is valid.
-   * If it is provided, it must either contain a time or delay.
-   * This check does not apply to a NEW trip update where it is possible to provide only a scheduled time.
+   * Check if the departure for a SCHEDULED trip update is valid. If it is provided, it must either
+   * contain a time or delay. This check does not apply to a NEW trip update where it is possible to
+   * provide only a scheduled time.
    */
   public boolean isDepartureValid() {
-    return (
-      !stopTimeUpdate.hasDeparture() ||
+    return (!stopTimeUpdate.hasDeparture() ||
       stopTimeUpdate.getDeparture().hasTime() ||
-      stopTimeUpdate.getDeparture().hasDelay()
-    );
+      stopTimeUpdate.getDeparture().hasDelay());
   }
 
   public boolean isSkipped() {
-    return (
-      stopTimeUpdate.getScheduleRelationship() ==
-      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
-    );
+    return (stopTimeUpdate.getScheduleRelationship() ==
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED);
   }
 
   public OptionalInt stopSequence() {
@@ -163,13 +157,13 @@ public final class StopTimeUpdate {
   public Optional<I18NString> stopHeadsign() {
     return stopTimeUpdate.hasStopTimeProperties() &&
       stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
-      ? Optional.of(I18NString.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign()))
-      : Optional.empty();
+        ? Optional.of(I18NString.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign()))
+        : Optional.empty();
   }
 
   public Optional<String> assignedStopId() {
-    return stopTimeProperties().flatMap(p ->
-      p.hasAssignedStopId() ? Optional.of(p.getAssignedStopId()) : Optional.empty()
+    return stopTimeProperties().flatMap(
+      p -> p.hasAssignedStopId() ? Optional.of(p.getAssignedStopId()) : Optional.empty()
     );
   }
 
@@ -199,10 +193,10 @@ public final class StopTimeUpdate {
   }
 
   private Optional<MfdzRealtimeExtensions.StopTimePropertiesExtension> stopTimePropertiesExtension() {
-    return stopTimeProperties().map(stopTimeProperties ->
-      stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
-        ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)
-        : null
+    return stopTimeProperties().map(
+      stopTimeProperties -> stopTimeProperties.hasExtension(
+        MfdzRealtimeExtensions.stopTimeProperties
+      ) ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties) : null
     );
   }
 
@@ -213,23 +207,21 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * Get the scheduled time of a StopTimeEvent.
-   * If it is not specified, calculate it from time - delay.
+   * Get the scheduled time of a StopTimeEvent. If it is not specified, calculate it from time -
+   * delay.
    */
   private OptionalLong getScheduledTimeWithRealTimeFallback(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasScheduledTime()
       ? OptionalLong.of(stopTimeEvent.getScheduledTime())
-      : getTime(stopTimeEvent)
-          .stream()
-          .map(time -> time - getDelay(stopTimeEvent).orElse(0))
-          .findFirst();
+      : getTime(stopTimeEvent).stream()
+        .map(time -> time - getDelay(stopTimeEvent).orElse(0))
+        .findFirst();
   }
 
   private OptionalInt getDelay(StopTimeEvent stopTimeEvent) {
-    return stopTimeEvent.hasDelay()
-      ? OptionalInt.of(stopTimeEvent.getDelay())
+    return stopTimeEvent.hasDelay() ? OptionalInt.of(stopTimeEvent.getDelay())
       : stopTimeEvent.hasTime() && stopTimeEvent.hasScheduledTime()
         ? OptionalInt.of((int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime()))
-        : OptionalInt.empty();
+      : OptionalInt.empty();
   }
 }

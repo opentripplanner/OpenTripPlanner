@@ -8,14 +8,12 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class TriasApiConfig {
 
   public static TriasApiParameters mapParameters(String parameterName, NodeAdapter root) {
-    var c = root
-      .of(parameterName)
+    var c = root.of(parameterName)
       .since(V2_8)
       .summary("Configuration for the TRIAS API.")
       .asObject();
 
-    var hideFeedId = c
-      .of("hideFeedId")
+    var hideFeedId = c.of("hideFeedId")
       .since(V2_8)
       .summary("Hide the feed id in all API output, and add it to input ids.")
       .description(
@@ -23,8 +21,7 @@ public class TriasApiConfig {
           "feedId prefix."
       )
       .asBoolean(false);
-    var hardcodedInputFeedId = c
-      .of("hardcodedInputFeedId")
+    var hardcodedInputFeedId = c.of("hardcodedInputFeedId")
       .since(V2_8)
       .summary("The hardcoded feedId to add to all input ids.")
       .description(
@@ -32,8 +29,7 @@ public class TriasApiConfig {
           "feedId prefix _and_ `hideFeedId` is set to `true`.`"
       )
       .asString(null);
-    var timeZone = c
-      .of("timeZone")
+    var timeZone = c.of("timeZone")
       .since(V2_8)
       .summary("If you don't want to use the feed's timezone, configure it here.")
       .description(

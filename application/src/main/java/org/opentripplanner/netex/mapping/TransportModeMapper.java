@@ -32,7 +32,8 @@ class TransportModeMapper {
   public NetexMainAndSubMode map(
     AllVehicleModesOfTransportEnumeration netexMode,
     TransportSubmodeStructure submode
-  ) throws UnsupportedModeException {
+  )
+    throws UnsupportedModeException {
     if (submode == null) {
       return new NetexMainAndSubMode(mapAllVehicleModesOfTransport(netexMode));
     } else {
@@ -62,10 +63,9 @@ class TransportModeMapper {
   }
 
   /**
-   * Use submode to determine if a trip/ServiceJourney is allowed for car or not. There are
-   * probably other ways to specify this in NeTEx. The list of included submodes
-   * {@link #CARS_ALLOWED_WATER_SUBMODES} are not complete, feel free to request
-   * changes.
+   * Use submode to determine if a trip/ServiceJourney is allowed for car or not. There are probably
+   * other ways to specify this in NeTEx. The list of included submodes
+   * {@link #CARS_ALLOWED_WATER_SUBMODES} are not complete, feel free to request changes.
    */
   public CarAccess mapCarsAllowed(@Nullable TransportSubmodeStructure submode) {
     if (submode == null || submode.getWaterSubmode() == null) {

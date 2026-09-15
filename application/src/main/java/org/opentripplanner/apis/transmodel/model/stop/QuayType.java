@@ -89,8 +89,8 @@ public class QuayType {
               .type(Scalars.GraphQLString)
               .build()
           )
-          .dataFetcher(env ->
-            ((StopLocation) env.getSource()).getName().toString(GqlUtil.getLocale(env))
+          .dataFetcher(
+            env -> ((StopLocation) env.getSource()).getName().toString(GqlUtil.getLocale(env))
           )
           .build()
       )
@@ -112,8 +112,11 @@ public class QuayType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(env ->
-            GraphQLUtils.getTranslation(((StopLocation) env.getSource()).getDescription(), env)
+          .dataFetcher(
+            env -> GraphQLUtils.getTranslation(
+              ((StopLocation) env.getSource()).getDescription(),
+              env
+            )
           )
           .build()
       )
@@ -140,8 +143,8 @@ public class QuayType {
           .name("wheelchairAccessible")
           .type(EnumTypes.WHEELCHAIR_BOARDING)
           .description("Whether this quay is suitable for wheelchair boarding.")
-          .dataFetcher(env ->
-            Objects.requireNonNullElse(
+          .dataFetcher(
+            env -> Objects.requireNonNullElse(
               ((StopLocation) env.getSource()).getWheelchairAccessibility(),
               Accessibility.NO_INFORMATION
             )
@@ -152,8 +155,9 @@ public class QuayType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("timeZone")
           .type(Scalars.GraphQLString)
-          .dataFetcher(env ->
-            Optional.ofNullable(((StopLocation) env.getSource()).getTimeZone()).map(ZoneId::getId)
+          .dataFetcher(
+            env -> Optional.ofNullable(((StopLocation) env.getSource()).getTimeZone())
+              .map(ZoneId::getId)
           )
           .build()
       )
@@ -173,8 +177,8 @@ public class QuayType {
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of lines servicing this quay")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
-          .dataFetcher(env ->
-            GqlUtil.getTransitService(env)
+          .dataFetcher(
+            env -> GqlUtil.getTransitService(env)
               .findPatterns(env.getSource(), true)
               .stream()
               .map(TripPattern::getRoute)
@@ -305,8 +309,9 @@ public class QuayType {
             StopLocation stop = environment.getSource();
 
             Long startTimeInput = environment.getArgument("startTime");
-            Instant startTime =
-              startTimeInput != null ? Instant.ofEpochMilli(startTimeInput) : Instant.now();
+            Instant startTime = startTimeInput != null
+              ? Instant.ofEpochMilli(startTimeInput)
+              : Instant.now();
 
             List<Map<String, ?>> filtersInput = environment.getArgument("filters");
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);
@@ -333,16 +338,14 @@ public class QuayType {
               var mapper = new TripTimeOnDateFilterMapper(idMapper);
               requestBuilder.withTransitFilters(mapper.mapFilters(filtersInput));
             }
-            requestBuilder
-              .withIncludeAgencies(
-                whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
-              )
+            requestBuilder.withIncludeAgencies(
+              whiteListed.authorityIds.isEmpty() ? null : whiteListed.authorityIds
+            )
               .withIncludeRoutes(whiteListed.lineIds.isEmpty() ? null : whiteListed.lineIds)
               .withIncludeModes(transitModes);
 
-            var tripTimes = GqlUtil.getTransitService(environment).findTripTimesOnDate(
-              requestBuilder.build()
-            );
+            var tripTimes = GqlUtil.getTransitService(environment)
+              .findTripTimesOnDate(requestBuilder.build());
 
             return EstimatedCallHelper.limitPerLineAndDestinationDisplay(
               tripTimes,
@@ -367,8 +370,8 @@ public class QuayType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("stopType")
           .type(Scalars.GraphQLString)
-          .dataFetcher(env ->
-            StopTypeMapper.getStopType(((StopLocation) env.getSource()).getStopType())
+          .dataFetcher(
+            env -> StopTypeMapper.getStopType(((StopLocation) env.getSource()).getStopType())
           )
           .build()
       )
@@ -379,8 +382,7 @@ public class QuayType {
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
           .dataFetcher(env -> {
             StopLocation stopLocation = env.getSource();
-            return stopLocation
-              .getEncompassingAreaGeometry()
+            return stopLocation.getEncompassingAreaGeometry()
               .map(Geometry::getCoordinates)
               .orElse(null);
           })

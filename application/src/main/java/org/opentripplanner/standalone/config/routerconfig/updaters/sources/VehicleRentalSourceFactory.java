@@ -70,8 +70,7 @@ public class VehicleRentalSourceFactory {
   }
 
   private String network() {
-    return c
-      .of("network")
+    return c.of("network")
       .since(V1_5)
       .summary("The name of the network to override the one derived from the source data.")
       .description(
@@ -82,8 +81,7 @@ public class VehicleRentalSourceFactory {
   }
 
   private boolean allowKeepingRentedVehicleAtDestination() {
-    return c
-      .of("allowKeepingRentedVehicleAtDestination")
+    return c.of("allowKeepingRentedVehicleAtDestination")
       .since(V2_1)
       .summary("If a vehicle should be allowed to be kept at the end of a station-based rental.")
       .description(
@@ -102,22 +100,19 @@ public class VehicleRentalSourceFactory {
   }
 
   private boolean overloadingAllowed() {
-    return c
-      .of("overloadingAllowed")
+    return c.of("overloadingAllowed")
       .since(V2_2)
       .summary("Allow leaving vehicles at a station even though there are no free slots.")
       .asBoolean(false);
   }
 
   private GeofencingConfig geofencing() {
-    var g = c
-      .of("geofencing")
+    var g = c.of("geofencing")
       .since(V2_10)
       .summary("Configuration for GBFS geofencing-based rental restrictions.")
       .asObject();
 
-    boolean enabled = g
-      .of("enabled")
+    boolean enabled = g.of("enabled")
       .since(V2_10)
       .summary("Compute rental restrictions based on GBFS 2.2 geofencing zones.")
       .description(
@@ -130,8 +125,7 @@ public class VehicleRentalSourceFactory {
       )
       .asBoolean(false);
 
-    boolean businessAreaBorders = g
-      .of("businessAreaBorders")
+    boolean businessAreaBorders = g.of("businessAreaBorders")
       .since(V2_10)
       .summary(
         "Infer an operational area from permissive GBFS geofencing zones and enforce drop-off at its boundary."
@@ -151,8 +145,7 @@ public class VehicleRentalSourceFactory {
   }
 
   private Set<RentalPickupType> rentalPickupTypes() {
-    return c
-      .of("rentalPickupTypes")
+    return c.of("rentalPickupTypes")
       .since(V2_7)
       .summary(RentalPickupType.STATION.typeDescription())
       .description(docEnumValueList(RentalPickupType.values()))

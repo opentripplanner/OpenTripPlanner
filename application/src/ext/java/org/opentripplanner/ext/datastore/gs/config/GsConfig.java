@@ -15,14 +15,12 @@ public class GsConfig implements GsParameters {
   }
 
   public static GsConfig fromConfig(NodeAdapter root, String parameterName) {
-    NodeAdapter gsRoot = root
-      .of(parameterName)
+    NodeAdapter gsRoot = root.of(parameterName)
       .since(OtpVersion.V2_8)
       .summary("Configuration for Google Cloud Storage")
       .asObject();
 
-    String host = gsRoot
-      .of("cloudServiceHost")
+    String host = gsRoot.of("cloudServiceHost")
       .since(OtpVersion.V2_8)
       .summary("Host of the Google Cloud Storage Server")
       .description(
@@ -30,12 +28,12 @@ public class GsConfig implements GsParameters {
         Host of the Google Cloud Storage server. In case of a real GCS Bucket this parameter can be
         omitted. When the host differs from the usual GCS host, for example when emulating GCS in a
         docker container for testing purposes, the host has to be specified including the port.
-        Eg: http://localhost:4443"""
+        Eg: http://localhost:4443\
+        """
       )
       .asString(null);
 
-    String credentialFile = gsRoot
-      .of("credentialFile")
+    String credentialFile = gsRoot.of("credentialFile")
       .since(OtpVersion.V2_8)
       .summary("Local file system path to Google Cloud Platform service accounts credentials file.")
       .description(

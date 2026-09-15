@@ -19,11 +19,8 @@ class GbfsStationStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
   private static final Throttle LOG_THROTTLE = Throttle.ofOneMinute();
-  private static final Collector<
-    VehicleTypeCount,
-    ?,
-    Map<RentalVehicleType, Integer>
-  > TYPE_MAP_COLLECTOR = Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count);
+  private static final Collector<VehicleTypeCount, ?, Map<RentalVehicleType, Integer>> TYPE_MAP_COLLECTOR =
+    Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count);
 
   private final Map<String, GBFSStation> statusLookup;
   private final Map<String, RentalVehicleType> vehicleTypes;
@@ -44,24 +41,23 @@ class GbfsStationStatusMapper {
     }
     GBFSStation status = statusLookup.get(station.stationId());
 
-    int vehiclesAvailable =
-      status.getNumBikesAvailable() != null ? status.getNumBikesAvailable() : 0;
+    int vehiclesAvailable = status.getNumBikesAvailable() != null
+      ? status.getNumBikesAvailable()
+      : 0;
 
-    Map<RentalVehicleType, Integer> vehicleTypesAvailable =
-      status.getVehicleTypesAvailable() != null
-        ? status
-            .getVehicleTypesAvailable()
-            .stream()
-            .filter(e -> containsVehicleType(e, status, station.network()))
-            .collect(
-              Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount())
-            )
+    Map<RentalVehicleType, Integer> vehicleTypesAvailable = status.getVehicleTypesAvailable() !=
+      null
+        ? status.getVehicleTypesAvailable()
+          .stream()
+          .filter(e -> containsVehicleType(e, status, station.network()))
+          .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
         : Map.of(RentalVehicleType.getDefaultType(station.network()), vehiclesAvailable);
 
     int vehiclesDisabled = status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;
 
-    int spacesAvailable =
-      status.getNumDocksAvailable() != null ? status.getNumDocksAvailable() : Integer.MAX_VALUE;
+    int spacesAvailable = status.getNumDocksAvailable() != null
+      ? status.getNumDocksAvailable()
+      : Integer.MAX_VALUE;
 
     var vehicleSpacesAvailable = vehicleSpaces(status);
 
@@ -70,8 +66,7 @@ class GbfsStationStatusMapper {
     boolean isRenting = toBoolean(status.getIsRenting());
     boolean isReturning = toBoolean(status.getIsReturning());
 
-    return station
-      .copyOf()
+    return station.copyOf()
       .withVehiclesAvailable(vehiclesAvailable)
       .withVehicleTypesAvailable(vehicleTypesAvailable)
       .withVehiclesDisabled(vehiclesDisabled)
@@ -90,14 +85,12 @@ class GbfsStationStatusMapper {
   private Map<RentalVehicleType, Integer> vehicleSpaces(GBFSStation status) {
     var docksAvailable = status.getVehicleDocksAvailable();
     if (docksAvailable != null) {
-      return docksAvailable
-        .stream()
-        .flatMap(available ->
-          available
-            .getVehicleTypeIds()
+      return docksAvailable.stream()
+        .flatMap(
+          available -> available.getVehicleTypeIds()
             .stream()
-            .filter(t ->
-              vehicleTypeFilter.filterUnknownVehicleType(
+            .filter(
+              t -> vehicleTypeFilter.filterUnknownVehicleType(
                 t,
                 status.getStationId(),
                 "vehicle_docks_available"
@@ -130,8 +123,8 @@ class GbfsStationStatusMapper {
   ) {
     boolean containsKey = vehicleTypes.containsKey(vehicleTypesAvailable.getVehicleTypeId());
     if (!containsKey) {
-      LOG_THROTTLE.throttle(() ->
-        LOG.info(
+      LOG_THROTTLE.throttle(
+        () -> LOG.info(
           "Unexpected vehicle type ID {} in status for GBFS station {} in network {}. {}",
           vehicleTypesAvailable.getVehicleTypeId(),
           station.getStationId(),

@@ -86,8 +86,7 @@ public final class NetexTestDataSupport {
    * empty {@code PropertyOfDay} - which states no days of the week at all.
    */
   public static DayType createDayTypeWithProperties(String id, PropertyOfDay... properties) {
-    return new DayType()
-      .withId(id)
+    return new DayType().withId(id)
       .withProperties(new PropertiesOfDay_RelStructure().withPropertyOfDay(properties));
   }
 
@@ -104,9 +103,9 @@ public final class NetexTestDataSupport {
   }
 
   public static DayTypeAssignment createDayTypeAssignment(String dayTypeId, Boolean isAvailable) {
-    return new DayTypeAssignment()
-      .withDayTypeRef(jaxbElement(createDayTypeRef(dayTypeId), DayTypeRefStructure.class))
-      .withIsAvailable(isAvailable);
+    return new DayTypeAssignment().withDayTypeRef(
+      jaxbElement(createDayTypeRef(dayTypeId), DayTypeRefStructure.class)
+    ).withIsAvailable(isAvailable);
   }
 
   public static DayTypeAssignment createDayTypeAssignment(
@@ -144,8 +143,7 @@ public final class NetexTestDataSupport {
     LocalDate fromDate,
     LocalDate toDate
   ) {
-    return new OperatingPeriod()
-      .withId(id)
+    return new OperatingPeriod().withId(id)
       .withFromDate(createLocalDateTime(fromDate))
       .withToDate(createLocalDateTime(toDate));
   }
@@ -155,8 +153,7 @@ public final class NetexTestDataSupport {
     String fromOperatingDayId,
     String toOperatingDayId
   ) {
-    return new OperatingPeriod()
-      .withId(id)
+    return new OperatingPeriod().withId(id)
       .withFromOperatingDayRef(operatingDayRef(fromOperatingDayId))
       .withToOperatingDayRef(operatingDayRef(toOperatingDayId));
   }
@@ -167,8 +164,7 @@ public final class NetexTestDataSupport {
     LocalDate toDate,
     String validDayBits
   ) {
-    return new UicOperatingPeriod()
-      .withId(id)
+    return new UicOperatingPeriod().withId(id)
       .withFromDate(createLocalDateTime(fromDate))
       .withToDate(createLocalDateTime(toDate))
       .withValidDayBits(validDayBits);
@@ -191,8 +187,7 @@ public final class NetexTestDataSupport {
   ) {
     var sjRef = jaxbElement(journeyRef(sjId), JourneyRefStructure.class);
     var odRef = new OperatingDayRefStructure().withRef(opDayId);
-    return new DatedServiceJourney()
-      .withId(id)
+    return new DatedServiceJourney().withId(id)
       .withJourneyRef(sjRef)
       .withOperatingDayRef(odRef)
       .withServiceAlteration(alt);
@@ -215,8 +210,7 @@ public final class NetexTestDataSupport {
     AllVehicleModesOfTransportEnumeration transportMode,
     Quay quay
   ) {
-    StopPlace stopPlace = new StopPlace()
-      .withName(createMLString(name))
+    StopPlace stopPlace = new StopPlace().withName(createMLString(name))
       .withVersion(version)
       .withId(id)
       .withCentroid(createSimplePoint(lat, lon))
@@ -224,9 +218,8 @@ public final class NetexTestDataSupport {
 
     if (quay != null) {
       Collection<JAXBElement<?>> jaxbQuays = List.of(OBJECT_FACTORY.createQuay(quay));
-      Quays_RelStructure quays = OBJECT_FACTORY.createQuays_RelStructure().withQuayRefOrQuay(
-        jaxbQuays
-      );
+      Quays_RelStructure quays = OBJECT_FACTORY.createQuays_RelStructure()
+        .withQuayRefOrQuay(jaxbQuays);
       stopPlace.withQuays(quays);
     }
 
@@ -268,8 +261,7 @@ public final class NetexTestDataSupport {
     Double lon,
     String platformCode
   ) {
-    return new Quay()
-      .withName(createMLString(name))
+    return new Quay().withName(createMLString(name))
       .withId(id)
       .withVersion(version)
       .withPublicCode(platformCode)

@@ -68,9 +68,7 @@ class ModifiedTripBuilderTest {
   private static final TripPattern PATTERN = TransitRepositoryForTest.tripPattern(
     "PATTERN_ID",
     ROUTE
-  )
-    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
-    .build();
+  ).withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1)).build();
 
   private static final FeedScopedId SERVICE_ID = id("CAL_1");
 
@@ -443,8 +441,9 @@ class ModifiedTripBuilderTest {
   void testCreateStopPatternDifferentStationCall() {
     // Stop on non-pattern stop, without parent station should be rejected
 
-    assertFailure(UpdateErrorType.STOP_MISMATCH, () ->
-      ModifiedTripBuilder.createStopPattern(
+    assertFailure(
+      UpdateErrorType.STOP_MISMATCH,
+      () -> ModifiedTripBuilder.createStopPattern(
         PATTERN,
         List.of(
           TestCall.of().withStopPointRef(STOP_A_1.getId().getId()).build(),

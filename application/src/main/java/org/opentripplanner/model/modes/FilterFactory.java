@@ -13,9 +13,9 @@ import org.opentripplanner.transit.model.basic.ReplacementRequirement;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
- * This utility merges a set of MainMode and MainAndSubMode Filters into a more optimized
- * set of filters using an EnumSet for MainModes and BitSet for subModes. For further
- * details on the implementation see the comments in the code.
+ * This utility merges a set of MainMode and MainAndSubMode Filters into a more optimized set of
+ * filters using an EnumSet for MainModes and BitSet for subModes. For further details on the
+ * implementation see the comments in the code.
  */
 class FilterFactory {
 
@@ -53,8 +53,7 @@ class FilterFactory {
       return filters.get(0);
     }
 
-    Map<Class<?>, List<AllowTransitModeFilter>> map = filters
-      .stream()
+    Map<Class<?>, List<AllowTransitModeFilter>> map = filters.stream()
       .collect(Collectors.groupingBy(Object::getClass));
 
     if (map.containsKey(AllowAllModesFilter.class)) {

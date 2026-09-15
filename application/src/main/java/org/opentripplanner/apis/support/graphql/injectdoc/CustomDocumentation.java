@@ -12,8 +12,8 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.utils.text.TextVariablesSubstitution;
 
 /**
- * Load custom documentation from a properties file and make it available to any
- * consumer using the {@code type-name[.field-name]} as key for lookups.
+ * Load custom documentation from a properties file and make it available to any consumer using the
+ * {@code type-name[.field-name]} as key for lookups.
  */
 public class CustomDocumentation {
 
@@ -50,17 +50,15 @@ public class CustomDocumentation {
   }
 
   /**
-   * Get documentation for a type. The given {@code typeName} is used as the key. The
-   * documentation text is resolved by:
+   * Get documentation for a type. The given {@code typeName} is used as the key. The documentation
+   * text is resolved by:
    * <ol>
-   *   <li>
-   *     first looking up the given {@code key} + {@code ".description"}. If a value is found, then
-   *     the value is returned.
-   *   <li>
-   *     then {@code key} + {@code ".description.append"} is used. If a value is found the
-   *     {@code originalDoc} + {@code value} is returned.
-   *   </li>
+   *   <li>first looking up the given {@code key} + {@code ".description"}. If a value is found, then
+   *       the value is returned.
+   *   <li>then {@code key} + {@code ".description.append"} is used. If a value is found the
+   *       {@code originalDoc} + {@code value} is returned.</li>
    * </ol>
+   *
    * @param typeName Use {@code TYPE_NAME} or {@code TYPE_NAME.FIELD_NAME} as key.
    */
   public Optional<String> typeDescription(String typeName, @Nullable String originalDoc) {
@@ -87,13 +85,10 @@ public class CustomDocumentation {
    * ({@code key = typeName + '.' + fieldName} is used to retrieve the reason from the properties
    * file. The deprecated documentation text is resolved by:
    * <ol>
-   *   <li>
-   *     first looking up the given {@code key} + {@code ".deprecated"}. If a value is found, then
-   *     the value is returned.
-   *   <li>
-   *     then {@code key} + {@code ".deprecated.append"} is used. If a value is found the
-   *     {@code originalDoc} + {@code text} is returned.
-   *   </li>
+   *   <li>first looking up the given {@code key} + {@code ".deprecated"}. If a value is found, then
+   *       the value is returned.
+   *   <li>then {@code key} + {@code ".deprecated.append"} is used. If a value is found the
+   *       {@code originalDoc} + {@code text} is returned.</li>
    * </ol>
    * Any {@code null} values are excluded from the result and if both the input {@code originalDoc}
    * and the resolved value is {@code null}, then {@code empty} is returned.
@@ -154,8 +149,9 @@ public class CustomDocumentation {
         }
         map.put(key, value);
       }
-      return TextVariablesSubstitution.insertVariables(map, varName ->
-        errorHandlerVariableSubstitution(varName, resource)
+      return TextVariablesSubstitution.insertVariables(
+        map,
+        varName -> errorHandlerVariableSubstitution(varName, resource)
       );
     } catch (IOException e) {
       throw new RuntimeException(e);

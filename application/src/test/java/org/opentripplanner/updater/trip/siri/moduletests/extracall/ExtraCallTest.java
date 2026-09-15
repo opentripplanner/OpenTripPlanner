@@ -98,10 +98,10 @@ class ExtraCallTest implements RealtimeTestConstants {
   }
 
   /**
-   * Add an extra call (A → D(extra) → B), then send a second update with the same extra call
-   * but different times. Unlike {@link #testExtraCallMultipleTimes()} which replays an identical
-   * message, this test verifies that updated times are actually applied while preserving the
-   * extra call and the stop pattern.
+   * Add an extra call (A → D(extra) → B), then send a second update with the same extra call but
+   * different times. Unlike {@link #testExtraCallMultipleTimes()} which replays an identical
+   * message, this test verifies that updated times are actually applied while preserving the extra
+   * call and the stop pattern.
    */
   @Test
   void testExtraCallThenUpdateTimesKeepsExtraCall() {
@@ -119,14 +119,12 @@ class ExtraCallTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:route-id::001:RT[P U]");
 
     // Step 2: Send update with same extra call but different times
-    var updatedTimes = siri
-      .etBuilder()
+    var updatedTimes = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withLineRef(ROUTE_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:16"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_D)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_D)
           .withIsExtraCall(true)
           .arriveAimedExpected("00:00:18", "00:00:22")
           .departAimedExpected("00:00:19", "00:00:27")
@@ -149,8 +147,8 @@ class ExtraCallTest implements RealtimeTestConstants {
   }
 
   /**
-   * Add an extra call (A → D(extra) → B), then send a regular update without the extra call
-   * (A → B with updated times). The trip should revert to the scheduled pattern.
+   * Add an extra call (A → D(extra) → B), then send a regular update without the extra call (A → B
+   * with updated times). The trip should revert to the scheduled pattern.
    */
   @Test
   void testExtraCallThenRevertToOriginalStops() {
@@ -168,12 +166,11 @@ class ExtraCallTest implements RealtimeTestConstants {
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:route-id::001:RT[P U]");
 
     // Step 2: Send regular update without extra call — just A → B with updated times
-    var revert = siri
-      .etBuilder()
+    var revert = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:16"))
-      .withEstimatedCalls(builder ->
-        builder.call(STOP_B).arriveAimedExpected("00:00:20", "00:00:30")
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_B).arriveAimedExpected("00:00:20", "00:00:30")
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -193,12 +190,10 @@ class ExtraCallTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // Unexpected extra stop without isExtraCall flag
           .call(STOP_D)
@@ -219,12 +214,10 @@ class ExtraCallTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // Unexpected ExtraCall flag on a scheduled stop
           .call(STOP_B)
@@ -243,12 +236,10 @@ class ExtraCallTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_D)
           .withIsExtraCall(true)
@@ -270,8 +261,7 @@ class ExtraCallTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = builderWithExtraCall(siri)
-      .withVehicleRef("BUS-42")
+    var updates = builderWithExtraCall(siri).withVehicleRef("BUS-42")
       .buildEstimatedTimetableDeliveries();
     assertSuccess(siri.applyEstimatedTimetable(updates));
 
@@ -307,14 +297,12 @@ class ExtraCallTest implements RealtimeTestConstants {
   }
 
   private SiriEtBuilder builderWithExtraCall(SiriTestHelper siri) {
-    return siri
-      .etBuilder()
+    return siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withLineRef(ROUTE_ID)
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_D)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_D)
           .withIsExtraCall(true)
           .arriveAimedExpected("00:00:18", "00:00:20")
           .departAimedExpected("00:00:19", "00:00:25")

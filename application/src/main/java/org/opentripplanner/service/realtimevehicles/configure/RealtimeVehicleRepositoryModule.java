@@ -16,10 +16,9 @@ public abstract class RealtimeVehicleRepositoryModule {
 
   @Provides
   @Singleton
-  public static RepositoryHandle<
-    RealtimeVehicleRepositorySnapshot,
-    RealtimeVehicleRepository
-  > realtimeVehicleRepositoryHandle(@TransitDomain RepositoryRegistry repositoryRegistry) {
+  public static RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle(
+    @TransitDomain RepositoryRegistry repositoryRegistry
+  ) {
     return repositoryRegistry.registerRepository(
       new DefaultRealtimeVehicleRepository(),
       new RealtimeVehicleRepositoryLifecycle()

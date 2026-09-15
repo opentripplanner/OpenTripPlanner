@@ -63,9 +63,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     var oneDollar = Money.usDollars(1.0f);
     FareAttribute oneDollarFareAttribute = FareAttribute.of(
       new FeedScopedId(FEED_ID, "oneDollarAttribute")
-    )
-      .withPrice(oneDollar)
-      .build();
+    ).withPrice(oneDollar).build();
     FareRuleSet oneDollarRouteBasedFares = new FareRuleSet(oneDollarFareAttribute);
     oneDollarRouteBasedFares.addRoute(routeA.getId());
     oneDollarRouteBasedFares.addRoute(routeB.getId());
@@ -75,9 +73,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     var twoDollars = Money.usDollars(2.0f);
     FareAttribute twoDollarFareAttribute = FareAttribute.of(
       new FeedScopedId(FEED_ID, "twoDollarAttribute")
-    )
-      .withPrice(twoDollars)
-      .build();
+    ).withPrice(twoDollars).build();
 
     FareRuleSet twoDollarRouteBasedFares = new FareRuleSet(twoDollarFareAttribute);
     twoDollarRouteBasedFares.addRoute(routeC.getId());
@@ -90,8 +86,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     );
 
     // a single transit leg should calculate default fare
-    Itinerary singleTransitLegPath = newItinerary(A, T11_06)
-      .bus(routeA, 1, T11_06, T11_12, B)
+    Itinerary singleTransitLegPath = newItinerary(A, T11_06).bus(routeA, 1, T11_06, T11_12, B)
       .build();
 
     args.add(
@@ -99,8 +94,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     );
 
     // a two transit leg itinerary with same route costs within free-transfer window should calculate default fare
-    Itinerary twoTransitLegPath = newItinerary(A, 30)
-      .bus(routeA, 1, 30, 60, B)
+    Itinerary twoTransitLegPath = newItinerary(A, 30).bus(routeA, 1, 30, 60, B)
       .bus(routeB, 2, 90, 120, C)
       .build();
 
@@ -115,10 +109,13 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // a two transit leg itinerary where the first route costs more than the second route, but both are within
     // the free transfer window should calculate the first route cost
-    Itinerary twoTransitLegFirstRouteCostsTwoDollarsPath = newItinerary(A, 30)
-      .bus(routeC, 1, 30, 60, B)
-      .bus(routeB, 2, 90, 120, C)
-      .build();
+    Itinerary twoTransitLegFirstRouteCostsTwoDollarsPath = newItinerary(A, 30).bus(
+      routeC,
+      1,
+      30,
+      60,
+      B
+    ).bus(routeB, 2, 90, 120, C).build();
 
     args.add(
       Arguments.of(
@@ -131,10 +128,13 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // a two transit leg itinerary where the second route costs more than the first route, but both are within
     // the free transfer window should calculate the second route cost
-    Itinerary twoTransitLegSecondRouteCostsTwoDollarsPath = newItinerary(A, 30)
-      .bus(routeB, 1, 30, 60, B)
-      .bus(routeC, 2, 90, 120, C)
-      .build();
+    Itinerary twoTransitLegSecondRouteCostsTwoDollarsPath = newItinerary(A, 30).bus(
+      routeB,
+      1,
+      30,
+      60,
+      B
+    ).bus(routeC, 2, 90, 120, C).build();
     args.add(
       Arguments.of(
         "Two transit legs in free transfer window, second leg more expensive",
@@ -146,10 +146,13 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // a two transit leg itinerary with same route costs but where the second leg begins after the free transfer
     // window should calculate double the default fare
-    Itinerary twoTransitLegSecondRouteHappensAfterFreeTransferWindowPath = newItinerary(A, 30)
-      .bus(routeA, 1, 30, 60, B)
-      .bus(routeB, 2, 10000, 10120, C)
-      .build();
+    Itinerary twoTransitLegSecondRouteHappensAfterFreeTransferWindowPath = newItinerary(A, 30).bus(
+      routeA,
+      1,
+      30,
+      60,
+      B
+    ).bus(routeB, 2, 10000, 10120, C).build();
     args.add(
       Arguments.of(
         "Two transit legs, second leg starts outside free transfer window",
@@ -177,11 +180,13 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // a three transit leg itinerary with same route costs but where each leg begins after the free transfer window,
     // should calculate triple the default fare
-    Itinerary threeTransitLegAllOutsideFreeTransferWindowPath = newItinerary(A, 30)
-      .bus(routeA, 1, 30, 60, B)
-      .bus(routeB, 2, 10000, 10120, C)
-      .bus(routeA, 3, 20000, 20180, D)
-      .build();
+    Itinerary threeTransitLegAllOutsideFreeTransferWindowPath = newItinerary(A, 30).bus(
+      routeA,
+      1,
+      30,
+      60,
+      B
+    ).bus(routeB, 2, 10000, 10120, C).bus(routeA, 3, 20000, 20180, D).build();
     args.add(
       Arguments.of(
         "Three transit legs, all starting outside free transfer window",
@@ -193,10 +198,13 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // a two transit leg itinerary with an interlined transfer where the second route costs more than the first
     // route, but both are within the free transfer window should calculate the first route cost
-    Itinerary twoTransitLegInterlinedSecondRouteCostsTwoDollarsPath = newItinerary(A, 30)
-      .bus(routeB, 1, 30, 60, B)
-      .staySeatedBus(routeC, 2, 90, 120, C)
-      .build();
+    Itinerary twoTransitLegInterlinedSecondRouteCostsTwoDollarsPath = newItinerary(A, 30).bus(
+      routeB,
+      1,
+      30,
+      60,
+      B
+    ).staySeatedBus(routeC, 2, 90, 120, C).build();
     args.add(
       Arguments.of(
         "Two interlined transit legs, second leg more expensive should calculate first leg fare with default config",

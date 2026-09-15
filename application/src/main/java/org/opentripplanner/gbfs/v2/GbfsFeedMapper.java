@@ -67,8 +67,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
         // Index all the station status entries on their station ID.
         // in case of duplicates entries (stations with identical unique id),
         // only the first occurrence is kept.
-        Map<String, GBFSStation> statusLookup = stationStatus
-          .getData()
+        Map<String, GBFSStation> statusLookup = stationStatus.getData()
           .getStations()
           .stream()
           .collect(
@@ -91,8 +90,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
 
         // Iterate over all known stations, and if we have any status information add it to those station objects.
         stations.addAll(
-          stationInformation
-            .getData()
+          stationInformation.getData()
             .getStations()
             .stream()
             .map(stationInformationMapper::mapStationInformation)
@@ -112,8 +110,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
           vehicleTypes
         );
         stations.addAll(
-          freeBikeStatus
-            .getData()
+          freeBikeStatus.getData()
             .getBikes()
             .stream()
             .map(freeVehicleStatusMapper::mapFreeVehicleStatus)
@@ -150,8 +147,7 @@ public class GbfsFeedMapper implements org.opentripplanner.gbfs.GbfsFeedMapper {
     GbfsVehicleTypeMapper vehicleTypeMapper,
     List<GBFSVehicleType> gbfsVehicleTypes
   ) {
-    return gbfsVehicleTypes
-      .stream()
+    return gbfsVehicleTypes.stream()
       .map(vehicleTypeMapper::mapRentalVehicleType)
       .filter(Objects::nonNull)
       .distinct()

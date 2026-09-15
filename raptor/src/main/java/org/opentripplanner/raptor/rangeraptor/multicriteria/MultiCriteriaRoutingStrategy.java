@@ -28,10 +28,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class MultiCriteriaRoutingStrategy<
-  T extends RaptorTripSchedule,
-  R extends AbstractPatternRide<T>
-> implements RoutingStrategy<T> {
+public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extends AbstractPatternRide<T>>
+  implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
   private final TimeBasedBoardingSupport<T> boardingSupport;
@@ -210,8 +208,7 @@ public class MultiCriteriaRoutingStrategy<
     McStopArrival<T> prevArrival,
     final RaptorBoardOrAlightEvent<T> boardEvent
   ) {
-    return (
-      prevArrival.c1() +
+    return (prevArrival.c1() +
       c1Calculator.boardingCost(
         prevArrival.isFirstRound(),
         prevArrival.arrivalTime(),
@@ -219,16 +216,14 @@ public class MultiCriteriaRoutingStrategy<
         boardEvent.time(),
         boardEvent.trip(),
         boardEvent.transferConstraint()
-      )
-    );
+      ));
   }
 
   /**
    * Calculate a cost for riding a trip. The cost is used to compare trips boarding in the same
-   * pattern with the same number of transfers. It is ok for the cost to be relative to any
-   * point in place or time - as long as it can be used to compare to paths that started at the
-   * origin in the same iteration, having used the same number-of-rounds to board trips in the same
-   * pattern.
+   * pattern with the same number of transfers. It is ok for the cost to be relative to any point in
+   * place or time - as long as it can be used to compare to paths that started at the origin in the
+   * same iteration, having used the same number-of-rounds to board trips in the same pattern.
    */
   private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
     return c1Calculator.transitCost(tripSchedule.relativeTravelDuration(boardTime), tripSchedule);

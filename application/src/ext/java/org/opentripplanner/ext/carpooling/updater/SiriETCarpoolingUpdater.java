@@ -100,8 +100,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     var now = Instant.now();
     repository.removeExpiredTrips(now, TRIP_EXPIRY);
     var cutoff = now.minus(TRIP_EXPIRY);
-    failedResolutions
-      .values()
+    failedResolutions.values()
       .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));
   }
 
@@ -149,9 +148,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes the
-   * trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails to
-   * resolve.
+   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes
+   * the trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails
+   * to resolve.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {

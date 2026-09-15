@@ -21,17 +21,14 @@ public class OperatorToAgencyMapperTest {
   @Test
   public void mapOperatorWithEverything() {
     // Given
-    Operator operator = new Operator()
-      .withId(ID)
+    Operator operator = new Operator().withId(ID)
       .withName(new MultilingualString().withValue(NAME))
       .withContactDetails(new ContactStructure().withUrl(URL).withPhone(PHONE));
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
-    o = new OperatorToAgencyMapper(
-      DataImportIssueStore.NOOP,
-      MappingSupport.ID_FACTORY
-    ).mapOperator(operator);
+    o = new OperatorToAgencyMapper(DataImportIssueStore.NOOP, MappingSupport.ID_FACTORY)
+      .mapOperator(operator);
 
     // Then expect
     assertEquals(ID, o.getId().getId());
@@ -43,16 +40,13 @@ public class OperatorToAgencyMapperTest {
   @Test
   public void mapOperatorWithMinimumDataSet() {
     // Given
-    Operator operator = new Operator()
-      .withId(ID)
+    Operator operator = new Operator().withId(ID)
       .withName(new MultilingualString().withValue(NAME));
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
-    o = new OperatorToAgencyMapper(
-      DataImportIssueStore.NOOP,
-      MappingSupport.ID_FACTORY
-    ).mapOperator(operator);
+    o = new OperatorToAgencyMapper(DataImportIssueStore.NOOP, MappingSupport.ID_FACTORY)
+      .mapOperator(operator);
 
     // Then expect
     assertEquals(ID, o.getId().getId());

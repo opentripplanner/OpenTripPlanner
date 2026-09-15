@@ -16,7 +16,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
  * held here are immutable and only updated in atomic operations that replace the existing
  * collection with a new copy.
  *
- * <P>THIS CLASS IS THREAD-SAFE<p>
+ * <P>THIS CLASS IS THREAD-SAFE
+ * <p>
  */
 @Singleton
 public class DefaultVehicleParkingService implements Serializable, VehicleParkingService {
@@ -30,8 +31,7 @@ public class DefaultVehicleParkingService implements Serializable, VehicleParkin
 
   @Override
   public Collection<VehicleParking> listBikeParks() {
-    return repository
-      .listVehicleParkings()
+    return repository.listVehicleParkings()
       .stream()
       .filter(VehicleParking::hasBicyclePlaces)
       .toList();
@@ -39,8 +39,7 @@ public class DefaultVehicleParkingService implements Serializable, VehicleParkin
 
   @Override
   public Collection<VehicleParking> listCarParks() {
-    return repository
-      .listVehicleParkings()
+    return repository.listVehicleParkings()
       .stream()
       .filter(VehicleParking::hasAnyCarPlaces)
       .toList();

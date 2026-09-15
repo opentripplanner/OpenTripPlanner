@@ -37,13 +37,11 @@ class ExtraCallScheduledStopTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder(DATE_1)
+    var updates = siri.etBuilder(DATE_1)
       .withFramedVehicleJourneyRef(TRIP_1_ID, DATE_1)
       .withLineRef(ROUTE_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_E)
           .withIsExtraCall(true)

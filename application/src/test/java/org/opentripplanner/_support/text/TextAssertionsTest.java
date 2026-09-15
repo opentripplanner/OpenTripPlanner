@@ -19,7 +19,8 @@ public class TextAssertionsTest {
       Line 2
       DOS\r\n
       line-shift
-      """,
+      """
+      ,
       """
 
         A Test \t
@@ -33,8 +34,9 @@ public class TextAssertionsTest {
 
   @Test
   void testEndOfText() {
-    var ex = Assertions.assertThrows(org.opentest4j.AssertionFailedError.class, () ->
-      assertLinesEquals("A\n", "A\nExtra Line")
+    var ex = Assertions.assertThrows(
+      org.opentest4j.AssertionFailedError.class,
+      () -> assertLinesEquals("A\n", "A\nExtra Line")
     );
     Assertions.assertTrue(
       ex.getMessage().contains("Expected(@end-of-text)"),

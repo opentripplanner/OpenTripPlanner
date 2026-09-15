@@ -25,24 +25,21 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
   static List<Arguments> accessibilityScoreTestCase() {
     return List.of(
       Arguments.of(
-        newItinerary(A, 0)
-          .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
+        newItinerary(A, 0).walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
           .bus(ID, 0, 50, B)
           .bus(ID, 52, 100, C)
           .build(),
         0.5f
       ),
       Arguments.of(
-        newItinerary(A, 0)
-          .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
+        newItinerary(A, 0).walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
           .bus(ID, 0, 50, B)
           .bus(ID, 52, 100, C)
           .build(),
         0.5f
       ),
       Arguments.of(
-        newItinerary(A, 0)
-          .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
+        newItinerary(A, 0).walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
           .bus(ID, 0, 50, B)
           .bus(ID, 52, 100, C)
           .build(),
@@ -79,8 +76,7 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
   }
 
   /**
-   * Only itinerary which are walk-only or have a transit leg should have an itinerary-level
-   * score.
+   * Only itinerary which are walk-only or have a transit leg should have an itinerary-level score.
    */
   @MethodSource("nonWalkingCases")
   @ParameterizedTest

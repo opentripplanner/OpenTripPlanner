@@ -16,21 +16,21 @@ public class PlannerErrorMapper {
     PlannerError api;
 
     switch (domain.code) {
-      case NO_TRANSIT_CONNECTION:
-      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW:
+      case NO_TRANSIT_CONNECTION :
+      case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW :
         api = new PlannerError(Message.PATH_NOT_FOUND);
         break;
-      case NO_DIRECT_MODE_CONNECTION:
+      case NO_DIRECT_MODE_CONNECTION :
         api = new PlannerError(Message.NO_DIRECT_MODE_CONNECTION);
         break;
-      case OUTSIDE_BOUNDS:
+      case OUTSIDE_BOUNDS :
         api = new PlannerError(Message.OUTSIDE_BOUNDS);
         api.setMissing(List.of(domain.inputField.name()));
         break;
-      case OUTSIDE_SERVICE_PERIOD:
+      case OUTSIDE_SERVICE_PERIOD :
         api = new PlannerError(Message.NO_TRANSIT_TIMES);
         break;
-      case LOCATION_NOT_FOUND:
+      case LOCATION_NOT_FOUND :
         if (domain.inputField.equals(InputField.FROM_PLACE)) {
           api = new PlannerError(Message.GEOCODE_FROM_NOT_FOUND);
           api.setMissing(List.of(domain.inputField.name()));
@@ -44,14 +44,14 @@ public class PlannerErrorMapper {
           throw new IllegalArgumentException();
         }
         break;
-      case NO_STOPS_IN_RANGE:
+      case NO_STOPS_IN_RANGE :
         api = new PlannerError(Message.LOCATION_NOT_ACCESSIBLE);
         api.setMissing(List.of(domain.inputField.name()));
         break;
-      case WALKING_BETTER_THAN_TRANSIT:
+      case WALKING_BETTER_THAN_TRANSIT :
         api = new PlannerError(Message.TOO_CLOSE);
         break;
-      default:
+      default :
         throw new IllegalArgumentException();
     }
 

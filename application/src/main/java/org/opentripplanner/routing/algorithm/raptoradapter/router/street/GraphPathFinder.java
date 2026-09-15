@@ -24,8 +24,8 @@ import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 
 /// A helper class for finding paths through the street graph.
 ///
-/// It links the from/to, sets up the [StreetSearchBuilder], executes it,
-/// and throws an exception if no path is found.
+/// It links the from/to, sets up the [StreetSearchBuilder], executes it, and throws an exception if
+/// no path is found.
 class GraphPathFinder {
 
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
@@ -71,8 +71,8 @@ class GraphPathFinder {
     // so initial renting states have correct zone membership for boundary-based tracking.
     if (
       request.arriveBy() &&
-      request.journey().direct().mode().includesRenting() &&
-      geofencingZoneService.hasIndexedZones()
+        request.journey().direct().mode().includesRenting() &&
+        geofencingZoneService.hasIndexedZones()
     ) {
       var destinationZones = computeZonesAtVertices(to);
       if (!destinationZones.isEmpty()) {

@@ -24,8 +24,8 @@ class LegOfferContainer {
   private final SetMultimap<Leg, LegOffer> unlimitedTransferOffers = HashMultimap.create();
 
   /**
-   * Offers which are limited by the number of transfers. These need special handling.
-   * See {@link LegOfferContainer#addTransferLimitedOffer(TransitLeg, List, Collection)}.
+   * Offers which are limited by the number of transfers. These need special handling. See
+   * {@link LegOfferContainer#addTransferLimitedOffer(TransitLeg, List, Collection)}.
    */
   private final List<TransferLimitedOffer> transferLimitedOffers = new ArrayList<>();
 
@@ -51,8 +51,7 @@ class LegOfferContainer {
     List<TransitLeg> tail,
     Collection<LegOffer> limitedTransferOffers
   ) {
-    limitedTransferOffers
-      .stream()
+    limitedTransferOffers.stream()
       .filter(o -> containsNoTransferLimitedOffersAlready(head, o))
       .forEach(o -> transferLimitedOffers.add(new TransferLimitedOffer(head, tail, o)));
   }
@@ -62,13 +61,12 @@ class LegOfferContainer {
   }
 
   /**
-   * Add an offer for a specific leg. If the given offer has a start time before a currently existing
-   * one, this means that the currently existing one is worse than the proposed new one and
+   * Add an offer for a specific leg. If the given offer has a start time before a currently
+   * existing one, this means that the currently existing one is worse than the proposed new one and
    * is removed.
    */
   private void addToLeg(TransitLeg leg, LegOffer legOffer) {
-    var legContainsItAlready = unlimitedTransferOffers
-      .get(leg)
+    var legContainsItAlready = unlimitedTransferOffers.get(leg)
       .stream()
       .filter(existingOffer -> existingOffer.fareProduct().equals(legOffer.fareProduct()))
       .findAny();
@@ -99,8 +97,7 @@ class LegOfferContainer {
 
   @Override
   public String toString() {
-    return unlimitedTransferOffers
-      .keys()
+    return unlimitedTransferOffers.keys()
       .stream()
       .sorted(Comparator.comparing(Leg::startTime))
       .map(l -> l.startTime().toString() + " -> " + unlimitedTransferOffers.get(l))
@@ -108,11 +105,10 @@ class LegOfferContainer {
   }
 
   private boolean containsNoTransferLimitedOffersAlready(TransitLeg head, LegOffer o) {
-    return transferLimitedOffers
-      .stream()
+    return transferLimitedOffers.stream()
       .noneMatch(
-        t ->
-          t.legOffer.offer().fareProduct().equals(o.offer().fareProduct()) && t.tail.contains(head)
+        t -> t.legOffer.offer().fareProduct().equals(o.offer().fareProduct()) &&
+          t.tail.contains(head)
       );
   }
 }

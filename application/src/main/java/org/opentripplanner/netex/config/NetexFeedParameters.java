@@ -15,14 +15,14 @@ import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Parameters to configure the NETEX import. Se the generated build-config documentation or
- * the config mapping for documentation.
+ * Parameters to configure the NETEX import. Se the generated build-config documentation or the
+ * config mapping for documentation.
  */
 public class NetexFeedParameters implements DataSourceConfig {
 
   /**
-   * The default feed-id is used if the auto-discover feature is used; hence no feeds
-   * are present in the build-config.
+   * The default feed-id is used if the auto-discover feature is used; hence no feeds are present in
+   * the build-config.
    */
   private static final String NETEX_FEED_ID = "NETEX";
   private static final String EMPTY_STRING_PATTERN = "$^";
@@ -146,16 +146,14 @@ public class NetexFeedParameters implements DataSourceConfig {
       return false;
     }
     NetexFeedParameters that = (NetexFeedParameters) o;
-    return (
-      Objects.equals(source, that.source) &&
+    return (Objects.equals(source, that.source) &&
       feedId.equals(that.feedId) &&
       ignoreFilePattern.equals(that.ignoreFilePattern) &&
       sharedFilePattern.equals(that.sharedFilePattern) &&
       sharedGroupFilePattern.equals(that.sharedGroupFilePattern) &&
       groupFilePattern.equals(that.groupFilePattern) &&
       ignoredFeatures.equals(that.ignoredFeatures) &&
-      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle)
-    );
+      ferryIdsNotAllowedForBicycle.equals(that.ferryIdsNotAllowedForBicycle));
   }
 
   @Override

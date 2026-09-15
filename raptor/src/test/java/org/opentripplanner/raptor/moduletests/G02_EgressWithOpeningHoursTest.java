@@ -46,18 +46,18 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    data.access("Free ~ A").withTimetables(
-      """
-      A      B
-      00:10  00:20
-      00:20  00:30
-      00:30  00:40
-      24:20  24:30
-      """
-    );
+    data.access("Free ~ A")
+      .withTimetables(
+        """
+        A      B
+        00:10  00:20
+        00:20  00:30
+        00:30  00:40
+        24:20  24:30
+        """
+      );
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_10)
       .latestArrivalTime(T25_00)
       .searchWindow(D15_m)
@@ -101,8 +101,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
       )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))
@@ -124,9 +124,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:00 1:00) [0:20+1d 0:32+1d 12m Tₙ0 C₁1_440]";
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r
-          .searchParams()
+      .withRequest(
+        r -> r.searchParams()
           .earliestDepartureTime(T24_10)
           .addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T01_00))
       )
@@ -149,8 +148,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T00_25))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_00, T00_25))
       )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.all()))
@@ -172,9 +171,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m Open(0:25 0:40) [0:20+1d 0:32+1d 12m Tₙ0 C₁1_440]";
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r
-          .searchParams()
+      .withRequest(
+        r -> r.searchParams()
           .earliestDepartureTime(T24_10)
           .latestArrivalTime(T25_00)
           .searchWindow(Duration.ofMinutes(30))
@@ -201,8 +199,8 @@ public class G02_EgressWithOpeningHoursTest implements RaptorTestConstants {
     );
 
     return RaptorModuleTestCase.of()
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_25, T00_35))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(walk(STOP_B, D2_m).openingHours(T00_25, T00_35))
       )
       .addMinDuration("12m", TX_0, T00_10, T25_00)
       .add(TC_STANDARD, withoutCost(expected.first(3)))

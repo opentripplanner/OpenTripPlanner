@@ -146,8 +146,8 @@ public class TripTimesOnDateTest {
   }
 
   /**
-   * Mode filter should use the trip's mode, not the route's mode. Trips can override
-   * the mode of their route, e.g. a rail replacement bus on a rail route.
+   * Mode filter should use the trip's mode, not the route's mode. Trips can override the mode of
+   * their route, e.g. a rail replacement bus on a rail route.
    */
   @Test
   void modeFilterRespectsTriplevelModeOverride() {
@@ -199,18 +199,15 @@ public class TripTimesOnDateTest {
         .build()
     );
     assertThat(railResult).hasSize(2);
-    assertThat(
-      railResult
-        .stream()
-        .map(t -> t.getTrip().getId().getId())
-        .toList()
-    ).containsExactly("rail1", "rail2");
+    assertThat(railResult.stream().map(t -> t.getTrip().getId().getId()).toList()).containsExactly(
+      "rail1",
+      "rail2"
+    );
   }
 
   /**
-   * Mode filter on a multi-modal route where trips override their mode.
-   * Earlier BUS trips should not prevent later COACH trips from being returned
-   * when filtering for COACH.
+   * Mode filter on a multi-modal route where trips override their mode. Earlier BUS trips should
+   * not prevent later COACH trips from being returned when filtering for COACH.
    */
   @Test
   void modeFilterOnMultiModalRoute() {
@@ -277,18 +274,17 @@ public class TripTimesOnDateTest {
     );
 
     assertThat(result).hasSize(3);
-    assertThat(
-      result
-        .stream()
-        .map(t -> t.getTrip().getId().getId())
-        .toList()
-    ).containsExactly("coach1", "coach2", "coach3");
+    assertThat(result.stream().map(t -> t.getTrip().getId().getId()).toList()).containsExactly(
+      "coach1",
+      "coach2",
+      "coach3"
+    );
   }
 
   /**
-   * Mode filter with separate single-mode routes. BUS and COACH are on different
-   * routes (and thus different patterns), so filtering for COACH returns the COACH
-   * trips regardless of earlier BUS departures.
+   * Mode filter with separate single-mode routes. BUS and COACH are on different routes (and thus
+   * different patterns), so filtering for COACH returns the COACH trips regardless of earlier BUS
+   * departures.
    */
   @Test
   void modeFilterOnSingleModalRoutes() {
@@ -332,17 +328,15 @@ public class TripTimesOnDateTest {
     );
 
     assertThat(result).hasSize(3);
-    assertThat(
-      result
-        .stream()
-        .map(t -> t.getTrip().getId().getId())
-        .toList()
-    ).containsExactly("coach1", "coach2", "coach3");
+    assertThat(result.stream().map(t -> t.getTrip().getId().getId()).toList()).containsExactly(
+      "coach1",
+      "coach2",
+      "coach3"
+    );
   }
 
   /**
-   * When querying for multiple stops, numberOfDepartures should be the total limit,
-   * not per-stop.
+   * When querying for multiple stops, numberOfDepartures should be the total limit, not per-stop.
    */
   @Test
   void numberOfDeparturesIsGlobalAcrossStops() {

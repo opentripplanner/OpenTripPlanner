@@ -18,8 +18,7 @@ public class NetexConfig {
     NodeAdapter root,
     String parameterName
   ) {
-    var node = root
-      .of(parameterName)
+    var node = root.of(parameterName)
       .since(V2_2)
       .summary(
         "The netexDefaults section allows you to specify default properties for NeTEx files."
@@ -30,11 +29,9 @@ public class NetexConfig {
   }
 
   static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode, NetexFeedParameters original) {
-    return mapFilePatternParameters(feedNode, original)
-      .withFeedId(readFeedId(feedNode).asString())
+    return mapFilePatternParameters(feedNode, original).withFeedId(readFeedId(feedNode).asString())
       .withSource(
-        feedNode
-          .of("source")
+        feedNode.of("source")
           .since(V2_2)
           .summary("The unique URI pointing to the data file.")
           .asUri()
@@ -54,11 +51,9 @@ public class NetexConfig {
     NetexFeedParameters base
   ) {
     var dft = NetexFeedParameters.DEFAULT;
-    return base
-      .copyOf()
+    return base.copyOf()
       .withSharedFilePattern(
-        config
-          .of("sharedFilePattern")
+        config.of("sharedFilePattern")
           .since(V2_0)
           .summary("Pattern for matching shared NeTEx files in a NeTEx bundle.")
           .description(
@@ -80,8 +75,7 @@ public class NetexConfig {
           .asPattern(base.sharedFilePattern().pattern())
       )
       .withSharedGroupFilePattern(
-        config
-          .of("sharedGroupFilePattern")
+        config.of("sharedGroupFilePattern")
           .since(V2_0)
           .summary("Pattern for matching shared group NeTEx files in a NeTEx bundle.")
           .description(
@@ -101,8 +95,7 @@ public class NetexConfig {
           .asPattern(base.sharedGroupFilePattern().pattern())
       )
       .withGroupFilePattern(
-        config
-          .of("groupFilePattern")
+        config.of("groupFilePattern")
           .since(V2_0)
           .summary("Pattern for matching group NeTEx files.")
           .description(
@@ -118,8 +111,7 @@ public class NetexConfig {
           .asPattern(base.groupFilePattern().pattern())
       )
       .withIgnoreFilePattern(
-        config
-          .of("ignoreFilePattern")
+        config.of("ignoreFilePattern")
           .since(V2_0)
           .summary("Pattern for matching ignored files in a NeTEx bundle.")
           .description(
@@ -132,8 +124,7 @@ public class NetexConfig {
           .asPattern(base.ignoreFilePattern().pattern())
       )
       .withNoTransfersOnIsolatedStops(
-        config
-          .of("noTransfersOnIsolatedStops")
+        config.of("noTransfersOnIsolatedStops")
           .since(V2_2)
           .summary(
             "Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED"
@@ -142,8 +133,7 @@ public class NetexConfig {
           .asBoolean(base.noTransfersOnIsolatedStops())
       )
       .addFerryIdsNotAllowedForBicycle(
-        config
-          .of("ferryIdsNotAllowedForBicycle")
+        config.of("ferryIdsNotAllowedForBicycle")
           .since(V2_0)
           .summary("List ferries which do not allow bikes.")
           .description(
@@ -159,16 +149,14 @@ public class NetexConfig {
           .asStringSet(base.ferryIdsNotAllowedForBicycle())
       )
       .withIgnoreFareFrame(
-        config
-          .of("ignoreFareFrame")
+        config.of("ignoreFareFrame")
           .since(V2_3)
           .summary("Ignore contents of the FareFrame")
           .docDefaultValue(base.ignoreFareFrame())
           .asBoolean(base.ignoreFareFrame())
       )
       .withIgnoreParking(
-        config
-          .of("ignoreParking")
+        config.of("ignoreParking")
           .since(V2_6)
           .summary("Ignore Parking elements.")
           .docDefaultValue(base.ignoreParking())
@@ -178,8 +166,7 @@ public class NetexConfig {
 
   /** Provide common documentation for the default and feed specific 'feedId'. */
   private static ParameterBuilder readFeedId(NodeAdapter config) {
-    return config
-      .of("feedId")
+    return config.of("feedId")
       .since(V2_2)
       .summary(
         "This field is used to identify the specific NeTEx feed. It is used instead of " +

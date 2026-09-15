@@ -48,16 +48,12 @@ public class StreetModeDurationInputType {
   public static Value mapDurationForStreetModeGraphQLValue(
     DurationForEnum<StreetMode> durationForStreetMode
   ) {
-    List<Value> list = EnumTypes.STREET_MODE.getValues()
-      .stream()
-      .map(gqlModeType -> {
-        var mode = (StreetMode) gqlModeType.getValue();
-        return durationForStreetMode.isSet(mode)
-          ? mapModeDuration(gqlModeType, durationForStreetMode.valueOf(mode))
-          : null;
-      })
-      .filter(Objects::nonNull)
-      .toList();
+    List<Value> list = EnumTypes.STREET_MODE.getValues().stream().map(gqlModeType -> {
+      var mode = (StreetMode) gqlModeType.getValue();
+      return durationForStreetMode.isSet(mode)
+        ? mapModeDuration(gqlModeType, durationForStreetMode.valueOf(mode))
+        : null;
+    }).filter(Objects::nonNull).toList();
     return ArrayValue.newArrayValue().values(list).build();
   }
 

@@ -35,10 +35,9 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   public SiriETHttpTripUpdateSource(Parameters parameters, SiriLoader siriLoader) {
     this.url = parameters.url();
 
-    this.requestorRef =
-      parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
-        ? "otp-" + UUID.randomUUID()
-        : parameters.requestorRef();
+    this.requestorRef = parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
+      ? "otp-" + UUID.randomUUID()
+      : parameters.requestorRef();
 
     this.siriLoader = siriLoader;
   }

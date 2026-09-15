@@ -9,14 +9,10 @@ import org.opentripplanner.astar.spi.AStarVertex;
 /**
  * A shortest path on the graph.
  * <p>
- * WARNING: This class is often a hotspot as it eagerly traverses the state chain. Avoid
- * as much as possible.
+ * WARNING: This class is often a hotspot as it eagerly traverses the state chain. Avoid as much
+ * as possible.
  */
-public class GraphPath<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class GraphPath<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   public List<State> states;
 

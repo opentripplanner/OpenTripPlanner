@@ -98,31 +98,36 @@ public class NoDataGridCoverage implements GridCoverage {
 
   @Override
   public boolean[] evaluate(Position directPosition, boolean[] booleans)
-    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
+    throws CannotEvaluateException,
+    ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
   public byte[] evaluate(Position directPosition, byte[] bytes)
-    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
+    throws CannotEvaluateException,
+    ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
   public int[] evaluate(Position directPosition, int[] ints)
-    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
+    throws CannotEvaluateException,
+    ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
   public float[] evaluate(Position directPosition, float[] floats)
-    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
+    throws CannotEvaluateException,
+    ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
   public double[] evaluate(Position directPosition, double[] dest)
-    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
+    throws CannotEvaluateException,
+    ArrayIndexOutOfBoundsException {
     gridCoverage.evaluate(directPosition, dest);
     if (this.noData != null && this.noData.getAsSingleValue() == dest[0]) {
       throw new PointOutsideCoverageException("Value is NO_DATA.");
@@ -142,7 +147,8 @@ public class NoDataGridCoverage implements GridCoverage {
 
   @Override
   public RenderableImage getRenderableImage(int xAxis, int yAxis)
-    throws UnsupportedOperationException, IndexOutOfBoundsException {
+    throws UnsupportedOperationException,
+    IndexOutOfBoundsException {
     return gridCoverage.getRenderableImage(xAxis, yAxis);
   }
 

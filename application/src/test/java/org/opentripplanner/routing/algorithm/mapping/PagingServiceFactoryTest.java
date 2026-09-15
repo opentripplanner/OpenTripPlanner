@@ -40,8 +40,7 @@ class PagingServiceFactoryTest {
     .addEgressPaths(TestAccessEgress.walk(1, 1))
     .build()
     .searchParams();
-  private static final SearchParams SEARCH_PARAMS_ALL = new RaptorRequestBuilder<>()
-    .searchParams()
+  private static final SearchParams SEARCH_PARAMS_ALL = new RaptorRequestBuilder<>().searchParams()
     .earliestDepartureTime(EDT)
     .latestArrivalTime(LAT)
     .searchWindow(SEARCH_WINDOW)

@@ -58,9 +58,9 @@ public final class TimeSlopeSafetyTriangle {
   }
 
   /**
-   * Creates a special builder which is initialized with default values.
-   * This is useful in the APIs where we want to fall back to
-   * the default {@link TimeSlopeSafetyTriangle}, if no values are set.
+   * Creates a special builder which is initialized with default values. This is useful in the APIs
+   * where we want to fall back to the default {@link TimeSlopeSafetyTriangle}, if no values are
+   * set.
    */
   public static Builder of() {
     return new Builder(DEFAULT);
@@ -87,11 +87,9 @@ public final class TimeSlopeSafetyTriangle {
       return false;
     }
     var that = (TimeSlopeSafetyTriangle) obj;
-    return (
-      Double.doubleToLongBits(this.time) == Double.doubleToLongBits(that.time) &&
+    return (Double.doubleToLongBits(this.time) == Double.doubleToLongBits(that.time) &&
       Double.doubleToLongBits(this.slope) == Double.doubleToLongBits(that.slope) &&
-      Double.doubleToLongBits(this.safety) == Double.doubleToLongBits(that.safety)
-    );
+      Double.doubleToLongBits(this.safety) == Double.doubleToLongBits(that.safety));
   }
 
   @Override

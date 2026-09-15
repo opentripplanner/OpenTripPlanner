@@ -140,8 +140,9 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     validateFromTo();
     validateWalkDurationSec();
 
-    var pathTransfer =
-      fromStopIndex == toStopIndex ? null : TestTransfers.transfer(toStopIndex, walkDurationSec);
+    var pathTransfer = fromStopIndex == toStopIndex
+      ? null
+      : TestTransfers.transfer(toStopIndex, walkDurationSec);
 
     return new TripToTripTransfer<>(
       arrival(fromTrip, fromStopIndex),

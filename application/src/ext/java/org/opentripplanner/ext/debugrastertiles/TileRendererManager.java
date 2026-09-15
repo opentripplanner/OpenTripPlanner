@@ -81,8 +81,8 @@ public class TileRendererManager {
       -context.bbox.getMinY() - context.bbox.getHeight()
     );
     context.transform.scale(xScale, -yScale);
-    context.metersPerPixel =
-      (Math.toRadians(context.bbox.getHeight()) * 6371000) / mapTile.height();
+    context.metersPerPixel = (Math.toRadians(context.bbox.getHeight()) * 6371000) /
+      mapTile.height();
     context.tileWidth = mapTile.width();
     context.tileHeight = mapTile.height();
 

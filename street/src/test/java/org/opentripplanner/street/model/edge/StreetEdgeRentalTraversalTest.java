@@ -74,9 +74,8 @@ public class StreetEdgeRentalTraversalTest {
   }
 
   static Stream<Arguments> noTraversal() {
-    return Stream.of(StreetTraversalPermission.CAR, StreetTraversalPermission.NONE).flatMap(
-      StreetEdgeRentalTraversalTest::baseCases
-    );
+    return Stream.of(StreetTraversalPermission.CAR, StreetTraversalPermission.NONE)
+      .flatMap(StreetEdgeRentalTraversalTest::baseCases);
   }
 
   @ParameterizedTest(

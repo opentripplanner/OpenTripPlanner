@@ -79,8 +79,8 @@ public class Itinerary implements ItinerarySortKey {
   /* ITINERARY LIFECYCLE - MUTABLE FIELDS */
 
   /**
-   * The systemNotices is part of the itinerary "life-cycle" and is intended to be
-   * MUTABLE. We add new system-notices as part of the itinerary filter chain.
+   * The systemNotices is part of the itinerary "life-cycle" and is intended to be MUTABLE. We add
+   * new system-notices as part of the itinerary filter chain.
    */
   private final List<SystemNotice> systemNotices;
 
@@ -112,8 +112,7 @@ public class Itinerary implements ItinerarySortKey {
     this.emissionPerPerson = builder.emissionPerPerson;
 
     // Set aggregated data
-    this.generalizedCostIncludingPenalty = generalizedCost
-      .plus(accessPenalty.cost())
+    this.generalizedCostIncludingPenalty = generalizedCost.plus(accessPenalty.cost())
       .plus(egressPenalty.cost())
       .normalize();
 
@@ -141,8 +140,8 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * Creates an itinerary that creates only street or flex results which are not aware of the
-   * input request time-window.
+   * Creates an itinerary that creates only street or flex results which are not aware of the input
+   * request time-window.
    */
   public static ItineraryBuilder ofDirect(List<Leg> legs) {
     return new ItineraryBuilder(legs, false);
@@ -154,6 +153,7 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * Time that the trip departs. The time is normalized(rounded to closest second).
+   *
    * @see #endTime() for details no the normalization.
    */
   public ZonedDateTime startTime() {
@@ -172,8 +172,8 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * Time that the trip arrives. The time is normalized(rounded to closest second). The value is
    * normalized (rounded to seconds) is required for the paging to work properly. We serialize the
-   * times in the paging-token with a resolution of seconds. When filtering the page-cut, any
-   * millis part could cause duplicates. This also have an effect when sorting itineraries in the
+   * times in the paging-token with a resolution of seconds. When filtering the page-cut, any millis
+   * part could cause duplicates. This also have an effect when sorting itineraries in the
    * itinerary-filter-chain.
    */
   public ZonedDateTime endTime() {
@@ -214,8 +214,7 @@ public class Itinerary implements ItinerarySortKey {
    * Total distance in meters.
    */
   public double distanceMeters() {
-    return legs()
-      .stream()
+    return legs().stream()
       // An unknown distance is -1
       .filter(l -> l.distanceMeters() > 0)
       .mapToDouble(Leg::distanceMeters)
@@ -234,8 +233,7 @@ public class Itinerary implements ItinerarySortKey {
   /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
     // TODO This does not look correct, replace with !streetLeg
-    return legs
-      .stream()
+    return legs.stream()
       .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
@@ -272,8 +270,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * Utility method to check if one of the attached system notices matches the
-   * given {@code tag}.
+   * Utility method to check if one of the attached system notices matches the given {@code tag}.
    */
   public boolean hasSystemNoticeTag(String tag) {
     return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
@@ -376,13 +373,13 @@ public class Itinerary implements ItinerarySortKey {
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>
-   * An alternative to this is to use the `generalized-cost` and use that to indicate which itineraries is the
-   * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
-   * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
-   * street traversal.
+   * An alternative to this is to use the `generalized-cost` and use that to indicate which
+   * itineraries is the best/most friendly with respect to making the journey in a wheelchair. The
+   * `generalized-cost` include, not only a penalty for unknown and inaccessible boardings, but also
+   * a penalty for undesired uphill and downhill street traversal.
    * <p>
-   * The intended audience for this score are frontend developers wanting to show a simple UI rather
-   * than having to iterate over all the stops and trips.
+   * The intended audience for this score are frontend developers wanting to show a simple UI
+   * rather than having to iterate over all the stops and trips.
    * <p>
    * Note: the information to calculate this score are all available to the frontend, however
    * calculating them on the backend makes life a little easier and changes are automatically
@@ -435,8 +432,8 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the total cost computed
-   * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
-   * system. The unit should be equivalent to the cost of "one second of transit".
+   * by the algorithm. This is relevant for anyone who want to debug a search and tuning the system.
+   * The unit should be equivalent to the cost of "one second of transit".
    * <p>
    * Zero(0) cost indicate that the cost is not set/computed.
    */
@@ -446,10 +443,10 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * If a generalized cost is used in the routing algorithm, this is the cost computed plus
-   * the artificial penalty added for access/egresses. This is useful so that itineraries
-   * using only on-street legs don't have an unfair advantage over those combining access/egress with
-   * transit and using a penalty when being processed by the itinerary filter chain.
+   * If a generalized cost is used in the routing algorithm, this is the cost computed plus the
+   * artificial penalty added for access/egresses. This is useful so that itineraries using only
+   * on-street legs don't have an unfair advantage over those combining access/egress with transit
+   * and using a penalty when being processed by the itinerary filter chain.
    *
    * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
    */
@@ -515,33 +512,31 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * The maximum slope for any part of the itinerary.
-   * TODO Document unit
+   * The maximum slope for any part of the itinerary. TODO Document unit
    */
   public Double maxSlope() {
     return maxSlope;
   }
 
   /**
-   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
-   * is set than it is possible to end a trip without dropping off the rented bicycle.
+   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination} is set than it is possible to
+   * end a trip without dropping off the rented bicycle.
    */
   public boolean isArrivedAtDestinationWithRentedVehicle() {
     return arrivedAtDestinationWithRentedVehicle;
   }
 
   public List<TransitLeg> listTransitLegs() {
-    return legs()
-      .stream()
+    return legs().stream()
       .filter(TransitLeg.class::isInstance)
       .map(TransitLeg.class::cast)
       .toList();
   }
 
   /**
-   * The agregated sum of emission for all legs in the itinerary. This method return a value
-   * (none {@code null}) if the emission can be computed for all transit and car legs. This method
-   * return {@code null} if at least one leg can not be computed.
+   * The agregated sum of emission for all legs in the itinerary. This method return a value (none
+   * {@code null}) if the emission can be computed for all transit and car legs. This method return
+   * {@code null} if at least one leg can not be computed.
    */
   @Sandbox
   @Nullable
@@ -570,9 +565,10 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * Return {@code true} it the other object is the same object using the {@link
-   * Object#equals(Object)}. An itinerary is a temporary object, and the equals method should not be
-   * used for comparison of 2 instances, only to check that two objects are the same instance.
+   * Return {@code true} it the other object is the same object using the
+   * {@link Object#equals(Object)}. An itinerary is a temporary object, and the equals method should
+   * not be used for comparison of 2 instances, only to check that two objects are the same
+   * instance.
    */
   @Override
   public final boolean equals(Object o) {
@@ -608,8 +604,8 @@ public class Itinerary implements ItinerarySortKey {
    * Used to convert a list of itineraries to a SHORT human-readable string.
    *
    * @see #toStr()
-   * <p>
-   * It is great for comparing lists of itineraries in a test: {@code
+   *      <p>
+   *      It is great for comparing lists of itineraries in a test: {@code
    * assertEquals(toStr(List.of(it1)), toStr(result))}.
    */
   public static String toStr(List<Itinerary> list) {
@@ -618,8 +614,8 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * Used to convert an itinerary to a SHORT human readable string - including just a few of the
-   * most important fields. It is much shorter and easier to read then the {@link
-   * Itinerary#toString()}.
+   * most important fields. It is much shorter and easier to read then the
+   * {@link Itinerary#toString()}.
    * <p>
    * It is great for comparing to itineraries in a test: {@code assertEquals(toStr(it1),
    * toStr(it2))}.

@@ -14,8 +14,7 @@ public class CanceledTripsSummary {
   }
 
   public List<CanceledTripsSummaryRoute> routes() {
-    return cancellationSummaryForRoutes
-      .entrySet()
+    return cancellationSummaryForRoutes.entrySet()
       .stream()
       .map(entry -> new CanceledTripsSummaryRoute(entry.getKey(), entry.getValue()))
       .toList();

@@ -21,17 +21,13 @@ import org.slf4j.LoggerFactory;
 /**
  * A namer that assigns names to crosswalks using the name or type of the crossed street.
  * <p>
- * The algorithm works as follows:
- *  - For each crosswalk, we find the intersecting street edge that shares a node.
- *  - Apply a name depending on the type of street:
- *      * For named streets, name the crossing so it reads "crosswalk over 10th Street".
- *      * For service roads (e.g. car access to commercial complexes, such as
- *        <a href="https://www.openstreetmap.org/way/1024601318">...</a>),
- *        use "crosswalk over service road".
- *      * For turn lanes or slip lanes at intersections (shortcuts from a street to another,
- *        to bypass traffic signals, prevalent in North America,
- *        e.g. <a href="https://www.openstreetmap.org/way/1139062913">...</a>),
- *        use "crosswalk over turn lane".
+ * The algorithm works as follows: - For each crosswalk, we find the intersecting street edge
+ * that shares a node. - Apply a name depending on the type of street: * For named streets, name the
+ * crossing so it reads "crosswalk over 10th Street". * For service roads (e.g. car access to
+ * commercial complexes, such as <a href="https://www.openstreetmap.org/way/1024601318">...</a>),
+ * use "crosswalk over service road". * For turn lanes or slip lanes at intersections (shortcuts
+ * from a street to another, to bypass traffic signals, prevalent in North America, e.g.
+ * <a href="https://www.openstreetmap.org/way/1139062913">...</a>), use "crosswalk over turn lane".
  */
 class CrosswalkNamer implements EdgeNamer {
 
@@ -56,8 +52,7 @@ class CrosswalkNamer implements EdgeNamer {
   public void recordEdges(OsmWay way, StreetEdgePair pair, OsmDatabase osmdb) {
     // Record unnamed crossings to a list.
     if (way.isCrossing() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
-      pair
-        .asIterable()
+      pair.asIterable()
         .forEach(edge -> unnamedCrosswalks.add(new EdgeOnLevel(way, edge, Set.of())));
     }
     // Record (short) sidewalks to a geometric index
@@ -81,8 +76,8 @@ class CrosswalkNamer implements EdgeNamer {
   }
 
   /**
-   * The actual logic for naming individual crosswalk edges.
-   * This will also name adjacent sidewalks on each end if they are the only adjacent sidewalks to a crosswalk.
+   * The actual logic for naming individual crosswalk edges. This will also name adjacent sidewalks
+   * on each end if they are the only adjacent sidewalks to a crosswalk.
    */
   public boolean assignNameToEdge(EdgeOnLevel crosswalkOnLevel, Geometry buffer) {
     var crosswalk = crosswalkOnLevel.edge();
@@ -108,8 +103,7 @@ class CrosswalkNamer implements EdgeNamer {
         crosswalk.setName(I18NString.of(String.format("crosswalk %s", way.getId())));
       }
 
-      var adjacentSidewalks = sidewalkIndex
-        .query(buffer)
+      var adjacentSidewalks = sidewalkIndex.query(buffer)
         .stream()
         .filter(e -> e.way().isAdjacentTo(way))
         .filter(e -> e.edge().nameIsDerived())
@@ -127,15 +121,15 @@ class CrosswalkNamer implements EdgeNamer {
   }
 
   /**
-   * Rename a sidewalk, among candidates, if it is the only adjacent sidewalk to the given crosswalk.
+   * Rename a sidewalk, among candidates, if it is the only adjacent sidewalk to the given
+   * crosswalk.
    */
   private void renameAdjacentSidewalk(
     List<EdgeOnLevel> adjacentSidewalks,
     I18NString crosswalkName,
     long nodeId
   ) {
-    List<EdgeOnLevel> sidewalks = adjacentSidewalks
-      .stream()
+    List<EdgeOnLevel> sidewalks = adjacentSidewalks.stream()
       .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
     if (sidewalks.size() == 1) {
@@ -153,8 +147,7 @@ class CrosswalkNamer implements EdgeNamer {
       // and one somewhere in the middle that joins the crossing with the street.
       // We exclude the first and last node which are on the sidewalk.
       long[] nodeRefsArray = nodeRefs.toArray(1, nodeRefs.size() - 2);
-      return streets
-        .stream()
+      return streets.stream()
         .filter(w -> Arrays.stream(nodeRefsArray).anyMatch(nid -> w.getNodeRefs().contains(nid)))
         .findFirst();
     }

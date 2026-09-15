@@ -49,12 +49,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorResponse<T> response;
 
     if (request.isDynamicSearch()) {
-      response = new RangeRaptorDynamicSearch<>(
-        config,
-        transitData,
-        extraMcSearch,
-        request
-      ).route();
+      response = new RangeRaptorDynamicSearch<>(config, transitData, extraMcSearch, request)
+        .route();
     } else {
       response = routeUsingStdWorker(transitData, request);
     }
@@ -63,9 +59,9 @@ public class RaptorService<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Find all transit options for the given request. The result should contain ALL options,
-   * not just the parato-optimal result return by the {@link #route(RaptorRequest, RaptorTransitDataProvider)}
-   * method.
+   * Find all transit options for the given request. The result should contain ALL options, not just
+   * the parato-optimal result return by the
+   * {@link #route(RaptorRequest, RaptorTransitDataProvider)} method.
    */
   public Collection<RaptorPath<T>> findAllDirectTransit(
     RaptorDirectTransitRequest request,
@@ -75,8 +71,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
   }
 
   /**
-   * TODO Add back the possibility to compare heuristics using a test - like the SpeedTest,
-   *      but maybe better to make a separate test.
+   * TODO Add back the possibility to compare heuristics using a test - like the SpeedTest, but
+   * maybe better to make a separate test.
    */
   @SuppressWarnings("unused")
   public void compareHeuristics(
@@ -114,8 +110,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     RaptorResponse<T> response
   ) {
     if (LOG.isDebugEnabled()) {
-      var pathsAsText = response
-        .paths()
+      var pathsAsText = response.paths()
         .stream()
         .map(p -> "\t\n" + p.toString(transitData.stopNameResolver()))
         .collect(Collectors.joining());

@@ -10,20 +10,17 @@ import org.rutebanken.netex.model.StopUseEnumeration;
 
 /**
  * Validates that the number of passing times in the journey and the number of stop points in the
- * pattern are equal.
- * It also takes into account that some points in the pattern can be set to stopUse=passthrough
- * which means that those must not be referenced in the journey.
+ * pattern are equal. It also takes into account that some points in the pattern can be set to
+ * stopUse=passthrough which means that those must not be referenced in the journey.
  */
 class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, ServiceJourney> {
 
   @Override
   public Status validate(ServiceJourney sj) {
-    JourneyPattern_VersionStructure journeyPattern = index
-      .getJourneyPatternsById()
+    JourneyPattern_VersionStructure journeyPattern = index.getJourneyPatternsById()
       .lookup(getPatternId(sj));
 
-    int nStopPointsInJourneyPattern = (int) journeyPattern
-      .getPointsInSequence()
+    int nStopPointsInJourneyPattern = (int) journeyPattern.getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .stream()
       .filter(Predicate.not(JourneyPatternSJMismatch::isPassThrough))
@@ -39,10 +36,8 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
    * stopping?
    */
   private static boolean isPassThrough(PointInLinkSequence_VersionedChildStructure point) {
-    return (
-      point instanceof StopPointInJourneyPattern spijp &&
-      spijp.getStopUse() == StopUseEnumeration.PASSTHROUGH
-    );
+    return (point instanceof StopPointInJourneyPattern spijp &&
+      spijp.getStopUse() == StopUseEnumeration.PASSTHROUGH);
   }
 
   @Override
@@ -66,14 +61,12 @@ class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, Servic
 
     @Override
     public String getMessage() {
-      return (
-        "Mismatch in stop points between ServiceJourney and JourneyPattern. " +
+      return ("Mismatch in stop points between ServiceJourney and JourneyPattern. " +
         "ServiceJourney will be skipped. " +
         " ServiceJourney=" +
         sjId +
         ", JourneyPattern= " +
-        patternId
-      );
+        patternId);
     }
   }
 }

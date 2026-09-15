@@ -37,8 +37,9 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("invalidRangeCases")
   void invalidRange(LocalDate start, LocalDate end) {
-    assertThrows(IllegalArgumentException.class, () ->
-      new PatternByServiceDatesFilter(
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new PatternByServiceDatesFilter(
         LocalDateRange.ofExclusiveEnd(start, end),
         r -> List.of(),
         d -> List.of()
@@ -58,8 +59,8 @@ class PatternByServiceDatesFilterTest {
   @ParameterizedTest
   @MethodSource("validRangeCases")
   void validRange(LocalDate start, LocalDate end) {
-    assertDoesNotThrow(() ->
-      new PatternByServiceDatesFilter(
+    assertDoesNotThrow(
+      () -> new PatternByServiceDatesFilter(
         LocalDateRange.ofExclusiveEnd(start, end),
         r -> List.of(),
         d -> List.of()

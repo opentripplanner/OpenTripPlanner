@@ -39,7 +39,6 @@ final class ValueOutsideRangeIssue extends AbstractIssue {
       Objects.toString(value),
       columnName(),
       Objects.toString(range),
-      csvLine(),
-    };
+      csvLine(), };
   }
 }

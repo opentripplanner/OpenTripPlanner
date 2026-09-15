@@ -74,8 +74,7 @@ public class RoutingPreferencesBuilder {
   }
 
   public RoutingPreferencesBuilder withWheelchair(Consumer<WheelchairPreferences.Builder> body) {
-    this.wheelchair = ifNotNull(this.wheelchair, original.wheelchair())
-      .copyOf()
+    this.wheelchair = ifNotNull(this.wheelchair, original.wheelchair()).copyOf()
       .apply(body)
       .build();
     return this;
@@ -124,8 +123,7 @@ public class RoutingPreferencesBuilder {
   public RoutingPreferencesBuilder withItineraryFilter(
     Consumer<ItineraryFilterPreferences.Builder> body
   ) {
-    this.itineraryFilter = ifNotNull(this.itineraryFilter, original.itineraryFilter())
-      .copyOf()
+    this.itineraryFilter = ifNotNull(this.itineraryFilter, original.itineraryFilter()).copyOf()
       .apply(body)
       .build();
     return this;

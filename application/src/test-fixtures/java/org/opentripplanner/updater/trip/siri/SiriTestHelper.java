@@ -62,27 +62,23 @@ public class SiriTestHelper {
     var resultRef = new AtomicReference<UpdateResult>();
     var adapter = fuzzyMatching ? siriAdapterWithFuzzyMatching : siriAdapter;
     try {
-      transitTestEnvironment
-        .updateManager()
-        .submit(ctx -> {
-          var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
-          var feedId = transitTestEnvironment.feedId();
-          var transitService = new DefaultTransitService(
-            transitTestEnvironment.transitRepository(),
-            buffer
-          );
-          resultRef.set(
-            adapter
-              .forUpdate(buffer)
-              .applyEstimatedTimetable(
-                new EntityResolver(transitService, feedId),
-                feedId,
-                DIFFERENTIAL,
-                updates
-              )
-          );
-        })
-        .get();
+      transitTestEnvironment.updateManager().submit(ctx -> {
+        var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
+        var feedId = transitTestEnvironment.feedId();
+        var transitService = new DefaultTransitService(
+          transitTestEnvironment.transitRepository(),
+          buffer
+        );
+        resultRef.set(
+          adapter.forUpdate(buffer)
+            .applyEstimatedTimetable(
+              new EntityResolver(transitService, feedId),
+              feedId,
+              DIFFERENTIAL,
+              updates
+            )
+        );
+      }).get();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

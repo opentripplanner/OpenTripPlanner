@@ -15,8 +15,7 @@ public class FixedFeedIdGenerator {
     String fixedFeedId = "UNKNOWN_FEED";
 
     // Count each feedId
-    Map<String, Integer> feedIds = entities
-      .stream()
+    Map<String, Integer> feedIds = entities.stream()
       .map(a -> a.getId().getFeedId())
       .collect(Collectors.groupingBy(it -> it, Collectors.reducing(0, i -> 1, Integer::sum)));
 

@@ -13,9 +13,9 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 /**
  * Cancelling all individual stops (as opposed to journey-level cancellation) should result in an
- * implicit trip cancellation when all stops are non-routable.
- * TODO RT_VP: This is a non-regression test that captures the existing behavior.
- *             We should verify that this behavior is acceptable/correct.
+ * implicit trip cancellation when all stops are non-routable. TODO RT_VP: This is a non-regression
+ * test that captures the existing behavior. We should verify that this behavior is
+ * acceptable/correct.
  */
 class CancelAllStopsTest implements RealtimeTestConstants {
 
@@ -33,12 +33,10 @@ class CancelAllStopsTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:11")
           .withIsCancellation(true)
           .call(STOP_B)

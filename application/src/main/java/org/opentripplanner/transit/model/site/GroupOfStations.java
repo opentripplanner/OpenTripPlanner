@@ -14,10 +14,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster of
  * stops that naturally belong together.
  */
-public class GroupOfStations
-  extends AbstractTransitEntity<GroupOfStations, GroupOfStationsBuilder>
-  implements StopLocationsGroup
-{
+public class GroupOfStations extends AbstractTransitEntity<GroupOfStations, GroupOfStationsBuilder>
+  implements StopLocationsGroup {
 
   private final Set<StopLocationsGroup> childStations;
   private final I18NString name;
@@ -51,10 +49,7 @@ public class GroupOfStations
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations
-      .stream()
-      .flatMap(s -> s.getChildStops().stream())
-      .toList();
+    return this.childStations.stream().flatMap(s -> s.getChildStops().stream()).toList();
   }
 
   public Collection<StopLocationsGroup> getChildStations() {
@@ -71,13 +66,11 @@ public class GroupOfStations
 
   @Override
   public boolean sameAs(GroupOfStations other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
       Objects.equals(childStations, other.getChildStations()) &&
       Objects.equals(coordinate, other.getCoordinate()) &&
-      Objects.equals(purposeOfGrouping, other.getPurposeOfGrouping())
-    );
+      Objects.equals(purposeOfGrouping, other.getPurposeOfGrouping()));
   }
 
   @Override

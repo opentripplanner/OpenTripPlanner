@@ -73,8 +73,8 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
   public Predicate<TripTimes> createTripFilter(TripPattern tripPattern) {
     for (TransitFilter filter : filters) {
       if (filter.matchTripPattern(tripPattern)) {
-        var applyTripTimesFilters =
-          hasTripLevelModeFilters && tripPattern.getContainsMultipleModes();
+        var applyTripTimesFilters = hasTripLevelModeFilters &&
+          tripPattern.getContainsMultipleModes();
         return tripTimes -> tripTimesPredicate(tripTimes, applyTripTimesFilters);
       }
     }
@@ -94,7 +94,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
 
     if (
       requireWheelchairAccessibleTrips &&
-      tripTimes.getWheelchairAccessibility() != Accessibility.POSSIBLE
+        tripTimes.getWheelchairAccessibility() != Accessibility.POSSIBLE
     ) {
       return false;
     }

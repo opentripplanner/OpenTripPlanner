@@ -54,18 +54,16 @@ public class ApiTransitService {
       Stream.of(originalPattern)
     )
       .distinct()
-      .flatMap(tripPattern ->
-        transitService
-          .findTripTimesOnDate(
-            stop,
-            tripPattern,
-            startTime,
-            timeRange,
-            numDepartures,
-            arrivalDeparture,
-            false
-          )
-          .stream()
+      .flatMap(
+        tripPattern -> transitService.findTripTimesOnDate(
+          stop,
+          tripPattern,
+          startTime,
+          timeRange,
+          numDepartures,
+          arrivalDeparture,
+          false
+        ).stream()
       )
       .sorted(
         Comparator.comparing(
@@ -81,10 +79,9 @@ public class ApiTransitService {
    */
   public List<TripTimeOnDate> findStopCalls(Leg leg) {
     if (leg.isTransitLeg()) {
-      var calls = transitService
-        .findTripTimesOnDate(leg.trip(), leg.serviceDate())
-        .orElseThrow(() ->
-          new IllegalStateException(
+      var calls = transitService.findTripTimesOnDate(leg.trip(), leg.serviceDate())
+        .orElseThrow(
+          () -> new IllegalStateException(
             "Cannot find times for %s on service date %s".formatted(leg.trip(), leg.serviceDate())
           )
         );
@@ -100,8 +97,8 @@ public class ApiTransitService {
    * whose trip's service date is within any of the given service date ranges are returned. If
    * {@code callTimePeriods} is non-null, only calls where the vehicle is scheduled to visit the
    * stop during one of the periods are returned. The {@code arrivalDeparture} parameter controls
-   * whether drop-off-only calls are included. Each call is paired with the {@link TripOnServiceDate}
-   * it belongs to, which is synthesized when no real one exists.
+   * whether drop-off-only calls are included. Each call is paired with the
+   * {@link TripOnServiceDate} it belongs to, which is synthesized when no real one exists.
    */
   public List<StopCallOnTripOnServiceDate> findCanceledStopCalls(
     StopLocation stop,
@@ -117,17 +114,16 @@ public class ApiTransitService {
       .withCancellationPolicy(CancellationPolicy.ONLY_CANCELLATIONS)
       .build();
 
-    return transitService
-      .findTripTimesOnDate(request)
+    return transitService.findTripTimesOnDate(request)
       .stream()
       .map(call -> new StopCallOnTripOnServiceDate(resolveTripOnServiceDate(call), call))
       .toList();
   }
 
   /**
-   * Find the {@link TripOnServiceDate} for the given trip and service date. A real one (e.g. a NeTEx
-   * dated service journey or a real-time added trip) is preferred if it exists. Otherwise one is
-   * synthesized from the scheduled trip, but only if the trip actually runs on the given date.
+   * Find the {@link TripOnServiceDate} for the given trip and service date. A real one (e.g. a
+   * NeTEx dated service journey or a real-time added trip) is preferred if it exists. Otherwise one
+   * is synthesized from the scheduled trip, but only if the trip actually runs on the given date.
    */
   public Optional<TripOnServiceDate> findOrCreateTripOnServiceDate(
     FeedScopedId tripId,
@@ -146,8 +142,7 @@ public class ApiTransitService {
     if (trip == null) {
       return Optional.empty();
     }
-    boolean runsOnDate = transitService
-      .getTripCalendars()
+    boolean runsOnDate = transitService.getTripCalendars()
       .isActiveOn(trip.getServiceId(), serviceDate);
     if (!runsOnDate) {
       return Optional.empty();
@@ -181,12 +176,10 @@ public class ApiTransitService {
     TripPattern originalPattern,
     LocalDate date
   ) {
-    return originalPattern
-      .scheduledTripsAsStream()
+    return originalPattern.scheduledTripsAsStream()
       .map(trip -> transitService.findNewTripPatternForModifiedTrip(trip.getId(), date))
       .filter(
-        tripPattern ->
-          tripPattern != null &&
+        tripPattern -> tripPattern != null &&
           tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );
   }

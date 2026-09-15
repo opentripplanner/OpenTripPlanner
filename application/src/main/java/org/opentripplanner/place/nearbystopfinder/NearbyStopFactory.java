@@ -34,15 +34,14 @@ public class NearbyStopFactory {
       .withMode(mode)
       .build();
 
-    return stopVertices
-      .stream()
+    return stopVertices.stream()
       .map(s -> ofZeroDistance(s.getId(), new State(s, streetSearchRequest)))
       .toList();
   }
 
   /**
-   * Given a list of Vertices, find the TransitStopVertices and create zero distance NearbyStops
-   * for them.
+   * Given a list of Vertices, find the TransitStopVertices and create zero distance NearbyStops for
+   * them.
    */
   public static List<NearbyStop> nearbyStopsForTransitStopVerticesFiltered(
     Collection<? extends Vertex> vertices,
@@ -50,8 +49,7 @@ public class NearbyStopFactory {
     RouteRequest routeRequest,
     StreetMode mode
   ) {
-    var transitStops = vertices
-      .stream()
+    var transitStops = vertices.stream()
       .filter(v -> v instanceof TransitStopVertex)
       .map(v -> (TransitStopVertex) v)
       .collect(Collectors.toSet());

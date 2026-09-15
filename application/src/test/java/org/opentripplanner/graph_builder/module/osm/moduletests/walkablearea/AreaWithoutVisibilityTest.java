@@ -12,11 +12,13 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
- * Tests the {@code buildWithoutVisibility} code path, activated by {@code withAreaVisibility(false)}.
+ * Tests the {@code buildWithoutVisibility} code path, activated by
+ * {@code withAreaVisibility(false)}.
  *
- * <p>Without visibility computation there is no pruning: every ring segment survives. No
- * cross-area visibility edges are ever added, so the only graph edges are the ring boundary
- * plus any non-area ways that happen to share nodes with the area.
+ * <p>
+ * Without visibility computation there is no pruning: every ring segment survives. No cross-area
+ * visibility edges are ever added, so the only graph edges are the ring boundary plus any non-area
+ * ways that happen to share nodes with the area.
  */
 class AreaWithoutVisibilityTest {
 
@@ -48,8 +50,9 @@ class AreaWithoutVisibilityTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // footway from outside1 to bl
         "(0,0) → (-0.001,0) PEDESTRIAN ♿✅",

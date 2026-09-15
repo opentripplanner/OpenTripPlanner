@@ -42,9 +42,8 @@ public class PlatformLinkingTest {
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
   /**
-   * Link stop outside platform area to platform.
-   * Stop gets linked to the closest edge pair and optimal paths from
-   * the splitting points to visibility points are added
+   * Link stop outside platform area to platform. Stop gets linked to the closest edge pair and
+   * optimal paths from the splitting points to visibility points are added
    */
   @Test
   void testLinkStopOutsideArea() {
@@ -53,8 +52,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.001),
       new Coordinate(10.002, 60.001),
       new Coordinate(10.002, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform (this array defines indices)
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -72,8 +70,8 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link stop inside platform area to platform.
-   * Connects stop with visibility points and to closest edge.
+   * Link stop inside platform area to platform. Connects stop with visibility points and to closest
+   * edge.
    */
   @Test
   void testLinkStopInsideArea() {
@@ -83,8 +81,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.0006),
       new Coordinate(10.0008, 60.0006),
       new Coordinate(10.0008, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform (this array defines indices)
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -103,18 +100,13 @@ public class PlatformLinkingTest {
     // transit stop is connected in one rectangle corner only to walk no thru trafic edges
     // verify that new area edge connection is also walk no thru
     // otherwise connection cannot be used to exit the area
-    var noThruEdges = graph
-      .listAreaEdges()
-      .stream()
-      .filter(a -> a.isWalkNoThruTraffic())
-      .toList();
+    var noThruEdges = graph.listAreaEdges().stream().filter(a -> a.isWalkNoThruTraffic()).toList();
     // original platform has 4 nothru edges, now 2 more got added
     assertEquals(6, noThruEdges.size());
   }
 
   /**
-   * Link stop which is very close to a platform vertex.
-   * Linking snaps directly to the vertex.
+   * Link stop which is very close to a platform vertex. Linking snaps directly to the vertex.
    * Connections to other vertices are not created.
    */
   @Test
@@ -123,8 +115,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -139,9 +130,9 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link an interior vertex which is very close to a visibility vertex by
-   * calling directly addPermanentAreaVertex used in boarding location linking
-   * A connecting edge pair is created despite of the small distance
+   * Link an interior vertex which is very close to a visibility vertex by calling directly
+   * addPermanentAreaVertex used in boarding location linking A connecting edge pair is created
+   * despite of the small distance
    */
   @Test
   void testAddPermanentAreaVertex() {
@@ -149,8 +140,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add one entrance to bottom left corner
     int[] visibilityPoints = { 3 };
 
@@ -194,8 +184,8 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link a stop which is inside an area and very close to its edge.
-   * Linking snaps directly to the edge without short connecting edges
+   * Link a stop which is inside an area and very close to its edge. Linking snaps directly to the
+   * edge without short connecting edges
    */
   @Test
   void testLinkStopNearPlatformEdge() {
@@ -203,8 +193,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // add entrance to every corner of the platform
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -221,8 +210,7 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link two stops inside platform area to platform.
-   * Stops will get linked directly.
+   * Link two stops inside platform area to platform. Stops will get linked directly.
    */
   @Test
   void testLinkTwoStopsInsideArea() {
@@ -230,8 +218,7 @@ public class PlatformLinkingTest {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10, 60),
-    };
+      new Coordinate(10, 60), };
     // entrance to every corner of the platform
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
@@ -264,13 +251,13 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link stop inside a concave platform. Stop gets connected to the graph,
-   * but visibility edges which would cross the area boundary are not added
+   * Link stop inside a concave platform. Stop gets connected to the graph, but visibility edges
+   * which would cross the area boundary are not added
    */
   @Test
   void testLinkStopToConcaveArea() {
     /* test platform has a L shape with 12 edges:
-
+    
       0                    1
        ____________________
       |                    |
@@ -287,8 +274,7 @@ public class PlatformLinkingTest {
       new Coordinate(10.010, 60),
       new Coordinate(10.006, 60),
       new Coordinate(10.006, 60.003),
-      new Coordinate(10, 60.003),
-    };
+      new Coordinate(10, 60.003), };
     // add entrances to corners 0 and 5
     int[] visibilityPoints = { 0, 5 };
 
@@ -323,8 +309,7 @@ public class PlatformLinkingTest {
       new Coordinate(10.006, 60.004),
       new Coordinate(10.006, 60.002),
       new Coordinate(10.004, 60),
-      new Coordinate(10.002, 60),
-    };
+      new Coordinate(10.002, 60), };
     // add 8 visibility points (max limit applied in linking is 6)
     int[] visibilityPoints = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
@@ -355,10 +340,9 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Test that the edge split point connects to other visibility points.
-   * This used to occasionally fail due to jts geometry.contains accuracy limitations.
-   * The test geometry is taken from Bletchley station platform 6, where
-   * the problem was easy to duplicate.
+   * Test that the edge split point connects to other visibility points. This used to occasionally
+   * fail due to jts geometry.contains accuracy limitations. The test geometry is taken from
+   * Bletchley station platform 6, where the problem was easy to duplicate.
    */
   @Test
   void boundaryTest() {
@@ -372,8 +356,7 @@ public class PlatformLinkingTest {
       // southeast
       new Coordinate(-0.7356841, 51.9950911),
       // southwest
-      new Coordinate(-0.7357458, 51.9950836),
-    };
+      new Coordinate(-0.7357458, 51.9950836), };
 
     // 1 visibility point at eastern exit
     int[] visibilityPoints = { 2 };
@@ -486,34 +469,32 @@ public class PlatformLinkingTest {
           tStop,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
             )
+          )
         );
       } else {
         linker.linkVertexForRealTime(
           tStop,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
+          (vertex, streetVertex) -> List.of(
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
             )
+          )
         );
       }
     }
@@ -525,13 +506,11 @@ public class PlatformLinkingTest {
     AreaGroup area,
     String nameString
   ) {
-    LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] {
-      v1.getCoordinate(),
-      v2.getCoordinate(),
-    });
+    LineString line = GEOMETRY_FACTORY.createLineString(
+      new Coordinate[] { v1.getCoordinate(), v2.getCoordinate(), }
+    );
     I18NString name = new LocalizedString(nameString);
-    return new AreaEdgeBuilder()
-      .withFromVertex(v1)
+    return new AreaEdgeBuilder().withFromVertex(v1)
       .withToVertex(v2)
       .withGeometry(line)
       .withName(name)

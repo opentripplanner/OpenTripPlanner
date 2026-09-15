@@ -20,9 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 /**
- * Indexed access to Stop entities.
- * For performance reasons these indexes are not part of the serialized state of the graph.
- * They are rebuilt at runtime after graph deserialization.
+ * Indexed access to Stop entities. For performance reasons these indexes are not part of the
+ * serialized state of the graph. They are rebuilt at runtime after graph deserialization.
  */
 class SiteRepositoryIndex {
 
@@ -78,8 +77,7 @@ class SiteRepositoryIndex {
    * @return A collection of {@link RegularStop}s that are inside of the passed envelope.
    */
   Collection<RegularStop> findRegularStops(Envelope envelope) {
-    return regularStopSpatialIndex
-      .query(envelope)
+    return regularStopSpatialIndex.query(envelope)
       .stream()
       .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
       .toList();
@@ -103,19 +101,16 @@ class SiteRepositoryIndex {
   }
 
   /**
-   * A small number of holes in the stop-index is ok, but if there are many, it will affect
-   * the Raptor performance.
+   * A small number of holes in the stop-index is ok, but if there are many, it will affect the
+   * Raptor performance.
    */
   private void logHolesInIndex() {
     int c = (int) Arrays.stream(stopsByIndex).filter(Objects::isNull).count();
     if (c > 0) {
       double p = (100.0 * c) / stopsByIndex.length;
       // Log this as warning if more than 5% of the space is null
-      LOG.atLevel(p >= 5.0 ? Level.WARN : Level.INFO).log(
-        "The stop index contains holes in it. {} of {} is null.",
-        c,
-        stopsByIndex.length
-      );
+      LOG.atLevel(p >= 5.0 ? Level.WARN : Level.INFO)
+        .log("The stop index contains holes in it. {} of {} is null.", c, stopsByIndex.length);
     }
   }
 }

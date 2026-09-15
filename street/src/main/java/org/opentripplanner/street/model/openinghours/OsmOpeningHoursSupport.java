@@ -14,8 +14,7 @@ public class OsmOpeningHoursSupport {
    * happens on best effort basis.
    */
   public static String osmFormat(OHCalendar calendar) {
-    return calendar
-      .openingHours()
+    return calendar.openingHours()
       .stream()
       .map(OsmOpeningHoursSupport::osmFormat)
       .collect(Collectors.joining("; "));
@@ -28,13 +27,11 @@ public class OsmOpeningHoursSupport {
    * happens on best effort basis.
    */
   public static String osmFormat(OpeningHours oh) {
-    return (
-      toOsm(oh.periodDescription()) +
+    return (toOsm(oh.periodDescription()) +
       " " +
       TimeUtils.timeToStrCompact(truncateToMinute(oh.startTime())) +
       "-" +
-      TimeUtils.timeToStrCompact(truncateToMinute(oh.endTime()))
-    );
+      TimeUtils.timeToStrCompact(truncateToMinute(oh.endTime())));
   }
 
   private static int truncateToMinute(long startTime) {

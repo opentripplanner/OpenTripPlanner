@@ -184,9 +184,8 @@ class PathwayEdgeTest {
       .withWheelchairEnabled(wheelchair)
       .withWalk(b -> b.withSpeed(10).build())
       .withMode(StreetMode.WALK)
-      .withWheelchair(b ->
-        b
-          .withStopOnlyAccessible()
+      .withWheelchair(
+        b -> b.withStopOnlyAccessible()
           .withElevatorOnlyAccessible()
           .withInaccessibleStreetReluctance(25)
           .withMaxSlope(0.08)

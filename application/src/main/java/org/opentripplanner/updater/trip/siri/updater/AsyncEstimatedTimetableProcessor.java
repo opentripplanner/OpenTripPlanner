@@ -29,13 +29,14 @@ public class AsyncEstimatedTimetableProcessor {
   }
 
   /**
-   * Apply the estimated timetables to the transit model.
-   * This method is non-blocking and applies the changes asynchronously.
+   * Apply the estimated timetables to the transit model. This method is non-blocking and applies
+   * the changes asynchronously.
+   *
    * @return a future indicating when the changes are applied.
    */
   public Future<?> processSiriData(ServiceDelivery serviceDelivery) {
-    return saveResultOnGraph.execute(context ->
-      updateResultConsumer.accept(
+    return saveResultOnGraph.execute(
+      context -> updateResultConsumer.accept(
         estimatedTimetableHandler.applyUpdate(
           serviceDelivery.getEstimatedTimetableDeliveries(),
           UpdateIncrementality.DIFFERENTIAL,

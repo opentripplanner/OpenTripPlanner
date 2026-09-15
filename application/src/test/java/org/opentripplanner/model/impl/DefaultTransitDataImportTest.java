@@ -85,7 +85,9 @@ public class DefaultTransitDataImportTest {
       ConstrainedTransfer{from: StopTP{K}, to: StopTP{M}, constraint: (priority: NOT_ALLOWED)}
       ConstrainedTransfer{from: StopTP{L}, to: StopTP{K}, constraint: (priority: RECOMMENDED)}
       ConstrainedTransfer{from: StopTP{M}, to: StopTP{K}, constraint: (priority: NOT_ALLOWED)}
-      ConstrainedTransfer{from: TripTP{1.1, stopPos 1}, to: TripTP{2.2, stopPos 0}, constraint: (guaranteed)}""",
+      ConstrainedTransfer{from: TripTP{1.1, stopPos 1}, to: TripTP{2.2, stopPos 0}, constraint: (guaranteed)}\
+      """
+      ,
       result
     );
   }

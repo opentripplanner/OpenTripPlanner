@@ -18,8 +18,8 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * <p>
  * An example of such a geometry is https://www.openstreetmap.org/relation/8513460.
  * <p>
- * There we want to make sure that the node https://www.openstreetmap.org/node/6136980344
- * can be used as the start point of the search, and you can leave the area.
+ * There we want to make sure that the node https://www.openstreetmap.org/node/6136980344 can be
+ * used as the start point of the search, and you can leave the area.
  * <p>
  * Further reading: https://github.com/opentripplanner/OpenTripPlanner/pull/6486
  */
@@ -81,8 +81,9 @@ class ConcaveHoleTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // connecting ways from outside into two outer-ring corners
         "(0,0) → (-1,0) PEDESTRIAN ♿✅",

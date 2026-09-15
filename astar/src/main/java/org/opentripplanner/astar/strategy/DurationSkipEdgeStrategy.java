@@ -10,10 +10,8 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
  * all relevant results up to the specified duration, as the only criterion we optimize on is
  * generalized cost.
  */
-public class DurationSkipEdgeStrategy<
-  State extends AStarState<State, Edge, ?>,
-  Edge extends AStarEdge<State, Edge, ?>
-> implements SkipEdgeStrategy<State, Edge> {
+public class DurationSkipEdgeStrategy<State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>>
+  implements SkipEdgeStrategy<State, Edge> {
 
   private final double durationInSeconds;
 

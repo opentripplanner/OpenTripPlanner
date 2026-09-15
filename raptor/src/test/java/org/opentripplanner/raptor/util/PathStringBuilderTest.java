@@ -79,8 +79,7 @@ public class PathStringBuilderTest {
     int egressDuration = 3600 + 37 * 60 + 7;
     assertEquals(
       "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s [10:44 12:33 1h49m Tₙ0 C₁567 C₂7]",
-      subject
-        .walk(37)
+      subject.walk(37)
         .stop(227)
         .transit(MODE, T_10_46_05, T_10_55)
         .stop(112)
@@ -94,8 +93,7 @@ public class PathStringBuilderTest {
   public void pathWithoutAccessAndEgress() {
     assertEquals(
       "227 ~ BUS 10:46:05 10:55 ~ 112 [10:46:05 10:55 8m55s Tₙ0 C₁60 C₂9 3pz]",
-      subject
-        .accessEgress(free(227))
+      subject.accessEgress(free(227))
         .stop(227)
         .transit(MODE, T_10_46_05, T_10_55)
         .stop(112)

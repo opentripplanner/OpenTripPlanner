@@ -64,10 +64,7 @@ public class UpdaterConfigurator {
   private final VertexLinker linker;
   private final TransitRepository transitRepository;
   private final UpdatersParameters updatersParameters;
-  private final RepositoryHandle<
-    RealtimeVehicleRepositorySnapshot,
-    RealtimeVehicleRepository
-  > realtimeVehicleRepositoryHandle;
+  private final RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final GbfsNetworkOverrides gbfsNetworkOverrides;
 
@@ -82,10 +79,7 @@ public class UpdaterConfigurator {
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager transitUpdateManager;
   private final UpdateManager streetUpdateManager;
-  private final RepositoryHandle<
-    TimetableRepositorySnapshot,
-    TimetableRepository
-  > timetableRepositoryHandle;
+  private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle;
   private final DelegatingTransitAlertServiceImpl transitAlertService;
 
   @Nullable
@@ -95,10 +89,7 @@ public class UpdaterConfigurator {
     Graph graph,
     DeduplicatorService deduplicator,
     VertexLinker linker,
-    RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
-    > realtimeVehicleRepositoryHandle,
+    RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
@@ -132,10 +123,7 @@ public class UpdaterConfigurator {
     Graph graph,
     DeduplicatorService deduplicator,
     VertexLinker linker,
-    RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
-    > realtimeVehicleRepositoryHandle,
+    RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle,
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
@@ -195,8 +183,7 @@ public class UpdaterConfigurator {
     );
     var streetWriterService = GraphWriterService.forStreetDomain(streetUpdateManager, graph);
     var updaterManager = new GraphUpdaterManager(
-      new WriteToGraphCallbacks()
-        .with(WriteDomain.TRANSIT, transitWriterService)
+      new WriteToGraphCallbacks().with(WriteDomain.TRANSIT, transitWriterService)
         .with(WriteDomain.STREET, streetWriterService),
       () -> {
         try {
@@ -250,8 +237,8 @@ public class UpdaterConfigurator {
    * @return a list of GraphUpdaters created from the configuration
    */
   private List<GraphUpdater<?>> createUpdatersFromConfig() {
-    OpeningHoursCalendarService openingHoursCalendarService =
-      graph.getOpeningHoursCalendarService();
+    OpeningHoursCalendarService openingHoursCalendarService = graph
+      .getOpeningHoursCalendarService();
 
     List<GraphUpdater<?>> updaters = new ArrayList<>();
 
@@ -365,8 +352,10 @@ public class UpdaterConfigurator {
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(transitRepository, deduplicator, () ->
-      LocalDate.now(transitRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(
+      transitRepository,
+      deduplicator,
+      () -> LocalDate.now(transitRepository.getTimeZone())
     );
   }
 }

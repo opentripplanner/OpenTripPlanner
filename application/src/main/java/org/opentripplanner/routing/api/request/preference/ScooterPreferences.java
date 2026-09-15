@@ -91,13 +91,11 @@ public final class ScooterPreferences implements Serializable {
       return false;
     }
     ScooterPreferences that = (ScooterPreferences) o;
-    return (
-      doubleEquals(that.speed, speed) &&
+    return (doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
-      optimizeTriangle.equals(that.optimizeTriangle)
-    );
+      optimizeTriangle.equals(that.optimizeTriangle));
   }
 
   @Override

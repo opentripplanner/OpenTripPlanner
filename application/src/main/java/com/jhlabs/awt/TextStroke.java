@@ -20,7 +20,8 @@ import java.awt.geom.Point2D;
  * <p>
  * Slightly adapted to OTP from original source.
  *
- * @see <a href="http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
+ * @see <a href=
+ *      "http://www.jhlabs.com/java/java2d/strokes/">http://www.jhlabs.com/java/java2d/strokes/</a>
  */
 public class TextStroke implements Stroke {
 
@@ -73,19 +74,19 @@ public class TextStroke implements Stroke {
     while (currentChar < length && !it.isDone()) {
       type = it.currentSegment(points);
       switch (type) {
-        case PathIterator.SEG_MOVETO:
+        case PathIterator.SEG_MOVETO :
           moveX = lastX = points[0];
           moveY = lastY = points[1];
           result.moveTo(moveX, moveY);
           nextAdvance = glyphVector.getGlyphMetrics(currentChar).getAdvance() * 0.5f;
           next = nextAdvance;
           break;
-        case PathIterator.SEG_CLOSE:
+        case PathIterator.SEG_CLOSE :
           points[0] = moveX;
           points[1] = moveY;
-        // Fall into....
+          // Fall into....
 
-        case PathIterator.SEG_LINETO:
+        case PathIterator.SEG_LINETO :
           thisX = points[0];
           thisY = points[1];
           float dx = thisX - lastX;
@@ -102,10 +103,9 @@ public class TextStroke implements Stroke {
               float x = lastX + next * dx * r;
               float y = lastY + next * dy * r;
               float advance = nextAdvance;
-              nextAdvance =
-                currentChar < length - 1
-                  ? glyphVector.getGlyphMetrics(currentChar + 1).getAdvance() * 0.5f
-                  : 0;
+              nextAdvance = currentChar < length - 1
+                ? glyphVector.getGlyphMetrics(currentChar + 1).getAdvance() * 0.5f
+                : 0;
               t.setToTranslation(x, y);
               t.rotate(angle);
               t.translate(-px - advance, -py + (height * factor) / 2.0f);
@@ -143,16 +143,16 @@ public class TextStroke implements Stroke {
     while (!it.isDone()) {
       type = it.currentSegment(points);
       switch (type) {
-        case PathIterator.SEG_MOVETO:
+        case PathIterator.SEG_MOVETO :
           moveX = lastX = points[0];
           moveY = lastY = points[1];
           break;
-        case PathIterator.SEG_CLOSE:
+        case PathIterator.SEG_CLOSE :
           points[0] = moveX;
           points[1] = moveY;
-        // Fall into....
+          // Fall into....
 
-        case PathIterator.SEG_LINETO:
+        case PathIterator.SEG_LINETO :
           thisX = points[0];
           thisY = points[1];
           float dx = thisX - lastX;

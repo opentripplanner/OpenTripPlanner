@@ -151,8 +151,7 @@ public class OsmArea {
   }
 
   /**
-   * Try to extract a point which is in  the middle of the area and
-   * also inside the area geometry.
+   * Try to extract a point which is in the middle of the area and also inside the area geometry.
    *
    * @return Point geometry inside the area
    */
@@ -173,9 +172,8 @@ public class OsmArea {
     for (Ring ring : outermostRings) {
       polygons.add(ring.jtsPolygon);
     }
-    MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory().createMultiPolygon(
-      polygons.toArray(new Polygon[0])
-    );
+    MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory()
+      .createMultiPolygon(polygons.toArray(new Polygon[0]));
     var validOp = new IsValidOp(jtsMultiPolygon);
     if (!validOp.isValid()) {
       var validationError = validOp.getValidationError();

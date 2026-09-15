@@ -28,8 +28,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).name().toString()
+          .dataFetcher(
+            environment -> ((VehicleRentalStation) environment.getSource()).name().toString()
           )
           .build()
       )
@@ -42,8 +42,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("bikesAvailable")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).vehiclesAvailable()
+          .dataFetcher(
+            environment -> ((VehicleRentalStation) environment.getSource()).vehiclesAvailable()
           )
           .build()
       )
@@ -51,8 +51,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("spacesAvailable")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).spacesAvailable()
+          .dataFetcher(
+            environment -> ((VehicleRentalStation) environment.getSource()).spacesAvailable()
           )
           .build()
       )
@@ -60,8 +60,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("realtimeOccupancyAvailable")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).isRealTimeData()
+          .dataFetcher(
+            environment -> ((VehicleRentalStation) environment.getSource()).isRealTimeData()
           )
           .build()
       )
@@ -69,8 +69,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("allowDropoff")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(environment ->
-            ((VehicleRentalStation) environment.getSource()).isAllowDropoff()
+          .dataFetcher(
+            environment -> ((VehicleRentalStation) environment.getSource()).isAllowDropoff()
           )
           .build()
       )
@@ -78,8 +78,8 @@ public class BikeRentalStationType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("networks")
           .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-          .dataFetcher(environment ->
-            List.of(((VehicleRentalStation) environment.getSource()).network())
+          .dataFetcher(
+            environment -> List.of(((VehicleRentalStation) environment.getSource()).network())
           )
           .build()
       )

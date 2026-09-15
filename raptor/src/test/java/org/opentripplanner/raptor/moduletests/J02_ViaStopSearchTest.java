@@ -39,8 +39,8 @@ import org.opentripplanner.raptor.configure.RaptorTestFactory;
  * stop of one of the trips in the path.
  *
  * It should be possible to specify more than one connection. The result should include the via
- * locations in the order as they were specified in the request. Only alternatives that pass
- * through all via locations should be included in the result.
+ * locations in the order as they were specified in the request. Only alternatives that pass through
+ * all via locations should be included in the result.
  *
  * To support stations and other collections of stops, Raptor should also support multiple via
  * connections in one via location.
@@ -69,14 +69,12 @@ class J02_ViaStopSearchTest {
   private RaptorRequestBuilder<TestTripSchedule> prepareRequest() {
     var builder = data.requestBuilder();
 
-    builder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    builder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: 2023-07-24 Currently heuristics does not work with pass-through so we
       //  have to turn them off. Make sure to re-enable optimization later when it's fixed
       .clearOptimizations();
 
-    builder
-      .searchParams()
+    builder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(10))
@@ -91,8 +89,7 @@ class J02_ViaStopSearchTest {
       "first trip and wait for the next one at the specified via stop."
   )
   void viaSearchAlightingAtViaStop() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         A     B     C     D
@@ -123,16 +120,15 @@ class J02_ViaStopSearchTest {
       "stop is used over the alternatives."
   )
   void viaSearchArrivingByTransferAtViaStop() {
-    data
-      .withTimetables(
-        """
-        A     B           D     E
-        0:02  0:10        0:20  0:30
-        --
-                    C     D     E
-                    0:25  0:30  0:40
-        """
-      )
+    data.withTimetables(
+      """
+      A     B           D     E
+      0:02  0:10        0:20  0:30
+      --
+                  C     D     E
+                  0:25  0:30  0:40
+      """
+    )
       // Walk 1 minute to transfer from D to C - this is the only way to visit stop C
       .withTransfer(STOP_D, transfer(STOP_C, D1_m));
 
@@ -162,7 +158,8 @@ class J02_ViaStopSearchTest {
       """
       A B C D
       0:02 0:05 0:10 0:15
-      """ +
+      """
+        +
         // We add another trip to allow riding trip one - via B - then ride trip two, this
         // is not a pareto-optimal solution and should only appear if there is something wrong.
         """
@@ -212,8 +209,7 @@ class J02_ViaStopSearchTest {
 
     // We will add access to A, B, and C, but since the B stop is the via point we expect that to
     // be used
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(VIA_LOCATION_STOP_C)
       // We allow egress from B, C, and D - if the via search works as expected, only egress from C
@@ -252,8 +248,7 @@ class J02_ViaStopSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(VIA_LOCATION_STOP_B_THEN_D)
       .addEgressPaths(walk(STOP_F, D30_s));
@@ -284,8 +279,7 @@ class J02_ViaStopSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(VIA_LOCATION_STOP_C_THEN_B)
       .addEgressPaths(walk(STOP_D, D30_s));
@@ -316,8 +310,7 @@ class J02_ViaStopSearchTest {
 
     var requestBuilder = prepareRequest();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addAccessPaths(walk(STOP_B, D2_m))
       .addViaLocations(VIA_LOCATION_STOP_A_OR_B)
@@ -354,8 +347,7 @@ class J02_ViaStopSearchTest {
     var requestBuilder = prepareRequest();
     var minWaitTime = Duration.ofSeconds(45);
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(walk(STOP_A, D30_s))
       .addViaLocations(
         List.of(RaptorViaLocation.viaVisit("B", minWaitTime).addStop(STOP_B).build())

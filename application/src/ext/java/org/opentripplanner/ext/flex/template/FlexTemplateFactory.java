@@ -89,26 +89,24 @@ class FlexTemplateFactory {
    * Check if stop position is routable and that the latest-booking time criteria is met.
    */
   private boolean isAllowedToBoardAt(int boardStopPosition) {
-    return (
-      trip.getBoardRule(boardStopPosition).isRoutable() &&
+    return (trip.getBoardRule(boardStopPosition).isRoutable() &&
       !RoutingBookingInfo.of(
         date.requestedBookingTime(),
         trip.getPickupBookingInfo(boardStopPosition)
-      ).exceedsLatestBookingTime()
-    );
+      ).exceedsLatestBookingTime());
   }
 
   /**
-   * With respect to one journey/itinerary this method returns {@code true} if a passenger can
-   * board and alight at the same stop in the journey pattern. This is not allowed for regular
-   * stops, but it would make sense to allow it for area stops or group stops.
+   * With respect to one journey/itinerary this method returns {@code true} if a passenger can board
+   * and alight at the same stop in the journey pattern. This is not allowed for regular stops, but
+   * it would make sense to allow it for area stops or group stops.
    * <p>
    * In NeTEx this is not allowed.
    * <p>
    * In GTFS this is no longer allowed according to specification. But it was allowed earlier.
    * <p>
-   * This method simply returns {@code false}, but we keep it here for documentation. If requested,
-   * we can add code to be backward compatible with the old GTFS version here.
+   * This method simply returns {@code false}, but we keep it here for documentation. If
+   * requested, we can add code to be backward compatible with the old GTFS version here.
    */
   private boolean isBoardingAndAlightingAtSameStopPositionAllowed() {
     return false;

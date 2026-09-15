@@ -23,8 +23,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements
-  RaptorTripScheduleSearch<T>,
-  RaptorBoardOrAlightEvent<T> {
+  RaptorTripScheduleSearch<T>, RaptorBoardOrAlightEvent<T> {
 
   private final TripSearchTimetable<T> timetable;
   private final int nTrips;
@@ -195,11 +194,10 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implem
   }
 
   /**
-   * Do a binary search to find the approximate lower bound index for where to start the search.
-   * We IGNORE if the trip schedule is in service.
-   * <p/>
-   * This is just a guess, and we return when the trip with a best valid arrival is in the range of
-   * the next {@link #binarySearchThreshold}.
+   * Do a binary search to find the approximate lower bound index for where to start the search. We
+   * IGNORE if the trip schedule is in service.
+   * <p/>This is just a guess, and we return when the trip with a best valid arrival is in the range
+   * of the next {@link #binarySearchThreshold}.
    *
    * @return a better lower bound index (inclusive)
    */

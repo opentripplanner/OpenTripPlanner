@@ -24,10 +24,8 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.ServiceDelivery;
 import uk.org.siri.siri21.Siri;
 
-public class SiriSXUpdater
-  extends PollingGraphUpdater<TransitRealTimeUpdateContext>
-  implements TransitAlertProvider
-{
+public class SiriSXUpdater extends PollingGraphUpdater<TransitRealTimeUpdateContext> implements
+  TransitAlertProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final int RETRY_MAX_ATTEMPTS = 3;
@@ -75,8 +73,7 @@ public class SiriSXUpdater
     );
     siriHttpLoader = siriLoader;
 
-    retry = new OtpRetryBuilder()
-      .withName("SIRI-SX Update")
+    retry = new OtpRetryBuilder().withName("SIRI-SX Update")
       .withMaxAttempts(RETRY_MAX_ATTEMPTS)
       .withInitialRetryInterval(RETRY_INITIAL_DELAY)
       .withBackoffMultiplier(RETRY_BACKOFF)

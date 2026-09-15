@@ -8,8 +8,8 @@ import org.opentripplanner.raptor.util.composite.CompositeUtil;
 
 /**
  * The {@link ParetoSet} do only support ONE listener, this class uses the composite pattern to
- * forward all events to a set of listeners, while playing the role of {@link
- * ParetoSetEventListener} towards the set.
+ * forward all events to a set of listeners, while playing the role of
+ * {@link ParetoSetEventListener} towards the set.
  *
  * @param <T> the set element type
  */
@@ -18,8 +18,8 @@ public class ParetoSetEventListenerComposite<T> implements ParetoSetEventListene
   private final ParetoSetEventListener<T>[] listeners;
 
   /**
-   * Take a list of listeners and return a composite listener. Input listeners, which are {@code null},
-   * are skipped. If no listeners are provided or all listeners are {@code null}, then
+   * Take a list of listeners and return a composite listener. Input listeners, which are
+   * {@code null}, are skipped. If no listeners are provided or all listeners are {@code null}, then
    * {@code null} is returned. If just one listener is passed in the listener it-self is returned
    * (without any wrapper). If more than one listener exists, a composite instance is returned.
    */

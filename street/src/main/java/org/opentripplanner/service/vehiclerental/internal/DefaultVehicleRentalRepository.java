@@ -18,14 +18,16 @@ import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZon
 import org.opentripplanner.street.graph.Graph;
 
 /**
- * Default {@link VehicleRentalRepository}. Owns the rental places and the geofencing zone
- * indices, and answers geofencing zone queries via {@link GeofencingZoneService}.
+ * Default {@link VehicleRentalRepository}. Owns the rental places and the geofencing zone indices,
+ * and answers geofencing zone queries via {@link GeofencingZoneService}.
  *
- * <p>Lives only in the serve phase. Zones applied during the graph build are carried on the
- * {@link org.opentripplanner.street.graph.Graph} and indexed here at construction; zones applied
- * by an updater are indexed as they are registered.
+ * <p>
+ * Lives only in the serve phase. Zones applied during the graph build are carried on the
+ * {@link org.opentripplanner.street.graph.Graph} and indexed here at construction; zones applied by
+ * an updater are indexed as they are registered.
  *
- * <p>Indices are keyed by network. A network has exactly one source of zones, so a later
+ * <p>
+ * Indices are keyed by network. A network has exactly one source of zones, so a later
  * registration replaces an earlier one rather than adding a second index alongside it.
  */
 @Singleton
@@ -36,8 +38,8 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
   private final Map<String, GeofencingZoneIndex> geofencingZoneIndexes = new ConcurrentHashMap<>();
 
   /**
-   * Seeds the repository with the zones applied during the graph build, which the
-   * {@link Graph} carries out of the build phase, and indexes them.
+   * Seeds the repository with the zones applied during the graph build, which the {@link Graph}
+   * carries out of the build phase, and indexes them.
    */
   @Inject
   public DefaultVehicleRentalRepository(Graph graph) {
@@ -85,8 +87,7 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   @Override
   public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
-    return geofencingZoneIndexes
-      .values()
+    return geofencingZoneIndexes.values()
       .stream()
       .flatMap(idx -> idx.findZonesContaining(coord).stream())
       .collect(Collectors.toSet());

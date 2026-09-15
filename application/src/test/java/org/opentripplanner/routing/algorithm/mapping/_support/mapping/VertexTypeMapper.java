@@ -11,15 +11,15 @@ class VertexTypeMapper {
       return null;
     }
     switch (domain) {
-      case NORMAL:
+      case NORMAL :
         return ApiVertexType.NORMAL;
-      case VEHICLEPARKING:
+      case VEHICLEPARKING :
         return ApiVertexType.BIKEPARK;
-      case VEHICLERENTAL:
+      case VEHICLERENTAL :
         return ApiVertexType.BIKESHARE;
-      case TRANSIT:
+      case TRANSIT :
         return ApiVertexType.TRANSIT;
-      default:
+      default :
         throw new IllegalArgumentException(domain.toString());
     }
   }

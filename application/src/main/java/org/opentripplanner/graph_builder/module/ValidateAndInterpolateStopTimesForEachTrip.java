@@ -200,25 +200,23 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   private double getMaxSpeedForMode(TransitMode mode) {
     // The following numbers (except airplane) are copied from the GTFS validator
     // https://github.com/MobilityData/gtfs-validator/blob/master/main/src/main/java/org/mobilitydata/gtfsvalidator/validator/StopTimeTravelSpeedValidator.java#L310
-    return (
-      switch (mode) {
-        case AIRPLANE -> 1000;
-        case TRAM -> 100;
-        case RAIL -> 500;
-        case SUBWAY, MONORAIL, BUS, TROLLEYBUS, COACH -> 150;
-        case FERRY -> 80;
-        case CABLE_CAR -> 30;
-        case GONDOLA, FUNICULAR -> 50;
-        default -> 200;
-      } / 3.6
-    );
+    return (switch (mode) {
+      case AIRPLANE -> 1000;
+      case TRAM -> 100;
+      case RAIL -> 500;
+      case SUBWAY, MONORAIL, BUS, TROLLEYBUS, COACH -> 150;
+      case FERRY -> 80;
+      case CABLE_CAR -> 30;
+      case GONDOLA, FUNICULAR -> 50;
+      default -> 200;
+    } / 3.6);
   }
 
   /**
    * Scan through the given list of stoptimes, interpolating the missing (unset) ones. This is
    * currently done by assuming equidistant stops and constant speed. While we may not be able to
-   * improve the constant speed assumption, we can
-   * TODO: use route matching (or shape distance etc.) to improve inter-stop distances
+   * improve the constant speed assumption, we can TODO: use route matching (or shape distance etc.)
+   * to improve inter-stop distances
    *
    * @param stopTimes the stoptimes (from a single trip) to be interpolated
    */
@@ -246,7 +244,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
           st = stopTimes.get(j);
           if (
             (st.isDepartureTimeSet() && st.getDepartureTime() != departureTime) ||
-            (st.isArrivalTimeSet() && st.getArrivalTime() != departureTime)
+              (st.isArrivalTimeSet() && st.getArrivalTime() != departureTime)
           ) {
             break;
           }

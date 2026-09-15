@@ -10,8 +10,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
- * Tests that the right number of permanent edges are in the graph for the various linking
- * scopes.
+ * Tests that the right number of permanent edges are in the graph for the various linking scopes.
  */
 class ScopedLinkingTest {
 
@@ -44,8 +43,7 @@ class ScopedLinkingTest {
     var env = buildEnv();
     assertThat(env.graph().listStreetEdges()).hasSize(1);
     TraverseModeSet traverseModes = TraverseModeSet.allModes();
-    var temp = env
-      .linker()
+    var temp = env.linker()
       .linkVertexForRealTime(SPLIT, traverseModes, BIDIRECTIONAL, (_, _) -> List.of());
     assertThat(env.graph().listStreetEdges()).hasSize(3);
     temp.disposeEdges();

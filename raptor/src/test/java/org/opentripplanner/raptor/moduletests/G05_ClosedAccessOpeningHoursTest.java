@@ -40,8 +40,7 @@ public class G05_ClosedAccessOpeningHoursTest implements RaptorTestConstants {
       """
     );
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindow(Duration.ofMinutes(30))

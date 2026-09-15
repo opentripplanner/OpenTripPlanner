@@ -28,16 +28,14 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   @Test
   void midEdgeRoutePointsResolveToNearerEndpoints() {
     var v = new IntersectionVertex[2];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("A", 60.0000, 10.0000);
-          v[1] = intersection("B", 60.0000, 10.0018);
-          street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("A", 60.0000, 10.0000);
+        v[1] = intersection("B", 60.0000, 10.0018);
+        street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
 
     var trip = CarpoolTripTestData.createSimpleTrip(
       new WgsCoordinate(60.0000, 10.0005),
@@ -57,19 +55,17 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   @Test
   void tripWithUnresolvableRoutePointResolvesToNull() {
     var v = new IntersectionVertex[4];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("I1", 60.0000, 10.0000);
-          v[1] = intersection("I2", 60.0000, 10.0006);
-          v[2] = intersection("M1", 60.0100, 10.0000);
-          v[3] = intersection("M2", 60.0100, 10.0018);
-          street(v[0], v[1], 35, StreetTraversalPermission.CAR, StreetTraversalPermission.CAR);
-          street(v[2], v[3], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("I1", 60.0000, 10.0000);
+        v[1] = intersection("I2", 60.0000, 10.0006);
+        v[2] = intersection("M1", 60.0100, 10.0000);
+        v[3] = intersection("M2", 60.0100, 10.0018);
+        street(v[0], v[1], 35, StreetTraversalPermission.CAR, StreetTraversalPermission.CAR);
+        street(v[2], v[3], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
 
     var trip = CarpoolTripTestData.createSimpleTrip(
       new WgsCoordinate(60.0000, 10.0003),
@@ -80,8 +76,8 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   }
 
   /**
-   * A route point whose own linking offers no car-reachable vertex falls back to the walk search and
-   * relocates onto the drivable network. Both ends of a one-way corridor are car-permitting but
+   * A route point whose own linking offers no car-reachable vertex falls back to the walk search
+   * and relocates onto the drivable network. Both ends of a one-way corridor are car-permitting but
    * neither can be both arrived at and departed from, so both points walk ~56 m to M, the only
    * vertex that can. Graph (one-way car forward, reverse pedestrian):
    * <pre>
@@ -91,30 +87,16 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   @Test
   void routePointWalksOutWhenItsLinkingIsNotCarReachable() {
     var v = new IntersectionVertex[3];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("O", 60.0000, 10.0000);
-          v[1] = intersection("M", 60.0000, 10.0010);
-          v[2] = intersection("D", 60.0000, 10.0020);
-          street(
-            v[0],
-            v[1],
-            56,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(
-            v[1],
-            v[2],
-            56,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("O", 60.0000, 10.0000);
+        v[1] = intersection("M", 60.0000, 10.0010);
+        v[2] = intersection("D", 60.0000, 10.0020);
+        street(v[0], v[1], 56, StreetTraversalPermission.ALL, StreetTraversalPermission.PEDESTRIAN);
+        street(v[1], v[2], 56, StreetTraversalPermission.ALL, StreetTraversalPermission.PEDESTRIAN);
       }
-    );
+    });
 
     var trip = CarpoolTripTestData.createSimpleTrip(v[0].toWgsCoordinate(), v[2].toWgsCoordinate());
     var resolved = resolverFor(model).resolve(trip);

@@ -21,8 +21,8 @@ public final class VehicleRentalPreferences implements Serializable {
   public static final VehicleRentalPreferences DEFAULT = new VehicleRentalPreferences();
 
   /**
-   * Default slope sensitivity for electric-assist vehicles.
-   * 0.0 = motor fully compensates (ignore slope), 1.0 = no assistance (full slope effect).
+   * Default slope sensitivity for electric-assist vehicles. 0.0 = motor fully compensates (ignore
+   * slope), 1.0 = no assistance (full slope effect).
    */
   public static final double DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY =
     RentalRequest.DEFAULT_ELECTRIC_ASSIST_SLOPE_SENSITIVITY;
@@ -155,8 +155,7 @@ public final class VehicleRentalPreferences implements Serializable {
       return false;
     }
     VehicleRentalPreferences that = (VehicleRentalPreferences) o;
-    return (
-      Objects.equals(pickupTime, that.pickupTime) &&
+    return (Objects.equals(pickupTime, that.pickupTime) &&
       Objects.equals(pickupCost, that.pickupCost) &&
       Objects.equals(dropOffTime, that.dropOffTime) &&
       Objects.equals(dropOffCost, that.dropOffCost) &&
@@ -168,8 +167,10 @@ public final class VehicleRentalPreferences implements Serializable {
       allowArrivingInRentedVehicleAtDestination == that.allowArrivingInRentedVehicleAtDestination &&
       allowedNetworks.equals(that.allowedNetworks) &&
       bannedNetworks.equals(that.bannedNetworks) &&
-      DoubleUtils.doubleEquals(electricAssistSlopeSensitivity, that.electricAssistSlopeSensitivity)
-    );
+      DoubleUtils.doubleEquals(
+        electricAssistSlopeSensitivity,
+        that.electricAssistSlopeSensitivity
+      ));
   }
 
   @Override

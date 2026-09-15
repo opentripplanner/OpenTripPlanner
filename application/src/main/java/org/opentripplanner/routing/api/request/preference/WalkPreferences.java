@@ -12,8 +12,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The walk preferences contain all speed, reluctance, cost and factor preferences for walking
- * related to street and transit routing. The values are normalized(rounded) so the class
- * can used as a cache key.
+ * related to street and transit routing. The values are normalized(rounded) so the class can used
+ * as a cache key.
  * <p>
  * See the configuration for documentation of each field.
  * <p>
@@ -71,13 +71,12 @@ public final class WalkPreferences implements Serializable {
   }
 
   /**
-   * A multiplier for how bad walking is, compared to being in transit for equal
-   * lengths of time. Empirically, values between 2 and 4 seem to correspond
-   * well to the concept of not wanting to walk too much without asking for
-   * totally ridiculous itineraries, but this observation should in no way be
-   * taken as scientific or definitive. Your mileage may vary. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
-   * performance with high values. Default value: 2.0
+   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+   * Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to
+   * walk too much without asking for totally ridiculous itineraries, but this observation should in
+   * no way be taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
+   * high values. Default value: 2.0
    */
   public double reluctance() {
     return reluctance;
@@ -125,15 +124,13 @@ public final class WalkPreferences implements Serializable {
       return false;
     }
     WalkPreferences that = (WalkPreferences) o;
-    return (
-      doubleEquals(that.speed, speed) &&
+    return (doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       boardCost.equals(that.boardCost) &&
       doubleEquals(that.stairsReluctance, stairsReluctance) &&
       doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
       doubleEquals(that.safetyFactor, safetyFactor) &&
-      escalator.equals(that.escalator)
-    );
+      escalator.equals(that.escalator));
   }
 
   @Override

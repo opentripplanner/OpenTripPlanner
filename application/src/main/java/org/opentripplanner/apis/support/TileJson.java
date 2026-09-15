@@ -48,8 +48,7 @@ public class TileJson implements Serializable {
       envelope.lowerLeft().longitude(),
       envelope.lowerLeft().latitude(),
       envelope.upperRight().longitude(),
-      envelope.upperRight().latitude(),
-    };
+      envelope.upperRight().latitude(), };
 
     var c = envelope.center();
     center = new double[] { c.longitude(), c.latitude(), 9 };
@@ -88,8 +87,8 @@ public class TileJson implements Serializable {
   }
 
   /**
-   * Creates a vector source layer URL from a configured base path plus information from the incoming
-   * HTTP request.
+   * Creates a vector source layer URL from a configured base path plus information from the
+   * incoming HTTP request.
    */
   public static String urlFromOverriddenBasePath(
     UriInfo uri,
@@ -107,10 +106,12 @@ public class TileJson implements Serializable {
   }
 
   private static String attributionFromFeedInfo(Collection<FeedInfo> feedInfos) {
-    return feedInfos
-      .stream()
-      .map(feedInfo ->
-        "<a href='%s'>%s</a>".formatted(feedInfo.getPublisherUrl(), feedInfo.getPublisherName())
+    return feedInfos.stream()
+      .map(
+        feedInfo -> "<a href='%s'>%s</a>".formatted(
+          feedInfo.getPublisherUrl(),
+          feedInfo.getPublisherName()
+        )
       )
       .distinct()
       .collect(Collectors.joining(", "));

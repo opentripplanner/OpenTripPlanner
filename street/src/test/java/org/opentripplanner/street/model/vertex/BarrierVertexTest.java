@@ -93,8 +93,7 @@ public class BarrierVertexTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(vA)
+    return new StreetEdgeBuilder<>().withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withName(name)

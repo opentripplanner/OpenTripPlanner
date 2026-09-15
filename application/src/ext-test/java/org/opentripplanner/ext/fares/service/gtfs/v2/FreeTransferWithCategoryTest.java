@@ -15,8 +15,8 @@ import org.opentripplanner.model.plan.TestItinerary;
 import org.opentripplanner.model.plan.TestTransitLeg;
 import org.opentripplanner.transit.model.basic.Money;
 
-/// The free transfer is only valid for the youth fare product, because it is the only one that
-/// has the "youth" category. Fare product A has no category therefore doesn't qualify for the
+/// The free transfer is only valid for the youth fare product, because it is the only one that has
+/// the "youth" category. Fare product A has no category therefore doesn't qualify for the
 /// free transfer.
 class FreeTransferWithCategoryTest implements PlanTestConstants, FareTestConstants {
 
@@ -24,16 +24,12 @@ class FreeTransferWithCategoryTest implements PlanTestConstants, FareTestConstan
     id("youth"),
     "youth",
     Money.euros(4)
-  )
-    .withCategory(CATEGORY_ALPHA)
-    .build();
+  ).withCategory(CATEGORY_ALPHA).build();
   private static final FareProduct YOUTH_TRANSFER_PRODUCT = FareProduct.of(
     id("youth-transfer"),
     "youth",
     Money.euros(0)
-  )
-    .withCategory(CATEGORY_ALPHA)
-    .build();
+  ).withCategory(CATEGORY_ALPHA).build();
   private static final GtfsFaresV2Service SERVICE = GtfsFaresV2Service.of()
     .withLegRules(
       FareLegRule.of(id("adult"), FARE_PRODUCT_A).withLegGroupId(LEG_GROUP_A).build(),

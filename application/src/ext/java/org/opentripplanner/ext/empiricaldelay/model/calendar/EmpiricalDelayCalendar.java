@@ -9,13 +9,12 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * This implementation of a Service Calendar is specific to the empirical delay.
- * A feed can only have one {@link EmpiricalDelayCalendar} and the calendar can only
- * contain one service(id) for each day-of-week. Exceptions are not currently
- * supported, but it should be possible to add this with small changes to this class.
- * An important constraint is that a specific date should map to only one service-id.
- * Remember the calendar is not meant to represent the trip calendar information, but
- * the empirical delay information for each day-of-week.
+ * This implementation of a Service Calendar is specific to the empirical delay. A feed can only
+ * have one {@link EmpiricalDelayCalendar} and the calendar can only contain one service(id) for
+ * each day-of-week. Exceptions are not currently supported, but it should be possible to add this
+ * with small changes to this class. An important constraint is that a specific date should map to
+ * only one service-id. Remember the calendar is not meant to represent the trip calendar
+ * information, but the empirical delay information for each day-of-week.
  */
 public class EmpiricalDelayCalendar implements Serializable {
 
@@ -39,11 +38,6 @@ public class EmpiricalDelayCalendar implements Serializable {
    * Return a set of all service ids in the calendar.
    */
   public List<String> listServiceIds() {
-    return calendarForDays
-      .values()
-      .stream()
-      .map(c -> c.serviceId())
-      .distinct()
-      .toList();
+    return calendarForDays.values().stream().map(c -> c.serviceId()).distinct().toList();
   }
 }

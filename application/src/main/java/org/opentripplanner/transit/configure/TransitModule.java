@@ -27,8 +27,8 @@ public abstract class TransitModule {
   /**
    * Binds the app-singleton, no-real-time-data {@link TransitService} used by consumers that live
    * outside any HTTP request (e.g. {@code DefaultRealtimeVehicleService}). The request-scoped,
-   * snapshot-consistent {@link TransitService} is a distinct binding inside {@link
-   * RequestScopedFactory} — do not retarget this one.
+   * snapshot-consistent {@link TransitService} is a distinct binding inside
+   * {@link RequestScopedFactory} — do not retarget this one.
    */
   @Binds
   @StaticTransitService
@@ -42,10 +42,7 @@ public abstract class TransitModule {
 
   @Provides
   @Singleton
-  public static RepositoryHandle<
-    TimetableRepositorySnapshot,
-    TimetableRepository
-  > timetableRepositoryHandle(
+  public static RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle(
     TimetableSnapshotParameters parameters,
     TransitRepository transitRepository,
     @TransitDomain RepositoryRegistry repositoryRegistry,
@@ -53,8 +50,10 @@ public abstract class TransitModule {
     TripCalendars tripCalendars
   ) {
     var buffer = new DefaultTimetableRepository(scheduledRaptorTransitData, tripCalendars);
-    var lifecycle = new TimetableRepositoryLifecycle(buffer, parameters.purgeExpiredData(), () ->
-      LocalDate.now(transitRepository.getTimeZone())
+    var lifecycle = new TimetableRepositoryLifecycle(
+      buffer,
+      parameters.purgeExpiredData(),
+      () -> LocalDate.now(transitRepository.getTimeZone())
     );
     return repositoryRegistry.registerRepository(buffer, lifecycle);
   }

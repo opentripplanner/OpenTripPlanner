@@ -44,16 +44,14 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
       00:15  00:25
       """
     );
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .addAccessPaths(
         walk(STOP_B, D1_m).openingHours("0:05", "0:08"),
         walk(STOP_B, D1_m).openingHours("0:10", "0:13")
       )
       .addEgressPaths(walk(STOP_C, D2_m));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindow(Duration.ofMinutes(30))
@@ -61,14 +59,12 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
   }
 
   static List<RaptorModuleTestCase> openInWholeSearchIntervalTestCases() {
-    var expA =
-      "Walk 1m Open(0:05 0:08) 0:08 0:09 C₁120 ~ B 1m " +
+    var expA = "Walk 1m Open(0:05 0:08) 0:08 0:09 C₁120 ~ B 1m " +
       "~ BUS R1 0:10 0:20 10m C₁1_260 ~ C 0s " +
       "~ Walk 2m 0:20 0:22 C₁240 " +
       "[0:08 0:22 14m Tₙ0 C₁1_620]";
 
-    var expB =
-      "Walk 1m Open(0:10 0:13) 0:13 0:14 C₁120 ~ B 1m " +
+    var expB = "Walk 1m Open(0:10 0:13) 0:13 0:14 C₁120 ~ B 1m " +
       "~ BUS R1 0:15 0:25 10m C₁1_260 ~ C 0s " +
       "~ Walk 2m 0:25 0:27 C₁240 " +
       "[0:13 0:27 14m Tₙ0 C₁1_620]";

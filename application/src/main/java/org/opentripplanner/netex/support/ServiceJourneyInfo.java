@@ -13,8 +13,8 @@ import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
- * Wrapper around {@link ServiceJourney} that provides a simpler interface
- * for using {@link TimetabledPassingTime}.
+ * Wrapper around {@link ServiceJourney} that provides a simpler interface for using
+ * {@link TimetabledPassingTime}.
  */
 public class ServiceJourneyInfo {
 
@@ -37,22 +37,23 @@ public class ServiceJourneyInfo {
   public List<StopTimeAdaptor> orderedTimetabledPassingTimeInfos() {
     Map<TimetabledPassingTime, Boolean> stopFlexibility = stopFlexibility();
 
-    Map<String, Integer> stopPointIdToOrder = journeyPattern
-      .getPointsInSequence()
+    Map<String, Integer> stopPointIdToOrder = journeyPattern.getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .stream()
       .collect(Collectors.toMap(EntityStructure::getId, point -> point.getOrder().intValueExact()));
-    return serviceJourney
-      .getPassingTimes()
+    return serviceJourney.getPassingTimes()
       .getTimetabledPassingTime()
       .stream()
       .sorted(
-        Comparator.comparing(timetabledPassingTime ->
-          stopPointIdToOrder.get(stopPointId(timetabledPassingTime))
+        Comparator.comparing(
+          timetabledPassingTime -> stopPointIdToOrder.get(stopPointId(timetabledPassingTime))
         )
       )
-      .map(timetabledPassingTime ->
-        StopTimeAdaptor.of(timetabledPassingTime, stopFlexibility.get(timetabledPassingTime))
+      .map(
+        timetabledPassingTime -> StopTimeAdaptor.of(
+          timetabledPassingTime,
+          stopFlexibility.get(timetabledPassingTime)
+        )
       )
       .toList();
   }
@@ -63,21 +64,18 @@ public class ServiceJourneyInfo {
   private Map<TimetabledPassingTime, Boolean> stopFlexibility() {
     Map<String, String> scheduledStopPointIdByStopPointId = scheduledStopPointIdByStopPointId();
 
-    return serviceJourney
-      .getPassingTimes()
+    return serviceJourney.getPassingTimes()
       .getTimetabledPassingTime()
       .stream()
       .collect(
         Collectors.toMap(
           timetabledPassingTime -> timetabledPassingTime,
-          timetabledPassingTime ->
-            netexEntityIndex
-              .getFlexibleStopPlaceByStopPointRef()
-              .containsKey(
-                scheduledStopPointIdByStopPointId.get(
-                  timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef()
-                )
+          timetabledPassingTime -> netexEntityIndex.getFlexibleStopPlaceByStopPointRef()
+            .containsKey(
+              scheduledStopPointIdByStopPointId.get(
+                timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef()
               )
+            )
         )
       );
   }
@@ -90,17 +88,16 @@ public class ServiceJourneyInfo {
   }
 
   /**
-   * Return the mapping between stop point id and scheduled stop point id for the journey
-   * pattern.
+   * Return the mapping between stop point id and scheduled stop point id for the journey pattern.
    */
   private Map<String, String> scheduledStopPointIdByStopPointId() {
-    return journeyPattern
-      .getPointsInSequence()
+    return journeyPattern.getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .stream()
       .collect(
-        Collectors.toMap(EntityStructure::getId, p ->
-          ((StopPointInJourneyPattern) p).getScheduledStopPointRef().getValue().getRef()
+        Collectors.toMap(
+          EntityStructure::getId,
+          p -> ((StopPointInJourneyPattern) p).getScheduledStopPointRef().getValue().getRef()
         )
       );
   }

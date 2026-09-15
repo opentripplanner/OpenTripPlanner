@@ -6,7 +6,8 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * This class is responsible for creating StopArrivals which support accumulated criteria ONE and TWO.
+ * This class is responsible for creating StopArrivals which support accumulated criteria ONE and
+ * TWO.
  */
 public class StopArrivalFactoryC2<T extends RaptorTripSchedule> implements McStopArrivalFactory<T> {
 

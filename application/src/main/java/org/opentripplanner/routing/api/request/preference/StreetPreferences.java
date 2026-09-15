@@ -111,15 +111,13 @@ public final class StreetPreferences implements Serializable {
       return false;
     }
     StreetPreferences that = (StreetPreferences) o;
-    return (
-      DoubleUtils.doubleEquals(that.turnReluctance, turnReluctance) &&
+    return (DoubleUtils.doubleEquals(that.turnReluctance, turnReluctance) &&
       drivingDirection == that.drivingDirection &&
       elevator.equals(that.elevator) &&
       routingTimeout.equals(that.routingTimeout) &&
       intersectionTraversalModel == that.intersectionTraversalModel &&
       maxDirectDuration.equals(that.maxDirectDuration) &&
-      accessEgress.equals(that.accessEgress)
-    );
+      accessEgress.equals(that.accessEgress));
   }
 
   @Override

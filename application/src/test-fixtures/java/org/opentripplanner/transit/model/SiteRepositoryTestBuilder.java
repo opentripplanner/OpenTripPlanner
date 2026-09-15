@@ -27,14 +27,14 @@ public class SiteRepositoryTestBuilder {
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
   private static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
-  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory().createPolygon(
-    new Coordinate[] {
-      Coordinates.of(61.0, 10.0),
-      Coordinates.of(61.0, 12.0),
-      Coordinates.of(60.0, 11.0),
-      Coordinates.of(61.0, 10.0),
-    }
-  );
+  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
+    .createPolygon(
+      new Coordinate[] {
+        Coordinates.of(61.0, 10.0),
+        Coordinates.of(61.0, 12.0),
+        Coordinates.of(60.0, 11.0),
+        Coordinates.of(61.0, 10.0), }
+    );
 
   public SiteRepositoryTestBuilder(SiteRepositoryBuilder siteRepositoryBuilder) {
     this.siteRepositoryBuilder = siteRepositoryBuilder;
@@ -53,8 +53,7 @@ public class SiteRepositoryTestBuilder {
     var coordinate = ANY_COORDINATE.moveEastMeters(
       100 * siteRepositoryBuilder.regularStopsById().size()
     );
-    var builder = siteRepositoryBuilder
-      .regularStop(id(id))
+    var builder = siteRepositoryBuilder.regularStop(id(id))
       .withName(new NonLocalizedString(id))
       .withCode(id)
       .withCoordinate(coordinate);
@@ -69,16 +68,14 @@ public class SiteRepositoryTestBuilder {
    */
   public RegularStop stopAtStation(String stopId, String stationId) {
     // Get or create station
-    final var station = Optional.ofNullable(
-      siteRepositoryBuilder.stationById().get(id(stationId))
-    ).orElseGet(() -> station(stationId));
+    final var station = Optional.ofNullable(siteRepositoryBuilder.stationById().get(id(stationId)))
+      .orElseGet(() -> station(stationId));
 
     return stop(stopId, b -> b.withParentStation(station));
   }
 
   public AreaStop areaStop(String id) {
-    var stop = siteRepositoryBuilder
-      .areaStop(id(id))
+    var stop = siteRepositoryBuilder.areaStop(id(id))
       .withName(new NonLocalizedString(id))
       .withGeometry(ANY_POLYGON)
       .build();

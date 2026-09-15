@@ -38,12 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilderModule} module that links up the
- * stops of a transit network among themselves. This is necessary for routing in long-distance
- * mode.
+ * {@link GraphBuilderModule} module that links up the stops of a transit network among themselves.
+ * This is necessary for routing in long-distance mode.
  * <p>
- * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
- * will use straight-line distance between stops.
+ * It will use the street network if OSM data has already been loaded into the graph. Otherwise
+ * it will use straight-line distance between stops.
  */
 public class DirectTransferGenerator implements GraphBuilderModule {
 
@@ -105,10 +104,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
-    Set<StopLocation> carsAllowedStops =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
-    Set<StopLocation> bikesAllowedStops =
-      transitRepository.getStopLocationsUsedForBikesAllowedTrips();
+    Set<StopLocation> carsAllowedStops = transitRepository
+      .getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> bikesAllowedStops = transitRepository
+      .getStopLocationsUsedForBikesAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -116,8 +115,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       LOG.info("No mode-specific transfer configurations provided.");
     } else {
       LOG.info("Using transfer configurations for modes:");
-      transferParametersForMode.forEach((mode, transferParameters) ->
-        LOG.info(mode + ": " + transferParameters)
+      transferParametersForMode.forEach(
+        (mode, transferParameters) -> LOG.info(mode + ": " + transferParameters)
       );
     }
 
@@ -139,8 +138,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransferConfiguration transferConfiguration = parseTransferParameters();
 
     var transitService = new DefaultTransitService(transitRepository);
-    var emptyStops = transitRepository
-      .getSiteRepository()
+    var emptyStops = transitRepository.getSiteRepository()
       .listStopLocations()
       .stream()
       .filter(stop -> transitService.findPatterns(stop).isEmpty())
@@ -155,73 +153,63 @@ public class DirectTransferGenerator implements GraphBuilderModule {
      */
     bikesAllowedStops.addAll(emptyStops);
 
-    stops
-      .stream()
-      .parallel()
-      .forEach(ts0 -> {
-        /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
-         * Use map based on the list of edges, so that only distinct transfers are stored. */
-        Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
-        RegularStop stop = Objects.requireNonNull(
-          transitRepository.getSiteRepository().getRegularStop(ts0.getId())
-        );
+    stops.stream().parallel().forEach(ts0 -> {
+      /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
+       * Use map based on the list of edges, so that only distinct transfers are stored. */
+      Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
+      RegularStop stop = Objects.requireNonNull(
+        transitRepository.getSiteRepository().getRegularStop(ts0.getId())
+      );
 
-        if (stop.transfersNotAllowed()) {
-          return;
-        }
+      if (stop.transfersNotAllowed()) {
+        return;
+      }
 
-        LOG.debug("Linking stop '{}' {}", stop, ts0);
+      LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        calculateDefaultTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers
-        );
-        calculateFlexTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers
-        );
-        calculateCarsAllowedTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers,
-          carsAllowedStops
-        );
-        calculateBikesAllowedTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers,
-          bikesAllowedStops
-        );
+      calculateDefaultTransfers(
+        nearbyStopFinder,
+        transferConfiguration,
+        ts0,
+        stop,
+        distinctTransfers
+      );
+      calculateFlexTransfers(nearbyStopFinder, transferConfiguration, ts0, stop, distinctTransfers);
+      calculateCarsAllowedTransfers(
+        nearbyStopFinder,
+        transferConfiguration,
+        ts0,
+        stop,
+        distinctTransfers,
+        carsAllowedStops
+      );
+      calculateBikesAllowedTransfers(
+        nearbyStopFinder,
+        transferConfiguration,
+        ts0,
+        stop,
+        distinctTransfers,
+        bikesAllowedStops
+      );
 
-        LOG.debug(
-          "Linked stop {} with {} transfers to stops with different patterns.",
-          stop,
-          distinctTransfers.size()
-        );
-        if (distinctTransfers.isEmpty()) {
-          issueStore.add(new StopNotLinkedForTransfers(ts0));
-        } else {
-          distinctTransfers
-            .values()
-            .forEach(transfer -> transfersByStop.put(transfer.from, transfer));
-          nLinkedStops.incrementAndGet();
-          nTransfersTotal.addAndGet(distinctTransfers.size());
-        }
+      LOG.debug(
+        "Linked stop {} with {} transfers to stops with different patterns.",
+        stop,
+        distinctTransfers.size()
+      );
+      if (distinctTransfers.isEmpty()) {
+        issueStore.add(new StopNotLinkedForTransfers(ts0));
+      } else {
+        distinctTransfers.values()
+          .forEach(transfer -> transfersByStop.put(transfer.from, transfer));
+        nLinkedStops.incrementAndGet();
+        nTransfersTotal.addAndGet(distinctTransfers.size());
+      }
 
-        //Keep lambda! A method-ref would causes incorrect class and line number to be logged
-        //noinspection Convert2MethodRef
-        progress.step(m -> LOG.info(m));
-      });
+      //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
+    });
 
     transferRepository.addAllTransfersByStops(transfersByStop);
 
@@ -231,12 +219,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
-    transferRequests
-      .stream()
+    transferRequests.stream()
       .map(transferProfile -> transferProfile.journey().transfer().mode())
       .distinct()
-      .forEach(mode ->
-        LOG.info(
+      .forEach(
+        mode -> LOG.info(
           "Created {} transfers for mode {}.",
           transferRepository.findTransfersByMode(mode).size(),
           mode
@@ -291,7 +278,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method parses the given transfer parameters into a transfer configuration and checks for invalid input.
+   * This method parses the given transfer parameters into a transfer configuration and checks for
+   * invalid input.
    */
   private TransferConfiguration parseTransferParameters() {
     List<RouteRequest> defaultTransferRequests = new ArrayList<>();
@@ -306,8 +294,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Check that the mode specified in transferParametersForMode can also be found in transferRequests.
     for (StreetMode mode : transferParametersForMode.keySet()) {
       if (
-        transferRequests
-          .stream()
+        transferRequests.stream()
           .noneMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
       ) {
         throw new IllegalArgumentException(
@@ -362,8 +349,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Flex transfer requests only use the WALK mode.
     if (OTPFeature.FlexRouting.isOn()) {
       flexTransferRequests.addAll(
-        transferRequests
-          .stream()
+        transferRequests.stream()
           .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
           .toList()
       );
@@ -454,7 +440,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method calculates transfers between stops that are visited by trips that allow cars, if configured.
+   * This method calculates transfers between stops that are visited by trips that allow cars, if
+   * configured.
    */
   private void calculateCarsAllowedTransfers(
     NearbyStopFinder nearbyStopFinder,
@@ -480,7 +467,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method calculates transfers between stops that are visited by trips that allow bikes, if configured.
+   * This method calculates transfers between stops that are visited by trips that allow bikes, if
+   * configured.
    */
   private void calculateBikesAllowedTransfers(
     NearbyStopFinder nearbyStopFinder,
@@ -491,7 +479,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     Set<StopLocation> bikesAllowedStops
   ) {
     if (bikesAllowedStops.contains(stop)) {
-      for (RouteRequest transferProfile : transferConfiguration.bikesAllowedStopTransferRequests()) {
+      for (
+        RouteRequest transferProfile : transferConfiguration.bikesAllowedStopTransferRequests()
+      ) {
         calculateTransfersForStopWithAllowedStops(
           nearbyStopFinder,
           ts0,

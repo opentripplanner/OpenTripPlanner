@@ -36,9 +36,8 @@ public abstract class AbstractViaLocation implements ViaLocation {
       return false;
     }
     AbstractViaLocation that = (AbstractViaLocation) o;
-    return (
-      Objects.equals(label, that.label) && Objects.equals(stopLocationIds, that.stopLocationIds)
-    );
+    return (Objects.equals(label, that.label) &&
+      Objects.equals(stopLocationIds, that.stopLocationIds));
   }
 
   @Override

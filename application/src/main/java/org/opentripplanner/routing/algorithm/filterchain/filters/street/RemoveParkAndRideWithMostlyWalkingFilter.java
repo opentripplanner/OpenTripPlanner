@@ -35,8 +35,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements RemoveItinerary
         return false;
       }
 
-      double carDuration = itinerary
-        .legs()
+      double carDuration = itinerary.legs()
         .stream()
         .filter(StreetLeg.class::isInstance)
         .map(StreetLeg.class::cast)

@@ -19,7 +19,8 @@ public class RealtimeResolver {
   }
 
   /**
-   * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
+   * Loop through all itineraries and populate legs with real-time data using legReference from the
+   * original leg
    */
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
@@ -65,8 +66,9 @@ public class RealtimeResolver {
     ScheduledTransitLeg reference,
     ScheduledTransitLeg original
   ) {
-    return new ScheduledTransitLegBuilder<>(reference)
-      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
+    return new ScheduledTransitLegBuilder<>(reference).withTransferFromPreviousLeg(
+      original.transferFromPrevLeg()
+    )
       .withTransferToNextLeg(original.transferToNextLeg())
       .withGeneralizedCost(original.generalizedCost())
       .withAccessibilityScore(original.accessibilityScore())

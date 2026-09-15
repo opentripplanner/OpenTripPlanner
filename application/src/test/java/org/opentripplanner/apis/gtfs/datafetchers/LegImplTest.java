@@ -51,9 +51,7 @@ class LegImplTest implements PlanTestConstants {
   private static final TripPattern PATTERN = TransitRepositoryForTest.tripPattern(
     "p",
     TRIP.getRoute()
-  )
-    .withStopPattern(STOP_PATTERN)
-    .build();
+  ).withStopPattern(STOP_PATTERN).build();
 
   private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes.of()
     .withArrivalTimes("10:00 11:00 12:00 13:00 14:00")
@@ -61,8 +59,9 @@ class LegImplTest implements PlanTestConstants {
     .withTrip(TRIP)
     .build();
   private static final ZonedDateTime TIME = ZonedDateTime.parse("2025-06-26T10:25:28+02:00");
-  private static final ScheduledTransitLeg LEG = new ScheduledTransitLegBuilder<>()
-    .withStartTime(TIME)
+  private static final ScheduledTransitLeg LEG = new ScheduledTransitLegBuilder<>().withStartTime(
+    TIME
+  )
     .withEndTime(TIME)
     .withZoneId(TIME.getZone())
     .withServiceDate(TIME.toLocalDate())
@@ -139,8 +138,9 @@ class LegImplTest implements PlanTestConstants {
     var transitService = env.transitService();
 
     var tripData = env.tripData("Trip1");
-    var leg = new ScheduledTransitLegBuilder<>()
-      .withStartTime(ZonedDateTime.of(serviceDate, LocalTime.of(10, 0), env.timeZone()))
+    var leg = new ScheduledTransitLegBuilder<>().withStartTime(
+      ZonedDateTime.of(serviceDate, LocalTime.of(10, 0), env.timeZone())
+    )
       .withEndTime(ZonedDateTime.of(serviceDate, LocalTime.of(11, 0), env.timeZone()))
       .withZoneId(env.timeZone())
       .withServiceDate(serviceDate)

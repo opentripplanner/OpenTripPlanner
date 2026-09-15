@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
  * used during network linking and trip planning.
  * <p>
- * Instantiating this class is expensive, because it creates a spatial index of all the intersections
- * in the graph.
+ * Instantiating this class is expensive, because it creates a spatial index of all the
+ * intersections in the graph.
  */
 class StreetIndex {
 
@@ -36,7 +36,8 @@ class StreetIndex {
   private final Map<FeedScopedId, TransitStopVertex> stopVertices;
 
   /**
-   * This list contains transitStationVertices for the stations that are configured to route to centroid
+   * This list contains transitStationVertices for the stations that are configured to route to
+   * centroid
    */
   private final Map<FeedScopedId, StationCentroidVertex> stationCentroidVertices;
 
@@ -80,16 +81,13 @@ class StreetIndex {
   }
 
   /**
-   * Return the edges whose geometry intersect with the specified envelope.
-   * Warning: edges disconnected from the graph
-   * will not be indexed.
+   * Return the edges whose geometry intersect with the specified envelope. Warning: edges
+   * disconnected from the graph will not be indexed.
    */
   Collection<Edge> findEdges(Envelope envelope) {
-    return edgeIndex
-      .query(envelope, Scope.PERMANENT)
+    return edgeIndex.query(envelope, Scope.PERMANENT)
       .filter(
-        e ->
-          e.isReachableFromGraph() &&
+        e -> e.isReachableFromGraph() &&
           envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
       )
       .toList();
@@ -127,8 +125,7 @@ class StreetIndex {
     if (geometry == null) {
       Coordinate[] coordinates = new Coordinate[] {
         e.getFromVertex().getCoordinate(),
-        e.getToVertex().getCoordinate(),
-      };
+        e.getToVertex().getCoordinate(), };
       geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
     return geometry;
@@ -166,8 +163,7 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
-    return graph
-      .getVerticesOfType(StationCentroidVertex.class)
+    return graph.getVerticesOfType(StationCentroidVertex.class)
       .stream()
       .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
   }

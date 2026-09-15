@@ -17,21 +17,17 @@ public class RaptorRequestTransferCacheTest {
   public void testRaptorRequestTransferCacheKeyWithWheelchair() {
     List<List<PathTransfer>> list = List.of();
 
-    RouteRequest base = builder()
-      .withJourney(b -> b.withAllModes(StreetMode.WALK))
-      .buildRequest();
+    RouteRequest base = builder().withJourney(b -> b.withAllModes(StreetMode.WALK)).buildRequest();
     RaptorRequestTransferCacheKey cacheKeyBase = new RaptorRequestTransferCacheKey(list, base);
 
-    RouteRequest routeRequestWithWheelchairPreferences = base
-      .copyOf()
+    RouteRequest routeRequestWithWheelchairPreferences = base.copyOf()
       .withPreferences(p -> p.withWheelchair(b -> b.withStairsReluctance(999)))
       .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithWheelchairPreferences =
       new RaptorRequestTransferCacheKey(list, routeRequestWithWheelchairPreferences);
 
     RouteRequest routeRequestWithWheelchairPreferencesAndWheelchairEnabled =
-      routeRequestWithWheelchairPreferences
-        .copyOf()
+      routeRequestWithWheelchairPreferences.copyOf()
         .withJourney(j -> j.withWheelchair(true))
         .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithWheelchairPreferencesAndWheelchairEnabled =
@@ -49,13 +45,10 @@ public class RaptorRequestTransferCacheTest {
     List<List<PathTransfer>> list = List.of();
 
     // This is intentionally CAR in the beginning.
-    RouteRequest base = builder()
-      .withJourney(b -> b.withAllModes(StreetMode.CAR))
-      .buildRequest();
+    RouteRequest base = builder().withJourney(b -> b.withAllModes(StreetMode.CAR)).buildRequest();
     RaptorRequestTransferCacheKey cacheKeyBase = new RaptorRequestTransferCacheKey(list, base);
 
-    RouteRequest routeRequestWithWalkPreferences = base
-      .copyOf()
+    RouteRequest routeRequestWithWalkPreferences = base.copyOf()
       .withPreferences(p -> p.withWalk(b -> b.withBoardCost(999)))
       .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithWalkPreferences = new RaptorRequestTransferCacheKey(
@@ -79,13 +72,10 @@ public class RaptorRequestTransferCacheTest {
     List<List<PathTransfer>> list = List.of();
 
     // This is intentionally CAR in the beginning.
-    RouteRequest base = builder()
-      .withJourney(b -> b.withAllModes(StreetMode.CAR))
-      .buildRequest();
+    RouteRequest base = builder().withJourney(b -> b.withAllModes(StreetMode.CAR)).buildRequest();
     RaptorRequestTransferCacheKey cacheKeyBase = new RaptorRequestTransferCacheKey(list, base);
 
-    RouteRequest routeRequestWithBikePreferences = base
-      .copyOf()
+    RouteRequest routeRequestWithBikePreferences = base.copyOf()
       .withPreferences(p -> p.withBike(b -> b.withBoardCost(999)))
       .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithBikePreferences = new RaptorRequestTransferCacheKey(
@@ -109,13 +99,10 @@ public class RaptorRequestTransferCacheTest {
     List<List<PathTransfer>> list = List.of();
 
     // This is intentionally WALK in the beginning.
-    RouteRequest base = builder()
-      .withJourney(b -> b.withAllModes(StreetMode.WALK))
-      .buildRequest();
+    RouteRequest base = builder().withJourney(b -> b.withAllModes(StreetMode.WALK)).buildRequest();
     RaptorRequestTransferCacheKey cacheKeyBase = new RaptorRequestTransferCacheKey(list, base);
 
-    RouteRequest routeRequestWithCarPreferences = base
-      .copyOf()
+    RouteRequest routeRequestWithCarPreferences = base.copyOf()
       .withPreferences(p -> p.withCar(b -> b.withBoardCost(999)))
       .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithCarPreferences = new RaptorRequestTransferCacheKey(
@@ -123,8 +110,7 @@ public class RaptorRequestTransferCacheTest {
       routeRequestWithCarPreferences
     );
 
-    RouteRequest routeRequestWithCarPreferencesAndCarMode = routeRequestWithCarPreferences
-      .copyOf()
+    RouteRequest routeRequestWithCarPreferencesAndCarMode = routeRequestWithCarPreferences.copyOf()
       .withJourney(j -> j.withAllModes(StreetMode.CAR))
       .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithCarPreferencesAndCarMode =
@@ -138,13 +124,10 @@ public class RaptorRequestTransferCacheTest {
   public void testRaptorRequestTransferCacheKeyWithTurnReluctance() {
     List<List<PathTransfer>> list = List.of();
 
-    RouteRequest base = builder()
-      .withJourney(b -> b.withAllModes(StreetMode.WALK))
-      .buildRequest();
+    RouteRequest base = builder().withJourney(b -> b.withAllModes(StreetMode.WALK)).buildRequest();
     RaptorRequestTransferCacheKey cacheKeyBase = new RaptorRequestTransferCacheKey(list, base);
 
-    RouteRequest routeRequestWithTurnReluctance = base
-      .copyOf()
+    RouteRequest routeRequestWithTurnReluctance = base.copyOf()
       .withPreferences(p -> p.withStreet(b -> b.withTurnReluctance(999)))
       .buildRequest();
     RaptorRequestTransferCacheKey cacheKeyWithTurnReluctance = new RaptorRequestTransferCacheKey(

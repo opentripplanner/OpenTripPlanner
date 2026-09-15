@@ -54,7 +54,7 @@ public class FlexTripsMapper {
         // result.add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       } else if (
         stopTimes.size() < 2 &&
-        stopTimes.stream().anyMatch(st -> st.hasFlexWindow() || st.hasFlexibleStop())
+          stopTimes.stream().anyMatch(st -> st.hasFlexWindow() || st.hasFlexibleStop())
       ) {
         store.add(
           "InvalidFlexTrip",

@@ -74,8 +74,7 @@ class JourneyPatternDuplicateStopPointsTest {
       var point = new StopPointInJourneyPattern();
       point.setId(pointId);
       point.setOrder(BigInteger.valueOf(order++));
-      points
-        .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      points.getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
         .add(point);
     }
 

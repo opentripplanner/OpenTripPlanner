@@ -5,8 +5,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.StopRealTimeState;
 
 /**
- * This class fills in missing times before the first updated time directly from the scheduled
- * time, propagating negative delay only when necessary to keep the trip times non-decreasing.
+ * This class fills in missing times before the first updated time directly from the scheduled time,
+ * propagating negative delay only when necessary to keep the trip times non-decreasing.
  */
 class BackwardsDelayRequiredInterpolator extends AbstractBackwardsDelayInterpolator {
 
@@ -23,7 +23,7 @@ class BackwardsDelayRequiredInterpolator extends AbstractBackwardsDelayInterpola
   protected void fillInMissingTimes(RealTimeTripTimesBuilder builder, int firstUpdatedIndex) {
     while (
       builder.getArrivalDelay(firstUpdatedIndex) == null &&
-      builder.getDepartureDelay(firstUpdatedIndex) == null
+        builder.getDepartureDelay(firstUpdatedIndex) == null
     ) {
       ++firstUpdatedIndex;
     }

@@ -9,10 +9,11 @@ import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
  * Describes which elements in the internal transit data model are affected by a realtime alert.
- * Note that this is specific to alerts and doesn't seem to be used by anything else.
- * This is probably because alerts are unique in their ability to attach themselves to many
- * different routes, stops, etc. at once, while non-alert elements tend to be associated with very
- * specific single other elements.
+ * Note that this is specific to alerts and doesn't seem to be used by anything else. This is
+ * probably because alerts are unique in their ability to attach themselves to many different
+ * routes, stops, etc. at once, while non-alert elements tend to be associated with very specific
+ * single other elements.
+ *
  * @see EntityKey
  */
 public sealed interface EntitySelector {
@@ -44,10 +45,8 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.Stop s)) {
         return false;
       }
-      return (
-        stopId.equals(s.stopId) &&
-        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions)
-      );
+      return (stopId.equals(s.stopId) &&
+        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions));
     }
   }
 
@@ -73,17 +72,16 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.Trip t)) {
         return false;
       }
-      return (
-        tripId.equals(t.tripId) &&
-        (serviceDate == null || t.serviceDate == null || serviceDate.equals(t.serviceDate))
-      );
+      return (tripId.equals(t.tripId) &&
+        (serviceDate == null || t.serviceDate == null || serviceDate.equals(t.serviceDate)));
     }
   }
 
-  /// EntitySelector for a stop and a route. The stop can optionally be restricted to certain stopConditions
-  /// and the line can be restricted to certain directions.
+  /// EntitySelector for a stop and a route. The stop can optionally be restricted to certain
+  /// stopConditions and the line can be restricted to certain directions.
   ///
-  /// @param directions If set the selector will only match trips with one of the specified directions. An empty list will match nothing.
+  /// @param directions If set the selector will only match trips with one of the specified
+  ///                   directions. An empty list will match nothing.
   record StopAndRoute(
     FeedScopedId stopId,
     FeedScopedId routeId,
@@ -113,15 +111,13 @@ public sealed interface EntitySelector {
         return false;
       }
 
-      var matchesDirection =
-        directions == null || (s.directions() != null && directions.containsAll(s.directions()));
+      var matchesDirection = directions == null ||
+        (s.directions() != null && directions.containsAll(s.directions()));
 
-      return (
-        stopId.equals(s.stopId) &&
+      return (stopId.equals(s.stopId) &&
         routeId.equals(s.routeId) &&
         StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions) &&
-        matchesDirection
-      );
+        matchesDirection);
     }
   }
 
@@ -149,12 +145,10 @@ public sealed interface EntitySelector {
       if (!(other instanceof EntitySelector.StopAndTrip s)) {
         return false;
       }
-      return (
-        stopId.equals(s.stopId) &&
+      return (stopId.equals(s.stopId) &&
         tripId.equals(s.tripId) &&
         StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions) &&
-        (serviceDate == null || s.serviceDate == null || serviceDate.equals(s.serviceDate))
-      );
+        (serviceDate == null || s.serviceDate == null || serviceDate.equals(s.serviceDate)));
     }
   }
 

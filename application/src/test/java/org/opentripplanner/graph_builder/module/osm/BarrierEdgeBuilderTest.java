@@ -117,8 +117,7 @@ class BarrierEdgeBuilderTest {
   }
 
   private static List<StreetEdge> getEdgesThroughBarrierFromVertex(BarrierPassThroughVertex v1) {
-    return v1
-      .getOutgoingStreetEdges()
+    return v1.getOutgoingStreetEdges()
       .stream()
       .filter(e -> e.getToVertex() instanceof BarrierPassThroughVertex)
       .toList();
@@ -274,8 +273,7 @@ class BarrierEdgeBuilderTest {
     StreetVertex v2,
     TraverseMode... noThruTraverseModes
   ) {
-    var seb = new StreetEdgeBuilder<>()
-      .withFromVertex(v1)
+    var seb = new StreetEdgeBuilder<>().withFromVertex(v1)
       .withToVertex(v2)
       .withPermission(ALL)
       .withGeometry(GeometryUtils.makeLineString(0, 0, 0, 1));

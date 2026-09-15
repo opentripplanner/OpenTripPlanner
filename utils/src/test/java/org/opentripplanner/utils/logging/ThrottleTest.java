@@ -43,17 +43,16 @@ class ThrottleTest {
     List<Integer> events = createIntegerSequence(20_000_000);
     long start = System.currentTimeMillis();
 
-    events
-      .parallelStream()
-      .forEach(i ->
-        subject.throttle(() ->
-          System.err.printf(Locale.ROOT, "%d ms%n", System.currentTimeMillis() - start)
+    events.parallelStream()
+      .forEach(
+        i -> subject.throttle(
+          () -> System.err.printf(Locale.ROOT, "%d ms%n", System.currentTimeMillis() - start)
         )
       );
     /*
       We get a lot of duplicates here because of "optimistic read/write" on shared memory - this is ok, as long as
       it does not fail.
-
+    
       EXPECTED OUTPUT
          4 ms
         54 ms

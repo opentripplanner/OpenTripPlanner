@@ -40,32 +40,22 @@ public class VehicleParkingGroupsLayerTest {
   @BeforeEach
   public void setUp() {
     vehicleParkingGroup = VehicleParkingGroup.of(ID)
-      .withName(
-        TranslatedString.getI18NString(
-          new HashMap<>() {
-            {
-              put(null, "groupName");
-              put("de", "groupDE");
-            }
-          },
-          false
-        )
-      )
+      .withName(TranslatedString.getI18NString(new HashMap<>() {
+        {
+          put(null, "groupName");
+          put("de", "groupDE");
+        }
+      }, false))
       .withCoordinate(new WgsCoordinate(1.9, 1.1))
       .build();
     vehicleParking = VehicleParking.of()
       .id(ID)
-      .name(
-        TranslatedString.getI18NString(
-          new HashMap<>() {
-            {
-              put(null, "name");
-              put("de", "DE");
-            }
-          },
-          false
-        )
-      )
+      .name(TranslatedString.getI18NString(new HashMap<>() {
+        {
+          put(null, "name");
+          put("de", "DE");
+        }
+      }, false))
       .coordinate(new WgsCoordinate(2, 1))
       .bicyclePlaces(false)
       .carPlaces(true)
@@ -88,7 +78,8 @@ public class VehicleParkingGroupsLayerTest {
     var repository = new DefaultVehicleParkingRepository();
     repository.updateVehicleParking(List.of(vehicleParking), List.of());
 
-    var config = """
+    var config =
+    """
     {
       "vectorTiles": {
         "layers" :[
@@ -128,8 +119,7 @@ public class VehicleParkingGroupsLayerTest {
     VehicleParkingGroupPropertyMapperWithPublicMap mapper =
       new VehicleParkingGroupPropertyMapperWithPublicMap(Locale.US);
     Map<String, Object> map = new HashMap<>();
-    mapper
-      .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
+    mapper.map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
       .forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals(ID.toString(), map.get("id").toString());
@@ -146,8 +136,7 @@ public class VehicleParkingGroupsLayerTest {
     VehicleParkingGroupPropertyMapperWithPublicMap mapper =
       new VehicleParkingGroupPropertyMapperWithPublicMap(new Locale("de"));
     Map<String, Object> map = new HashMap<>();
-    mapper
-      .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
+    mapper.map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
       .forEach(o -> map.put(o.key(), o.value()));
 
     assertEquals("groupDE", map.get("name").toString());
@@ -159,8 +148,8 @@ public class VehicleParkingGroupsLayerTest {
   }
 
   private static class VehicleParkingGroupsLayerBuilderWithPublicGeometry
-    extends VehicleParkingGroupsLayerBuilder
-  {
+    extends
+    VehicleParkingGroupsLayerBuilder {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       VehicleParkingService service,
@@ -177,8 +166,8 @@ public class VehicleParkingGroupsLayerTest {
   }
 
   private static class VehicleParkingGroupPropertyMapperWithPublicMap
-    extends DigitransitVehicleParkingGroupPropertyMapper
-  {
+    extends
+    DigitransitVehicleParkingGroupPropertyMapper {
 
     public VehicleParkingGroupPropertyMapperWithPublicMap(Locale locale) {
       super(locale);

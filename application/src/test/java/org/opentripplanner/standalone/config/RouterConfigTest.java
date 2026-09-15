@@ -22,7 +22,8 @@ class RouterConfigTest {
           "maxSearchWindow": "48h"
         }
       }
-      """,
+      """
+      ,
       Duration.ofHours(48)
     );
   }

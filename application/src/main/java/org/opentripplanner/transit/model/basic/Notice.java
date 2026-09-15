@@ -34,11 +34,9 @@ public class Notice extends AbstractTransitEntity<Notice, NoticeBuilder> {
 
   @Override
   public boolean sameAs(Notice other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(publicCode, other.publicCode) &&
-      Objects.equals(text, other.text)
-    );
+      Objects.equals(text, other.text));
   }
 
   @Override

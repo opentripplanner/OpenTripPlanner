@@ -29,29 +29,26 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
- * Tests that split vertices on boundary-crossing edges get spatially correct
- * geofencing boundary extensions instead of blind-copied ones from parent vertices.
+ * Tests that split vertices on boundary-crossing edges get spatially correct geofencing boundary
+ * extensions instead of blind-copied ones from parent vertices.
  */
 class VertexLinkerGeofencingTest {
 
   // Zone polygon: a rectangle covering lon [10.70, 10.71], lat [59.92, 59.93]
-  private static final Polygon ZONE_POLYGON = GeometryUtils.getGeometryFactory().createPolygon(
-    new Coordinate[] {
-      new Coordinate(10.70, 59.92),
-      new Coordinate(10.71, 59.92),
-      new Coordinate(10.71, 59.93),
-      new Coordinate(10.70, 59.93),
-      new Coordinate(10.70, 59.92),
-    }
-  );
+  private static final Polygon ZONE_POLYGON = GeometryUtils.getGeometryFactory()
+    .createPolygon(
+      new Coordinate[] {
+        new Coordinate(10.70, 59.92),
+        new Coordinate(10.71, 59.92),
+        new Coordinate(10.71, 59.93),
+        new Coordinate(10.70, 59.93),
+        new Coordinate(10.70, 59.92), }
+    );
 
   private static final GeofencingZone NO_DROP_OFF_ZONE = TestGeofencingZoneBuilder.of(
     "tier",
     "park"
-  )
-    .withGeometry(ZONE_POLYGON)
-    .noDropOff()
-    .build();
+  ).withGeometry(ZONE_POLYGON).noDropOff().build();
 
   // A is outside the zone (lon=10.695), B is inside (lon=10.705)
   // Both at lat=59.925 (midpoint of zone's lat range)
@@ -85,10 +82,10 @@ class VertexLinkerGeofencingTest {
   }
 
   /**
-   * When a split vertex is created inside a zone on a boundary-crossing edge, the parent
-   * edge's fromVertex must NOT get a boundary extension added. Only the split vertex itself
-   * should receive a boundary — fromVertex may be an interior vertex with no boundary crossings,
-   * and adding one would break zone tracking during traversal.
+   * When a split vertex is created inside a zone on a boundary-crossing edge, the parent edge's
+   * fromVertex must NOT get a boundary extension added. Only the split vertex itself should receive
+   * a boundary — fromVertex may be an interior vertex with no boundary crossings, and adding one
+   * would break zone tracking during traversal.
    */
   @Test
   void splitVertexInsideZoneDoesNotAddBoundaryToParentFromVertex() {
@@ -131,8 +128,9 @@ class VertexLinkerGeofencingTest {
       split,
       TraverseModeSet.allModes(),
       LinkingDirection.BIDIRECTIONAL,
-      (sv1, sv2) ->
-        List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) sv1, sv2))
+      (sv1, sv2) -> List.of(
+        TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) sv1, sv2)
+      )
     );
 
     // Find the split vertex
@@ -171,8 +169,9 @@ class VertexLinkerGeofencingTest {
       split,
       TraverseModeSet.allModes(),
       LinkingDirection.BIDIRECTIONAL,
-      (v1, v2) ->
-        List.of(TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2))
+      (v1, v2) -> List.of(
+        TemporaryFreeEdge.createTemporaryFreeEdge((TemporaryStreetLocation) v1, v2)
+      )
     );
 
     var splitterVertex = findSplitterVertex(split);
@@ -204,8 +203,7 @@ class VertexLinkerGeofencingTest {
 
       @Override
       public Set<GeofencingZone> findZonesContaining(Coordinate coord, String network) {
-        return index
-          .findZonesContaining(coord)
+        return index.findZonesContaining(coord)
           .stream()
           .filter(z -> z.id().getFeedId().equals(network))
           .collect(Collectors.toUnmodifiableSet());

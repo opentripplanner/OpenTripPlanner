@@ -13,12 +13,12 @@ import org.opentripplanner.model.ShapePoint;
  * iterate over them for further processing.
  * <p>
  * The fields of ShapePoints are stored densely in automatically expanding Trove primitive lists.
- * When later needed, they are reconstituted into objects and sorted on their sequence number.
- * Only an iterator over the sorted collection escapes rather than the collection itself, providing
- * some assurance that the objects will be quickly garbage collected.
+ * When later needed, they are reconstituted into objects and sorted on their sequence number. Only
+ * an iterator over the sorted collection escapes rather than the collection itself, providing some
+ * assurance that the objects will be quickly garbage collected.
  * <p>
- * This class is package-private but implements Iterable, so you should use that as the return type
- * of the mapping process.
+ * This class is package-private but implements Iterable, so you should use that as the return
+ * type of the mapping process.
  */
 class CompactShape implements Iterable<ShapePoint> {
 
@@ -39,12 +39,9 @@ class CompactShape implements Iterable<ShapePoint> {
 
   @Override
   public Iterator<ShapePoint> iterator() {
-    return IntStream.range(0, lats.size())
-      .mapToObj(i -> {
-        double dist = dists.get(i);
-        return new ShapePoint(seqs.get(i), lats.get(i), lons.get(i), dist < 0 ? null : dist);
-      })
-      .sorted()
-      .iterator();
+    return IntStream.range(0, lats.size()).mapToObj(i -> {
+      double dist = dists.get(i);
+      return new ShapePoint(seqs.get(i), lats.get(i), lons.get(i), dist < 0 ? null : dist);
+    }).sorted().iterator();
   }
 }

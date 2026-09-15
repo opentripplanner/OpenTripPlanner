@@ -9,10 +9,10 @@ import org.locationtech.jts.geom.LineString;
  * vertices). Only the intermediate points are delta-packed, which keeps both the per-edge heap
  * footprint and the serialized graph minimal.
  * <p>
- * This is the stateless companion to {@link CompactLineString}. It operates on a raw {@code byte[]}
- * supplied by the caller plus the externally-held endpoints &mdash; {@code StreetEdge} stores the
- * bytes directly and supplies its from/to vertex coordinates per call, so there is no wrapper
- * object per edge.
+ * This is the stateless companion to {@link CompactLineString}. It operates on a raw
+ * {@code byte[]} supplied by the caller plus the externally-held endpoints &mdash;
+ * {@code StreetEdge} stores the bytes directly and supplies its from/to vertex coordinates per
+ * call, so there is no wrapper object per edge.
  */
 public final class EndpointContextLineString {
 
@@ -35,8 +35,7 @@ public final class EndpointContextLineString {
   /**
    * Pack a line string into the endpoint-context form: the first and last coordinates are
    * <i>omitted</i> (they must equal the supplied {@code (xa,ya)} and {@code (xb,yb)} endpoints up
-   * to
-   * {@link #EPS}) and only the intermediate points are stored, delta-coded against the start
+   * to {@link #EPS}) and only the intermediate points are stored, delta-coded against the start
    * endpoint.
    *
    * @param xa         X coordinate of end point A
@@ -73,9 +72,9 @@ public final class EndpointContextLineString {
      */
     if (
       Math.abs(x0 - seq.getX(0)) > EPS ||
-      Math.abs(y0 - seq.getY(0)) > EPS ||
-      Math.abs(x1 - seq.getX(n - 1)) > EPS ||
-      Math.abs(y1 - seq.getY(n - 1)) > EPS
+        Math.abs(y0 - seq.getY(0)) > EPS ||
+        Math.abs(x1 - seq.getX(n - 1)) > EPS ||
+        Math.abs(y1 - seq.getY(n - 1)) > EPS
     ) {
       throw new IllegalArgumentException(
         "EndpointContextLineString geometry must stick to given end points. If you need to relax this, please read source code."
@@ -109,8 +108,9 @@ public final class EndpointContextLineString {
     double y0 = reverse ? yb : ya;
     double x1 = reverse ? xa : xb;
     double y1 = reverse ? ya : yb;
-    int intermediateCount =
-      packedCoords == null ? 0 : DlugoszVarLenIntPacker.countValues(packedCoords) / 2;
+    int intermediateCount = packedCoords == null
+      ? 0
+      : DlugoszVarLenIntPacker.countValues(packedCoords) / 2;
     double[] c = new double[(intermediateCount + 2) * 2];
     c[0] = x0;
     c[1] = y0;
@@ -130,8 +130,8 @@ public final class EndpointContextLineString {
    * on the packed form without materializing a {@link LineString} or any
    * {@link org.locationtech.jts.geom.Coordinate}.
    * <p>
-   * This uses the "fast somewhat inaccurate" local equirectangular projection (only the x axis is
-   * scaled by {@code xscale}; distances come out in latitude degrees) and computes the same
+   * This uses the "fast somewhat inaccurate" local equirectangular projection (only the x axis
+   * is scaled by {@code xscale}; distances come out in latitude degrees) and computes the same
    * per-segment point-to-segment distance JTS {@code DistanceOp} produces &mdash; mathematically
    * equivalent up to floating-point rounding &mdash; but it streams the segments straight from the
    * packed deltas via {@link DlugoszVarLenIntPacker.Decoder} instead of decoding into an array
@@ -141,20 +141,21 @@ public final class EndpointContextLineString {
    * thresholds, both of which are monotonic in the distance, so the per-candidate {@code sqrt} is
    * unnecessary (callers square their thresholds instead).
    * <p>
-   * The result is order-invariant, so {@code reverse} only affects which endpoint seeds the delta
-   * chain (it must match the value the bytes were encoded with); the minimum distance over the
-   * segment set is identical regardless.
+   * The result is order-invariant, so {@code reverse} only affects which endpoint seeds the
+   * delta chain (it must match the value the bytes were encoded with); the minimum distance over
+   * the segment set is identical regardless.
    *
-   * @param xa      X (longitude) of end point A
-   * @param ya      Y (latitude) of end point A
-   * @param xb      X (longitude) of end point B
-   * @param yb      Y (latitude) of end point B
+   * @param xa           X (longitude) of end point A
+   * @param ya           Y (latitude) of end point A
+   * @param xb           X (longitude) of end point B
+   * @param yb           Y (latitude) of end point B
    * @param packedCoords the endpoint-context packed intermediate points (may be empty/null for a
    *                     straight line)
-   * @param reverse True if A and B are inverted (B is start, A is end) — must match compaction.
-   * @param px      X (longitude) of the query point
-   * @param py      Y (latitude) of the query point
-   * @param xscale  cos(latitude) of the projection centre, as used by the linker
+   * @param reverse      True if A and B are inverted (B is start, A is end) — must match
+   *                     compaction.
+   * @param px           X (longitude) of the query point
+   * @param py           Y (latitude) of the query point
+   * @param xscale       cos(latitude) of the projection centre, as used by the linker
    * @return the squared projected distance in latitude degrees squared
    */
   public static double squaredEquirectangularDistanceToPoint(

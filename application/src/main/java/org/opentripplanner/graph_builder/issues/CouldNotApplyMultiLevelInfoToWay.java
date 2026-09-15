@@ -15,13 +15,13 @@ public record CouldNotApplyMultiLevelInfoToWay(
 ) implements DataImportIssue {
   private static final String FMT =
     "Multi-level info for way %s can not be used because node references did not match. " +
-    "This is probably caused by more than 2 intersection nodes in the way. " +
-    "The way has %s nodes in total.";
+      "This is probably caused by more than 2 intersection nodes in the way. " +
+      "The way has %s nodes in total.";
 
   private static final String HTMLFMT =
     "Multi-level info for <a href='%s'>way %s</a> can not be used because node references did not match. " +
-    "This is probably caused by more than 2 intersection nodes in the way. " +
-    "The way has %s nodes in total.";
+      "This is probably caused by more than 2 intersection nodes in the way. " +
+      "The way has %s nodes in total.";
 
   @Override
   public String getMessage() {

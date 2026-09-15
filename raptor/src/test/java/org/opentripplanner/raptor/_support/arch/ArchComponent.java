@@ -7,14 +7,14 @@ import java.util.Collection;
 
 public interface ArchComponent {
   /**
-   * ArchUnit cached set of classes in OTP. It takes a bit of time to build the set of
-   * classes, so it is nice to avoid this for every test. ArchUnit also support JUnit5
-   * with a @ArchTest annotation which cache and inject the classes, but the test become
-   * slightly more complex by using it and chasing it here works fine.
+   * ArchUnit cached set of classes in OTP. It takes a bit of time to build the set of classes, so
+   * it is nice to avoid this for every test. ArchUnit also support JUnit5 with a @ArchTest
+   * annotation which cache and inject the classes, but the test become slightly more complex by
+   * using it and chasing it here works fine.
    */
-  JavaClasses OTP_CLASSES = new ClassFileImporter()
-    .withImportOption(new ImportOption.DoNotIncludeTests())
-    .importPackages("org.opentripplanner");
+  JavaClasses OTP_CLASSES = new ClassFileImporter().withImportOption(
+    new ImportOption.DoNotIncludeTests()
+  ).importPackages("org.opentripplanner");
 
   /**
    * All Java packages in {@code java.*} and {@code javax.*}

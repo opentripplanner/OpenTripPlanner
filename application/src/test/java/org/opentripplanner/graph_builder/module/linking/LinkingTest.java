@@ -89,8 +89,7 @@ public class LinkingTest {
   }
 
   private static List<StreetTransitStopLink> outgoingStls(final TransitStopVertex tsv) {
-    return tsv
-      .getOutgoing()
+    return tsv.getOutgoing()
       .stream()
       .filter(StreetTransitStopLink.class::isInstance)
       .map(StreetTransitStopLink.class::cast)

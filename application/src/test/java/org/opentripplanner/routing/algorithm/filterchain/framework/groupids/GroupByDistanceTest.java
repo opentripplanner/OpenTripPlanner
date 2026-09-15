@@ -44,8 +44,7 @@ public class GroupByDistanceTest implements PlanTestConstants {
 
   @Test
   public void calculateTotalDistanceTest() {
-    Itinerary i = newItinerary(A)
-      .bus(21, T11_01, T11_02, B)
+    Itinerary i = newItinerary(A).bus(21, T11_01, T11_02, B)
       .walk(D2_m, C)
       .bus(31, T11_05, T11_07, D)
       .build();
@@ -231,15 +230,17 @@ public class GroupByDistanceTest implements PlanTestConstants {
 
   @Test
   public void illegalRangeForPUpperBound() {
-    assertThrows(IllegalArgumentException.class, () ->
-      new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
     );
   }
 
   @Test
   public void illegalRangeForPLowerBound() {
-    assertThrows(IllegalArgumentException.class, () ->
-      new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
     );
   }
 

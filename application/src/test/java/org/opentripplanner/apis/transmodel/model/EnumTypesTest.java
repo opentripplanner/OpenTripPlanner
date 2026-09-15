@@ -60,15 +60,17 @@ class EnumTypesTest {
 
   @Test
   void createFromDocumentedEnumMissingValueThrowsException() {
-    assertThrows(IllegalStateException.class, () ->
-      EnumTypes.createFromDocumentedEnum("oof", List.of(EnumTypes.map("Rab", Foo.Bar)))
+    assertThrows(
+      IllegalStateException.class,
+      () -> EnumTypes.createFromDocumentedEnum("oof", List.of(EnumTypes.map("Rab", Foo.Bar)))
     );
   }
 
   @Test
   void createFromDocumentedEnumDuplicateThrowsException() {
-    assertThrows(IllegalStateException.class, () ->
-      EnumTypes.createFromDocumentedEnum(
+    assertThrows(
+      IllegalStateException.class,
+      () -> EnumTypes.createFromDocumentedEnum(
         "oof",
         List.of(
           EnumTypes.map("Rab", Foo.Bar),
@@ -102,10 +104,7 @@ class EnumTypesTest {
   void assertAllRoutingErrorCodesAreMapped() {
     var expected = EnumSet.allOf(RoutingErrorCode.class);
     var values = EnumSet.copyOf(
-      ROUTING_ERROR_CODE.getValues()
-        .stream()
-        .map(it -> (RoutingErrorCode) it.getValue())
-        .toList()
+      ROUTING_ERROR_CODE.getValues().stream().map(it -> (RoutingErrorCode) it.getValue()).toList()
     );
     assertEquals(expected, values);
   }

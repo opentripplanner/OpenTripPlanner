@@ -79,11 +79,7 @@ public class FareModelForTest implements FareTestConstants {
 
   public static final FareAttribute OTHER_FEED_ATTRIBUTE = FareAttribute.of(
     FeedScopedId.ofNullable("F2", "other-feed-attribute")
-  )
-    .withPrice(Money.usDollars(10))
-    .withTransfers(1)
-    .withAgency(OTHER_FEED_AGENCY.getId())
-    .build();
+  ).withPrice(Money.usDollars(10)).withTransfers(1).withAgency(OTHER_FEED_AGENCY.getId()).build();
   public static final FareOffer ANY_FARE_OFFER = FareOffer.of(
     ZonedDateTime.parse("2025-06-24T12:16:09+02:00"),
     FareTestConstants.FARE_PRODUCT_A

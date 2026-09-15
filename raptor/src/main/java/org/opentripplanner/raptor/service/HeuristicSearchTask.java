@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
  * features. This is mostly to extract some "glue" out of the {@link RangeRaptorDynamicSearch} to
  * make that simpler and let it focus on the main business logic.
  * <p>
- * This class is not meant for reuse, create one task for each potential heuristic search. The task
- * must be {@link #enable()}d before it is {@link #run()}.
+ * This class is not meant for reuse, create one task for each potential heuristic search. The
+ * task must be {@link #enable()}d before it is {@link #run()}.
  */
 public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
@@ -130,8 +130,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (search == null) {
       var profile = MIN_TRAVEL_DURATION;
 
-      var builder = request
-        .mutate()
+      var builder = request.mutate()
         // Disable any optimization that is not valid for a heuristic search
         .clearOptimizations()
         .profile(profile)

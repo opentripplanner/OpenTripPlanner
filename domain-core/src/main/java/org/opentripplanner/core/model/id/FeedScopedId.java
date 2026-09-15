@@ -30,6 +30,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   }
 
   /// Create a FeedScopedID
+  ///
   /// @throws IllegalArgumentException if the feedId or id is empty
   public static FeedScopedId of(String feedId, String id) throws IllegalArgumentException {
     return new FeedScopedId(feedId, id);
@@ -46,8 +47,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   }
 
   /**
-   * Return a new FeedId if the id is not {@code null}, an empty string or contains whitespace
-   * only.
+   * Return a new FeedId if the id is not {@code null}, an empty string or contains whitespace only.
    */
   @Nullable
   public static FeedScopedId ofNullable(String feedId, @Nullable String id) {
@@ -78,13 +78,14 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   /// @param value id of the form "feedId:entityId"
   /// @throws IllegalArgumentException if the input is not a valid FeedScopedId
   public static FeedScopedId parseStrict(String value) throws IllegalArgumentException {
-    return parseOptional(value).orElseThrow(() ->
-      new IllegalArgumentException("Invalid FeedScopedId: " + value)
+    return parseOptional(value).orElseThrow(
+      () -> new IllegalArgumentException("Invalid FeedScopedId: " + value)
     );
   }
 
   /**
-   * Given collection of strings in the form "feedId:entityId", parses into a list of {@link FeedScopedId}.
+   * Given collection of strings in the form "feedId:entityId", parses into a list of
+   * {@link FeedScopedId}.
    *
    * @throws IllegalArgumentException if there is a null or invalid value in the collection
    */

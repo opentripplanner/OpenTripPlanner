@@ -21,16 +21,14 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
-  static Map<
-    VehicleParkingsLayerBuilder.MapperType,
-    Function<Locale, PropertyMapper<VehicleParking>>
-  > mappers = Map.ofEntries(
-    entry(
-      VehicleParkingsLayerBuilder.MapperType.Stadtnavi,
-      StadtnaviVehicleParkingPropertyMapper::create
-    ),
-    entry(MapperType.Digitransit, DigitransitVehicleParkingPropertyMapper::create)
-  );
+  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParking>>> mappers =
+    Map.ofEntries(
+      entry(
+        VehicleParkingsLayerBuilder.MapperType.Stadtnavi,
+        StadtnaviVehicleParkingPropertyMapper::create
+      ),
+      entry(MapperType.Digitransit, DigitransitVehicleParkingPropertyMapper::create)
+    );
   private final VehicleParkingService service;
 
   public VehicleParkingsLayerBuilder(
@@ -48,16 +46,12 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
   @Override
   protected List<Geometry> findGeometries(Envelope query) {
-    return service
-      .listVehicleParkings()
-      .stream()
-      .map(vehicleParking -> {
-        Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
-        Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        point.setUserData(vehicleParking);
-        return point;
-      })
-      .collect(Collectors.toList());
+    return service.listVehicleParkings().stream().map(vehicleParking -> {
+      Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
+      Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
+      point.setUserData(vehicleParking);
+      return point;
+    }).collect(Collectors.toList());
   }
 
   enum MapperType {

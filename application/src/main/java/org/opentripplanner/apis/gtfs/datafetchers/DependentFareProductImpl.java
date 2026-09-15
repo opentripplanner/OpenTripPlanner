@@ -15,9 +15,8 @@ public class DependentFareProductImpl implements GraphQLDataFetchers.GraphQLDepe
   public DataFetcher<Iterable<FareOffer>> dependencies() {
     return env -> {
       var fpl = getSource(env);
-      var filter = new GraphQLDependentFareProductDependenciesArgs(
-        env.getArguments()
-      ).getGraphQLFilter();
+      var filter = new GraphQLDependentFareProductDependenciesArgs(env.getArguments())
+        .getGraphQLFilter();
       return switch (filter) {
         case null -> fpl.dependencies();
         case ALL -> fpl.dependencies();

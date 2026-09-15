@@ -188,16 +188,14 @@ public class DebugVectorTilesResource {
   }
 
   static String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
-    final String allLayers = layers
-      .stream()
+    final String allLayers = layers.stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
     return "%s%s%s/tilejson.json".formatted(base, PATH, allLayers);
   }
 
   private List<FeedInfo> feedInfos() {
-    return transitService
-      .listFeedIds()
+    return transitService.listFeedIds()
       .stream()
       .map(transitService::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))
@@ -210,19 +208,21 @@ public class DebugVectorTilesResource {
     LayerBuilderContext context
   ) {
     return switch (layerParameters.type()) {
-      case RegularStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
-        context.transitService().findRegularStopsByBoundingBox(e)
+      case RegularStop -> new StopLayerBuilder<>(
+        layerParameters,
+        locale,
+        e -> context.transitService().findRegularStopsByBoundingBox(e)
       );
-      case AreaStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
-        context.transitService().findAreaStops(e)
+      case AreaStop -> new StopLayerBuilder<>(
+        layerParameters,
+        locale,
+        e -> context.transitService().findAreaStops(e)
       );
       case GroupStop -> new GroupStopLayerBuilder(
         layerParameters,
         locale,
         // There are not many GroupStops, so we can just list them all.
-        context
-          .transitService()
-          .listGroupStops()
+        context.transitService().listGroupStops()
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(
         context.vehicleRentalService(),
@@ -243,8 +243,10 @@ public class DebugVectorTilesResource {
     };
   }
 
-  /** The subset of services {@link #createLayerBuilder} needs, passed through {@link
-   * VectorTileResponseFactory#create} as its generic context parameter. */
+  /**
+   * The subset of services {@link #createLayerBuilder} needs, passed through
+   * {@link VectorTileResponseFactory#create} as its generic context parameter.
+   */
   private record LayerBuilderContext(
     TransitService transitService,
     VehicleRentalService vehicleRentalService,

@@ -10,23 +10,19 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The main purpose of this class is to hold data for a given arrival at a stop and raptor round. It
  * should be as light-weight as possible to minimize memory consumption and cheap to create and
  * garbage collect.
- * <p/>
- * This class holds both the best transit and the best transfer to a stop if they exist for a given
- * round and stop. The normal case is that this class represents either a transit arrival or a
+ * <p/>This class holds both the best transit and the best transfer to a stop if they exist for a
+ * given round and stop. The normal case is that this class represents either a transit arrival or a
  * transfer arrival. We only keep both if the transfer is better, arriving before the transit.
- * <p/>
- * The reason we need to keep both the best transfer and the best transit for a given stop and round
- * is that we may arrive at a stop by transit, then in the same or later round we may arrive by
- * transit. If the transfer arrival is better than the transit arrival, it might be tempting to
+ * <p/>The reason we need to keep both the best transfer and the best transit for a given stop and
+ * round is that we may arrive at a stop by transit, then in the same or later round we may arrive
+ * by transit. If the transfer arrival is better than the transit arrival, it might be tempting to
  * remove the transit arrival, but this transit might be the best way (or only way) to get to
  * another stop by transfer.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
-  implements StopArrivalState<T>
-  permits EgressStopArrivalState
-{
+sealed class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T>
+  permits EgressStopArrivalState {
 
   /**
    * Used to initialize all none-time-based attributes.
@@ -155,8 +151,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
 
   /** This allows subclasses to attach content and type to their own toString() */
   ToStringBuilder toStringAddBody(ToStringBuilder builder) {
-    builder
-      .addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
+    builder.addServiceTime("arrivalTime", bestArrivalTime, NOT_SET)
       .addServiceTime("onBoardArrivalTime", onBoardArrivalTime, NOT_SET)
       .addNum("boardStopPosition", boardStopPosition, NOT_SET)
       .addObj("trip", tripInfo())
@@ -187,7 +182,7 @@ sealed class DefaultStopArrivalState<T extends RaptorTripSchedule>
     return boardStopPosition == NOT_SET
       ? null
       : trip.pattern().debugInfo() +
-          " @" +
-          TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
+        " @" +
+        TimeUtils.timeToStrCompact(trip.departure(boardStopPosition));
   }
 }

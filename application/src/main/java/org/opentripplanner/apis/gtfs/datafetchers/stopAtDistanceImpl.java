@@ -17,17 +17,17 @@ public class stopAtDistanceImpl implements GraphQLDataFetchers.GraphQLStopAtDist
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId(
-        "stopAtDistance",
-        getSource(environment).distance + ";" + getSource(environment).stopId.toString()
-      );
+    return environment -> new Relay.ResolvedGlobalId(
+      "stopAtDistance",
+      getSource(environment).distance + ";" + getSource(environment).stopId.toString()
+    );
   }
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment ->
-      getTransitService(environment).getStopLocation(getSource(environment).stopId);
+    return environment -> getTransitService(environment).getStopLocation(
+      getSource(environment).stopId
+    );
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

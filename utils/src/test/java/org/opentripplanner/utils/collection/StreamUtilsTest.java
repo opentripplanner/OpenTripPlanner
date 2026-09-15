@@ -36,8 +36,7 @@ class StreamUtilsTest {
 
   @Test
   void ofIterableList() {
-    assertThat(StreamUtils.ofIterable(List.of(1, 2, 3)).toList())
-      .containsExactly(1, 2, 3)
+    assertThat(StreamUtils.ofIterable(List.of(1, 2, 3)).toList()).containsExactly(1, 2, 3)
       .inOrder();
   }
 

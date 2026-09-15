@@ -43,24 +43,27 @@ public class GqlUtilTest {
   @Test
   void testGetPositiveNonNullIntegerArgumentWithNegativeValue() {
     var env = buildEnvWithTestValue(-1);
-    assertThrows(InvalidInputException.class, () ->
-      GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
+    assertThrows(
+      InvalidInputException.class,
+      () -> GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
 
   @Test
   void testGetPositiveNonNullIntegerArgumentWithNullValue() {
     var env = buildEnvWithTestValue(null);
-    assertThrows(InvalidInputException.class, () ->
-      GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
+    assertThrows(
+      InvalidInputException.class,
+      () -> GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
 
   @Test
   void testGetPositiveNonNullIntegerArgumentWithoutValue() {
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT).build();
-    assertThrows(InvalidInputException.class, () ->
-      GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
+    assertThrows(
+      InvalidInputException.class,
+      () -> GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
 

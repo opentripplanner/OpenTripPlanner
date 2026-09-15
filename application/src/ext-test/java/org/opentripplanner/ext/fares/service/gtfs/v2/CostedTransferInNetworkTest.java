@@ -69,14 +69,13 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
   }
 
   /**
-   * Tests that a transfer product is correctly applied to three consecutive legs of the same network:
-   * Transfers are one dollar but unlimited, so you need to either product a or b plus a single
-   * transfer for the last two legs.
+   * Tests that a transfer product is correctly applied to three consecutive legs of the same
+   * network: Transfers are one dollar but unlimited, so you need to either product a or b plus a
+   * single transfer for the last two legs.
    */
   @Test
   void threeLegs() {
-    var i1 = newItinerary(A, 0)
-      .bus(ROUTE_1, 1, 0, 20, B)
+    var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B)
       .bus(ROUTE_2, 2, 21, 40, C)
       .bus(ROUTE_3, 3, 41, 45, D)
       .build();
@@ -105,8 +104,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
   @Test
   void threeLegsDifferentNetwork() {
-    var i1 = newItinerary(A, 0)
-      .bus(ROUTE_1, 1, 0, 20, B)
+    var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B)
       .bus(ROUTE_2, 2, 21, 40, C)
       .bus(ROUTE_4, 3, 41, 45, D)
       .build();

@@ -60,15 +60,11 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   protected static String getRoutes(TransitService transitService, RegularStop stop) {
     try {
-      var objects = transitService
-        .findRoutes(stop)
-        .stream()
-        .map(route -> {
-          var routeObject = OBJECT_MAPPER.createObjectNode();
-          routeObject.put("gtfsType", route.getGtfsType());
-          return routeObject;
-        })
-        .toList();
+      var objects = transitService.findRoutes(stop).stream().map(route -> {
+        var routeObject = OBJECT_MAPPER.createObjectNode();
+        routeObject.put("gtfsType", route.getGtfsType());
+        return routeObject;
+      }).toList();
       return OBJECT_MAPPER.writeValueAsString(objects);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -78,8 +74,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
   protected static String getType(TransitService transitService, RegularStop stop) {
     Collection<TripPattern> patternsForStop = transitService.findPatterns(stop);
 
-    return patternsForStop
-      .stream()
+    return patternsForStop.stream()
       .map(TripPattern::getMode)
       .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
       .entrySet()

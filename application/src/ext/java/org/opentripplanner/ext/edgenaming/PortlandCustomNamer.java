@@ -30,8 +30,7 @@ class PortlandCustomNamer implements EdgeNamer {
     "Place",
     "Road",
     "Boulevard",
-    "Alley",
-  };
+    "Alley", };
 
   public static String[] PATH_WORDS = {
     "Trail",
@@ -39,8 +38,7 @@ class PortlandCustomNamer implements EdgeNamer {
     "Greenway",
     "Esplanade",
     "Spur",
-    "Loop",
-  };
+    "Loop", };
 
   private final HashSet<StreetEdge> nameByOrigin = new HashSet<>();
 
@@ -194,10 +192,8 @@ class PortlandCustomNamer implements EdgeNamer {
 
   private static boolean isLowerLink(OsmWay way) {
     String highway = way.getTag("highway");
-    return (
-      "secondary_link".equals(highway) ||
+    return ("secondary_link".equals(highway) ||
       "primary_link".equals(highway) ||
-      "tertiary_link".equals(highway)
-    );
+      "tertiary_link".equals(highway));
   }
 }

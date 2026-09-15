@@ -21,7 +21,9 @@ public abstract class CachingOAuthService implements OAuthService {
 
   /**
    * Obtains and caches an OAuth API access token.
-   * @return A token holder with the token value (including null token values if the call was unsuccessful).
+   *
+   * @return A token holder with the token value (including null token values if the call was
+   *         unsuccessful).
    */
   @Override
   public String getToken() throws IOException {
@@ -30,10 +32,8 @@ public abstract class CachingOAuthService implements OAuthService {
       try {
         var request = oauthTokenRequest();
         LOG.info("Requesting new {} access token", request.uri());
-        var response = HttpClient.newHttpClient().send(
-          request,
-          HttpResponse.BodyHandlers.ofString()
-        );
+        var response = HttpClient.newHttpClient()
+          .send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
           LOG.error(

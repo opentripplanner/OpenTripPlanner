@@ -73,7 +73,10 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     if (element == null) {
       return;
     }
-    for (Journey_VersionStructure it : element.getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()) {
+    for (
+      Journey_VersionStructure it : element
+        .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()
+    ) {
       if (it instanceof ServiceJourney serviceJourney) {
         serviceJourneys.add(serviceJourney);
       } else if (it instanceof DatedServiceJourney datedServiceJourney) {

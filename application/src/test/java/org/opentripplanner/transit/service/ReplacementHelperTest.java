@@ -33,22 +33,22 @@ public class ReplacementHelperTest implements RealtimeTestConstants {
   private final String ROUTE_1_ID = "route_1";
   private final String ROUTE_2_ID = "route_2";
   private final Route ROUTE_1 = envBuilder.route(ROUTE_1_ID);
-  private final Route ROUTE_2 = envBuilder.route(ROUTE_2_ID, routeBuilder ->
-    routeBuilder.withNetexSubmode("railReplacementBus")
+  private final Route ROUTE_2 = envBuilder.route(
+    ROUTE_2_ID,
+    routeBuilder -> routeBuilder.withNetexSubmode("railReplacementBus")
   );
 
-  private final TransitTestEnvironment env = envBuilder
-    .addTrip(
-      TripInput.of(TRIP_1_ID)
-        .withServiceDates(
-          envBuilder.defaultServiceDate().minusDays(1),
-          envBuilder.defaultServiceDate().plusDays(1)
-        )
-        .withRoute(ROUTE_1)
-        .addStop(STOP_A, "12:00", "12:00")
-        .addStop(STOP_B, "12:10", "12:10")
-        .addStop(STOP_C, "12:20", "12:20")
-    )
+  private final TransitTestEnvironment env = envBuilder.addTrip(
+    TripInput.of(TRIP_1_ID)
+      .withServiceDates(
+        envBuilder.defaultServiceDate().minusDays(1),
+        envBuilder.defaultServiceDate().plusDays(1)
+      )
+      .withRoute(ROUTE_1)
+      .addStop(STOP_A, "12:00", "12:00")
+      .addStop(STOP_B, "12:10", "12:10")
+      .addStop(STOP_C, "12:20", "12:20")
+  )
     .addTrip(
       TripInput.of(TRIP_2_ID)
         .withServiceDates(
@@ -104,32 +104,26 @@ public class ReplacementHelperTest implements RealtimeTestConstants {
       StreamSupport.stream(
         replacementHelper.getReplacedBy(addedTripOnServiceDate).spliterator(),
         false
-      )
-        .map(ReplacedByRelation::getTripOnServiceDate)
-        .toList()
+      ).map(ReplacedByRelation::getTripOnServiceDate).toList()
     ).contains(addedTripOnServiceDate2);
     assertThat(
       StreamSupport.stream(
         replacementHelper.getReplacementFor(addedTripOnServiceDate2).spliterator(),
         false
-      )
-        .map(ReplacementForRelation::getTripOnServiceDate)
-        .toList()
+      ).map(ReplacementForRelation::getTripOnServiceDate).toList()
     ).contains(addedTripOnServiceDate);
   }
 
   private TripOnServiceDate createReplacementTrip(String oldId, String newId, String min) {
     var siri = SiriTestHelper.of(env);
-    var createExtraJourney = siri
-      .etBuilder()
+    var createExtraJourney = siri.etBuilder()
       .withOperatorRef(OPERATOR_ID)
       .withEstimatedVehicleJourneyCode(newId)
       .withIsExtraJourney(true)
       .withLineRef(ROUTE_1_ID)
       .withVehicleJourneyRef(oldId)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("12:00", "12:0" + min)
           .call(STOP_B)
           .departAimedExpected("12:10", "12:1" + min)

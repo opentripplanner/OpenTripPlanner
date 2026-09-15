@@ -89,8 +89,12 @@ class ConfigFileLoaderTest {
    */
   @Test
   public void testMissingEnvironmentVariable() {
-    assertThrows(OtpAppException.class, () ->
-      ConfigFileLoader.nodeFromString(json("{ key: '${none_existing_env_variable}' }"), "test")
+    assertThrows(
+      OtpAppException.class,
+      () -> ConfigFileLoader.nodeFromString(
+        json("{ key: '${none_existing_env_variable}' }"),
+        "test"
+      )
     );
   }
 

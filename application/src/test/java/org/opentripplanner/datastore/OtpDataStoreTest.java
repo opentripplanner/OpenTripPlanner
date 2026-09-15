@@ -158,13 +158,15 @@ public class OtpDataStoreTest {
         },
         graph: '%s',
         buildReportDir: '%s'
-        }""".formatted(
-        uri + OSM_FILENAME,
-        uri + GTFS_FILENAME,
-        uri + EMPIRICAL_DELAY,
-        uri + GRAPH_FILENAME,
-        uri + REPORT_FILENAME
-      )
+        }\
+      """
+        .formatted(
+          uri + OSM_FILENAME,
+          uri + GTFS_FILENAME,
+          uri + EMPIRICAL_DELAY,
+          uri + GRAPH_FILENAME,
+          uri + REPORT_FILENAME
+        )
     );
 
     // Create build-config  and an unknown file in the 'baseDir'

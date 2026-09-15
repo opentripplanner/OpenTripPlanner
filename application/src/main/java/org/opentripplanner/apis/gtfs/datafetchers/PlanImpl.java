@@ -27,8 +27,14 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
 
   @Override
   public DataFetcher<StopArrival> from() {
-    return environment ->
-      new StopArrival(getSource(environment).getTripPlan().from, null, null, null, null, null);
+    return environment -> new StopArrival(
+      getSource(environment).getTripPlan().from,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
   }
 
   @Override
@@ -38,24 +44,20 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
 
   @Override
   public DataFetcher<Iterable<String>> messageEnums() {
-    return environment ->
-      getSource(environment)
-        .getRoutingErrors()
-        .stream()
-        .map(routingError -> routingError.code)
-        .map(Enum::name)
-        .collect(Collectors.toList());
+    return environment -> getSource(environment).getRoutingErrors()
+      .stream()
+      .map(routingError -> routingError.code)
+      .map(Enum::name)
+      .collect(Collectors.toList());
   }
 
   @Override
   public DataFetcher<Iterable<String>> messageStrings() {
-    return environment ->
-      getSource(environment)
-        .getRoutingErrors()
-        .stream()
-        .map(PlannerErrorMapper::mapMessage)
-        .map(plannerError -> plannerError.message.get(environment.getLocale()))
-        .collect(Collectors.toList());
+    return environment -> getSource(environment).getRoutingErrors()
+      .stream()
+      .map(PlannerErrorMapper::mapMessage)
+      .map(plannerError -> plannerError.message.get(environment.getLocale()))
+      .collect(Collectors.toList());
   }
 
   @Override
@@ -114,8 +116,14 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
 
   @Override
   public DataFetcher<StopArrival> to() {
-    return environment ->
-      new StopArrival(getSource(environment).getTripPlan().to, null, null, null, null, null);
+    return environment -> new StopArrival(
+      getSource(environment).getTripPlan().to,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
   }
 
   private RoutingResponse getSource(DataFetchingEnvironment environment) {

@@ -99,9 +99,7 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardDefault() {
-    var request = StreetSearchRequest.of()
-      .withWalk(w -> w.withSpeed(1.0))
-      .build();
+    var request = StreetSearchRequest.of().withWalk(w -> w.withSpeed(1.0)).build();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -129,9 +127,7 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsPedestrian() {
-    var request = StreetSearchRequest.of()
-      .withWalk(w -> w.withSpeed(1.0))
-      .build();
+    var request = StreetSearchRequest.of().withWalk(w -> w.withSpeed(1.0)).build();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -158,9 +154,9 @@ public class TurnRestrictionTest {
   }
 
   /**
-   * Helper to return the label of the parent vertex of a vertex, useful for not
-   * digging too deep in the details of the turn restriction graph application code,
-   * and instead checking that the returned vertex is in the expected group.
+   * Helper to return the label of the parent vertex of a vertex, useful for not digging too deep in
+   * the details of the turn restriction graph application code, and instead checking that the
+   * returned vertex is in the expected group.
    */
   public static String getParentLabelString(Vertex vertex) {
     return vertex.getParent().getLabelString();
@@ -210,8 +206,7 @@ public class TurnRestrictionTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdgeBuilder<>()
-      .withFromVertex(vA)
+    return new StreetEdgeBuilder<>().withFromVertex(vA)
       .withToVertex(vB)
       .withGeometry(geom)
       .withName(name)

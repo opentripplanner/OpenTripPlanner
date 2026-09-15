@@ -21,38 +21,32 @@ public class VehicleRentalConfig {
     VehicleRentalPreferences.Builder builder
   ) {
     var dft = builder.original();
-    builder
-      .withDropOffCost(
-        c
-          .of("dropOffCost")
-          .since(V2_0)
-          .summary("Cost to drop-off a rented vehicle.")
-          .asInt(dft.dropOffCost().toSeconds())
-      )
+    builder.withDropOffCost(
+      c.of("dropOffCost")
+        .since(V2_0)
+        .summary("Cost to drop-off a rented vehicle.")
+        .asInt(dft.dropOffCost().toSeconds())
+    )
       .withDropOffTime(
-        c
-          .of("dropOffTime")
+        c.of("dropOffTime")
           .since(V2_0)
           .summary("Time to drop-off a rented vehicle.")
           .asDuration(dft.dropOffTime())
       )
       .withPickupCost(
-        c
-          .of("pickupCost")
+        c.of("pickupCost")
           .since(V2_0)
           .summary("Cost to rent a vehicle.")
           .asInt(dft.pickupCost().toSeconds())
       )
       .withPickupTime(
-        c
-          .of("pickupTime")
+        c.of("pickupTime")
           .since(V2_0)
           .summary("Time to rent a vehicle.")
           .asDuration(dft.pickupTime())
       )
       .withUseAvailabilityInformation(
-        c
-          .of("useAvailabilityInformation")
+        c.of("useAvailabilityInformation")
           .since(V2_0)
           .summary(
             "Whether or not vehicle rental availability information will be used to plan vehicle rental trips."
@@ -60,8 +54,7 @@ public class VehicleRentalConfig {
           .asBoolean(dft.useAvailabilityInformation())
       )
       .withArrivingInRentalVehicleAtDestinationCost(
-        c
-          .of("keepingAtDestinationCost")
+        c.of("keepingAtDestinationCost")
           .since(V2_2)
           .summary(
             "The cost of arriving at the destination with the rented vehicle, to discourage doing so."
@@ -69,8 +62,7 @@ public class VehicleRentalConfig {
           .asInt(dft.arrivingInRentalVehicleAtDestinationCost().toSeconds())
       )
       .withAllowArrivingInRentedVehicleAtDestination(
-        c
-          .of("allowKeepingAtDestination")
+        c.of("allowKeepingAtDestination")
           .since(V2_2)
           .summary(
             "If a vehicle should be allowed to be kept at the end of a station-based rental."
@@ -78,8 +70,7 @@ public class VehicleRentalConfig {
           .asBoolean(dft.allowArrivingInRentedVehicleAtDestination())
       )
       .withAllowedNetworks(
-        c
-          .of("allowedNetworks")
+        c.of("allowedNetworks")
           .since(V2_1)
           .summary(
             "The vehicle rental networks which may be used. If empty all networks may be used."
@@ -87,8 +78,7 @@ public class VehicleRentalConfig {
           .asStringSet(dft.allowedNetworks())
       )
       .withBannedNetworks(
-        c
-          .of("bannedNetworks")
+        c.of("bannedNetworks")
           .since(V2_1)
           .summary(
             "The vehicle rental networks which may not be used. If empty, no networks are banned."
@@ -96,8 +86,7 @@ public class VehicleRentalConfig {
           .asStringSet(dft.bannedNetworks())
       )
       .withElectricAssistSlopeSensitivity(
-        c
-          .of("electricAssistSlopeSensitivity")
+        c.of("electricAssistSlopeSensitivity")
           .since(V2_8)
           .summary("How sensitive electric-assist rental vehicles are to slopes.")
           .description(

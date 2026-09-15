@@ -106,9 +106,7 @@ class ZipStreamDataSourceDecoratorTest {
 
     List<String> lines = new BufferedReader(
       new InputStreamReader(entry.asInputStream(), StandardCharsets.UTF_8)
-    )
-      .lines()
-      .toList();
+    ).lines().toList();
     assertEquals("agency_id,agency_name,agency_url,agency_timezone", lines.get(0));
 
     // Close zip
@@ -127,8 +125,7 @@ class ZipStreamDataSourceDecoratorTest {
     Collection<String> names = content.stream().map(DataSource::name).toList();
     assertTrue(names.containsAll(EXPECTED_ZIP_ENTRIES));
     assertTrue(
-      content
-        .stream()
+      content.stream()
         .allMatch(dataSource -> EXPECTED_FILE_SIZES.get(dataSource.name()) == dataSource.size())
     );
     assertTrue(content.stream().allMatch(TemporaryFileDataSource.class::isInstance));

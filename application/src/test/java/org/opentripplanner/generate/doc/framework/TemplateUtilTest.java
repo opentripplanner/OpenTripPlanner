@@ -13,7 +13,8 @@ public class TemplateUtilTest {
 
   @Test
   public void replaceSectionTest() {
-    var body = """
+    var body =
+    """
     Expected line 1.
     Expected line 2.
     """;
@@ -28,7 +29,8 @@ public class TemplateUtilTest {
       Expected line 2.
 
       <!-- TEST END -->
-      """.trim(),
+      """
+        .trim(),
       replaceSection(doc, "TEST", body)
     );
   }

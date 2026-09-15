@@ -64,8 +64,7 @@ public final class RaptorTransferViaConnection extends ViaConnection {
 
   @Override
   public String toString(RaptorStopNameResolver stopNameResolver) {
-    return new StringBuilder("(transfer ")
-      .append(stopNameResolver.apply(fromStop()))
+    return new StringBuilder("(transfer ").append(stopNameResolver.apply(fromStop()))
       .append(" ~ ")
       .append(stopNameResolver.apply(toStop()))
       .append(" [")

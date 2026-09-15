@@ -25,7 +25,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class Place {
 
   /**
-   * For transit stops, the name of the stop.  For points of interest, the name of the POI.
+   * For transit stops, the name of the stop. For points of interest, the name of the POI.
    */
   public final I18NString name;
 
@@ -212,8 +212,7 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    boolean realTime = vertex
-      .getVehicleParking()
+    boolean realTime = vertex.getVehicleParking()
       .hasRealTimeDataForMode(traverseMode, request.wheelchairEnabled());
     return new Place(
       vertex.getName(),

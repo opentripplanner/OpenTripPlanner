@@ -228,8 +228,9 @@ class RouteRequestMapperBicycleTest {
       )
     );
     var allowedEnv = testCtx.executionContext(bikeArgs);
-    assertThrows(InvalidInputException.class, () ->
-      RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
+    assertThrows(
+      InvalidInputException.class,
+      () -> RouteRequestMapper.toRouteRequest(allowedEnv, testCtx.context())
     );
 
     bikeArgs = testCtx.basicRequest();

@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 public class ParetoComparatorTest {
 
-  private static final ParetoComparator<TestVector> COMPARATOR = (l, r) ->
-    l.v1 < r.v1 || l.v2 < r.v2;
+  private static final ParetoComparator<TestVector> COMPARATOR = (l, r) -> l.v1 < r.v1 ||
+    l.v2 < r.v2;
   private static final TestVector A_5_5 = new TestVector("a", 5, 5);
   private static final TestVector B_5_5 = new TestVector("b", 5, 5);
   private static final TestVector C_3_5 = new TestVector("c", 3, 5);

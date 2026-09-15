@@ -18,7 +18,8 @@ class StopTimesMapper {
   }
 
   /**
-   * Map the call to the aimed StopTime or return null if the stop cannot be found in the site repository.
+   * Map the call to the aimed StopTime or return null if the stop cannot be found in the site
+   * repository.
    */
   @Nullable
   StopTime createAimedStopTime(
@@ -49,20 +50,18 @@ class StopTimesMapper {
     }
 
     // Fallback to other time, if one doesn't exist
-    var aimedArrivalTime =
-      call.getAimedArrivalTime() != null
-        ? call.getAimedArrivalTime()
-        : call.getAimedDepartureTime();
+    var aimedArrivalTime = call.getAimedArrivalTime() != null
+      ? call.getAimedArrivalTime()
+      : call.getAimedDepartureTime();
 
     var aimedArrivalTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
       startOfService,
       aimedArrivalTime
     );
 
-    var aimedDepartureTime =
-      call.getAimedDepartureTime() != null
-        ? call.getAimedDepartureTime()
-        : call.getAimedArrivalTime();
+    var aimedDepartureTime = call.getAimedDepartureTime() != null
+      ? call.getAimedDepartureTime()
+      : call.getAimedArrivalTime();
 
     var aimedDepartureTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
       startOfService,

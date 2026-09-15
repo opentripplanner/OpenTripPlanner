@@ -39,8 +39,7 @@ class RaptorCumulativeUpdateTest implements RealtimeTestConstants {
     assertThat(env.raptorData(DATE_2).summarizePatterns()).containsExactly("F:Pattern1[S]");
 
     // Commit 1: delay the trip on DATE_1 only.
-    var update1 = rt
-      .tripUpdateScheduled(TRIP_2_ID, DATE_1)
+    var update1 = rt.tripUpdateScheduled(TRIP_2_ID, DATE_1)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60)
       .addDelayedStopTime(2, 90)
@@ -50,8 +49,7 @@ class RaptorCumulativeUpdateTest implements RealtimeTestConstants {
     assertThat(env.raptorData(DATE_1).summarizePatterns()).containsExactly("F:Pattern1[U]");
 
     // Commit 2: delay the trip on DATE_2 only (DATE_1 is NOT in this commit's dirty set).
-    var update2 = rt
-      .tripUpdateScheduled(TRIP_2_ID, DATE_2)
+    var update2 = rt.tripUpdateScheduled(TRIP_2_ID, DATE_2)
       .addDelayedStopTime(0, 0)
       .addDelayedStopTime(1, 60)
       .addDelayedStopTime(2, 90)

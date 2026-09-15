@@ -11,25 +11,25 @@ import org.rutebanken.netex.model.ServiceJourney;
  * Ensure that passing times are increasing along the service journey.
  * <p>
  * The validator checks first that individual TimetabledPassingTimes are valid, i.e:
- *  <ul>
- *  <li> a regular stop has either arrivalTime or departureTime specified,
- *  and arrivalTime < departureTime</li>
- *  <li>an area stop has both earliestDepartureTime and latestArrivalTime specified,
- *  and earliestDepartureTime < latestArrivalTime</li>
- *  </ul>
+ * <ul>
+ *   <li>a regular stop has either arrivalTime or departureTime specified, and arrivalTime <
+ *       departureTime</li>
+ *   <li>an area stop has both earliestDepartureTime and latestArrivalTime specified, and
+ *       earliestDepartureTime < latestArrivalTime</li>
+ * </ul>
  * <p>
- * The validator then checks that successive stops have increasing times, taking
- * into account 4 different cases:
- *  <ul>
- *  <li> a regular stop followed by a regular stop</li>
- *  <li>an area stop followed by an area stop</li>
- *  <li>a regular stop followed by an area stop</li>
- *  <li>an area stop followed by a regular stop</li>
- *  </ul>
+ * The validator then checks that successive stops have increasing times, taking into account 4
+ * different cases:
+ * <ul>
+ *   <li>a regular stop followed by a regular stop</li>
+ *   <li>an area stop followed by an area stop</li>
+ *   <li>a regular stop followed by an area stop</li>
+ *   <li>an area stop followed by a regular stop</li>
+ * </ul>
  */
 class ServiceJourneyNonIncreasingPassingTime
-  extends AbstractHMapValidationRule<String, ServiceJourney>
-{
+  extends
+  AbstractHMapValidationRule<String, ServiceJourney> {
 
   private StopTimeAdaptor invalidTimetabledPassingTimeInfo;
   private ErrorType errorType;
@@ -37,8 +37,8 @@ class ServiceJourneyNonIncreasingPassingTime
   @Override
   public Status validate(ServiceJourney sj) {
     ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj, index);
-    List<StopTimeAdaptor> orderedPassingTimes =
-      serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
+    List<StopTimeAdaptor> orderedPassingTimes = serviceJourneyInfo
+      .orderedTimetabledPassingTimeInfos();
 
     var previousPassingTime = orderedPassingTimes.get(0);
     if (!previousPassingTime.isComplete()) {

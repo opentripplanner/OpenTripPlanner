@@ -5,8 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * This is a simple {@link CompositeDataSource} using a list of children. It is usefull
- * for testing.
+ * This is a simple {@link CompositeDataSource} using a list of children. It is usefull for testing.
  */
 public class ListCompositeDataSource implements CompositeDataSource {
 
@@ -30,11 +29,7 @@ public class ListCompositeDataSource implements CompositeDataSource {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   @Override
   public DataSource entry(String name) {
-    return children
-      .stream()
-      .filter(it -> name.equals(it.name()))
-      .findFirst()
-      .orElse(null);
+    return children.stream().filter(it -> name.equals(it.name())).findFirst().orElse(null);
   }
 
   @Override

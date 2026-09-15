@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A Vertical datum specified as a grid of offsets from NAD83 http://vdatum.noaa.gov/dev/gtx_info.html
+ * A Vertical datum specified as a grid of offsets from NAD83
+ * http://vdatum.noaa.gov/dev/gtx_info.html
  *
  * @author novalis
  */
@@ -98,12 +99,10 @@ public class VerticalDatum {
 
     double gridXFraction = longitudeNormalized * columns - x1;
     double gridYFraction = latitudeNormalized * rows - y1;
-    return (
-      datum[y1][x1] * gridXFraction * gridYFraction +
+    return (datum[y1][x1] * gridXFraction * gridYFraction +
       datum[y1][x1 + 1] * (1 - gridXFraction) * gridYFraction +
       datum[y1 + 1][x1] * gridXFraction * (1 - gridYFraction) +
-      datum[y1 + 1][x1 + 1] * (1 - gridXFraction) * (1 - gridYFraction)
-    );
+      datum[y1 + 1][x1 + 1] * (1 - gridXFraction) * (1 - gridYFraction));
   }
 
   boolean covers(double longitude, double latitude) {

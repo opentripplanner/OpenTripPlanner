@@ -139,8 +139,7 @@ public class PathStringBuilder {
     int c2,
     @Nullable Consumer<PathStringBuilder> appendToSummary
   ) {
-    summaryStart()
-      .time(startTime, endTime)
+    summaryStart().time(startTime, endTime)
       .duration(Math.abs(endTime - startTime))
       .numberOfTransfers(nTransfers)
       .c1(c1)

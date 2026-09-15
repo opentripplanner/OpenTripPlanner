@@ -29,9 +29,9 @@ public class RideHailingAccessShifter {
   private static final Duration MAX_DURATION_FROM_NOW = Duration.ofMinutes(30);
 
   /**
-   * Given a list of {@link RoutingAccessEgress}, shift the access ones that contain driving
-   * so that they only start at the time when the ride hailing vehicle can actually be there
-   * to pick up passengers.
+   * Given a list of {@link RoutingAccessEgress}, shift the access ones that contain driving so that
+   * they only start at the time when the ride hailing vehicle can actually be there to pick up
+   * passengers.
    */
   public static List<RoutingAccessEgress> shiftAccesses(
     boolean isAccess,
@@ -40,24 +40,20 @@ public class RideHailingAccessShifter {
     RouteRequest request,
     Instant now
   ) {
-    return results
-      .stream()
-      .map(ae -> {
-        // only time-shift access legs on a car
-        // (there could be walk-only accesses if you're close to the stop)
-        if (isAccess && ae.getFinalState().containsModeCar()) {
-          var duration = fetchArrivalDelay(services, request, now);
-          if (duration.isSuccess()) {
-            return new RideHailingAccessAdapter(ae, duration.successValue());
-          } else {
-            return null;
-          }
+    return results.stream().map(ae -> {
+      // only time-shift access legs on a car
+      // (there could be walk-only accesses if you're close to the stop)
+      if (isAccess && ae.getFinalState().containsModeCar()) {
+        var duration = fetchArrivalDelay(services, request, now);
+        if (duration.isSuccess()) {
+          return new RideHailingAccessAdapter(ae, duration.successValue());
         } else {
-          return ae;
+          return null;
         }
-      })
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+      } else {
+        return ae;
+      }
+    }).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   /**
@@ -104,11 +100,9 @@ public class RideHailingAccessShifter {
   }
 
   private static boolean shouldShift(RouteRequest req, Instant now) {
-    return (
-      req.journey().modes().accessMode == StreetMode.CAR_HAILING &&
+    return (req.journey().modes().accessMode == StreetMode.CAR_HAILING &&
       req.dateTime().isBefore(now.plus(MAX_DURATION_FROM_NOW)) &&
-      !req.arriveBy()
-    );
+      !req.arriveBy());
   }
 
   private static Result<Duration, Error> shiftTime(
@@ -118,10 +112,10 @@ public class RideHailingAccessShifter {
   ) {
     try {
       var service = services.get(0);
-      var arrivalTimeOpt = service
-        .arrivalTimes(new WgsCoordinate(req.from().getCoordinate()), req.journey().wheelchair())
-        .stream()
-        .min(Comparator.comparing(ArrivalTime::duration));
+      var arrivalTimeOpt = service.arrivalTimes(
+        new WgsCoordinate(req.from().getCoordinate()),
+        req.journey().wheelchair()
+      ).stream().min(Comparator.comparing(ArrivalTime::duration));
 
       if (arrivalTimeOpt.isPresent()) {
         var earliestArrival = arrivalTimeOpt.get();

@@ -63,25 +63,26 @@ class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
   }
 
   /**
-   * TODO RT_VP: This is a non-regression test that captures the existing behavior.
-   *             We should verify that this behavior is acceptable/correct.
+   * TODO RT_VP: This is a non-regression test that captures the existing behavior. We should verify
+   * that this behavior is acceptable/correct.
    */
   @Test
   void testAddJourneyWithAllStopsCancelledIsImplicitlyCancelled() {
     var env = envBuilder.addTrip(TRIP_1_INPUT).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef("operatorId")
       .withLineRef("routeId")
-      .withRecordedCalls(builder ->
-        builder.call(stopA).departAimedActual("11:00", "11:00").withIsCancellation(true)
+      .withRecordedCalls(
+        builder -> builder.call(stopA).departAimedActual("11:00", "11:00").withIsCancellation(true)
       )
-      .withEstimatedCalls(builder ->
-        builder.call(stopB).arriveAimedExpected("11:10", "11:10").withIsCancellation(true)
+      .withEstimatedCalls(
+        builder -> builder.call(stopB)
+          .arriveAimedExpected("11:10", "11:10")
+          .withIsCancellation(true)
       )
       .buildEstimatedTimetableDeliveries();
 
@@ -98,15 +99,13 @@ class ExtraThenCanceledJourneyTest implements RealtimeTestConstants {
   }
 
   private List<EstimatedTimetableDeliveryStructure> cancelledJourney(SiriTestHelper siri) {
-    return siriEtBuilder(siri)
-      .withCancellation(true)
+    return siriEtBuilder(siri).withCancellation(true)
       .withIsExtraJourney(true)
       .buildEstimatedTimetableDeliveries();
   }
 
   private SiriEtBuilder siriEtBuilder(SiriTestHelper siri) {
-    return siri
-      .etBuilder()
+    return siri.etBuilder()
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withOperatorRef("operatorId")
       .withLineRef("routeId")

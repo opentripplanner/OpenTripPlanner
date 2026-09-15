@@ -37,10 +37,9 @@ import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagat
 import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 
 /**
- * The test class is called legacy not because it tests a legacy feature but because the test
- * setup is not how we would write a test in 2025: it tests several classes and reads a full GTFS
- * feed from disk. It's also very hard to follow. All in all, I would say its usefulness is
- * questionable.
+ * The test class is called legacy not because it tests a legacy feature but because the test setup
+ * is not how we would write a test in 2025: it tests several classes and reads a full GTFS feed
+ * from disk. It's also very hard to follow. All in all, I would say its usefulness is questionable.
  */
 public class LegacyTimetableRepositoryIntegrationTest {
 
@@ -58,8 +57,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
     patternIndex = new HashMap<>();
     for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
-      tripPattern
-        .scheduledTripsAsStream()
+      tripPattern.scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
     }
   }
@@ -292,11 +290,8 @@ public class LegacyTimetableRepositoryIntegrationTest {
       ForwardsDelayPropagationType.DEFAULT,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
-    var realTimeTripUpdate = RealTimeTripUpdate.of(
-      pattern,
-      result.tripTimes(),
-      serviceDate
-    ).build();
+    var realTimeTripUpdate = RealTimeTripUpdate.of(pattern, result.tripTimes(), serviceDate)
+      .build();
     resolver.update(realTimeTripUpdate);
     return UpdateSuccess.of(realTimeTripUpdate.producer());
   }

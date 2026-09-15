@@ -131,8 +131,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A connection to a list of alerts that follows
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * A connection to a list of alerts that follows [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLAlertConnection {
     public DataFetcher<Iterable<Edge<TransitAlert>>> edges();
@@ -141,8 +141,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * An edge for the alert connection. Part of the
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * An edge for the alert connection. Part of the [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLAlertEdge {
     public DataFetcher<String> cursor();
@@ -200,8 +200,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Booking information for a stop time which has special requirements to use, like calling ahead or
-   * using an app.
+   * Booking information for a stop time which has special requirements to use, like calling ahead
+   * or using an app.
    */
   public interface GraphQLBookingInfo {
     public DataFetcher<org.opentripplanner.transit.model.organization.ContactInfo> contactInfo();
@@ -251,8 +251,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Contains route, how many canceled trips there are for the route and cancellation statistics grouped
-   * by patterns.
+   * Contains route, how many canceled trips there are for the route and cancellation statistics
+   * grouped by patterns.
    */
   public interface GraphQLCanceledTripsSummaryRoute {
     public DataFetcher<Integer> cancellationCount();
@@ -316,8 +316,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * The standard case of a fare product: it only has a single price to be paid by the passenger
-   * and no discounts are applied.
+   * The standard case of a fare product: it only has a single price to be paid by the passenger and
+   * no discounts are applied.
    */
   public interface GraphQLDefaultFareProduct {
     public DataFetcher<String> id();
@@ -332,8 +332,8 @@ public class GraphQLDataFetchers {
    *
    * They are de-duplicated so for each pattern there will only be a single departure row.
    *
-   * This is useful if you want to show a list of stop/pattern combinations but want each pattern to be
-   * listed only once.
+   * This is useful if you want to show a list of stop/pattern combinations but want each pattern to
+   * be listed only once.
    */
   public interface GraphQLDepartureRow {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -345,8 +345,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A (possibly discounted) fare product that requires another fare product to be purchased previously
-   * in order to be valid.
+   * A (possibly discounted) fare product that requires another fare product to be purchased
+   * previously in order to be valid.
    *
    * For example, when taking the train into a city, you might get a discounted "transfer fare" when
    * switching to the bus for the second leg.
@@ -392,7 +392,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> time();
   }
 
-  /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
+  /**
+   * A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator
+   * App'.
+   */
   public interface GraphQLFareMedium {
     public DataFetcher<String> id();
     public DataFetcher<String> name();
@@ -423,7 +426,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<FareOffer> product();
   }
 
-  /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
+  /**
+   * A feed provides routing data (stops, routes, timetables, etc.) from one or more public
+   * transport agencies.
+   */
   public interface GraphQLFeed {
     public DataFetcher<Iterable<Agency>> agencies();
     public DataFetcher<Iterable<TransitAlert>> alerts();
@@ -517,7 +523,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<java.time.OffsetDateTime> scheduledTime();
   }
 
-  /** A level with a name and comparable number. Levels can sometimes contain half levels, e.g. '1.5'. */
+  /**
+   * A level with a name and comparable number. Levels can sometimes contain half levels, e.g.
+   * '1.5'.
+   */
   public interface GraphQLLevel {
     public DataFetcher<Double> level();
     public DataFetcher<String> name();
@@ -573,8 +582,8 @@ public class GraphQLDataFetchers {
   /**
    * A textual message about a transit entity that is already known at planning time.
    *
-   * It is not intended to convey real-time or emergency updates of the transit system but information that
-   * is known well ahead of time.
+   * It is not intended to convey real-time or emergency updates of the transit system but
+   * information that is known well ahead of time.
    */
   public interface GraphQLNotice {
     public DataFetcher<String> text();
@@ -583,9 +592,9 @@ public class GraphQLDataFetchers {
   /**
    * A range of time which can be unbounded in either direction.
    *
-   * The start of the range is inclusive and the end is exclusive.
-   * A `null` start means that the range extends indefinitely into the past and a `null` end means
-   * that it extends indefinitely into the future.
+   * The start of the range is inclusive and the end is exclusive. A `null` start means that the
+   * range extends indefinitely into the past and a `null` end means that it extends indefinitely
+   * into the future.
    */
   public interface GraphQLOffsetDateTimeRange {
     public DataFetcher<java.time.OffsetDateTime> end();
@@ -606,9 +615,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Pattern is sequence of stops used by trips on a specific direction and variant
-   * of a route. Most routes have only two patterns: one for outbound trips and one
-   * for inbound trips
+   * Pattern is sequence of stops used by trips on a specific direction and variant of a route. Most
+   * routes have only two patterns: one for outbound trips and one for inbound trips
    */
   public interface GraphQLPattern {
     public DataFetcher<Iterable<TransitAlert>> alerts();
@@ -682,8 +690,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Plan (result of an itinerary search) that follows
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * Plan (result of an itinerary search) that follows [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLPlanConnection {
     public DataFetcher<Iterable<DefaultEdge<Itinerary>>> edges();
@@ -693,8 +701,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Edge outputted by a plan search. Part of the
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * Edge outputted by a plan search. Part of the [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLPlanEdge {
     public DataFetcher<String> cursor();
@@ -702,8 +710,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Information about pagination in a connection. Part of the
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * Information about pagination in a connection. Part of the [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLPlanPageInfo {
     public DataFetcher<String> endCursor();
@@ -718,7 +726,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<Integer> position();
   }
 
-  /** The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off. */
+  /**
+   * The board/alight position in between two stops of the pattern of a trip with continuous
+   * pickup/drop off.
+   */
   public interface GraphQLPositionBetweenStops {
     public DataFetcher<Integer> nextPosition();
     public DataFetcher<Integer> previousPosition();
@@ -749,12 +760,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<TripPattern> pattern();
     public DataFetcher<Iterable<TripPattern>> patterns();
     public DataFetcher<Iterable<TripPattern>> patternsByIds();
-    public DataFetcher<
-      graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
-    > plan();
-    public DataFetcher<
-      graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
-    > planConnection();
+    public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> plan();
+    public DataFetcher<graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>> planConnection();
     public DataFetcher<VehicleRentalVehicle> rentalVehicle();
     public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles();
     public DataFetcher<Route> route();
@@ -842,8 +849,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Relation for indicating the TripOnServiceDate which is being replaced by a newer one. Exists
-   * as a place to put additional information on the replacement when we get SIRI 2.1 support.
+   * Relation for indicating the TripOnServiceDate which is being replaced by a newer one. Exists as
+   * a place to put additional information on the replacement when we get SIRI 2.1 support.
    */
   public interface GraphQLReplacementForRelation {
     public DataFetcher<TripOnServiceDate> tripOnServiceDate();
@@ -870,11 +877,10 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Route represents a public transportation service, usually from point A to point
-   * B and *back*, shown to customers under a single name, e.g. bus 550. Routes
-   * contain patterns (see field `patterns`), which describe different variants of
-   * the route, e.g. outbound pattern from point A to point B and inbound pattern
-   * from point B to point A.
+   * Route represents a public transportation service, usually from point A to point B and *back*,
+   * shown to customers under a single name, e.g. bus 550. Routes contain patterns (see field
+   * `patterns`), which describe different variants of the route, e.g. outbound pattern from point A
+   * to point B and inbound pattern from point B to point A.
    */
   public interface GraphQLRoute {
     public DataFetcher<Agency> agency();
@@ -900,8 +906,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Route type entity which covers all agencies if agency is null,
-   * otherwise only relevant for one agency.
+   * Route type entity which covers all agencies if agency is null, otherwise only relevant for one
+   * agency.
    */
   public interface GraphQLRouteType {
     public DataFetcher<Agency> agency();
@@ -927,9 +933,8 @@ public class GraphQLDataFetchers {
   public interface GraphQLStepFeature extends TypeResolver {}
 
   /**
-   * Stop can represent either a single public transport stop, where passengers can
-   * board and/or disembark vehicles, or a station, which contains multiple stops.
-   * See field `locationType`.
+   * Stop can represent either a single public transport stop, where passengers can board and/or
+   * disembark vehicles, or a station, which contains multiple stops. See field `locationType`.
    */
   public interface GraphQLStop {
     public DataFetcher<Iterable<TransitAlert>> alerts();
@@ -964,8 +969,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Represents the time or time window when a specific trip on a specific date arrives to and/or departs
-   * from a specific stop location.
+   * Represents the time or time window when a specific trip on a specific date arrives to and/or
+   * departs from a specific stop location.
    *
    * This may contain real-time information, if available.
    */
@@ -1007,7 +1012,9 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> stop();
   }
 
-  /** Stoptime represents the time when a specific trip arrives to or departs from a specific stop. */
+  /**
+   * Stoptime represents the time when a specific trip arrives to or departs from a specific stop.
+   */
   public interface GraphQLStoptime {
     public DataFetcher<Integer> arrivalDelay();
     public DataFetcher<Integer> departureDelay();
@@ -1035,12 +1042,11 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A system notice is used to tag elements with system information for debugging
-   * or other system related purpose. One use-case is to run a routing search with
-   * 'debugItineraryFilter: true'. This will then tag itineraries instead of removing
-   * them from the result. This make it possible to inspect the itinerary-filter-chain.
-   * A SystemNotice only has english text,
-   * because the primary user are technical staff, like testers and developers.
+   * A system notice is used to tag elements with system information for debugging or other system
+   * related purpose. One use-case is to run a routing search with 'debugItineraryFilter: true'.
+   * This will then tag itineraries instead of removing them from the result. This make it possible
+   * to inspect the itinerary-filter-chain. A SystemNotice only has english text, because the
+   * primary user are technical staff, like testers and developers.
    */
   public interface GraphQLSystemNotice {
     public DataFetcher<String> tag();
@@ -1068,7 +1074,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> text();
   }
 
-  /** Trip is a specific occurance of a pattern, usually identified by route, direction on the route and exact departure time. */
+  /**
+   * Trip is a specific occurance of a pattern, usually identified by route, direction on the route
+   * and exact departure time.
+   */
   public interface GraphQLTrip {
     public DataFetcher<Iterable<String>> activeDates();
     public DataFetcher<Iterable<TransitAlert>> alerts();
@@ -1124,8 +1133,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * A connection to a list of trips on service dates that follows
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * A connection to a list of trips on service dates that follows [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLTripOnServiceDateConnection {
     public DataFetcher<Iterable<Edge<TripOnServiceDate>>> edges();
@@ -1134,8 +1143,8 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * An edge for TripOnServiceDate connection. Part of the
-   * [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+   * An edge for TripOnServiceDate connection. Part of the [GraphQL Cursor Connections
+   * Specification](https://relay.dev/graphql/connections.htm).
    */
   public interface GraphQLTripOnServiceDateEdge {
     public DataFetcher<String> cursor();
@@ -1191,9 +1200,10 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Vehicle rental network, which is referred as system in the GBFS terminology. Note, the same operator can operate in multiple
-   * regions either with the same network/system or with a different one. This can contain information about either the rental brand
-   * or about the operator.
+   * Vehicle rental network, which is referred as system in the GBFS terminology. Note, the same
+   * operator can operate in multiple regions either with the same network/system or with a
+   * different one. This can contain information about either the rental brand or about the
+   * operator.
    */
   public interface GraphQLVehicleRentalNetwork {
     public DataFetcher<String> networkId();
@@ -1295,9 +1305,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> area();
     public DataFetcher<Boolean> bogusName();
     public DataFetcher<Double> distance();
-    public DataFetcher<
-      Iterable<org.opentripplanner.street.model.elevation.ElevationProfile.Step>
-    > elevationProfile();
+    public DataFetcher<Iterable<org.opentripplanner.street.model.elevation.ElevationProfile.Step>> elevationProfile();
     public DataFetcher<String> exit();
     public DataFetcher<Object> feature();
     public DataFetcher<Double> lat();

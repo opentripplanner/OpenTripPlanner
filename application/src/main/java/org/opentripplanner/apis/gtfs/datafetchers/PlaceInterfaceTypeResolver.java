@@ -22,13 +22,13 @@ public class PlaceInterfaceTypeResolver implements TypeResolver {
       var vehicleParking = (VehicleParking) o;
       if (
         NodeTypeResolver.queryContainsFragment("BikePark", environment) &&
-        vehicleParking.hasBicyclePlaces()
+          vehicleParking.hasBicyclePlaces()
       ) {
         return schema.getObjectType("BikePark");
       }
       if (
         NodeTypeResolver.queryContainsFragment("CarPark", environment) &&
-        vehicleParking.hasAnyCarPlaces()
+          vehicleParking.hasAnyCarPlaces()
       ) {
         return schema.getObjectType("CarPark");
       }

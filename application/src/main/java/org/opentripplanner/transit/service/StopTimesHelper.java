@@ -104,11 +104,10 @@ public class StopTimesHelper {
     TripTimeOnDateRequest request,
     Matcher<TripTimeOnDate> matcher
   ) {
-    return request
-      .stopLocations()
+    return request.stopLocations()
       .stream()
-      .flatMap(stopLocation ->
-        stopTimesForStop(
+      .flatMap(
+        stopLocation -> stopTimesForStop(
           stopLocation,
           request.time(),
           request.timeWindow(),
@@ -117,9 +116,7 @@ public class StopTimesHelper {
           request.cancellationPolicy().includesCancellations(),
           request.sortOrder(),
           matcher
-        )
-          .stream()
-          .flatMap(st -> st.times.stream())
+        ).stream().flatMap(st -> st.times.stream())
       );
   }
 
@@ -140,19 +137,20 @@ public class StopTimesHelper {
     LocalDate defaultEndExclusive = ServiceDateUtils.asServiceDay(
       ServiceDateUtils.asStartOfService(transitService.getTransitServiceEnds(), zone)
     ).plusDays(1);
-    return request
-      .serviceDateRanges()
+    return request.serviceDateRanges()
       .stream()
       .flatMap(range -> range.asLocalDates(defaultStart, defaultEndExclusive).stream())
       .distinct()
-      .flatMap(serviceDate ->
-        request
-          .stopLocations()
+      .flatMap(
+        serviceDate -> request.stopLocations()
           .stream()
-          .flatMap(stop ->
-            stopTimesForStop(stop, serviceDate, request.arrivalDeparture(), includeCancellations)
-              .stream()
-              .flatMap(st -> st.times.stream())
+          .flatMap(
+            stop -> stopTimesForStop(
+              stop,
+              serviceDate,
+              request.arrivalDeparture(),
+              includeCancellations
+            ).stream().flatMap(st -> st.times.stream())
           )
       )
       .filter(matcher::match);
@@ -174,10 +172,8 @@ public class StopTimesHelper {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
     var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
-    Instant midnight = ServiceDateUtils.asStartOfService(
-      serviceDate,
-      transitService.getTimeZone()
-    ).toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, transitService.getTimeZone())
+      .toInstant();
 
     for (TripPattern pattern : transitService.findPatterns(stop, true)) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
@@ -337,12 +333,12 @@ public class StopTimesHelper {
               continue;
             }
 
-            boolean departureTimeInRange =
-              tripTimes.getDepartureTime(stopPos) >= secondsSinceMidnight &&
+            boolean departureTimeInRange = tripTimes.getDepartureTime(stopPos) >=
+              secondsSinceMidnight &&
               tripTimes.getDepartureTime(stopPos) <= secondsSinceMidnight + timeRangeSeconds;
 
-            boolean arrivalTimeInRange =
-              tripTimes.getArrivalTime(stopPos) >= secondsSinceMidnight &&
+            boolean arrivalTimeInRange = tripTimes.getArrivalTime(stopPos) >=
+              secondsSinceMidnight &&
               tripTimes.getArrivalTime(stopPos) <= secondsSinceMidnight + timeRangeSeconds;
 
             // ARRIVAL: Arrival time has to be within range
@@ -350,7 +346,7 @@ public class StopTimesHelper {
             // BOTH: Either arrival time or departure time has to be within range
             if (
               (arrivalDeparture != ARRIVALS && departureTimeInRange) ||
-              (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
+                (arrivalDeparture != DEPARTURES && arrivalTimeInRange)
             ) {
               var tripTimeOnDate = new TripTimeOnDate(
                 tripTimes,

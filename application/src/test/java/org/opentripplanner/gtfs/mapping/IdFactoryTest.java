@@ -30,8 +30,9 @@ class IdFactoryTest {
 
   @Test
   void emptyAgencyAndId() {
-    assertThrows(IllegalArgumentException.class, () ->
-      FACTORY.createNullableId(new org.onebusaway.gtfs.model.AgencyAndId())
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> FACTORY.createNullableId(new org.onebusaway.gtfs.model.AgencyAndId())
     );
   }
 

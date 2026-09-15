@@ -252,10 +252,10 @@ public class TransitRouter {
     //            Remove '&& !request.isViaSearch()'
     if (
       OTPFeature.OptimizeTransfers.isOn() &&
-      !transitResponse.containsUnknownPaths() &&
-      // TODO VIA - This is temporary, we want pass via info in paths so transfer optimizer can
-      //            skip legs containing via points.
-      request.allowTransferOptimization()
+        !transitResponse.containsUnknownPaths() &&
+        // TODO VIA - This is temporary, we want pass via info in paths so transfer optimizer can
+        //            skip legs containing via points.
+        request.allowTransferOptimization()
     ) {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
         raptorTransitData::getStopByIndex,

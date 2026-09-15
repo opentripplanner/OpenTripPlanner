@@ -12,7 +12,8 @@ public class JsonAssertions {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
-   * Take two JSON documents and reformat them before comparing {@code actual} with {@code expected}.
+   * Take two JSON documents and reformat them before comparing {@code actual} with
+   * {@code expected}.
    */
   public static void assertEqualJson(String expected, String actual) {
     try {
@@ -29,8 +30,10 @@ public class JsonAssertions {
     try {
       var actualNode = MAPPER.readTree(actual.toString());
       var exp = MAPPER.readTree(expected);
-      assertEquals(exp, actualNode, () ->
-        "Expected '%s' but actual was '%s'".formatted(
+      assertEquals(
+        exp,
+        actualNode,
+        () -> "Expected '%s' but actual was '%s'".formatted(
           JsonSupport.prettyPrint(exp),
           JsonSupport.prettyPrint(actualNode)
         )

@@ -67,9 +67,9 @@ public final class CarPreferences implements Serializable {
   }
 
   /**
-   * Separate cost for boarding a vehicle with a car, which is different compared to on foot or with a bicycle. This
-   * is in addition to the cost of the transfer and waiting-time. It is also in addition to
-   * the {@link TransferPreferences#cost()}.
+   * Separate cost for boarding a vehicle with a car, which is different compared to on foot or with
+   * a bicycle. This is in addition to the cost of the transfer and waiting-time. It is also in
+   * addition to the {@link TransferPreferences#cost()}.
    */
   public int boardCost() {
     return boardCost.toSeconds();
@@ -96,16 +96,16 @@ public final class CarPreferences implements Serializable {
   }
 
   /**
-   * The acceleration speed of an automobile, in meters per second per second.
-   * Default is 2.9 m/s^2 (0 mph to 65 mph in 10 seconds)
+   * The acceleration speed of an automobile, in meters per second per second. Default is 2.9 m/s^2
+   * (0 mph to 65 mph in 10 seconds)
    */
   public double accelerationSpeed() {
     return accelerationSpeed;
   }
 
   /**
-   * The deceleration speed of an automobile, in meters per second per second.
-   * The default is 2.9 m/s/s: 65 mph - 0 mph in 10 seconds
+   * The deceleration speed of an automobile, in meters per second per second. The default is 2.9
+   * m/s/s: 65 mph - 0 mph in 10 seconds
    */
   public double decelerationSpeed() {
     return decelerationSpeed;
@@ -120,16 +120,14 @@ public final class CarPreferences implements Serializable {
       return false;
     }
     CarPreferences that = (CarPreferences) o;
-    return (
-      DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
+    return (DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
       boardCost.equals(that.boardCost) &&
       parking.equals(that.parking) &&
       rental.equals(that.rental) &&
       Objects.equals(pickupTime, that.pickupTime) &&
       pickupCost.equals(that.pickupCost) &&
       DoubleUtils.doubleEquals(that.accelerationSpeed, accelerationSpeed) &&
-      DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed)
-    );
+      DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed));
   }
 
   @Override

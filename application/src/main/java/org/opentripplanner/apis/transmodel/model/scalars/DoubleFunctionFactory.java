@@ -16,7 +16,8 @@ public class DoubleFunctionFactory {
 
   private static final String TYPENAME = "DoubleFunction";
 
-  private static final String DOCUMENTATION = """
+  private static final String DOCUMENTATION =
+  """
   A double function `f(t)` is used to calculate a value based on a variable (t). The variable can
   be the duration/time or cost for a leg or section of a path/itinerary. The function
   `f(t) = a + bt` has a constant (a) and a coefficient (b) that will be used in OTP to compute
@@ -33,46 +34,42 @@ public class DoubleFunctionFactory {
     return GraphQLScalarType.newScalar()
       .name(TYPENAME)
       .description(DOCUMENTATION)
-      .coercing(
-        new Coercing<DoubleFunction, String>() {
-          @Override
-          public String serialize(
-            Object dataFetcherResult,
-            GraphQLContext graphQLContext,
-            Locale locale
-          ) {
-            var value = (DoubleFunction) dataFetcherResult;
-            return LinearFunctionSerialization.serialize(value.constant(), value.coefficient());
-          }
+      .coercing(new Coercing<DoubleFunction, String>() {
+        @Override
+        public String serialize(
+          Object dataFetcherResult,
+          GraphQLContext graphQLContext,
+          Locale locale
+        ) {
+          var value = (DoubleFunction) dataFetcherResult;
+          return LinearFunctionSerialization.serialize(value.constant(), value.coefficient());
+        }
 
-          @Override
-          public DoubleFunction parseValue(
-            Object input,
-            GraphQLContext graphQLContext,
-            Locale locale
-          ) throws CoercingParseValueException {
-            try {
-              String text = (String) input;
-              return LinearFunctionSerialization.parse(text, DoubleFunction::new).orElseThrow();
-            } catch (IllegalArgumentException | NoSuchElementException e) {
-              throw new CoercingParseValueException(e.getMessage(), e);
-            }
-          }
-
-          @Override
-          public DoubleFunction parseLiteral(
-            Value<?> input,
-            CoercedVariables variables,
-            GraphQLContext graphQLContext,
-            Locale locale
-          ) throws CoercingParseLiteralException {
-            if (input instanceof StringValue stringValue) {
-              return parseValue(stringValue.getValue(), graphQLContext, locale);
-            }
-            return null;
+        @Override
+        public DoubleFunction parseValue(Object input, GraphQLContext graphQLContext, Locale locale)
+          throws CoercingParseValueException {
+          try {
+            String text = (String) input;
+            return LinearFunctionSerialization.parse(text, DoubleFunction::new).orElseThrow();
+          } catch (IllegalArgumentException | NoSuchElementException e) {
+            throw new CoercingParseValueException(e.getMessage(), e);
           }
         }
-      )
+
+        @Override
+        public DoubleFunction parseLiteral(
+          Value<?> input,
+          CoercedVariables variables,
+          GraphQLContext graphQLContext,
+          Locale locale
+        )
+          throws CoercingParseLiteralException {
+          if (input instanceof StringValue stringValue) {
+            return parseValue(stringValue.getValue(), graphQLContext, locale);
+          }
+          return null;
+        }
+      })
       .build();
   }
 }

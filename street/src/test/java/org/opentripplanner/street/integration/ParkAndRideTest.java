@@ -145,18 +145,16 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
       .withMode(streetMode)
       .withWheelchairEnabled(requireWheelChairAccessible)
       .withArriveBy(arriveBy)
-      .withBike(b ->
-        b.withParking(parking ->
-          parking
-            .withFilter(parkingFilter)
+      .withBike(
+        b -> b.withParking(
+          parking -> parking.withFilter(parkingFilter)
             .withCost(Cost.costOfSeconds(120))
             .withTime(Duration.ofSeconds(60))
         )
       )
-      .withCar(c ->
-        c.withParking(parking ->
-          parking
-            .withFilter(parkingFilter)
+      .withCar(
+        c -> c.withParking(
+          parking -> parking.withFilter(parkingFilter)
             .withCost(Cost.costOfSeconds(240))
             .withTime(Duration.ofSeconds(180))
         )
@@ -176,10 +174,9 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
       return List.of();
     }
 
-    return path.states
-      .stream()
-      .map(s ->
-        String.format(
+    return path.states.stream()
+      .map(
+        s -> String.format(
           Locale.ROOT,
           "%s%s - %s (%,.2f, %d)",
           s.getBackMode(),

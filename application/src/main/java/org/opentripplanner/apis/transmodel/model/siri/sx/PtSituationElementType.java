@@ -53,8 +53,11 @@ public class PtSituationElementType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment ->
-            relay.toGlobalId(NAME, ((TransitAlert) environment.getSource()).getId().getId())
+          .dataFetcher(
+            environment -> relay.toGlobalId(
+              NAME,
+              ((TransitAlert) environment.getSource()).getId().getId()
+            )
           )
           .build()
       )
@@ -64,17 +67,17 @@ public class PtSituationElementType {
           .type(authorityType)
           .description("Get affected authority for this situation element")
           .deprecate("Use affects instead")
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getAgency(
-              ((TransitAlert) environment.getSource())
-                .entities()
-                .stream()
-                .filter(EntitySelector.Agency.class::isInstance)
-                .map(EntitySelector.Agency.class::cast)
-                .findAny()
-                .map(EntitySelector.Agency::agencyId)
-                .orElse(null)
-            )
+          .dataFetcher(
+            environment -> GqlUtil.getTransitService(environment)
+              .getAgency(
+                ((TransitAlert) environment.getSource()).entities()
+                  .stream()
+                  .filter(EntitySelector.Agency.class::isInstance)
+                  .map(EntitySelector.Agency.class::cast)
+                  .findAny()
+                  .map(EntitySelector.Agency::agencyId)
+                  .orElse(null)
+              )
           )
           .build()
       )
@@ -85,8 +88,7 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource())
-              .entities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Route.class::isInstance)
               .map(EntitySelector.Route.class::cast)
@@ -103,8 +105,7 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource())
-              .entities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Trip.class::isInstance)
               .map(EntitySelector.Trip.class::cast)
@@ -121,8 +122,7 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource())
-              .entities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -140,16 +140,18 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource())
-              .entities()
+            return ((TransitAlert) environment.getSource()).entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
               .map(EntitySelector.Stop::stopId)
               .map(transitService::getStation)
               .filter(Objects::nonNull)
-              .map(station ->
-                new MonoOrMultiModalStation(station, transitService.findMultiModalStation(station))
+              .map(
+                station -> new MonoOrMultiModalStation(
+                  station,
+                  transitService.findMultiModalStation(station)
+                )
               )
               .toList();
           })
@@ -168,18 +170,14 @@ public class PtSituationElementType {
           .name("summary")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Summary of situation in all different translations available")
-          .dataFetcher(environment ->
-            environment
-              .<TransitAlert>getSource()
-              .headerText()
-              .map(headerText -> {
-                if (headerText instanceof TranslatedString translatedString) {
-                  return translatedString.getTranslations();
-                } else {
-                  return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
-                }
-              })
-              .orElse(emptyList())
+          .dataFetcher(
+            environment -> environment.<TransitAlert>getSource().headerText().map(headerText -> {
+              if (headerText instanceof TranslatedString translatedString) {
+                return translatedString.getTranslations();
+              } else {
+                return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
+              }
+            }).orElse(emptyList())
           )
           .build()
       )
@@ -188,9 +186,8 @@ public class PtSituationElementType {
           .name("description")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Description of situation in all different translations available")
-          .dataFetcher(environment ->
-            environment
-              .<TransitAlert>getSource()
+          .dataFetcher(
+            environment -> environment.<TransitAlert>getSource()
               .descriptionText()
               .map(descriptionText -> {
                 if (descriptionText instanceof TranslatedString translatedString) {
@@ -242,14 +239,12 @@ public class PtSituationElementType {
           .description("Period this situation is in effect")
           .dataFetcher(environment -> {
             TransitAlert alert = environment.getSource();
-            Long startTime =
-              alert.getEffectiveStartDate() != null
-                ? alert.getEffectiveStartDate().toEpochMilli()
-                : null;
-            Long endTime =
-              alert.getEffectiveEndDate() != null
-                ? alert.getEffectiveEndDate().toEpochMilli()
-                : null;
+            Long startTime = alert.getEffectiveStartDate() != null
+              ? alert.getEffectiveStartDate().toEpochMilli()
+              : null;
+            Long endTime = alert.getEffectiveEndDate() != null
+              ? alert.getEffectiveEndDate().toEpochMilli()
+              : null;
             return new ValidityPeriod(startTime, endTime);
           })
           .build()
@@ -264,12 +259,11 @@ public class PtSituationElementType {
           )
           .dataFetcher(environment -> {
             TransitAlert alert = environment.getSource();
-            return alert
-              .calendar()
+            return alert.calendar()
               .timePeriods()
               .stream()
-              .map(period ->
-                new ValidityPeriod(
+              .map(
+                period -> new ValidityPeriod(
                   period.start().map(Instant::toEpochMilli).orElse(null),
                   period.end().map(Instant::toEpochMilli).orElse(null)
                 )
@@ -278,10 +272,11 @@ public class PtSituationElementType {
                 Comparator.comparing(
                   ValidityPeriod::startTime,
                   Comparator.nullsFirst(Comparator.naturalOrder())
-                ).thenComparing(
-                  ValidityPeriod::endTime,
-                  Comparator.nullsLast(Comparator.naturalOrder())
                 )
+                  .thenComparing(
+                    ValidityPeriod::endTime,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+                  )
               )
               .toList();
           })
@@ -308,8 +303,10 @@ public class PtSituationElementType {
           .name("severity")
           .type(EnumTypes.SEVERITY)
           .description("Severity of this situation ")
-          .dataFetcher(environment ->
-            getTransmodelSeverity(((TransitAlert) environment.getSource()).severity())
+          .dataFetcher(
+            environment -> getTransmodelSeverity(
+              ((TransitAlert) environment.getSource()).severity()
+            )
           )
           .build()
       )

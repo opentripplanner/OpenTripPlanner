@@ -70,7 +70,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
     VehicleRentalDataSource source,
     VertexLinker vertexLinker,
     VehicleRentalRepository repository
-  ) throws IllegalArgumentException {
+  )
+    throws IllegalArgumentException {
     super(parameters);
     // Configure updater
     LOG.info("Setting up vehicle rental updater for {}.", source);
@@ -81,8 +82,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
       parameters.sourceParameters().url()
     );
     this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
-    this.requireDropOffInsideBusinessArea =
-      parameters.sourceParameters() instanceof GbfsVehicleRentalDataSourceParameters gbfs
+    this.requireDropOffInsideBusinessArea = parameters
+      .sourceParameters() instanceof GbfsVehicleRentalDataSourceParameters gbfs
         ? gbfs.requireDropOffInsideBusinessArea()
         : true;
 
@@ -92,8 +93,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
     // Adding a vehicle rental station service needs a graph writer runnable
     this.service = repository;
 
-    OtpRetry retry = new OtpRetryBuilder()
-      .withName("%s updater setup".formatted(nameForLogging))
+    OtpRetry retry = new OtpRetryBuilder().withName("%s updater setup".formatted(nameForLogging))
       .withMaxAttempts((int) parameters.startupRetryPeriod().dividedBy(RETRY_INTERVAL))
       .withInitialRetryInterval(RETRY_INTERVAL)
       .withBackoffMultiplier(RETRY_BACKOFF_MULTIPLIER)
@@ -157,9 +157,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
     updateGraph(graphWriterRunnable);
   }
 
-  private class VehicleRentalGraphWriterRunnable
-    implements GraphWriterRunnable<StreetRealTimeUpdateContext>
-  {
+  private class VehicleRentalGraphWriterRunnable implements
+    GraphWriterRunnable<StreetRealTimeUpdateContext> {
 
     private final List<VehicleRentalPlace> stations;
     private final Set<GeofencingZone> geofencingZones;
@@ -198,8 +197,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
             // Copy reference to pass into lambda
             var vrv = vehicleRentalVertex;
-            unlinkedPlaceThrottle.throttle(() ->
-              LOG
+            unlinkedPlaceThrottle.throttle(
+              () -> LOG
                 // the toString includes the text "Bike rental station"
                 .warn(
                   "VehicleRentalPlace is unlinked for {}: {}  {}",
@@ -235,14 +234,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
         tempEdgesByStation.remove(station);
       }
 
-      boolean zonesChanged =
-        !geofencingZones.isEmpty() && !geofencingZonesUnchanged(geofencingZones);
+      boolean zonesChanged = !geofencingZones.isEmpty() &&
+        !geofencingZonesUnchanged(geofencingZones);
       if (zonesChanged) {
         LOG.info("Computing geofencing zones for {}", nameForLogging);
         var start = System.currentTimeMillis();
 
-        latestBoundaryVertices.forEach(vertex ->
-          vertex.removeGeofencingBoundariesForZones(latestAppliedGeofencingZones)
+        latestBoundaryVertices.forEach(
+          vertex -> vertex.removeGeofencingBoundariesForZones(latestAppliedGeofencingZones)
         );
 
         var graph = context.graph();
@@ -295,8 +294,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater<StreetRealTimeUpda
       return false;
     }
     for (var zone : incoming) {
-      var match = latestAppliedGeofencingZones
-        .stream()
+      var match = latestAppliedGeofencingZones.stream()
         .filter(z -> z.equals(zone))
         .findFirst()
         .orElse(null);

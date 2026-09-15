@@ -84,10 +84,9 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
   ) {
     var map = new HashMap<FeedScopedId, List<FeedScopedId>>();
     for (var pattern : tripPatterns) {
-      pattern
-        .scheduledTripsAsStream()
-        .forEach(it ->
-          map.put(it.getId(), pattern.getStops().stream().map(StopLocation::getId).toList())
+      pattern.scheduledTripsAsStream()
+        .forEach(
+          it -> map.put(it.getId(), pattern.getStops().stream().map(StopLocation::getId).toList())
         );
     }
     return map;

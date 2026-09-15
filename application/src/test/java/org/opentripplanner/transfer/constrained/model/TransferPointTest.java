@@ -68,15 +68,14 @@ public class TransferPointTest {
 
   @Test
   public void isNnnTransferPoint() {
-    List.of(STATION_POINT, STOP_POINT_A, ROUTE_POINT_1_A, ROUTE_POINT_1_S, TRIP_POINT_11_1).forEach(
-      p -> {
+    List.of(STATION_POINT, STOP_POINT_A, ROUTE_POINT_1_A, ROUTE_POINT_1_S, TRIP_POINT_11_1)
+      .forEach(p -> {
         assertEquals(p == STATION_POINT, p.isStationTransferPoint());
         assertEquals(p == STOP_POINT_A, p.isStopTransferPoint());
         assertEquals(p == ROUTE_POINT_1_A, p.isRouteStopTransferPoint());
         assertEquals(p == ROUTE_POINT_1_S, p.isRouteStationTransferPoint());
         assertEquals(p == TRIP_POINT_11_1, p.isTripTransferPoint());
-      }
-    );
+      });
   }
 
   @Test

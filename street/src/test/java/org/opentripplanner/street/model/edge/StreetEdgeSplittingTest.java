@@ -31,13 +31,11 @@ class StreetEdgeSplittingTest {
     for (double delta = 0; delta <= 2; delta += 0.005) {
       StreetVertex v0 = intersectionVertex("zero", x, y);
       StreetVertex v1 = intersectionVertex("one", x + delta, y + delta);
-      LineString geom = gf.createLineString(new Coordinate[] {
-        v0.getCoordinate(),
-        v1.getCoordinate(),
-      });
+      LineString geom = gf.createLineString(
+        new Coordinate[] { v0.getCoordinate(), v1.getCoordinate(), }
+      );
       double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-      StreetEdge s0 = new StreetEdgeBuilder<>()
-        .withFromVertex(v0)
+      StreetEdge s0 = new StreetEdgeBuilder<>().withFromVertex(v0)
         .withToVertex(v1)
         .withGeometry(geom)
         .withName("test")
@@ -45,8 +43,7 @@ class StreetEdgeSplittingTest {
         .withPermission(StreetTraversalPermission.ALL)
         .withBack(false)
         .buildAndConnect();
-      StreetEdge s1 = new StreetEdgeBuilder<>()
-        .withFromVertex(v1)
+      StreetEdge s1 = new StreetEdgeBuilder<>().withFromVertex(v1)
         .withToVertex(v0)
         .withGeometry(geom.reverse())
         .withName("back")

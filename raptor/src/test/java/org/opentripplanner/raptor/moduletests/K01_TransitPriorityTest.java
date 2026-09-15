@@ -42,10 +42,10 @@ public class K01_TransitPriorityTest {
 
   /**
    * Each pattern departs at the same time, but arrives at different times. They may belong to
-   * different groups. Line U1 is not optimal, because it slower than L1 and is in the same
-   * group as L1. Given a slack on the cost equals to ~90s makes both L1 and L2 optimal (since
-   * they are in different groups), but not L3 (which is in its own group, but its cost is
-   * outside the range allowed by the slack).
+   * different groups. Line U1 is not optimal, because it slower than L1 and is in the same group as
+   * L1. Given a slack on the cost equals to ~90s makes both L1 and L2 optimal (since they are in
+   * different groups), but not L3 (which is in its own group, but its cost is outside the range
+   * allowed by the slack).
    */
   @BeforeEach
   void prepareRequest() {
@@ -53,37 +53,31 @@ public class K01_TransitPriorityTest {
       // Add 1 second access paths
       .access("Walk 1s ~ B")
       .withRoutes(
-        route(
-          TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()
-        ).withTimetable("00:02 00:12"),
-        route(
-          TestTripPattern.of("U1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()
-        ).withTimetable("00:02 00:12:01"),
-        route(
-          TestTripPattern.of("L2", STOP_B, STOP_C).priorityGroup(GROUP_B).build()
-        ).withTimetable("00:02 00:13"),
-        route(
-          TestTripPattern.of("L3", STOP_B, STOP_C).priorityGroup(GROUP_C).build()
-        ).withTimetable("00:02 00:14")
+        route(TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build())
+          .withTimetable("00:02 00:12"),
+        route(TestTripPattern.of("U1", STOP_B, STOP_C).priorityGroup(GROUP_A).build())
+          .withTimetable("00:02 00:12:01"),
+        route(TestTripPattern.of("L2", STOP_B, STOP_C).priorityGroup(GROUP_B).build())
+          .withTimetable("00:02 00:13"),
+        route(TestTripPattern.of("L3", STOP_B, STOP_C).priorityGroup(GROUP_C).build())
+          .withTimetable("00:02 00:14")
       )
       // Add 1 second egress paths
       .egress("C ~ Walk 1s");
 
-    requestBuilder
-      .profile(RaptorProfile.MULTI_CRITERIA)
+    requestBuilder.profile(RaptorProfile.MULTI_CRITERIA)
       // TODO: 2023-07-24 Currently heuristics does not work with pass-through so we
       //  have to turn them off. Make sure to re-enable optimization later when it's fixed
       .clearOptimizations();
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(2))
       .timetable(true);
 
-    requestBuilder.withMultiCriteria(mc ->
-      mc
+    requestBuilder.withMultiCriteria(
+      mc -> mc
         // Raptor cost 9000 ~= 90 seconds slack
         .withRelaxC1(value -> value + C1_SLACK_90_s)
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
@@ -97,7 +91,8 @@ public class K01_TransitPriorityTest {
       """
       Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₙ0 C₁1_204 C₂1]
       Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₙ0 C₁1_264 C₂2]
-      """.trim(),
+      """
+        .trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }

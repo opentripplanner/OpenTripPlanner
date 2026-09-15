@@ -45,8 +45,7 @@ public class BookingInfoMapper {
     ServiceJourney serviceJourney,
     FlexibleLine flexibleLine
   ) {
-    return new NetexBookingInfoBuilder()
-      .withFlexibleLine(flexibleLine)
+    return new NetexBookingInfoBuilder().withFlexibleLine(flexibleLine)
       .withServiceJourney(serviceJourney)
       .withStopPoint(stopPoint)
       .build();
@@ -85,8 +84,8 @@ public class BookingInfoMapper {
       if (serviceJourney != null && serviceJourney.getFlexibleServiceProperties() != null) {
         this.hasBookingInfo = true;
         this.serviceJourneyRef = ref("ServiceJourney", serviceJourney);
-        FlexibleServiceProperties flexibleServiceProperties =
-          serviceJourney.getFlexibleServiceProperties();
+        FlexibleServiceProperties flexibleServiceProperties = serviceJourney
+          .getFlexibleServiceProperties();
         setIfNotEmpty(
           flexibleServiceProperties.getBookingContact(),
           flexibleServiceProperties.getBookingMethods(),
@@ -149,11 +148,8 @@ public class BookingInfoMapper {
 
     private static BookingTime mapEarliestBookingTime(PurchaseWhenEnumeration purchaseWhen) {
       return switch (purchaseWhen) {
-        case
-          UNTIL_PREVIOUS_DAY,
-          ADVANCE_ONLY,
-          ADVANCE_AND_DAY_OF_TRAVEL,
-          TIME_OF_TRAVEL_ONLY -> null;
+        case UNTIL_PREVIOUS_DAY, ADVANCE_ONLY, ADVANCE_AND_DAY_OF_TRAVEL, TIME_OF_TRAVEL_ONLY ->
+          null;
         case DAY_OF_TRAVEL_ONLY -> new BookingTime(LocalTime.MIDNIGHT, 0);
         default -> throw new IllegalArgumentException("Value not supported: " + purchaseWhen);
       };
@@ -193,8 +189,7 @@ public class BookingInfoMapper {
         )
         .build();
 
-      EnumSet<BookingMethod> filteredBookingMethods = bookingMethodEnum
-        .stream()
+      EnumSet<BookingMethod> filteredBookingMethods = bookingMethodEnum.stream()
         .map(bm -> BookingMethodMapper.map(entityRefs, bm))
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(() -> EnumSet.noneOf(BookingMethod.class)));

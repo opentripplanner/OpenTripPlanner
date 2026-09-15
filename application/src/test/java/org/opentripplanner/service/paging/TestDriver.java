@@ -147,10 +147,7 @@ final class TestDriver {
 
     // Simulate Raptor - apply LAT filtering done by raptor
     if (lat != null) {
-      kept = kept
-        .stream()
-        .filter(it -> !lat.isBefore(it.endTime().toInstant()))
-        .toList();
+      kept = kept.stream().filter(it -> !lat.isBefore(it.endTime().toInstant())).toList();
     }
 
     //Page filter
@@ -165,10 +162,9 @@ final class TestDriver {
     kept = maxNumFilter.removeMatchesForTest(kept);
     DefaultPageCursorInput.Builder pageCursorInputBuilder = DefaultPageCursorInput.of();
     if (maxNumFilter.getNumItinerariesFilterResult() != null) {
-      pageCursorInputBuilder = pageCursorInputBuilder
-        .withEarliestRemovedDeparture(
-          maxNumFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
-        )
+      pageCursorInputBuilder = pageCursorInputBuilder.withEarliestRemovedDeparture(
+        maxNumFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
+      )
         .withLatestRemovedDeparture(
           maxNumFilter.getNumItinerariesFilterResult().latestRemovedDeparture()
         )

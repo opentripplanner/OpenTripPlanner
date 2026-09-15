@@ -54,8 +54,7 @@ public class BoardAndAlightTime {
 
   @Override
   public String toString() {
-    return (
-      "[" +
+    return ("[" +
       trip.pattern().stopIndex(boardStopPos) +
       " ~ " +
       TimeUtils.timeToStrCompact(boardTime()) +
@@ -65,7 +64,6 @@ public class BoardAndAlightTime {
       DurationUtils.durationToStr(alightTime() - boardTime()) +
       ") ~ " +
       trip.pattern().stopIndex(alightStopPos) +
-      "]"
-    );
+      "]");
   }
 }

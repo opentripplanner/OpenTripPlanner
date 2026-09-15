@@ -6,10 +6,8 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseMode;
 
-public class SimpleIntersectionTraversalCalculator
-  extends AbstractIntersectionTraversalCalculator
-  implements Serializable
-{
+public class SimpleIntersectionTraversalCalculator extends AbstractIntersectionTraversalCalculator
+  implements Serializable {
 
   private final DrivingDirection drivingDirection;
 
@@ -109,8 +107,7 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   /**
-   * Returns if this angle represents a safe turn were incoming traffic does not have to be
-   * crossed.
+   * Returns if this angle represents a safe turn were incoming traffic does not have to be crossed.
    * <p>
    * In right hand traffic countries (US, mainland Europe), this is a right turn. In left hand
    * traffic countries (UK, Japan) this is a left turn.
@@ -125,8 +122,8 @@ public class SimpleIntersectionTraversalCalculator
   /**
    * Returns if this angle represents a turn across incoming traffic.
    * <p>
-   * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK) countries
-   * this is a right turn.
+   * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK)
+   * countries this is a right turn.
    */
   protected boolean isTurnAcrossTraffic(int turnAngle) {
     return switch (drivingDirection) {
@@ -212,11 +209,10 @@ public class SimpleIntersectionTraversalCalculator
     if (!(o instanceof SimpleIntersectionTraversalCalculator that)) {
       return false;
     }
-    return (
-      Double.compare(acrossTrafficBicycleTurnMultiplier, that.acrossTrafficBicycleTurnMultiplier) ==
-        0 &&
-      drivingDirection == that.drivingDirection
-    );
+    return (Double.compare(
+      acrossTrafficBicycleTurnMultiplier,
+      that.acrossTrafficBicycleTurnMultiplier
+    ) == 0 && drivingDirection == that.drivingDirection);
   }
 
   @Override

@@ -24,8 +24,7 @@ class OpenGisMapper {
         mapCoordinateSequence(polygonType.getExterior()),
         GeometryUtils.getGeometryFactory()
       ),
-      polygonType
-        .getInterior()
+      polygonType.getInterior()
         .stream()
         .map(c -> new LinearRing(mapCoordinateSequence(c), GeometryUtils.getGeometryFactory()))
         .toArray(LinearRing[]::new),

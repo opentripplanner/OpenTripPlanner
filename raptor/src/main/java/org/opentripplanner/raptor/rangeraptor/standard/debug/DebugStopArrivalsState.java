@@ -12,9 +12,8 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the {@link
- * StateDebugger} about all stop
- * arrival events.
+ * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the
+ * {@link StateDebugger} about all stop arrival events.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -62,8 +61,16 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     T trip,
     boolean newBestOverall
   ) {
-    debug.dropOldStateAndAcceptNewOnBoardArrival(stop, newBestOverall, () ->
-      delegate.setNewBestTransitTime(stop, alightTime, boardStopPosition, trip, newBestOverall)
+    debug.dropOldStateAndAcceptNewOnBoardArrival(
+      stop,
+      newBestOverall,
+      () -> delegate.setNewBestTransitTime(
+        stop,
+        alightTime,
+        boardStopPosition,
+        trip,
+        newBestOverall
+      )
     );
   }
 
@@ -75,8 +82,9 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
 
   @Override
   public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transfer) {
-    debug.dropOldStateAndAcceptNewOnStreetArrival(transfer.stop(), () ->
-      delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
+    debug.dropOldStateAndAcceptNewOnStreetArrival(
+      transfer.stop(),
+      () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transfer)
     );
   }
 

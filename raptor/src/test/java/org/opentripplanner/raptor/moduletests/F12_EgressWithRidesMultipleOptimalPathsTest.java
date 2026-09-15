@@ -31,12 +31,11 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * This test focuses on on-foot and flex egresses. You are not allowed to have two walk legs after
- * each other, so depending on how you arrived at the stop where the egress starts, the walking
- * option might not be possible.
+ * This test focuses on on-foot and flex egresses. You are not allowed to have two walk legs
+ * after each other, so depending on how you arrived at the stop where the egress starts, the
+ * walking option might not be possible.
  * <p>
- * Test case:
- * <img src="images/F12.svg" width="432" height="212" />
+ * Test case: <img src="images/F12.svg" width="432" height="212" />
  * <p>
  * <pre>
  * // Allowed paths
@@ -46,9 +45,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * // Not allowed
  * A ~ L2 ~ B ~ Walk 2m ~ C ~ Walk ~ D
  * </pre>
- * To alternate which egress leg is the best, we change the egress walk between 5 minutes (walking
- * is better than the path with flex) and 7 minutes (the path with flex egress becomes the fastest
- * option). Note! There is 1 minute transfer slack.
+ * To alternate which egress leg is the best, we change the egress walk between 5 minutes
+ * (walking is better than the path with flex) and 7 minutes (the path with flex egress becomes the
+ * fastest option). Note! There is 1 minute transfer slack.
  */
 public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 
@@ -69,21 +68,21 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
 
   @BeforeEach
   public void setup() {
-    data.access("Free ~ A").withTimetables(
-      """
-      A     C
-      0:04  0:20
-      --
-      A     B
-      0:05  0:16
-      """
-    );
+    data.access("Free ~ A")
+      .withTimetables(
+        """
+        A     C
+        0:04  0:20
+        --
+        A     B
+        0:05  0:16
+        """
+      );
 
     // We will test board- and alight-slack in a separate test
     data.withSlackProvider(new TestSlackProvider(D1_m, D0_s, D0_s));
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .searchWindowInSeconds(D20_m)
       .latestArrivalTime(T00_30);
@@ -94,8 +93,8 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
     return RaptorModuleTestCase.of()
       // with Flex egress as the best destination arrival-time
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D7_m))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D7_m))
       )
       .add(TC_MIN_DURATION, "[0:00 0:21 21m Tₙ1]", "[0:00 0:23 23m Tₙ0]")
       .add(TC_MIN_DURATION_REV, "[0:09 0:30 21m Tₙ0]")
@@ -116,8 +115,8 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
     return RaptorModuleTestCase.of()
       // with walk egress as the best destination arrival-time
-      .withRequest(r ->
-        r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D5_m))
+      .withRequest(
+        r -> r.searchParams().addEgressPaths(flex(STOP_C, D7_m, 1, C1_10_m), walk(STOP_C, D5_m))
       )
       .addMinDuration("21m", TX_0, T00_00, T00_30)
       .add(standard().forwardOnly(), withoutCost(EXPECTED_PATH_WALK_5_m))

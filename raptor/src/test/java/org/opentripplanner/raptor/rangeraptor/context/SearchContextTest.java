@@ -48,8 +48,7 @@ class SearchContextTest implements RaptorTestConstants {
   @Test
   void accessOrEgressPathsHandlesOneElementPaths() {
     // given:
-    var emptyPaths = requestBuilder
-      .searchParams()
+    var emptyPaths = requestBuilder.searchParams()
       .addAccessPaths(PATH_A_10s)
       .addEgressPaths(PATH_C_30s)
       .build()
@@ -63,8 +62,7 @@ class SearchContextTest implements RaptorTestConstants {
 
   @Test
   void accessOrEgressPathsHandlesDuplicatesPaths() {
-    var emptyPaths = requestBuilder
-      .searchParams()
+    var emptyPaths = requestBuilder.searchParams()
       .addAccessPaths(PATH_A_10s, PATH_A_11s, PATH_B)
       .addEgressPaths(PATH_B, PATH_C_40s, PATH_C_30s)
       .build()
@@ -89,8 +87,7 @@ class SearchContextTest implements RaptorTestConstants {
   }
 
   private static List<RaptorAccessEgress> sort(Collection<RaptorAccessEgress> c) {
-    return c
-      .stream()
+    return c.stream()
       .sorted(Comparator.comparingInt(it -> it.stop() * 10_000 + it.durationInSeconds()))
       .collect(Collectors.toList());
   }
@@ -117,8 +114,7 @@ class SearchContextTest implements RaptorTestConstants {
     assertEquals(
       expected,
       SearchContext.paretoSetTimeConfig(
-        new RaptorRequestBuilder()
-          .searchParams()
+        new RaptorRequestBuilder().searchParams()
           // EDT, LAT, access and egress is required, but not used
           .addAccessPaths(ANY_WALK)
           .addEgressPaths(ANY_WALK)

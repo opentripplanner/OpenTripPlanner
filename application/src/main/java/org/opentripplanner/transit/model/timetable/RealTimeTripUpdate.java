@@ -41,13 +41,14 @@ public final class RealTimeTripUpdate {
 
     if (pattern.numberOfStops() != updatedTripTimes.getNumStops()) {
       throw new IllegalArgumentException(
-        "The pattern %s has %d stops while the TripTimes for Trip %s on service date %s has %d stops".formatted(
-          pattern.logName(),
-          pattern.numberOfStops(),
-          updatedTripTimes.getTrip(),
-          serviceDate,
-          updatedTripTimes.getNumStops()
-        )
+        "The pattern %s has %d stops while the TripTimes for Trip %s on service date %s has %d stops"
+          .formatted(
+            pattern.logName(),
+            pattern.numberOfStops(),
+            updatedTripTimes.getTrip(),
+            serviceDate,
+            updatedTripTimes.getNumStops()
+          )
       );
     }
   }
@@ -58,8 +59,8 @@ public final class RealTimeTripUpdate {
    * @param pattern          the pattern to which the updated trip belongs. This can be a new
    *                         pattern created in real-time.
    * @param updatedTripTimes the new trip times for the updated trip.
-   * @param serviceDate      the service date for which this update applies (updates are valid
-   *                         only for one service date).
+   * @param serviceDate      the service date for which this update applies (updates are valid only
+   *                         for one service date).
    */
   public static Builder of(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
     return new Builder(pattern, updatedTripTimes, serviceDate);

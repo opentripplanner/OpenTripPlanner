@@ -26,25 +26,23 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
 
   @BeforeEach
   void setUp() {
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          var A = intersection("A", ORIGIN);
-          var B = intersection("B", ORIGIN.moveEastMeters(500));
-          var C = intersection("C", ORIGIN.moveEastMeters(1000));
-          var Z = intersection("Z", ORIGIN.moveNorthMeters(500));
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        var A = intersection("A", ORIGIN);
+        var B = intersection("B", ORIGIN.moveEastMeters(500));
+        var C = intersection("C", ORIGIN.moveEastMeters(1000));
+        var Z = intersection("Z", ORIGIN.moveNorthMeters(500));
 
-          biStreet(A, B, 500);
-          biStreet(B, C, 500);
-          // Z has no edges — disconnected from the rest of the graph
+        biStreet(A, B, 500);
+        biStreet(B, C, 500);
+        // Z has no edges — disconnected from the rest of the graph
 
-          vertexA = A;
-          vertexC = C;
-          vertexDisconnected = Z;
-        }
+        vertexA = A;
+        vertexC = C;
+        vertexDisconnected = Z;
       }
-    );
+    });
   }
 
   /**
@@ -69,8 +67,8 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   /**
    * A cancelled search has no verdict on whether the leg is routable, so it must not be reported as
    * a routing failure: the caller memoizes a null return as "unroutable" for every later request.
-   * The router carries no state between calls, so the pair routes for real once the cancellation
-   * is over.
+   * The router carries no state between calls, so the pair routes for real once the cancellation is
+   * over.
    */
   @Test
   void propagateCancellationInsteadOfReturningNull() {

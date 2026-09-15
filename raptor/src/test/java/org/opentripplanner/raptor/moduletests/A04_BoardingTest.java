@@ -23,17 +23,17 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * routing strategies do not board at the same stop, they should board at the optimal stop for the
  * criterion which they optimize on.
  * <ul>
- *    <li>The `MinTravelDurationRoutingStrategy` should board at the stop which give the shortest
- *    travel duration. Hence; picking the path with the shortest travel duration at the point of
- *    boarding.
- *    <li>The `ArrivalTimeRoutingStrategy` should board at the first possible stop and drop all
- *    other paths boarding the same trip. We only care about the arrival-time with this strategy so
- *    any boarding of the same trip will lead to the same arrival-time at the destination. Picking
- *    the first possible path gives us deterministic behavior and the best performance.
- *    <li>The `McTransitWorker` should board at the all stops which give us pareto optimal results.
- *    The test is set up, so that the cost and time is aligned. We expect the same result as with
- *    the `MinTravelDurationRoutingStrategy`. There are other tests that focus on testing the
- *    multi-criteria routing strategy.
+ *   <li>The `MinTravelDurationRoutingStrategy` should board at the stop which give the shortest
+ *       travel duration. Hence; picking the path with the shortest travel duration at the point of
+ *       boarding.
+ *   <li>The `ArrivalTimeRoutingStrategy` should board at the first possible stop and drop all other
+ *       paths boarding the same trip. We only care about the arrival-time with this strategy so any
+ *       boarding of the same trip will lead to the same arrival-time at the destination. Picking the
+ *       first possible path gives us deterministic behavior and the best performance.
+ *   <li>The `McTransitWorker` should board at the all stops which give us pareto optimal results. The
+ *       test is set up, so that the cost and time is aligned. We expect the same result as with the
+ *       `MinTravelDurationRoutingStrategy`. There are other tests that focus on testing the
+ *       multi-criteria routing strategy.
  * </ul>
  * Note! This test does only one iteration, it does not run RangeRaptor over a time window. This
  * would give us the best/latest departure time for the `ArrivalTimeRoutingStrategy` as well, but
@@ -48,8 +48,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
 
   @BeforeEach
   void setup() {
-    data
-      .access("Walk 1m ~ A")
+    data.access("Walk 1m ~ A")
       .withTimetables(
         """
         -- R1
@@ -78,8 +77,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
       )
       .egress("H ~ Walk 1m");
 
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();

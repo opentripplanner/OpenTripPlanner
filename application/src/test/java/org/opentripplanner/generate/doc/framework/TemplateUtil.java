@@ -37,7 +37,8 @@ public class TemplateUtil {
     if (!doc.contains(replaceToken)) {
       throw new IllegalStateException("Doc did not contain token: " + replaceToken);
     }
-    var replacementText = """
+    var replacementText =
+    """
     <!-- %s BEGIN -->
     <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
@@ -62,24 +63,28 @@ public class TemplateUtil {
    * Create a JSON example for an arbitrary JSON node.
    */
   public static String jsonExample(JsonNode json, String comment) {
-    return """
+    return
+    """
     ```JSON
     // %s
     %s
     ```
-    """.formatted(comment, JsonSupport.prettyPrint(json));
+    """
+      .formatted(comment, JsonSupport.prettyPrint(json));
   }
 
   public static String graphQlExample(String query) {
-    return """
+    return
+    """
     ```graphql
     %s
     ```
-    """.formatted(query);
+    """
+      .formatted(query);
   }
 
   /**
-   * Create a JSON example for the node. The given source  from the node
+   * Create a JSON example for the node. The given source from the node
    */
   public static String jsonExample(NodeAdapter nodeAdapter, String source) {
     return jsonExample(nodeAdapter.rawNode(), source);

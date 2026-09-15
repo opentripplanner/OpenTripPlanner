@@ -12,9 +12,8 @@ import org.opentripplanner.core.model.time.TimePeriod;
 class OffsetDateTimeRangeTest {
 
   private static final ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
-  private static final Instant START = OffsetDateTime.parse(
-    "2023-02-15T12:03:28+01:00"
-  ).toInstant();
+  private static final Instant START = OffsetDateTime.parse("2023-02-15T12:03:28+01:00")
+    .toInstant();
   private static final Instant END = OffsetDateTime.parse("2023-02-16T12:03:28+01:00").toInstant();
 
   @Test
@@ -45,8 +44,7 @@ class OffsetDateTimeRangeTest {
       .sorted(OffsetDateTimeRange.CHRONOLOGICAL_ORDER)
       .toList();
 
-    assertThat(sorted)
-      .containsExactly(unboundedStart, bounded, unboundedEndFromStart, unboundedEnd)
+    assertThat(sorted).containsExactly(unboundedStart, bounded, unboundedEndFromStart, unboundedEnd)
       .inOrder();
   }
 }

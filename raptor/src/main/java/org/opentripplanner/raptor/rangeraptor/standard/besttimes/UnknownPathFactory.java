@@ -17,8 +17,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 
 /**
- * Used to create "unknown" paths if the Raptor state implementation does not
- * keep path information.
+ * Used to create "unknown" paths if the Raptor state implementation does not keep path information.
  */
 public class UnknownPathFactory<T extends RaptorTripSchedule> {
 
@@ -77,10 +76,10 @@ public class UnknownPathFactory<T extends RaptorTripSchedule> {
     // arrival-time without waiting time
     int egressDepartureTime = skipTimeShiftEgressPaths
       ? transitCalculator.calculateEgressDepartureTimeWithoutTimeShift(
-          arrivalTime,
-          egress,
-          transferSlack
-        )
+        arrivalTime,
+        egress,
+        transferSlack
+      )
       : transitCalculator.calculateEgressDepartureTime(arrivalTime, egress, transferSlack);
 
     // Opening hours is not within bounds

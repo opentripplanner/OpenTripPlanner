@@ -31,8 +31,7 @@ class InvalidNewStopSequenceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdate(ADDED_TRIP_ID, NEW)
+    var update = rt.tripUpdate(ADDED_TRIP_ID, NEW)
       .addRawStopTime(
         StopTimeUpdate.newBuilder()
           .setStopId(STOP_A_ID)
@@ -50,8 +49,7 @@ class InvalidNewStopSequenceTest implements RealtimeTestConstants {
     var env = envBuilder.addTrip(tripInput).build();
     var rt = GtfsRtTestHelper.of(env);
 
-    var update = rt
-      .tripUpdate(ADDED_TRIP_ID, NEW)
+    var update = rt.tripUpdate(ADDED_TRIP_ID, NEW)
       .addRawStopTime(
         StopTimeUpdate.newBuilder()
           .setStopId(STOP_A_ID)

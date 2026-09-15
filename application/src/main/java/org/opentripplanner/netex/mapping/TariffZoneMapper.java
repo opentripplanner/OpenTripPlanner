@@ -32,8 +32,7 @@ class TariffZoneMapper {
    * Map all current TariffZones.
    */
   Collection<FareZone> listAllCurrentFareZones() {
-    return tariffZonesById
-      .localListCurrentVersionEntities(startOfPeriod)
+    return tariffZonesById.localListCurrentVersionEntities(startOfPeriod)
       .stream()
       .map(this::mapTariffZone)
       .toList();
@@ -61,8 +60,7 @@ class TariffZoneMapper {
   }
 
   private FareZone deduplicate(FareZone candidate) {
-    var existing = deduplicateCache
-      .get(candidate.getId())
+    var existing = deduplicateCache.get(candidate.getId())
       .stream()
       .filter(candidate::sameAs)
       .findFirst();

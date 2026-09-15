@@ -28,8 +28,8 @@ import org.opentripplanner.utils.lang.RunnableUtils;
 
 class VehicleParkingAvailabilityUpdaterTest {
 
-  private static final VehicleParkingUpdaterParameters PARAMETERS =
-    VehicleParkingUpdaterConfig.create(
+  private static final VehicleParkingUpdaterParameters PARAMETERS = VehicleParkingUpdaterConfig
+    .create(
       "ref",
       newNodeAdapterForTest(
         """
@@ -100,8 +100,7 @@ class VehicleParkingAvailabilityUpdaterTest {
   private static VehicleParkingRepository buildParkingRepository(VehicleParkingSpaces capacity) {
     var repo = new DefaultVehicleParkingRepository();
 
-    var parking = parkingBuilder()
-      .carPlaces(capacity.getCarSpaces() != null)
+    var parking = parkingBuilder().carPlaces(capacity.getCarSpaces() != null)
       .bicyclePlaces(capacity.getBicycleSpaces() != null)
       .capacity(capacity)
       .build();

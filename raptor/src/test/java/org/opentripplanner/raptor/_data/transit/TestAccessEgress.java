@@ -74,8 +74,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   /**
-   * @deprecated A stop cannot be both free and have a cost - This is not a valid
-   *             access/egress.
+   * @deprecated A stop cannot be both free and have a cost - This is not a valid access/egress.
    */
   @Deprecated
   public static TestAccessEgress free(int stop, int cost) {
@@ -103,8 +102,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   /** Create a new flex access and arrive stop onBoard. */
   public static TestAccessEgress flex(int stop, int durationInSeconds, int nRides, int cost) {
     assert nRides > DEFAULT_NUMBER_OF_RIDES;
-    return new Builder(stop, durationInSeconds)
-      .arrivedOnBoard()
+    return new Builder(stop, durationInSeconds).arrivedOnBoard()
       .withNRides(nRides)
       .withCost(cost)
       .build();
@@ -269,8 +267,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return false;
     }
     TestAccessEgress that = (TestAccessEgress) o;
-    return (
-      stop == that.stop &&
+    return (stop == that.stop &&
       durationInSeconds == that.durationInSeconds &&
       c1 == that.c1 &&
       numberOfRides == that.numberOfRides &&
@@ -278,8 +275,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       timePenalty == that.timePenalty &&
       closed == that.closed &&
       openUntil == that.openUntil &&
-      openFrom == that.openFrom
-    );
+      openFrom == that.openFrom);
   }
 
   @Override
@@ -355,11 +351,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
           case RIDES -> withNRides(field.value());
           case TIME_PENALTY -> withTimePenalty(field.value());
           case VIAS -> withViaLocationsVisited(field.value());
-          case
-            C2,
-            TRANSFERS,
-            TRANSFER_PRIORITY,
-            WAIT_TIME_COST -> throw new IllegalArgumentException(field.toString());
+          case C2, TRANSFERS, TRANSFER_PRIORITY, WAIT_TIME_COST ->
+            throw new IllegalArgumentException(field.toString());
           default -> throw new IllegalArgumentException(field.type().toString());
         }
       }

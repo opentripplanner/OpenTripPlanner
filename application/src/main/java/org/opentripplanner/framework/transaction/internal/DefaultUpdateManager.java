@@ -22,10 +22,10 @@ import org.opentripplanner.framework.transaction.api.WriteContext;
 /**
  * Default implementation of {@link UpdateManager}.
  *
- * <p>Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks.
- * After each task completes, changes are committed via the
- * {@link TransactionManager}. The transaction manager is package-private and
- * never exposed to callers — commit is an internal implementation detail.
+ * <p>
+ * Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks. After each
+ * task completes, changes are committed via the {@link TransactionManager}. The transaction manager
+ * is package-private and never exposed to callers — commit is an internal implementation detail.
  */
 class DefaultUpdateManager implements UpdateManager {
 
@@ -52,10 +52,9 @@ class DefaultUpdateManager implements UpdateManager {
       new LinkedBlockingQueue<>(),
       threadFactory
     );
-    this.periodicCommitScheduler =
-      commitInterval != null && !commitInterval.isZero()
-        ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::submitCommit)
-        : null;
+    this.periodicCommitScheduler = commitInterval != null && !commitInterval.isZero()
+      ? new PeriodicCommitScheduler(name, commitInterval, threadFactory, this::submitCommit)
+      : null;
   }
 
   @Override
@@ -63,8 +62,7 @@ class DefaultUpdateManager implements UpdateManager {
     EventHandler<E, M> handler,
     RepositoryHandle<?, M> repoHandle
   ) {
-    eventHandlers
-      .computeIfAbsent(handler.eventType(), k -> new ArrayList<>())
+    eventHandlers.computeIfAbsent(handler.eventType(), k -> new ArrayList<>())
       .add(new HandlerEntry<>(handler, repoHandle));
   }
 

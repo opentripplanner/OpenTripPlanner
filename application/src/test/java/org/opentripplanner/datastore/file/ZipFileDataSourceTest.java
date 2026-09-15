@@ -83,9 +83,7 @@ public class ZipFileDataSourceTest {
 
     List<String> lines = new BufferedReader(
       new InputStreamReader(entry.asInputStream(), StandardCharsets.UTF_8)
-    )
-      .lines()
-      .toList();
+    ).lines().toList();
     assertEquals("agency_id,agency_name,agency_url,agency_timezone", lines.get(0));
     assertEquals("Caltrain,Caltrain,http://www.caltrain.com,America/Los_Angeles", lines.get(1));
 

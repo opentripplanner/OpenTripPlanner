@@ -28,8 +28,8 @@ public final class DirectionUtils {
   /**
    * Calculates the angular difference between two bearings in degrees.
    * <p>
-   * Returns the smallest angle between the two bearings, accounting for the circular nature
-   * of angles (e.g., 10° and -170° are only 20° apart, not 180°).
+   * Returns the smallest angle between the two bearings, accounting for the circular nature of
+   * angles (e.g., 10° and -170° are only 20° apart, not 180°).
    * <p>
    * Works with any degree range (e.g., [0, 360) or [-180, 180]).
    *
@@ -96,7 +96,7 @@ public final class DirectionUtils {
     int minDistance_m = 10;
     while (
       SphericalDistanceLibrary.fastDistance(coord0, coord1) < minDistance_m &&
-      i < line.getNumPoints()
+        i < line.getNumPoints()
     ) {
       coord1 = line.getCoordinateN(i++);
     }

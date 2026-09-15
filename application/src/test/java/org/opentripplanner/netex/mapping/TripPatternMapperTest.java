@@ -107,8 +107,7 @@ class TripPatternMapperTest {
       assertEquals(TripAlteration.PLANNED, tripOnServiceDate.getTripAlteration());
       assertEquals(
         1,
-        sample
-          .getOperatingDaysById()
+        sample.getOperatingDaysById()
           .localValues()
           .stream()
           .map(OperatingDay::getId)
@@ -137,22 +136,24 @@ class TripPatternMapperTest {
 
     assertTrue(res.isPresent());
     var r = res.get();
-    Optional<TripOnServiceDate> replacedTripOnServiceDate = r
-      .tripOnServiceDates()
+    Optional<TripOnServiceDate> replacedTripOnServiceDate = r.tripOnServiceDates()
       .stream()
-      .filter(tripOnServiceDate ->
-        NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1.equals(tripOnServiceDate.getId().getId())
+      .filter(
+        tripOnServiceDate -> NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_1.equals(
+          tripOnServiceDate.getId().getId()
+        )
       )
       .findFirst();
 
     assertTrue(replacedTripOnServiceDate.isPresent());
     assertEquals(TripAlteration.REPLACED, replacedTripOnServiceDate.get().getTripAlteration());
 
-    Optional<TripOnServiceDate> replacingTripOnServiceDate = r
-      .tripOnServiceDates()
+    Optional<TripOnServiceDate> replacingTripOnServiceDate = r.tripOnServiceDates()
       .stream()
-      .filter(tripOnServiceDate ->
-        NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2.equals(tripOnServiceDate.getId().getId())
+      .filter(
+        tripOnServiceDate -> NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2.equals(
+          tripOnServiceDate.getId().getId()
+        )
       )
       .findFirst();
 

@@ -26,17 +26,12 @@ public class StationEntrancesTest {
   private static final OsmNode ENTRANCE_OUTSIDE_STOP_AREA = NodeBuilder.of(
     2,
     new WgsCoordinate(1, 1)
-  )
-    .withTag("entrance", "yes")
-    .build();
+  ).withTag("entrance", "yes").build();
 
   private static final OsmNode SUBWAY_ENTRANCE_OUTSIDE_STOP_AREA = NodeBuilder.of(
     3,
     new WgsCoordinate(2, 2)
-  )
-    .withTag("railway", "subway_entrance")
-    .withTag("entrance", "yes")
-    .build();
+  ).withTag("railway", "subway_entrance").withTag("entrance", "yes").build();
 
   private static final OsmRelation STOP_AREA = RelationBuilder.ofStopArea()
     .withNodeMember(ENTRANCE_IN_STOP_AREA.getId())

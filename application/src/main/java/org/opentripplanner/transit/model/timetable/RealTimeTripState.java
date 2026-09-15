@@ -5,18 +5,20 @@ import java.util.Objects;
 /**
  * Value object encapsulating the real-time state of a trip.
  *
- * <p>{@code timesModified} is {@code true} if any stop arrival or departure time was updated via
+ * <p>
+ * {@code timesModified} is {@code true} if any stop arrival or departure time was updated via
  * real-time data. The remaining flags represent structural changes:
  * <ul>
  *   <li>{@code canceled} – the trip has been canceled.</li>
- *   <li>{@code added} – the trip was injected entirely via a real-time feed (not in the
- *       planned timetable).</li>
- *   <li>{@code tripPatternModified} – the trip retains its identity but its stop pattern has
- *       been changed by a real-time update.</li>
+ *   <li>{@code added} – the trip was injected entirely via a real-time feed (not in the planned
+ *       timetable).</li>
+ *   <li>{@code tripPatternModified} – the trip retains its identity but its stop pattern has been
+ *       changed by a real-time update.</li>
  *   <li>{@code deleted} – the trip is soft-deleted and must not be visible to end users.</li>
  * </ul>
  *
- * <p>Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
+ * <p>
+ * Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
  * stop pattern will always also have {@code timesModified == true}.
  */
 final class RealTimeTripState {
@@ -73,13 +75,11 @@ final class RealTimeTripState {
       return false;
     }
     RealTimeTripState that = (RealTimeTripState) o;
-    return (
-      timesModified == that.timesModified &&
+    return (timesModified == that.timesModified &&
       canceled == that.canceled &&
       added == that.added &&
       tripPatternModified == that.tripPatternModified &&
-      deleted == that.deleted
-    );
+      deleted == that.deleted);
   }
 
   @Override

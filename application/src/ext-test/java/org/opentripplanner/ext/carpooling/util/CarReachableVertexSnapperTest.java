@@ -44,33 +44,31 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    */
   @BeforeEach
   void setUp() {
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.9139, 10.7522);
-          B = intersection("B", 59.9139, 10.7530);
-          C = intersection("C", 59.9139, 10.7540);
-          D = intersection("D", 59.9139, 10.7548);
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.9139, 10.7522);
+        B = intersection("B", 59.9139, 10.7530);
+        C = intersection("C", 59.9139, 10.7540);
+        D = intersection("D", 59.9139, 10.7548);
 
-          street(
-            A,
-            B,
-            50,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(
-            B,
-            C,
-            70,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(C, D, 50, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+        street(
+          A,
+          B,
+          50,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(
+          B,
+          C,
+          70,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(C, D, 50, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
   }
 
   /**
@@ -91,8 +89,9 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
   @Test
   void propagateCancellationInsteadOfReturningNull() {
     Thread.currentThread().interrupt();
-    assertThrows(OTPRequestTimeoutException.class, () ->
-      snapper.snapPickup(StreetSearchRequest.DEFAULT, A, Duration.ofMinutes(10))
+    assertThrows(
+      OTPRequestTimeoutException.class,
+      () -> snapper.snapPickup(StreetSearchRequest.DEFAULT, A, Duration.ofMinutes(10))
     );
     Thread.interrupted();
 
@@ -145,50 +144,48 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
   @Test
   void halfCarReachableVertexIsRejected() {
     var holder = new IntersectionVertex[5];
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          holder[0] = intersection("S", 60.0000, 10.0000);
-          holder[1] = intersection("V", 60.0000, 10.0010);
-          holder[2] = intersection("W", 60.0000, 10.0020);
-          holder[3] = intersection("X", 60.0000, 10.0030);
-          holder[4] = intersection("Y", 60.0000, 10.0040);
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        holder[0] = intersection("S", 60.0000, 10.0000);
+        holder[1] = intersection("V", 60.0000, 10.0010);
+        holder[2] = intersection("W", 60.0000, 10.0020);
+        holder[3] = intersection("X", 60.0000, 10.0030);
+        holder[4] = intersection("Y", 60.0000, 10.0040);
 
-          street(
-            holder[0],
-            holder[1],
-            50,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          // V→W forward car, reverse ped: V gets out-CAR only, W in-CAR only.
-          street(
-            holder[1],
-            holder[2],
-            50,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          // W↔X pedestrian both ways: walker continues, neither gains CAR.
-          street(
-            holder[2],
-            holder[3],
-            50,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          // X↔Y bidirectional car: X gets in- and out-CAR, so it is car-reachable.
-          street(
-            holder[3],
-            holder[4],
-            50,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.ALL
-          );
-        }
+        street(
+          holder[0],
+          holder[1],
+          50,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        // V→W forward car, reverse ped: V gets out-CAR only, W in-CAR only.
+        street(
+          holder[1],
+          holder[2],
+          50,
+          StreetTraversalPermission.ALL,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        // W↔X pedestrian both ways: walker continues, neither gains CAR.
+        street(
+          holder[2],
+          holder[3],
+          50,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        // X↔Y bidirectional car: X gets in- and out-CAR, so it is car-reachable.
+        street(
+          holder[3],
+          holder[4],
+          50,
+          StreetTraversalPermission.ALL,
+          StreetTraversalPermission.ALL
+        );
       }
-    );
+    });
 
     var result = snapper.snapPickup(StreetSearchRequest.DEFAULT, holder[0], Duration.ofMinutes(10));
 
@@ -207,61 +204,59 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   Yc --(car)-- Y --(walk 100 m, safety x1)-- S --(walk 50 m, safety x10)-- X --(car)-- Xc
    * </pre>
-   * The S–Y walk weighs ~100 while the shorter S–X walk weighs ~500, so Y wins on generalized weight
-   * despite being farther.
+   * The S–Y walk weighs ~100 while the shorter S–X walk weighs ~500, so Y wins on
+   * generalized weight despite being farther.
    */
   @Test
   void snapsToMinimumWeightVertex_notNearestByDistance() {
     var holder = new IntersectionVertex[5];
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          holder[0] = intersection("Yc", 60.0000, 9.9982);
-          holder[1] = intersection("Y", 60.0000, 9.9988);
-          holder[2] = intersection("S", 60.0000, 10.0000);
-          holder[3] = intersection("X", 60.0000, 10.0006);
-          holder[4] = intersection("Xc", 60.0000, 10.0012);
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        holder[0] = intersection("Yc", 60.0000, 9.9982);
+        holder[1] = intersection("Y", 60.0000, 9.9988);
+        holder[2] = intersection("S", 60.0000, 10.0000);
+        holder[3] = intersection("X", 60.0000, 10.0006);
+        holder[4] = intersection("Xc", 60.0000, 10.0012);
 
-          // Yc ↔ Y gives Y bidirectional CAR access, making it car-reachable.
-          street(
-            holder[0],
-            holder[1],
-            50,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.ALL
-          );
+        // Yc ↔ Y gives Y bidirectional CAR access, making it car-reachable.
+        street(
+          holder[0],
+          holder[1],
+          50,
+          StreetTraversalPermission.ALL,
+          StreetTraversalPermission.ALL
+        );
 
-          // Y→S: longer (100 m), normal safety → weight ~100 (cheaper).
-          street(
-            holder[1],
-            holder[2],
-            100,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
+        // Y→S: longer (100 m), normal safety → weight ~100 (cheaper).
+        street(
+          holder[1],
+          holder[2],
+          100,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
 
-          // S→X: short (50 m) but walkSafetyFactor 10 → weight ~500.
-          var sx = street(
-            holder[2],
-            holder[3],
-            50,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          sx.forEach(e -> e.setWalkSafetyFactor(10.0f));
+        // S→X: short (50 m) but walkSafetyFactor 10 → weight ~500.
+        var sx = street(
+          holder[2],
+          holder[3],
+          50,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        sx.forEach(e -> e.setWalkSafetyFactor(10.0f));
 
-          // X ↔ Xc gives X bidirectional CAR access, making it car-reachable.
-          street(
-            holder[3],
-            holder[4],
-            50,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.ALL
-          );
-        }
+        // X ↔ Xc gives X bidirectional CAR access, making it car-reachable.
+        street(
+          holder[3],
+          holder[4],
+          50,
+          StreetTraversalPermission.ALL,
+          StreetTraversalPermission.ALL
+        );
       }
-    );
+    });
 
     var result = snapper.snapPickup(StreetSearchRequest.DEFAULT, holder[2], Duration.ofMinutes(10));
 
@@ -311,26 +306,24 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
   @Test
   void connectedCarVertex_isAccepted() {
     var v = new IntersectionVertex[4];
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("O", 60.0000, 10.0000);
-          v[1] = intersection("P", 60.0000, 10.0010);
-          v[2] = intersection("P1", 60.0000, 10.0020);
-          v[3] = intersection("P2", 60.0000, 10.0030);
-          street(
-            v[0],
-            v[1],
-            60,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(v[1], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(v[2], v[3], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("O", 60.0000, 10.0000);
+        v[1] = intersection("P", 60.0000, 10.0010);
+        v[2] = intersection("P1", 60.0000, 10.0020);
+        v[3] = intersection("P2", 60.0000, 10.0030);
+        street(
+          v[0],
+          v[1],
+          60,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(v[1], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(v[2], v[3], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
 
     var reachabilitySnapper = new CarReachableVertexSnapper(100);
     var result = reachabilitySnapper.snapPickup(
@@ -349,42 +342,40 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   Q2 --(car)-- Q1 --(car)-- Q --(ped)-- O --(ped)-- Isl --(car)-- IslC
    * </pre>
-   * {@code Isl↔IslC} spans ~33 m (below the 100 m escape) while {@code Q–Q1–Q2} spans ~111 m, so O
-   * snaps west to Q rather than to the island.
+   * {@code Isl↔IslC} spans ~33 m (below the 100 m escape) while {@code Q–Q1–Q2} spans ~111
+   * m, so O snaps west to Q rather than to the island.
    */
   @Test
   void islandCarVertex_isRejected_snapsToReachableVertex() {
     var v = new IntersectionVertex[6];
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("Q2", 60.0000, 9.9970);
-          v[1] = intersection("Q1", 60.0000, 9.9980);
-          v[2] = intersection("Q", 60.0000, 9.9990);
-          v[3] = intersection("O", 60.0000, 10.0000);
-          v[4] = intersection("Isl", 60.0000, 10.0006);
-          v[5] = intersection("IslC", 60.0000, 10.0012);
-          street(v[0], v[1], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(v[1], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(
-            v[2],
-            v[3],
-            60,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(
-            v[3],
-            v[4],
-            40,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(v[4], v[5], 40, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("Q2", 60.0000, 9.9970);
+        v[1] = intersection("Q1", 60.0000, 9.9980);
+        v[2] = intersection("Q", 60.0000, 9.9990);
+        v[3] = intersection("O", 60.0000, 10.0000);
+        v[4] = intersection("Isl", 60.0000, 10.0006);
+        v[5] = intersection("IslC", 60.0000, 10.0012);
+        street(v[0], v[1], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(v[1], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(
+          v[2],
+          v[3],
+          60,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(
+          v[3],
+          v[4],
+          40,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(v[4], v[5], 40, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
 
     var reachabilitySnapper = new CarReachableVertexSnapper(100);
     var result = reachabilitySnapper.snapPickup(
@@ -410,55 +401,35 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    *              (ped)
    *                 O
    * </pre>
-   * The origin O is pedestrian-linked to T. A car reaches T from U2 over ~111 m (arrival passes),
-   * but leaving T dead-ends at Td after only ~67 m — below the 100 m escape — so T is rejected and
-   * the snap returns {@code null}.
+   * The origin O is pedestrian-linked to T. A car reaches T from U2 over ~111 m (arrival
+   * passes), but leaving T dead-ends at Td after only ~67 m — below the 100 m escape — so T is
+   * rejected and the snap returns {@code null}.
    */
   @Test
   void deadEndTooShortToEscape_isRejected() {
     var v = new IntersectionVertex[5];
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("Td", 60.0000, 9.9994);
-          v[1] = intersection("O", 60.0000, 10.0000);
-          v[2] = intersection("T", 60.0000, 10.0006);
-          v[3] = intersection("U1", 60.0000, 10.0016);
-          v[4] = intersection("U2", 60.0000, 10.0026);
-          street(
-            v[1],
-            v[2],
-            40,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          // One-way car toward T (U2→U1→T): T gains incoming car.
-          street(
-            v[4],
-            v[3],
-            60,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(
-            v[3],
-            v[2],
-            60,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          // One-way car T→Td into a dead-end: T gains outgoing car that leads nowhere.
-          street(
-            v[2],
-            v[0],
-            40,
-            StreetTraversalPermission.ALL,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-        }
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("Td", 60.0000, 9.9994);
+        v[1] = intersection("O", 60.0000, 10.0000);
+        v[2] = intersection("T", 60.0000, 10.0006);
+        v[3] = intersection("U1", 60.0000, 10.0016);
+        v[4] = intersection("U2", 60.0000, 10.0026);
+        street(
+          v[1],
+          v[2],
+          40,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        // One-way car toward T (U2→U1→T): T gains incoming car.
+        street(v[4], v[3], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.PEDESTRIAN);
+        street(v[3], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.PEDESTRIAN);
+        // One-way car T→Td into a dead-end: T gains outgoing car that leads nowhere.
+        street(v[2], v[0], 40, StreetTraversalPermission.ALL, StreetTraversalPermission.PEDESTRIAN);
       }
-    );
+    });
 
     var reachabilitySnapper = new CarReachableVertexSnapper(100);
     var result = reachabilitySnapper.snapPickup(
@@ -481,34 +452,32 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   M3 --(car)-- M2 --(car)-- M1 ==temp== hub ==temp== Isl --(car)-- IslC
    * </pre>
-   * {@code M1–M2–M3} spans ~111 m, so M1 is genuinely car-reachable; {@code Isl↔IslC} spans only
-   * ~33 m, so the island's sole escape is the temporary bridge — which the probe ignores, keeping
-   * Isl rejected.
+   * {@code M1–M2–M3} spans ~111 m, so M1 is genuinely car-reachable; {@code Isl↔IslC} spans
+   * only ~33 m, so the island's sole escape is the temporary bridge — which the probe ignores,
+   * keeping Isl rejected.
    */
   @Test
   void permanentVertexVerdict_ignoresTemporaryEdges() {
     var v = new IntersectionVertex[5];
-    modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("M3", 60.0000, 9.9974);
-          v[1] = intersection("M2", 60.0000, 9.9984);
-          v[2] = intersection("M1", 60.0000, 9.9994);
-          v[3] = intersection("Isl", 60.0000, 10.0000);
-          v[4] = intersection("IslC", 60.0000, 10.0006);
-          street(v[0], v[1], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(v[1], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(v[3], v[4], 40, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+    modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("M3", 60.0000, 9.9974);
+        v[1] = intersection("M2", 60.0000, 9.9984);
+        v[2] = intersection("M1", 60.0000, 9.9994);
+        v[3] = intersection("Isl", 60.0000, 10.0000);
+        v[4] = intersection("IslC", 60.0000, 10.0006);
+        street(v[0], v[1], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(v[1], v[2], 60, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(v[3], v[4], 40, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
 
-          var hub = streetLocation("bridge", 60.0000, 9.9997);
-          createTemporaryFreeEdge(v[3], hub);
-          link(hub, v[2]);
-          createTemporaryFreeEdge(v[2], hub);
-          link(hub, v[3]);
-        }
+        var hub = streetLocation("bridge", 60.0000, 9.9997);
+        createTemporaryFreeEdge(v[3], hub);
+        link(hub, v[2]);
+        createTemporaryFreeEdge(v[2], hub);
+        link(hub, v[3]);
       }
-    );
+    });
 
     var reachabilitySnapper = new CarReachableVertexSnapper(100);
 
@@ -523,50 +492,48 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
   }
 
   /**
-   * A temporary vertex on a stranded island must not be judged reachable through a foreign request's
-   * mode-blind {@link org.opentripplanner.street.model.edge.TemporaryFreeEdge} bridge: the probe
-   * confines traversal to its own linking, so the snap walks out to the real mainland instead. Graph
-   * (west to east):
+   * A temporary vertex on a stranded island must not be judged reachable through a foreign
+   * request's mode-blind {@link org.opentripplanner.street.model.edge.TemporaryFreeEdge} bridge:
+   * the probe confines traversal to its own linking, so the snap walks out to the real mainland
+   * instead. Graph (west to east):
    * <pre>
    *   Q2 --(all)-- Q1 --(all)-- Q --(ped, ~56 m)-- Isl --(all, ~33 m)-- IslC
    *   Q2 =free= hub =free= IslC
    * </pre>
-   * The second line is a foreign, mode-blind bridge standing in for another request's linking. The
-   * island {@code Isl↔IslC} is too small to escape by car (~33 m); {@code Q–Q1–Q2} is a genuine car
-   * mainland reached from Isl on foot via Q. Honouring the bridge would wrongly accept the island,
-   * so the passenger (linked onto the island edge) must snap to {@code Q}.
+   * The second line is a foreign, mode-blind bridge standing in for another request's
+   * linking. The island {@code Isl↔IslC} is too small to escape by car (~33 m); {@code Q–Q1–Q2} is
+   * a genuine car mainland reached from Isl on foot via Q. Honouring the bridge would wrongly
+   * accept the island, so the passenger (linked onto the island edge) must snap to {@code Q}.
    */
   @Test
   void temporaryVertexProbe_ignoresForeignLinking() {
     var v = new IntersectionVertex[5];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("Q2", 60.0000, 9.997);
-          v[1] = intersection("Q1", 60.0000, 9.998);
-          v[2] = intersection("Q", 60.0000, 9.999);
-          v[3] = intersection("Isl", 60.0000, 10.0000);
-          v[4] = intersection("IslC", 60.0000, 10.0006);
-          street(v[0], v[1], 56, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(v[1], v[2], 56, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          street(
-            v[2],
-            v[3],
-            56,
-            StreetTraversalPermission.PEDESTRIAN,
-            StreetTraversalPermission.PEDESTRIAN
-          );
-          street(v[3], v[4], 33, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-          // Foreign mode-blind bridge IslC <-> hub <-> Q2, standing in for another request's linking.
-          var hub = streetLocation("foreign-bridge", 60.0000, 10.0009);
-          link(v[4], hub);
-          link(hub, v[4]);
-          link(hub, v[0]);
-          link(v[0], hub);
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("Q2", 60.0000, 9.997);
+        v[1] = intersection("Q1", 60.0000, 9.998);
+        v[2] = intersection("Q", 60.0000, 9.999);
+        v[3] = intersection("Isl", 60.0000, 10.0000);
+        v[4] = intersection("IslC", 60.0000, 10.0006);
+        street(v[0], v[1], 56, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(v[1], v[2], 56, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        street(
+          v[2],
+          v[3],
+          56,
+          StreetTraversalPermission.PEDESTRIAN,
+          StreetTraversalPermission.PEDESTRIAN
+        );
+        street(v[3], v[4], 33, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+        // Foreign mode-blind bridge IslC <-> hub <-> Q2, standing in for another request's linking.
+        var hub = streetLocation("foreign-bridge", 60.0000, 10.0009);
+        link(v[4], hub);
+        link(hub, v[4]);
+        link(hub, v[0]);
+        link(v[0], hub);
       }
-    );
+    });
 
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
@@ -603,26 +570,22 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
   @Test
   void snapToPermanentVertex_skipsTemporaryVertices() {
     var v = new IntersectionVertex[2];
-    var model = modelOf(
-      new GraphRoutingTest.Builder() {
-        @Override
-        public void build() {
-          v[0] = intersection("A", 60.0000, 10.0000);
-          v[1] = intersection("B", 60.0000, 10.0018);
-          street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-        }
+    var model = modelOf(new GraphRoutingTest.Builder() {
+      @Override
+      public void build() {
+        v[0] = intersection("A", 60.0000, 10.0000);
+        v[1] = intersection("B", 60.0000, 10.0018);
+        street(v[0], v[1], 100, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
       }
-    );
+    });
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
     var reachabilitySnapper = new CarReachableVertexSnapper(50);
 
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var linked = new StreetVertexUtils(
-        vertexCreationService,
-        temporaryVerticesContainer
-      ).createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
+      var linked = new StreetVertexUtils(vertexCreationService, temporaryVerticesContainer)
+        .createDriverWaypointVertex(new WgsCoordinate(60.0000, 10.0005));
       assertNotNull(linked);
 
       var plain = reachabilitySnapper.snapPickup(

@@ -52,79 +52,77 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    var otpModel = modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          var a = TransitRepositoryForTest.agency("Agency");
+    var otpModel = modelOf(new Builder() {
+      @Override
+      public void build() {
+        var a = TransitRepositoryForTest.agency("Agency");
 
-          R1 = route("R1", TransitMode.BUS, a);
-          R2 = route("R2", TransitMode.TRAM, a);
+        R1 = route("R1", TransitMode.BUS, a);
+        R2 = route("R2", TransitMode.TRAM, a);
 
-          S1 = stop("S1", 47.500, 19.001);
-          S2 = stop("S2", 47.510, 19.001);
-          S3 = stop("S3", 47.520, 19.001);
+        S1 = stop("S1", 47.500, 19.001);
+        S2 = stop("S2", 47.510, 19.001);
+        S3 = stop("S3", 47.520, 19.001);
 
-          BR1 = vehicleRentalStation("BR1", 47.500, 18.999);
-          BR2 = vehicleRentalStation("BR2", 47.520, 18.999);
+        BR1 = vehicleRentalStation("BR1", 47.500, 18.999);
+        BR2 = vehicleRentalStation("BR2", 47.520, 18.999);
 
-          A = intersection("A", 47.500, 19.00);
-          B = intersection("B", 47.510, 19.00);
-          C = intersection("C", 47.520, 19.00);
-          D = intersection("D", 47.530, 19.00);
+        A = intersection("A", 47.500, 19.00);
+        B = intersection("B", 47.510, 19.00);
+        C = intersection("C", 47.520, 19.00);
+        D = intersection("D", 47.530, 19.00);
 
-          BP1 = vehicleParking(
-            "BP1",
-            47.520,
-            18.999,
-            true,
-            false,
-            List.of(vehicleParkingEntrance(C, "BP1 Entrance", false, true))
-          );
+        BP1 = vehicleParking(
+          "BP1",
+          47.520,
+          18.999,
+          true,
+          false,
+          List.of(vehicleParkingEntrance(C, "BP1 Entrance", false, true))
+        );
 
-          PR1 = vehicleParking(
-            "PR1",
-            47.510,
-            18.999,
-            false,
-            true,
-            List.of(vehicleParkingEntrance(B, "PR1 Entrance", true, true))
-          );
+        PR1 = vehicleParking(
+          "PR1",
+          47.510,
+          18.999,
+          false,
+          true,
+          List.of(vehicleParkingEntrance(B, "PR1 Entrance", true, true))
+        );
 
-          PR2 = vehicleParking(
-            "PR2",
-            47.530,
-            18.999,
-            false,
-            true,
-            List.of(vehicleParkingEntrance(D, "PR2 Entrance", true, true))
-          );
+        PR2 = vehicleParking(
+          "PR2",
+          47.530,
+          18.999,
+          false,
+          true,
+          List.of(vehicleParkingEntrance(D, "PR2 Entrance", true, true))
+        );
 
-          biLink(A, S1);
-          biLink(A, BR1);
-          biLink(B, S2);
-          biLink(C, S3);
-          biLink(C, BR2);
+        biLink(A, S1);
+        biLink(A, BR1);
+        biLink(B, S2);
+        biLink(C, S3);
+        biLink(C, BR2);
 
-          street(A, B, 100, StreetTraversalPermission.ALL);
-          street(B, C, 100, StreetTraversalPermission.ALL);
-          street(C, D, 100, StreetTraversalPermission.ALL);
+        street(A, B, 100, StreetTraversalPermission.ALL);
+        street(B, C, 100, StreetTraversalPermission.ALL);
+        street(C, D, 100, StreetTraversalPermission.ALL);
 
-          tripPattern(
-            (TP1 = TripPattern.of(FeedScopedIdForTestFactory.id("TP1"))
-              .withRoute(R1)
-              .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
-              .build())
-          );
-          tripPattern(
-            (TP2 = TripPattern.of(FeedScopedIdForTestFactory.id("TP2"))
-              .withRoute(R2)
-              .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
-              .build())
-          );
-        }
+        tripPattern(
+          (TP1 = TripPattern.of(FeedScopedIdForTestFactory.id("TP1"))
+            .withRoute(R1)
+            .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
+            .build())
+        );
+        tripPattern(
+          (TP2 = TripPattern.of(FeedScopedIdForTestFactory.id("TP2"))
+            .withRoute(R2)
+            .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
+            .build())
+        );
       }
-    );
+    });
 
     transitService = new DefaultTransitService(otpModel.transitRepository());
     var vertexLinker = VertexLinkerTestFactory.of(otpModel.graph());

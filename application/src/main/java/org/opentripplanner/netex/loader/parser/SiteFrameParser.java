@@ -138,17 +138,13 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   }
 
   private boolean isMultiModalStopPlace(StopPlace stopPlace) {
-    return (
-      stopPlace.getKeyList() != null &&
-      stopPlace
-        .getKeyList()
+    return (stopPlace.getKeyList() != null &&
+      stopPlace.getKeyList()
         .getKeyValue()
         .stream()
         .anyMatch(
-          keyValueStructure ->
-            keyValueStructure.getKey().equals("IS_PARENT_STOP_PLACE") &&
+          keyValueStructure -> keyValueStructure.getKey().equals("IS_PARENT_STOP_PLACE") &&
             keyValueStructure.getValue().equals("true")
-        )
-    );
+        ));
   }
 }

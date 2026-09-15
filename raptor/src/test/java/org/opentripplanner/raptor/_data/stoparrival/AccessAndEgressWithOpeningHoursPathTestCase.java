@@ -31,18 +31,18 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * Case A with flex access and egress and one transit:
  * <ol>
- *     <li>Flex access</li>
- *     <li>Transit, BUS A</li>
- *     <li>Flex egress</li>
+ *   <li>Flex access</li>
+ *   <li>Transit, BUS A</li>
+ *   <li>Flex egress</li>
  * </ol>
  * <p>
  * Case B with walking between transit and flex:
  * <ol>
- *     <li>Flex access</li>
- *     <li>Walk transfer</li>
- *     <li>Transit. BUS B</li>
- *     <li>Walk transfer</li>
- *     <li>Flex egress</li>
+ *   <li>Flex access</li>
+ *   <li>Walk transfer</li>
+ *   <li>Transit. BUS B</li>
+ *   <li>Walk transfer</li>
+ *   <li>Flex egress</li>
  * </ol>
  */
 public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestConstants {
@@ -127,27 +127,24 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     EGRESS_CLOSING
   );
 
-  public static final int EGRESS_C1_W_1_m_SLACK =
-    EGRESS_C1 + toRaptorCost(TRANSFER_C1_SEC) + C1_CALCULATOR.waitCost(TRANSFER_SLACK);
-  public static final int EGRESS_C1_W_7_m_45_s_SLACK =
-    EGRESS_C1_W_1_m_SLACK + C1_CALCULATOR.waitCost(durationInSeconds("6m45s"));
-  public static final int EGRESS_C1_W_9_m_45_s_SLACK =
-    EGRESS_C1_W_1_m_SLACK + C1_CALCULATOR.waitCost(durationInSeconds("8m45s"));
+  public static final int EGRESS_C1_W_1_m_SLACK = EGRESS_C1 +
+    toRaptorCost(TRANSFER_C1_SEC) +
+    C1_CALCULATOR.waitCost(TRANSFER_SLACK);
+  public static final int EGRESS_C1_W_7_m_45_s_SLACK = EGRESS_C1_W_1_m_SLACK +
+    C1_CALCULATOR.waitCost(durationInSeconds("6m45s"));
+  public static final int EGRESS_C1_W_9_m_45_s_SLACK = EGRESS_C1_W_1_m_SLACK +
+    C1_CALCULATOR.waitCost(durationInSeconds("8m45s"));
 
   public static final String LINE_A = "A";
   public static final String LINE_B = "B";
 
   public static final TestTripSchedule TRIP_A = TestTripSchedule.schedule(
     TestTripPattern.pattern(LINE_A, STOP_A, STOP_D)
-  )
-    .times(L1_START, L1_END)
-    .build();
+  ).times(L1_START, L1_END).build();
 
   public static final TestTripSchedule TRIP_B = TestTripSchedule.schedule(
     TestTripPattern.pattern(LINE_B, STOP_B, STOP_C)
-  )
-    .times(L1_START, L1_END)
-    .build();
+  ).times(L1_START, L1_END).build();
 
   public static final int L1_C1_EX_WAIT = C1_CALCULATOR.transitArrivalCost(
     C1_CALCULATOR.boardingCostRegularTransfer(false, L1_START, STOP_B, L1_START),
@@ -162,10 +159,10 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
   private static final int TOT_C1_B = toRaptorCost(2924);
   private static final int TOT_C1_W_OPENING_HOURS_B = toRaptorCost(3728);
   // Wait before 12m45s + ALIGHT SLACK 15s
-  private static final int L1_C1_INC_WAIT_W_OPENING_HOURS_A =
-    L1_C1_EX_WAIT + C1_CALCULATOR.waitCost(durationInSeconds("13m"));
-  private static final int L1_C1_INC_WAIT_W_OPENING_HOURS_B =
-    L1_C1_EX_WAIT + C1_CALCULATOR.waitCost(durationInSeconds("12m"));
+  private static final int L1_C1_INC_WAIT_W_OPENING_HOURS_A = L1_C1_EX_WAIT +
+    C1_CALCULATOR.waitCost(durationInSeconds("13m"));
+  private static final int L1_C1_INC_WAIT_W_OPENING_HOURS_B = L1_C1_EX_WAIT +
+    C1_CALCULATOR.waitCost(durationInSeconds("12m"));
 
   /* TEST CASES WITH EXPECTED TO-STRING TEXTS */
 
@@ -312,8 +309,8 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     departureTime = egressPath.earliestDepartureTime(departureTime);
     arrivalTime = departureTime + egressPath.durationInSeconds();
     waitTime = departureTime - prevArrival.arrivalTime();
-    int additionalCost =
-      egressPath.c1() + toRaptorCost(waitTime * WAIT_RELUCTANCE + TRANSFER_C1_SEC);
+    int additionalCost = egressPath.c1() +
+      toRaptorCost(waitTime * WAIT_RELUCTANCE + TRANSFER_C1_SEC);
 
     return new DestinationArrival<>(
       egressPath,
@@ -357,8 +354,8 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     departureTime = accessPath.latestArrivalTime(departureTime);
     arrivalTime = departureTime - accessPath.durationInSeconds();
     int waitTime = prevArrival.arrivalTime() - departureTime;
-    int additionalCost =
-      accessPath.c1() + toRaptorCost(waitTime * WAIT_RELUCTANCE + TRANSFER_C1_SEC);
+    int additionalCost = accessPath.c1() +
+      toRaptorCost(waitTime * WAIT_RELUCTANCE + TRANSFER_C1_SEC);
 
     return new DestinationArrival<>(
       accessPath,

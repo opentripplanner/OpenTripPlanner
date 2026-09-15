@@ -14,16 +14,14 @@ public class DisposableEdgeDataFetcher {
   }
 
   public Set<String> summarize() {
-    return temp
-      .listEdges()
+    return temp.listEdges()
       .stream()
       .map(StreetSummarizer::summarizeEdge)
       .collect(Collectors.toSet());
   }
 
   public String geojsonUrl() {
-    var vertices = temp
-      .listEdges()
+    var vertices = temp.listEdges()
       .stream()
       .flatMap(e -> Stream.of(e.getFromVertex(), e.getToVertex()))
       .toList();

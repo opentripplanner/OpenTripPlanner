@@ -65,8 +65,7 @@ public class DefaultConstrainedTransferService implements Serializable, Constrai
     int toStopPosition,
     StopLocation toStop
   ) {
-    return transfersMap
-      .get(fromTrip, fromStop, fromStopPosition)
+    return transfersMap.get(fromTrip, fromStop, fromStopPosition)
       .stream()
       .map(map2 -> map2.get(toTrip, toStop, toStopPosition))
       .flatMap(Collection::stream)

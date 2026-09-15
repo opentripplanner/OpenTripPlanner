@@ -174,8 +174,9 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   /**
-   * An assumed rental period of a car rental trip, to make sure the vehicle is available during this period.
-   * The rentalPeriod only apply to free-floating vehicles in a direct search. Access and egress is not supported.
+   * An assumed rental period of a car rental trip, to make sure the vehicle is available during
+   * this period. The rentalPeriod only apply to free-floating vehicles in a direct search. Access
+   * and egress is not supported.
    */
   @Nullable
   public RentalPeriod rentalPeriod() {
@@ -191,8 +192,7 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   public StreetSearchRequestBuilder copyOfReversed(Instant time) {
-    return copyOf(this)
-      .withStartTime(time)
+    return copyOf(this).withStartTime(time)
       .withArriveBy(!arriveBy)
       .withArriveByDestinationZones(Set.of());
   }
@@ -211,10 +211,8 @@ public class StreetSearchRequest implements AStarRequest {
    * @see DominanceFunctions#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {
-    return (
-      (fromEnvelope != null && fromEnvelope.intersects(vertex.getCoordinate())) ||
-      (toEnvelope != null && toEnvelope.intersects(vertex.getCoordinate()))
-    );
+    return ((fromEnvelope != null && fromEnvelope.intersects(vertex.getCoordinate())) ||
+      (toEnvelope != null && toEnvelope.intersects(vertex.getCoordinate())));
   }
 
   public WalkRequest walk() {

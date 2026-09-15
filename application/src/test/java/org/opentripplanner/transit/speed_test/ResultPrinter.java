@@ -49,8 +49,9 @@ class ResultPrinter {
 
   static void printResultFailed(TestCase testCase, Exception e) {
     boolean testError = e instanceof TestCaseFailedException;
-    String errorDetails =
-      " - " + e.getMessage() + (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
+    String errorDetails = " - " +
+      e.getMessage() +
+      (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
 
     printResult("FAILED", testCase, true, errorDetails);
 
@@ -112,12 +113,7 @@ class ResultPrinter {
   ) {
     System.err.println();
     System.err.println(header);
-    int labelMaxLen = result
-      .keySet()
-      .stream()
-      .mapToInt(it -> it.name().length())
-      .max()
-      .orElse(20);
+    int labelMaxLen = result.keySet().stream().mapToInt(it -> it.name().length()).max().orElse(20);
     for (SpeedTestProfile p : profiles) {
       List<Integer> v = result.get(p);
       if (v != null) {
@@ -148,8 +144,7 @@ class ResultPrinter {
   private static List<String> listResults(SpeedTestTimer timer) {
     var times = timer.getResults();
 
-    int namesMaxLen = times
-      .stream()
+    int namesMaxLen = times.stream()
       .map(SpeedTestTimer.Result::name)
       .mapToInt(String::length)
       .max()
@@ -206,19 +201,10 @@ class ResultPrinter {
 
   private static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {
     if (!v.isEmpty()) {
-      String values =
-        "[ " +
-        v
-          .stream()
-          .map(it -> String.format("%4d", it))
-          .reduce((a, b) -> a + ", " + b)
-          .orElse("") +
+      String values = "[ " +
+        v.stream().map(it -> String.format("%4d", it)).reduce((a, b) -> a + ", " + b).orElse("") +
         " ]";
-      double avg = v
-        .stream()
-        .mapToInt(it -> it)
-        .average()
-        .orElse(0d);
+      double avg = v.stream().mapToInt(it -> it).average().orElse(0d);
 
       System.err.printf(
         " ==> %-" + labelMaxLen + "s : %s (μ=%4.1f, σ=%.1f)%n",

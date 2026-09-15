@@ -203,8 +203,7 @@ public final class ItineraryFilterPreferences {
       return false;
     }
     ItineraryFilterPreferences that = (ItineraryFilterPreferences) o;
-    return (
-      accessibilityScore == that.accessibilityScore &&
+    return (accessibilityScore == that.accessibilityScore &&
       Double.compare(that.bikeRentalDistanceRatio, bikeRentalDistanceRatio) == 0 &&
       debug == that.debug &&
       filterItinerariesWithSameFirstOrLastTrip == that.filterItinerariesWithSameFirstOrLastTrip &&
@@ -223,8 +222,7 @@ public final class ItineraryFilterPreferences {
         that.removeTransitWithHigherCostThanBestOnStreetOnly
       ) &&
       Objects.equals(transitGeneralizedCostLimit, that.transitGeneralizedCostLimit) &&
-      filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow
-    );
+      filterDirectFlexBySearchWindow == that.filterDirectFlexBySearchWindow);
   }
 
   @Override

@@ -45,8 +45,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
 
   @Test
   void listsAreInitialized() {
-    var leg = new FlexibleTransitLegBuilder()
-      .withStartTime(START_TIME)
+    var leg = new FlexibleTransitLegBuilder().withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
       .withFromStop(A.stop)
@@ -61,21 +60,22 @@ class FlexibleTransitLegTest implements PlanTestConstants {
     var expectedType = RuntimeException.class;
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withStartTime(null).build());
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withEndTime(null).build());
-    assertThrows(expectedType, () ->
-      new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
+    assertThrows(
+      expectedType,
+      () -> new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
     );
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withFromStop(null).build());
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withToStop(null).build());
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withAlerts(null).build());
-    assertThrows(expectedType, () ->
-      new FlexibleTransitLegBuilder().withFareProducts(null).build()
+    assertThrows(
+      expectedType,
+      () -> new FlexibleTransitLegBuilder().withFareProducts(null).build()
     );
   }
 
   @Test
   void copyOf() {
-    var leg = new FlexibleTransitLegBuilder()
-      .withStartTime(START_TIME)
+    var leg = new FlexibleTransitLegBuilder().withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
       .withFromStop(A.stop)
@@ -97,8 +97,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
 
   @Test
   void timeShift() {
-    var leg = new FlexibleTransitLegBuilder()
-      .withStartTime(START_TIME)
+    var leg = new FlexibleTransitLegBuilder().withStartTime(START_TIME)
       .withEndTime(END_TIME)
       .withFlexTripEdge(EDGE)
       .withFromStop(A.stop)

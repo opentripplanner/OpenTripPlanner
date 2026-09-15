@@ -171,10 +171,9 @@ class CrosswalkNamerTest {
     private final List<EdgePair> pairs = new ArrayList<>();
 
     EdgePair addWay(OsmWay way, WgsCoordinate... coordinates) {
-      var edge = edgeBuilder(coordinates)
-        .withPermission(
-          way.isFootway() ? StreetTraversalPermission.PEDESTRIAN : StreetTraversalPermission.CAR
-        )
+      var edge = edgeBuilder(coordinates).withPermission(
+        way.isFootway() ? StreetTraversalPermission.PEDESTRIAN : StreetTraversalPermission.CAR
+      )
         .withName(Objects.requireNonNullElse(way.getAssumedName(), I18NString.of("path")))
         .withBogusName(!way.isNamed())
         .buildAndConnect();
@@ -185,8 +184,8 @@ class CrosswalkNamerTest {
     }
 
     void recordEdges(EdgeNamer namer) {
-      pairs.forEach(p ->
-        namer.recordEdges(
+      pairs.forEach(
+        p -> namer.recordEdges(
           p.way,
           new StreetEdgePair(p.edge, null),
           new OsmDatabase(DataImportIssueStore.NOOP)

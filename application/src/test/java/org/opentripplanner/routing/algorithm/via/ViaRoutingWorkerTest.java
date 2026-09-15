@@ -31,8 +31,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * minSlack is 10 min and maxSlack is 45 minutes.
  * <p>
- * Search from C to B at 13:15 (first arrival + minSlack) gives 3 results s2i1, s2i2 and s2i3. s2i1
- * departures at 13:15, s2i2 departures at 13:45 and s2i3 departures at 14:30
+ * Search from C to B at 13:15 (first arrival + minSlack) gives 3 results s2i1, s2i2 and s2i3.
+ * s2i1 departures at 13:15, s2i2 departures at 13:45 and s2i3 departures at 14:30
  * <p>
  * s1i1 should be combined with s2i1 and s2i2. Not s2i3 because maxSlack gives that it shold not
  * match departures after 13:45 (first arrival + maxSlack).
@@ -159,25 +159,20 @@ public class ViaRoutingWorkerTest {
    */
   void createItinieraries() {
     // Arrive 13
-    s1i1 = newItinerary(fromA)
-      .bus(1, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(13, 0), viaC)
+    s1i1 = newItinerary(fromA).bus(1, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(13, 0), viaC)
       .build();
     // Arrive 14
-    s1i2 = newItinerary(fromA)
-      .bus(2, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(14, 0), viaC)
+    s1i2 = newItinerary(fromA).bus(2, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(14, 0), viaC)
       .build();
 
     // departure 13:15
-    s2i1 = newItinerary(viaC)
-      .bus(3, TimeUtils.hm2time(13, 15), TimeUtils.hm2time(15, 0), toB)
+    s2i1 = newItinerary(viaC).bus(3, TimeUtils.hm2time(13, 15), TimeUtils.hm2time(15, 0), toB)
       .build();
     // departure 13:45
-    s2i2 = newItinerary(viaC)
-      .bus(3, TimeUtils.hm2time(13, 45), TimeUtils.hm2time(15, 0), toB)
+    s2i2 = newItinerary(viaC).bus(3, TimeUtils.hm2time(13, 45), TimeUtils.hm2time(15, 0), toB)
       .build();
     // departure 14:30
-    s2i3 = newItinerary(viaC)
-      .bus(3, TimeUtils.hm2time(14, 30), TimeUtils.hm2time(15, 0), toB)
+    s2i3 = newItinerary(viaC).bus(3, TimeUtils.hm2time(14, 30), TimeUtils.hm2time(15, 0), toB)
       .build();
 
     firstSearch = List.of(s1i1, s1i2);

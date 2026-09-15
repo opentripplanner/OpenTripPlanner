@@ -26,21 +26,24 @@ class GeneralizedCostRelaxFunctionTest {
     assertEquals(10585, GeneralizedCostRelaxFunction.of(1.06, 0).relax(10_000));
     assertEquals(10703, GeneralizedCostRelaxFunction.of(1.07, 0).relax(10_000));
 
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      GeneralizedCostRelaxFunction.of(0.99)
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> GeneralizedCostRelaxFunction.of(0.99)
     );
     assertEquals("Cost ratio is not in range: 0.99 not in [1.0, 4.0)", ex.getMessage());
 
     ex = assertThrows(IllegalArgumentException.class, () -> GeneralizedCostRelaxFunction.of(4.0));
     assertEquals("Cost ratio is not in range: 4.00 not in [1.0, 4.0)", ex.getMessage());
 
-    ex = assertThrows(IllegalArgumentException.class, () ->
-      GeneralizedCostRelaxFunction.of(1.0, SLACK_RANGE.startInclusive() - 1)
+    ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> GeneralizedCostRelaxFunction.of(1.0, SLACK_RANGE.startInclusive() - 1)
     );
     assertEquals("Cost slack is not in range: -1 not in [0s, 4h]", ex.getMessage());
 
-    ex = assertThrows(IllegalArgumentException.class, () ->
-      GeneralizedCostRelaxFunction.of(1.0, SLACK_RANGE.endInclusive() + 1)
+    ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> GeneralizedCostRelaxFunction.of(1.0, SLACK_RANGE.endInclusive() + 1)
     );
     assertEquals("Cost slack is not in range: 1440001 not in [0s, 4h]", ex.getMessage());
   }

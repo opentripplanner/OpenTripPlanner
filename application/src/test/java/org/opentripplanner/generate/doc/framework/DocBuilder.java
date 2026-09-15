@@ -17,8 +17,8 @@ public class DocBuilder {
   private final StringBuilder buffer = new StringBuilder();
 
   /**
-   * Add new line to output document - note this do not break the line in the generated HTML
-   * end result.
+   * Add new line to output document - note this do not break the line in the generated HTML end
+   * result.
    */
   public DocBuilder newLine() {
     buffer.append(NEW_LINE);
@@ -116,8 +116,7 @@ public class DocBuilder {
    */
   DocBuilder addEnums(List<? extends Enum<?>> enums) {
     buffer.append(
-      enums
-        .stream()
+      enums.stream()
         .map(EnumMapper::toString)
         .map(MarkdownFormatter::code)
         .collect(Collectors.joining(" | "))

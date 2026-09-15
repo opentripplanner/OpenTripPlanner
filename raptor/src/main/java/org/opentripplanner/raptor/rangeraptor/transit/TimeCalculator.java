@@ -33,9 +33,8 @@ public interface TimeCalculator {
   /**
    * Forward search: Return {@code true} if the first argument ({@code subject}) is BEFORE the
    * second argument ({@code candidate}). If both are equal {@code false} is returned.
-   * <p/>
-   * Reverse search: Return {@code true} if the first argument ({@code subject}) is AFTER the second
-   * argument ({@code candidate}). If both are equal {@code false} is returned.
+   * <p/>Reverse search: Return {@code true} if the first argument ({@code subject}) is AFTER the
+   * second argument ({@code candidate}). If both are equal {@code false} is returned.
    *
    * @return true if subject is better than the candidate; if not false.
    */
@@ -44,8 +43,7 @@ public interface TimeCalculator {
   /**
    * Forward search: Return {@code true} if the first argument ({@code subject}) is AFTER the second
    * argument ({@code candidate}). If both are equal {@code false} is returned.
-   * <p/>
-   * Reverse search: Return {@code true} if the first argument ({@code subject}) is BEFORE the
+   * <p/>Reverse search: Return {@code true} if the first argument ({@code subject}) is BEFORE the
    * second argument ({@code candidate}). If both are equal {@code false} is returned.
    *
    * @return true if subject is better than the candidate; if not false.
@@ -54,8 +52,7 @@ public interface TimeCalculator {
 
   /**
    * Result time values is set to this value to mark them as UNREACHED.
-   * <p/>
-   * For a normal forward search this should be {@link RaptorConstants#TIME_UNREACHED_FORWARD}
+   * <p/>For a normal forward search this should be {@link RaptorConstants#TIME_UNREACHED_FORWARD}
    * and for a reverse search this should be {@link RaptorConstants#TIME_UNREACHED_REVERSE}.
    */
   int unreachedTime();

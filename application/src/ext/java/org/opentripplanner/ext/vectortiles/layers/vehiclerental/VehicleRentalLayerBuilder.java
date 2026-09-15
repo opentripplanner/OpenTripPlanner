@@ -37,15 +37,12 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
     if (service == null) {
       return List.of();
     }
-    return getVehicleRentalPlaces(service)
-      .stream()
-      .map(rental -> {
-        Coordinate coordinate = new Coordinate(rental.longitude(), rental.latitude());
-        Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        point.setUserData(rental);
-        return (Geometry) point;
-      })
-      .toList();
+    return getVehicleRentalPlaces(service).stream().map(rental -> {
+      Coordinate coordinate = new Coordinate(rental.longitude(), rental.latitude());
+      Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
+      point.setUserData(rental);
+      return (Geometry) point;
+    }).toList();
   }
 
   protected abstract Collection<T> getVehicleRentalPlaces(VehicleRentalService service);

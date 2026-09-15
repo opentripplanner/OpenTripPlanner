@@ -55,14 +55,10 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
-      .withJourney(jb -> {
-        jb.withModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-        jb.withTransit(b -> b.disable());
-      })
-      .withFrom(p1)
-      .withTo(p2)
-      .buildRequest();
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.withModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withTransit(b -> b.disable());
+    }).withFrom(p1).withTo(p2).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -105,20 +101,16 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Access BIKE_RENTAL")
   @Test
   public void accessBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0)
-      .withJourney(jb ->
-        jb.withModes(
-          RequestModes.of()
-            .withAccessMode(StreetMode.BIKE_RENTAL)
-            .withEgressMode(StreetMode.WALK)
-            .withDirectMode(StreetMode.NOT_SET)
-            .withTransferMode(StreetMode.WALK)
-            .build()
-        )
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0).withJourney(
+      jb -> jb.withModes(
+        RequestModes.of()
+          .withAccessMode(StreetMode.BIKE_RENTAL)
+          .withEgressMode(StreetMode.WALK)
+          .withDirectMode(StreetMode.NOT_SET)
+          .withTransferMode(StreetMode.WALK)
+          .build()
       )
-      .withFrom(p1)
-      .withTo(p3)
-      .buildRequest();
+    ).withFrom(p1).withTo(p3).buildRequest();
 
     try {
       expectRequestResponseToMatchSnapshot(request);
@@ -130,28 +122,26 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Egress BIKE_RENTAL")
   @Test
   public void egressBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
-      .withJourney(jb ->
-        jb.withModes(
-          RequestModes.of()
-            .withAccessMode(StreetMode.WALK)
-            .withEgressMode(StreetMode.BIKE_RENTAL)
-            .withTransferMode(StreetMode.WALK)
-            .withDirectMode(StreetMode.NOT_SET)
-            .build()
-        )
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(
+      jb -> jb.withModes(
+        RequestModes.of()
+          .withAccessMode(StreetMode.WALK)
+          .withEgressMode(StreetMode.BIKE_RENTAL)
+          .withTransferMode(StreetMode.WALK)
+          .withDirectMode(StreetMode.NOT_SET)
+          .build()
       )
-      .withFrom(p3)
-      .withTo(p1)
-      .buildRequest();
+    ).withFrom(p3).withTo(p1).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
 
   private void allowArrivalWithRentalVehicle(RouteRequestBuilder builder) {
-    builder.withPreferences(preferences ->
-      preferences.withBike(bike ->
-        bike.withRental(rental -> rental.withAllowArrivingInRentedVehicleAtDestination(true))
+    builder.withPreferences(
+      preferences -> preferences.withBike(
+        bike -> bike.withRental(
+          rental -> rental.withAllowArrivingInRentedVehicleAtDestination(true)
+        )
       )
     );
   }

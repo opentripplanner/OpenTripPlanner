@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This filter removes itineraries, which use the same trips for most of their legs, but where some
- * itineraries have a much higher cost for the other legs. This is similar to {@link
- * org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
+ * itineraries have a much higher cost for the other legs. This is similar to
+ * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
  * but is used together with {@link GroupByFilter} to filter within the groups.
  *
  * <h3>Example</h3>
@@ -27,10 +27,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * </pre>
  *
  * <ul>
- * <li>Min cost common legs: a=$42</li>
- * <li>Min cost all itineraries: b=$79</li>
- * <li>maxLimit = a + (b - a) * f = 42 + 37 * 1.05 = 81</li>
- * <li><b>Result:</b> Keep itinerary A, and drop B ($83 > limit $81)</li>
+ *   <li>Min cost common legs: a=$42</li>
+ *   <li>Min cost all itineraries: b=$79</li>
+ *   <li>maxLimit = a + (b - a) * f = 42 + 37 * 1.05 = 81</li>
+ *   <li><b>Result:</b> Keep itinerary A, and drop B ($83 > limit $81)</li>
  * </ul>
  */
 public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItineraryFlagger {
@@ -59,34 +59,26 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     }
 
     // Get all transit trips for an itinerary
-    Function<Itinerary, Set<Trip>> getTripsForItinerary = itinerary ->
-      itinerary
-        .legs()
-        .stream()
-        .filter(Leg::isTransitLeg)
-        .map(Leg::trip)
-        .collect(Collectors.toSet());
+    Function<Itinerary, Set<Trip>> getTripsForItinerary = itinerary -> itinerary.legs()
+      .stream()
+      .filter(Leg::isTransitLeg)
+      .map(Leg::trip)
+      .collect(Collectors.toSet());
 
     // Find the trips that are shared between all itineraries
-    Set<Trip> commonTrips = itineraries
-      .stream()
-      .map(getTripsForItinerary)
-      .reduce((a, b) -> {
-        a.retainAll(b);
-        return a;
-      })
-      .get();
+    Set<Trip> commonTrips = itineraries.stream().map(getTripsForItinerary).reduce((a, b) -> {
+      a.retainAll(b);
+      return a;
+    }).get();
 
     if (commonTrips.isEmpty()) {
       return List.of();
     }
 
     // Find the lowest cost of the common legs
-    int commonLegsCost = itineraries
-      .stream()
-      .mapToInt(itinerary ->
-        itinerary
-          .legs()
+    int commonLegsCost = itineraries.stream()
+      .mapToInt(
+        itinerary -> itinerary.legs()
           .stream()
           .filter(Leg::isTransitLeg)
           .filter(leg -> commonTrips.contains(leg.trip()))
@@ -97,8 +89,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
       .orElseThrow();
 
     // Find the lowest cost for any itinerary
-    int minimumItineraryCost = itineraries
-      .stream()
+    int minimumItineraryCost = itineraries.stream()
       .mapToInt(it -> it.generalizedCostIncludingPenalty().toSeconds())
       .min()
       .orElseThrow();
@@ -111,8 +102,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     // Calculate the maximum limit allowed for itinerary cost
     Cost maxLimit = Cost.costOfSeconds(otherLegsCost * maxCostOtherLegsFactor + commonLegsCost);
 
-    return itineraries
-      .stream()
+    return itineraries.stream()
       .filter(it -> it.generalizedCostIncludingPenalty().greaterThan(maxLimit))
       .toList();
   }

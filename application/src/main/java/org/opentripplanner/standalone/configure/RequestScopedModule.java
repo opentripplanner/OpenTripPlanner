@@ -52,21 +52,21 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Provides the bindings that live inside {@link RequestScopedFactory}. A single {@link
- * TransactionScope} is captured once per request, and every other binding here is derived from
- * that same scope, so they all see a consistent, pinned view of real-time data.
+ * Provides the bindings that live inside {@link RequestScopedFactory}. A single
+ * {@link TransactionScope} is captured once per request, and every other binding here is derived
+ * from that same scope, so they all see a consistent, pinned view of real-time data.
  * <p>
  * Every {@code @Provides} method below <b>must</b> also be annotated {@link HttpRequestScoped}
- * (enforced by {@link RequestScopedModuleTest}). Without it, Dagger treats the binding as
- * unscoped and re-invokes the provider — constructing a brand-new instance — every single time
- * something depends on that type, even within the same {@link RequestScopedFactory} instance.
- * That matters because {@link org.opentripplanner.standalone.server.DaggerToJerseyBridge}
- * registers a separate HK2 accessor lambda for every binding here, and different resources
- * handling the same HTTP request pull from those lambdas lazily, at different times. An unscoped
- * binding would let two resources in one request each trigger a fresh call and get two different
- * instances — e.g. two {@link TransitService}s each wrapping a different {@code
- * TimetableRepositorySnapshot} if real-time data changed in between. {@code @HttpRequestScoped}
- * is what turns "derived from the same scope" into an actual guarantee: one instance per request,
+ * (enforced by {@link RequestScopedModuleTest}). Without it, Dagger treats the binding as unscoped
+ * and re-invokes the provider — constructing a brand-new instance — every single time something
+ * depends on that type, even within the same {@link RequestScopedFactory} instance. That matters
+ * because {@link org.opentripplanner.standalone.server.DaggerToJerseyBridge} registers a separate
+ * HK2 accessor lambda for every binding here, and different resources handling the same HTTP
+ * request pull from those lambdas lazily, at different times. An unscoped binding would let two
+ * resources in one request each trigger a fresh call and get two different instances — e.g. two
+ * {@link TransitService}s each wrapping a different {@code
+ * TimetableRepositorySnapshot} if real-time data changed in between. {@code @HttpRequestScoped} is
+ * what turns "derived from the same scope" into an actual guarantee: one instance per request,
  * shared by every consumer, instead of silently rebuilt on each lookup.
  */
 @Module
@@ -195,10 +195,7 @@ public class RequestScopedModule {
   @Provides
   @HttpRequestScoped
   static RealtimeVehicleService realtimeVehicleService(
-    RepositoryHandle<
-      RealtimeVehicleRepositorySnapshot,
-      RealtimeVehicleRepository
-    > realtimeVehicleRepositoryHandle,
+    RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> realtimeVehicleRepositoryHandle,
     TransactionScope transactionScope,
     TransitService transitService
   ) {
@@ -209,9 +206,9 @@ public class RequestScopedModule {
   }
 
   /**
-   * Request context for the Transmodel API's GraphQL data fetchers. Every accessor delegates to
-   * the enclosing {@link RequestScopedFactory}, so a dependency is only resolved if a data
-   * fetcher actually asks for it.
+   * Request context for the Transmodel API's GraphQL data fetchers. Every accessor delegates to the
+   * enclosing {@link RequestScopedFactory}, so a dependency is only resolved if a data fetcher
+   * actually asks for it.
    */
   @Provides
   @HttpRequestScoped

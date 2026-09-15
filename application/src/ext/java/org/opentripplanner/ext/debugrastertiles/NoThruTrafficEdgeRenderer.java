@@ -31,8 +31,7 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
     // no car & bike thru = purple
     new Color(200, 0, 200),
     // no for all = red
-    new Color(200, 0, 0),
-  };
+    new Color(200, 0, 0), };
 
   public NoThruTrafficEdgeRenderer() {}
 

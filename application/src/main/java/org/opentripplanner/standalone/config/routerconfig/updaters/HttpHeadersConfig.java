@@ -10,8 +10,7 @@ public class HttpHeadersConfig {
 
   public static HttpHeaders headers(NodeAdapter c, OtpVersion version) {
     return HttpHeaders.of(
-      c
-        .of(PARAM_NAME)
+      c.of(PARAM_NAME)
         .since(version)
         .summary("HTTP headers to add to the request. Any header key, value can be inserted.")
         .asStringMap()

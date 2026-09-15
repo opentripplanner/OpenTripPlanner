@@ -13,8 +13,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 /**
  * Selects all rental places.
  * <p>
- * Note that the envelope query is relatively inefficient as it doesn't use an index to speed
- * up the queries. I'm unsure if it matters though.
+ * Note that the envelope query is relatively inefficient as it doesn't use an index to speed up
+ * the queries. I'm unsure if it matters though.
  */
 public class RentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
 
@@ -27,16 +27,11 @@ public class RentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
 
   @Override
   protected List<Geometry> findGeometries(Envelope env) {
-    return service
-      .getVehicleRentalPlacesForEnvelope(env)
-      .stream()
-      .map(place -> {
-        Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(
-          new Coordinate(place.longitude(), place.latitude())
-        );
-        geometry.setUserData(place);
-        return geometry;
-      })
-      .toList();
+    return service.getVehicleRentalPlacesForEnvelope(env).stream().map(place -> {
+      Geometry geometry = GeometryUtils.getGeometryFactory()
+        .createPoint(new Coordinate(place.longitude(), place.latitude()));
+      geometry.setUserData(place);
+      return geometry;
+    }).toList();
   }
 }

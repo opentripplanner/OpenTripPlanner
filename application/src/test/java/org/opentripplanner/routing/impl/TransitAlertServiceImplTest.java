@@ -63,9 +63,8 @@ class TransitAlertServiceImplTest {
     var iut = serviceWithStopAlerts();
 
     // unlike getStopAlerts, both the stop's own alert and the parent station alert are returned
-    assertThat(
-      iut.getStopLocationsAlerts(List.of(id(RAIL_P1_ID), id(RAIL_STATION_ID)))
-    ).containsExactly(RAIL_STOP_ALERT, RAIL_STATION_ALERT);
+    assertThat(iut.getStopLocationsAlerts(List.of(id(RAIL_P1_ID), id(RAIL_STATION_ID))))
+      .containsExactly(RAIL_STOP_ALERT, RAIL_STATION_ALERT);
   }
 
   @Test
@@ -82,9 +81,8 @@ class TransitAlertServiceImplTest {
     var iut = serviceWithStopAlerts();
 
     // the stop itself has no alert, so only the parent station alert is returned
-    assertThat(
-      iut.getStopLocationsAlerts(List.of(id(RAIL_PA_ID), id(RAIL_STATION_ID)))
-    ).containsExactly(RAIL_STATION_ALERT);
+    assertThat(iut.getStopLocationsAlerts(List.of(id(RAIL_PA_ID), id(RAIL_STATION_ID))))
+      .containsExactly(RAIL_STATION_ALERT);
   }
 
   @Test
@@ -97,9 +95,8 @@ class TransitAlertServiceImplTest {
     iut.setAlerts(List.of(alert));
 
     // the same alert matches both ids, but it is returned only once
-    assertThat(
-      iut.getStopLocationsAlerts(List.of(id(RAIL_P1_ID), id(RAIL_STATION_ID)))
-    ).containsExactly(alert);
+    assertThat(iut.getStopLocationsAlerts(List.of(id(RAIL_P1_ID), id(RAIL_STATION_ID))))
+      .containsExactly(alert);
   }
 
   @Test

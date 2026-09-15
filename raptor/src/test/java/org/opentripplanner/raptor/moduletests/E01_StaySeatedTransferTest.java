@@ -24,8 +24,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
  * <p>
  * Raptor should return a path if it exists when a transfer is only possible because it is
  * guaranteed/stay-seated. A stay-seated transfer should be possible even if there is zero time to
- * do the transfer. In these cases the transfer-slack should be ignored and the connection should
- * be possible.
+ * do the transfer. In these cases the transfer-slack should be ignored and the connection should be
+ * possible.
  */
 public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
@@ -35,8 +35,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         A     B
@@ -56,8 +55,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
     data.withTransferCost(100);
 
     // NOTE! No search-window is set.
-    requestBuilder
-      .searchParams()
+    requestBuilder.searchParams()
       .constrainedTransfers(true)
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
@@ -70,8 +68,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
   static List<RaptorModuleTestCase> testCases() {
     // Note! The number of transfers is zero with stay-seated/interlining
-    var path =
-      "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
+    var path = "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
       "[0:01:10 0:10:40 9m30s Tₙ0 C₁1_230]";
     return RaptorModuleTestCase.of()
       .addMinDuration("9m30s", TX_1, T00_00, T00_30)

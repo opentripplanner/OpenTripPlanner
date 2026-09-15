@@ -142,8 +142,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding
-   * the given trip pattern. THIS DOES NOT INCLUDE THE transfer-slack, and should only be used to
+   * The board-slack (duration time in seconds) to add to the stop arrival time, before boarding the
+   * given trip pattern. THIS DOES NOT INCLUDE THE transfer-slack, and should only be used to
    * time-shift the access-path.
    * <p>
    * Unit: seconds.
@@ -337,8 +337,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
     if (searchParams.timetable()) {
       return USE_TIMETABLE;
     }
-    boolean preferLatestDeparture =
-      searchParams.preferLateArrival() != searchDirection.isInReverse();
+    boolean preferLatestDeparture = searchParams.preferLateArrival() !=
+      searchDirection.isInReverse();
 
     return preferLatestDeparture ? USE_DEPARTURE_TIME : USE_ARRIVAL_TIME;
   }

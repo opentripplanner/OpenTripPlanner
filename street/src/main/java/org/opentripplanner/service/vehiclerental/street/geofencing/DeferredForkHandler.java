@@ -10,14 +10,15 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 
 /**
- * Creates the deferred RENTING_FLOATING fork one edge after a zone boundary, so the renting
- * state's backEdge is safely outside the zone in the forward itinerary.
+ * Creates the deferred RENTING_FLOATING fork one edge after a zone boundary, so the renting state's
+ * backEdge is safely outside the zone in the forward itinerary.
  *
- * <p>Forking at the boundary itself would attach the drop event to an edge pointing into the
- * zone (the renting state's backEdge would be the boundary edge), so the rendered itinerary
- * would show the drop on the wrong side. Instead, the strategy returns only the walking branch
- * at the boundary; this handler creates the renting branches on the next edge, where the
- * backEdge is safely outside.
+ * <p>
+ * Forking at the boundary itself would attach the drop event to an edge pointing into the zone
+ * (the renting state's backEdge would be the boundary edge), so the rendered itinerary would show
+ * the drop on the wrong side. Instead, the strategy returns only the walking branch at the
+ * boundary; this handler creates the renting branches on the next edge, where the backEdge is
+ * safely outside.
  */
 class DeferredForkHandler {
 
@@ -34,8 +35,8 @@ class DeferredForkHandler {
 
   /**
    * Trigger when a HAVE_RENTED walker just crossed a zone boundary the previous edge deferred:
-   * restricted-zone loss (walker exited in arriveBy) or BA gain (walker entered BA in arriveBy
-   * = exited in forward time).
+   * restricted-zone loss (walker exited in arriveBy) or BA gain (walker entered BA in arriveBy =
+   * exited in forward time).
    */
   private static boolean isDeferredRentingForkTrigger(State s0) {
     if (s0.getVehicleRentalState() != VehicleRentalState.HAVE_RENTED) {
@@ -49,7 +50,7 @@ class DeferredForkHandler {
     for (var zone : backState.getCurrentGeofencingZones()) {
       if (
         (zone.hasRestriction() || zone.isBusinessArea()) &&
-        !s0.getCurrentGeofencingZones().contains(zone)
+          !s0.getCurrentGeofencingZones().contains(zone)
       ) {
         return true;
       }
@@ -146,7 +147,7 @@ class DeferredForkHandler {
     for (var zone : s0.getBackState().getCurrentGeofencingZones()) {
       if (
         (zone.hasRestriction() || zone.isBusinessArea()) &&
-        !s0.getCurrentGeofencingZones().contains(zone)
+          !s0.getCurrentGeofencingZones().contains(zone)
       ) {
         forkNetworks.add(zone.id().getFeedId());
       }

@@ -74,8 +74,9 @@ class FilterMapperTest {
   @MethodSource("invalidArgumentCases")
   void invalidArgument(Map<String, Object> args) {
     var input = new GraphQLTransitFilterInput(args);
-    assertThrows(IllegalArgumentException.class, () ->
-      FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(input))
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(input))
     );
   }
 
@@ -83,8 +84,9 @@ class FilterMapperTest {
   @MethodSource("invalidInputCases")
   void invalidInput(Map<String, Object> args) {
     var input = new GraphQLTransitFilterInput(args);
-    assertThrows(InvalidInputException.class, () ->
-      FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(input))
+    assertThrows(
+      InvalidInputException.class,
+      () -> FilterMapper.mapFilters(NarrowedTransitMode.all(), List.of(input))
     );
   }
 }

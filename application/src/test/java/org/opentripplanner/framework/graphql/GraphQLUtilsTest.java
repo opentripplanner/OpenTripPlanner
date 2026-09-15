@@ -103,10 +103,7 @@ class GraphQLUtilsTest {
 
     var envWithWildcardLocale = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(
       EXECUTION_CONTEXT
-    )
-      .locale(wildcardLocale)
-      .localContext(Map.of("locale", Locale.FRENCH))
-      .build();
+    ).locale(wildcardLocale).localContext(Map.of("locale", Locale.FRENCH)).build();
 
     locale = GraphQLUtils.getLocale(envWithWildcardLocale);
 

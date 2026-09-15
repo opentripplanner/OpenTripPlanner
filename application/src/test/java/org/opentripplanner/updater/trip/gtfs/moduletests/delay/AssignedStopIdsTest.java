@@ -58,8 +58,7 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
     assertEquals(List.of("F:Pattern1[S]"), env.raptorData().summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
-    var tripUpdate1 = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate1 = rt.tripUpdateScheduled(TRIP_1_ID)
       .addAssignedStopTime(0, "09:50:00", STOP_D_ID)
       .addStopTime(1, "10:01:00")
       .addStopTime(2, "10:02:00")
@@ -73,8 +72,7 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
     assertTrue(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Route1::001:RT[U]"), env.raptorData().summarizePatterns());
 
-    var tripUpdate2 = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate2 = rt.tripUpdateScheduled(TRIP_1_ID)
       .addAssignedStopTime(0, "09:55:00", STOP_E_ID)
       .addStopTime(1, "10:01:00")
       .addStopTime(2, "10:02:00")
@@ -88,8 +86,7 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
     assertTrue(env.tripData(TRIP_1_ID).tripPattern().isStopPatternModifiedInRealTime());
     assertEquals(List.of("F:Route1::002:RT[U]"), env.raptorData().summarizePatterns());
 
-    var tripUpdate3 = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate3 = rt.tripUpdateScheduled(TRIP_1_ID)
       .addAssignedStopTime(0, "10:01:00", STOP_A_ID)
       .addStopTime(1, "10:02:00")
       .addStopTime(2, "10:03:00")
@@ -114,13 +111,11 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
     assertEquals(List.of("F:Pattern1[S,S]"), env.raptorData().summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
-    var tripUpdate1 = rt
-      .tripUpdateScheduled(TRIP_1_ID)
+    var tripUpdate1 = rt.tripUpdateScheduled(TRIP_1_ID)
       .addAssignedStopTime(0, "10:01", STOP_E_ID)
       .build();
 
-    var tripUpdate2 = rt
-      .tripUpdateScheduled(TRIP_2_ID)
+    var tripUpdate2 = rt.tripUpdateScheduled(TRIP_2_ID)
       .addAssignedStopTime(0, "11:01", STOP_E_ID)
       .build();
 
@@ -202,21 +197,17 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
     assertEquals(List.of("F:Pattern1[S,S]"), env.raptorData(SERVICE_DATE_PLUS).summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
-    var tripUpdate11 = rt
-      .tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE)
+    var tripUpdate11 = rt.tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE)
       .addAssignedStopTime(0, "10:01", STOP_E_ID)
       .build();
-    var tripUpdate12 = rt
-      .tripUpdateScheduled(TRIP_2_ID, SERVICE_DATE)
+    var tripUpdate12 = rt.tripUpdateScheduled(TRIP_2_ID, SERVICE_DATE)
       .addAssignedStopTime(0, "11:01", STOP_E_ID)
       .build();
 
-    var tripUpdate21 = rt
-      .tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE_PLUS)
+    var tripUpdate21 = rt.tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE_PLUS)
       .addAssignedStopTime(0, "10:01", STOP_E_ID)
       .build();
-    var tripUpdate22 = rt
-      .tripUpdateScheduled(TRIP_2_ID, SERVICE_DATE_PLUS)
+    var tripUpdate22 = rt.tripUpdateScheduled(TRIP_2_ID, SERVICE_DATE_PLUS)
       .addAssignedStopTime(0, "11:01", STOP_E_ID)
       .build();
 
@@ -417,13 +408,11 @@ class AssignedStopIdsTest implements RealtimeTestConstants {
     assertEquals(List.of("F:Pattern1[S]"), env.raptorData(SERVICE_DATE_PLUS).summarizePatterns());
 
     var rt = GtfsRtTestHelper.of(env);
-    var tripUpdate1 = rt
-      .tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE)
+    var tripUpdate1 = rt.tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE)
       .addDelayedStopTime(0, 60)
       .build();
 
-    var tripUpdate2 = rt
-      .tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE_PLUS)
+    var tripUpdate2 = rt.tripUpdateScheduled(TRIP_1_ID, SERVICE_DATE_PLUS)
       .addDelayedStopTime(0, 60)
       .build();
 

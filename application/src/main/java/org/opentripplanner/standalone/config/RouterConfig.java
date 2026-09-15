@@ -70,8 +70,7 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion = root
-      .of("configVersion")
+    this.configVersion = root.of("configVersion")
       .since(V2_1)
       .summary("Deployment version of the *" + ROUTER_CONFIG_FILENAME + "*.")
       .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
@@ -82,8 +81,7 @@ public class RouterConfig implements Serializable {
     this.gtfsApi = new GtfsApiConfig("gtfsApi", root);
     var request = mapDefaultRouteRequest("routingDefaults", root);
     this.transitConfig = new TransitRoutingConfig("transit", root, request);
-    this.routingRequestDefaults = request
-      .copyOf()
+    this.routingRequestDefaults = request.copyOf()
       .withMaxSearchWindow(transitConfig.maxSearchWindow())
       .buildDefault();
     this.updatersParameters = new UpdatersConfig(root);
@@ -105,11 +103,10 @@ public class RouterConfig implements Serializable {
   /**
    * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
    * server and verify that it uses the correct version of the config. The version must be injected
-   * into the config in the operation deployment pipeline. How this is done is up to the
-   * deployment.
+   * into the config in the operation deployment pipeline. How this is done is up to the deployment.
    * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
-   * or format check on the version and it can be any string.
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not
+   * syntax or format check on the version and it can be any string.
    * <p>
    * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
    * <p>

@@ -86,10 +86,7 @@ public final class GtfsBundle {
       csvInputSource = new CsvInputSource() {
         @Override
         public boolean hasResource(String s) {
-          return dataSource
-            .content()
-            .stream()
-            .anyMatch(it -> it.name().equals(s));
+          return dataSource.content().stream().anyMatch(it -> it.name().equals(s));
         }
 
         @Override

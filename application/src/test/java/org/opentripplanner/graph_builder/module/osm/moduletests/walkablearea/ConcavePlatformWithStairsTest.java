@@ -12,24 +12,26 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 
 /**
- * Tests that a re-entrant (concave) corner of an L-shaped platform enters the visibility vertex
- * set via {@code isNodeConvex}, enabling the shortest path between two stair entries.
+ * Tests that a re-entrant (concave) corner of an L-shaped platform enters the visibility vertex set
+ * via {@code isNodeConvex}, enabling the shortest path between two stair entries.
  *
- * <p>The platform is an L-shape made of two rectangles:
+ * <p>
+ * The platform is an L-shape made of two rectangles:
  * <pre>
  *   A --- B
  *   |     C --- D
  *   E ---------- F
  * </pre>
  * Corner C is the re-entrant corner (interior angle &gt; 180° in the polygon sense).
- * {@code Ring.isNodeConvex(C)} returns {@code true} for a CW ring because the cross-product at
- * a re-entrant corner is positive. This adds C to {@code visibilityVertices}.
+ * {@code Ring.isNodeConvex(C)} returns {@code true} for a CW ring because the cross-product at a
+ * re-entrant corner is positive. This adds C to {@code visibilityVertices}.
  *
- * <p>Stairs connect from outside to the top-left (A) and the bottom-right (F). The direct
- * line-of-sight from A to F grazes the re-entrant corner C exactly (the segment A–F passes
- * through C's coordinate), so it stays inside the L-shape and is a valid visibility edge. Being
- * shorter than the ring detour A→E→F, this direct diagonal survives the SPT pruning between the
- * two stair entries; no separate A–C or C–F visibility edges are needed.
+ * <p>
+ * Stairs connect from outside to the top-left (A) and the bottom-right (F). The direct
+ * line-of-sight from A to F grazes the re-entrant corner C exactly (the segment A–F passes through
+ * C's coordinate), so it stays inside the L-shape and is a valid visibility edge. Being shorter
+ * than the ring detour A→E→F, this direct diagonal survives the SPT pruning between the two stair
+ * entries; no separate A–C or C–F visibility edges are needed.
  */
 class ConcavePlatformWithStairsTest {
 
@@ -66,8 +68,9 @@ class ConcavePlatformWithStairsTest {
 
     var summarizer = new GraphSummarizer(graph);
 
-    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl())
-      .that(summarizer.summarizeEdges())
+    assertWithMessage("Unexpected edges. Check graph at %s", summarizer.geoJsonUrl()).that(
+      summarizer.summarizeEdges()
+    )
       .containsExactly(
         // stairs into A (wheelchair-inaccessible steps)
         "(0.004,0) → (0.005,0) PEDESTRIAN ♿❌",

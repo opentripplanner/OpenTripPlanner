@@ -47,16 +47,14 @@ public class FlexIndex {
         }
       }
 
-      transitRepository
-        .getTripCalendar()
+      transitRepository.getTripCalendar()
         .listServiceDates(flexTrip.getTrip().getServiceId())
         .forEach(serviceDate -> {
           LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
           FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);
 
           serviceDate.datesUntil(maxDate.plusDays(1)).forEach(runningDate -> {
-            flexTripsRunningOnDate
-              .computeIfAbsent(runningDate, d -> new ArrayList<>())
+            flexTripsRunningOnDate.computeIfAbsent(runningDate, d -> new ArrayList<>())
               .add(flexTripForDate);
           });
         });
@@ -86,9 +84,9 @@ public class FlexIndex {
   }
 
   /**
-   * For a given stop location returns the flex routes that visit it, taking care to resolve
-   * members of group stops (which are visited "transitively", ie. not directly but by
-   * them being members of the group stop).
+   * For a given stop location returns the flex routes that visit it, taking care to resolve members
+   * of group stops (which are visited "transitively", ie. not directly but by them being members of
+   * the group stop).
    */
   public Collection<Route> findRoutes(StopLocation stop) {
     return routeByStop.get(stop);

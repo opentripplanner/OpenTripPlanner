@@ -40,8 +40,8 @@ public class TransportModeSlack {
   static {
     BOARD_SLACK_DESCRIPTION =
       "The boardSlack is the minimum extra time to board a public transport vehicle. This is " +
-      "the same as the 'minimumTransferTime', except that this also applies to to the first " +
-      "transit leg in the trip.";
+        "the same as the 'minimumTransferTime', except that this also applies to to the first " +
+        "transit leg in the trip.";
 
     ALIGHT_SLACK_DESCRIPTION =
       "The alightSlack is the minimum extra time after exiting a public transport vehicle.";
@@ -52,15 +52,13 @@ public class TransportModeSlack {
       .name("TransportModeSlack")
       .description("Used to specify board and alight slack for a given modes.")
       .field(
-        newInputObjectField()
-          .name("slack")
+        newInputObjectField().name("slack")
           .description("The slack used for all given modes.")
           .type(INT_TYPE)
           .build()
       )
       .field(
-        newInputObjectField()
-          .name("modes")
+        newInputObjectField().name("modes")
           .description("List of modes for which the given slack apply.")
           .type(MODE_LIST_TYPE)
           .build()
@@ -137,13 +135,11 @@ public class TransportModeSlack {
     if (modes == null) {
       return "{slack: " + slack + "}";
     }
-    return (
-      "{" +
+    return ("{" +
       modes.stream().map(TransportModeSlack::serializeTransportMode).collect(Collectors.toList()) +
       " : " +
       slack +
-      "}"
-    );
+      "}");
   }
 
   private static String defaultDescription(String groupName) {

@@ -81,9 +81,7 @@ class SegmentedIdentityMapTest {
   @Test
   void forEachKey() {
     var map = new SegmentedIdentityMap<String, Integer>(8);
-    String a = "a",
-      b = "b",
-      c = "c";
+    String a = "a", b = "b", c = "c";
     map.put(a, 1);
     map.put(b, 2);
     map.put(c, 3);

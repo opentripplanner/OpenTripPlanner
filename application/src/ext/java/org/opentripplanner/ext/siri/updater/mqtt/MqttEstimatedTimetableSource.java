@@ -44,8 +44,8 @@ import uk.org.siri.siri21.Siri;
 
 /**
  * This is a realtime updater for trip updates in Siri ET format via MQTT. The updater is primed
- * (ready for routing requests), when all retained messages in the connected MQTT are processed.
- * If there are no retained messages, the updater is primed immediately. Live messages (messages
+ * (ready for routing requests), when all retained messages in the connected MQTT are processed. If
+ * there are no retained messages, the updater is primed immediately. Live messages (messages
  * without a retained flag) are always processed, even if the updater is not yet primed.
  * <p>
  * If the MQTT broker is unavailable at startup, the updater waits up to
@@ -137,17 +137,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     );
 
     // when all are done, switch to live
-    allPriming
-      .thenRunAsync(() -> {
-        waitForGraphUpdates();
-        logPrimingSummary();
-        primingExecutor.shutdown();
-        primed = true;
-      })
-      .exceptionally(ex -> {
-        LOG.error("Priming failed", ex);
-        return null;
-      });
+    allPriming.thenRunAsync(() -> {
+      waitForGraphUpdates();
+      logPrimingSummary();
+      primingExecutor.shutdown();
+      primed = true;
+    }).exceptionally(ex -> {
+      LOG.error("Priming failed", ex);
+      return null;
+    });
 
     liveExecutor.submit(new LiveRunner());
   }
@@ -208,8 +206,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   /**
    * Build the HiveMQ client and initiate a non-blocking connect. The client will automatically
-   * retry the connection (with exponential backoff) if the broker is unavailable. When a
-   * connection is established, {@link #onConnect()} is called which sets up the subscription.
+   * retry the connection (with exponential backoff) if the broker is unavailable. When a connection
+   * is established, {@link #onConnect()} is called which sets up the subscription.
    */
   private Mqtt5AsyncClient buildAndConnectClient() {
     Mqtt5SimpleAuth auth;
@@ -252,8 +250,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     // Subscribe on every connect (including reconnects). With cleanStart=false the broker
     // remembers the subscription across reconnects, but re-subscribing is idempotent in MQTT5
     // and ensures the callback is always registered correctly.
-    client
-      .subscribeWith()
+    client.subscribeWith()
       .topicFilter(parameters.topic())
       .qos(Optional.ofNullable(MqttQos.fromCode(parameters.qos())).orElse(MqttQos.AT_MOST_ONCE))
       .callback(this::onMessage)
@@ -330,8 +327,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     long receivedPrimingMessageCount = primingMessageCounter.get();
     long processedPrimingMessageCount = processedPrimingMessageCounter.get();
     double receivedPrimingMessageRate = ((double) receivedPrimingMessageCount / totalMillis) * 1000;
-    double processedPrimingMessageRate =
-      ((double) processedPrimingMessageCount / totalMillis) * 1000;
+    double processedPrimingMessageRate = ((double) processedPrimingMessageCount / totalMillis) *
+      1000;
     LOG.info(
       "Siri Messages: Processed/Received {}/{} retained messages ({} /s received, {} /s processed",
       processedPrimingMessageCount,

@@ -43,11 +43,9 @@ class StopClusterMapper {
 
   /**
    * De-duplicates collections of {@link StopLocation} and {@link StopLocationsGroup} into a stream
-   * of {@link StopCluster}.
-   * Deduplication means
-   * - stop/station relationships are resolved and only the station returned
-   * - of "identical" stops which are very close to each other and have an identical name, only one
-   *   is chosen (at random)
+   * of {@link StopCluster}. Deduplication means - stop/station relationships are resolved and only
+   * the station returned - of "identical" stops which are very close to each other and have an
+   * identical name, only one is chosen (at random)
    */
   Iterable<LuceneStopCluster> generateStopClusters(
     Collection<StopLocation> stopLocations,
@@ -61,8 +59,7 @@ class StopClusterMapper {
   }
 
   private Iterable<LuceneStopCluster> buildConsolidatedStopClusters() {
-    var multiMap = stopConsolidationService
-      .replacements()
+    var multiMap = stopConsolidationService.replacements()
       .stream()
       .collect(
         ImmutableListMultimap.toImmutableListMultimap(
@@ -70,37 +67,23 @@ class StopClusterMapper {
           StopReplacement::secondary
         )
       );
-    return multiMap
-      .keySet()
-      .stream()
-      .map(primary -> {
-        var secondaryIds = multiMap.get(primary);
-        var secondaries = secondaryIds
-          .stream()
-          .map(transitService::getStopLocation)
-          .filter(Objects::nonNull)
-          .toList();
-        var codes = ListUtils.combine(
-          ListUtils.ofNullable(primary.getCode()),
-          getCodes(secondaries)
-        );
-        var names = ListUtils.combine(
-          ListUtils.ofNullable(primary.getName()),
-          getNames(secondaries)
-        );
+    return multiMap.keySet().stream().map(primary -> {
+      var secondaryIds = multiMap.get(primary);
+      var secondaries = secondaryIds.stream()
+        .map(transitService::getStopLocation)
+        .filter(Objects::nonNull)
+        .toList();
+      var codes = ListUtils.combine(ListUtils.ofNullable(primary.getCode()), getCodes(secondaries));
+      var names = ListUtils.combine(ListUtils.ofNullable(primary.getName()), getNames(secondaries));
 
-        return new LuceneStopCluster(
-          primary.getId().toString(),
-          secondaries
-            .stream()
-            .map(id -> id.getId().toString())
-            .toList(),
-          names,
-          codes,
-          toCoordinate(primary.getCoordinate())
-        );
-      })
-      .toList();
+      return new LuceneStopCluster(
+        primary.getId().toString(),
+        secondaries.stream().map(id -> id.getId().toString()).toList(),
+        names,
+        codes,
+        toCoordinate(primary.getCoordinate())
+      );
+    }).toList();
   }
 
   private static List<LuceneStopCluster> buildStationClusters(
@@ -110,8 +93,7 @@ class StopClusterMapper {
   }
 
   private List<LuceneStopCluster> buildStopClusters(Collection<StopLocation> stopLocations) {
-    List<StopLocation> stops = stopLocations
-      .stream()
+    List<StopLocation> stops = stopLocations.stream()
       // remove stop locations without a parent station
       .filter(sl -> sl.getParentStation() == null)
       .filter(sl -> !stopConsolidationService.isPartOfConsolidatedStop(sl))
@@ -120,11 +102,10 @@ class StopClusterMapper {
       .toList();
 
     // if they are very close to each other and have the same name, only one is chosen (at random)
-    return stops
-      .stream()
+    return stops.stream()
       .collect(
-        Collectors.groupingBy(sl ->
-          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate10m())
+        Collectors.groupingBy(
+          sl -> new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate10m())
         )
       )
       .values()
@@ -136,10 +117,7 @@ class StopClusterMapper {
 
   private static LuceneStopCluster map(StopLocationsGroup g) {
     var childStops = g.getChildStops();
-    var ids = childStops
-      .stream()
-      .map(s -> s.getId().toString())
-      .toList();
+    var ids = childStops.stream().map(s -> s.getId().toString()).toList();
     var childNames = getNames(childStops);
     var codes = getCodes(childStops);
 
@@ -162,23 +140,20 @@ class StopClusterMapper {
 
   private static Optional<LuceneStopCluster> map(List<StopLocation> stopLocations) {
     var primary = stopLocations.getFirst();
-    var secondaryIds = stopLocations
-      .stream()
-      .skip(1)
-      .map(sl -> sl.getId().toString())
-      .toList();
+    var secondaryIds = stopLocations.stream().skip(1).map(sl -> sl.getId().toString()).toList();
     var names = getNames(stopLocations);
     var codes = getCodes(stopLocations);
 
-    return Optional.ofNullable(primary.getName()).map(name ->
-      new LuceneStopCluster(
-        primary.getId().toString(),
-        secondaryIds,
-        names,
-        codes,
-        toCoordinate(primary.getCoordinate())
-      )
-    );
+    return Optional.ofNullable(primary.getName())
+      .map(
+        name -> new LuceneStopCluster(
+          primary.getId().toString(),
+          secondaryIds,
+          names,
+          codes,
+          toCoordinate(primary.getCoordinate())
+        )
+      );
   }
 
   private List<Agency> agenciesForStopLocation(StopLocation stop) {
@@ -186,8 +161,7 @@ class StopClusterMapper {
   }
 
   private List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
-    return group
-      .getChildStops()
+    return group.getChildStops()
       .stream()
       .flatMap(sl -> agenciesForStopLocation(sl).stream())
       .distinct()
@@ -199,8 +173,7 @@ class StopClusterMapper {
     if (loc != null) {
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
       var modes = transitService.findTransitModes(loc).stream().map(Enum::name).toList();
-      var agencies = agenciesForStopLocation(loc)
-        .stream()
+      var agencies = agenciesForStopLocation(loc).stream()
         .map(StopClusterMapper::toAgency)
         .toList();
       return new StopCluster.Location(
@@ -217,8 +190,7 @@ class StopClusterMapper {
       var group = transitService.getStopLocationsGroup(id);
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
       var modes = transitService.findTransitModes(group).stream().map(Enum::name).toList();
-      var agencies = agenciesForStopLocationsGroup(group)
-        .stream()
+      var agencies = agenciesForStopLocationsGroup(group).stream()
         .map(StopClusterMapper::toAgency)
         .toList();
       return new StopCluster.Location(

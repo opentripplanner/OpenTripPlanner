@@ -89,13 +89,11 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> implements Path
       return false;
     }
     TransferPathLeg<?> that = (TransferPathLeg<?>) o;
-    return (
-      toStop == that.toStop &&
+    return (toStop == that.toStop &&
       toTime == that.toTime &&
       fromStop == that.fromStop &&
       fromTime == that.fromTime &&
-      Objects.equals(next, that.next)
-    );
+      Objects.equals(next, that.next));
   }
 
   @Override

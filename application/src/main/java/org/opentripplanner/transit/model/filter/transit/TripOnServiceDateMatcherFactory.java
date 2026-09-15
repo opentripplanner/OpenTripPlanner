@@ -26,8 +26,8 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 /**
  * A factory for creating matchers for TripOnServiceDates.
  * <p>
- * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a request.
- * The resulting matcher can be used to filter a list of TripOnServiceDate objects.
+ * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a
+ * request. The resulting matcher can be used to filter a list of TripOnServiceDate objects.
  */
 public class TripOnServiceDateMatcherFactory {
 
@@ -52,8 +52,9 @@ public class TripOnServiceDateMatcherFactory {
 
     if (!request.filters().isEmpty()) {
       expr.matches(
-        SelectorBasedMatcherFactory.of(request.filters(), selector ->
-          buildSelectorMatcher(selector, runningTimeResolver)
+        SelectorBasedMatcherFactory.of(
+          request.filters(),
+          selector -> buildSelectorMatcher(selector, runningTimeResolver)
         )
       );
     }
@@ -93,8 +94,8 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   /**
-   * Builds a matcher from a single {@link TripOnServiceDateSelectRequest}, combining its
-   * agencies, routes, and transport modes with AND logic.
+   * Builds a matcher from a single {@link TripOnServiceDateSelectRequest}, combining its agencies,
+   * routes, and transport modes with AND logic.
    */
   private static Matcher<TripOnServiceDate> buildSelectorMatcher(
     TripOnServiceDateSelectRequest selector,
@@ -117,8 +118,9 @@ public class TripOnServiceDateMatcherFactory {
         selector.transportModes().get().stream().map(NarrowedTransitMode::of).toList()
       );
       expr.matches(
-        new GenericUnaryMatcher<>("transportMode", (TripOnServiceDate tripTime) ->
-          transportModeFilter.match(
+        new GenericUnaryMatcher<>(
+          "transportMode",
+          (TripOnServiceDate tripTime) -> transportModeFilter.match(
             tripTime.getTrip().getMode(),
             tripTime.getTrip().getNetexSubMode()
           )
@@ -160,8 +162,10 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   static Matcher<TripOnServiceDate> netexInternalPlanningCode(String code) {
-    return new EqualityMatcher<>("netexInternalPlanningCode", code, t ->
-      t.getTrip().getNetexInternalPlanningCode()
+    return new EqualityMatcher<>(
+      "netexInternalPlanningCode",
+      code,
+      t -> t.getTrip().getNetexInternalPlanningCode()
     );
   }
 
@@ -170,8 +174,9 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   static Matcher<TripOnServiceDate> serviceDateRange(LocalDateRange dateRange) {
-    return new GenericUnaryMatcher<>("serviceDateRange", date ->
-      dateRange.contains(date.getServiceDate())
+    return new GenericUnaryMatcher<>(
+      "serviceDateRange",
+      date -> dateRange.contains(date.getServiceDate())
     );
   }
 

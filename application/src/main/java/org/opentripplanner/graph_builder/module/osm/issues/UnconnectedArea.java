@@ -26,8 +26,7 @@ public record UnconnectedArea(OsmAreaGroup areaGroup) implements DataImportIssue
   }
 
   private String idList() {
-    return areaGroup.areas
-      .stream()
+    return areaGroup.areas.stream()
       .map(area -> area.parent.getId())
       .map(Object::toString)
       .collect(Collectors.joining(", "));

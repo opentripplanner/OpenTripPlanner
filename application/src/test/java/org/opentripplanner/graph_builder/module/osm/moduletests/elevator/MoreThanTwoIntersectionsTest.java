@@ -14,8 +14,8 @@ import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 public class MoreThanTwoIntersectionsTest {
 
   /**
-   * If an elevator way has three intersection nodes, it is is probably a tagging error.
-   * OTP supports it anyway. We need to make sure that the middle intersection node is not created
+   * If an elevator way has three intersection nodes, it is is probably a tagging error. OTP
+   * supports it anyway. We need to make sure that the middle intersection node is not created
    * twice, otherwise we get an error during deserialization.
    */
   @Test
@@ -36,8 +36,7 @@ public class MoreThanTwoIntersectionsTest {
 
     var elevatorHopEdges = graph.findEdges(ElevatorHopEdge.class);
     assertThat(elevatorHopEdges).hasSize(4);
-    var elevatorHopVertices = graph
-      .getVerticesOfType(ElevatorHopVertex.class)
+    var elevatorHopVertices = graph.getVerticesOfType(ElevatorHopVertex.class)
       .stream()
       .map(vertex -> vertex.getLabelString());
     assertThat(elevatorHopVertices).containsNoDuplicates();

@@ -19,20 +19,18 @@ public record ViaRoutingResponse(
    * Map each of the RoutingResponse to its itineraries
    */
   public List<List<Itinerary>> getItineraries() {
-    return routingResponses
-      .stream()
+    return routingResponses.stream()
       .map(RoutingResponse::getTripPlan)
       .map(plan -> plan.itineraries)
       .toList();
   }
 
   /**
-   * Create a list of possible connections between the routingResponses.
-   * The response contains three levels of nested lists. The first level is the segment index, i.e.
-   * the first list contains the connections around the first via location. The second level
-   * represents the nth itinerary of the segment before the via location and the third, innermost,
-   * list contains all indices of itineraries after the via that are compatible with the itinerary
-   * before the via location.
+   * Create a list of possible connections between the routingResponses. The response contains three
+   * levels of nested lists. The first level is the segment index, i.e. the first list contains the
+   * connections around the first via location. The second level represents the nth itinerary of the
+   * segment before the via location and the third, innermost, list contains all indices of
+   * itineraries after the via that are compatible with the itinerary before the via location.
    */
   public List<List<ViaRoutingResponseConnection>> createConnections() {
     var connectionLists = new ArrayList<List<ViaRoutingResponseConnection>>();

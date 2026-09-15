@@ -23,8 +23,7 @@ public abstract class SiriAzureUpdaterConfig {
   ) {
     parameters.setConfigRef(configRef);
     parameters.setServiceBusUrl(
-      c
-        .of("servicebus-url")
+      c.of("servicebus-url")
         .since(V2_2)
         .summary("Service Bus connection used for authentication.")
         .description(
@@ -39,45 +38,39 @@ public abstract class SiriAzureUpdaterConfig {
       c.of("feedId").since(V2_2).summary("The ID of the feed to apply the updates to.").asString()
     );
     parameters.setAutoDeleteOnIdle(
-      c
-        .of("autoDeleteOnIdle")
+      c.of("autoDeleteOnIdle")
         .since(V2_5)
         .summary("The time after which an inactive subscription is removed.")
         .asDuration(Duration.ofHours(1))
     );
     parameters.setPrefetchCount(
-      c
-        .of("prefetchCount")
+      c.of("prefetchCount")
         .since(V2_5)
         .summary("The number of messages to fetch from the subscription at a time.")
         .asInt(10)
     );
     parameters.setFuzzyTripMatching(
-      c
-        .of("fuzzyTripMatching")
+      c.of("fuzzyTripMatching")
         .since(V2_2)
         .summary("Whether to apply fuzzyTripMatching on the updates")
         .asBoolean(false)
     );
     parameters.setFullyQualifiedNamespace(
-      c
-        .of("fullyQualifiedNamespace")
+      c.of("fullyQualifiedNamespace")
         .since(V2_5)
         .summary("Service Bus fully qualified namespace used for authentication.")
         .description("Has to be present for authenticationMethod FederatedIdentity.")
         .asString(null)
     );
     parameters.setAuthenticationType(
-      c
-        .of("authenticationType")
+      c.of("authenticationType")
         .since(V2_5)
         .summary("Which authentication type to use")
         .asEnum(AuthenticationType.SharedAccessKey)
     );
 
     if (c.exist("history")) {
-      NodeAdapter history = c
-        .of("history")
+      NodeAdapter history = c.of("history")
         .since(V2_2)
         .summary("Configuration for fetching historical data on startup")
         .asObject();
@@ -119,9 +112,9 @@ public abstract class SiriAzureUpdaterConfig {
    * Get current date with offset for a custom midnight, using a zonedDateTime as input.
    *
    * @param time           ZonedDateTime to calculate date from
-   * @param customMidnight In order to match the custom day break handling, this value will configure a custom midnight.
-   *                       For example: 4 - Then a new day will begin at 4am.
-   *                       Int value of a 24 hour clock
+   * @param customMidnight In order to match the custom day break handling, this value will
+   *                       configure a custom midnight. For example: 4 - Then a new day will begin
+   *                       at 4am. Int value of a 24 hour clock
    * @return LocalDate
    */
   public static LocalDate getDateBasedOnCustomMidnight(ZonedDateTime time, int customMidnight) {

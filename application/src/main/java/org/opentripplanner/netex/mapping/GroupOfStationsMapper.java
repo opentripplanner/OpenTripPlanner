@@ -52,8 +52,7 @@ class GroupOfStationsMapper {
         "GroupOfStopPlaces {} does not contain a name.",
         groupOfStopPlaces.getId()
       );
-      StopPlaceRefStructure ref = groupOfStopPlaces
-        .getMembers()
+      StopPlaceRefStructure ref = groupOfStopPlaces.getMembers()
         .getStopPlaceRef()
         .get(0)
         .getValue();

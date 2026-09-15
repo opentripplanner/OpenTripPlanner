@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateSelectRequest;
 
 /**
- * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link FilterRequest}
- * objects by extracting the {@code select} and {@code not} criteria from the GraphQL input.
+ * Maps GraphQL {@code EstimatedCallFilterInput} to a list of {@link FilterRequest} objects by
+ * extracting the {@code select} and {@code not} criteria from the GraphQL input.
  * <p>
  * Each filter has {@code select} and {@code not} arrays of select criteria.
  * <p>
@@ -106,8 +106,8 @@ public class TripTimeOnDateFilterMapper {
   private static void validateNotEmpty(Map<String, List<?>> input) {
     if (
       !input.containsKey("lines") &&
-      !input.containsKey("authorities") &&
-      !input.containsKey("transportModes")
+        !input.containsKey("authorities") &&
+        !input.containsKey("transportModes")
     ) {
       throw new InvalidInputException("A selector cannot be empty");
     }

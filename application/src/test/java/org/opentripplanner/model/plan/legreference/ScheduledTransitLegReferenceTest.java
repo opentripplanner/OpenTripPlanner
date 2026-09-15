@@ -76,14 +76,16 @@ class ScheduledTransitLegReferenceTest {
     // build transit data
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     transitRepository.updateCalendarServiceData(calendarServiceData);
-    for (var item : Map.of(
-      SIMPLE_TRIP_ID,
-      TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a),
-      TRIP_ID_WITH_MULTIPLE_CALLS,
-      TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a, stop3b),
-      LOOP_TRIP_ID,
-      TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a, stop1, stop2, stop3b)
-    ).entrySet()) {
+    for (
+      var item : Map.of(
+        SIMPLE_TRIP_ID,
+        TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a),
+        TRIP_ID_WITH_MULTIPLE_CALLS,
+        TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a, stop3b),
+        LOOP_TRIP_ID,
+        TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a, stop1, stop2, stop3b)
+      ).entrySet()
+    ) {
       Trip trip = TransitRepositoryForTest.trip(item.getKey().getId()).build();
       var tripTimes = TripTimesFactory.tripTimes(
         trip,
@@ -340,8 +342,9 @@ class ScheduledTransitLegReferenceTest {
 
   @Test
   void legReferenceCannotReferToBothTripAndTripOnServiceDate() {
-    assertThrows(IllegalArgumentException.class, () ->
-      new ScheduledTransitLegReference(
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new ScheduledTransitLegReference(
         SIMPLE_TRIP_ID,
         SERVICE_DATE,
         0,
@@ -355,8 +358,9 @@ class ScheduledTransitLegReferenceTest {
 
   @Test
   void legReferenceMustContainEitherTripOrTripOnServiceDate() {
-    assertThrows(IllegalArgumentException.class, () ->
-      new ScheduledTransitLegReference(
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> new ScheduledTransitLegReference(
         null,
         SERVICE_DATE,
         0,

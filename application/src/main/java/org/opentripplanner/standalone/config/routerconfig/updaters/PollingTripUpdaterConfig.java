@@ -15,8 +15,7 @@ import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterPara
 public class PollingTripUpdaterConfig {
 
   public static PollingTripUpdaterParameters create(String configRef, NodeAdapter c) {
-    var url = c
-      .of("url")
+    var url = c.of("url")
       .since(V1_5)
       .summary("The URL of the GTFS-RT resource.")
       .description(
@@ -28,24 +27,20 @@ public class PollingTripUpdaterConfig {
 
     return new PollingTripUpdaterParameters(
       configRef,
-      c
-        .of("frequency")
+      c.of("frequency")
         .since(V1_5)
         .summary("How often the data should be downloaded.")
         .asDuration(Duration.ofMinutes(1)),
-      c
-        .of("fuzzyTripMatching")
+      c.of("fuzzyTripMatching")
         .since(V1_5)
         .summary("If the trips should be matched fuzzily.")
         .asBoolean(false),
-      c
-        .of("forwardsDelayPropagationType")
+      c.of("forwardsDelayPropagationType")
         .since(V2_8)
         .summary(ForwardsDelayPropagationType.DEFAULT.typeDescription())
         .description(docEnumValueList(ForwardsDelayPropagationType.values()))
         .asEnum(ForwardsDelayPropagationType.DEFAULT),
-      c
-        .of("backwardsDelayPropagationType")
+      c.of("backwardsDelayPropagationType")
         .since(V2_2)
         .summary(BackwardsDelayPropagationType.REQUIRED_NO_DATA.typeDescription())
         .description(docEnumValueList(BackwardsDelayPropagationType.values()))

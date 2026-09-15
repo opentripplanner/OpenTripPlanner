@@ -84,12 +84,10 @@ public final class RaptorPreferences implements Serializable {
     }
     RaptorPreferences that = (RaptorPreferences) o;
 
-    return (
-      optimizations.equals(that.optimizations) &&
+    return (optimizations.equals(that.optimizations) &&
       profile == that.profile &&
       searchDirection == that.searchDirection &&
-      Objects.equals(timeLimit, that.timeLimit)
-    );
+      Objects.equals(timeLimit, that.timeLimit));
   }
 
   @Override

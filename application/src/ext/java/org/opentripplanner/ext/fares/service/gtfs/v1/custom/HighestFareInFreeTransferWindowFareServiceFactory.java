@@ -19,10 +19,10 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  * fare is used up until the end of the free transfer window. The length of the free transfer window
  * is configurable, but defaults to 2.5 hours.
  * <p>
- * Additionally, there is an option to treat interlined transfers as actual transfers (with respect
- * to fares). This means that interlining between two routes with different fares will result in the
- * higher fare being charged. This is a work-around for transit agencies that choose to code their
- * fares in a route-based fashion instead of a zone-based fashion.
+ * Additionally, there is an option to treat interlined transfers as actual transfers (with
+ * respect to fares). This means that interlining between two routes with different fares will
+ * result in the higher fare being charged. This is a work-around for transit agencies that choose
+ * to code their fares in a route-based fashion instead of a zone-based fashion.
  * <p>
  * This calculator is maintained by IBI Group.
  */
@@ -54,14 +54,12 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends GtfsFareS
   @Override
   public void configure(JsonNode config) {
     var adapter = new NodeAdapter(config, null);
-    freeTransferWindow = adapter
-      .of("freeTransferWindow")
+    freeTransferWindow = adapter.of("freeTransferWindow")
       .since(NA)
       .summary("TODO")
       .asDuration(freeTransferWindow);
 
-    analyzeInterlinedTransfers = adapter
-      .of("analyzeInterlinedTransfers")
+    analyzeInterlinedTransfers = adapter.of("analyzeInterlinedTransfers")
       .since(NA)
       .summary("TODO")
       .asBoolean(analyzeInterlinedTransfers);

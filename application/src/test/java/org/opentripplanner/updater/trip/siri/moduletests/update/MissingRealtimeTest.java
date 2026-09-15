@@ -12,10 +12,11 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 
 /**
- * Tests for the handling of SIRI ET updates where real-time times are partially or fully absent
- * for stops in a trip.
+ * Tests for the handling of SIRI ET updates where real-time times are partially or fully absent for
+ * stops in a trip.
  *
- * <p>The key behaviours under test:
+ * <p>
+ * The key behaviours under test:
  * <ul>
  *   <li>A stop that receives only one of arrival/departure time must NOT be marked NO_DATA.</li>
  *   <li>A stop with no real-time times at all must be marked NO_DATA.</li>
@@ -43,20 +44,18 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   /**
    * An intermediate stop that provides only a departure time (no arrival) must be treated as a
-   * real-time update, not NO_DATA. The missing arrival falls back to the scheduled arrival
-   * (delay = 0), while the departure carries the provided delay.
+   * real-time update, not NO_DATA. The missing arrival falls back to the scheduled arrival (delay =
+   * 0), while the departure carries the provided delay.
    */
   @Test
   void intermediateStop_withOnlyDepartureTime_isNotNoData() {
     var env = ENV_BUILDER.addTrip(THREE_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           // departure only – arrival falls back to scheduled
@@ -78,20 +77,18 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   /**
    * An intermediate stop that provides only an arrival time (no departure) must be treated as a
-   * real-time update. The missing departure falls back to the scheduled departure (delay = 0).
-   * The real-time arrival must not exceed the scheduled departure to avoid a negative dwell time.
+   * real-time update. The missing departure falls back to the scheduled departure (delay = 0). The
+   * real-time arrival must not exceed the scheduled departure to avoid a negative dwell time.
    */
   @Test
   void intermediateStop_withOnlyArrivalTime_isNotNoData() {
     var env = ENV_BUILDER.addTrip(THREE_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           // arrival only – departure falls back to scheduled
@@ -120,12 +117,10 @@ class MissingRealtimeTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(THREE_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // no times → NO_DATA, scheduled times shown
           .call(STOP_B)
@@ -153,8 +148,7 @@ class MissingRealtimeTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TWO_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder -> builder.call(STOP_A).call(STOP_B))
       .buildEstimatedTimetableDeliveries();
@@ -179,12 +173,10 @@ class MissingRealtimeTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TWO_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -212,12 +204,10 @@ class MissingRealtimeTest implements RealtimeTestConstants {
     var env = ENV_BUILDER.addTrip(TWO_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:25")
@@ -235,20 +225,20 @@ class MissingRealtimeTest implements RealtimeTestConstants {
   }
 
   /**
-   * A journey-level cancellation with no stop times provided must set {@code isCanceled = true}
-   * and leave {@code timesModified = false}. The trip is "updated" because it is cancelled
-   * (prefix "C U"), but no time modifications were made, so the scheduled times are shown.
+   * A journey-level cancellation with no stop times provided must set {@code isCanceled = true} and
+   * leave {@code timesModified = false}. The trip is "updated" because it is cancelled (prefix "C
+   * U"), but no time modifications were made, so the scheduled times are shown.
    *
-   * <p>This verifies that {@code hasAnyUpdates()} is driven by the cancellation flag alone and
-   * does not require {@code timesModified} to be {@code true}.
+   * <p>
+   * This verifies that {@code hasAnyUpdates()} is driven by the cancellation flag alone and does
+   * not require {@code timesModified} to be {@code true}.
    */
   @Test
   void journeyLevelCancellation_withNoTimes_isCanceled_butTimesNotModified() {
     var env = ENV_BUILDER.addTrip(TWO_STOP_TRIP).build();
     var siri = SiriTestHelper.of(env);
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withCancellation(true)
       .buildEstimatedTimetableDeliveries();

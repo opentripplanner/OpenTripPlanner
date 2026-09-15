@@ -11,8 +11,7 @@ import org.opentripplanner.transit.model.framework.LogInfo;
 /**
  * A company which is responsible for operating public transport services. The operator will often
  * operate under contract with an Authority (Agency).
- * <p/>
- * Netex ONLY. Operators are available only if the data source is Netex, not GTFS.
+ * <p/>Netex ONLY. Operators are available only if the data source is Netex, not GTFS.
  *
  * @see Agency
  */
@@ -66,11 +65,9 @@ public class Operator extends AbstractTransitEntity<Operator, OperatorBuilder> i
 
   @Override
   public boolean sameAs(Operator other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(name, other.name) &&
       Objects.equals(url, other.url) &&
-      Objects.equals(phone, other.phone)
-    );
+      Objects.equals(phone, other.phone));
   }
 }

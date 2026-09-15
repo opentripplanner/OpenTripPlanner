@@ -67,12 +67,10 @@ public class SiriFmDataSource implements DataSource<AvailabiltyUpdate> {
    * are required by the Italian Siri-FM profile.
    */
   private boolean conformsToItalianProfile(FacilityConditionStructure c) {
-    return (
-      c.getFacilityRef() != null &&
+    return (c.getFacilityRef() != null &&
       c.getFacilityRef().getValue() != null &&
       c.getMonitoredCountings().size() == 1 &&
-      c.getMonitoredCountings().getFirst().getCountingType() == PRESENT_COUNT
-    );
+      c.getMonitoredCountings().getFirst().getCountingType() == PRESENT_COUNT);
   }
 
   @Override

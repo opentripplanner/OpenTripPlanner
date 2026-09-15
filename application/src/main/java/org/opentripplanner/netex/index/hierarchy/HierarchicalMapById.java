@@ -11,10 +11,8 @@ import org.rutebanken.netex.model.EntityStructure;
  *
  * @param <V> the value type
  */
-public class HierarchicalMapById<V extends EntityStructure>
-  extends HierarchicalMap<String, V>
-  implements ReadOnlyHierarchicalMapById<V>
-{
+public class HierarchicalMapById<V extends EntityStructure> extends HierarchicalMap<String, V>
+  implements ReadOnlyHierarchicalMapById<V> {
 
   /** Create a root for the hierarchy */
   public HierarchicalMapById() {}

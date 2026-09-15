@@ -32,8 +32,8 @@ public class SiriMqttConfigurationDocTest implements DocsTestConstants {
   public static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the latest
-   * version of the code.
+   * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the
+   * latest version of the code.
    */
   @Test
   public void updateSiriDoc() {

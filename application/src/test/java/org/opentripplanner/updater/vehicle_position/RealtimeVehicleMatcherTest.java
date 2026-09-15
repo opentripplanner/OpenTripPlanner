@@ -72,8 +72,7 @@ public class RealtimeVehicleMatcherTest {
   @Test
   public void testOccupancy() {
     var pos = vehiclePosition(tripId);
-    var posWithOccupancy = pos
-      .toBuilder()
+    var posWithOccupancy = pos.toBuilder()
       .setOccupancyStatus(VehiclePosition.OccupancyStatus.FEW_SEATS_AVAILABLE)
       .build();
     testVehiclePositionOccupancy(posWithOccupancy);
@@ -293,8 +292,8 @@ public class RealtimeVehicleMatcherTest {
     var pattern = TripPattern.of(trip.getId())
       .withStopPattern(stopPattern)
       .withRoute(ROUTE)
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addFrequencyEntry(frequencyEntry1).addFrequencyEntry(frequencyEntry2)
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addFrequencyEntry(frequencyEntry1).addFrequencyEntry(frequencyEntry2)
       )
       .build();
 
@@ -564,8 +563,8 @@ public class RealtimeVehicleMatcherTest {
     return TripPattern.of(trip.getId())
       .withStopPattern(stopPattern)
       .withRoute(ROUTE)
-      .withScheduledTimeTableBuilder(builder ->
-        stopTimes.isEmpty()
+      .withScheduledTimeTableBuilder(
+        builder -> stopTimes.isEmpty()
           ? builder
           : builder.addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
       )

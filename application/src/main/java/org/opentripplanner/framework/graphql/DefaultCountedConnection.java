@@ -11,10 +11,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * This class extends the {@link DefaultConnection} with a somewhat standard {@code totalCount}
  * field.
  */
-public class DefaultCountedConnection<T>
-  extends DefaultConnection<T>
-  implements CountedConnection<T>
-{
+public class DefaultCountedConnection<T> extends DefaultConnection<T> implements
+  CountedConnection<T> {
 
   private final Integer totalCount;
 
@@ -38,11 +36,9 @@ public class DefaultCountedConnection<T>
     }
     DefaultCountedConnection<?> that = (DefaultCountedConnection<?>) o;
 
-    return (
-      Objects.equals(getEdges(), that.getEdges()) &&
+    return (Objects.equals(getEdges(), that.getEdges()) &&
       Objects.equals(getPageInfo(), that.getPageInfo()) &&
-      totalCount.equals(that.totalCount)
-    );
+      totalCount.equals(that.totalCount));
   }
 
   @Override

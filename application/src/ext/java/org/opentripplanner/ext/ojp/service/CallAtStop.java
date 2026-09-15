@@ -16,8 +16,8 @@ public record CallAtStop(TripTimeOnDate tripTimeOnDate, @Nullable Duration walkT
 
   public static Comparator<CallAtStop> compareByScheduledDeparture() {
     return Comparator.comparing(
-      tt ->
-        tt.tripTimeOnDate().getServiceDayMidnight() + tt.tripTimeOnDate().getScheduledDeparture()
+      tt -> tt.tripTimeOnDate().getServiceDayMidnight() +
+        tt.tripTimeOnDate().getScheduledDeparture()
     );
   }
 }

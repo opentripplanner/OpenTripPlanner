@@ -22,11 +22,11 @@ public class TripMatcherFactory {
   /**
    * Creates a matcher that filters Trips.
    * <p>
-   * The {@code serviceDateProvider} is a function that provides the service dates for a given Trip.
-   * It is injected because the service dates are determined by the transit service which has access
-   * to service dates for a Trip.
+   * The {@code serviceDateProvider} is a function that provides the service dates for a given
+   * Trip. It is injected because the service dates are determined by the transit service which has
+   * access to service dates for a Trip.
    *
-   * @param request the criteria for filtering Trips.
+   * @param request             the criteria for filtering Trips.
    * @param serviceDateProvider a function that provides the service dates for a given Trip.
    * @return a matcher for filtering Trips.
    */
@@ -71,11 +71,10 @@ public class TripMatcherFactory {
   static Function<LocalDate, Matcher<Trip>> serviceDate(
     Function<FeedScopedId, Set<LocalDate>> serviceDateProvider
   ) {
-    return date ->
-      new ContainsMatcher<>(
-        "serviceDate",
-        t -> serviceDateProvider.apply(t.getServiceId()),
-        new EqualityMatcher<>("serviceDate", date, dateToMatch -> dateToMatch)
-      );
+    return date -> new ContainsMatcher<>(
+      "serviceDate",
+      t -> serviceDateProvider.apply(t.getServiceId()),
+      new EqualityMatcher<>("serviceDate", date, dateToMatch -> dateToMatch)
+    );
   }
 }

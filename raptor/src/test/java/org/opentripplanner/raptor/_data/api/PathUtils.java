@@ -10,8 +10,8 @@ import org.opentripplanner.raptor.api.response.RaptorResponse;
 
 /**
  * This utility help converting a Raptor path to a string which is used in several unit tests for
- * easy comparison. The Stop index(1..n) is translated to stop names(A..N) using {@link
- * RaptorTestConstants#stopIndexToName(int)}.
+ * easy comparison. The Stop index(1..n) is translated to stop names(A..N) using
+ * {@link RaptorTestConstants#stopIndexToName(int)}.
  */
 public class PathUtils {
 
@@ -43,10 +43,7 @@ public class PathUtils {
   }
 
   public static String[] withoutCost(String... paths) {
-    return Stream.of(paths)
-      .map(path -> withoutCost(path))
-      .toList()
-      .toArray(new String[0]);
+    return Stream.of(paths).map(path -> withoutCost(path)).toList().toArray(new String[0]);
   }
 
   public static String pathsToString(

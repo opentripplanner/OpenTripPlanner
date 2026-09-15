@@ -20,10 +20,10 @@ import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
- * This class is responsible for performing Raptor-specific functionality on access-paths. It
- * groups paths based on number-of-trips(FLEX mainly) and stop-arrival "mode" (on-board or on-foot).
- * This is used to insert the access into the Raptor rounds at the correct moment (round), so
- * the number-of-transfers criteria become correct.
+ * This class is responsible for performing Raptor-specific functionality on access-paths. It groups
+ * paths based on number-of-trips(FLEX mainly) and stop-arrival "mode" (on-board or on-foot). This
+ * is used to insert the access into the Raptor rounds at the correct moment (round), so the
+ * number-of-transfers criteria become correct.
  * <p>
  * This class also provides an iterator to iterate over iteration steps in the Raptor algorithm
  * to cover extra minutes outside the search-window for access with a time-penalty.
@@ -128,8 +128,7 @@ public class AccessPaths {
   }
 
   public List<RaptorAccessEgress> arrivedOnBoard() {
-    return arrivedOnBoardByNumOfRides
-      .valueCollection()
+    return arrivedOnBoardByNumOfRides.valueCollection()
       .stream()
       .flatMap(Collection::stream)
       .toList();
@@ -170,19 +169,16 @@ public class AccessPaths {
       @Override
       public int next() {
         AccessPaths.this.iterationTimePenaltyLimit += iterationStep;
-        return (
-          raptorIterationStartTime - signedIterationStep(AccessPaths.this.iterationTimePenaltyLimit)
-        );
+        return (raptorIterationStartTime -
+          signedIterationStep(AccessPaths.this.iterationTimePenaltyLimit));
       }
     };
   }
 
   /** Raptor uses this information to optimize boarding of the first trip */
   public boolean hasTimeDependentAccess() {
-    return (
-      hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
-      hasTimeDependentAccess(arrivedOnStreetByNumOfRides)
-    );
+    return (hasTimeDependentAccess(arrivedOnBoardByNumOfRides) ||
+      hasTimeDependentAccess(arrivedOnStreetByNumOfRides));
   }
 
   public AccessPaths filterOnSegment(int segment) {
@@ -200,8 +196,7 @@ public class AccessPaths {
   /* private methods */
 
   private static int maxTimePenalty(TIntObjectMap<List<RaptorAccessEgress>> col) {
-    return col
-      .valueCollection()
+    return col.valueCollection()
       .stream()
       .flatMapToInt(it -> it.stream().mapToInt(RaptorAccessEgress::timePenalty))
       .max()
@@ -213,17 +208,14 @@ public class AccessPaths {
   }
 
   /**
-   * Decorate access to implement time-penalty. This decoration will do the necessary
-   * adjustments to apply the penalty in the raptor algorithm. See the decorator class for more
-   * info. The original access object is returned if it does not have a time-penalty set.
+   * Decorate access to implement time-penalty. This decoration will do the necessary adjustments to
+   * apply the penalty in the raptor algorithm. See the decorator class for more info. The original
+   * access object is returned if it does not have a time-penalty set.
    */
   private static List<RaptorAccessEgress> decorateWithTimePenaltyLogic(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths
-      .stream()
-      .map(it -> it.hasTimePenalty() ? new AccessWithPenalty(it) : it)
-      .toList();
+    return paths.stream().map(it -> it.hasTimePenalty() ? new AccessWithPenalty(it) : it).toList();
   }
 
   private boolean hasTimePenalty() {
@@ -253,16 +245,15 @@ public class AccessPaths {
   private static Map<Boolean, List<RaptorAccessEgress>> partitioningByStartOnBoard(
     Collection<RaptorAccessEgress> paths
   ) {
-    return paths
-      .stream()
+    return paths.stream()
       .collect(Collectors.partitioningBy(RaptorStartOnBoardAccess.class::isInstance));
   }
 
   /**
-   * This method will filter the given list of access using the time-penalty-limit - if the
-   * limit is set. If the limit is not set, then the given list is returned. This only filters the
-   * list after all iterations are done, and we start iterating over the vertual minutes to allow
-   * itineraries with a time-penalty to be included, even if the start before the search-window.
+   * This method will filter the given list of access using the time-penalty-limit - if the limit is
+   * set. If the limit is not set, then the given list is returned. This only filters the list after
+   * all iterations are done, and we start iterating over the vertual minutes to allow itineraries
+   * with a time-penalty to be included, even if the start before the search-window.
    * <p>
    * This method returns an empty list if the given input list is {@code null}.
    */
@@ -271,17 +262,14 @@ public class AccessPaths {
       return List.of();
     }
     if (iterationTimePenaltyLimit != RaptorConstants.TIME_NOT_SET) {
-      return list
-        .stream()
-        .filter(e -> e.timePenalty() > iterationTimePenaltyLimit)
-        .toList();
+      return list.stream().filter(e -> e.timePenalty() > iterationTimePenaltyLimit).toList();
     }
     return list;
   }
 
   /**
-   * When searching forward, we step back in time (minus), and when searching in reverse, we
-   * step forward in time (plus).
+   * When searching forward, we step back in time (minus), and when searching in reverse, we step
+   * forward in time (plus).
    */
   private int signedIterationStep(int value) {
     return iterationOp.applyAsInt(value);
@@ -289,6 +277,7 @@ public class AccessPaths {
 
   /**
    * We step back/forward in Raptor depending on the search direction.
+   *
    * @see #signedIterationStep(int)
    */
   private static IntUnaryOperator iterationOp(SearchDirection searchDirection) {

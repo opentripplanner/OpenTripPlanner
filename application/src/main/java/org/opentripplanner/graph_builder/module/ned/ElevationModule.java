@@ -46,14 +46,13 @@ import org.slf4j.LoggerFactory;
  * THIS CLASS IS MULTI-THREADED (When configured to do so, it uses parallel streams to distribute
  * elevation calculation tasks for edges.)
  * <p>
- * {@link GraphBuilderModule} plugin that applies
- * elevation data to street data that has already been loaded into a (@link Graph}, creating
- * elevation profiles for each Street encountered in the Graph. Data sources that could be used
- * include auto-downloaded and cached National Elevation Dataset (NED) raster data or a GeoTIFF
- * file. The elevation profiles are stored as {@link PackedCoordinateSequence} objects, where each
- * (x,y) pair represents one sample, with the x-coord representing the distance along the edge
- * measured from the start, and the y-coord representing the sampled elevation at that point (both
- * in meters).
+ * {@link GraphBuilderModule} plugin that applies elevation data to street data that has already
+ * been loaded into a (@link Graph}, creating elevation profiles for each Street encountered in the
+ * Graph. Data sources that could be used include auto-downloaded and cached National Elevation
+ * Dataset (NED) raster data or a GeoTIFF file. The elevation profiles are stored as
+ * {@link PackedCoordinateSequence} objects, where each (x,y) pair represents one sample, with the
+ * x-coord representing the distance along the edge measured from the start, and the y-coord
+ * representing the sampled elevation at that point (both in meters).
  */
 public class ElevationModule implements GraphBuilderModule {
 
@@ -62,11 +61,11 @@ public class ElevationModule implements GraphBuilderModule {
   private static final long ONE_MEGABYTE = 1024L * 1024L;
 
   /**
-   * The WGS84 CRS with longitude-first axis order. The first time a CRS lookup is
-   * performed is surprisingly expensive (around 500ms), apparently due to  initializing
-   * an HSQLDB JDBC connection. For this reason, the constant is defined in this
-   * narrower scope rather than a shared utility class, where it was seen to incur the
-   * initialization cost in a broader range of tests than is necessary.
+   * The WGS84 CRS with longitude-first axis order. The first time a CRS lookup is performed is
+   * surprisingly expensive (around 500ms), apparently due to initializing an HSQLDB JDBC
+   * connection. For this reason, the constant is defined in this narrower scope rather than a
+   * shared utility class, where it was seen to incur the initialization cost in a broader range of
+   * tests than is necessary.
    */
   private static final CoordinateReferenceSystem WGS84_XY;
 
@@ -201,8 +200,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     if (multiThreadElevationCalculations) {
       // Multi-threaded execution
-      streetsWithElevationEdges
-        .parallelStream()
+      streetsWithElevationEdges.parallelStream()
         .forEach(ee -> processEdgeWithProgress(ee, progress));
     } else {
       // If using just a single thread, process each edge inline
@@ -262,17 +260,13 @@ public class ElevationModule implements GraphBuilderModule {
       cacheManager.save(CacheTask.ELEVATION, newCachedElevations);
     }
 
-    @SuppressWarnings("unchecked")
-    var elevationsForVertices = collectKnownElevationsForVertices(
+    @SuppressWarnings("unchecked") var elevationsForVertices = collectKnownElevationsForVertices(
       elevationData,
       edgesWithCalculatedElevations
     );
 
-    new MissingElevationHandler(
-      issueStore,
-      elevationsForVertices,
-      maxElevationPropagationMeters
-    ).run();
+    new MissingElevationHandler(issueStore, elevationsForVertices, maxElevationPropagationMeters)
+      .run();
 
     updateElevationMetadata(graph);
 
@@ -288,8 +282,8 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * Resize the Imagen default tile cache to the configured budget. Run once before any DEM tile
-   * is fetched, so subsequent {@code getTile} calls hit the cache instead of re-decompressing.
+   * Resize the Imagen default tile cache to the configured budget. Run once before any DEM tile is
+   * fetched, so subsequent {@code getTile} calls hit the cache instead of re-decompressing.
    * <p>
    * Imagen's default cache is 16 MB, which is too small to hold the hot working set on regional
    * DEMs and causes the elevation pass to spend most of its time re-decompressing TIFF tiles.
@@ -323,8 +317,9 @@ public class ElevationModule implements GraphBuilderModule {
   ) {
     // knownElevations will be null if there are no ElevationPoints in the data
     // for instance, with the Shapefile loader.)
-    var elevations =
-      knownElevations != null ? new HashMap<>(knownElevations) : new HashMap<Vertex, Double>();
+    var elevations = knownElevations != null
+      ? new HashMap<>(knownElevations)
+      : new HashMap<Vertex, Double>();
 
     // If including the EllipsoidToGeoidDifference, subtract these from the known elevations
     // found in OpenStreetMap data.
@@ -375,8 +370,7 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   /**
-   * Calculate the elevation for a single street edge, creating and assigning the elevation
-   * profile.
+   * Calculate the elevation for a single street edge, creating and assigning the elevation profile.
    *
    * @param ee the street edge
    */
@@ -489,8 +483,8 @@ public class ElevationModule implements GraphBuilderModule {
    * interpolator instance for each thread to avoid other threads waiting for a lock to be released
    * on the Coverage interpolator instance.
    * <p>
-   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since these
-   * interpolator instances take some time to create, they are lazy-created instead of created
+   * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since
+   * these interpolator instances take some time to create, they are lazy-created instead of created
    * upfront because it could lock all other threads even if other threads don't need an
    * interpolator right away if they happen to process a lot of cached data initially.
    */
@@ -506,9 +500,7 @@ public class ElevationModule implements GraphBuilderModule {
           try {
             getElevation(coverage, examplarCoordinate);
           } catch (
-            PointOutsideCoverageException
-            | ArrayIndexOutOfBoundsException
-            | TransformException e
+            PointOutsideCoverageException | ArrayIndexOutOfBoundsException | TransformException e
           ) {
             LOG.warn(
               "Error processing elevation for coordinate: {} due to error: {}",
@@ -552,7 +544,8 @@ public class ElevationModule implements GraphBuilderModule {
    * @return elevation in meters
    */
   private double getElevation(Coverage coverage, Coordinate c)
-    throws PointOutsideCoverageException, TransformException {
+    throws PointOutsideCoverageException,
+    TransformException {
     return getElevation(coverage, c.x, c.y);
   }
 
@@ -564,13 +557,15 @@ public class ElevationModule implements GraphBuilderModule {
    * @param x        the query longitude (NAD83)
    * @param y        the query latitude (NAD83)
    * @return elevation in meters
-   * @throws PointOutsideCoverageException if the point lies outside the elevation tile area.
-   * @throws TransformException if computing the EllipsoidToGeoidDifference fails.
+   * @throws PointOutsideCoverageException  if the point lies outside the elevation tile area.
+   * @throws TransformException             if computing the EllipsoidToGeoidDifference fails.
    * @throws ArrayIndexOutOfBoundsException at the edges of some elevation tiles with NoData
-   *         regions, see <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
+   *                                        regions, see <a href=
+   *                                        "https://github.com/opentripplanner/OpenTripPlanner/issues/2792">#2792</a>.
    */
   private double getElevation(Coverage coverage, double x, double y)
-    throws PointOutsideCoverageException, TransformException {
+    throws PointOutsideCoverageException,
+    TransformException {
     double[] values = new double[1];
     try {
       // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
@@ -584,8 +579,7 @@ public class ElevationModule implements GraphBuilderModule {
       throw e;
     }
 
-    var elevation =
-      values[0] * gridCoverageFactory.elevationUnitMultiplier() -
+    var elevation = values[0] * gridCoverageFactory.elevationUnitMultiplier() -
       (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
 
     minElevation = Math.min(minElevation, elevation);

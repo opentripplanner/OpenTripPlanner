@@ -34,8 +34,7 @@ public class I01_HeuristicTest implements RaptorTestConstants {
     20 + 3 * 60 + 30 + 60 + 2 * 60,
     20 + 3 * 60 + 30,
     20 + 3 * 60,
-    20,
-  };
+    20, };
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = data.requestBuilder();
@@ -43,8 +42,7 @@ public class I01_HeuristicTest implements RaptorTestConstants {
 
   @BeforeEach
   public void setup() {
-    data
-      .access("Walk 30s ~ A")
+    data.access("Walk 30s ~ A")
       .withTimetables(
         """
         A      B

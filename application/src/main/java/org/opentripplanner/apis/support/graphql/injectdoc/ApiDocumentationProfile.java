@@ -6,7 +6,8 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
   DEFAULT,
   ENTUR;
 
-  private static final String TYPE_DOC = """
+  private static final String TYPE_DOC =
+  """
   List of available custom documentation profiles. A profile is used to inject custom
   documentation like type and field description or a deprecated reason.
 
@@ -22,8 +23,9 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
   public String enumValueDescription() {
     return switch (this) {
       case DEFAULT -> "Default documentation is used.";
-      case ENTUR -> "Entur specific documentation. This deprecate features not supported at Entur," +
-        " Norway.";
+      case ENTUR ->
+        "Entur specific documentation. This deprecate features not supported at Entur," +
+          " Norway.";
     };
   }
 }

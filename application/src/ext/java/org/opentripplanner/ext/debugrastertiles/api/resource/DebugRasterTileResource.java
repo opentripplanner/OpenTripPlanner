@@ -51,7 +51,8 @@ public class DebugRasterTileResource {
     @PathParam("z") int z,
     @PathParam("layer") String layer,
     @PathParam("ext") String ext
-  ) throws Exception {
+  )
+    throws Exception {
     // Re-use analyst
     Envelope env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);

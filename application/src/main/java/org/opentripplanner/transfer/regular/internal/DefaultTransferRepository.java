@@ -31,8 +31,7 @@ public class DefaultTransferRepository implements TransferRepository {
   /** Pre-generated transfers between all stops filtered based on the modes in the PathTransfer. */
   @Override
   public List<PathTransfer> findTransfersByMode(StreetMode mode) {
-    return transfersByStop
-      .values()
+    return transfersByStop.values()
       .stream()
       .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
       .toList();

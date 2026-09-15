@@ -12,14 +12,12 @@ public class UberConfig {
     return new RideHailingServiceParameters(
       c.of("clientId").since(V2_3).summary("OAuth client id to access the API.").asString(),
       c.of("clientSecret").since(V2_3).summary("OAuth client secret to access the API.").asString(),
-      c
-        .of("wheelchairAccessibleProductId")
+      c.of("wheelchairAccessibleProductId")
         .since(V2_3)
         .summary("The id of the requested wheelchair-accessible product ID.")
         .description("See `bannedProductIds` for a list of product IDs.")
         .asString(),
-      c
-        .of("bannedProductIds")
+      c.of("bannedProductIds")
         .since(V2_3)
         .summary("The IDs of those product ids that should not be used for estimates.")
         .description(

@@ -25,8 +25,8 @@ import uk.org.siri.siri21.StopPointRefStructure;
  * Instances are created via the {@link #of(EstimatedVehicleJourney)} factory which validates and
  * sorts calls during parsing, making invalid {@code CallWrapper} instances unrepresentable.
  * <p>
- * The SIRI/JAXB enumerations of the underlying call are not exposed; the wrapper maps them to the
- * corresponding OTP types ({@link OccupancyStatus}, {@link PickDrop}).
+ * The SIRI/JAXB enumerations of the underlying call are not exposed; the wrapper maps them to
+ * the corresponding OTP types ({@link OccupancyStatus}, {@link PickDrop}).
  */
 public interface CallWrapper {
   /**
@@ -86,7 +86,8 @@ public interface CallWrapper {
     StopPointRefStructure stopPointRef,
     java.math.BigInteger order,
     java.math.BigInteger visitNumber
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     var ref = stopPointRef != null ? stopPointRef.getValue() : null;
     if (StringUtils.hasNoValueOrNullAsString(ref)) {
       throw UpdateException.of(UpdateErrorType.EMPTY_STOP_POINT_REF);

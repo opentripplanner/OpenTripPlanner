@@ -24,8 +24,7 @@ public class S3BucketConfig {
 
   public static S3BucketConfig fromConfig(NodeAdapter root, String elevationBucketName) {
     return fromConfig(
-      root
-        .of(elevationBucketName)
+      root.of(elevationBucketName)
         .since(NA)
         .summary("Used to download NED elevation tiles from the given AWS S3 bucket.")
         .description(
@@ -61,23 +60,19 @@ public class S3BucketConfig {
     }
     S3BucketConfig bucketConfig = new S3BucketConfig();
     try {
-      bucketConfig.accessKey = config
-        .of("accessKey")
+      bucketConfig.accessKey = config.of("accessKey")
         .since(NA)
         .summary("Credentials: the Amazon Web Services access key")
         .asString();
-      bucketConfig.secretKey = config
-        .of("secretKey")
+      bucketConfig.secretKey = config.of("secretKey")
         .since(NA)
         .summary("Credentials: the Amazon Web Services secret key corresponding to the access key.")
         .asString();
-      bucketConfig.bucketName = config
-        .of("bucketName")
+      bucketConfig.bucketName = config.of("bucketName")
         .since(NA)
         .summary("The bucket from which you want to download.")
         .asString();
-      bucketConfig.datumUrl = config
-        .of("datumUrl")
+      bucketConfig.datumUrl = config.of("datumUrl")
         .since(V2_9)
         .summary("HTTP URL of the vertical datum zip file.")
         .summary(
@@ -106,12 +101,10 @@ public class S3BucketConfig {
   }
 
   public String toString() {
-    return (
-      "[AWS S3 bucket configuration: bucketName=" +
+    return ("[AWS S3 bucket configuration: bucketName=" +
       bucketName +
       " accessKey=" +
       accessKey +
-      " secretKey=***]"
-    );
+      " secretKey=***]");
   }
 }

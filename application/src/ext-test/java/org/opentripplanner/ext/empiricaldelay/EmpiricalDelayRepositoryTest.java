@@ -42,8 +42,9 @@ class EmpiricalDelayRepositoryTest {
 
   @Test
   void allowOnlyOneServiceCalendarPerFeed() {
-    var ex = assertThrows(IllegalStateException.class, () ->
-      subject.addEmpiricalDelayServiceCalendar(
+    var ex = assertThrows(
+      IllegalStateException.class,
+      () -> subject.addEmpiricalDelayServiceCalendar(
         FEED_ID,
         EmpiricalDelayCalendar.of().with("SID", List.of(DayOfWeek.FRIDAY), START, END).build()
       )

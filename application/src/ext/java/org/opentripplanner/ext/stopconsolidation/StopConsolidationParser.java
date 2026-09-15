@@ -34,38 +34,26 @@ public class StopConsolidationParser {
         entries.add(entry);
       }
 
-      var groups = entries
-        .stream()
+      var groups = entries.stream()
         .collect(
-          ImmutableListMultimap.<
-            StopGroupEntry,
-            String,
-            StopGroupEntry
-          >flatteningToImmutableListMultimap(x -> x.groupId, Stream::of)
+          ImmutableListMultimap
+            .<StopGroupEntry, String, StopGroupEntry>flatteningToImmutableListMultimap(
+              x -> x.groupId,
+              Stream::of
+            )
         );
 
-      return groups
-        .keys()
-        .stream()
-        .map(key -> {
-          var group = groups.get(key);
+      return groups.keys().stream().map(key -> {
+        var group = groups.get(key);
 
-          var primaryId = group
-            .stream()
-            .filter(e -> e.isPrimary)
-            .findAny()
-            .orElseThrow()
-            .stopId;
-          var secondaries = group
-            .stream()
-            .filter(e -> !e.isPrimary)
-            .map(e -> e.stopId)
-            .collect(Collectors.toSet());
+        var primaryId = group.stream().filter(e -> e.isPrimary).findAny().orElseThrow().stopId;
+        var secondaries = group.stream()
+          .filter(e -> !e.isPrimary)
+          .map(e -> e.stopId)
+          .collect(Collectors.toSet());
 
-          return new ConsolidatedStopGroup(primaryId, secondaries);
-        })
-        .distinct()
-        .toList();
+        return new ConsolidatedStopGroup(primaryId, secondaries);
+      }).distinct().toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -60,8 +60,7 @@ public class StopEventResponseMapper {
   }
 
   public OJP mapCalls(List<CallAtStop> calls, ZonedDateTime timestamp) {
-    List<JAXBElement<StopEventResultStructure>> stopEvents = calls
-      .stream()
+    List<JAXBElement<StopEventResultStructure>> stopEvents = calls.stream()
       .map(call -> this.stopEventResult(call))
       .map(JaxbElementMapper::jaxbElement)
       .toList();
@@ -69,52 +68,45 @@ public class StopEventResponseMapper {
     var sed = new OJPStopEventDeliveryStructure().withStatus(true);
     stopEvents.forEach(sed::withRest);
 
-    var serviceDelivery = ServiceDeliveryMapper.serviceDelivery(
-      timestamp
-    ).withAbstractFunctionalServiceDelivery(JaxbElementMapper.jaxbElement(sed));
+    var serviceDelivery = ServiceDeliveryMapper.serviceDelivery(timestamp)
+      .withAbstractFunctionalServiceDelivery(JaxbElementMapper.jaxbElement(sed));
 
     var response = new OJPResponseStructure().withServiceDelivery(serviceDelivery);
     return new OJP().withOJPResponse(response);
   }
 
   private StopEventResultStructure stopEventResult(CallAtStop call) {
-    var callAtNearStop = new CallAtNearStopStructure()
-      .withCallAtStop(callAtStop(call.tripTimeOnDate()))
-      .withWalkDuration(call.walkTime());
+    var callAtNearStop = new CallAtNearStopStructure().withCallAtStop(
+      callAtStop(call.tripTimeOnDate())
+    ).withWalkDuration(call.walkTime());
 
     var mapper = new DatedJourneyMapper(idMapper);
-    var stopEvent = new StopEventStructure()
-      .withThisCall(callAtNearStop)
+    var stopEvent = new StopEventStructure().withThisCall(callAtNearStop)
       .withService(mapper.datedJourney(call.tripTimeOnDate(), lang(call.tripTimeOnDate())));
     if (optionalFeatures.contains(OptionalFeature.PREVIOUS_CALLS)) {
-      call
-        .tripTimeOnDate()
+      call.tripTimeOnDate()
         .previousTimes()
         .forEach(previous -> stopEvent.withPreviousCall(callAtNearStop(previous)));
     }
     if (optionalFeatures.contains(OptionalFeature.ONWARD_CALLS)) {
-      call
-        .tripTimeOnDate()
+      call.tripTimeOnDate()
         .nextTimes()
         .forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
     }
-    return new StopEventResultStructure()
-      .withStopEvent(stopEvent)
+    return new StopEventResultStructure().withStopEvent(stopEvent)
       .withId(eventId(call.tripTimeOnDate()));
   }
 
   private String eventId(TripTimeOnDate tripTimeOnDate) {
-    var bytes = (
-      tripTimeOnDate.getStopTimeKey().toString() + tripTimeOnDate.getServiceDay()
-    ).getBytes(StandardCharsets.UTF_8);
+    var bytes = (tripTimeOnDate.getStopTimeKey().toString() + tripTimeOnDate.getServiceDay())
+      .getBytes(StandardCharsets.UTF_8);
     return UUID.nameUUIDFromBytes(bytes).toString();
   }
 
   private CallAtStopStructure callAtStop(TripTimeOnDate tripTimeOnDate) {
     var stop = tripTimeOnDate.getStop();
     var stopPointRef = stopPointRefMapper.stopPointRef(stop);
-    return new CallAtStopStructure()
-      .withStopPointRef(stopPointRef)
+    return new CallAtStopStructure().withStopPointRef(stopPointRef)
       .withStopPointName(internationalText(stop.getName(), lang(tripTimeOnDate)))
       .withServiceArrival(serviceArrival(tripTimeOnDate))
       .withServiceDeparture(serviceDeparture(tripTimeOnDate))
@@ -147,8 +139,7 @@ public class StopEventResponseMapper {
     var departure = new ServiceDepartureStructure().withTimetabledTime(
       new XmlDateTime(tripTimeOnDate.scheduledDeparture().atZone(zoneId))
     );
-    tripTimeOnDate
-      .realtimeDeparture()
+    tripTimeOnDate.realtimeDeparture()
       .filter(d -> optionalFeatures.contains(REALTIME_DATA))
       .ifPresent(time -> departure.withEstimatedTime(new XmlDateTime(time.atZone(zoneId))));
     return departure;
@@ -159,8 +150,7 @@ public class StopEventResponseMapper {
       new XmlDateTime(tripTimeOnDate.scheduledArrival().atZone(zoneId))
     );
 
-    tripTimeOnDate
-      .realtimeArrival()
+    tripTimeOnDate.realtimeArrival()
       .filter(d -> optionalFeatures.contains(REALTIME_DATA))
       .ifPresent(time -> arrival.withEstimatedTime(new XmlDateTime(time.atZone(zoneId))));
     return arrival;

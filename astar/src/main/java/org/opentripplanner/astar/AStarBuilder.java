@@ -15,16 +15,13 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AStarBuilder<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class AStarBuilder<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   Logger LOG = LoggerFactory.getLogger(AStarBuilder.class);
 
-  private Runnable preStartHook = () ->
-    LOG.warn("No pre-start hook provided. Call withPreStartHook() to set one.");
+  private Runnable preStartHook = () -> LOG.warn(
+    "No pre-start hook provided. Call withPreStartHook() to set one."
+  );
   private RemainingWeightHeuristic<State> heuristic;
   private SkipEdgeStrategy<State, Edge> skipEdgeStrategy;
   private TraverseVisitor<State, Edge> traverseVisitor;
@@ -46,8 +43,8 @@ public class AStarBuilder<
   }
 
   /**
-   * Set a function that will be called before the search begins. Useful for checking that
-   * a timeout has not been reached before the search begins.
+   * Set a function that will be called before the search begins. Useful for checking that a timeout
+   * has not been reached before the search begins.
    */
   public AStarBuilder<State, Edge, Vertex> withPreStartHook(Runnable hook) {
     this.preStartHook = hook;
@@ -92,7 +89,10 @@ public class AStarBuilder<
     return this;
   }
 
-  /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
+  /**
+   * The function that compares paths converging on the same vertex to decide which ones continue to
+   * be explored.
+   */
   public AStarBuilder<State, Edge, Vertex> withDominanceFunction(
     DominanceFunction<State> dominanceFunction
   ) {

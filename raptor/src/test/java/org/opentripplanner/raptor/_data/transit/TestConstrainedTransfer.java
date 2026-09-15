@@ -8,9 +8,8 @@ import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-class TestConstrainedTransfer
-  implements RaptorConstrainedTransfer, RaptorBoardOrAlightEvent<TestTripSchedule>
-{
+class TestConstrainedTransfer implements RaptorConstrainedTransfer,
+  RaptorBoardOrAlightEvent<TestTripSchedule> {
 
   private final TestTransferConstraint transferConstraint;
   private final TestTripSchedule sourceTrip;
@@ -104,12 +103,10 @@ class TestConstrainedTransfer
     TestTripSchedule targetTrip,
     int targetStopPos
   ) {
-    return (
-      this.sourceTrip.equals(sourceTrip) &&
+    return (this.sourceTrip.equals(sourceTrip) &&
       this.sourceStopPos == sourceStopPos &&
       this.targetTrip.equals(targetTrip) &&
-      this.targetStopPos == targetStopPos
-    );
+      this.targetStopPos == targetStopPos);
   }
 
   @Override

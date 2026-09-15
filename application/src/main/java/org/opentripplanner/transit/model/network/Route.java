@@ -71,8 +71,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
 
   @Override
   public boolean sameAs(Route other) {
-    return (
-      getId().equals(other.getId()) &&
+    return (getId().equals(other.getId()) &&
       Objects.equals(this.agency, other.agency) &&
       Objects.equals(this.operator, other.operator) &&
       Objects.equals(this.groupsOfRoutes, other.groupsOfRoutes) &&
@@ -88,8 +87,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
       Objects.equals(this.url, other.url) &&
       Objects.equals(this.color, other.color) &&
       Objects.equals(this.textColor, other.textColor) &&
-      Objects.equals(this.bikesAllowed, other.bikesAllowed)
-    );
+      Objects.equals(this.bikesAllowed, other.bikesAllowed));
   }
 
   @Override
@@ -151,8 +149,8 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   }
 
   /**
-   * The visual sort priority of this route when displayed in a graphical interface.
-   * A lower number means that the route has a higher priority.
+   * The visual sort priority of this route when displayed in a graphical interface. A lower number
+   * means that the route has a higher priority.
    * <p>
    * Pass-through information from GTFS. This information is not used by OTP.
    */

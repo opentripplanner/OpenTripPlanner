@@ -63,8 +63,8 @@ public class GqlUtil {
     return GraphQLFieldDefinition.newFieldDefinition()
       .name("id")
       .type(new GraphQLNonNull(Scalars.GraphQLID))
-      .dataFetcher(env ->
-        Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
+      .dataFetcher(
+        env -> Optional.ofNullable((AbstractTransitEntity<?, ?>) env.getSource())
           .map(AbstractTransitEntity::getId)
           .map(idMapper::mapToApi)
           .orElse("")
@@ -86,10 +86,9 @@ public class GqlUtil {
   }
 
   /**
-   * Return the integer value of the argument or throw an exception if the value is null
-   * or strictly negative.
-   * This should generally be handled at the GraphQL schema level,
-   * but must sometimes be implemented programmatically to preserve backward compatibility.
+   * Return the integer value of the argument or throw an exception if the value is null or strictly
+   * negative. This should generally be handled at the GraphQL schema level, but must sometimes be
+   * implemented programmatically to preserve backward compatibility.
    */
   public static int getPositiveNonNullIntegerArgument(
     DataFetchingEnvironment environment,

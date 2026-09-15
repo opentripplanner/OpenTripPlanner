@@ -67,8 +67,8 @@ class TripPatternMapper {
 
   private final ReadOnlyHierarchicalMap<String, Route> routeById;
 
-  private final Multimap<String, ServiceJourney> serviceJourneysByPatternId =
-    ArrayListMultimap.create();
+  private final Multimap<String, ServiceJourney> serviceJourneysByPatternId = ArrayListMultimap
+    .create();
 
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
 
@@ -252,8 +252,8 @@ class TripPatternMapper {
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
       )
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addAllTripTimes(createTripTimes(trips, tripStopTimes))
+      .withScheduledTimeTableBuilder(
+        builder -> builder.addAllTripTimes(createTripTimes(trips, tripStopTimes))
       )
       .build();
 
@@ -275,9 +275,11 @@ class TripPatternMapper {
   ) {
     var tripsOnServiceDates = new ArrayList<TripOnServiceDate>();
     if (datedServiceJourneysBySJId.containsKey(serviceJourney.getId())) {
-      for (DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(
-        serviceJourney.getId()
-      )) {
+      for (
+        DatedServiceJourney datedServiceJourney : datedServiceJourneysBySJId.get(
+          serviceJourney.getId()
+        )
+      ) {
         tripsOnServiceDates.add(mapDatedServiceJourney(journeyPattern, trip, datedServiceJourney));
       }
     }
@@ -301,8 +303,7 @@ class TripPatternMapper {
       datedServiceJourney.getServiceAlteration()
     );
 
-    var replacementFor = datedServiceJourney
-      .getJourneyRef()
+    var replacementFor = datedServiceJourney.getJourneyRef()
       .stream()
       .map(JAXBElement::getValue)
       .filter(DatedServiceJourneyRefStructure.class::isInstance)
@@ -392,8 +393,9 @@ class TripPatternMapper {
   ) {
     return deduplicator.deduplicateObject(
       Trip.class,
-      tripMapper.mapServiceJourney(serviceJourney, () ->
-        findTripHeadsign(journeyPattern, serviceJourney)
+      tripMapper.mapServiceJourney(
+        serviceJourney,
+        () -> findTripHeadsign(journeyPattern, serviceJourney)
       )
     );
   }

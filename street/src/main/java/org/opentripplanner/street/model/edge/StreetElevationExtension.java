@@ -60,8 +60,8 @@ public class StreetElevationExtension implements Serializable {
       this.compactedElevationProfile = null;
       this.packedElevationProfile = packedElevationProfile;
     } else {
-      this.compactedElevationProfile =
-        CompactElevationProfile.compactElevationProfileWithRegularSamples(packedElevationProfile);
+      this.compactedElevationProfile = CompactElevationProfile
+        .compactElevationProfileWithRegularSamples(packedElevationProfile);
       this.packedElevationProfile = null;
     }
   }
@@ -78,8 +78,8 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
-   * The distance multiplied by the {@link StreetEdge#getBicycleSafetyFactor()} }, but also considering the
-   * increased length caused by the slope.
+   * The distance multiplied by the {@link StreetEdge#getBicycleSafetyFactor()} }, but also
+   * considering the increased length caused by the slope.
    */
   public double getEffectiveBicycleSafetyDistance() {
     return effectiveBicycleSafetyDistance;
@@ -94,8 +94,8 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
-   * The distance multiplied by a factor considering how much more/less convenient it is to bike
-   * the edge, compared to if it was flat. This is calculated form the energy usage of the cyclist.
+   * The distance multiplied by a factor considering how much more/less convenient it is to bike the
+   * edge, compared to if it was flat. This is calculated form the energy usage of the cyclist.
    */
   public double getEffectiveBikeDistanceForWorkCost() {
     return effectiveBikeDistanceForWorkCost;
@@ -110,8 +110,8 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
-   * The distance multiplied by the {@link StreetEdge#getWalkSafetyFactor()}, but also considering the
-   * increased length caused by the slope.
+   * The distance multiplied by the {@link StreetEdge#getWalkSafetyFactor()}, but also considering
+   * the increased length caused by the slope.
    */
   public double getEffectiveWalkSafetyDistance() {
     return effectiveWalkSafetyDistance;
@@ -133,9 +133,9 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
-   * Slice this elevation profile to {@code [start, end]} along the edge. Returns {@code null}
-   * when the resulting sub-profile would have fewer than two coordinates (e.g. a zero-length
-   * slice or a slice that falls entirely between two coordinate samples).
+   * Slice this elevation profile to {@code [start, end]} along the edge. Returns {@code null} when
+   * the resulting sub-profile would have fewer than two coordinates (e.g. a zero-length slice or a
+   * slice that falls entirely between two coordinate samples).
    */
   public PackedCoordinateSequence partial(double start, double end) {
     return ElevationProfileSlicer.slice(getElevationProfile(), start, end);

@@ -17,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Module to analyze connectivity of stops in the graph. Ferry stops are considered isolated if
- * they are not connected to any edge. The rest are isolated when you cannot walk for at least
- * 10 minutes after alighting at the stop.
+ * Module to analyze connectivity of stops in the graph. Ferry stops are considered isolated if they
+ * are not connected to any edge. The rest are isolated when you cannot walk for at least 10 minutes
+ * after alighting at the stop.
  */
 public class StopConnectivityModule implements GraphBuilderModule {
 
@@ -45,18 +45,13 @@ public class StopConnectivityModule implements GraphBuilderModule {
       graph.getVerticesOfType(TransitStopVertex.class).size()
     );
     LOG.info(progress.startMessage());
-    var issues = graph
-      .getVerticesOfType(TransitStopVertex.class)
-      .parallelStream()
-      .map(stop -> {
-        if (stop.isFerryStop()) {
-          return checkFerryStop(stop, progress);
-        } else {
-          return checkWalkingConnection(stop, progress);
-        }
-      })
-      .filter(Objects::nonNull)
-      .toList();
+    var issues = graph.getVerticesOfType(TransitStopVertex.class).parallelStream().map(stop -> {
+      if (stop.isFerryStop()) {
+        return checkFerryStop(stop, progress);
+      } else {
+        return checkWalkingConnection(stop, progress);
+      }
+    }).filter(Objects::nonNull).toList();
 
     issues.forEach(issueStore::add);
 

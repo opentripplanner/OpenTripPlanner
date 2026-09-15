@@ -15,8 +15,8 @@ import org.opentripplanner.astar.spi.DominanceFunction;
 class ShortestPathTreeTest {
 
   /** Dominance by weight: lower weight dominates. */
-  private static final DominanceFunction<TestState> BY_WEIGHT = (a, b) ->
-    a.getWeight() <= b.getWeight();
+  private static final DominanceFunction<TestState> BY_WEIGHT = (a, b) -> a.getWeight() <=
+    b.getWeight();
 
   /** No dominance: all states are co-dominant. */
   private static final DominanceFunction<TestState> NONE = (_, _) -> false;

@@ -33,8 +33,9 @@ public class DefaultTransitDataProviderFilterBuilder {
     var wheelchairEnabled = request.journey().wheelchair();
     var wheelchair = request.preferences().wheelchair();
 
-    var builder = new DefaultTransitDataProviderFilterBuilder()
-      .withRequireBikesAllowed(request.journey().transfer().mode() == StreetMode.BIKE)
+    var builder = new DefaultTransitDataProviderFilterBuilder().withRequireBikesAllowed(
+      request.journey().transfer().mode() == StreetMode.BIKE
+    )
       .withRequireCarsAllowed(request.journey().transfer().mode() == StreetMode.CAR)
       .withRequireWheelchairAccessibleTrips(
         wheelchairEnabled && wheelchair.trip().onlyConsiderAccessible()

@@ -437,8 +437,8 @@ public class TripUpdateBuilder {
     @Nullable String scheduledDepartureTime,
     @Nullable String assignedStopId
   ) {
-    final StopTimeUpdate.Builder stopTimeUpdateBuilder =
-      tripUpdateBuilder.addStopTimeUpdateBuilder();
+    final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder
+      .addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationShip);
 
     if (stopId != null) {
@@ -489,8 +489,7 @@ public class TripUpdateBuilder {
     }
 
     if (scheduledDepartureTime != null) {
-      var epochSeconds = midnight
-        .plusSeconds(TimeUtils.time(scheduledDepartureTime))
+      var epochSeconds = midnight.plusSeconds(TimeUtils.time(scheduledDepartureTime))
         .toEpochSecond();
       stopTimeUpdateBuilder.getDepartureBuilder().setScheduledTime(epochSeconds);
     }

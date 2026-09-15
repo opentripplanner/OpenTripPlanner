@@ -97,9 +97,10 @@ public class AffectsType {
           .type(datedServiceJourneyType)
           .dataFetcher(environment -> {
             EntitySelector.Trip entitySelector = environment.getSource();
-            return GqlUtil.getTransitService(environment).getTripOnServiceDate(
-              new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
-            );
+            return GqlUtil.getTransitService(environment)
+              .getTripOnServiceDate(
+                new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
+              );
           })
           .build()
       )
@@ -183,8 +184,8 @@ public class AffectsType {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")
           .type(TransmodelScalars.DATE_SCALAR)
-          .dataFetcher(environment ->
-            environment.<EntitySelector.StopAndTrip>getSource().serviceDate()
+          .dataFetcher(
+            environment -> environment.<EntitySelector.StopAndTrip>getSource().serviceDate()
           )
           .build()
       )
@@ -194,9 +195,10 @@ public class AffectsType {
           .type(datedServiceJourneyType)
           .dataFetcher(environment -> {
             EntitySelector.StopAndTrip entitySelector = environment.getSource();
-            return GqlUtil.getTransitService(environment).getTripOnServiceDate(
-              new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
-            );
+            return GqlUtil.getTransitService(environment)
+              .getTripOnServiceDate(
+                new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
+              );
           })
           .build()
       )

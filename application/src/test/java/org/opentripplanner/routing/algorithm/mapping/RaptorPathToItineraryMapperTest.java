@@ -137,8 +137,7 @@ public class RaptorPathToItineraryMapperTest {
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
     var schedule = getTestTripSchedule2();
-    var path = new TestPathBuilder(COST_CALCULATOR)
-      .access(TRANSIT_START - BOARD_SLACK, 1)
+    var path = new TestPathBuilder(COST_CALCULATOR).access(TRANSIT_START - BOARD_SLACK, 1)
       .bus(schedule, 2)
       .bus(schedule, 1)
       .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
@@ -176,8 +175,8 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   /**
-   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3 legs
-   * are properly mapped in the itinerary.
+   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3
+   * legs are properly mapped in the itinerary.
    */
   @Test
   void createItineraryWithOnBoardFlexAccess() {
@@ -225,8 +224,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private RaptorPath<TestTripSchedule> transferAtSameStopPath() {
     var schedule = transferAtSameStopSchedule();
-    return new TestPathBuilder(COST_CALCULATOR)
-      .access(TRANSIT_START, 1)
+    return new TestPathBuilder(COST_CALCULATOR).access(TRANSIT_START, 1)
       .bus(schedule, 2)
       .bus(schedule, 1)
       .egress(TestAccessEgress.free(1, RaptorCostConverter.toRaptorCost(100)));
@@ -237,14 +235,13 @@ public class RaptorPathToItineraryMapperTest {
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
     var originalPattern = getOriginalPattern(pattern);
 
-    var timetable = new TestTripSchedule.Builder()
-      .times(
-        TimeUtils.time("10:00"),
-        TimeUtils.time("10:05"),
-        TimeUtils.time("10:10"),
-        TimeUtils.time("10:15"),
-        TimeUtils.time("10:20")
-      )
+    var timetable = new TestTripSchedule.Builder().times(
+      TimeUtils.time("10:00"),
+      TimeUtils.time("10:05"),
+      TimeUtils.time("10:10"),
+      TimeUtils.time("10:15"),
+      TimeUtils.time("10:20")
+    )
       .pattern(pattern)
       .originalPattern(originalPattern)
       .withTripTimes(buildTripTimes(originalPattern))
@@ -286,8 +283,7 @@ public class RaptorPathToItineraryMapperTest {
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
-      var stop = siteRepositoryBuilder
-        .regularStop(new FeedScopedId("TestFeed", i + ""))
+      var stop = siteRepositoryBuilder.regularStop(new FeedScopedId("TestFeed", i + ""))
         .withCoordinate(0.0, 0.0)
         .build();
       var stopTime = new StopTime();
@@ -347,14 +343,13 @@ public class RaptorPathToItineraryMapperTest {
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2, 3, 2, 1).withRoute(ROUTE);
     var originalPattern = getOriginalPattern(pattern);
 
-    var timetable = new TestTripSchedule.Builder()
-      .times(
-        TimeUtils.time("10:00"),
-        TimeUtils.time("10:05"),
-        TimeUtils.time("10:10"),
-        TimeUtils.time("10:15"),
-        TimeUtils.time("10:20")
-      )
+    var timetable = new TestTripSchedule.Builder().times(
+      TimeUtils.time("10:00"),
+      TimeUtils.time("10:05"),
+      TimeUtils.time("10:10"),
+      TimeUtils.time("10:15"),
+      TimeUtils.time("10:20")
+    )
       .pattern(pattern)
       .originalPattern(originalPattern)
       .withTripTimes(buildTripTimes(originalPattern))
@@ -370,8 +365,7 @@ public class RaptorPathToItineraryMapperTest {
     var pattern = TestTripPattern.pattern("TestPattern", 1, 2).withRoute(ROUTE);
     var originalPattern = getOriginalPattern(pattern);
 
-    var timetable = new TestTripSchedule.Builder()
-      .times(TRANSIT_START, TRANSIT_END)
+    var timetable = new TestTripSchedule.Builder().times(TRANSIT_START, TRANSIT_END)
       .pattern(pattern)
       .originalPattern(originalPattern)
       .withTripTimes(buildTripTimes(originalPattern))

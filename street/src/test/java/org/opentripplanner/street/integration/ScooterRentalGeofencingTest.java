@@ -51,10 +51,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   static final GeofencingZone NO_DROP_OFF_ZONE = TestGeofencingZoneBuilder.of(
     NETWORK,
     "no-dropoff-zone"
-  )
-    .withGeometry(Polygons.OSLO)
-    .noDropOff()
-    .build();
+  ).withGeometry(Polygons.OSLO).noDropOff().build();
 
   private StreetVertex A, B, C, D, E;
   private TemporaryStreetLocation T_ORIGIN, T_DEST;
@@ -62,36 +59,34 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
 
   @BeforeEach
   public void setUp() {
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 200, perm);
-          street(B, C, 2000, perm);
-          street(C, D, 200, perm);
-          street(D, E, 200, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 200, perm);
+        street(B, C, 2000, perm);
+        street(C, D, 200, perm);
+        street(D, E, 200, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, true));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, false));
-        }
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, true));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, false));
       }
-    );
+    });
   }
 
   @Test
@@ -123,37 +118,35 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
 
   @Test
   public void forwardSearchWithScooterInsideZone() {
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter-inside", 59.913, 10.7401);
-          SCOOTER_VERTEX.setInitialGeofencingZones(Set.of(NO_DROP_OFF_ZONE));
+        SCOOTER_VERTEX = createFloatingScooter("scooter-inside", 59.913, 10.7401);
+        SCOOTER_VERTEX.setInitialGeofencingZones(Set.of(NO_DROP_OFF_ZONE));
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 100, perm);
-          street(B, C, 100, perm);
-          street(C, D, 100, perm);
-          street(D, E, 100, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 100, perm);
+        street(B, C, 100, perm);
+        street(C, D, 100, perm);
+        street(D, E, 100, perm);
 
-          biLink(D, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(D, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, true));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, false));
-        }
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, true));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(NO_DROP_OFF_ZONE, false));
       }
-    );
+    });
 
     var forward = runSearch(T_ORIGIN, T_DEST, false);
     assertNotNull(forward, "forward should find a path");
@@ -186,10 +179,9 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var builder = StreetSearchRequest.of()
       .withArriveBy(true)
       .withMode(StreetMode.SCOOTER_RENTAL)
-      .withScooter(s ->
-        s.withRental(r ->
-          r
-            .withPickupTime(Duration.ofSeconds(30))
+      .withScooter(
+        s -> s.withRental(
+          r -> r.withPickupTime(Duration.ofSeconds(30))
             .withPickupCost(Cost.costOfSeconds(30))
             .withDropOffTime(Duration.ofSeconds(15))
             .withDropOffCost(Cost.costOfSeconds(15))
@@ -209,8 +201,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var path = tree.getPath(T_ORIGIN);
     assertNotNull(path, "arriveBy should find a path");
 
-    var descriptor = path.states
-      .stream()
+    var descriptor = path.states.stream()
       .filter(s -> s.getBackEdge() != null)
       .map(s -> formatState(s))
       .collect(Collectors.toList());
@@ -233,38 +224,36 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .noDropOff()
       .build();
 
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 100, perm);
-          street(B, C, 100, perm);
-          street(C, D, 100, perm);
-          street(D, E, 100, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 100, perm);
+        street(B, C, 100, perm);
+        street(C, D, 100, perm);
+        street(D, E, 100, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          B.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, true));
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, false));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, true));
-          E.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, false));
-        }
+        B.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, true));
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, false));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, true));
+        E.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, false));
       }
-    );
+    });
 
     var forward = runSearch(T_ORIGIN, T_DEST, false);
     assertNotNull(forward, "forward should find a path");
@@ -278,48 +267,45 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .noTraversal()
       .build();
 
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.912, 10.770);
-          E = intersection("E", 59.913, 10.740);
-          var F = intersection("F", 59.9125, 10.740);
-          var G = intersection("G", 59.9128, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.912, 10.770);
+        E = intersection("E", 59.913, 10.740);
+        var F = intersection("F", 59.9125, 10.740);
+        var G = intersection("G", 59.9128, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9135, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9135, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 100, perm);
-          street(B, C, 100, perm);
-          street(C, D, 1500, perm);
-          street(D, E, 1500, perm);
-          street(C, F, 800, perm);
-          street(F, G, 400, perm);
-          street(G, E, 800, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 100, perm);
+        street(B, C, 100, perm);
+        street(C, D, 1500, perm);
+        street(D, E, 1500, perm);
+        street(C, F, 800, perm);
+        street(F, G, 400, perm);
+        street(G, E, 800, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
-          F.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, false));
-        }
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
+        F.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, false));
       }
-    );
+    });
 
     var forward = runSearch(T_ORIGIN, T_DEST, false);
     assertNotNull(forward, "should find a path");
     var allStates = String.join("\n  ", forward);
 
-    boolean ridesAroundZone = forward
-      .stream()
+    boolean ridesAroundZone = forward.stream()
       .anyMatch(d -> d.contains("CD street") && d.contains("RENTING_FLOATING"));
     assertTrue(
       ridesAroundZone,
@@ -328,8 +314,8 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   }
 
   /**
-   * ArriveBy with adjacent no-drop-off zones (same network). Destination inside zone A,
-   * zone B is adjacent. Drop-off must happen outside BOTH zones.
+   * ArriveBy with adjacent no-drop-off zones (same network). Destination inside zone A, zone B is
+   * adjacent. Drop-off must happen outside BOTH zones.
    *
    * <pre>
    *   T_origin -- A -- B(scooter) -- C -- D -- E -- T_dest
@@ -353,49 +339,46 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .noDropOff()
       .build();
 
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 200, perm);
-          street(B, C, 2000, perm);
-          street(C, D, 500, perm);
-          street(D, E, 500, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 200, perm);
+        street(B, C, 2000, perm);
+        street(C, D, 500, perm);
+        street(D, E, 500, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          // Zone A boundary: C outside (entering=true), D inside (entering=false)
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, true));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, false));
-          // Zone B boundary: B outside (entering=true), C inside (entering=false)
-          B.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, true));
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, false));
-        }
+        // Zone A boundary: C outside (entering=true), D inside (entering=false)
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, true));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneA, false));
+        // Zone B boundary: B outside (entering=true), C inside (entering=false)
+        B.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, true));
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(zoneB, false));
       }
-    );
+    });
 
     // ArriveBy: destination inside zone A only (not zone B)
     var builder = StreetSearchRequest.of()
       .withArriveBy(true)
       .withMode(StreetMode.SCOOTER_RENTAL)
-      .withScooter(s ->
-        s.withRental(r ->
-          r
-            .withPickupTime(Duration.ofSeconds(30))
+      .withScooter(
+        s -> s.withRental(
+          r -> r.withPickupTime(Duration.ofSeconds(30))
             .withPickupCost(Cost.costOfSeconds(30))
             .withDropOffTime(Duration.ofSeconds(15))
             .withDropOffCost(Cost.costOfSeconds(15))
@@ -415,8 +398,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var path = tree.getPath(T_ORIGIN);
     assertNotNull(path, "arriveBy should find a path");
 
-    var descriptor = path.states
-      .stream()
+    var descriptor = path.states.stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
       .collect(Collectors.toList());
@@ -439,42 +421,40 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   }
 
   private void setupNoTraversalGraph(GeofencingZone noTraversalZone) {
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 500, perm);
-          street(B, C, 1000, perm);
-          street(C, D, 1000, perm);
-          street(D, E, 500, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 500, perm);
+        street(B, C, 1000, perm);
+        street(C, D, 1000, perm);
+        street(D, E, 500, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, false));
-        }
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, true));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(noTraversalZone, false));
       }
-    );
+    });
   }
 
   /**
-   * Business area: origin and scooter inside BA, destination outside.
-   * Forward: rider should drop off at BA boundary (C), walk C→D→E→dest.
-   * Rider must NOT be RENTING_FLOATING on DE or E→dest edges (outside BA).
+   * Business area: origin and scooter inside BA, destination outside. Forward: rider should drop
+   * off at BA boundary (C), walk C→D→E→dest. Rider must NOT be RENTING_FLOATING on DE or E→dest
+   * edges (outside BA).
    *
    * <pre>
    *   T_origin --- A --- B(scooter) --- C --- D --- E --- T_dest
@@ -490,37 +470,35 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .asBusinessArea()
       .build();
 
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 200, perm);
-          street(B, C, 200, perm);
-          street(C, D, 200, perm);
-          street(D, E, 200, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 200, perm);
+        street(B, C, 200, perm);
+        street(C, D, 200, perm);
+        street(D, E, 200, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          // C is last vertex inside BA (entering=false), D is first outside (entering=true)
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, false));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, true));
-        }
+        // C is last vertex inside BA (entering=false), D is first outside (entering=true)
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, false));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, true));
       }
-    );
+    });
 
     var forward = runSearch(T_ORIGIN, T_DEST, false);
     assertNotNull(forward, "forward should find a path");
@@ -528,8 +506,8 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
   }
 
   /**
-   * Business area arrive-by: destination outside BA. The search should find a path that
-   * drops off inside the BA and walks to destination — NOT ride to destination and drop outside.
+   * Business area arrive-by: destination outside BA. The search should find a path that drops off
+   * inside the BA and walks to destination — NOT ride to destination and drop outside.
    */
   @Test
   public void arriveBySearchDropsOffInsideBusinessArea() {
@@ -538,46 +516,43 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .asBusinessArea()
       .build();
 
-    modelOf(
-      new Builder() {
-        @Override
-        public void build() {
-          A = intersection("A", 59.910, 10.740);
-          B = intersection("B", 59.911, 10.740);
-          C = intersection("C", 59.912, 10.740);
-          D = intersection("D", 59.913, 10.740);
-          E = intersection("E", 59.914, 10.740);
+    modelOf(new Builder() {
+      @Override
+      public void build() {
+        A = intersection("A", 59.910, 10.740);
+        B = intersection("B", 59.911, 10.740);
+        C = intersection("C", 59.912, 10.740);
+        D = intersection("D", 59.913, 10.740);
+        E = intersection("E", 59.914, 10.740);
 
-          T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
-          T_DEST = streetLocation("dest", 59.9145, 10.740);
+        T_ORIGIN = streetLocation("origin", 59.9095, 10.740);
+        T_DEST = streetLocation("dest", 59.9145, 10.740);
 
-          SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
+        SCOOTER_VERTEX = createFloatingScooter("scooter1", 59.911, 10.7401);
 
-          var perm = StreetTraversalPermission.ALL;
-          street(A, B, 200, perm);
-          street(B, C, 200, perm);
-          street(C, D, 200, perm);
-          street(D, E, 200, perm);
+        var perm = StreetTraversalPermission.ALL;
+        street(A, B, 200, perm);
+        street(B, C, 200, perm);
+        street(C, D, 200, perm);
+        street(D, E, 200, perm);
 
-          biLink(B, SCOOTER_VERTEX);
-          link(T_ORIGIN, A);
-          link(E, T_DEST);
+        biLink(B, SCOOTER_VERTEX);
+        link(T_ORIGIN, A);
+        link(E, T_DEST);
 
-          C.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, false));
-          D.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, true));
-        }
+        C.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, false));
+        D.addGeofencingBoundary(new GeofencingBoundaryExtension(businessArea, true));
       }
-    );
+    });
 
     // Destination is outside BA — arriveByDestinationZones must be empty (not the
     // default NO_DROP_OFF_ZONE from runSearch). Use a custom search.
     var request = StreetSearchRequest.of()
       .withArriveBy(true)
       .withMode(StreetMode.SCOOTER_RENTAL)
-      .withScooter(s ->
-        s.withRental(r ->
-          r
-            .withPickupTime(Duration.ofSeconds(30))
+      .withScooter(
+        s -> s.withRental(
+          r -> r.withPickupTime(Duration.ofSeconds(30))
             .withPickupCost(Cost.costOfSeconds(30))
             .withDropOffTime(Duration.ofSeconds(15))
             .withDropOffCost(Cost.costOfSeconds(15))
@@ -595,8 +570,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var path = tree.getPath(T_ORIGIN);
     assertNotNull(path, "arriveBy should find a path");
 
-    var arriveBy = path.states
-      .stream()
+    var arriveBy = path.states.stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
       .collect(Collectors.toList());
@@ -632,10 +606,9 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var builder = StreetSearchRequest.of()
       .withArriveBy(arriveBy)
       .withMode(StreetMode.SCOOTER_RENTAL)
-      .withScooter(s ->
-        s.withRental(r ->
-          r
-            .withPickupTime(Duration.ofSeconds(30))
+      .withScooter(
+        s -> s.withRental(
+          r -> r.withPickupTime(Duration.ofSeconds(30))
             .withPickupCost(Cost.costOfSeconds(30))
             .withDropOffTime(Duration.ofSeconds(15))
             .withDropOffCost(Cost.costOfSeconds(15))
@@ -660,8 +633,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       return null;
     }
 
-    return path.states
-      .stream()
+    return path.states.stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
       .collect(Collectors.toList());

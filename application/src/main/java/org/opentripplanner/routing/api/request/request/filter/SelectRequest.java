@@ -48,7 +48,8 @@ public class SelectRequest implements Serializable {
   }
 
   /**
-   * Will return true if the pattern matches the filter and false if it doesn't match or might not match.
+   * Will return true if the pattern matches the filter and false if it doesn't match or might not
+   * match.
    */
   public boolean matchesPatternNot(TripPattern tripPattern) {
     return matchesPattern(tripPattern, false);
@@ -60,14 +61,12 @@ public class SelectRequest implements Serializable {
   public boolean matchesSelect(TripTimes tripTimes) {
     var trip = tripTimes.getTrip();
 
-    return (
-      this.transportModeFilter == null ||
+    return (this.transportModeFilter == null ||
       this.transportModeFilter.match(
         trip.getMode(),
         trip.getNetexSubMode(),
         trip.getRoute().getGtfsType()
-      )
-    );
+      ));
   }
 
   /**
@@ -75,14 +74,12 @@ public class SelectRequest implements Serializable {
    */
   public boolean matchesNot(TripTimes tripTimes) {
     var trip = tripTimes.getTrip();
-    return (
-      this.transportModeFilter != null &&
+    return (this.transportModeFilter != null &&
       this.transportModeFilter.match(
         trip.getMode(),
         trip.getNetexSubMode(),
         trip.getRoute().getGtfsType()
-      )
-    );
+      ));
   }
 
   @Override
@@ -167,14 +164,12 @@ public class SelectRequest implements Serializable {
         // If 3 or less of the main modes are *excluded* we guess that the user did exclude, and
         // not included everything. This make it much easier to read: "NOT [FERRY]" instead of
         // "[AIRPLANE, CABLE_CAR, CARPOOL, COACH ... "
-        return (
-          "NOT " +
+        return ("NOT " +
           MainAndSubMode.toString(
             MainAndSubMode.notMainModes(
               transportModes.stream().map(NarrowedTransitMode::toMainAndSubMode).toList()
             )
-          )
-        );
+          ));
       }
     }
     return NarrowedTransitMode.toString(transportModes);

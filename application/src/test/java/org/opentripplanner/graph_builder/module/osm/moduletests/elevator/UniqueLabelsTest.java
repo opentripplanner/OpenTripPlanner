@@ -20,8 +20,7 @@ class UniqueLabelsTest {
       "1, 1, 1, 1",
       "0, 1, 1, null",
       "null, null, 1, null",
-      "null, null, null, null",
-    },
+      "null, null, null, null", },
     nullValues = "null"
   )
   void testOsmElevatorNodeUniqueLabels(String level1, String ref1, String level2, String ref2) {
@@ -30,36 +29,20 @@ class UniqueLabelsTest {
     var elevatorNode = NodeBuilder.of(3, new WgsCoordinate(0, 3))
       .withTag("highway", "elevator")
       .build();
-    var provider = TestOsmProvider.of()
-      .addWayFromNodes(
-        way -> {
-          way.withTag("level", level1);
-          way.withTag("level:ref", ref1);
-        },
-        n1,
-        elevatorNode
-      )
-      .addWayFromNodes(
-        way -> {
-          way.withTag("level", level2);
-          way.withTag("level:ref", ref2);
-        },
-        elevatorNode,
-        n2
-      )
-      .build();
+    var provider = TestOsmProvider.of().addWayFromNodes(way -> {
+      way.withTag("level", level1);
+      way.withTag("level:ref", ref1);
+    }, n1, elevatorNode).addWayFromNodes(way -> {
+      way.withTag("level", level2);
+      way.withTag("level:ref", ref2);
+    }, elevatorNode, n2).build();
     var graph = new Graph();
 
     OsmModuleTestFactory.of(provider).withGraph(graph).builder().build().buildGraph();
 
     assertEquals(
       graph.getVertices().size(),
-      graph
-        .getVertices()
-        .stream()
-        .map(vertex -> vertex.getLabel())
-        .distinct()
-        .count()
+      graph.getVertices().stream().map(vertex -> vertex.getLabel()).distinct().count()
     );
   }
 }

@@ -190,8 +190,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     );
 
     assertFalse(
-      ((EntitySelector.Stop) entitySelector)
-        .stopConditions()
+      ((EntitySelector.Stop) entitySelector).stopConditions()
         .contains(StopCondition.EXCEPTIONAL_STOP)
     );
     assertFalse(
@@ -1261,8 +1260,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
         if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
           foundMatch = stopAndRoute.equals(new EntityKey.StopAndRoute(stopId, routeOrTripId));
         } else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
-          foundMatch =
-            stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&
+          foundMatch = stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&
             stopAndTrip.serviceDate().equals(serviceDate);
         }
       }

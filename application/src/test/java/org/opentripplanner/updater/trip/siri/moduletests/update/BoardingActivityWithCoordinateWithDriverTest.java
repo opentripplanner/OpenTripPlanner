@@ -22,10 +22,9 @@ class BoardingActivityWithCoordinateWithDriverTest implements RealtimeTestConsta
   private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
 
   /**
-   * When a stop has COORDINATE_WITH_DRIVER pickup/dropoff and SIRI sends
-   * BOARDING/ALIGHTING boarding activities, the trip should stay UPDATED
-   * (not MODIFIED), because both are routable — SIRI boarding activities
-   * are less specific than the planned PickDrop value.
+   * When a stop has COORDINATE_WITH_DRIVER pickup/dropoff and SIRI sends BOARDING/ALIGHTING
+   * boarding activities, the trip should stay UPDATED (not MODIFIED), because both are routable —
+   * SIRI boarding activities are less specific than the planned PickDrop value.
    */
   @Test
   void boardingActivityShouldNotOverrideCoordinateWithDriver() {
@@ -49,12 +48,10 @@ class BoardingActivityWithCoordinateWithDriverTest implements RealtimeTestConsta
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, scheduledPattern.getBoardType(1));
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, scheduledPattern.getAlightType(1));
 
-    var updates = siri
-      .etBuilder()
+    var updates = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:11")
           .call(STOP_B)
           .arriveAimedExpected("00:00:20", "00:00:20")

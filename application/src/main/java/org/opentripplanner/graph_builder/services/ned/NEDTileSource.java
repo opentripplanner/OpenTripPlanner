@@ -14,7 +14,7 @@ import org.opentripplanner.street.graph.Graph;
 public interface NEDTileSource {
   /**
    * Fetches all of the required data and stores it in the specified cache directory. It is crucial
-   * that this be somewhere permanent with plenty of disk space.  Don't use /tmp -- the downloading
+   * that this be somewhere permanent with plenty of disk space. Don't use /tmp -- the downloading
    * process takes a long time and you don't want to repeat it if at all possible.
    */
   void fetchData(Graph graph, CompositeDataSource cacheDir);

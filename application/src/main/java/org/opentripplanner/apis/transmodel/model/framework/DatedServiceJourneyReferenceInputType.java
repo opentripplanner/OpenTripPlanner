@@ -17,15 +17,13 @@ public class DatedServiceJourneyReferenceInputType {
         "Exactly one of the fields must be set."
     )
     .withDirective(OneOfDirective)
-    .field(b ->
-      b
-        .name(FIELD_SERVICE_JOURNEY_ON_SERVICE_DATE)
+    .field(
+      b -> b.name(FIELD_SERVICE_JOURNEY_ON_SERVICE_DATE)
         .description("Identifies the service journey by service journey ID and service date.")
         .type(ServiceJourneyOnServiceDateInputType.INPUT_TYPE)
     )
-    .field(b ->
-      b
-        .name(FIELD_DATED_SERVICE_JOURNEY_ID)
+    .field(
+      b -> b.name(FIELD_DATED_SERVICE_JOURNEY_ID)
         .description(
           "Identifies the service journey by a dated service journey ID " +
             "(e.g. from NeTEx data where a service journey on a date has a unique ID)."

@@ -45,10 +45,10 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
           switch (type) {
-            case ROUTE:
+            case ROUTE :
               alerts.addAll(alertService.getRouteAlerts(getSource(environment).getId()));
               break;
-            case ROUTE_TYPE:
+            case ROUTE_TYPE :
               alerts.addAll(
                 alertService.getRouteTypeAlerts(
                   getSource(environment).getGtfsType(),
@@ -62,28 +62,25 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
                 )
               );
               break;
-            case AGENCY:
+            case AGENCY :
               alerts.addAll(
                 alertService.getAgencyAlerts(getSource(environment).getAgency().getId())
               );
               break;
-            case TRIPS:
-              getTrips(environment).forEach(trip ->
-                alerts.addAll(alertService.getTripAlerts(trip.getId()))
+            case TRIPS :
+              getTrips(environment).forEach(
+                trip -> alerts.addAll(alertService.getTripAlerts(trip.getId()))
               );
               break;
-            case STOPS_ON_ROUTE:
+            case STOPS_ON_ROUTE :
               alerts.addAll(
-                alertService
-                  .getAllAlerts()
+                alertService.getAllAlerts()
                   .stream()
-                  .filter(alert ->
-                    alert
-                      .entities()
+                  .filter(
+                    alert -> alert.entities()
                       .stream()
                       .anyMatch(
-                        entity ->
-                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                        entity -> entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
                           stopAndRoute.routeId().equals(getSource(environment).getId())
                       )
                   )
@@ -96,20 +93,17 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
                 );
               });
               break;
-            case STOPS_ON_TRIPS:
+            case STOPS_ON_TRIPS :
               Iterable<Trip> trips = getTrips(environment);
-              trips.forEach(trip ->
-                alerts.addAll(
-                  alertService
-                    .getAllAlerts()
+              trips.forEach(
+                trip -> alerts.addAll(
+                  alertService.getAllAlerts()
                     .stream()
-                    .filter(alert ->
-                      alert
-                        .entities()
+                    .filter(
+                      alert -> alert.entities()
                         .stream()
                         .anyMatch(
-                          entity ->
-                            entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                          entity -> entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
                             stopAndTrip.tripId().equals(trip.getId())
                         )
                     )
@@ -117,7 +111,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
                 )
               );
               break;
-            case PATTERNS:
+            case PATTERNS :
               alerts.addAll(
                 alertService.getDirectionAndRouteAlerts(
                   Direction.INBOUND,
@@ -162,8 +156,10 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment ->
-      new Relay.ResolvedGlobalId("Route", getSource(environment).getId().toString());
+    return environment -> new Relay.ResolvedGlobalId(
+      "Route",
+      getSource(environment).getId().toString()
+    );
   }
 
   @Override
@@ -177,11 +173,10 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<String> longName() {
-    return environment ->
-      org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
-        getSource(environment).getLongName(),
-        environment
-      );
+    return environment -> org.opentripplanner.framework.graphql.GraphQLUtils.getTranslation(
+      getSource(environment).getLongName(),
+      environment
+    );
   }
 
   @Override
@@ -216,10 +211,8 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<Boolean> replacementsExist() {
-    return environment ->
-      getTransitService(environment)
-        .getReplacementHelper()
-        .replacementsExist(getSource(environment));
+    return environment -> getTransitService(environment).getReplacementHelper()
+      .replacementsExist(getSource(environment));
   }
 
   @Override
@@ -258,8 +251,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   }
 
   private Iterable<Object> getStops(DataFetchingEnvironment environment) {
-    return getTransitService(environment)
-      .findPatterns(getSource(environment))
+    return getTransitService(environment).findPatterns(getSource(environment))
       .stream()
       .map(TripPattern::getStops)
       .flatMap(Collection::stream)
@@ -267,8 +259,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   }
 
   private Iterable<Trip> getTrips(DataFetchingEnvironment environment) {
-    return getTransitService(environment)
-      .findPatterns(getSource(environment))
+    return getTransitService(environment).findPatterns(getSource(environment))
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toSet());

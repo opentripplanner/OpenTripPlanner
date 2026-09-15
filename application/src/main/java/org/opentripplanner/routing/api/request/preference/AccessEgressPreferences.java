@@ -71,11 +71,9 @@ public final class AccessEgressPreferences implements Serializable {
       return false;
     }
     AccessEgressPreferences that = (AccessEgressPreferences) o;
-    return (
-      penalty.equals(that.penalty) &&
+    return (penalty.equals(that.penalty) &&
       maxDuration.equals(that.maxDuration) &&
-      maxStopCountLimit.equals(that.maxStopCountLimit)
-    );
+      maxStopCountLimit.equals(that.maxStopCountLimit));
   }
 
   @Override
@@ -125,8 +123,8 @@ public final class AccessEgressPreferences implements Serializable {
       int defaultMaxStopCount,
       Map<StreetMode, Integer> maxStopCountForMode
     ) {
-      return withMaxStopCount(b ->
-        b.withDefaultLimit(defaultMaxStopCount).withLimitsForModes(maxStopCountForMode)
+      return withMaxStopCount(
+        b -> b.withDefaultLimit(defaultMaxStopCount).withLimitsForModes(maxStopCountForMode)
       );
     }
 

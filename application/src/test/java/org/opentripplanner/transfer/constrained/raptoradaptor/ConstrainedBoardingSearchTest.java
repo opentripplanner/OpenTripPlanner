@@ -42,10 +42,14 @@ public class ConstrainedBoardingSearchTest {
   private static final TransferConstraint NOT_ALLOWED_CONSTRAINT = TransferConstraint.of()
     .notAllowed()
     .build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT =
-    TransferConstraint.of().minTransferTime(600).build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT =
-    TransferConstraint.of().minTransferTime(0).build();
+  private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT = TransferConstraint
+    .of()
+    .minTransferTime(600)
+    .build();
+  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT = TransferConstraint
+    .of()
+    .minTransferTime(0)
+    .build();
   private static final StopTransferPoint STOP_B_TX_POINT = new StopTransferPoint(STOP_B);
   private static final StopTransferPoint STOP_C_TX_POINT = new StopTransferPoint(STOP_C);
 
@@ -85,19 +89,12 @@ public class ConstrainedBoardingSearchTest {
    *   - Trip R2-6:           10:40  10:55  11:05
    * </pre>
    * <ul>
-   *     <li>
-   *         The transfer at stop B is tight between trip R1-2 and R2-1. There is no time between
-   *         the arrival and departure, and it is only possible to transfer if the transfer is
-   *         stay-seated or guaranteed. For other types of constrained transfers we should board
-   *         the next trip 'R2-2'.
-   *     </li>
-   *     <li>
-   *         The transfer at stop C allow regular transfers between trip R1-2 and R2-1.
-   *     </li>
-   *     <li>
-   *         R1-1 is the fallback in the reverse search in the same way as R2-2 is the fallback
-   *         int the forward search.
-   *     </li>
+   *   <li>The transfer at stop B is tight between trip R1-2 and R2-1. There is no time between the
+   *       arrival and departure, and it is only possible to transfer if the transfer is stay-seated or
+   *       guaranteed. For other types of constrained transfers we should board the next trip 'R2-2'.</li>
+   *   <li>The transfer at stop C allow regular transfers between trip R1-2 and R2-1.</li>
+   *   <li>R1-1 is the fallback in the reverse search in the same way as R2-2 is the fallback int the
+   *       forward search.</li>
    * </ul>
    * The
    */

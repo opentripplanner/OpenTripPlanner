@@ -6,9 +6,8 @@ import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculat
 /**
  * Implement {@link RaptorTransitGroupPriorityCalculator}.
  */
-public final class DefaultTransitGroupPriorityCalculator
-  implements RaptorTransitGroupPriorityCalculator
-{
+public final class DefaultTransitGroupPriorityCalculator implements
+  RaptorTransitGroupPriorityCalculator {
 
   @Override
   public int mergeInGroupId(int currentGroupIds, int boardingGroupId) {

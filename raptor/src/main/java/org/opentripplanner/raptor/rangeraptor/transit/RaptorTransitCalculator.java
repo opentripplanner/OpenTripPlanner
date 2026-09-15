@@ -15,10 +15,9 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 /**
- * The transit calculator is used to calculate transit related stuff, like calculating
- * <em>earliest boarding time</em> and time-shifting the access paths.
- * <p/>
- * The calculator is shared between the state, worker and path mapping code. This make the
+ * The transit calculator is used to calculate transit related stuff, like calculating <em>earliest
+ * boarding time</em> and time-shifting the access paths.
+ * <p/>The calculator is shared between the state, worker and path mapping code. This make the
  * calculations consistent and let us hide the request parameters. Hiding the request parameters
  * ensure that this calculator is used.
  * <p>
@@ -26,15 +25,11 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  * argument names uses a search-direction agnostic vocabulary. We try to use the terms "source" and
  * "target", in stead of "from/to" and "board/alight".
  * <ul>
- * <li>
- *     In a FORWARD search the "source" means "from" and "target" means "to".
- * </li>
- * <li>
- *     In a BACKWARD search the "source" means "to" and "target" means "from". The traversal of the
- *     graph happens from the destination towards the origin - backwards in time. The "from/to"
- *     refer to the "natural way" we think about a journey, while "source/target" the destination
- *     is the source and the origin is the target in a BACKWARD search.
- * </li>
+ *   <li>In a FORWARD search the "source" means "from" and "target" means "to".</li>
+ *   <li>In a BACKWARD search the "source" means "to" and "target" means "from". The traversal of the
+ *       graph happens from the destination towards the origin - backwards in time. The "from/to" refer to
+ *       the "natural way" we think about a journey, while "source/target" the destination is the source
+ *       and the origin is the target in a BACKWARD search.</li>
  * </ul>
  * "Source" and "target" may apply to stop-arrival, trip, board-/aligh-slack, and so on.
  * <p>
@@ -47,9 +42,9 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
   /**
    * Return a calculator for test purpose. The following parameters are fixed:
    * <ul>
-   *     <li>'earliestDepartureTime' = 08:00:00
-   *     <li>'latestArrivalTime',  = 10:00:00
-   *     <li>'iterationStep' = 60 seconds
+   *   <li>'earliestDepartureTime' = 08:00:00
+   *   <li>'latestArrivalTime', = 10:00:00
+   *   <li>'iterationStep' = 60 seconds
    * </ul>
    *
    * @param forward if true create a calculator for forward search, if false search
@@ -80,8 +75,8 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
    * search it will be the earliest possible departure time, while for reverse search it uses the
    * latest arrival time.
    * <p>
-   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
-   * is not possible after the requested departure time
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible after the requested
+   * departure time
    */
   int departureTime(RaptorAccessEgress accessPath, int departureTime);
 
@@ -98,8 +93,8 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
   int minIterationDepartureTime();
 
   /**
-   * Return TRUE if the Range Raptor should perform only ONE iteration. This happens if
-   * the search window is less than or equals to the iteration step duration.
+   * Return TRUE if the Range Raptor should perform only ONE iteration. This happens if the search
+   * window is less than or equals to the iteration step duration.
    */
   boolean oneIterationOnly();
 
@@ -158,12 +153,12 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
   );
 
   /**
-   * This method removes the time-penalty from the given time if the provided accessEgress has
-   * a time-penalty, if not the given time is returned without any change.
+   * This method removes the time-penalty from the given time if the provided accessEgress has a
+   * time-penalty, if not the given time is returned without any change.
    * <p>
-   * You may use this method to enforce time constraints like the arriveBy time passed into Raptor.
-   * This should not be applied to the time Raptor uses for the comparison, like in the ParetoSet.
-   * The arrival-times used in a pareto-set must include the time-penalty.
+   * You may use this method to enforce time constraints like the arriveBy time passed into
+   * Raptor. This should not be applied to the time Raptor uses for the comparison, like in the
+   * ParetoSet. The arrival-times used in a pareto-set must include the time-penalty.
    */
   default int timeMinusPenalty(int time, RaptorAccessEgress accessEgress) {
     return accessEgress.hasTimePenalty() ? minusDuration(time, accessEgress.timePenalty()) : time;

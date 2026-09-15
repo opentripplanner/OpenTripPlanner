@@ -61,7 +61,8 @@ public class SiriFuzzyTripMatcher {
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     var calls = journeyWrapper.calls();
     if (calls.isEmpty()) {
       throw UpdateException.of(NO_VALID_STOPS);
@@ -84,10 +85,9 @@ public class SiriFuzzyTripMatcher {
       if (stop == null) {
         throw UpdateException.of(UNKNOWN_STOP);
       }
-      ZonedDateTime arrivalTime =
-        lastCall.getAimedArrivalTime() != null
-          ? lastCall.getAimedArrivalTime()
-          : lastCall.getAimedDepartureTime();
+      ZonedDateTime arrivalTime = lastCall.getAimedArrivalTime() != null
+        ? lastCall.getAimedArrivalTime()
+        : lastCall.getAimedDepartureTime();
 
       if (arrivalTime != null) {
         trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
@@ -99,8 +99,7 @@ public class SiriFuzzyTripMatcher {
 
     Optional<Route> route = journeyWrapper.lineRef().map(entityResolver::resolveRoute);
     if (route.isPresent()) {
-      trips = trips
-        .stream()
+      trips = trips.stream()
         .filter(trip -> trip.getRoute().equals(route.get()))
         .collect(Collectors.toSet());
     }
@@ -123,8 +122,7 @@ public class SiriFuzzyTripMatcher {
   ) {
     List<FeedScopedId> matches = new ArrayList<>();
     for (Trip trip : cache.tripsByInternalPlanningCode(internalPlanningCode)) {
-      Set<LocalDate> serviceDates = transitService
-        .getTripCalendars()
+      Set<LocalDate> serviceDates = transitService.getTripCalendars()
         .listServiceDates(trip.getServiceId());
       if (serviceDates.contains(serviceDate)) {
         matches.add(trip.getId());
@@ -184,7 +182,8 @@ public class SiriFuzzyTripMatcher {
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
     BiFunction<FeedScopedId, LocalDate, TripPattern> getNewTripPatternForModifiedTrip
-  ) throws UpdateException {
+  )
+    throws UpdateException {
     var journeyFirstStop = entityResolver.resolveQuay(calls.getFirst().getStopPointRef());
     var journeyLastStop = entityResolver.resolveQuay(calls.getLast().getStopPointRef());
     if (journeyFirstStop == null || journeyLastStop == null) {
@@ -210,18 +209,17 @@ public class SiriFuzzyTripMatcher {
         trip.getId(),
         serviceDate
       );
-      TripPattern tripPattern =
-        newTripPatternForModifiedTrip != null
-          ? newTripPatternForModifiedTrip
-          : transitService.findPattern(trip);
+      TripPattern tripPattern = newTripPatternForModifiedTrip != null
+        ? newTripPatternForModifiedTrip
+        : transitService.findPattern(trip);
 
       var firstStop = tripPattern.firstStop();
       var lastStop = tripPattern.lastStop();
 
-      boolean firstStopIsMatch =
-        firstStop.equals(journeyFirstStop) || firstStop.isPartOfSameStationAs(journeyFirstStop);
-      boolean lastStopIsMatch =
-        lastStop.equals(journeyLastStop) || lastStop.isPartOfSameStationAs(journeyLastStop);
+      boolean firstStopIsMatch = firstStop.equals(journeyFirstStop) ||
+        firstStop.isPartOfSameStationAs(journeyFirstStop);
+      boolean lastStopIsMatch = lastStop.equals(journeyLastStop) ||
+        lastStop.isPartOfSameStationAs(journeyLastStop);
 
       if (!firstStopIsMatch || !lastStopIsMatch) {
         continue;

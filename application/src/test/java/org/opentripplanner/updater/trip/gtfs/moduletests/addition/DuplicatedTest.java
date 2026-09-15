@@ -25,15 +25,17 @@ class DuplicatedTest implements RealtimeTestConstants {
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2026, 6, 22);
   private static final LocalTime TIME = LocalTime.of(13, 30);
-  private static final String DUPLICATED_ID =
-    TRIP_1_ID + ":duplicated:" + SERVICE_DATE + "T" + TIME;
+  private static final String DUPLICATED_ID = TRIP_1_ID +
+    ":duplicated:" +
+    SERVICE_DATE +
+    "T" +
+    TIME;
   private final TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of();
   private final RegularStop stopA = envBuilder.stop(STOP_A_ID);
   private final RegularStop stopB = envBuilder.stop(STOP_B_ID);
   private final RegularStop stopC = envBuilder.stop(STOP_C_ID);
 
-  private final TransitTestEnvironment env = envBuilder
-    .addStops(STOP_A_ID, STOP_B_ID, STOP_C_ID)
+  private final TransitTestEnvironment env = envBuilder.addStops(STOP_A_ID, STOP_B_ID, STOP_C_ID)
     .addTrip(
       TripInput.of(TRIP_1_ID)
         .withServiceDates(SERVICE_DATE, SERVICE_DATE.plusDays(2))
@@ -46,8 +48,7 @@ class DuplicatedTest implements RealtimeTestConstants {
 
   @Test
   void duplicated() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(TRIP_1_ID, DUPLICATED)
+    var tripUpdate = gtfsRt.tripUpdate(TRIP_1_ID, DUPLICATED)
       .withStartDate(SERVICE_DATE)
       .withStartTime(TIME)
       .build();
@@ -71,8 +72,7 @@ class DuplicatedTest implements RealtimeTestConstants {
   )
   void duplicatedOnDifferentServiceDate() {
     var date = SERVICE_DATE.plusDays(1);
-    var tripUpdate = gtfsRt
-      .tripUpdate(TRIP_1_ID, DUPLICATED)
+    var tripUpdate = gtfsRt.tripUpdate(TRIP_1_ID, DUPLICATED)
       .withStartDate(date)
       .withStartTime(TIME)
       .build();
@@ -90,8 +90,7 @@ class DuplicatedTest implements RealtimeTestConstants {
 
   @Test
   void invalidIncrementality() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(TRIP_1_ID, DUPLICATED)
+    var tripUpdate = gtfsRt.tripUpdate(TRIP_1_ID, DUPLICATED)
       .withStartDate(SERVICE_DATE)
       .withStartTime(LocalTime.of(13, 0))
       .build();
@@ -104,8 +103,7 @@ class DuplicatedTest implements RealtimeTestConstants {
 
   @Test
   void originalTripNotFound() {
-    var tripUpdate = gtfsRt
-      .tripUpdate("not-found", DUPLICATED)
+    var tripUpdate = gtfsRt.tripUpdate("not-found", DUPLICATED)
       .withStartDate(SERVICE_DATE)
       .withStartTime(LocalTime.of(13, 0))
       .build();
@@ -115,8 +113,7 @@ class DuplicatedTest implements RealtimeTestConstants {
 
   @Test
   void outsideServicePeriod() {
-    var tripUpdate = gtfsRt
-      .tripUpdate(TRIP_1_ID, DUPLICATED)
+    var tripUpdate = gtfsRt.tripUpdate(TRIP_1_ID, DUPLICATED)
       .withStartDate(SERVICE_DATE.plusYears(1))
       .withStartTime(LocalTime.of(13, 0))
       .build();

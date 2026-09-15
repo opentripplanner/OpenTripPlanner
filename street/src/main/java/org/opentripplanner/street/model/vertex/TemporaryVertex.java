@@ -3,9 +3,8 @@ package org.opentripplanner.street.model.vertex;
 /**
  * Marker interface for temporary vertices.
  * <p>
- * Remember to use the {@link #dispose(Vertex)} to delete the temporary vertex from the main graph
- * after use.
- * </p>
+ * Remember to use the {@link #dispose(Vertex)} to delete the temporary vertex from the main
+ * graph after use.</p>
  */
 public interface TemporaryVertex {
   /**

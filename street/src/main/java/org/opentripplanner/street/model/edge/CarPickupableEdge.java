@@ -6,20 +6,16 @@ import org.opentripplanner.street.search.state.StateEditor;
 
 public interface CarPickupableEdge {
   default boolean canPickupAndDrive(State state) {
-    return (
-      state.getRequest().mode().includesPickup() &&
+    return (state.getRequest().mode().includesPickup() &&
       state.getCarPickupState() ==
         (state.getRequest().arriveBy()
           ? CarPickupState.WALK_FROM_DROP_OFF
-          : CarPickupState.WALK_TO_PICKUP)
-    );
+          : CarPickupState.WALK_TO_PICKUP));
   }
 
   default boolean canDropOffAfterDriving(State state) {
-    return (
-      state.getRequest().mode().includesPickup() &&
-      state.getCarPickupState() == CarPickupState.IN_CAR
-    );
+    return (state.getRequest().mode().includesPickup() &&
+      state.getCarPickupState() == CarPickupState.IN_CAR);
   }
 
   default void dropOffAfterDriving(State state, StateEditor editor) {

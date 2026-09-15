@@ -108,11 +108,10 @@ public final class State implements AStarState<State, Edge, Vertex> {
     var destinationZones = streetSearchRequest.arriveByDestinationZones();
     var restrictedNetworks = destinationZones.isEmpty()
       ? Set.<String>of()
-      : destinationZones
-          .stream()
-          .filter(GeofencingZone::hasRestriction)
-          .map(z -> z.id().getFeedId())
-          .collect(Collectors.toSet());
+      : destinationZones.stream()
+        .filter(GeofencingZone::hasRestriction)
+        .map(z -> z.id().getFeedId())
+        .collect(Collectors.toSet());
 
     for (Vertex vertex : vertices) {
       for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
@@ -142,8 +141,8 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * Takes two nullable states and returns an array of states (possibly empty) which is guaranteed
    * to contain no nulls.
    * <p>
-   * This method is optimized for a low number of allocations and therefore doesn't use any streams
-   * or collections to filter out the nulls.
+   * This method is optimized for a low number of allocations and therefore doesn't use any
+   * streams or collections to filter out the nulls.
    */
   public static State[] ofNullable(@Nullable State s1, @Nullable State s2) {
     if (s1 == null && s2 == null) {
@@ -188,8 +187,10 @@ public final class State implements AStarState<State, Edge, Vertex> {
     return stateData.carPickupState;
   }
 
-  /** Always round the same way and in the same direction when converting milliseconds to seconds.
-   * This means that request.arriveBy must be taken into account. Used in many places. */
+  /**
+   * Always round the same way and in the same direction when converting milliseconds to seconds.
+   * This means that request.arriveBy must be taken into account. Used in many places.
+   */
   private long millisecondsToSeconds(long milliseconds) {
     if (request.arriveBy()) {
       return milliseconds / 1000L;
@@ -217,11 +218,9 @@ public final class State implements AStarState<State, Edge, Vertex> {
   }
 
   public boolean isCompatibleVehicleRentalState(State state) {
-    return (
-      stateData.vehicleRentalState == state.stateData.vehicleRentalState &&
+    return (stateData.vehicleRentalState == state.stateData.vehicleRentalState &&
       stateData.mayKeepRentedVehicleAtDestination ==
-        state.stateData.mayKeepRentedVehicleAtDestination
-    );
+        state.stateData.mayKeepRentedVehicleAtDestination);
   }
 
   public boolean isRentingVehicleFromStation() {
@@ -233,22 +232,18 @@ public final class State implements AStarState<State, Edge, Vertex> {
   }
 
   public boolean isRentingVehicle() {
-    return (
-      stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION ||
-      stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING
-    );
+    return (stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION ||
+      stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING);
   }
 
   private boolean vehicleRentalIsFinished() {
     boolean dropOffBanned = isDropOffBannedByCurrentZones();
-    return (
-      stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
+    return (stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING && !dropOffBanned) ||
       (getRequest().allowsArrivingInRentalAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION &&
-        !dropOffBanned)
-    );
+        !dropOffBanned));
   }
 
   private boolean vehicleRentalNotStarted() {
@@ -275,8 +270,9 @@ public final class State implements AStarState<State, Edge, Vertex> {
       vehicleRentingOk = !request.mode().includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
-      vehicleRentingOk =
-        !request.mode().includesRenting() || vehicleRentalNotStarted() || vehicleRentalIsFinished();
+      vehicleRentingOk = !request.mode().includesRenting() ||
+        vehicleRentalNotStarted() ||
+        vehicleRentalIsFinished();
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;
@@ -339,7 +335,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
 
   /**
    * @return The current mode of this state. When doing a rental request, this can for example
-   * indicate if the state is currently using a vehicle or not.
+   *         indicate if the state is currently using a vehicle or not.
    */
   public TraverseMode currentMode() {
     return stateData.currentMode;
@@ -364,7 +360,7 @@ public final class State implements AStarState<State, Edge, Vertex> {
    * duration. This is the result of combining the functions from GraphPath optimize and reverse.
    *
    * @return a state at the other end (or this end, in the case of a forward search) of a reversed
-   * path
+   *         path
    */
   public State reverse() {
     State orig = this;

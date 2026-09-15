@@ -30,21 +30,20 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
         builder,
         "(v2, MAY, PT2M13S, 31)",
         // We can add named fields in any order(token order: byte,Duration,Int)
-        it ->
-          it
-            .encode()
-            .withInt(INT_FIELD, INT_VALUE)
-            .withEnum(ENUM_FIELD, ENUM_VALUE)
-            .withDuration(DURATION_FIELD, DURATION_VALUE)
+        it -> it.encode()
+          .withInt(INT_FIELD, INT_VALUE)
+          .withEnum(ENUM_FIELD, ENUM_VALUE)
+          .withDuration(DURATION_FIELD, DURATION_VALUE)
       )
     );
 
     // Version 3 - [ENUM, @deprecated DURATION, INT]
     builder = builder.newVersion().deprecate(DURATION_FIELD);
     TEST_CASES.add(
-      testCase(builder, "(v3, MAY, 31)", it ->
-        it
-          .encode()
+      testCase(
+        builder,
+        "(v3, MAY, 31)",
+        it -> it.encode()
           .withInt(INT_FIELD, INT_VALUE)
           .withEnum(ENUM_FIELD, ENUM_VALUE)
           .withDuration(DURATION_FIELD, DURATION_VALUE)
@@ -54,9 +53,10 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
     // Version 4 - [ENUM, INT, STRING]
     builder = builder.newVersion().addString(STRING_FIELD);
     TEST_CASES.add(
-      testCase(builder, "(v4, MAY, 31, text)", it ->
-        it
-          .encode()
+      testCase(
+        builder,
+        "(v4, MAY, 31, text)",
+        it -> it.encode()
           .withInt(INT_FIELD, INT_VALUE)
           .withEnum(ENUM_FIELD, ENUM_VALUE)
           .withString(STRING_FIELD, STRING_VALUE)
@@ -66,9 +66,10 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
     // Version 5 - [@deprecated ENUM, INT, STRING, TIME_INSTANT]
     builder = builder.newVersion().deprecate(ENUM_FIELD).addTimeInstant(TIME_INSTANT_FIELD);
     TEST_CASES.add(
-      testCase(builder, "(v5, 31, text, 2023-10-23T10:00:59Z)", it ->
-        it
-          .encode()
+      testCase(
+        builder,
+        "(v5, 31, text, 2023-10-23T10:00:59Z)",
+        it -> it.encode()
           .withInt(INT_FIELD, INT_VALUE)
           .withEnum(ENUM_FIELD, ENUM_VALUE)
           .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
@@ -78,9 +79,10 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
     // Version 6 - [INT, STRING, TIME_INSTANT]
     builder = builder.newVersion();
     TEST_CASES.add(
-      testCase(builder, "(v6, 31, text, 2023-10-23T10:00:59Z)", it ->
-        it
-          .encode()
+      testCase(
+        builder,
+        "(v6, 31, text, 2023-10-23T10:00:59Z)",
+        it -> it.encode()
           .withInt(INT_FIELD, INT_VALUE)
           .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
           .withString(STRING_FIELD, STRING_VALUE)
@@ -95,18 +97,20 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
   @ParameterizedTest
   @MethodSource(value = "testCases")
   void testDecodeBackwardsCompatibility(TestCase testCase) {
-    allTestCasesFrom(testCase).forEach(s ->
-      assertEquals(testCase.expected(), s.decode(testCase.token()).toString())
+    allTestCasesFrom(testCase).forEach(
+      s -> assertEquals(testCase.expected(), s.decode(testCase.token()).toString())
     );
   }
 
   @ParameterizedTest
   @MethodSource(value = "testCases")
   void testDecodeForwardCompatibility(TestCase testCase) {
-    nextTestCase(testCase)
-      .map(TestCase::token)
-      .ifPresent(nextVersionToken ->
-        assertEquals(testCase.expected(), testCase.subject().decode(nextVersionToken).toString())
+    nextTestCase(testCase).map(TestCase::token)
+      .ifPresent(
+        nextVersionToken -> assertEquals(
+          testCase.expected(),
+          testCase.subject().decode(nextVersionToken).toString()
+        )
       );
   }
 

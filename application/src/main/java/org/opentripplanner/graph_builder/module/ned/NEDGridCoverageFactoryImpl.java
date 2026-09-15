@@ -31,8 +31,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     "g2012h00.gtx",
     "g2012p00.gtx",
     "g2012s00.gtx",
-    "g2012u00.gtx",
-  };
+    "g2012u00.gtx", };
   private final CompositeDataSource cacheDir;
   private final NEDTileSource tileSource;
   private final List<GridCoverage2D> regionCoverages = new ArrayList<>();

@@ -113,13 +113,9 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
 
       LocalizedString note = toNote(jsonNode);
 
-      VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
-        builder
-          .entranceId(new FeedScopedId(parameters.feedId(), vehicleParkId.getId() + "/entrance"))
-          .name(name)
-          .coordinate(coord)
-          .walkAccessible(true)
-          .carAccessible(false);
+      VehicleParking.VehicleParkingEntranceCreator entrance = builder -> builder.entranceId(
+        new FeedScopedId(parameters.feedId(), vehicleParkId.getId() + "/entrance")
+      ).name(name).coordinate(coord).walkAccessible(true).carAccessible(false);
 
       return VehicleParking.of()
         .id(vehicleParkId)

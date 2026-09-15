@@ -76,8 +76,7 @@ public class ScooterPreferencesMapper {
     var triangleArgs = args.getGraphQLTriangle();
     if (isScooterTriangleSet(triangleArgs)) {
       preferences.withForcedOptimizeTriangle(triangle -> {
-        triangle
-          .withSlope(triangleArgs.getGraphQLFlatness())
+        triangle.withSlope(triangleArgs.getGraphQLFlatness())
           .withSafety(triangleArgs.getGraphQLSafety())
           .withTime(triangleArgs.getGraphQLTime());
       });
@@ -87,11 +86,9 @@ public class ScooterPreferencesMapper {
   private static boolean isScooterTriangleSet(
     GraphQLTypes.GraphQLTriangleScooterFactorsInput args
   ) {
-    return (
-      args != null &&
+    return (args != null &&
       args.getGraphQLFlatness() != null &&
       args.getGraphQLSafety() != null &&
-      args.getGraphQLTime() != null
-    );
+      args.getGraphQLTime() != null);
   }
 }

@@ -13,10 +13,8 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * This represents the connection between a street vertex and a transit vertex.
  */
-public abstract class StreetTransitEntityLink<T extends Vertex>
-  extends Edge
-  implements CarPickupableEdge
-{
+public abstract class StreetTransitEntityLink<T extends Vertex> extends Edge implements
+  CarPickupableEdge {
 
   static final int STEL_TRAVERSE_COST = 1;
 
@@ -53,7 +51,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // if they are for the same stop.
     if (
       s0.backEdge instanceof StreetTransitEntityLink<?> link &&
-      link.transitEntityVertex == this.transitEntityVertex
+        link.transitEntityVertex == this.transitEntityVertex
     ) {
       return State.empty();
     }
@@ -69,7 +67,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       var accessibility = request.wheelchair();
       if (
         accessibility.stop().onlyConsiderAccessible() &&
-        wheelchairAccessibility != Accessibility.POSSIBLE
+          wheelchairAccessibility != Accessibility.POSSIBLE
       ) {
         return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
@@ -89,13 +87,10 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         // floating rental vehicles.
         else if (
           s0.isRentingVehicleFromStation() &&
-          !(
-            s0.mayKeepRentedVehicleAtDestination() &&
-            s0
-              .getRequest()
-              .rental(s0.getRequest().mode())
-              .allowArrivingInRentedVehicleAtDestination()
-          )
+            !(s0.mayKeepRentedVehicleAtDestination() &&
+              s0.getRequest()
+                .rental(s0.getRequest().mode())
+                .allowArrivingInRentedVehicleAtDestination())
         ) {
           yield State.empty();
         }

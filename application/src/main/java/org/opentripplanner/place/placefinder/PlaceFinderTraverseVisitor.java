@@ -62,7 +62,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
    * @param filterByRoutes             A list of Route ids used for filtering Stops. Only the stops
    *                                   which are served by the route are returned. Use null to
    *                                   disable the filtering.
-   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering.  Use
+   * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering. Use
    *                                   null to disable the filtering.
    * @param maxResults                 Maximum number of results to return.
    */
@@ -124,10 +124,10 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   /**
    * @return A SkipEdgeStrategy to be used with this TraverseVisitor. It skips edges when either the
-   * maximum number of places or the furthest distance has been reached. However, when the maximum
-   * number of places has been reached, it continues searching along other paths until the distance
-   * of the place that is furthest away. This is to account for the fact that the a star does not
-   * traverse edges ordered by distance.
+   *         maximum number of places or the furthest distance has been reached. However, when the
+   *         maximum number of places has been reached, it continues searching along other paths
+   *         until the distance of the place that is furthest away. This is to account for the fact
+   *         that the a star does not traverse edges ordered by distance.
    */
   SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
     return (current, edge) -> {
@@ -135,7 +135,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
       if (
         PlaceFinderTraverseVisitor.this.placesFound.size() >=
-        PlaceFinderTraverseVisitor.this.maxResults
+          PlaceFinderTraverseVisitor.this.maxResults
       ) {
         furthestDistance = 0;
         for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
@@ -177,8 +177,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   }
 
   private boolean stopHasPatternsWithMode(RegularStop stop, Set<TransitMode> modes) {
-    return transitService
-      .findPatterns(stop)
+    return transitService.findPatterns(stop)
       .stream()
       .map(TripPattern::getMode)
       .anyMatch(modes::contains);
@@ -199,10 +198,8 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
   /* Checks whether the stop is included in the stop filter and whether the stop should be considered
    * a stop or a station in the search.*/
   private boolean stopShouldNotBeIncludedAsStop(RegularStop stop) {
-    return (
-      (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
-      (!includeStations && !stopIsIncludedByStopFilter(stop))
-    );
+    return ((includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
+      (!includeStations && !stopIsIncludedByStopFilter(stop)));
   }
 
   /* Checks if the stop is a part of a station and whether that station is
@@ -216,10 +213,10 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
     // or if it or its parent station has already been seen.
     if (
       stopShouldNotBeIncludedAsStop(stop) ||
-      stopShouldNotBeIncludedAsStation(stop) ||
-      seenStops.contains(stop.getId()) ||
-      seenStops.contains(stop.getStationOrStopId()) ||
-      !stopIsIncludedByModeFilter(stop)
+        stopShouldNotBeIncludedAsStation(stop) ||
+        seenStops.contains(stop.getId()) ||
+        seenStops.contains(stop.getStationOrStopId()) ||
+        !stopIsIncludedByModeFilter(stop)
     ) {
       return;
     }
@@ -235,8 +232,7 @@ class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
 
   private void handlePatternsAtStop(RegularStop stop, double distance) {
     if (includePatternAtStops) {
-      List<TripPattern> patterns = transitService
-        .findPatterns(stop)
+      List<TripPattern> patterns = transitService.findPatterns(stop)
         .stream()
         .filter(pattern -> filterByModes.isEmpty() || filterByModes.contains(pattern.getMode()))
         .filter(

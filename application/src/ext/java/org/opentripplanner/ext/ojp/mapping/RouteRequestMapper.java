@@ -44,16 +44,15 @@ public class RouteRequestMapper {
       var from = toGenericLocation(origin, "origin");
       var to = toGenericLocation(destination, "destination");
 
-      var builder = defaultRequest
-        .copyOf()
+      var builder = defaultRequest.copyOf()
         .withFrom(from)
         .withTo(to)
         .withNumItineraries(numItineraries(tr))
         .withJourney(j -> j.withModes(extractAccessAndEgressModes(tr)))
         .withPreferences(p -> {
           p.withTransit(t -> t.withIgnoreRealtimeUpdates(ignoreRealtime(tr)));
-          transferSlack(tr).ifPresent(slack ->
-            p.withTransfer(transfer -> transfer.withSlack(slack))
+          transferSlack(tr).ifPresent(
+            slack -> p.withTransfer(transfer -> transfer.withSlack(slack))
           );
         });
 
@@ -70,36 +69,40 @@ public class RouteRequestMapper {
   private void addTransitFilters(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
     var includedAgencies = filterMapper.includedAgencies(tr);
     if (!includedAgencies.isEmpty()) {
-      builder.withJourney(j ->
-        j.withTransit(t ->
-          t.withFilter(b -> b.addSelect(SelectRequest.of().withAgencies(includedAgencies).build()))
+      builder.withJourney(
+        j -> j.withTransit(
+          t -> t.withFilter(
+            b -> b.addSelect(SelectRequest.of().withAgencies(includedAgencies).build())
+          )
         )
       );
     }
 
     var excludedAgencies = filterMapper.excludedAgencies(tr);
     if (!excludedAgencies.isEmpty()) {
-      builder.withJourney(j ->
-        j.withTransit(t ->
-          t.withFilter(b -> b.addNot(SelectRequest.of().withAgencies(excludedAgencies).build()))
+      builder.withJourney(
+        j -> j.withTransit(
+          t -> t.withFilter(
+            b -> b.addNot(SelectRequest.of().withAgencies(excludedAgencies).build())
+          )
         )
       );
     }
 
     var includedRoutes = filterMapper.includedRoutes(tr);
     if (!includedRoutes.isEmpty()) {
-      builder.withJourney(j ->
-        j.withTransit(t ->
-          t.withFilter(b -> b.addSelect(SelectRequest.of().withRoutes(includedRoutes).build()))
+      builder.withJourney(
+        j -> j.withTransit(
+          t -> t.withFilter(b -> b.addSelect(SelectRequest.of().withRoutes(includedRoutes).build()))
         )
       );
     }
 
     var excludedRoutes = filterMapper.excludedRoutes(tr);
     if (!excludedRoutes.isEmpty()) {
-      builder.withJourney(j ->
-        j.withTransit(t ->
-          t.withFilter(b -> b.addNot(SelectRequest.of().withRoutes(excludedRoutes).build()))
+      builder.withJourney(
+        j -> j.withTransit(
+          t -> t.withFilter(b -> b.addNot(SelectRequest.of().withRoutes(excludedRoutes).build()))
         )
       );
     }
@@ -116,16 +119,12 @@ public class RouteRequestMapper {
       var g = place.getPlaceRef().getGeoPosition();
       return GenericLocation.fromCoordinate(g.getLatitude(), g.getLongitude());
     } else if (
-      Optional.ofNullable(place.getPlaceRef().getStopPlaceRef())
-        .map(r -> r.getValue())
-        .isPresent()
+      Optional.ofNullable(place.getPlaceRef().getStopPlaceRef()).map(r -> r.getValue()).isPresent()
     ) {
       var id = idMapper.parseStrict(place.getPlaceRef().getStopPlaceRef().getValue());
       return GenericLocation.fromStopId(id);
     } else if (
-      Optional.ofNullable(place.getPlaceRef().getStopPointRef())
-        .map(r -> r.getValue())
-        .isPresent()
+      Optional.ofNullable(place.getPlaceRef().getStopPointRef()).map(r -> r.getValue()).isPresent()
     ) {
       var id = idMapper.parseStrict(place.getPlaceRef().getStopPointRef().getValue());
       return GenericLocation.fromStopId(id);
@@ -165,8 +164,7 @@ public class RouteRequestMapper {
   }
 
   private static RequestModes extractAccessAndEgressModes(OJPTripRequestStructure tr) {
-    var filters = modeFilter(tr)
-      .stream()
+    var filters = modeFilter(tr).stream()
       .flatMap(Collection::stream)
       .filter(f -> !f.getPersonalMode().isEmpty())
       .toList();
@@ -203,10 +201,10 @@ public class RouteRequestMapper {
   private static void addIncludedModes(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
     var includedModes = filterModes(tr, f -> FALSE.equals(f.isExclude()));
     if (!includedModes.isEmpty()) {
-      builder.withJourney(r ->
-        r.withTransit(t ->
-          t.withFilter(b ->
-            b.addSelect(SelectRequest.of().withTransportModes(includedModes).build())
+      builder.withJourney(
+        r -> r.withTransit(
+          t -> t.withFilter(
+            b -> b.addSelect(SelectRequest.of().withTransportModes(includedModes).build())
           )
         )
       );
@@ -216,9 +214,11 @@ public class RouteRequestMapper {
   private static void addExcludedModes(OJPTripRequestStructure tr, RouteRequestBuilder builder) {
     var excludedModes = filterModes(tr, f -> !FALSE.equals(f.isExclude()));
     if (!excludedModes.isEmpty()) {
-      builder.withJourney(r ->
-        r.withTransit(t ->
-          t.withFilter(b -> b.addNot(SelectRequest.of().withTransportModes(excludedModes).build()))
+      builder.withJourney(
+        r -> r.withTransit(
+          t -> t.withFilter(
+            b -> b.addNot(SelectRequest.of().withTransportModes(excludedModes).build())
+          )
         )
       );
     }
@@ -234,8 +234,7 @@ public class RouteRequestMapper {
     OJPTripRequestStructure tr,
     Predicate<ModeAndModeOfOperationFilterStructure> filterPredicate
   ) {
-    return modeFilter(tr)
-      .stream()
+    return modeFilter(tr).stream()
       .flatMap(List::stream)
       .filter(filterPredicate)
       .flatMap(filter -> filter.getPtMode().stream())
@@ -247,8 +246,7 @@ public class RouteRequestMapper {
   private static Optional<List<ModeAndModeOfOperationFilterStructure>> modeFilter(
     OJPTripRequestStructure tr
   ) {
-    return Optional.ofNullable(tr.getParams()).map(
-      TripParamStructure::getModeAndModeOfOperationFilter
-    );
+    return Optional.ofNullable(tr.getParams())
+      .map(TripParamStructure::getModeAndModeOfOperationFilter);
   }
 }

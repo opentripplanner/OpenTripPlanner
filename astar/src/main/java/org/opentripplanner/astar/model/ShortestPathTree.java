@@ -20,17 +20,12 @@ import org.opentripplanner.astar.spi.DominanceFunction;
  * basic Dijkstra (single-state) approach. It is much more straightforward to use the more general
  * SPT implementation in all cases.
  * <p>
- * TODO: Is this still accurate?
- * Note that turn restrictions make all searches multi-state; however turn restrictions do not apply
- * when walking. The turn restriction handling is done in the base dominance function
- * implementation, and applies to all subclasses. It essentially splits each vertex into N vertices
- * depending on the incoming edge being taken.
+ * TODO: Is this still accurate? Note that turn restrictions make all searches multi-state;
+ * however turn restrictions do not apply when walking. The turn restriction handling is done in the
+ * base dominance function implementation, and applies to all subclasses. It essentially splits each
+ * vertex into N vertices depending on the incoming edge being taken.
  */
-public class ShortestPathTree<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class ShortestPathTree<State extends AStarState<State, Edge, Vertex>, Edge extends AStarEdge<State, Edge, Vertex>, Vertex extends AStarVertex<State, Edge, Vertex>> {
 
   public final DominanceFunction<State> dominanceFunction;
 
@@ -61,7 +56,7 @@ public class ShortestPathTree<
    *
    * @param newState the State to add to the SPT, if it is deemed non-dominated
    * @return a boolean value indicating whether the state was added to the tree and should therefore
-   * be enqueued
+   *         be enqueued
    */
   @SuppressWarnings("unchecked")
   public boolean add(State newState) {
@@ -144,16 +139,15 @@ public class ShortestPathTree<
    * A state may remain in the priority queue after being dominated, and such sub-optimal states
    * must be caught as they come out of the queue to avoid unnecessary branching.
    * <p>
-   * So this function checks that a state coming out of the queue is still in the Pareto-optimal set
-   * for this vertex, which indicates that it has not been ruled out as a state on an optimal path.
-   * Many shortest path algorithms will decrease the key of a vertex in the priority queue when it
-   * is updated, but we store states in the queue rather than vertices, and states do not get
-   * updated or change their weight.
-   * TODO consider just removing states from the priority queue.
+   * So this function checks that a state coming out of the queue is still in the Pareto-optimal
+   * set for this vertex, which indicates that it has not been ruled out as a state on an optimal
+   * path. Many shortest path algorithms will decrease the key of a vertex in the priority queue
+   * when it is updated, but we store states in the queue rather than vertices, and states do not
+   * get updated or change their weight. TODO consider just removing states from the priority queue.
    * <p>
    * When the Fibonacci heap was replaced with a binary heap, the decrease-key operation was
-   * removed for the same reason: both improve theoretical run time complexity, at the cost of
-   * high constant factors and more complex code.
+   * removed for the same reason: both improve theoretical run time complexity, at the cost of high
+   * constant factors and more complex code.
    * <p>
    * So there can be dominated (useless) states in the queue. When they come out we want to
    * ignore them rather than spend time branching out from them.

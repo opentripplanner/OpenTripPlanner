@@ -40,8 +40,7 @@ public final class RaptorTripScheduleReference {
 
   @Override
   public String toString() {
-    return new StringBuilder()
-      .append('(')
+    return new StringBuilder().append('(')
       .append("route: ")
       .append(routeIndex)
       .append(", ")

@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Applies bike and walk safety factors from OSM to street edges, and tracks
- * the minimum values found across the graph. These minimums are needed to
- * provide a {@link org.opentripplanner.astar.spi.RemainingWeightHeuristic}
- * that incorporates walk and bike safety in its lower bound.
+ * Applies bike and walk safety factors from OSM to street edges, and tracks the minimum values
+ * found across the graph. These minimums are needed to provide a
+ * {@link org.opentripplanner.astar.spi.RemainingWeightHeuristic} that incorporates walk and bike
+ * safety in its lower bound.
  */
 public class SafetyValueApplier {
 
@@ -38,7 +38,7 @@ public class SafetyValueApplier {
    * Get the best bike safety in the whole graph.
    *
    * @return The bike safety of the safest way in the graph, i.e. the way with the lowest bike
-   * safety value.
+   *         safety value.
    */
   float getBestBikeSafety() {
     return bestBikeSafety;
@@ -48,7 +48,7 @@ public class SafetyValueApplier {
    * Get the best walk safety in the whole graph.
    *
    * @return The walk safety of the safest way in the graph, i.e. the way with the lowest walk
-   * safety value.
+   *         safety value.
    */
   float getBestWalkSafety() {
     return bestWalkSafety;
@@ -63,8 +63,8 @@ public class SafetyValueApplier {
   ) {
     OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
-    boolean motorVehicleNoThrough =
-      tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
+    boolean motorVehicleNoThrough = tagMapperForWay
+      .isMotorVehicleThroughTrafficExplicitlyDisallowed(way);
     boolean bicycleNoThrough = tagMapperForWay.isBicycleThroughTrafficExplicitlyDisallowed(way);
     boolean walkNoThrough = tagMapperForWay.isWalkThroughTrafficExplicitlyDisallowed(way);
 

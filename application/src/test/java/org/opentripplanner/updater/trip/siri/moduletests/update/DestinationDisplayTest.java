@@ -30,20 +30,17 @@ class DestinationDisplayTest implements RealtimeTestConstants {
   void testUpdateJourneyWithDestinationDisplay() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     var siri = SiriTestHelper.of(env);
-    var update = siri
-      .etBuilder()
+    var update = siri.etBuilder()
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withRecordedCalls(builder ->
-        builder
-          .call(STOP_A)
+      .withRecordedCalls(
+        builder -> builder.call(STOP_A)
           .departAimedActual("00:10", "00:10")
           .addDestinationDisplay("Updated A")
           .call(STOP_B)
           .departAimedActual("00:20", "00:20")
       )
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_C)
+      .withEstimatedCalls(
+        builder -> builder.call(STOP_C)
           .addDestinationDisplay("Updated C")
           .departAimedExpected("00:30", "00:30")
           .call(STOP_D)

@@ -77,10 +77,10 @@ public class HeuristicsAdapter implements Heuristics {
   public HeuristicAtStop createHeuristicAtStop(int stop) {
     return reached(stop)
       ? new HeuristicAtStop(
-          bestTravelDuration(stop),
-          bestNumOfTransfers(stop),
-          bestGeneralizedCost(stop)
-        )
+        bestTravelDuration(stop),
+        bestNumOfTransfers(stop),
+        bestGeneralizedCost(stop)
+      )
       : HeuristicAtStop.UNREACHED;
   }
 
@@ -101,10 +101,8 @@ public class HeuristicsAdapter implements Heuristics {
 
   @Override
   public int minWaitTimeForJourneysReachingDestination() {
-    return (
-      Math.abs(aggregatedResults.earliestArrivalTime() - originDepartureTime) -
-      aggregatedResults.minJourneyTravelDuration()
-    );
+    return (Math.abs(aggregatedResults.earliestArrivalTime() - originDepartureTime) -
+      aggregatedResults.minJourneyTravelDuration());
   }
 
   @Override
