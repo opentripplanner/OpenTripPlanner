@@ -9,19 +9,32 @@
 The taxi zone module filters and decorates taxi itineraries using spatial zone data
 loaded from dedicated GTFS Flex feeds.
 
-For each driving-ish leg in a taxi itinerary:
-- If **no zone covers both the pickup and drop-off coordinates**, the itinerary is removed from
-  the response.
-- If **a matching zone is found**, the generic driving leg is replaced with a `TaxiZoneLeg`
-  decorated with the provider's route, agency, and booking information from the matched flex trip.
-- Decoration is only applied when the request's access, egress, or direct mode is `TAXI`, and only
-  when the feature flag is on and a `TaxiZoneService` is configured (see Configuration). It is
-  performed by `TaxiRouter` via `TaxiZoneService.decorateAndFilter(...)`, invoked directly by
-  `TransitRouter` (for access/egress legs) and by `RoutingWorker.routeDirectTaxi()` →
-  `TaxiZoneService.routeDirect(...)` (for direct legs, which internally reuses the same
-  taxi-agnostic `DirectStreetRouter` used for all other direct street routing) — there is no
-  itinerary filter-chain step involved. If the flag is off or no service is configured, direct
-  `TAXI` requests return no itineraries rather than falling back to undecorated street routing.
+For a transit itinerary with a `TAXI` access and/or egress leg:
+- Before the transit search runs, each candidate access/egress stop is checked against
+  the request's origin/destination coordinate: if **no zone covers both**, the candidate is
+  dropped and never reaches the transit search. Access and egress are filtered independently of
+  each other.
+- Once the transit search has picked a surviving access/egress candidate and the itinerary's legs
+  are built, the plain driving leg is replaced with a `TaxiZoneLeg` decorated with the provider's
+  route, agency, and booking information from the matched flex trip. This is done by
+  `RaptorPathToItineraryMapper` calling `TaxiZoneService.decorateAccessEgressLegs(...)`. Because
+  the candidate has already passed the pre-search check, a matching zone is expected to always be
+  found here.
+
+Both of these are implemented by `TaxiAccessEgressRouter`, which `TaxiZoneService` delegates to
+for the transit access/egress case.
+
+For a direct (non-transit) `TAXI` itinerary, filtering and decoration instead happen after the
+fact on the fully-built itinerary: `RoutingWorker.routeDirectTaxi()` calls
+`TaxiZoneService.routeDirect(...)`, which reuses the same taxi-agnostic `DirectStreetRouter` used
+for all other direct street routing and then, via `DirectTaxiRouter.decorateAndFilter(...)`,
+removes the itinerary if no zone covers both its origin and destination, or replaces its driving
+leg with a `TaxiZoneLeg` otherwise. There is no itinerary filter-chain step involved.
+
+Decoration is only applied when the request's access, egress, or direct mode is `TAXI`, and only
+when the feature flag is on and a `TaxiZoneService` is configured (see Configuration). If the flag
+is off or no service is configured, direct `TAXI` requests return no itineraries rather than
+falling back to undecorated street routing.
 
 **TODO:**
 - Multi-provider support. Currently only the first matching zone is used.
@@ -31,8 +44,9 @@ For each driving-ish leg in a taxi itinerary:
 
 Taxi zone data is provided as standard GTFS Flex zip files, configured explicitly in the
 `transitFeeds.gtfsFeeds` list in `build-config.json` like any other GTFS feed, but with
-`taxiZoneProvider` set to `true`. Such feeds are **not** added to normal transit or flex
-routing — they are processed exclusively by this module.
+`taxiZoneProvider` set to `true` (this can also be set as a default for all GTFS feeds via
+`transitFeeds.gtfsDefaults.taxiZoneProvider`, overridable per-feed). Such feeds are **not** added
+to normal transit or flex routing — they are processed exclusively by this module.
 
 Example graph directory layout:
 

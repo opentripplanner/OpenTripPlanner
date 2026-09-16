@@ -16,13 +16,14 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
- * Decorates itineraries produced by street routing (direct routing and transit access/egress)
- * with taxi zone information. For each driving-ish {@link StreetLeg} it:
+ * Decorates itineraries produced by street routing (direct routing) with taxi zone information.
+ * For each {@link TraverseMode#CAR} {@link StreetLeg} it:
  * <ol>
  *   <li>Looks up which taxi zone provider covers the leg's pickup and drop-off coordinates by
  *   querying the {@link TaxiZoneIndex}.
@@ -36,27 +37,19 @@ import org.opentripplanner.utils.lang.Sandbox;
  * all matching providers should be available so users can choose.
  */
 @Sandbox
-public class TaxiRouter {
+public class DirectTaxiRouter {
 
   private final TaxiZoneIndex taxiZoneIndex;
 
-  public TaxiRouter(TaxiZoneIndex taxiZoneIndex) {
+  public DirectTaxiRouter(TaxiZoneIndex taxiZoneIndex) {
     this.taxiZoneIndex = taxiZoneIndex;
   }
 
-  public List<Itinerary> decorateAndFilter(List<Itinerary> itineraries) {
-    List<Itinerary> result = new ArrayList<>();
-    for (Itinerary itinerary : itineraries) {
-      decorateItinerary(itinerary).ifPresent(result::add);
-    }
-    return result;
-  }
-
   /**
-   * Routes a direct (non-transit) taxi itinerary by delegating to {@link DirectStreetRouter} and
+   * Routes a direct taxi itinerary by delegating to {@link DirectStreetRouter} and
    * decorating the resulting itineraries with taxi zone information.
    */
-  public List<Itinerary> routeDirect(
+  public List<Itinerary> route(
     Graph graph,
     TransitService transitService,
     StreetLimitationParametersService streetLimitationParametersService,
@@ -79,14 +72,22 @@ public class TaxiRouter {
     return decorateAndFilter(itineraries);
   }
 
+  List<Itinerary> decorateAndFilter(List<Itinerary> itineraries) {
+    List<Itinerary> result = new ArrayList<>();
+    for (Itinerary itinerary : itineraries) {
+      decorateItinerary(itinerary).ifPresent(result::add);
+    }
+    return result;
+  }
+
   /**
-   * Returns the decorated itinerary, or {@link Optional#empty()} if a driving-ish leg has no
-   * matching taxi zone (in which case the whole itinerary is dropped).
+   * Returns the decorated itinerary, or {@link Optional#empty()} if a {@link TraverseMode#CAR}
+   * leg has no matching taxi zone (in which case the whole itinerary is dropped).
    */
   private Optional<Itinerary> decorateItinerary(Itinerary itinerary) {
     List<Leg> newLegs = new ArrayList<>();
     for (Leg leg : itinerary.legs()) {
-      if (leg instanceof StreetLeg streetLeg && streetLeg.getMode().isDrivingIsh()) {
+      if (leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR) {
         var taxiZone = taxiZoneIndex.findFirstZone(
           streetLeg.from().coordinate,
           streetLeg.to().coordinate

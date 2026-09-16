@@ -16,6 +16,7 @@ import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.RoutingStartOnBoardAccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess.TripAndServiceDateResolver;
@@ -61,7 +62,13 @@ class AccessEgressFetcher {
   private final LinkingContext linkingContext;
   private final TransitServiceResolver transitServiceResolver;
   private final AccessEgressMapper accessEgressMapper;
+
+  @Nullable
   private final CarpoolingService carpoolingService;
+
+  @Nullable
+  private final TaxiZoneService taxiZoneService;
+
   private final TripScheduleIndexResolver tripScheduleIndexResolver;
   private final TripLocationResolver tripLocationResolver;
 
@@ -85,7 +92,8 @@ class AccessEgressFetcher {
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     LinkingContext linkingContext,
-    CarpoolingService carpoolingService,
+    @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiZoneService taxiZoneService,
     RaptorRoutingRequestTransitData requestTransitDataProvider
   ) {
     this.request = request;
@@ -100,6 +108,7 @@ class AccessEgressFetcher {
     this.additionalSearchDays = additionalSearchDays;
     this.linkingContext = linkingContext;
     this.carpoolingService = carpoolingService;
+    this.taxiZoneService = taxiZoneService;
     this.transitServiceResolver = new TransitServiceResolver(transitService);
     this.accessEgressMapper = new AccessEgressMapper(transitServiceResolver);
     this.tripScheduleIndexResolver = new TripScheduleIndexResolver(requestTransitDataProvider);
@@ -188,6 +197,19 @@ class AccessEgressFetcher {
       stopCountLimit,
       linkingContext
     );
+    if (taxiZoneService != null && mode == StreetMode.TAXI) {
+      nearbyStops = type.isAccess()
+        ? taxiZoneService.filterAccessNearbyStops(
+            transitService,
+            nearbyStops,
+            request.from().wgsCoordinate()
+          )
+        : taxiZoneService.filterEgressNearbyStops(
+            transitService,
+            nearbyStops,
+            request.to().wgsCoordinate()
+          );
+    }
     var accessEgresses = accessEgressMapper.mapNearbyStops(nearbyStops);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 

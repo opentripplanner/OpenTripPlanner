@@ -44,7 +44,6 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -200,6 +199,7 @@ public class TransitRouter {
       additionalSearchDays,
       linkingContext,
       carpoolingService,
+      taxiZoneService,
       requestTransitDataProvider
     );
 
@@ -288,16 +288,11 @@ public class TransitRouter {
       streetDetailsService,
       raptorTransitData,
       transitSearchTimeZero,
-      request
+      request,
+      taxiZoneService
     );
 
     List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
-
-    if (
-      taxiZoneService != null && request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI)
-    ) {
-      itineraries = taxiZoneService.decorateAndFilter(itineraries);
-    }
 
     debugTimingAggregator.finishedItineraryCreation();
 
