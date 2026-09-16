@@ -28,9 +28,9 @@ public class TaxiZoneIndex {
    * Returns the first zone whose geometry contains both {@code pickup} and
    * {@code dropoff}. Returns an empty optional if no zone covers both endpoints.
    */
+  @SuppressWarnings("unchecked")
   public Optional<TaxiZone> findFirstZone(WgsCoordinate pickup, WgsCoordinate dropoff) {
     Envelope envelope = new Envelope(pickup.asJtsCoordinate());
-    @SuppressWarnings("unchecked")
     List<TaxiZone> candidates = index.query(envelope);
 
     for (TaxiZone zone : candidates) {
