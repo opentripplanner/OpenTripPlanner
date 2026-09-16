@@ -41,7 +41,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     this.stopIndex = stopIndex;
     this.stopsWithTrips = stopsWithTrips;
     this.pathProvider = pathProvider;
-    this.orderedProfiles = RegularTransferProfileOrdering.order(profiles);
+    this.orderedProfiles = RegularTransferProfiles.of(profiles).orderedProfiles();
     this.deduplicateTolerance = deduplicateTolerance;
     this.repository = repository;
   }

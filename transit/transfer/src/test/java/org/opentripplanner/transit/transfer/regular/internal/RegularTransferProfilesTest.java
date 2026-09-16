@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
 import org.opentripplanner.transit.transfer.regular.spi.RegularTransferParameters;
 
-class RegularTransferProfileOrderingTest {
+class RegularTransferProfilesTest {
 
   private static RegularTransferParameters<String> profile(
     RaptorTransferProfile profileId,
@@ -25,7 +25,9 @@ class RegularTransferProfileOrderingTest {
     var scooter = profile(RaptorTransferProfile.SCOOTER, RaptorTransferProfile.BICYCLE);
 
     // Deliberately out of order.
-    var ordered = RegularTransferProfileOrdering.order(List.of(scooter, bicycle, wheelchair, walk));
+    var ordered = RegularTransferProfiles.of(
+      List.of(scooter, bicycle, wheelchair, walk)
+    ).orderedProfiles();
 
     var orderedProfileIds = ordered.stream().map(RegularTransferParameters::profileId).toList();
     assertThat(orderedProfileIds.indexOf(RaptorTransferProfile.WALK)).isLessThan(
@@ -51,7 +53,7 @@ class RegularTransferProfileOrderingTest {
   void missingDeduplicationProfileIsRejected() {
     var bicycle = profile(RaptorTransferProfile.BICYCLE, RaptorTransferProfile.WALK);
     assertThrows(IllegalArgumentException.class, () ->
-      RegularTransferProfileOrdering.order(List.of(bicycle))
+      RegularTransferProfiles.of(List.of(bicycle))
     );
   }
 
@@ -60,7 +62,7 @@ class RegularTransferProfileOrderingTest {
     var walk1 = profile(RaptorTransferProfile.WALK, null);
     var walk2 = profile(RaptorTransferProfile.WALK, null);
     assertThrows(IllegalArgumentException.class, () ->
-      RegularTransferProfileOrdering.order(List.of(walk1, walk2))
+      RegularTransferProfiles.of(List.of(walk1, walk2))
     );
   }
 
@@ -68,8 +70,6 @@ class RegularTransferProfileOrderingTest {
   void circularDeduplicationProfileIsRejected() {
     var a = profile(RaptorTransferProfile.BICYCLE, RaptorTransferProfile.SCOOTER);
     var b = profile(RaptorTransferProfile.SCOOTER, RaptorTransferProfile.BICYCLE);
-    assertThrows(IllegalArgumentException.class, () ->
-      RegularTransferProfileOrdering.order(List.of(a, b))
-    );
+    assertThrows(IllegalArgumentException.class, () -> RegularTransferProfiles.of(List.of(a, b)));
   }
 }
