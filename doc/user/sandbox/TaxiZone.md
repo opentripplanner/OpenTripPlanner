@@ -24,12 +24,15 @@ For a transit itinerary with a `TAXI` access and/or egress leg:
 Both of these are implemented by `TaxiAccessEgressRouter`, which `TaxiZoneService` delegates to
 for the transit access/egress case.
 
-For a direct (non-transit) `TAXI` itinerary, filtering and decoration instead happen after the
-fact on the fully-built itinerary: `RoutingWorker.routeDirectTaxi()` calls
-`TaxiZoneService.routeDirect(...)`, which reuses the same taxi-agnostic `DirectStreetRouter` used
-for all other direct street routing and then, via `DirectTaxiRouter.decorateAndFilter(...)`,
-removes the itinerary if no zone covers both its origin and destination, or replaces its driving
-leg with a `TaxiZoneLeg` otherwise. There is no itinerary filter-chain step involved.
+For a direct (non-transit) `TAXI` itinerary, the same two-phase approach is used:
+`RoutingWorker.routeDirectTaxi()` calls `TaxiZoneService.routeDirect(...)`, which delegates to
+`DirectTaxiRouter.route(...)`:
+- Before the street search runs, it checks whether the request's origin and destination share a
+  common zone; if not, an empty result is returned immediately without running
+  `DirectStreetRouter` (the same taxi-agnostic router used for all other direct street routing).
+- Otherwise, once `DirectStreetRouter` has built the itinerary, the driving leg is replaced with a
+  `TaxiZoneLeg`, looked up using those same request origin/destination coordinates rather than the
+  leg's own local coordinates. There is no itinerary filter-chain step involved.
 
 Decoration is only applied when the request's access, egress, or direct mode is `TAXI`, and only
 when the feature flag is on and a `TaxiZoneService` is configured (see Configuration). If the flag
@@ -128,7 +131,10 @@ street leg. Some fields e.g. `mode`, `serviceDate`,
 | `rentedBike` and related vehicle-rental fields | Always `false`/`null` (not applicable to a taxi leg). |
 | `trip`, `tripOnServiceDate`, `alerts`, `stopCalls` | Not applicable — fall back to the `Leg` interface's defaults (`null`/empty), since there is no scheduled trip driving the leg. |
 
-Itineraries where the leg does not match any zone are removed from the response.
+A `TAXI` request whose origin and destination (for direct routing) or whose logical
+access/egress endpoints (for transit routing) don't share a common zone never reaches leg
+decoration at all — it is filtered out before routing runs (see above), rather than being
+built and then discarded.
 
 ### Configuration
 
@@ -148,3 +154,7 @@ Enable the feature flag in `otp-config.json`:
 - Initial implementation: spatial zone index, itinerary filtering, and leg decoration with
   provider information from GTFS Flex data. Taxi zone feeds are configured explicitly in
   `transitFeeds.gtfsFeeds` with `taxiZoneProvider: true`.
+- Moved zone checking before routing runs (for both transit access/egress and direct routing),
+  filtering out non-matching requests instead of discarding built itineraries afterward, and
+  decorate using request-level origin/destination coordinates rather than a leg's own local
+  coordinates.

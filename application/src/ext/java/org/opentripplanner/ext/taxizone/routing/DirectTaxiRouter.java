@@ -2,7 +2,6 @@ package org.opentripplanner.ext.taxizone.routing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
@@ -15,21 +14,26 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.lang.Sandbox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Decorates itineraries produced by street routing (direct routing) with taxi zone information.
- * For each {@link TraverseMode#CAR} {@link StreetLeg} it:
+ * Routes and decorates direct taxi itineraries with taxi zone information.
  * <ol>
- *   <li>Looks up which taxi zone provider covers the leg's pickup and drop-off coordinates by
- *   querying the {@link TaxiZoneIndex}.
- *   <li>If no provider covers both endpoints the itinerary is removed from the result.
- *   <li>Otherwise the driving leg is replaced by a {@link TaxiZoneLeg} decorated with the first
- *   matching zone.
+ *   <li>Before the street search runs, {@link #route} checks that the request origin and
+ *   destination are covered by a common taxi zone provider (via the {@link TaxiZoneIndex}); if
+ *   not, an empty result is returned immediately without running {@link DirectStreetRouter}.
+ *   <li>Once the street search has produced itineraries, each {@link TraverseMode#CAR}
+ *   {@link StreetLeg} is replaced by a {@link TaxiZoneLeg} decorated with the matching zone,
+ *   looked up using the same logical (request origin/destination) coordinates, rather than the
+ *   leg's own local coordinates, which may differ slightly when the route is a walk-drive-walk
+ *   chain.
  * </ol>
  *
  * <p>
@@ -38,6 +42,8 @@ import org.opentripplanner.utils.lang.Sandbox;
  */
 @Sandbox
 public class DirectTaxiRouter {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DirectTaxiRouter.class);
 
   private final TaxiZoneIndex taxiZoneIndex;
 
@@ -59,6 +65,12 @@ public class DirectTaxiRouter {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
+    WgsCoordinate pickup = request.from().wgsCoordinate();
+    WgsCoordinate dropoff = request.to().wgsCoordinate();
+    if (taxiZoneIndex.findFirstZone(pickup, dropoff).isEmpty()) {
+      return List.of();
+    }
+
     var itineraries = DirectStreetRouter.route(
       graph,
       transitService,
@@ -69,37 +81,49 @@ public class DirectTaxiRouter {
       request,
       linkingContext
     );
-    return decorateAndFilter(itineraries);
+    return decorate(itineraries, pickup, dropoff);
   }
 
-  List<Itinerary> decorateAndFilter(List<Itinerary> itineraries) {
-    List<Itinerary> result = new ArrayList<>();
+  List<Itinerary> decorate(
+    List<Itinerary> itineraries,
+    WgsCoordinate pickup,
+    WgsCoordinate dropoff
+  ) {
+    List<Itinerary> result = new ArrayList<>(itineraries.size());
     for (Itinerary itinerary : itineraries) {
-      decorateItinerary(itinerary).ifPresent(result::add);
+      result.add(decorateItinerary(itinerary, pickup, dropoff));
     }
     return result;
   }
 
   /**
-   * Returns the decorated itinerary, or {@link Optional#empty()} if a {@link TraverseMode#CAR}
-   * leg has no matching taxi zone (in which case the whole itinerary is dropped).
+   * Decorates every {@link TraverseMode#CAR} leg in the itinerary with taxi zone information,
+   * looking up the zone using the given logical {@code pickup}/{@code dropoff} coordinates rather
+   * than the leg's own local coordinates.
    */
-  private Optional<Itinerary> decorateItinerary(Itinerary itinerary) {
+  private Itinerary decorateItinerary(
+    Itinerary itinerary,
+    WgsCoordinate pickup,
+    WgsCoordinate dropoff
+  ) {
     List<Leg> newLegs = new ArrayList<>();
     for (Leg leg : itinerary.legs()) {
       if (leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR) {
-        var taxiZone = taxiZoneIndex.findFirstZone(
-          streetLeg.from().coordinate,
-          streetLeg.to().coordinate
-        );
+        var taxiZone = taxiZoneIndex.findFirstZone(pickup, dropoff);
         if (taxiZone.isEmpty()) {
-          return Optional.empty();
+          LOG.warn(
+            "No taxi zone covers the pre-filtered direct taxi leg between {} and {}",
+            pickup,
+            dropoff
+          );
+          newLegs.add(leg);
+        } else {
+          newLegs.add(new TaxiZoneLeg(streetLeg, taxiZone.get()));
         }
-        newLegs.add(new TaxiZoneLeg(streetLeg, taxiZone.get()));
       } else {
         newLegs.add(leg);
       }
     }
-    return Optional.of(itinerary.copyOf().withLegs(newLegs).build());
+    return itinerary.copyOf().withLegs(newLegs).build();
   }
 }

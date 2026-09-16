@@ -20,10 +20,12 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -46,6 +48,8 @@ class DirectTaxiRouterTest implements PlanTestConstants {
   private static final Place PLACE_B = Place.forStop(
     TEST_MODEL.stop("B").withCoordinate(6.0, 8.5).build()
   );
+  private static final WgsCoordinate PICKUP = new WgsCoordinate(5.0, 8.0);
+  private static final WgsCoordinate DROPOFF = new WgsCoordinate(6.0, 8.5);
 
   private static final Polygon ZONE_POLYGON = Polygons.square(
     new Coordinate(4, 4),
@@ -74,7 +78,7 @@ class DirectTaxiRouterTest implements PlanTestConstants {
       .build();
     var subject = new DirectTaxiRouter(MATCHING_INDEX);
 
-    var result = subject.decorateAndFilter(List.of(itinerary)).getFirst();
+    var result = subject.decorate(List.of(itinerary), PICKUP, DROPOFF).getFirst();
 
     var resultLeg = result.legs().getFirst();
     assertThat(resultLeg).isInstanceOf(TaxiZoneLeg.class);
@@ -83,15 +87,19 @@ class DirectTaxiRouterTest implements PlanTestConstants {
   }
 
   @Test
-  void driveLegWithNoMatchingZoneIsRemovedFromResult() {
+  void driveLegWithNoMatchingZoneIsLeftUndecorated() {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
+    var originalLeg = itinerary.legs().getFirst();
     var subject = new DirectTaxiRouter(EMPTY_INDEX);
 
-    var result = subject.decorateAndFilter(List.of(itinerary));
+    var result = subject.decorate(List.of(itinerary), PICKUP, DROPOFF).getFirst();
 
-    assertThat(result).isEmpty();
+    var resultLeg = result.legs().getFirst();
+    assertThat(resultLeg).isInstanceOf(StreetLeg.class);
+    assertThat(resultLeg).isNotInstanceOf(TaxiZoneLeg.class);
+    assertThat(resultLeg).isEqualTo(originalLeg);
   }
 
   @Test
@@ -104,7 +112,7 @@ class DirectTaxiRouterTest implements PlanTestConstants {
     var originalLegs = List.copyOf(itinerary.legs());
     var subject = new DirectTaxiRouter(EMPTY_INDEX);
 
-    var result = subject.decorateAndFilter(List.of(itinerary)).getFirst();
+    var result = subject.decorate(List.of(itinerary), PICKUP, DROPOFF).getFirst();
 
     assertThat(result.legs()).isEqualTo(originalLegs);
   }
@@ -122,7 +130,7 @@ class DirectTaxiRouterTest implements PlanTestConstants {
   }
 
   @Test
-  void routeFiltersOutItineraryWhenNoZoneMatches() {
+  void routeReturnsEmptyWithoutRoutingWhenOriginAndDestinationDoNotShareAZone() {
     var itineraries = route(List.of());
 
     assertThat(itineraries).isEmpty();
