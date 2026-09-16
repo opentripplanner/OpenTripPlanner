@@ -5,9 +5,9 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import java.util.Iterator;
 
 /**
- * TODO Migrate this into the Raptor SPI. This interface should be part of the Raptor SPI, and the
- *      {@code RaptorTransferDataProvider} should provide the instance directly. This should be
- *      done once the old regular-transfer pipeline is fully removed.
+ * TODO TX - This interface should be replaced by the Raptor SPI
+ *           {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider}. But, we need to move constrained
+ *           transfers into this module first. This needs to be analyzed - not necessarily the right thing.
  *
  * @see org.opentripplanner.raptor.spi.RaptorTransferDataProvider
  */
