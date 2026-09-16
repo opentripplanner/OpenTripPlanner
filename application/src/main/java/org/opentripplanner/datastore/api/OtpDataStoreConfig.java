@@ -57,11 +57,6 @@ public interface OtpDataStoreConfig {
   List<URI> emissionFiles();
 
   /**
-   * List of URIs to taxi zone composite data sources.
-   */
-  List<URI> taxiZoneFiles();
-
-  /**
    * List of URIs to Empirical Delay composite data sources.
    */
   List<URI> empiricalDelayFiles();

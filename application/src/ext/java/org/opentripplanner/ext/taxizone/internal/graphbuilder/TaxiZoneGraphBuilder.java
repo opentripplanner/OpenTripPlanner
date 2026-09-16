@@ -11,8 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Loads taxi zones from GTFS feeds whose filenames match the taxi zone pattern
- * and stores them in the {@link TaxiZoneRepository}.
+ * Loads taxi zones from GTFS feeds explicitly flagged with
+ * {@code transitFeeds.gtfsFeeds[].taxiZoneProvider: true} and stores them in the
+ * {@link TaxiZoneRepository}.
  */
 public class TaxiZoneGraphBuilder implements GraphBuilderModule {
 

@@ -21,7 +21,8 @@ class GtfsConfigTest {
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': false,
-         'maxInterlineDistance': 300
+         'maxInterlineDistance': 300,
+         'taxiZoneProvider': true
        }
       }
       """
@@ -33,6 +34,7 @@ class GtfsConfigTest {
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
     assertEquals(300, subject.maxInterlineDistance());
+    assertTrue(subject.taxiZoneProvider());
   }
 
   @Test
@@ -50,6 +52,7 @@ class GtfsConfigTest {
     assertFalse(subject.discardMinTransferTimes());
     assertTrue(subject.blockBasedInterlining());
     assertEquals(200, subject.maxInterlineDistance());
+    assertFalse(subject.taxiZoneProvider());
   }
 
   @Test
@@ -61,7 +64,8 @@ class GtfsConfigTest {
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': false,
-         'maxInterlineDistance': 300
+         'maxInterlineDistance': 300,
+         'taxiZoneProvider': true
        }
       }
       """
@@ -86,6 +90,7 @@ class GtfsConfigTest {
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
     assertEquals(300, subject.maxInterlineDistance());
+    assertTrue(subject.taxiZoneProvider());
   }
 
   @Test
@@ -97,7 +102,8 @@ class GtfsConfigTest {
          'stationTransferPreference' : 'allowed',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': true,
-         'maxInterlineDistance': 300
+         'maxInterlineDistance': 300,
+         'taxiZoneProvider': true
        }
       }
       """
@@ -113,7 +119,8 @@ class GtfsConfigTest {
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': false,
          'blockBasedInterlining': false,
-         'maxInterlineDistance': 400
+         'maxInterlineDistance': 400,
+         'taxiZoneProvider': false
       }
       """
     );
@@ -126,6 +133,7 @@ class GtfsConfigTest {
     assertFalse(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
     assertEquals(400, subject.maxInterlineDistance());
+    assertFalse(subject.taxiZoneProvider());
   }
 
   @Test
@@ -147,7 +155,8 @@ class GtfsConfigTest {
          'stationTransferPreference' : 'preferred',
          'discardMinTransferTimes': true,
          'blockBasedInterlining': false,
-         'maxInterlineDistance': 300
+         'maxInterlineDistance': 300,
+         'taxiZoneProvider': true
       }
       """
     );
@@ -160,5 +169,6 @@ class GtfsConfigTest {
     assertTrue(subject.discardMinTransferTimes());
     assertFalse(subject.blockBasedInterlining());
     assertEquals(300, subject.maxInterlineDistance());
+    assertTrue(subject.taxiZoneProvider());
   }
 }

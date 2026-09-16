@@ -29,16 +29,10 @@ For each driving-ish leg in a taxi itinerary:
 
 ### Taxi Zone Data Files
 
-Taxi zone data is provided as standard GTFS Flex zip files. Files are auto-discovered by
-filename: a file whose name contains `taxi_zone`, `taxi-zone`, or `taxizone`
-(case-insensitive) is classified as `TAXI_ZONE` type and processed exclusively by this
-module. Such files are **not** added to normal transit or flex routing.
-
-Every taxi zone file, whether found by auto-discovery or configured explicitly, must have a
-corresponding entry in the `taxiZone.feeds` list in `build-config.json`, providing a `feedId` and the
-`source` URI. If a taxi zone file is present but has no matching `taxiZone.feeds` entry, graph
-building fails. In practice, this means you must always configure `taxiZone.feeds` explicitly,
-listing the exact same `source` that would otherwise be auto-discovered, plus its `feedId`.
+Taxi zone data is provided as standard GTFS Flex zip files, configured explicitly in the
+`transitFeeds.gtfsFeeds` list in `build-config.json` like any other GTFS feed, but with
+`taxiZoneProvider` set to `true`. Such feeds are **not** added to normal transit or flex
+routing — they are processed exclusively by this module.
 
 Example graph directory layout:
 
@@ -46,17 +40,21 @@ Example graph directory layout:
 graph/
   build-config.json
   HSL-gtfs.zip
-  TaxiProvider-taxizone.zip           ← auto-discovered as TAXI_ZONE type
+  TaxiProvider-gtfs.zip
 ```
 
 ```JSON
 // build-config.json
 {
-  "taxiZone": {
-    "feeds": [
+  "transitFeeds": {
+    "gtfsFeeds": [
       {
+        "source": "HSL-gtfs.zip"
+      },
+      {
+        "source": "TaxiProvider-gtfs.zip",
         "feedId": "TaxiProvider",
-        "source": "TaxiProvider-taxizone.zip"
+        "taxiZoneProvider": true
       }
     ]
   }
@@ -131,9 +129,8 @@ Enable the feature flag in `otp-config.json`:
 
 ## Changelog
 
-### OTP 2.10
+### OTP 2.11
 
 - Initial implementation: spatial zone index, itinerary filtering, and leg decoration with
-  provider information from GTFS Flex data. Taxi zone files are auto-discovered by filename
-  pattern, but each discovered file requires a matching `feedId`/`source` entry in the
-  `taxiZone.feeds` build-config field.
+  provider information from GTFS Flex data. Taxi zone feeds are configured explicitly in
+  `transitFeeds.gtfsFeeds` with `taxiZoneProvider: true`.

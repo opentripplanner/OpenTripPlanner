@@ -1,6 +1,8 @@
 package org.opentripplanner.datastore.api;
 
 import java.util.EnumSet;
+import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * Represents the different types of files that might be present in a router / graph build
@@ -13,9 +15,9 @@ public enum FileType {
   OSM("🌍", "OpenStreetMap data"),
   DEM("🏔", "Elevation data"),
   GTFS("🚌", "GTFS data"),
+  GTFS_TAXI_ZONE("🚕", "Taxi zone data", GTFS),
   NETEX("🚌", "NeTEx data"),
   EMISSION("🌿", "Emission data"),
-  TAXI_ZONE("🚕", "Taxi zone data"),
   EMPIRICAL_DATA("📊", "Empirical data"),
   GRAPH("🌐", "OTP Graph file"),
   REPORT("📈", "Issue report"),
@@ -25,9 +27,17 @@ public enum FileType {
   private final String icon;
   private final String text;
 
+  @Nullable
+  private final FileType supertype;
+
   FileType(String icon, String text) {
+    this(icon, text, null);
+  }
+
+  FileType(String icon, String text, @Nullable FileType supertype) {
     this.icon = icon;
     this.text = text;
+    this.supertype = supertype;
   }
 
   /**
@@ -54,5 +64,13 @@ public enum FileType {
    */
   public boolean isTransit() {
     return EnumSet.of(GTFS, NETEX).contains(this);
+  }
+
+  /**
+   * If present, this type is not resolved directly from a filename or a dedicated build-config
+   * file list. If present, this type is essentialy an internal type derived from its supertype.
+   */
+  public Optional<FileType> supertype() {
+    return Optional.ofNullable(supertype);
   }
 }

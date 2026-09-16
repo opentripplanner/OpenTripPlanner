@@ -5,9 +5,9 @@ import static org.opentripplanner.datastore.api.FileType.DEM;
 import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
+import static org.opentripplanner.datastore.api.FileType.GTFS_TAXI_ZONE;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
-import static org.opentripplanner.datastore.api.FileType.TAXI_ZONE;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -95,6 +95,10 @@ public class GraphBuilderDataSources implements Closeable {
 
     selectFilesToImport();
 
+    // Reclassify internal file types (e.g. taxi zone data) out of their underlying file type's
+    // bucket, so they are excluded from normal import and can be looked up separately.
+    reclassifyInternalFileTypes();
+
     // Log all files and expected action to take
     logSkippedAndSelectedFiles();
 
@@ -123,6 +127,10 @@ public class GraphBuilderDataSources implements Closeable {
     return has(NETEX);
   }
 
+  /**
+   * {@code true} if there is transit data that will populate the TransitRepository.
+   * This excludes GTFS feeds that are exclusively used as taxi zone data sources.
+   */
   public boolean hasTransitData() {
     return hasOneOf(GTFS, NETEX);
   }
@@ -131,7 +139,7 @@ public class GraphBuilderDataSources implements Closeable {
    * Unlike {@link #hasTransitData()}, taxi zone data never populates the TransitRepository.
    */
   public boolean hasTransitOrTaxiZoneData() {
-    return hasOneOf(GTFS, NETEX, TAXI_ZONE);
+    return hasOneOf(GTFS, NETEX, GTFS_TAXI_ZONE);
   }
 
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
@@ -159,7 +167,7 @@ public class GraphBuilderDataSources implements Closeable {
   public Iterable<
     ConfiguredCompositeDataSource<GtfsFeedParameters>
   > getTaxiZoneConfiguredDataSource() {
-    return ofStream(TAXI_ZONE).map(this::mapTaxiZoneFeed).toList();
+    return ofStream(GTFS_TAXI_ZONE).map(this::mapGtfsFeed).toList();
   }
 
   public Iterable<
@@ -299,22 +307,6 @@ public class GraphBuilderDataSources implements Closeable {
     return new ConfiguredDataSource<>(dataSource, p);
   }
 
-  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapTaxiZoneFeed(DataSource dataSource) {
-    var feedId = buildConfig.taxiZone
-      .feeds()
-      .stream()
-      .filter(c -> uriMatch(c.source(), dataSource.uri()))
-      .findFirst()
-      .orElseThrow()
-      .feedId();
-    var p = buildConfig.gtfsDefaults
-      .withFeedInfo()
-      .withFeedId(feedId)
-      .withSource(dataSource.uri())
-      .build();
-    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
-  }
-
   private ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters> mapEmpiricalDelayFeed(
     DataSource dataSource
   ) {
@@ -418,6 +410,29 @@ public class GraphBuilderDataSources implements Closeable {
         skipData.putAll(type, store.listExistingSourcesFor(type));
       }
     }
+  }
+
+  private void reclassifyInternalFileTypes() {
+    for (FileType type : FileType.values()) {
+      type.supertype().ifPresent(from -> reclassifyFileType(from, type));
+    }
+  }
+
+  private void reclassifyFileType(FileType from, FileType to) {
+    var matches = ofStream(from)
+      .filter(dataSource -> shouldBeReclassified(dataSource, to))
+      .toList();
+    matches.forEach(dataSource -> inputData.remove(from, dataSource));
+    inputData.putAll(to, matches);
+  }
+
+  private boolean shouldBeReclassified(DataSource dataSource, FileType type) {
+    return switch (type) {
+      case GTFS_TAXI_ZONE -> mapGtfsFeed(dataSource).config().taxiZoneProvider();
+      default -> throw new IllegalStateException(
+        "No reclassification rule configured for internal file type " + type
+      );
+    };
   }
 
   private Stream<DataSource> ofStream(FileType type) {

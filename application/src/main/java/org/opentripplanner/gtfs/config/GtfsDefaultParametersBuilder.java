@@ -8,12 +8,14 @@ public class GtfsDefaultParametersBuilder {
   private boolean discardMinTransferTimes;
   private boolean blockBasedInterlining;
   private int maxInterlineDistance;
+  private boolean taxiZoneProvider;
 
   public GtfsDefaultParametersBuilder(GtfsDefaultParameters original) {
     this.stationTransferPreference = original.stationTransferPreference();
     this.discardMinTransferTimes = original.discardMinTransferTimes();
     this.blockBasedInterlining = original.blockBasedInterlining();
     this.maxInterlineDistance = original.maxInterlineDistance();
+    this.taxiZoneProvider = original.taxiZoneProvider();
   }
 
   public GtfsDefaultParametersBuilder withStationTransferPreference(
@@ -52,6 +54,15 @@ public class GtfsDefaultParametersBuilder {
 
   int maxInterlineDistance() {
     return maxInterlineDistance;
+  }
+
+  public GtfsDefaultParametersBuilder withTaxiZoneProvider(boolean value) {
+    this.taxiZoneProvider = value;
+    return this;
+  }
+
+  boolean taxiZoneProvider() {
+    return taxiZoneProvider;
   }
 
   public GtfsDefaultParameters build() {
