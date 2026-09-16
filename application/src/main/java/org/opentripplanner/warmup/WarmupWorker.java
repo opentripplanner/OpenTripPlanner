@@ -41,13 +41,13 @@ class WarmupWorker implements Runnable {
     this.updaterStatusProvider = updaterStatusProvider;
     this.queryStrategy = switch (parameters.api()) {
       case TRANSMODEL -> new TransmodelWarmupQueryExecutor(
-        requestScopedFactory.transmodelGraphQLSchema().schema(),
+        requestScopedFactory.transmodelGraphQLSchema(),
         requestScopedFactory.transmodelRequestContext(),
         parameters.accessModes(),
         parameters.egressModes()
       );
       case GTFS -> new GtfsWarmupQueryExecutor(
-        requestScopedFactory.graphQLRequestContext(),
+        requestScopedFactory.gtfsRequestContext(),
         parameters.accessModes(),
         parameters.egressModes()
       );

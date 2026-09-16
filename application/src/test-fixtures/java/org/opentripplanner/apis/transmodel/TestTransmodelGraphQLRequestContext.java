@@ -18,9 +18,12 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.utils.lang.Sandbox;
 
-public class TransmodelRequestContext {
+/**
+ * A plain, hand-built {@link TransmodelGraphQLRequestContext} for tests that don't need (or want) a
+ * Dagger-assembled request scope.
+ */
+public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLRequestContext {
 
   private final RoutingService routingService;
   private final TransitService transitService;
@@ -35,10 +38,10 @@ public class TransmodelRequestContext {
   private final LinkingContextFactory linkingContextFactory;
   private final StreetLimitationParametersService streetLimitationParametersService;
 
-  public TransmodelRequestContext(
+  public TestTransmodelGraphQLRequestContext(
     RoutingService routingService,
     TransitService transitService,
-    TransitAlertService transitAlertService,
+    @Nullable TransitAlertService transitAlertService,
     @Nullable EmpiricalDelayService empiricalDelayService,
     RouteRequest defaultRouteRequest,
     VehicleRentalService vehicleRentalService,
@@ -63,61 +66,75 @@ public class TransmodelRequestContext {
     this.streetLimitationParametersService = streetLimitationParametersService;
   }
 
-  public RoutingService getRoutingService() {
+  @Override
+  public RoutingService routingService() {
     return routingService;
   }
 
-  public TransitService getTransitService() {
+  @Override
+  public TransitService transitService() {
     return transitService;
   }
 
-  public TransitAlertService getTransitAlertService() {
+  @Nullable
+  @Override
+  public TransitAlertService transitAlertService() {
     return transitAlertService;
   }
 
   @Nullable
-  @Sandbox
-  public EmpiricalDelayService getEmpiricalDelayService() {
+  @Override
+  public EmpiricalDelayService empiricalDelayService() {
     return empiricalDelayService;
   }
 
-  public RouteRequest getDefaultRouteRequest() {
+  @Override
+  public RouteRequest defaultRouteRequest() {
     return defaultRouteRequest;
   }
 
-  public VehicleRentalService getVehicleRentalService() {
+  @Override
+  public VehicleRentalService vehicleRentalService() {
     return vehicleRentalService;
   }
 
-  public VehicleParkingService getVehicleParkingService() {
+  @Override
+  public VehicleParkingService vehicleParkingService() {
     return vehicleParkingService;
   }
 
-  public Graph getGraph() {
+  @Override
+  public Graph graph() {
     return graph;
   }
 
-  public RegularTransferService getTransferService() {
+  @Override
+  public RegularTransferService transferService() {
     return transferService;
   }
 
-  public StreetDetailsService getStreetDetailsService() {
+  @Override
+  public StreetDetailsService streetDetailsService() {
     return streetDetailsService;
   }
 
-  public LinkingContextFactory getLinkingContextFactory() {
+  @Override
+  public LinkingContextFactory linkingContextFactory() {
     return linkingContextFactory;
   }
 
-  public StreetLimitationParametersService getStreetLimitationParametersService() {
+  @Override
+  public StreetLimitationParametersService streetLimitationParametersService() {
     return streetLimitationParametersService;
   }
 
-  public NearbyPlaceFinder getNearbyPlaceFinder() {
+  @Override
+  public NearbyPlaceFinder nearbyPlaceFinder() {
     return new StreetNearbyPlaceFinder(linkingContextFactory);
   }
 
-  public NearbyStopFinder getNearbyStopFinder() {
+  @Override
+  public NearbyStopFinder nearbyStopFinder() {
     return graph.hasStreets
       ? StreetNearbyStopFinder.of(linkingContextFactory).build()
       : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);

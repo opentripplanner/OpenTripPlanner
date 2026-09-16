@@ -19,26 +19,17 @@ import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.standalone.api.TestServerContext;
-import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -132,7 +123,8 @@ class DatedServiceJourneyTypeTest {
 
   /**
    * Builds real-time trip times from the scheduled trip (applying the given customizer to set the
-   * desired flags), injects them into a fresh snapshot, and fetches the resolved state.
+   * desired flags) and applies them to the environment's timetable repository, then fetches the
+   * resolved state.
    */
   private Map<String, Object> fetchWithUpdate(Consumer<RealTimeTripTimesBuilder> customize) {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
@@ -141,24 +133,8 @@ class DatedServiceJourneyTypeTest {
     customize.accept(builder);
     var tripTimes = builder.build();
     var update = RealTimeTripUpdate.of(tripData.tripPattern(), tripTimes, SERVICE_DATE).build();
-
     env.applyUpdate(update);
-
     return fetch(env, tripOnServiceDate(env, TRIP_ID));
-  }
-
-  /** Builds a {@link TransitService} that sees the given real-time update in its snapshot. */
-  private static TransitService transitServiceWithUpdate(
-    TransitTestEnvironment env,
-    RealTimeTripUpdate update
-  ) {
-    var repo = env.transitRepository();
-    var snapshot = new DefaultTimetableRepository(
-      repo.getRaptorTransitData(),
-      TripCalendars.empty()
-    );
-    snapshot.update(update);
-    return new DefaultTransitService(repo, snapshot.commit());
   }
 
   private static TripOnServiceDate tripOnServiceDate(TransitTestEnvironment env, String tripId) {
@@ -183,28 +159,7 @@ class DatedServiceJourneyTypeTest {
     TransitTestEnvironment env,
     TripOnServiceDate tripOnServiceDate
   ) {
-    var transitService = env.transitService();
-    var graph = new Graph();
-    var vertexLinker = VertexLinkerTestFactory.of(graph);
-    var defaultRequest = RouteRequest.defaultValue();
-
-    TransferRepository transferRepository = TransferServiceTestFactory.defaultTransferRepository();
-
-    TransmodelRequestContext context = new TransmodelRequestContext(
-      TestServerContext.createRoutingService(graph, transitService, transferRepository),
-      transitService,
-      null,
-      null,
-      defaultRequest,
-      TestServerContext.createVehicleRentalService(),
-      TestServerContext.createVehicleParkingService(),
-      graph,
-      TransferServiceTestFactory.transferService(transferRepository),
-      TestServerContext.createStreetDetailsService(),
-      TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
-      TestServerContext.createStreetLimitationParametersService()
-    );
-
+    var context = TransmodelAPITestContextBuilder.of(env).build();
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
         .query(

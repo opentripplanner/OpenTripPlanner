@@ -32,13 +32,13 @@ public class TransmodelGraphQLPlanner {
   }
 
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     Locale locale;
     PlanResponse response;
     RouteRequestBuilder requestBuilder = tripRequestMapper.createRequestBuilder(environment);
     try {
       var request = requestBuilder.buildRequest();
-      RoutingResponse res = ctx.getRoutingService().route(request);
+      RoutingResponse res = ctx.routingService().route(request);
       response = PlanResponse.of()
         .withPlan(res.getTripPlan())
         .withMetadata(res.getMetadata())
@@ -65,11 +65,11 @@ public class TransmodelGraphQLPlanner {
 
   public DataFetcherResult<ViaRoutingResponse> planVia(DataFetchingEnvironment environment) {
     ViaRoutingResponse response;
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     Locale locale;
     try {
       var request = viaRequestMapper.createRouteViaRequest(environment);
-      response = ctx.getRoutingService().route(request);
+      response = ctx.routingService().route(request);
       locale = request.locale();
     } catch (InvalidRoutingInputException e) {
       throw new InvalidInputException(e.getMessage());
@@ -83,7 +83,7 @@ public class TransmodelGraphQLPlanner {
       .build();
   }
 
-  private static Locale defaultLocale(TransmodelRequestContext ctx) {
-    return ctx.getDefaultRouteRequest().preferences().locale();
+  private static Locale defaultLocale(TransmodelGraphQLRequestContext ctx) {
+    return ctx.defaultRouteRequest().preferences().locale();
   }
 }

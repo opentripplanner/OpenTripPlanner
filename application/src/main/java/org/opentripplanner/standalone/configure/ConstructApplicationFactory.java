@@ -6,7 +6,7 @@ import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
-import org.opentripplanner.apis.gtfs.configure.SchemaModule;
+import org.opentripplanner.apis.gtfs.configure.GtfsSchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchemaModule;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
@@ -99,7 +99,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     LinkingServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
     RideHailingServicesModule.class,
-    SchemaModule.class,
+    GtfsSchemaModule.class,
     TransmodelSchemaModule.class,
     SorlandsbanenNorwayModule.class,
     StopConsolidationServiceModule.class,

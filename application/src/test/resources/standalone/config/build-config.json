@@ -19,6 +19,7 @@
       "osmTagMapping": "norway"
     }
   ],
+  "elevatorRefTags": [{ "tagGroup": ["manufacturer", "ref"] }],
   "demDefaults": {
     "elevationUnitMultiplier": 1.0
   },

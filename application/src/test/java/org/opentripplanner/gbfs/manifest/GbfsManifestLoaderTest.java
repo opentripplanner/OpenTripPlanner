@@ -12,12 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSDataset;
 import org.mobilitydata.gbfs.v3_0.manifest.GBFSVersion;
 import org.opentripplanner.framework.io.HttpHeaders;
+import org.opentripplanner.test.support.ResourceLoader;
 
 class GbfsManifestLoaderTest {
 
-  private static final URI MANIFEST = Path.of("src/test/resources/gbfs/manifest.json")
-    .toAbsolutePath()
-    .toUri();
+  private static final URI MANIFEST = ResourceLoader.of(GbfsManifestLoaderTest.class).uri(
+    "/gbfs/manifest.json"
+  );
 
   @Test
   void loadsAManifestFromAFile() {

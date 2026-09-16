@@ -9,6 +9,7 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -87,7 +88,7 @@ public class TestServerContext {
   > indexAndRegisterTimetableSnapshot(
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    org.opentripplanner.framework.transaction.RepositoryRegistry registry
+    RepositoryRegistry registry
   ) {
     transitRepository.index();
 
@@ -150,14 +151,14 @@ public class TestServerContext {
 
     return new DefaultRoutingService(
       transitService,
-      createTransitAlertService(),
       graph,
       raptorConfig,
       Metrics.globalRegistry,
       streetLimitationParametersService,
       createVehicleRentalService(),
-      streetDetailsService,
-      transferService,
+      createStreetDetailsService(),
+      TransferServiceTestFactory.transferService(transferRepository),
+      new TransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),
       null,

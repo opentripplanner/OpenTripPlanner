@@ -15,12 +15,17 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingZoneIndex;
+import org.opentripplanner.street.graph.Graph;
 
 /**
- * Default {@link VehicleRentalRepository}. Owns the rental places and the geofencing zone indices,
- * and answers geofencing zone queries via {@link GeofencingZoneService}.
- * <p>
- * The indices are keyed by network. A network has exactly one source of zones, so a later
+ * Default {@link VehicleRentalRepository}. Owns the rental places and the geofencing zone
+ * indices, and answers geofencing zone queries via {@link GeofencingZoneService}.
+ *
+ * <p>Lives only in the serve phase. Zones applied during the graph build are carried on the
+ * {@link org.opentripplanner.street.graph.Graph} and indexed here at construction; zones applied
+ * by an updater are indexed as they are registered.
+ *
+ * <p>Indices are keyed by network. A network has exactly one source of zones, so a later
  * registration replaces an earlier one rather than adding a second index alongside it.
  */
 @Singleton
@@ -30,8 +35,23 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
 
   private final Map<String, GeofencingZoneIndex> geofencingZoneIndexes = new ConcurrentHashMap<>();
 
+  /**
+   * Seeds the repository with the zones applied during the graph build, which the
+   * {@link Graph} carries out of the build phase, and indexes them.
+   */
   @Inject
-  public DefaultVehicleRentalRepository() {}
+  public DefaultVehicleRentalRepository(Graph graph) {
+    this(graph.vehicleRentalGeofencingZones());
+  }
+
+  public DefaultVehicleRentalRepository(Map<String, Set<GeofencingZone>> zonesByNetwork) {
+    zonesByNetwork.forEach(this::setGeofencingZones);
+  }
+
+  /** A repository with no zones, for tests and for a graph built without them. */
+  public DefaultVehicleRentalRepository() {
+    this(Map.of());
+  }
 
   @Override
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
@@ -44,8 +64,8 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
   }
 
   @Override
-  public void setGeofencingZoneIndex(String network, GeofencingZoneIndex index) {
-    geofencingZoneIndexes.put(network, index);
+  public void setGeofencingZones(String network, Collection<GeofencingZone> zones) {
+    geofencingZoneIndexes.put(network, new GeofencingZoneIndex(zones));
   }
 
   @Override
@@ -70,6 +90,12 @@ public class DefaultVehicleRentalRepository implements VehicleRentalRepository {
       .stream()
       .flatMap(idx -> idx.findZonesContaining(coord).stream())
       .collect(Collectors.toSet());
+  }
+
+  @Override
+  public Set<GeofencingZone> findZonesContaining(Coordinate coord, String network) {
+    var index = geofencingZoneIndexes.get(network);
+    return index == null ? Set.of() : index.findZonesContaining(coord);
   }
 
   @Override

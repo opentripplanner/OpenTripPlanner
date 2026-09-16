@@ -224,7 +224,6 @@ public class SpeedTest {
 
     this.routingService = new DefaultRoutingService(
       this.transitService,
-      transitAlertService,
       graph,
       raptorConfig,
       timer.getRegistry(),
@@ -232,6 +231,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       streetDetailsService,
       transferService,
+      transitAlertService,
       routerConfig.flexParameters(),
       List.of(),
       null,

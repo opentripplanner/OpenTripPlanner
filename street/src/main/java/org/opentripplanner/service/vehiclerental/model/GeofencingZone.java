@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -26,7 +27,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * excluded because JTS Geometry equality iterates all coordinates (expensive in hot paths like
  * set lookups during A* traversal), and id+priority uniquely identifies a zone within a feed.
  */
-public final class GeofencingZone {
+public final class GeofencingZone implements Serializable {
 
   private final FeedScopedId id;
 

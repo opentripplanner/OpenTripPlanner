@@ -8,8 +8,10 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.j
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.osm.model.CompoundRefTagGroup;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 class BuildConfigTest {
@@ -42,6 +44,20 @@ class BuildConfigTest {
     var subject = new BuildConfig(node, "Test", false);
 
     assertEquals(Set.of("a-ha", "royksopp"), subject.boardingLocationTags);
+  }
+
+  @Test
+  public void elevatorRefTags() {
+    var node = jsonNodeForTest(
+      "{ 'elevatorRefTags' : [ {'tagGroup': ['ref']}, {'tagGroup': ['manufacturer', 'ref']} ] }"
+    );
+
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(
+      List.of(CompoundRefTagGroup.of("ref"), CompoundRefTagGroup.of("manufacturer", "ref")),
+      subject.elevatorRefTags
+    );
   }
 
   @Test

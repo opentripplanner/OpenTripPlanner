@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.gbfs.network.GeofencingZoneScope;
+import org.opentripplanner.gbfs.network.GeofencingZoneOtpPhase;
 
 class GbfsNetworksConfigTest {
 
@@ -31,7 +31,7 @@ class GbfsNetworksConfigTest {
             "requireDropOffInsideBusinessArea" : false,
             "allowKeepingVehicleAtDestination" : true
           },
-          "networks" : [ { "network" : "tier", "applyGeofencingZones" : "realtime" } ]
+          "networks" : [ { "network" : "tier", "applyGeofencingZones" : "serve" } ]
         }
       }
       """
@@ -39,7 +39,7 @@ class GbfsNetworksConfigTest {
 
     var tier = subject.forNetwork("tier").orElseThrow();
 
-    assertEquals(GeofencingZoneScope.REALTIME, tier.geofencingZoneScope());
+    assertEquals(GeofencingZoneOtpPhase.SERVE, tier.geofencingZonePhase());
     assertFalse(tier.requireDropOffInsideBusinessArea());
     assertTrue(tier.allowKeepingVehicleAtDestination());
   }
@@ -74,7 +74,7 @@ class GbfsNetworksConfigTest {
         "gbfs" : {
           "includeUnlistedNetworks" : true,
           "defaults" : {
-            "applyGeofencingZones" : "realtime",
+            "applyGeofencingZones" : "serve",
             "requireDropOffInsideBusinessArea" : false
           },
           "networks" : [
@@ -86,11 +86,11 @@ class GbfsNetworksConfigTest {
     );
 
     var listed = subject.forNetwork("boltoslo").orElseThrow();
-    assertEquals(GeofencingZoneScope.REALTIME, listed.geofencingZoneScope());
+    assertEquals(GeofencingZoneOtpPhase.SERVE, listed.geofencingZonePhase());
     assertTrue(listed.requireDropOffInsideBusinessArea());
 
     var unlisted = subject.forNetwork("voioslo").orElseThrow();
-    assertEquals(GeofencingZoneScope.REALTIME, unlisted.geofencingZoneScope());
+    assertEquals(GeofencingZoneOtpPhase.SERVE, unlisted.geofencingZonePhase());
     assertFalse(unlisted.requireDropOffInsideBusinessArea());
   }
 
@@ -104,7 +104,7 @@ class GbfsNetworksConfigTest {
 
     var tier = subject.forNetwork("tier").orElseThrow();
 
-    assertEquals(GeofencingZoneScope.OFF, tier.geofencingZoneScope());
+    assertEquals(GeofencingZoneOtpPhase.OFF, tier.geofencingZonePhase());
     assertTrue(tier.requireDropOffInsideBusinessArea());
     assertFalse(tier.allowKeepingVehicleAtDestination());
   }
@@ -116,7 +116,7 @@ class GbfsNetworksConfigTest {
       {
         "gbfs" : {
           "includeUnlistedNetworks" : true,
-          "defaults" : { "applyGeofencingZones" : "realtime" },
+          "defaults" : { "applyGeofencingZones" : "serve" },
           "networks" : []
         }
       }
@@ -124,8 +124,8 @@ class GbfsNetworksConfigTest {
     );
 
     assertEquals(
-      GeofencingZoneScope.REALTIME,
-      subject.forNetwork("ryde").orElseThrow().geofencingZoneScope()
+      GeofencingZoneOtpPhase.SERVE,
+      subject.forNetwork("ryde").orElseThrow().geofencingZonePhase()
     );
   }
 
@@ -136,7 +136,7 @@ class GbfsNetworksConfigTest {
       {
         "gbfs" : {
           "includeUnlistedNetworks" : true,
-          "defaults" : { "applyGeofencingZones" : "realtime" },
+          "defaults" : { "applyGeofencingZones" : "serve" },
           "networks" : [ { "network" : "tier", "applyGeofencingZones" : "off" } ]
         }
       }
@@ -144,12 +144,12 @@ class GbfsNetworksConfigTest {
     );
 
     assertEquals(
-      GeofencingZoneScope.OFF,
-      subject.forNetwork("tier").orElseThrow().geofencingZoneScope()
+      GeofencingZoneOtpPhase.OFF,
+      subject.forNetwork("tier").orElseThrow().geofencingZonePhase()
     );
     assertEquals(
-      GeofencingZoneScope.REALTIME,
-      subject.forNetwork("ryde").orElseThrow().geofencingZoneScope()
+      GeofencingZoneOtpPhase.SERVE,
+      subject.forNetwork("ryde").orElseThrow().geofencingZonePhase()
     );
   }
 

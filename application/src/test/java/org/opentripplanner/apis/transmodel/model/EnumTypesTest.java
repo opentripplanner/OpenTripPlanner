@@ -122,6 +122,12 @@ class EnumTypesTest {
     assertEquals(TransitMode.CARPOOL, mappedValue(LEG_MODE, "carpool"));
   }
 
+  @Test
+  void assertSnowAndIceIsMappedInBothModeEnums() {
+    assertEquals(TransitMode.SNOW_AND_ICE, mappedValue(TRANSPORT_MODE, "snowAndIce"));
+    assertEquals(TransitMode.SNOW_AND_ICE, mappedValue(LEG_MODE, "snowAndIce"));
+  }
+
   private static Object mappedValue(GraphQLEnumType type, String apiName) {
     var value = type.getValue(apiName);
     assertNotNull(value, () -> "'%s' is not mapped in enum %s".formatted(apiName, type.getName()));

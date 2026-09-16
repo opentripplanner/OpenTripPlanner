@@ -9,7 +9,7 @@
     "networks": [
       {
         "network": "tier",
-        "applyGeofencingZones": "realtime",
+        "applyGeofencingZones": "serve",
         "requireDropOffInsideBusinessArea": false,
         "allowKeepingVehicleAtDestination": true
       }
