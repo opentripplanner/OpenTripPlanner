@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
@@ -16,14 +15,13 @@ import org.opentripplanner.transit.transfer.regular.spi.RegularTransferParameter
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
- * v1: only {@link #generateTransfersForAllStops()} is implemented (GraphBuilder use-case).
- * Updater use-cases ({@link #updateTransfersForStop}, {@link #updateTransfersForStops}) are not
- * supported yet.
+ * Graph-build-time implementation of {@link TransferGenerator} - see that interface's doc. There
+ * is no {@code TransferRealtimeUpdater} implementation yet.
  *
  * @param <P> the transfer path/template type
  * @param <U> the user preferences type
  */
-public class DefaultTransferGenerator<P, U> implements TransferGenerator<P> {
+public class DefaultTransferGenerator<P, U> implements TransferGenerator {
 
   private final StopIndex stopIndex;
   private final Collection<FeedScopedId> stopsWithTrips;
@@ -55,22 +53,6 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator<P> {
         generateForStop(profile, stop);
       }
     }
-  }
-
-  @Override
-  public void updateTransfersForStop(FeedScopedId stopId) {
-    throw new UnsupportedOperationException(
-      "Updating transfers for a single stop is not supported yet - v1 only supports " +
-      "generateTransfersForAllStops() at graph build time."
-    );
-  }
-
-  @Override
-  public void updateTransfersForStops(List<FeedScopedId> stops, Predicate<P> filterPaths) {
-    throw new UnsupportedOperationException(
-      "Updating transfers for a set of stops is not supported yet - v1 only supports " +
-      "generateTransfersForAllStops() at graph build time."
-    );
   }
 
   /**
