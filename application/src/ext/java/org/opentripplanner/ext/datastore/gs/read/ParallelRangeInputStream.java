@@ -33,8 +33,10 @@ import org.slf4j.LoggerFactory;
  * buffer is needed - workers may complete in any order, they only count down their own latch. The
  * consumer never waits on anything but the head.
  * <p>
- * With {@code parallelism == 1} this degenerates to a single read-ahead feeder thread, which is why
- * there is one component here rather than two.
+ * With {@code parallelism == 1} this degenerates to a single feeder thread reading one range at a
+ * time, which is why there is one component here rather than two. Note that it is not equivalent to
+ * reading the object over one continuous connection: every block still opens its own channel, so at
+ * a parallelism of 1 there is no second request to hide that setup cost behind.
  * <p>
  * Not thread-safe for concurrent readers: one consumer thread at a time. {@link #close()} may be
  * called from any thread.

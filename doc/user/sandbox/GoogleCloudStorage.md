@@ -144,8 +144,10 @@ typically `graph.obj` - over one stream therefore has a long tail, where an unlu
 connection takes several times the median. Downloading several ranges at once removes that
 tail, and lets the transfer overlap the work of the consumer.
 
-Set to `0` to disable this and use a single sequential stream. Set to `1` to keep a single
-stream but move it to a background thread, so the download still overlaps the consumer.
+Set to `0` to disable this and use a single sequential stream. Otherwise use a value of at
+least 2: each range is fetched on its own connection, so `1` issues the requests one after
+another and pays the setup cost of every one of them with no other request to hide it
+behind, which makes it slower than turning the feature off.
 
 Each concurrent read holds buffers off the Java heap. The memory used by one object read is
 at most `3 * parallelReads * parallelReadBlockSizeMb` megabytes - 192 MB with the default

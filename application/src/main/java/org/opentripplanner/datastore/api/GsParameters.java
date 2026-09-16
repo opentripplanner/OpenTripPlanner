@@ -40,8 +40,12 @@ public interface GsParameters {
    * throughput varies a lot from connection to connection, so a large object read over one stream
    * has a long tail. Fetching several ranges at once removes that tail.
    * <p>
-   * {@code 0} disables the feature and restores a single sequential stream; {@code 1} keeps one
-   * stream but moves it to a background thread so the download overlaps the caller's work.
+   * {@code 0} disables the feature and restores a single sequential stream.
+   * <p>
+   * Use {@code 0} or a value of at least 2. Each range is fetched on its own connection, so
+   * {@code 1} issues the range requests one after another and pays the connection setup of every
+   * one of them with no other request to hide it behind - measured on a 2 GB object it is
+   * substantially slower than disabling the feature.
    */
   default int parallelReads() {
     return DEFAULT_PARALLEL_READS;
