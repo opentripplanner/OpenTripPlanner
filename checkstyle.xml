@@ -13,6 +13,11 @@
         </module>
         <module name="DefaultComesLast"/>
         <module name="EmptyStatement"/>
+        <module name="IllegalImport">
+            <property name="illegalClasses" value="java.util.LinkedList"/>
+            <message key="import.illegal"
+                     value="LinkedList is almost always the wrong choice; use ArrayList for List usage or ArrayDeque for Queue/Deque usage instead."/>
+        </module>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>
         <module name="SimplifyBooleanReturn"/>
