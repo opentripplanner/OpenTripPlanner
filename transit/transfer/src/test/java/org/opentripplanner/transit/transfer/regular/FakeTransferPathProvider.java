@@ -39,13 +39,13 @@ public class FakeTransferPathProvider implements TransferPathProvider<FakeTransf
 
   @Override
   public Collection<NearbyPath<FakePath>> findNearbyStops(
-    FeedScopedId sourceStop,
+    FeedScopedId fromStop,
     RaptorTransferProfile profileId,
     FakePrefs prefs
   ) {
     return byProfileIdAndStop
       .getOrDefault(profileId, Map.of())
-      .getOrDefault(sourceStop, List.of())
+      .getOrDefault(fromStop, List.of())
       .stream()
       .map(p -> new NearbyPath<>(p.to(), p))
       .toList();

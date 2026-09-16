@@ -18,11 +18,11 @@ import java.util.Optional;
  */
 public interface TransferPathProvider<P, U> {
   /**
-   * Discover candidate paths from {@code sourceStop} under {@code (profileId, preferences)}.
+   * Discover candidate paths from {@code fromStop} under {@code (profileId, preferences)}.
    * Called once per stop per profile at graph-build time.
    */
   Collection<NearbyPath<P>> findNearbyStops(
-    FeedScopedId sourceStop,
+    FeedScopedId fromStop,
     RaptorTransferProfile profileId,
     U preferences
   );

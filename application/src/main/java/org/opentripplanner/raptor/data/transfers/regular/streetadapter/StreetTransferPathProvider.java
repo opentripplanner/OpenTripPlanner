@@ -95,11 +95,11 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
 
   @Override
   public Collection<NearbyPath<NearbyStop>> findNearbyStops(
-    FeedScopedId sourceStop,
+    FeedScopedId fromStop,
     RaptorTransferProfile profileId,
     RouteRequest preferences
   ) {
-    TransitStopVertex vertex = graph.getStopVertex(sourceStop);
+    TransitStopVertex vertex = graph.getStopVertex(fromStop);
     if (vertex == null) {
       return List.of();
     }
@@ -113,7 +113,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
     );
     return nearbyStops
       .stream()
-      .filter(nearbyStop -> !nearbyStop.stopId.equals(sourceStop))
+      .filter(nearbyStop -> !nearbyStop.stopId.equals(fromStop))
       .map(nearbyStop -> new NearbyPath<>(nearbyStop.stopId, stripState(nearbyStop)))
       .toList();
   }
@@ -165,19 +165,19 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
 
   /**
    * The most specific matching rule wins: a restricted rule (declared earlier in config) whose
-   * {@code allowedModes} covers the target stop beats the profile's unrestricted rule, if any. A
+   * {@code allowedModes} covers the to-stop beats the profile's unrestricted rule, if any. A
    * profile with only restricted rules (e.g. CAR, matching today's
    * {@code carsAllowedStopMaxDuration}) has no answer - and so no transfer - for a stop none of
    * those rules cover.
    */
   private Optional<Duration> resolveMaxDuration(
     RaptorTransferProfile profileId,
-    FeedScopedId targetStopId
+    FeedScopedId toStopId
   ) {
     List<MaxDurationRule> rules = maxDurationsByProfileId.getOrDefault(profileId, List.of());
     MaxDurationRule matchedRestricted = null;
     MaxDurationRule unrestrictedFallback = null;
-    StopLocation targetStop = null;
+    StopLocation toStop = null;
 
     for (var rule : rules) {
       if (rule.allowedModes() == null) {
@@ -189,10 +189,10 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
       if (matchedRestricted != null) {
         continue;
       }
-      if (targetStop == null) {
-        targetStop = siteRepository.getStopLocation(targetStopId);
+      if (toStop == null) {
+        toStop = siteRepository.getStopLocation(toStopId);
       }
-      if (stopAllowsAnyOf(targetStop, rule.allowedModes())) {
+      if (stopAllowsAnyOf(toStop, rule.allowedModes())) {
         matchedRestricted = rule;
       }
     }

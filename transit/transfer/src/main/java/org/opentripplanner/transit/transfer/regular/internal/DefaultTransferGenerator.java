@@ -81,7 +81,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
       if (criteria.isEmpty()) {
         continue;
       }
-      int toStop = stopIndex.toStopIndex(candidate.targetStop());
+      int toStop = stopIndex.toStopIndex(candidate.toStop());
       var existing = bestCriteriaPerTargetStop.get(toStop);
       if (existing == null || criteria.get().c1() < existing.c1()) {
         bestCandidatePerTargetStop.put(toStop, candidate);
