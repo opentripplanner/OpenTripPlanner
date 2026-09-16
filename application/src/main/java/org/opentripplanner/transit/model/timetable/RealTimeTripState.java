@@ -37,7 +37,7 @@ public final class RealTimeTripState {
     this.deleted = builder.deleted;
   }
 
-  static Builder of() {
+  public static Builder of() {
     return new Builder();
   }
 
@@ -89,7 +89,7 @@ public final class RealTimeTripState {
     return Objects.hash(timesModified, canceled, added, tripPatternModified, deleted);
   }
 
-  static class Builder {
+  public static class Builder {
 
     private boolean timesModified = false;
     private boolean canceled = false;
@@ -99,52 +99,52 @@ public final class RealTimeTripState {
 
     private Builder() {}
 
-    Builder withTimesModified() {
+    public Builder withTimesModified() {
       this.timesModified = true;
       return this;
     }
 
-    Builder withCanceled() {
+    public Builder withCanceled() {
       this.canceled = true;
       return this;
     }
 
-    Builder withAdded() {
+    public Builder withAdded() {
       this.added = true;
       return this;
     }
 
-    Builder withTripPatternModified() {
+    public Builder withTripPatternModified() {
       this.tripPatternModified = true;
       return this;
     }
 
-    Builder withDeleted() {
+    public Builder withDeleted() {
       this.deleted = true;
       return this;
     }
 
-    boolean isTimesModified() {
+    public boolean isTimesModified() {
       return timesModified;
     }
 
-    boolean isCanceled() {
+    public boolean isCanceled() {
       return canceled;
     }
 
-    boolean isAdded() {
+    public boolean isAdded() {
       return added;
     }
 
-    boolean isTripPatternModified() {
+    public boolean isTripPatternModified() {
       return tripPatternModified;
     }
 
-    boolean isDeleted() {
+    public boolean isDeleted() {
       return deleted;
     }
 
-    RealTimeTripState build() {
+    public RealTimeTripState build() {
       return new RealTimeTripState(this);
     }
   }
