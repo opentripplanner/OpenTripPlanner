@@ -16,13 +16,10 @@ import org.opentripplanner.ext.ojp.RequestHandler;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.service.CallAtStopService;
 import org.opentripplanner.ext.ojp.service.OjpService;
-import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,16 +48,12 @@ public class OjpResource {
 
   public OjpResource(
     @Context TransitService transitService,
-    @Context Graph graph,
-    @Context LinkingContextFactory linkingContextFactory,
+    @Context NearbyStopFinderFactory nearbyStopFinderFactory,
     @Context OjpApiParameters ojpApiParameters,
     @Context RouteRequest defaultRouteRequest,
     @Context RoutingService routingService
   ) {
-    NearbyStopFinder nearbyStopFinder = graph.hasStreets
-      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
-      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
-    var callAtStopService = new CallAtStopService(transitService, nearbyStopFinder);
+    var callAtStopService = new CallAtStopService(transitService, nearbyStopFinderFactory.create());
     var idMapper = idMapper(ojpApiParameters);
     var ojpService = new OjpService(
       callAtStopService,

@@ -33,7 +33,7 @@ import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.DefaultNearbyStopFinderFactory;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
@@ -85,6 +85,11 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
         return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
       }
     );
+    var nearbyStopFinderFactory = new DefaultNearbyStopFinderFactory(
+      graph,
+      transitService,
+      linkingContextFactory
+    );
     CONTEXT = new GtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
@@ -99,7 +104,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       ),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       new StreetNearbyPlaceFinder(linkingContextFactory),
-      StreetNearbyStopFinder.of(linkingContextFactory).build(),
+      nearbyStopFinderFactory,
       routeRequest
     );
   }

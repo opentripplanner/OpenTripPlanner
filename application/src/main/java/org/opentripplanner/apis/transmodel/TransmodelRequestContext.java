@@ -4,8 +4,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -34,6 +33,7 @@ public class TransmodelRequestContext {
   private final StreetDetailsService streetDetailsService;
   private final LinkingContextFactory linkingContextFactory;
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final NearbyStopFinderFactory nearbyStopFinderFactory;
 
   public TransmodelRequestContext(
     RoutingService routingService,
@@ -47,7 +47,8 @@ public class TransmodelRequestContext {
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    NearbyStopFinderFactory nearbyStopFinderFactory
   ) {
     this.routingService = routingService;
     this.transitService = transitService;
@@ -61,6 +62,7 @@ public class TransmodelRequestContext {
     this.streetDetailsService = streetDetailsService;
     this.linkingContextFactory = linkingContextFactory;
     this.streetLimitationParametersService = streetLimitationParametersService;
+    this.nearbyStopFinderFactory = nearbyStopFinderFactory;
   }
 
   public RoutingService getRoutingService() {
@@ -118,8 +120,6 @@ public class TransmodelRequestContext {
   }
 
   public NearbyStopFinder getNearbyStopFinder() {
-    return graph.hasStreets
-      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
-      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
+    return nearbyStopFinderFactory.create();
   }
 }

@@ -1030,7 +1030,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   private NearbyStopFinder getNearbyStopFinder(DataFetchingEnvironment environment) {
-    return environment.<GtfsGraphQLRequestContext>getContext().nearbyStopFinder();
+    return environment.<GtfsGraphQLRequestContext>getContext().nearbyStopFinderFactory().create();
   }
 
   private DataFetcherResult getPlanResult(GtfsGraphQLRequestContext context, RouteRequest request) {

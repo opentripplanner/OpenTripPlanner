@@ -11,6 +11,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -82,6 +83,8 @@ public interface RequestScopedFactory {
   TransmodelRequestContext transmodelRequestContext();
 
   GtfsGraphQLRequestContext graphQLRequestContext();
+
+  NearbyStopFinderFactory nearbyStopFinderFactory();
 
   @Subcomponent.Builder
   interface Builder {

@@ -146,7 +146,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       TransferServiceTestFactory.transferService(TRANSFER_REPOSITORY),
       TestServerContext.createStreetDetailsService(),
       TestServerContext.createLinkingContextFactory(GRAPH, vertexLinker, transitService),
-      TestServerContext.createStreetLimitationParametersService()
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createNearbyStopFinderFactory(GRAPH, vertexLinker, transitService)
     );
   }
 

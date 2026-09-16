@@ -27,10 +27,9 @@ import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
 import org.opentripplanner.framework.transaction.configure.TransitDomain;
+import org.opentripplanner.place.DefaultNearbyStopFinderFactory;
 import org.opentripplanner.place.NearbyPlaceFinder;
-import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
@@ -229,7 +228,8 @@ public class RequestScopedModule {
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    NearbyStopFinderFactory nearbyStopFinderFactory
   ) {
     return new TransmodelRequestContext(
       routingService,
@@ -243,7 +243,8 @@ public class RequestScopedModule {
       transferService,
       streetDetailsService,
       linkingContextFactory,
-      streetLimitationParametersService
+      streetLimitationParametersService,
+      nearbyStopFinderFactory
     );
   }
 
@@ -266,9 +267,9 @@ public class RequestScopedModule {
     > realtimeVehicleRepositoryHandle,
     TransactionScope transactionScope,
     @Nullable @GtfsSchema GraphQLSchema gtfsSchema,
-    Graph graph,
     LinkingContextFactory linkingContextFactory,
-    RouteRequest defaultRouteRequest
+    RouteRequest defaultRouteRequest,
+    NearbyStopFinderFactory nearbyStopFinderFactory
   ) {
     var realtimeVehicleSnapshot = realtimeVehicleRepositoryHandle.repositorySnapshot(
       transactionScope
@@ -278,9 +279,6 @@ public class RequestScopedModule {
       transitService
     );
     NearbyPlaceFinder nearbyPlaceFinder = new StreetNearbyPlaceFinder(linkingContextFactory);
-    NearbyStopFinder nearbyStopFinder = graph.hasStreets
-      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
-      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
 
     return new GtfsGraphQLRequestContext(
       routingService,
@@ -293,8 +291,18 @@ public class RequestScopedModule {
       realtimeVehicleService,
       gtfsSchema,
       nearbyPlaceFinder,
-      nearbyStopFinder,
+      nearbyStopFinderFactory,
       defaultRouteRequest
     );
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static NearbyStopFinderFactory nearbyStopFinderFactory(
+    Graph graph,
+    TransitService transitService,
+    LinkingContextFactory linkingContextFactory
+  ) {
+    return new DefaultNearbyStopFinderFactory(graph, transitService, linkingContextFactory);
   }
 }

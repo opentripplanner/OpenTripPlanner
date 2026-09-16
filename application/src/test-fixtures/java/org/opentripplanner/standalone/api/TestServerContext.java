@@ -10,6 +10,8 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.place.DefaultNearbyStopFinderFactory;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
@@ -207,6 +209,18 @@ public class TestServerContext {
         var group = transitService.getStopLocationsGroup(id);
         return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
       }
+    );
+  }
+
+  public static NearbyStopFinderFactory createNearbyStopFinderFactory(
+    Graph graph,
+    VertexLinker vertexLinker,
+    TransitService transitService
+  ) {
+    return new DefaultNearbyStopFinderFactory(
+      graph,
+      transitService,
+      createLinkingContextFactory(graph, vertexLinker, transitService)
     );
   }
 }

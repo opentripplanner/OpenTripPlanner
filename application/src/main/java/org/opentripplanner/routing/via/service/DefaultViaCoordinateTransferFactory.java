@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.place.DefaultNearbyStopFinderFactory;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
@@ -74,11 +75,8 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
    * available, or straight-line distance otherwise.
    */
   private NearbyStopFinder createNearbyStopFinder() {
-    if (!graph.hasStreets) {
-      return new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
-    } else {
-      return StreetNearbyStopFinder.of(null).build();
-    }
+    var nearbyStopFinderFactory = new DefaultNearbyStopFinderFactory(graph, transitService, null);
+    return nearbyStopFinderFactory.create();
   }
 
   /**

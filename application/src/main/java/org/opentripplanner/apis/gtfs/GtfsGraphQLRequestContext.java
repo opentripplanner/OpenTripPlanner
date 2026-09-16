@@ -2,7 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.place.NearbyPlaceFinder;
-import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
@@ -24,7 +24,7 @@ public record GtfsGraphQLRequestContext(
   RealtimeVehicleService realTimeVehicleService,
   GraphQLSchema schema,
   NearbyPlaceFinder nearbyPlaceFinder,
-  NearbyStopFinder nearbyStopFinder,
+  NearbyStopFinderFactory nearbyStopFinderFactory,
   RouteRequest defaultRouteRequest
 ) {
   /**

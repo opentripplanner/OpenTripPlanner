@@ -202,7 +202,8 @@ class DatedServiceJourneyTypeTest {
       TransferServiceTestFactory.transferService(transferRepository),
       TestServerContext.createStreetDetailsService(),
       TestServerContext.createLinkingContextFactory(graph, vertexLinker, transitService),
-      TestServerContext.createStreetLimitationParametersService()
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createNearbyStopFinderFactory(graph, vertexLinker, transitService)
     );
 
     var result = GRAPHQL.execute(

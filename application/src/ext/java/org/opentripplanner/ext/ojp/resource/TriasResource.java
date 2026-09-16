@@ -24,13 +24,10 @@ import org.opentripplanner.ext.ojp.RequestHandler;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ojp.service.CallAtStopService;
 import org.opentripplanner.ext.ojp.service.OjpService;
-import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
+import org.opentripplanner.place.NearbyStopFinderFactory;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
-import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,16 +45,12 @@ public class TriasResource {
 
   public TriasResource(
     @Context TransitService transitService,
-    @Context Graph graph,
-    @Context LinkingContextFactory linkingContextFactory,
+    @Context NearbyStopFinderFactory nearbyStopFinderFactory,
     @Context TriasApiParameters triasApiParameters,
     @Context RoutingService routingService
   ) {
     var zoneId = triasApiParameters.timeZone().orElse(transitService.getTimeZone());
-    NearbyStopFinder nearbyStopFinder = graph.hasStreets
-      ? StreetNearbyStopFinder.of(linkingContextFactory).build()
-      : new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
-    var service = new CallAtStopService(transitService, nearbyStopFinder);
+    var service = new CallAtStopService(transitService, nearbyStopFinderFactory.create());
     var idMapper = idMapper(triasApiParameters);
     var serviceMapper = new OjpService(service, routingService, idMapper, zoneId);
     this.handler = new RequestHandler(serviceMapper, TriasResource::ojpToTrias, "TRIAS");
