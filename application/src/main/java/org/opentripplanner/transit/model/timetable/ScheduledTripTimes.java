@@ -202,6 +202,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
+  public RealTimeTripState realtimeTripState() {
+    return RealTimeTripState.of().build();
+  }
+
+  @Override
   public boolean hasAnyUpdates() {
     return false;
   }

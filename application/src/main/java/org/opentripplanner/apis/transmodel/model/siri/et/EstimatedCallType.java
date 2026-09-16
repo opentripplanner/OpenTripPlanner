@@ -25,6 +25,7 @@ import org.opentripplanner.apis.transmodel.model.TransmodelRealTimeState;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
+import org.opentripplanner.apis.transmodel.model.timetable.TransmodelRealTimeTripStateModel;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.TimePeriod;
@@ -52,7 +53,8 @@ public class EstimatedCallType {
     GraphQLOutputType datedServiceJourneyType,
     GraphQLOutputType empiricalDelayType,
     GraphQLOutputType replacedByType,
-    GraphQLScalarType dateTimeScalar
+    GraphQLScalarType dateTimeScalar,
+    GraphQLOutputType realTimeJourneyStateType
   ) {
     return (
       GraphQLObjectType.newObject()
@@ -165,6 +167,22 @@ public class EstimatedCallType {
             .description("Whether this call has been updated with real time information.")
             .dataFetcher(env -> ((TripTimeOnDate) env.getSource()).isRealtime())
             .build()
+        )
+        .field(
+          GraphQLFieldDefinition.newFieldDefinition()
+            .name("realTimeJourneyState")
+            .description("The real-time state of the dated service journey this call belongs to.")
+            .type(new GraphQLNonNull(realTimeJourneyStateType))
+            .dataFetcher(env -> {
+              var realtimeState = ((TripTimeOnDate) env.getSource()).realtimeTripState();
+
+              if (realtimeState.deleted()) {
+                throw new RuntimeException(
+                  "Trip has been deleted. this should not be exposed to the API and is probably a bug"
+                );
+              }
+              return TransmodelRealTimeTripStateModel.of(realtimeState);
+            })
         )
         .field(
           GraphQLFieldDefinition.newFieldDefinition()
