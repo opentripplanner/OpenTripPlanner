@@ -189,9 +189,10 @@ public class GraphBuilderModules {
   @Singleton
   static StopConnectivityModule provideStopConnectivityModule(
     Graph graph,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
-    return new StopConnectivityModule(graph, issueStore);
+    return new StopConnectivityModule(graph, transitRepository.getSiteRepository(), issueStore);
   }
 
   @Provides

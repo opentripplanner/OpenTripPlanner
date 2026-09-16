@@ -124,7 +124,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track(
       "Create transfer edges for stops",
       1000,
-      ProgressTracker.UNKNOWN_SIZE
+      transitRepository.getSiteRepository().listRegularStops().size()
     );
 
     AtomicInteger nTransfersTotal = new AtomicInteger();

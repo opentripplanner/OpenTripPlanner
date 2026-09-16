@@ -91,7 +91,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     var progress = ProgressTracker.track(
       "Linking transit stops to graph",
       5000,
-      ProgressTracker.UNKNOWN_SIZE
+      transitRepository.getSiteRepository().listRegularStops().size()
     );
     LOG.info(progress.startMessage());
 

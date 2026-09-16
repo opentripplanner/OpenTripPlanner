@@ -12,6 +12,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -26,12 +27,18 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   private static final Duration DURATION = Duration.ofMinutes(10);
   private final Graph graph;
+  private final SiteRepository siteRepository;
   private final DataImportIssueStore issueStore;
 
   private static final Logger LOG = LoggerFactory.getLogger(StopConnectivityModule.class);
 
-  public StopConnectivityModule(Graph graph, DataImportIssueStore issueStore) {
+  public StopConnectivityModule(
+    Graph graph,
+    SiteRepository siteRepository,
+    DataImportIssueStore issueStore
+  ) {
     this.graph = graph;
+    this.siteRepository = siteRepository;
     this.issueStore = issueStore;
   }
 
@@ -40,13 +47,13 @@ public class StopConnectivityModule implements GraphBuilderModule {
     if (!graph.hasStreets) {
       return;
     }
-    var stopVertices = graph.findVertices(TransitStopVertex.class);
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,
-      ProgressTracker.UNKNOWN_SIZE
+      siteRepository.listRegularStops().size()
     );
     LOG.info(progress.startMessage());
+    var stopVertices = graph.findVertices(TransitStopVertex.class);
     var issues = StreamUtils.ofIterable(stopVertices)
       .parallel()
       .map(stop -> {
