@@ -2,10 +2,11 @@ package org.opentripplanner.transit.transfer.regular.spi;
 
 /**
  * Cost-only equivalence tolerance used when deciding whether a dependent profile's own path can
- * be deduplicated against its {@code base} profile's path (see {@link RegularTransferParameters#base()}).
- * {@code raptor-data} has no dependency on OTP's domain-model cost-function types, so this stays a
- * plain function of the base cost - the application layer supplies an implementation backed by
- * whatever config-driven cost function it likes (e.g. a linear {@code a + b*x} tolerance).
+ * be deduplicated against its {@code deduplicationProfile}'s path (see
+ * {@link RegularTransferParameters#deduplicationProfile()}). {@code raptor-data} has no
+ * dependency on OTP's domain-model cost-function types, so this stays a plain function of the
+ * base cost - the application layer supplies an implementation backed by whatever config-driven
+ * cost function it likes (e.g. a linear {@code a + b*x} tolerance).
  */
 @FunctionalInterface
 public interface CostTolerance {

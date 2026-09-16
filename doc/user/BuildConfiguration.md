@@ -1214,9 +1214,10 @@ Transfer profiles for the raptor-data regular-transfer pipeline.
 
 Replaces `transferRequests` for regular (non-FLEX) transfer generation. One entry per
 named profile (`walk`, `wheelchair`, `bicycle`, `car`, `scooter`), each declaring its own
-preferences, duration limits, and optionally a `base` profile to deduplicate its
-discovered paths against. If this block is omitted entirely, a single default `walk`
-profile is used, mirroring the implicit default of the old `transferRequests` config.
+preferences, duration limits, and optionally a `deduplicationProfile` profile to
+deduplicate its discovered paths against. If this block is omitted entirely, a single
+default `walk` profile is used, mirroring the implicit default of the old
+`transferRequests` config.
 
 
 <h3 id="transitFeeds">transitFeeds</h3>

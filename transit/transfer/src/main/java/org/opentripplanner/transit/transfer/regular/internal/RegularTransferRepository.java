@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
 
 /**
@@ -28,7 +28,8 @@ import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
  */
 public class RegularTransferRepository<P> implements Serializable {
 
-  private final Map<RaptorTransferProfile, Map<Integer, Map<Integer, P>>> pathsByProfile = new HashMap<>();
+  private final Map<RaptorTransferProfile, Map<Integer, Map<Integer, P>>> pathsByProfile =
+    new HashMap<>();
 
   void setPath(RaptorTransferProfile profileId, int fromStop, int toStop, P path) {
     pathsByProfile

@@ -80,7 +80,9 @@ public class RaptorDataTransferGenerator implements GraphBuilderModule {
     List<RegularTransferParameters<RouteRequest>> profiles = config
       .profiles()
       .stream()
-      .map(p -> new RegularTransferParameters<>(p.profileId(), p.base(), p.preferences()))
+      .map(p ->
+        new RegularTransferParameters<>(p.profileId(), p.deduplicationProfile(), p.preferences())
+      )
       .toList();
 
     var nearbyStopFinder = StreetTransferPathProvider.createNearbyStopFinder(

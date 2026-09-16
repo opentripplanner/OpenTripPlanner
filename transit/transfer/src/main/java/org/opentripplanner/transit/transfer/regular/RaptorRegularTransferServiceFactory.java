@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.transfer.regular;
 
-
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
@@ -51,7 +50,9 @@ public class RaptorRegularTransferServiceFactory<P, U> {
     this.pathProvider = pathProvider;
     this.cache = new LinkedHashMap<>(16, 0.75f, true) {
       @Override
-      protected boolean removeEldestEntry(Map.Entry<CacheKey<U>, RaptorRegularTransferService> eldest) {
+      protected boolean removeEldestEntry(
+        Map.Entry<CacheKey<U>, RaptorRegularTransferService> eldest
+      ) {
         return size() > maxCacheSize;
       }
     };
@@ -66,9 +67,8 @@ public class RaptorRegularTransferServiceFactory<P, U> {
     RaptorTransferProfile profileId,
     U preferences
   ) {
-    return cache.computeIfAbsent(
-      new CacheKey<>(profileId, preferences),
-      key -> build(profileId, preferences)
+    return cache.computeIfAbsent(new CacheKey<>(profileId, preferences), key ->
+      build(profileId, preferences)
     );
   }
 

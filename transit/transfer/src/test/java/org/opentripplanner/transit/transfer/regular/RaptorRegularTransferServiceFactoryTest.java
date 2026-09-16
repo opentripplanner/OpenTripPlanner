@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.transfer.regular;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePrefs;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,9 +13,6 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.spi.RegularTransferParameters;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePrefs;
 
 class RaptorRegularTransferServiceFactoryTest {
 
@@ -66,13 +66,20 @@ class RaptorRegularTransferServiceFactoryTest {
     provider.addNearby(RaptorTransferProfile.WALK, A, C, 200, 90);
 
     var stopIndex = stopIndex();
-    var repository = generate(stopIndex, provider, new FakeTransferPathProvider.FakePrefs(1.0, 120));
+    var repository = generate(
+      stopIndex,
+      provider,
+      new FakeTransferPathProvider.FakePrefs(1.0, 120)
+    );
 
     var factory = new RaptorRegularTransferServiceFactory<>(stopIndex, repository, provider);
     var service = factory.create(RaptorTransferProfile.WALK, new FakePrefs(2.0, 120));
 
     // Cost was re-costed under the request's own costMultiplier (2.0), not the build-time one.
-    assertThat(collectC1(service.getTransfersFromStop(stopIndex.toStopIndex(A)))).containsExactly(200, 400);
+    assertThat(collectC1(service.getTransfersFromStop(stopIndex.toStopIndex(A)))).containsExactly(
+      200,
+      400
+    );
   }
 
   @Test

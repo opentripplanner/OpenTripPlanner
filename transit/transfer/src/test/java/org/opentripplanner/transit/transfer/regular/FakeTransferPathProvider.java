@@ -16,11 +16,13 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  * Test double: candidate paths are pre-registered per {@code (profileId, fromStop)}; cost scales
  * linearly with {@link FakePrefs#costMultiplier()}, filtered by {@link FakePrefs#maxDurationSeconds()}.
  */
-public class FakeTransferPathProvider implements TransferPathProvider<FakeTransferPathProvider.FakePath, FakeTransferPathProvider.FakePrefs> {
+public class FakeTransferPathProvider
+  implements
+    TransferPathProvider<FakeTransferPathProvider.FakePath, FakeTransferPathProvider.FakePrefs>
+{
 
-  private final Map<RaptorTransferProfile, Map<FeedScopedId, List<FakePath>>> byProfileIdAndStop = new EnumMap<>(
-    RaptorTransferProfile.class
-  );
+  private final Map<RaptorTransferProfile, Map<FeedScopedId, List<FakePath>>> byProfileIdAndStop =
+    new EnumMap<>(RaptorTransferProfile.class);
 
   public FakePath addNearby(
     RaptorTransferProfile profileId,
@@ -64,7 +66,12 @@ public class FakeTransferPathProvider implements TransferPathProvider<FakeTransf
     return Optional.of(new PathCriteria(cost, path.baseDurationSeconds()));
   }
 
-  public record FakePath(FeedScopedId from, FeedScopedId to, int baseCost, int baseDurationSeconds) {}
+  public record FakePath(
+    FeedScopedId from,
+    FeedScopedId to,
+    int baseCost,
+    int baseDurationSeconds
+  ) {}
 
   public record FakePrefs(double costMultiplier, int maxDurationSeconds) {}
 }

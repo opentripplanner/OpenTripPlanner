@@ -1,34 +1,31 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
 import org.opentripplanner.transit.transfer.regular.spi.RegularTransferParameters;
-
-import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RegularTransferProfileOrderingTest {
 
   private static RegularTransferParameters<String> profile(
     RaptorTransferProfile profileId,
-    RaptorTransferProfile base
+    RaptorTransferProfile deduplicationProfile
   ) {
-    return new RegularTransferParameters<>(profileId, base, profileId.name());
+    return new RegularTransferParameters<>(profileId, deduplicationProfile, profileId.name());
   }
 
   @Test
-  void baseProfilesComeBeforeDependents() {
+  void deduplicationProfilesComeBeforeDependents() {
     var walk = profile(RaptorTransferProfile.WALK, null);
     var wheelchair = profile(RaptorTransferProfile.WHEELCHAIR, RaptorTransferProfile.WALK);
     var bicycle = profile(RaptorTransferProfile.BICYCLE, RaptorTransferProfile.WALK);
     var scooter = profile(RaptorTransferProfile.SCOOTER, RaptorTransferProfile.BICYCLE);
 
     // Deliberately out of order.
-    var ordered = RegularTransferProfileOrdering.order(
-      List.of(scooter, bicycle, wheelchair, walk)
-    );
+    var ordered = RegularTransferProfileOrdering.order(List.of(scooter, bicycle, wheelchair, walk));
 
     var orderedProfileIds = ordered.stream().map(RegularTransferParameters::profileId).toList();
     assertThat(orderedProfileIds.indexOf(RaptorTransferProfile.WALK)).isLessThan(
@@ -51,25 +48,28 @@ class RegularTransferProfileOrderingTest {
   }
 
   @Test
-  void missingBaseIsRejected() {
+  void missingDeduplicationProfileIsRejected() {
     var bicycle = profile(RaptorTransferProfile.BICYCLE, RaptorTransferProfile.WALK);
-    assertThrows(IllegalArgumentException.class, () -> RegularTransferProfileOrdering.order(List.of(bicycle)));
+    assertThrows(IllegalArgumentException.class, () ->
+      RegularTransferProfileOrdering.order(List.of(bicycle))
+    );
   }
 
   @Test
   void duplicateProfileIsRejected() {
     var walk1 = profile(RaptorTransferProfile.WALK, null);
     var walk2 = profile(RaptorTransferProfile.WALK, null);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> RegularTransferProfileOrdering.order(List.of(walk1, walk2))
+    assertThrows(IllegalArgumentException.class, () ->
+      RegularTransferProfileOrdering.order(List.of(walk1, walk2))
     );
   }
 
   @Test
-  void circularBaseIsRejected() {
+  void circularDeduplicationProfileIsRejected() {
     var a = profile(RaptorTransferProfile.BICYCLE, RaptorTransferProfile.SCOOTER);
     var b = profile(RaptorTransferProfile.SCOOTER, RaptorTransferProfile.BICYCLE);
-    assertThrows(IllegalArgumentException.class, () -> RegularTransferProfileOrdering.order(List.of(a, b)));
+    assertThrows(IllegalArgumentException.class, () ->
+      RegularTransferProfileOrdering.order(List.of(a, b))
+    );
   }
 }

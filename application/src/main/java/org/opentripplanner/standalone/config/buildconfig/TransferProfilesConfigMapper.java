@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.module.transfer.api.MaxDurationRule;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfileConfig;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
@@ -55,9 +54,10 @@ public class TransferProfilesConfigMapper {
         """
         Replaces `transferRequests` for regular (non-FLEX) transfer generation. One entry per
         named profile (`walk`, `wheelchair`, `bicycle`, `car`, `scooter`), each declaring its own
-        preferences, duration limits, and optionally a `base` profile to deduplicate its
-        discovered paths against. If this block is omitted entirely, a single default `walk`
-        profile is used, mirroring the implicit default of the old `transferRequests` config.
+        preferences, duration limits, and optionally a `deduplicationProfile` profile to
+        deduplicate its discovered paths against. If this block is omitted entirely, a single
+        default `walk` profile is used, mirroring the implicit default of the old
+        `transferRequests` config.
         """
       )
       .asObject();
@@ -74,7 +74,7 @@ public class TransferProfilesConfigMapper {
       .of("deduplicateDelta")
       .since(V2_10)
       .summary(
-        "Cost tolerance used when deduplicating a profile's discovered path against its `base`."
+        "Cost tolerance used when deduplicating a profile's discovered path against its `deduplicationProfile`."
       )
       .asCostLinearFunction(CostLinearFunction.of(Duration.ZERO, 0.0));
 
@@ -100,7 +100,24 @@ public class TransferProfilesConfigMapper {
       profiles.add(mapProfile(RaptorTransferProfile.WALK, p, defaultMaxDuration));
     }
 
-    return new TransferProfilesConfig(defaultMaxDuration, deduplicateDelta, profiles);
+    String fallbackProfileName = c
+      .of("fallbackProfile")
+      .since(V2_10)
+      .summary(
+        "The profile to use for a request that matches no configured profile. Defaults to the first configured profile."
+      )
+      .asString(null);
+    RaptorTransferProfile fallbackProfileId =
+      fallbackProfileName == null
+        ? null
+        : mapProfileReference(fallbackProfileName, "fallbackProfile");
+
+    return new TransferProfilesConfig(
+      defaultMaxDuration,
+      deduplicateDelta,
+      fallbackProfileId,
+      profiles
+    );
   }
 
   private static TransferProfileConfig mapProfile(
@@ -108,12 +125,15 @@ public class TransferProfilesConfigMapper {
     NodeAdapter p,
     Duration defaultMaxDuration
   ) {
-    String baseName = p
-      .of("base")
+    String deduplicationProfileName = p
+      .of("deduplicationProfile")
       .since(V2_10)
       .summary("Profile to deduplicate paths against.")
       .asString(null);
-    RaptorTransferProfile base = mapBase(baseName);
+    RaptorTransferProfile deduplicationProfile =
+      deduplicationProfileName == null
+        ? null
+        : mapProfileReference(deduplicationProfileName, "deduplicationProfile");
 
     List<MaxDurationRule> maxDurations = p
       .of("maxDurations")
@@ -131,21 +151,17 @@ public class TransferProfilesConfigMapper {
       .asObject();
     RouteRequest preferences = mapPreferences(profileId, prefs);
 
-    return new TransferProfileConfig(profileId, base, preferences, maxDurations);
+    return new TransferProfileConfig(profileId, deduplicationProfile, preferences, maxDurations);
   }
 
-  @Nullable
-  private static RaptorTransferProfile mapBase(@Nullable String baseName) {
-    if (baseName == null) {
-      return null;
-    }
-    RaptorTransferProfile base = PROFILE_NAMES.get(baseName);
-    if (base == null) {
+  private static RaptorTransferProfile mapProfileReference(String name, String fieldName) {
+    RaptorTransferProfile profile = PROFILE_NAMES.get(name);
+    if (profile == null) {
       throw new IllegalArgumentException(
-        "Unknown transfer profile referenced by 'base': " + baseName
+        "Unknown transfer profile referenced by '" + fieldName + "': " + name
       );
     }
-    return base;
+    return profile;
   }
 
   private static MaxDurationRule mapMaxDurationRule(NodeAdapter md, Duration defaultMaxDuration) {

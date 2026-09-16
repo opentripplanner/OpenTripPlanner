@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-
 import java.util.Iterator;
+import org.opentripplanner.raptor.spi.RaptorTransfer;
 
 /**
  * TODO TX - This interface should be replaced by the Raptor SPI

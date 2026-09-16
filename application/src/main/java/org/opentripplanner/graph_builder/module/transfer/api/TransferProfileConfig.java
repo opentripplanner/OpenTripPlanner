@@ -9,8 +9,8 @@ import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
  * A configured {@code transfers:} profile (see {@code TransferProfilesConfig}), resolved into the
  * types the new raptor-data transfer pipeline needs.
  *
- * @param profileId   this profile's identifying key
- * @param base        another configured profile's key to deduplicate this profile's own
+ * @param profileId            this profile's identifying key
+ * @param deduplicationProfile another configured profile's key to deduplicate this profile's own
  *                    discovered paths against (see {@code TransferProfilesConfig#deduplicateDelta}),
  *                    {@code null} if this profile has none
  * @param preferences this profile's own preferences, as a full {@code RouteRequest} - the shape
@@ -25,7 +25,7 @@ import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
  */
 public record TransferProfileConfig(
   RaptorTransferProfile profileId,
-  @Nullable RaptorTransferProfile base,
+  @Nullable RaptorTransferProfile deduplicationProfile,
   RouteRequest preferences,
   List<MaxDurationRule> maxDurations
 ) {}

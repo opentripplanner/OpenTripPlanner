@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.spi;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
-
 import java.io.Serializable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * A path {@code P} found by {@link TransferPathProvider#findNearbyStops} together with the stop

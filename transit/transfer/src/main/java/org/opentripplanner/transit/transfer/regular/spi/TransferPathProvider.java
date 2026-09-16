@@ -1,10 +1,9 @@
 package org.opentripplanner.transit.transfer.regular.spi;
 
-import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
-import org.opentripplanner.core.model.id.FeedScopedId;
-
 import java.util.Collection;
 import java.util.Optional;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
 
 /**
  * The only boundary {@code raptor-data}'s regular-transfer pipeline has into street-search
@@ -29,9 +28,13 @@ public interface TransferPathProvider<P, U> {
 
   /**
    * Re-cost a previously discovered path under a specific {@code (profileId, preferences)}.
-   * Called both to cost a profile's own candidates and, for {@code base}/dedup comparisons, to
-   * re-cost a base profile's path under a dependent profile's preferences. Empty if the path
-   * exceeds that profile's duration limit.
+   * Called both to cost a profile's own candidates and, for {@code deduplicationProfile}/dedup
+   * comparisons, to re-cost a deduplicationProfile's path under a dependent profile's
+   * preferences. Empty if the path exceeds that profile's duration limit.
    */
-  Optional<PathCriteria> computePathCriteria(P path, RaptorTransferProfile profileId, U preferences);
+  Optional<PathCriteria> computePathCriteria(
+    P path,
+    RaptorTransferProfile profileId,
+    U preferences
+  );
 }

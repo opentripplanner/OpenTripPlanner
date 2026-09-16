@@ -21,7 +21,12 @@ class DefaultTransferGeneratorTest {
   private record TestStop(FeedScopedId id, int index) {}
 
   private static StopIndex stopIndex() {
-    var stops = List.of(new TestStop(A, 0), new TestStop(B, 1), new TestStop(C, 2), new TestStop(D, 3));
+    var stops = List.of(
+      new TestStop(A, 0),
+      new TestStop(B, 1),
+      new TestStop(C, 2),
+      new TestStop(D, 3)
+    );
     return new StopIndex(stops.size(), stops, TestStop::index, TestStop::id);
   }
 
@@ -110,7 +115,11 @@ class DefaultTransferGeneratorTest {
     generator.generateTransfersForAllStops();
 
     assertThat(
-      repository.findPath(RaptorTransferProfile.WALK, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
+      repository.findPath(
+        RaptorTransferProfile.WALK,
+        stopIndex.toStopIndex(A),
+        stopIndex.toStopIndex(B)
+      )
     ).isNull();
   }
 }

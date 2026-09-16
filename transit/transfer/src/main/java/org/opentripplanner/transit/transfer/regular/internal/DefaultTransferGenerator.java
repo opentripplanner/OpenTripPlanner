@@ -58,10 +58,10 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
   /**
    * Run the profile's own discovery search and keep every candidate the provider still considers
    * usable under this profile's own {@code (profileId, preferences)} - not just the single
-   * cheapest. If the profile has a {@code base}, each surviving candidate is independently
-   * checked for deduplication against the base's already-stored path to the same target stop
-   * (the profile still runs its own search regardless - {@code base} only affects what gets
-   * stored).
+   * cheapest. If the profile has a {@code deduplicationProfile}, each surviving candidate is
+   * independently checked for deduplication against the deduplicationProfile's already-stored
+   * path to the same target stop (the profile still runs its own search regardless -
+   * {@code deduplicationProfile} only affects what gets stored).
    */
   private void generateForStop(RegularTransferParameters<U> profile, FeedScopedId fromStopId) {
     int fromStop = stopIndex.toStopIndex(fromStopId);
@@ -93,16 +93,18 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
       int toStop = entry.getKey();
       P ownPath = entry.getValue().path();
       PathCriteria ownCriteria = bestCriteriaPerTargetStop.get(toStop);
-      P chosenPath = profile.base() == null
-        ? ownPath
-        : resolveDeduplicatedPath(profile, fromStop, toStop, ownPath, ownCriteria);
+      P chosenPath =
+        profile.deduplicationProfile() == null
+          ? ownPath
+          : resolveDeduplicatedPath(profile, fromStop, toStop, ownPath, ownCriteria);
       repository.setPath(profile.profileId(), fromStop, toStop, chosenPath);
     }
   }
 
   /**
-   * @return the base's path if it is cost-equivalent to {@code ownPath} under this profile's own
-   * preferences (see {@link CostTolerance}), otherwise {@code ownPath} unchanged.
+   * @return the deduplicationProfile's path if it is cost-equivalent to {@code ownPath} under
+   * this profile's own preferences (see {@link CostTolerance}), otherwise {@code ownPath}
+   * unchanged.
    */
   private P resolveDeduplicatedPath(
     RegularTransferParameters<U> profile,
@@ -111,7 +113,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     P ownPath,
     PathCriteria ownCriteria
   ) {
-    P basePath = repository.findPath(profile.base(), fromStop, toStop);
+    P basePath = repository.findPath(profile.deduplicationProfile(), fromStop, toStop);
     if (basePath == null) {
       return ownPath;
     }

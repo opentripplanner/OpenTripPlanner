@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.transfer.regular;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
-
 import java.util.List;
 import java.util.function.Predicate;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 ///
 /// Incrementally (re)generates a profile's regular transfer path templates in response to a

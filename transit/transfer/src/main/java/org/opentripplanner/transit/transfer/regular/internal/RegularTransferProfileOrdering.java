@@ -11,9 +11,9 @@ import org.opentripplanner.transit.transfer.regular.RaptorTransferProfile;
 import org.opentripplanner.transit.transfer.regular.spi.RegularTransferParameters;
 
 /**
- * Orders transfer profiles so a profile with a {@code base} always comes after the base profile
- * it deduplicates paths against, and rejects a configuration where a {@code base} reference is
- * missing or the references form a cycle.
+ * Orders transfer profiles so a profile with a {@code deduplicationProfile} always comes after
+ * the profile it deduplicates paths against, and rejects a configuration where a
+ * {@code deduplicationProfile} reference is missing or the references form a cycle.
  */
 final class RegularTransferProfileOrdering {
 
@@ -31,13 +31,13 @@ final class RegularTransferProfileOrdering {
       }
     }
     for (var profile : profiles) {
-      var base = profile.base();
-      if (base != null && !byProfileId.containsKey(base)) {
+      var deduplicationProfile = profile.deduplicationProfile();
+      if (deduplicationProfile != null && !byProfileId.containsKey(deduplicationProfile)) {
         throw new IllegalArgumentException(
           "Transfer profile " +
             profile.profileId() +
-            " has base " +
-            base +
+            " has deduplicationProfile " +
+            deduplicationProfile +
             ", which is not a configured transfer profile."
         );
       }
@@ -65,13 +65,13 @@ final class RegularTransferProfileOrdering {
     }
     if (!visiting.add(profileId)) {
       throw new IllegalArgumentException(
-        "Circular base reference involving transfer profile " + profileId
+        "Circular deduplicationProfile reference involving transfer profile " + profileId
       );
     }
     var profile = byProfileId.get(profileId);
-    var base = profile.base();
-    if (base != null) {
-      visit(base, byProfileId, visited, visiting, ordered);
+    var deduplicationProfile = profile.deduplicationProfile();
+    if (deduplicationProfile != null) {
+      visit(deduplicationProfile, byProfileId, visited, visiting, ordered);
     }
     visiting.remove(profileId);
     visited.add(profileId);
