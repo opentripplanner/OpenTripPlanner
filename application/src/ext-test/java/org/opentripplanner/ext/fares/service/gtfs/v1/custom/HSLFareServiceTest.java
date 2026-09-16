@@ -6,7 +6,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model.basic.Money.euros;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,7 +52,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
   }
 
   private static List<Arguments> createTestCases() {
-    List<Arguments> args = new LinkedList<>();
+    List<Arguments> args = new ArrayList<>();
 
     Agency agency1 = Agency.of(new FeedScopedId(FEED_ID, "AG1"))
       .withName("Agency 1")

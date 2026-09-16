@@ -2,12 +2,12 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -106,7 +106,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     }
 
     int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
+    List<Vertex> toRemove = new ArrayList<>();
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
         toRemove.add(v);
@@ -471,7 +471,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     Map<Vertex, Subgraph> alreadyMapped
   ) {
     Subgraph subgraph = new Subgraph();
-    Queue<Vertex> q = new LinkedList<>();
+    Queue<Vertex> q = new ArrayDeque<>();
     Subgraph anchor = null;
 
     if (anchors != null) {
