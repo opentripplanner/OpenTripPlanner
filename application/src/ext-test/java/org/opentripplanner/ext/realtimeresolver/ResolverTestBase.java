@@ -22,7 +22,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -36,10 +35,7 @@ class ResolverTestBase extends AbstractTestBase {
 
   @Test
   void populateItineraryLegsWithNoRealTime() {
-    var refetchService = createRefetchService(
-      new TransitAlertServiceImpl(),
-      new DefaultConstrainedTransferService()
-    );
+    var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
     TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip4");
 
@@ -107,10 +103,7 @@ class ResolverTestBase extends AbstractTestBase {
 
   @Test
   void populateItineraryLegsWithRealTime() {
-    var refetchService = createRefetchService(
-      new TransitAlertServiceImpl(),
-      new DefaultConstrainedTransferService()
-    );
+    var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
     TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip4");
 
@@ -235,7 +228,7 @@ class ResolverTestBase extends AbstractTestBase {
 
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
-      createRefetchService(transitAlertService, new DefaultConstrainedTransferService()),
+      createRefetchService(transitAlertService),
       TRANSIT_ENV.transitService(),
       transitAlertService,
       routeRequest()
@@ -284,7 +277,7 @@ class ResolverTestBase extends AbstractTestBase {
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
-      createRefetchService(new TransitAlertServiceImpl(), new DefaultConstrainedTransferService()),
+      createRefetchService(new TransitAlertServiceImpl()),
       transitService,
       new TransitAlertServiceImpl(),
       routeRequest()
@@ -301,7 +294,7 @@ class ResolverTestBase extends AbstractTestBase {
   @Test
   void testPopulateLegsKeepStaySeated() {
     var cts = createConstrainedTransferService(staySeated("trip1", 1, "trip2", 0));
-    var refetchService = createRefetchService(new TransitAlertServiceImpl(), cts);
+    var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
     TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip2");
 

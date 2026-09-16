@@ -111,7 +111,6 @@ public class RequestScopedModule {
     TransitAlertService transitAlertService,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
-    ConstrainedTransferService constrainedTransferService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
   ) {
@@ -121,7 +120,6 @@ public class RequestScopedModule {
       transitAlertService,
       transferService,
       streetDetailsService,
-      constrainedTransferService,
       linkingContextFactory,
       streetLimitationParametersService
     );

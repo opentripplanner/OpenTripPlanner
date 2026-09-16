@@ -48,7 +48,6 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.paging.PagingService;
@@ -58,7 +57,6 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitService;
@@ -450,19 +448,6 @@ public class RoutingWorker {
       raptorSearchParamsUsed,
       pageCursorInput,
       itineraries
-    );
-  }
-
-  private RefetchItineraryService createRefetchItineraryService() {
-    return new RefetchItineraryService(
-      graph,
-      transitService,
-      transitAlertService,
-      transferService,
-      streetDetailsService,
-      new DefaultConstrainedTransferService(),
-      linkingContextFactory,
-      streetLimitationParametersService
     );
   }
 

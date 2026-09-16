@@ -226,10 +226,7 @@ public abstract class AbstractTestBase {
     return List.of(linkFrom, edge, linkTo);
   }
 
-  protected RefetchItineraryService createRefetchService(
-    TransitAlertService transitAlertService,
-    ConstrainedTransferService constrainedTransferService
-  ) {
+  protected RefetchItineraryService createRefetchService(TransitAlertService transitAlertService) {
     StreetDetailsService streetDetailsService = null;
 
     VertexCreationService vertexCreationService = new VertexCreationService(
@@ -275,7 +272,6 @@ public abstract class AbstractTestBase {
       transitAlertService,
       TRANSFER_SERVICE,
       streetDetailsService,
-      constrainedTransferService,
       linkingContextFactory,
       streetLimitationParametersService
     );

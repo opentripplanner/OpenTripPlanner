@@ -310,6 +310,8 @@ class RefetchItineraryServiceTest extends AbstractTestBase {
       GRAPH,
       vertexCreationService
     );
+    //Enrich constrainedTransfer with transfers
+    TRANSIT_ENV.transitService().getConstrainedTransferService().addAll(cts.listAll());
     var streetLimitationParametersService = new StreetLimitationParametersService() {
       @Override
       public float maxCarSpeed() {
@@ -337,7 +339,6 @@ class RefetchItineraryServiceTest extends AbstractTestBase {
       new TransitAlertServiceImpl(),
       TRANSFER_SERVICE,
       streetDetailsService,
-      cts,
       linkingContextFactory,
       streetLimitationParametersService
     );

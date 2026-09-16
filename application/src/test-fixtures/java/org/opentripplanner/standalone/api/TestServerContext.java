@@ -269,7 +269,6 @@ public class TestServerContext {
       transitAlertService,
       transferService,
       streetDetailsService,
-      transitService.getConstrainedTransferService(),
       linkingContextFactory,
       streetLimitationParametersService
     );

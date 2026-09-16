@@ -67,11 +67,10 @@ public class RefetchItineraryService {
     TransitAlertService transitAlertService,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
-    ConstrainedTransferService constrainedTransferService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
   ) {
-    this.constrainedTransferService = constrainedTransferService;
+    this.constrainedTransferService = transitService.getConstrainedTransferService();
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
     this.transferService = transferService;
