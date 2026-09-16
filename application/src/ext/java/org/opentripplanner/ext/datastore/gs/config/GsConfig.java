@@ -8,10 +8,32 @@ public class GsConfig implements GsParameters {
 
   private final String host;
   private final String credentialFile;
+  private final int parallelReads;
+  private final int parallelReadBlockSizeMb;
+  private final int parallelReadMinSizeMb;
 
   public GsConfig(String host, String credentialFile) {
+    this(
+      host,
+      credentialFile,
+      GsParameters.DEFAULT_PARALLEL_READS,
+      GsParameters.DEFAULT_PARALLEL_READ_BLOCK_SIZE_MB,
+      GsParameters.DEFAULT_PARALLEL_READ_MIN_SIZE_MB
+    );
+  }
+
+  public GsConfig(
+    String host,
+    String credentialFile,
+    int parallelReads,
+    int parallelReadBlockSizeMb,
+    int parallelReadMinSizeMb
+  ) {
     this.host = host;
     this.credentialFile = credentialFile;
+    this.parallelReads = parallelReads;
+    this.parallelReadBlockSizeMb = parallelReadBlockSizeMb;
+    this.parallelReadMinSizeMb = parallelReadMinSizeMb;
   }
 
   public static GsConfig fromConfig(NodeAdapter root, String parameterName) {
@@ -49,7 +71,60 @@ public class GsConfig implements GsParameters {
       )
       .asString(null);
 
-    return new GsConfig(host, credentialFile);
+    int parallelReads = gsRoot
+      .of("parallelReads")
+      .since(OtpVersion.V2_11)
+      .summary("Number of byte-ranges of a single object to download concurrently.")
+      .description(
+        """
+        A single Cloud Storage connection tops out well below the available bandwidth, and its
+        throughput varies substantially from one connection to the next. Reading a large object -
+        typically `graph.obj` - over one stream therefore has a long tail, where an unlucky
+        connection takes several times the median. Downloading several ranges at once removes that
+        tail, and lets the transfer overlap the work of the consumer.
+
+        Set to `0` to disable this and use a single sequential stream. Set to `1` to keep a single
+        stream but move it to a background thread, so the download still overlaps the consumer.
+
+        Each concurrent read holds buffers off the Java heap. The memory used by one object read is
+        at most `3 * parallelReads * parallelReadBlockSizeMb` megabytes - 192 MB with the default
+        settings. That memory is outside the heap but inside the container memory limit, so reduce
+        `parallelReads` or `parallelReadBlockSizeMb` if the process is close to that limit.
+        """
+      )
+      .asInt(GsParameters.DEFAULT_PARALLEL_READS);
+
+    int parallelReadBlockSizeMb = gsRoot
+      .of("parallelReadBlockSizeMb")
+      .since(OtpVersion.V2_11)
+      .summary("The size of each range request in megabytes, when reading in parallel.")
+      .description(
+        """
+        Smaller blocks spread a slow connection over a smaller share of the object, but cost one
+        more request each. The default is a reasonable balance for objects of a few gigabytes.
+        """
+      )
+      .asInt(GsParameters.DEFAULT_PARALLEL_READ_BLOCK_SIZE_MB);
+
+    int parallelReadMinSizeMb = gsRoot
+      .of("parallelReadMinSizeMb")
+      .since(OtpVersion.V2_11)
+      .summary("Objects smaller than this are read with a single sequential stream.")
+      .description(
+        """
+        Parallel reads pay for themselves only on large objects. Below this size OTP reads the
+        object exactly as it did before, allocating no buffers and starting no threads.
+        """
+      )
+      .asInt(GsParameters.DEFAULT_PARALLEL_READ_MIN_SIZE_MB);
+
+    return new GsConfig(
+      host,
+      credentialFile,
+      parallelReads,
+      parallelReadBlockSizeMb,
+      parallelReadMinSizeMb
+    );
   }
 
   @Override
@@ -60,5 +135,20 @@ public class GsConfig implements GsParameters {
   @Override
   public String credentialFile() {
     return credentialFile;
+  }
+
+  @Override
+  public int parallelReads() {
+    return parallelReads;
+  }
+
+  @Override
+  public int parallelReadBlockSizeMb() {
+    return parallelReadBlockSizeMb;
+  }
+
+  @Override
+  public int parallelReadMinSizeMb() {
+    return parallelReadMinSizeMb;
   }
 }
