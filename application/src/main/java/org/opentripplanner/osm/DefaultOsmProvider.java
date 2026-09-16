@@ -39,7 +39,7 @@ public class DefaultOsmProvider implements OsmProvider {
   private final WayPropertySet wayPropertySet;
   /// since reading from disk is still serial, this only controls how many threads _decode_ the zip
   /// stream. past 2-3, more threads don't make it faster any more.
-  private final int decodeParallelism = Math.max(4, Runtime.getRuntime().availableProcessors());
+  private final int decodeParallelism = Math.min(4, Runtime.getRuntime().availableProcessors());
   private final ExecutorService executorService = Executors.newFixedThreadPool(decodeParallelism);
   private byte[] cachedBytes = null;
 
