@@ -189,12 +189,6 @@ public class RoutingWorker {
         // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
         //       log-trace-parameters-propagation and graceful timeout handling here.
         try {
-          /**
-           * DirectStreet = Resor som INTE använder kollektivtrafik.
-           * DirectFlex = Specialkollektivtrafik (Vi använder det inte). Vi har istället Närtrafik, egen flex.
-           * RouteTransit - Den som använder Raptor för att räkna ut kollektivtrafik.
-           * Carpooling - Inget som vi gör.
-           */
           var r1 = CompletableFuture.supplyAsync(() -> routeDirectStreet());
           var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex());
           var r3 = CompletableFuture.supplyAsync(() -> routeTransit());
