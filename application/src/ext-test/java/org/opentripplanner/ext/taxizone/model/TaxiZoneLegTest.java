@@ -32,7 +32,7 @@ class TaxiZoneLegTest implements PlanTestConstants {
   private static final BookingInfo DROP_OFF_BOOKING_INFO = BookingInfo.of().build();
 
   @Test
-  void modeComesFromZoneRoute() {
+  void modeIsTaxi() {
     var leg = taxiZoneLeg();
     assertThat(leg.mode()).isEqualTo(TransitMode.TAXI);
   }
@@ -68,9 +68,9 @@ class TaxiZoneLegTest implements PlanTestConstants {
   }
 
   @Test
-  void serviceDateComesFromLegStartTime() {
+  void serviceDateIsNull() {
     var leg = taxiZoneLeg();
-    assertThat(leg.serviceDate()).isEqualTo(leg.startTime().toLocalDate());
+    assertThat(leg.serviceDate()).isNull();
   }
 
   @Test
@@ -107,6 +107,26 @@ class TaxiZoneLegTest implements PlanTestConstants {
   }
 
   @Test
+  void fareOffersIsEmpty() {
+    var leg = taxiZoneLeg();
+    assertThat(leg.fareOffers()).isEmpty();
+  }
+
+  @Test
+  void accessibilityScoreIsNull() {
+    var leg = taxiZoneLeg();
+    assertThat(leg.accessibilityScore()).isNull();
+  }
+
+  @Test
+  void rentalFieldsAreNotUsed() {
+    var leg = taxiZoneLeg();
+    assertThat(leg.walkingBike()).isFalse();
+    assertThat(leg.rentedVehicle()).isFalse();
+    assertThat(leg.vehicleRentalNetwork()).isNull();
+  }
+
+  @Test
   void hasSameModeTrueForMatchingTaxiZoneLeg() {
     var leg = taxiZoneLeg();
     var other = taxiZoneLeg();
@@ -117,17 +137,6 @@ class TaxiZoneLegTest implements PlanTestConstants {
   void hasSameModeFalseForPlainStreetLeg() {
     var leg = taxiZoneLeg();
     assertThat(leg.hasSameMode(driveLeg())).isFalse();
-  }
-
-  @Test
-  void hasSameModeFalseForDifferentModeZoneLeg() {
-    var leg = taxiZoneLeg();
-    var otherRoute = TransitRepositoryForTest.route("other-route")
-      .withMode(TransitMode.CARPOOL)
-      .build();
-    var otherZone = new TaxiZone(Polygons.OSLO, otherRoute, null, null);
-    var other = new TaxiZoneLeg(driveLeg(), otherZone);
-    assertThat(leg.hasSameMode(other)).isFalse();
   }
 
   private static StreetLeg driveLeg() {

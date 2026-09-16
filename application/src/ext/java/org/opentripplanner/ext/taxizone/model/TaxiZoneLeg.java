@@ -60,7 +60,7 @@ public class TaxiZoneLeg implements Leg {
   }
 
   public TransitMode mode() {
-    return taxiZone.route().getMode();
+    return TransitMode.TAXI;
   }
 
   @Override
@@ -74,8 +74,9 @@ public class TaxiZoneLeg implements Leg {
   }
 
   @Override
+  @Nullable
   public LocalDate serviceDate() {
-    return startTime().toLocalDate();
+    return null;
   }
 
   /**
@@ -157,17 +158,18 @@ public class TaxiZoneLeg implements Leg {
 
   @Override
   public Boolean walkingBike() {
-    return streetLeg.walkingBike();
+    return false;
   }
 
   @Override
   public Boolean rentedVehicle() {
-    return streetLeg.rentedVehicle();
+    return false;
   }
 
   @Override
+  @Nullable
   public String vehicleRentalNetwork() {
-    return streetLeg.vehicleRentalNetwork();
+    return null;
   }
 
   @Override
@@ -188,7 +190,7 @@ public class TaxiZoneLeg implements Leg {
   @Override
   @Nullable
   public Float accessibilityScore() {
-    return streetLeg.accessibilityScore();
+    return null;
   }
 
   @Nullable
@@ -199,7 +201,7 @@ public class TaxiZoneLeg implements Leg {
 
   @Override
   public List<FareOffer> fareOffers() {
-    return streetLeg.fareOffers();
+    return List.of();
   }
 
   @Nullable

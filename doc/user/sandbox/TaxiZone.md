@@ -96,20 +96,24 @@ interface directly (**not** `TransitLeg`), even though it carries route/agency/b
 information from the matched provider's flex trip. This means `transitLeg`/`isTransit` is
 `false` in the API for a taxi leg, and the itinerary's own `isTransit`-based fields are
 unaffected by it. The physical street route (geometry, distance, elevation, steps, generalized
-cost, emissions, fare offers, etc.) of the original driving leg is preserved by delegating to the
-wrapped street leg.
+cost, emissions, etc.) of the original driving leg is preserved by delegating to the wrapped
+street leg. Some fields e.g. `mode`, `serviceDate`,
+`accessibilityScore`, `fareOffers`, and the vehicle-rental fields are not delegated.
 
 | Field (GTFS GraphQL / Transmodel) | Source                                                       |
 |:-----------------------------------|:--------------------------------------------------------------|
 | `transitLeg` / n\/a                | Always `false` — `TaxiZoneLeg` is not a `TransitLeg`.          |
 | `agency` / `authority`             | Agency from the matched route.                                |
 | `route` / `line`                   | Route from the matched flex trip.                              |
-| `mode`                              | `TransitMode` from the matched route (e.g. `TAXI`), resolved via an explicit `instanceof TaxiZoneLeg` branch in `LegImpl`/`LegType`, since it isn't a `TransitLeg`. |
-| `serviceDate`                      | The leg's own start date |
+| `mode`                              | `TAXI`, resolved via an explicit `instanceof TaxiZoneLeg` branch in `LegImpl`/`LegType`, since it isn't a `TransitLeg`. |
+| `serviceDate`                      | Always `null` (not meaningful for a taxi leg). |
 | `boardStopPosInPattern`            | Always `0` (the pickup stop).                                  |
 | `alightStopPosInPattern`           | Always `1` (the drop-off stop).                                |
 | `pickupBookingInfo`                | Booking info from stop 0 of the matched flex trip.             |
 | `dropOffBookingInfo`               | Booking info from stop 1 of the matched flex trip.             |
+| `accessibilityScore`               | Always `null` (not meaningful for a taxi leg). |
+| `fareOffers`                       | Always empty (same as for a plain driving leg). |
+| `rentedBike` and related vehicle-rental fields | Always `false`/`null` (not applicable to a taxi leg). |
 | `trip`, `tripOnServiceDate`, `alerts`, `stopCalls` | Not applicable — fall back to the `Leg` interface's defaults (`null`/empty), since there is no scheduled trip driving the leg. |
 
 Itineraries where the leg does not match any zone are removed from the response.
