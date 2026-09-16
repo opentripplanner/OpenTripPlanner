@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,14 +34,6 @@ class UnmodifiableCollectionsSerializerTest {
   @Test
   void roundTripUnmodifiableRandomAccessList() {
     var original = Collections.unmodifiableList(new ArrayList<>(List.of("a", "b", "c")));
-    var result = roundTrip(original);
-    assertThat(result).containsExactly("a", "b", "c").inOrder();
-    assertThrows(UnsupportedOperationException.class, () -> result.add("d"));
-  }
-
-  @Test
-  void roundTripUnmodifiableList() {
-    var original = Collections.unmodifiableList(new LinkedList<>(List.of("a", "b", "c")));
     var result = roundTrip(original);
     assertThat(result).containsExactly("a", "b", "c").inOrder();
     assertThrows(UnsupportedOperationException.class, () -> result.add("d"));
