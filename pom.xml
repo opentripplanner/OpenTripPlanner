@@ -99,16 +99,15 @@
     </properties>
 
     <modules>
-        <module>utils</module>
-        <module>core</module>
-        <module>transit</module>
-        <module>raptor</module>
-        <module>astar</module>
-        <module>gtfs-realtime-protobuf</module>
         <module>application</module>
+        <module>astar</module>
+        <module>core</module>
+        <module>gtfs-realtime-protobuf</module>
         <module>otp-shaded</module>
-        <module>test/integration</module>
+        <module>raptor</module>
         <module>street</module>
+        <module>test/integration</module>
+        <module>transit</module>
     </modules>
 
 
