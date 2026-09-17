@@ -3,9 +3,9 @@ package org.opentripplanner.framework.transaction.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.opentripplanner.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.core.domain.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
-import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 
 /**

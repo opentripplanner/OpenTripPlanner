@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
+import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater;
@@ -14,8 +16,6 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServic
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
-import org.opentripplanner.framework.transaction.UpdateManager;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;

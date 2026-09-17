@@ -1,8 +1,8 @@
 package org.opentripplanner.framework.transaction.internal;
 
 import java.util.Objects;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
 
 /**
  * Default request-scoped implementation of {@link TransactionScope}.

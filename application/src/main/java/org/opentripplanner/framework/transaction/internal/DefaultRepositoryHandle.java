@@ -1,7 +1,7 @@
 package org.opentripplanner.framework.transaction.internal;
 
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.TransactionScope;
+import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
 
 /**
  * Package-private implementation of {@link RepositoryHandle} that additionally exposes

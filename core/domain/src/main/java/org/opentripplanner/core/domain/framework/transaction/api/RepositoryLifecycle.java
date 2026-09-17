@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.api;
+package org.opentripplanner.core.domain.framework.transaction.api;
 
 /**
  * Strategy for the copy-on-write / freeze lifecycle of a repository snapshot.
