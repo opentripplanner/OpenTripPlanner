@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
@@ -18,6 +19,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.search.TraverseMode;
@@ -132,11 +134,11 @@ public class TaxiRouter {
 
     List<NearbyStop> result = new ArrayList<>(nearbyStops.size());
     for (NearbyStop nearbyStop : nearbyStops) {
-      WgsCoordinate stopCoordinate = transitService
-        .getStopLocation(nearbyStop.stopId)
-        .getCoordinate();
+      Point stopPoint = GeometryUtils.getGeometryFactory().createPoint(
+        transitService.getStopLocation(nearbyStop.stopId).getCoordinate().asJtsCoordinate()
+      );
       for (TaxiZone zone : zones) {
-        if (zone.contains(stopCoordinate)) {
+        if (taxiZoneIndex.getPreparedGeometry(zone).contains(stopPoint)) {
           result.add(nearbyStop);
           break;
         }

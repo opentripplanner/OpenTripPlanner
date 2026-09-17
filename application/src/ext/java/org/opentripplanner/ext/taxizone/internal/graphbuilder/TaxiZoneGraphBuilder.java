@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Loads taxi zones from GTFS feeds explicitly flagged with
- * {@code transitFeeds.gtfsFeeds[].taxiZoneProvider: true} and stores them in the
+ * {@code transitFeeds[].taxiZoneProvider: true} and stores them in the
  * {@link TaxiZoneRepository}.
  */
 public class TaxiZoneGraphBuilder implements GraphBuilderModule {
