@@ -11,6 +11,21 @@
     <artifactId>application</artifactId>
     <name>OpenTripPlanner - Application</name>
 
+    <dependencyManagement>
+        <dependencies>
+            <!--
+             Not declared directly; pulled in transitively by both com.google.truth:truth and
+             com.google.cloud:google-cloud-pubsub. Pinned so the resolved version doesn't depend
+             on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.41.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- project dependencies -->
         <dependency>
