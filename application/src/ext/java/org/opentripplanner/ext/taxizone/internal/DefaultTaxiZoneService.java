@@ -63,17 +63,7 @@ public class DefaultTaxiZoneService implements TaxiZoneService {
     AccessEgressType type,
     RouteRequest request
   ) {
-    return type.isAccess()
-      ? taxiAccessEgressRouter.filterAccessNearbyStops(
-          transitService,
-          nearbyStops,
-          request.from().wgsCoordinate()
-        )
-      : taxiAccessEgressRouter.filterEgressNearbyStops(
-          transitService,
-          nearbyStops,
-          request.to().wgsCoordinate()
-        );
+    return taxiAccessEgressRouter.filterNearbyStops(transitService, nearbyStops, type, request);
   }
 
   @Override

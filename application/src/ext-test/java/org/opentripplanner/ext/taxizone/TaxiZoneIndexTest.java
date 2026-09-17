@@ -26,6 +26,9 @@ class TaxiZoneIndexTest {
   private static final Route ROUTE_1 = TransitRepositoryForTest.route("route-1").build();
   private static final Route ROUTE_2 = TransitRepositoryForTest.route("route-2").build();
 
+  private static final TaxiZone ZONE_1 = zone(SQUARE_1, ROUTE_1);
+  private static final TaxiZone ZONE_2 = zone(SQUARE_2, ROUTE_2);
+
   private static final WgsCoordinate INSIDE_SQUARE_1_A = new WgsCoordinate(2, 2);
   private static final WgsCoordinate INSIDE_SQUARE_1_B = new WgsCoordinate(8, 8);
   private static final WgsCoordinate INSIDE_SQUARE_2_A = new WgsCoordinate(25, 25);
@@ -34,7 +37,7 @@ class TaxiZoneIndexTest {
 
   @Test
   void findsZoneCoveringBothPickupAndDropoff() {
-    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, ROUTE_1)));
+    var index = new TaxiZoneIndex(List.of(ZONE_1));
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B);
 
@@ -44,7 +47,7 @@ class TaxiZoneIndexTest {
 
   @Test
   void returnsEmptyWhenDropoffOutsideZone() {
-    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, ROUTE_1)));
+    var index = new TaxiZoneIndex(List.of(ZONE_1));
 
     var result = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_2_A);
 
@@ -53,7 +56,7 @@ class TaxiZoneIndexTest {
 
   @Test
   void returnsEmptyWhenNeitherPointInAnyZone() {
-    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, ROUTE_1), zone(SQUARE_2, ROUTE_2)));
+    var index = new TaxiZoneIndex(List.of(ZONE_1, ZONE_2));
 
     var result = index.findFirstZone(OUTSIDE_ALL_ZONES, OUTSIDE_ALL_ZONES);
 
@@ -71,7 +74,7 @@ class TaxiZoneIndexTest {
 
   @Test
   void findsCorrectZoneAmongMultipleCandidates() {
-    var index = new TaxiZoneIndex(List.of(zone(SQUARE_1, ROUTE_1), zone(SQUARE_2, ROUTE_2)));
+    var index = new TaxiZoneIndex(List.of(ZONE_1, ZONE_2));
 
     var resultInSquare1 = index.findFirstZone(INSIDE_SQUARE_1_A, INSIDE_SQUARE_1_B);
     var resultInSquare2 = index.findFirstZone(INSIDE_SQUARE_2_A, INSIDE_SQUARE_2_B);
@@ -80,6 +83,46 @@ class TaxiZoneIndexTest {
     assertThat(resultInSquare1.get().route()).isEqualTo(ROUTE_1);
     assertThat(resultInSquare2).isPresent();
     assertThat(resultInSquare2.get().route()).isEqualTo(ROUTE_2);
+  }
+
+  @Test
+  void findAllZonesReturnsTheZoneCoveringTheCoordinate() {
+    var index = new TaxiZoneIndex(List.of(ZONE_1, ZONE_2));
+
+    var result = index.findAllZones(INSIDE_SQUARE_1_A);
+
+    assertThat(result).containsExactly(ZONE_1);
+  }
+
+  @Test
+  void findAllZonesReturnsAllZonesWhenTheyOverlap() {
+    var overlappingZone = zone(
+      Polygons.square(new Coordinate(5, 5), new Coordinate(15, 15)),
+      ROUTE_2
+    );
+    var index = new TaxiZoneIndex(List.of(ZONE_1, overlappingZone));
+
+    var result = index.findAllZones(INSIDE_SQUARE_1_B);
+
+    assertThat(result).containsExactly(ZONE_1, overlappingZone);
+  }
+
+  @Test
+  void findAllZonesReturnsEmptyListWhenNoZoneCoversTheCoordinate() {
+    var index = new TaxiZoneIndex(List.of(ZONE_1, ZONE_2));
+
+    var result = index.findAllZones(OUTSIDE_ALL_ZONES);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void findAllZonesReturnsEmptyListForEmptyIndex() {
+    var index = new TaxiZoneIndex(List.of());
+
+    var result = index.findAllZones(INSIDE_SQUARE_1_A);
+
+    assertThat(result).isEmpty();
   }
 
   private static TaxiZone zone(Polygon geometry, Route route) {

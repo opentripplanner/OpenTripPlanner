@@ -1,12 +1,16 @@
 package org.opentripplanner.ext.taxizone.routing;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
+import org.opentripplanner.ext.taxizone.model.TaxiZone;
 import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.service.TransitService;
@@ -17,10 +21,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles taxi zone filtering and decoration for transit access/egress.
  * <ol>
- *   <li>Before the transit search runs, {@link #filterAccessNearbyStops} and
- *   {@link #filterEgressNearbyStops} drop candidate stops whose logical endpoints (the request
- *   origin/destination and the stop) are not covered by a common taxi zone provider, so RAPTOR
- *   never considers a combination that would later be rejected.
+ *   <li>Before the transit search runs, {@link #filterNearbyStops} drops candidate stops whose
+ *   logical endpoints (the request origin/destination and the stop) are not covered by a common
+ *   taxi zone provider, so RAPTOR never considers a combination that would later be rejected.
  *   <li>Once the transit search has picked a surviving candidate and its legs are built,
  *   {@link #decorateAccessEgressLegs} replaces the {@link TraverseMode#CAR} leg with a
  *   {@link TaxiZoneLeg}, using the same logical coordinates.
@@ -38,47 +41,43 @@ public class TaxiAccessEgressRouter {
   }
 
   /**
-   * Drops access candidates whose logical endpoints (the request origin and the stop) are not
-   * covered by a common taxi zone provider.
+   * Drops access/egress candidates whose logical endpoints (the request origin/destination and
+   * the stop) are not covered by a common taxi zone provider.
    */
-  public Collection<NearbyStop> filterAccessNearbyStops(
+  public Collection<NearbyStop> filterNearbyStops(
     TransitService transitService,
     Collection<NearbyStop> nearbyStops,
-    WgsCoordinate requestFrom
+    AccessEgressType type,
+    RouteRequest request
   ) {
-    return nearbyStops
-      .stream()
-      .filter(nearbyStop ->
-        taxiZoneIndex
-          .findFirstZone(
-            requestFrom,
-            transitService.getStopLocation(nearbyStop.stopId).getCoordinate()
-          )
-          .isPresent()
-      )
-      .toList();
+    return type.isAccess()
+      ? filterNearbyStops(transitService, nearbyStops, request.from().wgsCoordinate())
+      : filterNearbyStops(transitService, nearbyStops, request.to().wgsCoordinate());
   }
 
-  /**
-   * Drops egress candidates whose logical endpoints (the stop and the request destination) are
-   * not covered by a common taxi zone provider.
-   */
-  public Collection<NearbyStop> filterEgressNearbyStops(
+  private Collection<NearbyStop> filterNearbyStops(
     TransitService transitService,
     Collection<NearbyStop> nearbyStops,
-    WgsCoordinate requestTo
+    WgsCoordinate coordinate
   ) {
-    return nearbyStops
-      .stream()
-      .filter(nearbyStop ->
-        taxiZoneIndex
-          .findFirstZone(
-            transitService.getStopLocation(nearbyStop.stopId).getCoordinate(),
-            requestTo
-          )
-          .isPresent()
-      )
-      .toList();
+    List<TaxiZone> zones = taxiZoneIndex.findAllZones(coordinate);
+    if (zones.isEmpty()) {
+      return List.of();
+    }
+
+    List<NearbyStop> result = new ArrayList<>(nearbyStops.size());
+    for (NearbyStop nearbyStop : nearbyStops) {
+      WgsCoordinate stopCoordinate = transitService
+        .getStopLocation(nearbyStop.stopId)
+        .getCoordinate();
+      for (TaxiZone zone : zones) {
+        if (zone.contains(stopCoordinate)) {
+          result.add(nearbyStop);
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   /**
@@ -89,8 +88,8 @@ public class TaxiAccessEgressRouter {
    * walk-drive-walk chain.
    * <p>
    * Candidates are expected to already have been filtered for zone coverage (see
-   * {@link #filterAccessNearbyStops} and {@link #filterEgressNearbyStops}), so a common zone is
-   * expected to always exist; if none is found (defensive) the leg is returned unchanged and a
+   * {@link #filterNearbyStops}), so a common zone is expected to always exist; if none is found
+   * (defensive) the leg is returned unchanged and a
    * warning is logged.
    */
   public List<Leg> decorateAccessEgressLegs(

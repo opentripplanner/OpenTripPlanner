@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.taxizone;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Envelope;
@@ -39,5 +40,23 @@ public class TaxiZoneIndex {
       }
     }
     return Optional.empty();
+  }
+
+  /**
+   * Returns all zones whose geometry contains the given {@code coordinate}.
+   * Returns an empty list if no zone covers the coordinate.
+   */
+  @SuppressWarnings("unchecked")
+  public List<TaxiZone> findAllZones(WgsCoordinate coordinate) {
+    Envelope envelope = new Envelope(coordinate.asJtsCoordinate());
+    List<TaxiZone> candidates = index.query(envelope);
+
+    List<TaxiZone> result = new ArrayList<>(candidates.size());
+    for (TaxiZone zone : candidates) {
+      if (zone.contains(coordinate)) {
+        result.add(zone);
+      }
+    }
+    return result;
   }
 }
