@@ -300,6 +300,21 @@ class ParallelRangeInputStreamTest {
   }
 
   @Test
+  void readingToTheEndReleasesTheRangeReaderThreadsEvenWithoutClose() {
+    assertTimeoutPreemptively(TIMEOUT, () -> {
+      byte[] data = randomBytes(20 * BLOCK);
+      InputStream in = open(data, new InMemoryRangeFetcher(data), BLOCK, 4);
+      assertThat(in.readAllBytes()).isEqualTo(data);
+
+      // Idle pool threads are GC roots, so a forgotten close() must not leak them.
+      pollUntil(() -> liveRangeThreads() == 0, Duration.ofSeconds(10));
+      assertThat(liveRangeThreads()).isEqualTo(0);
+
+      in.close();
+    });
+  }
+
+  @Test
   void closeIsIdempotentAndReadsAfterCloseThrow() throws IOException {
     byte[] data = randomBytes(4 * BLOCK);
     InputStream in = open(data, new InMemoryRangeFetcher(data), BLOCK, 2);

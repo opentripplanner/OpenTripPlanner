@@ -11,9 +11,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
@@ -39,7 +40,8 @@ import org.slf4j.LoggerFactory;
  * a parallelism of 1 there is no second request to hide that setup cost behind.
  * <p>
  * Not thread-safe for concurrent readers: one consumer thread at a time. {@link #close()} may be
- * called from any thread.
+ * called from any thread. The worker threads are released when the stream is closed or read to the
+ * end, and time out on their own if it is abandoned part way.
  */
 public final class ParallelRangeInputStream extends InputStream {
 
@@ -47,6 +49,7 @@ public final class ParallelRangeInputStream extends InputStream {
 
   private static final long CLOSE_TIMEOUT_SECONDS = 10;
   private static final long POLL_INTERVAL_MS = 200;
+  private static final long WORKER_IDLE_TIMEOUT_SECONDS = 30;
 
   private final RangeFetcher fetcher;
   private final String sourceName;
@@ -93,7 +96,7 @@ public final class ParallelRangeInputStream extends InputStream {
     this.plan = plan;
     this.pool = new ByteBufferPool(plan.inFlight(), plan.blockSize());
     this.pipeline = new ArrayBlockingQueue<>(plan.inFlight());
-    this.executor = Executors.newFixedThreadPool(plan.parallelism(), threadFactory(sourceName));
+    this.executor = newExecutor(plan.parallelism(), sourceName);
 
     LOG.debug(
       "Reading {} ({} bytes) with {} workers, {} blocks of {} bytes, {} MB off-heap.",
@@ -205,6 +208,9 @@ public final class ParallelRangeInputStream extends InputStream {
       }
       if (blocksConsumed >= plan.blockCount()) {
         eof = true;
+        // Nothing more will be dispatched: let the workers go now rather than at close(), so a
+        // caller that reads to the end but never closes does not keep them alive.
+        executor.shutdown();
         verifyComplete();
         return false;
       }
@@ -347,6 +353,23 @@ public final class ParallelRangeInputStream extends InputStream {
       headOfLineWaitNanos / 1_000_000,
       fetcher.statsSummary()
     );
+  }
+
+  /**
+   * Idle workers are GC roots that hold the executor alive, so they must not be permanent: they
+   * are shut down at end of stream and on close, and time out on their own otherwise.
+   */
+  private static ExecutorService newExecutor(int parallelism, String sourceName) {
+    var executor = new ThreadPoolExecutor(
+      parallelism,
+      parallelism,
+      WORKER_IDLE_TIMEOUT_SECONDS,
+      TimeUnit.SECONDS,
+      new LinkedBlockingQueue<>(),
+      threadFactory(sourceName)
+    );
+    executor.allowCoreThreadTimeOut(true);
+    return executor;
   }
 
   private static ThreadFactory threadFactory(String sourceName) {
