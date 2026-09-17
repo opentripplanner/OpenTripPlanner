@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.opentripplanner</groupId>
+        <groupId>org.opentripplanner.raptor</groupId>
         <artifactId>raptor</artifactId>
         <version>2.11.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>raptor-data</artifactId>
+    <artifactId>data</artifactId>
     <name>OpenTripPlanner - Raptor Data</name>
 
     <build>
@@ -25,7 +25,7 @@
         <!-- project dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>raptor-router</artifactId>
+            <artifactId>router</artifactId>
             <version>${project.version}</version>
         </dependency>
 
