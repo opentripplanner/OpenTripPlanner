@@ -19,18 +19,18 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>core-utils</artifactId>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>core-framework</artifactId>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>framework</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>raptor-router</artifactId>
+            <groupId>org.opentripplanner.raptor</groupId>
+            <artifactId>router</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -144,8 +144,8 @@
 
         <!-- TESTING -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>core-test-fixtures</artifactId>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>test-fixtures</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

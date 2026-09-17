@@ -23,8 +23,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>core-utils</artifactId>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.opentripplanner</groupId>
+        <groupId>org.opentripplanner.core</groupId>
         <artifactId>core</artifactId>
         <version>2.11.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>core-domain</artifactId>
+    <artifactId>domain</artifactId>
     <name>OpenTripPlanner - Core Domain</name>
 
     <build>
@@ -24,7 +24,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core-utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
         </dependency>
 
