@@ -2,7 +2,7 @@ package org.opentripplanner.netex.configure;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;

@@ -4,7 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.graphbuilder.EmpiricalDelayGraphBuilder;
 import org.opentripplanner.framework.application.OTPFeature;

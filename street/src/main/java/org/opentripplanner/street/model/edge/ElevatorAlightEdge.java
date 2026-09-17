@@ -2,8 +2,8 @@ package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.LocalizedString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;

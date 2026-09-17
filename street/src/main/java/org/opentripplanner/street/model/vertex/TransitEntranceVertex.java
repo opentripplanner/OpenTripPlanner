@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.accessibility.Accessibility;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class TransitEntranceVertex extends StationElementVertex {

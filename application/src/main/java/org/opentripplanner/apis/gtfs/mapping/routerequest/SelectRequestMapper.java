@@ -5,7 +5,7 @@ import static org.opentripplanner.utils.collection.CollectionUtils.requireNullOr
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitFilterSelectInput;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.utils.collection.CollectionUtils;
 

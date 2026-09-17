@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.core.model.i18n.TranslatedString;
+import org.opentripplanner.core.domain.model.i18n.TranslatedString;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.gbfs.GbfsAutoConfiguration;

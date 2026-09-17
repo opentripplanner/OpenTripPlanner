@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.place.api.PatternAtStop;
 import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.place.api.PlaceType;

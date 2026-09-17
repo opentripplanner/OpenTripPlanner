@@ -8,7 +8,7 @@ import static org.opentripplanner.ext.empiricaldelay.internal.csvinput.Empirical
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.DataSourceTestFactory;
 import org.opentripplanner.datastore.api.ListCompositeDataSource;
 import org.opentripplanner.ext.empiricaldelay.internal.model.DelayAtStopDto;

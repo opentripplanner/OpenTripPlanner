@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.spi;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 /**
  * Detailed information about a failure to apply a realtime update, for example for trips or vehicle

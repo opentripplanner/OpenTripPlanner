@@ -27,7 +27,7 @@ config:
     GeoJson: org.locationtech.jts.geom.Geometry
     Grams: org.opentripplanner.framework.model.Gram
     Duration: java.time.Duration
-    Cost: org.opentripplanner.core.model.basic.Cost
+    Cost: org.opentripplanner.core.domain.model.basic.Cost
     CoordinateValue: Double
     Locale: java.util.Locale
     OffsetDateTime: java.time.OffsetDateTime

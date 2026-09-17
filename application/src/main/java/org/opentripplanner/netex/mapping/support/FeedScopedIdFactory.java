@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.mapping.support;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 /**
  * GTFS uses the term agency_id, which is used to scope the ids of all other elements in OTP. Since

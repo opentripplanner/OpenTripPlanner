@@ -5,7 +5,7 @@ import static uk.org.siri.siri21.CountingTypeEnumeration.PRESENT_COUNT;
 import java.util.List;
 import java.util.stream.Stream;
 import org.entur.siri21.util.SiriXml;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;

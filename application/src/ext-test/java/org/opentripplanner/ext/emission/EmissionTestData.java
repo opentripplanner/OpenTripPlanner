@@ -2,7 +2,7 @@ package org.opentripplanner.ext.emission;
 
 import java.io.File;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.DataSourceTestFactory;

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;

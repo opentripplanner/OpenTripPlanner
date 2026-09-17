@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 @Deprecated
 class FeedScopedIdMapper {

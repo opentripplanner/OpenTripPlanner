@@ -3,7 +3,7 @@ package org.opentripplanner.ext.flex.trip;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
