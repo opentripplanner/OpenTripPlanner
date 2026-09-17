@@ -6,12 +6,16 @@ import com.google.cloud.storage.StorageException;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.framework.retry.OtpRetry;
+import org.opentripplanner.framework.retry.OtpRetryBuilder;
+import org.opentripplanner.framework.retry.OtpRetryException;
 
 /**
  * Fetches byte-ranges of a Google Cloud Storage blob. The only GCS-aware part of the parallel read
@@ -25,15 +29,13 @@ import org.slf4j.LoggerFactory;
  */
 public class GsRangeFetcher implements RangeFetcher {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GsRangeFetcher.class);
-
   /** HTTP status codes that will never succeed on retry. */
   private static final Set<Integer> PERMANENT = Set.of(400, 401, 403, 404, 412);
 
   /** Attempts to recover a range before the read fails; the client retries below this too. */
-  private static final int MAX_RETRIES = 3;
-
-  private static final long RETRY_BACKOFF_MS = 200;
+  private static final int RETRY_MAX_ATTEMPTS = 3;
+  private static final Duration RETRY_INITIAL_DELAY = Duration.ofMillis(200);
+  private static final int RETRY_BACKOFF = 2;
 
   private final Blob blob;
   private final String path;
@@ -47,49 +49,55 @@ public class GsRangeFetcher implements RangeFetcher {
   @Override
   public void fetch(long offset, ByteBuffer dst, Cancellation cancellation) throws IOException {
     final long end = offset + dst.remaining();
-    int attempt = 0;
 
-    while (dst.hasRemaining()) {
-      // Resume where the previous attempt stopped, so a failure costs only the bytes not yet
-      // received rather than the whole block.
-      long position = end - dst.remaining();
-      ReadChannel channel = null;
-      try {
-        channel = open(position, end, cancellation);
-        while (dst.hasRemaining()) {
-          if (channel.read(dst) < 0) {
-            throw new EOFException(
-              "Unexpected end of %s at %d, wanted %d more bytes".formatted(
-                path,
-                end - dst.remaining(),
-                dst.remaining()
-              )
-            );
-          }
-        }
-      } catch (IOException | StorageException e) {
-        if (cancellation.isCancelled()) {
-          throw new IOException("Read cancelled: " + path, e);
-        }
-        if (++attempt > MAX_RETRIES || !isRetryable(e)) {
-          throw asIOException(e, position);
-        }
-        retries.incrementAndGet();
-        LOG.warn(
-          "Retrying read of {} at {} (attempt {} of {}): {}",
-          path,
-          position,
-          attempt,
-          MAX_RETRIES,
-          e.toString()
-        );
-        backOff(attempt);
-      } finally {
-        closeQuietly(channel);
-      }
+    // Built per range because the retry cycle must stop as soon as this particular read is
+    // cancelled, rather than sleeping and reopening a channel that is about to be thrown away.
+    OtpRetry retry = new OtpRetryBuilder()
+      .withName("GCS range read of " + path)
+      .withMaxAttempts(RETRY_MAX_ATTEMPTS)
+      .withInitialRetryInterval(RETRY_INITIAL_DELAY)
+      .withBackoffMultiplier(RETRY_BACKOFF)
+      .withRetryableException(e -> !cancellation.isCancelled() && isRetryable(unwrap(e)))
+      .withOnRetry(retries::incrementAndGet)
+      .build();
+
+    try {
+      retry.execute(() -> readRange(end, dst, cancellation));
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new InterruptedIOException("Interrupted while reading " + path);
+    } catch (OtpRetryException e) {
+      throw asIOException(unwrap(e.getCause()), end - dst.remaining());
     }
     // Do not leave a closed channel registered for cancellation.
     cancellation.register(null);
+  }
+
+  /**
+   * One attempt at the range. It resumes at the first byte not yet in {@code dst}, so a retry only
+   * refetches what is still missing rather than the whole block.
+   */
+  private void readRange(long end, ByteBuffer dst, Cancellation cancellation) {
+    long position = end - dst.remaining();
+    ReadChannel channel = null;
+    try {
+      channel = open(position, end, cancellation);
+      while (dst.hasRemaining()) {
+        if (channel.read(dst) < 0) {
+          throw new EOFException(
+            "Unexpected end of %s at %d, wanted %d more bytes".formatted(
+              path,
+              end - dst.remaining(),
+              dst.remaining()
+            )
+          );
+        }
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    } finally {
+      closeQuietly(channel);
+    }
   }
 
   @Override
@@ -122,7 +130,12 @@ public class GsRangeFetcher implements RangeFetcher {
     }
   }
 
-  private static boolean isRetryable(Exception e) {
+  /** {@link OtpRetry} only sees unchecked exceptions, so the checked cause is wrapped. */
+  private static Throwable unwrap(Throwable e) {
+    return e instanceof UncheckedIOException wrapped ? wrapped.getCause() : e;
+  }
+
+  private static boolean isRetryable(Throwable e) {
     if (e instanceof StorageException se) {
       return !PERMANENT.contains(se.getCode()) && se.isRetryable();
     }
@@ -131,20 +144,11 @@ public class GsRangeFetcher implements RangeFetcher {
     return !(e instanceof EOFException);
   }
 
-  private IOException asIOException(Exception e, long position) {
+  private IOException asIOException(Throwable e, long position) {
     if (e instanceof IOException io) {
       return io;
     }
     return new IOException("Failed to read %s at %d".formatted(path, position), e);
-  }
-
-  private static void backOff(int attempt) throws IOException {
-    try {
-      Thread.sleep(RETRY_BACKOFF_MS * attempt);
-    } catch (InterruptedException ie) {
-      Thread.currentThread().interrupt();
-      throw new IOException("Interrupted while retrying", ie);
-    }
   }
 
   private static void closeQuietly(@Nullable Closeable closeable) {
