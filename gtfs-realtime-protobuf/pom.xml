@@ -13,6 +13,7 @@
 
 
     <dependencies>
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>

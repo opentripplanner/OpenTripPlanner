@@ -29,22 +29,22 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--- 3rd party dependencies -->
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <!--- test dependencies -->
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.truth</groupId>
-            <artifactId>truth</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
