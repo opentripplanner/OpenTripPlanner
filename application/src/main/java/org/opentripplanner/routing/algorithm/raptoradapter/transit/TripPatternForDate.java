@@ -34,7 +34,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
    * day. Invariant: this array should contain a subset of the TripSchedules in
    * tripPattern.tripSchedules.
    */
-  private final TripTimes[] tripTimes;
+  private final TripTimes<?>[] tripTimes;
 
   /**
    * The filtered FrequencyEntries for only those entries in the TripPattern that are active on the
@@ -58,12 +58,14 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   public TripPatternForDate(
     RoutingTripPattern tripPattern,
-    List<TripTimes> tripTimes,
+    List<TripTimes<?>> tripTimes,
     List<FrequencyEntry> frequencies,
     LocalDate serviceDate
   ) {
     this.tripPattern = tripPattern;
-    this.tripTimes = tripTimes.toArray(new TripTimes[0]);
+    @SuppressWarnings("unchecked")
+    TripTimes<?>[] arr = tripTimes.toArray(TripTimes[]::new);
+    this.tripTimes = arr;
     this.frequencies = frequencies.toArray(new FrequencyEntry[0]);
     this.serviceDate = serviceDate;
 
@@ -93,7 +95,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
   }
 
-  public List<TripTimes> tripTimes() {
+  public List<TripTimes<?>> tripTimes() {
     return Arrays.asList(tripTimes);
   }
 
@@ -109,7 +111,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return this.tripPattern.stopIndex(i);
   }
 
-  public TripTimes getTripTimes(int i) {
+  public TripTimes<?> getTripTimes(int i) {
     return tripTimes[i];
   }
 
@@ -186,9 +188,9 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
   }
 
   @Nullable
-  public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes.length);
-    for (TripTimes tripTimes : tripTimes) {
+  public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes<?>> filter) {
+    ArrayList<TripTimes<?>> filteredTripTimes = new ArrayList<>(tripTimes.length);
+    for (TripTimes<?> tripTimes : tripTimes) {
       if (filter.test(tripTimes)) {
         filteredTripTimes.add(tripTimes);
       }

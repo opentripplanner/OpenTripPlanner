@@ -14,7 +14,7 @@ public class TimetableBuilder {
 
   private TripPattern pattern;
   private LocalDate serviceDate;
-  private final Map<FeedScopedId, TripTimes> tripTimes;
+  private final Map<FeedScopedId, TripTimes<?>> tripTimes;
   private final List<FrequencyEntry> frequencies;
 
   TimetableBuilder() {
@@ -45,7 +45,7 @@ public class TimetableBuilder {
    * thrown. This is considered a programming error. Use {@link #addOrUpdateTripTimes(TripTimes)}
    * if you want to replace an existing trip.
    */
-  public TimetableBuilder addTripTimes(TripTimes tripTimes) {
+  public TimetableBuilder addTripTimes(TripTimes<?> tripTimes) {
     var trip = tripTimes.getTrip();
     if (this.tripTimes.containsKey(trip.getId())) {
       throw new IllegalStateException(
@@ -60,25 +60,25 @@ public class TimetableBuilder {
    * are replaced. If not, the trip-times it is added. Consider using
    * {@link #addTripTimes(TripTimes)}.
    */
-  public TimetableBuilder addOrUpdateTripTimes(TripTimes tripTimes) {
+  public TimetableBuilder addOrUpdateTripTimes(TripTimes<?> tripTimes) {
     this.tripTimes.put(tripTimes.getTrip().getId(), tripTimes);
     return this;
   }
 
-  public TimetableBuilder addAllTripTimes(List<TripTimes> tripTimes) {
-    for (TripTimes it : tripTimes) {
+  public TimetableBuilder addAllTripTimes(List<TripTimes<?>> tripTimes) {
+    for (TripTimes<?> it : tripTimes) {
       addTripTimes(it);
     }
     return this;
   }
 
-  public TimetableBuilder removeTripTimes(TripTimes tripTimesToRemove) {
+  public TimetableBuilder removeTripTimes(TripTimes<?> tripTimesToRemove) {
     tripTimes.remove(tripTimesToRemove.getTrip().getId());
     return this;
   }
 
-  public TimetableBuilder removeAllTripTimes(Collection<TripTimes> tripTimesToBeRemoved) {
-    for (TripTimes it : tripTimesToBeRemoved) {
+  public TimetableBuilder removeAllTripTimes(Collection<TripTimes<?>> tripTimesToBeRemoved) {
+    for (TripTimes<?> it : tripTimesToBeRemoved) {
       tripTimes.remove(it.getTrip().getId());
     }
     return this;
@@ -90,9 +90,14 @@ public class TimetableBuilder {
    * <p>
    */
   public TimetableBuilder withAdjustedTimes(Duration timeshift) {
-    tripTimes.replaceAll((t, tt) -> tt.withAdjustedTimes(timeshift));
+    tripTimes.replaceAll((t, tt) -> withAdjustedTimes(tt, timeshift));
     frequencies.replaceAll(it -> it.withAdjustedTimes(timeshift));
     return this;
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private static TripTimes<?> withAdjustedTimes(TripTimes<?> tt, Duration timeshift) {
+    return ((TripTimes) tt).withAdjustedTimes(timeshift);
   }
 
   public TimetableBuilder addFrequencyEntry(FrequencyEntry frequencyEntry) {
@@ -111,11 +116,11 @@ public class TimetableBuilder {
     return new Timetable(this);
   }
 
-  List<TripTimes> createImmutableOrderedListOfTripTimes() {
+  List<TripTimes<?>> createImmutableOrderedListOfTripTimes() {
     return tripTimes.values().stream().sorted().toList();
   }
 
-  Map<FeedScopedId, TripTimes> createImmutableTripTimesIndex() {
+  Map<FeedScopedId, TripTimes<?>> createImmutableTripTimesIndex() {
     return Map.copyOf(tripTimes);
   }
 

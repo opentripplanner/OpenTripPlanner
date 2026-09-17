@@ -20,7 +20,6 @@ import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
@@ -79,7 +78,7 @@ class TripPatternMapperTest {
 
     assertEquals(1, r.tripPattern().getScheduledTimetable().getTripTimes().size());
 
-    TripTimes tripTimes = r.tripPattern().getScheduledTimetable().getTripTimes().get(0);
+    var tripTimes = r.tripPattern().getScheduledTimetable().getTripTimes().get(0);
 
     assertEquals(4, tripTimes.getNumStops());
 

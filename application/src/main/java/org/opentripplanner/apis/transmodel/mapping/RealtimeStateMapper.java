@@ -15,7 +15,7 @@ public class RealtimeStateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RealtimeStateMapper.class);
 
-  public static TransmodelRealTimeState map(TripTimes tripTimes) {
+  public static TransmodelRealTimeState map(TripTimes<?> tripTimes) {
     return switch (tripTimes) {
       case RealTimeTripTimes realTimeTripTimes -> map(realTimeTripTimes);
       case ScheduledTripTimes _ -> TransmodelRealTimeState.SCHEDULED;

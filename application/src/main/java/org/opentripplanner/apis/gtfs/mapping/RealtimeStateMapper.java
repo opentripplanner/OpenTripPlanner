@@ -16,7 +16,7 @@ public class RealtimeStateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RealtimeStateMapper.class);
 
-  public static GraphQLTypes.GraphQLRealtimeState map(TripTimes tripTimes) {
+  public static GraphQLTypes.GraphQLRealtimeState map(TripTimes<?> tripTimes) {
     return switch (tripTimes) {
       case RealTimeTripTimes realTimeTripTimes -> map(realTimeTripTimes);
       case ScheduledTripTimes _ -> GraphQLTypes.GraphQLRealtimeState.SCHEDULED;

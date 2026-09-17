@@ -70,7 +70,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
 
   @Override
   @Nullable
-  public Predicate<TripTimes> createTripFilter(TripPattern tripPattern) {
+  public Predicate<TripTimes<?>> createTripFilter(TripPattern tripPattern) {
     for (TransitFilter filter : filters) {
       if (filter.matchTripPattern(tripPattern)) {
         var applyTripTimesFilters =
@@ -81,7 +81,7 @@ public class DefaultTransitDataProviderFilter implements TransitDataProviderFilt
     return null;
   }
 
-  private boolean tripTimesPredicate(TripTimes tripTimes, boolean applyTripTimesFilters) {
+  private boolean tripTimesPredicate(TripTimes<?> tripTimes, boolean applyTripTimesFilters) {
     final Trip trip = tripTimes.getTrip();
 
     if (requireBikesAllowed && bikeAccessForTrip(trip) != BikeAccess.ALLOWED) {
