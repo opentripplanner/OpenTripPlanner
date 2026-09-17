@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.base;
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.base;
 
 import java.util.Collection;
 import java.util.Collections;

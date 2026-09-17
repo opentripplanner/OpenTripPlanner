@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.event;
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.event;
 
 import org.opentripplanner.core.domain.framework.event.DomainEvent;
 

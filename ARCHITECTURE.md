@@ -97,7 +97,7 @@ in order to sort and reduce the number of returned itineraries. It can also be u
 returned itineraries, especially if it requires more complex calculations, which would be unfeasible
 to do during the routing process.
 
-### [Transaction Framework](application/src/main/java/org/opentripplanner/framework/transaction/package.md)
+### [Transaction Framework](core/framework/src/main/java/org/opentripplanner/core/framework/transaction/package.md)
 
 A generic, reusable copy-on-write concurrency mechanism for application-scoped repositories: any
 number of concurrent readers sees a consistent, unchanging snapshot while a single writer thread

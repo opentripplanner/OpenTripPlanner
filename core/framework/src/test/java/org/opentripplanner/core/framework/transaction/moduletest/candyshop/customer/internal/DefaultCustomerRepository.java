@@ -1,10 +1,10 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal;
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.internal;
 
 import java.util.Collection;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.EntityMap;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model.Customer;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.EntityMap;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.model.Customer;
 
 /**
  * The repository implementation implements both the {@link CustomerRepository} and

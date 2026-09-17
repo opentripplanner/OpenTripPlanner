@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.internal;
+package org.opentripplanner.core.framework.transaction.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 

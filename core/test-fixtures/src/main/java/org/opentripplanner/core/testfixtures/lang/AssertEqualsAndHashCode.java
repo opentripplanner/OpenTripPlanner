@@ -1,4 +1,4 @@
-package org.opentripplanner._support.asserts;
+package org.opentripplanner.core.testfixtures.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

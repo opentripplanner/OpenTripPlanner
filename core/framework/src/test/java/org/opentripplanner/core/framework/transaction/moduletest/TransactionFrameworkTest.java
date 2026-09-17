@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.moduletest;
+package org.opentripplanner.core.framework.transaction.moduletest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -18,22 +18,22 @@ import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
 import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
 import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
-import org.opentripplanner.framework.transaction.internal.TransactionFactory;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.Entity;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal.CustomerRepositoryLifecycle;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal.DefaultCustomerRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model.Customer;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.event.CustomerEventHandler;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.event.CustomerOrderDomainEvent;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.event.OrderEventHandler;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderService;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.internal.DefaultOrderRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.internal.OrderRepositoryLifecycle;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.model.Order;
+import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.Entity;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.internal.CustomerRepositoryLifecycle;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.internal.DefaultCustomerRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.model.Customer;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.event.CustomerEventHandler;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.event.CustomerOrderDomainEvent;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.event.OrderEventHandler;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.OrderRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.OrderService;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.internal.DefaultOrderRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.internal.OrderRepositoryLifecycle;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.model.Order;
 
 /**
  * This test demonstrates how the snapshot framework can be used with two repositories. The example

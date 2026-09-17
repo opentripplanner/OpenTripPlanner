@@ -1,10 +1,10 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.order.internal;
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.internal;
 
 import java.util.Collection;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.EntityMap;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.OrderService;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.order.model.Order;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.EntityMap;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.OrderRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.OrderService;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.model.Order;
 
 /**
  * The repository implementation implements both the {@link OrderRepository} and

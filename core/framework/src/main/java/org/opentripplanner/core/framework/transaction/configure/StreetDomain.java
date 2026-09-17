@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.configure;
+package org.opentripplanner.core.framework.transaction.configure;
 
 import jakarta.inject.Qualifier;
 import java.lang.annotation.ElementType;
