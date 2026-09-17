@@ -237,7 +237,7 @@ public class WayPropertySet {
 
     var maxSpeed = way.getTag("maxspeed");
     if (maxSpeed != null && speed == null) {
-      speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed"));
+      speed = SpeedParser.getMetersSecondFromSpeed(maxSpeed);
     }
 
     if (speed != null) {
