@@ -8,8 +8,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.taxizone.TaxiZoneIndex;
 import org.opentripplanner.ext.taxizone.TaxiZoneService;
 import org.opentripplanner.ext.taxizone.model.TaxiZone;
-import org.opentripplanner.ext.taxizone.routing.DirectTaxiRouter;
-import org.opentripplanner.ext.taxizone.routing.TaxiAccessEgressRouter;
+import org.opentripplanner.ext.taxizone.routing.TaxiRouter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.place.api.NearbyStop;
@@ -26,8 +25,7 @@ import org.opentripplanner.transit.service.TransitService;
 public class DefaultTaxiZoneService implements TaxiZoneService {
 
   private final TaxiZoneIndex taxiZoneIndex;
-  private final DirectTaxiRouter directTaxiRouter;
-  private final TaxiAccessEgressRouter taxiAccessEgressRouter;
+  private final TaxiRouter taxiRouter;
   private final Graph graph;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final VehicleRentalService vehicleRentalService;
@@ -45,8 +43,7 @@ public class DefaultTaxiZoneService implements TaxiZoneService {
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings
   ) {
     this.taxiZoneIndex = new TaxiZoneIndex(zones);
-    this.directTaxiRouter = new DirectTaxiRouter(taxiZoneIndex);
-    this.taxiAccessEgressRouter = new TaxiAccessEgressRouter(taxiZoneIndex);
+    this.taxiRouter = new TaxiRouter(taxiZoneIndex);
     this.graph = Objects.requireNonNull(graph);
     this.streetLimitationParametersService = Objects.requireNonNull(
       streetLimitationParametersService
@@ -63,7 +60,7 @@ public class DefaultTaxiZoneService implements TaxiZoneService {
     AccessEgressType type,
     RouteRequest request
   ) {
-    return taxiAccessEgressRouter.filterNearbyStops(transitService, nearbyStops, type, request);
+    return taxiRouter.filterNearbyStops(transitService, nearbyStops, type, request);
   }
 
   @Override
@@ -72,7 +69,7 @@ public class DefaultTaxiZoneService implements TaxiZoneService {
     WgsCoordinate pickup,
     WgsCoordinate dropoff
   ) {
-    return taxiAccessEgressRouter.decorateAccessEgressLegs(legs, pickup, dropoff);
+    return taxiRouter.decorateAccessEgressLegs(legs, pickup, dropoff);
   }
 
   @Override
@@ -81,7 +78,7 @@ public class DefaultTaxiZoneService implements TaxiZoneService {
     RouteRequest request,
     LinkingContext linkingContext
   ) {
-    return directTaxiRouter.route(
+    return taxiRouter.routeDirect(
       graph,
       transitService,
       streetLimitationParametersService,

@@ -33,7 +33,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.service.TransitRepository;
 
-class DirectTaxiRouterTest implements PlanTestConstants {
+class TaxiRouterDirectRoutingTest implements PlanTestConstants {
 
   private static final double FROM_LAT = 59.9000;
   private static final double FROM_LON = 10.7000;
@@ -63,7 +63,7 @@ class DirectTaxiRouterTest implements PlanTestConstants {
   );
   private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
 
-  // Covers the synthetic FROM/TO coordinates used by route(...).
+  // Covers the synthetic FROM/TO coordinates used by routeDirect(...).
   private static final TaxiZone COVERING_ZONE = new TaxiZone(
     Polygons.square(new Coordinate(10.69, 59.89), new Coordinate(10.71, 59.91)),
     ZONE_ROUTE,
@@ -76,9 +76,9 @@ class DirectTaxiRouterTest implements PlanTestConstants {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
-    var subject = new DirectTaxiRouter(MATCHING_INDEX);
+    var subject = new TaxiRouter(MATCHING_INDEX);
 
-    var result = subject.decorate(List.of(itinerary), PICKUP, DROPOFF).getFirst();
+    var result = subject.decorateItineraries(List.of(itinerary), PICKUP, DROPOFF).getFirst();
 
     var resultLeg = result.legs().getFirst();
     assertThat(resultLeg).isInstanceOf(TaxiZoneLeg.class);
@@ -92,9 +92,9 @@ class DirectTaxiRouterTest implements PlanTestConstants {
       .drive(T11_00, T11_10, PLACE_B)
       .build();
     var originalLeg = itinerary.legs().getFirst();
-    var subject = new DirectTaxiRouter(EMPTY_INDEX);
+    var subject = new TaxiRouter(EMPTY_INDEX);
 
-    var result = subject.decorate(List.of(itinerary), PICKUP, DROPOFF).getFirst();
+    var result = subject.decorateItineraries(List.of(itinerary), PICKUP, DROPOFF).getFirst();
 
     var resultLeg = result.legs().getFirst();
     assertThat(resultLeg).isInstanceOf(StreetLeg.class);
@@ -110,16 +110,16 @@ class DirectTaxiRouterTest implements PlanTestConstants {
       .bus(21, T11_10, T11_20, PLACE_B)
       .build();
     var originalLegs = List.copyOf(itinerary.legs());
-    var subject = new DirectTaxiRouter(EMPTY_INDEX);
+    var subject = new TaxiRouter(EMPTY_INDEX);
 
-    var result = subject.decorate(List.of(itinerary), PICKUP, DROPOFF).getFirst();
+    var result = subject.decorateItineraries(List.of(itinerary), PICKUP, DROPOFF).getFirst();
 
     assertThat(result.legs()).isEqualTo(originalLegs);
   }
 
   @Test
   void routeDecoratesItineraryWithMatchingZone() {
-    var itineraries = route(List.of(COVERING_ZONE));
+    var itineraries = routeDirect(List.of(COVERING_ZONE));
 
     assertThat(itineraries).isNotEmpty();
     var itinerary = itineraries.getFirst();
@@ -131,17 +131,17 @@ class DirectTaxiRouterTest implements PlanTestConstants {
 
   @Test
   void routeReturnsEmptyWithoutRoutingWhenOriginAndDestinationDoNotShareAZone() {
-    var itineraries = route(List.of());
+    var itineraries = routeDirect(List.of());
 
     assertThat(itineraries).isEmpty();
   }
 
   /**
    * Routes a direct {@link StreetMode#TAXI} request through
-   * {@link DirectTaxiRouter#route} on a minimal synthetic street graph, decorating the
+   * {@link TaxiRouter#routeDirect} on a minimal synthetic street graph, decorating the
    * result with the given zones.
    */
-  private static List<Itinerary> route(List<TaxiZone> zones) {
+  private static List<Itinerary> routeDirect(List<TaxiZone> zones) {
     var fromVertex = intersectionVertex("from", FROM_LAT, FROM_LON);
     var toVertex = intersectionVertex("to", TO_LAT, TO_LON);
 
@@ -169,9 +169,9 @@ class DirectTaxiRouterTest implements PlanTestConstants {
       TransferServiceTestFactory.defaultTransferRepository()
     );
 
-    var directTaxiRouter = new DirectTaxiRouter(new TaxiZoneIndex(zones));
+    var taxiRouter = new TaxiRouter(new TaxiZoneIndex(zones));
 
-    return directTaxiRouter.route(
+    return taxiRouter.routeDirect(
       new Graph(),
       transitService,
       TestServerContext.createStreetLimitationParametersService(),

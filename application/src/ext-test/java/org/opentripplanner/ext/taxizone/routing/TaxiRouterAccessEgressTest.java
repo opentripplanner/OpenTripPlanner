@@ -24,7 +24,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-class TaxiAccessEgressRouterTest implements PlanTestConstants {
+class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
   private static final double FROM_LAT = 59.9000;
   private static final double FROM_LON = 10.7000;
@@ -89,7 +89,7 @@ class TaxiAccessEgressRouterTest implements PlanTestConstants {
   @Test
   void filterNearbyStopsKeepsOnlyAccessStopsSharingAZoneWithTheOrigin() {
     var transitService = mockTransitService();
-    var subject = new TaxiAccessEgressRouter(COVERING_INDEX);
+    var subject = new TaxiRouter(COVERING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
     var uncovered = nearbyStop(UNCOVERED_STOP);
 
@@ -106,7 +106,7 @@ class TaxiAccessEgressRouterTest implements PlanTestConstants {
   @Test
   void filterNearbyStopsKeepsOnlyEgressStopsSharingAZoneWithTheDestination() {
     var transitService = mockTransitService();
-    var subject = new TaxiAccessEgressRouter(COVERING_INDEX);
+    var subject = new TaxiRouter(COVERING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
     var uncovered = nearbyStop(UNCOVERED_STOP);
 
@@ -123,7 +123,7 @@ class TaxiAccessEgressRouterTest implements PlanTestConstants {
   @Test
   void filterNearbyStopsDropsAllAccessStopsWhenNoZoneCoversAny() {
     var transitService = mockTransitService();
-    var subject = new TaxiAccessEgressRouter(EMPTY_INDEX);
+    var subject = new TaxiRouter(EMPTY_INDEX);
 
     var result = subject.filterNearbyStops(
       transitService,
@@ -138,7 +138,7 @@ class TaxiAccessEgressRouterTest implements PlanTestConstants {
   @Test
   void filterNearbyStopsKeepsStopCoveredByMultipleOverlappingZonesOnlyOnce() {
     var transitService = mockTransitService();
-    var subject = new TaxiAccessEgressRouter(OVERLAPPING_INDEX);
+    var subject = new TaxiRouter(OVERLAPPING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
 
     var result = subject.filterNearbyStops(
@@ -165,7 +165,7 @@ class TaxiAccessEgressRouterTest implements PlanTestConstants {
       .build()
       .legs()
       .getFirst();
-    var subject = new TaxiAccessEgressRouter(COVERING_INDEX);
+    var subject = new TaxiRouter(COVERING_INDEX);
     var pickup = FROM_COORDINATE;
     var dropoff = TO_COORDINATE;
 
@@ -183,7 +183,7 @@ class TaxiAccessEgressRouterTest implements PlanTestConstants {
       .build()
       .legs()
       .getFirst();
-    var subject = new TaxiAccessEgressRouter(EMPTY_INDEX);
+    var subject = new TaxiRouter(EMPTY_INDEX);
 
     var result = subject.decorateAccessEgressLegs(
       List.of(driveLeg),
