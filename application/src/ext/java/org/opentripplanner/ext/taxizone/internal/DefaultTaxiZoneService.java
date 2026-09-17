@@ -13,6 +13,7 @@ import org.opentripplanner.ext.taxizone.routing.TaxiAccessEgressRouter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
@@ -56,21 +57,23 @@ public class DefaultTaxiZoneService implements TaxiZoneService {
   }
 
   @Override
-  public Collection<NearbyStop> filterAccessNearbyStops(
+  public Collection<NearbyStop> filterNearbyStops(
     TransitService transitService,
     Collection<NearbyStop> nearbyStops,
-    WgsCoordinate requestFrom
+    AccessEgressType type,
+    RouteRequest request
   ) {
-    return taxiAccessEgressRouter.filterAccessNearbyStops(transitService, nearbyStops, requestFrom);
-  }
-
-  @Override
-  public Collection<NearbyStop> filterEgressNearbyStops(
-    TransitService transitService,
-    Collection<NearbyStop> nearbyStops,
-    WgsCoordinate requestTo
-  ) {
-    return taxiAccessEgressRouter.filterEgressNearbyStops(transitService, nearbyStops, requestTo);
+    return type.isAccess()
+      ? taxiAccessEgressRouter.filterAccessNearbyStops(
+          transitService,
+          nearbyStops,
+          request.from().wgsCoordinate()
+        )
+      : taxiAccessEgressRouter.filterEgressNearbyStops(
+          transitService,
+          nearbyStops,
+          request.to().wgsCoordinate()
+        );
   }
 
   @Override

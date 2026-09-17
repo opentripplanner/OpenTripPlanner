@@ -198,17 +198,7 @@ class AccessEgressFetcher {
       linkingContext
     );
     if (taxiZoneService != null && mode == StreetMode.TAXI) {
-      nearbyStops = type.isAccess()
-        ? taxiZoneService.filterAccessNearbyStops(
-            transitService,
-            nearbyStops,
-            request.from().wgsCoordinate()
-          )
-        : taxiZoneService.filterEgressNearbyStops(
-            transitService,
-            nearbyStops,
-            request.to().wgsCoordinate()
-          );
+      nearbyStops = taxiZoneService.filterNearbyStops(transitService, nearbyStops, type, request);
     }
     var accessEgresses = accessEgressMapper.mapNearbyStops(nearbyStops);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);

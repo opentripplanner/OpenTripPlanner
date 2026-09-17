@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -16,23 +17,14 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public interface TaxiZoneService {
   /**
-   * Drops access candidates whose logical endpoints (the request origin and the stop) are not
-   * covered by a common taxi zone provider.
+   * Drops access/egress candidates whose logical endpoints (the request origin/destination and
+   * the stop) are not covered by a common taxi zone provider.
    */
-  Collection<NearbyStop> filterAccessNearbyStops(
+  Collection<NearbyStop> filterNearbyStops(
     TransitService transitService,
     Collection<NearbyStop> nearbyStops,
-    WgsCoordinate requestFrom
-  );
-
-  /**
-   * Drops egress candidates whose logical endpoints (the stop and the request destination) are
-   * not covered by a common taxi zone provider.
-   */
-  Collection<NearbyStop> filterEgressNearbyStops(
-    TransitService transitService,
-    Collection<NearbyStop> nearbyStops,
-    WgsCoordinate requestTo
+    AccessEgressType type,
+    RouteRequest request
   );
 
   /**
