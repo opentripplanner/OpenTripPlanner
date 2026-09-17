@@ -21,12 +21,12 @@ For a transit itinerary with a `TAXI` access and/or egress leg:
   the candidate has already passed the pre-search check, a matching zone is expected to always be
   found here.
 
-Both of these are implemented by `TaxiAccessEgressRouter`, which `TaxiZoneService` delegates to
+Both of these are implemented by `TaxiRouter`, which `TaxiZoneService` delegates to
 for the transit access/egress case.
 
 For a direct (non-transit) `TAXI` itinerary, the same two-phase approach is used:
 `RoutingWorker.routeDirectTaxi()` calls `TaxiZoneService.routeDirect(...)`, which delegates to
-`DirectTaxiRouter.route(...)`:
+`TaxiRouter.routeDirect(...)`:
 - Before the street search runs, it checks whether the request's origin and destination share a
   common zone; if not, an empty result is returned immediately without running
   `DirectStreetRouter` (the same taxi-agnostic router used for all other direct street routing).
@@ -46,9 +46,9 @@ falling back to undecorated street routing.
 ### Taxi Zone Data Files
 
 Taxi zone data is provided as standard GTFS Flex zip files, configured explicitly in the
-`transitFeeds.gtfsFeeds` list in `build-config.json` like any other GTFS feed, but with
-`taxiZoneProvider` set to `true` (this can also be set as a default for all GTFS feeds via
-`transitFeeds.gtfsDefaults.taxiZoneProvider`, overridable per-feed). Such feeds are **not** added
+`transitFeeds` list in `build-config.json` like any other GTFS feed (with `"type": "gtfs"`), but
+with `taxiZoneProvider` set to `true` (this can also be set as a default for all GTFS feeds via
+the top-level `gtfsDefaults.taxiZoneProvider`, overridable per-feed). Such feeds are **not** added
 to normal transit or flex routing — they are processed exclusively by this module.
 
 Example graph directory layout:
@@ -63,18 +63,18 @@ graph/
 ```JSON
 // build-config.json
 {
-  "transitFeeds": {
-    "gtfsFeeds": [
-      {
-        "source": "HSL-gtfs.zip"
-      },
-      {
-        "source": "TaxiProvider-gtfs.zip",
-        "feedId": "TaxiProvider",
-        "taxiZoneProvider": true
-      }
-    ]
-  }
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "HSL-gtfs.zip"
+    },
+    {
+      "type": "gtfs",
+      "source": "TaxiProvider-gtfs.zip",
+      "feedId": "TaxiProvider",
+      "taxiZoneProvider": true
+    }
+  ]
 }
 ```
 
@@ -153,7 +153,7 @@ Enable the feature flag in `otp-config.json`:
 
 - Initial implementation: spatial zone index, itinerary filtering, and leg decoration with
   provider information from GTFS Flex data. Taxi zone feeds are configured explicitly in
-  `transitFeeds.gtfsFeeds` with `taxiZoneProvider: true`.
+  `transitFeeds` with `taxiZoneProvider: true`.
 - Moved zone checking before routing runs (for both transit access/egress and direct routing),
   filtering out non-matching requests instead of discarding built itineraries afterward, and
   decorate using request-level origin/destination coordinates rather than a leg's own local
