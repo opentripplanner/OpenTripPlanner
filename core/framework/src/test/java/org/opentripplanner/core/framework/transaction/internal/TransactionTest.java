@@ -1,9 +1,9 @@
-package org.opentripplanner.framework.transaction.internal;
+package org.opentripplanner.core.framework.transaction.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 
 class TransactionTest {
 

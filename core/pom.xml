@@ -15,7 +15,8 @@
 
     <modules>
         <module>domain</module>
-        <module>utils</module>
         <module>framework</module>
+        <module>test-fixtures</module>
+        <module>utils</module>
     </modules>
 </project>

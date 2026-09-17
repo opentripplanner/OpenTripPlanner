@@ -1,6 +1,6 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.order;
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.order;
 
-import org.opentripplanner.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
 
 /**
  * In this case we demonstrate that the service can also play the repository snapshot role.

@@ -7,8 +7,8 @@ import static org.opentripplanner._support.asserts.AssertString.assertEqualsIgno
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;

@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Month;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 
 class ServiceCalendarTest {
 
