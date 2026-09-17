@@ -15,6 +15,7 @@
 
     <modules>
         <module>domain</module>
+        <module>utils</module>
         <module>framework</module>
     </modules>
 </project>

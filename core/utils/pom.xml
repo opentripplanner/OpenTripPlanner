@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opentripplanner</groupId>
-        <artifactId>otp</artifactId>
+        <artifactId>core</artifactId>
         <version>2.11.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>utils</artifactId>
+    <artifactId>core-utils</artifactId>
     <name>OpenTripPlanner - Utils</name>
 
     <build>
