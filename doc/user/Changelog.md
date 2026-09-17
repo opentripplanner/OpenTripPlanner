@@ -12,6 +12,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Limit growth of NeTEx stop time index [#7963](https://github.com/opentripplanner/OpenTripPlanner/pull/7963)
 - Remove .idea files from version control [#7992](https://github.com/opentripplanner/OpenTripPlanner/pull/7992)
 - Deprecate serviceId in GTFS API and stop populating it [#7991](https://github.com/opentripplanner/OpenTripPlanner/pull/7991)
+- Decode OSM PBF data in parallel [#8008](https://github.com/opentripplanner/OpenTripPlanner/pull/8008)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
