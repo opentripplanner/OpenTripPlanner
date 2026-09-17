@@ -18,6 +18,41 @@ Prettier does not format the _content_ of Javadoc comments, it only re-indents t
 therefore runs the Eclipse JDT formatter before Prettier, configured to format  Javadoc comments
 only.
 
+#### Preventing Javadoc formatting
+
+The Javadoc formatter re-flows paragraphs, so text which must keep its line breaks (CSV samples,
+ASCII tables, code snippets) needs to be marked. There are two ways to do this:
+
+1. Put the text in a `<pre>` block. This is the preferred way, it also renders correctly in the
+   generated Javadoc. Note! The block must be **closed**, an unterminated `<pre>` is not recognized
+   and the text is re-flowed like normal prose.
+
+   ```java
+   /**
+    * <pre>
+    * id, monday, tuesday, start_date, end_date
+    * MONDAY ,1,0,2025-01-01,2030-12-31
+    * </pre>
+    */
+   ```
+
+2. Use `@formatter:off` / `@formatter:on` markers. Everything between the two markers is left
+   exactly as written. This is the escape hatch for text which cannot be put inside a `<pre>` block.
+   The markers are part of the comment text, so they show up in the generated Javadoc.
+
+   ```java
+   /**
+    * @formatter:off
+    * id, monday, tuesday, start_date, end_date
+    * MONDAY ,1,0,2025-01-01,2030-12-31
+    * @formatter:on
+    */
+   ```
+
+The markers can also be used in line/block comments to turn the formatter off for a section of
+_code_, but Prettier runs after the Eclipse formatter and does not honour them, so they have no
+effect there.
+
 Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a Maven
 plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to spot and fix
 issues. We also have an OpenRewrite Maven plugin available that can be used to automatically fix
