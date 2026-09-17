@@ -13,6 +13,21 @@
     <name>OpenTripPlanner - Core Framework</name>
     <description>Core framework implementation - the api should be in the domain module</description>
 
+    <dependencyManagement>
+        <dependencies>
+            <!--
+             Not declared directly; pulled in transitively by both io.micrometer:micrometer-core
+             and com.google.truth:truth (via guava). Pinned so the resolved version doesn't depend
+             on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <plugin>

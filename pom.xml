@@ -618,6 +618,17 @@
                 <version>33.7.1-jre</version>
             </dependency>
 
+            <!--
+             Not declared directly anywhere; pulled in transitively by both azure-identity and
+             azure-messaging-servicebus (application/otp-shaded/integration-test). Pinned so the
+             resolved version doesn't depend on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-core-http-netty</artifactId>
+                <version>1.16.6</version>
+            </dependency>
+
             <!-- Logging API -->
             <dependency>
                 <groupId>org.slf4j</groupId>
