@@ -30,8 +30,10 @@ public class GsRangeFetcher implements RangeFetcher {
   /** HTTP status codes that will never succeed on retry. */
   private static final Set<Integer> PERMANENT = Set.of(400, 401, 403, 404, 412);
 
-  private static final int MAX_RETRIES = Integer.getInteger("otp.gs.rangeReadRetries", 3);
-  private static final long RETRY_BACKOFF_MS = Long.getLong("otp.gs.rangeReadBackoffMs", 200);
+  /** Attempts to recover a range before the read fails; the client retries below this too. */
+  private static final int MAX_RETRIES = 3;
+
+  private static final long RETRY_BACKOFF_MS = 200;
 
   private final Blob blob;
   private final String path;

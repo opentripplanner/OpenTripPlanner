@@ -29,7 +29,7 @@ public record ParallelReadParameters(
    * but inside the container memory limit, and {@code MaxDirectMemorySize} defaults to the maximum
    * heap size, so the JVM will not cap this for us - the cgroup would, by OOM-kill.
    */
-  static final long MAX_POOL_BYTES = Long.getLong("otp.gs.maxParallelReadPoolBytes", 256L * MB);
+  static final long MAX_POOL_BYTES = 256L * MB;
 
   public static final ParallelReadParameters DEFAULT = new ParallelReadParameters(
     4,
