@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opentripplanner</groupId>
-        <artifactId>otp</artifactId>
+        <artifactId>core</artifactId>
         <version>2.11.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>astar</artifactId>
-    <name>OpenTripPlanner - A*</name>
+    <artifactId>core-domain</artifactId>
+    <name>OpenTripPlanner - Core Domain</name>
 
     <build>
         <plugins>
@@ -40,12 +40,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.23.0</version>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
             <scope>test</scope>
         </dependency>
 
-    </dependencies>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
 
+    </dependencies>
 </project>
