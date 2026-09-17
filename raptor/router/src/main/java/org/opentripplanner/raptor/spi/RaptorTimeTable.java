@@ -12,7 +12,7 @@ public interface RaptorTimeTable<T extends RaptorTripSchedule> {
   /**
    * Get trip schedule by index. Trip schedules should be listed in order by the departure time for
    * the first stop in the pattern.
-   * <p/>
+   * <p>
    * This method needs to be FAST - it is in the most critical line of execution in Raptor.
    *
    * @param index the trip schedule index in pattern starting at 0.

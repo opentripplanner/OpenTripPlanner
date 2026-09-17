@@ -37,16 +37,17 @@ import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
  * <ul>
  *   <li>{@link CarpoolItineraryMapper#toBookingInfo} — the pickup booking-info derivation from
  *       the trip's public contact details.</li>
- *   <li>Endpoint-naming precedence for itinerary boundaries:
- *     <ol>
- *       <li>Transit stop (Place#forStop) — when the chain ends at a transit stop</li>
- *       <li>User input location (Place#forGenericLocation) — the request's from/to label, with a
- *           localized "Origin"/"Destination" fallback when the label is null</li>
- *       <li>Vertex intersection name (StreetVertex#getIntersectionName) — for intermediate
- *           boundaries between walk and carpool legs</li>
- *     </ol>
- *   </li>
+ *   <li>Endpoint-naming precedence for itinerary boundaries, see below.</li>
  * </ul>
+ * <p>
+ * Endpoint-naming precedence for itinerary boundaries:
+ * <ol>
+ *   <li>Transit stop (Place#forStop) — when the chain ends at a transit stop</li>
+ *   <li>User input location (Place#forGenericLocation) — the request's from/to label, with a
+ *       localized "Origin"/"Destination" fallback when the label is null</li>
+ *   <li>Vertex intersection name (StreetVertex#getIntersectionName) — for intermediate
+ *       boundaries between walk and carpool legs</li>
+ * </ol>
  */
 class CarpoolItineraryMapperTest {
 

@@ -11,11 +11,13 @@ class TransitGroupPriority32n {
   private static final int MAX_SEQ_NO = 32;
 
   /**
+   * <pre>
    * Left dominates right:
    *   - if right contains a group which does not exist in the left.
    * Left do NOT dominate right:
    *   - if they are equals or
    *   - left is a superset of right.
+   * </pre>
    */
   static boolean dominate(int left, int right) {
     return ((left ^ right) & right) != 0;

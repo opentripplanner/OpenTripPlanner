@@ -33,16 +33,21 @@ public class A01_SingleRouteTest implements RaptorTestConstants {
    * Stops: 0..3
    *
    * Stop on route (stop indexes):
+   * <pre>
    *   R1:  1 - 2 - 3
-   *
+   * </pre>
    * Schedule:
+   * <pre>
    *   R1: 00:01 - 00:03 - 00:05
-   *
+   * </pre>
    * Access (toStop & duration):
+   * <pre>
    *   1  30s
-   *
+   * </pre>
    * Egress (fromStop & duration):
+   * <pre>
    *   3  20s
+   * </pre>
    */
   @BeforeEach
   void setup() {

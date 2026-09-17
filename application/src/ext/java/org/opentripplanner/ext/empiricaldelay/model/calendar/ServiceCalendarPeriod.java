@@ -11,7 +11,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * of the {@link EmpiricalDelayCalendar}. Together these two classes implement the
  * responsibilities described in the GTFS specification for calendar.txt
  * (https://gtfs.org/documentation/schedule/reference/#calendartxt).
- * <p/>
+ * <p>
  * Note! This implementation does not support the GTFS calendar_dates.txt features (adding
  * exceptions for specific days).
  */

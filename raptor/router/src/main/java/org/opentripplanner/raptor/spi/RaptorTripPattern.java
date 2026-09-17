@@ -56,7 +56,7 @@ public interface RaptorTripPattern {
    * only. The implementation should provide a short description with enough information for humans
    * to identify the trip/route. This is used in a context where information about agency and
    * stop is known, so there is no need to include agency or geographical region information.
-   * <p/>
+   * <p>
    * The recommended string to return is: {@code [MODE] [SHORT_ROUTE_DESCRIPTION]}.
    */
   String debugInfo();
@@ -150,7 +150,7 @@ public interface RaptorTripPattern {
    * {@code -1} is returned if not found.
    *
    * @param startPos the stop position in the pattern to start the search (inclusive). Note! Only
-   *    *            defined for range {@code [0..N-1]} (N = number of stops in the pattern).
+   *                 defined for range {@code [0..N-1]} (N = number of stops in the pattern).
    * @param boardStopIndex the stopIndex to find
    */
   default int findBoardStopPositionAfter(int startPos, int boardStopIndex) {

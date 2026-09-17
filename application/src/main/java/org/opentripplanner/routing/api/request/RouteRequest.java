@@ -230,6 +230,7 @@ public class RouteRequest implements Serializable {
    * destination can be specified either by a reference to a stop place or by geographical
    * coordinates. Origin and destination are required in a one-to-one search, but not in a
    * many-to-one or one-to-many.
+   * <p>
    * TODO - Refactor and make separate requests for one-to-one and the other searches.
    *
    * @throws RoutingValidationException if either origin or destination is missing.
@@ -281,6 +282,7 @@ public class RouteRequest implements Serializable {
 
   /**
    * TransferOptimization is applied to all results except via-visit requests.
+   * <p>
    * TODO VIA - When the Optimized transfer support this, then this method should be removed.
    */
   public boolean allowTransferOptimization() {

@@ -14,7 +14,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  * legs can follow each* other or be connected by one {@link TransferPathLeg}. Note! Access and
  * egress path legs may contain more than one "OTP leg", but inside raptor these are threaded as one
  * leg; hence also just one leg returned by Raptor.
- * <p/>
+ * <p>
  * This interface contain utility methods to _cast_ a leg into the concrete sub-type:
  * <pre>
  * if(leg.isTransitLeg()) {

@@ -13,12 +13,17 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * scheduled NeTEx or GTFS. This is a "cache" in the sense that it will keep returning the same TripPattern
  * when presented with the same StopPattern, so if realtime messages add many trips passing through
  * the same sequence of stops, they will all end up on this same TripPattern.
+ * <p>
+ * <pre>
  *  TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and the flow
  *             between them.
  *             With the increased usage of DatedServiceJourneys, this should probably
  *             be part of the main model - not a separate cache. It is possible that this class works when it comes to
  *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
  *             analysed, designed and documented.
+ * </pre>
+ * <p>
+ * <pre>
  *  TODO RT_VP  TripPatternCache caches RT patterns keyed by StopPattern only, setting
  *              originalTripPattern from the first trip that created the entry in the cache.
  *              When a second trip on a different route produces the same modified StopPattern,
@@ -27,7 +32,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  *              of a modified trip, it will return the wrong result
  *              (symptom: when looking up for TripTimes in the wrong pattern's timetable,
  *              it will get null → TRIP_NOT_FOUND_IN_PATTERN).
- *
+ * </pre>
  */
 public class TripPatternCache {
 

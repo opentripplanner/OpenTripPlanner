@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This decorator help unzip the content of any underling data source(the delegate). This make it
  * easier to provide a store implementation - since this code can be reused.
- * <p/>
+ * <p>
  * See the Google Cloud Store implementation for an example on hwo to use it.
  */
 public class ZipStreamDataSourceDecorator implements CompositeDataSource {

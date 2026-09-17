@@ -20,8 +20,11 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
  * If the updater uses originalTripPattern to identify the original scheduled pattern of a
  * modified trip, it will return the wrong result (symptom: when looking up for TripTimes
  * in the wrong pattern's timetable, it will get null → TRIP_NOT_FOUND_IN_PATTERN).
+ * <p>
+ * <pre>
  * TODO RT_VP this design flaw is documented also in TripPatternCache
  *      and org.opentripplanner.transit.model.network.TripPattern#getOriginalTripPattern()
+ * </pre>
  */
 class CancelledStopCrossPatternTest implements RealtimeTestConstants {
 

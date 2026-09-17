@@ -46,6 +46,7 @@ class UnroutableTest {
   /**
    * Search for a path across the Willamette river. This OSM data includes a bridge that is not yet
    * built and is therefore tagged highway=construction.
+   * <p>
    * TODO also test unbuilt, proposed, raceways etc.
    */
   @Test

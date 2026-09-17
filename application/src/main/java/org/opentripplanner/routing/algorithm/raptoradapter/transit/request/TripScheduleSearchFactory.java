@@ -13,7 +13,7 @@ public class TripScheduleSearchFactory {
    * This threshold is used to determine when to perform a binary trip schedule search
    * to reduce the number of trips departure time lookups and comparisons. When testing
    * with data from Entur and all of Norway as a Graph, the optimal value was about 50.
-   * <p/>
+   * <p>
    * If you calculate the departure time every time or want to fine tune the performance,
    * changing this may improve the performance a few percent.
    */

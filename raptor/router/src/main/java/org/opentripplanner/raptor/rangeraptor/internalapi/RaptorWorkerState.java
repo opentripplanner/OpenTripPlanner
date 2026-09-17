@@ -30,7 +30,7 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    * current round. If no paths to the destination is found in the current round, FALSE is returned.
    * And last, if a new path is found in the current round - reaching the destination - but the path
    * is NOT accepted(not pareto-optimal), then FALSE is returned.
-   * <p/>
+   * <p>
    * This method is called at the end of each round.
    */
   boolean isDestinationReachedInCurrentRound();

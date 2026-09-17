@@ -13,10 +13,12 @@ public class OtpBadgeGenerator {
 
   /**
    * Accept formats:
+   * <pre>
    * - HEX: #112233
    * - RGB: rgb(0,255,0)
    * - RGBA: rgba(0,255,0,0.5)
    * - Named colors (\w{3, 20}) 'tan' to 'lightgoldenrodyellow'
+   * </pre>
    */
   private static final Pattern COLOR_PATTERN = Pattern.compile(
     "(#[\\dA-Fa-f]{6}|rgba?\\(N,N,N(,D)?\\)|[\\w]{3,30})".replace("N", NUM).replace("D", DEC)

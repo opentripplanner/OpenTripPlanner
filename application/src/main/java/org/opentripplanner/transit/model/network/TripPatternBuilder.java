@@ -130,7 +130,6 @@ public final class TripPatternBuilder
    * @see #withRealTimeAddedTrip() as an alternative
    * @see TripPattern#isRealTimeTripPattern()
    * @see TripPattern#isStopPatternModifiedInRealTime()
-   *
    */
   public TripPatternBuilder withRealTimeStopPatternModified() {
     this.realTimeTripPattern = true;

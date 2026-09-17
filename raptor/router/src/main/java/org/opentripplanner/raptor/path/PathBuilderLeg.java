@@ -256,7 +256,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * <ul>
    *     <li>if this leg is not a transit leg</li>
    *     <li>no transit leg exist after this leg</li>
-   * <ul>
+   * </ul>
    */
   public int waitTimeBeforeNextTransitIncludingSlack() {
     if (next.hasRides()) {

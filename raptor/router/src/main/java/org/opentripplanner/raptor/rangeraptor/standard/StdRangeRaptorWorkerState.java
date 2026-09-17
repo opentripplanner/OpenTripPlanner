@@ -144,9 +144,9 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
   /**
    * Return the "best time" found in the previous round. This is used to calculate the board/alight
    * time in the next round.
-   * <p/>
+   * <p>
    * PLEASE OVERRIDE!
-   * <p/>
+   * <p>
    * The implementation here is not correct - please override if you plan to use any result paths or
    * "rounds" as "number of transfers". The implementation is OK if the only thing you care about is
    * the "arrival time".

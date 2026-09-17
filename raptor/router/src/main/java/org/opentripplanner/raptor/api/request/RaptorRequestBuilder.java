@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 /**
  * This is a Request builder to help construct valid requests. Se the request classes for
  * documentation on each parameter.
- * <p/>
+ * <p>
  * <ul>
  *     <li>{@link RaptorRequest}
  *     <li>{@link DebugRequest}

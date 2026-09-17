@@ -75,7 +75,7 @@ public interface DynamicSearchWindowCoefficients {
    * {@code N} - The search window is rounded of to the closest multiplication of N minutes. If N=10
    * minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5
    * minutes and 17 seconds it will be rounded up to 10 minutes.
-   * <p/>
+   * <p>
    * Use a value between {@code 1 and 60}. This should be less than the {@code C}
    * (min-raptor-search-window) coefficient.
    */
