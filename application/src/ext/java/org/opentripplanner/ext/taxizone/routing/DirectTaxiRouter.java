@@ -106,7 +106,7 @@ public class DirectTaxiRouter {
     WgsCoordinate pickup,
     WgsCoordinate dropoff
   ) {
-    List<Leg> newLegs = new ArrayList<>();
+    List<Leg> newLegs = new ArrayList<>(itinerary.legs().size());
     for (Leg leg : itinerary.legs()) {
       if (leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR) {
         var taxiZone = taxiZoneIndex.findFirstZone(pickup, dropoff);
