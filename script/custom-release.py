@@ -35,6 +35,7 @@ class Config:
         self.release_branch = None
         self.ext_branches = None
         self.include_prs_label = None
+        self.include_prs_labelers = []
         self.ser_ver_id_prefix = None
         self.otp_production_url = None
 
@@ -51,7 +52,8 @@ class Config:
                 f"release_branch: '{self.release_branch}', "
                 f"ext_branches: {self.ext_branches}, "
                 f"include_prs_label: '{self.include_prs_label}', "
-                f"ser_ver_id_prefix: '{self.ser_ver_id_prefix}'"
+                f"include_prs_labelers: {self.include_prs_labelers}, "
+                f"ser_ver_id_prefix: '{self.ser_ver_id_prefix}', "
                 f"otp_production_url: '{self.otp_production_url}'>")
 
 
@@ -95,6 +97,8 @@ class PullRequest:
         self.title = None
         self.commit_hash = None
         self.labels = []
+        # GitHub login of the user who set the 'include_prs_label' last
+        self.labeled_by = None
 
     def description(self):
         return f'{self.title} #{self.number}'
@@ -103,7 +107,9 @@ class PullRequest:
         return f'{self.description()} {self.labels}'
 
     def description_link(self):
-        return f"{self.title} [#{self.number}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) {self.labels}"
+        labeled_by = f' - labeled by {self.labeled_by}' if self.labeled_by else ''
+        return (f"{self.title} [#{self.number}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) "
+                f"{self.labels}{labeled_by}")
 
     def is_label_bump_ser_id_set(self):
         return LBL_BUMP_SER_VER_ID in self.labels
@@ -218,7 +224,8 @@ def setup_and_verify():
         resolve_version_number()
         resolve_next_version()
         resolve_latest_ser_ver_id()
-        read_pull_request_info_from_github()
+        read_pull_request_info()
+        verify_pr_labelers()
         check_if_prs_exist_in_latest_release()
         resolve_next_ser_ver_id()
         resolve_production_versions()
@@ -243,8 +250,18 @@ def merge_in_labeled_prs():
         temp_branch = f'pull-request-{pr.number}'
         if section_w_resume(temp_branch, f'Merge in PR {pr.description()}'):
             git('fetch', config.upstream_remote, f'pull/{pr.number}/head:{temp_branch}')
+            verify_pr_head_not_moved(pr, temp_branch)
             git('merge', temp_branch)
             git('branch', '-D', temp_branch)
+
+
+# The PR head is fetched some time after it was read from GitHub, so make sure the code merged into
+# the release is the code that was listed and verified.
+def verify_pr_head_not_moved(pr, temp_branch):
+    fetched_hash = git_commit_hash(temp_branch)
+    if fetched_hash != pr.commit_hash:
+        error(f'The head of PR #{pr.number} has moved since it was read: expected {pr.commit_hash}, '
+              f'but fetched {fetched_hash}. Start over to release the new head.')
 
 
 def merge_in_ext_branches():
@@ -436,6 +453,7 @@ def load_config():
         config.release_branch = doc['release_branch']
         config.ext_branches = doc['ext_branches']
         config.include_prs_label = doc['include_prs_label']
+        config.include_prs_labelers = doc.get('include_prs_labelers', [])
         config.ser_ver_id_prefix = doc['ser_ver_id_prefix']
         config.otp_production_url = doc['otp_production_url']
         debug(f'Config loaded: {config}')
@@ -443,6 +461,10 @@ def load_config():
     if len(config.ser_ver_id_prefix) > 2:
         error(f"Configure the 'ser_ver_id_prefix'. The prefix must be maximum two characters long. "
               f"Value: <{config.ser_ver_id_prefix}>")
+    labelers = config.include_prs_labelers
+    if not isinstance(labelers, list) or not all(isinstance(it, str) and it for it in labelers):
+        error(f"Configure the 'include_prs_labelers'. It must be a list of GitHub logins. "
+              f"Value: <{labelers}>")
 
 
 def verify_script_run_from_root():
@@ -512,24 +534,38 @@ def resolve_latest_ser_ver_id():
     state.latest_ser_ver_id = maxSId
 
 
-def read_pull_request_info_from_github():
+def read_pull_request_info():
     if options.skip_prs or (not config.include_prs_label):
         info('Skip merging in GitHub PRs.')
-        return
-    info('Get PRs to include and their labels from GitHub - This requires authentication ...')
+    else:
+        read_pull_request_info_from_github()
 
+
+# Read the open upstream PRs labeled with the 'include_prs_label'. Together with the PR, the labeling
+# events on it are read so that the login of the person who set the label can be verified, see
+# 'verify_pr_labelers'. All labeling events are fetched, the filtering on label name is done here.
+def read_pull_request_info_from_github():
+    info('Get PRs to include and their labels from GitHub - This requires authentication ...')
 
     query_text = '''
     query ReadOpenPullRequests {
       repository(owner:\\"opentripplanner\\", name:\\"OpenTripPlanner\\") {
         pullRequests(first: 100, states: OPEN, labels: \\"''' + config.include_prs_label + '''\\") {
           nodes {
-            number, 
-            title, 
+            number,
+            title,
             headRefOid,
             labels(first: 20) {
               nodes {
                 name
+              }
+            },
+            timelineItems(itemTypes: [LABELED_EVENT], last: 100) {
+              nodes {
+                ... on LabeledEvent {
+                  actor { login },
+                  label { name }
+                }
               }
             }
           }
@@ -551,25 +587,71 @@ def read_pull_request_info_from_github():
     result = execute('curl', '-H', f'Authorization: Bearer {git_hub_access_token}', '-X', 'POST',
                      '-d', post_body, 'https://api.github.com/graphql',
                      error_msg='GitHub GraphQL Query failed!', quiet_err=True)
+    # The token is not needed after this point. Remove it from the environment so that it is not
+    # inherited by Maven, which runs the tests of the merged in - not yet reviewed - PRs.
+    del os.environ['CUSTOM_RELEASE_GIT_HUB_API_TOKEN']
 
     # Example response
-    #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"+Bump Serialization Id"},{"name":"Entur Test"}]}}]}}}}
+    #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"+Bump Serialization Id"},{"name":"Entur Test"}]},"timelineItems":{"nodes":[{"actor":{"login":"octocat"},"label":{"name":"Entur Test"}}]}}]}}}}
     json_doc = json.loads(result.stdout)
-    defined_labels = [LBL_BUMP_SER_VER_ID.lower(), config.include_prs_label.lower()]
-
     for node in json_doc['data']['repository']['pullRequests']['nodes']:
-        pr = PullRequest()
-        pr.number = node['number']
-        pr.title = node['title']
-        pr.commit_hash = node['headRefOid']
-        labels = node['labels']['nodes']
-        # GitHub labels are not case-sensitive, hence using 'lower()'
-        for label in labels:
-            lbl_name = label['name']
-            lbl_name_lc= lbl_name.lower()
-            if lbl_name_lc in defined_labels:
-                pr.labels.append(lbl_name)
-        pullRequests.append(pr)
+        label_names = [label['name'] for label in node['labels']['nodes']]
+        labeled_by = resolve_labeled_by(node['timelineItems']['nodes'])
+        add_pull_request(node['number'], node['title'], node['headRefOid'], label_names, labeled_by)
+
+
+# Return the login of the user who set the 'include_prs_label' last. The label can be removed and
+# set again, so only the last event counts. A user who no longer exists has no login, in which case
+# 'unknown' is returned - the same if no event is found.
+def resolve_labeled_by(labeled_events):
+    labeled_by = 'unknown'
+    for event in labeled_events:
+        if event.get('label', {}).get('name', '').lower() == config.include_prs_label.lower():
+            actor = event.get('actor')
+            labeled_by = actor['login'] if actor and actor.get('login') else 'unknown'
+    return labeled_by
+
+
+def add_pull_request(number, title, commit_hash, label_names, labeled_by):
+    if not re.fullmatch(r'[0-9a-f]{40}', str(commit_hash)):
+        error(f'PR #{number} does not have a full 40 character commit hash as head: {commit_hash}')
+    pr = PullRequest()
+    pr.number = int(number)
+    pr.title = title
+    pr.commit_hash = commit_hash
+    pr.labeled_by = labeled_by
+    # GitHub labels are not case-sensitive, hence using 'lower()'
+    defined_labels = [LBL_BUMP_SER_VER_ID.lower(), config.include_prs_label.lower()]
+    pr.labels = [name for name in label_names if name.lower() in defined_labels]
+    pullRequests.append(pr)
+
+
+# Anyone with triage access to the upstream repository can label a PR, and a labeled PR is merged,
+# built and released without review. If 'include_prs_labelers' is configured, only PRs labeled by
+# one of the listed GitHub logins are accepted. The check runs before anything is merged.
+def verify_pr_labelers():
+    if not pullRequests:
+        return
+    if not config.include_prs_labelers:
+        warn(f"'include_prs_labelers' is not configured, so it is not verified who set the "
+             f"'{config.include_prs_label}' label on the PRs merged into this release.")
+        return
+    section(f'Verify who set the {config.include_prs_label} label on the PRs ...')
+    # GitHub logins are not case-sensitive, hence using 'lower()'
+    trusted = [login.lower() for login in config.include_prs_labelers]
+    untrusted = []
+    for pr in pullRequests:
+        if pr.labeled_by and pr.labeled_by.lower() in trusted:
+            info(f'  - PR #{pr.number} labeled by {pr.labeled_by} - OK')
+        else:
+            info(f'  - PR #{pr.number} labeled by {pr.labeled_by} - NOT TRUSTED')
+            untrusted.append(pr)
+    if untrusted:
+        error('These PRs are labeled by a user not listed in the \'include_prs_labelers\':\n'
+              + ''.join(f"  - PR #{pr.number} '{pr.title}' labeled by {pr.labeled_by}\n"
+                        for pr in untrusted)
+              + "Remove the label, or add the login to 'include_prs_labelers' in the "
+                "'script/custom-release-env.json' file.")
 
 
 def check_if_prs_exist_in_latest_release():
@@ -675,19 +757,22 @@ CLI Options
   - Dry run  .................... : {options.dry_run}
   - Debugging ................... : {options.debugging}
   - Release ..................... : {options.release_only}
+  - Skip PRs .................... : {options.skip_prs}
 
 Config
   - Upstream git repo remote name : {config.upstream_remote}
   - Release to remote git repo .. : {config.release_remote}
   - Release branch .............. : {config.release_branch}
   - Configuration branches ...... : {config.ext_branches}
+  - PRs label ................... : {config.include_prs_label}
+  - PRs trusted labelers ........ : {config.include_prs_labelers}
   - Ser.ver.id prefix ........... : {config.ser_ver_id_prefix}
   - Otp production url .......... : {config.otp_production_url}  
 ''')
     if config.include_prs_label:
         info(f'PRs to merge')
         for pr in pullRequests:
-            info(f'  - {pr.description_w_labels()}')
+            info(f'  - {pr.description_w_labels()} labeled by {pr.labeled_by}')
     info(f'''
 Release info
   - Project major version ....... : {state.major_version}
@@ -908,7 +993,9 @@ def print_help():
 
     Release process overview
       1. The configured release-branch is reset hard to the <base-revision> script argument.
-      2. Then the labeled PRs are merged into the release-branch [if configured].
+      2. Then the labeled PRs are merged into the release-branch [if configured]. If the
+         'include_prs_labelers' is configured, only PRs labeled by one of the listed GitHub
+         users are accepted - the release stops if any other user has set the label.
       3. The config-branches are merged into the release-branch [if configured].
       4. The pom.xml file is updated with a new version and serialization version id [if required].
       5. The release is tested, tagged and pushed to Git repo.
