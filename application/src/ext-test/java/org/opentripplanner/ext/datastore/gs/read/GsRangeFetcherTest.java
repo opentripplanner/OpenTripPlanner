@@ -44,6 +44,10 @@ class GsRangeFetcherTest {
     assertThat(channel.seekedTo).isEqualTo(1024L);
     assertThat(channel.limitedTo).isEqualTo(2024L);
     assertThat(channel.closed).isTrue();
+    // The chunk must stay far below a block: the client reads straight into the destination only
+    // while it has at least a chunk of room left, and otherwise allocates a heap copy of a chunk.
+    assertThat(channel.chunkSize).isGreaterThan(0);
+    assertThat(channel.chunkSize).isAtMost(1024 * 1024);
   }
 
   @Test
@@ -173,6 +177,7 @@ class GsRangeFetcherTest {
 
     long seekedTo = -1;
     long limitedTo = -1;
+    int chunkSize = -1;
     boolean closed = false;
 
     /** Raise {@link #failure} after this many bytes of this channel have been served. */
@@ -243,7 +248,7 @@ class GsRangeFetcherTest {
 
     @Override
     public void setChunkSize(int chunkSize) {
-      // not relevant for the fake
+      this.chunkSize = chunkSize;
     }
 
     @Override

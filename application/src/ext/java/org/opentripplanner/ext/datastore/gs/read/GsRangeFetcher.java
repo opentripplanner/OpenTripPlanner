@@ -34,6 +34,15 @@ public class GsRangeFetcher implements RangeFetcher {
 
   /** Attempts to recover a range before the read fails; the client retries below this too. */
   private static final int RETRY_MAX_ATTEMPTS = 3;
+
+  /**
+   * The client's own read buffer. It must be small. The range is fixed by seek/limit and arrives
+   * as one HTTP request whatever the chunk size, but as soon as the destination has less room left
+   * than one chunk the client stops reading straight into it and allocates a heap buffer of a full
+   * chunk to read through instead. A chunk the size of a block would therefore cost a heap
+   * allocation of the whole block, and an extra copy, for every block.
+   */
+  private static final int CHUNK_SIZE = 256 * 1024;
   private static final Duration RETRY_INITIAL_DELAY = Duration.ofMillis(200);
   private static final int RETRY_BACKOFF = 2;
 
@@ -117,7 +126,7 @@ public class GsRangeFetcher implements RangeFetcher {
     try {
       channel.seek(position);
       channel.limit(end);
-      channel.setChunkSize((int) Math.min(end - position, Integer.MAX_VALUE));
+      channel.setChunkSize(CHUNK_SIZE);
       if (!cancellation.register(channel)) {
         throw new IOException("Read cancelled: " + path);
       }

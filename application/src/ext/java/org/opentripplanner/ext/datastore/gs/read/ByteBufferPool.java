@@ -11,10 +11,10 @@ import java.util.concurrent.ArrayBlockingQueue;
  * dispatched until a buffer is free, so the number of buffers <em>is</em> the number of blocks that
  * can be in flight, and the memory footprint is an invariant rather than a bound.
  * <p>
- * The buffers are direct for two reasons: {@code ReadChannel.read(ByteBuffer)} is the native API
- * and a heap buffer would force an extra copy through a thread-local direct buffer anyway, and
- * keeping them off-heap means the block size is a throughput decision rather than a G1
- * humongous-allocation decision (the humongous threshold moves with the heap size).
+ * The buffers are direct so that the working set of one read - 192 MB with the defaults - lives
+ * outside the heap for the seconds it is needed, instead of pinning a dozen humongous regions
+ * there. That is a footprint decision only: the Cloud Storage client copies the response through
+ * a small heap array whatever kind of buffer it is handed, so a direct buffer saves no copy.
  */
 class ByteBufferPool {
 
