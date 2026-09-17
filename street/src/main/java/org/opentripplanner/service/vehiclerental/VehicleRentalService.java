@@ -3,7 +3,7 @@ package org.opentripplanner.service.vehiclerental;
 import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;

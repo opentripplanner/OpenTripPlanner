@@ -1,6 +1,6 @@
 package org.opentripplanner.osm.wayproperty;
 
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.osm.model.OsmEntity;
 
 /**

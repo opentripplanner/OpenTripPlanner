@@ -1,8 +1,8 @@
 package org.opentripplanner.gbfs.v2;
 
 import org.mobilitydata.gbfs.v2_3.system_information.GBFSData;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 
 class GbfsSystemInformationMapper {

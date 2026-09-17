@@ -1,7 +1,7 @@
 package org.opentripplanner.place;
 
 import java.util.List;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.transit.model.basic.TransitMode;

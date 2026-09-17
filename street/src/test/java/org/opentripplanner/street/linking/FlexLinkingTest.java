@@ -6,7 +6,7 @@ import static org.opentripplanner.street.linking.LinkingDirection.BIDIRECTIONAL;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdFactory;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.vertex.StreetVertex;

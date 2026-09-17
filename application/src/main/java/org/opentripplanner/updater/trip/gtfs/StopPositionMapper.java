@@ -5,7 +5,7 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.INVALID_STOP_SEQUE
 
 import java.util.Collections;
 import java.util.List;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateException;

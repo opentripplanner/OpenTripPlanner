@@ -3,7 +3,7 @@ package org.opentripplanner.ext.vehicleparking.liipi;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.framework.io.JsonDataListDownloader;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;

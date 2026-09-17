@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
 import java.util.List;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;

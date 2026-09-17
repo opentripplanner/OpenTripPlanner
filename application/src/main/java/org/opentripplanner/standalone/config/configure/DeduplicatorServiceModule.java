@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 @Module

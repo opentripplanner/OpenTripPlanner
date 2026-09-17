@@ -28,7 +28,7 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.core.domain.model.accessibility.Accessibility;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;

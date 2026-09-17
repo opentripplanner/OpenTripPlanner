@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import java.time.LocalDate;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 
 /** Responsible for mapping GTFS ServiceDate into the OTP model. */
 class ServiceDateMapper {

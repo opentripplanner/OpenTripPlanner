@@ -2,7 +2,7 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.util.Objects;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 

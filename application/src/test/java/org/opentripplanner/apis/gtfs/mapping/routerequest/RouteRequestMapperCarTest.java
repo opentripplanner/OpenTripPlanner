@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.domain.model.basic.Cost;
 
 class RouteRequestMapperCarTest {
 

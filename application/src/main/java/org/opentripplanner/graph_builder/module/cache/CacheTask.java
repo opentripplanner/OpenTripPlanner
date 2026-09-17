@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.cache;
 
-import org.opentripplanner.core.model.doc.DocumentedEnum;
+import org.opentripplanner.core.domain.model.doc.DocumentedEnum;
 
 /**
  * Identifies a graph-build computation that can be persisted to a file cache between builds.

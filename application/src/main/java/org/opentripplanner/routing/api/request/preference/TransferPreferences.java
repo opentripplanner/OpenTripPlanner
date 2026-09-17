@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.domain.model.basic.Cost;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.time.DurationUtils;

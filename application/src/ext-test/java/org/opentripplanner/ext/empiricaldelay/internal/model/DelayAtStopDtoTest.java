@@ -3,7 +3,7 @@ package org.opentripplanner.ext.empiricaldelay.internal.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;
 
 class DelayAtStopDtoTest {

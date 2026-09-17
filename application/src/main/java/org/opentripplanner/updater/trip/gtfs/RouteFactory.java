@@ -2,9 +2,9 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import java.util.Objects;
 import java.util.Optional;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;

@@ -1,7 +1,7 @@
 package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.core.model.basic.Cost.costOfSeconds;
+import static org.opentripplanner.core.domain.model.basic.Cost.costOfSeconds;
 
 import java.time.Duration;
 import java.util.List;

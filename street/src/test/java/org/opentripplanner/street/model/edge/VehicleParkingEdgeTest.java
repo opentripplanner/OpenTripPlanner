@@ -6,7 +6,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdFactory.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.street.geometry.WgsCoordinate;

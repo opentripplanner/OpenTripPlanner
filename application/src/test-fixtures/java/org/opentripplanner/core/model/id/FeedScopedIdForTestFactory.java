@@ -1,5 +1,7 @@
 package org.opentripplanner.core.model.id;
 
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
+
 public class FeedScopedIdForTestFactory {
 
   public static final String FEED_ID = "F";

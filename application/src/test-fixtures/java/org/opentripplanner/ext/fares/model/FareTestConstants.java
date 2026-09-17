@@ -5,7 +5,7 @@ import static org.opentripplanner.ext.fares.model.FareModelForTest.fareProduct;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.groupOfRoutes;
 
 import java.time.LocalTime;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;

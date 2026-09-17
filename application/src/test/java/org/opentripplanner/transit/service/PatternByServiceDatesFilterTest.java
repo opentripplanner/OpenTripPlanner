@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 import org.opentripplanner.transit.model._data.PatternTestModel;
 import org.opentripplanner.transit.model.network.TripPattern;
 

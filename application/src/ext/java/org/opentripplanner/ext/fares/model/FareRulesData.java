@@ -7,7 +7,7 @@ import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 public final class FareRulesData {
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router.startonboardaccess;
 
 import java.time.LocalDate;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.TripOnDateReference;
 import org.opentripplanner.routing.api.request.TripOnDateReferenceWithTripAndDate;
 import org.opentripplanner.routing.api.request.TripOnDateReferenceWithTripOnServiceDateId;

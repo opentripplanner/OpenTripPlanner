@@ -1,4 +1,4 @@
-package org.opentripplanner.core.framework.di;
+package org.opentripplanner.core.domain.framework.di;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

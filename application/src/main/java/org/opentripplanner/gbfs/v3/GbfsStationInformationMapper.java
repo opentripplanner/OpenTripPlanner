@@ -10,7 +10,7 @@ import org.mobilitydata.gbfs.v3_0.station_information.GBFSName;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSRentalUris;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSShortName;
 import org.mobilitydata.gbfs.v3_0.station_information.GBFSStation;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.gbfs.support.UnknownVehicleTypeFilter;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;

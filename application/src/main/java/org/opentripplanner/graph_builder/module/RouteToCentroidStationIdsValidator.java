@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.domain.model.basic.Cost;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.lang.Units;

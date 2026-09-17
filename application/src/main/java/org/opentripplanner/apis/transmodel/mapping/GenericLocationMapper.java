@@ -8,7 +8,7 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.model.framework.DatedServiceJourneyReferenceInputType;
 import org.opentripplanner.apis.transmodel.model.framework.PointInJourneyPatternReferenceInputType;
 import org.opentripplanner.apis.transmodel.support.OneOfInputValidator;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.TripLocation;
 import org.opentripplanner.routing.api.request.TripOnDateReference;

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.onebusaway.gtfs.model.Location;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.street.geometry.GeometryUtils;

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.core.domain.model.accessibility.Accessibility;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.NodeBuilder;

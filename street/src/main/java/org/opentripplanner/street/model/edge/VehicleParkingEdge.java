@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
 import java.time.Duration;
-import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;

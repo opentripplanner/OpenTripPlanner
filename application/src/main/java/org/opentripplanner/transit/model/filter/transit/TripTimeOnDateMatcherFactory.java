@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.filter.transit;
 
 import java.time.Instant;
-import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.time.TimePeriod;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;

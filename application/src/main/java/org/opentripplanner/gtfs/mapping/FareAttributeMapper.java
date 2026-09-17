@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
 import org.opentripplanner.transit.model.basic.Money;
