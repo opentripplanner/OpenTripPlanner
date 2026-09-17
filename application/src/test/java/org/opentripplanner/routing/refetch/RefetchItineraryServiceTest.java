@@ -55,18 +55,18 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class RefetchItineraryServiceTest {
 
   // Setup transit
-  static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
-  protected static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(
+  private static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
+  private static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(
     SERVICE_DATE
   );
-  static final Station STATION_A = ENV_BUILDER.station("StationA");
-  static final RegularStop STOP_A = ENV_BUILDER.stopAtStation("A", "StationA");
-  static final RegularStop STOP_B = ENV_BUILDER.stop("B");
-  static final RegularStop STOP_C = ENV_BUILDER.stop("C");
-  static final RegularStop STOP_D = ENV_BUILDER.stop("D");
-  static final RegularStop STOP_E = ENV_BUILDER.stop("E");
+  private static final Station STATION_A = ENV_BUILDER.station("StationA");
+  private static final RegularStop STOP_A = ENV_BUILDER.stopAtStation("A", "StationA");
+  private static final RegularStop STOP_B = ENV_BUILDER.stop("B");
+  private static final RegularStop STOP_C = ENV_BUILDER.stop("C");
+  private static final RegularStop STOP_D = ENV_BUILDER.stop("D");
+  private static final RegularStop STOP_E = ENV_BUILDER.stop("E");
 
-  static final TransitTestEnvironmentBuilder TRANSIT_ENV = ENV_BUILDER.addTrip(
+  private static final TransitTestEnvironmentBuilder TRANSIT_ENV = ENV_BUILDER.addTrip(
     TripInput.of("trip1")
       .withWithTripOnServiceDate("trip1")
       .addStop(STOP_A, "10:00")
@@ -90,14 +90,14 @@ public class RefetchItineraryServiceTest {
     );
 
   // Setup street
-  static final GraphBuilder G = GraphBuilder.of();
+  private static final GraphBuilder G = GraphBuilder.of();
 
-  static final VertexRef V1 = G.vertex();
-  static final VertexRef VA = G.linkStop(STOP_A);
-  static final VertexRef VB = G.linkStop(STOP_B);
-  static final VertexRef VC = G.linkStop(STOP_C);
-  static final VertexRef VD = G.linkStop(STOP_D);
-  static final VertexRef V2 = G.vertex();
+  private static final VertexRef V1 = G.vertex();
+  private static final VertexRef VA = G.linkStop(STOP_A);
+  private static final VertexRef VB = G.linkStop(STOP_B);
+  private static final VertexRef VC = G.linkStop(STOP_C);
+  private static final VertexRef VD = G.linkStop(STOP_D);
+  private static final VertexRef V2 = G.vertex();
 
   static {
     V1.street(VA).meters(10);
@@ -106,10 +106,10 @@ public class RefetchItineraryServiceTest {
     VB.street(VC).meters(20);
   }
 
-  static final Graph GRAPH = G.build();
+  private static final Graph GRAPH = G.build();
 
   // Setup transfers
-  static final RegularTransferService TRANSFER_SERVICE = createTransferService(
+  private static final RegularTransferService TRANSFER_SERVICE = createTransferService(
     List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
   );
 
