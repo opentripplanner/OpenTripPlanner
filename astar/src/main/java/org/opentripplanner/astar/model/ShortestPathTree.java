@@ -149,6 +149,7 @@ public class ShortestPathTree<
    * Many shortest path algorithms will decrease the key of a vertex in the priority queue when it
    * is updated, but we store states in the queue rather than vertices, and states do not get
    * updated or change their weight.
+   * <p>
    * TODO consider just removing states from the priority queue.
    * <p>
    * When the Fibonacci heap was replaced with a binary heap, the decrease-key operation was

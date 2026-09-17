@@ -7,12 +7,12 @@ import org.opentripplanner.utils.time.TimeUtils;
 /**
  * The responsibility of this class is to compare two int arrays and list all elements that differ.
  * You may provide a list of indexes to compare or compare all elements.
- * <p/>
+ * <p>
  * The result is returned as a multi-line string.
- * <p/>
+ * <p>
  * If the header line exceeds 2000 characters and you compare all elements the comparison is
  * aborted.
- * <p/>
+ * <p>
  * Both regular numbers and time is supported. The time uses the {@link
  * TimeUtils#timeToStrCompact(int)} to print all times.
  */

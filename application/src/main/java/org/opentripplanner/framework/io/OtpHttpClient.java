@@ -43,7 +43,7 @@ import org.slf4j.Logger;
  * objects.
  *
  * <p>
- * <p/>
+ * <p>
  * <h3>Exception management</h3>
  * Exceptions thrown during network operations or response mapping are wrapped in
  * {@link OtpHttpClientException}

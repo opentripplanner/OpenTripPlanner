@@ -4,7 +4,7 @@ package org.opentripplanner.raptor.spi;
  * The purpose of the TripScheduleSearch is to search for a trip schedule for a given pattern.
  * The search need to be optimized for speed, this is one of the most frequently called
  * operations in Raptor and accessing objects in memory should be avoided.
- * <p/>
+ * <p>
  * There should be two implementations of this interface, one for board-times and one for
  * alight-times. When Raptor search in reverse direction the alight-time search should be used. For
  * a reverse search (searching backward in time) the trip found departure/arrival times are swapped.

@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * The purpose of this class is hold information about a destination arrival and compute the values
  * for arrival time and cost.
- * <p/>
+ * <p>
  * Compared with the ParetoSet of each stop we need two extra criteria:
  * <ul>
  * <li>Number of transfers. The McRangeRaptor works in rounds, so

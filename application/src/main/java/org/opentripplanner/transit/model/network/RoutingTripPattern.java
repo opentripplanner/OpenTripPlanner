@@ -9,11 +9,13 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * The split between TripPattern and RoutingTripPattern is done for the following technical reasons:
+ * <pre>
  *  - The RTP is accessed frequently during the Raptor search, and we want it to be as small as
  *    possible to load/access it in the cache and CPU for performance reasons.
  *  - Also, we deduplicate these so a RTP can be reused by more than one TP.
  *  - This also provide explicit documentation on which fields are used during a search and which
  *    are not.
+ * </pre>
  */
 public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 

@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
  * A set of instances of this interface can be used to create a pareto-set. See
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoSet} and
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoComparator}.
- * <p/>
+ * <p>
  * This interface extends {@link Comparator} so elements can be sorted as well. Not all criteria
  * can be sorted, if so the {@link #strictOrder()} should return false (this is the default).
  */

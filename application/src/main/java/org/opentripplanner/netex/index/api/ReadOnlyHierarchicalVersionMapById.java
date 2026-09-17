@@ -40,7 +40,7 @@ public interface ReadOnlyHierarchicalVersionMapById<V> {
   /**
    * Return {@code true} if the given {@code value.version} is larger or equals to all the maximum
    * version of all elements in the collection.
-   * <p/>
+   * <p>
    * Note! This method do not check all values in the hierarchy, only the elements in the first
    * collection found.
    */

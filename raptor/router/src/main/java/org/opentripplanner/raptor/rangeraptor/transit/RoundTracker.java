@@ -26,10 +26,10 @@ public class RoundTracker {
 
   /**
    * The round upper limit for when to abort the search.
-   * <p/>
+   * <p>
    * This is default set to the maximum number of rounds limit, but as soon as the destination is
    * reach the {@link #numberOfAdditionalTransfers} is used to update the limit.
-   * <p/>
+   * <p>
    * The limit is inclusive, indicating the last round to process.
    */
   private int roundMaxLimit;

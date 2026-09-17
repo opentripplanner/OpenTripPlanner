@@ -15,10 +15,12 @@ import org.opentripplanner.street.search.state.State;
  * Represents a viable insertion of a passenger into a carpool trip.
  * <p>
  * Contains all information needed to construct an itinerary, including:
+ * <pre>
  * - The original trip
  * - Insertion positions (where pickup and dropoff occur in the modified route)
  * - Route segments (all GraphPaths forming the complete modified route)
  * - Timing information
+ * </pre>
  * <p>
  * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
  * pickup and dropoff stops in the modified route (the route after the passenger's stops have
@@ -100,7 +102,8 @@ public record InsertionCandidate(
 
   /**
    * Gets the pickup route segment(s) - from boarding to passenger pickup.
-   * Returns all segments before the pickup position.
+   *
+   * @return all segments before the pickup position.
    */
   public List<GraphPath<State, Edge, Vertex>> getPickupSegments() {
     if (pickupPosition == 0) {
@@ -111,7 +114,8 @@ public record InsertionCandidate(
 
   /**
    * Gets the shared route segment(s) - from passenger pickup to dropoff.
-   * Returns all segments between pickup and dropoff positions.
+   *
+   * @return all segments between pickup and dropoff positions.
    */
   public List<GraphPath<State, Edge, Vertex>> getSharedSegments() {
     return routeSegments.subList(pickupPosition, dropoffPosition);
@@ -119,7 +123,8 @@ public record InsertionCandidate(
 
   /**
    * Gets the dropoff route segment(s) - from passenger dropoff to alighting.
-   * Returns all segments after the dropoff position.
+   *
+   * @return all segments after the dropoff position.
    */
   public List<GraphPath<State, Edge, Vertex>> getDropoffSegments() {
     if (dropoffPosition >= routeSegments.size()) {
@@ -133,7 +138,8 @@ public record InsertionCandidate(
    * Includes travel time through pickup segments and intermediate stop delays between them, but
    * <em>excludes</em> the boarding dwell at the pickup itself — that is accounted for in
    * {@link #getPassengerRideDuration()}.
-   * Returns {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup segments).
+   *
+   * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup segments).
    */
   public Duration getDurationUntilPickupArrival() {
     return totalSegmentDuration(getPickupSegments(), stopDuration);

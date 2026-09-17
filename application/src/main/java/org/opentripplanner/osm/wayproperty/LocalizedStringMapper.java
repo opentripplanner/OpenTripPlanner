@@ -39,7 +39,6 @@ class LocalizedStringMapper {
    * For example. If key platform has key {ref} current value of tag ref in way is saved to be used
    * in localizations. It currently assumes that tag exists in way. (otherwise this namer wouldn't
    * be used)
-   * </p>
    *
    * @param key key of translation for this way set in the WayPropertyMapper and translations read
    *            from properties Files
@@ -64,8 +63,6 @@ class LocalizedStringMapper {
    * brackets.
    * <p>
    * For example "Platform {ref}" ref is way tagname.
-   *
-   * </p>
    */
   private List<String> getTagNames(String key) {
     //TODO: after finding all keys for replacements replace strings to normal java strings

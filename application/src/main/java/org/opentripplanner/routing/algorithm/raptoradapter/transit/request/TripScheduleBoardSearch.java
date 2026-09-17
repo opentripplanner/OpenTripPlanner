@@ -13,7 +13,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * stop. Normally the search scan from the upper bound index and down, it can do so because the
  * trips are ordered after the FIRST stop boarding times. We also assume that trips do not pass each
  * other; Hence trips IN SERVICE on a given day will be in order for all other stops too.
- * <p/>
+ * <p>
  * The search uses a binary search if the number of trip schedules is above a given threshold. A
  * linear search is slow when the number of schedules is very large, let say more than 300 trip
  * schedules.
@@ -154,7 +154,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
    * This method search for the first scheduled trip boarding, after or equals to the
    * given {@code earliestBoardTime}. Only trips with a trip index smaller than the given
    * {@code tripIndexUpperBound} is considered.
-   * <p/>
+   * <p>
    * The search searches backwards until index 0 is reached (inclusive).
    *
    * @param tripIndexUpperBound The trip index upper bound, where search start (exclusive).
@@ -199,7 +199,7 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
 
   /**
    * Do a binary search to find the approximate upper bound index for where to start the search.
-   * <p/>
+   * <p>
    * This is just a guess and we return when the trip with a best valid departure is in the range
    * of the next {@link #binarySearchThreshold}.
    *

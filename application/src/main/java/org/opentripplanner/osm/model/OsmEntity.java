@@ -372,9 +372,11 @@ public abstract class OsmEntity {
 
   /**
    * Parse an OSM duration tag, which is one of:
+   * <pre>
    *   mm
    *   hh:mm
    *   hh:mm:ss
+   * </pre>
    * and where the leading value is not limited to any maximum.
    * See <a href="https://wiki.openstreetmap.org/wiki/Key:duration">OSM wiki definition
    * of duration</a>.

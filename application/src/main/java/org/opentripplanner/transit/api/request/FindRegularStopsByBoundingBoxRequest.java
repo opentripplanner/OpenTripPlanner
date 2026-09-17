@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * A request for {@link RegularStop}s within a bounding box.
- * <p/>
+ * <p>
  * This request is used to retrieve {@link RegularStop}s that are within a provided bounding box and
  * match the other criteria.
  */

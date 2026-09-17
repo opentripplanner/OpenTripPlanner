@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * With two connected ways to a node (which can be on the same level), after building the
  * ElevatorAlightEdge and ElevatorBoardEdge the graph will look like this (side view):
- *
+ * <pre>
  * +==X
  *
  * +==X
@@ -76,10 +76,11 @@ import org.slf4j.LoggerFactory;
  * +  ElevatorHopVertex
  * X  OsmElevatorVertex or IntersectionVertex
  * == ElevatorBoardEdge and ElevatorAlightEdge
+ * </pre>
  * <p>
  * Another loop fills in the ElevatorHopEdges. After filling in the ElevatorHopEdges when a node
  * has 3 connected ways the graph will look like this (side view):
- *
+ * <pre>
  * +==X
  * |
  * +==X
@@ -90,6 +91,7 @@ import org.slf4j.LoggerFactory;
  * X  OsmElevatorVertex or IntersectionVertex
  * == ElevatorBoardEdge and ElevatorAlightEdge
  * |  ElevatorHopEdge
+ * </pre>
  */
 class ElevatorProcessor {
 
@@ -204,8 +206,10 @@ class ElevatorProcessor {
    * Add way with tag highway=elevator to graph as elevator.
    * <p>
    * Needs to be called after:
+   * <pre>
    * - intersection vertices have been created in vertexGenerator
    * - elevator ways have been collected
+   * </pre>
    */
   private void buildElevatorEdgesFromElevatorWays() {
     for (OsmWay way : osmdb.getWays()) {

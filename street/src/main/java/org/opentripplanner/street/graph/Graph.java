@@ -283,9 +283,11 @@ public class Graph implements Serializable {
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graph builder to server in memory, without a round trip through serialization.
    * <p>
+   * <pre>
    * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
    *           - something that should go into the index; Hence, inconsistent data.
+   * </pre>
    */
   public void index() {
     LOG.info("Index street model...");

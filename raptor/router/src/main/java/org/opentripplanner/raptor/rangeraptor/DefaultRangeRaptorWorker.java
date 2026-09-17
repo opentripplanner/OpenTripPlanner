@@ -57,7 +57,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
   /**
    * The RangeRaptor state - we delegate keeping track of state to the state object, this allows
    * the worker implementation to focus on the algorithm, while the state keep track of the result.
-   * <p/>
+   * <p>
    * This also allows us to try out different strategies for storing the result in memory. For a
    * long time, we had a state which stored all data as int arrays in addition to the current
    * object-oriented approach. There were no performance differences(=> GC is not the bottleneck),

@@ -126,6 +126,7 @@ public class IslandPruningModule implements GraphBuilderModule {
 
   /**
    * Island pruning strategy:
+   * <pre>
    * 1. Extract islands without using noThruTraffic edges at all.
    * 2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across
    *    original islands! Note: these expanded islands can overlap.
@@ -134,6 +135,7 @@ public class IslandPruningModule implements GraphBuilderModule {
    * 4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via
    *    noThruTraffic edges to noThruTraffic state. Remove traversal mode specific access from
    *    unreachable edges. Remove unconnected edges.
+   * </pre>
    */
   private void pruneIslands(TraverseMode traverseMode) {
     LOG.debug("nothru pruning");

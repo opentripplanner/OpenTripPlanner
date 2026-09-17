@@ -13,7 +13,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * This interface define a superset of operations to maintain the stop arrivals state, and for the
  * implementation to compute results. The Range Raptor algorithm do NOT depend on the state, only on
  * the {@link BestTimes} - with one exception the {@link #bestTimePreviousRound(int)}.
- * <p/>
+ * <p>
  * Different implementations may implement this to:
  * <ul>
  *     <li>Compute paths
