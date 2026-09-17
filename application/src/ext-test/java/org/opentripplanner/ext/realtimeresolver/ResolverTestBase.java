@@ -4,14 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createConstrainedTransferService;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createTransferService;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.makeTransfer;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.routeRequest;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.staySeated;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.ext.common.AbstractTestBase;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -21,8 +27,23 @@ import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
+import org.opentripplanner.routing.refetch.RefetchItineraryServiceTest;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VertexLinker;
+import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
+import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -30,8 +51,81 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
+import org.opentripplanner.utils.time.TimeUtils;
 
-class ResolverTestBase extends AbstractTestBase {
+class ResolverTestBase {
+
+  // Setup transit
+  protected static final LocalDate SERVICE_DATE = LocalDate.of(2020, 3, 3);
+  protected static final TransitTestEnvironmentBuilder ENV_BUILDER = TransitTestEnvironment.of(
+    SERVICE_DATE
+  );
+  protected static final RegularStop STOP_A = ENV_BUILDER.stopAtStation("A", "StationA");
+  protected static final RegularStop STOP_B = ENV_BUILDER.stop("B");
+  protected static final RegularStop STOP_C = ENV_BUILDER.stop("C");
+  protected static final RegularStop STOP_D = ENV_BUILDER.stop("D");
+  protected static final RegularStop STOP_E = ENV_BUILDER.stop("E");
+
+  protected static final TransitTestEnvironment TRANSIT_ENV = ENV_BUILDER.addTrip(
+    TripInput.of("trip1")
+      .withWithTripOnServiceDate("trip1")
+      .addStop(STOP_A, "10:00")
+      .addStop(STOP_B, "11:00")
+      .addStop(STOP_D, "12:00")
+  )
+    .addTrip(
+      TripInput.of("trip2")
+        .withWithTripOnServiceDate("trip2")
+        .addStop(STOP_B, "12:00")
+        .addStop(STOP_C, "13:00")
+        .addStop(STOP_D, "14:00")
+    )
+    .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
+    .addTrip(TripInput.of("trip4").addStop(STOP_C, "08:30").addStop(STOP_D, "09:30"))
+    .addTrip(
+      TripInput.of("trip5")
+        .withWithTripOnServiceDate("trip5")
+        .addStop(STOP_A, "11:05")
+        .addStop(STOP_B, "11:20")
+    )
+    .addTrip(
+      TripInput.of("trip6")
+        .withWithTripOnServiceDate("trip6")
+        .addStop(STOP_B, "11:20")
+        .addStop(STOP_C, "11:40")
+    )
+    .addTrip(
+      TripInput.of("trip7")
+        .withWithTripOnServiceDate("trip7")
+        .addStop(STOP_D, "15:00")
+        .addStop(STOP_E, "16:00")
+    )
+    .build();
+
+  // Setup street
+  protected static final RefetchItineraryServiceTest.GraphBuilder G =
+    RefetchItineraryServiceTest.GraphBuilder.of();
+
+  protected static final RefetchItineraryServiceTest.VertexRef V1 = G.vertex();
+  protected static final RefetchItineraryServiceTest.VertexRef VA = G.linkStop(STOP_A);
+  protected static final RefetchItineraryServiceTest.VertexRef VB = G.linkStop(STOP_B);
+  protected static final RefetchItineraryServiceTest.VertexRef VC = G.linkStop(STOP_C);
+  protected static final RefetchItineraryServiceTest.VertexRef VD = G.linkStop(STOP_D);
+  protected static final RefetchItineraryServiceTest.VertexRef V2 = G.vertex();
+
+  static {
+    V1.street(VA).meters(10);
+    V2.street(VD).meters(10);
+
+    VB.street(VC).meters(20);
+  }
+
+  protected static final Graph GRAPH = G.build();
+
+  // Setup transfers
+  protected static final RegularTransferService TRANSFER_SERVICE = createTransferService(
+    List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
+  );
 
   @Test
   void populateItineraryLegsWithNoRealTime() {
@@ -339,6 +433,87 @@ class ResolverTestBase extends AbstractTestBase {
     assertEquals(
       "A ~ BUS trip1 10:00 11:00 ~ B ~ BUS trip2 12:00 13:00 ~ C []",
       itineraries.getFirst().toStr()
+    );
+  }
+
+  private ScheduledTransitLeg buildScheduledTransitLeg(
+    TripOnDateDataFetcher trip,
+    int boardPos,
+    int alightPos
+  ) {
+    ZonedDateTime startTime = TimeUtils.zonedDateTime(
+      SERVICE_DATE,
+      trip.scheduledTripTimes().getDepartureTime(boardPos),
+      TRANSIT_ENV.timeZone()
+    );
+
+    ZonedDateTime endTime = TimeUtils.zonedDateTime(
+      SERVICE_DATE,
+      trip.scheduledTripTimes().getDepartureTime(alightPos),
+      TRANSIT_ENV.timeZone()
+    );
+
+    return ScheduledTransitLeg.of()
+      .withTripTimes(trip.scheduledTripTimes())
+      .withTripPattern(trip.tripPattern())
+      .withStartTime(startTime)
+      .withEndTime(endTime)
+      .withServiceDate(SERVICE_DATE)
+      .withZoneId(TRANSIT_ENV.timeZone())
+      .withBoardStopIndexInPattern(boardPos)
+      .withAlightStopIndexInPattern(alightPos)
+      .withGeneralizedCost(Cost.ZERO.toSeconds())
+      .build();
+  }
+
+  private RefetchItineraryService createRefetchService(TransitAlertService transitAlertService) {
+    StreetDetailsService streetDetailsService = null;
+
+    VertexCreationService vertexCreationService = new VertexCreationService(
+      new VertexLinker(
+        GRAPH,
+        GeofencingZoneService.EMPTY,
+        VisibilityMode.TRAVERSE_AREA_EDGES,
+        100,
+        false
+      )
+    );
+
+    LinkingContextFactory linkingContextFactory = new LinkingContextFactory(
+      GRAPH,
+      vertexCreationService
+    );
+
+    var streetLimitationParametersService = new StreetLimitationParametersService() {
+      @Override
+      public float maxCarSpeed() {
+        return 100f;
+      }
+
+      @Override
+      public int maxAreaNodes() {
+        return 0;
+      }
+
+      @Override
+      public float getBestWalkSafety() {
+        return 0;
+      }
+
+      @Override
+      public float getBestBikeSafety() {
+        return 0;
+      }
+    };
+
+    return new RefetchItineraryService(
+      GRAPH,
+      TRANSIT_ENV.transitService(),
+      transitAlertService,
+      TRANSFER_SERVICE,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
     );
   }
 }
