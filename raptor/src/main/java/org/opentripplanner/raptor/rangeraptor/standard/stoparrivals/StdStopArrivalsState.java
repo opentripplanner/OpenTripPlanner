@@ -11,7 +11,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Tracks the state necessary to construct paths at the end of each iteration.
- * <p/>
+ * <p>
  * This class find the pareto optimal paths with respect to: rounds, arrival time and total travel
  * time.
  *

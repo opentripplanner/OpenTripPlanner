@@ -37,11 +37,13 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All trips
  * grouped under a TripPattern should have the same values for these characteristics (with possible
  * exceptions for TransitMode and SubMode).
+ * <p>
  * TODO RT_AB: We need to clarify exactly which characteristics are identical across the trips.
  *   Grouping into patterns serves more than one purpose: it conserves memory by not replicating
  *   details shared across all trips in the TripPattern; it reflects business practices outside
  *   routing; it is essential to optimizations in routing algorithms like Raptor. We may be
  *   conflating a domain model grouping with an internal routing grouping.
+ * <p>
  * TODO RT_TG In addition to AB comment: this does not map cleanly to NeTEx JourneyPattern, the
  *   concept does not exist in GTFS. The TripPattern ID is unfortunatly exposed in the OTP APIs.
  *   This class has a 1-to-1 relationship with RoutingTripPattern. To support a more flexible
@@ -78,6 +80,7 @@ public final class TripPattern
    * there will be another Timetable holding those updates and reading through to the scheduled one.
    * That other realtime Timetable is retrieved from a TimetableRepositorySnapshot (see end of Javadoc on
    * DefaultTimetableRepository for more details).
+   * <p>
    * TODO RT_AB: The above system should be changed to integrate realtime and scheduled data more
    *   closely. The Timetable may become obsolete or change significantly when they are integrated.
    */
@@ -382,9 +385,11 @@ public final class TripPattern
   /**
    * Return the direction for all the trips in this pattern.
    * By construction, all trips in a pattern have the same direction:
+   * <pre>
    * - trips derived from NeTEx data belong to a ServiceJourney that belongs to a JourneyPattern
-   * that belongs to a NeTEx Route that specifies a single direction.
+   *   that belongs to a NeTEx Route that specifies a single direction.
    * - trips derived from GTFS data are grouped by direction in a trip pattern, during graph build.
+   * </pre>
    */
   public Direction getDirection() {
     return scheduledTimetable.getDirection();
@@ -422,9 +427,12 @@ public final class TripPattern
    *
    * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    *
+   * <p>
+   * <pre>
    * TODO RT_VP: this method is unreliable due to a design flaw in the current implementation of
    *             {@link org.opentripplanner.updater.trip.patterncache.TripPatternCache}
    *             See comment in TripPatternCache.
+   * </pre>
    */
   @Deprecated
   @Nullable

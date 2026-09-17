@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 /**
  * The transit calculator is used to calculate transit related stuff, like calculating
  * <em>earliest boarding time</em> and time-shifting the access paths.
- * <p/>
+ * <p>
  * The calculator is shared between the state, worker and path mapping code. This make the
  * calculations consistent and let us hide the request parameters. Hiding the request parameters
  * ensure that this calculator is used.

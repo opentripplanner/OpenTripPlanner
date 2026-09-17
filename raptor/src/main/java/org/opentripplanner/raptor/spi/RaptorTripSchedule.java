@@ -5,7 +5,7 @@ import java.util.BitSet;
 /**
  * The purpose of this interface is to provide information about the trip schedule. The trip is a
  * child of, and lives in the context of a trip pattern.
- * <p/>
+ * <p>
  * The purpose of hiding these attributes behind an interface is to allow the implementation to
  * choose the most efficient underlying representation that suits its needs.
  */

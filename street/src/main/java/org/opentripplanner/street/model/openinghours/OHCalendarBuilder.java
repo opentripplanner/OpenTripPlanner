@@ -268,6 +268,7 @@ public class OHCalendarBuilder {
     /**
      * Edits this builder and potentially creates one or two new {@link OpeningHoursBuilder} based
      * on the provided {@link OpeningHoursBuilder} according to the following rules:
+     * <pre>
      * 1. If time spans or days don't overlap with this builder, do nothing and return 0 new builders.
      * 2. if the provided builder covers the whole period from this builder's start time to end time,
      *    edit this builder to be off on the common days and return 0 new builders.
@@ -278,6 +279,7 @@ public class OHCalendarBuilder {
      *    edit this builder to be off on the common days and return two new builders that are open
      *    on the common days, one for the beginning and one for the end part of this builder's
      *    opening period
+     * </pre>
      *
      * @return a list of new {@link OHCalendarBuilder.OpeningHoursBuilder} created while
      * splitting existing builders.

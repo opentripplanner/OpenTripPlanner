@@ -12,6 +12,9 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 /**
  * Information about a configuration parameter.
  *
+ * <p>
+ * TODO DOC - Add Unit tests on this class using the builder
+ *
  * @param name The parameter name in the JSON config file.
  * @param summary Short one sentence description of the parameter used for documentation.
  * @param description Long optional multi-line documentation of a parameter - use markdown.
@@ -24,9 +27,6 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  *                 set.
  * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
  *                  node.
- *
- *
- * TODO DOC - Add Unit tests on this class using the builder
  */
 public record NodeInfo(
   String name,
@@ -62,8 +62,10 @@ public record NodeInfo(
    * the parent. Hence, we need to skip the child when generating documentation. So, this factory
    * method is used to generate a placeholder in these cases.
    * <p>
+   * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
+   * </pre>
    */
   static NodeInfo ofSkipChild(String name) {
     return of()
@@ -81,8 +83,10 @@ public record NodeInfo(
    * the parent. Hence, we need to skip the child when generating documentation. So, this factory
    * method is used to generate a placeholder in these cases.
    * <p>
+   * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
+   * </pre>
    */
   public NodeInfo arraysChild() {
     return of()

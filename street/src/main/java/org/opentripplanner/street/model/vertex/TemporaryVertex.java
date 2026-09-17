@@ -5,7 +5,6 @@ package org.opentripplanner.street.model.vertex;
  * <p>
  * Remember to use the {@link #dispose(Vertex)} to delete the temporary vertex from the main graph
  * after use.
- * </p>
  */
 public interface TemporaryVertex {
   /**
@@ -14,7 +13,6 @@ public interface TemporaryVertex {
    * to the temporary subgraph and it is garbage collected.
    * <p>
    * Note! If the {@code vertex} is NOT a TemporaryVertex the method returns. No action taken.
-   * </p>
    *
    * @param vertex Vertex part of the temporary part of the graph.
    */

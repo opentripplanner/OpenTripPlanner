@@ -43,16 +43,13 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
- * <p>
  * This is the ROOT mapper to map from the Netex domin model into the OTP internal model. This class
  * delegates to type/argegate specific mappers and take the result from each such mapper and add the
  * result to the {@link TransitDataImportBuilder}.
- * </p>
  * <p>
  * The transit builder is updated with the new OTP model entities, holding ALL entities parsed so
  * fare including previous Netex files in the same bundle. This enable the mapping code to make
  * direct references between entities in the OTP domain model.
- * </p>
  */
 public class NetexMapper {
 
@@ -160,15 +157,12 @@ public class NetexMapper {
   }
 
   /**
-   * <p>
    * This method maps the last Netex file imported using the *local* entities in the hierarchical
    * {@link NetexEntityIndexReadOnlyView}.
-   * </p>
    * <p>
    * Note that the order in which the elements are mapped is important. For example, if a file
    * contains Authorities, Line and Notices - they need to be mapped in that order, since Route have
    * a reference on Agency, and Notice may reference on Route.
-   * </p>
    *
    * @param netexIndex The parsed Netex entities to be mapped
    */

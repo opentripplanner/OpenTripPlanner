@@ -6,6 +6,7 @@ import uk.org.siri.siri21.Siri;
 
 /**
  * Interface for a blocking, polling approach to retrieving SIRI realtime timetable updates.
+ * <p>
  * TODO RT_AB: Clearly document whether the methods should return as fast as possible, or if they
  *  should intentionally block and wait for refreshed data, and how this fits into the design.
  */

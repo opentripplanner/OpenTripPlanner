@@ -82,10 +82,12 @@ public class SorlandsbanenNorwayService {
 
   /**
    * Find a coordinate matching the given location, in order:
+   * <pre>
    *  - First return the coordinate of the location if it exists.
    *  - Then loop through the access/egress stops and try to find the
    *    stop or station given by the location id, return the stop/station coordinate.
    *  - Return the stop coordinate of the first access/egress in the list.
+   * </pre>
    */
   @SuppressWarnings("ConstantConditions")
   private static WgsCoordinate findStopCoordinate(

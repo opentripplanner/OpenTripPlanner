@@ -423,8 +423,10 @@ public class TransitRepository implements Serializable {
    * <p>
    * Note: before this method is called an empty {@code transitAlertService} is returned instead.
    * <p>
+   * <pre>
    * TODO: This logic is unfortunate and quite brittle. We would like to improve it in the future.
    *       The UpdateManager should live in a DI context(Dagger), not here.
+   * </pre>
    */
   public void initUpdaterManager(GraphUpdaterManager updaterManager) {
     this.updaterManager = ObjectUtils.requireNotInitialized(

@@ -112,7 +112,7 @@ public interface DataSource {
   /**
    * Return the content as a byte array. The implementation may chose to implement this in a more
    * efficient way - not reading the input stream. Do not change the data returned.
-   * <p/>
+   * <p>
    * Calling this method is the same as reading everything off the {@link #asInputStream()}.
    */
   default byte[] asBytes() {

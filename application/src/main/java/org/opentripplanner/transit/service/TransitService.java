@@ -92,8 +92,11 @@ public interface TransitService {
 
   /**
    * Return all scheduled trip patterns, not including real-time created trip patterns.
+   * <p>
+   * <pre>
    * TODO: verify this is the intended behavior and possibly change the method name to
    *       getAllScheduledTripPatterns
+   * </pre>
    */
   Collection<TripPattern> listTripPatterns();
 

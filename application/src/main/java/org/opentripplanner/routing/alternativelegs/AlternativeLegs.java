@@ -116,6 +116,7 @@ public class AlternativeLegs {
 
   /**
    * This has been copied and slightly modified from StopTimesHelper.
+   * <p>
    * TODO: Adapt after new transit model is in place
    */
   private static Stream<ScheduledTransitLeg> generateLegs(
