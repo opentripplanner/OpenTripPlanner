@@ -41,13 +41,13 @@
 
         <!-- test dependencies -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.truth</groupId>
-            <artifactId>truth</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
