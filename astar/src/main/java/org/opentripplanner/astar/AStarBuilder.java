@@ -46,8 +46,8 @@ public class AStarBuilder<
   }
 
   /**
-   * Set a function that will be called before the search begins. Useful for checking that
-   * a timeout has not been reached before the search begins.
+   * Set a function that will be called before the search begins. Useful for checking that a timeout
+   * has not been reached before the search begins.
    */
   public AStarBuilder<State, Edge, Vertex> withPreStartHook(Runnable hook) {
     this.preStartHook = hook;
@@ -92,7 +92,10 @@ public class AStarBuilder<
     return this;
   }
 
-  /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
+  /**
+   * The function that compares paths converging on the same vertex to decide which ones continue to
+   * be explored.
+   */
   public AStarBuilder<State, Edge, Vertex> withDominanceFunction(
     DominanceFunction<State> dominanceFunction
   ) {

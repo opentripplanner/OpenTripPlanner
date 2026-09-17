@@ -6,12 +6,12 @@ import java.util.Objects;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * This class only checks if a service is inside a period, [start, end] both inclusive. This
- * does not check if a {@code serviceDate} is on a given week day, that is the responsibility
- * of the {@link EmpiricalDelayCalendar}. Together these two classes implement the
- * responsibilities described in the GTFS specification for calendar.txt
+ * This class only checks if a service is inside a period, [start, end] both inclusive. This does
+ * not check if a {@code serviceDate} is on a given week day, that is the responsibility of the
+ * {@link EmpiricalDelayCalendar}. Together these two classes implement the responsibilities
+ * described in the GTFS specification for calendar.txt
  * (https://gtfs.org/documentation/schedule/reference/#calendartxt).
- * <p/>
+ * <p>
  * Note! This implementation does not support the GTFS calendar_dates.txt features (adding
  * exceptions for specific days).
  */

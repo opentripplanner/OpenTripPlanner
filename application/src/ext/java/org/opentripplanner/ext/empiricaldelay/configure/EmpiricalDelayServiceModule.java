@@ -9,8 +9,8 @@ import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayServ
 import org.opentripplanner.framework.application.OTPFeature;
 
 /**
- * The service is used during application serve phase, not loading, so we need to provide
- * a module for the service without the repository, which is injected from the loading phase.
+ * The service is used during application serve phase, not loading, so we need to provide a module
+ * for the service without the repository, which is injected from the loading phase.
  */
 @Module
 public class EmpiricalDelayServiceModule {

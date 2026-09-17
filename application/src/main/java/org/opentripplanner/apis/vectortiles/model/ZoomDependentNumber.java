@@ -23,7 +23,7 @@ public record ZoomDependentNumber(List<ZoomStop> stops) {
   }
 
   /**
-   * @param zoom The zoom level.
+   * @param zoom  The zoom level.
    * @param value What the value should be at the specified zoom.
    */
   public record ZoomStop(int zoom, float value) {

@@ -403,8 +403,8 @@ public class AffectsMapper {
   /**
    * Resolve serviceDate. For legacy reasons this is provided in originAimedDepartureTime - in lack
    * of alternatives. Even though the field's name indicates that the timestamp represents the
-   * departure from the first stop, only the Date-part is actually used, and is defined to
-   * represent the actual serviceDate. The time and zone part is ignored.
+   * departure from the first stop, only the Date-part is actually used, and is defined to represent
+   * the actual serviceDate. The time and zone part is ignored.
    */
   @Nullable
   private static LocalDate resolveServiceDate(@Nullable ZonedDateTime originAimedDepartureTime) {
@@ -474,7 +474,7 @@ public class AffectsMapper {
 
   /**
    * @return True if list have at least one element. {@code false} is returned if the given list is
-   * empty or {@code null}.
+   *         empty or {@code null}.
    */
   private static boolean isNotEmpty(List<?> list) {
     return list != null && !list.isEmpty();

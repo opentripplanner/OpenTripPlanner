@@ -16,9 +16,13 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 /**
- * Test CarPickup: - it may start with (WALK - WALK_TO_PICKUP, CAR - IN_CAR) - it may end with (WALK
- * - WALK_FROM_DROP_OFF, CAR - IN_CAR) - StreetTransitEntityLink require mode changes to WALK -
- * StreetEdges may contain mode changes between CAR / WALK
+ * Test CarPickup:
+ * <pre>
+ * - it may start with (WALK - WALK_TO_PICKUP, CAR - IN_CAR)
+ * - it may end with (WALK - WALK_FROM_DROP_OFF, CAR - IN_CAR)
+ * - StreetTransitEntityLink require mode changes to WALK
+ * - StreetEdges may contain mode changes between CAR / WALK
+ * </pre>
  * <p>
  * arriveBy and departAt paths should be symmetric.
  */

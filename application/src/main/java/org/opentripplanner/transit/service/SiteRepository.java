@@ -68,8 +68,8 @@ public class SiteRepository implements Serializable {
 
   /**
    * Merge child into main. The child model must be created using the {@code main.withContext()}
-   * method, if not this method will fail! If a duplicate key exist, then child value is kept -
-   * this feature is normally not allowed, but not enforced here.
+   * method, if not this method will fail! If a duplicate key exist, then child value is kept - this
+   * feature is normally not allowed, but not enforced here.
    */
   private SiteRepository(SiteRepository main, SiteRepository child) {
     this.stopIndexCounter = assertSameStopIndexCounterIsUsedToCreateBothModels(main, child);
@@ -90,8 +90,8 @@ public class SiteRepository implements Serializable {
   }
 
   /**
-   * Create a new builder based on an empty model. This is useful in unit-tests, but should
-   * NOT be used in the main code. It is not possible to merge the result with another
+   * Create a new builder based on an empty model. This is useful in unit-tests, but should NOT be
+   * used in the main code. It is not possible to merge the result with another
    * {@link SiteRepository}, because they do not share the same context(stopIndexCounter).
    * <p>
    * In the application code the correct way is to retrieve a model instance and then use the
@@ -102,9 +102,9 @@ public class SiteRepository implements Serializable {
   }
 
   /**
-   * Create a new builder attached to the existing model. The entities of the existing model are
-   * NOT copied into the builder, but the builder has access to the model - allowing it to check
-   * for duplicates and injecting information from the model(indexing). The changes in the
+   * Create a new builder attached to the existing model. The entities of the existing model are NOT
+   * copied into the builder, but the builder has access to the model - allowing it to check for
+   * duplicates and injecting information from the model(indexing). The changes in the
    * SiteRepositoryBuilder can then be merged into the original model - this is for now left to the
    * caller.
    * <p>
@@ -261,8 +261,8 @@ public class SiteRepository implements Serializable {
   /**
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
    * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
-   * stops, area stop or stop group, then a list with one item is returned.
-   * An empty list is if nothing is found.
+   * stops, area stop or stop group, then a list with one item is returned. An empty list is if
+   * nothing is found.
    */
   public Collection<StopLocation> findStopOrChildStops(FeedScopedId id) {
     StopLocationsGroup stops = getStopLocationsGroup(id);

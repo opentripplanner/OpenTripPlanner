@@ -15,10 +15,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * A Timetable is a TripTimes (stop-level details like arrival and departure times) for each of the
- * trips on a particular TripPattern.
- * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more than
- * one Timetable when stop time updates are being applied: one for the scheduled stop times, one for
- * each snapshot of updated stop times, another for a working buffer of updated stop times, etc.
+ * trips on a particular TripPattern. Timetables provide most of the TripPattern functionality. Each
+ * TripPattern may possess more than one Timetable when stop time updates are being applied: one for
+ * the scheduled stop times, one for each snapshot of updated stop times, another for a working
+ * buffer of updated stop times, etc.
  */
 public class Timetable implements Serializable {
 
@@ -129,35 +129,35 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Return the direction for all the trips in this timetable.
-   * By construction, all trips in a timetable have the same direction.
+   * Return the direction for all the trips in this timetable. By construction, all trips in a
+   * timetable have the same direction.
    */
   public Direction getDirection() {
     return getDirection(tripTimes, frequencyEntries);
   }
 
   /**
-   * Return an arbitrary TripTimes in this Timetable.
-   * Return a scheduled trip times if it exists, otherwise return a frequency-based trip times.
+   * Return an arbitrary TripTimes in this Timetable. Return a scheduled trip times if it exists,
+   * otherwise return a frequency-based trip times.
    */
   public TripTimes getRepresentativeTripTimes() {
     return getRepresentativeTripTimes(tripTimes, frequencyEntries);
   }
 
   /**
-   * @return true if the timetable was created by a real-time update, false if this
-   * timetable is based on scheduled data.
-   * Only real-time timetables have a service date.
+   * @return true if the timetable was created by a real-time update, false if this timetable is
+   *         based on scheduled data. Only real-time timetables have a service date.
    */
   public boolean isCreatedByRealTimeUpdater() {
     return serviceDate != null;
   }
 
   /**
-   * The direction for the given collections of trip times.
-   * The method assumes that all trip times have the same directions and picks up one arbitrarily.
+   * The direction for the given collections of trip times. The method assumes that all trip times
+   * have the same directions and picks up one arbitrarily.
+   *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies all the frequency-based trip times in a timetable.
+   * @param frequencies        all the frequency-based trip times in a timetable.
    */
   static Direction getDirection(
     Collection<TripTimes> scheduledTripTimes,
@@ -171,8 +171,9 @@ public class Timetable implements Serializable {
 
   /**
    * Return an arbitrary TripTimes.
+   *
    * @param scheduledTripTimes all the scheduled-based trip times in a timetable.
-   * @param frequencies all the frequency-based trip times in a timetable.
+   * @param frequencies        all the frequency-based trip times in a timetable.
    *
    */
   private static TripTimes getRepresentativeTripTimes(
@@ -202,9 +203,8 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Compute the maximum number of whole days a trip schedule lasts. This method
-   * will use the last stop arrival time of the last trip. Return zero if the
-   * arrival time is negative.
+   * Compute the maximum number of whole days a trip schedule lasts. This method will use the last
+   * stop arrival time of the last trip. Return zero if the arrival time is negative.
    */
   private static int computeMaxTripSpanDays(List<TripTimes> tripTimes) {
     if (tripTimes.isEmpty()) {

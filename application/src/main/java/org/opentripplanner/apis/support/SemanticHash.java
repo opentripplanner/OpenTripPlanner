@@ -26,12 +26,12 @@ public class SemanticHash {
    * the same with a high degree of probability. An example application is avoiding double-booking
    * of a particular bus trip for school field trips. Using Murmur hash function. see
    * <a href="http://programmers.stackexchange.com/a/145633">here</a> for comparison.
+   * <p>
+   * TODO deal with frequency-based trips
    *
    * @param trip a trip object within this pattern, or null to hash the pattern itself independent
    *             any specific trip.
    * @return the semantic hash of a Trip in this pattern as a printable String.
-   * <p>
-   * TODO deal with frequency-based trips
    */
   public static String forTripPattern(TripPattern tripPattern, Trip trip) {
     HashFunction murmur = Hashing.murmur3_32();
@@ -79,8 +79,8 @@ public class SemanticHash {
    * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS
    * feed versions. Use hops rather than stops because:
    * <ol>
-   * <li>arrival at stop zero and departure from last stop are irrelevant</li>
-   * <li>this hash function needs to stay stable when users switch from 0.10.x to 1.0</li>
+   *   <li>arrival at stop zero and departure from last stop are irrelevant</li>
+   *   <li>this hash function needs to stay stable when users switch from 0.10.x to 1.0</li>
    * </ol>
    */
   private static HashCode forTripTimes(TripTimes tripTimes, final HashFunction hashFunction) {

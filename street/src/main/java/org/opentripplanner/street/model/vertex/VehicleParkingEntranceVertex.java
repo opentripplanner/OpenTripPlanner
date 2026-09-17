@@ -12,8 +12,8 @@ import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 /**
  * A vertex for a vehicle parking entrance.
  * <p>
- * Connected to streets by {@link StreetVehicleParkingLink}.
- * Transition for parking the bike is handled by {@link VehicleParkingEdge}.
+ * Connected to streets by {@link StreetVehicleParkingLink}. Transition for parking the bike is
+ * handled by {@link VehicleParkingEdge}.
  */
 public class VehicleParkingEntranceVertex extends Vertex {
 

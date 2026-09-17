@@ -18,8 +18,8 @@ import org.junit.jupiter.params.support.ParameterDeclarations;
  * {@link org.opentripplanner.transit.model.TransitTestEnvironment}, and on a control date without
  * one. The test takes the case name and the service date as its parameters.
  * <p>
- * Applying a real-time update should give the same result whether or not the service date contains
- * a daylight-saving transition.
+ * Applying a real-time update should give the same result whether or not the service date
+ * contains a daylight-saving transition.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

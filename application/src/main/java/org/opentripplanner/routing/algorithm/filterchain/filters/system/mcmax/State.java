@@ -8,8 +8,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
 
 /**
- * Keep a list of items, groups and the result in progress. This is just a class for
- * simple bookkeeping for the state of the filter.
+ * Keep a list of items, groups and the result in progress. This is just a class for simple
+ * bookkeeping for the state of the filter.
  */
 class State {
 

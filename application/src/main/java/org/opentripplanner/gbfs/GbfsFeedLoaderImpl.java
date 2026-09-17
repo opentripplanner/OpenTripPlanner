@@ -101,8 +101,8 @@ public abstract class GbfsFeedLoaderImpl<
   protected abstract <T> Class<T> classForName(N name);
 
   /**
-   * Fetches a feed with conditional request support (ETag/If-None-Match).
-   * Returns the response including status code and headers.
+   * Fetches a feed with conditional request support (ETag/If-None-Match). Returns the response
+   * including status code and headers.
    */
   private <T> T fetchFeedWithResponse(
     URI uri,

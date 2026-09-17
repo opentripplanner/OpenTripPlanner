@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implements the default GTFS fare rules as described in http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b
- * as well as Fares V2.
+ * Implements the default GTFS fare rules as described in
+ * http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b as well as Fares V2.
  *
  */
 public class GtfsFareServiceFactory implements FareServiceFactory {

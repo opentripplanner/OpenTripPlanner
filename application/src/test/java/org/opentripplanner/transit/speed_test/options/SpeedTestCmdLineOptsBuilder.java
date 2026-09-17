@@ -39,9 +39,8 @@ public class SpeedTestCmdLineOptsBuilder {
   private final List<String> debugPath = new ArrayList<>();
 
   /**
-   * The result options, kept as a member to avoid passing it to helper methods during
-   * the build. The build method will init this to an empty list, then add the options
-   * before returning it.
+   * The result options, kept as a member to avoid passing it to helper methods during the build.
+   * The build method will init this to an empty list, then add the options before returning it.
    */
   private List<String> opts;
 

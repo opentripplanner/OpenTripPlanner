@@ -9,7 +9,7 @@ public class StopConditionsHelper {
    * conditions. Also returns true, if the EntitySelector or the request don't specify any stop
    * conditions.
    *
-   * @param stopConditions StopConditions set of the EntitySelector
+   * @param stopConditions    StopConditions set of the EntitySelector
    * @param requestConditions StopConditions requested by the client/matching the usage of the stop
    *                          in a leg
    */

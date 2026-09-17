@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class handles reading the CO₂ emissions data from the files in the GTFS package
- * and saving it in a map.
+ * This class handles reading the CO₂ emissions data from the files in the GTFS package and saving
+ * it in a map.
  */
 public class EmissionDataReader {
 

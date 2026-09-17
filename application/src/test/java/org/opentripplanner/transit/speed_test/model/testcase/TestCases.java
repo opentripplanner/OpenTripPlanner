@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Collection of test-cases with a builder that can filter down the number of cases
- * according to the config parameters.
+ * Collection of test-cases with a builder that can filter down the number of cases according to the
+ * config parameters.
  * <p>
- * A {@link TestCase} does only contain ONE result, so a new set of test-cases should
- * be created for every sample run (run each test-case once).
+ * A {@link TestCase} does only contain ONE result, so a new set of test-cases should be created
+ * for every sample run (run each test-case once).
  */
 public class TestCases {
 
@@ -42,8 +42,8 @@ public class TestCases {
    * <p>
    * If there are three or fewer cases, all cases are returned. Otherwise, a small set of cases
    * is selected. When there are multiple mode combinations, the first test-case for each mode
-   * combination is selected first. Additional cases are then sampled from across the list until
-   * at least three cases have been selected.
+   * combination is selected first. Additional cases are then sampled from across the list until at
+   * least three cases have been selected.
    */
   public List<TestCase> getJitWarmUpCases() {
     if (numberOfTestCases() <= 3) {

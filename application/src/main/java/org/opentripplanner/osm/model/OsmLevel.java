@@ -41,9 +41,8 @@ public class OsmLevel implements Comparable<OsmLevel> {
   }
 
   /**
-   * 0-based level that can be negative.
-   * See https://wiki.openstreetmap.org/wiki/Key:level
-   * and https://wiki.openstreetmap.org/wiki/Key:layer.
+   * 0-based level that can be negative. See https://wiki.openstreetmap.org/wiki/Key:level and
+   * https://wiki.openstreetmap.org/wiki/Key:layer.
    */
   public double level() {
     return this.level;

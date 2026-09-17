@@ -53,10 +53,10 @@ import org.slf4j.LoggerFactory;
  * gives the corresponding GTFS stop ID for the stop but the exact tag name is configurable. See
  * <a href="https://wiki.openstreetmap.org/wiki/Key:public_transport">the OSM wiki page</a>.
  * <p>
- * This module will attempt to link all transit stops and platforms to such nodes or way centroids
- * in the OSM data, based on the stop ID or stop code and ref tag. It is run before the main transit
- * stop linker, and if no linkage was created here, the main linker should create one based on
- * distance or other heuristics.
+ * This module will attempt to link all transit stops and platforms to such nodes or way
+ * centroids in the OSM data, based on the stop ID or stop code and ref tag. It is run before the
+ * main transit stop linker, and if no linkage was created here, the main linker should create one
+ * based on distance or other heuristics.
  */
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
@@ -76,8 +76,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final Map<Platform, OsmBoardingLocationVertex> existingBoardingLocationsAtAreas;
 
   /**
-   * @param transitRepository This module requires the timetable repository because at the time
-   *                            of the instantiation the site repository is empty.
+   * @param transitRepository This module requires the timetable repository because at the time of
+   *                          the instantiation the site repository is empty.
    */
   @Inject
   public OsmBoardingLocationsModule(

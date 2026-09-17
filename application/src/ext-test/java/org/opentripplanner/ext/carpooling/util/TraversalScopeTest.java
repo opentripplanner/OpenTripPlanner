@@ -22,9 +22,9 @@ class TraversalScopeTest extends GraphRoutingTest {
 
   /**
    * Every candidate {@code permanentBoundary} offers must be permanent, because
-   * {@code snapToPermanentVertex} accepts one without re-checking permanence — a temporary candidate
-   * would be stored in the carpooling repository and die with the request that produced it. Graph:
-   * {@code A --(100 m, all modes)-- B}, linked ~30 % along so A is the nearer endpoint.
+   * {@code snapToPermanentVertex} accepts one without re-checking permanence — a temporary
+   * candidate would be stored in the carpooling repository and die with the request that produced
+   * it. Graph: {@code A --(100 m, all modes)-- B}, linked ~30 % along so A is the nearer endpoint.
    */
   @Test
   void permanentBoundary_offersOnlyPermanentVertices_nearestFirst() {
@@ -64,8 +64,8 @@ class TraversalScopeTest extends GraphRoutingTest {
 
   /**
    * A scope admits the temporary edges of its own linking — a search starting on a temporary vertex
-   * needs them to reach the permanent graph at all — but not those of a foreign one, whose mode-blind
-   * free edges would let a car cross between networks it cannot drive between.
+   * needs them to reach the permanent graph at all — but not those of a foreign one, whose
+   * mode-blind free edges would let a car cross between networks it cannot drive between.
    * {@link TraversalScope#STATIC_GRAPH} admits neither. Graph:
    * <pre>
    *   A --(100 m, all modes)-- B

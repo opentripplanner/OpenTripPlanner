@@ -26,23 +26,23 @@ import org.slf4j.LoggerFactory;
  * {@link CompositeDataSource} so it works with both local filesystems and cloud storage (e.g. GCP).
  * <p>
  * Each {@link CacheTask} has its own entry named
- * {@code <task>-cache-<serializationVersionId>.obj} inside the composite data source.
- * The per-task version ID is embedded in the entry name so that stale entries from a previous
- * format version are ignored automatically without needing to read their contents.
+ * {@code <task>-cache-<serializationVersionId>.obj} inside the composite data source. The per-task
+ * version ID is embedded in the entry name so that stale entries from a previous format version are
+ * ignored automatically without needing to read their contents.
  * <p>
  * Only the cache for the task currently being executed is held in memory, reducing peak memory
  * usage during large graph builds.
  * <p>
  * Cache writes are performed asynchronously on a dedicated background thread so that the main
- * graph-build thread can continue immediately after a save is requested. Call {@link #close()}
- * at the end of the build to wait for any in-flight write to finish before exiting.
+ * graph-build thread can continue immediately after a save is requested. Call {@link #close()} at
+ * the end of the build to wait for any in-flight write to finish before exiting.
  */
 public class GraphBuildCacheManager implements Closeable {
 
   /**
-   * Maximum time to wait for a background cache write to finish before giving up.
-   * The write should normally complete well within this window; the limit exists purely
-   * as a safety valve so a slow or hung write never stalls the build process indefinitely.
+   * Maximum time to wait for a background cache write to finish before giving up. The write should
+   * normally complete well within this window; the limit exists purely as a safety valve so a slow
+   * or hung write never stalls the build process indefinitely.
    */
   static final Duration WRITE_TIMEOUT = Duration.ofMinutes(30);
 
@@ -57,7 +57,9 @@ public class GraphBuildCacheManager implements Closeable {
   private final GraphBuildCacheParameters parameters;
   private final Map<CacheTask, DataSource> cacheFiles;
 
-  /** Used for load operations only (main thread). Save operations create their own Kryo instance. */
+  /**
+   * Used for load operations only (main thread). Save operations create their own Kryo instance.
+   */
   private final Kryo kryo;
 
   private final ExecutorService writeExecutor;
@@ -81,8 +83,8 @@ public class GraphBuildCacheManager implements Closeable {
   }
 
   /**
-   * Load the cache for the given task. Returns {@code null} on a miss (entry absent, unreadable,
-   * or version mismatch).
+   * Load the cache for the given task. Returns {@code null} on a miss (entry absent, unreadable, or
+   * version mismatch).
    * <p>
    * Return {@code null} if the cache is disabled by configuration.
    */
@@ -169,9 +171,9 @@ public class GraphBuildCacheManager implements Closeable {
   }
 
   /**
-   * Signals that no more saves will be submitted, then waits up to {@link #WRITE_TIMEOUT} for
-   * any in-flight write to finish. Should be called once at the end of the graph build, before
-   * closing the underlying data sources.
+   * Signals that no more saves will be submitted, then waits up to {@link #WRITE_TIMEOUT} for any
+   * in-flight write to finish. Should be called once at the end of the graph build, before closing
+   * the underlying data sources.
    */
   @Override
   public void close() {

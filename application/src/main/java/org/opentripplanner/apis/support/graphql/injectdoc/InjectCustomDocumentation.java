@@ -142,8 +142,8 @@ public class InjectCustomDocumentation
   }
 
   /**
-   * Set or append description and deprecated reason on a field [Object, InputType, Interface,
-   * Union or Enum].
+   * Set or append description and deprecated reason on a field [Object, InputType, Interface, Union
+   * or Enum].
    */
   private <T extends GraphQLNamedSchemaElement> TraversalControl fieldDoc(
     TraverserContext<GraphQLSchemaElement> context,

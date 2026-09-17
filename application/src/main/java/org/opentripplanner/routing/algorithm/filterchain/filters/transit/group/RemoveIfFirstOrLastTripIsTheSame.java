@@ -7,9 +7,9 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.Grou
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
- * This filter ensures that no more than one itinerary begins or ends with the same trip.
- * It loops through itineraries from top to bottom. If an itinerary matches another itinerary, then
- * it is removed from the list. Uses {@link GroupBySameFirstOrLastTrip}.
+ * This filter ensures that no more than one itinerary begins or ends with the same trip. It loops
+ * through itineraries from top to bottom. If an itinerary matches another itinerary, then it is
+ * removed from the list. Uses {@link GroupBySameFirstOrLastTrip}.
  */
 public class RemoveIfFirstOrLastTripIsTheSame implements RemoveItineraryFlagger {
 

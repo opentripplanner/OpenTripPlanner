@@ -11,8 +11,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 /**
  * A factory for creating matchers for RegularStops.
  * <p>
- * This factory is used to create matchers for {@link RegularStop} objects based on a request. The
- * resulting matcher can be used to filter a list of RegularStop objects.
+ * This factory is used to create matchers for {@link RegularStop} objects based on a request.
+ * The resulting matcher can be used to filter a list of RegularStop objects.
  */
 public class RegularStopMatcherFactory {
 
@@ -23,7 +23,7 @@ public class RegularStopMatcherFactory {
    * inUseProvider} is an injected function, because the check is done by the transit service which
    * has access to all stops and routes. A stop is used if it has routes visiting the stop.
    *
-   * @param request the criteria for filtering RegularStops.
+   * @param request       the criteria for filtering RegularStops.
    * @param inUseProvider a function that determines if a RegularStop is in use.
    * @return a matcher for filtering RegularStops.
    */

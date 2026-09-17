@@ -44,7 +44,8 @@ public class CarpoolStreetRouter implements CarpoolRouter {
   /**
    * Creates a new carpool street router.
    *
-   * @param streetLimitationParametersService provides street routing parameters (speed limits, etc.)
+   * @param streetLimitationParametersService provides street routing parameters (speed limits,
+   *                                          etc.)
    */
   public CarpoolStreetRouter(StreetLimitationParametersService streetLimitationParametersService) {
     this.streetLimitationParametersService = streetLimitationParametersService;
@@ -74,7 +75,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * </ul>
    *
    * @param fromVertex the origin vertex
-   * @param toVertex the destination vertex
+   * @param toVertex   the destination vertex
    * @return the first (best) path found, or null if no path reaches the destination within
    *         {@link CarpoolTrip#MAX_TRIP_DURATION}
    */

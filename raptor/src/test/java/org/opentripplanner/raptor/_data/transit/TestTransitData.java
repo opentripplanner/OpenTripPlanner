@@ -238,7 +238,7 @@ public class TestTransitData
   }
 
   /// Build a test data with multiple routes. The route name is generated(R1, R2 ...) if not
-  /// provided. See  {@link TestRoute#withTimetable(String)} for timetable format.
+  /// provided. See {@link TestRoute#withTimetable(String)} for timetable format.
   ///
   /// For exampe, creating R1 and Route-55:
   /// ```
@@ -249,7 +249,8 @@ public class TestTransitData
   /// B     C
   /// 10:05 11:05
   /// 11:05 12:05
-  ///```
+  /// ```
+  ///
   public TestTransitData withTimetables(String routeTimetables) {
     int routeIndex = 0;
     for (String timetable : routeTimetables.split("\s*--.*\n")) {

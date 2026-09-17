@@ -84,8 +84,8 @@ public class CarpoolStopBuilder extends AbstractEntityBuilder<CarpoolStop, Carpo
    * semantics of the value.
    *
    * @param deviationBudget remaining slack at this stop; must be non-null. Use
-   *                        {@link Duration#ZERO} for stops where no further deviation is
-   *                        acceptable (always for the trip origin).
+   *                        {@link Duration#ZERO} for stops where no further deviation is acceptable
+   *                        (always for the trip origin).
    * @throws NullPointerException if {@code deviationBudget} is null
    */
   public CarpoolStopBuilder withDeviationBudget(Duration deviationBudget) {

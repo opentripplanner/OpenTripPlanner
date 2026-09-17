@@ -12,9 +12,9 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public interface RealtimeVehicleService {
   /**
-   * Get the realtime vehicles for a certain trip pattern, either a scheduled pattern or a
-   * pattern created by a real-time update. Service contains all the vehicles that exist in
-   * input feeds but doesn't store any historical data.
+   * Get the realtime vehicles for a certain trip pattern, either a scheduled pattern or a pattern
+   * created by a real-time update. Service contains all the vehicles that exist in input feeds but
+   * doesn't store any historical data.
    */
   List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern);
 

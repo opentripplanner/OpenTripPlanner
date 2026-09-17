@@ -14,9 +14,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * A geofencing zone describing restrictions for traversing with a rental vehicle or dropping it off
  * inside the zone.
  * <p>
- * Restriction fields ({@code dropOffBanned}, {@code traversalBanned}, {@code rideStartBanned}) are
- * nullable: {@code null} means the zone does not specify that field, allowing lower-priority zones
- * to contribute a value via per-field precedence resolution. {@code true} means banned,
+ * Restriction fields ({@code dropOffBanned}, {@code traversalBanned}, {@code rideStartBanned})
+ * are nullable: {@code null} means the zone does not specify that field, allowing lower-priority
+ * zones to contribute a value via per-field precedence resolution. {@code true} means banned,
  * {@code false} means explicitly allowed.
  * <p>
  * The {@code businessArea} flag is set at construction time. A zone is a business area when all
@@ -24,8 +24,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * {@code vehicleTypeIds} are orthogonal to business area classification.
  * <p>
  * Equality uses {@code id} + {@code priority} only. The geometry and restriction fields are
- * excluded because JTS Geometry equality iterates all coordinates (expensive in hot paths like
- * set lookups during A* traversal), and id+priority uniquely identifies a zone within a feed.
+ * excluded because JTS Geometry equality iterates all coordinates (expensive in hot paths like set
+ * lookups during A* traversal), and id+priority uniquely identifies a zone within a feed.
  */
 public final class GeofencingZone implements Serializable {
 
@@ -146,8 +146,8 @@ public final class GeofencingZone implements Serializable {
 
   /**
    * Deep equality check comparing all fields including geometry and restriction values. Use this
-   * when you need to detect any change to a zone (e.g., to decide whether to re-apply zones after
-   * a GBFS update). This is expensive due to JTS Geometry comparison and should not be used on hot
+   * when you need to detect any change to a zone (e.g., to decide whether to re-apply zones after a
+   * GBFS update). This is expensive due to JTS Geometry comparison and should not be used on hot
    * paths — use {@link #equals(Object)} (id+priority only) for set lookups during routing.
    */
   public boolean isEquivalentTo(GeofencingZone other) {
@@ -197,11 +197,11 @@ public final class GeofencingZone implements Serializable {
    * network, using per-field precedence. For each field independently, the highest-priority zone
    * (lowest priority value) that specifies (non-null) the field wins.
    *
-   * @param zones the set of zones currently containing the state
-   * @param network the committed rental network (null returns false)
+   * @param zones         the set of zones currently containing the state
+   * @param network       the committed rental network (null returns false)
    * @param fieldAccessor accessor for the field to resolve
    * @return true if the resolved value is TRUE, false if no zone specifies the field or if the
-   *     resolved value is FALSE
+   *         resolved value is FALSE
    */
   public static boolean resolveField(
     Set<GeofencingZone> zones,

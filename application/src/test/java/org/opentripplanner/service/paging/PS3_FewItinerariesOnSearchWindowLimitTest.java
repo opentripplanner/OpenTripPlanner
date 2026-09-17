@@ -24,14 +24,14 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 /**
  * This test focus on testing the paging with few itineraries. There should be no page-cuts. The
- * test focus on paging back and forth, matching itineraries with departure time at
- * the exact same time as the search-window earliest-departure-time.
+ * test focus on paging back and forth, matching itineraries with departure time at the exact same
+ * time as the search-window earliest-departure-time.
  * <p>
  * Note! We are not doing the actual search, just emulating the search using the
  * {@link TestDriver} mock.
  * <p>
- * All components required to test paging is used including the {@link PagingService} and the
- * 3 filters:
+ * All components required to test paging is used including the {@link PagingService} and the 3
+ * filters:
  * <ol>
  *   <li>PagingFilter</li>
  *   <li>OutsideSearchWindowFilter</li>
@@ -44,7 +44,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
 
   private static final Duration SEARCH_WINDOW = Duration.ofHours(6);
   private static final int SEARCH_WINDOW_SEC = (int) SEARCH_WINDOW.toSeconds();
-  /** We are avoiding the pageCut in this test - hence setting the value high > 2*/
+  /** We are avoiding the pageCut in this test - hence setting the value high > 2 */
   private static final int NUM_OF_ITINERARIES = 10;
   private static final String LATEST_ARRIVAL_TIME_TEXT = "12:00+1d";
   private static final int LATEST_ARRIVAL_TIME = TimeUtils.time(LATEST_ARRIVAL_TIME_TEXT);
@@ -53,8 +53,8 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   public static final String EMPTY = "";
 
   /**
-   * This matches strings like N5h1m and P1h. It is used to add a time shift value
-   * to the test cases that differs from the search window.
+   * This matches strings like N5h1m and P1h. It is used to add a time shift value to the test cases
+   * that differs from the search window.
    */
   private static final Pattern PAGING_SEQUENCE_TIME_SHIFT_PATTERN = Pattern.compile("^(N|P)(.+)$");
 

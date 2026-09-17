@@ -56,7 +56,9 @@ import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropaga
 import org.opentripplanner.updater.trip.gtfs.interpolation.ForwardsDelayPropagationType;
 import org.opentripplanner.utils.lang.RunnableUtils;
 
-/** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
+/**
+ * Common base class for many test classes which need to load a GTFS feed in preparation for tests.
+ */
 public abstract class GtfsTest {
 
   protected static final String FEED_ID = "FEED";

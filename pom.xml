@@ -121,7 +121,8 @@
                 </plugin>
                 <plugin>
                     <!--
-                      Spotless runs Prettier (with the prettier-java plugin) to format the code.
+                      Spotless runs the Eclipse JDT formatter (Javadoc only) and Prettier (with the
+                      prettier-java plugin) to format the code.
                       Note! Spotless requires node/npm to be available on the PATH.
 
                       The Prettier options are configured inline below. Spotless resolves the
@@ -157,6 +158,87 @@
                             <removeUnusedImports>
                                 <engine>cleanthat-javaparser-unnecessaryimport</engine>
                             </removeUnusedImports>
+                            <!--
+                              Prettier does not format the content of Javadoc comments, it only
+                              re-indents them. The Eclipse JDT formatter is therefore run first,
+                              configured to format Javadoc comments only (see
+                              eclipse-formatter.properties). Prettier runs afterwards and restores
+                              the canonical code style, keeping the formatted Javadoc.
+                            -->
+                            <eclipse>
+                                <file>${maven.multiModuleProjectDirectory}/eclipse-formatter.properties</file>
+                            </eclipse>
+                            <!--
+                              The Eclipse formatter re-flows a paragraph as one unit, which moves
+                              an opening <p>/<pre> onto the neighbouring text line, a closing
+                              </ul>/</ol> onto the last list item, and text up onto a closing
+                              </pre>, </ul> or </ol> line. OTP keeps these tags on separate lines,
+                              so the four rules below move them back. They only match inside
+                              comments ('*' as the first character on the line).
+                            -->
+                            <replaceRegex>
+                                <name>Javadoc: &lt;p&gt; on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)([ \t]+)&lt;p&gt;(\S)</searchRegex>
+                                <replacement>$1$2&lt;p&gt;
+$1$2$3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: &lt;pre&gt; on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)( .*\S) &lt;pre&gt;$</searchRegex>
+                                <replacement>$1$2
+$1 &lt;pre&gt;</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: text after a closing block tag on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)([ \t]+&lt;/(?:pre|ul|ol)&gt;) (\S)</searchRegex>
+                                <replacement>$1$2
+$1 $3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: closing list tag on its own line</name>
+                                <searchRegex>(?m)^([ \t]*\*)([ \t]+.*[^ \t])[ \t]?(&lt;/(?:ul|ol)&gt;)$</searchRegex>
+                                <replacement>$1$2
+$1 $3</replacement>
+                            </replaceRegex>
+                            <!--
+                              The Eclipse formatter puts all list content in the same column as the
+                              surrounding text. These two rules indent the content of a &lt;ul&gt;/&lt;ol&gt;
+                              block by two spaces per nesting level (the second rule handles lists
+                              nested inside a list that the first rule has already indented). The
+                              match starts at the end of the opening tag line and then chains from
+                              line to line (\G) until the closing tag is reached.
+                            -->
+                            <replaceRegex>
+                                <name>Javadoc: indent list content (level 1)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]&lt;(?:ul|ol)&gt;)|\G)\R([ \t]*\*)[ \t](?!&lt;/(?:ul|ol)&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2   $3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: indent list content (level 2)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]{3}&lt;(?:ul|ol)&gt;)|\G)\R([ \t]*\*)[ \t]{3}(?!&lt;/(?:ul|ol)&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2     $3</replacement>
+                            </replaceRegex>
+                            <!--
+                              Wrapped list items continue in the same column as the <li> tag, which
+                              makes it hard to see where an item ends. These two rules indent the
+                              continuation lines of an item by four more spaces, so that they line
+                              up with the item text. The chain starts at a <li> line (indented by
+                              the rules above) and stops at the next tag line.
+                            -->
+                            <replaceRegex>
+                                <name>Javadoc: indent wrapped list items (level 1)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]{3}&lt;li&gt;.*)|\G)\R([ \t]*\*)[ \t]{3}(?!&lt;/|&lt;li&gt;|&lt;ul&gt;|&lt;ol&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2       $3</replacement>
+                            </replaceRegex>
+                            <replaceRegex>
+                                <name>Javadoc: indent wrapped list items (level 2)</name>
+                                <searchRegex>(?m)(?:(^[ \t]*\*[ \t]{5}&lt;li&gt;.*)|\G)\R([ \t]*\*)[ \t]{5}(?!&lt;/|&lt;li&gt;|&lt;ul&gt;|&lt;ol&gt;)(\S.*)$</searchRegex>
+                                <replacement>$1
+$2         $3</replacement>
+                            </replaceRegex>
                             <prettier>
                                 <devDependencies>
                                     <prettier>${prettier.version}</prettier>

@@ -66,17 +66,18 @@ public interface GroupId<T extends GroupId<T>> {
    * III : Origin ~ Bus B 25 km ~ Bus A 75 km ~ Destination
    *  IV : Origin ~ Bus A 75 km ~ Bus D 25 km ~ Destination
    * </pre>
-   * Concatenating the trip-ids(A,B,C,D) ordered by distance gives us the following group-ids:
+   * Concatenating the trip-ids(A,B,C,D) ordered by distance gives us the following
+   * group-ids:
    * <pre>
    *   I : "A"
    *  II : "A"    // B account for less than 20% of the distance
    * III : "AB"   // A (75%) is longer; hence comes first and than B (25%) > 80%
    *  IV : "AD"   // A is longer, then D
    * </pre>
-   * So all of these trips have the same main part "A" and we want to group them together. We do so
-   * by comparing the keys, if one is a prefix of another then they belong to the same group. But
-   * what about III and IV? By them self they are not the same group, but if we use the groupId for
-   * A or B ad a key to the group, both fall into the same group. So, to be deterministic we use
+   * So all of these trips have the same main part "A" and we want to group them together. We
+   * do so by comparing the keys, if one is a prefix of another then they belong to the same group.
+   * But what about III and IV? By them self they are not the same group, but if we use the groupId
+   * for A or B ad a key to the group, both fall into the same group. So, to be deterministic we use
    * this {@code merge(..)} method to return the group-id that is the most general one - the id able
    * to represent the biggest set of trips.
    */

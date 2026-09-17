@@ -302,8 +302,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   /**
-   * The leg geometry is built lazily by concatenating the trip pattern's hop geometries between
-   * the board and alight stops. It is not cached: each call recomputes it.
+   * The leg geometry is built lazily by concatenating the trip pattern's hop geometries between the
+   * board and alight stops. It is not cached: each call recomputes it.
    */
   @Override
   public LineString legGeometry() {
@@ -384,9 +384,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   /**
-   * Construct a leg reference from this leg.
-   * If the trip is based on a TripOnServiceDate, the leg reference will contain the
-   * TripOnServiceDate id instead of the Trip id.
+   * Construct a leg reference from this leg. If the trip is based on a TripOnServiceDate, the leg
+   * reference will contain the TripOnServiceDate id instead of the Trip id.
    */
   @Override
   public LegReference legReference() {
@@ -428,8 +427,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   /**
    * Should be used for debug logging only
    * <p>
-   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid
-   * spamming logs. Explicit access should be used if needed.
+   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid spamming logs.
+   * Explicit access should be used if needed.
    */
   @Override
   public String toString() {
