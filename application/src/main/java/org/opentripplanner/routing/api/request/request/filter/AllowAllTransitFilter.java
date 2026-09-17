@@ -23,7 +23,7 @@ public class AllowAllTransitFilter implements Serializable, TransitFilter {
   }
 
   @Override
-  public boolean matchTripTimes(TripTimes trip) {
+  public boolean matchTripTimes(TripTimes<?> trip) {
     return true;
   }
 

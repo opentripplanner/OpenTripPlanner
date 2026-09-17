@@ -362,7 +362,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
     TripPattern pattern = realTimeTripUpdate.pattern();
     LocalDate serviceDate = realTimeTripUpdate.serviceDate();
-    TripTimes updatedTripTimes = realTimeTripUpdate.updatedTripTimes();
+    var updatedTripTimes = realTimeTripUpdate.updatedTripTimes();
 
     Timetable tt = resolve(pattern, serviceDate);
     TimetableBuilder ttb = tt.copyOf().withServiceDate(serviceDate);
@@ -522,10 +522,10 @@ public class DefaultTimetableRepository implements TimetableRepository {
       // under that now-obsolete realtime-added pattern.
       SortedSet<Timetable> sortedTimetables = this.timetables.get(pattern.getId());
       if (sortedTimetables != null) {
-        TripTimes tripTimesToRemove = null;
+        TripTimes<?> tripTimesToRemove = null;
         for (Timetable timetable : sortedTimetables) {
           if (timetable.isValidFor(serviceDate)) {
-            final TripTimes tripTimes = timetable.getTripTimes(tripId);
+            final var tripTimes = timetable.getTripTimes(tripId);
             if (tripTimes == null) {
               LOG.debug("No triptimes to remove for trip {}", tripId);
             } else if (tripTimesToRemove != null) {
@@ -796,7 +796,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     }
   }
 
-  private TripOnServiceDate mapToTripOnServiceDate(TripTimes tripTimes, Timetable timetable) {
+  private TripOnServiceDate mapToTripOnServiceDate(TripTimes<?> tripTimes, Timetable timetable) {
     return TripOnServiceDate.of(tripTimes.getTrip().getId())
       .withServiceDate(timetable.getServiceDate())
       .withTrip(tripTimes.getTrip())
@@ -808,7 +808,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    *
    * @param filter used to filter {@link TripTimes}.
    */
-  private List<TripOnServiceDate> findTripsOnServiceDates(Predicate<TripTimes> filter) {
+  private List<TripOnServiceDate> findTripsOnServiceDates(Predicate<TripTimes<?>> filter) {
     return timetables
       .values()
       .stream()
