@@ -7,11 +7,11 @@ single writer thread applies changes and periodically (or atomically) publishes 
 subsequent readers to see. No locking is required on the read path.
 
 The model is a generalization of the timetable-snapshot concurrency approach described in
-[`updater/package.md`](../../../../../../../../../../application/src/main/java/org/opentripplanner/updater/package.md#realtime-concurrency). That document is still the
-best source for the full rationale (why copy-on-write, why a single writer thread, why multiple
-coexisting snapshots) — read it first if the "why" here feels thin. This package extracts the same
-mechanism so any repository, not just the timetable, can use it without re-implementing the
-snapshot/copy-on-write bookkeeping by hand.
+[`updater/package.md`](../../../../../../../../../../application/src/main/java/org/opentripplanner/updater/package.md#realtime-concurrency).
+That document is still the best source for the full rationale (why copy-on-write, why a single
+writer thread, why multiple coexisting snapshots) — read it first if the "why" here feels thin. This
+package extracts the same mechanism so any repository, not just the timetable, can use it without
+re-implementing the snapshot/copy-on-write bookkeeping by hand.
 
 ## Core Concepts
 
