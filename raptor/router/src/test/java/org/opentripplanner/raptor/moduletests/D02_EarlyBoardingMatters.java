@@ -34,8 +34,11 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 ///                R7              R5         R3
 /// ```
 /// **Origin:** Stop A
+///
 /// **Destination:** Stop F
+///
 /// **Routes:**
+/// ```
 ///    - R1 : E - F - G - H - I - J
 ///    - R2 : A - I
 ///    - R3 : A - B
@@ -44,6 +47,7 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 ///    - R6 : C - G
 ///    - R7 : C - D
 ///    - R8 : D - E
+/// ```
 ///
 /// **Only path to destination:** A ~ R3 ~ B ~ R5 ~ C ~ R7 ~ D ~ R8 ~ E ~ R1 ~ F
 public class D02_EarlyBoardingMatters implements RaptorTestConstants {

@@ -248,8 +248,10 @@ public sealed interface Condition {
 
   /**
    * Selects a tag where one of the following conditions is true:
+   * <pre>
    *  - one of a set of given values matches
    *  - the tag is absent
+   * </pre>
    */
   record OneOfOrAbsent(String key, String... values) implements Condition {
     /* A use case for this is to detect the absence of a sidewalk, cycle lane or verge*/

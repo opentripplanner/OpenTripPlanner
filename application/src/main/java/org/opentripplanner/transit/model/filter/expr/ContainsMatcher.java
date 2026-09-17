@@ -5,10 +5,10 @@ import java.util.function.Function;
 /**
  * A matcher that applies a provided matcher to an iterable of child entities returned from the main
  * entity that this matcher is for.
- * <p/>
+ * <p>
  * If any of the iterable entities match the valueMatcher, then the match method returns true. In
  * this way it is similar to an OR.
- * <p/>
+ * <p>
  * @param <S> The main entity type this matcher is applied to.
  * @param <T> The type of the child entities, for which there is a mapping from S to T.
  */

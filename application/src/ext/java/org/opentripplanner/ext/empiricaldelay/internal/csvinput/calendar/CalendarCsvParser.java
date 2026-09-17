@@ -15,10 +15,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
  * MONDAY   ,1,0,0,0,0,0,0,2025-01-01, 2030-12-31
  * TUESDAY  ,0,1,0,0,0,0,0,2025-01-01, 2030-12-31
  * WEDNESDAY,0,0,1,0,0,0,0,2025-01-01, 2030-12-31
- * THURDAY  ,0,0,0,1,0,0,0,2025-01-01, 2030-12-31
+ * THURSDAY ,0,0,0,1,0,0,0,2025-01-01, 2030-12-31
  * FRIDAY   ,0,0,0,0,1,0,0,2025-01-01, 2030-12-31
  * SATURDAY ,0,0,0,0,0,1,0,2025-01-01, 2030-12-31
  * SUNDAY   ,0,0,0,0,0,0,1,2025-01-01, 2030-12-31
+ * </pre>
  */
 public class CalendarCsvParser extends AbstractCsvParser<CalendarRow> {
 

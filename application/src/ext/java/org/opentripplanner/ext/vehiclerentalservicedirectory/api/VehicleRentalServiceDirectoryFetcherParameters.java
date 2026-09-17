@@ -35,8 +35,10 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
    * URL or file path to the GBFS v3 manifest.json
    * <p>
    * This is required. Can be either:
+   * <pre>
    * - A remote URL (http/https)
    * - A local file path (file://)
+   * </pre>
    */
   public URI getUrl() {
     return url;

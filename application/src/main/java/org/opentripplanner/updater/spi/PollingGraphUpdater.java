@@ -105,8 +105,11 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
    * Allow clients to wait for all realtime data to be loaded before submitting any travel plan
    * requests. This does not block use of the OTP server. The client must voluntarily hit an
    * endpoint and wait for readiness.
+   * <p>
+   * <pre>
    * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
    *           and not bring the router online until they have finished.
+   * </pre>
    */
   @Override
   public boolean isPrimed() {

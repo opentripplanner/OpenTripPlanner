@@ -163,11 +163,13 @@ public class ListUtils {
   /**
    * Takes a list of at least 2 items and partitions them into "splits".
    * For example, [A,B,C,D] becomes
+   * <pre>
    *   [
    *     [A,[B,C,D]],
    *     [B,[C,D],
    *     [C,[D]]
    *   ]
+   * </pre>
    */
   public static <T> List<Split<T>> partitionIntoSplits(List<T> input) {
     requireAtLeastNElements(input, 2);

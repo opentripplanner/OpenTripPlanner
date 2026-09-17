@@ -23,6 +23,7 @@ class WorldEnvelopeTest {
 
   /**
    * To make sure we cover all cases we add a case for each combination of:
+   * <pre>
    *  - latitude
    *    - south hemisphere
    *    - north hemisphere
@@ -32,6 +33,7 @@ class WorldEnvelopeTest {
    *    - west side of 0º
    *    - both sides of 0º
    *    - both sides of 180º
+   * </pre>
    * Skip cases for North- and South-pole - not relevant - obscure cases)
    */
   static List<Arguments> testCases() {

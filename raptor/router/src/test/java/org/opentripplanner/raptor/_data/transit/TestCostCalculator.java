@@ -7,7 +7,7 @@ import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 
 /**
  * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
- * <p/>
+ * <p>
  * This class is immutable and thread safe.
  */
 public final class TestCostCalculator implements RaptorCostCalculator<TestTripSchedule> {

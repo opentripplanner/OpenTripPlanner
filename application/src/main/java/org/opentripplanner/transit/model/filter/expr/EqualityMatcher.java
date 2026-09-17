@@ -4,9 +4,9 @@ import java.util.function.Function;
 
 /**
  * A matcher that checks if a value is equal to another value derived from the matched entities.
- * <p/>
+ * <p>
  * The derived entity value is provided by a function that takes the entity being matched as an argument.
- * <p/>
+ * <p>
  * @param <T> The type of the entity being matched.
  * @param <V> The type of the value that the matcher will test equality for.
  */

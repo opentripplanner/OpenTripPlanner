@@ -128,6 +128,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * This index includes only modified trip patterns for existing trips.
    * It does not include trip patterns for new trips created by real-time updates (extra journeys).
    * .
+   * <p>
    * TODO RT_AB: clarify if this is an index or the original source of truth.
    */
   private final Map<TripIdAndServiceDate, TripPattern> realTimeNewTripPatternsForModifiedTrips;
@@ -138,6 +139,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * to be readily found and included in API responses containing stop times at a specific stop.
    * This is a SetMultimap, so that each pattern is only retained once per stop even if it's added
    * more than once.
+   * <p>
    * TODO RT_AB: More general handling of all realtime indexes outside primary data structures.
    */
   private final SetMultimap<StopLocation, TripPattern> patternsForStop;

@@ -5,7 +5,7 @@ import java.util.function.Function;
 /**
  * A matcher that validates that a value is not null before applying another matcher. A useful case
  * is when you want to check that a String field is not null before applying a {@link CaseInsensitiveStringPrefixMatcher}.
- * <p/>
+ * <p>
  * @param <T> The type of the entity being matched.
  * @param <V> The type of the value that the matcher will test for not null.
  */

@@ -208,12 +208,14 @@ public interface Leg {
 
   /**
    * The date and time this leg begins. The time is normalized(rounded to closest second).
+   * <p>
    * TODO Does the start-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime startTime();
 
   /**
    * The date and time this leg ends. The time is normalized(rounded to closest second).
+   * <p>
    * TODO Does the end-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime endTime();

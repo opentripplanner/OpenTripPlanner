@@ -60,7 +60,7 @@ import org.rutebanken.netex.model.TariffZone_VersionStructure;
  * <p>
  * The hierarchy implementation is delegated to the {@link org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap}
  * and the {@link HierarchicalElement} classes.
- * <p/>
+ * <p>
  * The mapping code should not insert entities, so an instance of this class implements the {@link
  * NetexEntityIndexReadOnlyView} which is passed to the mapping code for translation into OTP domain
  * model objects.
@@ -217,7 +217,7 @@ public class NetexEntityIndex {
        * {@code groupOfLineOrNetworkId} is a GroupOfLine ID, we lookup the GroupOfLine, and then
        * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we
        * can lookup the Network directly.
-       * <p/>
+       * <p>
        * If no Network is found {@code null} is returned.
        */
       @Override

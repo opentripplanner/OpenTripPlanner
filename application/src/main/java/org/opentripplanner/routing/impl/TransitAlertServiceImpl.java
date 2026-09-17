@@ -21,6 +21,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
  * of TransitAlerts and indexes them for fast lookup by which transit entity is affected.
  * The only other implementation exists just to combine several instances of this primary
  * implementation into one.
+ * <p>
  * TODO RT_AB: investigate why each updater has its own service instead of taking turns
  *   sequentially writing to a single service. Original design was for all data and indexes to be
  *   associated with the Graph or transit model (i.e. the object graph of instances of the transit

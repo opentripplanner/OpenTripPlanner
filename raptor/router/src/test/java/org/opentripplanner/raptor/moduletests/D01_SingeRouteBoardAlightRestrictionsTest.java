@@ -33,19 +33,23 @@ public class D01_SingeRouteBoardAlightRestrictionsTest implements RaptorTestCons
    * Stops: 0..3
    *
    * Route restrictions at stop (B:Board, A:Alight, W:Wheelchair):
+   * <pre>
    *   Stop:  B   C   D
    *     R1:  BW  BA  AW
-   *
+   * </pre>
    * Schedule:
+   * <pre>
    *   Stop:     B      C      D
    *     R1:   00:01  00:03  00:05
-   *
+   * </pre>
    * Access (toStop & duration):
+   * <pre>
    *   1  30s
-   *
+   * </pre>
    * Egress (fromStop & duration):
+   * <pre>
    *   3  20s
-   *
+   * </pre>
    */
   @BeforeEach
   void setup() {

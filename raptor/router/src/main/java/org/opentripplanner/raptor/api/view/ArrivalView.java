@@ -17,17 +17,17 @@ import org.opentripplanner.utils.time.TimeUtils;
  * different implementations. The view hide the internal Raptor specific models, like the standard
  * and multi-criteria implementation. The internal models can be optimized for speed and/or memory
  * consumption, while the view provide one interface for mapping back to the users domain.
- * <p/>
+ * <p>
  * The view is used by the debugging functionality and mapping to raptor paths (Raptor API).
- * <p/>
+ * <p>
  * The view objects are only created to construct paths to be returned as part of debugging. This is
  * done for just a fraction of all stop arrivals, so there is no need to optimize performance nor
  * memory consumption fo view objects, but the view is designed with the Flyweight design pattern in
  * mind.
- * <p/>
+ * <p>
  * NB! The scope of a view is only guaranteed to be valid for the duration of the method call - e.g.
  * debug callback.
- * <p/>
+ * <p>
  * There is different kind of arrivals:
  * <ul>
  *     <li>Access - The first stop arrival, arriving after the access path.</li>

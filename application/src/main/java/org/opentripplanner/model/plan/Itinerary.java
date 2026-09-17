@@ -516,6 +516,7 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * The maximum slope for any part of the itinerary.
+   * <p>
    * TODO Document unit
    */
   public Double maxSlope() {

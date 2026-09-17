@@ -88,7 +88,7 @@ public class DebugEvent<E> {
   /**
    * The element was dominated by the this element. This may or may not affect the final result
    * depending on the round/iteration the original element was accepted.
-   * <p/>
+   * <p>
    * The rejectedDroppedByElement is optional. It can be {@code null}.
    */
   public E rejectedDroppedByElement() {
@@ -98,7 +98,7 @@ public class DebugEvent<E> {
   /**
    * An element might get rejected or dropped as part of an optimization. The reason should explain
    * why an element is rejected.
-   * <p/>
+   * <p>
    * The reason is optional, especially if the {@link #rejectedDroppedByElement} is specified.
    *
    * @return If no reason exist an empty string is returned.

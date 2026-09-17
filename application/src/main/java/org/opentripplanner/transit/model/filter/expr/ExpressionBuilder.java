@@ -7,7 +7,7 @@ import org.opentripplanner.transit.api.model.FilterValues;
 
 /**
  * A builder for creating complex matchers composed of other matchers.
- * <p/>
+ * <p>
  * This builder contains convenience methods for creating complex matchers from simpler ones. The
  * resulting matcher "ands" together all the matchers it has built up. This supports the common
  * pattern of narrowing results with multiple filters.

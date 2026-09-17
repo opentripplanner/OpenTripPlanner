@@ -25,7 +25,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * Each segment is linked to the next by copying stop arrivals at via stops from one segment to the
  * following segment. This is implemented using Pareto set event listeners.
- * </p>
  */
 @SuppressWarnings("ClassCanBeRecord")
 public class SearchContextViaSegments<T extends RaptorTripSchedule> {

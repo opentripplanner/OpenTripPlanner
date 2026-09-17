@@ -34,12 +34,12 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
   /**
    * This method is responsible for providing all transfers from a given stop to all possible stops
    * around that stop.
-   * <p/>
+   * <p>
    * The implementation may implement a lightweight {@link RaptorTransfer} representation. The
    * iterator element only needs to be valid for the duration og a single iterator step. Hence; It
    * is safe to use a cursor/flyweight pattern to represent both the Transfer and the
    * Iterator<Transfer> - this will most likely be the best performing implementation.
-   * <p/>
+   * <p>
    * Example:
    * <pre>
    * class LightweightTransferIterator implements Iterator&lt;RaptorTransfer&gt;, RaptorTransfer {
@@ -82,7 +82,7 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
 
   /**
    * Returns the raptor route for a specific route index
-   * <p/>
+   * <p>
    * The implementation may implement a lightweight {@link RaptorTripPattern} representation. See
    * {@link #getTransfersFromStop(int)} for detail on how to implement this.
    * @throws IndexOutOfBoundsException if routeIndex not found

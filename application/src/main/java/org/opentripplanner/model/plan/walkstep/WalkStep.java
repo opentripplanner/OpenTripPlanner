@@ -18,17 +18,14 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Turn onto Broadway from W 57th St (coming from 7th Ave): <br> distance = 100 (say) <br>
  * walkDirection = RIGHT <br> streetName = Broadway <br> everything else null/false <br>
- * </p>
  * <p>
  * Now, turn from Broadway onto Central Park S via Columbus Circle <br> distance = 200 (say) <br>
  * walkDirection = CIRCLE_COUNTERCLOCKWISE <br> streetName = Central Park S <br> exit = 1 (first
  * exit) <br> immediately everything else false <br>
- * </p>
  * <p>
  * Instead, go through the circle to continue on Broadway <br> distance = 100 (say) <br>
  * walkDirection = CIRCLE_COUNTERCLOCKWISE <br> streetName = Broadway <br> exit = 3 <br> stayOn =
  * true <br> everything else false <br>
- * </p>
  */
 public final class WalkStep {
 

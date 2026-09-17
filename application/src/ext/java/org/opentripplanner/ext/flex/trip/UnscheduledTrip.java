@@ -87,8 +87,10 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
    * Tests if the stop times constitute an {@link UnscheduledTrip}.
    * <p>
    * Returns true for the following cases:
+   * <pre>
    *  - A single fixed scheduled stop followed by a flexible one
    *  - One or more stop times with a flexible time window but no fixed stop in between them
+   * </pre>
    */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     if (stopTimes.size() < 2) {

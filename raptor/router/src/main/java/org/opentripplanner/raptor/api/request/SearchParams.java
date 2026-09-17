@@ -126,10 +126,12 @@ public class SearchParams {
    * if this parameter is set. This parameter is not allowed if the {@link #timetable} is
    * enabled.
    * <p>
+   * <pre>
    * TODO - Reactor, we should use an Enum value instead of this and 'timetable':
    *      - timePreference : enum TimePreference{ TIMETABLE, DEPART_AFTER, ARRIVE_BY }
    *      - PS! There are some corner cases here. E.g. DEPART_AFTER must work when
    *        edt=null & lat!=null - same for ARRIVE_BY.
+   * </pre>
    */
   public boolean preferLateArrival() {
     return preferLateArrival;
@@ -138,7 +140,7 @@ public class SearchParams {
   /**
    * RangeRaptor is designed to search until the destination is reached and then {@code
    * numberOfAdditionalTransfers} more rounds.
-   * <p/>
+   * <p>
    * The default value is 5.
    */
   public int numberOfAdditionalTransfers() {
@@ -148,7 +150,7 @@ public class SearchParams {
   /**
    * This is an absolute limit to the number of transfers. The preferred way to limit the transfers
    * is to use the {@link #numberOfAdditionalTransfers()}.
-   * <p/>
+   * <p>
    * The default is to use the limit in the tuning parameters {@link RaptorTuningParameters#maxNumberOfTransfers()}.
    */
   public int maxNumberOfTransfers() {
@@ -164,10 +166,10 @@ public class SearchParams {
    * AFTER another Journey, even if the first departure have lower cost, number of transfers, and
    * shorter travel time. For two Journeys that depart at the same time only the best one will be
    * included (both if they are mutually dominating each other).
-   * <p/>
+   * <p>
    * Setting this parameter to "TRUE" will increase the number of paths returned. The performance
    * impact is small since the check only affect the pareto check at the destination.
-   * <p/>
+   * <p>
    * The default value is FALSE.
    */
   public boolean timetable() {
@@ -186,7 +188,7 @@ public class SearchParams {
 
   /**
    * List of access paths from the origin to all transit stops using the street network.
-   * <p/>
+   * <p>
    * Required, at least one access path must exist.
    */
   public Collection<RaptorAccessEgress> accessPaths() {
@@ -198,7 +200,7 @@ public class SearchParams {
    * <p>
    * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path start, NOT the
    * destination - think of it as a reversed path.
-   * <p/>
+   * <p>
    * Required, at least one egress path must exist.
    */
   public Collection<RaptorAccessEgress> egressPaths() {

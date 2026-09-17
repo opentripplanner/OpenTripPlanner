@@ -9,7 +9,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Group itineraries by the main legs and keeping at most the given total number of itineraries. The
  * itineraries are grouped by the legs that account for more then 'p' % for the total distance.
- * <p/>
+ * <p>
  * If the time-table-view is enabled, the result may contain similar itineraries where only the
  * first and/or last legs are different. This can happen by walking to/from another stop, saving
  * time, but getting a higher generalized-cost; Or, by taking a short ride. Use {@code groupByP} in

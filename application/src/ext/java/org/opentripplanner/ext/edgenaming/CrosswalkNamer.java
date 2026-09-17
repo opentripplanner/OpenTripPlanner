@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * A namer that assigns names to crosswalks using the name or type of the crossed street.
  * <p>
  * The algorithm works as follows:
+ * <pre>
  *  - For each crosswalk, we find the intersecting street edge that shares a node.
  *  - Apply a name depending on the type of street:
  *      * For named streets, name the crossing so it reads "crosswalk over 10th Street".
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  *        to bypass traffic signals, prevalent in North America,
  *        e.g. <a href="https://www.openstreetmap.org/way/1139062913">...</a>),
  *        use "crosswalk over turn lane".
+ * </pre>
  */
 class CrosswalkNamer implements EdgeNamer {
 

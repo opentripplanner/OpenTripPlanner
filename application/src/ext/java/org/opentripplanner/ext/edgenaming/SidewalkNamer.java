@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * geometric similarity criteria.
  * <p>
  * The algorithm works as follows:
+ * <pre>
  *  - for each sidewalk we look up (named) street edges nearby
  *  - group those edges into groups where each edge has the same name
  *  - draw a flat-capped buffer around the sidewalk, like this: https://tinyurl.com/4fpe882h
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
  *  - remove those groups which are below MIN_PERCENT_IN_BUFFER
  *  - take the group that has the highest percentage (as a proportion of the sidewalk length) inside
  *    the buffer and apply its name to the sidewalk.
+ * </pre>
  * <p>
  * This works very well for OSM data where the sidewalk runs a parallel to the street and at each
  * intersection the sidewalk is also split. It doesn't work well for sidewalks that go around

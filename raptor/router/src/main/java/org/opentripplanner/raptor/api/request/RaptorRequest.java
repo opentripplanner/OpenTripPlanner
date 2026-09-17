@@ -104,7 +104,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   /**
    * The profile/algorithm to use for this request.
-   * <p/>
+   * <p>
    * The default value is {@link RaptorProfile#MULTI_CRITERIA}
    */
   public RaptorProfile profile() {
@@ -147,7 +147,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   /**
    * Specify what to debug in the debug request.
-   * <p/>
+   * <p>
    * This feature is optional, by default debugging is turned off.
    */
   public DebugRequest debug() {

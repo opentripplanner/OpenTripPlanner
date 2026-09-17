@@ -75,8 +75,10 @@ public class RaptorService<T extends RaptorTripSchedule> {
   }
 
   /**
+   * <pre>
    * TODO Add back the possibility to compare heuristics using a test - like the SpeedTest,
    *      but maybe better to make a separate test.
+   * </pre>
    */
   @SuppressWarnings("unused")
   public void compareHeuristics(

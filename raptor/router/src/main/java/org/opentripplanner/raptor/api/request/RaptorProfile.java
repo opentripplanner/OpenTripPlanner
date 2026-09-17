@@ -15,7 +15,7 @@ public enum RaptorProfile {
   /**
    * Used by Range Raptor finding the earliest-arrival-time, the shortest travel duration and the
    * fewest transfers. Generalized-cost is not used.
-   * <p/>
+   * <p>
    * Computes result paths.
    */
   STANDARD("Standard", true),

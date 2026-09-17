@@ -123,14 +123,11 @@ public class SlopeCostCalculator {
   }
 
   /**
-   * <p>
    * We use the Tobler function {@link ToblersHikingFunction} to calculate this.
-   * </p>
    * <p>
    * When testing this we get good results in general, but for some edges the elevation profile is
    * not accurate. A (serpentine) road is usually build with a constant slope, but the elevation
    * profile in OTP is not as smooth, resulting in an extra penalty for these roads.
-   * </p>
    */
   static double calculateEffectiveWalkLength(double run, double rise) {
     return run * TOBLER_WALKING_FUNCTION.calculateHorizontalWalkingDistanceMultiplier(run, rise);
