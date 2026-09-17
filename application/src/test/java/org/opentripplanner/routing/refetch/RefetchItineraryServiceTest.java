@@ -66,7 +66,7 @@ public class RefetchItineraryServiceTest {
   protected static final RegularStop STOP_D = ENV_BUILDER.stop("D");
   protected static final RegularStop STOP_E = ENV_BUILDER.stop("E");
 
-  protected static final TransitTestEnvironment TRANSIT_ENV = ENV_BUILDER.addTrip(
+  protected static final TransitTestEnvironmentBuilder TRANSIT_ENV = ENV_BUILDER.addTrip(
     TripInput.of("trip1")
       .withWithTripOnServiceDate("trip1")
       .addStop(STOP_A, "10:00")
@@ -87,8 +87,7 @@ public class RefetchItineraryServiceTest {
         .withWithTripOnServiceDate("trip5")
         .addStop(STOP_D, "15:00")
         .addStop(STOP_E, "16:00")
-    )
-    .build();
+    );
 
   // Setup street
   protected static final GraphBuilder G = GraphBuilder.of();
@@ -116,9 +115,10 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchSimple() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1), routeRequest());
 
@@ -129,9 +129,10 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchFromSameStation() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
     var from = GenericLocation.fromStopId(STATION_A.getId());
 
     var itinerary = refetch.refetchItinerary(from, null, List.of(leg1), routeRequest());
@@ -143,10 +144,11 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchWithTransferAtSameStop() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip2", STOP_B, STOP_C);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip2", STOP_B, STOP_C, transitEnv);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
 
@@ -155,10 +157,11 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchWithTransfer() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip3", STOP_C, STOP_D);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip3", STOP_C, STOP_D, transitEnv);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
 
@@ -175,10 +178,11 @@ public class RefetchItineraryServiceTest {
   /// a transfer impossible to make.
   @Test
   void refetchWithImpossibleTransfer() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip4", STOP_C, STOP_D);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip4", STOP_C, STOP_D, transitEnv);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
 
@@ -191,12 +195,13 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithAccessEgress() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
     var start = GenericLocation.fromCoordinate(V1.coord());
     var end = GenericLocation.fromCoordinate(V2.coord());
 
-    var leg1 = legRef("trip1", STOP_A, STOP_D);
+    var leg1 = legRef("trip1", STOP_A, STOP_D, transitEnv);
 
     var itinerary = refetch.refetchItinerary(start, end, List.of(leg1), routeRequest());
 
@@ -208,10 +213,11 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithAccessFromStop() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
     var start = GenericLocation.fromStopId(STOP_B.getId());
-    var leg1 = legRef("trip3", STOP_C, STOP_D);
+    var leg1 = legRef("trip3", STOP_C, STOP_D, transitEnv);
 
     var itinerary = refetch.refetchItinerary(start, null, List.of(leg1), routeRequest());
 
@@ -220,13 +226,14 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithMultipleLegsAndAccessEgress() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
     var start = GenericLocation.fromCoordinate(V1.coord());
     var end = GenericLocation.fromCoordinate(V2.coord());
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip3", STOP_C, STOP_D);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip3", STOP_C, STOP_D, transitEnv);
 
     var itinerary = refetch.refetchItinerary(start, end, List.of(leg1, leg2), routeRequest());
 
@@ -238,11 +245,17 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithTwoTransitLegsAndConstrainedTransfer() {
-    var cts = createConstrainedTransferService(guaranteed("trip1", 1, "trip2", 0));
-    var refetch = createRefetchService(cts);
+    var transitEnv = ENV_BUILDER.build();
+    var cts = createConstrainedTransferService(guaranteed("trip1", 1, "trip2", 0, transitEnv));
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip2", STOP_B, STOP_D);
+    transitEnv.transitService().getConstrainedTransferService().addAll(cts.listAll());
+
+    var refetch = createRefetchService(transitEnv);
+
+    transitEnv.transitService().getConstrainedTransferService().addAll(cts.listAll());
+
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip2", STOP_B, STOP_D, transitEnv);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest());
 
@@ -262,15 +275,17 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchItineraryWithMultipleConstrainedTransfers() {
+    var transitEnv = TRANSIT_ENV.build();
     var cts = createConstrainedTransferService(
-      staySeated("trip1", 1, "trip3", 0),
-      guaranteed("trip3", 1, "trip5", 0)
+      staySeated("trip1", 1, "trip3", 0, transitEnv),
+      guaranteed("trip3", 1, "trip5", 0, transitEnv)
     );
-    var refetch = createRefetchService(cts);
+    transitEnv.transitService().getConstrainedTransferService().addAll(cts.listAll());
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip3", STOP_C, STOP_D);
-    var leg3 = legRef("trip5", STOP_D, STOP_E);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip3", STOP_C, STOP_D, transitEnv);
+    var leg3 = legRef("trip5", STOP_D, STOP_E, transitEnv);
 
     var itinerary = refetch.refetchItinerary(null, null, List.of(leg1, leg2, leg3), routeRequest());
 
@@ -291,10 +306,11 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchWithFailedLinking() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
     var start = GenericLocation.fromCoordinate(V1.coord().moveNorthMeters(10000));
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
     var e = assertThrows(RefetchItineraryException.class, () ->
       refetch.refetchItinerary(start, null, List.of(leg1), routeRequest())
@@ -304,10 +320,11 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchWithFailedTransfer() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip3", STOP_C, STOP_D);
-    var leg2 = legRef("trip1", STOP_A, STOP_B);
+    var leg1 = legRef("trip3", STOP_C, STOP_D, transitEnv);
+    var leg2 = legRef("trip1", STOP_A, STOP_B, transitEnv);
 
     var e = assertThrows(RefetchItineraryException.class, () ->
       refetch.refetchItinerary(null, null, List.of(leg1, leg2), routeRequest())
@@ -317,7 +334,8 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchEmptyLegs() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
     assertThrows(IllegalArgumentException.class, () ->
       refetch.refetchItinerary(null, null, List.of(), routeRequest())
@@ -326,10 +344,11 @@ public class RefetchItineraryServiceTest {
 
   @Test
   void refetchWithBoardAlightSlack() {
-    var refetch = createRefetchService();
+    var transitEnv = TRANSIT_ENV.build();
+    var refetch = createRefetchService(transitEnv);
 
-    var leg1 = legRef("trip1", STOP_A, STOP_B);
-    var leg2 = legRef("trip3", STOP_C, STOP_D);
+    var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
+    var leg2 = legRef("trip3", STOP_C, STOP_D, transitEnv);
     var start = GenericLocation.fromCoordinate(V1.coord());
     var end = GenericLocation.fromCoordinate(V2.coord());
 
@@ -359,16 +378,17 @@ public class RefetchItineraryServiceTest {
   private ScheduledTransitLegReference legRef(
     String tripId,
     RegularStop boardStop,
-    RegularStop alightStop
+    RegularStop alightStop,
+    TransitTestEnvironment transitEnv
   ) {
-    var tripData = TRANSIT_ENV.tripData(tripId);
+    var tripData = transitEnv.tripData(tripId);
     var stops = tripData.tripPattern().getStops();
     var boardPos = stops.indexOf(boardStop);
     var alightPos = stops.indexOf(alightStop);
     assertNotEquals(-1, boardPos);
     assertNotEquals(-1, alightPos);
     return new ScheduledTransitLegReference(
-      TRANSIT_ENV.tripData(tripId).trip().getId(),
+      transitEnv.tripData(tripId).trip().getId(),
       SERVICE_DATE,
       boardPos,
       alightPos,
@@ -378,11 +398,7 @@ public class RefetchItineraryServiceTest {
     );
   }
 
-  private RefetchItineraryService createRefetchService() {
-    return createRefetchService(new DefaultConstrainedTransferService());
-  }
-
-  private RefetchItineraryService createRefetchService(ConstrainedTransferService cts) {
+  private RefetchItineraryService createRefetchService(TransitTestEnvironment transitEnv) {
     StreetDetailsService streetDetailsService = null;
     VertexCreationService vertexCreationService = new VertexCreationService(
       new VertexLinker(
@@ -397,8 +413,7 @@ public class RefetchItineraryServiceTest {
       GRAPH,
       vertexCreationService
     );
-    //Enrich constrainedTransfer with transfers
-    TRANSIT_ENV.transitService().getConstrainedTransferService().addAll(cts.listAll());
+
     var streetLimitationParametersService = new StreetLimitationParametersService() {
       @Override
       public float maxCarSpeed() {
@@ -422,7 +437,7 @@ public class RefetchItineraryServiceTest {
     };
     return new RefetchItineraryService(
       GRAPH,
-      TRANSIT_ENV.transitService(),
+      transitEnv.transitService(),
       new TransitAlertServiceImpl(),
       TRANSFER_SERVICE,
       streetDetailsService,
@@ -453,14 +468,16 @@ public class RefetchItineraryServiceTest {
     String fromTrip,
     int fromPos,
     String toTrip,
-    int toPos
+    int toPos,
+    TransitTestEnvironment transitEnv
   ) {
     return constrained(
       fromTrip,
       fromPos,
       toTrip,
       toPos,
-      TransferConstraint.of().staySeated().build()
+      TransferConstraint.of().staySeated().build(),
+      transitEnv
     );
   }
 
@@ -468,14 +485,16 @@ public class RefetchItineraryServiceTest {
     String fromTrip,
     int fromPos,
     String toTrip,
-    int toPos
+    int toPos,
+    TransitTestEnvironment transitEnv
   ) {
     return constrained(
       fromTrip,
       fromPos,
       toTrip,
       toPos,
-      TransferConstraint.of().guaranteed().build()
+      TransferConstraint.of().guaranteed().build(),
+      transitEnv
     );
   }
 
@@ -484,11 +503,12 @@ public class RefetchItineraryServiceTest {
     int fromPos,
     String toTrip,
     int toPos,
-    TransferConstraint constraint
+    TransferConstraint constraint,
+    TransitTestEnvironment transitEnv
   ) {
-    var p1 = new TripTransferPoint(TRANSIT_ENV.tripData(fromTrip).trip(), fromPos);
+    var p1 = new TripTransferPoint(transitEnv.tripData(fromTrip).trip(), fromPos);
 
-    var p2 = new TripTransferPoint(TRANSIT_ENV.tripData(toTrip).trip(), toPos);
+    var p2 = new TripTransferPoint(transitEnv.tripData(toTrip).trip(), toPos);
 
     return new ConstrainedTransfer(null, p1, p2, constraint);
   }
@@ -514,7 +534,7 @@ public class RefetchItineraryServiceTest {
     return List.of(linkFrom, edge, linkTo);
   }
 
-  public static RouteRequest routeRequest() {
+  private static RouteRequest routeRequest() {
     return RouteRequest.of()
       .withFrom(GenericLocation.fromCoordinate(0, 0))
       .withTo(GenericLocation.fromCoordinate(1, 1))

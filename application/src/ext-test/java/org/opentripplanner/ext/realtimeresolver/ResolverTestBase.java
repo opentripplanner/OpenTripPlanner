@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createConstrainedTransferService;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createTransferService;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.makeTransfer;
-import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.routeRequest;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.staySeated;
 
 import java.time.LocalDate;
@@ -18,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -26,6 +26,7 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -387,7 +388,7 @@ class ResolverTestBase {
 
   @Test
   void testPopulateLegsKeepStaySeated() {
-    var cts = createConstrainedTransferService(staySeated("trip1", 1, "trip2", 0));
+    var cts = createConstrainedTransferService(staySeated("trip1", 1, "trip2", 0, TRANSIT_ENV));
     var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
     TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip2");
@@ -434,6 +435,14 @@ class ResolverTestBase {
       "A ~ BUS trip1 10:00 11:00 ~ B ~ BUS trip2 12:00 13:00 ~ C []",
       itineraries.getFirst().toStr()
     );
+  }
+
+  private static RouteRequest routeRequest() {
+    return RouteRequest.of()
+      .withFrom(GenericLocation.fromCoordinate(0, 0))
+      .withTo(GenericLocation.fromCoordinate(1, 1))
+      .withPreferences(p -> p.withWalk(w -> w.withSpeed(2)))
+      .buildRequest();
   }
 
   private ScheduledTransitLeg buildScheduledTransitLeg(
