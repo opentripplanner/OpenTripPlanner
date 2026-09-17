@@ -15,7 +15,7 @@ In addition to running Prettier, Spotless removes unused imports from Java files
 them. Imports that are only referenced from Javadoc (for example `{@link Foo}`) are kept.
 
 Prettier does not format the _content_ of Javadoc comments, it only re-indents them. Spotless
-therefore runs the Eclipse JDT formatter before Prettier, configured to format  Javadoc comments
+therefore runs the Eclipse JDT formatter before Prettier, configured to format Javadoc comments
 only.
 
 Additionally since OTP v2.9, we are using Checkstyle to check for code style issues with a Maven
@@ -23,6 +23,33 @@ plugin. There is also a checkstyle plugin for IntelliJ IDEA which can be used to
 issues. We also have an OpenRewrite Maven plugin available that can be used to automatically fix
 some of the issues that are pointed out by Checkstyle. Comparison of different tools we considered
 can be found in [#6913](https://github.com/opentripplanner/OpenTripPlanner/issues/6913).
+
+#### Preventing Javadoc formatting
+
+The Javadoc formatter re-flows paragraphs, so text which must keep its line breaks (CSV samples,
+ASCII tables, code snippets) needs to be marked. Use code blocks or `<pre>` blocks to prevent
+formatting. The following two options are available:
+
+1. Put the text in a `<pre>` block when using old Javadoc format. Note! The block must be
+   **closed**.
+
+   ```java
+   /**
+    * <pre>
+    * id, monday, tuesday, start_date, end_date
+    * MONDAY ,1,0,2025-01-01,2030-12-31
+    * </pre>
+    */
+   ```
+
+2. Put the text in a code block when using new Javadoc format.
+
+   ````
+    /// ```
+    /// id, monday, tuesday, start_date, end_date
+    /// MONDAY ,1,0,2025-01-01,2030-12-31
+    /// ```
+   ````
 
 ### How to Use Checkstyle
 
