@@ -1,6 +1,6 @@
 package org.opentripplanner.framework.transaction.moduletest.candyshop.event;
 
-import org.opentripplanner.framework.event.DomainEvent;
+import org.opentripplanner.core.domain.framework.event.DomainEvent;
 
 public record CustomerOrderDomainEvent(
   int orderId,

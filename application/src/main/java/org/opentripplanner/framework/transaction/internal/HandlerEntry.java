@@ -1,8 +1,8 @@
 package org.opentripplanner.framework.transaction.internal;
 
-import org.opentripplanner.framework.event.DomainEvent;
-import org.opentripplanner.framework.event.EventHandler;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.core.domain.framework.event.DomainEvent;
+import org.opentripplanner.core.domain.framework.event.EventHandler;
+import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
 
 /**
  * Pairs a {@link EventHandler} with the {@link RepositoryHandle} whose mutable snapshot it writes
