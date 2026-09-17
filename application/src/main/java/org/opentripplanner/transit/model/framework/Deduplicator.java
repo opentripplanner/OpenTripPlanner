@@ -17,9 +17,9 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Object deduplicator used to reduce memory footprint.
- * Deduplication is based on the hashcode/equals method of the target object. Some Java data
- * structures that do not have proper native equality (int[], ...) are wrapped.
+ * Object deduplicator used to reduce memory footprint. Deduplication is based on the
+ * hashcode/equals method of the target object. Some Java data structures that do not have proper
+ * native equality (int[], ...) are wrapped.
  * <p>
  * In older JVMs, this deduplicator used to be more efficient for deduplicating String than
  * String.intern() (not tested with recent JVMs).
@@ -287,8 +287,8 @@ public class Deduplicator implements DeduplicatorService, Serializable {
   }
 
   /**
-   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements
-   * as well.
+   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements as
+   * well.
    */
   private record ObjArray<T>(T[] array) implements Serializable {
     private static <E> ObjArray<E> deepDeduplicateOf(

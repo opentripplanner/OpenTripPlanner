@@ -60,9 +60,9 @@ final class EstimatedVehicleJourneyWrapper {
   /**
    * Whether this journey must be rejected because it is not monitored.
    * <p>
-   * A journey reported as not monitored is normally rejected, but the not-monitored flag is ignored
-   * when the journey is a cancellation: a cancelled journey is no longer monitored, yet must still
-   * be processed so that the cancellation is applied.
+   * A journey reported as not monitored is normally rejected, but the not-monitored flag is
+   * ignored when the journey is a cancellation: a cancelled journey is no longer monitored, yet
+   * must still be processed so that the cancellation is applied.
    */
   private boolean mustBeRejectedAsUnmonitored() {
     return !isMonitored() && !isCancellation();
@@ -103,8 +103,8 @@ final class EstimatedVehicleJourneyWrapper {
 
   /**
    * The EstimatedVehicleJourneyCode of an extra journey, used to identify the added trip. It can be
-   * viewed as either a {@code ServiceJourney} or a {@code DatedServiceJourney} id. {@code empty} when
-   * the journey carries no code.
+   * viewed as either a {@code ServiceJourney} or a {@code DatedServiceJourney} id. {@code empty}
+   * when the journey carries no code.
    */
   Optional<EstimatedVehicleJourneyCode> code() {
     return Optional.ofNullable(code);
@@ -129,8 +129,7 @@ final class EstimatedVehicleJourneyWrapper {
   }
 
   /**
-   * The reference to the vehicle operating this journey.
-   * Also used for fuzzy matching
+   * The reference to the vehicle operating this journey. Also used for fuzzy matching
    */
   Optional<String> vehicleRef() {
     return Optional.ofNullable(journey.getVehicleRef())
@@ -148,7 +147,8 @@ final class EstimatedVehicleJourneyWrapper {
   }
 
   /**
-   * Additional dated vehicle journeys this journey replaces (beyond {@link #replacedDatedVehicleJourneyRef()}).
+   * Additional dated vehicle journeys this journey replaces (beyond
+   * {@link #replacedDatedVehicleJourneyRef()}).
    */
   List<VehicleJourneyIdAndServiceDate> additionalReplacedDatedVehicleJourneyRefs() {
     return journey

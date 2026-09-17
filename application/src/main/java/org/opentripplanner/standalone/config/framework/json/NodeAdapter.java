@@ -46,15 +46,14 @@ public class NodeAdapter {
   private final Map<String, NodeAdapter> childrenByName = new HashMap<>();
 
   /**
-   * A map of all configured parameters for this node. The current JSON document that is parsed
-   * may or may not contain the parameter in this map. The map holds information about the
-   * parameter and can be used for generating documentation and such.
+   * A map of all configured parameters for this node. The current JSON document that is parsed may
+   * or may not contain the parameter in this map. The map holds information about the parameter and
+   * can be used for generating documentation and such.
    */
   private final Map<String, NodeInfo> parameters = new HashMap<>();
 
   /**
-   * All warnings are collected during the file parsing and printed as one block at the
-   * end.
+   * All warnings are collected during the file parsing and printed as one block at the end.
    */
   private final List<String> warnings = new ArrayList<>();
 
@@ -121,8 +120,8 @@ public class NodeAdapter {
   }
 
   /**
-   * WARNING! Avoid using this method - it bypasses the build in typesafe parsing support. Only
-   * use it to provide custom parsing.
+   * WARNING! Avoid using this method - it bypasses the build in typesafe parsing support. Only use
+   * it to provide custom parsing.
    */
   public String asText() {
     return json.asText();
@@ -161,8 +160,8 @@ public class NodeAdapter {
   }
 
   /**
-   * Log unused parameters and other warnings for the entire configuration file/node tree. Only
-   * call this method for the root adapter, once for each config file read.
+   * Log unused parameters and other warnings for the entire configuration file/node tree. Only call
+   * this method for the root adapter, once for each config file read.
    */
   public void logAllWarnings(Consumer<String> logger) {
     for (String p : unusedParams()) {
@@ -179,8 +178,8 @@ public class NodeAdapter {
   }
 
   /**
-   * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
-   * track of unused parameters and cannot generate documentation for the children.
+   * Be careful when using this method - this bypasses the NodeAdaptor, and we loose track of unused
+   * parameters and cannot generate documentation for the children.
    * <p>
    * OTP will no longer WARN about unused parameters for this node.
    */
@@ -190,16 +189,16 @@ public class NodeAdapter {
   }
 
   /**
-   * Return the level for this node, relative to root of the document. Root is at level zero,
-   * roots children are at level one, and so on.
+   * Return the level for this node, relative to root of the document. Root is at level zero, roots
+   * children are at level one, and so on.
    */
   public int level() {
     return level;
   }
 
   /**
-   * Used by {@link ParameterBuilder} to skip one node in the node tree. This method
-   * does work with the unused parameters.
+   * Used by {@link ParameterBuilder} to skip one node in the node tree. This method does work with
+   * the unused parameters.
    */
   JsonNode rawNode(String paramName) {
     parameters.put(paramName, NodeInfo.ofSkipChild(paramName));
@@ -261,9 +260,9 @@ public class NodeAdapter {
   }
 
   /**
-   * This method validate the given parameter info and save it to the list of parameters.
-   * The JSON node is for this parameter is returned, if the node do not exist a "missing node"
-   * (node that returns true for isMissingNode) will be returned.
+   * This method validate the given parameter info and save it to the list of parameters. The JSON
+   * node is for this parameter is returned, if the node do not exist a "missing node" (node that
+   * returns true for isMissingNode) will be returned.
    */
   JsonNode addAndValidateParameterNode(NodeInfo info) {
     addParameterInfo(info);
@@ -283,8 +282,7 @@ public class NodeAdapter {
   }
 
   /**
-   * Add a warning to the list of warnings logged after parsing a config file is
-   * complete.
+   * Add a warning to the list of warnings logged after parsing a config file is complete.
    */
   public void addWarning(String message, String paramName) {
     message += " Parameter: " + fullPath(paramName) + ".";

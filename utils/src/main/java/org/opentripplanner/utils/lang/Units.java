@@ -28,10 +28,10 @@ public class Units {
   private Units() {}
 
   /**
-   * Reluctance or factor from zero(0) to positive infinity.
-   * Bucketed so that close-but-distinct values share a single canonical representation:
-   * step 0.1 below 3.0, step 0.5 in [3.0, 10.0), step 1.0 at or above 10.0. See
-   * {@link #normalizedFactor(double, double, double)} for the rationale.
+   * Reluctance or factor from zero(0) to positive infinity. Bucketed so that close-but-distinct
+   * values share a single canonical representation: step 0.1 below 3.0, step 0.5 in [3.0, 10.0),
+   * step 1.0 at or above 10.0. See {@link #normalizedFactor(double, double, double)} for the
+   * rationale.
    * <p>
    * Unit: Human cost per second of actual time (scalar)
    */
@@ -40,17 +40,17 @@ public class Units {
   }
 
   /**
-   * Normalized factor in given range between {@param minValue} and {@param maxValue}.
-   * Bucketing is tiered so that fewer distinct request-cache keys are produced from
-   * close-but-distinct client-supplied values:
+   * Normalized factor in given range between {@param minValue} and {@param maxValue}. Bucketing is
+   * tiered so that fewer distinct request-cache keys are produced from close-but-distinct
+   * client-supplied values:
    * <ul>
    *   <li>step 0.1 for absolute value less than 3.0. Example: 1.94 -> 1.9, 1.96 -> 2.0</li>
    *   <li>step 0.5 for absolute value in [3.0, 10.0). Example: 3.2 -> 3.0, 3.3 -> 3.5</li>
    *   <li>step 1.0 for absolute value at or above 10.0. Example: 10.4 -> 10, 10.6 -> 11</li>
    * </ul>
-   * Ties are broken to the even neighbour (HALF_EVEN, banker's rounding), implemented
-   * via BigDecimal so that decimal inputs are pinned exactly and the tie detection is
-   * not subject to IEEE-754 drift.
+   * Ties are broken to the even neighbour (HALF_EVEN, banker's rounding), implemented via
+   * BigDecimal so that decimal inputs are pinned exactly and the tie detection is not subject to
+   * IEEE-754 drift.
    * <p>
    * Unit: scalar
    */
@@ -72,8 +72,8 @@ public class Units {
 
   /**
    * Convert a factor to string using the same precision as the bucket grid in
-   * {@link #normalizedFactor(double, double, double)}: 1 decimal below 10.0, 0 decimals
-   * at or above 10.0.
+   * {@link #normalizedFactor(double, double, double)}: 1 decimal below 10.0, 0 decimals at or above
+   * 10.0.
    */
   public static String factorToString(double value) {
     if (abs(value) < 10.0) {
@@ -90,10 +90,9 @@ public class Units {
   }
 
   /**
-   * Sanity check and bucketed normalization of the speed. Bucketing collapses close-but-
-   * distinct client-supplied values into a single canonical representation so that fewer
-   * distinct request-cache keys are produced (e.g. walk speeds 1.38 and 1.39 both snap
-   * to 1.40):
+   * Sanity check and bucketed normalization of the speed. Bucketing collapses close-but- distinct
+   * client-supplied values into a single canonical representation so that fewer distinct
+   * request-cache keys are produced (e.g. walk speeds 1.38 and 1.39 both snap to 1.40):
    * <ol>
    *   <li>Less than 0.0 -> throw IllegalArgumentException.</li>
    *   <li>[0.0 .. 0.1) -> round up to 0.1 - Avoid divide by zero.</li>
@@ -102,9 +101,8 @@ public class Units {
    *   <li>[10 .. 1 mach (340 m/s)) -> step 1.0 m/s.</li>
    *   <li>Greater than 1 Mach (speed of sound) -> throw IllegalArgumentException.</li>
    * </ol>
-   * Ties are broken to the even neighbour (HALF_EVEN, banker's rounding), via
-   * BigDecimal so that decimal inputs are pinned exactly and the tie detection is not
-   * subject to IEEE-754 drift.
+   * Ties are broken to the even neighbour (HALF_EVEN, banker's rounding), via BigDecimal so that
+   * decimal inputs are pinned exactly and the tie detection is not subject to IEEE-754 drift.
    *
    * <p>
    * Unit: meters per second (m/s)
@@ -154,8 +152,8 @@ public class Units {
   }
 
   /**
-   * A number between 0.000 and 1.000 (0% - 100%) - theoretical values above 1 can happen,
-   * but is not allowed here - use {@link #reluctance(double)} instead.
+   * A number between 0.000 and 1.000 (0% - 100%) - theoretical values above 1 can happen, but is
+   * not allowed here - use {@link #reluctance(double)} instead.
    * <p>
    * Unit: scalar
    */

@@ -12,9 +12,8 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the {@link
- * StateDebugger} about all stop
- * arrival events.
+ * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the
+ * {@link StateDebugger} about all stop arrival events.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

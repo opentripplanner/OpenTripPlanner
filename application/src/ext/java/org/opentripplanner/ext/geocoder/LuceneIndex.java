@@ -74,8 +74,8 @@ public class LuceneIndex implements Serializable {
 
   /**
    * Since the {@link TransitService} is request scoped, we don't inject it into this class.
-   * However, we do need some methods in the service and that's why we instantiate it manually in this
-   * constructor.
+   * However, we do need some methods in the service and that's why we instantiate it manually in
+   * this constructor.
    */
   public LuceneIndex(
     TransitRepository transitRepository,

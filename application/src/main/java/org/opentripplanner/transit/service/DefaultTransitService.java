@@ -72,9 +72,9 @@ import org.opentripplanner.utils.collection.SetUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * A new instance of this class should be created for each request.
- * This ensures that the same TimetableRepositorySnapshot is used for the
- * duration of the request (which may involve several method calls).
+ * A new instance of this class should be created for each request. This ensures that the same
+ * TimetableRepositorySnapshot is used for the duration of the request (which may involve several
+ * method calls).
  */
 public class DefaultTransitService implements TransitService {
 
@@ -87,8 +87,8 @@ public class DefaultTransitService implements TransitService {
   private final TransitRepositoryIndex transitRepositoryIndex;
 
   /**
-   * A nullable timetable snapshot containing real-time updates. If {@code null} then this
-   * instance does not contain any real-time information.
+   * A nullable timetable snapshot containing real-time updates. If {@code null} then this instance
+   * does not contain any real-time information.
    */
   @Nullable
   private final TimetableRepositorySnapshot timetableSnapshot;
@@ -101,8 +101,8 @@ public class DefaultTransitService implements TransitService {
   private final ReplacementHelper replacementHelper;
 
   /**
-   * Create a service without a real-time snapshot (and therefore without any real-time data).
-   * This is the constructor used by Dagger injection.
+   * Create a service without a real-time snapshot (and therefore without any real-time data). This
+   * is the constructor used by Dagger injection.
    */
   @Inject
   public DefaultTransitService(TransitRepository transitRepository) {
@@ -374,8 +374,7 @@ public class DefaultTransitService implements TransitService {
 
   /**
    * Resolves a trip's runtime on its service date according to its schedule. The period starts at
-   * the scheduled departure from the first stop and ends at the scheduled arrival at the last
-   * stop.
+   * the scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
    *
    * @return {@code null} if the schedule of the trip cannot be resolved.
    */
@@ -531,9 +530,9 @@ public class DefaultTransitService implements TransitService {
 
   /**
    * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
-   * added by realtime updates are added to the collection.
-   * A set is used here because trip patterns
-   * that were updated by realtime data is both part of the TransitRepositoryIndex and the TimetableRepositorySnapshot
+   * added by realtime updates are added to the collection. A set is used here because trip patterns
+   * that were updated by realtime data is both part of the TransitRepositoryIndex and the
+   * TimetableRepositorySnapshot
    */
   @Override
   public Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates) {

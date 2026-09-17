@@ -18,8 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Iterates over all area stops in the stop and adds them to vertices that are suitable for
- * boarding flex trips.
+ * Iterates over all area stops in the stop and adds them to vertices that are suitable for boarding
+ * flex trips.
  */
 public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 

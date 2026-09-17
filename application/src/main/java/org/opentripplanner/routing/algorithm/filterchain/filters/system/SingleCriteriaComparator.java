@@ -25,9 +25,9 @@ public interface SingleCriteriaComparator {
     new DefaultTransitGroupPriorityCalculator();
 
   /**
-   * The left criteria dominates the right criteria. Note! The right criteria may dominate
-   * the left criteria if there is no {@link #strictOrder()}. If left and right are equals, then
-   * there is no dominance.
+   * The left criteria dominates the right criteria. Note! The right criteria may dominate the left
+   * criteria if there is no {@link #strictOrder()}. If left and right are equals, then there is no
+   * dominance.
    */
   boolean leftDominanceExist(Itinerary left, Itinerary right);
 

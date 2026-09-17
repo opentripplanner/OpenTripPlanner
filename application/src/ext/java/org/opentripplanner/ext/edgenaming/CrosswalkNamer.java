@@ -83,8 +83,8 @@ class CrosswalkNamer implements EdgeNamer {
   }
 
   /**
-   * The actual logic for naming individual crosswalk edges.
-   * This will also name adjacent sidewalks on each end if they are the only adjacent sidewalks to a crosswalk.
+   * The actual logic for naming individual crosswalk edges. This will also name adjacent sidewalks
+   * on each end if they are the only adjacent sidewalks to a crosswalk.
    */
   public boolean assignNameToEdge(EdgeOnLevel crosswalkOnLevel, Geometry buffer) {
     var crosswalk = crosswalkOnLevel.edge();
@@ -129,7 +129,8 @@ class CrosswalkNamer implements EdgeNamer {
   }
 
   /**
-   * Rename a sidewalk, among candidates, if it is the only adjacent sidewalk to the given crosswalk.
+   * Rename a sidewalk, among candidates, if it is the only adjacent sidewalk to the given
+   * crosswalk.
    */
   private void renameAdjacentSidewalk(
     List<EdgeOnLevel> adjacentSidewalks,

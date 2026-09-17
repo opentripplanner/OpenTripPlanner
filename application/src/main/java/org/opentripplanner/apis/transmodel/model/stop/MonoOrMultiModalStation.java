@@ -121,7 +121,7 @@ public class MonoOrMultiModalStation {
   }
 
   /**
-   * Uses the  {@code id} for identity. We could use the {@link Object#equals(Object)} method, but
+   * Uses the {@code id} for identity. We could use the {@link Object#equals(Object)} method, but
    * this causes the equals to fail in cases were the same entity is created twice - for example
    * after reloading a serialized instance.
    */

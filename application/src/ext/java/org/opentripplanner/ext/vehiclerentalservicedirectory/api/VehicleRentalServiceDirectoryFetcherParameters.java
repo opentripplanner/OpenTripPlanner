@@ -5,8 +5,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.HttpHeaders;
 
 /**
- * Parameters for fetching vehicle rental services from a GBFS v3 manifest.json file.
- * The manifest can be loaded from a remote URL or a local file path.
+ * Parameters for fetching vehicle rental services from a GBFS v3 manifest.json file. The manifest
+ * can be loaded from a remote URL or a local file path.
  * <p>
  * Per-network settings are not configured here: they live in the shared {@code gbfs} section of
  * {@code otp-config.json} and reach the fetcher as

@@ -7,7 +7,8 @@ import org.opentripplanner.core.model.doc.DocumentedEnum;
  * (transit_realtime.VehiclePosition.OccupancyStatus) that can be easily be mapped to the Nordic
  * SIRI-profile (SIRI 2.1)
  * <p>
- * Descriptions are copied from the GTFS-RT specification with additions of SIRI nordic profile documentation.
+ * Descriptions are copied from the GTFS-RT specification with additions of SIRI nordic profile
+ * documentation.
  */
 public enum OccupancyStatus implements DocumentedEnum<OccupancyStatus> {
   NO_DATA_AVAILABLE,

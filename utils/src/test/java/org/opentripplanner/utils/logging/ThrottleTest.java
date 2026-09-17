@@ -53,7 +53,7 @@ class ThrottleTest {
     /*
       We get a lot of duplicates here because of "optimistic read/write" on shared memory - this is ok, as long as
       it does not fail.
-
+    
       EXPECTED OUTPUT
          4 ms
         54 ms

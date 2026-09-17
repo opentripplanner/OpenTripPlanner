@@ -11,19 +11,19 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * This class creates a group identifier for an itinerary based on the longest legs which together
- * account for more than 'p' part of the total distance. Transit legs must overlap and ride the
- * same trip, while street-legs only need to have the same mode. We call the set of legs the
+ * account for more than 'p' part of the total distance. Transit legs must overlap and ride the same
+ * trip, while street-legs only need to have the same mode. We call the set of legs the
  * 'key-set-of-legs' or just 'key-set'.
  * <p>
- * Two itineraries can be almost identical, but still have differences in the size of the key-set.
- * Riding any trip just one extra stop might include/exclude a leg in/from the key-set. To account
- * for this, we say two itineraries, A and B, are the same if the key-set of A is contained in B OR
- * the key-set of B is contained in A. Any "extra" legs in the key-set is ignored.
+ * Two itineraries can be almost identical, but still have differences in the size of the
+ * key-set. Riding any trip just one extra stop might include/exclude a leg in/from the key-set. To
+ * account for this, we say two itineraries, A and B, are the same if the key-set of A is contained
+ * in B OR the key-set of B is contained in A. Any "extra" legs in the key-set is ignored.
  * <p>
- * Two transit legs are considered the same if they are riding the same transit trip and overlap in
- * time. So, for example where a transfer happens do not affect the result, unless one of the legs
- * fall out of the key-set. They must overlap in time to account for looping patterns - a pattern
- * visiting the same stops more than once.
+ * Two transit legs are considered the same if they are riding the same transit trip and overlap
+ * in time. So, for example where a transfer happens do not affect the result, unless one of the
+ * legs fall out of the key-set. They must overlap in time to account for looping patterns - a
+ * pattern visiting the same stops more than once.
  * <p>
  * This filter does not support grouping street only-itineraries, but it does support having a
  * street leg as part of the key. At least one transit leg must be part of the key. This is done
@@ -33,9 +33,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * When comparing the street legs part of the key, we only care about the mode. If there are more
  * than one street leg in the key, then other keys must match. The street legs do not need to
- * overlap in time or place. For example, two itineraries, one with a long walking access and
- * the other with a long egress, are considered the same - we ignore the fact that the walking
- * happens in the beginning and the end of the journey.
+ * overlap in time or place. For example, two itineraries, one with a long walking access and the
+ * other with a long egress, are considered the same - we ignore the fact that the walking happens
+ * in the beginning and the end of the journey.
  */
 public class GroupByDistance implements GroupId<GroupByDistance> {
 

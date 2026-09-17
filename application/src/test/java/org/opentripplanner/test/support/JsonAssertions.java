@@ -12,7 +12,8 @@ public class JsonAssertions {
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
   /**
-   * Take two JSON documents and reformat them before comparing {@code actual} with {@code expected}.
+   * Take two JSON documents and reformat them before comparing {@code actual} with
+   * {@code expected}.
    */
   public static void assertEqualJson(String expected, String actual) {
     try {

@@ -46,19 +46,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation of both {@link TimetableRepository} and
- * {@link TimetableRepositorySnapshot}: a mutable instance serves as the repository (write
- * buffer), and committing it produces a read-only instance of the same class which serves as the
- * published snapshot. It holds a set of realtime-updated Timetables frozen at a moment in time. It
- * can return a Timetable for any TripPattern in the public transit network considering all
- * accumulated realtime updates, falling back on the scheduled Timetable if no updates have been
- * applied for a given TripPattern.
+ * {@link TimetableRepositorySnapshot}: a mutable instance serves as the repository (write buffer),
+ * and committing it produces a read-only instance of the same class which serves as the published
+ * snapshot. It holds a set of realtime-updated Timetables frozen at a moment in time. It can return
+ * a Timetable for any TripPattern in the public transit network considering all accumulated
+ * realtime updates, falling back on the scheduled Timetable if no updates have been applied for a
+ * given TripPattern.
  * <p>
- * This is a central part of managing concurrency when many routing searches may be happening, but
- * realtime updates are also streaming in which change the vehicle arrival and departure times.
+ * This is a central part of managing concurrency when many routing searches may be happening,
+ * but realtime updates are also streaming in which change the vehicle arrival and departure times.
  * Any given request will only see one unchanging snapshot over the course of its search.
  * <p>
- * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top of
- * any already known updates to the base schedules. From time to time such a batch of updates is
+ * A mutable instance first serves as a buffer to accumulate a batch of incoming updates on top
+ * of any already known updates to the base schedules. From time to time such a batch of updates is
  * committed (like a database transaction). At this point an immutable copy is created and becomes
  * available for use by new incoming routing requests.
  * <p>
@@ -67,53 +67,56 @@ import org.slf4j.LoggerFactory;
  * provide a consistent view not only of trips that have been boarded, but of relative arrival and
  * departure times of other trips that have not necessarily been boarded.
  * <p>
- * An instance may only be modified by a single thread. This makes it easier to
- * reason about how the snapshot is built up and used. Write operations are applied one by one, in
- * order, with no concurrent access. Read operations are then allowed concurrently by many threads
- * after writing is forbidden.
+ * An instance may only be modified by a single thread. This makes it easier to reason about how
+ * the snapshot is built up and used. Write operations are applied one by one, in order, with no
+ * concurrent access. Read operations are then allowed concurrently by many threads after writing is
+ * forbidden.
  * <p>
- * The fact that TripPattern instances carry a reference only to their scheduled Timetable and not
- * to their realtime timetable is largely due to historical path-dependence in OTP development.
+ * The fact that TripPattern instances carry a reference only to their scheduled Timetable and
+ * not to their realtime timetable is largely due to historical path-dependence in OTP development.
  * Streaming realtime support was added around 2013 as a sort of sandbox feature that was switched
- * off by default. Looking up realtime timetables during routing was a fringe feature that needed
- * to impose near-zero cost and avoid introducing complexity into the primary codebase. Now over
- * ten years later, the principles of how this system operates are rather stable, but the
- * implementation would benefit from some deduplication and cleanup. Once that is complete, looking
- * up timetables on this class could conceivably be replaced with snapshotting entire views of the
- * transit network. It would also be possible to make the realtime version of Timetables or
- * TripTimes the primary view, and include references back to their scheduled versions.
+ * off by default. Looking up realtime timetables during routing was a fringe feature that needed to
+ * impose near-zero cost and avoid introducing complexity into the primary codebase. Now over ten
+ * years later, the principles of how this system operates are rather stable, but the implementation
+ * would benefit from some deduplication and cleanup. Once that is complete, looking up timetables
+ * on this class could conceivably be replaced with snapshotting entire views of the transit
+ * network. It would also be possible to make the realtime version of Timetables or TripTimes the
+ * primary view, and include references back to their scheduled versions.
  * <p>
  * Implementation note: when a snapshot is committed, the mutable state of this class is stored
  * in final fields and completely initialized in the constructor. This provides an additional
- * guarantee of safe-publication without synchronization.
- * (see <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field Semantics</a>)
+ * guarantee of safe-publication without synchronization. (see
+ * <a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html#jls-17.5">final Field
+ * Semantics</a>)
  */
 public class DefaultTimetableRepository implements TimetableRepository {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTimetableRepository.class);
 
   /**
-   * During the construction phase of an instance, before it is considered immutable and
-   * used in routing, this Map holds all timetables that have been modified and are waiting to be
-   * indexed.
-   * A real-time timetable overrides the scheduled timetable of a TripPattern for only a single
+   * During the construction phase of an instance, before it is considered immutable and used in
+   * routing, this Map holds all timetables that have been modified and are waiting to be indexed. A
+   * real-time timetable overrides the scheduled timetable of a TripPattern for only a single
    * service date. There can be only one overriding timetable per TripPattern and per service date.
-   * This is enforced by indexing the map with a pair (TripPattern, service date).
-   * This map is cleared when the instance becomes read-only.
+   * This is enforced by indexing the map with a pair (TripPattern, service date). This map is
+   * cleared when the instance becomes read-only.
    */
   private final Map<TripPatternAndServiceDate, Timetable> dirtyTimetables = new HashMap<>();
 
   /**
    * For each TripPattern (sequence of stops on a particular Route) for which we have received a
    * realtime update, an ordered set of timetables on different days. The key TripPatterns may
-   * include ones from the scheduled GTFS, as well as ones added by realtime messages and
-   * tracked by the TripPatternCache. <p>
-   * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
-   * least one update, and those for which we had updates before but just recently cleared.<p>
-   * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
-   * when we're updating them. If an update will modify the timetable for a particular day, that
-   * timetable is replicated before any modifications are applied to avoid affecting any previous
-   * snapshots still in circulation which reference that same Timetable instance. <p>
+   * include ones from the scheduled GTFS, as well as ones added by realtime messages and tracked by
+   * the TripPatternCache.
+   * <p>
+   * Note that the keys do not include all scheduled TripPatterns, only those for which we have
+   * at least one update, and those for which we had updates before but just recently cleared.
+   * <p>
+   * The members of the SortedSet (the Timetable for a particular day) are treated as
+   * copy-on-write when we're updating them. If an update will modify the timetable for a particular
+   * day, that timetable is replicated before any modifications are applied to avoid affecting any
+   * previous snapshots still in circulation which reference that same Timetable instance.
+   * <p>
    * Alternative implementations: A. This could be an array indexed using the integer pattern
    * indexes. B. It could be made into a flat hashtable with compound keys (TripPattern, LocalDate).
    * The compound key approach better reflects the fact that there should be only one Timetable per
@@ -123,22 +126,20 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
-   * update, a Map associating the updated trip pattern with a compound key of the feed-scoped
-   * trip ID and the service date.
-   * This index includes only modified trip patterns for existing trips.
-   * It does not include trip patterns for new trips created by real-time updates (extra journeys).
-   * .
+   * update, a Map associating the updated trip pattern with a compound key of the feed-scoped trip
+   * ID and the service date. This index includes only modified trip patterns for existing trips. It
+   * does not include trip patterns for new trips created by real-time updates (extra journeys). .
    * <p>
    * TODO RT_AB: clarify if this is an index or the original source of truth.
    */
   private final Map<TripIdAndServiceDate, TripPattern> realTimeNewTripPatternsForModifiedTrips;
 
   /**
-   * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns
-   * that were updated or newly created by realtime messages contain which stops. This allows them
-   * to be readily found and included in API responses containing stop times at a specific stop.
-   * This is a SetMultimap, so that each pattern is only retained once per stop even if it's added
-   * more than once.
+   * This is an index of TripPatterns, not the primary collection. It tracks which TripPatterns that
+   * were updated or newly created by realtime messages contain which stops. This allows them to be
+   * readily found and included in API responses containing stop times at a specific stop. This is a
+   * SetMultimap, so that each pattern is only retained once per stop even if it's added more than
+   * once.
    * <p>
    * TODO RT_AB: More general handling of all realtime indexes outside primary data structures.
    */
@@ -146,8 +147,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
 
   /**
    * The realTimeAdded* maps are indexes on the trips created at runtime (extra-journey), and the
-   * Route, TripPattern, TripOnServiceDate they refer to.
-   * They are meant to override the corresponding indexes in TransitRepositoryIndex.
+   * Route, TripPattern, TripOnServiceDate they refer to. They are meant to override the
+   * corresponding indexes in TransitRepositoryIndex.
    */
   private final Map<FeedScopedId, Route> realtimeAddedRoutes;
   private final Map<FeedScopedId, Trip> realTimeAddedTrips;
@@ -507,7 +508,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * data, remaining on that pattern unless it's changed again by a future realtime update.
    *
    * @return true if the trip was found to be shifted to a different trip pattern by a realtime
-   * message and an attempt was made to re-associate it with its originally scheduled trip pattern.
+   *         message and an attempt was made to re-associate it with its originally scheduled trip
+   *         pattern.
    */
   public boolean revertTripToScheduledTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     validateNotReadOnly();
@@ -650,8 +652,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
   }
 
   /**
-   * Creates the new service id directly on this mutable write buffer's trip calendar, so that it
-   * is visible to (and only to) this write transaction until it commits.
+   * Creates the new service id directly on this mutable write buffer's trip calendar, so that it is
+   * visible to (and only to) this write transaction until it commits.
    */
   @Override
   @Nullable
@@ -754,13 +756,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
   }
 
   /**
-   * Replace the original Timetable by the updated one in the timetable index.
-   * The SortedSet that holds the collection of Timetables for that pattern
-   * (sorted by service date) is shared between multiple snapshots and must be copied as well.<br/>
-   * Note on performance: if  multiple Timetables are modified in a SortedSet, the SortedSet will be
-   * copied multiple times. The impact on memory/garbage collection is assumed to be minimal
-   * since the collection is small.
-   * The SortedSet is made immutable to prevent change after snapshot publication.
+   * Replace the original Timetable by the updated one in the timetable index. The SortedSet that
+   * holds the collection of Timetables for that pattern (sorted by service date) is shared between
+   * multiple snapshots and must be copied as well.<br/>
+   * Note on performance: if multiple Timetables are modified in a SortedSet, the SortedSet will be
+   * copied multiple times. The impact on memory/garbage collection is assumed to be minimal since
+   * the collection is small. The SortedSet is made immutable to prevent change after snapshot
+   * publication.
    */
   private void swapTimetable(TripPattern pattern, Timetable original, Timetable updated) {
     SortedSet<Timetable> sortedTimetables = timetables.get(pattern.getId());

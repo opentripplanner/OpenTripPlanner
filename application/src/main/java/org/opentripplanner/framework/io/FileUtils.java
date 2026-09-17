@@ -23,8 +23,8 @@ public class FileUtils {
   }
 
   /**
-   * Write the given input doc to the given file. The file is UTF-8 encoded. If an error
-   * occurs the exception is converted to a {@link RuntimeException}.
+   * Write the given input doc to the given file. The file is UTF-8 encoded. If an error occurs the
+   * exception is converted to a {@link RuntimeException}.
    */
   public static void writeFile(File file, String doc) {
     try (var os = new FileOutputStream(file); var writer = new OutputStreamWriter(os, UTF_8)) {

@@ -22,10 +22,10 @@ import org.opentripplanner.framework.transaction.api.WriteContext;
 /**
  * Default implementation of {@link UpdateManager}.
  *
- * <p>Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks.
- * After each task completes, changes are committed via the
- * {@link TransactionManager}. The transaction manager is package-private and
- * never exposed to callers — commit is an internal implementation detail.
+ * <p>
+ * Owns a single-threaded {@link ExecutorService} that serialises all submitted tasks. After each
+ * task completes, changes are committed via the {@link TransactionManager}. The transaction manager
+ * is package-private and never exposed to callers — commit is an internal implementation detail.
  */
 class DefaultUpdateManager implements UpdateManager {
 

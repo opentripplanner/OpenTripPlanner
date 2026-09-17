@@ -738,11 +738,9 @@ public class TripTimesUpdaterTest {
   }
 
   /**
-   * Test GtfsRealtime.TripUpdate with 1 stop cancellation and the regular stop times after the cancelled stop is
-   * earlier than the scheduled time at the cancelled stop.
-   * Scheduled: 0, 600, 1200
-   * Test case: 0, cancelled, 400
-   * Expect no errors and applied stop times should be increasing.
+   * Test GtfsRealtime.TripUpdate with 1 stop cancellation and the regular stop times after the
+   * cancelled stop is earlier than the scheduled time at the cancelled stop. Scheduled: 0, 600,
+   * 1200 Test case: 0, cancelled, 400 Expect no errors and applied stop times should be increasing.
    */
   @Test
   public void testUpdateWithCancellationAndEarlierThanCancelled() {
@@ -779,11 +777,9 @@ public class TripTimesUpdaterTest {
   }
 
   /**
-   * Test GtfsRealtime.TripUpdate with 1 stop cancellation and the regular stop times before the cancelled stop is
-   * later than the scheduled time at the cancelled stop.
-   * Scheduled: 0, 600, 1200
-   * Test case: 1000, cancelled, 1200
-   * Expect no errors and applied stop times should be increasing.
+   * Test GtfsRealtime.TripUpdate with 1 stop cancellation and the regular stop times before the
+   * cancelled stop is later than the scheduled time at the cancelled stop. Scheduled: 0, 600, 1200
+   * Test case: 1000, cancelled, 1200 Expect no errors and applied stop times should be increasing.
    */
   @Test
   public void testUpdateWithCancellationAndLaterThanCancelled() {
@@ -820,10 +816,9 @@ public class TripTimesUpdaterTest {
   }
 
   /**
-   * Test GtfsRealtime.TripUpdate with 1 stop cancellation and the regular stop times are non-increasing.
-   * Scheduled: 0, 600, 1200
-   * Test case: 1000, cancelled, 800
-   * Expect errors, since the stop times are not increasing.
+   * Test GtfsRealtime.TripUpdate with 1 stop cancellation and the regular stop times are
+   * non-increasing. Scheduled: 0, 600, 1200 Test case: 1000, cancelled, 800 Expect errors, since
+   * the stop times are not increasing.
    */
   @Test
   public void testUpdateWithCancellationAndNonIncreasingTimes() {
@@ -850,10 +845,9 @@ public class TripTimesUpdaterTest {
   }
 
   /**
-   * Test GtfsRealtime.TripUpdate with 1 stop cancellation at the beginning of the route and running early.
-   * Scheduled: 0, 600, 1200
-   * Test case: cancelled, -100, 1200
-   * Expect no errors and the stop times are increasing.
+   * Test GtfsRealtime.TripUpdate with 1 stop cancellation at the beginning of the route and running
+   * early. Scheduled: 0, 600, 1200 Test case: cancelled, -100, 1200 Expect no errors and the stop
+   * times are increasing.
    */
   @Test
   public void testUpdateWithStartTerminalCancellationAndEarly() {
@@ -891,9 +885,8 @@ public class TripTimesUpdaterTest {
 
   /**
    * Test GtfsRealtime.TripUpdate with 1 stop cancellation at the end of the route and running late.
-   * Scheduled: 0, 600, 1200
-   * Test case: 0, 1300, cancelled
-   * Expect no errors and the stop times are increasing.
+   * Scheduled: 0, 600, 1200 Test case: 0, 1300, cancelled Expect no errors and the stop times are
+   * increasing.
    */
   @Test
   public void testUpdateWithEndTerminalCancellationAndLate() {
@@ -930,10 +923,9 @@ public class TripTimesUpdaterTest {
   }
 
   /**
-   * Test GtfsRealtime.TripUpdate with multiple stop cancelled together.
-   * Scheduled: 0, 0, 600, 1200, 1800, 2400, 3000, 3600
-   * Test case: 600, cancelled, cancelled, cancelled, cancelled, cancelled, cancelled, 2400
-   * Expect no errors and the stop times are increasing.
+   * Test GtfsRealtime.TripUpdate with multiple stop cancelled together. Scheduled: 0, 0, 600, 1200,
+   * 1800, 2400, 3000, 3600 Test case: 600, cancelled, cancelled, cancelled, cancelled, cancelled,
+   * cancelled, 2400 Expect no errors and the stop times are increasing.
    */
   @Test
   public void testUpdateWithMultipleCancellationsTogether() {
@@ -988,10 +980,9 @@ public class TripTimesUpdaterTest {
   }
 
   /**
-   * Test GtfsRealtime.TripUpdate with multiple separate stop cancellations.
-   * Scheduled: 0, 0, 600, 1200, 1800, 2400, 3000, 3600
-   * Test case: 600, cancelled, cancelled, 700, 2300, cancelled, cancelled, 2400
-   * Expect no errors and the stop times are increasing.
+   * Test GtfsRealtime.TripUpdate with multiple separate stop cancellations. Scheduled: 0, 0, 600,
+   * 1200, 1800, 2400, 3000, 3600 Test case: 600, cancelled, cancelled, 700, 2300, cancelled,
+   * cancelled, 2400 Expect no errors and the stop times are increasing.
    */
   @Test
   public void testUpdateWithMultipleSeparateCancellations() {

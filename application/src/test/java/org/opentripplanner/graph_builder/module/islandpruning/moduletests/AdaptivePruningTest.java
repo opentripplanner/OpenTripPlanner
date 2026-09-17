@@ -9,9 +9,9 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningEnvir
 import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParameters;
 
 /**
- * Graph has one main part and two smaller equally sized islands.
- * Island which is close to the main part gets pruned, whereras a distant island
- * is not pruned, because it is considered a real island, not a connectivity error.
+ * Graph has one main part and two smaller equally sized islands. Island which is close to the main
+ * part gets pruned, whereras a distant island is not pruned, because it is considered a real
+ * island, not a connectivity error.
  */
 class AdaptivePruningTest {
 

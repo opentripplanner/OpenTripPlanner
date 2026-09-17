@@ -15,7 +15,7 @@ In addition to running Prettier, Spotless removes unused imports from Java files
 them. Imports that are only referenced from Javadoc (for example `{@link Foo}`) are kept.
 
 Prettier does not format the _content_ of Javadoc comments, it only re-indents them. Spotless
-therefore runs the Eclipse JDT formatter before Prettier, configured to format  Javadoc comments
+therefore runs the Eclipse JDT formatter before Prettier, configured to format Javadoc comments
 only.
 
 #### Preventing Javadoc formatting

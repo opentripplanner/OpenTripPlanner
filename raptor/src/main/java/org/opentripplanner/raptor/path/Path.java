@@ -19,15 +19,15 @@ import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The result of a Raptor search is a path describing the one possible journey. The path is the
- * main DTO part of the Raptor result, but it is also used internally in Raptor. Hence, it is a bit
- * more complex, and it has more responsiblilities than it should.
+ * The result of a Raptor search is a path describing the one possible journey. The path is the main
+ * DTO part of the Raptor result, but it is also used internally in Raptor. Hence, it is a bit more
+ * complex, and it has more responsiblilities than it should.
  * <p>
- * To improve the design, Raptor should not use the path internally. Instead, there should
- * be a special destination arrival that could take over the Raptor responsibilities. The
- * path would still need to be constructed at the time of arrival and then become a part of the
- * destination arrival. The reason for this is that the data necessary to create a path is not
- * kept in the Raptor state between rounds.
+ * To improve the design, Raptor should not use the path internally. Instead, there should be a
+ * special destination arrival that could take over the Raptor responsibilities. The path would
+ * still need to be constructed at the time of arrival and then become a part of the destination
+ * arrival. The reason for this is that the data necessary to create a path is not kept in the
+ * Raptor state between rounds.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

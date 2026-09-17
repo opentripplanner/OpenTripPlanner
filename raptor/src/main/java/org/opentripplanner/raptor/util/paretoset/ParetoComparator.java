@@ -17,8 +17,8 @@ package org.opentripplanner.raptor.util.paretoset;
 @FunctionalInterface
 public interface ParetoComparator<T> {
   /**
-   * Returns {@code true} if at least one criterion in {@code left} is better then the
-   * corresponding criterion in {@code right}.
+   * Returns {@code true} if at least one criterion in {@code left} is better then the corresponding
+   * criterion in {@code right}.
    */
   boolean leftDominanceExist(T left, T right);
 

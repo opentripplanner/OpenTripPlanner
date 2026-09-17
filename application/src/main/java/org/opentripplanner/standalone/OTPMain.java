@@ -48,8 +48,7 @@ public class OTPMain {
   }
 
   /**
-   * ENTRY POINT: This is the main method that is called when running otp.jar from the command
-   * line.
+   * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
    */
   public static void main(String[] args) {
     try {
@@ -227,8 +226,8 @@ public class OTPMain {
    * Shut down this server when evicted or (auto-)reloaded.
    * <ol>
    *   <li>Stop any real-time updater threads.</li>
-   *   <li>Cleanup various stuff of some used libraries (org.geotools), which depend on the
-   *   external client to call them for cleaning-up.</li>
+   *   <li>Cleanup various stuff of some used libraries (org.geotools), which depend on the external
+   *       client to call them for cleaning-up.</li>
    * </ol>
    */
   private static void registerShutdownHookToGracefullyShutDownServer(

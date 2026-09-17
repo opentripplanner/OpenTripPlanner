@@ -131,11 +131,10 @@ class DefaultAccessEgressTest {
   }
 
   /**
-   * Verify that the scalar values extracted during DefaultAccessEgress construction
-   * (duration, generalized cost, walk-only mode) are identical for reversed and unreversed
-   * State chains. This invariant allows deferring State.reverse() from AccessEgressMapper
-   * to GraphPath construction, where it is only applied to winning paths rather than all
-   * candidates.
+   * Verify that the scalar values extracted during DefaultAccessEgress construction (duration,
+   * generalized cost, walk-only mode) are identical for reversed and unreversed State chains. This
+   * invariant allows deferring State.reverse() from AccessEgressMapper to GraphPath construction,
+   * where it is only applied to winning paths rather than all candidates.
    */
   @Test
   void scalarValuesAreIdenticalForReversedAndUnreversedState() {

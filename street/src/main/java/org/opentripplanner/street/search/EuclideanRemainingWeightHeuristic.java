@@ -22,12 +22,12 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 /**
  * A Euclidean remaining weight strategy.
  * <p>
- * Generates an admissible heuristic by simply calculating the direct distance to the target,
- * and calculating the minimum possible weight for that. Any path which diverts from the straight
- * line or does not travel at the maximum possible "speed" for the given modes will have a larger
- * weight. "Speed" is in scare quotes because we have to consider the effect of safety on the
- * cost for non-car modes, so instead of maximum speed we actually use minimum cost per distance,
- * where cost is calculated in a mode-appropriate way.
+ * Generates an admissible heuristic by simply calculating the direct distance to the target, and
+ * calculating the minimum possible weight for that. Any path which diverts from the straight line
+ * or does not travel at the maximum possible "speed" for the given modes will have a larger weight.
+ * "Speed" is in scare quotes because we have to consider the effect of safety on the cost for
+ * non-car modes, so instead of maximum speed we actually use minimum cost per distance, where cost
+ * is calculated in a mode-appropriate way.
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic<State> {
 

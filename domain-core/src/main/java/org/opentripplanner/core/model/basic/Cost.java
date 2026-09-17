@@ -7,8 +7,8 @@ import org.opentripplanner.utils.lang.OtpNumberFormat;
 
 /**
  * A type safe representation of a cost, like generalized-cost. A cost unit is equivalent of riding
- * transit for 1 seconds. Note! The resolution of the cost is 1/100 (centi-seconds) of a second,
- * the same as in Raptor. A cost can not be negative.
+ * transit for 1 seconds. Note! The resolution of the cost is 1/100 (centi-seconds) of a second, the
+ * same as in Raptor. A cost can not be negative.
  * <p>
  * This is an immutable, thread-safe value-object.
  */

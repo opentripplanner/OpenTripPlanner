@@ -10,6 +10,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * Parameters to configure the multi-criteria search.
  * <p>
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
@@ -39,11 +40,11 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
   /**
    * Whether to accept non-optimal trips if they are close enough with respect to
-   * c1(generalized-cost). In other words this relaxes the pareto comparison at
-   * each stop and at the destination.
+   * c1(generalized-cost). In other words this relaxes the pareto comparison at each stop and at the
+   * destination.
    * <p>
-   * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip
-   * with cost {@code c'} is accepted if the following is true:
+   * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
+   * {@code c'} is accepted if the following is true:
    * <pre>
    * c' < RelaxFunction.relax(c)
    * </pre>

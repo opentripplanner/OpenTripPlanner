@@ -6,10 +6,10 @@ import java.util.Set;
 /**
  * Parameters for HTTP response time metrics.
  *
- * @param clientHeader the HTTP header name used to identify the client
- * @param monitoredClients the set of client names to track individually
- * @param monitoredEndpoints the set of endpoint paths to monitor for metrics
- * @param metricName the name of the metric to record
+ * @param clientHeader            the HTTP header name used to identify the client
+ * @param monitoredClients        the set of client names to track individually
+ * @param monitoredEndpoints      the set of endpoint paths to monitor for metrics
+ * @param metricName              the name of the metric to record
  * @param minExpectedResponseTime minimum expected response time for histogram buckets
  * @param maxExpectedResponseTime maximum expected response time for histogram buckets
  */

@@ -24,9 +24,9 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * With FLEX access and egress Raptor must support access/egress paths with more then one leg. These
- * access paths have more transfers that regular paths, hence should not dominate access/egress
- * walking, but only get accepted when they are better on time and/or cost.
+ * With FLEX access and egress Raptor must support access/egress paths with more then one leg.
+ * These access paths have more transfers that regular paths, hence should not dominate
+ * access/egress walking, but only get accepted when they are better on time and/or cost.
  */
 public class F02_EgressWithRidesTest implements RaptorTestConstants {
 

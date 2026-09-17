@@ -10,7 +10,7 @@ import java.util.List;
 public class ApiPlace {
 
   /**
-   * For transit stops, the name of the stop.  For points of interest, the name of the POI.
+   * For transit stops, the name of the stop. For points of interest, the name of the POI.
    */
   public String name = null;
 

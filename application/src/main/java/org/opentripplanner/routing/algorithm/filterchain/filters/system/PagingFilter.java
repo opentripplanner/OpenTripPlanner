@@ -15,8 +15,8 @@ import org.opentripplanner.utils.collection.ListSection;
  * and keep missed itineraries. It uses information from the page cursor to determine which
  * itineraries are potential duplicates and missed ones.
  * <p>
- * Based on where the previous results were cropped the potential duplicates will appear either at
- * the top of the list, or the bottom. If the previous results were cropped at the top, then the
+ * Based on where the previous results were cropped the potential duplicates will appear either
+ * at the top of the list, or the bottom. If the previous results were cropped at the top, then the
  * potential duplicates will appear at the bottom of the list. If the previous results were cropped
  * at the bottom, then the potential duplicates will appear at the top of the list.
  */

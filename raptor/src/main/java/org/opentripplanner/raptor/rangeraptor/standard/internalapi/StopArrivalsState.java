@@ -16,9 +16,9 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * <p>
  * Different implementations may implement this to:
  * <ul>
- *     <li>Compute paths
- *     <li>Enable debugging
- *     <li>Compute heuristics
+ *   <li>Compute paths
+ *   <li>Enable debugging
+ *   <li>Compute heuristics
  * </ul>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

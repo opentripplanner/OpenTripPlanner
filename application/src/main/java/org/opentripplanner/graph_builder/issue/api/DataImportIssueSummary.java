@@ -34,8 +34,8 @@ public class DataImportIssueSummary implements Serializable {
   }
 
   /**
-   * Takes two summaries and combine them into a single one. If there are types that
-   * are in both summaries their counts are added.
+   * Takes two summaries and combine them into a single one. If there are types that are in both
+   * summaries their counts are added.
    */
   public static DataImportIssueSummary combine(
     DataImportIssueSummary first,

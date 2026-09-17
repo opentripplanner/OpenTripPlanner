@@ -50,13 +50,13 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
  * <p>
- * The Graph object does not contain a collection of edges. The set of edges is generated on demand
- * from the vertices. However, when serializing, we intentionally do not serialize the vertices'
- * edge lists to prevent excessive recursion. So we need to save the edges along with the graph. We
- * used to make two serialization calls, one for the graph and one for the edges. But we need the
- * serializer to know that vertices referenced by the edges are the same vertices stored in the
- * graph itself. The easiest way to do this is to make only one serialization call, serializing a
- * single object that contains both the graph and the edge collection.
+ * The Graph object does not contain a collection of edges. The set of edges is generated on
+ * demand from the vertices. However, when serializing, we intentionally do not serialize the
+ * vertices' edge lists to prevent excessive recursion. So we need to save the edges along with the
+ * graph. We used to make two serialization calls, one for the graph and one for the edges. But we
+ * need the serializer to know that vertices referenced by the edges are the same vertices stored in
+ * the graph itself. The easiest way to do this is to make only one serialization call, serializing
+ * a single object that contains both the graph and the edge collection.
  */
 public class SerializedGraphObject implements Serializable {
 
@@ -83,8 +83,8 @@ public class SerializedGraphObject implements Serializable {
   public final RouterConfig routerConfig;
 
   /**
-   * All submodes are cached in a static collection inside SubMode,
-   * hence we need to serialize that as well
+   * All submodes are cached in a static collection inside SubMode, hence we need to serialize that
+   * as well
    */
   private final List<SubMode> allTransitSubModes;
 

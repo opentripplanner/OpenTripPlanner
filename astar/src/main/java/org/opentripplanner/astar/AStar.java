@@ -67,13 +67,18 @@ public class AStar<
   private int nVisited;
 
   /// Create an AStar search
-  /// @param initialStates The initial states to start the search from.
-  /// @param arriveBy If set to true we will do a backwards search by traversing the incoming edges from each vertex.
-  /// @param dominanceFunction A dominance function that determines which states we should keep during the search.
-  /// @param goalVertices The search stops once the first goal vertex is reached.
-  /// @param heuristic An astar heuristic that estimates a lower bound of the weight to the destination. If set to null the search will be a basic Dijkstra search.
-  /// @param timeout A timeout that exits the search.
-  /// @param preSearchHook A runnable that is run before the search starts.
+  ///
+  /// @param initialStates      The initial states to start the search from.
+  /// @param arriveBy           If set to true we will do a backwards search by traversing the
+  ///                           incoming edges from each vertex.
+  /// @param dominanceFunction  A dominance function that determines which states we should keep
+  ///                           during the search.
+  /// @param goalVertices       The search stops once the first goal vertex is reached.
+  /// @param heuristic          An astar heuristic that estimates a lower bound of the weight to the
+  ///                           destination. If set to null the search will be a basic Dijkstra
+  ///                           search.
+  /// @param timeout            A timeout that exits the search.
+  /// @param preSearchHook      A runnable that is run before the search starts.
   /// @param statisticsCallback A pluggable callback for logging metrics.
   AStar(
     Collection<State> initialStates,

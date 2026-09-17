@@ -50,7 +50,8 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * @return the effective pickup type even if it is not explicitly specified, for the use in NEW trips.
+   * @return the effective pickup type even if it is not explicitly specified, for the use in NEW
+   *         trips.
    */
   public PickDrop effectivePickup() {
     return getEffectivePickDrop(
@@ -64,7 +65,8 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * @return the effective dropoff type even if it is not explicitly specified, for the use in NEW trips.
+   * @return the effective dropoff type even if it is not explicitly specified, for the use in NEW
+   *         trips.
    */
   public PickDrop effectiveDropoff() {
     return getEffectivePickDrop(
@@ -118,9 +120,9 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * Check if the arrival for a SCHEDULED trip update is valid.
-   * If it is provided, it must either contain a time or delay.
-   * This check does not apply to a NEW trip update where it is possible to provide only a scheduled time.
+   * Check if the arrival for a SCHEDULED trip update is valid. If it is provided, it must either
+   * contain a time or delay. This check does not apply to a NEW trip update where it is possible to
+   * provide only a scheduled time.
    */
   public boolean isArrivalValid() {
     return (
@@ -131,9 +133,9 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * Check if the departure for a SCHEDULED trip update is valid.
-   * If it is provided, it must either contain a time or delay.
-   * This check does not apply to a NEW trip update where it is possible to provide only a scheduled time.
+   * Check if the departure for a SCHEDULED trip update is valid. If it is provided, it must either
+   * contain a time or delay. This check does not apply to a NEW trip update where it is possible to
+   * provide only a scheduled time.
    */
   public boolean isDepartureValid() {
     return (
@@ -213,8 +215,8 @@ public final class StopTimeUpdate {
   }
 
   /**
-   * Get the scheduled time of a StopTimeEvent.
-   * If it is not specified, calculate it from time - delay.
+   * Get the scheduled time of a StopTimeEvent. If it is not specified, calculate it from time -
+   * delay.
    */
   private OptionalLong getScheduledTimeWithRealTimeFallback(StopTimeEvent stopTimeEvent) {
     return stopTimeEvent.hasScheduledTime()

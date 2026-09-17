@@ -8,8 +8,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A filter class that checks if parking facilities match certain conditions for
- * inclusion/exclusion or preference/unpreference.
+ * A filter class that checks if parking facilities match certain conditions for inclusion/exclusion
+ * or preference/unpreference.
  */
 public class VehicleParkingFilter implements Serializable {
 

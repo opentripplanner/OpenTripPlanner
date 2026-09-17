@@ -32,8 +32,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private static final int NOT_SET = -999_999_999;
 
   /**
-   * The path is not reversed, so we can use the forward transit calculator to calculate the
-   * egress board-time (egress with rides).
+   * The path is not reversed, so we can use the forward transit calculator to calculate the egress
+   * board-time (egress with rides).
    */
   private static final TransitCalculator<?> TRANSIT_CALCULATOR = new ForwardTransitCalculator<>();
 
@@ -254,9 +254,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * <p>
    * {@code -1} is returned:
    * <ul>
-   *     <li>if this leg is not a transit leg</li>
-   *     <li>no transit leg exist after this leg</li>
-   * <ul>
+   *   <li>if this leg is not a transit leg</li>
+   *   <li>no transit leg exist after this leg</li>
+   *   <ul>
    */
   public int waitTimeBeforeNextTransitIncludingSlack() {
     if (next.hasRides()) {
@@ -485,10 +485,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /**
    * We need to calculate the access-arrival-time. There are 3 cases:
    * <ol>
-   *     <li>Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)</li>
-   *     <li>Flex and transit: Flex ~ (transferSlack + boardSlack) ~ transit</li>
-   *     <li>Flex, walk and transit: Flex ~ Walk ~ (transferSlack + boardSlack) ~ transit</li>
-   *     <li>Flex, walk and Flex: Flex ~ Walk ~ Flex (will be timeshifted in relation to the iteration departure time)</li>
+   *   <li>Normal case: Walk ~ boardSlack ~ transit (access can be time-shifted)</li>
+   *   <li>Flex and transit: Flex ~ (transferSlack + boardSlack) ~ transit</li>
+   *   <li>Flex, walk and transit: Flex ~ Walk ~ (transferSlack + boardSlack) ~ transit</li>
+   *   <li>Flex, walk and Flex: Flex ~ Walk ~ Flex (will be timeshifted in relation to the iteration
+   *       departure time)</li>
    * </ol>
    * Flex access may or may not be time-shifted.
    */

@@ -14,8 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * This class configure the amount of debugging you want for your request. Debugging is supported by
  * an event model and event listeners must be provided to receive any debug info.
  * <p>
- * To debug unexpected results is sometimes very time-consuming. This class make it possible to list
- * all stop arrival events during the search for a given list of stops and/or a path.
+ * To debug unexpected results is sometimes very time-consuming. This class make it possible to
+ * list all stop arrival events during the search for a given list of stops and/or a path.
  * <p>
  * The debug events are not returned as part of the result, instead they are posted to registered
  * listeners. The events are temporary objects; hence you should not hold a reference to the event
