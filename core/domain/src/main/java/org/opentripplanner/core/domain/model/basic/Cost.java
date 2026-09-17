@@ -1,4 +1,4 @@
-package org.opentripplanner.core.model.basic;
+package org.opentripplanner.core.domain.model.basic;
 
 import java.io.Serializable;
 import java.time.Duration;

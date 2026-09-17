@@ -8,7 +8,7 @@ import static org.opentripplanner.routing.alertpatch.AlertSeverity.INFO;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;

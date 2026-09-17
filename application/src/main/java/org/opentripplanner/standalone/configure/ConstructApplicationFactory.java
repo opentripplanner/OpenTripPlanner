@@ -9,7 +9,7 @@ import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchemaModule;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;

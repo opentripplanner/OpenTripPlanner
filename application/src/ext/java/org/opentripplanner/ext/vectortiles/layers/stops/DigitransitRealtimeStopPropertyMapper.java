@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
-import org.opentripplanner.core.model.i18n.I18NStringMapper;
+import org.opentripplanner.core.domain.model.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.TransitAlert;

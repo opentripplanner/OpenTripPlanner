@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;

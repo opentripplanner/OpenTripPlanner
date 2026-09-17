@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.core.domain.model.time.TimePeriod;
 
 class AlertCalendarTest {
 

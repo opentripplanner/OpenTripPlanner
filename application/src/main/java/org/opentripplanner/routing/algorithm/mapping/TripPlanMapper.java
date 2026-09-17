@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.time.Instant;
 import java.util.List;
-import org.opentripplanner.core.model.i18n.LocalizedString;
+import org.opentripplanner.core.domain.model.i18n.LocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;

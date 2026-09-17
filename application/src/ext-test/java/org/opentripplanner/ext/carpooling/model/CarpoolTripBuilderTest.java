@@ -12,7 +12,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopA
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
 public class CarpoolTripBuilderTest {

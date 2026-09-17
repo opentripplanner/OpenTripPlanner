@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 /**
  * Handles mapping from external IDs into feed-scoped ones.

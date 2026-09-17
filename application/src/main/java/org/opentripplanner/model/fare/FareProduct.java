@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

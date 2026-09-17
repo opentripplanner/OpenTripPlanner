@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
 import java.util.List;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.StopTime;
 
 /**

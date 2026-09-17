@@ -3,8 +3,8 @@ package org.opentripplanner.model.calendar;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 
 /**
  * Note that I decided to call this class ServiceCalendar instead of Calendar, so as to avoid

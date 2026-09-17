@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 public class FeedScopedIdFactoryTest {
 

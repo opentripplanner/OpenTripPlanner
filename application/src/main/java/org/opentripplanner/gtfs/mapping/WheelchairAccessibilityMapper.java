@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.core.domain.model.accessibility.Accessibility;
 
 class WheelchairAccessibilityMapper {
 

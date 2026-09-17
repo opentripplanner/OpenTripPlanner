@@ -6,7 +6,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;

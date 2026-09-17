@@ -1,4 +1,4 @@
-package org.opentripplanner.core.model.time;
+package org.opentripplanner.core.domain.model.time;
 
 import static java.time.LocalDate.MAX;
 import static java.time.LocalDate.MIN;

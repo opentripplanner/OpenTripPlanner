@@ -2,7 +2,7 @@ package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
 import java.util.Optional;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;

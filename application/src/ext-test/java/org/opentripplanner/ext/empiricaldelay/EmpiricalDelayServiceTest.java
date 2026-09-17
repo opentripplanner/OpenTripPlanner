@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayService;
 import org.opentripplanner.ext.empiricaldelay.model.TripDelays;

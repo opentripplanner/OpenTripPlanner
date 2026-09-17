@@ -5,9 +5,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Objects;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.core.framework.di.TransitServicePeriod;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.domain.framework.di.TransitServicePeriod;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 
 public class OpeningHoursCalendarService implements Serializable {
 

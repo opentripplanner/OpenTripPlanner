@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
 import java.util.Objects;
-import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.domain.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.utils.lang.Units;
 

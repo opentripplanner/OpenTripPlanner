@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
