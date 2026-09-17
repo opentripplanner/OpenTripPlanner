@@ -159,7 +159,7 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.4.2</version>
+            <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -300,7 +300,7 @@
         <dependency>
             <groupId>org.openstreetmap.pbf</groupId>
             <artifactId>osmpbf</artifactId>
-            <version>1.6.1</version>
+            <version>1.8.0</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>

@@ -18,6 +18,12 @@
             <message key="import.illegal"
                      value="LinkedList is almost always the wrong choice; use ArrayList for List usage or ArrayDeque for Queue/Deque usage instead."/>
         </module>
+        <module name="IllegalImport">
+            <property name="illegalClasses"
+                      value="javax.annotation.Nonnull, org.jspecify.annotations.NonNull"/>
+            <message key="import.illegal"
+                     value="Everything not annotated with @Nullable is assumed to be non-null."/>
+        </module>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>
         <module name="SimplifyBooleanReturn"/>
