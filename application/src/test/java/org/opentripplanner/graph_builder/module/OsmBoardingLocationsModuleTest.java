@@ -1,7 +1,9 @@
 package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
@@ -23,8 +25,11 @@ import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetModelForTest;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -529,8 +534,9 @@ class OsmBoardingLocationsModuleTest {
     var boardingLocation2 = linkedBoardingLocation(platformVertex2);
 
     // Each stop gets its own, distinct boarding location vertex (no deduplication to a centroid).
-    assertTrue(
-      boardingLocation1 != boardingLocation2,
+    assertNotSame(
+      boardingLocation1,
+      boardingLocation2,
       "Each stop should get its own boarding location vertex in TRANSIT mode"
     );
 
@@ -547,6 +553,17 @@ class OsmBoardingLocationsModuleTest {
       distance < 50,
       "Boarding locations on the same platform should be close, but were " + distance + " m apart"
     );
+
+    // Each boarding location is wired into the area with visibility edges (AreaEdge), in addition
+    // to the stop link. This is what connects it into the street network; without it the vertex
+    // would be placed at the stop coordinate but left floating.
+    assertConnections(boardingLocation1, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
+    assertConnections(boardingLocation2, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
+
+    // Stronger check: the visibility edges make the vertex reachable through the area in both
+    // directions (you can both enter and leave it via the area), so routing can actually use it.
+    assertReachableThroughArea(boardingLocation1);
+    assertReachableThroughArea(boardingLocation2);
   }
 
   /**
@@ -597,7 +614,7 @@ class OsmBoardingLocationsModuleTest {
       BoardingLocationCoordinateSource.TRANSIT
     );
 
-    assertTrue(!platformVertex9.getOutgoing().isEmpty(), "the stop should be linked");
+    assertFalse(platformVertex9.getOutgoing().isEmpty(), "the stop should be linked");
 
     // Guard: this test is only meaningful if linking actually split a platform edge (otherwise
     // there are no new edge halves to re-register).
@@ -624,10 +641,174 @@ class OsmBoardingLocationsModuleTest {
       .filter(StreetEdge.class::isInstance)
       .toList();
 
-    assertTrue(!incidentStreetEdges.isEmpty(), "expected the stop to be linked to a split vertex");
+    assertFalse(incidentStreetEdges.isEmpty(), "expected the stop to be linked to a split vertex");
     assertTrue(
       incidentStreetEdges.stream().allMatch(e -> osmService.findPlatform(e).isPresent()),
       "all street edges incident to the split vertices should be re-registered with the platform"
+    );
+  }
+
+  /**
+   * Regression guard for {@code reRegisterSplitEdgesWithPlatform} in the default
+   * {@link BoardingLocationCoordinateSource#OSM} mode. Two stops reference the same linear platform
+   * way. Linking the first stop splits the platform edge and removes the original edge from the
+   * graph, unless the split halves are re-registered with the platform, the second stop can no
+   * longer find the platform via {@code connectVertexToWay} and would be left unlinked (or linked
+   * elsewhere). This asserts that both stops end up linked to the platform.
+   */
+  @Test
+  void testSecondStopOnSameLinearPlatformIsLinkedInOsmMode() {
+    var graph = new Graph();
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmModule = OsmModuleTestFactory.of(
+      new DefaultOsmProvider(
+        ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
+          "two-stops-linear-platform.osm.pbf"
+        ),
+        false
+      )
+    )
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
+      .withBoardingAreaRefTags(Set.of("ref"))
+      .build();
+    osmModule.buildGraph();
+    graph.index();
+
+    var factory = new VertexFactory(graph);
+
+    // Two stops that both reference the single linear platform way (ref=STOP_A;STOP_B), at distinct
+    // coordinates along it so each projects to a different, interior point (a genuine split).
+    var stopA = testModel.stop("STOP_A").withCoordinate(48.5928, 8.86288).build();
+    var stopB = testModel.stop("STOP_B").withCoordinate(48.5928, 8.86312).build();
+
+    var stopVertexA = factory.transitStop(ofStop(stopA));
+    var stopVertexB = factory.transitStop(ofStop(stopB));
+
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(stopA, stopB))
+      .build();
+    var transitRepository = new TransitRepository(siteRepo);
+    transitRepository.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
+
+    // Both stops must be linked. Without re-registering the split halves, the second stop cannot
+    // find the platform (its edges were replaced by the first stop's split) and stays unlinked.
+    assertFalse(
+      stopVertexA.getOutgoing().isEmpty(),
+      "the first stop on the linear platform should be linked"
+    );
+    assertFalse(
+      stopVertexB.getOutgoing().isEmpty(),
+      "the second stop on the same linear platform should also be linked"
+    );
+
+    // On a linear platform the stop links to the split vertex on the platform edge (not to the
+    // centroid vertex directly). The split vertices must still be registered with the platform.
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+    for (var stopVertex : List.of(stopVertexA, stopVertexB)) {
+      var incidentPlatformEdges = stopVertex
+        .getOutgoing()
+        .stream()
+        .map(Edge::getToVertex)
+        .flatMap(v -> Stream.concat(v.getIncoming().stream(), v.getOutgoing().stream()))
+        .filter(StreetEdge.class::isInstance)
+        .toList();
+      assertTrue(
+        incidentPlatformEdges.stream().anyMatch(e -> osmService.findPlatform(e).isPresent()),
+        "the vertex the stop is linked to should sit on a platform-registered edge"
+      );
+    }
+  }
+
+  /**
+   * Regression guard for {@code reRegisterSplitEdgesWithPlatform}: when linking snaps the boarding
+   * location to an <em>existing</em> endpoint of the platform edge instead of splitting it, no
+   * {@link SplitterVertex} is produced and the method must return early. In particular it must not
+   * re-register the endpoint's <em>other</em> incident edges with the platform — otherwise an
+   * unrelated street edge that merely happens to share the endpoint would be wrongly tagged as part
+   * of the platform, letting a later stop "match" a platform it is not on.
+   * <p>
+   * The scenario is built synthetically: a linear platform way (A—B) shares endpoint A with an
+   * unrelated street (A—C). The stop sits exactly on A, so linking snaps to A (within the
+   * end-tolerance) rather than splitting the platform edge.
+   */
+  @Test
+  void testSnapToEndpointDoesNotReRegisterUnrelatedEdges() {
+    var graph = new Graph();
+
+    // A is the shared endpoint: the platform way (A—B) and an unrelated street (A—C) both touch it.
+    var a = StreetModelForTest.intersectionVertex("A", 48.59, 8.86);
+    var b = StreetModelForTest.intersectionVertex("B", 48.59, 8.8613);
+    var c = StreetModelForTest.intersectionVertex("C", 48.5893, 8.86);
+    graph.addVertex(a);
+    graph.addVertex(b);
+    graph.addVertex(c);
+
+    var platformEdgeAb = StreetModelForTest.streetEdge(a, b, StreetTraversalPermission.PEDESTRIAN);
+    var platformEdgeBa = StreetModelForTest.streetEdge(b, a, StreetTraversalPermission.PEDESTRIAN);
+    // Unrelated edges sharing endpoint A - these must never be tagged with the platform.
+    var unrelatedEdgeAc = StreetModelForTest.streetEdge(a, c, StreetTraversalPermission.PEDESTRIAN);
+    var unrelatedEdgeCa = StreetModelForTest.streetEdge(c, a, StreetTraversalPermission.PEDESTRIAN);
+
+    // A stop placed exactly on endpoint A, matching the platform via its id.
+    var stop = testModel.stop("stop-on-endpoint").withCoordinate(48.59, 8.86).build();
+    var platform = new Platform(
+      I18NString.of("platform"),
+      platformEdgeAb.getGeometry(),
+      Set.of(stop.getId().getId())
+    );
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(platformEdgeAb, platform);
+    osmInfoRepository.addPlatform(platformEdgeBa, platform);
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    // The coordinate source does not matter for this guard, but TRANSIT places the boarding
+    // location exactly on the stop (endpoint A), which is what makes linking snap rather than split.
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    // The stop is linked to the shared endpoint A itself, not to a freshly created split vertex.
+    assertTrue(!stopVertex.getOutgoing().isEmpty(), "the stop should be linked");
+    var linkedVertex = stopVertex.getOutgoing().iterator().next().getToVertex();
+    assertTrue(
+      !(linkedVertex instanceof SplitterVertex),
+      "linking should have snapped to the existing endpoint, not split the platform edge"
+    );
+
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+
+    // The platform edges are still registered (untouched by the early return).
+    assertTrue(osmService.findPlatform(platformEdgeAb).isPresent());
+    assertTrue(osmService.findPlatform(platformEdgeBa).isPresent());
+
+    // The unrelated edges sharing endpoint A must NOT have been tagged with the platform.
+    assertTrue(
+      osmService.findPlatform(unrelatedEdgeAc).isEmpty(),
+      "an unrelated edge sharing the snapped endpoint must not be re-registered with the platform"
+    );
+    assertTrue(
+      osmService.findPlatform(unrelatedEdgeCa).isEmpty(),
+      "an unrelated edge sharing the snapped endpoint must not be re-registered with the platform"
     );
   }
 
@@ -705,6 +886,23 @@ class OsmBoardingLocationsModuleTest {
   ) {
     Stream.of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing()).forEach(edges ->
       assertEquals(expected, edges.stream().map(Edge::getClass).collect(Collectors.toSet()))
+    );
+  }
+
+  /**
+   * Assert that the boarding location vertex is wired into the area via visibility edges
+   * ({@link AreaEdge}), so it can both be entered and left through the area. A vertex that was
+   * placed but not connected (e.g. because its coordinate fell outside the polygon and no
+   * visibility edge could be added) would fail this.
+   */
+  private static void assertReachableThroughArea(OsmBoardingLocationVertex boardingLocation) {
+    assertTrue(
+      boardingLocation.getIncoming().stream().anyMatch(AreaEdge.class::isInstance),
+      "boarding location should be reachable through the area (incoming AreaEdge)"
+    );
+    assertTrue(
+      boardingLocation.getOutgoing().stream().anyMatch(AreaEdge.class::isInstance),
+      "boarding location should be able to leave through the area (outgoing AreaEdge)"
     );
   }
 
