@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.internal;
+package org.opentripplanner.core.framework.transaction.internal;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URI;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner._support.net.URIUtils;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 
 class EmissionFeedParametersTest {
 

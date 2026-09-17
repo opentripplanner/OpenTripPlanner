@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.transaction.internal;
+package org.opentripplanner.core.framework.transaction.internal;
 
 import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;

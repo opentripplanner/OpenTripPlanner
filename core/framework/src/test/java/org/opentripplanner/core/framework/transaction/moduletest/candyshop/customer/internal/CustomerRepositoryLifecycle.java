@@ -1,8 +1,8 @@
-package org.opentripplanner.framework.transaction.moduletest.candyshop.customer.internal;
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.internal;
 
 import org.opentripplanner.core.domain.framework.transaction.api.RepositoryLifecycle;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
-import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
+import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
 
 /**
  * This life-cycle will create a new mutable repository for each transaction and freeze it into a
