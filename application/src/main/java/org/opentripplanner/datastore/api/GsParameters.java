@@ -3,6 +3,13 @@ package org.opentripplanner.datastore.api;
 import javax.annotation.Nullable;
 
 public interface GsParameters {
+  /** @see #parallelReads() */
+  int DEFAULT_PARALLEL_READS = 4;
+  /** @see #parallelReadBlockSizeMb() */
+  int DEFAULT_PARALLEL_READ_BLOCK_SIZE_MB = 16;
+  /** @see #parallelReadMinSizeMb() */
+  int DEFAULT_PARALLEL_READ_MIN_SIZE_MB = 32;
+
   /**
    * Host of the Google Cloud Services, including the port.
    * <p>
@@ -26,13 +33,6 @@ public interface GsParameters {
   @Nullable
   String credentialFile();
 
-  /** @see #parallelReads() */
-  int DEFAULT_PARALLEL_READS = 4;
-  /** @see #parallelReadBlockSizeMb() */
-  int DEFAULT_PARALLEL_READ_BLOCK_SIZE_MB = 16;
-  /** @see #parallelReadMinSizeMb() */
-  int DEFAULT_PARALLEL_READ_MIN_SIZE_MB = 32;
-
   /**
    * How many byte-ranges of one object to download concurrently.
    * <p>
@@ -42,16 +42,16 @@ public interface GsParameters {
    * <p>
    * {@code 0} disables the feature and restores a single sequential stream.
    * <p>
-   * Use {@code 0} or a value of at least 2. Each range is fetched on its own connection, so
-   * {@code 1} issues the range requests one after another and pays the connection setup of every
-   * one of them with no other request to hide it behind - measured on a 2 GB object it is
-   * substantially slower than disabling the feature.
+   * Otherwise the value must be between 2 and 16. Each range is fetched on its own connection, so
+   * {@code 1} would issue the range requests one after another and pay the connection setup of
+   * every one of them with no other request to hide it behind - measured on a 2 GB object that is
+   * substantially slower than disabling the feature - and is rejected.
    */
   default int parallelReads() {
     return DEFAULT_PARALLEL_READS;
   }
 
-  /** The size of each range request, in megabytes. */
+  /** The size of each range request, in megabytes. Between 4 and 256. */
   default int parallelReadBlockSizeMb() {
     return DEFAULT_PARALLEL_READ_BLOCK_SIZE_MB;
   }

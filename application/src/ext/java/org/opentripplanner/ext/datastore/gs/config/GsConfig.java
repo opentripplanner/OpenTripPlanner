@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.datastore.gs.config;
 
 import org.opentripplanner.datastore.api.GsParameters;
+import org.opentripplanner.ext.datastore.gs.read.ParallelReadParameters;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
@@ -83,10 +85,10 @@ public class GsConfig implements GsParameters {
         connection takes several times the median. Downloading several ranges at once removes that
         tail, and lets the transfer overlap the work of the consumer.
 
-        Set to `0` to disable this and use a single sequential stream. Otherwise use a value of at
-        least 2: each range is fetched on its own connection, so `1` issues the requests one after
-        another and pays the setup cost of every one of them with no other request to hide it
-        behind, which makes it slower than turning the feature off.
+        Set to `0` to disable this and use a single sequential stream. Otherwise the value must be
+        between 2 and 16: each range is fetched on its own connection, so `1` would issue the
+        requests one after another and pay the setup cost of every one of them with no other
+        request to hide it behind, which is slower than turning the feature off. It is rejected.
 
         Each concurrent read holds buffers off the Java heap. The memory used by one object read is
         at most `3 * parallelReads * parallelReadBlockSizeMb` megabytes - 192 MB with the default
@@ -104,6 +106,7 @@ public class GsConfig implements GsParameters {
         """
         Smaller blocks spread a slow connection over a smaller share of the object, but cost one
         more request each. The default is a reasonable balance for objects of a few gigabytes.
+        Must be between 4 and 256.
         """
       )
       .asInt(GsParameters.DEFAULT_PARALLEL_READ_BLOCK_SIZE_MB);
@@ -120,13 +123,27 @@ public class GsConfig implements GsParameters {
       )
       .asInt(GsParameters.DEFAULT_PARALLEL_READ_MIN_SIZE_MB);
 
-    return new GsConfig(
+    var config = new GsConfig(
       host,
       credentialFile,
       parallelReads,
       parallelReadBlockSizeMb,
       parallelReadMinSizeMb
     );
+    validateParallelReads(gsRoot, config);
+    return config;
+  }
+
+  /**
+   * Fail while the configuration is being read, with the path of the offending block, instead of
+   * later from inside the data store wiring with a bare exception.
+   */
+  private static void validateParallelReads(NodeAdapter gsRoot, GsConfig config) {
+    try {
+      ParallelReadParameters.of(config);
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException("Invalid '" + gsRoot.contextPath() + "': " + e.getMessage());
+    }
   }
 
   @Override

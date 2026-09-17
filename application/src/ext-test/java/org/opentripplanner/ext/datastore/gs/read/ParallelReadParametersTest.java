@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.datastore.api.GsParameters;
 
 class ParallelReadParametersTest {
 
@@ -65,6 +66,14 @@ class ParallelReadParametersTest {
   }
 
   @Test
+  void anObjectThatFitsInOneBlockIsReadSequentially() {
+    var everything = new ParallelReadParameters(4, 16 * MB, 0);
+    assertThat(everything.planFor(1000)).isNull();
+    assertThat(everything.planFor(ParallelReadParameters.MIN_BLOCK_SIZE_BYTES)).isNull();
+    assertThat(everything.planFor(ParallelReadParameters.MIN_BLOCK_SIZE_BYTES + 1)).isNotNull();
+  }
+
+  @Test
   void rejectsValuesOutOfRange() {
     assertThrows(IllegalArgumentException.class, () ->
       new ParallelReadParameters(17, 16 * MB, 32L * MB)
@@ -73,7 +82,57 @@ class ParallelReadParametersTest {
       new ParallelReadParameters(-1, 16 * MB, 32L * MB)
     );
     assertThrows(IllegalArgumentException.class, () -> new ParallelReadParameters(4, MB, 32L * MB));
+    assertThrows(IllegalArgumentException.class, () ->
+      new ParallelReadParameters(4, 257 * MB, 32L * MB)
+    );
     assertThrows(IllegalArgumentException.class, () -> new ParallelReadParameters(4, 16 * MB, -1));
+  }
+
+  @Test
+  void rejectsASingleWorkerBecauseItIsSlowerThanOff() {
+    var e = assertThrows(IllegalArgumentException.class, () ->
+      new ParallelReadParameters(1, 16 * MB, 32L * MB)
+    );
+    assertThat(e).hasMessageThat().contains("0 (off) or in [2, 16]");
+    assertThat(new ParallelReadParameters(2, 16 * MB, 32L * MB).planFor(100L * MB)).isNotNull();
+  }
+
+  @Test
+  void aHugeBlockSizeInMegabytesFailsValidationInsteadOfWrappingAround() {
+    var e = assertThrows(IllegalArgumentException.class, () ->
+      ParallelReadParameters.of(gsParameters(4, 5000, 32))
+    );
+    assertThat(e).hasMessageThat().contains("parallelReadBlockSizeMb");
+    assertThat(e).hasMessageThat().contains("5000");
+  }
+
+  private static GsParameters gsParameters(int reads, int blockMb, int minMb) {
+    return new GsParameters() {
+      @Override
+      public String host() {
+        return null;
+      }
+
+      @Override
+      public String credentialFile() {
+        return null;
+      }
+
+      @Override
+      public int parallelReads() {
+        return reads;
+      }
+
+      @Override
+      public int parallelReadBlockSizeMb() {
+        return blockMb;
+      }
+
+      @Override
+      public int parallelReadMinSizeMb() {
+        return minMb;
+      }
+    };
   }
 
   @Test

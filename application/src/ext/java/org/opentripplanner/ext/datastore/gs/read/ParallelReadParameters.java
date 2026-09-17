@@ -21,6 +21,11 @@ public record ParallelReadParameters(
   /** Smallest block worth a separate request; below this the per-request overhead dominates. */
   static final int MIN_BLOCK_SIZE_BYTES = 4 * MB;
 
+  /** The pool ceiling: a larger block could never be in flight at all. */
+  static final int MAX_BLOCK_SIZE_BYTES = 256 * MB;
+
+  static final int MAX_PARALLELISM = 16;
+
   /** Blocks in flight per worker: one draining, one waiting, one being fetched. */
   static final int IN_FLIGHT_PER_WORKER = 3;
 
@@ -38,31 +43,60 @@ public record ParallelReadParameters(
   );
 
   public ParallelReadParameters {
-    if (parallelism < 0 || parallelism > 16) {
-      throw new IllegalArgumentException("parallelReads must be in [0, 16], was " + parallelism);
-    }
-    if (parallelism > 0 && blockSizeBytes < MIN_BLOCK_SIZE_BYTES) {
+    // 1 is rejected on purpose: every block opens its own channel, so a single worker serialises
+    // the requests and pays each one's setup with nothing to hide it behind - slower than off.
+    if (parallelism < 0 || parallelism == 1 || parallelism > MAX_PARALLELISM) {
       throw new IllegalArgumentException(
-        "parallelReadBlockSizeMb must be at least " + MIN_BLOCK_SIZE_BYTES / MB + " MB"
+        "parallelReads must be 0 (off) or in [2, " + MAX_PARALLELISM + "], was " + parallelism
       );
+    }
+    if (
+      parallelism > 0 &&
+      (blockSizeBytes < MIN_BLOCK_SIZE_BYTES || blockSizeBytes > MAX_BLOCK_SIZE_BYTES)
+    ) {
+      throw new IllegalArgumentException(blockSizeError(blockSizeBytes / MB));
     }
     if (minParallelReadSizeBytes < 0) {
       throw new IllegalArgumentException("parallelReadMinSizeMb must not be negative");
     }
   }
 
+  /**
+   * @throws IllegalArgumentException if the parameters are out of range; the message names the
+   * offending configuration key.
+   */
   public static ParallelReadParameters of(GsParameters p) {
+    // Checked in megabytes first: converting an absurd value to bytes would wrap around in int.
+    int blockSizeMb = p.parallelReadBlockSizeMb();
+    if (
+      p.parallelReads() > 0 &&
+      (blockSizeMb < MIN_BLOCK_SIZE_BYTES / MB || blockSizeMb > MAX_BLOCK_SIZE_BYTES / MB)
+    ) {
+      throw new IllegalArgumentException(blockSizeError(blockSizeMb));
+    }
     return new ParallelReadParameters(
       p.parallelReads(),
-      p.parallelReadBlockSizeMb() * MB,
+      blockSizeMb * MB,
       (long) p.parallelReadMinSizeMb() * MB
+    );
+  }
+
+  private static String blockSizeError(long blockSizeMb) {
+    return (
+      "parallelReadBlockSizeMb must be in [" +
+      MIN_BLOCK_SIZE_BYTES / MB +
+      ", " +
+      MAX_BLOCK_SIZE_BYTES / MB +
+      "], was " +
+      blockSizeMb
     );
   }
 
   /**
    * The plan for an object of {@code size} bytes, or {@code null} when it should be read
-   * sequentially - which is the case for a disabled configuration, an unknown size, and every
-   * object below the threshold. A {@code null} plan allocates nothing and starts no threads.
+   * sequentially - which is the case for a disabled configuration, an unknown size, every object
+   * below the threshold, and an object that fits in a single block. A {@code null} plan allocates
+   * nothing and starts no threads.
    */
   @Nullable
   public ReadPlan planFor(long size) {
@@ -75,6 +109,10 @@ public record ParallelReadParameters(
     int blockSize = (int) Math.min(Math.min(targetBlock, blockSizeBytes), size);
 
     int blockCount = (int) Math.min(Integer.MAX_VALUE, (size + blockSize - 1) / blockSize);
+    if (blockCount < 2) {
+      // One block is one request: a thread pool and a pool of buffers would be pure overhead.
+      return null;
+    }
     int workers = Math.max(1, Math.min(parallelism, blockCount));
     int inFlight = Math.min(IN_FLIGHT_PER_WORKER * workers, blockCount);
 
