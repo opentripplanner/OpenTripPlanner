@@ -5,10 +5,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.opentripplanner.core.domain.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
 
 /**
- * Qualifies the {@link org.opentripplanner.framework.transaction.RepositoryRegistry} and
- * {@link org.opentripplanner.framework.transaction.UpdateManager} belonging to the street write
+ * Qualifies the {@link RepositoryRegistry} and
+ * {@link UpdateManager} belonging to the street write
  * domain: the street graph and the vehicle-rental and vehicle-parking repositories, updated by
  * the GBFS and parking updaters.
  * <p>

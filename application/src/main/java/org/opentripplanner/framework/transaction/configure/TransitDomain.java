@@ -5,10 +5,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.opentripplanner.core.domain.framework.transaction.RepositoryRegistry;
+import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
 
 /**
- * Qualifies the {@link org.opentripplanner.framework.transaction.RepositoryRegistry} and
- * {@link org.opentripplanner.framework.transaction.UpdateManager} belonging to the transit write
+ * Qualifies the {@link RepositoryRegistry} and
+ * {@link UpdateManager} belonging to the transit write
  * domain: timetable data, alerts and realtime vehicles, updated by the SIRI and GTFS-RT updaters.
  * <p>
  * Each write domain has its own registry, transaction sequence and single writer thread, so

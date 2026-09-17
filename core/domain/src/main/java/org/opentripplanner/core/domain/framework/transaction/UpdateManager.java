@@ -1,12 +1,12 @@
-package org.opentripplanner.framework.transaction;
+package org.opentripplanner.core.domain.framework.transaction;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import org.opentripplanner.framework.event.DomainEvent;
-import org.opentripplanner.framework.event.EventHandler;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.domain.framework.event.DomainEvent;
+import org.opentripplanner.core.domain.framework.event.EventHandler;
+import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
 
 /**
  * Application-scoped manager for write operations against transactional repositories.
@@ -31,7 +31,7 @@ public interface UpdateManager {
    * This method is NOT THREADSAFE and should not be called concurrently with or after event
    * publications.
    * <p>
-   * When a {@link org.opentripplanner.framework.event.DomainEvent} matching
+   * When a {@link DomainEvent} matching
    * {@code handler.eventType()} is published, the {@link WriteContext} will call the
    * given event handler, injecting the mutable repository for {@code repoHandle} at dispatch time.
    *

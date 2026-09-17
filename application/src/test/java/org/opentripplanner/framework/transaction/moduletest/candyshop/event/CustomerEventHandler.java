@@ -1,6 +1,6 @@
 package org.opentripplanner.framework.transaction.moduletest.candyshop.event;
 
-import org.opentripplanner.framework.event.EventHandler;
+import org.opentripplanner.core.domain.framework.event.EventHandler;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
 import org.opentripplanner.framework.transaction.moduletest.candyshop.customer.model.Customer;
 

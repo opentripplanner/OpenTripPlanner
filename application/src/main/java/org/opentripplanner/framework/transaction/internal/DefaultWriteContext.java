@@ -3,9 +3,9 @@ package org.opentripplanner.framework.transaction.internal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.framework.event.DomainEvent;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.domain.framework.event.DomainEvent;
+import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
+import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
 
 /**
  * Task-scoped implementation of {@link WriteContext}.
