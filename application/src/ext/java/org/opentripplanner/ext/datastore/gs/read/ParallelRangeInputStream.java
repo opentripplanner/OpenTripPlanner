@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
  * consumer never waits on anything but the head.
  * <p>
  * With {@code parallelism == 1} this degenerates to a single feeder thread reading one range at a
- * time, which is why there is one component here rather than two. Note that it is not equivalent to
- * reading the object over one continuous connection: every block still opens its own channel, so at
- * a parallelism of 1 there is no second request to hide that setup cost behind.
+ * time. It is not equivalent to reading the object over one continuous connection: every block
+ * still opens its own channel, so there is no second request to hide that setup cost behind, and
+ * the configuration therefore rejects it - it only exists here as the base case of the algorithm.
  * <p>
  * Not thread-safe for concurrent readers: one consumer thread at a time. {@link #close()} may be
  * called from any thread. The worker threads are released when the stream is closed or read to the
@@ -297,7 +297,9 @@ public final class ParallelRangeInputStream extends InputStream {
 
   private void runBlock(PendingBlock block) {
     try {
-      if (block.isCancelled()) {
+      // The closed check covers a block dispatched after close() had already swept `outstanding`
+      // but before the executor rejected new work; without it that block would fetch to the end.
+      if (closed.get() || block.isCancelled()) {
         throw new IOException("Read cancelled");
       }
       fetcher.fetch(block.offset, block.buffer, block);

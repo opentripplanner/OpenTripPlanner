@@ -149,8 +149,9 @@ public class GsRangeFetcher implements RangeFetcher {
       return !PERMANENT.contains(se.getCode()) && se.isRetryable();
     }
     // Plain I/O failures against the transport are transient by nature; a genuinely truncated
-    // object is caught by the length check in ParallelRangeInputStream.
-    return !(e instanceof EOFException);
+    // object is caught by the length check in ParallelRangeInputStream. Anything else is a bug,
+    // and retrying a bug only delays the report.
+    return e instanceof IOException && !(e instanceof EOFException);
   }
 
   private IOException asIOException(Throwable e, long position) {

@@ -94,6 +94,22 @@ class GsRangeFetcherTest {
   }
 
   @Test
+  void doesNotRetryAProgrammingError() {
+    var first = new FakeReadChannel(DATA);
+    first.failAfter = 0;
+    first.failure = new IllegalStateException("bug");
+    var second = new FakeReadChannel(DATA);
+    var fetcher = new GsRangeFetcher(blobReturning(first, second), PATH);
+
+    var e = assertThrows(IOException.class, () ->
+      fetcher.fetch(0, ByteBuffer.allocate(64), alwaysActive())
+    );
+    assertThat(e).hasCauseThat().isInstanceOf(IllegalStateException.class);
+    assertThat(second.seekedTo).isEqualTo(-1L);
+    assertThat(fetcher.statsSummary()).isEmpty();
+  }
+
+  @Test
   void abortsImmediatelyWhenTheReadIsAlreadyCancelled() {
     var channel = new FakeReadChannel(DATA);
     var fetcher = new GsRangeFetcher(blobReturning(channel), PATH);
