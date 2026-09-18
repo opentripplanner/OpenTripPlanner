@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableMultimap;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -37,8 +36,6 @@ import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
-import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
@@ -246,13 +243,13 @@ public class RefetchItineraryServiceTest {
   @Test
   void refetchItineraryWithTwoTransitLegsAndConstrainedTransfer() {
     var transitEnv = ENV_BUILDER.build();
-    var cts = createConstrainedTransferService(guaranteed("trip1", 1, "trip2", 0, transitEnv));
 
-    transitEnv.transitService().getConstrainedTransferService().addAll(cts.listAll());
+    transitEnv
+      .transitService()
+      .getConstrainedTransferService()
+      .addAll(List.of(guaranteed("trip1", 1, "trip2", 0, transitEnv)));
 
     var refetch = createRefetchService(transitEnv);
-
-    transitEnv.transitService().getConstrainedTransferService().addAll(cts.listAll());
 
     var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
     var leg2 = legRef("trip2", STOP_B, STOP_D, transitEnv);
@@ -276,11 +273,17 @@ public class RefetchItineraryServiceTest {
   @Test
   void refetchItineraryWithMultipleConstrainedTransfers() {
     var transitEnv = TRANSIT_ENV.build();
-    var cts = createConstrainedTransferService(
-      staySeated("trip1", 1, "trip3", 0, transitEnv),
-      guaranteed("trip3", 1, "trip5", 0, transitEnv)
-    );
-    transitEnv.transitService().getConstrainedTransferService().addAll(cts.listAll());
+
+    transitEnv
+      .transitService()
+      .getConstrainedTransferService()
+      .addAll(
+        List.of(
+          staySeated("trip1", 1, "trip3", 0, transitEnv),
+          guaranteed("trip3", 1, "trip5", 0, transitEnv)
+        )
+      );
+
     var refetch = createRefetchService(transitEnv);
 
     var leg1 = legRef("trip1", STOP_A, STOP_B, transitEnv);
@@ -452,16 +455,6 @@ public class RefetchItineraryServiceTest {
     transfers.forEach(transfer -> builder.put(transfer.from, transfer));
     transferRepo.addAllTransfersByStops(builder.build());
     return TransferServiceTestFactory.transferService(transferRepo);
-  }
-
-  public static ConstrainedTransferService createConstrainedTransferService(
-    ConstrainedTransfer... constrainedTransfers
-  ) {
-    DefaultConstrainedTransferService service = new DefaultConstrainedTransferService();
-
-    service.addAll(Arrays.asList(constrainedTransfers));
-
-    return service;
   }
 
   public static ConstrainedTransfer staySeated(

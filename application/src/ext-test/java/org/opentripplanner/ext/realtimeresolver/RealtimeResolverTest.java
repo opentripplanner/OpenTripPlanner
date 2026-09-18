@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createConstrainedTransferService;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createTransferService;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.makeTransfer;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.staySeated;
@@ -13,10 +12,8 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -40,14 +37,12 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -82,7 +77,12 @@ class RealtimeResolverTest {
         .addStop(STOP_D, "14:00")
     )
     .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
-    .addTrip(TripInput.of("trip4").addStop(STOP_C, "08:30").addStop(STOP_D, "09:30"))
+    .addTrip(
+      TripInput.of("trip4")
+        .withWithTripOnServiceDate("trip4")
+        .addStop(STOP_C, "08:30")
+        .addStop(STOP_D, "09:30")
+    )
     .addTrip(
       TripInput.of("trip5")
         .withWithTripOnServiceDate("trip5")
@@ -138,26 +138,8 @@ class RealtimeResolverTest {
 
     ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
 
-    StopLocation fromStop = RegularStop.of(
-      trip1.trip().getServiceId(),
-      new AtomicInteger()::getAndIncrement
-    )
-      .withName(I18NString.of("Stop"))
-      .withCoordinate(VC.vertex().toWgsCoordinate())
-      .withId(busLeg.to().stop.getId())
-      .build();
-
-    StopLocation toStop = RegularStop.of(
-      trip2.trip().getServiceId(),
-      new AtomicInteger()::getAndIncrement
-    )
-      .withName(I18NString.of("Stop"))
-      .withCoordinate(VC.vertex().toWgsCoordinate())
-      .withId(trainLeg.from().stop.getId())
-      .build();
-
-    var from = Place.forStop(fromStop);
-    var to = Place.forStop(toStop);
+    var from = Place.forStop(STOP_B);
+    var to = Place.forStop(STOP_C);
 
     var walkLeg = StreetLeg.of()
       .withFrom(from)
@@ -225,27 +207,8 @@ class RealtimeResolverTest {
 
     ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
 
-    StopLocation fromStop = RegularStop.of(
-      trip1.trip().getServiceId(),
-      new AtomicInteger()::getAndIncrement
-    )
-      .withName(I18NString.of("Stop"))
-      .withCoordinate(VC.vertex().toWgsCoordinate())
-      .withId(busLeg.to().stop.getId())
-      .build();
-
-    StopLocation toStop = RegularStop.of(
-      trip2.trip().getServiceId(),
-      new AtomicInteger()::getAndIncrement
-    )
-      .withName(I18NString.of("Stop"))
-      .withCoordinate(VC.vertex().toWgsCoordinate())
-      //Sets wrong id that doesnt match previous leg, in order for stops to not match and force a refetch
-      .withId(STOP_D.getId())
-      .build();
-
-    var from = Place.forStop(fromStop);
-    var to = Place.forStop(toStop);
+    var from = Place.forStop(STOP_B);
+    var to = Place.forStop(STOP_D);
 
     var walkLeg = StreetLeg.of()
       .withFrom(from)
@@ -274,6 +237,11 @@ class RealtimeResolverTest {
     List<Leg> legs = itineraries.getFirst().legs();
     Leg refetchedWalkingLeg = legs.stream().filter(Leg::isWalkingLeg).findFirst().orElse(null);
     assertEquals(3, legs.size());
+
+    //Realtime on first leg
+    assertEquals("2020-03-03T10:10+01:00[Europe/Paris]", legs.getFirst().startTime().toString());
+    assertEquals("2020-03-03T11:12+01:00[Europe/Paris]", legs.getFirst().endTime().toString());
+
     //Assert that refetch has updated leg data with realtime data
     assertEquals(
       "2020-03-03T11:12+01:00[Europe/Paris]",
@@ -283,6 +251,10 @@ class RealtimeResolverTest {
       "2020-03-03T11:12:10+01:00[Europe/Paris]",
       Objects.requireNonNull(refetchedWalkingLeg).endTime().toString()
     );
+
+    //No realtime on last leg
+    assertEquals("2020-03-03T08:30+01:00[Europe/Paris]", legs.getLast().startTime().toString());
+    assertEquals("2020-03-03T09:30+01:00[Europe/Paris]", legs.getLast().endTime().toString());
   }
 
   @Test
@@ -388,20 +360,13 @@ class RealtimeResolverTest {
 
   @Test
   void testPopulateLegsKeepStaySeated() {
-    var cts = createConstrainedTransferService(staySeated("trip1", 1, "trip2", 0, TRANSIT_ENV));
     var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
     TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip2");
 
     ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
-    ConstrainedTransfer transfer = cts.findTransfer(
-      TRANSIT_ENV.tripData("trip1").trip(),
-      1,
-      STOP_B,
-      TRANSIT_ENV.tripData("trip2").trip(),
-      0,
-      STOP_C
-    );
+
+    var transfer = staySeated("trip1", 1, "trip2", 0, TRANSIT_ENV);
     ScheduledTransitLeg updatedBusLeg = busLeg.copyOf().withTransferToNextLeg(transfer).build();
 
     ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
