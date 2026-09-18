@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -62,6 +63,74 @@ class TripPatternForDatesTest {
       .createCustomizedTripSearch(SearchDirection.REVERSE)
       .search(FREQUENCY_START - 1, 0);
     assertTrue(result.empty());
+  }
+
+  @Test
+  void regularTripTimesUseSourceValuesAndServiceDateOffset() {
+    var tripPattern = createTripPattern();
+    var firstTrip = createTripTimes("regular-1", new int[] { 0, 600 }, new int[] { 120, 720 });
+    var secondTrip = createTripTimes("regular-2", new int[] { 60, 660 }, new int[] { 180, 780 });
+
+    var subject = new TripPatternForDates(
+      tripPattern,
+      new TripPatternForDate[] {
+        new TripPatternForDate(tripPattern, List.of(firstTrip), List.of(), SERVICE_DATE),
+        new TripPatternForDate(
+          tripPattern,
+          List.of(secondTrip),
+          List.of(),
+          SERVICE_DATE.plusDays(1)
+        ),
+      },
+      new int[] { 0, 24 * 60 * 60 },
+      allStops(),
+      allStops(),
+      0
+    );
+
+    assertEquals(0, subject.arrivalTime(0, 0));
+    assertEquals(120, subject.departureTime(0, 0));
+    assertEquals(600, subject.arrivalTime(1, 0));
+    assertEquals(720, subject.departureTime(1, 0));
+    assertEquals(24 * 60 * 60 + 60, subject.arrivalTime(0, 1));
+    assertEquals(24 * 60 * 60 + 180, subject.departureTime(0, 1));
+    assertEquals(24 * 60 * 60 + 660, subject.arrivalTime(1, 1));
+    assertEquals(24 * 60 * 60 + 780, subject.departureTime(1, 1));
+  }
+
+  @Test
+  void regularTripTimesPreserveOvernightOrderAndNegativeOffset() {
+    var tripPattern = createTripPattern();
+    var overnightTrip = createTripTimes(
+      "overnight",
+      new int[] { 24 * 60 * 60, 24 * 60 * 60 + 600 },
+      new int[] { 24 * 60 * 60 + 120, 24 * 60 * 60 + 720 }
+    );
+    var nextDayTrip = createTripTimes("next-day", new int[] { 10, 610 }, new int[] { 130, 730 });
+
+    var subject = new TripPatternForDates(
+      tripPattern,
+      new TripPatternForDate[] {
+        new TripPatternForDate(tripPattern, List.of(overnightTrip), List.of(), SERVICE_DATE),
+        new TripPatternForDate(
+          tripPattern,
+          List.of(nextDayTrip),
+          List.of(),
+          SERVICE_DATE.plusDays(1)
+        ),
+      },
+      new int[] { -24 * 60 * 60, 0 },
+      allStops(),
+      allStops(),
+      0
+    );
+
+    assertEquals(0, subject.arrivalTime(0, 0));
+    assertEquals(120, subject.departureTime(0, 0));
+    assertEquals(10, subject.arrivalTime(0, 1));
+    assertEquals(130, subject.departureTime(0, 1));
+    assertEquals(610, subject.arrivalTime(1, 1));
+    assertEquals(730, subject.departureTime(1, 1));
   }
 
   private static TripPatternForDates getTestSubjectWithExactFrequency() {
@@ -114,5 +183,52 @@ class TripPatternForDatesTest {
       boardingAndAlightingPossible,
       0
     );
+  }
+
+  private static RoutingTripPattern createTripPattern() {
+    var testModel = TransitRepositoryForTest.of();
+    var stop1 = testModel.stop("FEED:REGULAR_STOP1", 0, 0).build();
+    var stop2 = testModel.stop("FEED:REGULAR_STOP2", 0, 0).build();
+    var stopPattern = new StopPattern(
+      List.of(stopTime(stop1, 0, 0, 0), stopTime(stop2, 600, 600, 1))
+    );
+    return TripPattern.of(FeedScopedIdForTestFactory.id("REGULAR_PATTERN"))
+      .withRoute(ROUTE)
+      .withStopPattern(stopPattern)
+      .build()
+      .getRoutingTripPattern();
+  }
+
+  private static ScheduledTripTimes createTripTimes(
+    String tripId,
+    int[] arrivalTimes,
+    int[] departureTimes
+  ) {
+    var trip = TransitRepositoryForTest.trip(tripId).withRoute(ROUTE).build();
+    return ScheduledTripTimes.of()
+      .withTrip(trip)
+      .withArrivalTimes(arrivalTimes)
+      .withDepartureTimes(departureTimes)
+      .build();
+  }
+
+  private static BitSet allStops() {
+    var result = new BitSet(2);
+    result.set(0, 2);
+    return result;
+  }
+
+  private static StopTime stopTime(
+    RegularStop stop,
+    int arrivalTime,
+    int departureTime,
+    int sequence
+  ) {
+    var stopTime = new StopTime();
+    stopTime.setStop(stop);
+    stopTime.setArrivalTime(arrivalTime);
+    stopTime.setDepartureTime(departureTime);
+    stopTime.setStopSequence(sequence);
+    return stopTime;
   }
 }
