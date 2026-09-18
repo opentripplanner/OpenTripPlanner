@@ -68,7 +68,7 @@ Sections follow that describe particular settings in more depth.
 |    [discardMinTransferTimes](#gd_discardMinTransferTimes)                                   |       `boolean`      | Should minimum transfer times in GTFS files be discarded.                                                                                                      | *Optional* | `false`                           |  2.3  |
 |    maxInterlineDistance                                                                     |       `integer`      | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)                               |        `enum`        | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
-|    [taxiZoneProvider](#gd_taxiZoneProvider)                                                 |       `boolean`      | When true, this GTFS feed is used exclusively as a source of taxi zone data.                                                                                   | *Optional* | `false`                           |  2.11 |
+|    [taxiProvider](#gd_taxiProvider)                                                         |       `boolean`      | When true, this GTFS feed is used exclusively as a source of taxi provider data.                                                                               | *Optional* | `false`                           |  2.11 |
 | islandPruning                                                                               |       `object`       | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
 |    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)                        |       `integer`      | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
 |    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)                            |       `double`       | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
@@ -119,7 +119,7 @@ Sections follow that describe particular settings in more depth.
 |       maxInterlineDistance                                                                  |       `integer`      | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle. Overrides the value specified in `gtfsDefaults`. | *Optional* | `200`                             |  2.3  |
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [stationTransferPreference](#tf_0_stationTransferPreference)                          |        `enum`        | Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.                | *Optional* | `"allowed"`                       |  2.3  |
-|       [taxiZoneProvider](#tf_0_taxiZoneProvider)                                            |       `boolean`      | When true, this GTFS feed is used exclusively as a source of taxi zone data. Overrides the value specified in `gtfsDefaults`.                                  | *Optional* | `false`                           |  2.11 |
+|       [taxiProvider](#tf_0_taxiProvider)                                                    |       `boolean`      | When true, this GTFS feed is used exclusively as a source of taxi provider data. Overrides the value specified in `gtfsDefaults`.                              | *Optional* | `false`                           |  2.11 |
 |    { object }                                                                               |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
 |       type = "netex"                                                                        |        `enum`        | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
 |       feedId                                                                                |       `string`       | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Required* |                                   |  2.2  |
@@ -828,18 +828,18 @@ This parameter sets the generic level of preference. What is the actual cost can
 with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
 
 
-<h3 id="gd_taxiZoneProvider">taxiZoneProvider</h3>
+<h3 id="gd_taxiProvider">taxiProvider</h3>
 
 **Since version:** `2.11` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /gtfsDefaults 
 
-When true, this GTFS feed is used exclusively as a source of taxi zone data.
+When true, this GTFS feed is used exclusively as a source of taxi provider data.
 
 The feed is not used for normal transit routing. Its stops, routes and trips are
 used only to decorate taxi legs with provider information and to spatially filter
-out itineraries that don't fall within a recognized taxi zone.
+out itineraries that don't fall within a recognized taxi provider's coverage area.
 
-Requires the `TaxiZone` sandbox feature to be enabled.
+Requires the `TaxiRouting` sandbox feature to be enabled.
 
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
@@ -1259,18 +1259,18 @@ This parameter sets the generic level of preference. What is the actual cost can
 with the `stopBoardAlightDuringTransferCost` parameter in the router configuration.
 
 
-<h3 id="tf_0_taxiZoneProvider">taxiZoneProvider</h3>
+<h3 id="tf_0_taxiProvider">taxiProvider</h3>
 
 **Since version:** `2.11` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /transitFeeds/[0] 
 
-When true, this GTFS feed is used exclusively as a source of taxi zone data. Overrides the value specified in `gtfsDefaults`.
+When true, this GTFS feed is used exclusively as a source of taxi provider data. Overrides the value specified in `gtfsDefaults`.
 
 The feed is not used for normal transit routing. Its stops, routes and trips are
 used only to decorate taxi legs with provider information and to spatially filter
-out itineraries that don't fall within a recognized taxi zone.
+out itineraries that don't fall within a recognized taxi provider's coverage area.
 
-Requires the `TaxiZone` sandbox feature to be enabled.
+Requires the `TaxiRouting` sandbox feature to be enabled.
 
 
 <h3 id="tf_1_groupFilePattern">groupFilePattern</h3>

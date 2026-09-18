@@ -42,7 +42,7 @@ public class GtfsFeedParametersBuilder extends GtfsDefaultParametersBuilder {
       discardMinTransferTimes(),
       blockBasedInterlining(),
       maxInterlineDistance(),
-      taxiZoneProvider()
+      taxiProvider()
     );
   }
 }

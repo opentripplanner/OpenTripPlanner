@@ -14,34 +14,34 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
   private static final boolean DEFAULT_DISCARD_MIN_TRANSFER_TIMES = false;
   private static final boolean DEFAULT_BLOCK_BASED_INTERLINING = true;
   private static final int DEFAULT_MAX_INTERLINE_DISTANCE = 200;
-  private static final boolean DEFAULT_TAXI_ZONE_PROVIDER = false;
+  private static final boolean DEFAULT_TAXI_PROVIDER = false;
 
   public static final GtfsDefaultParameters DEFAULT = new GtfsDefaultParameters(
     StopTransferPriority.defaultValue(),
     DEFAULT_DISCARD_MIN_TRANSFER_TIMES,
     DEFAULT_BLOCK_BASED_INTERLINING,
     DEFAULT_MAX_INTERLINE_DISTANCE,
-    DEFAULT_TAXI_ZONE_PROVIDER
+    DEFAULT_TAXI_PROVIDER
   );
 
   private final StopTransferPriority stationTransferPreference;
   private final boolean discardMinTransferTimes;
   private final boolean blockBasedInterlining;
   private final int maxInterlineDistance;
-  private final boolean taxiZoneProvider;
+  private final boolean taxiProvider;
 
   protected GtfsDefaultParameters(
     StopTransferPriority stationTransferPreference,
     boolean discardMinTransferTimes,
     boolean blockBasedInterlining,
     int maxInterlineDistance,
-    boolean taxiZoneProvider
+    boolean taxiProvider
   ) {
     this.stationTransferPreference = Objects.requireNonNull(stationTransferPreference);
     this.discardMinTransferTimes = discardMinTransferTimes;
     this.blockBasedInterlining = blockBasedInterlining;
     this.maxInterlineDistance = maxInterlineDistance;
-    this.taxiZoneProvider = taxiZoneProvider;
+    this.taxiProvider = taxiProvider;
   }
 
   GtfsDefaultParameters(GtfsDefaultParametersBuilder builder) {
@@ -50,7 +50,7 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
       builder.discardMinTransferTimes(),
       builder.blockBasedInterlining(),
       builder.maxInterlineDistance(),
-      builder.taxiZoneProvider()
+      builder.taxiProvider()
     );
   }
 
@@ -81,8 +81,8 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
     return maxInterlineDistance;
   }
 
-  public boolean taxiZoneProvider() {
-    return taxiZoneProvider;
+  public boolean taxiProvider() {
+    return taxiProvider;
   }
 
   @Override
@@ -118,6 +118,6 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
       )
       .addBool("blockBasedInterlining", blockBasedInterlining, DEFAULT_BLOCK_BASED_INTERLINING)
       .addNum("maxInterlineDistance", maxInterlineDistance, DEFAULT_MAX_INTERLINE_DISTANCE)
-      .addBool("taxiZoneProvider", taxiZoneProvider, DEFAULT_TAXI_ZONE_PROVIDER);
+      .addBool("taxiProvider", taxiProvider, DEFAULT_TAXI_PROVIDER);
   }
 }

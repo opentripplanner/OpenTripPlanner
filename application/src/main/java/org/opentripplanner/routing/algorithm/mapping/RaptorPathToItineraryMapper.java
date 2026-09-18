@@ -12,7 +12,7 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
-import org.opentripplanner.ext.taxizone.TaxiZoneService;
+import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
@@ -77,7 +77,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private final CarpoolItineraryMapper carpoolItineraryMapper;
 
   @Nullable
-  private final TaxiZoneService taxiZoneService;
+  private final TaxiService taxiService;
 
   /**
    * Constructs an itinerary mapper for a request and a set of results
@@ -94,7 +94,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     RaptorTransitData raptorTransitData,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request,
-    @Nullable TaxiZoneService taxiZoneService
+    @Nullable TaxiService taxiService
   ) {
     this.raptorTransitData = raptorTransitData;
     this.transitSearchTimeZero = transitSearchTimeZero;
@@ -109,7 +109,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     );
     this.transitService = transitService;
     this.carpoolItineraryMapper = new CarpoolItineraryMapper();
-    this.taxiZoneService = taxiZoneService;
+    this.taxiService = taxiService;
   }
 
   public Itinerary createItinerary(RaptorPath<T> path) {
@@ -216,8 +216,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     int fromTime = accessPathLeg.fromTime();
     var legs = mapAccessEgressToLegs(accessPathLeg.access(), createZonedDateTime(fromTime));
-    if (taxiZoneService != null && request.journey().access().mode() == StreetMode.TAXI) {
-      return taxiZoneService.decorateAccessEgressLegs(
+    if (taxiService != null && request.journey().access().mode() == StreetMode.TAXI) {
+      return taxiService.decorateAccessEgressLegs(
         legs,
         request.from().wgsCoordinate(),
         raptorTransitData.getStopByIndex(accessPathLeg.access().stop()).getCoordinate()
@@ -371,8 +371,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var startTime = createZonedDateTime(egressPathLeg.fromTime());
     var legs = mapAccessEgressToLegs(egressPathLeg.egress(), startTime);
-    if (taxiZoneService != null && request.journey().egress().mode() == StreetMode.TAXI) {
-      return taxiZoneService.decorateAccessEgressLegs(
+    if (taxiService != null && request.journey().egress().mode() == StreetMode.TAXI) {
+      return taxiService.decorateAccessEgressLegs(
         legs,
         raptorTransitData.getStopByIndex(egressPathLeg.egress().stop()).getCoordinate(),
         request.to().wgsCoordinate()

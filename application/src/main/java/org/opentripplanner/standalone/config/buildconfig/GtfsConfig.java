@@ -110,25 +110,25 @@ public class GtfsConfig {
           .docDefaultValue(docDefaults.maxInterlineDistance())
           .asInt(defaults.maxInterlineDistance())
       )
-      .withTaxiZoneProvider(
+      .withTaxiProvider(
         node
-          .of("taxiZoneProvider")
+          .of("taxiProvider")
           .since(V2_11)
           .summary(
-            "When true, this GTFS feed is used exclusively as a source of taxi zone data." +
+            "When true, this GTFS feed is used exclusively as a source of taxi provider data." +
               documentationAddition
           )
           .description(
             """
             The feed is not used for normal transit routing. Its stops, routes and trips are
             used only to decorate taxi legs with provider information and to spatially filter
-            out itineraries that don't fall within a recognized taxi zone.
+            out itineraries that don't fall within a recognized taxi provider's coverage area.
 
-            Requires the `TaxiZone` sandbox feature to be enabled.
+            Requires the `TaxiRouting` sandbox feature to be enabled.
             """
           )
-          .docDefaultValue(docDefaults.taxiZoneProvider())
-          .asBoolean(defaults.taxiZoneProvider())
+          .docDefaultValue(docDefaults.taxiProvider())
+          .asBoolean(defaults.taxiProvider())
       )
       .build();
   }

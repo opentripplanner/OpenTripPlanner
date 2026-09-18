@@ -5,7 +5,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
-import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -71,7 +71,7 @@ public class LoadApplication {
       obj.parkingRepository,
       obj.issueSummary,
       obj.emissionRepository,
-      obj.taxiZoneRepository,
+      obj.taxiRepository,
       obj.empiricalDelayRepository,
       obj.stopConsolidationRepository,
       obj.streetRepository,
@@ -91,7 +91,7 @@ public class LoadApplication {
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
-      factory.emptyTaxiZoneRepository(),
+      factory.emptyTaxiRepository(),
       factory.emptyEmpiricalDelayRepository(),
       factory.emptyStopConsolidationRepository(),
       factory.emptyStreetRepository(),
@@ -120,7 +120,7 @@ public class LoadApplication {
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
-    @Nullable TaxiZoneRepository taxiZoneRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetRepository streetRepository,
@@ -138,7 +138,7 @@ public class LoadApplication {
       graphBuilderDataSources(),
       issueSummary,
       emissionRepository,
-      taxiZoneRepository,
+      taxiRepository,
       empiricalDelayRepository,
       parkingRepository,
       stopConsolidationRepository,

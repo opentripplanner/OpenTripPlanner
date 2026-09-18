@@ -162,7 +162,7 @@ public class OTPMain {
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
         app.emissionRepository(),
-        app.taxiZoneRepository(),
+        app.taxiRepository(),
         app.empiricalDelayRepository(),
         app.stopConsolidationRepository(),
         app.fareServiceFactory()

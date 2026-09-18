@@ -17,8 +17,8 @@ import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
-import org.opentripplanner.ext.taxizone.model.TaxiZone;
-import org.opentripplanner.ext.taxizone.model.TaxiZoneLeg;
+import org.opentripplanner.ext.taxi.model.TaxiLeg;
+import org.opentripplanner.ext.taxi.model.TaxiZone;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
@@ -65,7 +65,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   private Itinerary car;
   // No emissions
   private Itinerary flex;
-  // Apply route emissions via TaxiZoneLeg
+  // Apply route emissions via TaxiLeg
   private Itinerary taxi;
 
   private Itinerary combinedWithFlex;
@@ -92,12 +92,12 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
       .build()
       .legs()
       .getFirst();
-    var taxiZoneLeg = new TaxiZoneLeg(driveLeg, taxiZone);
+    var taxiLeg = new TaxiLeg(driveLeg, taxiZone);
     taxi = newItinerary(A)
       .drive(START_TIME, END_TIME, B)
       .build()
       .copyOf()
-      .withLegs(List.of(taxiZoneLeg))
+      .withLegs(List.of(taxiLeg))
       .build();
 
     int t0 = START_TIME;
@@ -198,7 +198,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   }
 
   @Test
-  void decorateTaxiZoneLegUsingRouteEmission() {
+  void decorateTaxiLegUsingRouteEmission() {
     var subject = new EmissionItineraryDecorator(emissionService);
     var it = subject.decorate(taxi);
     assertEmission(1380, it.emissionPerPerson());

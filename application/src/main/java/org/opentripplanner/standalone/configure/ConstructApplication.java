@@ -9,7 +9,7 @@ import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
-import org.opentripplanner.ext.taxizone.TaxiZoneRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
@@ -93,7 +93,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
-    @Nullable TaxiZoneRepository taxiZoneRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
@@ -132,7 +132,7 @@ public class ConstructApplication {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
-      .taxiZoneRepository(taxiZoneRepository)
+      .taxiRepository(taxiRepository)
       .empiricalDelayRepository(empiricalDelayRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
@@ -179,7 +179,7 @@ public class ConstructApplication {
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
-      factory.taxiZoneRepository(),
+      factory.taxiRepository(),
       factory.empiricalDelayRepository(),
       factory.stopConsolidationRepository(),
       cli.doLoadStreetGraph(),
@@ -389,8 +389,8 @@ public class ConstructApplication {
   }
 
   @Nullable
-  public TaxiZoneRepository taxiZoneRepository() {
-    return factory.taxiZoneRepository();
+  public TaxiRepository taxiRepository() {
+    return factory.taxiRepository();
   }
 
   public StreetDetailsRepository streetDetailsRepository() {

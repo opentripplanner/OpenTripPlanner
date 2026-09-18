@@ -5,7 +5,7 @@ public enum GraphBuilderFileType {
   OSM,
   DEM,
   GTFS,
-  GTFS_TAXI_ZONE,
+  GTFS_TAXI,
   NETEX,
   EMISSION,
   EMPIRICAL_DATA,

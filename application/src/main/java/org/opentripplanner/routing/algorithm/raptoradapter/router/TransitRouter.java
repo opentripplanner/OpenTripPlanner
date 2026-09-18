@@ -15,7 +15,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
-import org.opentripplanner.ext.taxizone.TaxiZoneService;
+import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
@@ -81,7 +81,7 @@ public class TransitRouter {
   private final CarpoolingService carpoolingService;
 
   @Nullable
-  private final TaxiZoneService taxiZoneService;
+  private final TaxiService taxiService;
 
   private TransitRouter(
     RouteRequest request,
@@ -102,7 +102,7 @@ public class TransitRouter {
     DebugTimingAggregator debugTimingAggregator,
     LinkingContext linkingContext,
     @Nullable CarpoolingService carpoolingService,
-    @Nullable TaxiZoneService taxiZoneService
+    @Nullable TaxiService taxiService
   ) {
     this.request = request;
     this.transitService = transitService;
@@ -122,7 +122,7 @@ public class TransitRouter {
     this.viaTransferResolver = viaTransferResolver;
     this.linkingContext = linkingContext;
     this.carpoolingService = carpoolingService;
-    this.taxiZoneService = taxiZoneService;
+    this.taxiService = taxiService;
   }
 
   public static TransitRouterResult route(
@@ -144,7 +144,7 @@ public class TransitRouter {
     DebugTimingAggregator debugTimingAggregator,
     LinkingContext linkingContext,
     @Nullable CarpoolingService carpoolingService,
-    @Nullable TaxiZoneService taxiZoneService
+    @Nullable TaxiService taxiService
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
@@ -165,7 +165,7 @@ public class TransitRouter {
       debugTimingAggregator,
       linkingContext,
       carpoolingService,
-      taxiZoneService
+      taxiService
     );
 
     return transitRouter.route();
@@ -199,7 +199,7 @@ public class TransitRouter {
       additionalSearchDays,
       linkingContext,
       carpoolingService,
-      taxiZoneService,
+      taxiService,
       requestTransitDataProvider
     );
 
@@ -289,7 +289,7 @@ public class TransitRouter {
       raptorTransitData,
       transitSearchTimeZero,
       request,
-      taxiZoneService
+      taxiService
     );
 
     List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();

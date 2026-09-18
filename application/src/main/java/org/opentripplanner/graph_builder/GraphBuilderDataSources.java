@@ -5,7 +5,7 @@ import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.DEM;
 import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.EMISSION;
 import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.EMPIRICAL_DATA;
 import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.GTFS;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.GTFS_TAXI_ZONE;
+import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.GTFS_TAXI;
 import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.NETEX;
 import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.OSM;
 import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.UNKNOWN;
@@ -93,7 +93,7 @@ public class GraphBuilderDataSources implements Closeable {
     include(cli.doBuildStreet(), DEM);
     include(cli.doBuildStreet(), CACHE);
     include(cli.doBuildTransit(), GTFS);
-    include(cli.doBuildTransit(), GTFS_TAXI_ZONE);
+    include(cli.doBuildTransit(), GTFS_TAXI);
     include(cli.doBuildTransit(), NETEX);
 
     selectFilesToImport();
@@ -128,17 +128,17 @@ public class GraphBuilderDataSources implements Closeable {
 
   /**
    * {@code true} if there is transit data that will populate the TransitRepository.
-   * This excludes GTFS feeds that are exclusively used as taxi zone data sources.
+   * This excludes GTFS feeds that are exclusively used as taxi provider data sources.
    */
   public boolean hasTransitData() {
     return hasOneOf(GTFS, NETEX);
   }
 
   /**
-   * Unlike {@link #hasTransitData()}, taxi zone data never populates the TransitRepository.
+   * Unlike {@link #hasTransitData()}, taxi provider data never populates the TransitRepository.
    */
-  public boolean hasTransitOrTaxiZoneData() {
-    return hasOneOf(GTFS, NETEX, GTFS_TAXI_ZONE);
+  public boolean hasTransitOrTaxiData() {
+    return hasOneOf(GTFS, NETEX, GTFS_TAXI);
   }
 
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
@@ -163,10 +163,8 @@ public class GraphBuilderDataSources implements Closeable {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
   }
 
-  public Iterable<
-    ConfiguredCompositeDataSource<GtfsFeedParameters>
-  > getTaxiZoneConfiguredDataSource() {
-    return ofStream(GTFS_TAXI_ZONE).map(this::mapGtfsFeed).toList();
+  public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getTaxiConfiguredDataSource() {
+    return ofStream(GTFS_TAXI).map(this::mapGtfsFeed).toList();
   }
 
   public Iterable<
@@ -356,7 +354,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
-      if (!hasOsm() && !hasTransitOrTaxiZoneData()) {
+      if (!hasOsm() && !hasTransitOrTaxiData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
@@ -377,7 +375,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
-      if (!hasTransitOrTaxiZoneData()) {
+      if (!hasTransitOrTaxiData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }
@@ -419,8 +417,8 @@ public class GraphBuilderDataSources implements Closeable {
       case CONFIG -> GraphBuilderFileType.CONFIG;
       case OSM -> GraphBuilderFileType.OSM;
       case DEM -> GraphBuilderFileType.DEM;
-      case GTFS -> mapGtfsFeed(dataSource).config().taxiZoneProvider()
-        ? GraphBuilderFileType.GTFS_TAXI_ZONE
+      case GTFS -> mapGtfsFeed(dataSource).config().taxiProvider()
+        ? GraphBuilderFileType.GTFS_TAXI
         : GraphBuilderFileType.GTFS;
       case NETEX -> GraphBuilderFileType.NETEX;
       case EMISSION -> GraphBuilderFileType.EMISSION;
