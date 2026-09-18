@@ -39,5 +39,7 @@ public class CanceledTripTest implements RealtimeTestConstants {
     var trip = canceled.getFirst();
     assertEquals(id(TRIP_1_ID), trip.getTrip().getId());
     assertEquals(env.defaultServiceDate(), trip.getServiceDate());
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[C U]");
   }
 }

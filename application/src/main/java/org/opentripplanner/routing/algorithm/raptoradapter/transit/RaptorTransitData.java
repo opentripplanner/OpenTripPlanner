@@ -180,7 +180,11 @@ public class RaptorTransitData {
     LocalDate date,
     List<TripPatternForDate> tripPatternForDates
   ) {
-    this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
+    if (tripPatternForDates.isEmpty()) {
+      this.tripPatternsRunningOnDate.remove(date);
+    } else {
+      this.tripPatternsRunningOnDate.put(date, tripPatternForDates);
+    }
   }
 
   public void setConstrainedTransfers(ConstrainedTransfersForPatterns constrainedTransfers) {
