@@ -38,6 +38,24 @@ public class FlexStopTimesFactory {
     return stopTime;
   }
 
+  public static StopTime area(
+    StopLocation areaStop,
+    String startTime,
+    String endTime,
+    Trip trip,
+    PickDrop pickupType,
+    PickDrop dropOffType
+  ) {
+    var stopTime = new StopTime();
+    stopTime.setStop(areaStop);
+    stopTime.setFlexWindowStart(TimeUtils.time(startTime));
+    stopTime.setFlexWindowEnd(TimeUtils.time(endTime));
+    stopTime.setTrip(trip);
+    stopTime.setPickupType(pickupType);
+    stopTime.setDropOffType(dropOffType);
+    return stopTime;
+  }
+
   /**
    * Returns an invalid combination of a flex area and continuous stopping.
    */
