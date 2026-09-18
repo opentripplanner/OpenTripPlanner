@@ -116,9 +116,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   public void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer) {
     this.serviceDeliveryConsumer = serviceDeliveryConsumer;
 
-    // Live messages can be processed regardless of priming, so start the live runner right away.
-    liveExecutor.submit(new LiveRunner());
-
     // Fallback readiness for when no connection is ever established: if the broker is never
     // reachable, or the connection keeps failing during the MQTT handshake (connect/disconnect
     // loop, so onConnect never fires and priming never starts), this watcher guarantees OTP
@@ -155,8 +152,12 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   /**
    * Start the priming workers that drain the retained-message backlog. Triggered by the first
    * successful connection and guarded so it runs at most once, even across reconnects. When all
-   * workers have idled out and their graph updates are applied, the updater is marked primed (this
-   * may happen before the readiness watcher fires).
+   * workers have idled out and their graph updates are applied, the live runner is started and the
+   * updater is marked primed (this may happen before the readiness watcher fires).
+   * <p>
+   * Live (non-retained) messages that arrive during priming are buffered in the live queue and only
+   * applied once the retained backlog has been fully processed. This guarantees priming-first
+   * ordering: an older retained update can never overwrite a newer live update in the graph.
    */
   private void beginPriming() {
     if (!primingStarted.compareAndSet(false, true)) {
@@ -175,6 +176,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
         waitForGraphUpdates();
         logPrimingSummary();
         primingExecutor.shutdown();
+        // Only now start consuming live messages, so the retained backlog is fully applied first.
+        liveExecutor.submit(new LiveRunner());
         primed = true;
       })
       .exceptionally(ex -> {
