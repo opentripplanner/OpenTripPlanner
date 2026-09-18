@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
@@ -20,6 +21,7 @@ public class EmissionServiceModule {
   @Provides
   @Nullable
   @EmissionDecorator
+  @Singleton
   public ItineraryDecorator provideEmissionItineraryDecorator(
     EmissionRepository emissionRepository
   ) {
