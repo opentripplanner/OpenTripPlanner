@@ -14,6 +14,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Deprecate serviceId in GTFS API and stop populating it [#7991](https://github.com/opentripplanner/OpenTripPlanner/pull/7991)
 - Decode OSM PBF data in parallel [#8008](https://github.com/opentripplanner/OpenTripPlanner/pull/8008)
 - Verify who labeled the PRs merged by the custom release script [#8018](https://github.com/opentripplanner/OpenTripPlanner/pull/8018)
+- Use custom collections to speed up island pruning [#7990](https://github.com/opentripplanner/OpenTripPlanner/pull/7990)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
