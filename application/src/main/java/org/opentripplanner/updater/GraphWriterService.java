@@ -2,6 +2,7 @@ package org.opentripplanner.updater;
 
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.WriteContext;
@@ -41,13 +42,15 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
   }
 
   /**
-   * Create the bridge for the transit write domain. Each task checks out the mutable
-   * realtime-timetable repository for the current transaction. The realtime-vehicle repository is
-   * resolved lazily: only tasks that actually apply vehicle updates cause a new vehicle snapshot
-   * to be published at commit.
+   * Create the bridge for the transit write domain. All repositories are resolved lazily: only
+   * tasks that actually write to the realtime timetable or the realtime vehicles cause a new
+   * snapshot of the corresponding repository to be published at commit. The committed timetable
+   * snapshot is resolved through a fresh scope, which captures the state of the last commit
+   * without causing a new timetable snapshot to be published.
    */
   public static GraphWriterService<TransitRealTimeUpdateContext> forTransitDomain(
     UpdateManager updateManager,
+    RepositoryRegistry repositoryRegistry,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle,
     RepositoryHandle<
       RealtimeVehicleRepositorySnapshot,
@@ -58,7 +61,8 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
     return new GraphWriterService<>(updateManager, ctx ->
       new DefaultTransitRealTimeUpdateContext(
         transitRepository,
-        ctx.repository(timetableHandle),
+        () -> ctx.repository(timetableHandle),
+        () -> timetableHandle.repositorySnapshot(repositoryRegistry.scope()),
         () -> ctx.repository(realtimeVehicleHandle)
       )
     );
