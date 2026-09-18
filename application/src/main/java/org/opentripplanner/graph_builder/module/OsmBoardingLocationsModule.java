@@ -2,16 +2,19 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -66,6 +69,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     "name.platform"
   );
   private static final double SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(250);
+  private static final double INSIDE_AREA_MARGIN_METERS = 0.2;
 
   private final Graph graph;
 
@@ -172,7 +176,12 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         if (platOpt.isPresent()) {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
-            var boardingLocation = makeBoardingLocationForPlatform(stop, platform, area.getName());
+            var boardingLocation = makeBoardingLocationForPlatform(
+              stop,
+              platform,
+              area.getName(),
+              areaGroup.getGeometry()
+            );
             linker.addPermanentAreaVertex(boardingLocation, areaGroup);
             linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
             return true;
@@ -207,8 +216,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .findFirst()
       .map(platformEdgeList -> {
         Platform platform = platformEdgeList.getKey();
-        var boardingLocation = makeBoardingLocationForPlatform(stop, platform, platform.name());
-        for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
+        var boardingLocation = makeBoardingLocationForPlatform(
+          stop,
+          platform,
+          platform.name(),
+          null
+        );
+        var linkedVertices = linker.linkToSpecificStreetEdgesPermanently(
           boardingLocation,
           new TraverseModeSet(TraverseMode.WALK),
           LinkingDirection.BIDIRECTIONAL,
@@ -217,13 +231,20 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             .stream()
             .map(StreetEdge.class::cast)
             .collect(Collectors.toSet())
-        )) {
+        );
+        // A stop attaches to a linear platform way at a single point. VertexLinker's "duplicate
+        // way" heuristic (meant for genuinely parallel edges, e.g. dual carriageways) can misfire
+        // here: if an earlier stop on this same platform already split the way nearby, the two
+        // resulting halves are both ~equidistant from this stop's coordinate and both get split
+        // again, returning two near-duplicate attachment points instead of one. Link only to the
+        // closest of the returned vertices.
+        closestVertex(boardingLocation, linkedVertices).ifPresent(vertex -> {
           // Linking may have split a platform edge into two new edges. The platform association is
           // keyed by edge reference and is not carried over to the split halves, so re-register them
           // here; otherwise a later stop on the same platform can no longer match this platform.
           reRegisterSplitEdgesWithPlatform(vertex, platform);
           linkBoardingLocationToStop(ts, stop.getCode(), vertex);
-        }
+        });
         return true;
       })
       .orElse(false);
@@ -270,16 +291,29 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * on the platform (so several stops collapse onto the same vertex). In {@code TRANSIT} mode each
    * stop gets its own vertex at its own coordinate from the transit data, so stops on the same
    * platform stay distinct.
+   *
+   * @param areaGeometry the platform area's polygon, if this platform is mapped as an area; used to
+   *                      keep a {@code TRANSIT} coordinate inside it. {@code null} for a way-mapped
+   *                      platform, which has no polygon to stay inside of.
    */
   private OsmBoardingLocationVertex makeBoardingLocationForPlatform(
     RegularStop stop,
     Platform platform,
-    I18NString name
+    I18NString name,
+    @Nullable Geometry areaGeometry
   ) {
     if (coordinateSource == BoardingLocationCoordinateSource.TRANSIT) {
+      var coordinate = stop.getCoordinate().asJtsCoordinate();
+      if (areaGeometry != null) {
+        coordinate = ensureInsideArea(
+          coordinate,
+          areaGeometry,
+          platform.geometry().getCoordinate()
+        );
+      }
       return makeBoardingLocation(
         "platform-transit/%s".formatted(stop.getId().toString()),
-        stop.getCoordinate().asJtsCoordinate(),
+        coordinate,
         platform.references(),
         name
       );
@@ -293,6 +327,55 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         name
       )
     );
+  }
+
+  /**
+   * A {@code TRANSIT} coordinate can sit just outside the platform polygon it is meant to be linked
+   * into: the stop coordinate and the OSM-mapped platform boundary are surveyed independently
+   * and routinely differ by centimeters. {@link VertexLinker}'s area-visibility linking requires
+   * every candidate visibility edge to stay entirely inside the polygon, so a coordinate sitting even
+   * a hair outside it fails that check for nearly every visibility vertex, leaving the boarding
+   * location connected to only the one or two edges that happen to clear it anyway - a sparse,
+   * oddly-angled link instead of the normal dense fan to the platform's corners.
+   * <p>
+   * If {@code transitCoordinate} is outside {@code areaGeometry}, move it along the line towards the
+   * platform's own (always-inside) {@code interiorPoint} until it is just past the boundary, plus a
+   * small margin so it is safely inside rather than sitting on the boundary itself.
+   */
+  private Coordinate ensureInsideArea(
+    Coordinate transitCoordinate,
+    Geometry areaGeometry,
+    Coordinate interiorPoint
+  ) {
+    var geometryFactory = GeometryUtils.getGeometryFactory();
+    if (areaGeometry.contains(geometryFactory.createPoint(transitCoordinate))) {
+      return transitCoordinate;
+    }
+    var pathToInterior = geometryFactory.createLineString(new Coordinate[] {
+      transitCoordinate,
+      interiorPoint,
+    });
+    var crossings = areaGeometry.getBoundary().intersection(pathToInterior).getCoordinates();
+    if (crossings.length == 0) {
+      return interiorPoint;
+    }
+    var nearestCrossing = Stream.of(crossings)
+      .min(Comparator.comparingDouble(c -> SphericalDistanceLibrary.distance(transitCoordinate, c)))
+      .orElseThrow();
+    return stepTowards(nearestCrossing, interiorPoint, INSIDE_AREA_MARGIN_METERS);
+  }
+
+  /**
+   * A coordinate {@code marginMeters} further from {@code from} towards {@code to}, or {@code to}
+   * itself if that is closer than {@code marginMeters}.
+   */
+  private static Coordinate stepTowards(Coordinate from, Coordinate to, double marginMeters) {
+    double totalMeters = SphericalDistanceLibrary.distance(from, to);
+    if (totalMeters <= marginMeters) {
+      return to;
+    }
+    double fraction = marginMeters / totalMeters;
+    return new Coordinate(from.x + (to.x - from.x) * fraction, from.y + (to.y - from.y) * fraction);
   }
 
   private OsmBoardingLocationVertex makeBoardingLocation(
@@ -321,6 +404,24 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     Stream.concat(vertex.getIncoming().stream(), vertex.getOutgoing().stream())
       .filter(StreetEdge.class::isInstance)
       .forEach(edge -> osmInfoGraphBuildRepository.addPlatform(edge, platform));
+  }
+
+  /**
+   * Pick the closest of a set of candidate attachment points for a boarding location. Used to
+   * collapse near-duplicate vertices returned by {@link VertexLinker} back down to the single
+   * point a stop actually attaches to.
+   */
+  private Optional<StreetVertex> closestVertex(
+    OsmBoardingLocationVertex boardingLocation,
+    Set<StreetVertex> candidates
+  ) {
+    return candidates
+      .stream()
+      .min(
+        Comparator.comparingDouble(v ->
+          SphericalDistanceLibrary.distance(boardingLocation.getCoordinate(), v.getCoordinate())
+        )
+      );
   }
 
   private List<Edge> getConnectingEdges(
