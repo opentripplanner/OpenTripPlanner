@@ -49,7 +49,7 @@ public class ServiceJourneyType {
     GraphQLOutputType journeyPatternType,
     GraphQLOutputType estimatedCallType,
     GraphQLOutputType timetabledPassingTimeType,
-    GraphQLOutputType vehicleAssignmentType
+    GraphQLOutputType serviceJourneyVehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -155,8 +155,8 @@ public class ServiceJourneyType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("vehicleAssignment")
-          .type(vehicleAssignmentType)
-          .description("References to the vehicle expected to operate the service journey.")
+          .type(serviceJourneyVehicleAssignmentType)
+          .description("The vehicle and vehicle type aimed to operate the service journey.")
           .dataFetcher(environment -> trip(environment).getVehicleAssignment())
           .build()
       )

@@ -47,7 +47,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.model.timetable.VehicleAssignment;
+import org.opentripplanner.transit.model.timetable.VehicleAssignmentOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -464,9 +464,11 @@ public interface TransitService {
   Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
 
   /**
-   * The vehicle assignment expected to operate a dated service journey. If a real-time update
-   * contains updates about the assignment, this takes precedence over what's given in the planned
-   * data. Empty when no vehicle information is available.
+   * The vehicle assignment for the given trip on its service date, combining the planned
+   * assignment with the vehicle reported by real-time data. Empty when no vehicle reference is
+   * known.
    */
-  Optional<VehicleAssignment> findExpectedVehicleAssignment(TripOnServiceDate tripOnServiceDate);
+  Optional<VehicleAssignmentOnServiceDate> findVehicleAssignmentOnServiceDate(
+    TripOnServiceDate tripOnServiceDate
+  );
 }

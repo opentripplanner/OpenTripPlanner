@@ -85,9 +85,11 @@ class TripOnServiceDateTest {
   }
 
   @Test
-  void ownVehicleAssignmentOverridesTrip() {
+  void ownVehicleAssignmentOverridesTripAsAWhole() {
     var trip = TransitRepositoryForTest.trip(TRIP_ID)
-      .withVehicleAssignment(new VehicleAssignment(null, "RUT:VehicleType:SJ"))
+      .withVehicleAssignment(
+        new VehicleAssignment(FeedScopedIdForTestFactory.id("vehicle"), "RUT:VehicleType:SJ")
+      )
       .build();
     var own = new VehicleAssignment(null, "RUT:VehicleType:DSJ");
     var subject = TripOnServiceDate.of(FeedScopedIdForTestFactory.id(ID))
@@ -96,6 +98,7 @@ class TripOnServiceDateTest {
       .withVehicleAssignment(own)
       .build();
 
+    // The trip's assignment does not fill in references the own assignment leaves out
     assertEquals(own, subject.getVehicleAssignment());
   }
 

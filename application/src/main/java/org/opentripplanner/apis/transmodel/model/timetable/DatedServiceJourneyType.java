@@ -45,7 +45,7 @@ public class DatedServiceJourneyType {
     GraphQLOutputType replacedByType,
     GraphQLOutputType replacementForType,
     GraphQLOutputType realTimeJourneyStateType,
-    GraphQLOutputType vehicleAssignmentType
+    GraphQLOutputType datedServiceJourneyVehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -92,17 +92,16 @@ public class DatedServiceJourneyType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("vehicleAssignment")
-          .type(vehicleAssignmentType)
+          .type(datedServiceJourneyVehicleAssignmentType)
           .description(
             """
-            References to the vehicle expected to operate the dated service journey. If no vehicle
-            assignment is given for the dated service journey, then this value falls back to what is
-            set for the service journey.
+            The aimed and expected vehicle assignment for this dated service journey.
+            The aimed references fall back to the service journey's when the dated service journey has none of its own.
             """
           )
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment)
-              .findExpectedVehicleAssignment(tripOnServiceDate(environment))
+              .findVehicleAssignmentOnServiceDate(tripOnServiceDate(environment))
               .orElse(null)
           )
           .build()

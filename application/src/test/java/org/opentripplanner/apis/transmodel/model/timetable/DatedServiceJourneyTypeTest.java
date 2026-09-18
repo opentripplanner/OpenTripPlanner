@@ -230,7 +230,7 @@ class DatedServiceJourneyTypeTest {
       ref("ReplacedBy"),
       ref("ReplacementFor"),
       realTimeJourneyStateType,
-      VehicleAssignmentType.create(new DefaultFeedIdMapper())
+      DatedServiceJourneyVehicleAssignmentType.create(new DefaultFeedIdMapper())
     );
 
     var queryType = GraphQLObjectType.newObject()

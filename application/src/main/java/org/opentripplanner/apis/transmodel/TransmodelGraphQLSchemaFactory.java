@@ -109,15 +109,16 @@ import org.opentripplanner.apis.transmodel.model.stop.TariffZoneType;
 import org.opentripplanner.apis.transmodel.model.timetable.BookingArrangementType;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyQuery;
 import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyType;
+import org.opentripplanner.apis.transmodel.model.timetable.DatedServiceJourneyVehicleAssignmentType;
 import org.opentripplanner.apis.transmodel.model.timetable.EmpiricalDelayType;
 import org.opentripplanner.apis.transmodel.model.timetable.InterchangeType;
 import org.opentripplanner.apis.transmodel.model.timetable.RealTimeTripStateType;
 import org.opentripplanner.apis.transmodel.model.timetable.ReplacedByRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ReplacementForRelationType;
 import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyType;
+import org.opentripplanner.apis.transmodel.model.timetable.ServiceJourneyVehicleAssignmentType;
 import org.opentripplanner.apis.transmodel.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.apis.transmodel.model.timetable.TripMetadataType;
-import org.opentripplanner.apis.transmodel.model.timetable.VehicleAssignmentType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -353,7 +354,10 @@ public class TransmodelGraphQLSchemaFactory {
       dateTimeScalar
     );
 
-    GraphQLObjectType vehicleAssignmentType = VehicleAssignmentType.create(idMapper);
+    GraphQLObjectType serviceJourneyVehicleAssignmentType =
+      ServiceJourneyVehicleAssignmentType.create(idMapper);
+    GraphQLObjectType datedServiceJourneyVehicleAssignmentType =
+      DatedServiceJourneyVehicleAssignmentType.create(idMapper);
     GraphQLOutputType serviceJourneyType = serviceJourneyTypeFactory.create(
       bookingArrangementType,
       linkGeometryType,
@@ -365,7 +369,7 @@ public class TransmodelGraphQLSchemaFactory {
       journeyPatternType,
       estimatedCallType,
       TimetabledPassingTimeType.REF,
-      vehicleAssignmentType
+      serviceJourneyVehicleAssignmentType
     );
 
     GraphQLObjectType realTimeJourneyStateType = RealTimeTripStateType.create();
@@ -377,7 +381,7 @@ public class TransmodelGraphQLSchemaFactory {
       replacedByRelationType,
       replacementForRelationType,
       realTimeJourneyStateType,
-      vehicleAssignmentType
+      datedServiceJourneyVehicleAssignmentType
     );
 
     var timetabledPassingTime = TimetabledPassingTimeType.create(

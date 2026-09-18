@@ -7,7 +7,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * References to the vehicle assigned to operate a journey.
+ * References to the vehicle and vehicle type aimed to operate a trip, as given in the planned
+ * data.
  */
 public class VehicleAssignment implements Serializable {
 
@@ -34,22 +35,6 @@ public class VehicleAssignment implements Serializable {
     return vehicleId == null && vehicleTypeId == null
       ? null
       : new VehicleAssignment(vehicleId, vehicleTypeId);
-  }
-
-  /**
-   * Combine the planned vehicle assignment with a vehicle id from a real-time update. The real-time
-   * vehicle takes precedence over the planned one.
-   * Returns {@code null} when neither a vehicle nor a vehicle type is known.
-   */
-  @Nullable
-  public static VehicleAssignment ofPlannedAndRealTime(
-    @Nullable VehicleAssignment planned,
-    @Nullable FeedScopedId realTimeVehicleId
-  ) {
-    var vehicleId =
-      realTimeVehicleId != null ? realTimeVehicleId : planned == null ? null : planned.vehicleId();
-    var vehicleTypeId = planned == null ? null : planned.vehicleTypeId();
-    return ofNullable(vehicleId, vehicleTypeId);
   }
 
   /** The vehicle itself. */

@@ -9,25 +9,23 @@ import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 
 /**
- * References to the vehicle assigned to operate a journey.
+ * The vehicle and vehicle type aimed to operate a service journey, as given in the planned data.
  */
-public class VehicleAssignmentType {
+public class ServiceJourneyVehicleAssignmentType {
 
-  private static final String NAME = "VehicleAssignment";
+  private static final String NAME = "ServiceJourneyVehicleAssignment";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  private VehicleAssignmentType() {}
+  private ServiceJourneyVehicleAssignmentType() {}
 
   public static GraphQLObjectType create(FeedScopedIdMapper idMapper) {
     return GraphQLObjectType.newObject()
       .name(NAME)
-      .description("References to the vehicle assigned to operate a journey.")
+      .description("The vehicle and vehicle type aimed to operate a service journey.")
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("expectedVehicleId")
-          .description(
-            "Expected id of the vehicle. Updated with real time information if available."
-          )
+          .name("aimedVehicleId")
+          .description("Id of the vehicle aimed to operate the service journey.")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> {
             var id = vehicleAssignment(environment).vehicleId();
@@ -37,8 +35,8 @@ public class VehicleAssignmentType {
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
-          .name("expectedVehicleTypeId")
-          .description("Expected id of the type of vehicle.")
+          .name("aimedVehicleTypeId")
+          .description("Id of the type of vehicle aimed to operate the service journey.")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> vehicleAssignment(environment).vehicleTypeId())
           .build()
