@@ -119,10 +119,12 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     // Live messages can be processed regardless of priming, so start the live runner right away.
     liveExecutor.submit(new LiveRunner());
 
-    // Readiness is independent of the connection lifecycle: even if the broker is never reachable
-    // or the connection keeps failing during the MQTT handshake (connect/disconnect loop), this
-    // watcher guarantees OTP eventually becomes ready. Priming, when a connection is established,
-    // may mark the updater primed earlier (see onConnect -> beginPriming).
+    // Fallback readiness for when no connection is ever established: if the broker is never
+    // reachable, or the connection keeps failing during the MQTT handshake (connect/disconnect
+    // loop, so onConnect never fires and priming never starts), this watcher guarantees OTP
+    // eventually becomes ready. Once a connection is established and priming has started, readiness
+    // is governed by priming completion instead (see onConnect -> beginPriming), so a slow but
+    // progressing backlog is not cut short by this timeout.
     readinessWatcher.schedule(
       this::markPrimedOnStartupTimeout,
       parameters.connectionStartupTimeout().toMillis(),
@@ -133,10 +135,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   }
 
   private void markPrimedOnStartupTimeout() {
+    if (primingStarted.get()) {
+      // A connection was established and priming is underway; let it finish and mark readiness on
+      // completion rather than forcing it here.
+      return;
+    }
     if (!primed) {
       LOG.warn(
-        "MQTT broker at {} did not connect and finish priming within {}. " +
-          "OTP will start routing without (complete) real-time data. " +
+        "MQTT broker at {} did not connect within {}. " +
+          "OTP will start routing without real-time data. " +
           "The MQTT client will keep retrying in the background.",
         parameters.url(),
         parameters.connectionStartupTimeout()
