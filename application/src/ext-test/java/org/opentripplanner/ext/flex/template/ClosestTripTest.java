@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.place.api.NearbyStop;

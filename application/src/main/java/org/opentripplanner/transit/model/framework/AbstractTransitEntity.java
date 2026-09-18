@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 /**
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a

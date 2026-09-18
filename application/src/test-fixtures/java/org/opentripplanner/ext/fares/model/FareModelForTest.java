@@ -4,8 +4,8 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.OTHER_FEED_AGENCY;
 
 import java.time.ZonedDateTime;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.street.geometry.WgsCoordinate;

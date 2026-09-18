@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;

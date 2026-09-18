@@ -10,7 +10,7 @@ import com.google.common.collect.Multimap;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.alertpatch;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 
 /**

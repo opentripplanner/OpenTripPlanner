@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emission.parameters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 import org.opentripplanner.framework.model.Gram;
 
 class EmissionVehicleParametersTest {

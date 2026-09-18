@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.ext.vectortiles.layers.TestTransitService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.Station;

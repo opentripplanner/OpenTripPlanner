@@ -7,9 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.core.model.time.TimePeriod;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.time.TimePeriod;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
 

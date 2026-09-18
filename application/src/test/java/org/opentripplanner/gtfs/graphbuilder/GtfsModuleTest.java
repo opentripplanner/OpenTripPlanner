@@ -12,7 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.domain.model.time.LocalDateRange;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.service.SiteRepository;

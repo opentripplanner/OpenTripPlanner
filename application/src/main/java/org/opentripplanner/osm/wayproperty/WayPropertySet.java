@@ -6,7 +6,7 @@ import static org.opentripplanner.osm.model.TraverseDirection.FORWARD;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.osm.model.OsmEntity;

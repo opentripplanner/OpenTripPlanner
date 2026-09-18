@@ -2,9 +2,9 @@ package org.opentripplanner.apis.transmodel.model.stop;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;

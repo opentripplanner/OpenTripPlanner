@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;

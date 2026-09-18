@@ -6,7 +6,7 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;

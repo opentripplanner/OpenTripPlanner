@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInterceptor;
 import org.opentripplanner.street.geometry.DirectionUtils;

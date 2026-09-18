@@ -10,7 +10,7 @@ import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSFeature;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSGeofencingZones;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSName;
 import org.mobilitydata.gbfs.v3_0.geofencing_zones.GBFSRule;
-import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 
 /**

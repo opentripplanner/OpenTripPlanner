@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.RegularStop;

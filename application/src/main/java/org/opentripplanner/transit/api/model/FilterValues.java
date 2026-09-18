@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

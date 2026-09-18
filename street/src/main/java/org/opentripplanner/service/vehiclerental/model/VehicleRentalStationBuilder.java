@@ -2,8 +2,8 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 
 public class VehicleRentalStationBuilder {
 

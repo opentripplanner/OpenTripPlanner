@@ -1,0 +1,10 @@
+package org.opentripplanner.core.framework.transaction.moduletest.candyshop.event;
+
+import org.opentripplanner.core.domain.framework.event.DomainEvent;
+
+public record CustomerOrderDomainEvent(
+  int orderId,
+  String description,
+  int customerId,
+  String customerName
+) implements DomainEvent {}

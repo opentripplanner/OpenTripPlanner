@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opentripplanner</groupId>
-        <artifactId>otp-root</artifactId>
+        <artifactId>otp</artifactId>
         <version>2.11.0-SNAPSHOT</version>
     </parent>
 
@@ -22,56 +22,27 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>domain-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!-- project dependencies -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>astar</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>domain</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>com.google.dagger</groupId>
             <artifactId>dagger</artifactId>
             <version>${google.dagger.version}</version>
         </dependency>
-        <!--
-             GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections.
-             GEOTOOLS includes JTS as a transitive dependency. It also includes Eclipse ImageN as a
-             transitive dependency, but its use should be limited to input/output for geotools
-             usage.
-            -->
-        <!-- GEOTOOLS -->
-
         <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-coverage</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geotiff</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-geojson-core</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
             <groupId>de.grundid.opendatalab</groupId>
@@ -81,13 +52,39 @@
             <groupId>net.sf.trove4j</groupId>
             <artifactId>trove4j</artifactId>
         </dependency>
+        <!--
+             GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections.
+             GEOTOOLS includes JTS as a transitive dependency. It also includes Eclipse ImageN as a
+             transitive dependency, but its use should be limited to input/output for geotools
+             usage.
+            -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- test dependencies -->
         <dependency>
             <groupId>com.google.truth</groupId>
             <artifactId>truth</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-
 </project>

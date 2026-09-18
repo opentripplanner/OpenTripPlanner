@@ -17,7 +17,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.apis.transmodel.model.TripTimeOnDateHelper;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;

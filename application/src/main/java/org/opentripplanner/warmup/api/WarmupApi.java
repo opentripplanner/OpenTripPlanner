@@ -1,6 +1,6 @@
 package org.opentripplanner.warmup.api;
 
-import org.opentripplanner.core.model.doc.DocumentedEnum;
+import org.opentripplanner.core.domain.model.doc.DocumentedEnum;
 
 /** Which GraphQL API to use for warmup queries. */
 public enum WarmupApi implements DocumentedEnum<WarmupApi> {

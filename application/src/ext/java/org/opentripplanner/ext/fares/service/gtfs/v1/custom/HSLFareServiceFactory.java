@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares.service.gtfs.v1.custom;
 
 import java.util.Collection;
 import java.util.Map;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRule;
 import org.opentripplanner.ext.fares.model.FareRuleSet;

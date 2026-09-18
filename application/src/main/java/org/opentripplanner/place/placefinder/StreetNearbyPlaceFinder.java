@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.place.NearbyPlaceFinder;

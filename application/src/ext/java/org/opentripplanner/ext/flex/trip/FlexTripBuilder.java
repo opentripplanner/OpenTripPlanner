@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex.trip;
 
-import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.domain.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 
