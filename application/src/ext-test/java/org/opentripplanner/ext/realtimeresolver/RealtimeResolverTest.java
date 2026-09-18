@@ -43,8 +43,6 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -141,26 +139,21 @@ class RealtimeResolverTest {
     var from = Place.forStop(STOP_B);
     var to = Place.forStop(STOP_C);
 
-    var walkLeg = StreetLeg.of()
-      .withFrom(from)
-      .withMode(TraverseMode.WALK)
-      .withTo(to)
-      .withStartTime(busLeg.startTime().plusMinutes(1))
-      .withEndTime(busLeg.endTime().plusMinutes(10))
-      .withGeneralizedCost(Cost.ZERO.toSeconds())
-      .withDistanceMeters(500)
-      .build();
+    var walkLeg = walkLeg(
+      from,
+      to,
+      busLeg.endTime().plusMinutes(1),
+      busLeg.endTime().plusMinutes(10)
+    );
 
     var itinerary = Itinerary.ofScheduledTransit(List.of(busLeg, walkLeg, trainLeg))
       .withGeneralizedCost(Cost.ZERO)
       .build();
-    var model = new TransitRepository();
-    model.index();
-    var transitService = new DefaultTransitService(model);
+
     List<Itinerary> itineraries = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
       refetchService,
-      transitService,
+      TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -169,7 +162,7 @@ class RealtimeResolverTest {
     Leg walkingLeg = legs.stream().filter(Leg::isWalkingLeg).findFirst().orElse(null);
     assertEquals(3, legs.size());
     assertEquals(
-      "2020-03-03T10:01+01:00[Europe/Paris]",
+      "2020-03-03T11:01+01:00[Europe/Paris]",
       Objects.requireNonNull(walkingLeg).startTime().toString()
     );
     assertEquals(
@@ -179,7 +172,7 @@ class RealtimeResolverTest {
   }
 
   @Test
-  void populateItineraryLegsWithRealTime() {
+  void testChangeQuayAndPopulateItineraryLegsWithRealTime() {
     var refetchService = createRefetchService(new TransitAlertServiceImpl());
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
     TripOnDateDataFetcher trip2 = TRANSIT_ENV.tripData("trip4");
@@ -210,26 +203,21 @@ class RealtimeResolverTest {
     var from = Place.forStop(STOP_B);
     var to = Place.forStop(STOP_D);
 
-    var walkLeg = StreetLeg.of()
-      .withFrom(from)
-      .withMode(TraverseMode.WALK)
-      .withTo(to)
-      .withStartTime(busLeg.startTime().plusMinutes(1))
-      .withEndTime(busLeg.endTime().plusMinutes(10))
-      .withGeneralizedCost(Cost.ZERO.toSeconds())
-      .withDistanceMeters(500)
-      .build();
+    var walkLeg = walkLeg(
+      from,
+      to,
+      busLeg.startTime().plusMinutes(1),
+      busLeg.endTime().plusMinutes(10)
+    );
 
     var itinerary = Itinerary.ofScheduledTransit(List.of(busLeg, walkLeg, trainLeg))
       .withGeneralizedCost(Cost.ZERO)
       .build();
-    var model = new TransitRepository();
-    model.index();
-    var transitService = new DefaultTransitService(model);
+
     List<Itinerary> itineraries = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
       refetchService,
-      transitService,
+      TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -314,38 +302,30 @@ class RealtimeResolverTest {
 
   @Test
   void testPopulateLegsWithRealtimeNonTransit() {
-    // Test walk leg and transit leg that doesn't have a corresponding realtime leg
+    // Test walk leg and transit leg that can't be found in the transit service
     TripOnDateDataFetcher trip1 = TRANSIT_ENV.tripData("trip1");
 
     ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
 
-    Place from = Place.normal(VB.vertex(), VB.vertex().getName());
-    Place to = Place.normal(VC.vertex(), VC.vertex().getName());
+    Place from = Place.forStop(STOP_B);
+    Place to = Place.forStop(STOP_C);
 
-    StreetLeg walkLeg = StreetLeg.of()
-      .withFrom(from)
-      .withMode(TraverseMode.WALK)
-      .withTo(to)
-      .withDistanceMeters(300)
-      .withStartTime(busLeg.endTime().plusMinutes(1))
-      .withEndTime(busLeg.endTime().plusMinutes(10))
-      .withGeneralizedCost(Cost.ZERO.toSeconds())
-      .withDistanceMeters(500)
-      .build();
+    var walkLeg = walkLeg(
+      from,
+      to,
+      busLeg.endTime().plusMinutes(1),
+      busLeg.endTime().plusMinutes(10)
+    );
 
     var itinerary = Itinerary.ofScheduledTransit(List.of(busLeg, walkLeg))
       .withGeneralizedCost(Cost.ZERO)
       .build();
 
-    var model = new TransitRepository();
-    model.index();
-    var transitService = new DefaultTransitService(model);
-
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
       createRefetchService(new TransitAlertServiceImpl()),
-      transitService,
+      TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -378,14 +358,10 @@ class RealtimeResolverTest {
       .withGeneralizedCost(Cost.ZERO)
       .build();
 
-    var model = new TransitRepository();
-    model.index();
-
-    var transitService = new DefaultTransitService(model);
     List<Itinerary> itineraries = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
       refetchService,
-      transitService,
+      TRANSIT_ENV.transitService(),
       new TransitAlertServiceImpl(),
       routeRequest()
     );
@@ -400,6 +376,18 @@ class RealtimeResolverTest {
       "A ~ BUS trip1 10:00 11:00 ~ B ~ BUS trip2 12:00 13:00 ~ C []",
       itineraries.getFirst().toStr()
     );
+  }
+
+  private StreetLeg walkLeg(Place from, Place to, ZonedDateTime startTime, ZonedDateTime endTime) {
+    return StreetLeg.of()
+      .withFrom(from)
+      .withMode(TraverseMode.WALK)
+      .withTo(to)
+      .withStartTime(startTime)
+      .withEndTime(endTime)
+      .withGeneralizedCost(Cost.ZERO.toSeconds())
+      .withDistanceMeters(500)
+      .build();
   }
 
   private static RouteRequest routeRequest() {
