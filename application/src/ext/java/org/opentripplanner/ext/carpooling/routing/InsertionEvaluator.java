@@ -1,29 +1,29 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
-
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Evaluates pre-filtered insertion positions using A* routing.
+ * Evaluates pre-filtered insertion positions using street routing.
  * <p>
  * This class is a pure evaluator that takes positions identified by heuristic
- * filtering and evaluates them using expensive A* street routing. It selects
+ * filtering and evaluates them using expensive street routing. It selects
  * the insertion that minimizes additional travel time while satisfying
  * passenger delay constraints.
+ * <p>
+ * The evaluation works on segment durations only — see {@link RoutedSegment}. No street path is
+ * materialised here; the winning candidate carries its segments, and whoever builds an itinerary
+ * from it asks for the paths then.
  * <p>
  * This follows the established OTP pattern of separating candidate generation
  * from evaluation, similar to {@code TransferGenerator} and {@code OptimizePathDomainService}.
@@ -83,15 +83,15 @@ public class InsertionEvaluator {
    *
    * @return Array of routed segments, or null if any segment fails to route
    */
-  @SuppressWarnings("unchecked")
-  private GraphPath<State, Edge, Vertex>[] routeSegments(List<Vertex> routePoints) {
-    GraphPath<State, Edge, Vertex>[] segments = new GraphPath[routePoints.size() - 1];
+  @Nullable
+  private RoutedSegment[] routeSegments(List<Vertex> routePoints) {
+    RoutedSegment[] segments = new RoutedSegment[routePoints.size() - 1];
 
     for (int i = 0; i < routePoints.size() - 1; i++) {
       var from = routePoints.get(i);
       var to = routePoints.get(i + 1);
 
-      GraphPath<State, Edge, Vertex> segment = carpoolRouter.route(from, to);
+      RoutedSegment segment = carpoolRouter.route(from, to);
       if (segment == null && baselineFallbackRouter != null) {
         segment = baselineFallbackRouter.route(from, to);
         if (segment != null) {
@@ -127,13 +127,16 @@ public class InsertionEvaluator {
       return List.of();
     }
 
-    GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
+    RoutedSegment[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {
       LOG.info("Could not route baseline segments for trip {}", tripWithVertices.trip().getId());
       return List.of();
     }
 
-    Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments, stopDuration);
+    Duration[] cumulativeDurations = RoutedSegment.cumulativeDurations(
+      Arrays.asList(baselineSegments),
+      stopDuration
+    );
 
     return tripWithViableAccessEgress
       .viableAccessEgress()
@@ -170,11 +173,11 @@ public class InsertionEvaluator {
   }
 
   /**
-   * Evaluates pre-filtered insertion positions using A* routing.
+   * Evaluates pre-filtered insertion positions using street routing.
    * <p>
    * This method assumes the provided positions have already passed heuristic
    * validation (capacity, direction, beeline delay). It performs expensive
-   * A* routing for each position and selects the one with minimum additional
+   * routing for each position and selects the one with minimum additional
    * duration that satisfies delay constraints.
    *
    * @param tripWithVertices The carpool trip with resolved vertices
@@ -189,13 +192,16 @@ public class InsertionEvaluator {
     List<InsertionPosition> viablePositions,
     PassengerSnap snap
   ) {
-    GraphPath<State, Edge, Vertex>[] baselineSegments = routeSegments(tripWithVertices.vertices());
+    RoutedSegment[] baselineSegments = routeSegments(tripWithVertices.vertices());
     if (baselineSegments == null) {
       LOG.info("Could not route baseline for trip {}", tripWithVertices.trip().getId());
       return null;
     }
 
-    Duration[] cumulativeDurations = calculateCumulativeDurations(baselineSegments, stopDuration);
+    Duration[] cumulativeDurations = RoutedSegment.cumulativeDurations(
+      Arrays.asList(baselineSegments),
+      stopDuration
+    );
 
     return findBestInsertion(
       tripWithVertices,
@@ -212,7 +218,7 @@ public class InsertionEvaluator {
     CarpoolTripWithVertices tripWithVertices,
     List<InsertionPosition> viablePositions,
     PassengerSnap snap,
-    GraphPath<State, Edge, Vertex>[] baselineSegments,
+    RoutedSegment[] baselineSegments,
     Duration[] cumulativeDurations,
     NearbyStop transitStop
   ) {
@@ -259,11 +265,11 @@ public class InsertionEvaluator {
     int pickupPos,
     int dropoffPos,
     PassengerSnap snap,
-    GraphPath<State, Edge, Vertex>[] baselineSegments,
+    RoutedSegment[] baselineSegments,
     Duration[] originalCumulativeDurations,
     NearbyStop transitStop
   ) {
-    List<GraphPath<State, Edge, Vertex>> modifiedSegments = buildModifiedSegments(
+    List<RoutedSegment> modifiedSegments = buildModifiedSegments(
       tripWithVertices.vertices(),
       baselineSegments,
       pickupPos,
@@ -276,8 +282,8 @@ public class InsertionEvaluator {
       return null;
     }
 
-    Duration[] modifiedCumulativeDurations = calculateCumulativeDurations(
-      modifiedSegments.toArray(new GraphPath[modifiedSegments.size()]),
+    Duration[] modifiedCumulativeDurations = RoutedSegment.cumulativeDurations(
+      modifiedSegments,
       stopDuration
     );
     if (
@@ -309,22 +315,22 @@ public class InsertionEvaluator {
     );
   }
 
-  private List<GraphPath<State, Edge, Vertex>> buildModifiedSegments(
+  private List<RoutedSegment> buildModifiedSegments(
     List<Vertex> originalPoints,
-    GraphPath<State, Edge, Vertex>[] baselineSegments,
+    RoutedSegment[] baselineSegments,
     int pickupPos,
     int dropoffPos,
     Vertex passengerPickup,
     Vertex passengerDropoff
   ) {
-    List<GraphPath<State, Edge, Vertex>> segments = new ArrayList<>();
+    List<RoutedSegment> segments = new ArrayList<>();
 
     List<Vertex> modifiedPoints = new ArrayList<>(originalPoints);
     modifiedPoints.add(pickupPos, passengerPickup);
     modifiedPoints.add(dropoffPos, passengerDropoff);
 
     for (int i = 0; i < modifiedPoints.size() - 1; i++) {
-      GraphPath<State, Edge, Vertex> segment;
+      RoutedSegment segment;
 
       int baselineIndex = baselineSegmentIndex(i, pickupPos, dropoffPos);
       if (baselineIndex >= 0 && baselineIndex < baselineSegments.length) {

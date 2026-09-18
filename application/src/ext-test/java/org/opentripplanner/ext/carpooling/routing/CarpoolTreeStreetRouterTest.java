@@ -3,11 +3,14 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +36,8 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   private IntersectionVertex vertexC;
   private IntersectionVertex vertexD;
   private IntersectionVertex vertexDisconnected;
+  private IntersectionVertex vertexBranch;
+  private IntersectionVertex vertexBranchEnd;
 
   private CarpoolTreeStreetRouter router;
 
@@ -47,10 +52,16 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
           var C = intersection("C", ORIGIN.moveEastMeters(1000));
           var D = intersection("D", ORIGIN.moveEastMeters(1500));
           var Z = intersection("Z", ORIGIN.moveNorthMeters(500));
+          // A side branch north of B: far from the A-C line, so it lies outside the ellipse of a
+          // leg A -> C but inside the disc of the same duration limit.
+          var N = intersection("N", ORIGIN.moveEastMeters(500).moveNorthMeters(1500));
+          var M = intersection("M", ORIGIN.moveEastMeters(500).moveNorthMeters(1600));
 
           biStreet(A, B, 500);
           biStreet(B, C, 500);
           biStreet(C, D, 500);
+          biStreet(B, N, 1500);
+          biStreet(N, M, 100);
           // Z has no edges — disconnected from the rest of the graph
 
           vertexA = A;
@@ -58,6 +69,8 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
           vertexC = C;
           vertexD = D;
           vertexDisconnected = Z;
+          vertexBranch = N;
+          vertexBranchEnd = M;
         }
       }
     );
@@ -238,13 +251,196 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routePathIsNonEmpty() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path);
+    assertNotNull(segment);
+    var path = segment.path();
     assertNotNull(path.states, "Path should have states");
     assertFalse(path.states.isEmpty(), "Path states should not be empty");
     assertNotNull(path.edges, "Path should have edges");
     assertFalse(path.edges.isEmpty(), "Path edges should not be empty");
+  }
+
+  /**
+   * Insertion evaluation only reads durations. The path - a linked list of states and edges - is
+   * assembled from the tree's back pointers on demand, so the thousands of segments evaluated and
+   * discarded per request never pay for it.
+   */
+  @Test
+  void routeDoesNotBuildThePathUntilAsked() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+
+    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
+
+    assertNotNull(segment);
+    assertTrue(segment.durationSeconds() > 0);
+    assertFalse(segment.isPathMaterialized(), "Reading the duration must not build the path");
+
+    var path = segment.path();
+    assertTrue(segment.isPathMaterialized());
+    assertSame(path, segment.path(), "The path is memoised");
+  }
+
+  @Test
+  void durationIsTheMaterializedPathDurationForBothTreeDirections() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexD, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
+
+    var forward = router.route(vertexA, vertexC);
+    var reverse = router.route(vertexB, vertexD);
+
+    assertNotNull(forward);
+    assertNotNull(reverse);
+    assertEquals(forward.path().getDuration(), forward.durationSeconds());
+    assertEquals(reverse.path().getDuration(), reverse.durationSeconds());
+    assertEquals(vertexA, forward.from());
+    assertEquals(vertexC, forward.to());
+    assertEquals(vertexB, reverse.path().states.getFirst().getVertex());
+    assertEquals(vertexD, reverse.path().states.getLast().getVertex());
+  }
+
+  /**
+   * A leg's trees only need the ellipse in which a detour of the leg can still be feasible. The
+   * branch end M is within the duration limit of a plain disc around A, but a detour A -> M -> C
+   * would take far longer than the limit, so the leg registration must not explore it. The branch
+   * vertex N itself is still reached: the check only stops the search from continuing past it.
+   */
+  @Test
+  void addLegBoundsTheForwardTreeToTheLegsEllipse() {
+    var disc = new CarpoolTreeStreetRouter();
+    disc.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, Duration.ofHours(1));
+    var toBranchEnd = disc.route(vertexA, vertexBranchEnd);
+    assertNotNull(toBranchEnd);
+    var legLimit = toBranchEnd.duration().plusSeconds(5);
+
+    var discWithLegLimit = new CarpoolTreeStreetRouter();
+    discWithLegLimit.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, legLimit);
+    assertNotNull(
+      discWithLegLimit.route(vertexA, vertexBranchEnd),
+      "The plain disc of the same limit reaches the branch end"
+    );
+
+    router.addLeg(vertexA, vertexC, legLimit);
+    assertNotNull(router.route(vertexA, vertexC), "The leg itself is routable");
+    assertNotNull(router.route(vertexA, vertexBranch), "The branch vertex is inside the ellipse");
+    assertNull(
+      router.route(vertexA, vertexBranchEnd),
+      "Beyond the branch vertex no detour can return to C within the limit"
+    );
+    assertEquals(1, router.forwardTreeCount());
+    assertEquals(1, router.reverseTreeCount());
+  }
+
+  @Test
+  void addLegBoundsTheReverseTreeToTheLegsEllipse() {
+    var disc = new CarpoolTreeStreetRouter();
+    disc.addVertex(vertexC, CarpoolTreeStreetRouter.Direction.TO, Duration.ofHours(1));
+    var fromBranchEnd = disc.route(vertexBranchEnd, vertexC);
+    assertNotNull(fromBranchEnd);
+    var legLimit = fromBranchEnd.duration().plusSeconds(5);
+
+    router.addLeg(vertexA, vertexC, legLimit);
+    // Only C has a reverse tree; A's tree is a forward tree, so these queries use the reverse tree.
+    assertNotNull(router.route(vertexB, vertexC));
+    assertNotNull(router.route(vertexBranch, vertexC));
+    assertNull(router.route(vertexBranchEnd, vertexC));
+  }
+
+  /**
+   * A disc registration at the same vertex means everything within the limit is wanted, so it
+   * must widen an ellipse-bounded registration back to a disc.
+   */
+  @Test
+  void addVertexAtALegEndWidensTheTreeBackToADisc() {
+    var disc = new CarpoolTreeStreetRouter();
+    disc.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, Duration.ofHours(1));
+    var legLimit = disc.route(vertexA, vertexBranchEnd).duration().plusSeconds(5);
+
+    router.addLeg(vertexA, vertexC, legLimit);
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, legLimit);
+
+    assertNotNull(router.route(vertexA, vertexBranchEnd));
+    assertEquals(1, router.forwardTreeCount(), "Both registrations share one tree");
+  }
+
+  /** Two legs from the same start unite their ellipses: what either leg needs stays reachable. */
+  @Test
+  void legsSharingAStartUniteTheirEllipses() {
+    var disc = new CarpoolTreeStreetRouter();
+    disc.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, Duration.ofHours(1));
+    var legLimit = disc.route(vertexA, vertexBranchEnd).duration().plusSeconds(5);
+
+    router.addLeg(vertexA, vertexC, legLimit);
+    router.addLeg(vertexA, vertexBranchEnd, legLimit);
+
+    assertNotNull(router.route(vertexA, vertexC));
+    assertNotNull(router.route(vertexA, vertexBranchEnd));
+    assertEquals(1, router.forwardTreeCount());
+  }
+
+  @Test
+  void addLegAfterRoutingStartedThrows() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.route(vertexA, vertexB);
+
+    assertThrows(IllegalStateException.class, () -> router.addLeg(vertexB, vertexC, SEARCH_LIMIT));
+  }
+
+  /**
+   * A trip's trees are only queried while the trip is evaluated, so the service releases them right
+   * after. A segment that was detached first keeps its path without the tree; the registration
+   * survives, so a later query for the same root rebuilds the tree.
+   */
+  @Test
+  void releasedTreesFreeMemoryDetachedSegmentsKeepTheirPathAndQueriesRebuild() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
+    assertNotNull(segment);
+    assertEquals(1, router.liveTreeCount());
+
+    segment.detach();
+    assertTrue(segment.isDetached());
+    assertFalse(segment.isPathMaterialized(), "Detaching keeps edges, not a path");
+    router.releaseTrees(List.of(vertexA));
+    assertEquals(0, router.liveTreeCount());
+
+    var path = segment.path();
+    assertEquals(segment.durationSeconds(), path.getDuration());
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
+
+    assertNotNull(router.route(vertexA, vertexC), "the kept registration rebuilds the tree");
+    assertEquals(1, router.liveTreeCount());
+    assertEquals(1, router.forwardTreeCount());
+  }
+
+  /** Without a detach, a released tree's segment still yields a path — by re-routing. */
+  @Test
+  void segmentOfAReleasedTreeThatWasNotDetachedReroutesItsPath() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    var segment = router.route(vertexA, vertexD);
+    assertNotNull(segment);
+    router.releaseTrees(List.of(vertexA));
+
+    var path = segment.path();
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
+    assertEquals(segment.durationSeconds(), path.getDuration());
+  }
+
+  @Test
+  void releaseForgetsTheCachedSegmentsOfTheReleasedTreeOnly() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexD, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
+    var fromA = router.route(vertexA, vertexB);
+    var toD = router.route(vertexC, vertexD);
+    assertEquals(2, router.liveTreeCount());
+
+    router.releaseTrees(List.of(vertexA));
+
+    assertEquals(1, router.liveTreeCount());
+    assertNotSame(fromA, router.route(vertexA, vertexB), "answered by a rebuilt tree");
+    assertSame(toD, router.route(vertexC, vertexD), "the other tree's cache entry survives");
   }
 
   @Test
@@ -304,9 +500,10 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routeFromAToDContainsExpectedEdges() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexD);
+    var segment = router.route(vertexA, vertexD);
 
-    assertNotNull(path, "Should find path from A to D");
+    assertNotNull(segment, "Should find path from A to D");
+    var path = segment.path();
     assertEquals(3, path.edges.size(), "Path should have 3 edges (A->B, B->C, C->D)");
 
     var edgeAB = path.edges.get(0);

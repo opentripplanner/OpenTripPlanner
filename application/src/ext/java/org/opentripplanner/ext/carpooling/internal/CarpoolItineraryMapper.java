@@ -121,10 +121,10 @@ public class CarpoolItineraryMapper {
     GenericLocation fromLocation,
     GenericLocation toLocation
   ) {
-    var sharedSegments = candidate.getSharedSegments();
-    if (sharedSegments.isEmpty()) {
+    if (candidate.getSharedSegments().isEmpty()) {
       return null;
     }
+    var sharedSegments = candidate.getSharedPaths();
     var carpoolStart = candidate.trip().startTime().plus(candidate.getDurationUntilPickupArrival());
     var carpoolEnd = carpoolStart.plus(candidate.getPassengerRideDuration());
     return buildItinerary(

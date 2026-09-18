@@ -51,9 +51,10 @@ public class CarpoolStreetRouter implements CarpoolRouter {
   }
 
   @Override
-  public GraphPath<State, Edge, Vertex> route(Vertex from, Vertex to) {
+  public RoutedSegment route(Vertex from, Vertex to) {
     try {
-      return carpoolRouting(from, to);
+      var path = carpoolRouting(from, to);
+      return path == null ? null : RoutedSegment.of(path);
     } catch (OTPRequestTimeoutException e) {
       // Rethrown ahead of the catch-all below, which would turn a cancellation into a null return.
       throw e;
