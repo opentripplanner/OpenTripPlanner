@@ -13,6 +13,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class StopConnectivityModuleTest extends GraphRoutingTest {
 
@@ -37,7 +38,7 @@ class StopConnectivityModuleTest extends GraphRoutingTest {
     g.addVertex(i2);
     g.addVertex(i3);
 
-    var module = new StopConnectivityModule(g, issueStore);
+    var module = new StopConnectivityModule(g, new SiteRepository(), issueStore);
     module.buildGraph();
 
     assertThat(issueStore.listIssues()).hasSize(1);
