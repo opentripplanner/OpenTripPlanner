@@ -2,6 +2,7 @@ package org.opentripplanner.ext.taxi.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.taxi.TaxiRepository;
@@ -18,6 +19,7 @@ public class TaxiServiceModule {
 
   @Provides
   @Nullable
+  @Singleton
   public TaxiService provideTaxiService(
     @Nullable TaxiRepository taxiRepository,
     Graph graph,
