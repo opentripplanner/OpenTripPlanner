@@ -55,7 +55,8 @@ class TripPatternMapperTest {
       ArrayListMultimap.create(),
       Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
       new Deduplicator(),
-      150
+      150,
+      0.0
     );
 
     Optional<TripPatternMapperResult> res = tripPatternMapper.mapTripPattern(
@@ -193,7 +194,8 @@ class TripPatternMapperTest {
       sample.getDatedServiceJourneyBySjId(),
       Map.of(NetexTestDataSample.SERVICE_JOURNEY_ID, SERVICE_ID),
       new Deduplicator(),
-      150
+      150,
+      0.0
     );
 
     Optional<TripPatternMapperResult> res = tripPatternMapper.mapTripPattern(
