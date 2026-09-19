@@ -197,6 +197,21 @@ type DatedServiceJourney {
   serviceJourney: ServiceJourney!
   "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
   tripAlteration: ServiceAlteration
+  """
+  The aimed and expected vehicle assignment for this dated service journey.
+  The aimed references fall back to the service journey's when the dated service journey has none of its own.
+  """
+  vehicleAssignment: DatedServiceJourneyVehicleAssignment
+}
+
+"The vehicle and vehicle type aimed to operate a dated service journey, and the vehicle expected to operate it based on real-time data."
+type DatedServiceJourneyVehicleAssignment {
+  "Id of the vehicle aimed to operate the dated service journey."
+  aimedVehicleId: String
+  "Id of the type of vehicle aimed to operate the dated service journey."
+  aimedVehicleTypeId: String
+  "Id of the vehicle expected to operate the dated service journey. Updated with real-time information if available."
+  expectedVehicleId: String
 }
 
 "An advertised destination of a specific journey pattern, usually displayed on a head sign or at other on-board locations."
@@ -1354,8 +1369,18 @@ type ServiceJourney {
   situations: [PtSituationElement!]!
   transportMode: TransportMode
   transportSubmode: TransportSubmode
+  "The vehicle and vehicle type aimed to operate the service journey."
+  vehicleAssignment: ServiceJourneyVehicleAssignment
   "Whether service journey is accessible with wheelchair."
   wheelchairAccessible: WheelchairBoarding
+}
+
+"The vehicle and vehicle type aimed to operate a service journey."
+type ServiceJourneyVehicleAssignment {
+  "Id of the vehicle aimed to operate the service journey."
+  aimedVehicleId: String
+  "Id of the type of vehicle aimed to operate the service journey."
+  aimedVehicleTypeId: String
 }
 
 "Named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location."

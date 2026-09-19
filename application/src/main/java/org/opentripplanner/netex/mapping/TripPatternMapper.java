@@ -34,6 +34,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -339,11 +340,17 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .toList();
 
+    var vehicleAssignment = VehicleAssignment.ofNullable(
+      null,
+      VehicleTypeRefMapper.mapVehicleTypeRef(datedServiceJourney.getVehicleTypeRef())
+    );
+
     return TripOnServiceDate.of(id)
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .withTripAlteration(alteration)
       .withReplacementFor(replacementFor)
+      .withVehicleAssignment(vehicleAssignment)
       .build();
   }
 

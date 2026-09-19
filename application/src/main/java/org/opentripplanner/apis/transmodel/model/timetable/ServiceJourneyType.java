@@ -48,7 +48,8 @@ public class ServiceJourneyType {
     GraphQLOutputType ptSituationElementType,
     GraphQLOutputType journeyPatternType,
     GraphQLOutputType estimatedCallType,
-    GraphQLOutputType timetabledPassingTimeType
+    GraphQLOutputType timetabledPassingTimeType,
+    GraphQLOutputType serviceJourneyVehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -149,6 +150,14 @@ public class ServiceJourneyType {
           .name("bikesAllowed")
           .type(EnumTypes.BIKES_ALLOWED)
           .description("Whether bikes are allowed on service journey.")
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleAssignment")
+          .type(serviceJourneyVehicleAssignmentType)
+          .description("The vehicle and vehicle type aimed to operate the service journey.")
+          .dataFetcher(environment -> trip(environment).getVehicleAssignment())
           .build()
       )
       .field(
