@@ -16,7 +16,7 @@ import org.opentripplanner.street.search.state.State;
  * already yields edges in chronological order.
  * <p>
  * Implementation note: an earlier design relied on {@link org.opentripplanner.astar.model.GraphPath}
- * which allocates a {@code LinkedList<State>} and, for depart-after searches, a full reversed copy
+ * which allocates a full {@code List<State>} and, for depart-after searches, a full reversed copy
  * of the state chain via {@code State.reverse()}. This implementation avoids both by collecting
  * only the edges into a single {@code ArrayList} and reversing it in place.
  */
