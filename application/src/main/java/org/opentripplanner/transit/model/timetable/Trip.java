@@ -28,7 +28,7 @@ import org.opentripplanner.utils.lang.StringUtils;
  * <p>A Trip can run on multiple service dates.
  * <p>The service dates on which a trip is running are identified
  * by its service id and can be looked up with
- * {@link org.opentripplanner.model.calendar.CalendarService}.
+ * {@link org.opentripplanner.transit.model.calendar.TripCalendars}.
  * <p>Trips that follow the same sequence of stops are grouped under a {@link org.opentripplanner.transit.model.network.TripPattern}
  * via a {@link Timetable}
  * <p>A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.

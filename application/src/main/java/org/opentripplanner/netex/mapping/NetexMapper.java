@@ -15,7 +15,6 @@ import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
@@ -143,19 +142,22 @@ public class NetexMapper {
   public void finishUp() {
     // Add Calendar data created during the mapping of dayTypes, dayTypeAssignments,
     // datedServiceJourney and ServiceJourneys
-    transitBuilder.getCalendarDates().addAll(calendarServiceBuilder.createServiceCalendar());
+    calendarServiceBuilder.addServiceCalendarsTo(transitBuilder.tripCalendars());
 
+    // TODO - This code should be removed. Instead this should be handled by the OTP core model
+    //        builders. See https://github.com/opentripplanner/OpenTripPlanner/issues/7972The
     // Add the empty service id, as it can be used for routes expected to be added from realtime
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
-    ServiceCalendar emptyCalendar = calendarServiceBuilder.createEmptyCalendar();
     if (
       transitBuilder
         .getTripsById()
         .values()
         .stream()
-        .anyMatch(trip -> emptyCalendar.getServiceId().equals(trip.getServiceId()))
+        .anyMatch(trip -> CalendarServiceBuilder.EMPTY_SERVICE_ID.equals(trip.getServiceId()))
     ) {
-      transitBuilder.getCalendars().add(emptyCalendar);
+      transitBuilder
+        .tripCalendars()
+        .putServiceDatesForServiceId(CalendarServiceBuilder.EMPTY_SERVICE_ID, List.of());
     }
   }
 
