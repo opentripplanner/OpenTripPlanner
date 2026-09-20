@@ -102,6 +102,15 @@ public class FlexStopTimesFactory {
     return stopTime;
   }
 
+  public static StopTime regularStopWithWindow(String windowStart, String windowEnd) {
+    var stopTime = new StopTime();
+    stopTime.setStop(REGULAR_STOP_2);
+    stopTime.setFlexWindowStart(TimeUtils.time(windowStart));
+    stopTime.setFlexWindowEnd(TimeUtils.time(windowEnd));
+    stopTime.setTrip(TRIP);
+    return stopTime;
+  }
+
   public static StopTime groupStop(String windowStart, String windowEnd) {
     var stopTime = new StopTime();
     stopTime.setStop(GROUP_STOP);

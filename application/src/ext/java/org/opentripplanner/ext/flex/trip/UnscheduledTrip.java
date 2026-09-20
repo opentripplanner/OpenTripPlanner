@@ -95,11 +95,14 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       return false;
     } else if (stopTimes.stream().anyMatch(StopTime::combinesContinuousStoppingWithFlexWindow)) {
       return false;
-      // special case: one fixed stop and a flexible window
-    } else if (stopTimes.size() == 2) {
-      return stopTimes.stream().anyMatch(StopTime::hasFlexWindow);
+    } else if (stopTimes.stream().allMatch(StopTime::hasFlexWindow)) {
+      return true;
     } else {
-      return stopTimes.stream().allMatch(StopTime::hasFlexWindow);
+      // Allow a single fixed scheduled stop with all other stops having flexible windows
+      return (
+        stopTimes.stream().filter(st -> !st.hasFlexWindow()).count() <= 1 &&
+        stopTimes.stream().anyMatch(StopTime::hasFlexWindow)
+      );
     }
   }
 
