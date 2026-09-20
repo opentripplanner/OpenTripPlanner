@@ -108,7 +108,7 @@ public class DouglasPeuckerAlgorithm {
       int maxIndex = -1;
 
       for (int i = r.start() + 1; i < r.end(); i++) {
-        double distance = perpendicularDistance(
+        double distance = calculateDistance(
           coordinates[r.start()],
           coordinates[r.end()],
           coordinates[i],
@@ -129,12 +129,12 @@ public class DouglasPeuckerAlgorithm {
 
   /**
    * Distance from {@code point} to the segment between {@code start} and {@code end}, in degrees, with longitude
-   * scaled by {@link #lonScale}. Using the segment rather than the infinite line through it matters for a point that
-   * overshoots past {@code start} or {@code end} while staying close to that line's bearing: measured against the
-   * infinite line such a point looks almost colinear (near-zero distance) even though reaching it is a real,
-   * arbitrarily long detour, which would wrongly let it be simplified away.
+   * scaled by {@link #lonScale}. The method uses the perpendicular distance for all points that have a foot between
+   * the start and end point. If the point overshoots the start (or end), then the distance to the start (or end) is
+   * used. In the "basic" Douglas Peucker algorithm the distance is measured against the infinite line. But, this will
+   * remove points that can be far away from the line segment.
    */
-  static double perpendicularDistance(
+  static double calculateDistance(
     Coordinate start,
     Coordinate end,
     Coordinate point,

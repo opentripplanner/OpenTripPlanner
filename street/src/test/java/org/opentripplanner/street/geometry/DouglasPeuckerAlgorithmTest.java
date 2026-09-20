@@ -4,7 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.perpendicularDistance;
+import static org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm.calculateDistance;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -143,7 +143,7 @@ class DouglasPeuckerAlgorithmTest {
 
     assertEquals(
       expected,
-      perpendicularDistance(start, end, point, lonScale),
+      calculateDistance(start, end, point, lonScale),
       ON_CENTI_METER_DEGREES,
       text
     );
