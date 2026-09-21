@@ -2,7 +2,7 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**

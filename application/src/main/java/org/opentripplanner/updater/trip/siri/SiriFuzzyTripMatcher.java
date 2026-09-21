@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;

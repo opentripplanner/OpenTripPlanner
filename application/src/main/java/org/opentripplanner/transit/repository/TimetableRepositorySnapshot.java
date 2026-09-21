@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.framework.error.WordList;

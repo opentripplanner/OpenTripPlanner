@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emission.internal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.model.EmissionSummary;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;

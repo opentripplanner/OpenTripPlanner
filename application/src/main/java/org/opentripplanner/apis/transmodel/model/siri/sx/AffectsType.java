@@ -11,7 +11,7 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.model.stop.StopPlaceType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 

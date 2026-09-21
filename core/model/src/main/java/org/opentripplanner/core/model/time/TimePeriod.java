@@ -1,4 +1,4 @@
-package org.opentripplanner.core.domain.model.time;
+package org.opentripplanner.core.model.time;
 
 import java.time.Instant;
 import java.util.Objects;

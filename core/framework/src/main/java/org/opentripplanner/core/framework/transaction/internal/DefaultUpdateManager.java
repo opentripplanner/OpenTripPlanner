@@ -13,11 +13,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.framework.event.DomainEvent;
-import org.opentripplanner.core.domain.framework.event.EventHandler;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.model.event.DomainEvent;
+import org.opentripplanner.core.model.event.EventHandler;
+import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.WriteContext;
 
 /**
  * Default implementation of {@link UpdateManager}.

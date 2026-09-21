@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;

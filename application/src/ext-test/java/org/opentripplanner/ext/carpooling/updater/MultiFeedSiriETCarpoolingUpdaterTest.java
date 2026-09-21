@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;

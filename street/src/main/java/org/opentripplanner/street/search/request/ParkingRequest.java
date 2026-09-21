@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNullElse;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.street.search.request.filter.ParkingFilter;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

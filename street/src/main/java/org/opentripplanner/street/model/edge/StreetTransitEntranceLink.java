@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 

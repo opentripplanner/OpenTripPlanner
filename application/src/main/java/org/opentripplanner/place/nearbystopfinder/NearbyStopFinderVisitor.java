@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;

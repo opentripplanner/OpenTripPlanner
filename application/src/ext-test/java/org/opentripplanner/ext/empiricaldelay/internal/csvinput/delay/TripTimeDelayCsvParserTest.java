@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.csvreader.CsvReader;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
 class TripTimeDelayCsvParserTest {

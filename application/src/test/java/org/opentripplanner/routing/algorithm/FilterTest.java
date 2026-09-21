@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;

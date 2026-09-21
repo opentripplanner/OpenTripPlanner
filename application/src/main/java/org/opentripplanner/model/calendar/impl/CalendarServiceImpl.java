@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 

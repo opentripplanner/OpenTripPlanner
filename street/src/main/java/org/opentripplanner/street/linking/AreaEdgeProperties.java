@@ -1,7 +1,7 @@
 package org.opentripplanner.street.linking;
 
 import java.util.List;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 

@@ -8,7 +8,7 @@ import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

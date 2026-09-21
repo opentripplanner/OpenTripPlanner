@@ -2,13 +2,13 @@ package org.opentripplanner.street.search.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.opentripplanner.core.domain.model.basic.Cost.costOfSeconds;
+import static org.opentripplanner.core.model.basic.Cost.costOfSeconds;
 import static org.opentripplanner.street.search.request.ImmutableRequestAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 
 class RentalRequestTest {
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.core.domain.model.accessibility.Accessibility;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;

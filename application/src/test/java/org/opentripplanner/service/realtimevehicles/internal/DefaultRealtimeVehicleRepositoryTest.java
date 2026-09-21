@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TripInput;

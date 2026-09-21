@@ -5,8 +5,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.opentripplanner.core.domain.framework.transaction.RepositoryRegistry;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 
 /**
  * Qualifies the {@link RepositoryRegistry} and

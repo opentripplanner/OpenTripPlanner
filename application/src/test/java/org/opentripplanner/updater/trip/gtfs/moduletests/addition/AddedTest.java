@@ -20,7 +20,7 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;

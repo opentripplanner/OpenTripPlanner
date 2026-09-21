@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetModelFactory;
 import org.opentripplanner.street.model.StreetTraversalPermission;

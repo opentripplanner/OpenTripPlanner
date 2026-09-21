@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedInfoTestFactory;

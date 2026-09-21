@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public class JourneyWhiteListed {
 

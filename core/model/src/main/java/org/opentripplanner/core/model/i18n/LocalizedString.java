@@ -1,11 +1,11 @@
-package org.opentripplanner.core.domain.model.i18n;
+package org.opentripplanner.core.model.i18n;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import org.opentripplanner.core.domain.framework.resources.ResourceBundleSingleton;
+import org.opentripplanner.core.model.resources.ResourceBundleSingleton;
 
 /**
  * This is used to localize strings for which localization are known beforehand. Those are local

@@ -11,7 +11,7 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;

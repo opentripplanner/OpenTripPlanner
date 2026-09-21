@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;

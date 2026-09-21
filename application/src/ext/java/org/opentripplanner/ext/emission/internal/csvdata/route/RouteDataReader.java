@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.csv.HeadersDoNotMatch;
 import org.opentripplanner.framework.csv.OtpCsvReader;

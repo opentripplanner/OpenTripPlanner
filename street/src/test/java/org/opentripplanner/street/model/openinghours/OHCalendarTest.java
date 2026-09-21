@@ -12,7 +12,7 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 
 class OHCalendarTest {
 

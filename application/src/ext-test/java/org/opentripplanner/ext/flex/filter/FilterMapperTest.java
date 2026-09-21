@@ -5,7 +5,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;

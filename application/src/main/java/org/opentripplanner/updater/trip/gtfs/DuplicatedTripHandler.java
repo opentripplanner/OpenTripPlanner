@@ -4,8 +4,8 @@ import static org.opentripplanner.updater.spi.UpdateErrorType.NOT_IMPLEMENTED_DI
 import static org.opentripplanner.updater.spi.UpdateErrorType.OUTSIDE_SERVICE_PERIOD;
 import static org.opentripplanner.updater.spi.UpdateErrorType.TRIP_NOT_FOUND;
 
-import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;

@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.gtfs;
 import static org.opentripplanner.updater.spi.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;

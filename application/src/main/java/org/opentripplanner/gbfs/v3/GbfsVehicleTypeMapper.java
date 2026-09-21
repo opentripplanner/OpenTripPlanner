@@ -5,7 +5,7 @@ import static org.opentripplanner.gbfs.v3.GbfsFeedMapper.optionalLocalizedString
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSName;
 import org.mobilitydata.gbfs.v3_0.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.utils.logging.Throttle;

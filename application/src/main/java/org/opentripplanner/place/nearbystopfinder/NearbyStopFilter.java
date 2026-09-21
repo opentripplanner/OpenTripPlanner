@@ -1,7 +1,7 @@
 package org.opentripplanner.place.nearbystopfinder;
 
 import java.util.Collection;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.api.NearbyStop;
 
 /**

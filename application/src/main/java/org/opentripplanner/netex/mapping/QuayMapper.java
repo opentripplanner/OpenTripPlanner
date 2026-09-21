@@ -4,9 +4,9 @@ import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.accessibility.Accessibility;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;

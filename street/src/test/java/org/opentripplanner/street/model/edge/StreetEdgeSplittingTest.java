@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetTraversalPermission;

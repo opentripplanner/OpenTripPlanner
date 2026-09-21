@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 
 public class LocationStringParserTest {

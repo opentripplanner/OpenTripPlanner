@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.core.domain.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;

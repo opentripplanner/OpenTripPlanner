@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;

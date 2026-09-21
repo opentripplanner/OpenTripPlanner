@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.model.StreetEdgePair;

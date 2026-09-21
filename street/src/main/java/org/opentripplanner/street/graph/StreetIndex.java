@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.HashGridSpatialIndex;

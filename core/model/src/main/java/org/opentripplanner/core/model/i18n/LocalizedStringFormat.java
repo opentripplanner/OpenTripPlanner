@@ -1,4 +1,4 @@
-package org.opentripplanner.core.domain.model.i18n;
+package org.opentripplanner.core.model.i18n;
 
 import java.io.Serializable;
 import java.util.Arrays;

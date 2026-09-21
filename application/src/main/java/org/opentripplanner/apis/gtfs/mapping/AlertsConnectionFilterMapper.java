@@ -9,7 +9,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertsFilterI
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertsFilterSelectInput;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOffsetDateTimeRangeInput;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.core.domain.model.time.TimePeriod;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;

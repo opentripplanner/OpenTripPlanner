@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.transit.model.basic.Money;

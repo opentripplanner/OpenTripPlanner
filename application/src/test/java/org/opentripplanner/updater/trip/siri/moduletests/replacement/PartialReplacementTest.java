@@ -6,7 +6,7 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;

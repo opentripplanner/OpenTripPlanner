@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.EmissionTestData;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;

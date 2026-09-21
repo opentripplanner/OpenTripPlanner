@@ -26,7 +26,7 @@ import org.opentripplanner.apis.gtfs.mapping.CarsAllowedMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.support.SemanticHash;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;

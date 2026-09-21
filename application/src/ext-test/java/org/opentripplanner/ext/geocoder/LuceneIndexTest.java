@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;

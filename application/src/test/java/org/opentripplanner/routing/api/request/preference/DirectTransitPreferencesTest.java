@@ -8,7 +8,7 @@ import static org.opentripplanner.routing.api.request.preference.DirectTransitPr
 import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 

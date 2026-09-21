@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
 import java.time.LocalDate;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public sealed interface TripOnDateReference
   permits TripOnDateReferenceWithTripOnServiceDateId, TripOnDateReferenceWithTripAndDate

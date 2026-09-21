@@ -36,7 +36,7 @@ import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;

@@ -8,7 +8,7 @@ import com.google.common.collect.Multimaps;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;

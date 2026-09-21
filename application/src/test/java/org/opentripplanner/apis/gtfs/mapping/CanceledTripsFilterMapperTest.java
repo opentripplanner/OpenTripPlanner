@@ -17,8 +17,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
-import org.opentripplanner.core.domain.model.time.LocalDateRange;
-import org.opentripplanner.core.domain.model.time.TimePeriod;
+import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 

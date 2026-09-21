@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Coordinates;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.AreaStop;

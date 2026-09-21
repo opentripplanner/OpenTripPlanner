@@ -2,8 +2,8 @@ package org.opentripplanner.transit.repository;
 
 import java.time.LocalDate;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 
 /**

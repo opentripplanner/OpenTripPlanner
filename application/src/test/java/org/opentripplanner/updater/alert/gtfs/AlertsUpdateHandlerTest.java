@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.i18n.TranslatedString;
+import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;

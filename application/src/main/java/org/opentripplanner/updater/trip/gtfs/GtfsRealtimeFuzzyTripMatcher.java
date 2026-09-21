@@ -4,7 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import gnu.trove.set.TIntSet;
 import java.text.ParseException;
 import java.time.LocalDate;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.transit.model.network.Route;

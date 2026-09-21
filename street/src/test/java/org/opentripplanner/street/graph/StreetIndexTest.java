@@ -5,8 +5,8 @@ import static org.opentripplanner.core.model.id.FeedScopedIdFactory.id;
 
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;

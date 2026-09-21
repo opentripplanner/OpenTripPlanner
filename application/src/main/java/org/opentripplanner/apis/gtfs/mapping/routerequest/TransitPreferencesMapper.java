@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;

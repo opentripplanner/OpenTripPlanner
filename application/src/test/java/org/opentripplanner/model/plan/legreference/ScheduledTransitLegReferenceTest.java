@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;

@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.time.TimePeriod;
+import org.opentripplanner.core.model.time.TimePeriod;
 
 /**
  * A range of time with inclusive start and exclusive end {@code [start, end)}. Both bounds are

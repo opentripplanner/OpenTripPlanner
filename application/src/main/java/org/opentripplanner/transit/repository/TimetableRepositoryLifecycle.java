@@ -2,7 +2,7 @@ package org.opentripplanner.transit.repository;
 
 import java.time.LocalDate;
 import java.util.function.Supplier;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 
 /**
  * Copy-on-write / freeze lifecycle for the realtime-timetable repository. The repository is a

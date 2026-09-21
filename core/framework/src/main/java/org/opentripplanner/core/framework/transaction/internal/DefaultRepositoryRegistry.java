@@ -1,10 +1,10 @@
 package org.opentripplanner.core.framework.transaction.internal;
 
-import org.opentripplanner.core.domain.framework.transaction.RepositoryRegistry;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryLifecycle;
-import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
+import org.opentripplanner.core.model.transaction.TransactionScope;
 
 /**
  * Default implementation of {@link RepositoryRegistry}.

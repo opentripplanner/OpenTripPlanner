@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.gtfs.support.filter;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.core.domain.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.transit.service.PatternByServiceDatesFilter;
 import org.opentripplanner.transit.service.TransitService;
 

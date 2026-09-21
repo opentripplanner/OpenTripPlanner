@@ -4,8 +4,8 @@ import java.util.List;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class TestStopLocation implements StopLocation {

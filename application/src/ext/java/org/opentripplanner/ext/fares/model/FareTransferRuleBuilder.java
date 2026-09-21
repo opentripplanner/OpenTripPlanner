@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.fare.FareProduct;
 
 public class FareTransferRuleBuilder {

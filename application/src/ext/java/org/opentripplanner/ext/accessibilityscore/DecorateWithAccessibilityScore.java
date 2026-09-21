@@ -3,7 +3,7 @@ package org.opentripplanner.ext.accessibilityscore;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.core.domain.model.accessibility.Accessibility;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;

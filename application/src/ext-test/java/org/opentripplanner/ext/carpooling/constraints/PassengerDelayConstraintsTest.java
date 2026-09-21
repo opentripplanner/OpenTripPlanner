@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.street.model.edge.Edge;

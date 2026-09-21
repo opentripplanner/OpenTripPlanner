@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import java.util.Objects;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.transit.StopResolver;
 import org.opentripplanner.transit.model.site.Entrance;

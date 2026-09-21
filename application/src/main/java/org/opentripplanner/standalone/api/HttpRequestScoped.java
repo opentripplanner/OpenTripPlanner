@@ -5,7 +5,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
+import org.opentripplanner.core.model.transaction.TransactionScope;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 
 /**

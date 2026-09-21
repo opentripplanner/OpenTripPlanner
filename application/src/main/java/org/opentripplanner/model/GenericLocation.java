@@ -3,7 +3,7 @@ package org.opentripplanner.model;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.api.request.TripLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.utils.lang.StringUtils;

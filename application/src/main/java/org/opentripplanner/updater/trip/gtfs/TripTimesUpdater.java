@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.DataValidationException;

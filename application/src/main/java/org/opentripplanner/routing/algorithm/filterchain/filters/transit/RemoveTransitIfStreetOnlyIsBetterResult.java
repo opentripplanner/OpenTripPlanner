@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

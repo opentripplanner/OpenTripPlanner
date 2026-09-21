@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.TestGeofencingZoneBuilder;

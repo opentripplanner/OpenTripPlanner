@@ -3,7 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Map;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
