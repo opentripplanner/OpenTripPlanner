@@ -582,9 +582,16 @@ class OsmBoardingLocationsModuleTest {
    * differ by centimeters). {@link org.opentripplanner.street.linking.VertexLinker}'s area-visibility
    * linking requires each candidate visibility edge to stay entirely inside the polygon, so a
    * boarding location placed a hair outside it gets only the one or two edges that happen to clear
-   * that check anyway, instead of the normal dense fan to the platform's corners - producing a sparse,
-   * oddly-angled link. This asserts that a stop just outside the platform still ends up with the same
-   * rich connectivity as one placed safely inside it.
+   * that check anyway - or, when none do, a single forced edge to whichever visibility vertex is
+   * nearest, which routing then has to detour through.
+   * <p>
+   * The module therefore leaves the vertex at the stop coordinate and puts an <em>access point</em>
+   * just inside the polygon on its behalf: the access point carries the dense fan and the
+   * visibility-vertex registration, and a single edge of the true distance joins the two. This
+   * asserts that a stop just outside the platform ends up as well connected as one safely inside it,
+   * pays only a centimetre-scale edge for the privilege, and is not moved.
+   *
+   * @see #testTransitCoordinateFarOutsideAreaPlatformKeepsItsDistance()
    */
   @Test
   void testTransitCoordinateJustOutsideAreaPlatformIsStillWellConnected() {
@@ -639,22 +646,136 @@ class OsmBoardingLocationsModuleTest {
     var insideBoardingLocation = linkedBoardingLocation(insideStopVertex);
     var outsideBoardingLocation = linkedBoardingLocation(outsideStopVertex);
 
-    // With 4 visibility vertices (the rectangle's corners) plus each stop's own boarding location
-    // vertex once it has been added, a well-connected boarding location sees most of them. Before
-    // the fix, the outside stop's unclamped, just-outside coordinate failed the area-containment
-    // check for nearly every one of them, leaving it with only the 1-2 that happened to clear it.
+    // The inside stop is linked into the area directly, seeing at least the rectangle's 4 corners.
     assertTrue(
-      insideBoardingLocation.getOutgoing().size() >= 4,
+      areaEdgesOf(insideBoardingLocation).size() >= 4,
       "the inside stop should see at least all 4 platform corners, but saw " +
-        insideBoardingLocation.getOutgoing().size()
+        areaEdgesOf(insideBoardingLocation).size()
     );
+
+    // The outside stop is not moved onto the platform.
+    assertVertexAtStop(outsideBoardingLocation, outsideStop);
+
+    // It reaches the platform through an access point placed just inside the polygon on its behalf,
+    // over a single edge that costs it only the 5 cm it is actually off by (plus the margin that
+    // puts the access point safely inside rather than on the boundary).
+    var connector = onlyConnectorEdge(outsideBoardingLocation);
+    assertTrue(
+      connector.getDistanceMeters() < 1,
+      "a 5 cm discrepancy should cost a centimetre-scale edge, but was " +
+        connector.getDistanceMeters() +
+        " m"
+    );
+
+    // The access point, not the boarding location, carries the connectivity - and it is exactly as
+    // well connected as a stop placed inside the platform in the first place.
+    var accessPoint = connector.getToVertex();
     assertEquals(
-      insideBoardingLocation.getOutgoing().size(),
-      outsideBoardingLocation.getOutgoing().size(),
-      "the outside stop should end up exactly as well-connected as the inside one, not clamped " +
-        "down to the one or two visibility edges that happen to clear the area-containment check " +
-        "from its unclamped, just-outside coordinate"
+      areaEdgesOf(insideBoardingLocation).size(),
+      areaEdgesOf(accessPoint).size(),
+      "the outside stop's access point should end up exactly as well-connected as a stop inside " +
+        "the platform"
     );
+
+    // Which means linking succeeded, the access point was registered as a visibility vertex of the
+    // area, and the two stops on this platform are connected directly rather than via a detour.
+    assertTrue(
+      getEdge(accessPoint, insideBoardingLocation).isPresent() &&
+        getEdge(insideBoardingLocation, accessPoint).isPresent(),
+      "the two stops on the platform should be connected directly, in both directions"
+    );
+  }
+
+  /**
+   * The counterpart to {@link #testTransitCoordinateJustOutsideAreaPlatformIsStillWellConnected()}:
+   * a stop far outside the platform polygon is a real distance to walk, not a surveying
+   * discrepancy. The access point mechanism must charge for it rather than swallow it - the stop
+   * keeps its coordinate and the edge to its access point carries the true length - while still
+   * giving it the same connectivity into the platform.
+   */
+  @Test
+  void testTransitCoordinateFarOutsideAreaPlatformKeepsItsDistance() {
+    var graph = new Graph();
+
+    // The same platform as in the "just outside" test, corners as (lon, lat).
+    Coordinate[] corners = {
+      new Coordinate(10, 60.0006),
+      new Coordinate(10.0008, 60.0006),
+      new Coordinate(10.0008, 60),
+      new Coordinate(10, 60),
+    };
+    var area = buildRectangularPlatformArea(graph, corners);
+
+    // 30 m south of the bottom edge - far beyond any plausible surveying discrepancy.
+    var farLat = 60.0 - SphericalDistanceLibrary.metersToDegrees(30);
+    var farStop = testModel.stop("far-stop").withCoordinate(farLat, 10.0004).build();
+
+    var platform = new Platform(
+      I18NString.of("platform"),
+      area.getGeometry().getInteriorPoint(),
+      Set.of(farStop.getId().getId())
+    );
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(area, platform);
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(farStop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var farStopVertex = new VertexFactory(graph).transitStop(ofStop(farStop));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    assertFalse(farStopVertex.getOutgoing().isEmpty(), "the far stop should still be linked");
+    var boardingLocation = linkedBoardingLocation(farStopVertex);
+
+    // Not drawn onto the platform.
+    assertVertexAtStop(boardingLocation, farStop);
+
+    // The 30 m is walked, not swallowed.
+    var connector = onlyConnectorEdge(boardingLocation);
+    assertEquals(
+      30,
+      connector.getDistanceMeters(),
+      1,
+      "the edge to the access point should carry the real walking distance"
+    );
+
+    // And the access point is still properly linked into the platform.
+    assertTrue(
+      areaEdgesOf(connector.getToVertex()).size() >= 4,
+      "the access point should see at least all 4 platform corners, but saw " +
+        areaEdgesOf(connector.getToVertex()).size()
+    );
+  }
+
+  /**
+   * The single street edge from a boarding location to the access point standing in for it inside
+   * the platform polygon.
+   */
+  private static StreetEdge onlyConnectorEdge(OsmBoardingLocationVertex boardingLocation) {
+    var connectors = boardingLocation
+      .getOutgoing()
+      .stream()
+      .filter(StreetEdge.class::isInstance)
+      .map(StreetEdge.class::cast)
+      .toList();
+    assertEquals(
+      1,
+      connectors.size(),
+      "expected exactly one edge from the boarding location to its access point"
+    );
+    return connectors.getFirst();
+  }
+
+  private static List<Edge> areaEdgesOf(Vertex vertex) {
+    return vertex.getOutgoing().stream().filter(AreaEdge.class::isInstance).toList();
   }
 
   private static Area buildRectangularPlatformArea(Graph graph, Coordinate[] corners) {

@@ -28,6 +28,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -183,13 +184,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         if (platOpt.isPresent()) {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
-            var boardingLocation = makeBoardingLocationForPlatform(
-              stop,
-              platform,
-              area.getName(),
-              areaGroup.getGeometry()
-            );
-            linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+            var boardingLocation = makeBoardingLocationForPlatform(stop, platform, area.getName());
+            linkIntoPlatformArea(boardingLocation, areaGroup, platform, stop);
             linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
             return true;
           }
@@ -223,12 +219,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .findFirst()
       .map(platformEdgeList -> {
         Platform platform = platformEdgeList.getKey();
-        var boardingLocation = makeBoardingLocationForPlatform(
-          stop,
-          platform,
-          platform.name(),
-          null
-        );
+        var boardingLocation = makeBoardingLocationForPlatform(stop, platform, platform.name());
         var linkedVertices = linker.linkToSpecificStreetEdgesPermanently(
           boardingLocation,
           new TraverseModeSet(TraverseMode.WALK),
@@ -292,29 +283,16 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * on the platform (so several stops collapse onto the same vertex). In {@code TRANSIT} mode each
    * stop gets its own vertex at its own coordinate from the transit data, so stops on the same
    * platform stay distinct.
-   *
-   * @param areaGeometry the platform area's polygon, if this platform is mapped as an area; used to
-   *                      keep a {@code TRANSIT} coordinate inside it. {@code null} for a way-mapped
-   *                      platform, which has no polygon to stay inside of.
    */
   private OsmBoardingLocationVertex makeBoardingLocationForPlatform(
     RegularStop stop,
     Platform platform,
-    I18NString name,
-    @Nullable Geometry areaGeometry
+    I18NString name
   ) {
     if (coordinateSource == BoardingLocationCoordinateSource.TRANSIT) {
-      var coordinate = stop.getCoordinate().asJtsCoordinate();
-      if (areaGeometry != null) {
-        coordinate = ensureInsideArea(
-          coordinate,
-          areaGeometry,
-          platform.geometry().getCoordinate()
-        );
-      }
       return makeBoardingLocation(
         "platform-transit/%s".formatted(stop.getId().toString()),
-        coordinate,
+        stop.getCoordinate().asJtsCoordinate(),
         platform.references(),
         name
       );
@@ -331,17 +309,65 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
-   * A {@code TRANSIT} coordinate can sit just outside the platform polygon it is meant to be linked
-   * into: the stop coordinate and the OSM-mapped platform boundary are surveyed independently
-   * and routinely differ by centimeters. {@link VertexLinker}'s area-visibility linking requires
-   * every candidate visibility edge to stay entirely inside the polygon, so a coordinate sitting even
-   * a hair outside it fails that check for nearly every visibility vertex, leaving the boarding
-   * location connected to only the one or two edges that happen to clear it anyway - a sparse,
-   * oddly-angled link instead of the normal dense fan to the platform's corners.
+   * Wire a boarding location into the platform area it belongs to.
    * <p>
-   * If {@code transitCoordinate} is outside {@code areaGeometry}, move it along the line towards the
-   * platform's own (always-inside) {@code interiorPoint} until it is just past the boundary, plus a
-   * small margin so it is safely inside rather than sitting on the boundary itself.
+   * {@link VertexLinker}'s area-visibility linking requires every candidate visibility edge to stay
+   * entirely inside the polygon, so a vertex sitting even a hair outside it fails that check for
+   * nearly every visibility vertex. It is then left with the one or two edges that happen to clear
+   * the check anyway - or, when none do, with a single forced edge to whichever visibility vertex
+   * happens to be nearest, which routing has to detour through. Either way it is also not registered
+   * as a visibility vertex of the area, so the next stop on the same platform cannot connect to it
+   * directly.
+   * <p>
+   * A {@code TRANSIT} coordinate routinely is outside: the stop coordinate and the OSM-mapped
+   * platform boundary are surveyed independently. Rather than moving the stop onto the platform -
+   * which would silently swallow a genuine distance - the vertex stays exactly where the transit
+   * data puts it and an <em>access point</em> is placed just inside the polygon on its behalf. The
+   * access point gets the visibility fan and the visibility-vertex registration; a single street
+   * edge of its true length joins the two. A centimetre-scale discrepancy therefore costs a
+   * centimetre-scale edge, and a stop genuinely off the platform gets a walk of the right length,
+   * both without giving up the dense in-platform connectivity.
+   * <p>
+   * In {@code OSM} mode the vertex is the platform's own interior point and is inside the polygon by
+   * construction, so it is linked directly.
+   */
+  private void linkIntoPlatformArea(
+    OsmBoardingLocationVertex boardingLocation,
+    AreaGroup areaGroup,
+    Platform platform,
+    RegularStop stop
+  ) {
+    if (coordinateSource != BoardingLocationCoordinateSource.TRANSIT) {
+      linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+      return;
+    }
+    var insideCoordinate = ensureInsideArea(
+      boardingLocation.getCoordinate(),
+      areaGroup.getGeometry(),
+      platform.geometry().getCoordinate()
+    );
+    if (insideCoordinate.equals2D(boardingLocation.getCoordinate())) {
+      linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+      return;
+    }
+    var accessPoint = vertexFactory.intersection(
+      "platform-access/%s".formatted(stop.getId().toString()),
+      insideCoordinate.x,
+      insideCoordinate.y
+    );
+    linker.addPermanentAreaVertex(accessPoint, areaGroup);
+    linkBoardingLocationToStreetNetwork(boardingLocation, accessPoint);
+    linkBoardingLocationToStreetNetwork(accessPoint, boardingLocation);
+  }
+
+  /**
+   * The point just inside {@code areaGeometry} that stands in for {@code transitCoordinate} when
+   * that coordinate is outside the polygon, or {@code transitCoordinate} itself when it is already
+   * inside.
+   * <p>
+   * The returned point is found by walking from {@code transitCoordinate} towards the platform's own
+   * (always-inside) {@code interiorPoint} up to the first boundary crossing, plus a small margin so
+   * it is safely inside rather than sitting on the boundary itself.
    */
   private Coordinate ensureInsideArea(
     Coordinate transitCoordinate,
