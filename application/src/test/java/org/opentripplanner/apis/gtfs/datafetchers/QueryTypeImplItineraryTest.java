@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -140,7 +140,7 @@ class QueryTypeImplItineraryTest {
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
       .arguments(Map.of("id", id))
       .context(
-        new GtfsGraphQLRequestContext(
+        new TestGtfsGraphQLRequestContext(
           null,
           null,
           null,

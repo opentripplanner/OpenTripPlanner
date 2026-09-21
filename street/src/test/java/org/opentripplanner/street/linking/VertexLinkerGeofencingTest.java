@@ -9,6 +9,7 @@ import static org.opentripplanner.street.model.StreetModelFactory.streetEdge;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
@@ -199,6 +200,15 @@ class VertexLinkerGeofencingTest {
       @Override
       public Set<GeofencingZone> findZonesContaining(Coordinate coord) {
         return index.findZonesContaining(coord);
+      }
+
+      @Override
+      public Set<GeofencingZone> findZonesContaining(Coordinate coord, String network) {
+        return index
+          .findZonesContaining(coord)
+          .stream()
+          .filter(z -> z.id().getFeedId().equals(network))
+          .collect(Collectors.toUnmodifiableSet());
       }
 
       @Override

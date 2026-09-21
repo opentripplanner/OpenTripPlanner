@@ -44,7 +44,7 @@ class TransmodelGraph {
 
   Response executeGraphQL(
     String query,
-    TransmodelRequestContext transmodelRequestContext,
+    TransmodelGraphQLRequestContext transmodelRequestContext,
     Map<String, Object> variables,
     String operationName,
     int maxNumberOfResultFields,
@@ -96,7 +96,7 @@ class TransmodelGraph {
     String query,
     Map<String, Object> variables,
     String operationName,
-    TransmodelRequestContext transmodelRequestContext
+    TransmodelGraphQLRequestContext transmodelRequestContext
   ) {
     return ExecutionInput.newExecutionInput()
       .query(query)

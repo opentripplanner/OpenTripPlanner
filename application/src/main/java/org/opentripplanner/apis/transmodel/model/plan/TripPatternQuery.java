@@ -6,7 +6,7 @@ import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
 import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
@@ -47,7 +47,7 @@ public class TripPatternQuery {
   }
 
   Object refetchItinerary(DataFetchingEnvironment environment) {
-    TransmodelRequestContext ctx = environment.getContext();
+    TransmodelGraphQLRequestContext ctx = environment.getContext();
     String id = environment.getArgument("id");
     var reference = ItineraryReferenceSerializer.decode(id);
     if (reference == null) {
@@ -55,19 +55,19 @@ public class TripPatternQuery {
     }
 
     var refetchItineraryService = new RefetchItineraryService(
-      ctx.getGraph(),
-      ctx.getTransitService(),
-      ctx.getTransitAlertService(),
-      ctx.getTransferService(),
-      ctx.getStreetDetailsService(),
-      ctx.getLinkingContextFactory(),
-      ctx.getStreetLimitationParametersService()
+      ctx.graph(),
+      ctx.transitService(),
+      ctx.transitAlertService(),
+      ctx.transferService(),
+      ctx.streetDetailsService(),
+      ctx.linkingContextFactory(),
+      ctx.streetLimitationParametersService()
     );
 
     try {
       return ItineraryReferenceMapper.refetch(
         reference,
-        ctx.getDefaultRouteRequest(),
+        ctx.defaultRouteRequest(),
         refetchItineraryService
       );
     } catch (RefetchItineraryException e) {

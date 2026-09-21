@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TestTransmodelGraphQLRequestContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
@@ -179,7 +179,7 @@ class TripPatternQueryTest {
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
       .arguments(Map.of("id", id))
       .context(
-        new TransmodelRequestContext(
+        new TestTransmodelGraphQLRequestContext(
           null,
           TRANSIT_ENV.transitService(),
           new TransitAlertServiceImpl(),
