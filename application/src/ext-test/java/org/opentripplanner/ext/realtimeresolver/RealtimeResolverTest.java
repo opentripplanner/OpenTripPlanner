@@ -43,6 +43,8 @@ import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.TripOnDateDataFetcher;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -223,7 +225,6 @@ class RealtimeResolverTest {
     );
 
     List<Leg> legs = itineraries.getFirst().legs();
-    Leg refetchedWalkingLeg = legs.stream().filter(Leg::isWalkingLeg).findFirst().orElse(null);
     assertEquals(3, legs.size());
 
     //Realtime on first leg
@@ -233,12 +234,15 @@ class RealtimeResolverTest {
     //Assert that refetch has updated leg data with realtime data
     assertEquals(
       "2020-03-03T11:12+01:00[Europe/Paris]",
-      Objects.requireNonNull(refetchedWalkingLeg).startTime().toString()
+      Objects.requireNonNull(legs.get(1)).startTime().toString()
     );
     assertEquals(
       "2020-03-03T11:12:10+01:00[Europe/Paris]",
-      Objects.requireNonNull(refetchedWalkingLeg).endTime().toString()
+      Objects.requireNonNull(legs.get(1)).endTime().toString()
     );
+
+    assertEquals(Place.forStop(STOP_B).toString(), legs.get(1).from().toString());
+    assertEquals(Place.forStop(STOP_C).toString(), legs.get(1).to().toString());
 
     //No realtime on last leg
     assertEquals("2020-03-03T08:30+01:00[Europe/Paris]", legs.getLast().startTime().toString());
@@ -321,11 +325,15 @@ class RealtimeResolverTest {
       .withGeneralizedCost(Cost.ZERO)
       .build();
 
+    var model = new TransitRepository();
+    model.index();
+    var transitService = new DefaultTransitService(model);
+
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(
       itineraries,
-      createRefetchService(new TransitAlertServiceImpl()),
-      TRANSIT_ENV.transitService(),
+      null,
+      transitService,
       new TransitAlertServiceImpl(),
       routeRequest()
     );
