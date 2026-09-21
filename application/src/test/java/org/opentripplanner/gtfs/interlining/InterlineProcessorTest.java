@@ -15,10 +15,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -101,16 +101,16 @@ class InterlineProcessorTest implements PlanTestConstants {
     String transfers
   ) {
     var transferService = new DefaultConstrainedTransferService();
-    var calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
     for (int i = 0; i < serviceIds.size(); i++) {
-      calendarServiceData.putServiceDatesForServiceId(serviceIds.get(i), serviceDates.get(i));
+      calendarsBuilder.putServiceDatesForServiceId(serviceIds.get(i), serviceDates.get(i));
     }
     var processor = new InterlineProcessor(
       transferService,
       List.of(),
       100,
       DataImportIssueStore.NOOP,
-      calendarServiceData
+      calendarsBuilder.build()
     );
 
     var createdTransfers = processor.run(patterns);
@@ -130,8 +130,8 @@ class InterlineProcessorTest implements PlanTestConstants {
     var toTrip = patterns.get(1).getScheduledTimetable().getTripTimes().get(0).getTrip();
     var notAllowed = new StaySeatedNotAllowed(fromTrip, toTrip);
 
-    var calendarService = new CalendarServiceData();
-    calendarService.putServiceDatesForServiceId(
+    var calendarsBuilder = TripCalendars.of();
+    calendarsBuilder.putServiceDatesForServiceId(
       new FeedScopedId("1", "service-1"),
       List.of(LocalDate.of(2023, Month.JANUARY, 1))
     );
@@ -141,7 +141,7 @@ class InterlineProcessorTest implements PlanTestConstants {
       List.of(notAllowed),
       100,
       DataImportIssueStore.NOOP,
-      calendarService
+      calendarsBuilder.build()
     );
 
     var createdTransfers = processor.run(patterns);

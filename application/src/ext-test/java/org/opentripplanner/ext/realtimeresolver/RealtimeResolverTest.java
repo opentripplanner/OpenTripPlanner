@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -174,7 +174,7 @@ class RealtimeResolverTest {
     LocalDate serviceDate
   ) {
     var transitRepository = new TransitRepository();
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var calendarsBuilder = TripCalendars.of();
 
     patterns.forEach(pattern -> {
       transitRepository.addTripPattern(pattern.getId(), pattern);
@@ -182,10 +182,10 @@ class RealtimeResolverTest {
       var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
       transitRepository.putServiceCode(pattern.getId(), serviceCode);
 
-      calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
+      calendarsBuilder.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    transitRepository.mergeTripCalendars(calendarsBuilder.build());
     transitRepository.index();
 
     return new DefaultTransitService(transitRepository);
