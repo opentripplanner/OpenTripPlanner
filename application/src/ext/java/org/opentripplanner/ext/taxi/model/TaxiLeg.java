@@ -22,7 +22,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 
 /**
- * A car pickup/drop-off style leg decorated with a matched {@link TaxiZone} provider (e.g. a
+ * A car pickup/drop-off style leg decorated with a matched {@link TaxiRoute} provider (e.g. a
  * taxi). It is physically a street/driving leg, and is modeled as a plain {@link Leg} (not a
  * {@link org.opentripplanner.model.plan.TransitLeg}) even though it carries route, agency and
  * booking information from the matched provider.
@@ -33,15 +33,15 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 public class TaxiLeg implements Leg {
 
   private final StreetLeg streetLeg;
-  private final TaxiZone taxiZone;
+  private final TaxiRoute taxiRoute;
 
-  public TaxiLeg(StreetLeg streetLeg, TaxiZone taxiZone) {
+  public TaxiLeg(StreetLeg streetLeg, TaxiRoute taxiRoute) {
     this.streetLeg = streetLeg.copyOf().build();
-    this.taxiZone = taxiZone;
+    this.taxiRoute = taxiRoute;
   }
 
-  public TaxiZone taxiZone() {
-    return taxiZone;
+  public TaxiRoute taxiRoute() {
+    return taxiRoute;
   }
 
   @Override
@@ -65,12 +65,12 @@ public class TaxiLeg implements Leg {
 
   @Override
   public Agency agency() {
-    return taxiZone.route().getAgency();
+    return taxiRoute.route().getAgency();
   }
 
   @Override
   public Route route() {
-    return taxiZone.route();
+    return taxiRoute.route();
   }
 
   @Override
@@ -102,13 +102,13 @@ public class TaxiLeg implements Leg {
   @Override
   @Nullable
   public BookingInfo pickupBookingInfo() {
-    return taxiZone.pickupBookingInfo();
+    return taxiRoute.pickupBookingInfo();
   }
 
   @Override
   @Nullable
   public BookingInfo dropOffBookingInfo() {
-    return taxiZone.dropOffBookingInfo();
+    return taxiRoute.dropOffBookingInfo();
   }
 
   @Override
@@ -207,16 +207,16 @@ public class TaxiLeg implements Leg {
   @Nullable
   @Override
   public Leg withEmissionPerPerson(Emission emissionPerPerson) {
-    return new TaxiLeg((StreetLeg) streetLeg.withEmissionPerPerson(emissionPerPerson), taxiZone);
+    return new TaxiLeg((StreetLeg) streetLeg.withEmissionPerPerson(emissionPerPerson), taxiRoute);
   }
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return new TaxiLeg((StreetLeg) streetLeg.withTimeShift(duration), taxiZone);
+    return new TaxiLeg((StreetLeg) streetLeg.withTimeShift(duration), taxiRoute);
   }
 
   @Override
   public String toString() {
-    return "TaxiLeg{" + "streetLeg=" + streetLeg + ", taxiZone=" + taxiZone + '}';
+    return "TaxiLeg{" + "streetLeg=" + streetLeg + ", taxiRoute=" + taxiRoute + '}';
   }
 }

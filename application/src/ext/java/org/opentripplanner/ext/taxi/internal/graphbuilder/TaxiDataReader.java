@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Reads taxi zone data from a GTFS Flex feed and stores the zones in the
+ * Reads taxi route data from a GTFS Flex feed and stores the routes in the
  * {@link TaxiRepository}.
  */
 public class TaxiDataReader {
@@ -28,7 +28,7 @@ public class TaxiDataReader {
   }
 
   /**
-   * Load taxi zones from the given bundle and add them to the repository.
+   * Load taxi routes from the given bundle and add them to the repository.
    * Uses an isolated {@link SiteRepository} to avoid advancing the main model's stop index counter.
    */
   public void read(GtfsBundle bundle) throws IOException {
@@ -41,10 +41,10 @@ public class TaxiDataReader {
       bundle.parameters().stationTransferPreference()
     );
     mapper.mapStopTripAndRouteDataIntoBuilder(dao);
-    var zones = new TaxiBuilder(issueStore).buildZones(
+    var routes = new TaxiBuilder(issueStore).buildRoutes(
       FlexTripsMapper.createFlexTrips(mapper.getBuilder(), issueStore)
     );
-    taxiRepository.addZones(zones);
-    LOG.info("Loaded {} taxi zone(s) from {}", zones.size(), bundle.feedInfo());
+    taxiRepository.addRoutes(routes);
+    LOG.info("Loaded {} taxi route(s) from {}", routes.size(), bundle.feedInfo());
   }
 }

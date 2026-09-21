@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Loads taxi zones from GTFS feeds explicitly flagged with
+ * Loads taxi routes from GTFS feeds explicitly flagged with
  * {@code transitFeeds[].taxiProvider: true} and stores them in the
  * {@link TaxiRepository}.
  */

@@ -32,7 +32,7 @@ public class TaxiServiceModule {
       return null;
     }
     return new DefaultTaxiService(
-      taxiRepository.getZones(),
+      taxiRepository.getRoutes(),
       graph,
       streetLimitationParametersService,
       vehicleRentalService,

@@ -2,10 +2,13 @@ package org.opentripplanner.ext.taxi.internal.graphbuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -14,7 +17,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * Converts a collection of {@link FlexTrip}s from a taxi provider feed into
- * {@link TaxiZone} objects. Trips that do not satisfy the data requirements are skipped
+ * {@link TaxiRoute} objects. Trips that do not satisfy the data requirements are skipped
  * and reported as {@link TaxiTripSkipped} data import issues.
  */
 public class TaxiBuilder {
@@ -27,15 +30,16 @@ public class TaxiBuilder {
     this.issueStore = issueStore;
   }
 
-  public List<TaxiZone> buildZones(Collection<FlexTrip<?, ?>> flexTrips) {
-    List<TaxiZone> result = new ArrayList<>();
+  public List<TaxiRoute> buildRoutes(Collection<FlexTrip<?, ?>> flexTrips) {
+    List<TaxiRoute> result = new ArrayList<>();
+    Set<FeedScopedId> uniqueRouteIds = new HashSet<>();
     for (FlexTrip<?, ?> flexTrip : flexTrips) {
-      if (isValidTaxiZoneTrip(flexTrip)) {
+      if (isValidTaxiTrip(flexTrip, uniqueRouteIds)) {
         var areaStop = (AreaStop) flexTrip.getStop(0);
         result.add(
-          new TaxiZone(
-            areaStop.getGeometry(),
+          new TaxiRoute(
             flexTrip.getTrip().getRoute(),
+            areaStop.getGeometry(),
             flexTrip.getPickupBookingInfo(0),
             flexTrip.getDropOffBookingInfo(1)
           )
@@ -45,7 +49,7 @@ public class TaxiBuilder {
     return result;
   }
 
-  private boolean isValidTaxiZoneTrip(FlexTrip<?, ?> flexTrip) {
+  private boolean isValidTaxiTrip(FlexTrip<?, ?> flexTrip, Set<FeedScopedId> uniqueRouteIds) {
     // Order matters!
     // - isUnscheduledTrip must run first, since only UnscheduledTrip guarantees getTrip() is
     //   non-null, which the checks after it rely on.
@@ -54,6 +58,7 @@ public class TaxiBuilder {
     return (
       isUnscheduledTrip(flexTrip) &&
       hasTaxiRouteType(flexTrip) &&
+      hasUniqueRoute(flexTrip, uniqueRouteIds) &&
       hasNoTimeRestrictions(flexTrip) &&
       hasTwoStops(flexTrip) &&
       hasSingleZone(flexTrip) &&
@@ -83,6 +88,20 @@ public class TaxiBuilder {
       new TaxiTripSkipped(
         flexTrip.getId(),
         "route mode is %s; must be TAXI (GTFS route_type 1500-1599)".formatted(mode)
+      )
+    );
+    return false;
+  }
+
+  private boolean hasUniqueRoute(FlexTrip<?, ?> flexTrip, Set<FeedScopedId> uniqueRouteIds) {
+    FeedScopedId routeId = flexTrip.getTrip().getRoute().getId();
+    if (uniqueRouteIds.add(routeId)) {
+      return true;
+    }
+    issueStore.add(
+      new TaxiTripSkipped(
+        flexTrip.getId(),
+        "route %s already has a taxi trip; only one trip per route is supported".formatted(routeId)
       )
     );
     return false;

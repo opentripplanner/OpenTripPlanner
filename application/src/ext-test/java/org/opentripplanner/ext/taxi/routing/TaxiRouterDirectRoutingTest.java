@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.ext.taxi.TaxiZoneIndex;
+import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.model.TaxiLeg;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -51,28 +51,28 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
   private static final WgsCoordinate PICKUP = new WgsCoordinate(5.0, 8.0);
   private static final WgsCoordinate DROPOFF = new WgsCoordinate(6.0, 8.5);
 
-  private static final Polygon ZONE_POLYGON = Polygons.square(
+  private static final Polygon ROUTE_POLYGON = Polygons.square(
     new Coordinate(4, 4),
     new Coordinate(9, 9)
   );
 
-  private static final Route ZONE_ROUTE = TransitRepositoryForTest.route("taxi").build();
+  private static final Route ROUTE = TransitRepositoryForTest.route("taxi").build();
 
-  private static final TaxiZoneIndex MATCHING_INDEX = new TaxiZoneIndex(
-    List.of(new TaxiZone(ZONE_POLYGON, ZONE_ROUTE, null, null))
+  private static final TaxiRouteIndex MATCHING_INDEX = TaxiRouteIndex.createAndIndex(
+    List.of(new TaxiRoute(ROUTE, ROUTE_POLYGON, null, null))
   );
-  private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
+  private static final TaxiRouteIndex EMPTY_INDEX = TaxiRouteIndex.createAndIndex(List.of());
 
   // Covers the synthetic FROM/TO coordinates used by routeDirect(...).
-  private static final TaxiZone COVERING_ZONE = new TaxiZone(
+  private static final TaxiRoute COVERING_ROUTE = new TaxiRoute(
+    ROUTE,
     Polygons.square(new Coordinate(10.69, 59.89), new Coordinate(10.71, 59.91)),
-    ZONE_ROUTE,
     null,
     null
   );
 
   @Test
-  void driveLegWithinZoneIsReplacedWithTaxiLeg() {
+  void driveLegWithinRouteIsReplacedWithTaxiLeg() {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
@@ -83,11 +83,11 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
     var resultLeg = result.legs().getFirst();
     assertThat(resultLeg).isInstanceOf(TaxiLeg.class);
     var leg = (TaxiLeg) resultLeg;
-    assertThat(leg.route()).isEqualTo(ZONE_ROUTE);
+    assertThat(leg.route()).isEqualTo(ROUTE);
   }
 
   @Test
-  void driveLegWithNoMatchingZoneIsLeftUndecorated() {
+  void driveLegWithNoMatchingRouteIsLeftUndecorated() {
     var itinerary = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build();
@@ -118,19 +118,19 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
   }
 
   @Test
-  void routeDecoratesItineraryWithMatchingZone() {
-    var itineraries = routeDirect(List.of(COVERING_ZONE));
+  void routeDecoratesItineraryWithMatchingRoute() {
+    var itineraries = routeDirect(List.of(COVERING_ROUTE));
 
     assertThat(itineraries).isNotEmpty();
     var itinerary = itineraries.getFirst();
     var resultLeg = itinerary.legs().getFirst();
     assertThat(resultLeg).isInstanceOf(TaxiLeg.class);
     var leg = (TaxiLeg) resultLeg;
-    assertThat(leg.route()).isEqualTo(ZONE_ROUTE);
+    assertThat(leg.route()).isEqualTo(ROUTE);
   }
 
   @Test
-  void routeReturnsEmptyWithoutRoutingWhenOriginAndDestinationDoNotShareAZone() {
+  void routeReturnsEmptyWithoutRoutingWhenOriginAndDestinationDoNotShareARoute() {
     var itineraries = routeDirect(List.of());
 
     assertThat(itineraries).isEmpty();
@@ -139,9 +139,9 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
   /**
    * Routes a direct {@link StreetMode#TAXI} request through
    * {@link TaxiRouter#routeDirect} on a minimal synthetic street graph, decorating the
-   * result with the given zones.
+   * result with the given routes.
    */
-  private static List<Itinerary> routeDirect(List<TaxiZone> zones) {
+  private static List<Itinerary> routeDirect(List<TaxiRoute> routes) {
     var fromVertex = intersectionVertex("from", FROM_LAT, FROM_LON);
     var toVertex = intersectionVertex("to", TO_LAT, TO_LON);
 
@@ -169,7 +169,7 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
       TransferServiceTestFactory.defaultTransferRepository()
     );
 
-    var taxiRouter = new TaxiRouter(new TaxiZoneIndex(zones));
+    var taxiRouter = new TaxiRouter(TaxiRouteIndex.createAndIndex(routes));
 
     return taxiRouter.routeDirect(
       new Graph(),

@@ -87,14 +87,16 @@ a warning in the build report:
    not supported.
 2. The trip's route must have `route_type` `1500`-`1599` (the GTFS "Taxi Service" family, mapped
    to OTP's `TAXI` transit mode). Trips on any other route type are skipped.
-3. No stop may have a meaningful time restriction (`start_pickup_dropoff_window` /
+3. At most one trip is kept per route. If multiple trips otherwise satisfy all of these
+   requirements for the same route, only the first one is kept and the rest are skipped.
+4. No stop may have a meaningful time restriction (`start_pickup_dropoff_window` /
    `end_pickup_dropoff_window`). A full-day window (`0:00:00`–`24:00:00`) is accepted and treated
    as "always available". Any other bounded window causes the trip to be skipped.
-4. The trip must have exactly 2 stop times: stop 0 is the pickup stop and stop 1 is the
+5. The trip must have exactly 2 stop times: stop 0 is the pickup stop and stop 1 is the
    drop-off stop.
-5. Both stop times must reference the same GTFS Flex area (`location_id`) and that area must
+6. Both stop times must reference the same GTFS Flex area (`location_id`) and that area must
    have a geometry. Trips with separate departure and arrival zones are not supported.
-6. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
+7. Stop 0 must have `pickup_type` `2` (CALL_AGENCY) and stop 1 must have `drop_off_type` `2`
    (CALL_AGENCY). `0` (SCHEDULED) and `3` (COORDINATE_WITH_DRIVER) are not accepted.
 
 ### GTFS API Modes
@@ -106,7 +108,7 @@ Internally this maps to the `TAXI` street mode, which behaves identically to
 
 ### Decorated Leg Fields
 
-When a taxi leg matches a zone, it is replaced by a `TaxiLeg`. It implements the plain `Leg`
+When a taxi leg matches a route, it is replaced by a `TaxiLeg`. It implements the plain `Leg`
 interface directly (**not** `TransitLeg`), even though it carries route/agency/booking
 information from the matched provider's flex trip. This means `transitLeg`/`isTransit` is
 `false` in the API for a taxi leg, and the itinerary's own `isTransit`-based fields are
@@ -151,10 +153,10 @@ Enable the feature flag in `otp-config.json`:
 
 ### OTP 2.11
 
-- Initial implementation: spatial zone index, itinerary filtering, and leg decoration with
+- Initial implementation: spatial route index, itinerary filtering, and leg decoration with
   provider information from GTFS Flex data. Taxi provider feeds are configured explicitly in
   `transitFeeds` with `taxiProvider: true`.
-- Moved zone checking before routing runs (for both transit access/egress and direct routing),
+- Moved route checking before routing runs (for both transit access/egress and direct routing),
   filtering out non-matching requests instead of discarding built itineraries afterward, and
   decorate using request-level origin/destination coordinates rather than a leg's own local
   coordinates.

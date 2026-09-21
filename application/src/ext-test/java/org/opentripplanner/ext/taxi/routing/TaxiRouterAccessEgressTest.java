@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.geometry.Polygons;
-import org.opentripplanner.ext.taxi.TaxiZoneIndex;
+import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.model.TaxiLeg;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -41,7 +41,8 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
-  private static final Route ZONE_ROUTE = TransitRepositoryForTest.route("taxi").build();
+  private static final Route ROUTE = TransitRepositoryForTest.route("taxi").build();
+  private static final Route OTHER_ROUTE = TransitRepositoryForTest.route("taxi-2").build();
 
   private static final Place PLACE_A = Place.forStop(
     TEST_MODEL.stop("A").withCoordinate(5.0, 8.0).build()
@@ -50,29 +51,31 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
     TEST_MODEL.stop("B").withCoordinate(6.0, 8.5).build()
   );
 
-  private static final TaxiZoneIndex EMPTY_INDEX = new TaxiZoneIndex(List.of());
+  private static final TaxiRouteIndex EMPTY_INDEX = TaxiRouteIndex.createAndIndex(List.of());
 
   // Covers FROM_LAT/FROM_LON..TO_LAT/TO_LON but not PLACE_A/PLACE_B, so it can be used to verify
   // that decoration/filtering uses the given logical coordinates rather than a leg's or a stop's
   // own local coordinates.
-  private static final TaxiZone COVERING_ZONE = new TaxiZone(
+  private static final TaxiRoute COVERING_ROUTE = new TaxiRoute(
+    ROUTE,
     Polygons.square(new Coordinate(10.69, 59.89), new Coordinate(10.71, 59.91)),
-    ZONE_ROUTE,
     null,
     null
   );
-  private static final TaxiZoneIndex COVERING_INDEX = new TaxiZoneIndex(List.of(COVERING_ZONE));
+  private static final TaxiRouteIndex COVERING_INDEX = TaxiRouteIndex.createAndIndex(
+    List.of(COVERING_ROUTE)
+  );
 
-  // A second zone overlapping COVERING_ZONE, used to verify a stop covered by more than one
-  // zone is still only returned once.
-  private static final TaxiZone OVERLAPPING_ZONE = new TaxiZone(
+  // A second, distinct provider route overlapping COVERING_ROUTE, used to verify a stop covered
+  // by more than one route is still only returned once.
+  private static final TaxiRoute OVERLAPPING_ROUTE = new TaxiRoute(
+    OTHER_ROUTE,
     Polygons.square(new Coordinate(10.68, 59.88), new Coordinate(10.72, 59.92)),
-    ZONE_ROUTE,
     null,
     null
   );
-  private static final TaxiZoneIndex OVERLAPPING_INDEX = new TaxiZoneIndex(
-    List.of(COVERING_ZONE, OVERLAPPING_ZONE)
+  private static final TaxiRouteIndex OVERLAPPING_INDEX = TaxiRouteIndex.createAndIndex(
+    List.of(COVERING_ROUTE, OVERLAPPING_ROUTE)
   );
 
   private static final RegularStop COVERED_STOP = TEST_MODEL.stop(
@@ -87,7 +90,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
   ).build();
 
   @Test
-  void filterNearbyStopsKeepsOnlyAccessStopsSharingAZoneWithTheOrigin() {
+  void filterNearbyStopsKeepsOnlyAccessStopsSharingARouteWithTheOrigin() {
     var transitService = mockTransitService();
     var subject = new TaxiRouter(COVERING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
@@ -104,7 +107,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
   }
 
   @Test
-  void filterNearbyStopsKeepsOnlyEgressStopsSharingAZoneWithTheDestination() {
+  void filterNearbyStopsKeepsOnlyEgressStopsSharingARouteWithTheDestination() {
     var transitService = mockTransitService();
     var subject = new TaxiRouter(COVERING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
@@ -121,7 +124,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
   }
 
   @Test
-  void filterNearbyStopsDropsAllAccessStopsWhenNoZoneCoversAny() {
+  void filterNearbyStopsDropsAllAccessStopsWhenNoRouteCoversAny() {
     var transitService = mockTransitService();
     var subject = new TaxiRouter(EMPTY_INDEX);
 
@@ -136,7 +139,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
   }
 
   @Test
-  void filterNearbyStopsKeepsStopCoveredByMultipleOverlappingZonesOnlyOnce() {
+  void filterNearbyStopsKeepsStopCoveredByMultipleOverlappingRoutesOnlyOnce() {
     var transitService = mockTransitService();
     var subject = new TaxiRouter(OVERLAPPING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
@@ -153,7 +156,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
   @Test
   void decorateAccessEgressLegsReplacesCarLegUsingLogicalCoordinates() {
-    // The drive leg's own local coordinates (PLACE_A/PLACE_B) fall outside the zone, but the
+    // The drive leg's own local coordinates (PLACE_A/PLACE_B) fall outside the route, but the
     // logical pickup/dropoff coordinates passed in do not, so the leg should still be decorated.
     var walkLeg = TestItineraryBuilder.newItinerary(PLACE_A, T11_00)
       .walk(60, PLACE_B)
@@ -173,11 +176,11 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
     assertThat(result.get(0)).isSameInstanceAs(walkLeg);
     assertThat(result.get(1)).isInstanceOf(TaxiLeg.class);
-    assertThat(((TaxiLeg) result.get(1)).route()).isEqualTo(ZONE_ROUTE);
+    assertThat(((TaxiLeg) result.get(1)).route()).isEqualTo(ROUTE);
   }
 
   @Test
-  void decorateAccessEgressLegsLeavesCarLegUntouchedWhenNoZoneCoversLogicalCoordinates() {
+  void decorateAccessEgressLegsLeavesCarLegUntouchedWhenNoRouteCoversLogicalCoordinates() {
     var driveLeg = TestItineraryBuilder.newItinerary(PLACE_A)
       .drive(T11_00, T11_10, PLACE_B)
       .build()

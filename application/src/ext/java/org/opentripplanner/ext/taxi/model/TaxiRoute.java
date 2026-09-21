@@ -8,10 +8,15 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public final class TaxiZone implements Serializable {
+/**
+ * A {@link Route} served by a taxi provider, with its service area geometry and booking
+ * info. Equality is based on {@link #route} alone, assuming a one-to-one mapping between a
+ * route and its {@code TaxiRoute} (enforced by the graph builder).
+ */
+public final class TaxiRoute implements Serializable {
 
-  private final Geometry geometry;
   private final Route route;
+  private final Geometry geometry;
 
   @Nullable
   private final BookingInfo pickupBookingInfo;
@@ -19,24 +24,24 @@ public final class TaxiZone implements Serializable {
   @Nullable
   private final BookingInfo dropOffBookingInfo;
 
-  public TaxiZone(
-    Geometry geometry,
+  public TaxiRoute(
     Route route,
+    Geometry geometry,
     @Nullable BookingInfo pickupBookingInfo,
     @Nullable BookingInfo dropOffBookingInfo
   ) {
-    this.geometry = Objects.requireNonNull(geometry);
     this.route = Objects.requireNonNull(route);
+    this.geometry = Objects.requireNonNull(geometry);
     this.pickupBookingInfo = pickupBookingInfo;
     this.dropOffBookingInfo = dropOffBookingInfo;
   }
 
-  public Geometry geometry() {
-    return geometry;
-  }
-
   public Route route() {
     return route;
+  }
+
+  public Geometry geometry() {
+    return geometry;
   }
 
   @Nullable
@@ -57,25 +62,20 @@ public final class TaxiZone implements Serializable {
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
-    TaxiZone taxiZone = (TaxiZone) obj;
-    return (
-      Objects.equals(geometry, taxiZone.geometry) &&
-      Objects.equals(route, taxiZone.route) &&
-      Objects.equals(pickupBookingInfo, taxiZone.pickupBookingInfo) &&
-      Objects.equals(dropOffBookingInfo, taxiZone.dropOffBookingInfo)
-    );
+    TaxiRoute taxiRoute = (TaxiRoute) obj;
+    return route.equals(taxiRoute.route);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(geometry, route, pickupBookingInfo, dropOffBookingInfo);
+    return route.hashCode();
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(TaxiZone.class)
-      .addObj("geometry", geometry)
+    return ToStringBuilder.of(TaxiRoute.class)
       .addObj("route", route)
+      .addObj("geometry", geometry)
       .addObj("pickupBookingInfo", pickupBookingInfo)
       .addObj("dropOffBookingInfo", dropOffBookingInfo)
       .toString();

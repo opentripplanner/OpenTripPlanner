@@ -33,15 +33,15 @@ class TaxiBuilderTest {
     .build();
 
   @Test
-  void validTripProducesZone() {
+  void validTripProducesRoute() {
     var issueStore = new DefaultDataImportIssueStore();
     var trip = unscheduledTrip(validStopTimes());
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).hasSize(1);
-    var zone = zones.get(0);
-    assertThat(zone.geometry()).isEqualTo(AREA_1.getGeometry());
-    assertThat(zone.route()).isEqualTo(TRIP.getRoute());
+    assertThat(routes).hasSize(1);
+    var taxiRoute = routes.get(0);
+    assertThat(taxiRoute.geometry()).isEqualTo(AREA_1.getGeometry());
+    assertThat(taxiRoute.route()).isEqualTo(TRIP.getRoute());
     assertThat(issueStore.listIssues()).isEmpty();
   }
 
@@ -55,9 +55,9 @@ class TaxiBuilderTest {
     var tripId = FeedScopedIdForTestFactory.id("t2");
     var trip = ScheduledDeviatedTrip.of(tripId).withStopTimes(stopTimes).build();
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(issueStore, tripId, "only UnscheduledTrip is supported");
   }
 
@@ -75,9 +75,9 @@ class TaxiBuilderTest {
     var tripId = FeedScopedIdForTestFactory.id("t-bus");
     var trip = UnscheduledTrip.of(tripId).withTrip(nonTaxiTrip).withStopTimes(stopTimes).build();
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(issueStore, tripId, "route mode is BUS");
   }
 
@@ -90,9 +90,9 @@ class TaxiBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(issueStore, trip.getId(), "has a time restriction");
   }
 
@@ -101,9 +101,9 @@ class TaxiBuilderTest {
     var issueStore = new DefaultDataImportIssueStore();
     var trip = unscheduledTrip(validStopTimes());
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).hasSize(1);
+    assertThat(routes).hasSize(1);
     assertThat(issueStore.listIssues()).isEmpty();
   }
 
@@ -117,9 +117,9 @@ class TaxiBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(issueStore, trip.getId(), "expected exactly 2 stop times");
   }
 
@@ -132,13 +132,35 @@ class TaxiBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(
       issueStore,
       trip.getId(),
       "must reference the same GTFS Flex area"
+    );
+  }
+
+  @Test
+  void secondTripForSameRouteIsSkipped() {
+    var issueStore = new DefaultDataImportIssueStore();
+    var firstTrip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-first"))
+      .withTrip(TRIP)
+      .withStopTimes(validStopTimes())
+      .build();
+    var secondTrip = UnscheduledTrip.of(FeedScopedIdForTestFactory.id("t-second"))
+      .withTrip(TRIP)
+      .withStopTimes(validStopTimes())
+      .build();
+
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(firstTrip, secondTrip));
+
+    assertThat(routes).hasSize(1);
+    assertSingleTaxiTripSkippedIssue(
+      issueStore,
+      secondTrip.getId(),
+      "already has a taxi trip; only one trip per route is supported"
     );
   }
 
@@ -152,9 +174,9 @@ class TaxiBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(issueStore, trip.getId(), "stop 0 has pickup_type");
   }
 
@@ -168,9 +190,9 @@ class TaxiBuilderTest {
     );
     var trip = unscheduledTrip(stopTimes);
 
-    var zones = new TaxiBuilder(issueStore).buildZones(List.of(trip));
+    var routes = new TaxiBuilder(issueStore).buildRoutes(List.of(trip));
 
-    assertThat(zones).isEmpty();
+    assertThat(routes).isEmpty();
     assertSingleTaxiTripSkippedIssue(issueStore, trip.getId(), "stop 1 has drop_off_type");
   }
 

@@ -6,9 +6,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
-import org.opentripplanner.ext.taxi.TaxiZoneIndex;
+import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.model.TaxiLeg;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handles taxi routing, filtering and decoration, backed by a single {@link TaxiZoneIndex}.
+ * Handles taxi routing, filtering and decoration, backed by a single {@link TaxiRouteIndex}.
  * <ol>
  *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request
  *   origin and destination are covered by a common taxi provider; if not, an empty result
@@ -55,10 +55,10 @@ public class TaxiRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(TaxiRouter.class);
 
-  private final TaxiZoneIndex taxiZoneIndex;
+  private final TaxiRouteIndex taxiRouteIndex;
 
-  public TaxiRouter(TaxiZoneIndex taxiZoneIndex) {
-    this.taxiZoneIndex = taxiZoneIndex;
+  public TaxiRouter(TaxiRouteIndex taxiRouteIndex) {
+    this.taxiRouteIndex = taxiRouteIndex;
   }
 
   /**
@@ -77,7 +77,7 @@ public class TaxiRouter {
   ) {
     WgsCoordinate pickup = request.from().wgsCoordinate();
     WgsCoordinate dropoff = request.to().wgsCoordinate();
-    if (taxiZoneIndex.findFirstZone(pickup, dropoff).isEmpty()) {
+    if (taxiRouteIndex.findFirstRoute(pickup, dropoff).isEmpty()) {
       return List.of();
     }
 
@@ -127,8 +127,8 @@ public class TaxiRouter {
     Collection<NearbyStop> nearbyStops,
     WgsCoordinate coordinate
   ) {
-    List<TaxiZone> zones = taxiZoneIndex.findAllZones(coordinate);
-    if (zones.isEmpty()) {
+    List<TaxiRoute> routes = taxiRouteIndex.findAllRoutes(coordinate);
+    if (routes.isEmpty()) {
       return List.of();
     }
 
@@ -137,8 +137,8 @@ public class TaxiRouter {
       Point stopPoint = GeometryUtils.getGeometryFactory().createPoint(
         transitService.getStopLocation(nearbyStop.stopId).getCoordinate().asJtsCoordinate()
       );
-      for (TaxiZone zone : zones) {
-        if (taxiZoneIndex.getPreparedGeometry(zone).contains(stopPoint)) {
+      for (TaxiRoute route : routes) {
+        if (taxiRouteIndex.getPreparedGeometry(route).contains(stopPoint)) {
           result.add(nearbyStop);
           break;
         }
@@ -149,13 +149,13 @@ public class TaxiRouter {
 
   /**
    * Decorates the {@link TraverseMode#CAR} leg among an access or egress leg chain with taxi
-   * zone information, looking up the zone using the given logical {@code pickup} and
+   * route information, looking up the route using the given logical {@code pickup} and
    * {@code dropoff} coordinates (the request origin/destination and the stop), rather than the
    * leg's own local coordinates, which may differ slightly when the access/egress path is a
    * walk-drive-walk chain.
    * <p>
-   * Candidates are expected to already have been filtered for zone coverage (see
-   * {@link #filterNearbyStops}), so a common zone is expected to always exist; if none is found
+   * Candidates are expected to already have been filtered for route coverage (see
+   * {@link #filterNearbyStops}), so a common route is expected to always exist; if none is found
    * (defensive) the leg is returned unchanged and a warning is logged.
    */
   public List<Leg> decorateAccessEgressLegs(
@@ -168,13 +168,13 @@ public class TaxiRouter {
 
   /**
    * Replaces every {@link TraverseMode#CAR} {@link StreetLeg} among {@code legs} with a {@link
-   * TaxiLeg}, looking up the covering zone via {@code pickup}/{@code dropoff} once (not per
+   * TaxiLeg}, looking up the covering route via {@code pickup}/{@code dropoff} once (not per
    * leg, since they're invariant across the whole call) and reusing the result for every
    * matching leg.
    */
   private List<Leg> decorateLegs(List<Leg> legs, WgsCoordinate pickup, WgsCoordinate dropoff) {
-    var taxiZone = taxiZoneIndex.findFirstZone(pickup, dropoff);
-    if (taxiZone.isEmpty()) {
+    var taxiRoute = taxiRouteIndex.findFirstRoute(pickup, dropoff);
+    if (taxiRoute.isEmpty()) {
       LOG.warn(
         "No taxi provider covers the pre-filtered taxi legs between {} and {}",
         pickup,
@@ -186,7 +186,7 @@ public class TaxiRouter {
     List<Leg> newLegs = new ArrayList<>(legs.size());
     for (Leg leg : legs) {
       if (leg instanceof StreetLeg streetLeg && streetLeg.getMode() == TraverseMode.CAR) {
-        newLegs.add(new TaxiLeg(streetLeg, taxiZone.get()));
+        newLegs.add(new TaxiLeg(streetLeg, taxiRoute.get()));
       } else {
         newLegs.add(leg);
       }

@@ -38,13 +38,13 @@ class TaxiLegTest implements PlanTestConstants {
   }
 
   @Test
-  void agencyComesFromZoneRoute() {
+  void agencyComesFromTaxiRoute() {
     var leg = taxiLeg();
     assertThat(leg.agency()).isEqualTo(ROUTE.getAgency());
   }
 
   @Test
-  void routeComesFromZone() {
+  void routeComesFromTaxiRoute() {
     var leg = taxiLeg();
     assertThat(leg.route()).isEqualTo(ROUTE);
   }
@@ -81,7 +81,7 @@ class TaxiLegTest implements PlanTestConstants {
   }
 
   @Test
-  void bookingInfoComesFromZone() {
+  void bookingInfoComesFromTaxiRoute() {
     var leg = taxiLeg();
     assertThat(leg.pickupBookingInfo()).isEqualTo(PICKUP_BOOKING_INFO);
     assertThat(leg.dropOffBookingInfo()).isEqualTo(DROP_OFF_BOOKING_INFO);
@@ -93,7 +93,7 @@ class TaxiLegTest implements PlanTestConstants {
     var updated = leg.withEmissionPerPerson(Emission.ofCo2Gram(5));
     assertThat(updated).isInstanceOf(TaxiLeg.class);
     var castLeg = (TaxiLeg) updated;
-    assertThat(castLeg.taxiZone()).isEqualTo(leg.taxiZone());
+    assertThat(castLeg.taxiRoute()).isEqualTo(leg.taxiRoute());
     assertThat(castLeg.emissionPerPerson()).isEqualTo(Emission.ofCo2Gram(5));
   }
 
@@ -103,7 +103,7 @@ class TaxiLegTest implements PlanTestConstants {
     var updated = leg.withTimeShift(Duration.ofMinutes(5));
     assertThat(updated).isInstanceOf(TaxiLeg.class);
     var castLeg = (TaxiLeg) updated;
-    assertThat(castLeg.taxiZone()).isEqualTo(leg.taxiZone());
+    assertThat(castLeg.taxiRoute()).isEqualTo(leg.taxiRoute());
   }
 
   @Test
@@ -147,7 +147,7 @@ class TaxiLegTest implements PlanTestConstants {
   }
 
   private static TaxiLeg taxiLeg() {
-    var zone = new TaxiZone(Polygons.OSLO, ROUTE, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
-    return new TaxiLeg(driveLeg(), zone);
+    var taxiRoute = new TaxiRoute(ROUTE, Polygons.OSLO, PICKUP_BOOKING_INFO, DROP_OFF_BOOKING_INFO);
+    return new TaxiLeg(driveLeg(), taxiRoute);
   }
 }

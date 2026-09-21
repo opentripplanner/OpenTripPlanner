@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.taxi.TaxiRouteIndex;
 import org.opentripplanner.ext.taxi.TaxiService;
-import org.opentripplanner.ext.taxi.TaxiZoneIndex;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.ext.taxi.routing.TaxiRouter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -24,7 +24,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class DefaultTaxiService implements TaxiService {
 
-  private final TaxiZoneIndex taxiZoneIndex;
+  private final TaxiRouteIndex taxiRouteIndex;
   private final TaxiRouter taxiRouter;
   private final Graph graph;
   private final StreetLimitationParametersService streetLimitationParametersService;
@@ -35,15 +35,15 @@ public class DefaultTaxiService implements TaxiService {
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
 
   public DefaultTaxiService(
-    List<TaxiZone> zones,
+    List<TaxiRoute> routes,
     Graph graph,
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings
   ) {
-    this.taxiZoneIndex = new TaxiZoneIndex(zones);
-    this.taxiRouter = new TaxiRouter(taxiZoneIndex);
+    this.taxiRouteIndex = TaxiRouteIndex.createAndIndex(routes);
+    this.taxiRouter = new TaxiRouter(taxiRouteIndex);
     this.graph = Objects.requireNonNull(graph);
     this.streetLimitationParametersService = Objects.requireNonNull(
       streetLimitationParametersService

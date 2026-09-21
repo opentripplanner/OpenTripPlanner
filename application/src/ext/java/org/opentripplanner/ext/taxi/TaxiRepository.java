@@ -2,19 +2,19 @@ package org.opentripplanner.ext.taxi;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 
 /**
- * Repository for taxi zone data.
+ * Repository for taxi route data.
  */
 public interface TaxiRepository extends Serializable {
   /**
-   * Add taxi zones to the repository.
+   * Add taxi routes to the repository.
    */
-  void addZones(List<TaxiZone> zones);
+  void addRoutes(List<TaxiRoute> routes);
 
   /**
-   * Return all stored taxi zones.
+   * Return all stored taxi routes.
    */
-  List<TaxiZone> getZones();
+  List<TaxiRoute> getRoutes();
 }

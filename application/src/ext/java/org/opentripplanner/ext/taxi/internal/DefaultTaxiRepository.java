@@ -3,19 +3,19 @@ package org.opentripplanner.ext.taxi.internal;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.taxi.TaxiRepository;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 
 public class DefaultTaxiRepository implements TaxiRepository {
 
-  private final List<TaxiZone> zones = new ArrayList<>();
+  private final List<TaxiRoute> routes = new ArrayList<>();
 
   @Override
-  public void addZones(List<TaxiZone> zones) {
-    this.zones.addAll(zones);
+  public void addRoutes(List<TaxiRoute> routes) {
+    this.routes.addAll(routes);
   }
 
   @Override
-  public List<TaxiZone> getZones() {
-    return List.copyOf(zones);
+  public List<TaxiRoute> getRoutes() {
+    return List.copyOf(routes);
   }
 }

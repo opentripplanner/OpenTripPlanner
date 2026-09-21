@@ -18,7 +18,7 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.ext.taxi.model.TaxiLeg;
-import org.opentripplanner.ext.taxi.model.TaxiZone;
+import org.opentripplanner.ext.taxi.model.TaxiRoute;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
@@ -85,14 +85,18 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     car = newItinerary(A).drive(START_TIME, END_TIME, B).build();
     flex = newItinerary(A).flex(START_TIME, END_TIME, B).build();
 
-    var taxiRoute = ENV_BUILDER.route("TAXI1", b -> b.withMode(TransitMode.TAXI));
-    var taxiZone = new TaxiZone(Polygons.OSLO, taxiRoute, null, null);
+    var taxiRoute = new TaxiRoute(
+      ENV_BUILDER.route("TAXI1", b -> b.withMode(TransitMode.TAXI)),
+      Polygons.OSLO,
+      null,
+      null
+    );
     var driveLeg = (StreetLeg) newItinerary(A)
       .drive(START_TIME, END_TIME, B)
       .build()
       .legs()
       .getFirst();
-    var taxiLeg = new TaxiLeg(driveLeg, taxiZone);
+    var taxiLeg = new TaxiLeg(driveLeg, taxiRoute);
     taxi = newItinerary(A)
       .drive(START_TIME, END_TIME, B)
       .build()
@@ -124,7 +128,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     Map<FeedScopedId, Emission> routeEmissions = new HashMap<>();
     routeEmissions.put(routeA.getId(), Emission.ofCo2Gram(0.01));
     routeEmissions.put(routeB.getId(), Emission.ZERO);
-    routeEmissions.put(taxiRoute.getId(), Emission.ofCo2Gram(0.02));
+    routeEmissions.put(taxiRoute.route().getId(), Emission.ofCo2Gram(0.02));
     repository.addRouteEmissions(routeEmissions);
 
     // Set trip emissions for rail - using trip-pattern emission
