@@ -821,10 +821,8 @@ type Itinerary {
   """
   An opaque, versioned identifier for this itinerary. It can be used to refetch this exact
   itinerary later (with current realtime data applied) using the `itinerary` query, without
-  resending the original search parameters.
-
-  `null` if this itinerary cannot currently be refetched (for example, if it contains no
-  scheduled transit legs).
+  resending the original search parameters. `null` if this itinerary cannot currently be
+  refetched (for example, if it contains no scheduled transit legs).
   """
   id: String
   """
