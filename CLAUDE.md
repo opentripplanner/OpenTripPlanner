@@ -78,7 +78,7 @@ mvn test -Dtest=ClassName#methodName
 Multi-module Maven project (root `pom.xml` `<modules>`):
 
 - **utils**: low-level utilities shared by all modules
-- **domain-core**: core domain primitives (`org.opentripplanner.core`) — `FeedScopedId`, `Cost`,
+- **model-core**: core domain primitives (`org.opentripplanner.core`) — `FeedScopedId`, `Cost`,
   `Distance`, `I18NString`, `Accessibility`, plus framework (deduplicator, DI, resources)
 - **raptor**: transit routing engine — `raptor/router/src`. Isolated: **zero dependencies on OTP
   code** (only utilities). Performance-critical; data is supplied via the SPI in `raptor/spi`.
