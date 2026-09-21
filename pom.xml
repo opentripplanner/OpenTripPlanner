@@ -629,6 +629,17 @@
                 <version>1.16.6</version>
             </dependency>
 
+            <!--
+             Not declared directly; pulled in transitively by both io.micrometer:micrometer-core
+             and com.google.truth:truth (via guava). Pinned so the resolved version doesn't depend
+             on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+
             <!-- Logging API -->
             <dependency>
                 <groupId>org.slf4j</groupId>

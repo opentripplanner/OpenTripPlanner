@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>org.opentripplanner.core</groupId>
-            <artifactId>domain</artifactId>
+            <artifactId>model</artifactId>
             <version>${project.version}</version>
         </dependency>
 
