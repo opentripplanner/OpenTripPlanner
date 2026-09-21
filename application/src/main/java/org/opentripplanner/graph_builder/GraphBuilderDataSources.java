@@ -1,14 +1,13 @@
 package org.opentripplanner.graph_builder;
 
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.CACHE;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.DEM;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.EMISSION;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.EMPIRICAL_DATA;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.GTFS;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.GTFS_TAXI;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.NETEX;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.OSM;
-import static org.opentripplanner.graph_builder.model.GraphBuilderFileType.UNKNOWN;
+import static org.opentripplanner.datastore.api.FileType.CACHE;
+import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.EMISSION;
+import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
+import static org.opentripplanner.datastore.api.FileType.GTFS;
+import static org.opentripplanner.datastore.api.FileType.NETEX;
+import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -33,7 +32,6 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayFeedParam
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.model.GraphBuilderFileType;
 import org.opentripplanner.graph_builder.module.cache.CacheTask;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
@@ -51,8 +49,8 @@ import org.slf4j.LoggerFactory;
  * input files should be used and validate the available input files against the command line
  * parameters set.
  * <p/>
- * After this class is validated the {@link #has(GraphBuilderFileType)} method can be used to
- * determine if the build process should include a file in the build.
+ * After this class is validated the {@link #has(FileType)} method can be used to determine if the
+ * build process should include a file in the build.
  * <p/>
  * By separating this from the builder, this class can be constructed early, causing a validation of
  * the available data-sources against the configuration - and then if not valid - abort the entire
@@ -65,9 +63,9 @@ public class GraphBuilderDataSources implements Closeable {
   private static final String BULLET_POINT = "- ";
 
   private final OtpDataStore store;
-  private final Multimap<GraphBuilderFileType, DataSource> inputData = ArrayListMultimap.create();
-  private final Multimap<GraphBuilderFileType, DataSource> skipData = ArrayListMultimap.create();
-  private final Set<GraphBuilderFileType> includeTypes = EnumSet.complementOf(EnumSet.of(UNKNOWN));
+  private final Multimap<FileType, DataSource> inputData = ArrayListMultimap.create();
+  private final Multimap<FileType, DataSource> skipData = ArrayListMultimap.create();
+  private final Set<FileType> includeTypes = EnumSet.complementOf(EnumSet.of(UNKNOWN));
   private final DataSource outputGraph;
   private final BuildConfig buildConfig;
   private final File baseDirectory;
@@ -93,7 +91,6 @@ public class GraphBuilderDataSources implements Closeable {
     include(cli.doBuildStreet(), DEM);
     include(cli.doBuildStreet(), CACHE);
     include(cli.doBuildTransit(), GTFS);
-    include(cli.doBuildTransit(), GTFS_TAXI);
     include(cli.doBuildTransit(), NETEX);
 
     selectFilesToImport();
@@ -119,7 +116,7 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public boolean hasGtfs() {
-    return has(GTFS);
+    return hasNonTaxiGtfs();
   }
 
   public boolean hasNetex() {
@@ -131,14 +128,14 @@ public class GraphBuilderDataSources implements Closeable {
    * This excludes GTFS feeds that are exclusively used as taxi provider data sources.
    */
   public boolean hasTransitData() {
-    return hasOneOf(GTFS, NETEX);
+    return hasNonTaxiGtfs() || hasNetex();
   }
 
   /**
    * Unlike {@link #hasTransitData()}, taxi provider data never populates the TransitRepository.
    */
   public boolean hasTransitOrTaxiData() {
-    return hasOneOf(GTFS, NETEX, GTFS_TAXI);
+    return hasOneOf(GTFS, NETEX);
   }
 
   public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
@@ -150,7 +147,10 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDataSource() {
-    return ofStream(GTFS).map(this::mapGtfsFeed).toList();
+    return ofStream(GTFS)
+      .map(this::mapGtfsFeed)
+      .filter(ds -> !ds.config().taxiProvider())
+      .toList();
   }
 
   public Iterable<
@@ -164,7 +164,10 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getTaxiConfiguredDataSource() {
-    return ofStream(GTFS_TAXI).map(this::mapGtfsFeed).toList();
+    return ofStream(GTFS)
+      .map(this::mapGtfsFeed)
+      .filter(ds -> ds.config().taxiProvider())
+      .toList();
   }
 
   public Iterable<
@@ -234,17 +237,23 @@ public class GraphBuilderDataSources implements Closeable {
    * @return {@code true} if and only if the data source exist, proper command line parameters is
    * set and not disabled by the loaded configuration files.
    */
-  private boolean has(GraphBuilderFileType type) {
+  private boolean has(FileType type) {
     return inputData.containsKey(type);
   }
 
-  private boolean hasOneOf(GraphBuilderFileType... types) {
-    for (GraphBuilderFileType type : types) {
+  private boolean hasOneOf(FileType... types) {
+    for (FileType type : types) {
       if (has(type)) {
         return true;
       }
     }
     return false;
+  }
+
+  private boolean hasNonTaxiGtfs() {
+    return ofStream(GTFS)
+      .map(this::mapGtfsFeed)
+      .anyMatch(ds -> !ds.config().taxiProvider());
   }
 
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
@@ -336,7 +345,7 @@ public class GraphBuilderDataSources implements Closeable {
 
     // Sort data input files by type
     LOG.info("Existing files expected to be read or written:");
-    for (GraphBuilderFileType type : GraphBuilderFileType.values()) {
+    for (FileType type : FileType.values()) {
       for (DataSource source : inputData.get(type)) {
         LOG.info(BULLET_POINT + "{}", source.detailedInfo());
       }
@@ -344,7 +353,7 @@ public class GraphBuilderDataSources implements Closeable {
 
     if (!skipData.values().isEmpty()) {
       LOG.info("Files excluded due to command line switches or unknown type:");
-      for (GraphBuilderFileType type : GraphBuilderFileType.values()) {
+      for (FileType type : FileType.values()) {
         for (DataSource source : skipData.get(type)) {
           LOG.info(BULLET_POINT + "{}", source.detailedInfo());
         }
@@ -390,7 +399,7 @@ public class GraphBuilderDataSources implements Closeable {
     return null;
   }
 
-  private void include(boolean include, GraphBuilderFileType type) {
+  private void include(boolean include, FileType type) {
     // Add or remove type - we do not care if the element already exist or not
     if (include) {
       includeTypes.add(type);
@@ -401,36 +410,15 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void selectFilesToImport() {
     for (FileType type : FileType.values()) {
-      for (DataSource dataSource : store.listExistingSourcesFor(type)) {
-        GraphBuilderFileType graphBuilderType = resolveGraphBuilderType(dataSource);
-        if (includeTypes.contains(graphBuilderType)) {
-          inputData.put(graphBuilderType, dataSource);
-        } else {
-          skipData.put(graphBuilderType, dataSource);
-        }
+      if (includeTypes.contains(type)) {
+        inputData.putAll(type, store.listExistingSourcesFor(type));
+      } else {
+        skipData.putAll(type, store.listExistingSourcesFor(type));
       }
     }
   }
 
-  private GraphBuilderFileType resolveGraphBuilderType(DataSource dataSource) {
-    return switch (dataSource.type()) {
-      case CONFIG -> GraphBuilderFileType.CONFIG;
-      case OSM -> GraphBuilderFileType.OSM;
-      case DEM -> GraphBuilderFileType.DEM;
-      case GTFS -> mapGtfsFeed(dataSource).config().taxiProvider()
-        ? GraphBuilderFileType.GTFS_TAXI
-        : GraphBuilderFileType.GTFS;
-      case NETEX -> GraphBuilderFileType.NETEX;
-      case EMISSION -> GraphBuilderFileType.EMISSION;
-      case EMPIRICAL_DATA -> GraphBuilderFileType.EMPIRICAL_DATA;
-      case GRAPH -> GraphBuilderFileType.GRAPH;
-      case REPORT -> GraphBuilderFileType.REPORT;
-      case CACHE -> GraphBuilderFileType.CACHE;
-      case UNKNOWN -> GraphBuilderFileType.UNKNOWN;
-    };
-  }
-
-  private Stream<DataSource> ofStream(GraphBuilderFileType type) {
+  private Stream<DataSource> ofStream(FileType type) {
     return inputData.get(type).stream();
   }
 }
