@@ -441,7 +441,7 @@ public class RoutingWorker {
     //       configured.
     if (
       request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) &&
-      OTPFeature.TaxiRouting.isOff()
+      taxiService == null
     ) {
       return RoutingResult.empty();
     }
