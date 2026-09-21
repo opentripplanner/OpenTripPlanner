@@ -138,7 +138,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
       }
       var tripTimes = arguments.timetable().getTripTimes(arguments.trip());
       return Optional.ofNullable(tripTimes)
-        .flatMap(t -> ((TripTimes<?>) t).getVehicleId())
+        .flatMap(TripTimes::getVehicleId)
         .map(FeedScopedId::toString)
         .orElse(null);
     };
