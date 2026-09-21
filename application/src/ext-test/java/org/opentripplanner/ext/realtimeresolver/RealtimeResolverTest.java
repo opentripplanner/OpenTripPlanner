@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.model.GenericLocation;
@@ -63,60 +62,45 @@ class RealtimeResolverTest {
   private static final RegularStop STOP_D = ENV_BUILDER.stop("D");
   private static final RegularStop STOP_E = ENV_BUILDER.stop("E");
 
-  private TransitTestEnvironment transitEnv;
-
-  @BeforeEach
-  void setUp() {
-    TransitTestEnvironmentBuilder envBuilder = TransitTestEnvironment.of(SERVICE_DATE);
-
-    envBuilder.stopAtStation("A", "StationA");
-    envBuilder.stop("B");
-    envBuilder.stop("C");
-    envBuilder.stop("D");
-    envBuilder.stop("E");
-
-    transitEnv = envBuilder
-      .addTrip(
-        TripInput.of("trip1")
-          .withWithTripOnServiceDate("trip1")
-          .addStop(STOP_A, "10:00")
-          .addStop(STOP_B, "11:00")
-          .addStop(STOP_D, "12:00")
-      )
-      .addTrip(
-        TripInput.of("trip2")
-          .withWithTripOnServiceDate("trip2")
-          .addStop(STOP_B, "12:00")
-          .addStop(STOP_C, "13:00")
-          .addStop(STOP_D, "14:00")
-      )
-      .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
-      .addTrip(
-        TripInput.of("trip4")
-          .withWithTripOnServiceDate("trip4")
-          .addStop(STOP_C, "08:30")
-          .addStop(STOP_D, "09:30")
-      )
-      .addTrip(
-        TripInput.of("trip5")
-          .withWithTripOnServiceDate("trip5")
-          .addStop(STOP_A, "11:05")
-          .addStop(STOP_B, "11:20")
-      )
-      .addTrip(
-        TripInput.of("trip6")
-          .withWithTripOnServiceDate("trip6")
-          .addStop(STOP_B, "11:20")
-          .addStop(STOP_C, "11:40")
-      )
-      .addTrip(
-        TripInput.of("trip7")
-          .withWithTripOnServiceDate("trip7")
-          .addStop(STOP_D, "15:00")
-          .addStop(STOP_E, "16:00")
-      )
-      .build();
-  }
+  private static final TransitTestEnvironmentBuilder TRANSIT_ENV = ENV_BUILDER.addTrip(
+      TripInput.of("trip1")
+        .withWithTripOnServiceDate("trip1")
+        .addStop(STOP_A, "10:00")
+        .addStop(STOP_B, "11:00")
+        .addStop(STOP_D, "12:00")
+    )
+    .addTrip(
+      TripInput.of("trip2")
+        .withWithTripOnServiceDate("trip2")
+        .addStop(STOP_B, "12:00")
+        .addStop(STOP_C, "13:00")
+        .addStop(STOP_D, "14:00")
+    )
+    .addTrip(TripInput.of("trip3").addStop(STOP_C, "12:30").addStop(STOP_D, "13:30"))
+    .addTrip(
+      TripInput.of("trip4")
+        .withWithTripOnServiceDate("trip4")
+        .addStop(STOP_C, "08:30")
+        .addStop(STOP_D, "09:30")
+    )
+    .addTrip(
+      TripInput.of("trip5")
+        .withWithTripOnServiceDate("trip5")
+        .addStop(STOP_A, "11:05")
+        .addStop(STOP_B, "11:20")
+    )
+    .addTrip(
+      TripInput.of("trip6")
+        .withWithTripOnServiceDate("trip6")
+        .addStop(STOP_B, "11:20")
+        .addStop(STOP_C, "11:40")
+    )
+    .addTrip(
+      TripInput.of("trip7")
+        .withWithTripOnServiceDate("trip7")
+        .addStop(STOP_D, "15:00")
+        .addStop(STOP_E, "16:00")
+    );
 
   // Setup street
   private static final RefetchItineraryServiceTest.GraphBuilder G =
@@ -145,14 +129,14 @@ class RealtimeResolverTest {
 
   @Test
   void populateItineraryLegsWithNoRealTime() {
-    var refetchService = createRefetchService(new TransitAlertServiceImpl());
-
+    var transitEnv = TRANSIT_ENV.build();
+    var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
     TripOnDateDataFetcher trip2 = transitEnv.tripData("trip4");
 
-    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1, transitEnv);
 
-    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
+    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1, transitEnv);
 
     var from = Place.forStop(STOP_B);
     var to = Place.forStop(STOP_C);
@@ -191,8 +175,8 @@ class RealtimeResolverTest {
 
   @Test
   void populateItineraryLegsWithRealTimeAndChangeQuay() {
-    var refetchService = createRefetchService(new TransitAlertServiceImpl());
-
+    var transitEnv = TRANSIT_ENV.build();
+    var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
     TripOnDateDataFetcher trip2 = transitEnv.tripData("trip4");
 
@@ -215,9 +199,9 @@ class RealtimeResolverTest {
     UpdateResult updateResult = siri.applyEstimatedTimetable(updates);
     assertEquals(1, updateResult.successful());
 
-    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1, transitEnv);
 
-    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
+    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1, transitEnv);
 
     var from = Place.forStop(STOP_B);
     var to = Place.forStop(STOP_D);
@@ -268,12 +252,12 @@ class RealtimeResolverTest {
 
   @Test
   void populateTransitLegsWithRealtime() {
+    var transitEnv = TRANSIT_ENV.build();
     TripOnDateDataFetcher trip5 = transitEnv.tripData("trip5");
-
     TripOnDateDataFetcher trip6 = transitEnv.tripData("trip6");
 
-    ScheduledTransitLeg busOneLeg = buildScheduledTransitLeg(trip5, 0, 1);
-    ScheduledTransitLeg busTwoLeg = buildScheduledTransitLeg(trip6, 0, 1);
+    ScheduledTransitLeg busOneLeg = buildScheduledTransitLeg(trip5, 0, 1, transitEnv);
+    ScheduledTransitLeg busTwoLeg = buildScheduledTransitLeg(trip6, 0, 1, transitEnv);
 
     var itinerary = Itinerary.ofScheduledTransit(List.of(busOneLeg, busTwoLeg))
       .withGeneralizedCost(Cost.ZERO)
@@ -305,7 +289,7 @@ class RealtimeResolverTest {
 
     var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
       List.of(itinerary),
-      createRefetchService(transitAlertService),
+      createRefetchService(transitAlertService, transitEnv),
       transitEnv.transitService(),
       transitAlertService,
       routeRequest()
@@ -325,9 +309,10 @@ class RealtimeResolverTest {
   @Test
   void populateLegsWithRealtimeNonTransit() {
     // Test walk leg and transit leg that can't be found in the transit service
+    var transitEnv = TRANSIT_ENV.build();
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
 
-    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1, transitEnv);
 
     Place from = Place.forStop(STOP_B);
     Place to = Place.forStop(STOP_C);
@@ -366,16 +351,17 @@ class RealtimeResolverTest {
 
   @Test
   void populateTransitLegsKeepStaySeated() {
-    var refetchService = createRefetchService(new TransitAlertServiceImpl());
+    var transitEnv = TRANSIT_ENV.build();
+    var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
     TripOnDateDataFetcher trip2 = transitEnv.tripData("trip2");
 
-    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1);
+    ScheduledTransitLeg busLeg = buildScheduledTransitLeg(trip1, 0, 1, transitEnv);
 
     var transfer = staySeated("trip1", 1, "trip2", 0, transitEnv);
     ScheduledTransitLeg updatedBusLeg = busLeg.copyOf().withTransferToNextLeg(transfer).build();
 
-    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1);
+    ScheduledTransitLeg trainLeg = buildScheduledTransitLeg(trip2, 0, 1, transitEnv);
     ScheduledTransitLeg updatedTrainLeg = trainLeg
       .copyOf()
       .withTransferFromPreviousLeg(transfer)
@@ -427,7 +413,8 @@ class RealtimeResolverTest {
   private ScheduledTransitLeg buildScheduledTransitLeg(
     TripOnDateDataFetcher trip,
     int boardPos,
-    int alightPos
+    int alightPos,
+    TransitTestEnvironment transitEnv
   ) {
     ZonedDateTime startTime = TimeUtils.zonedDateTime(
       SERVICE_DATE,
@@ -454,7 +441,8 @@ class RealtimeResolverTest {
       .build();
   }
 
-  private RefetchItineraryService createRefetchService(TransitAlertService transitAlertService) {
+  private RefetchItineraryService createRefetchService(TransitAlertService transitAlertService,
+                                                       TransitTestEnvironment transitEnv) {
     StreetDetailsService streetDetailsService = null;
 
     VertexCreationService vertexCreationService = new VertexCreationService(
