@@ -2,6 +2,7 @@ package org.opentripplanner.apis.transmodel;
 
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,8 +39,9 @@ public class TransmodelGraphQLPlanner {
     Locale locale;
     PlanResponse response;
     RouteRequestBuilder requestBuilder = tripRequestMapper.createRequestBuilder(environment);
-    RouteRequest request = requestBuilder.buildRequest();
+    RouteRequest request = null;
     try {
+      request = requestBuilder.buildRequest();
       RoutingResponse res = ctx.routingService().route(request);
       response = PlanResponse.of()
         .withPlan(res.getTripPlan())
@@ -59,9 +61,12 @@ public class TransmodelGraphQLPlanner {
         .build();
       locale = defaultLocale(ctx);
     }
+    Map<String, Object> localContext = new HashMap<>();
+    localContext.put("locale", locale);
+    localContext.put(TripPatternType.ROUTE_REQUEST_CONTEXT_KEY, request);
     return DataFetcherResult.<PlanResponse>newResult()
       .data(response)
-      .localContext(Map.of("locale", locale, TripPatternType.ROUTE_REQUEST_CONTEXT_KEY, request))
+      .localContext(localContext)
       .build();
   }
 

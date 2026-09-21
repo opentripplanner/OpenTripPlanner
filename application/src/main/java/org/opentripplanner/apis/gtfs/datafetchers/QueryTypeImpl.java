@@ -402,7 +402,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           context.defaultRouteRequest(),
           context.refetchItineraryService()
         );
-      } catch (RefetchItineraryException e) {
+      } catch (RefetchItineraryException | IllegalArgumentException e) {
         return null;
       }
     };

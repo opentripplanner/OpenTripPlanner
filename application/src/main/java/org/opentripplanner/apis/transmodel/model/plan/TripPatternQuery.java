@@ -70,7 +70,7 @@ public class TripPatternQuery {
         ctx.defaultRouteRequest(),
         refetchItineraryService
       );
-    } catch (RefetchItineraryException e) {
+    } catch (RefetchItineraryException | IllegalArgumentException e) {
       return null;
     }
   }

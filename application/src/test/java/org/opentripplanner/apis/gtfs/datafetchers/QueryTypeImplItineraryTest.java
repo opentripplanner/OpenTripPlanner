@@ -11,9 +11,11 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -23,12 +25,14 @@ import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
@@ -84,6 +88,31 @@ class QueryTypeImplItineraryTest {
   void invalidIdReturnsNull() throws Exception {
     var itinerary = SUBJECT.itinerary().get(
       environment("this-is-not-a-valid-id", refetchItineraryService(), routeRequest())
+    );
+
+    assertNull(itinerary);
+  }
+
+  @Test
+  void invalidFiniteWalkSpeedReturnsNullInsteadOfThrowing() throws Exception {
+    var reference = new ItineraryReference(
+      List.of(legRef()),
+      null,
+      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      DurationForEnum.of(TransitMode.class).build(),
+      DurationForEnum.of(TransitMode.class).build(),
+      -1,
+      2.0,
+      DurationForEnum.of(StreetMode.class).build(),
+      false
+    );
+    var id = ItineraryReferenceSerializer.encode(reference);
+
+    var itinerary = SUBJECT.itinerary().get(
+      environment(id, refetchItineraryService(), routeRequest())
     );
 
     assertNull(itinerary);
