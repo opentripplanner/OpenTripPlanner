@@ -319,9 +319,8 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
-    // The centroid each stop is expected to attach at. On a platform way the stop is linked to a
-    // split vertex on the way, not to a vertex at the centroid itself, so capture the coordinate
-    // from the platform geometry before linking splits it.
+    // The stop attaches at a split vertex on the way, not at a vertex on the centroid itself, so
+    // capture the expected centroid from the platform geometry before linking splits it.
     var centroids = testCases
       .stream()
       .collect(
@@ -362,8 +361,7 @@ class OsmBoardingLocationsModuleTest {
       }
     }
 
-    // The vertex that only carried the centroid coordinate into the linker is not left behind in
-    // the graph: nothing can reach it, and it would be serialized with the graph.
+    // The vertex that only carried the centroid into the linker is not left behind in the graph.
     assertThat(
       graph
         .getVerticesOfType(OsmBoardingLocationVertex.class)
@@ -629,19 +627,10 @@ class OsmBoardingLocationsModuleTest {
 
   /**
    * Regression test for a "sparse visibility" bug with {@link BoardingLocationCoordinateSource#TRANSIT}:
-   * a stop's own coordinate can sit just outside the platform polygon it should be linked into (the
-   * GTFS stop coordinate and the OSM-mapped platform boundary are surveyed independently and easily
-   * differ by centimeters). {@link org.opentripplanner.street.linking.VertexLinker}'s area-visibility
-   * linking requires each candidate visibility edge to stay entirely inside the polygon, so a
-   * boarding location placed a hair outside it gets only the one or two edges that happen to clear
-   * that check anyway - or, when none do, a single forced edge to whichever visibility vertex is
-   * nearest, which routing then has to detour through.
-   * <p>
-   * The module therefore leaves the vertex at the stop coordinate and puts an <em>access point</em>
-   * just inside the polygon on its behalf: the access point carries the dense fan and the
-   * visibility-vertex registration, and a single edge of the true distance joins the two. This
-   * asserts that a stop just outside the platform ends up as well connected as one safely inside it,
-   * pays only a centimetre-scale edge for the privilege, and is not moved.
+   * a stop coordinate can sit just outside the platform polygon it should be linked into, and
+   * {@link VertexLinker} rejects visibility edges that leave the polygon. The module puts an access
+   * point just inside on the stop's behalf, so a stop just outside ends up as well connected as one
+   * inside it, pays only a centimetre-scale edge, and is not moved.
    *
    * @see #testTransitCoordinateFarOutsideAreaPlatformKeepsItsDistance()
    */
@@ -697,26 +686,22 @@ class OsmBoardingLocationsModuleTest {
     assertFalse(insideStopVertex.getOutgoing().isEmpty(), "the inside stop should be linked");
     assertFalse(outsideStopVertex.getOutgoing().isEmpty(), "the outside stop should be linked");
 
-    // A centimetre-scale discrepancy is normal between independently surveyed datasets and must
-    // not be reported - only a gap too large to be one.
+    // A centimetre-scale discrepancy is normal and must not be reported.
     assertThat(issueTypes(issueStore)).isEmpty();
 
     var insideBoardingLocation = linkedBoardingLocation(insideStopVertex);
     var outsideBoardingLocation = linkedBoardingLocation(outsideStopVertex);
 
-    // The inside stop is linked into the area directly, seeing at least the rectangle's 4 corners.
+    // The inside stop links into the area directly, seeing at least the rectangle's 4 corners.
     assertTrue(
       areaEdgesOf(insideBoardingLocation).size() >= 4,
       "the inside stop should see at least all 4 platform corners, but saw " +
         areaEdgesOf(insideBoardingLocation).size()
     );
 
-    // The outside stop is not moved onto the platform.
+    // Not moved onto the platform, and it only pays the 5 cm it is off by (plus the margin that
+    // puts the access point safely inside the boundary).
     assertVertexAtStop(outsideBoardingLocation, outsideStop);
-
-    // It reaches the platform through an access point placed just inside the polygon on its behalf,
-    // over a single edge that costs it only the 5 cm it is actually off by (plus the margin that
-    // puts the access point safely inside rather than on the boundary).
     var connector = onlyConnectorEdge(outsideBoardingLocation);
     assertTrue(
       connector.getDistanceMeters() < 1,
@@ -725,8 +710,7 @@ class OsmBoardingLocationsModuleTest {
         " m"
     );
 
-    // The access point, not the boarding location, carries the connectivity - and it is exactly as
-    // well connected as a stop placed inside the platform in the first place.
+    // The access point carries the connectivity, as well as a stop placed inside would.
     var accessPoint = connector.getToVertex();
     assertEquals(
       areaEdgesOf(insideBoardingLocation).size(),
@@ -735,8 +719,8 @@ class OsmBoardingLocationsModuleTest {
         "the platform"
     );
 
-    // Which means linking succeeded, the access point was registered as a visibility vertex of the
-    // area, and the two stops on this platform are connected directly rather than via a detour.
+    // So linking succeeded, the access point was registered as a visibility vertex, and the two
+    // stops on the platform are connected directly rather than via a detour.
     assertTrue(
       getEdge(accessPoint, insideBoardingLocation).isPresent() &&
         getEdge(insideBoardingLocation, accessPoint).isPresent(),
@@ -746,11 +730,9 @@ class OsmBoardingLocationsModuleTest {
 
   /**
    * The counterpart to {@link #testTransitCoordinateJustOutsideAreaPlatformIsStillWellConnected()}:
-   * a stop far outside the platform polygon is a real distance to walk, not a surveying
-   * discrepancy. The access point mechanism must charge for it rather than swallow it - the stop
-   * keeps its coordinate and the edge to its access point carries the true length - while still
-   * giving it the same connectivity into the platform. A gap that large also means one of the two
-   * datasets is wrong, so it is reported as a data import issue rather than silently walked.
+   * a stop far outside the polygon is a real distance to walk, not a surveying discrepancy, so the
+   * edge to its access point carries the true length and the gap is reported as a data import issue
+   * - while the stop still gets the same connectivity into the platform.
    */
   @Test
   void testTransitCoordinateFarOutsideAreaPlatformKeepsItsDistance() {
@@ -796,10 +778,8 @@ class OsmBoardingLocationsModuleTest {
     assertFalse(farStopVertex.getOutgoing().isEmpty(), "the far stop should still be linked");
     var boardingLocation = linkedBoardingLocation(farStopVertex);
 
-    // Not drawn onto the platform.
+    // Not drawn onto the platform, and the 30 m is walked rather than swallowed.
     assertVertexAtStop(boardingLocation, farStop);
-
-    // The 30 m is walked, not swallowed.
     var connector = onlyConnectorEdge(boardingLocation);
     assertEquals(
       30,
@@ -815,24 +795,20 @@ class OsmBoardingLocationsModuleTest {
         areaEdgesOf(connector.getToVertex()).size()
     );
 
-    // The gap is reported, so it can be fixed at the source rather than paid for on every
-    // itinerary through the stop.
     assertThat(issueTypes(issueStore)).contains("StopFarFromBoardingLocationPlatform");
   }
 
   /**
-   * {@link BoardingLocationCoordinateSource#TRANSIT} does not apply to the node path: a stop that
-   * matches a tagged OSM node stays linked at the node's coordinate, not at the stop's own, even
-   * though the two differ. This is the documented behaviour of the parameter - the centroid problem
-   * it addresses does not arise for a node, which is already a per-stop, provider-authoritative
-   * coordinate - so it is asserted here rather than left to be read as an oversight.
+   * {@link BoardingLocationCoordinateSource#TRANSIT} does not apply to the node path: a stop
+   * matching a tagged OSM node stays linked at the node's coordinate, not its own. That is the
+   * parameter's documented behaviour, so it is asserted rather than left to read as an oversight.
    */
   @Test
   void testTransitCoordinateDoesNotMoveNodeBoardingLocations() {
     var graph = new Graph();
     var factory = new VertexFactory(graph);
 
-    // A tagged OSM boarding location node, and a stop matching it whose own coordinate is 20 m away.
+    // A tagged OSM node, and a stop matching it whose own coordinate is 20 m away.
     var nodeCoordinate = new WgsCoordinate(53.55, 10.0);
     var stopCoordinate = SphericalDistanceLibrary.moveMeters(nodeCoordinate, 20, 0);
     var stop = testModel
@@ -869,7 +845,7 @@ class OsmBoardingLocationsModuleTest {
       BoardingLocationCoordinateSource.TRANSIT
     );
 
-    // The stop is linked to the OSM node itself, and that node has not been moved to the stop.
+    // Linked to the OSM node itself, which has not been moved to the stop.
     assertEquals(
       Set.<Vertex>of(boardingLocation),
       stopVertex.getOutgoing().stream().map(Edge::getToVertex).collect(Collectors.toSet())
@@ -880,15 +856,14 @@ class OsmBoardingLocationsModuleTest {
       "a node boarding location must keep the OSM node's coordinate in TRANSIT mode"
     );
 
-    // No second boarding location was created at the stop coordinate either.
+    // No second boarding location at the stop coordinate either.
     assertEquals(1, graph.getVerticesOfType(OsmBoardingLocationVertex.class).size());
   }
 
   /**
-   * When a platform is mapped as a way that turns out not to be linkable - here because no edge of
-   * it is walkable - {@code connectVertexToWay} must report failure so that the search falls
-   * through to {@code connectVertexToArea}. Reporting success regardless would leave the stop
-   * unlinked with the area path never tried.
+   * A platform mapped as a way that turns out not to be linkable - here because no edge of it is
+   * walkable - must report failure, so the search falls through to the area path instead of leaving
+   * the stop unlinked.
    */
   @Test
   void testUnlinkableWayPlatformFallsBackToAreaPlatform() {
@@ -905,7 +880,7 @@ class OsmBoardingLocationsModuleTest {
 
     var stop = testModel.stop("both-ways-stop").withCoordinate(60.0003, 10.0004).build();
 
-    // ... and as a way nearby that no pedestrian can use, so linking to it yields no vertex at all.
+    // ... and as a nearby way no pedestrian can use, so linking to it yields no vertex at all.
     var p = StreetModelForTest.intersectionVertex("P", 60.0009, 10.0002);
     var q = StreetModelForTest.intersectionVertex("Q", 60.0009, 10.0006);
     graph.addVertex(p);
@@ -955,11 +930,10 @@ class OsmBoardingLocationsModuleTest {
   }
 
   /**
-   * The edge from a boarding location to its access point runs across the platform, so it must carry
-   * the platform's properties - permission, safety factors and wheelchair accessibility - the same
-   * way the visibility edges {@link VertexLinker} builds within the area do. Taking the edge
-   * builder's defaults instead would, for instance, claim a wheelchair-accessible walk across a
-   * platform mapped as not accessible.
+   * The edge to an access point runs across the platform, so it must carry the platform's
+   * permission, safety factors and wheelchair accessibility, as {@link VertexLinker}'s own
+   * visibility edges in that area do. The builder's defaults would, for instance, claim a
+   * wheelchair-accessible walk across a platform mapped as not accessible.
    */
   @Test
   void testAccessPointConnectorCarriesPlatformProperties() {
@@ -984,7 +958,7 @@ class OsmBoardingLocationsModuleTest {
         .build()
     );
 
-    // A stop just outside the platform, so an access point and a connector edge are created.
+    // Just outside the platform, so an access point and a connector edge are created.
     var outsideLat = 60.0 - SphericalDistanceLibrary.metersToDegrees(0.05);
     var stop = testModel.stop("outside-stop").withCoordinate(outsideLat, 10.0004).build();
 
@@ -1368,14 +1342,12 @@ class OsmBoardingLocationsModuleTest {
    * coordinate (rather than sharing one centroid), so linking one stop can split the platform edge
    * right next to where a nearby stop will later project onto it. {@link VertexLinker}'s
    * duplicate-way heuristic (meant to catch genuinely parallel edges, e.g. dual carriageways) can
-   * then treat the two resulting split halves as "duplicates" of each other and link the second
-   * stop to both of them, instead of only to the one it actually sits next to - producing a
-   * spurious fork in the platform geometry instead of a single clean attachment point.
+   * then treat the two resulting split halves as "duplicates" and link the second stop to both,
+   * producing a spurious fork instead of a single attachment point.
    * <p>
-   * The stop must still be linked to <em>both</em> vertices at the point it does sit next to: OSM
-   * registers the forward and the back edge of the way with the platform, and they are split
-   * separately into two co-located, mutually unconnected vertices - one per traversal direction. A
-   * stop linked to only one of them is reachable from one end of the platform only.
+   * It must still be linked to <em>both</em> vertices at the point it does sit next to: the forward
+   * and back edge are split separately into two co-located, mutually unconnected vertices, one per
+   * traversal direction, and a stop linked to only one is reachable from one end only.
    */
   @Test
   void testCloseStopsOnLinearPlatformDoNotFanOutToDuplicateVertices() {
@@ -1442,9 +1414,8 @@ class OsmBoardingLocationsModuleTest {
     );
 
     for (var stopVertex : List.of(stopVertexA, stopVertexB)) {
+      // One vertex per traversal direction, and nothing from the spurious second attachment point.
       var attachments = linkedVertices(stopVertex);
-      // One vertex per traversal direction of the platform way, and nothing beyond that: no
-      // vertices from the spurious second attachment point the duplicate-way heuristic offers.
       assertEquals(
         2,
         attachments.size(),
@@ -1461,8 +1432,7 @@ class OsmBoardingLocationsModuleTest {
         stopVertex.getId() + " should be linked to vertices at a single point on the platform"
       );
 
-      // Together they attach the stop to both traversal directions, so it is reachable from either
-      // end of the platform. Linked to only one of them, the stop is a one-way stub.
+      // Together they reach either end of the platform; linked to one only, the stop is a stub.
       var nextHops = attachments
         .stream()
         .flatMap(v -> v.getOutgoing().stream())
@@ -1476,8 +1446,7 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
-    // The two stops must not have collapsed onto the same attachment point either - each is linked
-    // to its own, distinct nearby point on the platform.
+    // The two stops must not have collapsed onto the same attachment point either.
     var attachmentA = linkedVertices(stopVertexA).iterator().next().getCoordinate();
     var attachmentB = linkedVertices(stopVertexB).iterator().next().getCoordinate();
     assertNotEquals(

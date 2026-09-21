@@ -73,18 +73,16 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private static final double SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(250);
   private static final double INSIDE_AREA_MARGIN_METERS = 0.2;
   /**
-   * How far a stop coordinate may lie outside the OSM platform it is linked to before the gap is
-   * reported as a data import issue. A discrepancy of a metre or so is normal between independently
-   * surveyed datasets; much more than that means one of the two is misplaced, or the platform
-   * carries a reference it should not.
+   * How far a stop may lie outside its OSM platform before the gap is reported as a data import
+   * issue. A metre or so is normal between independently surveyed datasets; much more means one of
+   * the two is misplaced.
    */
   private static final double FAR_FROM_PLATFORM_METERS = 5;
   /**
    * How far apart two linked vertices may be and still count as the same attachment point on a
-   * platform way. Comfortably above floating-point noise between the forward and the back edge of
-   * the same way (which project to the same point), and comfortably below {@code VertexLinker}'s
-   * 0.1 m split-end tolerance, which guarantees that two genuinely distinct split points on one way
-   * are at least that far apart.
+   * platform way. Above floating-point noise between a way's forward and back edge, which project
+   * to the same point, and below {@code VertexLinker}'s 0.1 m split-end tolerance, which keeps
+   * genuinely distinct split points at least that far apart.
    */
   private static final double SAME_ATTACHMENT_POINT_TOLERANCE_METERS = 0.01;
 
@@ -197,8 +195,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
             var boardingLocation = makeBoardingLocationForPlatform(stop, platform, area.getName());
-            // An area group with no visibility vertices cannot be linked into at all. Keep looking:
-            // another nearby area may carry the same reference and be linkable.
+            // An area group with no visibility vertices cannot be linked into; another nearby
+            // area may carry the same reference and be linkable.
             if (!linkIntoPlatformArea(boardingLocation, areaGroup, area, platform, stop)) {
               continue;
             }
@@ -248,18 +246,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         );
         var attachmentPoints = closestAttachmentPoint(boardingLocation, linkedVertices);
         for (var vertex : attachmentPoints) {
-          // Linking may have split a platform edge into two new edges. The platform association is
-          // keyed by edge reference and is not carried over to the split halves, so re-register them
-          // here; otherwise a later stop on the same platform can no longer match this platform.
           reRegisterSplitEdgesWithPlatform(vertex, platform);
           linkBoardingLocationToStop(ts, stop.getCode(), vertex);
         }
-        // On this path the boarding location vertex only carries the coordinate to link from: the
-        // stop is attached to the split vertices on the platform way, not to the vertex itself,
-        // which is left with no edges. Drop it rather than serialize a vertex nothing can reach.
+        // The boarding location only carried the coordinate to link from - the stop is attached to
+        // the split vertices instead - so it is left with no edges. Don't serialize it.
         graph.removeIfUnconnected(boardingLocation);
-        // Report failure when linking found nothing to attach to, so the caller falls back to
-        // looking for a platform mapped as an area instead of leaving the stop unlinked.
+        // On failure the caller falls back to looking for a platform mapped as an area.
         return !attachmentPoints.isEmpty();
       })
       .orElse(false);
@@ -270,14 +263,10 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * <p>
    * The node is generated in the OSM processing step but we need to link it here.
    * <p>
-   * {@link BoardingLocationCoordinateSource#TRANSIT} does not apply on this path, and the vertex
-   * stays at the OSM node's coordinate. The centroid problem that option addresses does not arise
-   * here - an OSM node tagged with a stop's reference is already a single, per-stop,
-   * provider-authoritative coordinate, not a position shared between several stops. Honouring
-   * {@code TRANSIT} would mean relocating a vertex that was created during OSM parsing and is
-   * already in the graph and the spatial index, for which there is no clean operation. See
-   * {@code connectVertexToWay} and {@code connectVertexToArea}, which create their vertices here
-   * and so can place them freely.
+   * {@link BoardingLocationCoordinateSource#TRANSIT} does not apply here: a tagged OSM node is
+   * already a per-stop, provider-authoritative coordinate, so the centroid problem that option
+   * addresses does not arise, and honouring it would mean relocating a vertex that OSM parsing has
+   * already put in the graph and the spatial index.
    *
    * @return If the vertex has been connected.
    */
@@ -309,12 +298,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * Create (or, in {@code OSM} mode, reuse) the {@link OsmBoardingLocationVertex} used to link this
-   * stop to the given platform.
-   * <p>
-   * In {@code OSM} mode the vertex is placed at the platform centroid and shared between all stops
-   * on the platform (so several stops collapse onto the same vertex). In {@code TRANSIT} mode each
-   * stop gets its own vertex at its own coordinate from the transit data, so stops on the same
-   * platform stay distinct.
+   * stop to the given platform. {@code OSM} mode places it at the platform centroid, shared between
+   * all stops on the platform; {@code TRANSIT} mode gives each stop its own vertex at its own
+   * coordinate, so stops on one platform stay distinct.
    */
   private OsmBoardingLocationVertex makeBoardingLocationForPlatform(
     RegularStop stop,
@@ -343,28 +329,19 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /**
    * Wire a boarding location into the platform area it belongs to.
    * <p>
-   * {@link VertexLinker}'s area-visibility linking requires every candidate visibility edge to stay
-   * entirely inside the polygon, so a vertex sitting even a hair outside it fails that check for
-   * nearly every visibility vertex. It is then left with the one or two edges that happen to clear
-   * the check anyway - or, when none do, with a single forced edge to whichever visibility vertex
-   * happens to be nearest, which routing has to detour through. Either way it is also not registered
-   * as a visibility vertex of the area, so the next stop on the same platform cannot connect to it
-   * directly.
+   * {@link VertexLinker} requires every visibility edge to stay inside the polygon, so a vertex even
+   * a hair outside it gets at most the one or two edges that clear the check anyway - or a single
+   * forced edge to the nearest visibility vertex, which routing detours through - and is not
+   * registered as a visibility vertex, so the next stop on the platform cannot reach it directly.
    * <p>
-   * A {@code TRANSIT} coordinate routinely is outside: the stop coordinate and the OSM-mapped
-   * platform boundary are surveyed independently. Rather than moving the stop onto the platform -
-   * which would silently swallow a genuine distance - the vertex stays exactly where the transit
-   * data puts it and an <em>access point</em> is placed just inside the polygon on its behalf. The
-   * access point gets the visibility fan and the visibility-vertex registration; a single street
-   * edge of its true length joins the two. A centimetre-scale discrepancy therefore costs a
-   * centimetre-scale edge, and a stop genuinely off the platform gets a walk of the right length,
-   * both without giving up the dense in-platform connectivity.
-   * <p>
-   * In {@code OSM} mode the vertex is the platform's own interior point and is inside the polygon by
-   * construction, so it is linked directly.
+   * A {@code TRANSIT} coordinate routinely is outside, the two datasets being surveyed
+   * independently. Instead of moving the stop onto the platform, which would swallow a genuine
+   * distance, an <em>access point</em> is placed just inside the polygon on its behalf: it takes the
+   * visibility fan and the registration, joined to the boarding location by one edge of the true
+   * length. In {@code OSM} mode the vertex is the platform's interior point and already inside, so
+   * it is linked directly.
    *
-   * @param area the platform sub-area whose reference matched, whose properties the edge to the
-   *              access point carries
+   * @param area the matched platform sub-area, whose properties the edge to the access point carries
    * @return whether the boarding location was connected to the area
    */
   private boolean linkIntoPlatformArea(
@@ -406,13 +383,10 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
-   * The point just inside {@code areaGeometry} that stands in for {@code transitCoordinate} when
-   * that coordinate is outside the polygon, or {@code transitCoordinate} itself when it is already
-   * inside.
-   * <p>
-   * The returned point is found by walking from {@code transitCoordinate} towards the platform's own
-   * (always-inside) {@code interiorPoint} up to the first boundary crossing, plus a small margin so
-   * it is safely inside rather than sitting on the boundary itself.
+   * The point just inside {@code areaGeometry} standing in for a {@code transitCoordinate} outside
+   * the polygon, or {@code transitCoordinate} itself when already inside. Found by walking towards
+   * the platform's own (always-inside) {@code interiorPoint} up to the first boundary crossing, plus
+   * a margin so it does not sit on the boundary.
    */
   private Coordinate ensureInsideArea(
     Coordinate transitCoordinate,
@@ -437,10 +411,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     return stepTowards(nearestCrossing, interiorPoint, INSIDE_AREA_MARGIN_METERS);
   }
 
-  /**
-   * A coordinate {@code marginMeters} further from {@code from} towards {@code to}, or {@code to}
-   * itself if that is closer than {@code marginMeters}.
-   */
+  /** {@code marginMeters} from {@code from} towards {@code to}, or {@code to} if that is nearer. */
   private static Coordinate stepTowards(Coordinate from, Coordinate to, double marginMeters) {
     double totalMeters = SphericalDistanceLibrary.distance(from, to);
     if (totalMeters <= marginMeters) {
@@ -460,14 +431,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
-   * Linking a boarding location to a platform way splits the platform edge into two new edges. The
-   * platform association in {@link OsmInfoGraphBuildRepository} is keyed by edge reference and is not
-   * carried over to the split halves, so re-register the edges incident to the split vertex here.
-   * Without this, a later stop on the same platform can no longer find (and link to) this platform.
+   * The platform association in {@link OsmInfoGraphBuildRepository} is keyed by edge reference and is
+   * not carried over when linking splits a platform edge, so re-register the halves here; otherwise
+   * a later stop on the same platform can no longer find it.
    * <p>
-   * Only a genuine split produces a {@link SplitterVertex}; if the boarding location snapped to an
-   * existing endpoint of the platform edge, the original edge is untouched and still registered, so
-   * there is nothing to do (and the endpoint's other incident edges must not be tagged).
+   * Only a genuine split produces a {@link SplitterVertex}. If the boarding location snapped to an
+   * existing endpoint instead, the original edge is still registered and the endpoint's other
+   * incident edges must not be tagged.
    */
   private void reRegisterSplitEdgesWithPlatform(StreetVertex vertex, Platform platform) {
     if (!(vertex instanceof SplitterVertex)) {
@@ -479,22 +449,17 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
-   * A stop attaches to a platform way at a single <em>point</em>, but at that point there is one
-   * vertex per traversal direction: OSM registers both the forward and the back edge of the way
-   * with the platform, and {@link VertexLinker} splits each of them separately, producing two
-   * co-located vertices that are not connected to each other. The stop must be linked to all of
-   * them, or it becomes reachable from one end of the platform only.
+   * A stop attaches to a platform way at one <em>point</em>, but at that point there is one vertex
+   * per traversal direction: both the forward and the back edge are registered with the platform and
+   * {@link VertexLinker} splits each separately, giving two co-located, mutually unconnected
+   * vertices. The stop must be linked to both, or it is reachable from one end of the platform only.
    * <p>
-   * {@link VertexLinker}'s "duplicate way" heuristic (meant for genuinely parallel edges, e.g. dual
-   * carriageways) can additionally return vertices at a <em>different</em> point: if an earlier stop
-   * on this same platform already split the way nearby, the two resulting halves are both
-   * ~equidistant from this stop's coordinate and both get split again. Those extra vertices are
-   * within a fraction of a millimetre of the correct ones in <em>distance from the stop</em>, but
-   * they sit at a visibly different place on the platform, so they are filtered out by position
-   * rather than by distance.
+   * {@link VertexLinker}'s duplicate-way heuristic can also return vertices at a <em>different</em>
+   * point, where an earlier stop already split the way nearby. Those are within a fraction of a
+   * millimetre of the correct ones in distance from the stop, so they are filtered out by position.
    *
-   * @return every candidate co-located with the closest one, i.e. the attachment point the stop
-   *          actually sits on, with all its traversal directions.
+   * @return every candidate co-located with the closest one: the attachment point the stop sits on,
+   *          with all its traversal directions.
    */
   private static Set<StreetVertex> closestAttachmentPoint(
     OsmBoardingLocationVertex boardingLocation,
@@ -538,10 +503,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
-   * A connector edge for a boarding location that has no properties of its own to take, so it falls
-   * back to a plain walkable-and-cyclable link. Used on the node path, where the boarding location
-   * is an OSM node being attached to whatever street is nearest, and nothing says the street's
-   * properties should apply to the last few metres up to the node.
+   * A plain walkable-and-cyclable connector, for the node path: the boarding location is attached to
+   * whatever street is nearest, which has no claim on the last few metres up to the node.
    */
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     return linkBoardingLocationToStreetNetwork(from, to, null);
@@ -549,9 +512,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * @param area the platform the edge runs across, whose permission, safety factors and wheelchair
-   *              accessibility it then carries - matching the visibility edges {@link VertexLinker}
-   *              builds within the same area. {@code null} to fall back to a plain walkable-and-
-   *              cyclable link.
+   *              accessibility it carries, matching the visibility edges {@link VertexLinker} builds
+   *              in the same area. {@code null} for a plain walkable-and-cyclable link.
    */
   private StreetEdge linkBoardingLocationToStreetNetwork(
     StreetVertex from,

@@ -422,11 +422,10 @@ transfers. Setting this to `TRANSIT` places each vertex at the stop coordinate f
 transit data instead, so stops on the same platform stay distinct and are connected by a
 short path.
 
-A `TRANSIT` coordinate is never moved, so a stop whose coordinate falls outside the OSM
-platform polygon stays where the transit data puts it. It is connected to the platform by a
-single edge of the real distance, so a small surveying discrepancy costs a correspondingly
-small walk, and a stop genuinely away from the platform gets a walk of the right length.
-A gap too large to be a surveying discrepancy is reported as a data import issue.
+A `TRANSIT` coordinate is never moved. A stop falling outside the OSM platform polygon stays
+put and is connected to the platform by a single edge of the real distance, so the walk is
+always of the right length. A gap too large to be a surveying discrepancy is reported as a
+data import issue.
 
 This only affects platforms mapped as ways or areas; stops linked to a tagged OSM node are
 always placed at the node.
