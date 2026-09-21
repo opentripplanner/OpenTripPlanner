@@ -95,9 +95,8 @@ public class TimetableBuilder {
     return this;
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   private static TripTimes<?> withAdjustedTimes(TripTimes<?> tt, Duration timeshift) {
-    return ((TripTimes) tt).withAdjustedTimes(timeshift);
+    return tt.withAdjustedTimes(timeshift);
   }
 
   public TimetableBuilder addFrequencyEntry(FrequencyEntry frequencyEntry) {
