@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.filter.transit;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.time.TimePeriod;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;

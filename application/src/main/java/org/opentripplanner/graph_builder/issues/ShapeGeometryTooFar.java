@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
 public record ShapeGeometryTooFar(

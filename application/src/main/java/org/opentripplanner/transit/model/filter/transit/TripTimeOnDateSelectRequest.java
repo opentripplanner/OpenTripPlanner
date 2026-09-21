@@ -2,7 +2,7 @@ package org.opentripplanner.transit.model.filter.transit;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.Timeframe;
 import org.opentripplanner.model.plan.TransitLeg;

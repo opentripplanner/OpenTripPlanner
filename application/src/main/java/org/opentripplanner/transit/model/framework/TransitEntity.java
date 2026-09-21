@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.framework;
 
 import java.util.Comparator;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 public interface TransitEntity {
   FeedScopedId getId();

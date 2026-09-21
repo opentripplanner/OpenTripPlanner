@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.filter.transit;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.function.Function;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.filter.expr.ContainsMatcher;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;

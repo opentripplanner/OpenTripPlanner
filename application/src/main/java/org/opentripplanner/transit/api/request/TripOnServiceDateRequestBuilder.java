@@ -2,9 +2,9 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
-import org.opentripplanner.core.domain.model.time.LocalDateRange;
-import org.opentripplanner.core.domain.model.time.TimePeriod;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.core.model.time.TimePeriod;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.filter.selector.FilterRequest;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateSelectRequest;

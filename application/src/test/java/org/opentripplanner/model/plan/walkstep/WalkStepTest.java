@@ -8,7 +8,7 @@ import static org.opentripplanner.model.plan.walkstep.AbsoluteDirection.SOUTHWES
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 public class WalkStepTest {

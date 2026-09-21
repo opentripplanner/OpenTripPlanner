@@ -1,6 +1,6 @@
 package org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.internal;
 
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepository;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.customer.CustomerRepositorySnapshot;
 

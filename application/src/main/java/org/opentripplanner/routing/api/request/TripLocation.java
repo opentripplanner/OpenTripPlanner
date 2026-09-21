@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request;
 import java.time.Instant;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * Identifies a position on-board a specific transit trip. Used to start a trip planning search

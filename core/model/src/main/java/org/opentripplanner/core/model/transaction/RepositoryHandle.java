@@ -1,6 +1,4 @@
-package org.opentripplanner.core.domain.framework.transaction.api;
-
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
+package org.opentripplanner.core.model.transaction;
 
 /**
  * Application-scoped handle for a transactional repository. Obtained once at wiring time via

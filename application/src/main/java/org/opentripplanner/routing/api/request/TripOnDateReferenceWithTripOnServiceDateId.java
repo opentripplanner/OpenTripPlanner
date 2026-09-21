@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * A reference to a trip on date with a single id referencing the specific trip on service date.

@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import java.util.Collection;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.model.PathTransfer;

@@ -1,11 +1,11 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import static org.opentripplanner.core.domain.model.accessibility.Accessibility.NO_INFORMATION;
+import static org.opentripplanner.core.model.accessibility.Accessibility.NO_INFORMATION;
 import static org.opentripplanner.raptorlegacy._data.RaptorTestConstants.createDeprecatedUnsupportedFeatureException;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import org.opentripplanner.core.domain.model.accessibility.Accessibility;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.network.TripPattern;

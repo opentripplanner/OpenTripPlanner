@@ -1,4 +1,4 @@
-package org.opentripplanner.core.domain.model.time;
+package org.opentripplanner.core.model.time;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

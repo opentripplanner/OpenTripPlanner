@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Objects;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.Timeframe;
 
 class TimeframeMapper {

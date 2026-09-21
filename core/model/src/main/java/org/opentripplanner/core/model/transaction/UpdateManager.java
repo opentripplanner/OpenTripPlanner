@@ -1,12 +1,10 @@
-package org.opentripplanner.core.domain.framework.transaction;
+package org.opentripplanner.core.model.transaction;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
-import org.opentripplanner.core.domain.framework.event.DomainEvent;
-import org.opentripplanner.core.domain.framework.event.EventHandler;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.model.event.DomainEvent;
+import org.opentripplanner.core.model.event.EventHandler;
 
 /**
  * Application-scoped manager for write operations against transactional repositories.

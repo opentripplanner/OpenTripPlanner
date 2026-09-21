@@ -10,7 +10,7 @@ import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.t
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.place.api.PlaceType;

@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.ojp.mapping.RouteRequestMapper;
 import org.opentripplanner.ext.ojp.mapping.StopEventParamsMapper;
 import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;

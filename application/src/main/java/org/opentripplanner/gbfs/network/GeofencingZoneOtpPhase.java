@@ -1,6 +1,6 @@
 package org.opentripplanner.gbfs.network;
 
-import org.opentripplanner.core.domain.model.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * The OTP phase that computes and applies a network's geofencing zones. Configured per network as

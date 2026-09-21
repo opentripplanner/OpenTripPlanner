@@ -1,4 +1,4 @@
-package org.opentripplanner.core.domain.model.accessibility;
+package org.opentripplanner.core.model.accessibility;
 
 /**
  * Use this class to describe if a feature is accessible {@code POSSIBLE}, not accessible

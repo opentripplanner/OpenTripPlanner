@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.ojp.service.CallAtStopService;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.ArrivalDeparture;

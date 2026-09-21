@@ -7,7 +7,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import com.google.common.collect.ImmutableMultimap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.model.fare.FareOffer;

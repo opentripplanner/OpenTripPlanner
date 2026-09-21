@@ -1,7 +1,7 @@
 package org.opentripplanner.service.vehicleparking;
 
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.street.geometry.WgsCoordinate;

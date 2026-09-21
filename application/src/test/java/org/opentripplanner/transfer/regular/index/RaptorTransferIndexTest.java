@@ -9,7 +9,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;

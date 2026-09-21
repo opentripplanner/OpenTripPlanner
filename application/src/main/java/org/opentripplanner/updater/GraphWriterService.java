@@ -2,9 +2,9 @@ package org.opentripplanner.updater;
 
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;

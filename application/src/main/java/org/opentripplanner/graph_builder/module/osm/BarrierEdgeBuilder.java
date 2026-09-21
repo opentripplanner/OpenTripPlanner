@@ -5,7 +5,7 @@ import static org.opentripplanner.street.linking.VertexLinker.getNoThruModes;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.geometry.GeometryUtils;

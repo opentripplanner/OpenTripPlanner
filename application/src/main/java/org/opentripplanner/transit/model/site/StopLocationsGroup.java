@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Collection;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.utils.lang.ObjectUtils;

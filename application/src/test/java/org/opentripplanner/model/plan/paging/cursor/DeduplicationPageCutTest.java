@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.basic.Cost;
-import org.opentripplanner.core.domain.model.basic.NormalizedCost;
+import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.NormalizedCost;
 
 class DeduplicationPageCutTest {
 

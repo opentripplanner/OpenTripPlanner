@@ -1,4 +1,4 @@
-package org.opentripplanner.core.domain.model.id;
+package org.opentripplanner.core.model.id;
 
 import static org.opentripplanner.utils.lang.StringUtils.assertHasValue;
 

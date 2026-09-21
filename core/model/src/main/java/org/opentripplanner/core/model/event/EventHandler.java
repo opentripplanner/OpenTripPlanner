@@ -1,6 +1,6 @@
-package org.opentripplanner.core.domain.framework.event;
+package org.opentripplanner.core.model.event;
 
-import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.model.transaction.WriteContext;
 
 /**
  * A write-side event handler that receives a mutable repository at dispatch time.

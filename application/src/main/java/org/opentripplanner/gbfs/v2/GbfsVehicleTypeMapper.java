@@ -2,8 +2,8 @@ package org.opentripplanner.gbfs.v2;
 
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.vehicle_types.GBFSVehicleType;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.utils.logging.Throttle;

@@ -10,7 +10,7 @@ import graphql.schema.Coercing;
 import java.math.BigInteger;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 
 class CostScalarFactoryTest {
 

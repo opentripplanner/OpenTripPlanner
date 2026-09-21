@@ -3,7 +3,7 @@ package org.opentripplanner.model.plan;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.street.model.path.ElevationChange;

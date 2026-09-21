@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.trip.siri;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;

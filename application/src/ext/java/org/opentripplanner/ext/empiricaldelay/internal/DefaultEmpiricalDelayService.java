@@ -3,7 +3,7 @@ package org.opentripplanner.ext.empiricaldelay.internal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.ext.empiricaldelay.model.EmpiricalDelay;

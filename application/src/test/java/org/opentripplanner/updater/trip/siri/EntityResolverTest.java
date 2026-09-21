@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.LocalTimeParser;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;

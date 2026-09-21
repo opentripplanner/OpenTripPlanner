@@ -1,9 +1,6 @@
-package org.opentripplanner.core.domain.framework.transaction;
+package org.opentripplanner.core.model.transaction;
 
 import java.util.function.Consumer;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryLifecycle;
-import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
 
 /**
  * Application-scoped registry for transactional repositories.

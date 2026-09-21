@@ -2,8 +2,8 @@ package org.opentripplanner.core.framework.transaction.internal;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
-import org.opentripplanner.core.domain.framework.transaction.api.TransactionScope;
+import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.TransactionScope;
 
 /**
  * An opaque identity token representing a single committed state of the repository set.

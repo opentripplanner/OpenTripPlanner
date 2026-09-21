@@ -2,7 +2,7 @@ package org.opentripplanner.core.framework.transaction.internal;
 
 import java.util.Objects;
 import java.util.function.Supplier;
-import org.opentripplanner.core.domain.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 
 class TransactionalRepository<S, M> {
 

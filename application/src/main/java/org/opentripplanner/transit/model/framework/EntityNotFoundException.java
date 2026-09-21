@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.framework;
 
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
  * This exception is used by the main OTP business logic to signal that one of the

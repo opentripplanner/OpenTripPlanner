@@ -7,11 +7,11 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.basic.Distance;
-import org.opentripplanner.core.domain.model.basic.Ratio;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
-import org.opentripplanner.core.domain.model.i18n.NonLocalizedString;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.basic.Distance;
+import org.opentripplanner.core.model.basic.Ratio;
+import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.model.RentalFormFactor;
 
 public class TestFreeFloatingRentalVehicleBuilder {

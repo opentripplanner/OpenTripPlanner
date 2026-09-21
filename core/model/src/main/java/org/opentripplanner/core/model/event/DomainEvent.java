@@ -1,3 +1,3 @@
-package org.opentripplanner.core.domain.framework.event;
+package org.opentripplanner.core.model.event;
 
 public interface DomainEvent {}

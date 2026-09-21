@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.basic.Distance;
+import org.opentripplanner.core.model.basic.Distance;
 
 public class DistanceTest {
 

@@ -17,11 +17,8 @@ public interface OtpArchitectureModules {
   Package OTP_ROOT = Package.of("org.opentripplanner");
 
   Package CORE = OTP_ROOT.subPackage("core");
-  Package CORE_DOMAIN = CORE.subPackage("domain");
-  Package CORE_DOMAIN_FRAMEWORK = CORE_DOMAIN.subPackage("framework");
-  Package CORE_DOMAIN_FRAMEWORK_ALL = CORE_DOMAIN.subPackage("framework..");
-  Package CORE_DOMAIN_MODEL = CORE_DOMAIN.subPackage("model");
-  Package CORE_DOMAIN_MODEL_ALL = CORE_DOMAIN.subPackage("model..");
+  Package CORE_MODEL = CORE.subPackage("model");
+  Package CORE_MODEL_ALL = CORE.subPackage("model..");
   Package UTILS_PACKAGE = OTP_ROOT.subPackage("utils");
 
   Package DATASTORE = OTP_ROOT.subPackage("datastore");
@@ -54,8 +51,7 @@ public interface OtpArchitectureModules {
 
   Module FRAMEWORK_UTILS = Module.of(
     OTP_UTILS,
-    CORE_DOMAIN_MODEL_ALL,
-    CORE_DOMAIN_FRAMEWORK_ALL,
+    CORE_MODEL_ALL,
     FRAMEWORK.subPackage("application"),
     FRAMEWORK.subPackage("error"),
     FRAMEWORK.subPackage("i18n"),

@@ -2,8 +2,8 @@ package org.opentripplanner.core.framework.transaction.internal;
 
 import java.time.Duration;
 import java.util.concurrent.ThreadFactory;
-import org.opentripplanner.core.domain.framework.transaction.RepositoryRegistry;
-import org.opentripplanner.core.domain.framework.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 
 /**
  * Factory for creating instances of the transaction framework.

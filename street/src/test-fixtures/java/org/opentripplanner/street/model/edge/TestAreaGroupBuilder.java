@@ -3,7 +3,7 @@ package org.opentripplanner.street.model.edge;
 import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.core.domain.model.i18n.I18NString;
+import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;

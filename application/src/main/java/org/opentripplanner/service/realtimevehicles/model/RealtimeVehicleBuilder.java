@@ -1,7 +1,7 @@
 package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StopLocation;

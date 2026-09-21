@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.timetable;
 
-import org.opentripplanner.core.domain.model.doc.DocumentedEnum;
+import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * OccupancyStatus to be exposed in the API. The values are based on GTFS-RT

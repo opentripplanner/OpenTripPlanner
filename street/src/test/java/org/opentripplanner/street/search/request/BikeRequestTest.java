@@ -6,7 +6,7 @@ import static org.opentripplanner.street.search.request.ImmutableRequestAsserts.
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 
 class BikeRequestTest {

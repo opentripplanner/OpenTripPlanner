@@ -4,7 +4,7 @@ import com.csvreader.CsvReader;
 import java.time.Duration;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.csv.parser.AbstractCsvParser;
 import org.opentripplanner.framework.csv.parser.HandledCsvParseException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;

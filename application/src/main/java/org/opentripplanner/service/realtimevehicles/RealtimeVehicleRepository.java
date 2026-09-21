@@ -1,7 +1,7 @@
 package org.opentripplanner.service.realtimevehicles;
 
 import com.google.common.collect.Multimap;
-import org.opentripplanner.core.domain.framework.transaction.api.WriteContext;
+import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.network.TripPattern;
 

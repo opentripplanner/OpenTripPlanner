@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.support.InvalidInputException;
-import org.opentripplanner.core.domain.model.time.TimePeriod;
+import org.opentripplanner.core.model.time.TimePeriod;
 
 /**
  * Utilities for mapping the GraphQL {@code OffsetDateTimeRangeInput} to the domain type

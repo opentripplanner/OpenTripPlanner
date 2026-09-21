@@ -8,7 +8,7 @@ import static org.opentripplanner.utils.time.TimeUtils.time;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.domain.model.id.FeedScopedId;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareTransferRule;

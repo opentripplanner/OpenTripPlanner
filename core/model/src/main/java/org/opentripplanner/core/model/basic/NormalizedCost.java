@@ -1,4 +1,4 @@
-package org.opentripplanner.core.domain.model.basic;
+package org.opentripplanner.core.model.basic;
 
 /// A type safe normalized representation of a cost, like generalized-cost. A cost unit is
 /// equivalent of riding transit for 1 seconds. Note! The resolution of the normalized cost is
