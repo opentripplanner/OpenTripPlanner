@@ -417,9 +417,9 @@ public class RoutingWorker {
     if (request.journey().direct().mode() != StreetMode.TAXI) {
       return RoutingResult.ok(List.of());
     }
-    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
-    //       implemented. Until then, return no direct itinerary for TAXI unless the
-    //       taxi-zone sandbox feature is enabled and a taxi-zone provider is configured.
+    // TODO: The default TAXI routing strategy should use, for example flex routing, which has not
+    //       yet been implemented. Until then, return no direct itinerary for TAXI unless the
+    //       TaxiRouting sandbox feature is enabled and a taxi route provider is configured.
     if (taxiService == null) {
       return RoutingResult.empty();
     }
@@ -435,9 +435,10 @@ public class RoutingWorker {
   }
 
   private RoutingResult routeTransit() {
-    // TODO: The default TAXI routing strategy should use flex taxi routing, which is not yet
-    //       implemented. Until then, return no transit itinerary when access or egress is TAXI
-    //       unless the taxi-zone sandbox feature is enabled.
+    // TODO: The default TAXI routing strategy should use, for example flex routing, which has not
+    //       yet been implemented. Until then, return no transit itinerary when access or egress is
+    //       TAXI unless the TaxiRouting sandbox feature is enabled and a taxi route provider is
+    //       configured.
     if (
       request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) &&
       OTPFeature.TaxiRouting.isOff()
