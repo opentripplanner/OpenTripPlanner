@@ -2,7 +2,6 @@ package org.opentripplanner.apis.transmodel;
 
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -11,9 +10,7 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.transmodel.mapping.TripRequestMapper;
 import org.opentripplanner.apis.transmodel.mapping.ViaRequestMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
-import org.opentripplanner.apis.transmodel.model.plan.TripPatternType;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
@@ -39,9 +36,8 @@ public class TransmodelGraphQLPlanner {
     Locale locale;
     PlanResponse response;
     RouteRequestBuilder requestBuilder = tripRequestMapper.createRequestBuilder(environment);
-    RouteRequest request = null;
     try {
-      request = requestBuilder.buildRequest();
+      var request = requestBuilder.buildRequest();
       RoutingResponse res = ctx.routingService().route(request);
       response = PlanResponse.of()
         .withPlan(res.getTripPlan())
@@ -61,12 +57,9 @@ public class TransmodelGraphQLPlanner {
         .build();
       locale = defaultLocale(ctx);
     }
-    Map<String, Object> localContext = new HashMap<>();
-    localContext.put("locale", locale);
-    localContext.put(TripPatternType.ROUTE_REQUEST_CONTEXT_KEY, request);
     return DataFetcherResult.<PlanResponse>newResult()
       .data(response)
-      .localContext(localContext)
+      .localContext(Map.of("locale", locale))
       .build();
   }
 

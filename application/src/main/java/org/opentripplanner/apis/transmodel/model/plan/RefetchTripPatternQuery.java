@@ -188,10 +188,7 @@ public class RefetchTripPatternQuery {
           .build()
       )
       .dataFetcher(this::refetchJourney)
-      .deprecate(
-        "This query is experimental and might change in the future. Use the stable " +
-          "`tripPattern(id:)` query with `TripPattern.id` instead."
-      )
+      .deprecate("This query is experimental and might change in the future.")
       .build();
   }
 

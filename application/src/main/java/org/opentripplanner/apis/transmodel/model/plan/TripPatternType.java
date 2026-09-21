@@ -9,20 +9,9 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
-import java.util.Map;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
-import org.opentripplanner.routing.refetch.UnsupportedItineraryReferenceException;
 
 public class TripPatternType {
-
-  /// The key used to store the original planning [RouteRequest] in the GraphQL local context, so
-  /// [#id] can build a stable [org.opentripplanner.model.plan.itineraryreference.ItineraryReference]
-  /// from it. Set once in [org.opentripplanner.apis.transmodel.TransmodelGraphQLPlanner#plan] and
-  /// forwarded unchanged through [TripType#create]'s `tripPatterns` field.
-  public static final String ROUTE_REQUEST_CONTEXT_KEY = "routeRequest";
 
   public static GraphQLObjectType create(
     GraphQLOutputType systemNoticeType,
@@ -35,20 +24,6 @@ public class TripPatternType {
       .name("TripPattern")
       .description(
         "List of legs constituting a suggested sequence of rides and links for a specific trip."
-      )
-      .field(
-        GraphQLFieldDefinition.newFieldDefinition()
-          .name("id")
-          .description(
-            "An opaque, versioned identifier for this trip pattern. It can be used to refetch " +
-              "this exact trip pattern later (with current realtime data applied) using the " +
-              "`tripPattern` query, without resending the original search parameters.\n\n" +
-              "`null` if this trip pattern cannot currently be refetched (for example, if it " +
-              "contains no scheduled transit legs)."
-          )
-          .type(Scalars.GraphQLString)
-          .dataFetcher(TripPatternType::id)
-          .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
@@ -266,22 +241,5 @@ public class TripPatternType {
 
   public static Itinerary itinerary(DataFetchingEnvironment env) {
     return env.getSource();
-  }
-
-  static String id(DataFetchingEnvironment env) {
-    Map<String, ?> ctx = env.getLocalContext();
-    if (ctx == null) {
-      return null;
-    }
-    RouteRequest routeRequest = (RouteRequest) ctx.get(ROUTE_REQUEST_CONTEXT_KEY);
-    if (routeRequest == null) {
-      return null;
-    }
-    try {
-      var reference = ItineraryReferenceMapper.toItineraryReference(itinerary(env), routeRequest);
-      return ItineraryReferenceSerializer.encode(reference);
-    } catch (UnsupportedItineraryReferenceException e) {
-      return null;
-    }
   }
 }
