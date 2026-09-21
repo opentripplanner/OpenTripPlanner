@@ -63,9 +63,7 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     LocalDate serviceDate
   ) {
     this.tripPattern = tripPattern;
-    @SuppressWarnings("unchecked")
-    TripTimes<?>[] arr = tripTimes.toArray(TripTimes[]::new);
-    this.tripTimes = arr;
+    this.tripTimes = tripTimes.toArray(TripTimes[]::new);
     this.frequencies = frequencies.toArray(new FrequencyEntry[0]);
     this.serviceDate = serviceDate;
 

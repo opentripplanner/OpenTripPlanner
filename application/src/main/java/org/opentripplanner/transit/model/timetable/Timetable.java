@@ -201,9 +201,8 @@ public class Timetable implements Serializable {
     return copyOf().withServiceDate(date).build();
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   private static TripTimes<?> withServiceCode(TripTimes<?> tt, int serviceCode) {
-    return ((TripTimes) tt).withServiceCode(serviceCode);
+    return tt.withServiceCode(serviceCode);
   }
 
   /**

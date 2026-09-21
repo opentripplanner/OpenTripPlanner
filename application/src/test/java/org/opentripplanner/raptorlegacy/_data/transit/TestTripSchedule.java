@@ -148,7 +148,7 @@ public class TestTripSchedule implements TripSchedule {
     private int transitReluctanceIndex = 0;
     private Accessibility wheelchairBoarding = NO_INFORMATION;
     private TripPattern originalPattern;
-    private TripTimes tripTimes;
+    private TripTimes<?> tripTimes;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
