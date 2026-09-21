@@ -27,6 +27,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
+import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.UpdateManager;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.configure.StreetDomain;
@@ -140,6 +141,9 @@ public interface ConstructApplicationFactory {
 
   @StreetDomain
   UpdateManager streetUpdateManager();
+
+  @TransitDomain
+  RepositoryRegistry transitRepositoryRegistry();
 
   RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle();
   DataImportIssueSummary dataImportIssueSummary();
