@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,6 +69,14 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   );
   private static final double SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(250);
   private static final double INSIDE_AREA_MARGIN_METERS = 0.2;
+  /**
+   * How far apart two linked vertices may be and still count as the same attachment point on a
+   * platform way. Comfortably above floating-point noise between the forward and the back edge of
+   * the same way (which project to the same point), and comfortably below {@code VertexLinker}'s
+   * 0.1 m split-end tolerance, which guarantees that two genuinely distinct split points on one way
+   * are at least that far apart.
+   */
+  private static final double SAME_ATTACHMENT_POINT_TOLERANCE_METERS = 0.01;
 
   private final Graph graph;
 
@@ -232,19 +239,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             .map(StreetEdge.class::cast)
             .collect(Collectors.toSet())
         );
-        // A stop attaches to a linear platform way at a single point. VertexLinker's "duplicate
-        // way" heuristic (meant for genuinely parallel edges, e.g. dual carriageways) can misfire
-        // here: if an earlier stop on this same platform already split the way nearby, the two
-        // resulting halves are both ~equidistant from this stop's coordinate and both get split
-        // again, returning two near-duplicate attachment points instead of one. Link only to the
-        // closest of the returned vertices.
-        closestVertex(boardingLocation, linkedVertices).ifPresent(vertex -> {
+        for (var vertex : closestAttachmentPoint(boardingLocation, linkedVertices)) {
           // Linking may have split a platform edge into two new edges. The platform association is
           // keyed by edge reference and is not carried over to the split halves, so re-register them
           // here; otherwise a later stop on the same platform can no longer match this platform.
           reRegisterSplitEdgesWithPlatform(vertex, platform);
           linkBoardingLocationToStop(ts, stop.getCode(), vertex);
-        });
+        }
         return true;
       })
       .orElse(false);
@@ -407,21 +408,46 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
-   * Pick the closest of a set of candidate attachment points for a boarding location. Used to
-   * collapse near-duplicate vertices returned by {@link VertexLinker} back down to the single
-   * point a stop actually attaches to.
+   * A stop attaches to a platform way at a single <em>point</em>, but at that point there is one
+   * vertex per traversal direction: OSM registers both the forward and the back edge of the way
+   * with the platform, and {@link VertexLinker} splits each of them separately, producing two
+   * co-located vertices that are not connected to each other. The stop must be linked to all of
+   * them, or it becomes reachable from one end of the platform only.
+   * <p>
+   * {@link VertexLinker}'s "duplicate way" heuristic (meant for genuinely parallel edges, e.g. dual
+   * carriageways) can additionally return vertices at a <em>different</em> point: if an earlier stop
+   * on this same platform already split the way nearby, the two resulting halves are both
+   * ~equidistant from this stop's coordinate and both get split again. Those extra vertices are
+   * within a fraction of a millimetre of the correct ones in <em>distance from the stop</em>, but
+   * they sit at a visibly different place on the platform, so they are filtered out by position
+   * rather than by distance.
+   *
+   * @return every candidate co-located with the closest one, i.e. the attachment point the stop
+   *          actually sits on, with all its traversal directions.
    */
-  private Optional<StreetVertex> closestVertex(
+  private static Set<StreetVertex> closestAttachmentPoint(
     OsmBoardingLocationVertex boardingLocation,
     Set<StreetVertex> candidates
   ) {
-    return candidates
+    var closest = candidates
       .stream()
       .min(
         Comparator.comparingDouble(v ->
           SphericalDistanceLibrary.distance(boardingLocation.getCoordinate(), v.getCoordinate())
         )
       );
+    if (closest.isEmpty()) {
+      return Set.of();
+    }
+    var attachmentPoint = closest.get().getCoordinate();
+    return candidates
+      .stream()
+      .filter(
+        v ->
+          SphericalDistanceLibrary.distance(attachmentPoint, v.getCoordinate()) <=
+          SAME_ATTACHMENT_POINT_TOLERANCE_METERS
+      )
+      .collect(Collectors.toSet());
   }
 
   private List<Edge> getConnectingEdges(

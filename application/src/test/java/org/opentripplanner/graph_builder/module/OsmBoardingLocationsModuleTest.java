@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -967,6 +968,11 @@ class OsmBoardingLocationsModuleTest {
    * then treat the two resulting split halves as "duplicates" of each other and link the second
    * stop to both of them, instead of only to the one it actually sits next to - producing a
    * spurious fork in the platform geometry instead of a single clean attachment point.
+   * <p>
+   * The stop must still be linked to <em>both</em> vertices at the point it does sit next to: OSM
+   * registers the forward and the back edge of the way with the platform, and they are split
+   * separately into two co-located, mutually unconnected vertices - one per traversal direction. A
+   * stop linked to only one of them is reachable from one end of the platform only.
    */
   @Test
   void testCloseStopsOnLinearPlatformDoNotFanOutToDuplicateVertices() {
@@ -1033,20 +1039,53 @@ class OsmBoardingLocationsModuleTest {
     );
 
     for (var stopVertex : List.of(stopVertexA, stopVertexB)) {
+      var attachments = linkedVertices(stopVertex);
+      // One vertex per traversal direction of the platform way, and nothing beyond that: no
+      // vertices from the spurious second attachment point the duplicate-way heuristic offers.
+      assertEquals(
+        2,
+        attachments.size(),
+        stopVertex.getId() +
+          " should link to the two co-located vertices of its own attachment point on the " +
+          "platform, not fan out to a second one"
+      );
+      assertEquals(attachments.size(), stopVertex.getIncoming().size());
+
+      // The two are one point, not a fork in the platform geometry.
       assertEquals(
         1,
-        stopVertex.getOutgoing().size(),
-        stopVertex.getId() +
-          " should link to exactly one vertex on the platform, not fan out to several"
+        attachments.stream().map(Vertex::getCoordinate).distinct().count(),
+        stopVertex.getId() + " should be linked to vertices at a single point on the platform"
       );
-      assertEquals(1, stopVertex.getIncoming().size());
+
+      // Together they attach the stop to both traversal directions, so it is reachable from either
+      // end of the platform. Linked to only one of them, the stop is a one-way stub.
+      var nextHops = attachments
+        .stream()
+        .flatMap(v -> v.getOutgoing().stream())
+        .filter(StreetEdge.class::isInstance)
+        .map(Edge::getToVertex)
+        .collect(Collectors.toSet());
+      assertEquals(
+        2,
+        nextHops.size(),
+        stopVertex.getId() + " should be able to walk towards either end of the platform"
+      );
     }
 
-    // The two stops must not have collapsed onto the same vertex either - each is linked to its own,
-    // distinct nearby point on the platform.
-    var linkedVertexA = stopVertexA.getOutgoing().iterator().next().getToVertex();
-    var linkedVertexB = stopVertexB.getOutgoing().iterator().next().getToVertex();
-    assertNotSame(linkedVertexA, linkedVertexB);
+    // The two stops must not have collapsed onto the same attachment point either - each is linked
+    // to its own, distinct nearby point on the platform.
+    var attachmentA = linkedVertices(stopVertexA).iterator().next().getCoordinate();
+    var attachmentB = linkedVertices(stopVertexB).iterator().next().getCoordinate();
+    assertNotEquals(
+      attachmentA,
+      attachmentB,
+      "each stop should attach at its own point on the platform"
+    );
+  }
+
+  private static Set<Vertex> linkedVertices(TransitStopVertex stopVertex) {
+    return stopVertex.getOutgoing().stream().map(Edge::getToVertex).collect(Collectors.toSet());
   }
 
   private static OsmBoardingLocationVertex linkedBoardingLocation(TransitStopVertex stopVertex) {
