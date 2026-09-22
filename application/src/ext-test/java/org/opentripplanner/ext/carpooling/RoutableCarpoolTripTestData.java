@@ -25,6 +25,20 @@ public final class RoutableCarpoolTripTestData {
     return withVertices(trip, vertices);
   }
 
+  /**
+   * A trip on placeholder vertices whose legs are routed to the given durations, each leg allowed
+   * to take no longer than that.
+   */
+  public static RoutableCarpoolTrip withRoutedLegs(CarpoolTrip trip, Duration... legDurations) {
+    var vertices = withDummyVertices(trip).vertices();
+    var durations = List.of(legDurations);
+    return new RoutableCarpoolTrip(
+      trip,
+      vertices,
+      new CarpoolCorridor(durations, durations, List.of())
+    );
+  }
+
   public static RoutableCarpoolTrip withVertices(CarpoolTrip trip, List<Vertex> vertices) {
     int legs = vertices.size() - 1;
     var durations = Collections.nCopies(legs, Duration.ZERO);

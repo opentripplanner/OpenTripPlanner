@@ -15,6 +15,7 @@ import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
+import org.opentripplanner.ext.carpooling.filter.SnappedPassenger;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
@@ -75,8 +76,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The service executes routing requests in four phases:
  * <ol>
- *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Quickly eliminates incompatible
- *       trips based on capacity, time windows, and distance.</li>
+ *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Once the passenger is snapped to
+ *       the street network, quickly eliminates trips that cannot serve the passenger in time or
+ *       whose corridor cannot reach the passenger.</li>
  *   <li><strong>Position Finding ({@link InsertionPositionFinder}):</strong> For trips that
  *       pass filtering, identifies viable pickup/dropoff position pairs using fast heuristics
  *       (capacity, beeline delay estimates). No routing is performed in this phase.</li>
@@ -156,7 +158,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       streetLimitationParametersService,
       "streetLimitationParametersService"
     );
-    this.preFilters = TripPreFilters.defaults();
+    this.preFilters = TripPreFilters.defaults(streetLimitationParametersService.maxCarSpeed());
     this.postFilters = ItineraryPostFilters.defaults();
     this.itineraryMapper = new CarpoolItineraryMapper();
     this.positionFinder = new InsertionPositionFinder(
@@ -178,8 +180,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <p>
    * This method executes the full four-phase carpooling algorithm:
    * <ol>
-   *   <li><strong>Pre-filtering:</strong> All trips from the repository are filtered by capacity,
-   *       time window, and distance to quickly eliminate incompatible matches.</li>
+   *   <li><strong>Pre-filtering:</strong> Once the passenger is snapped to the street network, all
+   *       trips from the repository are filtered by time window and by whether their corridor can
+   *       reach both the snapped pickup and the snapped dropoff, to quickly eliminate incompatible
+   *       matches.</li>
    *   <li><strong>Position finding:</strong> For each surviving trip, viable pickup/dropoff
    *       insertion positions are identified using beeline heuristics (no routing).</li>
    *   <li><strong>Insertion evaluation:</strong> Viable positions are evaluated with A* street
@@ -214,18 +218,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
 
-    var candidateTrips = allTrips
-      .stream()
-      .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
-      .toList();
-
-    LOG.debug(
-      "{} trips passed pre-filters ({} rejected)",
-      candidateTrips.size(),
-      allTrips.size() - candidateTrips.size()
-    );
-
-    if (candidateTrips.isEmpty()) {
+    if (allTrips.isEmpty()) {
       return List.of();
     }
 
@@ -268,6 +261,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
           "No car-reachable pickup/dropoff reachable within {} from passenger origin/destination",
           maxWalkToCarpool
         );
+        return List.of();
+      }
+
+      var passenger = new SnappedPassenger(carpoolingRequest, pickupSnap, dropoffSnap);
+      var candidateTrips = allTrips
+        .stream()
+        .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
+        .toList();
+
+      LOG.debug(
+        "{} trips passed pre-filters ({} rejected)",
+        candidateTrips.size(),
+        allTrips.size() - candidateTrips.size()
+      );
+
+      if (candidateTrips.isEmpty()) {
         return List.of();
       }
 
@@ -338,7 +347,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <p>
    * The method proceeds as follows:
    * <ol>
-   *   <li>Pre-filters trips using time and distance heuristic.</li>
+   *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time
+   *       window and by whether their corridor can reach the passenger.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
    *       those the passenger can walk to or from within the walk budget.</li>
    *   <li>For each candidate trip and corridor stop combination, identifies viable insertion
@@ -398,12 +408,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .valueOf(StreetMode.CARPOOL)
       .toSeconds();
 
-    var candidateTrips = allTrips
-      .stream()
-      .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
-      .toList();
-
-    if (candidateTrips.isEmpty()) {
+    if (allTrips.isEmpty()) {
       return List.of();
     }
 
@@ -444,6 +449,18 @@ public class DefaultCarpoolingService implements CarpoolingService {
         return List.of();
       }
       var passengerVertex = passengerSnap.vertex();
+
+      var passenger = accessOrEgress.isAccess()
+        ? new SnappedPassenger(carpoolingRequest, passengerSnap, null)
+        : new SnappedPassenger(carpoolingRequest, null, passengerSnap);
+      var candidateTrips = allTrips
+        .stream()
+        .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
+        .toList();
+
+      if (candidateTrips.isEmpty()) {
+        return List.of();
+      }
 
       // The passenger's two trees, outward and inward, sized to the widest leg any candidate trip
       // can insert the passenger into, are the only street searches of the request.

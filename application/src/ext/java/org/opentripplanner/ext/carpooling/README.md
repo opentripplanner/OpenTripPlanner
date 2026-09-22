@@ -33,9 +33,9 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │ DefaultCarpoolingService                   │
 │                                            │
 │  1. Filter Phase (TripPreFilters)         │
+│     (after snapping the passenger)         │
 │     - Time window check                    │
-│     - Distance check                       │
-│     - Direction check                      │
+│     - Corridor reach check                 │
 │                                            │
 │  2. Insertion Phase                        │
 │     2a. Position Pre-screening             │
@@ -79,8 +79,8 @@ org.opentripplanner.ext.carpooling/
 │   ├── TripPreFilters.java         # Pre-filter composite (AND, short-circuit)
 │   ├── ItineraryPostFilters.java   # Post-filter composite (AND, short-circuit)
 │   ├── TimeTripFilter.java   # Pre-filter: depart-after & arrive-by time checks
-│   ├── TimeItineraryFilter.java # Post-filter: depart-after & arrive-by enforcement
-│   └── DistanceTripFilter.java # Distance check
+│   ├── CorridorTripFilter.java # Pre-filter: the trip's corridor reaches the passenger
+│   └── TimeItineraryFilter.java # Post-filter: depart-after & arrive-by enforcement
 │
 ├── routing/                         # Insertion optimization
 │   ├── InsertionEvaluator.java        # Routing evaluation and selection
@@ -109,10 +109,10 @@ org.opentripplanner.ext.carpooling/
 
 ### Phase 1: Filtering (Fast Pre-screening)
 
-Filters eliminate obviously incompatible trips **without any street routing**:
+Once the passenger is snapped to the street network, filters eliminate obviously incompatible trips **without any further street routing**. They are necessary conditions only: they never reject a trip the insertion evaluation would accept.
 
-1. **TimeTripFilter**: Is the trip timing compatible with the passenger's request (depart-after or arrive-by)?
-2. **DistanceTripFilter**: Is the passenger's journey within reasonable distance of driver route?
+1. **TimeTripFilter**: Can the trip be at the passenger's pickup or dropoff inside the passenger's window (depart-after or arrive-by)? The trip's span is taken as the insertion evaluation times it: from its start to its routed arrival at the destination plus the destination's deviation budget.
+2. **CorridorTripFilter** (`CarpoolCorridor.mayServe`): Can the trip's corridor reach the snapped passenger at all? A leg can only serve a point whose beeline detour, driven at the graph's maximum car speed, fits the leg's limit; direct requests check both the pickup and the dropoff.
 
 **Performance**: O(n) where n = number of active trips.
 
@@ -331,7 +331,7 @@ Add domain-specific filters by implementing `CarpoolTripFilter`:
 ```java
 public class CustomFilter implements CarpoolTripFilter {
   @Override
-  public boolean isCandidateTrip(CarpoolTrip trip, CarpoolingRequest request) {
+  public boolean isCandidateTrip(RoutableCarpoolTrip trip, SnappedPassenger passenger) {
     // Custom logic
     return true;
   }
@@ -339,7 +339,7 @@ public class CustomFilter implements CarpoolTripFilter {
 
 // Add to filter chain
 var preFilters = new TripPreFilters(
-  List.of(new TimeTripFilter(), new DistanceTripFilter(), new CustomFilter())
+  List.of(new TimeTripFilter(), new CorridorTripFilter(maxCarSpeed), new CustomFilter())
 );
 ```
 
@@ -353,10 +353,10 @@ Test individual components in isolation:
 @Test
 void testTimeTripFilter() {
   var filter = new TimeTripFilter();
-  var trip = createSimpleTrip(origin, destination);
-  var request = new CarpoolingRequestBuilder().withRequestedDateTime(now()).build();
+  var trip = RoutableCarpoolTripTestData.withDummyVertices(createSimpleTrip(origin, destination));
+  var request = CarpoolingRequestTestData.departAfterDirect(now());
 
-  assertTrue(filter.isCandidateTrip(trip, request, Duration.ofMinutes(30)));
+  assertTrue(filter.isCandidateTrip(trip, new SnappedPassenger(request, null, null)));
 }
 ```
 
