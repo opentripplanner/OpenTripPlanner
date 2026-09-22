@@ -25,7 +25,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
   private final int traversalTime;
   private final double distance;
-  private final int steps;
+  private final int stairCount;
   private final double slope;
 
   private final boolean wheelchairAccessible;
@@ -36,21 +36,21 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     @Nullable I18NString signpostedAs,
     int traversalTime,
     double distance,
-    int steps,
+    int stairCount,
     double slope,
     boolean wheelchairAccessible
   ) {
     super(fromv, tov);
     this.signpostedAs = signpostedAs;
     this.traversalTime = traversalTime;
-    this.steps = steps;
+    this.stairCount = stairCount;
     this.slope = slope;
     this.wheelchairAccessible = wheelchairAccessible;
     this.distance = distance;
   }
 
   /**
-   * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
+   * Create a PathwayEdge that doesn't have a traversal time, distance or stairCount.
    * <p>
    * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
    */
@@ -68,7 +68,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     I18NString signpostedAs,
     int traversalTime,
     double distance,
-    int steps,
+    int stairCount,
     double slope,
     boolean wheelchairAccessible
   ) {
@@ -79,7 +79,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
         signpostedAs,
         traversalTime,
         distance,
-        steps,
+        stairCount,
         slope,
         wheelchairAccessible
       )
@@ -102,7 +102,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
         time_ms = (long) ((1000.0 * distance) / request.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time_ms = (long) ((1000.0 * 0.4 * Math.abs(steps)) / request.walk().speed());
+        time_ms = (long) ((1000.0 * 0.4 * Math.abs(stairCount)) / request.walk().speed());
       }
     }
 
@@ -126,7 +126,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       s1.incrementTimeInMilliseconds(time_ms);
       s1.incrementWeight(weight);
     } else {
-      // elevators often don't have a traversal time, distance or steps, so we need to add
+      // elevators often don't have a traversal time, distance or stairCount, so we need to add
       // _some_ cost. the real cost is added in ElevatorHopEdge.
       // adding a cost of 1 is analogous to FreeEdge
       s1.incrementWeight(1);
@@ -174,8 +174,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     }
   }
 
-  public int getSteps() {
-    return steps;
+  public int getStairCount() {
+    return stairCount;
   }
 
   @Override
@@ -184,6 +184,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   private boolean isStairs() {
-    return steps != 0;
+    return stairCount != 0;
   }
 }
