@@ -439,10 +439,7 @@ public class RoutingWorker {
     //       yet been implemented. Until then, return no transit itinerary when access or egress is
     //       TAXI unless the TaxiRouting sandbox feature is enabled and a taxi route provider is
     //       configured.
-    if (
-      request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) &&
-      taxiService == null
-    ) {
+    if (request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) && taxiService == null) {
       return RoutingResult.empty();
     }
 
