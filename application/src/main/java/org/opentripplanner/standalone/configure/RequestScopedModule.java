@@ -46,7 +46,6 @@ import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -95,12 +94,6 @@ public class RequestScopedModule {
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
     return new DefaultTransitService(transitRepository, timetableSnapshot);
-  }
-
-  @Provides
-  @HttpRequestScoped
-  static ConstrainedTransferService constrainedTransferService(TransitService transitService) {
-    return transitService.getConstrainedTransferService();
   }
 
   @Provides

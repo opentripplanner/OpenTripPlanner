@@ -121,11 +121,6 @@ public class TestServerContext {
     var routerConfig = RouterConfig.DEFAULT;
     var raptorConfig = createRaptorConfig();
     var vertexLinker = createVertexLinker(graph);
-    var transitAlertService = createTransitAlertService();
-    RegularTransferService transferService = TransferServiceTestFactory.transferService(
-      transferRepository
-    );
-    StreetDetailsService streetDetailsService = createStreetDetailsService();
     LinkingContextFactory linkingContextFactory = createLinkingContextFactory(
       graph,
       vertexLinker,
@@ -133,21 +128,6 @@ public class TestServerContext {
     );
     StreetLimitationParametersService streetLimitationParametersService =
       createStreetLimitationParametersService();
-
-    var refetchItineraryService = createRefetchItineraryService(
-      graph,
-      transitService,
-      transitAlertService,
-      transferService,
-      streetDetailsService,
-      linkingContextFactory,
-      streetLimitationParametersService
-    );
-    var realTimeResolver = createRealTimeResolver(
-      transitService,
-      refetchItineraryService,
-      transitAlertService
-    );
 
     return new DefaultRoutingService(
       transitService,
@@ -170,7 +150,7 @@ public class TestServerContext {
       linkingContextFactory,
       routerConfig.transitTuningConfig(),
       routerConfig.transitTuningConfig(),
-      realTimeResolver
+      null
     );
   }
 

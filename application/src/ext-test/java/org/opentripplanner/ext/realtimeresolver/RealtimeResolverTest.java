@@ -63,12 +63,12 @@ class RealtimeResolverTest {
   private static final RegularStop STOP_E = ENV_BUILDER.stop("E");
 
   private static final TransitTestEnvironmentBuilder TRANSIT_ENV = ENV_BUILDER.addTrip(
-      TripInput.of("trip1")
-        .withWithTripOnServiceDate("trip1")
-        .addStop(STOP_A, "10:00")
-        .addStop(STOP_B, "11:00")
-        .addStop(STOP_D, "12:00")
-    )
+    TripInput.of("trip1")
+      .withWithTripOnServiceDate("trip1")
+      .addStop(STOP_A, "10:00")
+      .addStop(STOP_B, "11:00")
+      .addStop(STOP_D, "12:00")
+  )
     .addTrip(
       TripInput.of("trip2")
         .withWithTripOnServiceDate("trip2")
@@ -242,8 +242,8 @@ class RealtimeResolverTest {
       Objects.requireNonNull(legs.get(1)).endTime().toString()
     );
 
-    assertEquals(Place.forStop(STOP_B).toString(), legs.get(1).from().toString());
-    assertEquals(Place.forStop(STOP_C).toString(), legs.get(1).to().toString());
+    assertEquals(Place.forStop(STOP_B).stop.getId(), legs.get(1).from().stop.getId());
+    assertEquals(Place.forStop(STOP_C).stop.getId(), legs.get(1).to().stop.getId());
 
     //No realtime on last leg
     assertEquals("2020-03-03T08:30+01:00[Europe/Paris]", legs.getLast().startTime().toString());
@@ -441,8 +441,10 @@ class RealtimeResolverTest {
       .build();
   }
 
-  private RefetchItineraryService createRefetchService(TransitAlertService transitAlertService,
-                                                       TransitTestEnvironment transitEnv) {
+  private RefetchItineraryService createRefetchService(
+    TransitAlertService transitAlertService,
+    TransitTestEnvironment transitEnv
+  ) {
     StreetDetailsService streetDetailsService = null;
 
     VertexCreationService vertexCreationService = new VertexCreationService(

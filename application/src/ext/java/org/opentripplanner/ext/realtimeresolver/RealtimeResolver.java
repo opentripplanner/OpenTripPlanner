@@ -76,6 +76,7 @@ public class RealtimeResolver {
 
     boolean hasItineraryStopsChanged = hasItineraryStopsChanged(itinerary);
 
+    //We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
     if (hasItineraryStopsChanged) {
       return refetchItineraryService.refetchItinerary(
         fromLocation,
@@ -144,12 +145,9 @@ public class RealtimeResolver {
     var place = from ? leg.from() : leg.to();
 
     if (place.stop != null) {
-      return GenericLocation.fromCoordinate(place.stop.getCoordinate());
+      return GenericLocation.fromStopId(place.stop.getId());
     }
 
-    return GenericLocation.fromCoordinate(
-      place.coordinate.latitude(),
-      place.coordinate.longitude()
-    );
+    return GenericLocation.fromCoordinate(place.coordinate);
   }
 }

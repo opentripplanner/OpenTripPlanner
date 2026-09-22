@@ -206,22 +206,6 @@ public class SpeedTest {
 
     var transitAlertService = TestServerContext.createTransitAlertService();
 
-    var refetchService = TestServerContext.createRefetchItineraryService(
-      graph,
-      transitService,
-      transitAlertService,
-      transferService,
-      streetDetailsService,
-      linkingContextFactory,
-      streetLimitationParametersService
-    );
-
-    var realTimeResolver = TestServerContext.createRealTimeResolver(
-      transitService,
-      refetchService,
-      transitAlertService
-    );
-
     this.routingService = new DefaultRoutingService(
       this.transitService,
       graph,
@@ -243,7 +227,7 @@ public class SpeedTest {
       linkingContextFactory,
       routerConfig.transitTuningConfig(),
       routerConfig.transitTuningConfig(),
-      realTimeResolver
+      null
     );
 
     initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);
