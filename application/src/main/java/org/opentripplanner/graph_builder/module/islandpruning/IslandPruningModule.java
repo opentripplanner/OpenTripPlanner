@@ -287,12 +287,27 @@ public class IslandPruningModule implements GraphBuilderModule {
       if (!(gv instanceof StreetVertex)) {
         continue;
       }
-      State s0 = new State(gv, request);
+      State s0 = null;
       for (Edge e : gv.getOutgoing()) {
-        if (
-          e instanceof StreetEdge se && shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)
-        ) {
+        if (e instanceof StreetEdge se) {
+          if (shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)) {
+            continue;
+          }
+          if (!canTraverse(se, traverseMode)) {
+            continue;
+          }
+          Vertex out = se.getToVertex();
+          neighborsForVertex.put(gv, out);
+
+          // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
+          neighborsForVertex.put(out, gv);
           continue;
+        }
+
+        // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
+        // rental/parking edges) that don't behave like a plain permission-gated street edge.
+        if (s0 == null) {
+          s0 = new State(gv, request);
         }
         State[] states = e.traverse(s0);
         if (State.isEmpty(states)) {
@@ -301,12 +316,24 @@ public class IslandPruningModule implements GraphBuilderModule {
         for (State state : states) {
           Vertex out = state.getVertex();
           neighborsForVertex.put(gv, out);
-
-          // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
           neighborsForVertex.put(out, gv);
         }
       }
     }
+  }
+
+  /**
+   * Cheap connectivity-only equivalent of {@link StreetEdge#traverse}, for the plain WALK/
+   * BICYCLE/CAR travel modes this module cares about: a permission (incl. barrier vertex) check,
+   * with the same "walk the bike if it can't be ridden" fallback {@link StreetEdge#traverse}
+   * applies. This avoids allocating a {@link State}/{@code StateEditor} and computing speed/cost,
+   * none of which this module reads - it only needs to know whether the edge can be used at all.
+   */
+  private static boolean canTraverse(StreetEdge edge, TraverseMode traverseMode) {
+    if (traverseMode == TraverseMode.BICYCLE) {
+      return edge.canTraverse(TraverseMode.BICYCLE) || edge.canTraverse(TraverseMode.WALK);
+    }
+    return edge.canTraverse(traverseMode);
   }
 
   private int collectSubGraphs(
