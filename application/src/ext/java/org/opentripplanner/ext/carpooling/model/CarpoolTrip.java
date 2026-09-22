@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.model;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -68,6 +69,8 @@ public class CarpoolTrip
   // Ordered list of stops along the carpool route where passengers can be picked up or dropped off
   private final List<CarpoolStop> stops;
 
+  private final Duration[] legDeviationBudgets;
+
   @Nullable
   private final ContactInfo publicContactInformation;
 
@@ -82,6 +85,15 @@ public class CarpoolTrip
       throw new IllegalArgumentException(
         "Carpool trip " + getId() + " must contain at least an origin and a destination stop"
       );
+    }
+    this.legDeviationBudgets = new Duration[stops.size() - 1];
+    var budget = stops.getLast().getDeviationBudget();
+    for (int leg = legDeviationBudgets.length - 1; leg >= 0; leg--) {
+      var stopBudget = stops.get(leg + 1).getDeviationBudget();
+      if (stopBudget.compareTo(budget) < 0) {
+        budget = stopBudget;
+      }
+      legDeviationBudgets[leg] = budget;
     }
     this.publicContactInformation = builder.publicContactInformation();
   }
@@ -228,6 +240,14 @@ public class CarpoolTrip
     }
 
     return true;
+  }
+
+  /**
+   * The deviation budget of the leg from stop {@code leg}: the budget of the stop it ends at, or of
+   * a later stop if that is smaller, since a delay on the leg delays every later stop too.
+   */
+  public Duration legDeviationBudget(int leg) {
+    return legDeviationBudgets[leg];
   }
 
   @Nullable

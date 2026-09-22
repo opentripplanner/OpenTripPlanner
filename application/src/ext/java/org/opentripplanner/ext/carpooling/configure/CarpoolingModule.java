@@ -8,11 +8,14 @@ import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.CarpoolStopIndex;
+import org.opentripplanner.ext.carpooling.routing.CorridorBuilder;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.carpooling.service.DefaultCarpoolingService;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
+import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 
 @Module
@@ -45,17 +48,37 @@ public class CarpoolingModule {
   @Provides
   @Singleton
   @Nullable
-  public static CarpoolTripVertexResolver provideCarpoolTripVertexResolver(
-    VertexCreationService vertexCreationService,
-    @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+  public static CorridorBuilder provideCorridorBuilder(
+    @Nullable CarpoolStopIndex stopIndex,
+    StreetLimitationParametersService streetLimitationParametersService,
     @Nullable CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new CarpoolTripVertexResolver(
+    return new CorridorBuilder(
+      stopIndex,
+      streetLimitationParametersService,
+      parameters.maxTripDuration()
+    );
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  public static RoutableCarpoolTripResolver provideRoutableCarpoolTripResolver(
+    VertexCreationService vertexCreationService,
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+    @Nullable CorridorBuilder corridorBuilder,
+    @Nullable CarpoolingParameters parameters
+  ) {
+    if (OTPFeature.CarPooling.isOff()) {
+      return null;
+    }
+    return new RoutableCarpoolTripResolver(
       vertexCreationService,
       carReachableVertexSnapper,
+      corridorBuilder,
       parameters.maxRoutePointSnap()
     );
   }
@@ -68,6 +91,20 @@ public class CarpoolingModule {
       return null;
     }
     return CarpoolingParameters.DEFAULT;
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  public static CarpoolStopIndex provideCarpoolStopIndex(
+    Graph graph,
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+    @Nullable CarpoolingParameters parameters
+  ) {
+    if (OTPFeature.CarPooling.isOff()) {
+      return null;
+    }
+    return new CarpoolStopIndex(graph, carReachableVertexSnapper, parameters.maxStopWalk());
   }
 
   @Provides

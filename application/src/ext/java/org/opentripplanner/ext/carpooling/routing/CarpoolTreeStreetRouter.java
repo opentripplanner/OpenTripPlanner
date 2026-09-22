@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
@@ -68,20 +70,37 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     boolean reverse,
     Duration searchLimit
   ) {
+    return carTree(vertex, reverse, searchLimit, null);
+  }
+
+  /**
+   * A car shortest-path tree from {@code root}, or to it when {@code reverse}. Nothing is expanded
+   * past {@code searchLimit}, nor where {@code alsoSkip}, if given, skips.
+   */
+  static ShortestPathTree<State, Edge, Vertex> carTree(
+    Vertex root,
+    boolean reverse,
+    Duration searchLimit,
+    @Nullable SkipEdgeStrategy<State, Edge> alsoSkip
+  ) {
     var streetSearchRequest = reverse
       ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
       : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy = new DurationSkipEdgeStrategy<>(searchLimit);
+    if (alsoSkip != null) {
+      skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(skipEdgeStrategy, alsoSkip);
+    }
     var builder = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(searchLimit))
+      .withSkipEdgeStrategy(skipEdgeStrategy)
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())
       .withRequest(streetSearchRequest);
 
     if (reverse) {
-      return builder.withTo(vertex).getShortestPathTree();
+      return builder.withTo(root).getShortestPathTree();
     }
 
-    return builder.withFrom(vertex).getShortestPathTree();
+    return builder.withFrom(root).getShortestPathTree();
   }
 
   private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
