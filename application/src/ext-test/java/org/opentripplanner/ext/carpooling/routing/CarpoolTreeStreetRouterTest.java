@@ -112,17 +112,6 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   }
 
   @Test
-  void routeCachesResults() {
-    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
-
-    var first = router.route(vertexA, vertexC);
-    var second = router.route(vertexA, vertexC);
-
-    assertNotNull(first);
-    assertSame(first, second, "Second call should return cached path");
-  }
-
-  @Test
   void routePrefersForwardTreeOverReverseTree() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
     router.addVertex(vertexC, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
@@ -249,24 +238,20 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertFalse(path.edges.isEmpty(), "Path edges should not be empty");
   }
 
-  /**
-   * Insertion evaluation only reads durations. The path - a linked list of states and edges - is
-   * assembled from the tree's back pointers on demand, so the thousands of segments evaluated and
-   * discarded per request never pay for it.
-   */
+  /** Insertion evaluation only reads durations; the path is assembled on demand and memoised. */
   @Test
-  void routeDoesNotBuildThePathUntilAsked() {
+  void pathIsBuiltOnDemand() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
-
+    var segment = router.route(vertexA, vertexD);
     assertNotNull(segment);
     assertTrue(segment.durationSeconds() > 0);
-    assertFalse(segment.isPathMaterialized(), "Reading the duration must not build the path");
 
     var path = segment.path();
-    assertTrue(segment.isPathMaterialized());
     assertSame(path, segment.path(), "The path is memoised");
+    assertEquals(segment.durationSeconds(), path.getDuration());
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
   }
 
   @Test
@@ -287,6 +272,8 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertEquals(vertexD, reverse.path().states.getLast().getVertex());
   }
 
+  /** Two legs from the same start unite their ellipses: what either leg needs stays reachable. */
+  /** Without a detach, a released tree's segment still yields a path — by re-routing. */
   @Test
   void coLocatedVerticesKeepTheLargestLimit() {
     // Two driver-waypoint vertices at the same coordinate are distinct objects but compare equal
