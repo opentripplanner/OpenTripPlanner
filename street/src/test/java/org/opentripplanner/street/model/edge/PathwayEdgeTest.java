@@ -30,48 +30,21 @@ class PathwayEdgeTest {
   void zeroLength() {
     // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
     // from the vertices as they most likely have identical coordinates
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      0,
-      0,
-      0,
-      0,
-      true
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 0, 0, 0, 0, true);
 
     assertThatEdgeIsTraversable(edge);
   }
 
   @Test
   void zeroLengthWithSteps() {
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      0,
-      0,
-      2,
-      0,
-      true
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 0, 0, 2, 0, true);
 
     assertThatEdgeIsTraversable(edge);
   }
 
   @Test
   void traversalTime() {
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      60,
-      0,
-      0,
-      0,
-      true
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 60, 0, 0, 0, true);
 
     var state = assertThatEdgeIsTraversable(edge);
     assertEquals(60, state.getElapsedTimeSeconds());
@@ -80,16 +53,7 @@ class PathwayEdgeTest {
 
   @Test
   void traversalTimeOverridesLength() {
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      60,
-      1000,
-      0,
-      0,
-      true
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 60, 1000, 0, 0, true);
 
     assertEquals(1000, edge.getDistanceMeters());
 
@@ -100,16 +64,7 @@ class PathwayEdgeTest {
 
   @Test
   void distance() {
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      0,
-      60,
-      0,
-      0,
-      true
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 0, 60, 0, 0, true);
 
     var state = assertThatEdgeIsTraversable(edge);
     assertEquals(6, state.getElapsedTimeSeconds());
@@ -118,16 +73,7 @@ class PathwayEdgeTest {
 
   @Test
   void wheelchair() {
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      0,
-      60,
-      0,
-      0,
-      false
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 0, 60, 0, 0, false);
 
     var state = assertThatEdgeIsTraversable(edge, true);
     assertEquals(6, state.getElapsedTimeSeconds());
@@ -136,26 +82,8 @@ class PathwayEdgeTest {
 
   @Test
   void wheelchairNegativeStepsTreatedAsStairs() {
-    var down = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      0,
-      0,
-      -10,
-      0,
-      true
-    );
-    var up = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      0,
-      0,
-      10,
-      0,
-      true
-    );
+    var down = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 0, 0, -10, 0, true);
+    var up = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 0, 0, 10, 0, true);
 
     var downState = assertThatEdgeIsTraversable(down, true);
     var upState = assertThatEdgeIsTraversable(up, true);
@@ -190,16 +118,7 @@ class PathwayEdgeTest {
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
   @MethodSource("slopeCases")
   void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
-    var edge = PathwayEdge.createPathwayEdge(
-      from,
-      to,
-      PATHWAY_NAME,
-      60,
-      100,
-      0,
-      slope,
-      true
-    );
+    var edge = PathwayEdge.createPathwayEdge(from, to, PATHWAY_NAME, 60, 100, 0, slope, true);
 
     var state = assertThatEdgeIsTraversable(edge, true);
     assertEquals(60, state.getElapsedTimeSeconds());
