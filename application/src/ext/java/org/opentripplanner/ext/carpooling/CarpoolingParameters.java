@@ -11,6 +11,8 @@ import java.time.Duration;
  *
  * @param maxCandidateTripsPerRequest the most trips a request evaluates; when more pass the
  *        pre-filters, the ones whose route passes closest to the passenger are kept
+ * @param maxTrips the most live trips one SIRI feed may have; further new trips of the feed are
+ *        dropped
  * @param maxStopWalk the longest walk between a transit stop and the vertex where a car can stop
  *        for it; stops farther from any drivable street get no snap and are left out of the
  *        corridors
@@ -32,6 +34,7 @@ import java.time.Duration;
  */
 public record CarpoolingParameters(
   int maxCandidateTripsPerRequest,
+  int maxTrips,
   Duration maxStopWalk,
   Duration maxTripDuration,
   Duration tripExpiry,
@@ -42,6 +45,7 @@ public record CarpoolingParameters(
 ) {
   public static final CarpoolingParameters DEFAULT = new CarpoolingParameters(
     30,
+    10_000,
     Duration.ofMinutes(15),
     Duration.ofHours(2).plusMinutes(30),
     Duration.ofDays(2),
@@ -54,6 +58,9 @@ public record CarpoolingParameters(
   public CarpoolingParameters {
     if (maxCandidateTripsPerRequest < 1) {
       throw new IllegalArgumentException("maxCandidateTripsPerRequest must be positive");
+    }
+    if (maxTrips < 1) {
+      throw new IllegalArgumentException("maxTrips must be positive");
     }
     requirePositive(maxStopWalk, "maxStopWalk");
     requirePositive(maxTripDuration, "maxTripDuration");

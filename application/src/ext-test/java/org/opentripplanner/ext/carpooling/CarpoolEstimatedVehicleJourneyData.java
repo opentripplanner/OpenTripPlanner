@@ -79,6 +79,13 @@ public class CarpoolEstimatedVehicleJourneyData {
     return journey;
   }
 
+  /** Like {@link #minimalCompleteJourney()}, but for the trip with this journey code. */
+  public static EstimatedVehicleJourney journeyWithCode(String code) {
+    var journey = minimalCompleteJourney();
+    journey.setEstimatedVehicleJourneyCode(code);
+    return journey;
+  }
+
   public static EstimatedVehicleJourney minimalCompleteJourneyWithPolygon() {
     var journey = new EstimatedVehicleJourney();
     var operator = new OperatorRefStructure();
