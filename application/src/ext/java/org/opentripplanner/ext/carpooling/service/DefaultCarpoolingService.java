@@ -228,9 +228,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
   /**
    * Routes carpool access legs (origin to transit stops) or egress legs (transit stops to
-   * destination). The passenger's two street trees are the only street searches; the stops a trip
-   * can serve and the driver's driving times come from the trip's {@link CarpoolCorridor}. The
-   * best insertion per trip and stop becomes a candidate for Raptor.
+   * destination). The candidate trips come from the spatial index over the corridors; the
+   * passenger's two street trees are the only street searches, everything else is read from the
+   * trips' corridors. The best insertion per trip and stop becomes a candidate for Raptor.
    *
    * @param transitServiceResolver resolves the corridor stops' ids to stop locations
    * @param transitSearchTimeZero the reference time of Raptor's relative times
@@ -266,14 +266,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .valueOf(StreetMode.CARPOOL)
       .toSeconds();
 
-    // A trip without a corridor has a baseline that cannot be routed: it cannot carry a passenger.
     var candidateTrips = repository
-      .getCarpoolTrips()
+      .getCarpoolTripsNear(passengerCoordinates)
       .stream()
-      .filter(trip -> trip.corridor() != null)
+      .filter(trip -> trip.corridor().mayServe(trip.vertices(), passengerCoordinates, maxCarSpeed))
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
-    LOG.debug("{} candidate carpool trips for {}", candidateTrips.size(), passengerCoordinates);
+    LOG.debug("{} candidate carpool trips near {}", candidateTrips.size(), passengerCoordinates);
     if (candidateTrips.isEmpty()) {
       return List.of();
     }
