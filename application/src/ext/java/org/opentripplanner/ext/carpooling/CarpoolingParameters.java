@@ -8,30 +8,36 @@ import java.time.Duration;
  * These are deployment-wide values, not part of the routing request. They are hard-coded to
  * {@link #DEFAULT}.
  *
- * @param maxStopWalk         the longest walk between a transit stop and the vertex where a car can
- *                            stop for it; stops farther from any drivable street get no snap and
- *                            are left out of the corridors
- * @param maxTripDuration     the longest span a carpool trip may have, from the first stop's
- *                            departure to the destination's latest expected arrival; a longer trip
- *                            is not shaped like a carpool journey and is dropped, and no car search
- *                            reaches further
- * @param tripExpiry          how long a trip is kept after its latest end time, since the feed is
- *                            not guaranteed to cancel a journey once it has completed
- * @param expirySweepInterval the least time between two sweeps of the expired trips; trips expire
- *                            on a multi-day timescale, so sweeping on every poll would be wasted
- *                            work
- * @param maxRoutePointSnap   the ends of the edges a driver's route point is linked to are accepted
- *                            as its vertex at any distance; otherwise, how far from the point, in
- *                            walking time, the walk search for a car-reachable permanent vertex
- *                            goes
- * @param minCarEscapeMeters  how far, in a straight line, a car must be able to drive to and from a
- *                            vertex for it to count as car-reachable: far enough to clear a
- *                            connected vertex, short enough to reject a stranded stub or island
- * @param defaultSearchWindow the search window of a request that has none; wide, because carpool
- *                            trips are sparse and a narrow window would lose matches the passenger
- *                            would accept
+ * @param maxCandidateTripsPerRequest the most trips a request evaluates; when more pass the
+ *                                    pre-filters, the ones whose route passes closest to the
+ *                                    passenger are kept
+ * @param maxStopWalk                 the longest walk between a transit stop and the vertex where a
+ *                                    car can stop for it; stops farther from any drivable street
+ *                                    get no snap and are left out of the corridors
+ * @param maxTripDuration             the longest span a carpool trip may have, from the first
+ *                                    stop's departure to the destination's latest expected arrival;
+ *                                    a longer trip is not shaped like a carpool journey and is
+ *                                    dropped, and no car search reaches further
+ * @param tripExpiry                  how long a trip is kept after its latest end time, since the
+ *                                    feed is not guaranteed to cancel a journey once it has
+ *                                    completed
+ * @param expirySweepInterval         the least time between two sweeps of the expired trips; trips
+ *                                    expire on a multi-day timescale, so sweeping on every poll
+ *                                    would be wasted work
+ * @param maxRoutePointSnap           the ends of the edges a driver's route point is linked to are
+ *                                    accepted as its vertex at any distance; otherwise, how far
+ *                                    from the point, in walking time, the walk search for a
+ *                                    car-reachable permanent vertex goes
+ * @param minCarEscapeMeters          how far, in a straight line, a car must be able to drive to
+ *                                    and from a vertex for it to count as car-reachable: far enough
+ *                                    to clear a connected vertex, short enough to reject a stranded
+ *                                    stub or island
+ * @param defaultSearchWindow         the search window of a request that has none; wide, because
+ *                                    carpool trips are sparse and a narrow window would lose
+ *                                    matches the passenger would accept
  */
 public record CarpoolingParameters(
+  int maxCandidateTripsPerRequest,
   Duration maxStopWalk,
   Duration maxTripDuration,
   Duration tripExpiry,
@@ -41,6 +47,7 @@ public record CarpoolingParameters(
   Duration defaultSearchWindow
 ) {
   public static final CarpoolingParameters DEFAULT = new CarpoolingParameters(
+    30,
     Duration.ofMinutes(15),
     Duration.ofHours(2).plusMinutes(30),
     Duration.ofDays(2),
@@ -51,6 +58,9 @@ public record CarpoolingParameters(
   );
 
   public CarpoolingParameters {
+    if (maxCandidateTripsPerRequest < 1) {
+      throw new IllegalArgumentException("maxCandidateTripsPerRequest must be positive");
+    }
     requirePositive(maxStopWalk, "maxStopWalk");
     requirePositive(maxTripDuration, "maxTripDuration");
     requirePositive(tripExpiry, "tripExpiry");

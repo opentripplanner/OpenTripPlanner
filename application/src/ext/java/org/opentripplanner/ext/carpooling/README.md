@@ -81,6 +81,7 @@ org.opentripplanner.ext.carpooling/
 │   ├── TripPreFilters.java         # Pre-filter composite (AND, short-circuit)
 │   ├── ItineraryPostFilters.java   # Post-filter composite (AND, short-circuit)
 │   ├── SnappedPassenger.java       # The passenger's snapped pickup and dropoff
+│   ├── ClosestCandidateTrips.java  # The trips passing closest to the passenger
 │   ├── TimeTripFilter.java   # Pre-filter: depart-after & arrive-by time checks
 │   ├── CapacityTripFilter.java # Pre-filter: a free seat on some leg
 │   ├── CorridorTripFilter.java # Pre-filter: the trip's corridor reaches the passenger
@@ -185,6 +186,9 @@ Where the driving times come from:
   routed baseline legs and, per leg, every transit stop inside the leg's feasibility ellipse with
   the driving times to serve it. A request then builds only the passenger's two street trees
   (`CarpoolTreeStreetRouter`) and reads everything else from the candidate trips' corridors.
+
+In both modes, at most the 30 trips passing closest to the passenger are evaluated
+(`ClosestCandidateTrips`).
 
 ## Usage Examples
 
@@ -324,7 +328,8 @@ Result of finding optimal passenger insertion:
 ### Performance Bottlenecks
 
 If performance degrades:
-1. **Too many active trips**: Filter more aggressively
+1. **Too many candidate trips near the passenger**: at most 30 are evaluated per request, but each
+   still costs a few street searches in direct mode
 2. **Large route deviation budgets**: Increases insertion positions to test
 3. **Complex street networks**: A* routing takes longer
 
