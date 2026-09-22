@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
-import java.util.List;
-import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.street.model.path.StreetPath;
 
 /**
@@ -34,20 +32,5 @@ public interface RoutedSegment {
   /** Wraps an already materialised path. */
   static RoutedSegment of(StreetPath path) {
     return new PathSegment(path);
-  }
-
-  /**
-   * Cumulative durations along a chain of segments, with {@code stopDuration} added at every
-   * intermediate point.
-   */
-  static Duration[] cumulativeDurations(
-    List<? extends RoutedSegment> segments,
-    Duration stopDuration
-  ) {
-    Duration[] durations = new Duration[segments.size()];
-    for (int i = 0; i < durations.length; i++) {
-      durations[i] = segments.get(i).duration();
-    }
-    return StreetPathUtils.calculateCumulativeDurations(durations, stopDuration);
   }
 }

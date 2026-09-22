@@ -31,13 +31,10 @@ import org.opentripplanner.ext.carpooling.routing.CorridorRouter;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
-import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
-import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
-import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
@@ -68,7 +65,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link CarpoolingService} that orchestrates the carpooling routing
- * algorithm: pre-filtering, position finding, insertion evaluation, and post-filtering.
+ * algorithm: pre-filtering, insertion evaluation, and post-filtering.
  * <p>
  * This service is the main entry point for carpool routing functionality. It coordinates multiple
  * components to efficiently find viable carpool matches while minimizing expensive routing
@@ -76,17 +73,15 @@ import org.slf4j.LoggerFactory;
  *
  * <h2>Algorithm Phases</h2>
  * <p>
- * The service executes routing requests in four phases:
+ * The service executes routing requests in three phases:
  * <ol>
  *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Once the passenger is snapped to
  *       the street network, quickly eliminates trips that cannot serve the passenger in time,
  *       have no free seat, or whose corridor cannot reach the passenger.</li>
- *   <li><strong>Position Finding ({@link InsertionPositionFinder}):</strong> For trips that
- *       pass filtering, identifies viable pickup/dropoff position pairs using fast heuristics
- *       (capacity, beeline delay estimates). No routing is performed in this phase.</li>
- *   <li><strong>Insertion Evaluation ({@link InsertionEvaluator}):</strong> For viable positions,
- *       computes actual routes using A* street routing. Evaluates all feasible insertion positions
- *       and selects the one minimizing additional travel time while satisfying delay constraints.</li>
+ *   <li><strong>Insertion Evaluation ({@link InsertionEvaluator}):</strong> For trips that pass
+ *       filtering, computes the needed routes using A* street routing. Evaluates all feasible
+ *       insertion positions and selects the one minimizing additional travel time while satisfying
+ *       delay constraints.</li>
  *   <li><strong>Post-filtering ({@link ItineraryPostFilters}, direct routing only):</strong>
  *       Re-checks the fully-routed {@link Itinerary} against tight time bounds that the loose
  *       pre-filter could not enforce. Access/egress routing skips this phase because it emits
@@ -99,7 +94,6 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>{@link VertexCreationService}:</strong> Links coordinates to graph vertices</li>
  *   <li><strong>{@link StreetLimitationParametersService}:</strong> Street routing configuration</li>
  *   <li><strong>{@link TripPreFilters}:</strong> Pre-screening filters</li>
- *   <li><strong>{@link InsertionPositionFinder}:</strong> Heuristic position filtering</li>
  *   <li><strong>{@link InsertionEvaluator}:</strong> Routing evaluation and selection</li>
  *   <li><strong>{@link CarpoolItineraryMapper}:</strong> Maps insertions to OTP itineraries</li>
  *   <li><strong>{@link ItineraryPostFilters}:</strong> Tight time-window enforcement on routed
@@ -108,7 +102,6 @@ import org.slf4j.LoggerFactory;
  *
  * @see CarpoolingService for interface documentation and usage examples
  * @see TripPreFilters for filtering strategy details
- * @see InsertionPositionFinder for position finding strategy details
  * @see InsertionEvaluator for insertion evaluation algorithm details
  * @see ItineraryPostFilters for post-filter behaviour
  */
@@ -121,7 +114,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final TripPreFilters preFilters;
   private final ItineraryPostFilters postFilters;
   private final CarpoolItineraryMapper itineraryMapper;
-  private final InsertionPositionFinder positionFinder;
   private final VertexCreationService vertexCreationService;
 
   /**
@@ -166,9 +158,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     this.preFilters = TripPreFilters.defaults(streetLimitationParametersService.maxCarSpeed());
     this.postFilters = ItineraryPostFilters.defaults();
     this.itineraryMapper = new CarpoolItineraryMapper();
-    this.positionFinder = new InsertionPositionFinder(
-      new BeelineEstimator(streetLimitationParametersService.maxCarSpeed())
-    );
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
       "vertexCreationService"
@@ -184,7 +173,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   /**
    * Routes a direct carpool trip from the passenger's origin to destination.
    * <p>
-   * This method executes the full four-phase carpooling algorithm:
+   * This method executes the full three-phase carpooling algorithm:
    * <ol>
    *   <li><strong>Pre-filtering:</strong> Once the passenger is snapped to the street network, all
    *       trips from the repository are filtered by time window, by free seats and by whether
@@ -192,9 +181,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       eliminate incompatible matches. Of the survivors, at most
    *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
    *       passenger, are evaluated.</li>
-   *   <li><strong>Position finding:</strong> For each surviving trip, viable pickup/dropoff
-   *       insertion positions are identified using beeline heuristics (no routing).</li>
-   *   <li><strong>Insertion evaluation:</strong> Viable positions are evaluated with A* street
+   *   <li><strong>Insertion evaluation:</strong> Insertion positions are evaluated with A* street
    *       routing to find the insertion that minimizes additional driver travel time while
    *       respecting delay constraints.</li>
    *   <li><strong>Post-filtering:</strong> Routed itineraries are re-checked against tight time
@@ -298,44 +285,25 @@ public class DefaultCarpoolingService implements CarpoolingService {
         return List.of();
       }
 
-      var insertionEvaluator = new InsertionEvaluator(router, stopDuration);
-
-      var snappedPickup = new WgsCoordinate(pickupSnap.vertex().getCoordinate());
-      var snappedDropoff = new WgsCoordinate(dropoffSnap.vertex().getCoordinate());
+      var insertionEvaluator = new InsertionEvaluator(
+        router,
+        stopDuration,
+        streetLimitationParametersService.maxCarSpeed()
+      );
 
       var insertionCandidates = candidateTrips
         .stream()
-        .map(routableTrip -> {
-          var trip = routableTrip.trip();
-          List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-            trip,
-            snappedPickup,
-            snappedDropoff,
-            stopDuration
-          );
-
-          if (viablePositions.isEmpty()) {
-            LOG.debug("No viable positions found for trip {} (avoided all routing!)", trip.getId());
-            return null;
-          }
-
-          LOG.debug(
-            "{} viable positions found for trip {}, evaluating with routing",
-            viablePositions.size(),
-            trip.getId()
-          );
-
-          return insertionEvaluator.findBestInsertion(
+        .map(routableTrip ->
+          insertionEvaluator.findBestInsertion(
             routableTrip,
-            viablePositions,
             new PassengerSnap(
               pickupSnap.vertex(),
               dropoffSnap.vertex(),
               pickupSnap.walkPath(),
               dropoffSnap.walkPath()
             )
-          );
-        })
+          )
+        )
         .filter(Objects::nonNull)
         .toList();
 
@@ -371,10 +339,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       passing closest to the passenger, are evaluated.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
    *       those the passenger can walk to or from within the walk budget.</li>
-   *   <li>For each candidate trip and corridor stop combination, identifies viable insertion
-   *       positions using beeline heuristics.</li>
-   *   <li>Evaluates viable positions with the driving times of the corridor and the passenger's
-   *       two street trees, via {@link CorridorRouter}.</li>
+   *   <li>Evaluates the insertion positions with the driving times of the corridor and the
+   *       passenger's two street trees, via {@link CorridorRouter}.</li>
    *   <li>Converts the best insertions into {@link CarpoolAccessEgress} objects with timing
    *       information relative to {@code transitSearchTimeZero} for Raptor integration.</li>
    * </ol>
@@ -520,7 +486,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var stopDuration = request.preferences().car().pickupTime();
 
-      var insertionEvaluator = new InsertionEvaluator(corridorRouter, stopDuration);
+      var insertionEvaluator = new InsertionEvaluator(corridorRouter, stopDuration, maxCarSpeed);
 
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.
@@ -536,7 +502,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
           stopSnaps,
           streetSearchRequest,
           maxWalkToCarpool,
-          stopDuration,
           corridorRouter,
           transitServiceResolver
         );
@@ -568,8 +533,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   /**
    * Registers the trip's corridor on the router: its baseline legs, and the driving times to and
    * from every corridor stop the passenger can walk to (access) or from (egress) within the walk
-   * budget. Returns those stops with the insertion positions the beeline pre-check admits, one
-   * entry per stop even when several legs serve it.
+   * budget. Returns those stops, one entry per stop even when several legs serve it.
    */
   private List<ViableAccessEgress> registerCorridor(
     RoutableCarpoolTrip trip,
@@ -578,7 +542,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     Map<FeedScopedId, Optional<SnapResult>> stopSnaps,
     StreetSearchRequest streetSearchRequest,
     Duration maxWalk,
-    Duration stopDuration,
     CorridorRouter router,
     TransitServiceResolver transitServiceResolver
   ) {
@@ -624,23 +587,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var snap = entry.getValue();
       var pickupSide = access ? passengerSnap : snap;
       var dropoffSide = access ? snap : passengerSnap;
-
-      var viablePositions = positionFinder.findViablePositions(
-        trip.trip(),
-        new WgsCoordinate(pickupSide.vertex().getCoordinate()),
-        new WgsCoordinate(dropoffSide.vertex().getCoordinate()),
-        stopDuration
-      );
-      if (viablePositions.isEmpty()) {
-        continue;
-      }
       viable.add(
         new ViableAccessEgress(
           stop,
           snap.vertex(),
           passengerSnap.vertex(),
           accessOrEgress,
-          viablePositions,
           pickupSide.walkPath(),
           dropoffSide.walkPath()
         )

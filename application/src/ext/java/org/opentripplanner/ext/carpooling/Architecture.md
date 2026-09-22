@@ -28,8 +28,6 @@ org.opentripplanner.ext.carpooling/
 │   ├── CorridorTripFilter   # Pre-filter: the trip's corridor reaches the passenger
 │   ├── CapacityTripFilter   # Pre-filter: a free seat on some leg
 │   └── TimeItineraryFilter  # Post-filter: tight time-window enforcement
-├── constraints/              # Post-routing constraints
-│   └── PassengerDelayConstraints # Protects existing passengers
 ├── util/                     # Utilities
 │   └── BeelineEstimator     # Fast travel time estimates
 ├── updater/                  # Real-time updates
@@ -60,18 +58,14 @@ Optimal insertion point calculation:
 - Direct: goal-directed street searches between the passenger and the legs of each candidate trip
 - Access/egress: the trip's corridor (computed when the trip arrives) supplies the stops it can
   serve and the driver's driving times; the passenger's two street trees supply the rest
-- Evaluates all viable insertion positions
-- Selects position with minimum additional travel time
+- Every pair of pickup and dropoff legs is evaluated in constant time from those durations
+- Selects the pair with minimum additional travel time that keeps a free seat on every leg the
+  passenger rides and fits the deviation budget of every stop it delays
 
 ### 3. Post-Filter Phase
 Applied to fully-routed itineraries with actual computed times:
 - **TimeItineraryFilter**: Tight enforcement of the passenger's depart-after / arrive-by window
   against the itinerary's real start/end times
-
-### 4. Constraint Validation
-- **Capacity constraints**: Ensures vehicle capacity is not exceeded
-- **Passenger delay constraints**: Protects existing passengers (max 5 minutes additional delay)
-- **Deviation budget**: Respects driver's maximum acceptable detour time
 
 ## Multi-Stop Support
 
@@ -79,7 +73,7 @@ The system handles trips with multiple existing passengers:
 - Each stop tracks passenger count changes (pickups and dropoffs)
 - Capacity validation ensures vehicle is never over capacity
 - Route optimization considers all existing stops when inserting new passengers
-- Passenger delay constraints protect all existing passengers from excessive delays
+- The stops' deviation budgets protect all existing passengers from excessive delays
 
 ## Integration Points
 

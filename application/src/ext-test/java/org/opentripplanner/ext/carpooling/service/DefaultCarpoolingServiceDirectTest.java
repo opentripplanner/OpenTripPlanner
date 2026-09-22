@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * Integration tests for {@link DefaultCarpoolingService#routeDirect}.
  * <p>
  * These tests use a real street graph to verify the full direct routing pipeline
- * including filtering, position finding, insertion evaluation, and itinerary mapping.
+ * including filtering, insertion evaluation, and itinerary mapping.
  * <p>
  * Graph layout (main road going east, P and Q sit south of the road):
  * <pre>

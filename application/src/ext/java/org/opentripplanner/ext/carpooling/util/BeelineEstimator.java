@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
-import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -10,9 +9,10 @@ import org.opentripplanner.street.model.StreetConstants;
 /**
  * Provides fast, low-resolution travel time estimates based on beeline (straight-line) distances.
  * <p>
- * Used as a heuristic to quickly reject incompatible insertion positions before
- * performing expensive A* street routing. The estimates are intentionally optimistic
- * (lower bounds) so that valid insertions are never incorrectly rejected.
+ * Used to reject trips whose waypoints are too far apart to be driven within the longest trip
+ * that is modelled, and, through {@link #minDriveSeconds}, to bound the car searches, the
+ * pre-filters and the insertion checks of a request. The estimates are intentionally optimistic
+ * (lower bounds) so that valid trips are never incorrectly rejected.
  * <p>
  * Formula: duration = beeline_distance / speed (in m/s)
  * <p>
@@ -24,10 +24,8 @@ public class BeelineEstimator {
 
   /**
    * Fallback speed for the no-arg constructor when no graph-derived speed is supplied
-   * ({@link StreetConstants#DEFAULT_MAX_CAR_SPEED}, 40 m/s ≈ 144 km/h). Production passes the
-   * graph's actual maximum car speed instead — the tightest divisor that still keeps the estimate
-   * a lower bound, since dividing by anything slower would over-estimate and discard feasible
-   * insertions on fast roads.
+   * ({@link StreetConstants#DEFAULT_MAX_CAR_SPEED}, 40 m/s ≈ 144 km/h): dividing by anything
+   * slower than the fastest street would over-estimate and discard feasible trips on fast roads.
    */
   public static final double DEFAULT_SPEED_MPS = StreetConstants.DEFAULT_MAX_CAR_SPEED;
 
@@ -90,25 +88,5 @@ public class BeelineEstimator {
   /** Like {@link #minDriveSeconds(double, double, double, double, double)}, for two coordinates. */
   public static double minDriveSeconds(Coordinate from, Coordinate to, double maxCarSpeed) {
     return SphericalDistanceLibrary.fastDistance(from, to) / maxCarSpeed;
-  }
-
-  /**
-   * Calculates cumulative travel times to each point in a route, including stop duration
-   * at each intermediate point.
-   *
-   * @param points Route points in order
-   * @param stopDuration Duration added at each intermediate stop (not at the first point)
-   * @return Array of cumulative durations (first element is always Duration.ZERO)
-   */
-  public Duration[] calculateCumulativeTimes(List<WgsCoordinate> points, Duration stopDuration) {
-    if (points.isEmpty()) {
-      return new Duration[0];
-    }
-
-    Duration[] segmentDurations = new Duration[points.size() - 1];
-    for (int i = 0; i < segmentDurations.length; i++) {
-      segmentDurations[i] = estimateDuration(points.get(i), points.get(i + 1));
-    }
-    return StreetPathUtils.calculateCumulativeDurations(segmentDurations, stopDuration);
   }
 }
