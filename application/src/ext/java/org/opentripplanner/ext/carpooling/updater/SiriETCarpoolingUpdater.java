@@ -2,9 +2,12 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
@@ -31,6 +34,11 @@ import uk.org.siri.siri21.ServiceDelivery;
  * Polls carpool driver trips from a SIRI-ET HTTP source and maintains them in the
  * {@link CarpoolingRepository}. Each trip's route points are resolved to permanent, car-reachable
  * street vertices before insertion.
+ * <p>
+ * A poll only parses the delivery: cancellations are applied at once, and new or changed trips are
+ * handed to a {@link CarpoolTripResolutionQueue} that resolves them on a background thread. The
+ * updater is therefore primed, and the instance ready, once the first poll has been read, however
+ * many trips the feed holds; trips become routable one by one as their resolution completes.
  */
 public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTimeUpdateContext> {
 
@@ -57,22 +65,60 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * stored trip supplies the geometry to compare against and the end time that drives expiry (swept
    * on the same expiry as stored trips).
    */
-  private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new HashMap<>();
+  private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new ConcurrentHashMap<>();
+  private final CarpoolTripResolutionQueue resolutionQueue;
+
+  @Nullable
+  private final ExecutorService ownedExecutor;
 
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
     RoutableCarpoolTripResolver tripResolver
   ) {
+    this(config, repository, tripResolver, resolverThread(config.feedId()));
+  }
+
+  /**
+   * @param resolutionExecutor runs the trip resolutions handed over by the polls; the production
+   *        constructor uses one daemon thread, tests may run them inline
+   */
+  SiriETCarpoolingUpdater(
+    DefaultSiriETUpdaterParameters config,
+    CarpoolingRepository repository,
+    RoutableCarpoolTripResolver tripResolver,
+    Executor resolutionExecutor
+  ) {
     super(config);
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
     this.tripResolver = tripResolver;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+    this.ownedExecutor = resolutionExecutor instanceof ExecutorService owned ? owned : null;
+    this.resolutionQueue = new CarpoolTripResolutionQueue(
+      resolutionExecutor,
+      this::resolveTrip,
+      repository
+    );
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
     this.mapper = new CarpoolSiriMapper(config.feedId());
+  }
+
+  private static ExecutorService resolverThread(String feedId) {
+    return Executors.newSingleThreadExecutor(task -> {
+      var thread = new Thread(task, "carpool-trip-resolver-" + feedId);
+      thread.setDaemon(true);
+      return thread;
+    });
+  }
+
+  @Override
+  public void teardown() {
+    if (ownedExecutor != null) {
+      ownedExecutor.shutdownNow();
+    }
   }
 
   @Override
@@ -90,6 +136,10 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       moreData = fetchAndProcessUpdates();
     } while (moreData);
     removeExpiredTrips();
+    int pending = resolutionQueue.pending();
+    if (pending > 0) {
+      LOG.info("{} carpool trips are queued for resolution", pending);
+    }
   }
 
   /**
@@ -149,28 +199,24 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes the
-   * trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails to
-   * resolve.
+   * Maps a journey to a carpool trip and queues it for resolution and insertion (see
+   * {@link CarpoolTripResolutionQueue}). Removes the trip instead, at once, when the journey is
+   * cancelled or has fewer than 2 non-cancelled calls; a trip that later fails to resolve is
+   * removed by the queue.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
       FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
       if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
-        repository.removeCarpoolTrip(tripId);
+        remove(tripId);
         return;
       }
       var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
       if (carpoolTrip == null) {
-        repository.removeCarpoolTrip(tripId);
+        remove(tripId);
         return;
       }
-      var routableTrip = resolveTrip(carpoolTrip);
-      if (routableTrip == null) {
-        repository.removeCarpoolTrip(tripId);
-        return;
-      }
-      repository.upsertCarpoolTrip(routableTrip);
+      resolutionQueue.submit(carpoolTrip);
     } catch (Exception e) {
       LOG.info(
         "Failed to process EstimatedVehicleJourney {}",
@@ -178,6 +224,11 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         e
       );
     }
+  }
+
+  private void remove(FeedScopedId tripId) {
+    resolutionQueue.cancel(tripId);
+    repository.removeCarpoolTrip(tripId);
   }
 
   private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {
@@ -197,7 +248,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * {@code null} if a point cannot be resolved or the baseline cannot be routed. Both outcomes are
    * memoized on the route-point geometry: an unchanged geometry reuses
    * the stored vertices or skips a known failure without re-resolving. A first failure is logged; a
-   * resolution that throws is memoized as failed too, with its stack trace.
+   * resolution that throws is memoized as failed too, with its stack trace. Runs on the resolution
+   * queue's thread.
    */
   @Nullable
   private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
