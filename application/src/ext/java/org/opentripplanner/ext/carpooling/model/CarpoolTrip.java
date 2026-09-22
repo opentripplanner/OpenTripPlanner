@@ -44,8 +44,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * The routing algorithm uses trips to find compatible matches for passenger requests:
  * <ol>
  *   <li>Filters check basic compatibility (capacity, timing, direction)</li>
- *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route</li>
- *   <li>Validators ensure constraints (capacity timeline, deviation budget) are satisfied</li>
+ *   <li>Insertion strategy finds optimal pickup/dropoff positions along the route, keeping every leg
+ *       the passenger rides within capacity and every later stop within its deviation budget</li>
  * </ol>
  *
  * @see CarpoolStop for individual stop details
@@ -176,58 +176,6 @@ public class CarpoolTrip
     }
 
     return stops.get(stopIndex).getOnboardCount();
-  }
-
-  /**
-   * Checks if there's capacity to insert a passenger at the given pickup and dropoff positions in
-   * the modified route.
-   * <p>
-   * The positions are 0-based indices of the passenger's pickup and dropoff stops in the
-   * modified route (the route after the passenger's stops have been inserted). For example, with
-   * original stops [Origin, A, B, Destination] and pickupPosition=1, dropoffPosition=3: the
-   * modified route is [Origin, Pickup, A, Dropoff, B, Destination]. All stops between (inclusive)
-   * pickupPosition - 1 and dropoffPosition - 2 are checked for capacity. In the example this is
-   * between stops 0 and 1, meaning that stops Origin and A need to have sufficient capacity for
-   * {@code additionalPassengers} extra passengers.
-   * <p>
-   *
-   * @param pickupPosition       0-based index of the passenger's pickup in the modified route. Must
-   *                             be >= 1 (position 0 is the driver's origin).
-   * @param dropoffPosition      0-based index of the passenger's dropoff in the modified route.
-   *                             Must be > pickupPosition.
-   * @param additionalPassengers Number of passengers to add (typically 1)
-   * @return true if capacity is available throughout the entire range, false otherwise
-   * @throws IllegalArgumentException if pickupPosition < 1 or dropoffPosition <= pickupPosition
-   */
-  public boolean hasCapacityForInsertion(
-    int pickupPosition,
-    int dropoffPosition,
-    int additionalPassengers
-  ) {
-    if (pickupPosition < 1) {
-      throw new IllegalArgumentException(
-        "pickupPosition must be >= 1 (position 0 is the driver's origin), got: " + pickupPosition
-      );
-    }
-    if (dropoffPosition <= pickupPosition) {
-      throw new IllegalArgumentException(
-        "dropoffPosition must be > pickupPosition, got: pickupPosition=" +
-          pickupPosition +
-          ", dropoffPosition=" +
-          dropoffPosition
-      );
-    }
-
-    int firstOriginalStop = pickupPosition - 1;
-    int lastOriginalStop = dropoffPosition - 2;
-
-    for (int i = firstOriginalStop; i <= lastOriginalStop; i++) {
-      if (getPassengerCountAtDepartureOfStop(i) + additionalPassengers > totalCapacity) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   @Nullable
