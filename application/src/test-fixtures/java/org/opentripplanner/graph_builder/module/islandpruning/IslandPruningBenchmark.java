@@ -14,6 +14,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,11 +99,7 @@ public class IslandPruningBenchmark {
   }
 
   private static int countEdges(Graph graph) {
-    int count = 0;
-    for (var _ : graph.findEdges(StreetEdge.class)) {
-      count++;
-    }
-    return count;
+    return ListUtils.countIterable(graph.findEdges(StreetEdge.class));
   }
 
   private static long usedHeapBytes() {
