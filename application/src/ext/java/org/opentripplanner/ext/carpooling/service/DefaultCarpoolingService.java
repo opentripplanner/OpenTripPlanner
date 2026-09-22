@@ -721,8 +721,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var vertices = tripWithVertices.vertices();
     var durations = new Duration[vertices.size() - 1];
     for (int leg = 0; leg < durations.length; leg++) {
-      var path = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
-      if (path == null) {
+      var segment = baselineRouter.route(vertices.get(leg), vertices.get(leg + 1));
+      if (segment == null) {
         LOG.debug(
           "OTP could not route baseline leg {} of trip {} within the carpool bound; skipping it",
           leg,
@@ -730,7 +730,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         );
         return null;
       }
-      durations[leg] = path.duration();
+      durations[leg] = segment.duration();
     }
     return durations;
   }

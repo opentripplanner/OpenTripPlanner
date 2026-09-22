@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -113,6 +114,12 @@ class InsertionEvaluatorTest {
     );
   }
 
+  /** Routers answer {@code null} for an unroutable pair; a path is wrapped as a segment. */
+  @Nullable
+  private static RoutedSegment segmentOrNull(@Nullable StreetPath path) {
+    return path == null ? null : RoutedSegment.of(path);
+  }
+
   @Test
   void findOptimalInsertion_onDeviationBudgetExceeded_returnsNull() {
     var deviationBudget = Duration.ofMinutes(5);
@@ -127,7 +134,7 @@ class InsertionEvaluatorTest {
     );
 
     var mockPath = createStreetPath(Duration.ofMinutes(4));
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(
       trip,
@@ -157,13 +164,32 @@ class InsertionEvaluatorTest {
 
     var mockPath = createStreetPath();
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
     assertNotNull(result);
     assertEquals(1, result.pickupPosition());
     assertEquals(2, result.dropoffPosition());
+  }
+
+  @Test
+  void noPathIsBuiltWhileEvaluating() {
+    CarpoolRouter router = (from, to) ->
+      new RoutedSegment() {
+        @Override
+        public int durationSeconds() {
+          return 300;
+        }
+
+        @Override
+        public StreetPath path() {
+          throw new AssertionError("a path was built while evaluating");
+        }
+      };
+    var trip = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
+
+    assertNotNull(findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, router));
   }
 
   @Test
@@ -185,7 +211,7 @@ class InsertionEvaluatorTest {
       ) {
         return null;
       } else {
-        return mockPath;
+        return RoutedSegment.of(mockPath);
       }
     };
 
@@ -211,7 +237,7 @@ class InsertionEvaluatorTest {
     // Additional = 50 min, exceeds 5 min budget
     var mockPath = createStreetPath(Duration.ofMinutes(20));
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -227,7 +253,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createStreetPath();
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     assertDoesNotThrow(() ->
       findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction)
@@ -289,7 +315,7 @@ class InsertionEvaluatorTest {
 
     @SuppressWarnings("ConstantConditions")
     CarpoolRouter routingFunction = (from, to) ->
-      pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
+      segmentOrNull(pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to))));
 
     var viablePositions = List.of(new InsertionPosition(1, 2), new InsertionPosition(2, 3));
 
@@ -312,7 +338,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createStreetPath();
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -363,7 +389,7 @@ class InsertionEvaluatorTest {
     @SuppressWarnings("ConstantConditions")
     CarpoolRouter routingFunction = (from, to) -> {
       callCount[0]++;
-      return pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
+      return segmentOrNull(pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to))));
     };
 
     // Passenger pickup at OSLO_EAST, dropoff at OSLO_MIDPOINT_NORTH
@@ -403,7 +429,7 @@ class InsertionEvaluatorTest {
     final int[] callCount = { 0 };
     CarpoolRouter carpoolRouter = (from, to) -> {
       callCount[0]++;
-      return mockPath;
+      return RoutedSegment.of(mockPath);
     };
 
     // Pickup exactly at OSLO_EAST (existing stop), dropoff at OSLO_NORTH (new)
@@ -431,7 +457,7 @@ class InsertionEvaluatorTest {
     final int[] callCount = { 0 };
     CarpoolRouter carpoolRouter = (from, to) -> {
       callCount[0]++;
-      return mockPath;
+      return RoutedSegment.of(mockPath);
     };
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, carpoolRouter);

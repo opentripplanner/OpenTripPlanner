@@ -315,8 +315,11 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       assertTrue(accessEgress.durationInSeconds() > 0, "Duration should be positive");
       assertTrue(accessEgress.hasOpeningHours(), "Carpool access should have opening hours");
       assertFalse(accessEgress.isWalkOnly(), "Carpool access should not be walk-only");
-      assertNotNull(accessEgress.sharedSegments(), "Shared segments should not be null");
-      assertFalse(accessEgress.sharedSegments().isEmpty(), "Shared segments should not be empty");
+      assertNotNull(accessEgress.pathsWithNewPassenger(), "Shared segments should not be null");
+      assertFalse(
+        accessEgress.pathsWithNewPassenger().isEmpty(),
+        "Shared segments should not be empty"
+      );
     }
 
     int stopT3Index = transitServiceResolver.getStop(stopT3.getId()).getIndex();
@@ -352,7 +355,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
 
     for (CarpoolAccessEgress accessEgress : results) {
       assertTrue(accessEgress.durationInSeconds() > 0, "Duration should be positive");
-      assertNotNull(accessEgress.sharedSegments(), "Shared segments should not be null");
+      assertNotNull(accessEgress.pathsWithNewPassenger(), "Shared segments should not be null");
     }
 
     int stopT1Index = transitServiceResolver.getStop(stopT1.getId()).getIndex();

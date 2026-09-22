@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.path.StreetPath;
 
@@ -15,7 +14,7 @@ import org.opentripplanner.street.model.path.StreetPath;
  * <pre>
  * - The original trip
  * - Insertion positions (where pickup and dropoff occur in the modified route)
- * - Route segments (all StreetPaths forming the complete modified route)
+ * - Route segments (all {@link RoutedSegment}s forming the complete modified route)
  * - Timing information
  * </pre>
  * <p>
@@ -27,7 +26,7 @@ public record InsertionCandidate(
   CarpoolTrip trip,
   int pickupPosition,
   int dropoffPosition,
-  List<StreetPath> routeSegments,
+  List<RoutedSegment> routeSegments,
   Duration stopDuration,
   NearbyStop transitStop,
   Duration totalTripDuration,
@@ -67,7 +66,7 @@ public record InsertionCandidate(
     CarpoolTrip trip,
     int pickupPosition,
     int dropoffPosition,
-    List<StreetPath> routeSegments,
+    List<RoutedSegment> routeSegments,
     Duration stopDuration,
     NearbyStop transitStop,
     @Nullable StreetPath walkToPickup,
@@ -87,13 +86,10 @@ public record InsertionCandidate(
   }
 
   private static Duration computeTotalTripDuration(
-    List<StreetPath> routeSegments,
+    List<RoutedSegment> routeSegments,
     Duration stopDuration
   ) {
-    Duration[] cumulativeDurations = StreetPathUtils.calculateCumulativeDurations(
-      routeSegments.toArray(new StreetPath[0]),
-      stopDuration
-    );
+    Duration[] cumulativeDurations = RoutedSegment.cumulativeDurations(routeSegments, stopDuration);
     return cumulativeDurations[cumulativeDurations.length - 1];
   }
 
@@ -102,7 +98,7 @@ public record InsertionCandidate(
    *
    * @return all segments before the pickup position.
    */
-  public List<StreetPath> getPickupSegments() {
+  public List<RoutedSegment> getSegmentsBeforePickup() {
     if (pickupPosition == 0) {
       return List.of();
     }
@@ -110,12 +106,20 @@ public record InsertionCandidate(
   }
 
   /**
-   * Gets the shared route segment(s) - from passenger pickup to dropoff.
+   * The segments the new passenger rides, from pickup to dropoff.
    *
    * @return all segments between pickup and dropoff positions.
    */
-  public List<StreetPath> getSharedSegments() {
+  public List<RoutedSegment> getSegmentsWithNewPassenger() {
     return routeSegments.subList(pickupPosition, dropoffPosition);
+  }
+
+  /**
+   * The paths of the {@link #getSegmentsWithNewPassenger() segments with the new passenger}, in
+   * order.
+   */
+  public List<StreetPath> getPathsWithNewPassenger() {
+    return getSegmentsWithNewPassenger().stream().map(RoutedSegment::path).toList();
   }
 
   /**
@@ -123,7 +127,7 @@ public record InsertionCandidate(
    *
    * @return all segments after the dropoff position.
    */
-  public List<StreetPath> getDropoffSegments() {
+  public List<RoutedSegment> getSegmentsAfterDropoff() {
     if (dropoffPosition >= routeSegments.size()) {
       return List.of();
     }
@@ -140,16 +144,16 @@ public record InsertionCandidate(
    *         segments).
    */
   public Duration getDurationUntilPickupArrival() {
-    return totalSegmentDuration(getPickupSegments(), stopDuration);
+    return totalSegmentDuration(getSegmentsBeforePickup(), stopDuration);
   }
 
   /**
    * Calculates the duration of the passenger's ride from pickup arrival to dropoff. Includes the
-   * boarding dwell at the pickup, travel time through shared segments, and stop delays between
-   * shared segments.
+   * boarding dwell at the pickup, travel time through the segments with the new passenger, and stop
+   * delays between them.
    */
   public Duration getPassengerRideDuration() {
-    return totalSegmentDuration(getSharedSegments(), stopDuration).plus(stopDuration);
+    return totalSegmentDuration(getSegmentsWithNewPassenger(), stopDuration).plus(stopDuration);
   }
 
   /**
@@ -160,11 +164,11 @@ public record InsertionCandidate(
     return getPassengerRideDuration().getSeconds() * carpoolReluctance;
   }
 
-  private static Duration totalSegmentDuration(List<StreetPath> segments, Duration stopDuration) {
-    long segmentSeconds = segments
-      .stream()
-      .mapToLong(s -> s.duration().toSeconds())
-      .sum();
+  private static Duration totalSegmentDuration(
+    List<RoutedSegment> segments,
+    Duration stopDuration
+  ) {
+    long segmentSeconds = segments.stream().mapToLong(RoutedSegment::durationSeconds).sum();
     return Duration.ofSeconds(segmentSeconds).plus(
       stopDuration.multipliedBy(Math.max(0, segments.size() - 1))
     );

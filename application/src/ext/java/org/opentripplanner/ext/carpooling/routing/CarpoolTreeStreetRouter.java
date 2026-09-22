@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -42,7 +43,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
   private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> forwardTrees = new HashMap<>();
   private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> reverseTrees = new HashMap<>();
-  private final Map<Pair<Vertex>, StreetPath> pathCache = new HashMap<>();
+  private final Map<Pair<Vertex>, RoutedSegment> segmentCache = new HashMap<>();
   private boolean routingStarted = false;
 
   public enum Direction {
@@ -192,12 +193,12 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * well.
    */
   @Override
-  public StreetPath route(Vertex from, Vertex to) {
+  public RoutedSegment route(Vertex from, Vertex to) {
     routingStarted = true;
 
     var key = new Pair<>(from, to);
-    if (pathCache.containsKey(key)) {
-      return pathCache.get(key);
+    if (segmentCache.containsKey(key)) {
+      return segmentCache.get(key);
     }
 
     var isReverse = false;
@@ -211,9 +212,50 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var state = isReverse ? tree.getState(from) : tree.getState(to);
-    var path = state == null ? null : new StreetPath(state);
-    pathCache.put(key, path);
-    return path;
+    var arrival = tree.getState(isReverse ? from : to);
+    var segment = arrival == null ? null : new TreeSegment(from, to, arrival);
+    segmentCache.put(key, segment);
+    return segment;
+  }
+
+  /**
+   * A segment answered from a shortest-path tree. {@code arrival} is the tree's state at the end of
+   * the segment that is not the tree's root: the segment's {@code to} for a forward tree, its
+   * {@code from} for a reverse tree. The state's elapsed time is the segment's duration; walking
+   * its back pointers yields the path, which {@link StreetPath} puts in chronological order for
+   * both search directions.
+   */
+  static final class TreeSegment implements RoutedSegment {
+
+    private final Vertex from;
+    private final Vertex to;
+    private final State arrival;
+
+    @Nullable
+    private StreetPath path;
+
+    TreeSegment(Vertex from, Vertex to, State arrival) {
+      this.from = from;
+      this.to = to;
+      this.arrival = arrival;
+    }
+
+    @Override
+    public int durationSeconds() {
+      return (int) arrival.getElapsedTimeSeconds();
+    }
+
+    @Override
+    public StreetPath path() {
+      if (path == null) {
+        path = new StreetPath(arrival);
+      }
+      return path;
+    }
+
+    @Override
+    public String toString() {
+      return "TreeSegment{" + from + " -> " + to + ", " + durationSeconds() + "s}";
+    }
   }
 }
