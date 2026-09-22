@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * Write tasks submitted by updaters are serialised per {@link WriteDomain} by the
  * {@link WriteToGraphCallback}s passed at construction — currently {@link GraphWriterService}
  * instances, which will be replaced by the new
- * {@link org.opentripplanner.framework.transaction.UpdateManager} framework. Each updater is
+ * {@link UpdateManager} framework. Each updater is
  * routed to the callback of its declared write domain, so updaters working on unrelated domains
  * run in parallel.
  */

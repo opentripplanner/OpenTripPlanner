@@ -78,11 +78,10 @@ mvn test -Dtest=ClassName#methodName
 Multi-module Maven project (root `pom.xml` `<modules>`):
 
 - **utils**: low-level utilities shared by all modules
-- **domain-core**: core domain primitives (`org.opentripplanner.core`) — `FeedScopedId`, `Cost`,
+- **model-core**: core domain primitives (`org.opentripplanner.core`) — `FeedScopedId`, `Cost`,
   `Distance`, `I18NString`, `Accessibility`, plus framework (deduplicator, DI, resources)
-- **raptor**: transit routing engine — `raptor/src/main/java/org/opentripplanner/raptor/`. Isolated:
-  **zero dependencies on OTP code** (only utilities). Performance-critical; data is supplied via the
-  SPI in `raptor/spi`.
+- **raptor**: transit routing engine — `raptor/router/src`. Isolated: **zero dependencies on OTP
+  code** (only utilities). Performance-critical; data is supplied via the SPI in `raptor/spi`.
 - **astar**: generic A\* shortest-path engine — `astar/src/main/java/org/opentripplanner/astar/`
   (`AStar`, `AStarBuilder`, `spi/`, `strategy/`, `model/`)
 - **street**: street graph model, linking and search —
@@ -98,7 +97,7 @@ Multi-module Maven project (root `pom.xml` `<modules>`):
 
 ### Key Components
 
-**Transit Routing (Raptor)** — `raptor/src/main/java/org/opentripplanner/raptor/`
+**Transit Routing (Raptor)** — `raptor/router/src`
 
 - Range Raptor with multi-criteria pareto-optimal search; isolated from OTP (data supplied via SPI
   in `raptor/spi`). Test all changes with SpeedTest (see Performance Testing).

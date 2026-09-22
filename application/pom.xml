@@ -5,29 +5,29 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.opentripplanner</groupId>
-        <artifactId>otp-root</artifactId>
+        <artifactId>otp</artifactId>
         <version>2.11.0-SNAPSHOT</version>
     </parent>
     <artifactId>application</artifactId>
     <name>OpenTripPlanner - Application</name>
 
+    <dependencyManagement>
+        <dependencies>
+            <!--
+             Not declared directly; pulled in transitively by both com.google.truth:truth and
+             com.google.cloud:google-cloud-pubsub. Pinned so the resolved version doesn't depend
+             on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.41.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- project dependencies -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>gtfs-realtime-protobuf</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>raptor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>astar</artifactId>
@@ -35,27 +35,35 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>gtfs-realtime-protobuf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>street</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>framework</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.raptor</groupId>
+            <artifactId>router</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- 3rd party dependencies -->
         <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-        </dependency>
-        <!-- Logging API -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>ch.poole</groupId>
+            <artifactId>OpeningHoursParser</artifactId>
+            <version>0.29.0</version>
         </dependency>
         <!-- Logging library, implements slf4j logging API -->
         <dependency>
@@ -63,116 +71,27 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
-        <!-- JSON-formatted logging -->
         <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>9.0</version>
-        </dependency>
-
-        <!-- dependency injection -->
-        <dependency>
-            <groupId>com.google.dagger</groupId>
-            <artifactId>dagger</artifactId>
-            <version>${google.dagger.version}</version>
-        </dependency>
-
-        <!-- Lucene is used by the Debug Client Geocode API -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${lucene.version}</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core</artifactId>
+            <version>1.59.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>${lucene.version}</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+            <version>1.18.6</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-suggest</artifactId>
-            <version>${lucene.version}</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-messaging-servicebus</artifactId>
+            <version>7.17.20</version>
         </dependency>
-
+        <!-- Command line parameter parsing -->
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>${micrometer.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-influx</artifactId>
-            <version>${micrometer.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- netcdf4 -->
-
-        <dependency>
-            <groupId>edu.ucar</groupId>
-            <artifactId>netcdf4</artifactId>
-            <version>${netcdf4.version}</version>
-        </dependency>
-        <!--
-            Netex XML document - JAXB generated Java model.
-            This is generated using the official Netex schema(v1.0) and support the entire model,
-            not just the Nordic/Norwegian profile which is currently supported by OTP.
-         -->
-        <dependency>
-            <groupId>org.entur</groupId>
-            <artifactId>netex-java-model</artifactId>
-            <version>${netex-java-model.version}</version>
-        </dependency>
-
-        <!-- SIRI -->
-        <dependency>
-            <groupId>org.entur</groupId>
-            <artifactId>siri-java-model</artifactId>
-            <version>${siri-java-model.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mobilitydata</groupId>
-            <artifactId>gbfs-java-model</artifactId>
-            <version>1.0.14</version>
-        </dependency>
-
-        <!-- TESTING -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.truth</groupId>
-            <artifactId>truth</artifactId>
-            <version>1.4.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit</artifactId>
-            <version>1.5.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.23.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.origin-energy</groupId>
-            <artifactId>java-snapshot-testing-junit5</artifactId>
-            <version>2.3.0</version>
-            <scope>test</scope>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.82</version>
         </dependency>
         <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Trove, and Kryo. -->
         <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
@@ -181,56 +100,15 @@
             <artifactId>kryo-tools</artifactId>
             <version>1.6.0</version>
         </dependency>
-        <!-- kryo serializers for Guava types !-->
+        <!--
+            jersey pulls in older versions of this dependency which are binary-incompatible
+            with the latest jackson version, so we need to explicitly define them here
+         -->
         <dependency>
-            <groupId>de.javakaffee</groupId>
-            <artifactId>kryo-serializers</artifactId>
-            <version>0.45</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.22</version>
         </dependency>
-        <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-grizzly2-http</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <!-- Jackson modules to serialize Jersey response objects to JSON. -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <!-- JAXB serialize Jersey response objects to XML. -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-jaxb</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <!-- HK2 dependency injection framework for injecting context -->
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-
-        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>${jaxb-runtime.version}</version>
-        </dependency>
-
-        <!-- Jackson modules. -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -252,61 +130,34 @@
             <version>${jackson.version}</version>
         </dependency>
         <!--
-            jersey pulls in older versions of this dependency which are binary-incompatible
-            with the latest jackson version, so we need to explicitly define them here
-         -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>2.22</version>
-        </dependency>
-
-        <!--
           Google library imports
           The version is imported using google libraries-bom, see dep.management
         -->
-
+        <!-- Google Cloud Pubsub for SIRI-updater -->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+        </dependency>
         <!-- Google Cloud Storage - as OTP DataSource -->
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
         </dependency>
-
-        <!-- Google Cloud Pubsub for SIRI-updater-->
+        <!-- dependency injection -->
         <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-pubsub</artifactId>
+            <groupId>com.google.dagger</groupId>
+            <artifactId>dagger</artifactId>
+            <version>${google.dagger.version}</version>
         </dependency>
-
+        <!-- Direct dependency with -jre version, in order to not resolve to the limited -android version -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
         <!-- Google Protocol Buffers compact binary serialization format -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-        </dependency>
-
-        <!-- OBA GTFS loader -->
-        <dependency>
-            <groupId>org.onebusaway</groupId>
-            <artifactId>onebusaway-gtfs</artifactId>
-            <version>14.2.3</version>
-        </dependency>
-        <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
-        <dependency>
-            <groupId>net.java.dev.jets3t</groupId>
-            <artifactId>jets3t</artifactId>
-            <version>0.9.4</version>
-        </dependency>
-        <!-- OpenStreetMap protobuf (PBF) definitions and parser -->
-        <dependency>
-            <groupId>org.openstreetmap.pbf</groupId>
-            <artifactId>osmpbf</artifactId>
-            <version>1.8.0</version>
-        </dependency>
-        <!-- Command line parameter parsing -->
-        <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.82</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -319,9 +170,187 @@
             <version>24.0</version>
         </dependency>
         <dependency>
+            <groupId>com.hivemq</groupId>
+            <artifactId>hivemq-mqtt-client</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <!-- kryo serializers for Guava types !-->
+        <dependency>
+            <groupId>de.javakaffee</groupId>
+            <artifactId>kryo-serializers</artifactId>
+            <version>0.45</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.ucar</groupId>
+            <artifactId>netcdf4</artifactId>
+            <version>${netcdf4.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.ci-cmg</groupId>
+            <artifactId>mapbox-vector-tile</artifactId>
+            <version>4.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
+        </dependency>
+        <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
+        <dependency>
+            <groupId>net.java.dev.jets3t</groupId>
+            <artifactId>jets3t</artifactId>
+            <version>0.9.4</version>
+        </dependency>
+        <!-- JSON-formatted logging -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.objecthunter</groupId>
+            <artifactId>exp4j</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.javacsv</groupId>
+            <artifactId>javacsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
             <version>5.6.4</version>
+        </dependency>
+        <!-- Lucene is used by the Debug Client Geocode API -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-suggest</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <!--
+            Netex XML document - JAXB generated Java model.
+            This is generated using the official Netex schema(v1.0) and support the entire model,
+            not just the Nordic/Norwegian profile which is currently supported by OTP.
+         -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-java-model</artifactId>
+            <version>${netex-java-model.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>siri-java-model</artifactId>
+            <version>${siri-java-model.version}</version>
+        </dependency>
+        <!-- GeoTools raster/coverage support, used for elevation (NED/GeoTIFF) processing. -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-coverage</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geotiff</artifactId>
+        </dependency>
+        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb-runtime.version}</version>
+        </dependency>
+        <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- HK2 dependency injection framework for injecting context -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- JAXB serialize Jersey response objects to XML. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-jaxb</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- Jackson modules to serialize Jersey response objects to JSON. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mobilitydata</groupId>
+            <artifactId>gbfs-java-model</artifactId>
+            <version>1.0.14</version>
+        </dependency>
+        <!-- OBA GTFS loader -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-gtfs</artifactId>
+            <version>14.2.3</version>
+        </dependency>
+        <!-- OpenStreetMap protobuf (PBF) definitions and parser -->
+        <dependency>
+            <groupId>org.openstreetmap.pbf</groupId>
+            <artifactId>osmpbf</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>ojp-java-model</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <!-- Logging API -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit</artifactId>
+            <version>1.5.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -330,58 +359,39 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.javacsv</groupId>
-            <artifactId>javacsv</artifactId>
-            <version>2.0</version>
+            <groupId>io.github.origin-energy</groupId>
+            <artifactId>java-snapshot-testing-junit5</artifactId>
+            <version>2.3.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.hivemq</groupId>
-            <artifactId>hivemq-mqtt-client</artifactId>
-            <version>1.4.0</version>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-influx</artifactId>
+            <version>${micrometer.version}</version>
+            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.github.ci-cmg</groupId>
-            <artifactId>mapbox-vector-tile</artifactId>
-            <version>4.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>net.objecthunter</groupId>
-            <artifactId>exp4j</artifactId>
-            <version>0.4.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-core</artifactId>
-            <version>1.59.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.20</version>
-        </dependency>
-        <dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-identity</artifactId>
-            <version>1.18.6</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.poole</groupId>
-            <artifactId>OpeningHoursParser</artifactId>
-            <version>0.29.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.opentripplanner</groupId>
-            <artifactId>ojp-java-model</artifactId>
-            <version>2.0.7</version>
-        </dependency>
-
-        <!-- create zip test files-->
+        <!-- create zip test files -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.28.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.23.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>test-fixtures</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

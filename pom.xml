@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
-    <artifactId>otp-root</artifactId>
+    <artifactId>otp</artifactId>
     <version>2.11.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -99,15 +99,15 @@
     </properties>
 
     <modules>
-        <module>utils</module>
-        <module>domain-core</module>
-        <module>raptor</module>
-        <module>astar</module>
-        <module>gtfs-realtime-protobuf</module>
         <module>application</module>
+        <module>astar</module>
+        <module>core</module>
+        <module>gtfs-realtime-protobuf</module>
         <module>otp-shaded</module>
-        <module>test/integration</module>
+        <module>raptor</module>
         <module>street</module>
+        <module>test/integration</module>
+        <module>transit</module>
     </modules>
 
 
@@ -616,6 +616,28 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>33.7.1-jre</version>
+            </dependency>
+
+            <!--
+             Not declared directly anywhere; pulled in transitively by both azure-identity and
+             azure-messaging-servicebus (application/otp-shaded/integration-test). Pinned so the
+             resolved version doesn't depend on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-core-http-netty</artifactId>
+                <version>1.16.6</version>
+            </dependency>
+
+            <!--
+             Not declared directly; pulled in transitively by both io.micrometer:micrometer-core
+             and com.google.truth:truth (via guava). Pinned so the resolved version doesn't depend
+             on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>1.0.1</version>
             </dependency>
 
             <!-- Logging API -->

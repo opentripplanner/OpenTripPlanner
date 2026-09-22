@@ -2,7 +2,7 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import java.time.LocalDate;
 import java.util.function.Supplier;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
