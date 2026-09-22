@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - trippatternfordates-perf
 
 # There is only one performance-test runner, so runs queue up behind each other anyway.
 # Without this, GitHub picks the newest queued run first; `queue: max` makes it process
@@ -54,17 +55,17 @@ jobs:
           - location: switzerland
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"
-            profile: extended
+            profile: core
 
           - location: helsinki
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
     steps:
       - uses: actions/checkout@v7
