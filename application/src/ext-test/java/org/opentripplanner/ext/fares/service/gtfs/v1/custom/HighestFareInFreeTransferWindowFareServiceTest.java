@@ -7,7 +7,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
 import java.time.Duration;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -49,7 +49,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   }
 
   private static List<Arguments> createTestCases() {
-    List<Arguments> args = new LinkedList<>();
+    List<Arguments> args = new ArrayList<>();
 
     // create routes
     Route routeA = route("A", "Route with one dollar fare");
@@ -57,7 +57,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     Route routeC = route("C", "Route with two dollar fare");
 
     // create fare attributes and rules
-    List<FareRuleSet> defaultFareRules = new LinkedList<>();
+    List<FareRuleSet> defaultFareRules = new ArrayList<>();
 
     // $1 fares
     var oneDollar = Money.usDollars(1.0f);

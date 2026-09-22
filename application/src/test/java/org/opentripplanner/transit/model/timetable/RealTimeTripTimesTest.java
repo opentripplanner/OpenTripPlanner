@@ -9,7 +9,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class RealTimeTripTimesTest {
   static TripTimes createInitialTripTimes() {
     Trip trip = TransitRepositoryForTest.trip(TRIP_ID).build();
 
-    List<StopTime> stopTimes = new LinkedList<>();
+    List<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < STOP_IDS.size(); ++i) {
       StopTime stopTime = new StopTime();

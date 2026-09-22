@@ -1,6 +1,7 @@
 package org.opentripplanner.astar.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
@@ -48,16 +49,18 @@ public class GraphPath<
      * chronological order. List indices will thus increase forward in time, and backEdges will
      * be chronologically 'back' relative to their state.
      */
-    this.states = new LinkedList<>();
-    this.edges = new LinkedList<>();
+    this.states = new ArrayList<>();
+    this.edges = new ArrayList<>();
     for (State cur = lastState; cur != null; cur = cur.getBackState()) {
-      states.addFirst(cur);
+      states.add(cur);
 
       // Record the edge if it exists and this is not the first state in the path.
       if (cur.getBackEdge() != null && cur.getBackState() != null) {
-        edges.addFirst(cur.getBackEdge());
+        edges.add(cur.getBackEdge());
       }
     }
+    Collections.reverse(states);
+    Collections.reverse(edges);
   }
 
   public GraphPath(List<State> states, List<Edge> edges) {

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -106,7 +105,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     }
 
     int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
+    List<Vertex> toRemove = new ArrayList<>();
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
         toRemove.add(v);
