@@ -28,24 +28,6 @@ public final class GraphPathUtils {
   }
 
   /**
-   * Calculates cumulative durations from pre-routed segments, including stop duration
-   * at each intermediate stop.
-   *
-   * @param segments Pre-routed segments
-   * @param stopDuration Duration added at each intermediate stop
-   */
-  public static Duration[] calculateCumulativeDurations(
-    GraphPath<State, Edge, Vertex>[] segments,
-    Duration stopDuration
-  ) {
-    Duration[] segmentDurations = new Duration[segments.length];
-    for (int i = 0; i < segments.length; i++) {
-      segmentDurations[i] = Duration.ofSeconds(segments[i].getDuration());
-    }
-    return calculateCumulativeDurations(segmentDurations, stopDuration);
-  }
-
-  /**
    * Calculates cumulative arrival times from segment durations, including a stop delay
    * at each intermediate point. The stop delay is added <em>before</em> each segment
    * except the first, modelling time spent at an intermediate stop before departing
