@@ -25,6 +25,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyD
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -114,10 +115,10 @@ class SiriETCarpoolingUpdaterTest {
   void processEstimatedVehicleJourney_unresolvableGeometryRedelivered_resolvesOnlyOnce() {
     doReturn(null).when(resolver).resolve(any());
 
-    // Same geometry, fresh times: a re-delivery on an expected-time update must not re-resolve a
+    // Same geometry, later times: a re-delivery on an expected-time update must not re-resolve a
     // failed geometry.
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
-    updater.processEstimatedVehicleJourney(minimalCompleteJourney());
+    updater.processEstimatedVehicleJourney(arrivingLater(minimalCompleteJourney()));
 
     verify(resolver, times(1)).resolve(any());
     assertTrue(repository.getCarpoolTrips().isEmpty());
@@ -186,10 +187,10 @@ class SiriETCarpoolingUpdaterTest {
   void processEstimatedVehicleJourney_resolutionThrowsRedelivered_resolvesOnlyOnce() {
     doThrow(new RuntimeException("resolution blew up")).when(resolver).resolve(any());
 
-    // A thrown resolution is memoized like a null one: re-delivering the same geometry must not
-    // re-resolve.
+    // A thrown resolution is memoized like a null one: re-delivering the same geometry, with later
+    // times, must not re-resolve.
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
-    updater.processEstimatedVehicleJourney(minimalCompleteJourney());
+    updater.processEstimatedVehicleJourney(arrivingLater(minimalCompleteJourney()));
 
     verify(resolver, times(1)).resolve(any());
     assertTrue(repository.getCarpoolTrips().isEmpty());
@@ -239,13 +240,38 @@ class SiriETCarpoolingUpdaterTest {
     updater.processEstimatedVehicleJourney(journey);
     var stored = repository.getCarpoolTrips().iterator().next();
 
-    updater.processEstimatedVehicleJourney(journey);
+    // Same geometry, later times: a changed journey, which is not dropped as a re-delivery.
+    var later = arrivingLater(minimalCompleteJourney());
+    updater.processEstimatedVehicleJourney(later);
 
     verify(resolver, times(1)).resolve(any());
     verify(resolver, never()).resolve(any(), any());
     var reused = repository.getCarpoolTrips().iterator().next();
+    assertEquals(mapper.mapSiriToCarpoolTrip(later).endTime(), reused.trip().endTime());
     assertEquals(stored.vertices(), reused.vertices());
     assertSame(stored.corridor(), reused.corridor());
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_unchangedRedelivery_keepsStoredTrip() {
+    var departure = ZonedDateTime.now();
+    updater.processEstimatedVehicleJourney(minimalCompleteJourney(departure));
+    var storedTrip = repository.getCarpoolTrips().iterator().next();
+
+    updater.processEstimatedVehicleJourney(minimalCompleteJourney(departure));
+
+    assertSame(storedTrip, repository.getCarpoolTrips().iterator().next());
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_redeliveryAfterCancellation_upsertsTrip() {
+    var journey = minimalCompleteJourney();
+    updater.processEstimatedVehicleJourney(journey);
+    updater.processEstimatedVehicleJourney(cancelledJourney());
+
+    updater.processEstimatedVehicleJourney(journey);
+
+    assertTrue(tripIsInRepository(mapper.tripId(journey)));
   }
 
   @Test
