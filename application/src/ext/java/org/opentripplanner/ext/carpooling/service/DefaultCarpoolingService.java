@@ -11,6 +11,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
+import org.opentripplanner.ext.carpooling.filter.ClosestCandidateTrips;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
@@ -117,8 +118,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
   /**
    * Routes a direct carpool trip from the passenger's origin to destination: pre-filters the trips,
-   * finds the viable insertion positions of each by beeline estimates, evaluates them with
-   * goal-directed street searches, and post-filters the itineraries against the tight time bounds.
+   * finds the viable insertion positions of each of the closest candidates by beeline estimates,
+   * evaluates them with goal-directed street searches, and post-filters the itineraries against the
+   * tight time bounds.
    *
    * @param request the routing request; must have {@link StreetMode#CARPOOL} as the direct mode
    * @return the carpool itineraries, empty when none is viable or the direct mode is not CARPOOL
@@ -138,15 +140,21 @@ public class DefaultCarpoolingService implements CarpoolingService {
       carpoolingRequest.getRequestedDateTime()
     );
 
-    var allTrips = repository.getCarpoolTrips();
-    var candidateTrips = allTrips
+    var preFiltered = repository
+      .getCarpoolTrips()
       .stream()
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
+    // Each candidate costs several street searches; evaluate only the trips passing closest.
+    var candidateTrips = ClosestCandidateTrips.closest(
+      preFiltered,
+      List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff()),
+      ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+    );
     LOG.debug(
-      "{} of {} carpool trips passed the pre-filters",
+      "Evaluating {} of {} candidate carpool trips",
       candidateTrips.size(),
-      allTrips.size()
+      preFiltered.size()
     );
     if (candidateTrips.isEmpty()) {
       return List.of();
@@ -269,13 +277,23 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .valueOf(StreetMode.CARPOOL)
       .toSeconds();
 
-    var candidateTrips = repository
+    var preFiltered = repository
       .getCarpoolTripsNear(passengerCoordinates)
       .stream()
       .filter(trip -> trip.corridor().mayServe(trip.vertices(), passengerCoordinates, maxCarSpeed))
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
-    LOG.debug("{} candidate carpool trips near {}", candidateTrips.size(), passengerCoordinates);
+    var candidateTrips = ClosestCandidateTrips.closest(
+      preFiltered,
+      List.of(passengerCoordinates),
+      ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+    );
+    LOG.debug(
+      "Evaluating {} of {} candidate carpool trips near {}",
+      candidateTrips.size(),
+      preFiltered.size(),
+      passengerCoordinates
+    );
     if (candidateTrips.isEmpty()) {
       return List.of();
     }
