@@ -110,10 +110,10 @@ class SiriETCarpoolingUpdaterTest {
   void processEstimatedVehicleJourney_unresolvableGeometryRedelivered_resolvesOnlyOnce() {
     doReturn(null).when(resolver).resolve(any());
 
-    // Same geometry, fresh times: a re-delivery on an expected-time update must not re-resolve a
+    // Same geometry, later times: a re-delivery on an expected-time update must not re-resolve a
     // failed geometry.
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
-    updater.processEstimatedVehicleJourney(minimalCompleteJourney());
+    updater.processEstimatedVehicleJourney(arrivingLater(minimalCompleteJourney()));
 
     verify(resolver, times(1)).resolve(any());
     assertTrue(repository.getCarpoolTrips().isEmpty());
@@ -164,10 +164,10 @@ class SiriETCarpoolingUpdaterTest {
   void processEstimatedVehicleJourney_resolutionThrowsRedelivered_resolvesOnlyOnce() {
     doThrow(new RuntimeException("resolution blew up")).when(resolver).resolve(any());
 
-    // A thrown resolution is memoized like a null one: re-delivering the same geometry must not
-    // re-resolve.
+    // A thrown resolution is memoized like a null one: re-delivering the same geometry, with later
+    // times, must not re-resolve.
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
-    updater.processEstimatedVehicleJourney(minimalCompleteJourney());
+    updater.processEstimatedVehicleJourney(arrivingLater(minimalCompleteJourney()));
 
     verify(resolver, times(1)).resolve(any());
     assertTrue(repository.getCarpoolTrips().isEmpty());
@@ -191,10 +191,33 @@ class SiriETCarpoolingUpdaterTest {
     updater.processEstimatedVehicleJourney(journey);
     var storedVertices = repository.getCarpoolTrips().iterator().next().vertices();
 
-    updater.processEstimatedVehicleJourney(journey);
+    // Same geometry, later times: a changed journey, which is not dropped as a re-delivery.
+    updater.processEstimatedVehicleJourney(arrivingLater(minimalCompleteJourney()));
 
     verify(resolver, times(1)).resolve(any());
     assertEquals(storedVertices, repository.getCarpoolTrips().iterator().next().vertices());
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_unchangedRedelivery_keepsStoredTrip() {
+    var journey = minimalCompleteJourney();
+    updater.processEstimatedVehicleJourney(journey);
+    var storedTrip = repository.getCarpoolTrips().iterator().next();
+
+    updater.processEstimatedVehicleJourney(journey);
+
+    assertSame(storedTrip, repository.getCarpoolTrips().iterator().next());
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_redeliveryAfterCancellation_upsertsTrip() {
+    var journey = minimalCompleteJourney();
+    updater.processEstimatedVehicleJourney(journey);
+    updater.processEstimatedVehicleJourney(cancelledJourney());
+
+    updater.processEstimatedVehicleJourney(journey);
+
+    assertTrue(tripIsInRepository(mapper.tripId(journey)));
   }
 
   @Test
