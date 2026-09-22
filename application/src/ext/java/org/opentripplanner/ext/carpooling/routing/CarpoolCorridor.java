@@ -85,4 +85,18 @@ public record CarpoolCorridor(
       maxCarSpeed
     );
   }
+
+  /**
+   * Whether a passenger at {@code point} can possibly be inserted into some leg: whether a detour
+   * through it fits the {@link DetourBound} of a leg. It never rejects a feasible insertion; the
+   * exact verdict is the insertion evaluation.
+   */
+  public boolean mayServe(Vertex point) {
+    for (int leg = 0; leg < legLimits.size(); leg++) {
+      if (legBound(leg).mayPassThrough(point)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
