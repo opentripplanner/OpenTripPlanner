@@ -14,6 +14,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
+import org.opentripplanner.ext.carpooling.filter.ClosestCandidateTrips;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
@@ -181,7 +182,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * This method executes the full four-phase carpooling algorithm:
    * <ol>
    *   <li><strong>Pre-filtering:</strong> All trips from the repository are filtered by capacity,
-   *       time window, and distance to quickly eliminate incompatible matches.</li>
+   *       time window, and distance to quickly eliminate incompatible matches. Of the survivors,
+   *       at most {@link ClosestCandidateTrips#DEFAULT_MAX_CANDIDATE_TRIPS}, those passing
+   *       closest to the passenger, are evaluated.</li>
    *   <li><strong>Position finding:</strong> For each surviving trip, viable pickup/dropoff
    *       insertion positions are identified using beeline heuristics (no routing).</li>
    *   <li><strong>Insertion evaluation:</strong> Viable positions are evaluated with A* street
@@ -216,15 +219,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
 
-    var candidateTrips = allTrips
+    var preFilteredTrips = allTrips
       .stream()
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
 
     LOG.debug(
       "{} trips passed pre-filters ({} rejected)",
-      candidateTrips.size(),
-      allTrips.size() - candidateTrips.size()
+      preFilteredTrips.size(),
+      allTrips.size() - preFilteredTrips.size()
+    );
+
+    // Each candidate costs several street searches; evaluate only the trips passing closest.
+    var candidateTrips = ClosestCandidateTrips.closest(
+      preFilteredTrips,
+      List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff()),
+      ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
     );
 
     if (candidateTrips.isEmpty()) {
@@ -341,7 +351,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * The method proceeds as follows:
    * <ol>
    *   <li>Takes the trips whose corridor may serve the passenger from a spatial index over the
-   *       corridors, and pre-filters them using time and distance heuristic.</li>
+   *       corridors, and pre-filters them using time and distance heuristic. Of the survivors, at
+   *       most {@link ClosestCandidateTrips#DEFAULT_MAX_CANDIDATE_TRIPS}, those passing closest to
+   *       the passenger, are evaluated.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
    *       those the passenger can walk to or from within the walk budget.</li>
    *   <li>For each candidate trip and corridor stop combination, identifies viable insertion
@@ -403,11 +415,16 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var nearbyTrips = repository.getCarpoolTripsNear(passengerCoordinates);
     LOG.debug("{} carpool trips near {}", nearbyTrips.size(), passengerCoordinates);
 
-    var candidateTrips = nearbyTrips
+    var preFilteredTrips = nearbyTrips
       .stream()
       .filter(trip -> trip.corridor().mayServe(trip.vertices(), passengerCoordinates, maxCarSpeed))
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
+    var candidateTrips = ClosestCandidateTrips.closest(
+      preFilteredTrips,
+      List.of(passengerCoordinates),
+      ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+    );
 
     if (candidateTrips.isEmpty()) {
       return List.of();
