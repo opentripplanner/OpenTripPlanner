@@ -25,12 +25,10 @@ import org.opentripplanner.ext.carpooling.routing.CorridorRouter;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
-import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
 import org.opentripplanner.ext.carpooling.routing.PerStopCandidateCap;
 import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
-import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper.SnapResult;
 import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
@@ -61,10 +59,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default {@link CarpoolingService}: pre-filters the candidate trips, finds the viable insertion
- * positions with the {@link InsertionPositionFinder}, evaluates them with the
- * {@link InsertionEvaluator}, and maps the results to itineraries (direct) or
- * {@link CarpoolAccessEgress} legs for Raptor (access/egress).
+ * Default {@link CarpoolingService}: pre-filters the candidate trips, evaluates the best insertion
+ * of the passenger into each with the {@link InsertionEvaluator}, and maps the results to
+ * itineraries (direct) or {@link CarpoolAccessEgress} legs for Raptor (access/egress).
  *
  * @see CarpoolingService for the interface documentation
  */
@@ -77,7 +74,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final TripPreFilters preFilters = TripPreFilters.defaults();
   private final ItineraryPostFilters postFilters = ItineraryPostFilters.defaults();
   private final CarpoolItineraryMapper itineraryMapper = new CarpoolItineraryMapper();
-  private final InsertionPositionFinder positionFinder;
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
   private final CarpoolStopIndex stopIndex;
@@ -102,9 +98,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
       streetLimitationParametersService,
       "streetLimitationParametersService"
     );
-    this.positionFinder = new InsertionPositionFinder(
-      new BeelineEstimator(streetLimitationParametersService.maxCarSpeed())
-    );
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
       "vertexCreationService"
@@ -118,9 +111,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
   /**
    * Routes a direct carpool trip from the passenger's origin to destination: pre-filters the trips,
-   * finds the viable insertion positions of each of the closest candidates by beeline estimates,
-   * evaluates them with goal-directed street searches, and post-filters the itineraries against the
-   * tight time bounds.
+   * evaluates the best insertion into each of the closest candidates with goal-directed street
+   * searches, and post-filters the itineraries against the tight time bounds.
    *
    * @param request the routing request; must have {@link StreetMode#CARPOOL} as the direct mode
    * @return the carpool itineraries, empty when none is viable or the direct mode is not CARPOOL
@@ -202,28 +194,16 @@ public class DefaultCarpoolingService implements CarpoolingService {
         pickupSnap.walkPath(),
         dropoffSnap.walkPath()
       );
-      var pickupCoordinate = new WgsCoordinate(pickupSnap.vertex().getCoordinate());
-      var dropoffCoordinate = new WgsCoordinate(dropoffSnap.vertex().getCoordinate());
 
-      var stopDuration = request.preferences().car().pickupTime();
       var evaluator = new InsertionEvaluator(
         new CarpoolStreetRouter(streetLimitationParametersService),
-        stopDuration
+        request.preferences().car().pickupTime(),
+        streetLimitationParametersService.maxCarSpeed()
       );
       var carpoolReluctance = request.preferences().car().reluctance();
       itineraries = candidateTrips
         .stream()
-        .map(trip -> {
-          var positions = positionFinder.findViablePositions(
-            trip.trip(),
-            pickupCoordinate,
-            dropoffCoordinate,
-            stopDuration
-          );
-          return positions.isEmpty()
-            ? null
-            : evaluator.findBestInsertion(trip, positions, passengerSnap);
-        })
+        .map(trip -> evaluator.findBestInsertion(trip, passengerSnap))
         .filter(Objects::nonNull)
         .map(candidate ->
           itineraryMapper.toItinerary(candidate, carpoolReluctance, request.from(), request.to())
@@ -351,7 +331,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         new CarpoolStreetRouter(streetLimitationParametersService)
       );
       var stopDuration = request.preferences().car().pickupTime();
-      var evaluator = new InsertionEvaluator(corridorRouter, stopDuration);
+      var evaluator = new InsertionEvaluator(corridorRouter, stopDuration, maxCarSpeed);
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.
       var carpoolReluctance = request.preferences().car().reluctance();
@@ -369,7 +349,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
           accessOrEgress,
           passengerSnap,
           maxWalkToCarpool,
-          stopDuration,
           corridorRouter,
           transitServiceResolver
         );
@@ -414,15 +393,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
   /**
    * Registers the trip's corridor on the router: its baseline legs, and the driving times to and
    * from every corridor stop the passenger can walk to (access) or from (egress) within the walk
-   * budget. Returns those stops with the insertion positions the beeline pre-check admits, one
-   * entry per stop even when several legs serve it.
+   * budget. Returns those stops, one entry per stop even when several legs serve it.
    */
   private List<ViableAccessEgress> registerCorridor(
     CarpoolTripWithVertices trip,
     AccessEgressType accessOrEgress,
     SnapResult passengerSnap,
     Duration maxWalk,
-    Duration stopDuration,
     CorridorRouter router,
     TransitServiceResolver transitServiceResolver
   ) {
@@ -471,24 +448,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
         continue;
       }
       var snap = entry.getValue();
-      Vertex pickupVertex = access ? passengerSnap.vertex() : snap.vertex();
-      Vertex dropoffVertex = access ? snap.vertex() : passengerSnap.vertex();
-      var positions = positionFinder.findViablePositions(
-        trip.trip(),
-        new WgsCoordinate(pickupVertex.getCoordinate()),
-        new WgsCoordinate(dropoffVertex.getCoordinate()),
-        stopDuration
-      );
-      if (positions.isEmpty()) {
-        continue;
-      }
       viable.add(
         new ViableAccessEgress(
           stop,
           snap.vertex(),
           passengerSnap.vertex(),
           accessOrEgress,
-          positions,
           access ? passengerSnap.walkPath() : snap.walkPath(),
           access ? snap.walkPath() : passengerSnap.walkPath()
         )

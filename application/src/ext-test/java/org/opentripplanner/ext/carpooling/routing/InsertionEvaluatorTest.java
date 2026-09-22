@@ -20,6 +20,7 @@ import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripW
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -38,13 +38,10 @@ import org.opentripplanner.utils.collection.Pair;
 
 class InsertionEvaluatorTest {
 
-  private InsertionPositionFinder positionFinder;
   private Map<WgsCoordinate, Vertex> vertexMap;
 
   @BeforeEach
   void setup() {
-    positionFinder = new InsertionPositionFinder(new BeelineEstimator());
-
     vertexMap = new HashMap<>();
 
     for (WgsCoordinate coord : List.of(
@@ -81,7 +78,7 @@ class InsertionEvaluatorTest {
   }
 
   /**
-   * Runs position finding followed by evaluation and returns the best insertion.
+   * Evaluates every insertion of the passenger into the trip and returns the best.
    */
   private InsertionCandidate findOptimalInsertion(
     CarpoolTrip trip,
@@ -90,21 +87,9 @@ class InsertionEvaluatorTest {
     CarpoolRouter carpoolRouter
   ) {
     var tripWithVertices = createTripWithVertices(trip);
-    List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-      trip,
-      passengerPickup,
-      passengerDropoff,
-      Duration.ZERO
-    );
-
-    if (viablePositions.isEmpty()) {
-      return null;
-    }
-
     var evaluator = new InsertionEvaluator(carpoolRouter, Duration.ZERO);
     return evaluator.findBestInsertion(
       tripWithVertices,
-      viablePositions,
       new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
     );
   }
@@ -299,12 +284,9 @@ class InsertionEvaluatorTest {
     CarpoolRouter routingFunction = (from, to) ->
       segmentOrNull(pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to))));
 
-    var viablePositions = List.of(new InsertionPosition(1, 2), new InsertionPosition(2, 3));
-
     var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
     var result = evaluator.findBestInsertion(
       tripWithVertices,
-      viablePositions,
       new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
     );
 
@@ -425,6 +407,106 @@ class InsertionEvaluatorTest {
 
     // Routing should be called for baseline and new segments
     assertTrue(callCount[0] >= 2, "Should have called routing at least 2 times");
+  }
+
+  @Test
+  void legsTheBeelineRulesOutAreNotRouted() {
+    // Two legs; the passenger sits right on leg 1 and 30 km from leg 0, whose next stop allows
+    // one minute: at 30 m/s the beeline detour through leg 0 is far more than that, so nothing is
+    // routed into or out of leg 0.
+    var origin = new WgsCoordinate(63.43, 10.39);
+    var mid = origin.moveEastMeters(200);
+    var end = origin.moveEastMeters(400);
+    var farNorth = origin.moveNorthMeters(30_000);
+    var stop = createStopAt(mid, Duration.ofMinutes(1));
+    var trip = createTripWithStops(origin, List.of(stop), end, Duration.ofMinutes(60));
+    var points = new HashMap<WgsCoordinate, Vertex>();
+    for (var c : List.of(origin, mid, end, farNorth)) {
+      points.put(
+        c,
+        new SimpleVertex("v-" + c.latitude() + "-" + c.longitude(), c.latitude(), c.longitude())
+      );
+    }
+    var vertices = trip
+      .stops()
+      .stream()
+      .map(s -> points.get(s.getCoordinate()))
+      .toList();
+    var tripWithVertices = new CarpoolTripWithVertices(trip, vertices);
+    var routed = new java.util.ArrayList<String>();
+    CarpoolRouter counting = (from, to) -> {
+      routed.add(from.getLabelString() + ">" + to.getLabelString());
+      return RoutedSegment.of(createGraphPath(Duration.ofMinutes(3)));
+    };
+    var evaluator = new InsertionEvaluator(counting, Duration.ZERO, 30.0);
+
+    evaluator.findBestInsertion(
+      tripWithVertices,
+      new PassengerSnap(points.get(farNorth), points.get(farNorth), null, null)
+    );
+
+    var farLabel = points.get(farNorth).getLabelString();
+    var originLabel = points.get(origin).getLabelString();
+    assertFalse(routed.contains(originLabel + ">" + farLabel), "leg 0 was routed into: " + routed);
+    assertTrue(
+      routed
+        .stream()
+        .anyMatch(r -> r.startsWith(points.get(mid).getLabelString() + ">" + farLabel)),
+      "leg 1 was routed into: " + routed
+    );
+  }
+
+  @Test
+  void singleLegTrip_routesTheBaselineAndTheThreeNewSegmentsOnly() {
+    // With pickup and dropoff in the only leg, the pickup's way out of the leg and the dropoff's
+    // way into it are never needed, so they are not routed.
+    var trip = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
+    var routed = new ArrayList<Pair<WgsCoordinate>>();
+    CarpoolRouter recording = (from, to) -> {
+      routed.add(new Pair<>(getCoordinate(from), getCoordinate(to)));
+      return RoutedSegment.of(createGraphPath(Duration.ofMinutes(5)));
+    };
+
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, recording);
+
+    assertNotNull(result);
+    assertEquals(
+      List.of(
+        new Pair<>(OSLO_CENTER, OSLO_NORTH),
+        new Pair<>(OSLO_CENTER, OSLO_EAST),
+        new Pair<>(OSLO_WEST, OSLO_NORTH),
+        new Pair<>(OSLO_EAST, OSLO_WEST)
+      ),
+      routed
+    );
+  }
+
+  @Test
+  void theRideIsRoutedOncePerRequest() {
+    var rides = new int[] { 0 };
+    var evaluator = new InsertionEvaluator(rideCounting(rides), Duration.ZERO);
+
+    evaluateTwoTrips(evaluator);
+
+    assertEquals(1, rides[0], "pickup -> dropoff does not depend on the trip");
+  }
+
+  private CarpoolRouter rideCounting(int[] rides) {
+    var ride = new Pair<>(OSLO_EAST, OSLO_WEST);
+    return (from, to) -> {
+      if (ride.equals(new Pair<>(getCoordinate(from), getCoordinate(to)))) {
+        rides[0]++;
+      }
+      return RoutedSegment.of(createGraphPath(Duration.ofMinutes(5)));
+    };
+  }
+
+  private void evaluateTwoTrips(InsertionEvaluator evaluator) {
+    var tripA = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
+    var tripB = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_SOUTH, OSLO_NORTHEAST);
+    var snap = new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null);
+    assertNotNull(evaluator.findBestInsertion(createTripWithVertices(tripA), snap));
+    assertNotNull(evaluator.findBestInsertion(createTripWithVertices(tripB), snap));
   }
 
   @Test

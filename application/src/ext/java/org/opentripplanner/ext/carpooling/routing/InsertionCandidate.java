@@ -11,14 +11,9 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * Represents a viable insertion of a passenger into a carpool trip.
- * <p>
- * Contains all information needed to construct an itinerary, including:
- * - The original trip
- * - Insertion positions (where pickup and dropoff occur in the modified route)
- * - Route segments (all {@link RoutedSegment}s forming the complete modified route; their street
- *   paths are only materialised when an itinerary is built, see {@link #getSharedPaths()})
- * - Timing information
+ * A viable insertion of a passenger into a carpool trip: the trip, where the pickup and dropoff
+ * sit in the modified route, and the {@link RoutedSegment}s of that route, whose street paths are
+ * only built when an itinerary is (see {@link #getSharedPaths()}).
  * <p>
  * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
  * pickup and dropoff stops in the modified route (the route after the passenger's stops have
@@ -36,12 +31,9 @@ public record InsertionCandidate(
   @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
 ) {
   /**
-   * {@link InsertionPositionFinder} guarantees {@code 1 <= pickupPosition < dropoffPosition}
-   * (pickup is never at the driver's origin, and dropoff is always strictly after pickup).
-   * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
-   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at
-   * the trip's start. Enforce both invariants here so a regression upstream fails loud at
-   * construction instead of silently producing inconsistent durations.
+   * {@code 1 <= pickupPosition < dropoffPosition}: the pickup is never at the driver's origin and
+   * the dropoff is strictly after the pickup. {@link #getPassengerRideDuration()} relies on the
+   * lower bound, as it always adds a boarding dwell.
    */
   public InsertionCandidate {
     if (pickupPosition < 1) {
