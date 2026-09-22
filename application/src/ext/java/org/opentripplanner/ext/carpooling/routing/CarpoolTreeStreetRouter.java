@@ -62,7 +62,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   private record VertexRegistration(Vertex vertex, Duration searchLimit) {}
 
   private CompactCarTree createTree(Vertex vertex, boolean reverse, Duration searchLimit) {
-    return CompactCarTree.build(vertex, reverse, searchLimit);
+    return CompactCarTree.build(vertex, reverse, searchLimit, null);
   }
 
   private CompactCarTree getOrCreateForwardTree(Vertex vertex) {

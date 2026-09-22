@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -14,13 +15,14 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 /**
- * Resolves each of a {@link CarpoolTrip}'s route points to a permanent, car-reachable street
- * vertex, producing a {@link CarpoolTripWithVertices}. Each point is linked to a temporary vertex
- * via {@link StreetVertexUtils#createDriverWaypointVertex}, then snapped to a permanent one by
+ * Turns a {@link CarpoolTrip} into a {@link RoutableCarpoolTrip}: each route point is resolved to a
+ * permanent, car-reachable street vertex, and the trip's {@link CarpoolCorridor} is computed from
+ * the vertices. A point is linked to a temporary vertex via
+ * {@link StreetVertexUtils#createDriverWaypointVertex}, then snapped to a permanent one by
  * {@link CarReachableVertexSnapper#snapToPermanentVertex}. {@link #resolve} returns {@code null} if
- * any point cannot be resolved.
+ * any point cannot be resolved or the trip's baseline cannot be routed.
  */
-public class CarpoolTripVertexResolver {
+public class RoutableCarpoolTripResolver {
 
   /**
    * Reach of the fallback search that relocates a route point onto the drivable network when it
@@ -31,13 +33,15 @@ public class CarpoolTripVertexResolver {
 
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
+  private final CorridorBuilder corridorBuilder;
 
   /**
    * @throws NullPointerException if any parameter is null
    */
-  public CarpoolTripVertexResolver(
+  public RoutableCarpoolTripResolver(
     VertexCreationService vertexCreationService,
-    CarReachableVertexSnapper carReachableVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper,
+    CorridorBuilder corridorBuilder
   ) {
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
@@ -47,17 +51,21 @@ public class CarpoolTripVertexResolver {
       carReachableVertexSnapper,
       "carReachableVertexSnapper"
     );
+    this.corridorBuilder = Objects.requireNonNull(corridorBuilder, "corridorBuilder");
   }
 
-  /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */
+  /**
+   * Resolves every route point to a permanent vertex and computes the trip's corridor from them;
+   * {@code null} if any point cannot be resolved or the baseline cannot be routed.
+   */
   @Nullable
-  public CarpoolTripWithVertices resolve(CarpoolTrip trip) {
+  public RoutableCarpoolTrip resolve(CarpoolTrip trip) {
+    var vertices = new ArrayList<Vertex>(trip.routePoints().size());
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var streetVertexUtils = new StreetVertexUtils(
         vertexCreationService,
         temporaryVerticesContainer
       );
-      var vertices = new ArrayList<Vertex>(trip.routePoints().size());
       for (var routePoint : trip.routePoints()) {
         var vertex = resolveRoutePoint(routePoint, streetVertexUtils);
         if (vertex == null) {
@@ -65,8 +73,20 @@ public class CarpoolTripVertexResolver {
         }
         vertices.add(vertex);
       }
-      return new CarpoolTripWithVertices(trip, vertices);
     }
+    // The corridor is computed after the temporary linking is gone: the resolved vertices are
+    // permanent, and the searches should see the static graph only.
+    return resolveOnVertices(trip, vertices);
+  }
+
+  /**
+   * The trip on already resolved vertices, with its corridor computed for its current stops;
+   * {@code null} if the baseline cannot be routed.
+   */
+  @Nullable
+  public RoutableCarpoolTrip resolveOnVertices(CarpoolTrip trip, List<Vertex> vertices) {
+    var corridor = corridorBuilder.build(trip, vertices);
+    return corridor == null ? null : new RoutableCarpoolTrip(trip, vertices, corridor);
   }
 
   @Nullable
