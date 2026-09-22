@@ -18,6 +18,7 @@ import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
@@ -162,6 +163,7 @@ public class RequestScopedModule {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiService taxiService,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
@@ -183,6 +185,7 @@ public class RequestScopedModule {
       sorlandsbanenService,
       viaTransferResolver,
       carpoolingService,
+      taxiService,
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,

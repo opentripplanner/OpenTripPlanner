@@ -17,6 +17,7 @@ public class AccessModeMapper {
       case CAR_RENTAL -> StreetMode.CAR_RENTAL;
       case CAR_PARKING -> StreetMode.CAR_TO_PARK;
       case CAR_DROP_OFF -> StreetMode.CAR_PICKUP;
+      case TAXI -> StreetMode.TAXI;
       case FLEX -> StreetMode.FLEXIBLE;
       case SCOOTER_RENTAL -> StreetMode.SCOOTER_RENTAL;
       case WALK -> StreetMode.WALK;
@@ -32,6 +33,7 @@ public class AccessModeMapper {
       case CAR_RENTAL -> GraphQLTypes.GraphQLPlanAccessMode.CAR_RENTAL;
       case CAR_TO_PARK -> GraphQLTypes.GraphQLPlanAccessMode.CAR_PARKING;
       case CAR_PICKUP -> GraphQLTypes.GraphQLPlanAccessMode.CAR_DROP_OFF;
+      case TAXI -> GraphQLTypes.GraphQLPlanAccessMode.TAXI;
       case FLEXIBLE -> GraphQLTypes.GraphQLPlanAccessMode.FLEX;
       case SCOOTER_RENTAL -> GraphQLTypes.GraphQLPlanAccessMode.SCOOTER_RENTAL;
       case WALK, CAR_HAILING, CARPOOL, NOT_SET -> GraphQLTypes.GraphQLPlanAccessMode.WALK;

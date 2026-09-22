@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
@@ -108,6 +109,26 @@ public class GtfsConfig {
           )
           .docDefaultValue(docDefaults.maxInterlineDistance())
           .asInt(defaults.maxInterlineDistance())
+      )
+      .withTaxiProvider(
+        node
+          .of("taxiProvider")
+          .since(V2_11)
+          .summary(
+            "When true, this GTFS feed is used exclusively as a source of taxi provider data." +
+              documentationAddition
+          )
+          .description(
+            """
+            The feed is not used for normal transit routing. Its stops, routes and trips are
+            used only to decorate taxi legs with provider information and to spatially filter
+            out itineraries that don't fall within a recognized taxi provider's coverage area.
+
+            Requires the `TaxiRouting` sandbox feature to be enabled.
+            """
+          )
+          .docDefaultValue(docDefaults.taxiProvider())
+          .asBoolean(defaults.taxiProvider())
       )
       .build();
   }
