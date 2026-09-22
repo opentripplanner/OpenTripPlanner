@@ -54,10 +54,10 @@ class InsertionCandidateTest {
   }
 
   /**
-   * Pickup at position 0 would mean boarding at the driver's origin, which {@code
-   * InsertionPositionFinder} never produces (its loop starts at 1). The constructor enforces this
-   * because {@link InsertionCandidate#getPassengerRideDuration} unconditionally adds the boarding
-   * dwell, which only makes sense when the passenger boards mid-trip.
+   * Pickup at position 0 would mean boarding at the driver's origin, which the evaluator never
+   * produces (a pickup goes into a leg, after its start). The constructor enforces this because
+   * {@link InsertionCandidate#getPassengerRideDuration} unconditionally adds the boarding dwell,
+   * which only makes sense when the passenger boards mid-trip.
    */
   @Test
   void constructor_pickupAtOrigin_throws() {

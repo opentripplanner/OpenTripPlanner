@@ -127,12 +127,9 @@ public class CarpoolStop extends AbstractTransitEntity<CarpoolStop, CarpoolStopB
 
   /**
    * Returns the remaining slack the carpool may consume before this stop without breaking the
-   * driver's commitment to passengers already onboard. This is <em>not</em> the original commitment
-   * from the SIRI feed: as the trip is updated with additional SIRI messages, the budget shrinks as
-   * prior detours eat into it. A value of {@link Duration#ZERO} means no further deviation is
-   * acceptable here.
+   * driver's commitment to passengers already onboard.
    */
-  public Duration getDeviationBudget() {
+  Duration getDeviationBudget() {
     return deviationBudget;
   }
 

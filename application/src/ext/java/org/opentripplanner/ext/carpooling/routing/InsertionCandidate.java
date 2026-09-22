@@ -34,8 +34,8 @@ public record InsertionCandidate(
   @Nullable StreetPath walkFromDropoff
 ) {
   /**
-   * {@link InsertionPositionFinder} guarantees {@code 1 <= pickupPosition < dropoffPosition}
-   * (pickup is never at the driver's origin, and dropoff is always strictly after pickup).
+   * {@link InsertionEvaluator} guarantees {@code 1 <= pickupPosition < dropoffPosition} (pickup is
+   * never at the driver's origin, and dropoff is always strictly after pickup).
    * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
    * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at the
    * trip's start. Enforce both invariants here so a regression upstream fails loud at construction
@@ -79,18 +79,10 @@ public record InsertionCandidate(
       routeSegments,
       stopDuration,
       transitStop,
-      computeTotalTripDuration(routeSegments, stopDuration),
+      totalSegmentDuration(routeSegments, stopDuration),
       walkToPickup,
       walkFromDropoff
     );
-  }
-
-  private static Duration computeTotalTripDuration(
-    List<RoutedSegment> routeSegments,
-    Duration stopDuration
-  ) {
-    Duration[] cumulativeDurations = RoutedSegment.cumulativeDurations(routeSegments, stopDuration);
-    return cumulativeDurations[cumulativeDurations.length - 1];
   }
 
   /**

@@ -240,28 +240,19 @@ public class CarpoolSiriMapperTest {
   @Test
   void mapSiriToCarpoolTrip_noLatestExpectedArrivalTime_returnsDefaultDeviationBudget() {
     var mapped = mapper.mapSiriToCarpoolTrip(minimalCompleteJourney());
-    assertEquals(Duration.ZERO, mapped.stops().getFirst().getDeviationBudget());
-    assertEquals(DEFAULT_DEVIATION_BUDGET, mapped.stops().getLast().getDeviationBudget());
+    assertEquals(DEFAULT_DEVIATION_BUDGET, mapped.legDeviationBudget(0));
   }
 
   @Test
   void mapSiriToCarpoolTrip_withLatestExpectedArrivalTime_computesDeviationBudget() {
     var mapped = mapper.mapSiriToCarpoolTrip(journeyWithLatestExpectedArrivalTime(0, 10));
-    var lastStop = mapped.stops().getLast();
-    assertEquals(Duration.ofMinutes(10), lastStop.getDeviationBudget());
+    assertEquals(Duration.ofMinutes(10), mapped.legDeviationBudget(0));
   }
 
   @Test
   void mapSiriToCarpoolTrip_withLatestExpectedArrivalTimeNoExpected_usesAimedArrivalTime() {
     var mapped = mapper.mapSiriToCarpoolTrip(journeyWithLatestExpectedArrivalTimeAimedOnly(20));
-    var lastStop = mapped.stops().getLast();
-    assertEquals(Duration.ofMinutes(20), lastStop.getDeviationBudget());
-  }
-
-  @Test
-  void mapSiriToCarpoolTrip_originStop_hasZeroDeviationBudget() {
-    var mapped = mapper.mapSiriToCarpoolTrip(journeyWithLatestExpectedArrivalTime(0, 10));
-    assertEquals(Duration.ZERO, mapped.stops().getFirst().getDeviationBudget());
+    assertEquals(Duration.ofMinutes(20), mapped.legDeviationBudget(0));
   }
 
   @Test
@@ -269,8 +260,7 @@ public class CarpoolSiriMapperTest {
     // latestExpectedArrival is before expectedArrival — schedule has slipped past commitment,
     // no further deviation is acceptable
     var mapped = mapper.mapSiriToCarpoolTrip(journeyWithLatestExpectedArrivalTime(10, 5));
-    var lastStop = mapped.stops().getLast();
-    assertEquals(Duration.ZERO, lastStop.getDeviationBudget());
+    assertEquals(Duration.ZERO, mapped.legDeviationBudget(0));
   }
 
   // -- cancellation tests --
@@ -301,9 +291,8 @@ public class CarpoolSiriMapperTest {
       journeyWithPerStopLatestExpectedArrivalTimes(20, 23, 45, 55)
     );
     assertEquals(3, mapped.stops().size());
-    assertEquals(Duration.ZERO, mapped.stops().get(0).getDeviationBudget());
-    assertEquals(Duration.ofMinutes(3), mapped.stops().get(1).getDeviationBudget());
-    assertEquals(Duration.ofMinutes(10), mapped.stops().get(2).getDeviationBudget());
+    assertEquals(Duration.ofMinutes(3), mapped.legDeviationBudget(0));
+    assertEquals(Duration.ofMinutes(10), mapped.legDeviationBudget(1));
   }
 
   // -- publicContact tests --
