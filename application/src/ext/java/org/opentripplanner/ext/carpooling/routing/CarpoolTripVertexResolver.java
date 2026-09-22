@@ -32,12 +32,30 @@ public class CarpoolTripVertexResolver {
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
 
+  @Nullable
+  private final CorridorBuilder corridorBuilder;
+
   /**
+   * A resolver that only resolves vertices; trips get no corridor.
+   *
    * @throws NullPointerException if any parameter is null
    */
   public CarpoolTripVertexResolver(
     VertexCreationService vertexCreationService,
     CarReachableVertexSnapper carReachableVertexSnapper
+  ) {
+    this(vertexCreationService, carReachableVertexSnapper, null);
+  }
+
+  /**
+   * @param corridorBuilder computes each resolved trip's {@link CarpoolCorridor}, or {@code null}
+   *        to leave trips without one
+   * @throws NullPointerException if a required parameter is null
+   */
+  public CarpoolTripVertexResolver(
+    VertexCreationService vertexCreationService,
+    CarReachableVertexSnapper carReachableVertexSnapper,
+    @Nullable CorridorBuilder corridorBuilder
   ) {
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
@@ -47,17 +65,21 @@ public class CarpoolTripVertexResolver {
       carReachableVertexSnapper,
       "carReachableVertexSnapper"
     );
+    this.corridorBuilder = corridorBuilder;
   }
 
-  /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */
+  /**
+   * Resolves every route point to a permanent vertex and, when a corridor builder is configured,
+   * computes the trip's corridor from them; {@code null} if any point cannot be resolved.
+   */
   @Nullable
   public CarpoolTripWithVertices resolve(CarpoolTrip trip) {
+    var vertices = new ArrayList<Vertex>(trip.routePoints().size());
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
       var streetVertexUtils = new StreetVertexUtils(
         vertexCreationService,
         temporaryVerticesContainer
       );
-      var vertices = new ArrayList<Vertex>(trip.routePoints().size());
       for (var routePoint : trip.routePoints()) {
         var vertex = resolveRoutePoint(routePoint, streetVertexUtils);
         if (vertex == null) {
@@ -65,8 +87,22 @@ public class CarpoolTripVertexResolver {
         }
         vertices.add(vertex);
       }
-      return new CarpoolTripWithVertices(trip, vertices);
     }
+    // The corridor is computed after the temporary linking is gone: the resolved vertices are
+    // permanent, and the searches should see the static graph only.
+    return withCorridor(new CarpoolTripWithVertices(trip, vertices));
+  }
+
+  /**
+   * The trip with its corridor computed for its current stops and vertices, or unchanged when no
+   * corridor builder is configured. The corridor is {@code null} when the trip's baseline cannot
+   * be routed.
+   */
+  public CarpoolTripWithVertices withCorridor(CarpoolTripWithVertices tripWithVertices) {
+    if (corridorBuilder == null) {
+      return tripWithVertices;
+    }
+    return tripWithVertices.withCorridor(corridorBuilder.build(tripWithVertices));
   }
 
   @Nullable

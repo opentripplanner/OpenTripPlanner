@@ -42,6 +42,8 @@ class SiriETCarpoolingUpdaterTest {
   void setUp() {
     repository = new DefaultCarpoolingRepository();
     resolver = mock(CarpoolTripVertexResolver.class);
+    // Production resolvers hand the trip back with its corridor; the mock passes it through.
+    when(resolver.withCorridor(any())).thenAnswer(invocation -> invocation.getArgument(0));
     when(resolver.resolve(any())).thenAnswer(invocation ->
       CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );

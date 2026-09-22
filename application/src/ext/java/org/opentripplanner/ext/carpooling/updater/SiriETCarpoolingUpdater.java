@@ -180,6 +180,18 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     }
   }
 
+  private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {
+    if (a.stops().size() != b.stops().size()) {
+      return false;
+    }
+    for (int i = 0; i < a.stops().size(); i++) {
+      if (!a.stops().get(i).getDeviationBudget().equals(b.stops().get(i).getDeviationBudget())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * Resolves the trip's route points to permanent vertices, or {@code null} if any cannot be
    * resolved. Both outcomes are memoized on the route-point geometry: an unchanged geometry reuses
@@ -190,7 +202,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   private CarpoolTripWithVertices resolveVertices(CarpoolTrip trip) {
     var existing = repository.getCarpoolTrip(trip.getId());
     if (existing != null && existing.trip().routePoints().equals(trip.routePoints())) {
-      return new CarpoolTripWithVertices(trip, existing.vertices());
+      var reused = new CarpoolTripWithVertices(trip, existing.vertices());
+      // The corridor also depends on the stops' deviation budgets: keep it while those are
+      // unchanged too, otherwise recompute it from the reused vertices.
+      return existing.corridor() != null && sameDeviationBudgets(existing.trip(), trip)
+        ? reused.withCorridor(existing.corridor())
+        : vertexResolver.withCorridor(reused);
     }
     var failed = failedResolutions.get(trip.getId());
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {

@@ -167,22 +167,22 @@ class CompactCarTreeTest extends GraphRoutingTest {
 
   @Test
   void pedestrianStreetIsNotDriven() {
-    var tree = CompactCarTree.build(g00, false, UNLIMITED);
+    var tree = CompactCarTree.build(g00, false, UNLIMITED, null);
     assertEquals(-1, tree.elapsedSeconds(p));
   }
 
   @Test
   void oneWayStreetIsDrivenInItsDirectionOnly() {
-    var forward = CompactCarTree.build(g00, false, UNLIMITED);
+    var forward = CompactCarTree.build(g00, false, UNLIMITED, null);
     assertTrue(forward.elapsedSeconds(x) > 0, "X is reachable along the one-way street");
 
-    var reverseFromX = CompactCarTree.build(x, false, UNLIMITED);
+    var reverseFromX = CompactCarTree.build(x, false, UNLIMITED, null);
     assertEquals(-1, reverseFromX.elapsedSeconds(g22), "X is a dead end for a car");
   }
 
   @Test
   void noThroughTrafficPocketIsNoShortcut() {
-    var tree = CompactCarTree.build(g02, false, UNLIMITED);
+    var tree = CompactCarTree.build(g02, false, UNLIMITED, null);
     // The pocket itself may be entered ...
     assertTrue(tree.elapsedSeconds(n1) > 0);
     assertTrue(tree.elapsedSeconds(n2) > 0);
@@ -197,13 +197,13 @@ class CompactCarTreeTest extends GraphRoutingTest {
 
   @Test
   void transitStopVerticesAreNotEntered() {
-    var tree = CompactCarTree.build(g00, false, UNLIMITED);
+    var tree = CompactCarTree.build(g00, false, UNLIMITED, null);
     assertEquals(-1, tree.elapsedSeconds(stop));
   }
 
   @Test
   void pathReplaysTheSearchInBothDirections() {
-    var forward = CompactCarTree.build(t, false, UNLIMITED);
+    var forward = CompactCarTree.build(t, false, UNLIMITED, null);
     var path = forward.path(x);
     assertNotNull(path);
     assertSame(t, path.states.getFirst().getVertex());
@@ -211,7 +211,7 @@ class CompactCarTreeTest extends GraphRoutingTest {
     assertEquals(forward.elapsedSeconds(x), path.getDuration());
     assertEquals(path.states.size() - 1, path.edges.size());
 
-    var reverse = CompactCarTree.build(t, true, UNLIMITED);
+    var reverse = CompactCarTree.build(t, true, UNLIMITED, null);
     var reversePath = reverse.path(g02);
     assertNotNull(reversePath);
     assertSame(g02, reversePath.states.getFirst().getVertex(), "chronological: starts at G02");
@@ -225,7 +225,7 @@ class CompactCarTreeTest extends GraphRoutingTest {
   /** The edge chain taken from the tree replays to the same path the tree gives. */
   @Test
   void edgeChainReplaysToTheSamePathWithoutTheTree() {
-    var tree = CompactCarTree.build(g00, false, UNLIMITED);
+    var tree = CompactCarTree.build(g00, false, UNLIMITED, null);
     var edges = tree.edgesTo(g22);
     assertNotNull(edges);
 
@@ -236,14 +236,28 @@ class CompactCarTreeTest extends GraphRoutingTest {
 
   @Test
   void pathToUnreachedVertexIsNull() {
-    var tree = CompactCarTree.build(g00, false, UNLIMITED);
+    var tree = CompactCarTree.build(g00, false, UNLIMITED, null);
     assertNull(tree.path(p));
+  }
+
+  @Test
+  void ellipseBoundsKeepTheLegAndDropTheRest() {
+    var unbounded = CompactCarTree.build(g00, false, UNLIMITED, null);
+    long legSeconds = unbounded.elapsedSeconds(g22);
+    // The bound admits the leg with 5 s to spare; X lies beyond G22 and can never lead back to it
+    // within that, while everything on a fastest route to G22 stays.
+    var bounds = new EllipseBounds(g22.getCoordinate(), legSeconds + 5, 40.0);
+    var bounded = CompactCarTree.build(g00, false, UNLIMITED, bounds);
+
+    assertEquals(unbounded.elapsedSeconds(g22), bounded.elapsedSeconds(g22));
+    assertEquals(-1, bounded.elapsedSeconds(x));
+    assertTrue(bounded.size() < unbounded.size());
   }
 
   /* ------------------------------------------------------------------ helpers */
 
   private void assertMatchesReference(Vertex root, boolean reverse, Duration limit) {
-    var compact = CompactCarTree.build(root, reverse, limit);
+    var compact = CompactCarTree.build(root, reverse, limit, null);
     var reference = referenceTree(root, reverse, limit);
     var targets = new ArrayList<>(streetVertices);
     targets.add(t);

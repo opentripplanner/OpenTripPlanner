@@ -86,7 +86,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       if (limit == null) {
         return null;
       }
-      tree = CompactCarTree.build(root, reverse, limit);
+      tree = CompactCarTree.build(root, reverse, limit, null);
       trees.put(root, tree);
     }
     return tree;
