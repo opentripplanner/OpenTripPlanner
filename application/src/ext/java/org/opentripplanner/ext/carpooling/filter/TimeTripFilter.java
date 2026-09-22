@@ -3,14 +3,16 @@ package org.opentripplanner.ext.carpooling.filter;
 import java.time.Duration;
 import java.time.Instant;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Pre-filters carpool trip candidates based on time compatibility with the passenger request.
  * <p>
- * A trip is rejected when it is outside the passenger's window. Trips that pass are still subject
- * to expensive routing and a tighter post-filter on the actual itinerary times.
+ * A trip is rejected when it cannot serve the passenger inside the passenger's window. Trips that
+ * pass are still subject to expensive routing and a tighter post-filter on the actual itinerary
+ * times.
  *
  * <h2>Variables</h2>
  *
@@ -31,58 +33,60 @@ import org.slf4j.LoggerFactory;
  *       {@code requestedDateTime − searchWindow}. The passenger does not arrive before EAT.</li>
  * </ul>
  *
- * <h3>Slack constants</h3>
+ * <h3>The trip</h3>
  *
- * The carpool window is {@code [trip.startTime, trip.endTime]} but the passenger boards and
- * alights somewhere in the middle. Two slacks pad the request window outward so trips that could
- * still pick up or drop off a passenger inside their window are not rejected:
+ * The insertion evaluation times an insertion from the trip's start and OTP's routed driving
+ * times, so the bounds are taken in the same terms:
  *
  * <ul>
- *   <li><strong>{@code W} = {@link CarpoolingRequest#getMaxWalkTime()}</strong> (max walk time) —
- *       upper bound on how long the passenger walks between origin/destination and the carpool
- *       pickup/dropoff. Used wherever a single walk segment shifts the relevant bound by a known,
- *       bounded amount: a passenger leaving by LDT can be at the pickup as late as
- *       {@code LDT + W}; a carpool that drops off by {@code EAT − W} still gives an arrival at or
- *       after EAT after a W-long walk to destination.</li>
- *   <li><strong>{@code T} = {@link #MAX_TOTAL_TRAVEL_TIME}</strong> (max total passenger travel
- *       time, fallback) — used <em>only</em> in the two cells where neither the request window nor
- *       {@code W} can produce a real bound: <em>access / arriveBy=true / too early</em> and
- *       <em>egress / arriveBy=false / too late</em>. In both cases the carpool sits on the
- *       opposite end of the journey from the request anchor, separated from it by a transit ride
- *       of unknown duration. {@code T} caps that unknown duration with a deliberately
- *       conservative number so the filter degrades to "almost a no-op" in those cells rather than
- *       producing false negatives.</li>
+ *   <li><strong>{@code tripStart}</strong> — the trip's start time: no pickup or dropoff happens
+ *       before it.</li>
+ *   <li><strong>{@code tripEnd}</strong> — {@code tripStart} plus the routed baseline to the
+ *       destination, with the dwell at each intermediate stop, plus the destination's deviation
+ *       budget: no insertion delays the destination beyond its budget, so no pickup or dropoff
+ *       happens after it. The end time of the trip data is not used: the routed baseline may take
+ *       longer than the driver's schedule.</li>
+ * </ul>
+ *
+ * <h3>The passenger</h3>
+ *
+ * <ul>
+ *   <li><strong>{@code Wp}</strong>, <strong>{@code Wd}</strong> — the passenger's walk from the
+ *       origin to the snapped pickup and from the snapped dropoff to the destination; zero when
+ *       there is none, or when that end of the ride is a transit stop.</li>
+ *   <li><strong>{@code J}</strong> = {@link CarpoolingRequest#getMaxJourneyDuration()} — bounds
+ *       the transit ride of unknown duration that separates the carpool from the request anchor
+ *       for access with arriveBy=true and egress with arriveBy=false.</li>
  * </ul>
  *
  * <h2>Rules</h2>
  *
+ * The request bounds when the car can be at the passenger's own end of the ride; the trip is
+ * rejected when {@code [tripStart, tripEnd]} does not overlap that interval:
+ *
  * <pre>
- * | Leg type | arriveBy | Reject as TOO EARLY    | Reject as TOO LATE     |
- * |----------|----------|------------------------|------------------------|
- * | Direct   | false    | tripEnd   &lt; EDT        | tripStart &gt; LDT + W    |
- * | Direct   | true     | tripEnd   &lt; EAT − W    | tripStart &gt; LAT        |
- * | Access   | false    | tripEnd   &lt; EDT        | tripStart &gt; LDT + W    |
- * | Access   | true     | tripEnd   &lt; EAT − T    | tripStart &gt; LAT        |
- * | Egress   | false    | tripEnd   &lt; EDT        | tripStart &gt; LDT + T    |
- * | Egress   | true     | tripEnd   &lt; EAT − W    | tripStart &gt; LAT        |
+ * | Leg type | arriveBy | Reject as TOO EARLY      | Reject as TOO LATE       |
+ * |----------|----------|--------------------------|--------------------------|
+ * | Direct   | false    | tripEnd &lt; EDT + Wp        | tripStart &gt; LDT + Wp      |
+ * | Direct   | true     | tripEnd &lt; EAT − Wd        | tripStart &gt; LAT − Wd      |
+ * | Access   | false    | tripEnd &lt; EDT + Wp        | tripStart &gt; LDT + Wp      |
+ * | Access   | true     | tripEnd &lt; EAT − J + Wp    | tripStart &gt; LAT           |
+ * | Egress   | false    | tripEnd &lt; EDT             | tripStart &gt; LDT + J − Wd  |
+ * | Egress   | true     | tripEnd &lt; EAT − Wd        | tripStart &gt; LAT − Wd      |
  * </pre>
  *
  * <h3>Why these shapes</h3>
  *
  * <ul>
- *   <li><em>Too late</em> compares {@code tripStart} (earliest moment any pickup along the route
- *       can happen) against the latest the passenger could be at that pickup. {@code W} is added
- *       when the request anchors departure (arriveBy=false) and a walk pads the bound; {@code T}
- *       replaces {@code W} on the egress/false cell because access + transit between the anchor
- *       and the egress carpool is otherwise unbounded.</li>
- *   <li><em>Too early</em> compares {@code tripEnd} (latest moment any pickup or dropoff along
- *       the route can happen) against the earliest the passenger could be there. {@code W} is
- *       subtracted when a single dropoff walk separates the carpool from the destination anchor
- *       (direct & egress with arriveBy=true); {@code T} replaces {@code W} on the access/true
- *       cell because transit + egress between the carpool dropoff and the anchor is otherwise
- *       unbounded.</li>
- *   <li>The four cells with neither {@code W} nor {@code T} are the cases where the carpool is on
- *       the same side as the anchor and no walk or padding can move the bound.</li>
+ *   <li>Depart-after with the passenger at the pickup (direct, access): the passenger leaves the
+ *       origin between EDT and LDT and is picked up {@code Wp} later.</li>
+ *   <li>Arrive-by with the passenger at the dropoff (direct, egress): the passenger arrives
+ *       between EAT and LAT and is dropped off {@code Wd} earlier.</li>
+ *   <li>Egress with arriveBy=false: the passenger reaches the carpool by transit after leaving at
+ *       EDT or later, and is dropped off in time to arrive within {@code J} of LDT.</li>
+ *   <li>Access with arriveBy=true: the passenger is picked up before arriving by LAT, and, the
+ *       journey lasting at most {@code J}, after leaving at {@code EAT − J} or later and walking
+ *       to the pickup.</li>
  * </ul>
  *
  * <h3>Behavior with missing inputs</h3>
@@ -95,95 +99,66 @@ public class TimeTripFilter implements CarpoolTripFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimeTripFilter.class);
 
-  /**
-   * Conservative cap on total passenger travel time, used as a fallback bound when an unbounded
-   * transit segment separates the carpool leg from the request anchor.
-   */
-  private static final Duration MAX_TOTAL_TRAVEL_TIME = Duration.ofHours(24);
-
   @Override
-  public boolean isCandidateTrip(CarpoolTrip trip, CarpoolingRequest request) {
+  public boolean isCandidateTrip(RoutableCarpoolTrip trip, SnappedPassenger passenger) {
+    var request = passenger.request();
     var requestedDateTime = request.getRequestedDateTime();
     if (requestedDateTime == null) {
       return true;
     }
 
-    var tripStart = trip.startTime().toInstant();
-    var tripEnd = trip.latestEndTime().toInstant();
+    var tripStart = trip.trip().startTime().toInstant();
+    var tripEnd = tripEnd(trip, request.getStopDuration());
 
-    return request.isArriveByRequest()
-      ? acceptsArriveBy(trip, request, requestedDateTime, tripStart, tripEnd)
-      : acceptsDepartAfter(trip, request, requestedDateTime, tripStart, tripEnd);
-  }
-
-  /**
-   * Rules for {@code arriveBy = true}: requestedDateTime is LAT; EAT = LAT − searchWindow.
-   * <ul>
-   *   <li>Too late: {@code tripStart > LAT} for all leg types.</li>
-   *   <li>Too early: {@code tripEnd < EAT − maxConnectionTime} where maxConnectionTime is {@code T}
-   *       for access (transit + egress on the destination side is unbounded) and {@code W}
-   *       otherwise.</li>
-   * </ul>
-   */
-  private static boolean acceptsArriveBy(
-    CarpoolTrip trip,
-    CarpoolingRequest request,
-    Instant lat,
-    Instant tripStart,
-    Instant tripEnd
-  ) {
-    if (tripStart.isAfter(lat)) {
-      return reject(trip, "tripStart", tripStart, "is after LAT", lat);
+    var window = request.isArriveByRequest()
+      ? arriveByWindow(passenger, requestedDateTime)
+      : departAfterWindow(passenger, requestedDateTime);
+    if (tripEnd.isBefore(window.earliest())) {
+      return reject(trip.trip(), "tripEnd", tripEnd, "is before", window.earliest());
     }
-    var maxConnectionTime = request.isAccessRequest()
-      ? MAX_TOTAL_TRAVEL_TIME
-      : request.getMaxWalkTime();
-    var earliestAcceptableTripEnd = lat.minus(request.getSearchWindow()).minus(maxConnectionTime);
-    if (tripEnd.isBefore(earliestAcceptableTripEnd)) {
-      return reject(
-        trip,
-        "tripEnd",
-        tripEnd,
-        "is before EAT − maxConnectionTime",
-        earliestAcceptableTripEnd
-      );
+    if (tripStart.isAfter(window.latest())) {
+      return reject(trip.trip(), "tripStart", tripStart, "is after", window.latest());
     }
     return true;
   }
 
   /**
-   * Rules for {@code arriveBy = false}: requestedDateTime is EDT; LDT = EDT + searchWindow.
-   * <ul>
-   *   <li>Too early: {@code tripEnd < EDT} for all leg types.</li>
-   *   <li>Too late: {@code tripStart > LDT + maxConnectionTime} where maxConnectionTime is
-   *       {@code T} for egress (access + transit on the origin side is unbounded) and {@code W}
-   *       otherwise.</li>
-   * </ul>
+   * The latest moment the insertion evaluation can time a pickup or dropoff on the trip: its start,
+   * plus the routed baseline to the destination with the dwell at each intermediate stop, plus the
+   * destination's deviation budget. Package-private for testing.
    */
-  private static boolean acceptsDepartAfter(
-    CarpoolTrip trip,
-    CarpoolingRequest request,
-    Instant edt,
-    Instant tripStart,
-    Instant tripEnd
-  ) {
-    if (tripEnd.isBefore(edt)) {
-      return reject(trip, "tripEnd", tripEnd, "is before EDT", edt);
+  static Instant tripEnd(RoutableCarpoolTrip trip, Duration stopDuration) {
+    var corridor = trip.corridor();
+    var end = trip.trip().startTime().toInstant();
+    for (var leg : corridor.legDurations()) {
+      end = end.plus(leg);
     }
-    var maxConnectionTime = request.isEgressRequest()
-      ? MAX_TOTAL_TRAVEL_TIME
-      : request.getMaxWalkTime();
-    var latestAcceptableTripStart = edt.plus(request.getSearchWindow()).plus(maxConnectionTime);
-    if (tripStart.isAfter(latestAcceptableTripStart)) {
-      return reject(
-        trip,
-        "tripStart",
-        tripStart,
-        "is after LDT + maxConnectionTime",
-        latestAcceptableTripStart
-      );
+    end = end.plus(stopDuration.multipliedBy(corridor.legCount() - 1));
+    return end.plus(trip.trip().stops().getLast().getDeviationBudget());
+  }
+
+  /** {@code arriveBy = false}: requestedDateTime is EDT; LDT = EDT + searchWindow. */
+  private static Window departAfterWindow(SnappedPassenger passenger, Instant edt) {
+    var request = passenger.request();
+    var ldt = edt.plus(request.getSearchWindow());
+    if (request.isEgressRequest()) {
+      var latest = ldt.plus(request.getMaxJourneyDuration()).minus(passenger.walkFromDropoff());
+      return new Window(edt, latest);
     }
-    return true;
+    var walk = passenger.walkToPickup();
+    return new Window(edt.plus(walk), ldt.plus(walk));
+  }
+
+  /** {@code arriveBy = true}: requestedDateTime is LAT; EAT = LAT − searchWindow. */
+  private static Window arriveByWindow(SnappedPassenger passenger, Instant lat) {
+    var request = passenger.request();
+    var eat = lat.minus(request.getSearchWindow());
+    if (request.isAccessRequest()) {
+      var earliest = eat.minus(request.getMaxJourneyDuration()).plus(passenger.walkToPickup());
+      return new Window(earliest, lat);
+    }
+    var walk = passenger.walkFromDropoff();
+    return new Window(eat.minus(walk), lat.minus(walk));
   }
 
   private static boolean reject(
@@ -196,4 +171,7 @@ public class TimeTripFilter implements CarpoolTripFilter {
     LOG.debug("Trip {} rejected: {} {} {} {}", trip.getId(), field, value, reason, bound);
     return false;
   }
+
+  /** When the car can be at the passenger's own end of the ride. */
+  private record Window(Instant earliest, Instant latest) {}
 }

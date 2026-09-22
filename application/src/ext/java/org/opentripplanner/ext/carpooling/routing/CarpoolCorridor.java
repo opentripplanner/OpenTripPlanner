@@ -3,6 +3,9 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * What a driver trip can do for passengers, computed once when the trip arrives and reused by
@@ -60,5 +63,27 @@ public record CarpoolCorridor(
 
   public int legCount() {
     return legDurations.size();
+  }
+
+  /**
+   * Whether a passenger at {@code point} can possibly be inserted into some leg: the beelines from
+   * the leg's start to the point and on to the leg's end, driven at the graph's maximum car speed,
+   * must fit the leg's limit. A lower bound on the real detour, so it never rejects a feasible
+   * insertion; the exact verdict is the insertion evaluation.
+   *
+   * @param waypoints the trip's resolved waypoints, one per stop
+   */
+  public boolean mayServe(List<Vertex> waypoints, WgsCoordinate point, double maxCarSpeed) {
+    var p = point.asJtsCoordinate();
+    for (int leg = 0; leg < legLimits.size(); leg++) {
+      double meters =
+        (SphericalDistanceLibrary.fastDistance(waypoints.get(leg).getCoordinate(), p) +
+          SphericalDistanceLibrary.fastDistance(p, waypoints.get(leg + 1).getCoordinate())) *
+        SphericalDistanceLibrary.MAX_ERR_INV;
+      if (meters / maxCarSpeed <= legLimits.get(leg).toSeconds()) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -29,6 +29,11 @@ class CarpoolingRequestTest {
     assertEquals(PICKUP, carpoolingRequest.getPassengerPickup());
     assertEquals(DROPOFF, carpoolingRequest.getPassengerDropoff());
     assertFalse(carpoolingRequest.isAccessEgressRequest());
+    assertEquals(request.preferences().car().pickupTime(), carpoolingRequest.getStopDuration());
+    assertEquals(
+      request.preferences().system().maxJourneyDuration(),
+      carpoolingRequest.getMaxJourneyDuration()
+    );
   }
 
   @ParameterizedTest
