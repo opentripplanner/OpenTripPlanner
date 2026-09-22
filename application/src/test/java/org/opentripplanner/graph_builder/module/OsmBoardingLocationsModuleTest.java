@@ -998,6 +998,78 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(3.5f, connector.getBicycleSafetyFactor());
   }
 
+  /**
+   * Regression test for an access point landing far along the platform instead of next to the stop.
+   * On a long narrow platform the line from an outside stop to the platform's interior point is so
+   * oblique that it first crosses the boundary tens of metres away, so aiming at the interior point
+   * put the access point - and with it the walk onto the platform - there. The access point must sit
+   * at the foot of the perpendicular instead.
+   */
+  @Test
+  void testAccessPointOnLongPlatformSitsNextToTheStop() {
+    var graph = new Graph();
+
+    // A 200 m x 8 m platform running east-west, as a real station platform is shaped.
+    var southWest = new WgsCoordinate(60, 10);
+    var southEast = SphericalDistanceLibrary.moveMeters(southWest, 0, 200);
+    var northWest = SphericalDistanceLibrary.moveMeters(southWest, 8, 0);
+    var northEast = SphericalDistanceLibrary.moveMeters(southWest, 8, 200);
+    var area = buildRectangularPlatformArea(graph, new Coordinate[] {
+      southWest.asJtsCoordinate(),
+      southEast.asJtsCoordinate(),
+      northEast.asJtsCoordinate(),
+      northWest.asJtsCoordinate(),
+    });
+
+    // 2 m south of the platform, 10 m from its west end - so the line to the platform's centre runs
+    // at roughly 3 degrees to the long edge and crosses it about 33 m to the east.
+    var stopCoordinate = SphericalDistanceLibrary.moveMeters(southWest, -2, 10);
+    var stop = testModel
+      .stop("beside-long-platform")
+      .withCoordinate(stopCoordinate.latitude(), stopCoordinate.longitude())
+      .build();
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(
+      area,
+      new Platform(
+        I18NString.of("platform"),
+        area.getGeometry().getInteriorPoint(),
+        Set.of(stop.getId().getId())
+      )
+    );
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    assertFalse(stopVertex.getOutgoing().isEmpty(), "the stop should be linked");
+    var boardingLocation = linkedBoardingLocation(stopVertex);
+    assertVertexAtStop(boardingLocation, stop);
+
+    // The walk onto the platform is the 2 m it actually is, plus the margin that puts the access
+    // point inside the boundary - not the ~33 m to where an oblique line would have crossed it.
+    var connector = onlyConnectorEdge(boardingLocation);
+    assertEquals(
+      2.2,
+      connector.getDistanceMeters(),
+      0.3,
+      "the access point should sit next to the stop, but the walk onto the platform was " +
+        connector.getDistanceMeters() +
+        " m"
+    );
+  }
+
   private static List<String> issueTypes(DataImportIssueStore issueStore) {
     return issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
   }

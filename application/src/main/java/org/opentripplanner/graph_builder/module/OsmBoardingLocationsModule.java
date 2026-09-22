@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -384,9 +385,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * The point just inside {@code areaGeometry} standing in for a {@code transitCoordinate} outside
-   * the polygon, or {@code transitCoordinate} itself when already inside. Found by walking towards
-   * the platform's own (always-inside) {@code interiorPoint} up to the first boundary crossing, plus
-   * a margin so it does not sit on the boundary.
+   * the polygon, or {@code transitCoordinate} itself when already inside.
+   * <p>
+   * It is the foot of the perpendicular onto the polygon, stepped a margin further so it does not
+   * sit on the boundary - the shortest way onto the platform. Aiming at the platform's interior
+   * point instead would, on a long narrow platform, follow a line so oblique that it first crosses
+   * the boundary tens of metres along the platform rather than a few metres onto it.
+   *
+   * @param interiorPoint the platform's own always-inside point, used only if the step somehow ends
+   *                       up outside the polygon anyway.
    */
   private Coordinate ensureInsideArea(
     Coordinate transitCoordinate,
@@ -394,30 +401,22 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     Coordinate interiorPoint
   ) {
     var geometryFactory = GeometryUtils.getGeometryFactory();
-    if (areaGeometry.contains(geometryFactory.createPoint(transitCoordinate))) {
+    var transitPoint = geometryFactory.createPoint(transitCoordinate);
+    if (areaGeometry.contains(transitPoint)) {
       return transitCoordinate;
     }
-    var pathToInterior = geometryFactory.createLineString(new Coordinate[] {
-      transitCoordinate,
-      interiorPoint,
-    });
-    var crossings = areaGeometry.getBoundary().intersection(pathToInterior).getCoordinates();
-    if (crossings.length == 0) {
-      return interiorPoint;
-    }
-    var nearestCrossing = Stream.of(crossings)
-      .min(Comparator.comparingDouble(c -> SphericalDistanceLibrary.distance(transitCoordinate, c)))
-      .orElseThrow();
-    return stepTowards(nearestCrossing, interiorPoint, INSIDE_AREA_MARGIN_METERS);
+    var onBoundary = DistanceOp.nearestPoints(areaGeometry, transitPoint)[0];
+    var inside = stepBeyond(transitCoordinate, onBoundary, INSIDE_AREA_MARGIN_METERS);
+    return areaGeometry.contains(geometryFactory.createPoint(inside)) ? inside : interiorPoint;
   }
 
-  /** {@code marginMeters} from {@code from} towards {@code to}, or {@code to} if that is nearer. */
-  private static Coordinate stepTowards(Coordinate from, Coordinate to, double marginMeters) {
+  /** {@code marginMeters} past {@code to}, continuing along the line from {@code from}. */
+  private static Coordinate stepBeyond(Coordinate from, Coordinate to, double marginMeters) {
     double totalMeters = SphericalDistanceLibrary.distance(from, to);
-    if (totalMeters <= marginMeters) {
+    if (totalMeters == 0) {
       return to;
     }
-    double fraction = marginMeters / totalMeters;
+    double fraction = 1 + marginMeters / totalMeters;
     return new Coordinate(from.x + (to.x - from.x) * fraction, from.y + (to.y - from.y) * fraction);
   }
 
