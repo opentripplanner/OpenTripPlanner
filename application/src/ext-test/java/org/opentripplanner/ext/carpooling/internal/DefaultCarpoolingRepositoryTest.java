@@ -8,10 +8,15 @@ import static org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData.wit
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class DefaultCarpoolingRepositoryTest {
 
@@ -25,6 +30,51 @@ class DefaultCarpoolingRepositoryTest {
     0,
     ZoneId.of("Europe/Oslo")
   );
+
+  /** A one-leg trip whose corridor envelope is the given box. */
+  private static RoutableCarpoolTrip tripCovering(ZonedDateTime endTime, Envelope envelope) {
+    var trip = withDummyVertices(tripEndingAt(endTime));
+    var corridor = new CarpoolCorridor(
+      List.of(Duration.ofMinutes(10)),
+      List.of(Duration.ofMinutes(21)),
+      List.of(),
+      List.of(envelope)
+    );
+    return new RoutableCarpoolTrip(trip.trip(), trip.vertices(), corridor);
+  }
+
+  @Test
+  void findsTripsWhoseCorridorEnvelopeContainsThePoint() {
+    var repository = new DefaultCarpoolingRepository();
+    var trondheim = tripCovering(NOON.plusHours(2), new Envelope(10.2, 10.6, 63.3, 63.5));
+    var steinkjer = tripCovering(NOON.plusHours(3), new Envelope(11.3, 11.7, 63.9, 64.1));
+    repository.upsertCarpoolTrip(trondheim);
+    repository.upsertCarpoolTrip(steinkjer);
+
+    assertThat(repository.getCarpoolTripsNear(new WgsCoordinate(63.43, 10.39))).containsExactly(
+      trondheim
+    );
+    assertThat(repository.getCarpoolTripsNear(new WgsCoordinate(64.0, 11.5))).containsExactly(
+      steinkjer
+    );
+    assertThat(repository.getCarpoolTripsNear(new WgsCoordinate(60.0, 10.0))).isEmpty();
+  }
+
+  @Test
+  void indexFollowsReplacementRemovalAndExpiry() {
+    var repository = new DefaultCarpoolingRepository();
+    var trip = tripCovering(NOON, new Envelope(10.2, 10.6, 63.3, 63.5));
+    var trondheim = new WgsCoordinate(63.43, 10.39);
+    repository.upsertCarpoolTrip(trip);
+    assertThat(repository.getCarpoolTripsNear(trondheim)).containsExactly(trip);
+
+    repository.removeCarpoolTrip(trip.trip().getId());
+    assertThat(repository.getCarpoolTripsNear(trondheim)).isEmpty();
+
+    repository.upsertCarpoolTrip(trip);
+    repository.removeExpiredTrips(NOON.plusHours(1).toInstant(), Duration.ZERO);
+    assertThat(repository.getCarpoolTripsNear(trondheim)).isEmpty();
+  }
 
   @Test
   void removesTripsThatEndedBeforeTheThreshold() {

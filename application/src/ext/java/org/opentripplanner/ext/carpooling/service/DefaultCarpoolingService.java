@@ -338,7 +338,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <p>
    * The method proceeds as follows:
    * <ol>
-   *   <li>Pre-filters trips using time and distance heuristic.</li>
+   *   <li>Takes the trips whose corridor may serve the passenger from a spatial index over the
+   *       corridors, and pre-filters them using time and distance heuristic.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
    *       those the passenger can walk to or from within the walk budget.</li>
    *   <li>For each candidate trip and corridor stop combination, identifies viable insertion
@@ -383,9 +384,6 @@ public class DefaultCarpoolingService implements CarpoolingService {
     validateRequest(request);
     var carpoolingRequest = CarpoolingRequest.of(request, accessOrEgress);
 
-    var allTrips = repository.getCarpoolTrips();
-    LOG.debug("Repository contains {} carpool trips", allTrips.size());
-
     GenericLocation passengerLocation = accessOrEgress.isAccess() ? request.from() : request.to();
     WgsCoordinate passengerCoordinates = passengerLocation.wgsCoordinate();
     double maxCarSpeed = streetLimitationParametersService.maxCarSpeed();
@@ -398,8 +396,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .valueOf(StreetMode.CARPOOL)
       .toSeconds();
 
-    var candidateTrips = allTrips
+    var nearbyTrips = repository.getCarpoolTripsNear(passengerCoordinates);
+    LOG.debug("{} carpool trips near {}", nearbyTrips.size(), passengerCoordinates);
+
+    var candidateTrips = nearbyTrips
       .stream()
+      .filter(trip -> trip.corridor().mayServe(trip.vertices(), passengerCoordinates, maxCarSpeed))
       .filter(trip -> preFilters.isCandidateTrip(trip.trip(), carpoolingRequest))
       .toList();
 

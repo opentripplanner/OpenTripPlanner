@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Repository for managing carpooling trip ({@link CarpoolTrip}) data.
@@ -25,6 +26,13 @@ public interface CarpoolingRepository {
    * and not yet removed or expired.
    */
   Collection<RoutableCarpoolTrip> getCarpoolTrips();
+
+  /**
+   * The trips that could serve a passenger at {@code point}: those with a corridor one of whose
+   * leg envelopes contains the point, answered from a spatial index over the corridors rather than
+   * a scan of every trip.
+   */
+  Collection<RoutableCarpoolTrip> getCarpoolTripsNear(WgsCoordinate point);
 
   /**
    * Returns the trip with the given id together with its resolved street vertices, or {@code null}
