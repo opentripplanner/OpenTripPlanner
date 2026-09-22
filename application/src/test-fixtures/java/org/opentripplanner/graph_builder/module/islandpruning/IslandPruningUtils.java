@@ -26,7 +26,7 @@ class IslandPruningUtils {
    * {@link #buildOsmGraph} so callers (eg. a standalone benchmark) can time OSM import and island
    * pruning separately.
    */
-  static Graph buildStreetGraph(File osmFile) throws Exception {
+  static Graph buildStreetGraph(File osmFile) {
     var graph = new Graph();
     var osmProvider = new DefaultOsmProvider(osmFile, true);
 
