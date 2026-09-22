@@ -36,7 +36,7 @@ public record InsertionCandidate(
   @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
 ) {
   /**
-   * {@link InsertionPositionFinder} guarantees {@code 1 <= pickupPosition < dropoffPosition}
+   * {@link InsertionEvaluator} guarantees {@code 1 <= pickupPosition < dropoffPosition}
    * (pickup is never at the driver's origin, and dropoff is always strictly after pickup).
    * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
    * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at
