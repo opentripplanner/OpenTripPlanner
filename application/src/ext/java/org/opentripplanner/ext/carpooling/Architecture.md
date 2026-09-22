@@ -23,13 +23,14 @@ org.opentripplanner.ext.carpooling/
 │   └── PassengerTrees       # The passenger's two car trees of a request
 ├── filter/                   # Pre- and post-screening
 │   ├── CarpoolingRequest    # Passenger-side request abstraction
-│   ├── CarpoolTripFilter    # Pre-filter interface (raw trips)
+│   ├── CarpoolTripFilter    # Pre-filter interface (trips vs. the snapped passenger)
+│   ├── SnappedPassenger     # The passenger's snapped pickup and dropoff
 │   ├── CarpoolItineraryFilter # Post-filter interface (routed itineraries)
 │   ├── TripPreFilters       # Composite of pre-filters (AND)
 │   ├── ItineraryPostFilters # Composite of post-filters (AND)
 │   ├── TimeTripFilter       # Pre-filter: loose time-window check
-│   ├── TimeItineraryFilter  # Post-filter: tight time-window enforcement
-│   └── DistanceTripFilter   # Pre-filter: geographic proximity
+│   ├── CorridorTripFilter   # Pre-filter: the trip's corridor reaches the passenger
+│   └── TimeItineraryFilter  # Post-filter: tight time-window enforcement
 ├── constraints/              # Post-routing constraints
 │   └── PassengerDelayConstraints # Protects existing passengers
 ├── util/                     # Utilities
@@ -47,12 +48,12 @@ org.opentripplanner.ext.carpooling/
 The carpooling service uses a multi-phase algorithm to match passengers with compatible carpool trips:
 
 ### 1. Pre-Filter Phase
-Fast pre-screening to eliminate incompatible trips using necessary conditions only (loose bounds);
-tight enforcement is deferred to the post-filter once actual times are known:
-- **Capacity Filter**: Checks if any seats are available
-- **TimeTripFilter**: Trip start/end is loosely compatible with the passenger's depart-after or
-  arrive-by window
-- **DistanceTripFilter**: Validates pickup/dropoff are within 50km of driver's route
+Fast pre-screening, once the passenger is snapped to the street network, to eliminate incompatible
+trips using necessary conditions only (loose bounds); tight enforcement is deferred to the
+post-filter once actual times are known:
+- **TimeTripFilter**: the trip's time span overlaps the passenger's time window
+- **CorridorTripFilter**: the trip's corridor can reach the snapped passenger
+  (`CarpoolCorridor.mayServe`)
 
 ### 2. Routing Phase
 Optimal insertion point calculation:
