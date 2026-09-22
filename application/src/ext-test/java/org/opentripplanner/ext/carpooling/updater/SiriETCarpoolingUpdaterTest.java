@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.cancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithAllButOneCallCancelled;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithCode;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithLatestExpectedArrivalTime;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithMovedDestination;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.malformedNonCancelledJourney;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.CarpoolingParametersTestData;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
@@ -57,21 +59,8 @@ class SiriETCarpoolingUpdaterTest {
     when(resolver.resolve(any())).thenAnswer(invocation ->
       RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
-    var params = new DefaultSiriETUpdaterParameters(
-      "carpool-test",
-      FEED_ID,
-      false,
-      "http://localhost/never-fetched",
-      Duration.ofMinutes(1),
-      "test-requestor",
-      Duration.ofSeconds(30),
-      Duration.ofMinutes(15),
-      false,
-      HttpHeaders.empty(),
-      false
-    );
     updater = new SiriETCarpoolingUpdater(
-      params,
+      params(),
       repository,
       resolver,
       CarpoolingParameters.DEFAULT
@@ -275,6 +264,48 @@ class SiriETCarpoolingUpdaterTest {
     assertSame(seededTrip, repository.getCarpoolTrips().iterator().next());
   }
 
+  @Test
+  void newTripsBeyondTheLimitAreDropped() {
+    var limited = updaterHoldingAtMost(2);
+
+    limited.processEstimatedVehicleJourney(journeyWithCode("a"));
+    limited.processEstimatedVehicleJourney(journeyWithCode("b"));
+    limited.processEstimatedVehicleJourney(journeyWithCode("c"));
+
+    assertTrue(held("a"));
+    assertTrue(held("b"));
+    assertFalse(held("c"));
+  }
+
+  @Test
+  void aHeldTripCanStillChangeWhenTheFeedIsFull() {
+    var limited = updaterHoldingAtMost(2);
+    var changedA = arrivingLater(journeyWithCode("a"));
+
+    limited.processEstimatedVehicleJourney(journeyWithCode("a"));
+    limited.processEstimatedVehicleJourney(journeyWithCode("b"));
+    limited.processEstimatedVehicleJourney(changedA);
+
+    var stored = repository.getCarpoolTrip(mapper.tripId(changedA)).trip();
+    assertEquals(mapper.mapSiriToCarpoolTrip(changedA).endTime(), stored.endTime());
+  }
+
+  @Test
+  void aCancellationFreesASlot() {
+    var limited = updaterHoldingAtMost(2);
+    var cancelledA = journeyWithCode("a");
+    cancelledA.setCancellation(true);
+
+    limited.processEstimatedVehicleJourney(journeyWithCode("a"));
+    limited.processEstimatedVehicleJourney(journeyWithCode("b"));
+    limited.processEstimatedVehicleJourney(cancelledA);
+    limited.processEstimatedVehicleJourney(journeyWithCode("c"));
+
+    assertFalse(held("a"));
+    assertTrue(held("b"));
+    assertTrue(held("c"));
+  }
+
   private FeedScopedId seedActiveTrip() {
     var journey = minimalCompleteJourney();
     updater.processEstimatedVehicleJourney(journey);
@@ -292,5 +323,41 @@ class SiriETCarpoolingUpdaterTest {
       .getCarpoolTrips()
       .stream()
       .anyMatch(t -> t.trip().getId().equals(id));
+  }
+
+  private SiriETCarpoolingUpdater updaterHoldingAtMost(int maxTrips) {
+    return new SiriETCarpoolingUpdater(
+      params(),
+      repository,
+      resolver,
+      CarpoolingParametersTestData.withMaxTrips(maxTrips)
+    );
+  }
+
+  private boolean held(String code) {
+    return tripIsInRepository(mapper.tripId(journeyWithCode(code)));
+  }
+
+  /** The journey, arriving 30 minutes later: the same trip, changed. */
+  private static EstimatedVehicleJourney arrivingLater(EstimatedVehicleJourney journey) {
+    var last = journey.getEstimatedCalls().getEstimatedCalls().getLast();
+    last.setAimedArrivalTime(last.getAimedArrivalTime().plusMinutes(30));
+    return journey;
+  }
+
+  private static DefaultSiriETUpdaterParameters params() {
+    return new DefaultSiriETUpdaterParameters(
+      "carpool-test",
+      FEED_ID,
+      false,
+      "http://localhost/never-fetched",
+      Duration.ofMinutes(1),
+      "test-requestor",
+      Duration.ofSeconds(30),
+      Duration.ofMinutes(15),
+      false,
+      HttpHeaders.empty(),
+      false
+    );
   }
 }
