@@ -18,7 +18,7 @@ import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.StopFarFromBoardingLocationPlatform;
+import org.opentripplanner.graph_builder.issues.StopFarFromBoardingLocation;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
@@ -73,8 +73,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   );
   private static final double SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(250);
   private static final double INSIDE_AREA_MARGIN_METERS = 0.2;
-  /** Beyond this, a stop outside its OSM platform is reported as a data import issue. */
-  private static final double FAR_FROM_PLATFORM_METERS = 5;
+  /** Beyond this, a stop away from its OSM boarding location is reported as a data import issue. */
+  private static final double FAR_FROM_BOARDING_LOCATION_METERS = 5;
   /**
    * When two linked vertices count as the same attachment point. Above floating-point noise between
    * a way's forward and back edge, below {@code VertexLinker}'s 0.1 m split-end tolerance.
@@ -190,7 +190,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
             var boardingLocation = makeBoardingLocationForPlatform(stop, platform, area.getName());
-            // An area group with no visibility vertices cannot be linked into; another nearby
+            // An area group with no visibility vertices cannot be linked into -> another nearby
             // area may carry the same reference and be linkable.
             if (!linkIntoPlatformArea(boardingLocation, areaGroup, area, platform, stop)) {
               continue;
@@ -226,26 +226,29 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .entrySet()
       .stream()
       .findFirst()
-      .map(platformEdgeList -> {
-        Platform platform = platformEdgeList.getKey();
+      .map(entry -> {
+        Platform platform = entry.getKey();
+        var platformEdges = entry
+          .getValue()
+          .stream()
+          .map(StreetEdge.class::cast)
+          .collect(Collectors.toSet());
         var boardingLocation = makeBoardingLocationForPlatform(stop, platform, platform.name());
-        var linkedVertices = linker.linkToSpecificStreetEdgesPermanently(
+        var attachmentPoints = closestAttachmentPoint(
           boardingLocation,
-          new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BIDIRECTIONAL,
-          platformEdgeList
-            .getValue()
-            .stream()
-            .map(StreetEdge.class::cast)
-            .collect(Collectors.toSet())
+          linker.linkToSpecificStreetEdgesPermanently(
+            boardingLocation,
+            new TraverseModeSet(TraverseMode.WALK),
+            LinkingDirection.BIDIRECTIONAL,
+            platformEdges
+          )
         );
-        var attachmentPoints = closestAttachmentPoint(boardingLocation, linkedVertices);
         for (var vertex : attachmentPoints) {
           reRegisterSplitEdgesWithPlatform(vertex, platform);
-          linkBoardingLocationToStop(ts, stop.getCode(), vertex);
         }
-        // The boarding location only carried the coordinate to link from; the stop attaches to the
-        // split vertices instead, leaving it with no edges. Don't serialize it.
+        linkToPlatformWay(ts, stop, boardingLocation, attachmentPoints, platformEdges);
+        // In OSM mode the boarding location only carried the centroid to link from and is left with
+        // no edges. Don't serialize it.
         graph.removeIfUnconnected(boardingLocation);
         // On failure the caller falls back to looking for a platform mapped as an area.
         return !attachmentPoints.isEmpty();
@@ -254,13 +257,48 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
+   * Attach the stop to the points where it meets the platform way. In {@code TRANSIT} mode it keeps
+   * its own coordinate and walks to them over an edge of the true length, rather than being attached
+   * to its own projection onto the way and getting that offset for free. In {@code OSM} mode it is
+   * attached to them directly, the boarding location being a centroid nobody stands on.
+   */
+  private void linkToPlatformWay(
+    TransitStopVertex ts,
+    RegularStop stop,
+    OsmBoardingLocationVertex boardingLocation,
+    Set<StreetVertex> attachmentPoints,
+    Set<StreetEdge> platformEdges
+  ) {
+    if (coordinateSource != BoardingLocationCoordinateSource.TRANSIT) {
+      attachmentPoints.forEach(vertex -> linkBoardingLocationToStop(ts, stop.getCode(), vertex));
+      return;
+    }
+    if (attachmentPoints.isEmpty()) {
+      return;
+    }
+    var attachment = attachmentPoints.iterator().next().getCoordinate();
+    var walkToPlatform = SphericalDistanceLibrary.distance(
+      boardingLocation.getCoordinate(),
+      attachment
+    );
+    if (walkToPlatform <= SAME_ATTACHMENT_POINT_TOLERANCE_METERS) {
+      // The stop already sits on the platform way; a connector would be a zero-length edge.
+      attachmentPoints.forEach(vertex -> linkBoardingLocationToStop(ts, stop.getCode(), vertex));
+      return;
+    }
+    var properties = ConnectorProperties.of(platformEdges.iterator().next());
+    for (var vertex : attachmentPoints) {
+      connectBoardingLocation(boardingLocation, vertex, properties);
+      connectBoardingLocation(vertex, boardingLocation, properties);
+    }
+    reportIfFarAway(stop, "OSM platform way", walkToPlatform);
+    linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+  }
+
+  /**
    * Connect a transit stop vertex to a boarding location node.
    * <p>
    * The node is generated in the OSM processing step but we need to link it here.
-   * <p>
-   * {@link BoardingLocationCoordinateSource#TRANSIT} does not apply: a tagged node is already a
-   * per-stop coordinate, and honouring it would mean relocating a vertex OSM parsing has already put
-   * in the graph and the spatial index.
    *
    * @return If the vertex has been connected.
    */
@@ -283,7 +321,12 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
               getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
           );
         }
-        linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+        var distanceToNode = SphericalDistanceLibrary.distance(
+          stop.getCoordinate().asJtsCoordinate(),
+          boardingLocation.getCoordinate()
+        );
+        reportIfFarAway(stop, "OSM node %s".formatted(boardingLocation.getLabel()), distanceToNode);
+        linkToNode(ts, stop, boardingLocation, distanceToNode);
         return true;
       }
     }
@@ -291,8 +334,38 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   /**
+   * Attach the stop to the tagged OSM node. In {@code TRANSIT} mode the stop keeps its own
+   * coordinate and walks to the node over an edge of the real length, so that the coordinate a stop
+   * is placed at comes from the transit data on every linking path. In {@code OSM} mode it takes the
+   * node's coordinate as its position on the street network, as it always has.
+   */
+  private void linkToNode(
+    TransitStopVertex ts,
+    RegularStop stop,
+    OsmBoardingLocationVertex node,
+    double distanceToNode
+  ) {
+    if (
+      coordinateSource != BoardingLocationCoordinateSource.TRANSIT ||
+      distanceToNode <= SAME_ATTACHMENT_POINT_TOLERANCE_METERS
+    ) {
+      linkBoardingLocationToStop(ts, stop.getCode(), node);
+      return;
+    }
+    var stopPoint = makeBoardingLocation(
+      "node-transit/%s".formatted(stop.getId().toString()),
+      stop.getCoordinate().asJtsCoordinate(),
+      Set.of(stop.getId().getId()),
+      node.getName()
+    );
+    connectBoardingLocation(stopPoint, node, ConnectorProperties.DEFAULT);
+    connectBoardingLocation(node, stopPoint, ConnectorProperties.DEFAULT);
+    linkBoardingLocationToStop(ts, stop.getCode(), stopPoint);
+  }
+
+  /**
    * The vertex linking this stop to the platform: in {@code OSM} mode the platform centroid, shared
-   * between all stops on it; in {@code TRANSIT} mode the stop's own coordinate, so stops on one
+   * between all stops on it, in {@code TRANSIT} mode the stop's own coordinate, so stops on one
    * platform stay distinct.
    */
   private OsmBoardingLocationVertex makeBoardingLocationForPlatform(
@@ -358,15 +431,14 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     if (!linker.addPermanentAreaVertex(accessPoint, areaGroup)) {
       return false;
     }
-    var distanceToPlatform = SphericalDistanceLibrary.distance(
-      boardingLocation.getCoordinate(),
-      insideCoordinate
+    reportIfFarAway(
+      stop,
+      "OSM platform area",
+      SphericalDistanceLibrary.distance(boardingLocation.getCoordinate(), insideCoordinate)
     );
-    if (distanceToPlatform > FAR_FROM_PLATFORM_METERS) {
-      issueStore.add(new StopFarFromBoardingLocationPlatform(stop, distanceToPlatform));
-    }
-    linkBoardingLocationToStreetNetwork(boardingLocation, accessPoint, area);
-    linkBoardingLocationToStreetNetwork(accessPoint, boardingLocation, area);
+    var properties = ConnectorProperties.of(area);
+    connectBoardingLocation(boardingLocation, accessPoint, properties);
+    connectBoardingLocation(accessPoint, boardingLocation, properties);
     return true;
   }
 
@@ -433,7 +505,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * back edge separately, giving two co-located, mutually unconnected vertices there. Both must be
    * linked, or the stop is reachable from one end of the platform only. Its duplicate-way heuristic
    * can also return vertices at a <em>different</em> point, where an earlier stop already split the
-   * way; those are a fraction of a millimetre apart in distance from the stop, hence the filter by
+   * way, those are a fraction of a millimetre apart in distance from the stop, hence the filter by
    * position.
    *
    * @return every candidate co-located with the closest one
@@ -474,47 +546,36 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     // the OSM boarding location vertex is not connected to the street network, so we
     // need to link it first
     return List.of(
-      linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
-      linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
+      connectBoardingLocation(boardingLocation, splitVertex, ConnectorProperties.DEFAULT),
+      connectBoardingLocation(splitVertex, boardingLocation, ConnectorProperties.DEFAULT)
     );
   }
 
-  /**
-   * A plain walkable-and-cyclable connector, for the node path: the nearest street the node is
-   * attached to has no claim on the last few metres up to it.
-   */
-  private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
-    return linkBoardingLocationToStreetNetwork(from, to, null);
-  }
-
-  /**
-   * @param area the platform the edge runs across, whose permission, safety factors and wheelchair
-   *              accessibility it then carries, as {@link VertexLinker}'s own edges in that area do.
-   *              {@code null} for a plain walkable-and-cyclable link.
-   */
-  private StreetEdge linkBoardingLocationToStreetNetwork(
+  /** An edge of the real distance between a boarding location and the street network. */
+  private StreetEdge connectBoardingLocation(
     StreetVertex from,
     StreetVertex to,
-    @Nullable Area area
+    ConnectorProperties properties
   ) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    var builder = new StreetEdgeBuilder<>()
+    return new StreetEdgeBuilder<>()
       .withFromVertex(from)
       .withToVertex(to)
       .withGeometry(line)
       .withName(LOCALIZED_PLATFORM_NAME)
       .withMeterLength(GeometryUtils.sumDistances(line))
-      .withBack(false);
-    if (area == null) {
-      builder.withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    } else {
-      builder
-        .withPermission(area.getPermission())
-        .withWalkSafetyFactor(area.getWalkSafety())
-        .withBicycleSafetyFactor(area.getBicycleSafety())
-        .withWheelchairAccessible(area.isWheelchairAccessible());
+      .withBack(false)
+      .withPermission(properties.permission())
+      .withWalkSafetyFactor(properties.walkSafety())
+      .withBicycleSafetyFactor(properties.bicycleSafety())
+      .withWheelchairAccessible(properties.wheelchairAccessible())
+      .buildAndConnect();
+  }
+
+  private void reportIfFarAway(RegularStop stop, String boardingLocation, double distanceMeters) {
+    if (distanceMeters > FAR_FROM_BOARDING_LOCATION_METERS) {
+      issueStore.add(new StopFarFromBoardingLocation(stop, boardingLocation, distanceMeters));
     }
-    return builder.buildAndConnect();
   }
 
   private void linkBoardingLocationToStop(
@@ -538,5 +599,42 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     var stopId = stop.getId().getId();
 
     return (stopCode != null && references.contains(stopCode)) || references.contains(stopId);
+  }
+
+  /**
+   * What a connector edge inherits from the platform it runs across, so that it matches the edges
+   * {@link VertexLinker} builds there.
+   */
+  private record ConnectorProperties(
+    StreetTraversalPermission permission,
+    float walkSafety,
+    float bicycleSafety,
+    boolean wheelchairAccessible
+  ) {
+    /** For a connector with no platform to inheri  nt from, such as one up to a tagged OSM node. */
+    static final ConnectorProperties DEFAULT = new ConnectorProperties(
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      1f,
+      1f,
+      true
+    );
+
+    static ConnectorProperties of(Area area) {
+      return new ConnectorProperties(
+        area.getPermission(),
+        area.getWalkSafety(),
+        area.getBicycleSafety(),
+        area.isWheelchairAccessible()
+      );
+    }
+
+    static ConnectorProperties of(StreetEdge edge) {
+      return new ConnectorProperties(
+        edge.getPermission(),
+        edge.getWalkSafetyFactor(),
+        edge.getBicycleSafetyFactor(),
+        edge.isWheelchairAccessible()
+      );
+    }
   }
 }

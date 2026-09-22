@@ -427,8 +427,9 @@ put and is connected to the platform by a single edge of the real distance, so t
 always of the right length. A gap too large to be a surveying discrepancy is reported as a
 data import issue.
 
-This only affects platforms mapped as ways or areas; stops linked to a tagged OSM node are
-always placed at the node.
+This applies to platforms mapped as ways or areas and to stops matching a tagged OSM node
+alike, so the coordinate a stop is placed at always comes from the transit data. The OSM
+features themselves are never moved.
 
 
 <h3 id="buildReportDir">buildReportDir</h3>
