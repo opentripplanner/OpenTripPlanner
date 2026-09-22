@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +55,14 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   private static final Duration TRIP_EXPIRY = Duration.ofDays(2);
 
+  /**
+   * The most live carpool trips one feed may have. Each resolved trip costs about a hundred
+   * kilobytes of corridor and a tenth of a second of resolution, so this bounds both the heap and
+   * the time a restarted instance needs to catch up. New trips arriving while the feed is full are
+   * dropped (logged once per poll); updates and cancellations of its live trips are always applied.
+   */
+  public static final int DEFAULT_MAX_TRIPS = 10_000;
+
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
@@ -67,7 +76,16 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * on the same expiry as stored trips).
    */
   private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new ConcurrentHashMap<>();
+
+  /**
+   * The feed's live trips, with the version of each queued last, until the trip is removed or
+   * expires: what the repository holds of this feed once the queue has caught up, plus the trips
+   * that turned out unroutable. The trip limit counts them. Only touched by the polls.
+   */
+  private final Map<FeedScopedId, CarpoolTrip> liveTrips = new HashMap<>();
   private final CarpoolTripResolutionQueue resolutionQueue;
+  private final int maxTrips;
+  private int rejectedThisPoll;
 
   @Nullable
   private final ExecutorService ownedExecutor;
@@ -77,20 +95,26 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     CarpoolingRepository repository,
     RoutableCarpoolTripResolver tripResolver
   ) {
-    this(config, repository, tripResolver, resolverThread(config.feedId()));
+    this(config, repository, tripResolver, resolverThread(config.feedId()), DEFAULT_MAX_TRIPS);
   }
 
   /**
    * @param resolutionExecutor runs the trip changes handed over by the polls, one at a time and in
    *        order; the production constructor uses one daemon thread, tests may run them inline
+   * @param maxTrips the most live trips this feed may have, see {@link #DEFAULT_MAX_TRIPS}
    */
   SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
     RoutableCarpoolTripResolver tripResolver,
-    Executor resolutionExecutor
+    Executor resolutionExecutor,
+    int maxTrips
   ) {
     super(config);
+    if (maxTrips < 1) {
+      throw new IllegalArgumentException("maxTrips must be positive");
+    }
+    this.maxTrips = maxTrips;
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
     this.tripResolver = tripResolver;
@@ -137,11 +161,20 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       moreData = fetchAndProcessUpdates();
     } while (moreData);
     removeExpiredTrips();
+    if (rejectedThisPoll > 0) {
+      LOG.warn(
+        "Rejected {} new carpool trips: this feed has the maximum of {} trips",
+        rejectedThisPoll,
+        maxTrips
+      );
+      rejectedThisPoll = 0;
+    }
   }
 
   /**
    * Purges trips that ended more than {@link #TRIP_EXPIRY} ago, so completed trips are removed even
-   * when the source stops updating them. Cached resolution failures are swept on the same expiry.
+   * when the source stops updating them. Cached resolution failures and the live trips are swept on
+   * the same expiry.
    */
   private void removeExpiredTrips() {
     var now = Instant.now();
@@ -150,6 +183,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     failedResolutions
       .values()
       .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));
+    liveTrips.values().removeIf(trip -> trip.latestEndTime().toInstant().isBefore(cutoff));
   }
 
   /**
@@ -205,14 +239,20 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     try {
       FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
       if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
-        resolutionQueue.remove(tripId);
+        remove(tripId);
         return;
       }
       var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
       if (carpoolTrip == null) {
-        resolutionQueue.remove(tripId);
+        remove(tripId);
         return;
       }
+      if (isFullFor(tripId)) {
+        rejectedThisPoll++;
+        LOG.debug("Rejected new carpool trip {}: the feed is full", tripId);
+        return;
+      }
+      liveTrips.put(tripId, carpoolTrip);
       resolutionQueue.submit(carpoolTrip);
     } catch (Exception e) {
       LOG.info(
@@ -221,6 +261,20 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         e
       );
     }
+  }
+
+  private void remove(FeedScopedId tripId) {
+    liveTrips.remove(tripId);
+    resolutionQueue.remove(tripId);
+  }
+
+  /**
+   * Whether a journey for this trip id has to be dropped because the feed is full: the trip is not
+   * one of the feed's live trips, and the feed already has as many as it may. A live trip already
+   * has its slot and may always be updated.
+   */
+  private boolean isFullFor(FeedScopedId tripId) {
+    return !liveTrips.containsKey(tripId) && liveTrips.size() >= maxTrips;
   }
 
   private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {

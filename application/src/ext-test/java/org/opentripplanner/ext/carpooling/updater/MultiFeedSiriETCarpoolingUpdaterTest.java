@@ -20,6 +20,7 @@ import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
  * Verifies that two {@link SiriETCarpoolingUpdater} instances can share a single
@@ -39,6 +40,7 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   private static final String FEED_B = "AT";
 
   private DefaultCarpoolingRepository repository;
+  private RoutableCarpoolTripResolver resolver;
   private SiriETCarpoolingUpdater updaterA;
   private SiriETCarpoolingUpdater updaterB;
   private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(FEED_A);
@@ -47,12 +49,24 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   @BeforeEach
   void setUp() {
     repository = new DefaultCarpoolingRepository();
-    var resolver = mock(RoutableCarpoolTripResolver.class);
+    resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
       RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
-    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver, Runnable::run);
-    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver, Runnable::run);
+    updaterA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      Runnable::run,
+      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+    );
+    updaterB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      Runnable::run,
+      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+    );
   }
 
   @Test
@@ -127,6 +141,40 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
         );
       }
     }
+  }
+
+  @Test
+  void eachFeedHasItsOwnTripLimit() {
+    var feedA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      Runnable::run,
+      1
+    );
+    var feedB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      Runnable::run,
+      1
+    );
+    var first = journey("first");
+    var second = journey("second");
+
+    feedA.processEstimatedVehicleJourney(first);
+    feedA.processEstimatedVehicleJourney(second);
+    feedB.processEstimatedVehicleJourney(second);
+
+    assertTrue(tripIsInRepository(mapperA.tripId(first)));
+    assertFalse(tripIsInRepository(mapperA.tripId(second)), "feed A is full");
+    assertTrue(tripIsInRepository(mapperB.tripId(second)), "feed A's trips do not count for B");
+  }
+
+  private static EstimatedVehicleJourney journey(String code) {
+    var journey = minimalCompleteJourney();
+    journey.setEstimatedVehicleJourneyCode(code);
+    return journey;
   }
 
   private static DefaultSiriETUpdaterParameters paramsFor(String feedId) {
