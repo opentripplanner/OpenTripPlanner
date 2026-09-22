@@ -528,6 +528,14 @@ public final class State implements AStarState<State, Edge, Vertex> {
     return () -> new BackEdgeIterator(this);
   }
 
+  /**
+   * Returns an efficient iterable that allows traversing the state chain backwards, starting
+   * with (and including) this state.
+   */
+  public Iterable<State> listBackStates() {
+    return () -> new BackStateIterator(this);
+  }
+
   public String toString() {
     return ToStringBuilder.of(State.class)
       .addDateTime("time", getTime())

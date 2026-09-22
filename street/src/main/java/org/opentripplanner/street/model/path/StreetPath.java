@@ -4,16 +4,16 @@ import static org.opentripplanner.street.model.path.ElevationProfileEncoder.enco
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 
 /// This class represents a path within the street network
@@ -21,10 +21,6 @@ public class StreetPath {
 
   private final List<State> states;
   private final List<Edge> edges;
-
-  public StreetPath(GraphPath<State, Edge, Vertex> path) {
-    this(path.states, path.edges);
-  }
 
   public StreetPath(List<State> states, List<Edge> edges) {
     if (states.isEmpty()) {
@@ -37,8 +33,34 @@ public class StreetPath {
     this.edges = edges;
   }
 
+  /**
+   * Build a chronologically-ordered path by following the back-state chain of {@code endState}
+   * all the way back to the origin of the search. When {@code endState} comes from an arriveBy
+   * search, the chain is reversed first, since the back-state chain otherwise runs the "wrong"
+   * way for that search direction.
+   */
   public StreetPath(State endState) {
-    this(new GraphPath<>(endState));
+    var chronological = chronological(endState);
+    this(chronological.states, chronological.edges);
+  }
+
+  private record ChronologicalPath(List<State> states, List<Edge> edges) {}
+
+  private static ChronologicalPath chronological(State endState) {
+    State lastState = endState.getRequest().arriveBy() ? endState.reverse() : endState;
+    return new ChronologicalPath(
+      reversedList(lastState.listBackStates()),
+      reversedList(lastState.listBackEdges())
+    );
+  }
+
+  private static <T> List<T> reversedList(Iterable<T> backIterable) {
+    List<T> list = new ArrayList<>();
+    for (T t : backIterable) {
+      list.add(t);
+    }
+    Collections.reverse(list);
+    return list;
   }
 
   /// The start of the path in seconds
@@ -49,16 +71,6 @@ public class StreetPath {
   /// The end of the path in seconds
   public Instant endTime() {
     return states.getLast().getTime();
-  }
-
-  /// The start of the path in milliseconds
-  public Instant startTimeAccurate() {
-    return states.getFirst().getTimeAccurate();
-  }
-
-  /// The end of the path in milliseconds
-  public Instant endTimeAccurate() {
-    return states.getLast().getTimeAccurate();
   }
 
   public double weight() {
@@ -150,12 +162,5 @@ public class StreetPath {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);
     return new StreetPath(subStates, subEdges);
-  }
-
-  /// This is only used in the carpooling code and can be removed once the carpooling migrates
-  /// to use the StreetPath instead
-  @Deprecated
-  public GraphPath<State, Edge, Vertex> toGraphPath() {
-    return new GraphPath<>(states, edges);
   }
 }

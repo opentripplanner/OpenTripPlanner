@@ -1,6 +1,7 @@
 package org.opentripplanner.street.search;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -13,7 +14,6 @@ import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -113,11 +113,15 @@ public class StreetSearchBuilder {
   }
 
   /// Run the street search, returning all paths found
+  ///
+  /// All final states share the same search anchor time (the request's start/arriveBy time), so
+  /// sorting by elapsed time is equivalent to sorting by arrival time ascending (depart-after) or
+  /// departure time descending (arrive-by) without needing to build a chronological path first.
   public List<StreetPath> getPathsToTarget() {
     return buildAstar()
-      .getPathsToTarget()
+      .getFinalStates()
       .stream()
-      .sorted(new PathComparator(request.arriveBy()))
+      .sorted(Comparator.comparingLong(State::getElapsedTimeSeconds))
       .map(StreetPath::new)
       .toList();
   }

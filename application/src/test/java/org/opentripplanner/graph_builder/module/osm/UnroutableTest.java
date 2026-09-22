@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.street.graph.Graph;
@@ -62,11 +61,11 @@ class UnroutableTest {
       .withTo(to)
       .getShortestPathTree();
 
-    GraphPath<State, Edge, Vertex> path = spt.getPath(to);
+    State state = spt.getState(to);
     // At the time of writing this test, the router simply doesn't find a path at all when highway=construction
     // is filtered out, thus the null check.
-    if (path != null) {
-      for (Edge edge : path.edges) {
+    if (state != null) {
+      for (Edge edge : state.listBackEdges()) {
         assertNotEquals(
           "Path should not use the as-yet unbuilt Tilikum Crossing bridge.",
           "Tilikum Crossing",

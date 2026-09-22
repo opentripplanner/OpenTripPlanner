@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
-import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
