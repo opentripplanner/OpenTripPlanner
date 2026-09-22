@@ -69,7 +69,7 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   /** The itinerary mapper draws the leg from this geometry, so it must run in travel order. */
   @Test
   void geometryIsInTravelOrder() {
-    var path = ROUTER.route(vertexA, vertexC);
+    var path = ROUTER.route(vertexA, vertexC).path();
 
     assertThat(List.of(path.geometry().getCoordinates()))
       .containsExactly(vertexA.getCoordinate(), vertexB.getCoordinate(), vertexC.getCoordinate())

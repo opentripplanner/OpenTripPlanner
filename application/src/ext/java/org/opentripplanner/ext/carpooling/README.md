@@ -298,7 +298,7 @@ Result of finding optimal passenger insertion:
 - **trip**: The original carpool trip
 - **pickupPosition**: 0-based index of the passenger's pickup in the modified route
 - **dropoffPosition**: 0-based index of the passenger's dropoff in the modified route
-- **routeSegments**: Routed path segments forming the complete modified route
+- **routeSegments**: The `RoutedSegment`s forming the complete modified route
 - **stopDuration**: Dwell time added at each intermediate stop (from the car routing preferences' `pickupTime`)
 - **transitStop**: Passenger's access/egress stop, if any
 - **totalTripDuration**: Total trip duration including driving and stop delays, computed from `routeSegments` and `stopDuration`

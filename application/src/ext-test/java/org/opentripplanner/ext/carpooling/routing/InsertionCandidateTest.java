@@ -3,8 +3,8 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createStreetPath;
-import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createStreetPaths;
+import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createSegment;
+import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createSegments;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
@@ -22,9 +22,9 @@ class InsertionCandidateTest {
     // Simple trip origin → destination, with passenger pickup and dropoff inserted:
     // origin → pickup (5 min) → dropoff (10 min) → destination (8 min)
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var originToPickup = createStreetPath(Duration.ofMinutes(5));
-    var pickupToDropoff = createStreetPath(Duration.ofMinutes(10));
-    var dropoffToDestination = createStreetPath(Duration.ofMinutes(8));
+    var originToPickup = createSegment(Duration.ofMinutes(5));
+    var pickupToDropoff = createSegment(Duration.ofMinutes(10));
+    var dropoffToDestination = createSegment(Duration.ofMinutes(8));
 
     var candidate = new InsertionCandidate(
       trip,
@@ -42,15 +42,15 @@ class InsertionCandidateTest {
   }
 
   @Test
-  void getPickupSegments_returnsCorrectRange() {
+  void getSegmentsBeforePickup_returnsCorrectRange() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(5);
+    var segments = createSegments(5);
 
     var candidate = new InsertionCandidate(trip, 2, 4, segments, STOP_DURATION, null, null, null);
 
-    var pickupSegments = candidate.getPickupSegments();
-    assertEquals(2, pickupSegments.size());
-    assertEquals(segments.subList(0, 2), pickupSegments);
+    var segmentsBeforePickup = candidate.getSegmentsBeforePickup();
+    assertEquals(2, segmentsBeforePickup.size());
+    assertEquals(segments.subList(0, 2), segmentsBeforePickup);
   }
 
   /**
@@ -62,7 +62,7 @@ class InsertionCandidateTest {
   @Test
   void constructor_pickupAtOrigin_throws() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(3);
+    var segments = createSegments(3);
 
     assertThrows(IllegalArgumentException.class, () ->
       new InsertionCandidate(trip, 0, 2, segments, STOP_DURATION, null, null, null)
@@ -73,7 +73,7 @@ class InsertionCandidateTest {
   @Test
   void constructor_dropoffNotAfterPickup_throws() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(3);
+    var segments = createSegments(3);
 
     assertThrows(IllegalArgumentException.class, () ->
       new InsertionCandidate(trip, 2, 2, segments, STOP_DURATION, null, null, null)
@@ -81,55 +81,55 @@ class InsertionCandidateTest {
   }
 
   @Test
-  void getSharedSegments_returnsCorrectRange() {
+  void getSegmentsWithNewPassenger_returnsCorrectRange() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(5);
+    var segments = createSegments(5);
 
     var candidate = new InsertionCandidate(trip, 1, 3, segments, STOP_DURATION, null, null, null);
 
-    var sharedSegments = candidate.getSharedSegments();
-    assertEquals(2, sharedSegments.size());
-    assertEquals(segments.subList(1, 3), sharedSegments);
+    var segmentsWithNewPassenger = candidate.getSegmentsWithNewPassenger();
+    assertEquals(2, segmentsWithNewPassenger.size());
+    assertEquals(segments.subList(1, 3), segmentsWithNewPassenger);
   }
 
   @Test
-  void getSharedSegments_adjacentPositions_returnsSingleSegment() {
+  void getSegmentsWithNewPassenger_adjacentPositions_returnsSingleSegment() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(3);
+    var segments = createSegments(3);
 
     var candidate = new InsertionCandidate(trip, 1, 2, segments, STOP_DURATION, null, null, null);
 
-    var sharedSegments = candidate.getSharedSegments();
-    assertEquals(1, sharedSegments.size());
+    var segmentsWithNewPassenger = candidate.getSegmentsWithNewPassenger();
+    assertEquals(1, segmentsWithNewPassenger.size());
   }
 
   @Test
-  void getDropoffSegments_returnsCorrectRange() {
+  void getSegmentsAfterDropoff_returnsCorrectRange() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(5);
+    var segments = createSegments(5);
 
     var candidate = new InsertionCandidate(trip, 1, 3, segments, STOP_DURATION, null, null, null);
 
-    var dropoffSegments = candidate.getDropoffSegments();
-    assertEquals(2, dropoffSegments.size());
-    assertEquals(segments.subList(3, 5), dropoffSegments);
+    var segmentsAfterDropoff = candidate.getSegmentsAfterDropoff();
+    assertEquals(2, segmentsAfterDropoff.size());
+    assertEquals(segments.subList(3, 5), segmentsAfterDropoff);
   }
 
   @Test
-  void getDropoffSegments_atEnd_returnsEmpty() {
+  void getSegmentsAfterDropoff_atEnd_returnsEmpty() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(3);
+    var segments = createSegments(3);
 
     var candidate = new InsertionCandidate(trip, 1, 3, segments, STOP_DURATION, null, null, null);
 
-    var dropoffSegments = candidate.getDropoffSegments();
-    assertTrue(dropoffSegments.isEmpty());
+    var segmentsAfterDropoff = candidate.getSegmentsAfterDropoff();
+    assertTrue(segmentsAfterDropoff.isEmpty());
   }
 
   @Test
   void toString_includesKeyInformation() {
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
-    var segments = createStreetPaths(3);
+    var segments = createSegments(3);
 
     var candidate = new InsertionCandidate(trip, 1, 2, segments, STOP_DURATION, null, null, null);
 
@@ -147,18 +147,18 @@ class InsertionCandidateTest {
   @Test
   void durations_onePickupSegment_singleSharedSegment() {
     var stopDuration = Duration.ofMinutes(3);
-    var pickupPath = createStreetPath(Duration.ofMinutes(8));
-    var sharedPath = createStreetPath(Duration.ofMinutes(15));
+    var segmentBeforePickup = createSegment(Duration.ofMinutes(8));
+    var segmentWithNewPassenger = createSegment(Duration.ofMinutes(15));
 
-    var pickupDuration = pickupPath.duration();
-    var sharedDuration = sharedPath.duration();
+    var pickupDuration = segmentBeforePickup.duration();
+    var durationWithNewPassenger = segmentWithNewPassenger.duration();
 
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
     var candidate = new InsertionCandidate(
       trip,
       1,
       2,
-      List.of(pickupPath, sharedPath),
+      List.of(segmentBeforePickup, segmentWithNewPassenger),
       stopDuration,
       null,
       null,
@@ -166,7 +166,7 @@ class InsertionCandidateTest {
     );
 
     assertEquals(pickupDuration, candidate.getDurationUntilPickupArrival());
-    assertEquals(stopDuration.plus(sharedDuration), candidate.getPassengerRideDuration());
+    assertEquals(stopDuration.plus(durationWithNewPassenger), candidate.getPassengerRideDuration());
   }
 
   /**
@@ -176,10 +176,10 @@ class InsertionCandidateTest {
   @Test
   void durations_multiplePickupAndSharedSegments() {
     var stopDuration = Duration.ofMinutes(2);
-    var pickup0 = createStreetPath(Duration.ofMinutes(5));
-    var pickup1 = createStreetPath(Duration.ofMinutes(7));
-    var shared0 = createStreetPath(Duration.ofMinutes(10));
-    var shared1 = createStreetPath(Duration.ofMinutes(12));
+    var pickup0 = createSegment(Duration.ofMinutes(5));
+    var pickup1 = createSegment(Duration.ofMinutes(7));
+    var shared0 = createSegment(Duration.ofMinutes(10));
+    var shared1 = createSegment(Duration.ofMinutes(12));
 
     var pickup0Duration = pickup0.duration();
     var pickup1Duration = pickup1.duration();
@@ -212,9 +212,9 @@ class InsertionCandidateTest {
    */
   @Test
   void durations_scaleWithStopDuration() {
-    var pickup = createStreetPath(Duration.ofMinutes(5));
-    var shared0 = createStreetPath(Duration.ofMinutes(10));
-    var shared1 = createStreetPath(Duration.ofMinutes(10));
+    var pickup = createSegment(Duration.ofMinutes(5));
+    var shared0 = createSegment(Duration.ofMinutes(10));
+    var shared1 = createSegment(Duration.ofMinutes(10));
 
     var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
 
