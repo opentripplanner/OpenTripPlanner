@@ -31,8 +31,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * the position within the trip's TripPattern, not its GTFS stop sequence for example or Raptor
  * stop index. The stop position is 0(zero) based.
  */
-public sealed interface TripTimes<T extends TripTimes>
-  extends Serializable, Comparable<TripTimes>
+public sealed interface TripTimes<T extends TripTimes<T>>
+  extends Serializable, Comparable<TripTimes<?>>
   permits RealTimeTripTimes, ScheduledTripTimes
 {
   /**
@@ -106,12 +106,12 @@ public sealed interface TripTimes<T extends TripTimes>
   }
 
   /** Sort trips based on first departure time. */
-  default Comparator<TripTimes> compare() {
+  default Comparator<TripTimes<?>> compare() {
     return Comparator.comparingInt(TripTimes::sortIndex);
   }
 
   /** Sort trips based on first departure time. */
-  default int compareTo(TripTimes other) {
+  default int compareTo(TripTimes<?> other) {
     return sortIndex() - other.sortIndex();
   }
 

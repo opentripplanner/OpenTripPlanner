@@ -32,7 +32,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule> implem
   TripSchedule {
 
   protected final TripPatternForDates raptorTripPattern;
-  protected final TripTimes tripTimes;
+  protected final TripTimes<?> tripTimes;
   protected final int stopPositionInPattern;
   protected final int earliestDepartureTime;
   protected final int departureTime;
@@ -43,7 +43,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule> implem
 
   public FrequencyBoardOrAlightEvent(
     TripPatternForDates raptorTripPattern,
-    TripTimes tripTimes,
+    TripTimes<?> tripTimes,
     int stopPositionInPattern,
     int earliestDepartureTime,
     int departureTime,
@@ -130,7 +130,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule> implem
   /* TripSchedule implementation */
 
   @Override
-  public TripTimes getOriginalTripTimes() {
+  public TripTimes<?> getOriginalTripTimes() {
     return tripTimes;
   }
 

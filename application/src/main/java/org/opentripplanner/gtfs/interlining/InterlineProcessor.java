@@ -122,16 +122,16 @@ public class InterlineProcessor {
     Collection<TripPattern> tripPatterns
   ) {
     /* Record which Pattern each interlined TripTimes belongs to. */
-    Map<TripTimes, TripPattern> patternForTripTimes = new HashMap<>();
+    Map<TripTimes<?>, TripPattern> patternForTripTimes = new HashMap<>();
 
     /* TripTimes grouped by the block ID of their trips. Must be a ListMultimap to allow sorting. */
-    ListMultimap<String, TripTimes> tripTimesForBlockId = ArrayListMultimap.create();
+    ListMultimap<String, TripTimes<?>> tripTimesForBlockId = ArrayListMultimap.create();
 
     LOG.info("Finding interlining trips based on block IDs.");
     for (TripPattern pattern : tripPatterns) {
       Timetable timetable = pattern.getScheduledTimetable();
       /* TODO: Block semantics seem undefined for frequency trips, so skip them? */
-      for (TripTimes tripTimes : timetable.getTripTimes()) {
+      for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
         Trip trip = tripTimes.getTrip();
         if (StringUtils.hasValue(trip.getGtfsBlockId())) {
           tripTimesForBlockId.put(trip.getGtfsBlockId(), tripTimes);
@@ -148,7 +148,7 @@ public class InterlineProcessor {
     // linking them. One from trip can have multiple interline transfers if trip which interlines
     // with the from trip doesn't operate on every service date of the from trip.
     for (String blockId : tripTimesForBlockId.keySet()) {
-      List<TripTimes> blockTripTimes = tripTimesForBlockId.get(blockId);
+      List<TripTimes<?>> blockTripTimes = tripTimesForBlockId.get(blockId);
       Collections.sort(blockTripTimes);
       for (int i = 0; i < blockTripTimes.size(); i++) {
         var fromTripTimes = blockTripTimes.get(i);
@@ -188,10 +188,10 @@ public class InterlineProcessor {
    * creation for certain service dates.
    */
   private boolean createInterline(
-    TripTimes fromTripTimes,
-    TripTimes toTripTimes,
+    TripTimes<?> fromTripTimes,
+    TripTimes<?> toTripTimes,
     String blockId,
-    Map<TripTimes, TripPattern> patternForTripTimes,
+    Map<TripTimes<?>, TripPattern> patternForTripTimes,
     Multimap<TripPatternPair, TripPair> interlines
   ) {
     if (

@@ -553,7 +553,7 @@ public class TransitRepository implements Serializable {
   }
 
   private Set<StopLocation> getStopLocationsUsedByTripTimes(
-    Predicate<TripTimes> tripTimesPredicate
+    Predicate<TripTimes<?>> tripTimesPredicate
   ) {
     Set<StopLocation> stopLocations = getAllTripPatterns()
       .stream()

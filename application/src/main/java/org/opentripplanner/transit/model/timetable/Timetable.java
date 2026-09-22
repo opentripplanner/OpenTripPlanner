@@ -24,9 +24,9 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private List<TripTimes> tripTimes;
+  private List<TripTimes<?>> tripTimes;
 
-  private Map<FeedScopedId, TripTimes> tripTimesIndex;
+  private Map<FeedScopedId, TripTimes<?>> tripTimesIndex;
 
   private List<FrequencyEntry> frequencyEntries;
 
@@ -57,12 +57,12 @@ public class Timetable implements Serializable {
   }
 
   @Nullable
-  public TripTimes getTripTimes(Trip trip) {
+  public TripTimes<?> getTripTimes(Trip trip) {
     return getTripTimes(trip.getId());
   }
 
   @Nullable
-  public TripTimes getTripTimes(FeedScopedId tripId) {
+  public TripTimes<?> getTripTimes(FeedScopedId tripId) {
     return tripTimesIndex.get(tripId);
   }
 
@@ -75,7 +75,7 @@ public class Timetable implements Serializable {
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
     tripTimes = tripTimes
       .stream()
-      .map(tt -> tt.withServiceCode(serviceCodes.get(tt.getTrip().getServiceId())))
+      .<TripTimes<?>>map(tt -> withServiceCode(tt, serviceCodes.get(tt.getTrip().getServiceId())))
       .toList();
     tripTimesIndex = tripTimes
       .stream()
@@ -98,7 +98,7 @@ public class Timetable implements Serializable {
    * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
    * additional TripTimes objects for unscheduled trips. Frequency entries are stored separately.
    */
-  public List<TripTimes> getTripTimes() {
+  public List<TripTimes<?>> getTripTimes() {
     return tripTimes;
   }
 
@@ -140,7 +140,7 @@ public class Timetable implements Serializable {
    * Return an arbitrary TripTimes in this Timetable.
    * Return a scheduled trip times if it exists, otherwise return a frequency-based trip times.
    */
-  public TripTimes getRepresentativeTripTimes() {
+  public TripTimes<?> getRepresentativeTripTimes() {
     return getRepresentativeTripTimes(tripTimes, frequencyEntries);
   }
 
@@ -160,7 +160,7 @@ public class Timetable implements Serializable {
    * @param frequencies all the frequency-based trip times in a timetable.
    */
   static Direction getDirection(
-    Collection<TripTimes> scheduledTripTimes,
+    Collection<TripTimes<?>> scheduledTripTimes,
     Collection<FrequencyEntry> frequencies
   ) {
     return Optional.ofNullable(getRepresentativeTripTimes(scheduledTripTimes, frequencies))
@@ -175,8 +175,8 @@ public class Timetable implements Serializable {
    * @param frequencies all the frequency-based trip times in a timetable.
    *
    */
-  private static TripTimes getRepresentativeTripTimes(
-    Collection<TripTimes> scheduledTripTimes,
+  private static TripTimes<?> getRepresentativeTripTimes(
+    Collection<TripTimes<?>> scheduledTripTimes,
     Collection<FrequencyEntry> frequencies
   ) {
     if (!scheduledTripTimes.isEmpty()) {
@@ -201,12 +201,16 @@ public class Timetable implements Serializable {
     return copyOf().withServiceDate(date).build();
   }
 
+  private static TripTimes<?> withServiceCode(TripTimes<?> tt, int serviceCode) {
+    return tt.withServiceCode(serviceCode);
+  }
+
   /**
    * Compute the maximum number of whole days a trip schedule lasts. This method
    * will use the last stop arrival time of the last trip. Return zero if the
    * arrival time is negative.
    */
-  private static int computeMaxTripSpanDays(List<TripTimes> tripTimes) {
+  private static int computeMaxTripSpanDays(List<TripTimes<?>> tripTimes) {
     if (tripTimes.isEmpty()) {
       return 0;
     }

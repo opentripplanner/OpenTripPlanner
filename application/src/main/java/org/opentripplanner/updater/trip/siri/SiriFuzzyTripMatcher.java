@@ -21,7 +21,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.spi.UpdateException;
@@ -227,7 +226,7 @@ public class SiriFuzzyTripMatcher {
         continue;
       }
 
-      TripTimes times = getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes(trip);
+      var times = getCurrentTimetable.apply(tripPattern, serviceDate).getTripTimes(trip);
       if (times != null && times.getScheduledDepartureTime(0) == departureInSecondsSinceMidnight) {
         // Found matches
         possibleTrips.add(new TripAndPattern(times.getTrip(), tripPattern));
