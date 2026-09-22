@@ -113,6 +113,7 @@ class RequestScopedFactoryIntegrationTest {
     assertThat(requestOne.gtfsRequestContext().transitService()).isSameInstanceAs(
       requestOne.transitService()
     );
+    assertThat(requestOne.gtfsRequestContext().schema()).isSameInstanceAs(requestOne.gtfsSchema());
 
     var requestTwo = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.gtfsRequestContext().schema()).isSameInstanceAs(

@@ -157,11 +157,11 @@ final class DaggerScopeAssertions {
     List<Method> accessors,
     List<DaggerBindingKey>... buckets
   ) {
-    var classified = Stream.of(buckets).flatMap(List::stream).toList();
-    var unclassified = accessors
+    var accessorKeys = accessors.stream().map(DaggerBindingKey::ofAccessor).toList();
+
+    var unclassified = accessorKeys
       .stream()
-      .map(DaggerBindingKey::ofAccessor)
-      .filter(key -> !classified.contains(key))
+      .filter(key -> Stream.of(buckets).noneMatch(bucket -> bucket.contains(key)))
       .toList();
 
     assertWithMessage(
@@ -170,6 +170,25 @@ final class DaggerScopeAssertions {
       unclassified
     )
       .that(unclassified)
+      .isEmpty();
+
+    var multiplyClassified = accessorKeys
+      .stream()
+      .filter(
+        key ->
+          Stream.of(buckets)
+            .filter(bucket -> bucket.contains(key))
+            .count() > 1
+      )
+      .toList();
+
+    assertWithMessage(
+      "Every accessor on %s must be classified into exactly one bucket, but these are in more " +
+        "than one: %s",
+      accessorInterface.getSimpleName(),
+      multiplyClassified
+    )
+      .that(multiplyClassified)
       .isEmpty();
   }
 }

@@ -22,10 +22,13 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -34,12 +37,15 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.configure.DaggerBindingKey.GenericType;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.configure.StaticTransitService;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.warmup.WarmupLauncher;
@@ -63,8 +69,13 @@ class ConstructApplicationFactoryIntegrationTest {
     of(GraphQLSchema.class, GtfsSchema.class),
     of(GraphQLSchema.class, TransmodelSchema.class),
     of(MetricsLogging.class),
-    of(RaptorConfig.class),
-    of(RepositoryHandle.class),
+    of(new GenericType<RaptorConfig<TripSchedule>>() {}),
+    of(
+      new GenericType<
+        RepositoryHandle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository>
+      >() {}
+    ),
+    of(new GenericType<RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository>>() {}),
     of(StreetDetailsRepository.class),
     of(StreetRepository.class),
     of(TransferRepository.class),
