@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
    */
   private static final Duration SWEEP_INTERVAL = Duration.ofHours(1);
 
-  private final Map<FeedScopedId, CarpoolTripWithVertices> trips = new ConcurrentHashMap<>();
+  private final Map<FeedScopedId, RoutableCarpoolTrip> trips = new ConcurrentHashMap<>();
 
   /**
    * Outcome of routing each trip's baseline, memoized across requests and tagged with the geometry
@@ -41,20 +41,20 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   private final AtomicReference<Instant> nextSweep = new AtomicReference<>(Instant.MIN);
 
   @Override
-  public Collection<CarpoolTripWithVertices> getCarpoolTrips() {
+  public Collection<RoutableCarpoolTrip> getCarpoolTrips() {
     return trips.values();
   }
 
   @Override
   @Nullable
-  public CarpoolTripWithVertices getCarpoolTrip(FeedScopedId id) {
+  public RoutableCarpoolTrip getCarpoolTrip(FeedScopedId id) {
     return trips.get(id);
   }
 
   @Override
-  public void upsertCarpoolTrip(CarpoolTripWithVertices tripWithVertices) {
-    CarpoolTrip trip = tripWithVertices.trip();
-    CarpoolTripWithVertices existing = trips.put(trip.getId(), tripWithVertices);
+  public void upsertCarpoolTrip(RoutableCarpoolTrip routableTrip) {
+    CarpoolTrip trip = routableTrip.trip();
+    RoutableCarpoolTrip existing = trips.put(trip.getId(), routableTrip);
     // A read already validates the cached entry against the trip's geometry, so correctness does
     // not depend on this drop; it just promptly frees an entry whose route points changed instead
     // of letting it linger until the trip is removed or expires. A budget- or time-only update
@@ -71,7 +71,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
   @Override
   public void removeCarpoolTrip(FeedScopedId id) {
-    CarpoolTripWithVertices removed = trips.remove(id);
+    RoutableCarpoolTrip removed = trips.remove(id);
     baselineRouting.remove(id);
     if (removed != null) {
       LOG.debug("Removed carpool trip {}", id);
@@ -89,11 +89,11 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
     Instant expiryThreshold = now.minus(expiry);
     int removed = 0;
-    for (CarpoolTripWithVertices tripWithVertices : trips.values()) {
-      CarpoolTrip trip = tripWithVertices.trip();
+    for (RoutableCarpoolTrip routableTrip : trips.values()) {
+      CarpoolTrip trip = routableTrip.trip();
       if (
         trip.latestEndTime().toInstant().isBefore(expiryThreshold) &&
-        trips.remove(trip.getId(), tripWithVertices)
+        trips.remove(trip.getId(), routableTrip)
       ) {
         baselineRouting.remove(trip.getId());
         removed++;

@@ -42,7 +42,8 @@ import org.slf4j.LoggerFactory;
  * length over car speed plus the intersection traversal duration of the turn (each rounded up to
  * whole milliseconds), free edges take no time, and no other edge type is driven. It is a
  * label-setting Dijkstra ordered by time, so it agrees with the generic search except in rare
- * turn-cost ties. Nothing is expanded past the duration limit.
+ * turn-cost ties. Nothing is expanded past the duration limit, and nothing outside the optional
+ * {@link EllipseBounds}.
  * <p>
  * Evaluation only reads {@link #elapsedSeconds}. For the few segments that end up in an itinerary,
  * {@link #path} replays the label chain through the real edge traversals, which yields a genuine
@@ -63,6 +64,9 @@ final class CompactCarTree {
   private final StreetSearchRequest request;
   private final IntersectionTraversalCalculator turnCosts;
 
+  @Nullable
+  private final EllipseBounds bounds;
+
   private Vertex[] labelVertex = new Vertex[1024];
   private long[] labelElapsedMs = new long[1024];
   private int[] labelParent = new int[1024];
@@ -74,12 +78,18 @@ final class CompactCarTree {
   private final TObjectIntCustomHashMap<Vertex> plainLabels = newLabelMap();
   private final TObjectIntCustomHashMap<Vertex> noThruLabels = newLabelMap();
 
-  private CompactCarTree(Vertex root, boolean reverse, Duration limit) {
+  private CompactCarTree(
+    Vertex root,
+    boolean reverse,
+    Duration limit,
+    @Nullable EllipseBounds bounds
+  ) {
     this.root = root;
     this.reverse = reverse;
     this.limitSeconds = limit.toSeconds();
     this.request = carRequest(reverse);
     this.turnCosts = request.intersectionTraversalCalculator();
+    this.bounds = bounds;
   }
 
   /**
@@ -88,11 +98,17 @@ final class CompactCarTree {
    * @param root the vertex to search from (or, when {@code reverse}, to)
    * @param reverse arrive-by: follow incoming edges backwards in time
    * @param limit no label is expanded once its elapsed time exceeds this
+   * @param bounds if not {@code null}, no edge is followed to a vertex outside this ellipse
    * @throws OTPRequestTimeoutException when the request is cancelled while searching
    */
-  static CompactCarTree build(Vertex root, boolean reverse, Duration limit) {
+  static CompactCarTree build(
+    Vertex root,
+    boolean reverse,
+    Duration limit,
+    @Nullable EllipseBounds bounds
+  ) {
     OTPRequestTimeoutException.checkForTimeout();
-    var tree = new CompactCarTree(root, reverse, limit);
+    var tree = new CompactCarTree(root, reverse, limit, bounds);
     tree.search();
     return tree;
   }
@@ -212,6 +228,9 @@ final class CompactCarTree {
 
       for (Edge edge : reverse ? vertex.getIncoming() : vertex.getOutgoing()) {
         Vertex target = reverse ? edge.getFromVertex() : edge.getToVertex();
+        if (bounds != null && !bounds.contains(elapsedSeconds, target.getLat(), target.getLon())) {
+          continue;
+        }
         long edgeMs = traversalMs(edge, parentEdge, noThru);
         if (edgeMs < 0) {
           continue;

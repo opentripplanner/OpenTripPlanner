@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
@@ -47,9 +47,9 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   @BeforeEach
   void setUp() {
     repository = new DefaultCarpoolingRepository();
-    var resolver = mock(CarpoolTripVertexResolver.class);
+    var resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+      RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
     updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
     updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
@@ -112,8 +112,8 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
 
     // Every stop on every trip must inherit the trip's feed prefix — guards against
     // a half-finished refactor where the trip id is parameterised but stop ids are not.
-    for (var tripWithVertices : repository.getCarpoolTrips()) {
-      var trip = tripWithVertices.trip();
+    for (var routableTrip : repository.getCarpoolTrips()) {
+      var trip = routableTrip.trip();
       var expectedFeed = trip.getId().getFeedId();
       for (var stop : trip.stops()) {
         assertEquals(

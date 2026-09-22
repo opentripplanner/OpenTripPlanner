@@ -6,13 +6,13 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 
 /**
  * Repository for managing carpooling trip ({@link CarpoolTrip}) data.
  * <p>
  * This repository maintains an in-memory index of driver trips, each paired with the permanent
- * street vertices its route points resolve to ({@link CarpoolTripWithVertices}).
+ * street vertices its route points resolve to ({@link RoutableCarpoolTrip}).
  *
  * @see CarpoolTrip for trip data model
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for real-time updates
@@ -24,14 +24,14 @@ public interface CarpoolingRepository {
    * The returned collection includes all driver trips that have been added via {@link #upsertCarpoolTrip}
    * and not yet removed or expired.
    */
-  Collection<CarpoolTripWithVertices> getCarpoolTrips();
+  Collection<RoutableCarpoolTrip> getCarpoolTrips();
 
   /**
    * Returns the trip with the given id together with its resolved street vertices, or {@code null}
    * when no such trip exists.
    */
   @Nullable
-  CarpoolTripWithVertices getCarpoolTrip(FeedScopedId id);
+  RoutableCarpoolTrip getCarpoolTrip(FeedScopedId id);
 
   /**
    * Inserts a new carpooling trip or updates an existing trip with the same ID.
@@ -51,7 +51,7 @@ public interface CarpoolingRepository {
    *        If a trip with the same ID exists, it will be completely replaced.
    * @throws IllegalArgumentException if trip is null
    */
-  void upsertCarpoolTrip(CarpoolTripWithVertices trip);
+  void upsertCarpoolTrip(RoutableCarpoolTrip trip);
 
   /**
    * Removes the carpool trip with the given id. No-op if no trip with this id exists.
