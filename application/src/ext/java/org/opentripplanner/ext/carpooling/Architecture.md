@@ -27,6 +27,7 @@ org.opentripplanner.ext.carpooling/
 │   ├── SnappedPassenger     # The passenger's snapped pickup and dropoff
 │   ├── CarpoolItineraryFilter # Post-filter interface (routed itineraries)
 │   ├── TripPreFilters       # Composite of pre-filters (AND)
+│   ├── ClosestCandidateTrips # The trips passing closest to the passenger
 │   ├── ItineraryPostFilters # Composite of post-filters (AND)
 │   ├── TimeTripFilter       # Pre-filter: loose time-window check
 │   ├── CapacityTripFilter   # Pre-filter: a free seat on some leg
