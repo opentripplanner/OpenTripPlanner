@@ -53,6 +53,14 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   private static final Duration TRIP_EXPIRY = Duration.ofDays(2);
 
+  /**
+   * The most carpool trips one instance holds. Each resolved trip costs about a hundred kilobytes
+   * of corridor and a tenth of a second of resolution, so this bounds both the heap and the time a
+   * restarted instance needs to catch up. Trips arriving while the repository is full are dropped
+   * (logged once per poll); updates and cancellations of held trips are always applied.
+   */
+  public static final int DEFAULT_MAX_TRIPS = 10_000;
+
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
@@ -67,6 +75,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new ConcurrentHashMap<>();
   private final CarpoolTripResolutionQueue resolutionQueue;
+  private final int maxTrips;
+  private int rejectedThisPoll;
 
   @Nullable
   private final ExecutorService ownedExecutor;
@@ -76,20 +86,27 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     CarpoolingRepository repository,
     CarpoolTripVertexResolver vertexResolver
   ) {
-    this(config, repository, vertexResolver, resolverThread(config.feedId()));
+    this(config, repository, vertexResolver, resolverThread(config.feedId()), DEFAULT_MAX_TRIPS);
   }
 
   /**
    * @param resolutionExecutor runs the trip resolutions handed over by the polls; the production
    *        constructor uses one daemon thread, tests may run them inline
+   * @param maxTrips the most trips this updater lets the repository hold, see
+   *        {@link #DEFAULT_MAX_TRIPS}
    */
   SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
     CarpoolTripVertexResolver vertexResolver,
-    Executor resolutionExecutor
+    Executor resolutionExecutor,
+    int maxTrips
   ) {
     super(config);
+    if (maxTrips < 1) {
+      throw new IllegalArgumentException("maxTrips must be positive");
+    }
+    this.maxTrips = maxTrips;
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
     this.vertexResolver = vertexResolver;
@@ -142,6 +159,14 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     int pending = resolutionQueue.pending();
     if (pending > 0) {
       LOG.info("{} carpool trips are queued for resolution", pending);
+    }
+    if (rejectedThisPoll > 0) {
+      LOG.warn(
+        "Rejected {} new carpool trips: this instance holds the maximum of {} trips",
+        rejectedThisPoll,
+        maxTrips
+      );
+      rejectedThisPoll = 0;
     }
   }
 
@@ -219,6 +244,11 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         remove(tripId);
         return;
       }
+      if (isFullFor(tripId)) {
+        rejectedThisPoll++;
+        LOG.debug("Rejected new carpool trip {}: the repository is full", tripId);
+        return;
+      }
       resolutionQueue.submit(carpoolTrip);
     } catch (Exception e) {
       LOG.info(
@@ -227,6 +257,20 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         e
       );
     }
+  }
+
+  /**
+   * Whether a journey for this trip id has to be dropped because the instance is full: the trip is
+   * neither held nor queued, and the held trips plus the queued ones not held yet reach the limit.
+   * Held and queued trips already have their slot and may always be updated.
+   */
+  private boolean isFullFor(FeedScopedId tripId) {
+    if (
+      repository.getCarpoolTrip(tripId) != null || resolutionQueue.pendingVersion(tripId) != null
+    ) {
+      return false;
+    }
+    return repository.getCarpoolTrips().size() + resolutionQueue.pendingNew() >= maxTrips;
   }
 
   private void remove(FeedScopedId tripId) {

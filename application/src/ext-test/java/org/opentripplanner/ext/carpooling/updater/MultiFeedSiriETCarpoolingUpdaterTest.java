@@ -53,8 +53,20 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
     when(resolver.resolve(any())).thenAnswer(invocation ->
       CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );
-    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver, Runnable::run);
-    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver, Runnable::run);
+    updaterA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      Runnable::run,
+      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+    );
+    updaterB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      Runnable::run,
+      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+    );
   }
 
   @Test

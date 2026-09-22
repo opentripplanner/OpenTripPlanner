@@ -60,7 +60,13 @@ class SiriETCarpoolingUpdaterTest {
       HttpHeaders.empty(),
       false
     );
-    updater = new SiriETCarpoolingUpdater(params, repository, resolver, Runnable::run);
+    updater = new SiriETCarpoolingUpdater(
+      params,
+      repository,
+      resolver,
+      Runnable::run,
+      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+    );
   }
 
   @Test

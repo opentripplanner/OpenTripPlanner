@@ -99,6 +99,28 @@ class CarpoolTripResolutionQueueTest {
   }
 
   @Test
+  void countsQueuedTripsNotHeldYetAndRemembersTheLatestVersion() {
+    repository.upsertCarpoolTrip(CarpoolTripWithVerticesTestData.withDummyVertices(tripA));
+    var queue = queue();
+
+    queue.submit(tripA);
+    queue.submit(tripB);
+    assertEquals(2, queue.pending(), "both tasks are queued");
+    assertEquals(1, queue.pendingNew(), "only the trip the repository does not hold takes a slot");
+    assertEquals(tripB, queue.pendingVersion(tripB.getId()));
+
+    executor.runAll();
+    assertEquals(0, queue.pendingNew());
+    assertNull(queue.pendingVersion(tripB.getId()));
+
+    queue.submit(tripB);
+    queue.cancel(tripB.getId());
+    assertEquals(0, queue.pendingNew());
+    assertNull(queue.pendingVersion(tripB.getId()));
+    executor.runAll();
+  }
+
+  @Test
   void anUnresolvableTripIsRemovedAndAFailingResolverIsSurvived() {
     repository.upsertCarpoolTrip(CarpoolTripWithVerticesTestData.withDummyVertices(tripA));
     var unresolvable = new CarpoolTripResolutionQueue(executor, trip -> null, repository);
