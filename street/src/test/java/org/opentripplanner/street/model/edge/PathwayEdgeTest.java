@@ -21,18 +21,19 @@ import org.opentripplanner.street.search.state.State;
 
 class PathwayEdgeTest {
 
+  private static final NonLocalizedString PATHWAY_NAME = new NonLocalizedString("pathway");
+
   Vertex from = intersectionVertex(10, 10);
   Vertex to = intersectionVertex(10.001, 10.001);
 
   @Test
   void zeroLength() {
-    // if elevators have a traversal time and distance of 0 we cannot interpolate
-    // the distance
+    // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
     // from the vertices as they most likely have identical coordinates
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       0,
       0,
       0,
@@ -48,7 +49,7 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       0,
       0,
       2,
@@ -64,7 +65,7 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       60,
       0,
       0,
@@ -82,7 +83,7 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       60,
       1000,
       0,
@@ -102,7 +103,7 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       0,
       60,
       0,
@@ -120,7 +121,7 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       0,
       60,
       0,
@@ -138,7 +139,7 @@ class PathwayEdgeTest {
     var down = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       0,
       0,
       -10,
@@ -148,7 +149,7 @@ class PathwayEdgeTest {
     var up = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       0,
       0,
       10,
@@ -180,13 +181,10 @@ class PathwayEdgeTest {
   }
 
   /**
-   * This makes sure that when you exceed the max slope in a wheelchair there
-   * isn't a hard cut-off
-   * but rather the cost increases proportional to how much you go over the
-   * maximum.
+   * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
+   * but rather the cost increases proportional to how much you go over the maximum.
    * <p>
-   * In other words: 0.1 % over the limit only has a small cost but 2% over
-   * increases it
+   * In other words: 0.1 % over the limit only has a small cost but 2% over increases it
    * dramatically to the point where it's only used as a last resort.
    */
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
@@ -195,7 +193,7 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      new NonLocalizedString("pathway"),
+      PATHWAY_NAME,
       60,
       100,
       0,
