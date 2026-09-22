@@ -17,6 +17,7 @@ import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
+import org.opentripplanner.ext.carpooling.filter.ClosestCandidateTrips;
 import org.opentripplanner.ext.carpooling.filter.ItineraryPostFilters;
 import org.opentripplanner.ext.carpooling.filter.SnappedPassenger;
 import org.opentripplanner.ext.carpooling.filter.TripPreFilters;
@@ -188,7 +189,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *   <li><strong>Pre-filtering:</strong> Once the passenger is snapped to the street network, all
    *       trips from the repository are filtered by time window, by free seats and by whether
    *       their corridor can reach both the snapped pickup and the snapped dropoff, to quickly
-   *       eliminate incompatible matches.</li>
+   *       eliminate incompatible matches. Of the survivors, at most
+   *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
+   *       passenger, are evaluated.</li>
    *   <li><strong>Position finding:</strong> For each surviving trip, viable pickup/dropoff
    *       insertion positions are identified using beeline heuristics (no routing).</li>
    *   <li><strong>Insertion evaluation:</strong> Viable positions are evaluated with A* street
@@ -273,15 +276,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
       }
 
       var passenger = new SnappedPassenger(carpoolingRequest, pickupSnap, dropoffSnap);
-      var candidateTrips = allTrips
+      var preFilteredTrips = allTrips
         .stream()
         .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
         .toList();
 
       LOG.debug(
         "{} trips passed pre-filters ({} rejected)",
-        candidateTrips.size(),
-        allTrips.size() - candidateTrips.size()
+        preFilteredTrips.size(),
+        allTrips.size() - preFilteredTrips.size()
+      );
+
+      // Each candidate costs several street searches; evaluate only the trips passing closest.
+      var candidateTrips = ClosestCandidateTrips.closest(
+        preFilteredTrips,
+        List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff()),
+        parameters.maxCandidateTripsPerRequest()
       );
 
       if (candidateTrips.isEmpty()) {
@@ -356,7 +366,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * The method proceeds as follows:
    * <ol>
    *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time
-   *       window, by free seats and by whether their corridor can reach the passenger.</li>
+   *       window, by free seats and by whether their corridor can reach the passenger. Of the
+   *       survivors, at most {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those
+   *       passing closest to the passenger, are evaluated.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
    *       those the passenger can walk to or from within the walk budget.</li>
    *   <li>For each candidate trip and corridor stop combination, identifies viable insertion
@@ -465,10 +477,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var passenger = accessOrEgress.isAccess()
         ? new SnappedPassenger(carpoolingRequest, passengerSnap, null)
         : new SnappedPassenger(carpoolingRequest, null, passengerSnap);
-      var candidateTrips = allTrips
+      var preFilteredTrips = allTrips
         .stream()
         .filter(trip -> preFilters.isCandidateTrip(trip, passenger))
         .toList();
+      var candidateTrips = ClosestCandidateTrips.closest(
+        preFilteredTrips,
+        List.of(passengerCoordinates),
+        parameters.maxCandidateTripsPerRequest()
+      );
 
       if (candidateTrips.isEmpty()) {
         return List.of();

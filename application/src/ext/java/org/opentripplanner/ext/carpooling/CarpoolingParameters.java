@@ -9,6 +9,8 @@ import java.time.Duration;
  * {@link #DEFAULT} for now; the intention is to expose them in a {@code carpooling} section of
  * {@code router-config.json}, so this is the type that mapping would produce.
  *
+ * @param maxCandidateTripsPerRequest the most trips a request evaluates; when more pass the
+ *        pre-filters, the ones whose route passes closest to the passenger are kept
  * @param maxStopWalk the longest walk between a transit stop and the vertex where a car can stop
  *        for it; stops farther from any drivable street get no snap and are left out of the
  *        corridors
@@ -29,6 +31,7 @@ import java.time.Duration;
  *        trips are sparse and a narrow window would lose matches the passenger would accept
  */
 public record CarpoolingParameters(
+  int maxCandidateTripsPerRequest,
   Duration maxStopWalk,
   Duration maxTripDuration,
   Duration tripExpiry,
@@ -38,6 +41,7 @@ public record CarpoolingParameters(
   Duration defaultSearchWindow
 ) {
   public static final CarpoolingParameters DEFAULT = new CarpoolingParameters(
+    30,
     Duration.ofMinutes(15),
     Duration.ofHours(2).plusMinutes(30),
     Duration.ofDays(2),
@@ -48,6 +52,9 @@ public record CarpoolingParameters(
   );
 
   public CarpoolingParameters {
+    if (maxCandidateTripsPerRequest < 1) {
+      throw new IllegalArgumentException("maxCandidateTripsPerRequest must be positive");
+    }
     requirePositive(maxStopWalk, "maxStopWalk");
     requirePositive(maxTripDuration, "maxTripDuration");
     requirePositive(tripExpiry, "tripExpiry");

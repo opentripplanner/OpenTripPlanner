@@ -187,6 +187,9 @@ Where the driving times come from:
   the driving times to serve it. A request then builds only the passenger's two street trees
   (`CarpoolTreeStreetRouter`) and reads everything else from the candidate trips' corridors.
 
+In both modes, at most the 30 trips passing closest to the passenger are evaluated
+(`ClosestCandidateTrips`).
+
 ## Usage Examples
 
 ### Basic Carpooling Query
@@ -327,7 +330,8 @@ Result of finding optimal passenger insertion:
 ### Performance Bottlenecks
 
 If performance degrades:
-1. **Too many active trips**: Filter more aggressively
+1. **Too many candidate trips near the passenger**: at most 30 are evaluated per request, but each
+   still costs a few street searches in direct mode
 2. **Large route deviation budgets**: Increases insertion positions to test
 3. **Complex street networks**: A* routing takes longer
 
