@@ -138,7 +138,17 @@ public class CarpoolStop extends AbstractTransitEntity<CarpoolStop, CarpoolStopB
 
   @Override
   public boolean sameAs(CarpoolStop other) {
-    return false;
+    return (
+      getId().equals(other.getId()) &&
+      coordinate.equals(other.coordinate) &&
+      Objects.equals(aimedArrivalTime, other.aimedArrivalTime) &&
+      Objects.equals(expectedArrivalTime, other.expectedArrivalTime) &&
+      Objects.equals(latestExpectedArrivalTime, other.latestExpectedArrivalTime) &&
+      Objects.equals(aimedDepartureTime, other.aimedDepartureTime) &&
+      Objects.equals(expectedDepartureTime, other.expectedDepartureTime) &&
+      onboardCount == other.onboardCount &&
+      Objects.equals(deviationBudget, other.deviationBudget)
+    );
   }
 
   @Override

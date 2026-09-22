@@ -142,6 +142,39 @@ class SiriETCarpoolingUpdaterLimitTest {
   }
 
   @Test
+  void anUnchangedRedeliveryIsNeitherQueuedNorCounted() {
+    var queued = new ArrayDeque<Runnable>();
+    var updater = updater(queued::add, 2);
+    updater.processEstimatedVehicleJourney(journey("a"));
+    updater.processEstimatedVehicleJourney(journey("b"));
+    updater.processEstimatedVehicleJourney(journey("a"));
+    assertEquals(2, updater.pendingResolutions(), "the re-delivery of a queued trip is dropped");
+
+    runAll(queued);
+    updater.processEstimatedVehicleJourney(journey("a"));
+    assertEquals(0, updater.pendingResolutions(), "the re-delivery of a held trip is dropped");
+    assertTrue(held("a"));
+  }
+
+  @Test
+  void aChangedVersionOfAQueuedTripIsAcceptedWhenTheRepositoryIsFull() {
+    var queued = new ArrayDeque<Runnable>();
+    var updater = updater(queued::add, 2);
+    updater.processEstimatedVehicleJourney(journey("a"));
+    updater.processEstimatedVehicleJourney(journey("b"));
+    var original = mapper.mapSiriToCarpoolTrip(journey("a"));
+    updater.processEstimatedVehicleJourney(laterJourney("a"));
+    updater.processEstimatedVehicleJourney(journey("c"));
+
+    runAll(queued);
+    assertTrue(held("a"));
+    assertTrue(held("b"));
+    assertFalse(held("c"), "still no room for a third trip");
+    var storedA = repository.getCarpoolTrip(mapper.tripId(journey("a"))).trip();
+    assertTrue(storedA.endTime().isAfter(original.endTime()), "the changed version was stored");
+  }
+
+  @Test
   void theLimitMustBePositive() {
     assertThrows(IllegalArgumentException.class, () -> updater(Runnable::run, 0));
   }
