@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.cancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithAllButOneCallCancelled;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithLatestExpectedArrivalTime;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithMovedDestination;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.malformedNonCancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
@@ -23,10 +24,10 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
@@ -36,7 +37,7 @@ class SiriETCarpoolingUpdaterTest {
 
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updater;
-  private CarpoolTripVertexResolver resolver;
+  private RoutableCarpoolTripResolver resolver;
   private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
     FEED_ID,
     CarpoolingParameters.DEFAULT.maxTripDuration()
@@ -47,9 +48,9 @@ class SiriETCarpoolingUpdaterTest {
     repository = new DefaultCarpoolingRepository(
       CarpoolingParameters.DEFAULT.expirySweepInterval()
     );
-    resolver = mock(CarpoolTripVertexResolver.class);
+    resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+      RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
     var params = new DefaultSiriETUpdaterParameters(
       "carpool-test",
@@ -133,9 +134,7 @@ class SiriETCarpoolingUpdaterTest {
     doReturn(null).when(resolver).resolve(any());
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
 
-    doAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
-    )
+    doAnswer(invocation -> RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0)))
       .when(resolver)
       .resolve(any());
     var changedJourney = journeyWithMovedDestination();
@@ -154,6 +153,21 @@ class SiriETCarpoolingUpdaterTest {
     updater.processEstimatedVehicleJourney(journeyWithMovedDestination());
 
     assertFalse(tripIsInRepository(tripId));
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_corridorRecomputationThrows_dropsStaleTrip() {
+    updater.processEstimatedVehicleJourney(journeyWithLatestExpectedArrivalTime(0, 10));
+
+    doThrow(new RuntimeException("corridor blew up"))
+      .when(resolver)
+      .resolveOnVertices(any(), any());
+    // Same geometry, a wider budget: the corridor is recomputed on the stored vertices, and when
+    // that throws, the stored trip with the old budget must be dropped.
+    var widened = journeyWithLatestExpectedArrivalTime(0, 20);
+    updater.processEstimatedVehicleJourney(widened);
+
+    assertFalse(tripIsInRepository(mapper.tripId(widened)));
   }
 
   @Test

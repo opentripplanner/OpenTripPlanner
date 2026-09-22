@@ -5,7 +5,9 @@ import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.CarpoolStopIndex;
+import org.opentripplanner.ext.carpooling.routing.CorridorBuilder;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -21,7 +23,7 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 record CarpoolingServiceTestContext(
   DefaultCarpoolingService service,
   CarpoolingRepository repository,
-  CarpoolTripVertexResolver resolver,
+  RoutableCarpoolTripResolver resolver,
   TransitServiceResolver transitServiceResolver
 ) {
   private static final StreetLimitationParametersService STREET_LIMITATION_PARAMETERS =
@@ -58,9 +60,20 @@ record CarpoolingServiceTestContext(
     var carReachableVertexSnapper = new CarReachableVertexSnapper(
       CarpoolingParameters.DEFAULT.minCarEscapeMeters()
     );
-    var resolver = new CarpoolTripVertexResolver(
+    var stopIndex = new CarpoolStopIndex(
+      model.graph(),
+      carReachableVertexSnapper,
+      CarpoolingParameters.DEFAULT.maxStopWalk()
+    );
+    var corridorBuilder = new CorridorBuilder(
+      stopIndex,
+      STREET_LIMITATION_PARAMETERS,
+      CarpoolingParameters.DEFAULT.maxTripDuration()
+    );
+    var resolver = new RoutableCarpoolTripResolver(
       vertexCreationService,
       carReachableVertexSnapper,
+      corridorBuilder,
       CarpoolingParameters.DEFAULT.maxRoutePointSnap()
     );
     var service = new DefaultCarpoolingService(
@@ -80,17 +93,17 @@ record CarpoolingServiceTestContext(
 
   /**
    * Resolves the trip's route points against the test graph and stores the result; fails the test
-   * if any point cannot be resolved.
+   * if a point cannot be resolved or a leg cannot be routed.
    */
   void upsertTrip(CarpoolTrip trip) {
-    var tripWithVertices = resolver.resolve(trip);
-    if (tripWithVertices == null) {
+    var routableTrip = resolver.resolve(trip);
+    if (routableTrip == null) {
       throw new IllegalStateException(
-        "Trip %s has a route point that does not resolve to a car-reachable vertex on the test graph".formatted(
+        "Trip %s has a route point that does not resolve to a car-reachable vertex on the test graph, or a leg that cannot be routed".formatted(
           trip.getId()
         )
       );
     }
-    repository.upsertCarpoolTrip(tripWithVertices);
+    repository.upsertCarpoolTrip(routableTrip);
   }
 }

@@ -18,7 +18,7 @@ import org.opentripplanner.street.search.state.State;
 
 /**
  * The portion of the street graph a search may traverse: the permanent graph, optionally plus the
- * temporary edges of one linking.
+ * temporary edges of its start vertices' own linkings.
  * <p>
  * Request-scoped linking attaches temporary edges to permanent vertices, so a search over the shared
  * graph can reach another request's temporary subgraph. Some of those edges are mode-blind — a
@@ -27,11 +27,11 @@ import org.opentripplanner.street.search.state.State;
  * which temporary edges a search is allowed to use, keeping foreign linkings out.
  * <p>
  * {@link #STATIC_GRAPH} excludes every temporary edge and describes a graph that outlives any single
- * request. {@link #withOwnLinkingOf} additionally admits the temporary edges of the given vertex's
- * own linking, which a search departing from a temporary vertex needs in order to reach the permanent
- * graph at all.
+ * request. {@link #withOwnLinkingOf} additionally admits the temporary edges of the given vertices'
+ * own linkings, which a search departing from a temporary vertex needs in order to reach the
+ * permanent graph at all.
  */
-final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
+public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
 
   /** The permanent graph alone; every temporary edge is excluded. */
   static final TraversalScope STATIC_GRAPH = new TraversalScope(Set.of());
@@ -43,13 +43,16 @@ final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
   }
 
   /**
-   * The permanent graph plus {@code start}'s own linking — every temporary vertex reachable from
-   * {@code start} without crossing a permanent one. Foreign linkings attach only to the permanent
-   * graph, so this never spreads into another request's subgraph. Equal to {@link #STATIC_GRAPH}
-   * when {@code start} is permanent.
+   * The permanent graph plus the own linking of each of {@code starts} — every temporary vertex
+   * reachable from a start without crossing a permanent one. Foreign linkings attach only to the
+   * permanent graph, so this never spreads into another request's subgraph. Equal to
+   * {@link #STATIC_GRAPH} when every start is permanent.
    */
-  static TraversalScope withOwnLinkingOf(Vertex start) {
-    var ownTemporaryVertices = ownLinking(start);
+  public static TraversalScope withOwnLinkingOf(Vertex... starts) {
+    var ownTemporaryVertices = new HashSet<Vertex>();
+    for (var start : starts) {
+      ownTemporaryVertices.addAll(ownLinking(start));
+    }
     return ownTemporaryVertices.isEmpty() ? STATIC_GRAPH : new TraversalScope(ownTemporaryVertices);
   }
 

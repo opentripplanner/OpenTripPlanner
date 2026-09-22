@@ -116,7 +116,7 @@ public class InsertionEvaluator {
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
-    var tripWithVertices = tripWithViableAccessEgress.tripWithVertices();
+    var routableTrip = tripWithViableAccessEgress.routableTrip();
 
     // No nearby stop produced a viable insertion position for this trip, so there is nothing to
     // evaluate. Return before routing the baseline: that routing builds the trip's street trees,
@@ -126,9 +126,9 @@ public class InsertionEvaluator {
       return List.of();
     }
 
-    RoutedSegment[] baselineSegments = routeSegments(tripWithVertices.vertices());
+    RoutedSegment[] baselineSegments = routeSegments(routableTrip.vertices());
     if (baselineSegments == null) {
-      LOG.info("Could not route baseline segments for trip {}", tripWithVertices.trip().getId());
+      LOG.info("Could not route baseline segments for trip {}", routableTrip.trip().getId());
       return List.of();
     }
 
@@ -143,7 +143,7 @@ public class InsertionEvaluator {
       .map(viableAccessEgress -> {
         var snap = toPassengerSnap(viableAccessEgress);
         return findBestInsertion(
-          tripWithVertices,
+          routableTrip,
           viableAccessEgress.insertionPositions(),
           snap,
           baselineSegments,
@@ -179,7 +179,7 @@ public class InsertionEvaluator {
    * A* routing for each position and selects the one with minimum additional
    * duration that satisfies delay constraints.
    *
-   * @param tripWithVertices The carpool trip with resolved vertices
+   * @param routableTrip The carpool trip with resolved vertices
    * @param viablePositions Positions that passed heuristic checks (from InsertionPositionFinder)
    * @param snap Pickup/dropoff vertices (already snapped to car-reachable vertices by the
    *        caller) and the optional walk paths bracketing the carpool ride
@@ -187,13 +187,13 @@ public class InsertionEvaluator {
    */
   @Nullable
   public InsertionCandidate findBestInsertion(
-    CarpoolTripWithVertices tripWithVertices,
+    RoutableCarpoolTrip routableTrip,
     List<InsertionPosition> viablePositions,
     PassengerSnap snap
   ) {
-    RoutedSegment[] baselineSegments = routeSegments(tripWithVertices.vertices());
+    RoutedSegment[] baselineSegments = routeSegments(routableTrip.vertices());
     if (baselineSegments == null) {
-      LOG.info("Could not route baseline for trip {}", tripWithVertices.trip().getId());
+      LOG.info("Could not route baseline for trip {}", routableTrip.trip().getId());
       return null;
     }
 
@@ -203,7 +203,7 @@ public class InsertionEvaluator {
     );
 
     return findBestInsertion(
-      tripWithVertices,
+      routableTrip,
       viablePositions,
       snap,
       baselineSegments,
@@ -214,7 +214,7 @@ public class InsertionEvaluator {
 
   @Nullable
   private InsertionCandidate findBestInsertion(
-    CarpoolTripWithVertices tripWithVertices,
+    RoutableCarpoolTrip routableTrip,
     List<InsertionPosition> viablePositions,
     PassengerSnap snap,
     RoutedSegment[] baselineSegments,
@@ -225,7 +225,7 @@ public class InsertionEvaluator {
 
     for (InsertionPosition position : viablePositions) {
       InsertionCandidate candidate = evaluateInsertion(
-        tripWithVertices,
+        routableTrip,
         position.pickupPos(),
         position.dropoffPos(),
         snap,
@@ -260,7 +260,7 @@ public class InsertionEvaluator {
    * Reuses cached baseline segments and only routes new segments involving the passenger.
    */
   private InsertionCandidate evaluateInsertion(
-    CarpoolTripWithVertices tripWithVertices,
+    RoutableCarpoolTrip routableTrip,
     int pickupPos,
     int dropoffPos,
     PassengerSnap snap,
@@ -269,7 +269,7 @@ public class InsertionEvaluator {
     NearbyStop transitStop
   ) {
     List<RoutedSegment> modifiedSegments = buildModifiedSegments(
-      tripWithVertices.vertices(),
+      routableTrip.vertices(),
       baselineSegments,
       pickupPos,
       dropoffPos,
@@ -291,7 +291,7 @@ public class InsertionEvaluator {
         modifiedCumulativeDurations,
         pickupPos,
         dropoffPos,
-        tripWithVertices.trip().stops()
+        routableTrip.trip().stops()
       )
     ) {
       LOG.trace(
@@ -303,7 +303,7 @@ public class InsertionEvaluator {
     }
 
     return new InsertionCandidate(
-      tripWithVertices.trip(),
+      routableTrip.trip(),
       pickupPos,
       dropoffPos,
       modifiedSegments,

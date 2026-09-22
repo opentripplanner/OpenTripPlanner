@@ -15,6 +15,7 @@ org.opentripplanner.ext.carpooling/
 ├── routing/                  # Routing and insertion algorithms
 │   ├── InsertionEvaluator   # Finds optimal passenger insertion
 │   ├── InsertionCandidate   # Represents a viable insertion
+│   ├── CarpoolCorridor      # Per-trip stops and driving times, computed at ingest
 │   └── CarpoolStreetRouter  # Street routing for carpooling
 ├── filter/                   # Pre- and post-screening
 │   ├── CarpoolingRequest    # Passenger-side request abstraction

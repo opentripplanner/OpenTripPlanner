@@ -9,7 +9,7 @@ import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdater;
 import org.opentripplanner.ext.siri.updater.mqtt.SiriETMqttUpdater;
@@ -78,7 +78,7 @@ public class UpdaterConfigurator {
 
   /** {@code null} when {@link OTPFeature#CarPooling} is off. */
   @Nullable
-  private final CarpoolTripVertexResolver carpoolTripVertexResolver;
+  private final RoutableCarpoolTripResolver routableCarpoolTripResolver;
 
   private final CarpoolingParameters carpoolingParameters;
 
@@ -106,7 +106,7 @@ public class UpdaterConfigurator {
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
     @Nullable CarpoolingRepository carpoolingRepository,
-    @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
+    @Nullable RoutableCarpoolTripResolver routableCarpoolTripResolver,
     CarpoolingParameters carpoolingParameters,
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
@@ -127,7 +127,7 @@ public class UpdaterConfigurator {
     this.streetUpdateManager = streetUpdateManager;
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
-    this.carpoolTripVertexResolver = carpoolTripVertexResolver;
+    this.routableCarpoolTripResolver = routableCarpoolTripResolver;
     this.carpoolingParameters = carpoolingParameters;
     this.transitAlertService = transitAlertService;
     this.gbfsNetworkOverrides = gbfsNetworkOverrides;
@@ -145,7 +145,7 @@ public class UpdaterConfigurator {
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
     @Nullable CarpoolingRepository carpoolingRepository,
-    @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
+    @Nullable RoutableCarpoolTripResolver routableCarpoolTripResolver,
     CarpoolingParameters carpoolingParameters,
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
@@ -163,7 +163,7 @@ public class UpdaterConfigurator {
       parkingRepository,
       transitRepository,
       carpoolingRepository,
-      carpoolTripVertexResolver,
+      routableCarpoolTripResolver,
       carpoolingParameters,
       transitUpdateManager,
       streetUpdateManager,
@@ -296,7 +296,7 @@ public class UpdaterConfigurator {
           new SiriETCarpoolingUpdater(
             configItem,
             carpoolingRepository,
-            carpoolTripVertexResolver,
+            routableCarpoolTripResolver,
             carpoolingParameters
           )
         );

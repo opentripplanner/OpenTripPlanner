@@ -3,7 +3,7 @@ package org.opentripplanner.ext.carpooling.internal;
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
-import static org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData.withDummyVertices;
+import static org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData.withDummyVertices;
 
 import java.time.Duration;
 import java.time.ZoneId;
