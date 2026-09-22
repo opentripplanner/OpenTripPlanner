@@ -14,8 +14,9 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 
-class CarpoolTripVertexResolverTest extends GraphRoutingTest {
+class RoutableCarpoolTripResolverTest extends GraphRoutingTest {
 
   /** Escape distance matched to the ~100 m test streets: 50 m escapes; a ~35 m island cannot. */
   private static final CarReachableVertexSnapper SNAPPER = new CarReachableVertexSnapper(50);
@@ -132,10 +133,14 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
     );
   }
 
-  private static CarpoolTripVertexResolver resolverFor(TestOtpModel model) {
-    return new CarpoolTripVertexResolver(
+  private static RoutableCarpoolTripResolver resolverFor(TestOtpModel model) {
+    return new RoutableCarpoolTripResolver(
       new VertexCreationService(VertexLinkerTestFactory.of(model.graph())),
-      SNAPPER
+      SNAPPER,
+      new CorridorBuilder(
+        new CarpoolStopIndex(model.graph(), SNAPPER),
+        StreetLimitationParametersService.DEFAULT
+      )
     );
   }
 }

@@ -201,7 +201,7 @@ Trips are typically added via the SIRI-ET updater, but can also be added program
 
 ```java
 @Inject CarpoolingRepository repository;
-@Inject CarpoolTripVertexResolver tripVertexResolver;
+@Inject RoutableCarpoolTripResolver tripResolver;
 
 // Build a trip using the builder
 CarpoolTrip trip = CarpoolTrip.builder()
@@ -218,9 +218,10 @@ CarpoolTrip trip = CarpoolTrip.builder()
   ))
   .build();
 
-// Resolve route points to street vertices and add to the repository. Resolution returns null
-// when a route point has no car-reachable street vertex; such a trip is not routable, so drop it.
-var resolved = tripVertexResolver.resolve(trip);
+// Resolve route points to street vertices, compute the corridor, and add to the repository.
+// Resolution returns null when a route point has no car-reachable street vertex or a leg cannot
+// be routed; such a trip is not routable, so drop it.
+var resolved = tripResolver.resolve(trip);
 if (resolved != null) {
   repository.upsertCarpoolTrip(resolved);
 }
@@ -368,7 +369,7 @@ Test full routing flow with graph:
 void testCarpoolingRouting() {
   // Build test graph with carpool trips
   Graph graph = buildTestGraph();
-  var resolved = tripVertexResolver.resolve(testTrip);
+  var resolved = tripResolver.resolve(testTrip);
   assertNotNull(resolved);  // a seeded test trip is expected to resolve on the test graph
   repository.upsertCarpoolTrip(resolved);
 

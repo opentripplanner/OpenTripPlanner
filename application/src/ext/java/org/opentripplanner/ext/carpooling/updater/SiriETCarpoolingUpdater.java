@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
@@ -48,7 +48,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
-  private final CarpoolTripVertexResolver vertexResolver;
+  private final RoutableCarpoolTripResolver tripResolver;
   private final CarpoolSiriMapper mapper;
 
   /**
@@ -62,12 +62,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
-    CarpoolTripVertexResolver vertexResolver
+    RoutableCarpoolTripResolver tripResolver
   ) {
     super(config);
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
-    this.vertexResolver = vertexResolver;
+    this.tripResolver = tripResolver;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
@@ -165,12 +165,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         repository.removeCarpoolTrip(tripId);
         return;
       }
-      var tripWithVertices = resolveVertices(carpoolTrip);
-      if (tripWithVertices == null) {
+      var routableTrip = resolveTrip(carpoolTrip);
+      if (routableTrip == null) {
         repository.removeCarpoolTrip(tripId);
         return;
       }
-      repository.upsertCarpoolTrip(tripWithVertices);
+      repository.upsertCarpoolTrip(routableTrip);
     } catch (Exception e) {
       LOG.info(
         "Failed to process EstimatedVehicleJourney {}",
@@ -180,17 +180,34 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     }
   }
 
+  private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {
+    if (a.stops().size() != b.stops().size()) {
+      return false;
+    }
+    for (int i = 0; i < a.stops().size(); i++) {
+      if (!a.stops().get(i).getDeviationBudget().equals(b.stops().get(i).getDeviationBudget())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
-   * Resolves the trip's route points to permanent vertices, or {@code null} if any cannot be
-   * resolved. Both outcomes are memoized on the route-point geometry: an unchanged geometry reuses
+   * Resolves the trip's route points to permanent vertices and computes its corridor, or
+   * {@code null} if a point cannot be resolved or the baseline cannot be routed. Both outcomes are
+   * memoized on the route-point geometry: an unchanged geometry reuses
    * the stored vertices or skips a known failure without re-resolving. A first failure is logged; a
    * resolution that throws is memoized as failed too, with its stack trace.
    */
   @Nullable
-  private CarpoolTripWithVertices resolveVertices(CarpoolTrip trip) {
+  private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
     var existing = repository.getCarpoolTrip(trip.getId());
     if (existing != null && existing.trip().routePoints().equals(trip.routePoints())) {
-      return new CarpoolTripWithVertices(trip, existing.vertices());
+      // The corridor also depends on the stops' deviation budgets: keep it while those are
+      // unchanged too, otherwise recompute it from the reused vertices.
+      return sameDeviationBudgets(existing.trip(), trip)
+        ? new RoutableCarpoolTrip(trip, existing.vertices(), existing.corridor())
+        : tripResolver.resolveOnVertices(trip, existing.vertices());
     }
     var failed = failedResolutions.get(trip.getId());
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {
@@ -200,9 +217,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       );
       return null;
     }
-    CarpoolTripWithVertices resolved;
+    RoutableCarpoolTrip resolved;
     try {
-      resolved = vertexResolver.resolve(trip);
+      resolved = tripResolver.resolve(trip);
     } catch (RuntimeException e) {
       LOG.warn("Dropping carpool trip {}: route-point resolution failed", trip.getId(), e);
       failedResolutions.put(trip.getId(), trip);
@@ -210,7 +227,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     }
     if (resolved == null) {
       LOG.warn(
-        "Dropping carpool trip {}: a route point has no car-reachable street vertex",
+        "Dropping carpool trip {}: a route point has no car-reachable street vertex, or a leg " +
+          "cannot be routed",
         trip.getId()
       );
       failedResolutions.put(trip.getId(), trip);

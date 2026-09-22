@@ -31,7 +31,7 @@ import org.opentripplanner.street.search.state.State;
  * own linking, which a search departing from a temporary vertex needs in order to reach the permanent
  * graph at all.
  */
-final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
+public final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
 
   /** The permanent graph alone; every temporary edge is excluded. */
   static final TraversalScope STATIC_GRAPH = new TraversalScope(Set.of());
@@ -43,13 +43,16 @@ final class TraversalScope implements SkipEdgeStrategy<State, Edge> {
   }
 
   /**
-   * The permanent graph plus {@code start}'s own linking — every temporary vertex reachable from
-   * {@code start} without crossing a permanent one. Foreign linkings attach only to the permanent
-   * graph, so this never spreads into another request's subgraph. Equal to {@link #STATIC_GRAPH}
-   * when {@code start} is permanent.
+   * The permanent graph plus the own linking of each of {@code starts} — every temporary vertex
+   * reachable from a start without crossing a permanent one. Foreign linkings attach only to the
+   * permanent graph, so this never spreads into another request's subgraph. Equal to
+   * {@link #STATIC_GRAPH} when every start is permanent.
    */
-  static TraversalScope withOwnLinkingOf(Vertex start) {
-    var ownTemporaryVertices = ownLinking(start);
+  public static TraversalScope withOwnLinkingOf(Vertex... starts) {
+    var ownTemporaryVertices = new HashSet<Vertex>();
+    for (var start : starts) {
+      ownTemporaryVertices.addAll(ownLinking(start));
+    }
     return ownTemporaryVertices.isEmpty() ? STATIC_GRAPH : new TraversalScope(ownTemporaryVertices);
   }
 

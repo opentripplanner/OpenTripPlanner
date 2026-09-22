@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.astar.spi.SkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
+import org.opentripplanner.ext.carpooling.util.TraversalScope;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -73,20 +76,44 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     boolean reverse,
     Duration searchLimit
   ) {
+    return carTree(vertex, reverse, searchLimit, null);
+  }
+
+  /**
+   * A car shortest-path tree from {@code root}, or to it when {@code reverse}. Nothing is expanded
+   * past {@code searchLimit}, nor, if {@code bounds} is given, outside that ellipse.
+   */
+  static ShortestPathTree<State, Edge, Vertex> carTree(
+    Vertex root,
+    boolean reverse,
+    Duration searchLimit,
+    @Nullable EllipseBounds bounds
+  ) {
     var streetSearchRequest = reverse
       ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
       : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
+    // Never another request's temporary edges: a corridor tree is kept for the trip's lifetime.
+    SkipEdgeStrategy<State, Edge> skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(
+      TraversalScope.withOwnLinkingOf(root),
+      new DurationSkipEdgeStrategy<>(searchLimit)
+    );
+    if (bounds != null) {
+      skipEdgeStrategy = new ComposingSkipEdgeStrategy<>(
+        skipEdgeStrategy,
+        bounds.skipEdgeStrategy(reverse)
+      );
+    }
     var builder = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(searchLimit))
+      .withSkipEdgeStrategy(skipEdgeStrategy)
       .withDominanceFunction(new DominanceFunctions.EarliestArrival())
       .withRequest(streetSearchRequest);
 
     if (reverse) {
-      return builder.withTo(vertex).getShortestPathTree();
+      return builder.withTo(root).getShortestPathTree();
     }
 
-    return builder.withFrom(vertex).getShortestPathTree();
+    return builder.withFrom(root).getShortestPathTree();
   }
 
   private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
