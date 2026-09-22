@@ -14,8 +14,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BarrierIntersectingHighway;
 import org.opentripplanner.graph_builder.issues.DifferentLevelsSharingBarrier;
-import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
@@ -39,7 +39,12 @@ public class BarrierTest {
       List.of(way, barrier),
       Set.of(1, 2, 3, 4, 98, 99)
         .stream()
-        .map(id -> OsmNode.of().withId(id).withLatLon((double) id / 1000, 0).build())
+        .map(id ->
+          OsmNode.of()
+            .withId(id)
+            .withLatLon((double) id / 1000, 0)
+            .build()
+        )
         .toList()
     );
 

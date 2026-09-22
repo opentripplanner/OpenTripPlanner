@@ -62,12 +62,10 @@ public class PatternByServiceDatesFilter {
   }
 
   private boolean hasServicesOnDate(TripPattern pattern) {
-    return pattern
-      .scheduledTripsAsStream()
-      .anyMatch(trip -> {
-        var dates = getServiceDatesForTrip.apply(trip);
+    return pattern.scheduledTripsAsStream().anyMatch(trip -> {
+      var dates = getServiceDatesForTrip.apply(trip);
 
-        return dates.stream().anyMatch(range::contains);
-      });
+      return dates.stream().anyMatch(range::contains);
+    });
   }
 }

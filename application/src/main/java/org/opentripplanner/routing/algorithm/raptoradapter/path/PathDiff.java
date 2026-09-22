@@ -101,8 +101,14 @@ public class PathDiff<T extends RaptorTripSchedule> {
     boolean skipCost
   ) {
     return DiffTool.diff(
-      left.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
-      right.stream().map(PathDiff<T>::new).collect(Collectors.toList()),
+      left
+        .stream()
+        .map(PathDiff<T>::new)
+        .collect(Collectors.toList()),
+      right
+        .stream()
+        .map(PathDiff<T>::new)
+        .collect(Collectors.toList()),
       comparator(skipCost)
     );
   }

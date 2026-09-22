@@ -120,7 +120,7 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
     // a score 0.1, everything worse will give you a score of 0!
     double slopeMalus = (maxSlopeExceeded * maxSlopeExceeded) / 10;
 
-    score += (0.5 - slopeMalus);
+    score += 0.5 - slopeMalus;
 
     boolean allEdgesAreAccessible = edges
       .stream()

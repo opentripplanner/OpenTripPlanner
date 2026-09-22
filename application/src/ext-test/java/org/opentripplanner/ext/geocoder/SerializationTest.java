@@ -12,8 +12,31 @@ import org.opentripplanner.framework.json.ObjectMappers;
 class SerializationTest {
 
   private static final String STOP_CLUSTER_JSON = """
-      {
-        "primary" : {
+    {
+      "primary" : {
+        "id" : "F:123",
+        "code" : "aaa",
+        "type" : "STOP",
+        "name" : "A stop",
+        "coordinate" : {
+          "lat" : 1.0,
+          "lon" : 2.0
+        },
+        "modes" : [
+          "RAIL"
+        ],
+        "agencies" : [
+          {
+            "id" : "F:a1",
+            "name" : "Agency"
+          }
+        ],
+        "feedPublisher" : {
+          "name" : "Publisher"
+        }
+      },
+      "secondaries" : [
+        {
           "id" : "F:123",
           "code" : "aaa",
           "type" : "STOP",
@@ -34,33 +57,10 @@ class SerializationTest {
           "feedPublisher" : {
             "name" : "Publisher"
           }
-        },
-        "secondaries" : [
-          {
-            "id" : "F:123",
-            "code" : "aaa",
-            "type" : "STOP",
-            "name" : "A stop",
-            "coordinate" : {
-              "lat" : 1.0,
-              "lon" : 2.0
-            },
-            "modes" : [
-              "RAIL"
-            ],
-            "agencies" : [
-              {
-                "id" : "F:a1",
-                "name" : "Agency"
-              }
-            ],
-            "feedPublisher" : {
-              "name" : "Publisher"
-            }
-          }
-        ]
-      }
-    """;
+        }
+      ]
+    }
+  """;
 
   @Test
   void serialize() {

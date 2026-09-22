@@ -15,7 +15,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
  */
 public class MultiModalStation
   extends AbstractTransitEntity<MultiModalStation, MultiModalStationBuilder>
-  implements StopLocationsGroup {
+  implements StopLocationsGroup
+{
 
   private final Collection<Station> childStations;
 
@@ -59,7 +60,8 @@ public class MultiModalStation
   }
 
   public Collection<StopLocation> getChildStops() {
-    return this.childStations.stream()
+    return this.childStations
+      .stream()
       .flatMap(s -> s.getChildStops().stream())
       .toList();
   }

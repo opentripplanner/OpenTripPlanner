@@ -22,8 +22,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
-  implements RaptorTripScheduleSearch<T>, RaptorBoardOrAlightEvent<T> {
+public final class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements
+  RaptorTripScheduleSearch<T>,
+  RaptorBoardOrAlightEvent<T> {
 
   private final TripSearchTimetable<T> timetable;
   private final int nTrips;

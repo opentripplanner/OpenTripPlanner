@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory;
  * patterns via a GTFS-RT source.
  */
 public class PollingVehiclePositionUpdater
-  extends PollingGraphUpdater<TransitRealTimeUpdateContext> {
+  extends PollingGraphUpdater<TransitRealTimeUpdateContext>
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
 

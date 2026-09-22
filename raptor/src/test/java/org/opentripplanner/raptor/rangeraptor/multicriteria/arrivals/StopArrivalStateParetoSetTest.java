@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 public class StopArrivalStateParetoSetTest {
 
   // 08:35 in seconds
-  private static final int A_TIME = ((8 * 60) + 35) * 60;
+  private static final int A_TIME = (8 * 60 + 35) * 60;
   private static final int ANY = 3;
   private static final int ROUND_1 = 1;
   private static final int ROUND_2 = 2;

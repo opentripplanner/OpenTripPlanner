@@ -210,8 +210,8 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
   }
 
   /// This comparator uses a relax function on the cost to decide if a path dominates another.
-  private static class DestinationArrivalComparator<T extends RaptorTripSchedule>
-    implements ParetoComparator<RaptorPath<T>> {
+  private static class DestinationArrivalComparator<T extends RaptorTripSchedule> implements
+    ParetoComparator<RaptorPath<T>> {
 
     private final RelaxFunction relaxFunction;
 

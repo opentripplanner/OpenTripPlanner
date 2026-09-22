@@ -23,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * updater fetches data from a single {@link DataSource<VehicleParking>}.
  */
 public class VehicleParkingAvailabilityUpdater
-  extends PollingGraphUpdater<StreetRealTimeUpdateContext> {
+  extends PollingGraphUpdater<StreetRealTimeUpdateContext>
+{
 
   private static final Logger LOG = LoggerFactory.getLogger(
     VehicleParkingAvailabilityUpdater.class

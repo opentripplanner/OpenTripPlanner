@@ -116,7 +116,7 @@ class ExtraCallTripBuilder {
         stopSequence,
         call,
         stopSequence == 0,
-        stopSequence == (calls.size() - 1)
+        stopSequence == calls.size() - 1
       );
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
@@ -172,14 +172,14 @@ class ExtraCallTripBuilder {
         startOfService,
         builder,
         stopSequence,
-        stopSequence == (calls.size() - 1),
+        stopSequence == calls.size() - 1,
         isJourneyPredictionInaccurate,
         calls.get(stopSequence),
         occupancy
       );
     }
 
-    builder.withVehicleId(vehicleRef);
+    builder.withVehicleId(FeedScopedId.ofNullable(trip.getId().getFeedId(), vehicleRef));
     if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       builder.withCanceled();
     }

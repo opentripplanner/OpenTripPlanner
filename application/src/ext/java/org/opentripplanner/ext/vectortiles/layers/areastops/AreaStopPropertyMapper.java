@@ -33,15 +33,16 @@ public class AreaStopPropertyMapper extends PropertyMapper<AreaStop> {
 
   @Override
   protected Collection<KeyValue> map(AreaStop stop) {
-    var routeColors = getRoutesForStop
-      .apply(stop)
-      .stream()
-      .map(Route::getColor)
-      .filter(Objects::nonNull)
-      .distinct()
-      // the MVT spec explicitly doesn't cover how to encode arrays
-      // https://docs.mapbox.com/data/tilesets/guides/vector-tiles-standards/#what-the-spec-doesnt-cover
-      .collect(Collectors.joining(","));
+    var routeColors =
+      getRoutesForStop
+        .apply(stop)
+        .stream()
+        .map(Route::getColor)
+        .filter(Objects::nonNull)
+        .distinct()
+        // the MVT spec explicitly doesn't cover how to encode arrays
+        // https://docs.mapbox.com/data/tilesets/guides/vector-tiles-standards/#what-the-spec-doesnt-cover
+        .collect(Collectors.joining(","));
     return List.of(
       new KeyValue("gtfsId", stop.getId().toString()),
       new KeyValue("name", i18NStringMapper.mapNonnullToApi(stop.getName())),

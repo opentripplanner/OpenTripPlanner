@@ -79,11 +79,12 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
         .getIncomingStreetEdges()
         .stream()
         .filter(StreetEdge::hasElevationExtension)
-        .map(streetEdge ->
-          streetEdge
-            .getElevationProfile()
-            .getCoordinate(streetEdge.getElevationProfile().size() - 1)
-            .y
+        .map(
+          streetEdge ->
+            streetEdge
+              .getElevationProfile()
+              .getCoordinate(streetEdge.getElevationProfile().size() - 1)
+              .y
         ),
       v
         .getOutgoingStreetEdges()

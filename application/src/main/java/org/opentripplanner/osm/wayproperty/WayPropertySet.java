@@ -31,14 +31,14 @@ public class WayPropertySet {
     Float,
     OsmEntity,
     Double
-  > DEFAULT_BICYCLE_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.0);
+  > DEFAULT_BICYCLE_SAFETY_RESOLVER = (permission, speedLimit, osmWay) -> 1.0;
 
   public static final TriFunction<
     StreetTraversalPermission,
     Float,
     OsmEntity,
     Double
-  > DEFAULT_WALK_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.25);
+  > DEFAULT_WALK_SAFETY_RESOLVER = (permission, speedLimit, osmWay) -> 1.25;
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -211,8 +211,9 @@ public class WayPropertySet {
     Float speed = null;
     Float currentSpeed;
 
-    if (way.hasTag("maxspeed:motorcar")) {
-      speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
+    var motorCar = way.getTag("maxspeed:motorcar");
+    if (motorCar != null) {
+      speed = SpeedParser.getMetersSecondFromSpeed(motorCar);
     }
 
     if (speed == null && direction == FORWARD && way.hasTag("maxspeed:forward")) {
@@ -234,8 +235,9 @@ public class WayPropertySet {
       }
     }
 
-    if (way.hasTag("maxspeed") && speed == null) {
-      speed = SpeedParser.getMetersSecondFromSpeed(way.getTag("maxspeed"));
+    var maxSpeed = way.getTag("maxspeed");
+    if (maxSpeed != null && speed == null) {
+      speed = SpeedParser.getMetersSecondFromSpeed(maxSpeed);
     }
 
     if (speed != null) {

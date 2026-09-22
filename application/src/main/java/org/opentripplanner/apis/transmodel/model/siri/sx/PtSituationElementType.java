@@ -66,7 +66,8 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment).getAgency(
-              ((TransitAlert) environment.getSource()).entities()
+              ((TransitAlert) environment.getSource())
+                .entities()
                 .stream()
                 .filter(EntitySelector.Agency.class::isInstance)
                 .map(EntitySelector.Agency.class::cast)
@@ -84,7 +85,8 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).entities()
+            return ((TransitAlert) environment.getSource())
+              .entities()
               .stream()
               .filter(EntitySelector.Route.class::isInstance)
               .map(EntitySelector.Route.class::cast)
@@ -101,7 +103,8 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).entities()
+            return ((TransitAlert) environment.getSource())
+              .entities()
               .stream()
               .filter(EntitySelector.Trip.class::isInstance)
               .map(EntitySelector.Trip.class::cast)
@@ -118,7 +121,8 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).entities()
+            return ((TransitAlert) environment.getSource())
+              .entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -136,7 +140,8 @@ public class PtSituationElementType {
           .deprecate("Use affects instead")
           .dataFetcher(environment -> {
             TransitService transitService = GqlUtil.getTransitService(environment);
-            return ((TransitAlert) environment.getSource()).entities()
+            return ((TransitAlert) environment.getSource())
+              .entities()
               .stream()
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
@@ -237,12 +242,14 @@ public class PtSituationElementType {
           .description("Period this situation is in effect")
           .dataFetcher(environment -> {
             TransitAlert alert = environment.getSource();
-            Long startTime = alert.getEffectiveStartDate() != null
-              ? alert.getEffectiveStartDate().toEpochMilli()
-              : null;
-            Long endTime = alert.getEffectiveEndDate() != null
-              ? alert.getEffectiveEndDate().toEpochMilli()
-              : null;
+            Long startTime =
+              alert.getEffectiveStartDate() != null
+                ? alert.getEffectiveStartDate().toEpochMilli()
+                : null;
+            Long endTime =
+              alert.getEffectiveEndDate() != null
+                ? alert.getEffectiveEndDate().toEpochMilli()
+                : null;
             return new ValidityPeriod(startTime, endTime);
           })
           .build()

@@ -78,7 +78,11 @@ class AreaStopTest {
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withUrl(new NonLocalizedString("X")).build()));
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withZoneId("X").build()));
     assertFalse(
-      SUBJECT.sameAs(SUBJECT.copy().withGeometry(GeometryUtils.makeLineString(0, 0, 0, 2)).build())
+      SUBJECT.sameAs(
+        SUBJECT.copy()
+          .withGeometry(GeometryUtils.makeLineString(0, 0, 0, 2))
+          .build()
+      )
     );
   }
 }

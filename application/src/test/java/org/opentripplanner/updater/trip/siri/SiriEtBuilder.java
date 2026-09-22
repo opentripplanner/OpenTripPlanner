@@ -174,9 +174,8 @@ public class SiriEtBuilder {
   public SiriEtBuilder withEstimatedCalls(
     Function<EstimatedCallsBuilder, EstimatedCallsBuilder> producer
   ) {
-    int offset = evj.getRecordedCalls() == null
-      ? 0
-      : evj.getRecordedCalls().getRecordedCalls().size();
+    int offset =
+      evj.getRecordedCalls() == null ? 0 : evj.getRecordedCalls().getRecordedCalls().size();
     var builder = new EstimatedCallsBuilder(localTimeParser, offset);
 
     builder = producer.apply(builder);

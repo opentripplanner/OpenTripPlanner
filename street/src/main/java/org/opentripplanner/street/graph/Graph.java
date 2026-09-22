@@ -4,18 +4,19 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.Scope;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -68,6 +69,15 @@ public class Graph implements Serializable {
 
   /** The convex hull of all the graph vertices. Generated at the time the Graph is built. */
   private Geometry convexHull = null;
+
+  /**
+   * Vehicle rental geofencing zones applied to the street graph during the graph build, by network.
+   * The boundary markers derived from them live on the vertices; these are the zones themselves,
+   * kept so the serve phase can index them for containment queries. Networks whose zones are
+   * applied by an updater instead are absent here.
+   */
+  private final Map<String, Set<GeofencingZone>> vehicleRentalGeofencingZones =
+    new ConcurrentHashMap<>();
 
   /** True if OSM data was loaded into this Graph. */
   public boolean hasStreets = false;
@@ -199,18 +209,21 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Return all the edges in the graph. Derived from vertices on demand.
+   * Lazily iterate over all the edges in the graph, derived from vertices on demand, without
+   * materializing an intermediate collection. Can be reused/iterated over multiple times.
    * <p>
-   * Note: Under concurrent modification this method may return edges that have been removed from
-   * the graph or not return edges that have been added to the graph after this method has been
-   * called.
+   * Use {@link ListUtils#ofIterable} to materialize a {@link List} if a {@link Collection} is
+   * required (e.g. serialization).
+   * <p>
+   * THREAD SAFTY - This method does not support concurent use. The behavior is undefined.
    */
-  public Collection<Edge> listEdges() {
-    Set<Edge> edges = new HashSet<>();
-    for (Vertex v : this.getVertices()) {
-      edges.addAll(v.getOutgoing());
-    }
-    return edges;
+  public Iterable<Edge> listEdges() {
+    return () ->
+      this.vertices
+        .values()
+        .stream()
+        .flatMap(v -> v.getOutgoing().stream())
+        .iterator();
   }
 
   /**
@@ -225,15 +238,13 @@ public class Graph implements Serializable {
    * called.
    */
   public <T extends Edge> Iterable<T> findEdges(Class<T> clazz) {
-    return this.vertices.values()
-      .stream()
-      .flatMap(v -> v.getOutgoing().stream())
+    return StreamSupport.stream(listEdges().spliterator(), false)
       .filter(clazz::isInstance)
       .map(clazz::cast)::iterator;
   }
 
   public boolean containsVertex(Vertex v) {
-    return (v != null) && vertices.get(v.getLabel()) == v;
+    return v != null && vertices.get(v.getLabel()) == v;
   }
 
   public void remove(Vertex vertex) {
@@ -350,6 +361,19 @@ public class Graph implements Serializable {
    */
   public Geometry getConvexHull() {
     return convexHull;
+  }
+
+  /**
+   * Records the geofencing zones applied for a rental network during the graph build. Replaces any
+   * earlier registration for the same network, which has exactly one source of zones.
+   */
+  public void setVehicleRentalGeofencingZones(String network, Collection<GeofencingZone> zones) {
+    vehicleRentalGeofencingZones.put(network, Set.copyOf(zones));
+  }
+
+  /** The geofencing zones applied during the graph build, by rental network. */
+  public Map<String, Set<GeofencingZone>> vehicleRentalGeofencingZones() {
+    return Map.copyOf(vehicleRentalGeofencingZones);
   }
 
   public void initEllipsoidToGeoidDifference(double value, double lat, double lon) {

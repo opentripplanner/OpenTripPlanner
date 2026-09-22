@@ -151,7 +151,7 @@ public class StatesToWalkStepsMapper {
   }
 
   private static boolean isLink(Edge edge) {
-    return (edge instanceof StreetEdge streetEdge && streetEdge.isLink());
+    return edge instanceof StreetEdge streetEdge && streetEdge.isLink();
   }
 
   private static ElevationProfile encodeElevationProfile(
@@ -233,8 +233,7 @@ public class StatesToWalkStepsMapper {
       modeTransition ||
       !continueOnSameStreet(edge, streetNameNoParens) ||
       // went on to or off of a roundabout
-      edge.isRoundabout() !=
-      (roundaboutExit > 0) ||
+      edge.isRoundabout() != roundaboutExit > 0 ||
       (isLink(edge) && !isLink(backState.getBackEdge()))
     ) {
       // Street name has changed, or we've gone on to or off of a roundabout.
@@ -500,7 +499,7 @@ public class StatesToWalkStepsMapper {
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
     return !(
       current.directionText().toString() != null &&
-      !(java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens)) &&
+      !java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
       (!current.nameIsDerived() || !edge.nameIsDerived())
     );
   }

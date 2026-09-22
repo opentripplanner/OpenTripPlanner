@@ -8,7 +8,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 
 public class GroupOfStationsBuilder
-  extends AbstractEntityBuilder<GroupOfStations, GroupOfStationsBuilder> {
+  extends AbstractEntityBuilder<GroupOfStations, GroupOfStationsBuilder>
+{
 
   private I18NString name;
   private Set<StopLocationsGroup> childStations = new HashSet<>();

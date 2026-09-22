@@ -18,7 +18,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * and the "to" point in the reverse search.
  */
 public final class ConstrainedBoardingSearch
-  implements RaptorConstrainedBoardingSearch<TripSchedule> {
+  implements RaptorConstrainedBoardingSearch<TripSchedule>
+{
 
   /**
    * Abort the search after looking at 5 valid boardings. In the case where this happens, one of
@@ -221,7 +222,8 @@ public final class ConstrainedBoardingSearch
   }
 
   private static final class NoopRaptorConstrainedBoardingSearch
-    implements RaptorConstrainedBoardingSearch<TripSchedule> {
+    implements RaptorConstrainedBoardingSearch<TripSchedule>
+  {
 
     @Override
     public boolean transferExistTargetStop(int targetStopPos) {

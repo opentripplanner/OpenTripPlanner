@@ -188,17 +188,14 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
         updaterType + ":ServiceBusSubscription"
       );
 
-      executeStartupStep(
-        () -> {
-          var initialData = fetchInitialSiriData();
-          if (initialData.isEmpty()) {
-            LOG.info("Got empty response from history endpoint");
-          } else {
-            processInitialSiriData(initialData.get());
-          }
-        },
-        updaterType + ":HistoricalSiriData"
-      );
+      executeStartupStep(() -> {
+        var initialData = fetchInitialSiriData();
+        if (initialData.isEmpty()) {
+          LOG.info("Got empty response from history endpoint");
+        } else {
+          processInitialSiriData(initialData.get());
+        }
+      }, updaterType + ":HistoricalSiriData");
 
       if (isSuccess) {
         executeStartupStep(this::startEventProcessor, updaterType + ":ServiceBusEventProcessor");
@@ -427,7 +424,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
         response -> SiriXml.parseXml(response.body())
       );
       var t2 = System.currentTimeMillis();
-      LOG.info("Fetched initial data in {} ms", (t2 - t1));
+      LOG.info("Fetched initial data in {} ms", t2 - t1);
 
       if (siriOptional.isEmpty()) {
         LOG.info("Got status 204 'No Content'.");
@@ -444,7 +441,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
       if (f != null) {
         f.get();
       }
-      LOG.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
+      LOG.info("{} updater initialized in {} ms.", updaterType, System.currentTimeMillis() - t1);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new SiriAzureInitializationException("Interrupted while applying history", e);
@@ -477,8 +474,7 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
       // should this be recoverable?
-      reason ==
-      ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
+      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
     ) {
       LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",

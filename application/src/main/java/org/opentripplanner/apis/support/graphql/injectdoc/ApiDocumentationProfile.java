@@ -7,11 +7,11 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
   ENTUR;
 
   private static final String TYPE_DOC = """
-    List of available custom documentation profiles. A profile is used to inject custom
-    documentation like type and field description or a deprecated reason.
+  List of available custom documentation profiles. A profile is used to inject custom
+  documentation like type and field description or a deprecated reason.
 
-    Currently, ONLY the Transmodel API supports this feature.
-    """;
+  Currently, ONLY the Transmodel API supports this feature.
+  """;
 
   @Override
   public String typeDescription() {
@@ -23,7 +23,7 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
     return switch (this) {
       case DEFAULT -> "Default documentation is used.";
       case ENTUR -> "Entur specific documentation. This deprecate features not supported at Entur," +
-      " Norway.";
+        " Norway.";
     };
   }
 }

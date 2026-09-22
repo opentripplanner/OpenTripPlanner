@@ -25,18 +25,16 @@ class HexStringTest {
   void testLongString() {
     assertEquals(
       "0123456789abcdef",
-      HexString.of(
-        new byte[] {
-          (byte) 0x01,
-          (byte) 0x23,
-          (byte) 0x45,
-          (byte) 0x67,
-          (byte) 0x89,
-          (byte) 0xab,
-          (byte) 0xcd,
-          (byte) 0xef,
-        }
-      )
+      HexString.of(new byte[] {
+        (byte) 0x01,
+        (byte) 0x23,
+        (byte) 0x45,
+        (byte) 0x67,
+        (byte) 0x89,
+        (byte) 0xab,
+        (byte) 0xcd,
+        (byte) 0xef,
+      })
     );
   }
 }

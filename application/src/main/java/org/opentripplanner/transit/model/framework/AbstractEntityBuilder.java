@@ -4,11 +4,12 @@ import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 public abstract class AbstractEntityBuilder<
-  E extends AbstractTransitEntity<E, B>,
-  B extends AbstractEntityBuilder<E, B>
->
+    E extends AbstractTransitEntity<E, B>,
+    B extends AbstractEntityBuilder<E, B>
+  >
   extends AbstractBuilder<E, B>
-  implements TransitEntityBuilder<E, B> {
+  implements TransitEntityBuilder<E, B>
+{
 
   @SuppressWarnings("rawtypes")
   private static final EntityContext<?, ?> NOOP = new EntityContext() {};

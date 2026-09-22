@@ -45,7 +45,7 @@ public class BikeParkType {
           .name("spacesAvailable")
           .type(Scalars.GraphQLInt)
           .dataFetcher(environment -> {
-            var vehicleParking = ((VehicleParking) environment.getSource());
+            var vehicleParking = (VehicleParking) environment.getSource();
             var availability = vehicleParking.getAvailability();
             if (availability != null) {
               return availability.getBicycleSpaces();

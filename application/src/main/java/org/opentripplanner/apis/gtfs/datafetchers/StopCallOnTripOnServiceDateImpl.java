@@ -8,7 +8,8 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 public class StopCallOnTripOnServiceDateImpl
-  implements GraphQLDataFetchers.GraphQLStopCallOnTripOnServiceDate {
+  implements GraphQLDataFetchers.GraphQLStopCallOnTripOnServiceDate
+{
 
   @Override
   public DataFetcher<TripTimeOnDate> stopCall() {

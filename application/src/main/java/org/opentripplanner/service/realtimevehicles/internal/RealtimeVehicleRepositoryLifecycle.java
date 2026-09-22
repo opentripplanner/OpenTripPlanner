@@ -11,7 +11,8 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySna
  * that is never frozen are simply discarded — this supports transaction rollback in the future.
  */
 public class RealtimeVehicleRepositoryLifecycle
-  implements RepositoryLifecycle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository> {
+  implements RepositoryLifecycle<RealtimeVehicleRepositorySnapshot, RealtimeVehicleRepository>
+{
 
   @Override
   public RealtimeVehicleRepository copyOnWrite(RealtimeVehicleRepositorySnapshot snapshot) {

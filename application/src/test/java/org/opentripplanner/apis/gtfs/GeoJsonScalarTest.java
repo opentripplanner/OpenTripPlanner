@@ -13,14 +13,12 @@ class GeoJsonScalarTest {
   @Test
   void geoJson() throws JsonProcessingException {
     var gm = new GeometryFactory();
-    var polygon = gm.createPolygon(
-      new Coordinate[] {
-        new Coordinate(0, 0),
-        new Coordinate(1, 1),
-        new Coordinate(2, 2),
-        new Coordinate(0, 0),
-      }
-    );
+    var polygon = gm.createPolygon(new Coordinate[] {
+      new Coordinate(0, 0),
+      new Coordinate(1, 1),
+      new Coordinate(2, 2),
+      new Coordinate(0, 0),
+    });
     var geoJson = GraphQLScalars.GEOJSON_SCALAR.getCoercing().serialize(polygon);
 
     var expected = ObjectMappers.ignoringExtraFields().readTree(

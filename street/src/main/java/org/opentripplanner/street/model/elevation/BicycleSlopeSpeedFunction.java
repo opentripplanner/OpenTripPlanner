@@ -119,7 +119,7 @@ public final class BicycleSlopeSpeedFunction {
     int l = kx1;
     int l1 = l + 1;
 
-    while ((altitude >= TX[l1 - 1]) && (l != nkx1)) {
+    while (altitude >= TX[l1 - 1] && l != nkx1) {
       l = l1;
       l1 = l + 1;
     }
@@ -153,7 +153,7 @@ public final class BicycleSlopeSpeedFunction {
     l = ky1;
     l1 = l + 1;
 
-    while ((slope >= TY[l1 - 1]) && (l != nky1)) {
+    while (slope >= TY[l1 - 1] && l != nky1) {
       l = l1;
       l1 = l + 1;
     }

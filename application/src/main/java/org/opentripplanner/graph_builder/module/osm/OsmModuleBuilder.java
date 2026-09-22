@@ -1,13 +1,14 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
+import org.opentripplanner.graph_builder.module.osm.internal.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
-import org.opentripplanner.graph_builder.services.osm.DefaultNamer;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.CompoundRefTagGroup;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -28,6 +29,7 @@ public class OsmModuleBuilder {
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
 
   private Set<String> boardingAreaRefTags = Set.of();
+  private List<CompoundRefTagGroup> elevatorRefTags = List.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
   private EdgeNamer edgeNamer = new DefaultNamer();
   private boolean areaVisibility = false;
@@ -58,6 +60,11 @@ public class OsmModuleBuilder {
 
   public OsmModuleBuilder withBoardingAreaRefTags(Set<String> boardingAreaRefTags) {
     this.boardingAreaRefTags = boardingAreaRefTags;
+    return this;
+  }
+
+  public OsmModuleBuilder withElevatorRefTags(List<CompoundRefTagGroup> elevatorRefTags) {
+    this.elevatorRefTags = elevatorRefTags;
     return this;
   }
 
@@ -122,6 +129,7 @@ public class OsmModuleBuilder {
       issueStore,
       new OsmProcessingParameters(
         boardingAreaRefTags,
+        elevatorRefTags,
         edgeNamer,
         maxAreaNodes,
         areaVisibility,

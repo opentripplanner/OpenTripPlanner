@@ -90,9 +90,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
                     alert
                       .entities()
                       .stream()
-                      .anyMatch(entity ->
-                        (entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
-                          stopAndRoute.routeId().equals(getRoute(environment).getId()))
+                      .anyMatch(
+                        entity ->
+                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                          stopAndRoute.routeId().equals(getRoute(environment).getId())
                       )
                   )
                   .toList()
@@ -116,9 +117,10 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
                       alert
                         .entities()
                         .stream()
-                        .anyMatch(entity ->
-                          (entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
-                            stopAndTrip.tripId().equals(getSource(environment).getId()))
+                        .anyMatch(
+                          entity ->
+                            entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                            stopAndTrip.tripId().equals(getSource(environment).getId())
                         )
                     )
                     .toList()

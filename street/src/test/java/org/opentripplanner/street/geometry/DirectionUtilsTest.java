@@ -81,7 +81,7 @@ public class DirectionUtilsTest {
     double maxError = 0.0;
     for (int i = 0; i < exactAzimuths.length; i++) {
       // Degrees
-      double error = (exactAzimuths[i] - approxAzimuths[i]);
+      double error = exactAzimuths[i] - approxAzimuths[i];
       if (error > 360) {
         error -= 360;
       }

@@ -59,7 +59,9 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
       // None pass-through-points
       testCase("").expectTransfersFrom(STOP_C, STOP_H),
       // One pass-through-points
-      testCase().points(STOP_B).expectTransfersFrom(STOP_C, STOP_H),
+      testCase()
+        .points(STOP_B)
+        .expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_C).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_D).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_E).expectTransfersFrom(STOP_E, STOP_J),
@@ -91,7 +93,10 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
       testCase("at J w/unreachable F").points(STOP_J, STOP_F).expectTransfersFrom(STOP_C, STOP_J),
       testCase("at L w/unreachable F").points(STOP_L, STOP_F).expectTransfersFrom(STOP_C, STOP_H),
       // Two pass-through-points - a few samples
-      testCase().points(STOP_B).points(STOP_C).expectTransfersFrom(STOP_C, STOP_H),
+      testCase()
+        .points(STOP_B)
+        .points(STOP_C)
+        .expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_B).points(STOP_D).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_B).points(STOP_E).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_B).points(STOP_G).expectTransfersFrom(STOP_C, STOP_H),

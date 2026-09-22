@@ -235,9 +235,9 @@ class DirectTransferGeneratorTest {
     // S11, S13, S21 -> *   No patterns alight here
     // * -> S0, S12, S23    No patterns board here
     String expectedWalkAndBike = """
-       S0 - S11, 100m
-       S0 - S21, 100m
-      S12 - S22, 110m""";
+     S0 - S11, 100m
+     S0 - S21, 100m
+    S12 - S22, 110m""";
     assertEquals(expectedWalkAndBike, pathToString(walkTransfers));
     assertEquals(expectedWalkAndBike, pathToString(bikeTransfers));
     assertEquals("<Empty>", pathToString(carTransfers));

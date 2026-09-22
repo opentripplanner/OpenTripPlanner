@@ -75,7 +75,6 @@ nav:
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Preparing DEM Data: 'Preparing-DEM.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
-    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
     - Frontends: 'Frontends.md'
 - APIs:
     - Introduction: 'apis/Apis.md'
@@ -127,6 +126,7 @@ nav:
     - SIRI Azure Updater: 'sandbox/siri/SiriAzureUpdater.md'
     - SIRI MQTT Updater: 'sandbox/siri/SiriMqttUpdater.md'
     - Vehicle Rental Service Directory API support: 'sandbox/VehicleRentalServiceDirectory.md'
+    - Vehicle Rental Geofencing: 'sandbox/VehicleRentalGeofencing.md'
     - Mapbox Vector Tiles API: 'sandbox/MapboxVectorTilesApi.md'
     - Flex Routing: 'sandbox/Flex.md'
     - Report API: 'sandbox/ReportApi.md'

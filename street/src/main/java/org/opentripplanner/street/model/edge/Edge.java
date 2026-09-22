@@ -95,7 +95,7 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * hash code is based on memory location rather than content. See {@link #equals(Object)}.
    */
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return System.identityHashCode(this);
   }
 

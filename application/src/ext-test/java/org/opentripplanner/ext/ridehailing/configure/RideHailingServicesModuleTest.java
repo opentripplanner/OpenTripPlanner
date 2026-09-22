@@ -15,17 +15,17 @@ class RideHailingServicesModuleTest {
   void buildServices() throws JsonProcessingException {
     var module = new RideHailingServicesModule();
     var json = """
-      {
-          "rideHailingServices": [
-            {
-              "type": "uber-car-hailing",
-              "clientId": "secret-id",
-              "clientSecret": "very-secret",
-              "wheelchairAccessibleProductId": "product-id-accessible-by-wheelchair"
-            }
-          ]
-      }
-      """;
+    {
+        "rideHailingServices": [
+          {
+            "type": "uber-car-hailing",
+            "clientId": "secret-id",
+            "clientSecret": "very-secret",
+            "wheelchairAccessibleProductId": "product-id-accessible-by-wheelchair"
+          }
+        ]
+    }
+    """;
     var jsonNode = ObjectMappers.ignoringExtraFields().readTree(json);
     var services = module.services(new RouterConfig(jsonNode, json, false));
 

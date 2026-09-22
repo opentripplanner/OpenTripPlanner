@@ -11,7 +11,8 @@ import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public class SiriAzureETUpdaterParameters
   extends SiriAzureUpdaterParameters
-  implements UrlUpdaterParameters {
+  implements UrlUpdaterParameters
+{
 
   private LocalDate fromDateTime;
 

@@ -87,7 +87,8 @@ public class VehicleParkingUpdater extends PollingGraphUpdater<StreetRealTimeUpd
   }
 
   private class VehicleParkingGraphWriterRunnable
-    implements GraphWriterRunnable<StreetRealTimeUpdateContext> {
+    implements GraphWriterRunnable<StreetRealTimeUpdateContext>
+  {
 
     private final Map<FeedScopedId, VehicleParking> oldVehicleParkingsById;
     private final Set<VehicleParking> updatedVehicleParkings;

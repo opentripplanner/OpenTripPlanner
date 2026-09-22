@@ -263,9 +263,10 @@ class TransferMapper {
   private int boardStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
-    Predicate<StopLocation> stopMatches = station != null
-      ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
-      : s -> s == stop;
+    Predicate<StopLocation> stopMatches =
+      station != null
+        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
+        : s -> s == stop;
 
     for (int i = 0; i < stopTimes.size() - 1; i++) {
       StopTime stopTime = stopTimes.get(i);
@@ -283,9 +284,10 @@ class TransferMapper {
   private int alightStopPosition(Trip trip, RegularStop stop, Station station) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
-    Predicate<StopLocation> stopMatches = station != null
-      ? s -> ((s instanceof RegularStop regStop) && regStop.getParentStation() == station)
-      : s -> s == stop;
+    Predicate<StopLocation> stopMatches =
+      station != null
+        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
+        : s -> s == stop;
 
     for (int i = stopTimes.size() - 1; i > 0; i--) {
       StopTime stopTime = stopTimes.get(i);

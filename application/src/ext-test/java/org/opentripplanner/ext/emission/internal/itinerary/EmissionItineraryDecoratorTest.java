@@ -79,16 +79,16 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
     int t0 = START_TIME;
     combinedWithFlex = newItinerary(A)
-      .drive(t0, t0 += 90, C)
-      .rail(4, t0 += 90, t0 += 90, D)
-      .bus(routeA, 20, t0, t0 += 90, E)
+      .drive(t0, (t0 += 90), C)
+      .rail(4, (t0 += 90), (t0 += 90), D)
+      .bus(routeA, 20, t0, (t0 += 90), E)
       .flex(t0 + 90, END_TIME, B)
       .build();
 
     combinedNoFlex = newItinerary(A)
-      .drive(t0, t0 += 90, C)
-      .rail(4, t0 += 90, t0 + 90, D)
-      .bus(routeA, 20, t0, t0 += 90, E)
+      .drive(t0, (t0 += 90), C)
+      .rail(4, (t0 += 90), t0 + 90, D)
+      .bus(routeA, 20, t0, (t0 += 90), E)
       .bus(routeB, 23, t0, END_TIME, B)
       .build();
 

@@ -53,9 +53,10 @@ public class VertexCreationService {
   ) {
     LOG.debug("Creating {} vertex for {}", type.description(), coordinate);
 
-    I18NString name = label == null || label.isEmpty()
-      ? new LocalizedString(type.translationKey())
-      : new NonLocalizedString(label);
+    I18NString name =
+      label == null || label.isEmpty()
+        ? new LocalizedString(type.translationKey())
+        : new NonLocalizedString(label);
 
     var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 

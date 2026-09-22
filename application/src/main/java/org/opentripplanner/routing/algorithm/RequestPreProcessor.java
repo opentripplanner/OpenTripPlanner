@@ -86,12 +86,13 @@ public final class RequestPreProcessor {
       tripLocation.tripOnDateReference()
     );
     var aimedDeparture = tripLocation.aimedDepartureTime();
-    Integer aimedDepartureSeconds = aimedDeparture == null
-      ? null
-      : ServiceDateUtils.secondsSinceStartOfTime(
-          ServiceDateUtils.asStartOfService(tripAndServiceDate.serviceDate(), zoneId),
-          aimedDeparture
-        );
+    Integer aimedDepartureSeconds =
+      aimedDeparture == null
+        ? null
+        : ServiceDateUtils.secondsSinceStartOfTime(
+            ServiceDateUtils.asStartOfService(tripAndServiceDate.serviceDate(), zoneId),
+            aimedDeparture
+          );
     var locationInTripPattern = new TripLocationResolver(transitService).resolve(
       tripAndServiceDate,
       tripLocation.stopLocationId(),

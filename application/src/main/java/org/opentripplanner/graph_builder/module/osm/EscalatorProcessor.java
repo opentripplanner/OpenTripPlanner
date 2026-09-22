@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.opentripplanner.graph_builder.module.osm.model.EscalatorEdgePair;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;

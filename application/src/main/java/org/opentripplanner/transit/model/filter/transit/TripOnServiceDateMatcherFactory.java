@@ -155,7 +155,7 @@ public class TripOnServiceDateMatcherFactory {
     return new ContainsMatcher<>(
       "replacementForContains",
       t -> t.getReplacementFor().stream().map(AbstractTransitEntity::getId).toList(),
-      new EqualityMatcher<>("replacementForIdEquals", id, (idToMatch -> idToMatch))
+      new EqualityMatcher<>("replacementForIdEquals", id, idToMatch -> idToMatch)
     );
   }
 

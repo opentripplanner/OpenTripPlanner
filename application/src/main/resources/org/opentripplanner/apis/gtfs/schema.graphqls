@@ -3000,7 +3000,7 @@ type Trip implements Node {
   routeShortName: String
   "Hash code of the trip. This value is stable and not dependent on the trip id."
   semanticHash: String!
-  serviceId: String
+  serviceId: String @deprecated(reason : "This field always returns null. GTFS's service-id is being phased out as an internal OTP concept, see [GitHub issue](https://github.com/opentripplanner/OpenTripPlanner/issues/7972).\nThis field is subject for removal in September 2028. If you want this field to stay, please notify the OTP community.")
   shapeId: String
   "List of stops this trip passes through"
   stops: [Stop!]!
@@ -3066,6 +3066,8 @@ type TripOnServiceDate {
   stopCalls: [StopCall!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
+  "ID of the vehicle serving this trip, if provided by the real-time feed, in the format FeedId:VehicleId."
+  vehicleId: String
 }
 
 """

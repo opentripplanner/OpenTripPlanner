@@ -16,8 +16,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * {@link ExecutorService} is provided.
  * @see CompositeResult for joining results.
  */
-public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule>
-  implements RaptorRouter<T> {
+public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule> implements
+  RaptorRouter<T> {
 
   private final RaptorRouter<T> mainWorker;
   private final RaptorRouter<T> alternativeWorker;
@@ -74,7 +74,7 @@ public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule>
       alternativeResultFuture.cancel(true);
       throw mapInterruptedException.apply(e);
     } catch (ExecutionException e) {
-      throw (e.getCause() instanceof RuntimeException re) ? re : new RuntimeException(e);
+      throw e.getCause() instanceof RuntimeException re ? re : new RuntimeException(e);
     }
   }
 }

@@ -48,14 +48,13 @@ class VehicleParkingHelperTest {
       .entrances(
         IntStream.rangeClosed(1, 3)
           .<VehicleParkingEntranceCreator>mapToObj(
-            id ->
-              builder ->
-                builder
-                  .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                  .name(new NonLocalizedString("Entrance " + id))
-                  .coordinate(new WgsCoordinate(id, id))
-                  .carAccessible(id == 1 || id == 3)
-                  .walkAccessible(id == 2 || id == 3)
+            id -> builder ->
+              builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                .name(new NonLocalizedString("Entrance " + id))
+                .coordinate(new WgsCoordinate(id, id))
+                .carAccessible(id == 1 || id == 3)
+                .walkAccessible(id == 2 || id == 3)
           )
           .collect(Collectors.toList())
       )
@@ -74,13 +73,12 @@ class VehicleParkingHelperTest {
       .entrances(
         IntStream.rangeClosed(1, entranceNumber)
           .<VehicleParkingEntranceCreator>mapToObj(
-            id ->
-              builder ->
-                builder
-                  .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                  .name(new NonLocalizedString("Entrance " + id))
-                  .coordinate(new WgsCoordinate(id, id))
-                  .walkAccessible(true)
+            id -> builder ->
+              builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                .name(new NonLocalizedString("Entrance " + id))
+                .coordinate(new WgsCoordinate(id, id))
+                .walkAccessible(true)
           )
           .collect(Collectors.toList())
       )

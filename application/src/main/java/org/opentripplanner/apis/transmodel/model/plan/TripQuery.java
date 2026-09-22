@@ -32,9 +32,9 @@ public class TripQuery {
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
   public static final String TRIP_VIA_PARAMETER = "via";
   public static final String DOC_VIA = """
-    The list of via locations the journey is required to visit. All locations are
-    visited in the order they are listed.
-    """;
+  The list of via locations the journey is required to visit. All locations are
+  visited in the order they are listed.
+  """;
 
   private final TransmodelGraphQLPlanner graphQLPlanner;
 
@@ -127,9 +127,9 @@ public class TripQuery {
 
             Maximum value: %d minutes (%dh)
             """.formatted(
-                transitTuningParameters.maxSearchWindow().toMinutes(),
-                transitTuningParameters.maxSearchWindow().toHours()
-              )
+              transitTuningParameters.maxSearchWindow().toMinutes(),
+              transitTuningParameters.maxSearchWindow().toHours()
+            )
           )
           .type(Scalars.GraphQLInt)
           .build()

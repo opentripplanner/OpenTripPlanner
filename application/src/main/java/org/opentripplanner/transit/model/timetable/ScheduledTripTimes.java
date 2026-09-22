@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -134,7 +136,9 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   @Override
   public ScheduledTripTimes withAdjustedTimes(Duration shiftDelta) {
-    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
+    return copyOfNoDuplication()
+      .plusTimeShift((int) shiftDelta.toSeconds())
+      .build();
   }
 
   @Override
@@ -273,9 +277,14 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   }
 
   @Override
+  public Optional<FeedScopedId> getVehicleId() {
+    return Optional.empty();
+  }
+
+  @Override
   @Nullable
   public I18NString getHeadsign(final int stopPos) {
-    return (headsigns != null && headsigns[stopPos] != null)
+    return headsigns != null && headsigns[stopPos] != null
       ? headsigns[stopPos]
       : getTrip().getHeadsign();
   }

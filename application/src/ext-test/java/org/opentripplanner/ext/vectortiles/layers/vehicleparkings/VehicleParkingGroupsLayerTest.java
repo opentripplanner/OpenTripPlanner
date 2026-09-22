@@ -89,22 +89,22 @@ public class VehicleParkingGroupsLayerTest {
     repository.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config = """
-      {
-        "vectorTiles": {
-          "layers" :[
-            {
-              "name": "vehicleParkingGroups",
-              "type": "VehicleParkingGroup",
-              "mapper": "Digitransit",
-              "maxZoom": 20,
-              "minZoom": 14,
-              "cacheMaxSeconds": 600,
-              "expansionFactor": 0
-            }
-          ]
-        }
+    {
+      "vectorTiles": {
+        "layers" :[
+          {
+            "name": "vehicleParkingGroups",
+            "type": "VehicleParkingGroup",
+            "mapper": "Digitransit",
+            "maxZoom": 20,
+            "minZoom": 14,
+            "cacheMaxSeconds": 600,
+            "expansionFactor": 0
+          }
+        ]
       }
-      """;
+    }
+    """;
     var nodeAdapter = newNodeAdapterForTest(config);
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
@@ -159,7 +159,8 @@ public class VehicleParkingGroupsLayerTest {
   }
 
   private static class VehicleParkingGroupsLayerBuilderWithPublicGeometry
-    extends VehicleParkingGroupsLayerBuilder {
+    extends VehicleParkingGroupsLayerBuilder
+  {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       VehicleParkingService service,
@@ -176,7 +177,8 @@ public class VehicleParkingGroupsLayerTest {
   }
 
   private static class VehicleParkingGroupPropertyMapperWithPublicMap
-    extends DigitransitVehicleParkingGroupPropertyMapper {
+    extends DigitransitVehicleParkingGroupPropertyMapper
+  {
 
     public VehicleParkingGroupPropertyMapperWithPublicMap(Locale locale) {
       super(locale);

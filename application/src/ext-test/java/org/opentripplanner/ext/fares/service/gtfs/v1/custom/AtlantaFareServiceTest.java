@@ -286,8 +286,8 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .withMode(TransitMode.BUS)
       .build();
 
-    int start = (int) (T11_00 + (startTimeMins * 60));
-    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
+    int start = (int) (T11_00 + startTimeMins * 60);
+    int end = (int) (T11_00 + (startTimeMins + 12) * 60);
     return newItinerary(Place.forStop(firstStop), start)
       .bus(route, 1, start, end, Place.forStop(lastStop))
       .build();
