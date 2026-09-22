@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder;
 import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
 import javax.annotation.Nullable;
@@ -43,7 +43,7 @@ public class GraphBuilder implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
-  private final Queue<GraphBuilderModule> graphBuilderModules = new LinkedList<>();
+  private final Queue<GraphBuilderModule> graphBuilderModules = new ArrayDeque<>();
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final DataImportIssueStore issueStore;
