@@ -13,11 +13,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.core.model.transaction.RepositoryRegistry;
-import org.opentripplanner.core.model.transaction.UpdateManager;
-import org.opentripplanner.core.model.transaction.RepositoryHandle;
-import org.opentripplanner.core.model.transaction.TransactionScope;
-import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.Entity;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.base.EntityIdProvider;
@@ -34,6 +29,11 @@ import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.internal.DefaultOrderRepository;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.internal.OrderRepositoryLifecycle;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.model.Order;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.core.model.transaction.TransactionScope;
+import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.core.model.transaction.WriteContext;
 
 /**
  * This test demonstrates how the snapshot framework can be used with two repositories. The example

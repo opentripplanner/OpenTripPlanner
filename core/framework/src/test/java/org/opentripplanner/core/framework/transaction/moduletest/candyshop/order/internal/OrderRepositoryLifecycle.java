@@ -1,8 +1,8 @@
 package org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.internal;
 
-import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.OrderRepository;
 import org.opentripplanner.core.framework.transaction.moduletest.candyshop.order.OrderService;
+import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 
 /**
  * This lifecycle implements the {@link RepositoryLifecycle} interface, but does not create a new
