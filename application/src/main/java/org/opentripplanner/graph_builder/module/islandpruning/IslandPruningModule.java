@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -21,7 +20,6 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -95,26 +93,18 @@ public class IslandPruningModule implements GraphBuilderModule {
     // note that visibility vertices must not be removed from the graph
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
-    HashSet<AreaGroup> areas = new HashSet<>();
     HashSet<Vertex> visibilityVertices = new HashSet<>();
 
     for (AreaEdge ae : graph.findEdges(AreaEdge.class)) {
-      areas.add(ae.getArea());
-    }
-    for (AreaGroup a : areas) {
-      visibilityVertices.addAll(a.visibilityVertices());
+      visibilityVertices.addAll(ae.getArea().visibilityVertices());
     }
 
     int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
-        toRemove.add(v);
+        graph.remove(v);
+        removed += 1;
       }
-    }
-    for (Vertex v : toRemove) {
-      graph.remove(v);
-      removed += 1;
     }
     LOG.info("Removed {} edgeless street vertices", removed);
 

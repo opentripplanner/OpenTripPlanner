@@ -99,7 +99,7 @@ public class IslandPruningBenchmark {
 
   private static int countEdges(Graph graph) {
     int count = 0;
-    for (StreetEdge ignored : graph.findEdges(StreetEdge.class)) {
+    for (var _ : graph.findEdges(StreetEdge.class)) {
       count++;
     }
     return count;
