@@ -458,7 +458,8 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
    * @return              The fare product from the GTFS, or a generated $0 fare product.
    */
   private Money findFareProduct(FeedScopedId fareProductId) {
-    Optional<FareLegRule> potentialRuleMatch = this.fareLegRules.stream()
+    Optional<FareLegRule> potentialRuleMatch = this.fareLegRules
+      .stream()
       .filter(f ->
         f
           .fareProducts()
@@ -530,7 +531,7 @@ public class OregonHopFareFactory extends GtfsFareServiceFactory {
       FareProduct.of(
         ctranId("TRIMET_CTRAN_HC_TRANSFER"),
         "TriMet to C-TRAN",
-        Money.max(Money.ZERO_USD, (seniorLarger.minus(seniorSmaller)))
+        Money.max(Money.ZERO_USD, seniorLarger.minus(seniorSmaller))
       )
         .withCategory(CATEGORY_HONOURED_CITIZEN)
         .withMedium(HOP_FASTPASS)

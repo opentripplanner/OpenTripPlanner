@@ -84,9 +84,10 @@ public class SiriFuzzyTripMatcher {
       if (stop == null) {
         throw UpdateException.of(UNKNOWN_STOP);
       }
-      ZonedDateTime arrivalTime = lastCall.getAimedArrivalTime() != null
-        ? lastCall.getAimedArrivalTime()
-        : lastCall.getAimedDepartureTime();
+      ZonedDateTime arrivalTime =
+        lastCall.getAimedArrivalTime() != null
+          ? lastCall.getAimedArrivalTime()
+          : lastCall.getAimedDepartureTime();
 
       if (arrivalTime != null) {
         trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
@@ -209,9 +210,10 @@ public class SiriFuzzyTripMatcher {
         trip.getId(),
         serviceDate
       );
-      TripPattern tripPattern = newTripPatternForModifiedTrip != null
-        ? newTripPatternForModifiedTrip
-        : transitService.findPattern(trip);
+      TripPattern tripPattern =
+        newTripPatternForModifiedTrip != null
+          ? newTripPatternForModifiedTrip
+          : transitService.findPattern(trip);
 
       var firstStop = tripPattern.firstStop();
       var lastStop = tripPattern.lastStop();

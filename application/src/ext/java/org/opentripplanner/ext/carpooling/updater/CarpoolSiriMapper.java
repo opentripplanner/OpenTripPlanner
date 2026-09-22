@@ -20,6 +20,7 @@ import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
+import org.opentripplanner.ext.carpooling.util.BookingUrlTemplate;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -29,6 +30,7 @@ import uk.org.siri.siri21.AimedFlexibleArea;
 import uk.org.siri.siri21.CircularAreaStructure;
 import uk.org.siri.siri21.EstimatedCall;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.SimpleContactStructure;
 
 /**
  * Maps SIRI EstimatedVehicleJourney messages to {@link CarpoolTrip} instances.
@@ -103,8 +105,8 @@ public class CarpoolSiriMapper {
 
     for (int i = 0; i < activeCalls.size(); i++) {
       EstimatedCall call = activeCalls.get(i);
-      boolean isFirst = (i == 0);
-      boolean isLast = (i == activeCalls.size() - 1);
+      boolean isFirst = i == 0;
+      boolean isLast = i == activeCalls.size() - 1;
 
       var stop = buildCarpoolStopForPosition(call, tripId, i, isFirst, isLast);
       stops.add(stop);
@@ -144,9 +146,10 @@ public class CarpoolSiriMapper {
     // trees across the network and degrades every later request. When the destination has no
     // latest expected arrival, its scheduled arrival plus the default deviation budget is used —
     // the same default the destination stop itself receives when the feed omits a latest arrival.
-    var latestArrival = lastStop.getLatestExpectedArrivalTime() != null
-      ? lastStop.getLatestExpectedArrivalTime()
-      : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
+    var latestArrival =
+      lastStop.getLatestExpectedArrivalTime() != null
+        ? lastStop.getLatestExpectedArrivalTime()
+        : endTime.plus(CarpoolStop.DEFAULT_DEVIATION_BUDGET);
     var tripDuration = Duration.between(startTime, latestArrival);
     if (tripDuration.compareTo(CarpoolTrip.MAX_TRIP_DURATION) > 0) {
       throw new IllegalArgumentException(
@@ -189,15 +192,45 @@ public class CarpoolSiriMapper {
 
     var publicContact = journey.getPublicContact();
     if (publicContact != null) {
-      builder.withPublicContactInformation(
-        ContactInfo.of()
-          .withPhoneNumber(publicContact.getPhoneNumber())
-          .withBookingUrl(publicContact.getUrl())
-          .build()
-      );
+      var contactInformation = mapPublicContact(publicContact, tripId);
+      if (contactInformation != null) {
+        builder.withPublicContactInformation(contactInformation);
+      }
     }
 
     return builder.build();
+  }
+
+  /**
+   * Maps the journey's public contact, dropping a booking URL the passenger could not open.
+   *
+   * @return the contact information, or {@code null} if neither channel survives.
+   */
+  @Nullable
+  private static ContactInfo mapPublicContact(SimpleContactStructure publicContact, String tripId) {
+    var phoneNumber = publicContact.getPhoneNumber();
+    var bookingUrl = usableBookingUrl(publicContact.getUrl(), tripId);
+
+    if (phoneNumber == null && bookingUrl == null) {
+      return null;
+    }
+    return ContactInfo.of().withPhoneNumber(phoneNumber).withBookingUrl(bookingUrl).build();
+  }
+
+  /**
+   * Returns the booking URL template, or {@code null} when it would expand to a URL the passenger
+   * cannot open.
+   */
+  @Nullable
+  private static String usableBookingUrl(@Nullable String bookingUrl, String tripId) {
+    if (bookingUrl == null) {
+      return null;
+    }
+    if (!BookingUrlTemplate.isUsable(bookingUrl)) {
+      LOG.info("Trip {}: dropping unusable public contact booking URL '{}'.", tripId, bookingUrl);
+      return null;
+    }
+    return bookingUrl;
   }
 
   /**
@@ -347,9 +380,10 @@ public class CarpoolSiriMapper {
    */
   private Duration extractDeviationBudget(EstimatedCall call) {
     var latestExpected = call.getLatestExpectedArrivalTime();
-    var arrivalTime = call.getExpectedArrivalTime() != null
-      ? call.getExpectedArrivalTime()
-      : call.getAimedArrivalTime();
+    var arrivalTime =
+      call.getExpectedArrivalTime() != null
+        ? call.getExpectedArrivalTime()
+        : call.getAimedArrivalTime();
 
     if (latestExpected == null || arrivalTime == null) {
       return CarpoolStop.DEFAULT_DEVIATION_BUDGET;
@@ -397,9 +431,10 @@ public class CarpoolSiriMapper {
     // Validate intermediate calls are between first and last
     for (int i = 1; i < calls.size() - 1; i++) {
       EstimatedCall intermediateCall = calls.get(i);
-      ZonedDateTime intermediateTime = intermediateCall.getAimedDepartureTime() != null
-        ? intermediateCall.getAimedDepartureTime()
-        : intermediateCall.getAimedArrivalTime();
+      ZonedDateTime intermediateTime =
+        intermediateCall.getAimedDepartureTime() != null
+          ? intermediateCall.getAimedDepartureTime()
+          : intermediateCall.getAimedArrivalTime();
 
       if (intermediateTime == null) {
         LOG.info("Intermediate call at index {} has no timing information", i);
@@ -435,9 +470,10 @@ public class CarpoolSiriMapper {
     var flexibleArea = toFlexibleArea(call);
     var circleLocation = flexibleArea.getCircularArea();
     var legacyGeometry = flexibleArea.getPolygon();
-    var centroid = circleLocation == null
-      ? toWgsCoordinate(toPolygon(legacyGeometry))
-      : toWgsCoordinate(circleLocation);
+    var centroid =
+      circleLocation == null
+        ? toWgsCoordinate(toPolygon(legacyGeometry))
+        : toWgsCoordinate(circleLocation);
 
     return CarpoolStop.of(new FeedScopedId(feedId, id))
       .withCoordinate(centroid)

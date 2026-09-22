@@ -136,11 +136,9 @@ class FlexIndexTest {
 
     var groupStop = (GroupStop) st1.getStop();
     assertThat(groupStop.getChildLocations()).isNotEmpty();
-    groupStop
-      .getChildLocations()
-      .forEach(child -> {
-        assertThat(index.findRoutes(child)).containsExactly(ROUTE_2);
-        assertThat(index.findRoutes(child)).containsExactly(ROUTE_2);
-      });
+    groupStop.getChildLocations().forEach(child -> {
+      assertThat(index.findRoutes(child)).containsExactly(ROUTE_2);
+      assertThat(index.findRoutes(child)).containsExactly(ROUTE_2);
+    });
   }
 }

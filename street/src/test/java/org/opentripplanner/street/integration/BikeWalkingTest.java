@@ -409,7 +409,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
           s.getBackMode() != null && s.isBackWalkingBike() ? "🚲" : "",
           s.getBackMode(),
           s.getTimeDeltaSeconds(),
-          s.getBackEdge() != null ? ((double) Math.round(s.getWeightDelta() * 10)) / 10 : 0.0,
+          s.getBackEdge() != null ? (double) Math.round(s.getWeightDelta() * 10) / 10 : 0.0,
           s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null
         )
       )

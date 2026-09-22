@@ -33,15 +33,13 @@ public class ConfigFileRedactor {
   /** Note that this method destructively modifies the node and its children in place. */
   private static void redactSecretsRecursive(JsonNode node) {
     if (node.isObject()) {
-      node
-        .properties()
-        .forEach(entry -> {
-          if (entry.getValue().isObject() || entry.getValue().isArray()) {
-            redactSecretsRecursive(entry.getValue());
-          } else if (REDACT_KEYS.contains(entry.getKey())) {
-            entry.setValue(new TextNode("********"));
-          }
-        });
+      node.properties().forEach(entry -> {
+        if (entry.getValue().isObject() || entry.getValue().isArray()) {
+          redactSecretsRecursive(entry.getValue());
+        } else if (REDACT_KEYS.contains(entry.getKey())) {
+          entry.setValue(new TextNode("********"));
+        }
+      });
     } else if (node.isArray()) {
       for (JsonNode element : node) {
         redactSecretsRecursive(element);

@@ -105,14 +105,14 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
     if (minNumTransfers > -1) {
       return (
         boardCost +
-        ((boardCost + transferCost) * minNumTransfers) +
-        (TRANSIT_RELUCTANCE * minTravelDuration)
+        (boardCost + transferCost) * minNumTransfers +
+        TRANSIT_RELUCTANCE * minTravelDuration
       );
     } else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method
       return stopBoardAlightTransferCosts == null
-        ? (TRANSIT_RELUCTANCE * minTravelDuration)
-        : (TRANSIT_RELUCTANCE * minTravelDuration) - stopBoardAlightTransferCosts[fromStopIndex];
+        ? TRANSIT_RELUCTANCE * minTravelDuration
+        : TRANSIT_RELUCTANCE * minTravelDuration - stopBoardAlightTransferCosts[fromStopIndex];
     }
   }
 
@@ -146,7 +146,7 @@ public final class TestCostCalculator implements RaptorCostCalculator<TestTripSc
 
     int cost = waitFactor * boardWaitTime;
 
-    cost += firstBoarding ? boardCost : (boardCost + transferCost);
+    cost += firstBoarding ? boardCost : boardCost + transferCost;
 
     // If it's first boarding event then it is not a transfer
     if (stopBoardAlightTransferCosts != null && !firstBoarding) {

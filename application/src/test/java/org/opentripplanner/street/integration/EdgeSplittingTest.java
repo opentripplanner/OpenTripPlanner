@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.linearref.LinearLocation;
@@ -25,7 +24,6 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.internal.notes.StreetNotesService;
 import org.opentripplanner.street.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetModelForTest;
@@ -33,7 +31,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
-import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -236,13 +233,6 @@ public class EdgeSplittingTest {
     turns.add(left);
     turns.add(leftBack);
 
-    StreetNote alert = new StreetNote("This is the alert");
-    Set<StreetNote> alerts = new HashSet<>();
-    alerts.add(alert);
-
-    graph.streetNotesService.addStaticNote(left, alert, StreetNotesService.ALWAYS_MATCHER);
-    graph.streetNotesService.addStaticNote(leftBack, alert, StreetNotesService.ALWAYS_MATCHER);
-
     TemporaryStreetLocation start = StreetModelForTest.createTemporaryStreetLocationForTest(
       new NonLocalizedString("start"),
       filter(turns, StreetEdge.class),
@@ -262,27 +252,8 @@ public class EdgeSplittingTest {
       }
     }
 
-    assertEquals(alerts, graph.streetNotesService.getNotes(traversedOne));
     assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
     assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
-
-    // now, make sure wheelchair alerts are preserved
-    StreetNote wheelchairAlert = new StreetNote("This is the wheelchair alert");
-    Set<StreetNote> wheelchairAlerts = new HashSet<>();
-    wheelchairAlerts.add(wheelchairAlert);
-
-    graph.streetNotesService.removeStaticNotes(left);
-    graph.streetNotesService.removeStaticNotes(leftBack);
-    graph.streetNotesService.addStaticNote(
-      left,
-      wheelchairAlert,
-      StreetNotesService.WHEELCHAIR_MATCHER
-    );
-    graph.streetNotesService.addStaticNote(
-      leftBack,
-      wheelchairAlert,
-      StreetNotesService.WHEELCHAIR_MATCHER
-    );
 
     req.withWheelchairEnabled(true);
 
@@ -302,7 +273,6 @@ public class EdgeSplittingTest {
       }
     }
 
-    assertEquals(wheelchairAlerts, graph.streetNotesService.getNotes(traversedOne));
     assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
     assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
   }

@@ -9,7 +9,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  */
 public class ForwardTransitCalculator<T extends RaptorTripSchedule>
   extends ForwardTimeCalculator
-  implements TransitCalculator<T> {
+  implements TransitCalculator<T>
+{
 
   public ForwardTransitCalculator() {}
 

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
+import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
 import org.opentripplanner.osm.model.OsmMemberType;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmNodeBuilder;

@@ -193,13 +193,11 @@ class DefaultForwardsDelayInterpolatorTest {
     assertTrue(interpolator.interpolateDelay(builder));
 
     // NO_DATA should be propagated forward
-    builder
-      .listStopPositions()
-      .forEach(i -> {
-        assertEquals(0, builder.getArrivalDelay(i));
-        assertEquals(0, builder.getDepartureDelay(i));
-        assertEquals(NO_DATA, builder.getStopRealTimeState(i));
-      });
+    builder.listStopPositions().forEach(i -> {
+      assertEquals(0, builder.getArrivalDelay(i));
+      assertEquals(0, builder.getDepartureDelay(i));
+      assertEquals(NO_DATA, builder.getStopRealTimeState(i));
+    });
     assertNotNull(builder.build());
   }
 

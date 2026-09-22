@@ -491,12 +491,14 @@ public class EnumTypes {
     .value("funicular", TransitMode.FUNICULAR)
     .value("lift", TransitMode.GONDOLA)
     .value("rail", TransitMode.RAIL)
+    .value("snowAndIce", TransitMode.SNOW_AND_ICE)
     .value("metro", TransitMode.SUBWAY)
     .value("taxi", TransitMode.TAXI)
     .value("tram", TransitMode.TRAM)
     .value("trolleybus", TransitMode.TROLLEYBUS)
     .value("monorail", TransitMode.MONORAIL)
     .value("coach", TransitMode.COACH)
+    .value("carpool", TransitMode.CARPOOL)
     .value("unknown", "unknown")
     .build();
 
@@ -506,14 +508,15 @@ public class EnumTypes {
     TransmodelTransportSubmode::getValue
   );
 
-  public static final GraphQLEnumType VERTEX_TYPE = GraphQLEnumType.newEnum()
-    .name("VertexType")
-    .value("normal", VertexType.NORMAL)
-    .value("transit", VertexType.TRANSIT)
-    .value("bikePark", VertexType.VEHICLEPARKING)
-    .value("bikeShare", VertexType.VEHICLERENTAL)
-    //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
-    .build();
+  public static final GraphQLEnumType VERTEX_TYPE =
+    GraphQLEnumType.newEnum()
+      .name("VertexType")
+      .value("normal", VertexType.NORMAL)
+      .value("transit", VertexType.TRANSIT)
+      .value("bikePark", VertexType.VEHICLEPARKING)
+      .value("bikeShare", VertexType.VEHICLERENTAL)
+      //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
+      .build();
 
   public static final GraphQLEnumType VIA_LOCATION_TYPE = GraphQLEnumType.newEnum()
     .name("ViaLocationType")

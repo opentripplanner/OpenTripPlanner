@@ -75,7 +75,9 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     i2 = newItinerary(A).bus(21, T11_06, T11_09, E).build();
 
     // Not optimal, departure is very late
-    i3 = newItinerary(A).bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1_m, E).build();
+    i3 = newItinerary(A)
+      .bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1_m, E)
+      .build();
   }
 
   @Test
@@ -279,7 +281,9 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     // group these and flag any of them for deletion, because the 24h difference means they are
     // different TripOnServiceDate. This situation commonly arises with multi-day ferry routes,
     // such as the ones along the Norwegian cost.
-    var day1 = newItinerary(A).bus(TRIP_ID, T11_00, T11_00 + D50_h, B, date1).build(COST);
+    var day1 = newItinerary(A)
+      .bus(TRIP_ID, T11_00, T11_00 + D50_h, B, date1)
+      .build(COST);
     var day2 = newItinerary(A)
       .bus(TRIP_ID, T11_00 + D24_h, T11_00 + D24_h + D50_h, B, date2)
       .build(COST);

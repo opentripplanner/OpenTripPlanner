@@ -161,10 +161,8 @@ public final class StopTimeUpdate {
   }
 
   public Optional<I18NString> stopHeadsign() {
-    return (
-        stopTimeUpdate.hasStopTimeProperties() &&
-        stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
-      )
+    return stopTimeUpdate.hasStopTimeProperties() &&
+      stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
       ? Optional.of(I18NString.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign()))
       : Optional.empty();
   }
@@ -200,9 +198,7 @@ public final class StopTimeUpdate {
       : Optional.empty();
   }
 
-  private Optional<
-    MfdzRealtimeExtensions.StopTimePropertiesExtension
-  > stopTimePropertiesExtension() {
+  private Optional<MfdzRealtimeExtensions.StopTimePropertiesExtension> stopTimePropertiesExtension() {
     return stopTimeProperties().map(stopTimeProperties ->
       stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
         ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)

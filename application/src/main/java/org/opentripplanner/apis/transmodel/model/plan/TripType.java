@@ -73,7 +73,8 @@ public class TripType {
           .deprecate("Use routingErrors instead")
           .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
           .dataFetcher(env ->
-            ((PlanResponse) env.getSource()).messages()
+            ((PlanResponse) env.getSource())
+              .messages()
               .stream()
               .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
               .map(Enum::name)
@@ -91,7 +92,8 @@ public class TripType {
             GraphQLArgument.newArgument().name("language").type(Scalars.GraphQLString).build()
           )
           .dataFetcher(env ->
-            ((PlanResponse) env.getSource()).messages()
+            ((PlanResponse) env.getSource())
+              .messages()
               .stream()
               .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
               .map(message -> message.get(GraphQLUtils.getLocale(env)))

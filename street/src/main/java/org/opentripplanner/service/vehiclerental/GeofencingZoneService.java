@@ -30,6 +30,11 @@ public interface GeofencingZoneService {
     }
 
     @Override
+    public Set<GeofencingZone> findZonesContaining(Coordinate coord, String network) {
+      return Set.of();
+    }
+
+    @Override
     public Set<GeofencingZone> listZones() {
       return Set.of();
     }
@@ -37,6 +42,13 @@ public interface GeofencingZoneService {
 
   /** All registered zones (across all networks) that contain the given coordinate. */
   Set<GeofencingZone> findZonesContaining(Coordinate coord);
+
+  /**
+   * The zones of one network that contain the given coordinate. Equivalent to filtering
+   * {@link #findZonesContaining(Coordinate)} by feed id, since a network's index and its zones
+   * share that id, but it queries one index instead of every registered one.
+   */
+  Set<GeofencingZone> findZonesContaining(Coordinate coord, String network);
 
   /**
    * Whether any network has registered a zone index. Cheap short-circuit for callers that

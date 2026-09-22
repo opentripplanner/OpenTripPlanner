@@ -192,8 +192,7 @@ public class FlexDirectPathFactory {
           flexVertex,
           accessTemplate.boardStopPosition,
           accessTemplate.alightStopPosition
-        ) !=
-        null
+        ) != null
       );
     }
   }

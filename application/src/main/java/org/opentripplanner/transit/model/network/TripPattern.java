@@ -60,7 +60,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  */
 public final class TripPattern
   extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
-  implements Cloneable, LogInfo {
+  implements Cloneable, LogInfo
+{
 
   private final Route route;
 
@@ -349,7 +350,7 @@ public final class TripPattern
 
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopPos) {
-    return (stopPattern.getStop(stopPos).getWheelchairAccessibility() == Accessibility.POSSIBLE);
+    return stopPattern.getStop(stopPos).getWheelchairAccessibility() == Accessibility.POSSIBLE;
   }
 
   public PickDrop getAlightType(int stopPos) {

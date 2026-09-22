@@ -7,6 +7,8 @@ import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.api.request.TransitAlertRequest;
+import org.opentripplanner.transit.model.filter.transit.TransitAlertMatcherFactory;
 import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
@@ -31,6 +33,18 @@ public interface TransitAlertService {
   void setAlerts(Collection<TransitAlert> alerts);
 
   Collection<TransitAlert> getAllAlerts();
+
+  /**
+   * Returns all alerts matching the given request. A request without filters matches all alerts.
+   */
+  default Collection<TransitAlert> findAlerts(TransitAlertRequest request) {
+    var alerts = getAllAlerts();
+    if (request.filters().isEmpty()) {
+      return alerts;
+    }
+    var matcher = TransitAlertMatcherFactory.of(request);
+    return alerts.stream().filter(matcher::match).toList();
+  }
 
   TransitAlert getAlertById(FeedScopedId id);
 

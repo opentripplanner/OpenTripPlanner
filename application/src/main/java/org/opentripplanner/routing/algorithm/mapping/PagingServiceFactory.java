@@ -26,7 +26,9 @@ public class PagingServiceFactory {
       transitTuningParameters.pagingSearchWindowAdjustments(),
       // The dynamic search-window is not the same as requested search-window, but in lack
       // of a something else we use the raptor dynamic min here.
-      raptorTuningParameters.dynamicSearchWindowCoefficients().minWindow(),
+      raptorTuningParameters
+        .dynamicSearchWindowCoefficients()
+        .minWindow(),
       transitTuningParameters.maxSearchWindow(),
       searchWindowOf(raptorSearchParamsUsed),
       edt(searchStartTime, raptorSearchParamsUsed),

@@ -124,23 +124,21 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         return List.of();
       }
       Leg leg = getSource(environment);
-      return loader
-        .load(itinerary)
-        .thenApply(fare -> {
-          if (fare == null || fare.isEmpty()) {
-            return List.<FareOffer>of();
-          }
-          var legOffers = new ArrayList<>(fare.getLegProducts().get(leg));
-          // Itinerary-level products (e.g. day passes) only apply to transit legs
-          var itineraryOffers = leg.isTransitLeg()
-            ? fare
-                .getItineraryProducts()
-                .stream()
-                .map(fp -> FareOffer.of(itinerary.legs().getFirst().startTime(), fp))
-                .toList()
-            : List.<FareOffer>of();
-          return (Iterable<FareOffer>) ListUtils.combine(itineraryOffers, legOffers);
-        });
+      return loader.load(itinerary).thenApply(fare -> {
+        if (fare == null || fare.isEmpty()) {
+          return List.<FareOffer>of();
+        }
+        var legOffers = new ArrayList<>(fare.getLegProducts().get(leg));
+        // Itinerary-level products (e.g. day passes) only apply to transit legs
+        var itineraryOffers = leg.isTransitLeg()
+          ? fare
+              .getItineraryProducts()
+              .stream()
+              .map(fp -> FareOffer.of(itinerary.legs().getFirst().startTime(), fp))
+              .toList()
+          : List.<FareOffer>of();
+        return (Iterable<FareOffer>) ListUtils.combine(itineraryOffers, legOffers);
+      });
     };
     return (DataFetcher<Iterable<FareOffer>>) fetcher;
   }
@@ -376,19 +374,19 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
-          !(originModesWithParentStation
-              .stream()
-              .map(GraphQLTypes.GraphQLTransitMode::toString)
-              .toList()
-              .contains(originalLeg.mode().name()));
+          !originModesWithParentStation
+            .stream()
+            .map(GraphQLTypes.GraphQLTransitMode::toString)
+            .toList()
+            .contains(originalLeg.mode().name());
 
         boolean limitToExactDestinationStop =
           destinationModesWithParentStation == null ||
-          !(destinationModesWithParentStation
-              .stream()
-              .map(GraphQLTypes.GraphQLTransitMode::toString)
-              .toList()
-              .contains(originalLeg.mode().name()));
+          !destinationModesWithParentStation
+            .stream()
+            .map(GraphQLTypes.GraphQLTransitMode::toString)
+            .toList()
+            .contains(originalLeg.mode().name());
 
         var res = AlternativeLegs.getAlternativeLegs(
           environment.getSource(),

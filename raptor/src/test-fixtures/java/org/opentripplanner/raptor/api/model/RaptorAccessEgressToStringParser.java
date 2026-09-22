@@ -90,7 +90,7 @@ public final class RaptorAccessEgressToStringParser {
       throw new IllegalArgumentException("'" + input + "' does not match :/" + PARSE_INPUT + "'");
     }
     var stopValue = m.group(4);
-    this.stopIndex = (stopValue.matches("\\d+"))
+    this.stopIndex = stopValue.matches("\\d+")
       ? Integer.parseInt(stopValue)
       : stopIndexResolver.applyAsInt(stopValue);
 

@@ -42,8 +42,8 @@ import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
-  extends TransitCalculator<T> {
+public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
+  TransitCalculator<T> {
   /**
    * Return a calculator for test purpose. The following parameters are fixed:
    * <ul>

@@ -77,7 +77,7 @@ public class VehicleParkingFilter implements Serializable {
       return false;
     }
     VehicleParkingFilter that = (VehicleParkingFilter) o;
-    return (Arrays.equals(not, that.not) && Arrays.equals(select, that.select));
+    return Arrays.equals(not, that.not) && Arrays.equals(select, that.select);
   }
 
   @Override

@@ -13,8 +13,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-class CalculateTransferToDestination<T extends RaptorTripSchedule>
-  implements ParetoSetEventListener<ArrivalView<T>> {
+class CalculateTransferToDestination<T extends RaptorTripSchedule> implements
+  ParetoSetEventListener<ArrivalView<T>> {
 
   private final List<RaptorAccessEgress> egressPaths;
   private final DestinationArrivalPaths<T> destinationArrivals;

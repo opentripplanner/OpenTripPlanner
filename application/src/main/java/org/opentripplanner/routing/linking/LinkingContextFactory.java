@@ -139,9 +139,10 @@ public class LinkingContextFactory {
     if (from == null) {
       return Set.of();
     }
-    var modes = request.accessMode() != StreetMode.NOT_SET
-      ? EnumSet.of(request.accessMode())
-      : EnumSet.noneOf(StreetMode.class);
+    var modes =
+      request.accessMode() != StreetMode.NOT_SET
+        ? EnumSet.of(request.accessMode())
+        : EnumSet.noneOf(StreetMode.class);
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }
@@ -156,9 +157,10 @@ public class LinkingContextFactory {
     if (to == null) {
       return Set.of();
     }
-    var modes = request.egressMode() != StreetMode.NOT_SET
-      ? EnumSet.of(request.egressMode())
-      : EnumSet.noneOf(StreetMode.class);
+    var modes =
+      request.egressMode() != StreetMode.NOT_SET
+        ? EnumSet.of(request.egressMode())
+        : EnumSet.noneOf(StreetMode.class);
     if (request.directMode() != StreetMode.NOT_SET) {
       modes.add(request.directMode());
     }

@@ -729,8 +729,9 @@ public class DefaultTransitService implements TransitService {
       .getSiteRepository()
       .findRegularStops(request.envelope());
 
-    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(request, stop ->
-      !findPatterns(stop, true).isEmpty()
+    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
+      request,
+      stop -> !findPatterns(stop, true).isEmpty()
     );
     return stops.stream().filter(matcher::match).toList();
   }

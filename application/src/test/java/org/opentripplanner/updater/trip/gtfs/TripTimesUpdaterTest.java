@@ -1110,7 +1110,7 @@ public class TripTimesUpdaterTest {
 
     assertInstanceOf(RealTimeTripTimes.class, p.tripTimes());
     assertTrue(p.tripTimes().getVehicleId().isPresent());
-    assertEquals("BUS-42", p.tripTimes().getVehicleId().get());
+    assertEquals(new FeedScopedId(feedId, "BUS-42"), p.tripTimes().getVehicleId().get());
   }
 
   @Test

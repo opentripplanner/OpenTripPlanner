@@ -13,7 +13,6 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -53,20 +52,21 @@ class OjpToTriasTransformer {
     }
   }
 
+  /**
+   * Converts a TRIAS request received from a client into an OJP object.
+   * <p>
+   * The input is untrusted, so it is read with {@link SecureXml}: a document type declaration is
+   * rejected rather than resolved, which is what keeps this method from reading local files and
+   * making requests to internal services on behalf of the caller.
+   */
   static OJP triasToOjp(String trias) throws JAXBException, TransformerException {
-    var xmlSource = new StreamSource(
-      new ByteArrayInputStream(trias.getBytes(StandardCharsets.UTF_8))
-    );
-
     var transformer = TRIAS_TO_OJP_TEMPLATE.newTransformer();
     var writer = new ByteArrayOutputStream();
-    transformer.transform(xmlSource, new StreamResult(writer));
+    transformer.transform(SecureXml.source(trias), new StreamResult(writer));
     var transformedXml = writer.toString(StandardCharsets.UTF_8);
 
     var unmarshaller = CONTEXT.createUnmarshaller();
-    return (OJP) unmarshaller.unmarshal(
-      new ByteArrayInputStream(transformedXml.getBytes(StandardCharsets.UTF_8))
-    );
+    return (OJP) unmarshaller.unmarshal(SecureXml.source(transformedXml));
   }
 
   static void ojpToTrias(Writer writer, StreamSource xmlSource)
@@ -80,8 +80,7 @@ class OjpToTriasTransformer {
     try {
       var xslt = OjpToTriasTransformer.class.getResource(name).openStream();
       var xsltSource = new StreamSource(xslt);
-      TransformerFactory factory = TransformerFactory.newInstance();
-      return factory.newTemplates(xsltSource);
+      return SecureXml.transformerFactory().newTemplates(xsltSource);
     } catch (TransformerConfigurationException | IOException e) {
       throw new RuntimeException(e);
     }

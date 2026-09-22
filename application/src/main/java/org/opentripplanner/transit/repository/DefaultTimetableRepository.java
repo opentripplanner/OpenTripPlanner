@@ -26,7 +26,6 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
@@ -439,7 +438,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
     return createSnapshot();
   }
 
-  public @NonNull DefaultTimetableRepository createSnapshot() {
+  public DefaultTimetableRepository createSnapshot() {
     RaptorTransitData updatedRaptorData = timetableUpdateMapper.map(
       realtimeRaptorTransitData,
       dirtyTimetables.values(),
@@ -656,8 +655,9 @@ public class DefaultTimetableRepository implements TimetableRepository {
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     validateNotReadOnly();
-    return tripCalendars.getOrCreateServiceIdForDate(serviceDate, updated ->
-      this.tripCalendars = updated
+    return tripCalendars.getOrCreateServiceIdForDate(
+      serviceDate,
+      updated -> this.tripCalendars = updated
     );
   }
 
@@ -812,15 +812,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
       .values()
       .stream()
       .flatMap(timetables ->
-        timetables
-          .stream()
-          .flatMap(timetable ->
-            timetable
-              .getTripTimes()
-              .stream()
-              .filter(filter)
-              .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
-          )
+        timetables.stream().flatMap(timetable ->
+          timetable
+            .getTripTimes()
+            .stream()
+            .filter(filter)
+            .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
+        )
       )
       .collect(Collectors.toCollection(ArrayList::new));
   }

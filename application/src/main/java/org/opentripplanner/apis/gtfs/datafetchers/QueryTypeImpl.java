@@ -1,8 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import static org.opentripplanner.apis.gtfs.mapping.AlertCauseMapper.getGraphQLCause;
-import static org.opentripplanner.apis.gtfs.mapping.AlertEffectMapper.getGraphQLEffect;
-import static org.opentripplanner.apis.gtfs.mapping.SeverityMapper.getGraphQLSeverity;
+import static org.opentripplanner.apis.gtfs.support.filter.AlertsFilter.filterAlerts;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimaps;
@@ -32,11 +30,13 @@ import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
+import org.opentripplanner.apis.gtfs.mapping.AlertsConnectionFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.CanceledTripsFilterMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.LegacyRouteRequestMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapper;
 import org.opentripplanner.apis.gtfs.model.CanceledTripsSummary;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
+import org.opentripplanner.apis.gtfs.support.sort.AlertsConnectionOrdering;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -56,7 +56,6 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.api.PatternAtStop;
 import org.opentripplanner.place.api.PlaceAtDistance;
 import org.opentripplanner.place.api.PlaceType;
-import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -114,6 +113,18 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       Collection<TransitAlert> alerts = getTransitAlertService(environment).getAllAlerts();
       var args = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(environment.getArguments());
       return filterAlerts(alerts, args);
+    };
+  }
+
+  @Override
+  public DataFetcher<CountedConnection<TransitAlert>> alertsConnection() {
+    return environment -> {
+      var args = new GraphQLTypes.GraphQLQueryTypeAlertsConnectionArgs(environment.getArguments());
+      var request = AlertsConnectionFilterMapper.map(args.getGraphQLFilters());
+      var alerts = getTransitAlertService(environment).findAlerts(request);
+      return new SimpleCountedListConnection<>(AlertsConnectionOrdering.sort(alerts)).get(
+        environment
+      );
     };
   }
 
@@ -310,35 +321,40 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       GraphQLTypes.GraphQLInputFiltersInput filterByIds = args.getGraphQLFilterByIds();
 
       if (filterByIds != null) {
-        filterByStops = filterByIds.getGraphQLStops() != null
-          ? FeedScopedId.parse(filterByIds.getGraphQLStops())
-          : null;
-        filterByStations = filterByIds.getGraphQLStations() != null
-          ? FeedScopedId.parse(filterByIds.getGraphQLStations())
-          : null;
-        filterByRoutes = filterByIds.getGraphQLRoutes() != null
-          ? FeedScopedId.parse(filterByIds.getGraphQLRoutes())
-          : null;
+        filterByStops =
+          filterByIds.getGraphQLStops() != null
+            ? FeedScopedId.parse(filterByIds.getGraphQLStops())
+            : null;
+        filterByStations =
+          filterByIds.getGraphQLStations() != null
+            ? FeedScopedId.parse(filterByIds.getGraphQLStations())
+            : null;
+        filterByRoutes =
+          filterByIds.getGraphQLRoutes() != null
+            ? FeedScopedId.parse(filterByIds.getGraphQLRoutes())
+            : null;
         filterByBikeRentalStations = filterByIds.getGraphQLBikeRentalStations();
       }
 
-      List<TransitMode> filterByModes = args.getGraphQLFilterByModes() != null
-        ? args
-            .getGraphQLFilterByModes()
-            .stream()
-            .map(mode -> {
-              try {
-                return TransitMode.valueOf(mode.name());
-              } catch (IllegalArgumentException ignored) {
-                return null;
-              }
-            })
-            .filter(Objects::nonNull)
-            .toList()
-        : null;
-      List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
-        ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
-        : DEFAULT_PLACE_TYPES;
+      List<TransitMode> filterByModes =
+        args.getGraphQLFilterByModes() != null
+          ? args
+              .getGraphQLFilterByModes()
+              .stream()
+              .map(mode -> {
+                try {
+                  return TransitMode.valueOf(mode.name());
+                } catch (IllegalArgumentException ignored) {
+                  return null;
+                }
+              })
+              .filter(Objects::nonNull)
+              .toList()
+          : null;
+      List<PlaceType> filterByPlaceTypes =
+        args.getGraphQLFilterByPlaceTypes() != null
+          ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
+          : DEFAULT_PLACE_TYPES;
       List<String> filterByNetwork = args.getGraphQLFilterByNetwork();
 
       List<PlaceAtDistance> places;
@@ -794,9 +810,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
       var fareService = getFareService(environment);
-      Map<FareType, Collection<FareRuleSet>> fareRules = fareService instanceof GtfsFaresService
-        ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
-        : ((DefaultFareService) fareService).getFareRulesPerType();
+      Map<FareType, Collection<FareRuleSet>> fareRules =
+        fareService instanceof GtfsFaresService
+          ? ((GtfsFaresService) fareService).faresV1().getFareRulesPerType()
+          : ((DefaultFareService) fareService).getFareRulesPerType();
 
       return fareRules
         .entrySet()
@@ -1023,48 +1040,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       .data(res)
       .localContext(Map.of("locale", request.preferences().locale()))
       .build();
-  }
-
-  protected static List<TransitAlert> filterAlerts(
-    Collection<TransitAlert> alerts,
-    GraphQLTypes.GraphQLQueryTypeAlertsArgs args
-  ) {
-    var severities = args.getGraphQLSeverityLevel();
-    var effects = args.getGraphQLEffect();
-    var causes = args.getGraphQLCause();
-    return alerts
-      .stream()
-      .filter(
-        alert ->
-          args.getGraphQLFeeds() == null ||
-          args.getGraphQLFeeds().contains(alert.getId().getFeedId())
-      )
-      .filter(
-        alert -> severities == null || severities.contains(getGraphQLSeverity(alert.severity()))
-      )
-      .filter(alert -> effects == null || effects.contains(getGraphQLEffect(alert.effect())))
-      .filter(alert -> causes == null || causes.contains(getGraphQLCause(alert.cause())))
-      .filter(
-        alert ->
-          args.getGraphQLRoute() == null ||
-          alert
-            .entities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
-            .map(EntitySelector.Route.class::cast)
-            .anyMatch(route -> args.getGraphQLRoute().contains(route.routeId().toString()))
-      )
-      .filter(
-        alert ->
-          args.getGraphQLStop() == null ||
-          alert
-            .entities()
-            .stream()
-            .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
-            .map(EntitySelector.Stop.class::cast)
-            .anyMatch(stop -> args.getGraphQLStop().contains(stop.stopId().toString()))
-      )
-      .toList();
   }
 
   /// Parse a string as a feed scoped id and apply a mapping function to the id.

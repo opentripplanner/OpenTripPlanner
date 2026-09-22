@@ -17,11 +17,11 @@ import org.opentripplanner.utils.time.OffsetDateTimeParser;
 public final class DateTimeScalarFactory {
 
   private static final String DOCUMENTATION = """
-    DateTime format accepting ISO 8601 dates with time zone offset.
+  DateTime format accepting ISO 8601 dates with time zone offset.
 
-    Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`
+  Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`
 
-    Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`""";
+  Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`""";
 
   private static final DateTimeFormatter PARSER = OffsetDateTimeParser.LENIENT_PARSER;
 

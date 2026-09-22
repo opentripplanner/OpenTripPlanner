@@ -49,7 +49,7 @@ public class DurationUtilsTest {
     assertEquals("-13h33m57s", DurationUtils.durationToStr(timeSeconds2));
     int timeSeconds1 = -I9h31m;
     assertEquals("-9h31m", DurationUtils.durationToStr(timeSeconds1));
-    int timeSeconds = -(int) D9s.toSeconds();
+    int timeSeconds = -((int) D9s.toSeconds());
     assertEquals("-9s", DurationUtils.durationToStr(timeSeconds));
 
     int notSet = 999_999;

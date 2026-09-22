@@ -16,7 +16,8 @@ import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
  * to individual feed's TTL rules.
  */
 public class GbfsFeedLoader
-  extends GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details> {
+  extends GbfsFeedLoaderImpl<GBFSFeed.Name, GbfsFeedLoader.GBFSFeedV30Details>
+{
 
   /**
    * Sets up updaters for the feeds listed in the auto-configuration file.

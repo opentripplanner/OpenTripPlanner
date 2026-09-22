@@ -94,17 +94,13 @@ public class TransitRepositoryTestBuilder {
     }
     transitRepository.updateCalendarServiceData(calendarServiceData);
 
-    transitRepository
-      .getAllTripPatterns()
-      .forEach(pattern -> {
-        pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
-      });
+    transitRepository.getAllTripPatterns().forEach(pattern -> {
+      pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
+    });
 
-    transitRepository
-      .getAllTripPatterns()
-      .forEach(pattern -> {
-        pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
-      });
+    transitRepository.getAllTripPatterns().forEach(pattern -> {
+      pattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
+    });
 
     transitRepository.addScheduledStopPointMapping(scheduledStopPointMapping);
 
@@ -150,7 +146,9 @@ public class TransitRepositoryTestBuilder {
   }
 
   public Operator operator(String operatorId) {
-    var operator = Operator.of(id(operatorId)).withName(operatorId + " name").build();
+    var operator = Operator.of(id(operatorId))
+      .withName(operatorId + " name")
+      .build();
     operators.add(operator);
     return operator;
   }

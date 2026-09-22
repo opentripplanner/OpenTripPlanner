@@ -55,7 +55,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  */
 public class CarpoolTrip
   extends AbstractTransitEntity<CarpoolTrip, CarpoolTripBuilder>
-  implements LogInfo {
+  implements LogInfo
+{
 
   /** Default total capacity (including driver) when no capacity information is provided. */
   public static final int DEFAULT_TOTAL_CAPACITY = 5;

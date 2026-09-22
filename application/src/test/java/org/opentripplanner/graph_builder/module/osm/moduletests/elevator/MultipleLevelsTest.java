@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
@@ -169,7 +170,10 @@ class MultipleLevelsTest {
 
     assertEquals(expectedEdgeSet, actualEdgeSet);
     int streetEdgeCount = 8;
-    assertEquals(expectedEdgeSet.size() + streetEdgeCount, graph.listEdges().size());
+    assertEquals(
+      expectedEdgeSet.size() + streetEdgeCount,
+      ListUtils.countIterable(graph.listEdges())
+    );
 
     ListUtils.ofIterable(graph.findEdges(ElevatorHopEdge.class))
       .stream()
@@ -214,17 +218,10 @@ class MultipleLevelsTest {
     addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorHopVertex2);
     addElevatorHopEdges(elevatorHopVertex1, elevatorHopVertex2, 2.5, edgeSet, null);
 
-    assertEquals(
-      edgeSet,
-      new HashSet<>(
-        graph
-          .listEdges()
-          .stream()
-          .map(edge -> convertEdgeToVertexLabelString(edge))
-          .toList()
-      )
+    var result = StreamSupport.stream(graph.listEdges().spliterator(), false).map(e ->
+      convertEdgeToVertexLabelString(e)
     );
-    assertEquals(edgeSet.size(), graph.listEdges().size());
+    assertThat(result).containsExactlyElementsIn(edgeSet);
   }
 
   @Test
@@ -257,17 +254,10 @@ class MultipleLevelsTest {
     addElevatorBoardAndAlightEdges(edgeSet, osmVertex2, elevatorHopVertex2);
     addElevatorHopEdges(elevatorHopVertex1, elevatorHopVertex2, 0, edgeSet, null);
 
-    assertEquals(
-      edgeSet,
-      new HashSet<>(
-        graph
-          .listEdges()
-          .stream()
-          .map(edge -> convertEdgeToVertexLabelString(edge))
-          .toList()
-      )
+    var result = StreamSupport.stream(graph.listEdges().spliterator(), false).map(e ->
+      convertEdgeToVertexLabelString(e)
     );
-    assertEquals(edgeSet.size(), graph.listEdges().size());
+    assertThat(result).containsExactlyElementsIn(edgeSet);
   }
 
   private void addElevatorBoardAndAlightEdges(

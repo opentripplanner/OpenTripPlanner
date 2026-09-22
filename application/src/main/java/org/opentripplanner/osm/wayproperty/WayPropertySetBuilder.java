@@ -10,7 +10,6 @@ import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.OsmSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.note.StreetNoteMatcher;
 
 public class WayPropertySetBuilder {
 
@@ -21,7 +20,6 @@ public class WayPropertySetBuilder {
   final List<CreativeNamerPicker> creativeNamers = new ArrayList<>();
   final List<SlopeOverridePicker> slopeOverrides = new ArrayList<>();
   final List<SpeedPicker> speedPickers = new ArrayList<>();
-  final List<NotePicker> notes = new ArrayList<>();
   final List<MixinProperties> mixins = new ArrayList<>();
   FunctionUtils.TriFunction<
     StreetTraversalPermission,
@@ -61,10 +59,6 @@ public class WayPropertySetBuilder {
     creativeNamers.add(new CreativeNamerPicker(spec, namer));
   }
 
-  public void addNote(OsmSpecifier osmSpecifier, NoteProperties properties) {
-    notes.add(new NotePicker(osmSpecifier, properties));
-  }
-
   public void setSlopeOverride(OsmSpecifier spec, boolean override) {
     slopeOverrides.add(new SlopeOverridePicker(spec, override));
   }
@@ -76,12 +70,6 @@ public class WayPropertySetBuilder {
   public void createNames(String spec, String patternKey) {
     CreativeNamer namer = new CreativeNamer(patternKey);
     addCreativeNamer(new BestMatchSpecifier(spec), namer);
-  }
-
-  public void createNotes(String spec, String patternKey, StreetNoteMatcher matcher) {
-    // TODO: notes aren't localized
-    NoteProperties properties = new NoteProperties(patternKey, matcher);
-    addNote(new BestMatchSpecifier(spec), properties);
   }
 
   public void setDefaultWalkSafetyForPermission(
@@ -182,7 +170,6 @@ public class WayPropertySetBuilder {
     this.creativeNamers.addAll(other.listCreativeNamers());
     this.slopeOverrides.addAll(other.listSlopeOverrides());
     this.speedPickers.addAll(other.listSpeedPickers());
-    this.notes.addAll(other.listNotes());
     this.mixins.addAll(other.listMixins());
     return this;
   }

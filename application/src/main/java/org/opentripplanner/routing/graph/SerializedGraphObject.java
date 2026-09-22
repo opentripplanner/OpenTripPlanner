@@ -41,6 +41,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -114,7 +115,7 @@ public class SerializedGraphObject implements Serializable {
     FareServiceFactory fareServiceFactory
   ) {
     this.graph = graph;
-    this.edges = graph.listEdges();
+    this.edges = ListUtils.ofIterable(graph.listEdges());
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;

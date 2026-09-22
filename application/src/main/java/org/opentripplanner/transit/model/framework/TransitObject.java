@@ -2,8 +2,10 @@ package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
 
-public interface TransitObject<E extends TransitObject<E, T>, T extends TransitBuilder<E, T>>
-  extends Serializable {
+public interface TransitObject<
+  E extends TransitObject<E, T>,
+  T extends TransitBuilder<E, T>
+> extends Serializable {
   /**
    * Return {@code true} if this is the same as the given other objects, all fields must have
    * the same value. This is used to avoid creating new objects during transit model construction

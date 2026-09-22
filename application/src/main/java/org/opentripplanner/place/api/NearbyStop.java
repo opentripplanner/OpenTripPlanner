@@ -63,9 +63,9 @@ public class NearbyStop implements Comparable<NearbyStop> {
     }
 
     if (this.state != null) {
-      return (int) (this.state.getWeight()) - (int) (that.state.getWeight());
+      return (int) this.state.getWeight() - (int) that.state.getWeight();
     }
-    return (int) (this.distance) - (int) (that.distance);
+    return (int) this.distance - (int) that.distance;
   }
 
   /**

@@ -19,8 +19,10 @@ import org.slf4j.LoggerFactory;
  * Base class for managing the state and loading of complete GBFS datasets, and updating them
  * according to individual feed's TTL rules.
  */
-public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
-  implements GbfsFeedLoader {
+public abstract class GbfsFeedLoaderImpl<
+  N,
+  F extends GbfsFeedDetails<N>
+> implements GbfsFeedLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFeedLoaderImpl.class);
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -191,11 +193,12 @@ public abstract class GbfsFeedLoaderImpl<N, F extends GbfsFeedDetails<N>>
         // Fetch lastUpdated and ttl from the resulting class. Due to type erasure we don't know the actual
         // class, and have to use introspection to get the method references, as they do not share a supertype.
         Object lastUpdatedValue = implementingClass.getMethod("getLastUpdated").invoke(feedData);
-        Integer lastUpdated = lastUpdatedValue == null
-          ? null
-          : (lastUpdatedValue instanceof Date
+        Integer lastUpdated =
+          lastUpdatedValue == null
+            ? null
+            : lastUpdatedValue instanceof Date
               ? (int) ((Date) lastUpdatedValue).getTime()
-              : (Integer) lastUpdatedValue);
+              : (Integer) lastUpdatedValue;
         Integer ttl = (Integer) implementingClass.getMethod("getTtl").invoke(feedData);
         if (lastUpdated == null || ttl == null) {
           nextUpdate = getCurrentTimeSeconds();

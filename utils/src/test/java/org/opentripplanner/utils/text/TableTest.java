@@ -21,11 +21,11 @@ public class TableTest {
       .addRow(null, "Short", 123);
 
     var expected = """
-      LEFT      |    CENTER    |    RIGHT
-      SPACE     |  Long-value  |        2
-      NL Before | NL in middle | NL after
-                |     Short    |      123
-      """;
+    LEFT      |    CENTER    |    RIGHT
+    SPACE     |  Long-value  |        2
+    NL Before | NL in middle | NL after
+              |     Short    |      123
+    """;
 
     // Both the builder and the Table returns the same table as toString()
     assertEquals(expected, builder.toString());

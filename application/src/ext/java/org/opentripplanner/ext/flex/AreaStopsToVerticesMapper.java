@@ -61,17 +61,15 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 
     ImmutableMultimap<StreetVertex, FeedScopedId> mappedResults = results.collect(
       ImmutableListMultimap.<
-          MatchResult,
-          StreetVertex,
-          FeedScopedId
-        >flatteningToImmutableListMultimap(MatchResult::vertex, mr -> Stream.of(mr.stop().getId()))
+        MatchResult,
+        StreetVertex,
+        FeedScopedId
+      >flatteningToImmutableListMultimap(MatchResult::vertex, mr -> Stream.of(mr.stop().getId()))
     );
 
-    mappedResults
-      .keySet()
-      .forEach(vertex -> {
-        vertex.addAreaStops(mappedResults.get(vertex));
-      });
+    mappedResults.keySet().forEach(vertex -> {
+      vertex.addAreaStops(mappedResults.get(vertex));
+    });
 
     LOG.info(progress.completeMessage());
   }

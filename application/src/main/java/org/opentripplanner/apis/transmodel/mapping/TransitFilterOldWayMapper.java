@@ -31,8 +31,10 @@ class TransitFilterOldWayMapper {
     TransitRequestBuilder transitBuilder
   ) {
     if (
-      !(GqlUtil.hasArgument(environment, "modes") &&
-        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")) &&
+      !(
+        GqlUtil.hasArgument(environment, "modes") &&
+        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")
+      ) &&
       !GqlUtil.hasArgument(environment, "whiteListed") &&
       !GqlUtil.hasArgument(environment, "banned")
     ) {

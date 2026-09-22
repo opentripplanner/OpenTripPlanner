@@ -31,12 +31,12 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.EdgeNamer;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
@@ -86,9 +86,7 @@ public class GraphBuilderModules {
     GraphBuildCacheManager cacheManager
   ) {
     List<OsmProvider> providers = new ArrayList<>();
-    for (ConfiguredDataSource<
-      OsmExtractParameters
-    > osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
+    for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
       providers.add(
         new DefaultOsmProvider(
           osmConfiguredDataSource.dataSource(),
@@ -115,6 +113,7 @@ public class GraphBuilderModules {
       .withIncludeInclinedEdgeLevelInfo(config.includeInclinedEdgeLevelInfo)
       .withMaxAreaNodes(config.maxAreaNodes)
       .withBoardingAreaRefTags(config.boardingLocationTags)
+      .withElevatorRefTags(config.elevatorRefTags)
       .withIncludeOsmStationEntrances(config.osmDefaults.includeOsmStationEntrances())
       .withCacheManager(cacheManager)
       .withIssueStore(issueStore)

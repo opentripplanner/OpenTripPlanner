@@ -64,9 +64,8 @@ public record RaptorModuleTestCase(
   @Override
   public String toString() {
     String profile = config.profile().name().toLowerCase();
-    String optimizations = config == RaptorModuleTestConfig.TC_MULTI_CRITERIA_DEST_PRUNING
-      ? " w/dest-pruning"
-      : "";
+    String optimizations =
+      config == RaptorModuleTestConfig.TC_MULTI_CRITERIA_DEST_PRUNING ? " w/dest-pruning" : "";
     String oneIteration = config.withOneIteration() ? " one-iteration" : "";
     String reverse = config.isReverse() ? " reverse" : "";
     return profile + optimizations + reverse + oneIteration;

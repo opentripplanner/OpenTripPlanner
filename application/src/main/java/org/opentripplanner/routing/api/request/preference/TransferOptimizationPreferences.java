@@ -15,7 +15,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class TransferOptimizationPreferences
-  implements Serializable, TransferOptimizationParameters {
+  implements Serializable, TransferOptimizationParameters
+{
 
   private final boolean optimizeTransferWaitTime;
   private final double minSafeWaitTimeFactor;

@@ -13,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -205,11 +206,11 @@ public abstract class OsmEntity {
   }
 
   public static boolean isFalse(String tagValue) {
-    return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
+    return "no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue);
   }
 
   public static boolean isTrue(String tagValue) {
-    return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+    return "yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue);
   }
 
   /**
@@ -585,7 +586,7 @@ public abstract class OsmEntity {
       // get the translated value, if exists
       for (String lang : i18n.keySet()) {
         String i18nTag = getTag(defKey + ":" + lang);
-        i18n.get(lang).append(i18nTag != null ? i18nTag : (defTag != null ? defTag : ""));
+        i18n.get(lang).append(i18nTag != null ? i18nTag : defTag != null ? defTag : "");
       }
     }
     for (StringBuffer sb : i18n.values()) {
@@ -822,6 +823,21 @@ public abstract class OsmEntity {
     return result;
   }
 
+  /**
+   * Combines the values of one or more tags into a single id, using the first of the given tag
+   * groups that resolves to a value.
+   * <p>
+   * A group's tag values are joined with {@code :} in the given order. If any tag in a group is
+   * missing from this entity, that group is skipped in favor of the next one. A group with a
+   * single tag key produces a plain (non-compound) id.
+   */
+  public Optional<String> getCompoundTagValue(List<CompoundRefTagGroup> tagGroups) {
+    return tagGroups
+      .stream()
+      .flatMap(tagGroup -> tagGroup.compoundValue(this::getTag).stream())
+      .findFirst();
+  }
+
   public OsmProvider getOsmProvider() {
     return osmProvider;
   }
@@ -866,7 +882,7 @@ public abstract class OsmEntity {
    */
   public boolean isLink() {
     String highway = getTag("highway");
-    return highway != null && highway.endsWith(("_link"));
+    return highway != null && highway.endsWith("_link");
   }
 
   public boolean isElevator() {

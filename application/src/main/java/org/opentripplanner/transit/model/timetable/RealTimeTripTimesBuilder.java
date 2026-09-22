@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 
 public class RealTimeTripTimesBuilder {
@@ -36,7 +37,7 @@ public class RealTimeTripTimesBuilder {
   private Accessibility wheelchairAccessibility;
 
   @Nullable
-  private String vehicleId;
+  private FeedScopedId vehicleId;
 
   private final RealTimeTripState.Builder stateBuilder = RealTimeTripState.of();
 
@@ -304,8 +305,8 @@ public class RealTimeTripTimesBuilder {
   }
 
   public @Nullable I18NString[] stopHeadsigns() {
-    var result = scheduledTripTimes.copyHeadsigns(() ->
-      new I18NString[scheduledTripTimes.getNumStops()]
+    var result = scheduledTripTimes.copyHeadsigns(
+      () -> new I18NString[scheduledTripTimes.getNumStops()]
     );
     for (var i = 0; i < result.length; i++) {
       if (stopHeadsigns[i] != null) {
@@ -344,11 +345,11 @@ public class RealTimeTripTimesBuilder {
   }
 
   @Nullable
-  String vehicleId() {
+  FeedScopedId vehicleId() {
     return vehicleId;
   }
 
-  public RealTimeTripTimesBuilder withVehicleId(@Nullable String vehicleId) {
+  public RealTimeTripTimesBuilder withVehicleId(@Nullable FeedScopedId vehicleId) {
     this.vehicleId = vehicleId;
     return this;
   }

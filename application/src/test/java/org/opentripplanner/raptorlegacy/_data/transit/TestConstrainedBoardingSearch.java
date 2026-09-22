@@ -21,7 +21,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 @Deprecated
 public class TestConstrainedBoardingSearch
-  implements RaptorConstrainedBoardingSearch<TestTripSchedule> {
+  implements RaptorConstrainedBoardingSearch<TestTripSchedule>
+{
 
   /** Index of guaranteed transfers by fromStopPos */
   private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos =

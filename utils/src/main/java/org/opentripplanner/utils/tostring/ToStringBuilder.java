@@ -248,8 +248,8 @@ public class ToStringBuilder {
     return addIt(
       name,
       Arrays.stream(array)
-          .filter(t -> t != notSet)
-          .count() +
+        .filter(t -> t != notSet)
+        .count() +
         "/" +
         array.length
     );

@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "npm run codegen && vite",
     "build": "npm run codegen && npm run lint && npm run check-format && tsc && vite build",
-    "test": "vitest --root src/",
-    "coverage": "vitest run --root src/ --coverage",
+    "test": "vitest --root src/ -c ../vite.config.ts",
+    "coverage": "vitest run --root src/ -c ../vite.config.ts --coverage",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
     "check-format": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
@@ -20,7 +20,7 @@
     "bootstrap": "5.3.8",
     "graphql": "16.14.2",
     "graphql-request": "7.4.0",
-    "maplibre-gl": "6.3.0",
+    "maplibre-gl": "6.4.1",
     "react": "19.2.7",
     "react-bootstrap": "2.10.10",
     "react-dom": "19.2.7",
@@ -38,7 +38,7 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.3",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "5.0.0",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-import": "2.32.0",
@@ -52,6 +52,6 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.64.0",
     "vite": "8.1.5",
-    "vitest": "4.1.10"
+    "vitest": "5.0.0"
   }
 }

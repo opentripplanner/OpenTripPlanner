@@ -98,7 +98,7 @@ public class DateUtils {
             newString.substring(4, 6) +
             '.' +
             newString.substring(6, 8);
-        } else if (!(newString.matches(".*20\\d\\d.*"))) {
+        } else if (!newString.matches(".*20\\d\\d.*")) {
           // if it looks like we have a small date format, ala 11.4.09, then use
           // another set of compares
           dateTimeFormatterList = SMALL_DF_LIST;

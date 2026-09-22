@@ -7,7 +7,7 @@ record BucketKey(String issueType, Integer index) implements Comparable<BucketKe
   }
 
   String label() {
-    String bucketIndexString = this.index != null ? (" " + this.index) : "";
+    String bucketIndexString = this.index != null ? " " + this.index : "";
     return this.issueType + bucketIndexString;
   }
 

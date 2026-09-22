@@ -66,25 +66,23 @@ public class DemConfig {
     String documentationAddition
   ) {
     var docDefaults = DemExtractParameters.DEFAULT;
-    return defaults
-      .copyOf()
-      .withElevationUnitMultiplier(
-        node
-          .of("elevationUnitMultiplier")
-          .since(V2_3)
-          .summary(
-            "Specify a multiplier to convert elevation units from source to meters." +
-              documentationAddition
-          )
-          .description(
-            """
-            Unit conversion multiplier for elevation values. No conversion needed if the elevation
-            values are defined in meters in the source data. If, for example, decimetres are used
-            in the source data, this should be set to 0.1.
-            """
-          )
-          .docDefaultValue(docDefaults.elevationUnitMultiplier())
-          .asDouble(defaults.elevationUnitMultiplier())
-      );
+    return defaults.copyOf().withElevationUnitMultiplier(
+      node
+        .of("elevationUnitMultiplier")
+        .since(V2_3)
+        .summary(
+          "Specify a multiplier to convert elevation units from source to meters." +
+            documentationAddition
+        )
+        .description(
+          """
+          Unit conversion multiplier for elevation values. No conversion needed if the elevation
+          values are defined in meters in the source data. If, for example, decimetres are used
+          in the source data, this should be set to 0.1.
+          """
+        )
+        .docDefaultValue(docDefaults.elevationUnitMultiplier())
+        .asDouble(defaults.elevationUnitMultiplier())
+    );
   }
 }

@@ -23,7 +23,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
 public class ScheduledDeviatedTrip
-  extends FlexTrip<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> {
+  extends FlexTrip<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder>
+{
 
   private final ScheduledDeviatedStopTime[] stopTimes;
 

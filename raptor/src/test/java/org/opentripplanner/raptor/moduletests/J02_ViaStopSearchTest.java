@@ -160,9 +160,9 @@ class J02_ViaStopSearchTest {
   void accessWalkToViaStopWithoutTransit() {
     data.withTimetables(
       """
-        A B C D
-        0:02 0:05 0:10 0:15
-        """ +
+      A B C D
+      0:02 0:05 0:10 0:15
+      """ +
         // We add another trip to allow riding trip one - via B - then ride trip two, this
         // is not a pareto-optimal solution and should only appear if there is something wrong.
         """

@@ -174,7 +174,7 @@ public class TransitRepository implements Serializable {
    * Returns true if this repository contains any transit data at the given instant.
    */
   public boolean transitFeedCovers(Instant time) {
-    return (!time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds()));
+    return !time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds());
   }
 
   /**

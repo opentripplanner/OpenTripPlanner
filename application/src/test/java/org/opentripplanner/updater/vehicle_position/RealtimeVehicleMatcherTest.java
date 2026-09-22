@@ -542,7 +542,7 @@ public class RealtimeVehicleMatcherTest {
     var trip = TransitRepositoryForTest.trip(tripId).build();
 
     var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
-    var fivePastMidnight = fiveToMidnight + (10 * 60);
+    var fivePastMidnight = fiveToMidnight + 10 * 60;
     var stopTimes = List.of(
       testModel.stopTime(trip, 0, fiveToMidnight),
       testModel.stopTime(trip, 1, fivePastMidnight)

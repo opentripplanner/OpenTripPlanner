@@ -31,6 +31,7 @@ class StopConnectivityModuleTest extends GraphRoutingTest {
     StreetModelForTest.streetEdge(i1, i3);
 
     var g = new Graph();
+    g.hasStreets = true;
     g.addVertex(stop);
     g.addVertex(i1);
     g.addVertex(i2);

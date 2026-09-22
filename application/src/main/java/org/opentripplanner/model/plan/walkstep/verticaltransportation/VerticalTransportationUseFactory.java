@@ -113,10 +113,8 @@ public class VerticalTransportationUseFactory {
     Edge edge,
     InclinedEdgeLevelInfo inclinedEdgeLevelInfo
   ) {
-    return (
-        edge.getFromVertex() instanceof OsmVertex fromVertex &&
-        fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
-      )
+    return edge.getFromVertex() instanceof OsmVertex fromVertex &&
+      fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
       ? VerticalDirection.UP
       : VerticalDirection.DOWN;
   }

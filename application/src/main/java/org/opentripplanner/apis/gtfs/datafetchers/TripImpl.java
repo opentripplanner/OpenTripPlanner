@@ -142,9 +142,10 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
 
         ZoneId timeZone = transitService.getTimeZone();
-        LocalDate serviceDate = args.getGraphQLServiceDate() != null
-          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
-          : LocalDate.now();
+        LocalDate serviceDate =
+          args.getGraphQLServiceDate() != null
+            ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+            : LocalDate.now();
 
         TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
         if (tripPattern == null) {
@@ -197,9 +198,10 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         var args = new GraphQLTypes.GraphQLTripDepartureStoptimeArgs(environment.getArguments());
 
         ZoneId timeZone = transitService.getTimeZone();
-        LocalDate serviceDate = args.getGraphQLServiceDate() != null
-          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
-          : LocalDate.now();
+        LocalDate serviceDate =
+          args.getGraphQLServiceDate() != null
+            ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+            : LocalDate.now();
 
         TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
         if (tripPattern == null) {
@@ -327,7 +329,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   @Override
   public DataFetcher<String> serviceId() {
-    return environment -> getSource(environment).getServiceId().toString();
+    // Deprecated: GTFS service-id is being phased out as an internal OTP concept, see
+    // https://github.com/opentripplanner/OpenTripPlanner/issues/7972
+    return environment -> null;
   }
 
   @Override
@@ -358,9 +362,10 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         var args = new GraphQLTypes.GraphQLTripStoptimesForDateArgs(environment.getArguments());
 
         ZoneId timeZone = transitService.getTimeZone();
-        LocalDate serviceDate = args.getGraphQLServiceDate() != null
-          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
-          : LocalDate.now(timeZone);
+        LocalDate serviceDate =
+          args.getGraphQLServiceDate() != null
+            ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+            : LocalDate.now(timeZone);
 
         TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
         if (tripPattern == null) {

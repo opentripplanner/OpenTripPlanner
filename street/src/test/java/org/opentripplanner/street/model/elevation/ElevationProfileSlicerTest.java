@@ -39,18 +39,26 @@ class ElevationProfileSlicerTest {
     assertPartialElevation(four_point, 5, 25, new double[] { 0, 105, 5, 110, 15, 120, 20, 125 });
 
     assertPartialElevation(small_run, 10, 20.5, new double[] { 0, 110, 10, 120, 10.5, 120.5 });
-    assertPartialElevation(
-      small_run,
+    assertPartialElevation(small_run, 0, 20.25, new double[] {
       0,
+      100,
+      10,
+      110,
+      20,
+      120,
       20.25,
-      new double[] { 0, 100, 10, 110, 20, 120, 20.25, 120.25 }
-    );
-    assertPartialElevation(
-      small_run,
-      0.25,
-      20.25,
-      new double[] { 0, 100.25, 9.75, 110, 19.75, 120, 20, 120.25 }
-    );
+      120.25,
+    });
+    assertPartialElevation(small_run, 0.25, 20.25, new double[] {
+      0,
+      100.25,
+      9.75,
+      110,
+      19.75,
+      120,
+      20,
+      120.25,
+    });
   }
 
   private static void assertPartialElevation(
@@ -71,9 +79,8 @@ class ElevationProfileSlicerTest {
         2,
         0
       ).toCoordinateArray();
-      var actualElevationProfile = partialElevationProfile != null
-        ? partialElevationProfile.toCoordinateArray()
-        : null;
+      var actualElevationProfile =
+        partialElevationProfile != null ? partialElevationProfile.toCoordinateArray() : null;
       assertArrayEquals(expectedElevationProfile, actualElevationProfile);
     }
   }

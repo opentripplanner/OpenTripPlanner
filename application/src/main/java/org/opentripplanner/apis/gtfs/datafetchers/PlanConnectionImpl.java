@@ -44,16 +44,18 @@ public class PlanConnectionImpl implements GraphQLDataFetchers.GraphQLPlanConnec
   @Override
   public DataFetcher<PlanPageInfo> pageInfo() {
     return environment -> {
-      var startCursor = getSource(environment).getNextPageCursor() != null
-        ? getSource(environment).getPreviousPageCursor().encode()
-        : null;
+      var startCursor =
+        getSource(environment).getNextPageCursor() != null
+          ? getSource(environment).getPreviousPageCursor().encode()
+          : null;
       ConnectionCursor startConnectionCursor = null;
       if (startCursor != null) {
         startConnectionCursor = new DefaultConnectionCursor(startCursor);
       }
-      var endCursor = getSource(environment).getPreviousPageCursor() != null
-        ? getSource(environment).getNextPageCursor().encode()
-        : null;
+      var endCursor =
+        getSource(environment).getPreviousPageCursor() != null
+          ? getSource(environment).getNextPageCursor().encode()
+          : null;
       ConnectionCursor endConnectionCursor = null;
       if (endCursor != null) {
         endConnectionCursor = new DefaultConnectionCursor(endCursor);

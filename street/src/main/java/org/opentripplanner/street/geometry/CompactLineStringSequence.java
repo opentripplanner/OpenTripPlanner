@@ -109,7 +109,7 @@ public final class CompactLineStringSequence implements Serializable {
       totalCoords += geometries[i].coordinateCount();
     }
     // Each seam between two consecutive members repeats one coordinate; emit it only once.
-    totalCoords -= (count - 1);
+    totalCoords -= count - 1;
     if (totalCoords <= 0) {
       return GeometryUtils.emptyLineString();
     }
