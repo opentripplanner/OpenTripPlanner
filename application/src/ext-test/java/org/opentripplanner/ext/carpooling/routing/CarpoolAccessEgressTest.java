@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createSegment;
 import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createStreetPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
@@ -254,7 +255,7 @@ class CarpoolAccessEgressTest {
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
       PICKUP_POSITION,
       DROPOFF_POSITION,
-      List.of(createStreetPath(PICKUP_SEGMENT_DURATION), createStreetPath(sharedSegmentDuration)),
+      List.of(createSegment(PICKUP_SEGMENT_DURATION), createSegment(sharedSegmentDuration)),
       STOP_DURATION,
       null,
       walkToPickup,

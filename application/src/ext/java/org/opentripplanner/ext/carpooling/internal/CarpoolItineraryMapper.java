@@ -118,7 +118,7 @@ public class CarpoolItineraryMapper {
     GenericLocation fromLocation,
     GenericLocation toLocation
   ) {
-    var sharedSegments = candidate.getSharedSegments();
+    var sharedSegments = candidate.getSharedPaths();
     if (sharedSegments.isEmpty()) {
       return null;
     }

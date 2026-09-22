@@ -22,7 +22,6 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -242,11 +241,26 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routePathIsNonEmpty() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path);
+    assertNotNull(segment);
+    var path = segment.path();
     assertFalse(path.states().isEmpty(), "Path states should not be empty");
     assertTrue(path.states().size() > 1, "Path should have at least one edge");
+  }
+
+  @Test
+  void durationMatchesThePathInBothTreeDirections() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexD, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
+
+    var forward = router.route(vertexA, vertexC);
+    var reverse = router.route(vertexB, vertexD);
+
+    assertNotNull(forward);
+    assertNotNull(reverse);
+    assertEquals(forward.path().duration().toSeconds(), forward.durationSeconds());
+    assertEquals(reverse.path().duration().toSeconds(), reverse.durationSeconds());
   }
 
   @Test
@@ -318,9 +332,9 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertGeometryRunsFromAToD(router.route(vertexA, vertexD));
   }
 
-  private void assertGeometryRunsFromAToD(StreetPath path) {
-    assertThat(path).isNotNull();
-    assertThat(List.of(path.geometry().getCoordinates()))
+  private void assertGeometryRunsFromAToD(RoutedSegment segment) {
+    assertThat(segment).isNotNull();
+    assertThat(List.of(segment.path().geometry().getCoordinates()))
       .containsExactly(
         vertexA.getCoordinate(),
         vertexB.getCoordinate(),
