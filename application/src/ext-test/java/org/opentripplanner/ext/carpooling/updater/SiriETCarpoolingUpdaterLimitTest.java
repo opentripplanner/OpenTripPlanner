@@ -72,6 +72,33 @@ class SiriETCarpoolingUpdaterLimitTest {
     assertTrue(held("c"));
   }
 
+  @Test
+  void anUnchangedRedeliveryIsDropped() {
+    var updater = updater(2);
+    var a = journey("a");
+
+    updater.processEstimatedVehicleJourney(a);
+    updater.processEstimatedVehicleJourney(a);
+    assertEquals(1, queued.size(), "the re-delivery of a queued trip");
+
+    runQueued();
+    updater.processEstimatedVehicleJourney(a);
+    assertTrue(queued.isEmpty(), "the re-delivery of a held trip");
+  }
+
+  @Test
+  void aRedeliveryAfterACancellationIsKept() {
+    var updater = updater(2);
+    var a = journey("a");
+
+    updater.processEstimatedVehicleJourney(a);
+    updater.processEstimatedVehicleJourney(cancellation("a"));
+    updater.processEstimatedVehicleJourney(a);
+    runQueued();
+
+    assertTrue(held("a"));
+  }
+
   private SiriETCarpoolingUpdater updater(int maxTrips) {
     var resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->

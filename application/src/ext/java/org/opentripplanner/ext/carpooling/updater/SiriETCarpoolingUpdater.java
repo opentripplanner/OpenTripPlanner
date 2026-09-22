@@ -247,6 +247,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         remove(tripId);
         return;
       }
+      if (isUnchanged(tripId, carpoolTrip)) {
+        return;
+      }
       if (isFullFor(tripId)) {
         rejectedThisPoll++;
         LOG.debug("Rejected new carpool trip {}: the feed is full", tripId);
@@ -261,6 +264,16 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         e
       );
     }
+  }
+
+  /**
+   * Whether this delivery repeats the version of the trip queued last. A source that re-sends its
+   * whole feed on every poll then costs one comparison per trip instead of a resolution, and does
+   * not touch the trip limit.
+   */
+  private boolean isUnchanged(FeedScopedId tripId, CarpoolTrip delivered) {
+    var last = liveTrips.get(tripId);
+    return last != null && last.sameAs(delivered);
   }
 
   private void remove(FeedScopedId tripId) {
