@@ -6,15 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.cancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithAllButOneCallCancelled;
+import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithLatestExpectedArrivalTime;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.journeyWithMovedDestination;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.malformedNonCancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
@@ -23,10 +26,10 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
@@ -36,7 +39,7 @@ class SiriETCarpoolingUpdaterTest {
 
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updater;
-  private CarpoolTripVertexResolver resolver;
+  private RoutableCarpoolTripResolver resolver;
   private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
     FEED_ID,
     CarpoolingParameters.DEFAULT.maxTripDuration()
@@ -47,9 +50,9 @@ class SiriETCarpoolingUpdaterTest {
     repository = new DefaultCarpoolingRepository(
       CarpoolingParameters.DEFAULT.expirySweepInterval()
     );
-    resolver = mock(CarpoolTripVertexResolver.class);
+    resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+      RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
     var params = new DefaultSiriETUpdaterParameters(
       "carpool-test",
@@ -133,9 +136,7 @@ class SiriETCarpoolingUpdaterTest {
     doReturn(null).when(resolver).resolve(any());
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
 
-    doAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
-    )
+    doAnswer(invocation -> RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0)))
       .when(resolver)
       .resolve(any());
     var changedJourney = journeyWithMovedDestination();
@@ -157,6 +158,39 @@ class SiriETCarpoolingUpdaterTest {
   }
 
   @Test
+  void processEstimatedVehicleJourney_corridorRecomputationThrows_dropsStaleTrip() {
+    var stored = journeyWithLatestExpectedArrivalTime(0, 10);
+    updater.processEstimatedVehicleJourney(stored);
+    var storedTripId = mapper.tripId(stored);
+    assertTrue(tripIsInRepository(storedTripId));
+
+    doThrow(new RuntimeException("corridor blew up")).when(resolver).resolve(any(), any());
+    // The same trip with the same geometry and a wider budget: the corridor is recomputed on the
+    // stored vertices, and when that throws, the stored trip with the old budget must be dropped.
+    updater.processEstimatedVehicleJourney(journeyWithLatestExpectedArrivalTime(0, 20));
+
+    assertFalse(tripIsInRepository(storedTripId));
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_budgetChanged_recomputesCorridorOnStoredVertices() {
+    updater.processEstimatedVehicleJourney(journeyWithLatestExpectedArrivalTime(0, 10));
+    var storedVertices = repository.getCarpoolTrips().iterator().next().vertices();
+    doAnswer(invocation ->
+      RoutableCarpoolTripTestData.withVertices(invocation.getArgument(0), invocation.getArgument(1))
+    )
+      .when(resolver)
+      .resolve(any(), any());
+
+    // The same geometry with a wider budget.
+    updater.processEstimatedVehicleJourney(journeyWithLatestExpectedArrivalTime(0, 20));
+
+    verify(resolver, times(1)).resolve(any());
+    verify(resolver, times(1)).resolve(any(), eq(storedVertices));
+    assertEquals(storedVertices, repository.getCarpoolTrips().iterator().next().vertices());
+  }
+
+  @Test
   void processEstimatedVehicleJourney_resolutionThrowsRedelivered_resolvesOnlyOnce() {
     doThrow(new RuntimeException("resolution blew up")).when(resolver).resolve(any());
 
@@ -170,15 +204,18 @@ class SiriETCarpoolingUpdaterTest {
   }
 
   @Test
-  void processEstimatedVehicleJourney_unchangedGeometry_reusesStoredVertices() {
+  void processEstimatedVehicleJourney_unchangedGeometry_reusesStoredVerticesAndCorridor() {
     var journey = minimalCompleteJourney();
     updater.processEstimatedVehicleJourney(journey);
-    var storedVertices = repository.getCarpoolTrips().iterator().next().vertices();
+    var stored = repository.getCarpoolTrips().iterator().next();
 
     updater.processEstimatedVehicleJourney(journey);
 
     verify(resolver, times(1)).resolve(any());
-    assertEquals(storedVertices, repository.getCarpoolTrips().iterator().next().vertices());
+    verify(resolver, never()).resolve(any(), any());
+    var reused = repository.getCarpoolTrips().iterator().next();
+    assertEquals(stored.vertices(), reused.vertices());
+    assertSame(stored.corridor(), reused.corridor());
   }
 
   @Test

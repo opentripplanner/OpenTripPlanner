@@ -10,8 +10,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
@@ -42,28 +42,28 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
-  private final CarpoolTripVertexResolver vertexResolver;
+  private final RoutableCarpoolTripResolver tripResolver;
   private final CarpoolSiriMapper mapper;
 
   /**
-   * Trips whose route-point geometry failed to resolve, keyed by trip id, so an unresolvable
-   * journey re-delivered with unchanged geometry skips re-linking, re-probing, and re-logging. The
-   * stored trip supplies the geometry to compare against and the end time that drives expiry (swept
-   * on the same expiry as stored trips).
+   * Trips whose route points could not be resolved or whose corridor could not be computed, keyed
+   * by trip id, so an unresolvable journey re-delivered with unchanged geometry skips re-linking,
+   * re-probing, and re-logging. The stored trip supplies the geometry to compare against and the
+   * end time that drives expiry (swept on the same expiry as stored trips).
    */
   private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new HashMap<>();
 
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
-    CarpoolTripVertexResolver vertexResolver,
+    RoutableCarpoolTripResolver tripResolver,
     CarpoolingParameters parameters
   ) {
     super(config);
     this.tripExpiry = parameters.tripExpiry();
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
-    this.vertexResolver = vertexResolver;
+    this.tripResolver = tripResolver;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
@@ -161,12 +161,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         repository.removeCarpoolTrip(tripId);
         return;
       }
-      var tripWithVertices = resolveVertices(carpoolTrip);
-      if (tripWithVertices == null) {
+      var routableTrip = resolveTrip(carpoolTrip);
+      if (routableTrip == null) {
         repository.removeCarpoolTrip(tripId);
         return;
       }
-      repository.upsertCarpoolTrip(tripWithVertices);
+      repository.upsertCarpoolTrip(routableTrip);
     } catch (Exception e) {
       LOG.info(
         "Failed to process EstimatedVehicleJourney {}",
@@ -177,16 +177,21 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Resolves the trip's route points to permanent vertices, or {@code null} if any cannot be
-   * resolved. Both outcomes are memoized on the route-point geometry: an unchanged geometry reuses
-   * the stored vertices or skips a known failure without re-resolving. A first failure is logged; a
-   * resolution that throws is memoized as failed too, with its stack trace.
+   * Resolves the trip's route points to permanent vertices and computes its corridor, or
+   * {@code null} if a point cannot be resolved or the baseline cannot be routed. Both outcomes are
+   * memoized on the route-point geometry: an unchanged geometry reuses the stored vertices or skips
+   * a known failure without re-resolving. A first failure is logged; a resolution that throws is
+   * memoized as failed too, with its stack trace.
    */
   @Nullable
-  private CarpoolTripWithVertices resolveVertices(CarpoolTrip trip) {
+  private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
     var existing = repository.getCarpoolTrip(trip.getId());
-    if (existing != null && existing.trip().routePoints().equals(trip.routePoints())) {
-      return new CarpoolTripWithVertices(trip, existing.vertices());
+    boolean sameRoutePoints =
+      existing != null && existing.trip().routePoints().equals(trip.routePoints());
+    // The corridor also depends on the stops' deviation budgets: keep it while those are unchanged
+    // too, otherwise recompute it on the stored vertices.
+    if (sameRoutePoints && sameDeviationBudgets(existing.trip(), trip)) {
+      return new RoutableCarpoolTrip(trip, existing.vertices(), existing.corridor());
     }
     var failed = failedResolutions.get(trip.getId());
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {
@@ -196,22 +201,38 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       );
       return null;
     }
-    CarpoolTripWithVertices resolved;
+    RoutableCarpoolTrip resolved;
     try {
-      resolved = vertexResolver.resolve(trip);
+      resolved = sameRoutePoints
+        ? tripResolver.resolve(trip, existing.vertices())
+        : tripResolver.resolve(trip);
     } catch (RuntimeException e) {
-      LOG.warn("Dropping carpool trip {}: route-point resolution failed", trip.getId(), e);
+      LOG.warn(
+        "Dropping carpool trip {}: resolving its route points or computing its corridor failed",
+        trip.getId(),
+        e
+      );
       failedResolutions.put(trip.getId(), trip);
       return null;
     }
     if (resolved == null) {
       LOG.warn(
-        "Dropping carpool trip {}: a route point has no car-reachable street vertex",
+        "Dropping carpool trip {}: a route point has no car-reachable street vertex, or a leg " +
+          "cannot be routed",
         trip.getId()
       );
       failedResolutions.put(trip.getId(), trip);
     }
     return resolved;
+  }
+
+  private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {
+    for (int i = 0; i < a.stops().size(); i++) {
+      if (!a.stops().get(i).getDeviationBudget().equals(b.stops().get(i).getDeviationBudget())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

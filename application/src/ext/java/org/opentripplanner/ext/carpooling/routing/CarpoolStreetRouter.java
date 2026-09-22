@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import java.time.Duration;
+import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.ext.carpooling.util.TraversalScope;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.path.StreetPath;
@@ -74,7 +76,8 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    * Configures and executes an A* street search with settings optimized for carpooling:
    * <ul>
    *   <li><strong>Heuristic:</strong> Euclidean distance with max car speed</li>
-   *   <li><strong>Skip Strategy:</strong> Duration-based edge skipping</li>
+   *   <li><strong>Skip Strategy:</strong> Duration-based edge skipping, and no other request's
+   *       temporary edges</li>
    *   <li><strong>Dominance:</strong> Minimum weight</li>
    * </ul>
    *
@@ -91,7 +94,12 @@ public class CarpoolStreetRouter implements CarpoolRouter {
       // Bound the search at the carpool trip ceiling rather than the passenger request's
       // maxDirectDuration: a driver leg is not a passenger direct trip, and a request-independent
       // bound keeps the cached baseline leg durations request-independent too.
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxTripDuration))
+      .withSkipEdgeStrategy(
+        new ComposingSkipEdgeStrategy<>(
+          TraversalScope.withOwnLinkingOf(fromVertex, toVertex),
+          new DurationSkipEdgeStrategy<>(maxTripDuration)
+        )
+      )
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())
       .withRequest(request)
       .withFrom(fromVertex)

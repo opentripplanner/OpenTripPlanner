@@ -70,6 +70,22 @@ public class BeelineEstimator {
   }
 
   /**
+   * A lower bound on the time a car needs from one point to the other, given in degrees: the
+   * beeline, driven at the fastest speed any street in the graph can be driven at.
+   *
+   * @param maxCarSpeed the graph's maximum car speed, in metres per second
+   */
+  public static double minDriveSeconds(
+    double fromLat,
+    double fromLon,
+    double toLat,
+    double toLon,
+    double maxCarSpeed
+  ) {
+    return SphericalDistanceLibrary.fastDistance(fromLat, fromLon, toLat, toLon) / maxCarSpeed;
+  }
+
+  /**
    * Calculates cumulative travel times to each point in a route, including stop duration at each
    * intermediate point.
    *

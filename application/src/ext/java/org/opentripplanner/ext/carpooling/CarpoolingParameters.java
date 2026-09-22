@@ -8,6 +8,9 @@ import java.time.Duration;
  * These are deployment-wide values, not part of the routing request. They are hard-coded to
  * {@link #DEFAULT}.
  *
+ * @param maxStopWalk         the longest walk between a transit stop and the vertex where a car can
+ *                            stop for it; stops farther from any drivable street get no snap and
+ *                            are left out of the corridors
  * @param maxTripDuration     the longest span a carpool trip may have, from the first stop's
  *                            departure to the destination's latest expected arrival; a longer trip
  *                            is not shaped like a carpool journey and is dropped, and no car search
@@ -29,6 +32,7 @@ import java.time.Duration;
  *                            would accept
  */
 public record CarpoolingParameters(
+  Duration maxStopWalk,
   Duration maxTripDuration,
   Duration tripExpiry,
   Duration expirySweepInterval,
@@ -37,6 +41,7 @@ public record CarpoolingParameters(
   Duration defaultSearchWindow
 ) {
   public static final CarpoolingParameters DEFAULT = new CarpoolingParameters(
+    Duration.ofMinutes(15),
     Duration.ofHours(2).plusMinutes(30),
     Duration.ofDays(2),
     Duration.ofHours(1),
@@ -46,6 +51,7 @@ public record CarpoolingParameters(
   );
 
   public CarpoolingParameters {
+    requirePositive(maxStopWalk, "maxStopWalk");
     requirePositive(maxTripDuration, "maxTripDuration");
     requirePositive(tripExpiry, "tripExpiry");
     requirePositive(expirySweepInterval, "expirySweepInterval");

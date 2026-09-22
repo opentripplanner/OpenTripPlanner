@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -65,13 +66,13 @@ class InsertionEvaluatorTest {
     }
   }
 
-  private CarpoolTripWithVertices createTripWithVertices(CarpoolTrip trip) {
+  private RoutableCarpoolTrip createRoutableTrip(CarpoolTrip trip) {
     var vertices = trip
       .stops()
       .stream()
       .map(stop -> vertexMap.get(stop.getCoordinate()))
       .toList();
-    return new CarpoolTripWithVertices(trip, vertices);
+    return RoutableCarpoolTripTestData.withVertices(trip, vertices);
   }
 
   private WgsCoordinate getCoordinate(Vertex vertex) {
@@ -87,7 +88,7 @@ class InsertionEvaluatorTest {
     WgsCoordinate passengerDropoff,
     CarpoolRouter carpoolRouter
   ) {
-    var tripWithVertices = createTripWithVertices(trip);
+    var routableTrip = createRoutableTrip(trip);
     List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
       trip,
       passengerPickup,
@@ -101,7 +102,7 @@ class InsertionEvaluatorTest {
 
     var evaluator = new InsertionEvaluator(carpoolRouter, Duration.ZERO);
     return evaluator.findBestInsertion(
-      tripWithVertices,
+      routableTrip,
       viablePositions,
       new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
     );
@@ -289,7 +290,7 @@ class InsertionEvaluatorTest {
   void findBestInsertion_selectsShorterTotalTripDuration() {
     var stop = createStopAt(OSLO_CENTER, Duration.ofMinutes(30));
     var trip = createTripWithStops(OSLO_SOUTH, List.of(stop), OSLO_NORTH, Duration.ofMinutes(30));
-    var tripWithVertices = createTripWithVertices(trip);
+    var routableTrip = createRoutableTrip(trip);
 
     final Map<Pair<WgsCoordinate>, StreetPath> pathsMap = new HashMap<>(
       Map.of(
@@ -321,7 +322,7 @@ class InsertionEvaluatorTest {
 
     var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
     var result = evaluator.findBestInsertion(
-      tripWithVertices,
+      routableTrip,
       viablePositions,
       new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
     );
