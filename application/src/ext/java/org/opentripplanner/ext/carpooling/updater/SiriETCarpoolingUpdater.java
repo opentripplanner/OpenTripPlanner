@@ -169,7 +169,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   /**
    * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes
    * the trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails
-   * to resolve. A new trip is dropped when the feed already has as many live trips as it may.
+   * to resolve. A delivery that repeats the trip's last one is skipped, and a new trip is dropped
+   * when the feed already has as many live trips as it may.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
@@ -181,6 +182,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
       if (carpoolTrip == null) {
         remove(tripId);
+        return;
+      }
+      if (isUnchanged(tripId, carpoolTrip)) {
         return;
       }
       if (isFullFor(tripId)) {
@@ -202,6 +206,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         e
       );
     }
+  }
+
+  /** Whether this delivery repeats the trip's last delivery. */
+  private boolean isUnchanged(FeedScopedId tripId, CarpoolTrip delivered) {
+    var last = liveTrips.get(tripId);
+    return last != null && last.sameAs(delivered);
   }
 
   private void remove(FeedScopedId tripId) {
