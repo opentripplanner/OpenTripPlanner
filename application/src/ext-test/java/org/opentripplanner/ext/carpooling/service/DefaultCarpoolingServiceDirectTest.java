@@ -16,7 +16,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.filter.DistanceTripFilter;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter;
 import org.opentripplanner.model.GenericLocation;
@@ -65,6 +64,9 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
     ZONE
   );
 
+  /** A dropoff this far from the 2 km trip is far beyond what its 10-minute budget can reach. */
+  private static final int FAR_AWAY_METERS = 60_000;
+
   private DefaultCarpoolingService service;
   private CarpoolingServiceTestContext context;
 
@@ -99,9 +101,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
           var P = intersection("P", ORIGIN.moveEastMeters(250).moveSouthMeters(200));
           var Q = intersection("Q", ORIGIN.moveEastMeters(1750).moveSouthMeters(200));
 
-          var farNorth = Q.toWgsCoordinate().moveNorthMeters(
-            DistanceTripFilter.DEFAULT_MAX_DISTANCE_METERS + 10000
-          );
+          var farNorth = Q.toWgsCoordinate().moveNorthMeters(FAR_AWAY_METERS);
           var F = intersection("F", farNorth);
 
           coordB = B.toWgsCoordinate();
@@ -126,7 +126,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
           biStreet(D, Q, 255);
           biStreet(P, Q, 1400);
           biStreet(A, Q, 1500);
-          biStreet(Q, F, (int) DistanceTripFilter.DEFAULT_MAX_DISTANCE_METERS + 10000);
+          biStreet(Q, F, FAR_AWAY_METERS);
         }
       }
     );
@@ -209,7 +209,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   }
 
   @Test
-  void returnsEmptyWhenDropoffExceedsMaxDistance() {
+  void returnsEmptyWhenDropoffIsBeyondTheTripsReach() {
     var departureTime = SEARCH_TIME.plusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
     context.upsertTrip(trip);
@@ -220,7 +220,7 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
     assertTrue(
       results.isEmpty(),
-      "Should return no results when dropoff exceeds DEFAULT_MAX_DISTANCE_METERS from trip"
+      "Should return no results when the dropoff is far beyond the trip's deviation budget"
     );
   }
 
@@ -336,8 +336,9 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
   @Test
   void itineraryBoardingBeforeRequestedTimeIsRejected() {
     // A carpool that left 10 min before the passenger's requested depart-after time still passes
-    // the pre-filter (tripEnd is well after EDT), but the passenger would board mid-route before
-    // EDT. TimeItineraryFilter rejects that itinerary because startTime < EDT.
+    // the pre-filter (tripEnd, the routed leg plus the destination's deviation budget, is after
+    // EDT), but the passenger would board mid-route before EDT. TimeItineraryFilter rejects that
+    // itinerary because startTime < EDT.
     var departureTime = SEARCH_TIME.minusMinutes(10);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(tripStart, tripEnd, departureTime);
     context.upsertTrip(trip);

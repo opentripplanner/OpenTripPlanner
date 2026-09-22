@@ -21,6 +21,8 @@ public class CarpoolingRequestBuilder {
   private Instant requestedDateTime;
   private Duration maxWalkTime;
   private Duration searchWindow;
+  private Duration stopDuration;
+  private Duration maxJourneyDuration;
 
   public CarpoolingRequestBuilder() {}
 
@@ -38,6 +40,8 @@ public class CarpoolingRequestBuilder {
       .valueOf(StreetMode.WALK);
     this.searchWindow =
       request.searchWindow() == null ? defaultSearchWindow : request.searchWindow();
+    this.stopDuration = request.preferences().car().pickupTime();
+    this.maxJourneyDuration = request.preferences().system().maxJourneyDuration();
   }
 
   public CarpoolingRequestBuilder withAccessOrEgress(AccessEgressType accessOrEgress) {
@@ -75,6 +79,20 @@ public class CarpoolingRequestBuilder {
     return this;
   }
 
+  /** The dwell at each stop, see {@link CarpoolingRequest#getStopDuration()}. */
+  public CarpoolingRequestBuilder withStopDuration(Duration stopDuration) {
+    this.stopDuration = stopDuration;
+    return this;
+  }
+
+  /**
+   * The longest journey the search accepts, see {@link CarpoolingRequest#getMaxJourneyDuration()}.
+   */
+  public CarpoolingRequestBuilder withMaxJourneyDuration(Duration maxJourneyDuration) {
+    this.maxJourneyDuration = maxJourneyDuration;
+    return this;
+  }
+
   public CarpoolingRequest build() {
     return new CarpoolingRequest(
       accessOrEgress,
@@ -83,7 +101,9 @@ public class CarpoolingRequestBuilder {
       passengerDropoff,
       requestedDateTime,
       maxWalkTime,
-      searchWindow
+      searchWindow,
+      stopDuration,
+      maxJourneyDuration
     );
   }
 }
