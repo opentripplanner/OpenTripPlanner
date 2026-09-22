@@ -31,6 +31,7 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.ext.vehiclerentalgeofencing.config.VehicleRentalGeofencingConfig;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -700,8 +701,11 @@ public class BuildConfig implements OtpDataStoreConfig {
     // This should be stored and validated inside the domain model and accessed through it, but
     // this is injected into the build modules, so the check needs to be here.
     if (getTransitServicePeriod().daysInPeriod() > TEN_YEARS_IN_DAYS) {
-      throw new IllegalStateException(
-        "The transit service period is more than 10 years. This is not supported."
+      throw new OtpAppException(
+        "The transit service period (transitServiceStart=%s, transitServiceEnd=%s) is more " +
+          "than 10 years. Narrow the range between these two parameters.",
+        transitServiceStart,
+        transitServiceEnd
       );
     }
   }
