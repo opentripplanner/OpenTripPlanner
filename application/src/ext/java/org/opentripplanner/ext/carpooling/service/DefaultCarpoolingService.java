@@ -4,9 +4,12 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
@@ -49,6 +52,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -336,6 +340,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       //   its own preference.
       var carpoolReluctance = request.preferences().car().reluctance();
 
+      var stopSnaps = new HashMap<FeedScopedId, Optional<SnapResult>>();
       var cap = new PerStopCandidateCap<CarpoolAccessEgress>(
         PerStopCandidateCap.DEFAULT_MAX_PER_STOP,
         accessOrEgress.isAccess(),
@@ -348,6 +353,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
           trip,
           accessOrEgress,
           passengerSnap,
+          stopSnaps,
+          streetSearchRequest,
           maxWalkToCarpool,
           corridorRouter,
           transitServiceResolver
@@ -399,6 +406,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     CarpoolTripWithVertices trip,
     AccessEgressType accessOrEgress,
     SnapResult passengerSnap,
+    Map<FeedScopedId, Optional<SnapResult>> stopSnaps,
+    StreetSearchRequest streetSearchRequest,
     Duration maxWalk,
     CorridorRouter router,
     TransitServiceResolver transitServiceResolver
@@ -420,9 +429,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
       if (access ? !stop.servesDropoff() : !stop.servesPickup()) {
         continue;
       }
-      var snap = access
-        ? stopIndex.dropoffSnap(stop.stopId())
-        : stopIndex.pickupSnap(stop.stopId());
+      var snap = stopSnaps
+        .computeIfAbsent(stop.stopId(), id -> stopSnap(id, access, streetSearchRequest))
+        .orElse(null);
       if (snap == null || GraphPathUtils.durationOrZero(snap.walkPath()).compareTo(maxWalk) > 0) {
         continue;
       }
@@ -460,6 +469,27 @@ public class DefaultCarpoolingService implements CarpoolingService {
       );
     }
     return viable;
+  }
+
+  /**
+   * The stop's snap with its walk timed with the request's street preferences (the index times it
+   * with the defaults), or empty when the stop cannot be served: no car-reachable vertex, or a walk
+   * the passenger may not take, for instance by wheelchair.
+   */
+  private Optional<SnapResult> stopSnap(
+    FeedScopedId stopId,
+    boolean access,
+    StreetSearchRequest streetSearchRequest
+  ) {
+    var snap = access ? stopIndex.dropoffSnap(stopId) : stopIndex.pickupSnap(stopId);
+    if (snap == null) {
+      return Optional.empty();
+    }
+    if (snap.walkPath() == null) {
+      return Optional.of(snap);
+    }
+    var walk = GraphPathUtils.replay(snap.walkPath(), streetSearchRequest);
+    return walk == null ? Optional.empty() : Optional.of(new SnapResult(snap.vertex(), walk));
   }
 
   /**

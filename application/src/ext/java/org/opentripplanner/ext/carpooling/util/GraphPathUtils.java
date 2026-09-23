@@ -3,8 +3,10 @@ package org.opentripplanner.ext.carpooling.util;
 import java.time.Duration;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 
 public final class GraphPathUtils {
@@ -25,6 +27,37 @@ public final class GraphPathUtils {
    */
   public static double weightOrZero(@Nullable GraphPath<State, Edge, Vertex> path) {
     return path == null ? 0 : path.getWeight();
+  }
+
+  /**
+   * The same walk timed and weighted with {@code request}'s preferences: drives the path's edges
+   * through the real traversals from its first vertex, no search involved. {@code null} when an
+   * edge cannot be traversed under the request, for instance by a wheelchair user.
+   */
+  @Nullable
+  public static GraphPath<State, Edge, Vertex> replay(
+    GraphPath<State, Edge, Vertex> path,
+    StreetSearchRequest request
+  ) {
+    var walkRequest = StreetSearchRequest.copyOf(request)
+      .withMode(StreetMode.WALK)
+      .withArriveBy(false)
+      .build();
+    State state = new State(path.states.getFirst().getVertex(), walkRequest);
+    for (Edge edge : path.edges) {
+      State next = null;
+      for (State candidate : edge.traverse(state)) {
+        if (candidate.getVertex() == edge.getToVertex()) {
+          next = candidate;
+          break;
+        }
+      }
+      if (next == null) {
+        return null;
+      }
+      state = next;
+    }
+    return new GraphPath<>(state);
   }
 
   /**
