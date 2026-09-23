@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
  * Computes a trip's {@link CarpoolCorridor} from the static street graph: the routed baseline of
  * every leg, and per leg the transit stops inside its feasibility ellipse with the driving times
  * to serve them. Per leg this builds two ellipse-bounded car trees and reads the
- * times of every stop inside the ellipse's bounding box off them. Done once, when the trip
- * arrives.
+ * times of every stop inside the ellipse's bounding box off them. Done once when the trip
+ * arrives, instead of once per request.
  */
 public class CorridorBuilder {
 

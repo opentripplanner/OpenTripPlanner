@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.service;
 
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,7 +44,7 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * Integration tests for {@link DefaultCarpoolingService#routeAccessEgress}.
  * <p>
  * These tests use a real street graph with transit stops to verify the full
- * access/egress routing pipeline including nearby stop finding, insertion
+ * access/egress routing pipeline including the stops of the trips' corridors, insertion
  * evaluation, and result mapping.
  * <p>
  * Graph layout (going east):
@@ -151,9 +152,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
           biLink(iT4, stopT4);
 
           // T5 sits on a pedestrian-only side branch off the drivable network: a car can drive
-          // to D but cannot continue to iT5, so a pure CAR nearby-stop search misses it.
-          // CAR_PICKUP, which models walk -> drive -> walk, can drive to D and walk the
-          // final stretch to reach stopT5.
+          // to D but cannot continue to iT5, so the passenger walks the final stretch from D.
           var iT5 = intersection("iT5", ORIGIN.moveEastMeters(2000).moveNorthMeters(200));
           street(
             D,
@@ -330,6 +329,35 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
       results.stream().anyMatch(r -> r.stop() == stopT4Index),
       "At least one access result should include stopT4"
     );
+  }
+
+  @Test
+  void legsLongerThanTheRequestsMaximumCarpoolDurationAreDropped() {
+    var departureTime = SEARCH_TIME.plusMinutes(30);
+    context.upsertTrip(CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime));
+    var request = RouteRequest.of()
+      .withFrom(GenericLocation.fromCoordinate(coordP2.latitude(), coordP2.longitude()))
+      .withTo(GenericLocation.fromCoordinate(coordP3.latitude(), coordP3.longitude()))
+      .withDateTime(SEARCH_TIME.toInstant())
+      .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL)))
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, Duration.ofSeconds(30)))
+          )
+        )
+      )
+      .buildRequest();
+
+    var results = service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+
+    assertWithMessage("every carpool leg here takes more than 30 s").that(results).isEmpty();
   }
 
   @Test
@@ -549,14 +577,12 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   }
 
   /**
-   * Regression test: {@code routeAccessEgress} must call {@code findNearbyStops} with
-   * {@link StreetMode#CAR_PICKUP}, not {@link StreetMode#CAR}. CAR_PICKUP allows the search
-   * to leave the drivable network and walk the last stretch to a transit stop whose link
-   * endpoint is reachable only via a pedestrian-only edge (e.g. a pedestrian-plaza stop).
+   * A transit stop whose link endpoint is reachable only via a pedestrian-only edge (e.g. a
+   * pedestrian-plaza stop) is served at the nearest vertex a car can reach and leave, with a walk
+   * for the last stretch.
    * <p>
-   * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A pure CAR
-   * search would never reach it, so it would not appear in any access result. If the
-   * implementation regresses to using CAR here, this assertion will fail.
+   * In this graph stopT5 is exactly such a stop: a walk-only side branch off D. A car alone
+   * would never reach it, so without the walk it would not appear in any access result.
    */
   @Test
   void accessFindsTransitStopReachableOnlyViaWalkOnlySideBranchFromDrivableNetwork() {
@@ -583,9 +609,7 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     assertNotNull(
       stopT5Result,
       "Access results should include stopT5, which is only reachable from the drivable " +
-        "network by walking. If routeAccessEgress called findNearbyStops with " +
-        "StreetMode.CAR instead of CAR_PICKUP the search could not leave the car network " +
-        "to walk the pedestrian-only side branch to stopT5, and the stop would be missing here."
+        "network by walking the pedestrian-only side branch from D."
     );
 
     // The carpool drops the passenger at D (the only drivable vertex incident to the side branch)

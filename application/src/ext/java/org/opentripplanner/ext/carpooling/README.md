@@ -8,7 +8,7 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 
 **Why it exists**: Provides flexible, demand-responsive carpooling as a complement to fixed-route transit.
 
-**How it works**: Three-phase algorithm (filter → pre-screen → route → validate) finds optimal passenger insertion points in driver routes using A* street routing with intelligent position pre-screening and segment caching.
+**How it works**: Three-phase algorithm (filter → pre-screen → route → validate) finds optimal passenger insertion points in driver routes using A* street routing with intelligent position pre-screening; access and egress take the driver's driving times from each trip's corridor, computed when the trip arrives.
 
 ## Key Features
 
@@ -45,7 +45,8 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │                                            │
 │     2b. Routing & Selection                │
 │         (InsertionEvaluator)               │
-│         - Route baseline segments (cached) │
+│         - Route baseline segments, or take │
+│           them from the trip's corridor    │
 │         - Route viable positions           │
 │         - Endpoint-matching segment reuse  │
 │         - Select minimum additional time   │
@@ -90,7 +91,10 @@ org.opentripplanner.ext.carpooling/
 │   ├── InsertionCandidate.java     # Result of insertion computation
 │   ├── CarpoolCorridor.java        # Per-trip stops and driving times, built at ingest
 │   ├── CorridorBuilder.java        # Builds corridors from ellipse-bounded car trees
-│   └── CarpoolStopIndex.java       # Transit stops with their car-reachable snaps
+│   ├── CarpoolStopIndex.java       # Transit stops with their car-reachable snaps
+│   ├── CarpoolTreeStreetRouter.java # Tree-backed router (passenger's trees)
+│   ├── CorridorRouter.java         # Access/egress router over corridor + passenger trees
+│   └── CarpoolStreetRouter.java    # Goal-directed street router (direct mode)
 │
 ├── internal/                        # Implementation details
 │   ├── DefaultCarpoolingRepository.java  # In-memory repository
@@ -152,7 +156,7 @@ For viable positions from Stage 1, perform A* routing to find the optimal insert
 
 ```
 For each trip with viable positions:
-  1. Route baseline segments (driver's original route) and cache results
+  1. Route baseline segments (driver's original route), or take them from the trip's corridor
 
   2. For each viable position:
      a. Build modified route with passenger inserted
@@ -166,11 +170,19 @@ For each trip with viable positions:
 ```
 
 **Critical optimization - Endpoint-matching segment reuse**:
-- Baseline segments are cached after first routing
+- Baseline segments are routed once per trip, or taken from its corridor
 - For modified routes, segments are reused **only if both endpoints match exactly**
 - Endpoint matching uses `WgsCoordinate.equals()` with 7-decimal precision (~1cm)
 - Only segments with changed endpoints are re-routed
 - Prevents incorrect reuse when passenger insertion splits existing segments
+
+Where the driving times come from:
+
+- **Direct**: goal-directed street searches (`CarpoolStreetRouter`).
+- **Access/egress**: when a trip arrives, `CorridorBuilder` computes its `CarpoolCorridor`: the
+  routed baseline legs and, per leg, every transit stop inside the leg's feasibility ellipse with
+  the driving times to serve it. A request then builds only the passenger's two street trees
+  (`CarpoolTreeStreetRouter`) and reads everything else from the candidate trips' corridors.
 
 ## Usage Examples
 

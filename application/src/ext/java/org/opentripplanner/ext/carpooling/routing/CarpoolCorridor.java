@@ -5,13 +5,14 @@ import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
- * What a driver trip can do for passengers, computed once when the trip arrives: the routed
- * duration of each leg, the bound each leg may stretch to, and per leg the transit stops inside its
- * feasibility ellipse with the driving times to serve them.
+ * What a driver trip can do for passengers, computed once when the trip arrives and reused by
+ * every request: the routed duration of each leg, the bound each leg may stretch to, and per leg
+ * the transit stops inside its feasibility ellipse with the driving times to serve them.
  * <p>
  * Of the driving times an insertion needs, only those with the passenger at one end are
  * request-specific. The baseline legs and the times between a waypoint and a stop depend on the
- * trip and the static street graph alone, so the corridor holds them.
+ * trip and the static street graph alone, so the corridor holds them and a request evaluates an
+ * insertion with a few lookups instead of street searches per trip.
  *
  * @param legDurations routed driving time of each leg
  * @param legLimits the most each leg may take once a passenger is inserted, see

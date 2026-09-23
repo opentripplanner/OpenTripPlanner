@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.routing;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,6 +75,11 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
     assertThat(List.of(path.geometry().getCoordinates()))
       .containsExactly(vertexA.getCoordinate(), vertexB.getCoordinate(), vertexC.getCoordinate())
       .inOrder();
+  }
+
+  @Test
+  void returnNullWhenTheSearchStopsBeforeTheTarget() {
+    assertThat(ROUTER.route(vertexA, vertexC, Duration.ofSeconds(1))).isNull();
   }
 
   @Test

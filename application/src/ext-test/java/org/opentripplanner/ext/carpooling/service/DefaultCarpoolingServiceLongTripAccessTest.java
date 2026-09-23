@@ -21,13 +21,10 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
- * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a driver trip whose end-to-end
- * driving time exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS}, 60
- * minutes). Each leg's tree is sized from OTP's own routed leg duration (see
- * {@link DefaultCarpoolingService#driverLegTreeLimits} and {@code resolveLegDurations}), not from
- * the radius, so the leg's far waypoint stays inside the tree and the trip produces access
- * candidates.
+ * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a driver trip whose single leg takes
+ * more than an hour. The leg's corridor is sized from OTP's own routed leg duration (see
+ * {@link org.opentripplanner.ext.carpooling.routing.DriverLegLimits#legLimits}), so it spans the
+ * whole leg and the trip produces access candidates.
  *
  * <pre>
  *   P  (10 meters N of A)
@@ -41,12 +38,11 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * leg A to D in ~80 min, with a 10-min deviation budget at A and D. The access request has the
  * passenger at P, dropped at stop S — both 10 meters from A.
  * <p>
- * The leg tree is sized from the routed baseline: 80 + 1 (slack) + 10 (budget) = 91 min, wider
- * than the 60-min radius. After dropping the passenger at S the carpool still drives on to D, so
- * the S-to-D segment (~80 min) must be routed; it goes only through D's waypoint tree (inserted
- * passenger segments have no goal-directed fallback). A tree capped at the 60-min radius could not
- * span it — S sits ~80 min back along the leg from D — so the insertion would be dropped and the
- * trip would yield no access candidates.
+ * The leg's corridor is sized from the routed baseline: 80 + 10 (budget) = 90 min. After dropping
+ * the passenger at S the carpool still drives on to D, so the S-to-D drive (~80 min) is needed; the
+ * corridor holds it. A corridor capped at an hour could not span it — S sits ~80 min back along
+ * the leg from D — so the insertion would be dropped and the trip would yield no access
+ * candidates.
  */
 class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
 
@@ -75,7 +71,7 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
         @Override
         public void build() {
           var A = intersection("A", ORIGIN);
-          // D is one long leg ~80 min from A — well beyond the 60-min nearby-stop radius.
+          // D is one long leg ~80 min from A.
           var D = intersection("D", ORIGIN.moveEastMeters(48000));
 
           coordA = A.toWgsCoordinate();
@@ -105,8 +101,8 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
   }
 
   @Test
-  void findsAccessResultsForTripLongerThanNearbyStopRadius() {
-    // Routed leg ~80 min → tree limit 80 + 1 min slack + 10 min budget = 91 min, spanning the
+  void findsAccessResultsForALegOfMoreThanAnHour() {
+    // Routed leg ~80 min → corridor bound 80 + 10 min budget = 90 min, spanning the
     // A → D baseline.
     var tripStart = SEARCH_TIME.plusMinutes(30);
     var tripEnd = tripStart.plusMinutes(60);
@@ -130,8 +126,7 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
 
     assertFalse(
       results.isEmpty(),
-      "A carpool trip driving longer than the 60-min nearby-stop radius should still produce " +
-        "access candidates"
+      "A carpool trip with a leg of more than an hour should still produce access candidates"
     );
 
     int stopSIndex = transitServiceResolver.getStop(stopS.getId()).getIndex();

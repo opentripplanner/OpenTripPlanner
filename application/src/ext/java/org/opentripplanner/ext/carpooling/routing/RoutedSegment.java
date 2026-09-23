@@ -14,7 +14,11 @@ import org.opentripplanner.street.model.path.StreetPath;
  * from the start, and one that does not hold its {@link #path()} builds it on demand.
  */
 public interface RoutedSegment {
-  /** Travel time in whole seconds, the same value {@code path().duration().toSeconds()} reports. */
+  /**
+   * Travel time in whole seconds, as the router timed it. A path routed together with the
+   * duration reports the same value; a path found later for a known duration may differ from it by
+   * a few seconds, see {@link CorridorRouter}.
+   */
   int durationSeconds();
 
   default Duration duration() {

@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * Represents a viable insertion of a passenger into a carpool trip.
@@ -28,7 +28,7 @@ public record InsertionCandidate(
   int dropoffPosition,
   List<RoutedSegment> routeSegments,
   Duration stopDuration,
-  NearbyStop transitStop,
+  @Nullable StopLocation transitStop,
   Duration totalTripDuration,
   @Nullable StreetPath walkToPickup,
   @Nullable StreetPath walkFromDropoff
@@ -68,7 +68,7 @@ public record InsertionCandidate(
     int dropoffPosition,
     List<RoutedSegment> routeSegments,
     Duration stopDuration,
-    NearbyStop transitStop,
+    @Nullable StopLocation transitStop,
     @Nullable StreetPath walkToPickup,
     @Nullable StreetPath walkFromDropoff
   ) {

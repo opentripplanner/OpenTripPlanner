@@ -28,10 +28,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a cross-leg insertion — pickup on
  * one leg of a multi-stop driver trip, dropoff on a later leg — whose
- * {@code passenger → next waypoint} drive exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS},
- * 60 minutes). It is found only because the passenger's routing tree is sized to the largest
- * candidate leg limit, not to a fixed cap.
+ * {@code passenger → next waypoint} drive takes more than an hour. It is found only because the
+ * passenger's routing tree is sized to the largest candidate leg limit, not to a fixed cap.
  *
  * <pre>
  *   Right = EAST. The two legs run opposite ways over the same ground, so they are
@@ -57,22 +55,21 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * keep each waypoint off another street's geometry; every street length is declared (at a flat
  * 10 m/s), so the leg times above are exact. Deviation budget: 10 min at M and D, 0 at A.
  * <p>
- * Access request: passenger at P, dropped at the only stop S. S is 10 car-minutes from P over the
- * local road, so the nearby-stop search (≤ 60 min) finds it easily.
+ * Access request: passenger at P, dropped at the only stop S, which lies at the end of the trip's
+ * last leg.
  * <p>
  * The only insertion that fits the budget is cross-leg: pick up P on leg A → M and drop S on leg
  * M → D, giving A → P → M → S → D. Dropping S on the first leg instead (A → P → S → M) would reach
  * M at ~90 min against a 70-min schedule, blowing the 10-min budget.
  * <p>
- * That makes the P → M ride a 70-min drive — longer than the 60-min radius — and it is routed
- * solely through the passenger's own forward tree (inserted passenger segments have no
- * goal-directed fallback). So it routes only because that tree is sized to the largest leg limit:
- * 70 + 1 (slack) + 10 (budget) = 81 min.
+ * That makes the P → M ride a 70-min drive, routed solely through the passenger's own forward
+ * tree. So it routes only because that tree is sized to the largest leg limit: 70 + 10 (budget) =
+ * 80 min.
  * <p>
  * X is what makes a too-small tree actually fail here: {@code DurationSkipEdgeStrategy} prunes an
  * edge by the elapsed time at its start, so a single 42-km A → M edge would be crossed in one step
  * from ~0 elapsed and defeat any limit. Splitting it at X (61.7 min) lets a 60-min tree reach X but
- * prune X → M, while the 81-min tree spans the whole leg.
+ * prune X → M, while the 80-min tree spans the whole leg.
  */
 class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
 
@@ -120,8 +117,8 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
           street(A, X, 37000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
           street(X, M, 5000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
           street(M, D, 36000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
-          // Bidirectional local road tying A's area to D's, so the stop search from P reaches S
-          // and an early dropoff of S has a (budget-breaching) way back to M.
+          // Bidirectional local road tying A's area to D's, so an early dropoff of S has a
+          // (budget-breaching) way back to M.
           street(A, D, 6000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
           street(D, A, 6000, StreetTraversalPermission.ALL, CAR_SPEED_MPS);
 
@@ -145,7 +142,7 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
   }
 
   @Test
-  void findsCrossLegInsertionWithPassengerSegmentLongerThanNearbyStopRadius() {
+  void findsCrossLegInsertionWithAPassengerSegmentOfMoreThanAnHour() {
     var tripStart = SEARCH_TIME.plusMinutes(30);
     context.upsertTrip(trip(tripStart));
 
@@ -154,6 +151,14 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
       .withTo(GenericLocation.fromCoordinate(coordM.latitude(), coordM.longitude()))
       .withDateTime(SEARCH_TIME.toInstant())
       .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL)))
+      // The ride itself takes over an hour: allow it, the test is about finding the insertion.
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, Duration.ofHours(3)))
+          )
+        )
+      )
       .buildRequest();
 
     var results = service.routeAccessEgress(
@@ -166,8 +171,8 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
 
     assertFalse(
       results.isEmpty(),
-      "A budget-feasible cross-leg insertion whose passenger → waypoint segment exceeds the " +
-        "nearby-stop radius should produce access candidates"
+      "A budget-feasible cross-leg insertion whose passenger → waypoint segment takes more " +
+        "than an hour should produce access candidates"
     );
 
     int stopSIndex = transitServiceResolver.getStop(stopS.getId()).getIndex();

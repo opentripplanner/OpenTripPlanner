@@ -81,6 +81,7 @@ record CarpoolingServiceTestContext(
       STREET_LIMITATION_PARAMETERS,
       vertexCreationService,
       carReachableVertexSnapper,
+      stopIndex,
       CarpoolingParameters.DEFAULT
     );
     return new CarpoolingServiceTestContext(

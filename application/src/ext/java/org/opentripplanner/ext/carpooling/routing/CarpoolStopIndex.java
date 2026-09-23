@@ -25,10 +25,12 @@ import org.slf4j.LoggerFactory;
  * A passenger is dropped off for a stop at a vertex a car can reach and leave, then walks to the
  * stop; picked up likewise after walking from the stop to such a vertex. Both snaps depend only on
  * the static street graph, so they are computed once per stop, on first use, and shared by every
- * trip's corridor. The index also finds the stops inside an envelope, from a grid over their
- * coordinates, which the corridor computation uses.
+ * request; the walk is timed with default street preferences, a request replays it with its own
+ * (see {@link org.opentripplanner.ext.carpooling.util.StreetPathUtils#replay}). The index also
+ * finds the stops inside an envelope, from a grid over their coordinates, which the corridor
+ * computation uses.
  * <p>
- * Thread-safe: the updaters of all feeds share one instance.
+ * Thread-safe: requests and the updater share one instance.
  */
 public class CarpoolStopIndex {
 
@@ -40,7 +42,8 @@ public class CarpoolStopIndex {
   private final CarReachableVertexSnapper snapper;
   /**
    * Walk budget of the snap searches. The snap is the nearest car-reachable vertex whatever the
-   * budget, so it does not depend on a request's maximum walk.
+   * budget, so it does not depend on a request's maximum walk; a request with a smaller maximum
+   * simply drops the stops whose walk exceeds it.
    */
   private final Duration maxStopWalk;
   private final Map<FeedScopedId, TransitStopVertex> stops = new HashMap<>();

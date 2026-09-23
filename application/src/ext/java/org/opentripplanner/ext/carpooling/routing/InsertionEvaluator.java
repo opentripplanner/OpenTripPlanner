@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +34,6 @@ public class InsertionEvaluator {
 
   private final CarpoolRouter carpoolRouter;
 
-  @Nullable
-  private final CarpoolRouter baselineFallbackRouter;
-
   private final Duration stopDuration;
 
   /**
@@ -48,33 +45,7 @@ public class InsertionEvaluator {
    *        passenger-ride durations.
    */
   public InsertionEvaluator(CarpoolRouter carpoolRouter, Duration stopDuration) {
-    this(carpoolRouter, null, stopDuration);
-  }
-
-  /**
-   * @param carpoolRouter routes a single street segment between two vertices in the candidate
-   *        carpool route — used both to build the baseline route and to re-route only the
-   *        segments that change when a passenger pickup/dropoff is inserted.
-   * @param baselineFallbackRouter re-routes a baseline leg that {@code carpoolRouter} could not,
-   *        or {@code null} for no fallback. Only the baseline route falls back. When
-   *        {@code carpoolRouter} is a tree router whose per-leg trees are sized to a bounded
-   *        per-leg limit, an underestimate of that limit would leave a waypoint outside its tree
-   *        and drop the whole trip; a goal-directed fallback re-routes just that leg instead.
-   *        Inserted passenger
-   *        segments deliberately do not fall back — a segment that cannot be routed within the
-   *        tree is an insertion the delay constraints reject anyway, so failing fast there is
-   *        correct and avoids a goal-directed search per nearby stop.
-   * @param stopDuration duration added at each intermediate stop (from the car {@code pickupTime}
-   *        preference); applied between consecutive segments when computing total trip and
-   *        passenger-ride durations.
-   */
-  public InsertionEvaluator(
-    CarpoolRouter carpoolRouter,
-    @Nullable CarpoolRouter baselineFallbackRouter,
-    Duration stopDuration
-  ) {
     this.carpoolRouter = carpoolRouter;
-    this.baselineFallbackRouter = baselineFallbackRouter;
     this.stopDuration = stopDuration;
   }
 
@@ -91,12 +62,6 @@ public class InsertionEvaluator {
       var to = routePoints.get(i + 1);
 
       RoutedSegment segment = carpoolRouter.route(from, to);
-      if (segment == null && baselineFallbackRouter != null) {
-        segment = baselineFallbackRouter.route(from, to);
-        if (segment != null) {
-          LOG.debug("Baseline segment {} → {} routed by the fallback router", i, i + 1);
-        }
-      }
       if (segment == null) {
         LOG.debug("Baseline routing failed for segment {} → {}", i, i + 1);
         return null;
@@ -109,19 +74,17 @@ public class InsertionEvaluator {
   }
 
   /**
-   * @return A list containing the best insertion that can be found for every NearbyStop in
+   * @return A list containing the best insertion that can be found for every stop in
    * the list tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions
-   * for a NearbyStop, then no candidate for that stop will be returned.
+   * for a stop, then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
     var routableTrip = tripWithViableAccessEgress.routableTrip();
 
-    // No nearby stop produced a viable insertion position for this trip, so there is nothing to
-    // evaluate. Return before routing the baseline: that routing builds the trip's street trees,
-    // which are expensive for long trips — wasted work for a trip that cannot yield an
-    // access/egress leg.
+    // No stop produced a viable insertion position for this trip, so there is nothing to
+    // evaluate.
     if (tripWithViableAccessEgress.viableAccessEgress().isEmpty()) {
       return List.of();
     }
@@ -219,7 +182,7 @@ public class InsertionEvaluator {
     PassengerSnap snap,
     RoutedSegment[] baselineSegments,
     Duration[] cumulativeDurations,
-    NearbyStop transitStop
+    @Nullable StopLocation transitStop
   ) {
     InsertionCandidate bestCandidate = null;
 
@@ -266,7 +229,7 @@ public class InsertionEvaluator {
     PassengerSnap snap,
     RoutedSegment[] baselineSegments,
     Duration[] originalCumulativeDurations,
-    NearbyStop transitStop
+    @Nullable StopLocation transitStop
   ) {
     List<RoutedSegment> modifiedSegments = buildModifiedSegments(
       routableTrip.vertices(),
