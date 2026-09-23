@@ -28,9 +28,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a cross-leg insertion — pickup on
  * one leg of a multi-stop driver trip, dropoff on a later leg — whose
- * {@code passenger → next waypoint} drive exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS},
- * 60 minutes). It is found only because the passenger's routing tree is sized to the largest
+ * {@code passenger → next waypoint} drive exceeds the former nearby-stop search radius
+ * (60 minutes). It is found only because the passenger's routing tree is sized to the largest
  * candidate leg limit, not to a fixed cap.
  *
  * <pre>
@@ -67,12 +66,12 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * That makes the P → M ride a 70-min drive — longer than the 60-min radius — and it is routed
  * solely through the passenger's own forward tree (inserted passenger segments have no
  * goal-directed fallback). So it routes only because that tree is sized to the largest leg limit:
- * 70 + 1 (slack) + 10 (budget) = 81 min.
+ * 70 + 10 (budget) = 80 min.
  * <p>
  * X is what makes a too-small tree actually fail here: {@code DurationSkipEdgeStrategy} prunes an
  * edge by the elapsed time at its start, so a single 42-km A → M edge would be crossed in one step
  * from ~0 elapsed and defeat any limit. Splitting it at X (61.7 min) lets a 60-min tree reach X but
- * prune X → M, while the 81-min tree spans the whole leg.
+ * prune X → M, while the 80-min tree spans the whole leg.
  */
 class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
 
@@ -154,6 +153,14 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
       .withTo(GenericLocation.fromCoordinate(coordM.latitude(), coordM.longitude()))
       .withDateTime(SEARCH_TIME.toInstant())
       .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL)))
+      // The ride itself takes over an hour: allow it, the test is about finding the insertion.
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, Duration.ofHours(3)))
+          )
+        )
+      )
       .buildRequest();
 
     var results = service.routeAccessEgress(
