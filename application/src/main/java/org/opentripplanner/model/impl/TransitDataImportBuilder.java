@@ -7,21 +7,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.core.model.time.TimePenalty;
+import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
+import org.opentripplanner.transfer.constrained.model.DeferredConstrainedTransferPoint;
+import org.opentripplanner.transfer.constrained.model.PendingConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
+import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
@@ -44,6 +53,7 @@ import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -61,6 +71,19 @@ import org.slf4j.LoggerFactory;
 public class TransitDataImportBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitDataImportBuilder.class);
+
+  /**
+   * Whether/how {@link #build()} should validate the accumulated stop times before generating
+   * trip patterns. {@code SKIP} preserves the pre-{@code build()} behavior relied on by tests that
+   * construct a builder directly and never route it through {@link
+   * org.opentripplanner.gtfs.graphbuilder.GtfsModule} or {@link
+   * org.opentripplanner.netex.NetexModule}.
+   */
+  public enum StopTimeValidation {
+    SKIP,
+    INTERPOLATE,
+    VALIDATE,
+  }
 
   private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
@@ -95,6 +118,8 @@ public class TransitDataImportBuilder {
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
+  private final List<PendingConstrainedTransfer> pendingTransfers = new ArrayList<>();
+
   private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
 
   private final EntityById<Trip> tripsById = new DefaultEntityById<>();
@@ -118,6 +143,14 @@ public class TransitDataImportBuilder {
 
   private final DataImportIssueStore issueStore;
 
+  private final StopTimeValidation stopTimeValidation;
+
+  private final TripPatternGenerator patternGenerator;
+
+  private boolean hasFrequencyBasedTrips = false;
+
+  private boolean hasScheduledTrips = false;
+
   /**
    * Create a builder with no transit period limit - see
    * {@link #TransitDataImportBuilder(SiteRepository, DataImportIssueStore, LocalDateRange)}.
@@ -135,9 +168,35 @@ public class TransitDataImportBuilder {
     DataImportIssueStore issueStore,
     LocalDateRange transitPeriodLimit
   ) {
+    this(
+      siteRepository,
+      issueStore,
+      transitPeriodLimit,
+      StopTimeValidation.SKIP,
+      TripPatternGenerator.NONE
+    );
+  }
+
+  /**
+   * @param transitPeriodLimit dates outside this period are dropped as calendar data is added
+   * (see build-config's {@code transitServiceStart}/{@code transitServiceEnd}).
+   * @param stopTimeValidation whether/how {@link #build()} should validate stop times before
+   * generating trip patterns - see {@link StopTimeValidation}.
+   * @param patternGenerator generates {@code TripPattern}s as the last step of {@link #build()} -
+   * see {@link TripPatternGenerator}.
+   */
+  public TransitDataImportBuilder(
+    SiteRepository siteRepository,
+    DataImportIssueStore issueStore,
+    LocalDateRange transitPeriodLimit,
+    StopTimeValidation stopTimeValidation,
+    TripPatternGenerator patternGenerator
+  ) {
     this.siteRepositoryBuilder = siteRepository.withContext();
     this.issueStore = issueStore;
     this.tripCalendars = TripCalendars.of(transitPeriodLimit);
+    this.stopTimeValidation = stopTimeValidation;
+    this.patternGenerator = patternGenerator;
     if (!transitPeriodLimit.isUnbounded()) {
       LOG.info("Limiting transit service to time period: {}", transitPeriodLimit);
     }
@@ -235,6 +294,15 @@ public class TransitDataImportBuilder {
     return transfers;
   }
 
+  /**
+   * Transfers whose endpoints still need a stop position resolved against a trip's final,
+   * post-filtering stop-time sequence - see {@link DeferredConstrainedTransferPoint}. Resolved into
+   * {@link #getTransfers()} by {@link #build()}.
+   */
+  public List<PendingConstrainedTransfer> getPendingTransfers() {
+    return pendingTransfers;
+  }
+
   public List<StaySeatedNotAllowed> getStaySeatedNotAllowed() {
     return staySeatedNotAllowed;
   }
@@ -283,11 +351,46 @@ public class TransitDataImportBuilder {
   }
 
   /**
+   * Set by the {@link TripPatternGenerator} passed in at construction time. Exposed on the built
+   * {@link TransitDataImport} - see {@link TransitDataImport#hasFrequencyBasedTrips()}/
+   * {@link TransitDataImport#hasScheduledTrips()} - rather than read back off this builder.
+   */
+  public void markServiceType(boolean hasFrequencyBasedTrips, boolean hasScheduledTrips) {
+    this.hasFrequencyBasedTrips = this.hasFrequencyBasedTrips || hasFrequencyBasedTrips;
+    this.hasScheduledTrips = this.hasScheduledTrips || hasScheduledTrips;
+  }
+
+  boolean hasFrequencyBasedTrips() {
+    return hasFrequencyBasedTrips;
+  }
+
+  boolean hasScheduledTrips() {
+    return hasScheduledTrips;
+  }
+
+  /**
    * Build the {@link TransitDataImport}. Since calendar data is clipped to this builder's transit
    * period limit as it is added (see the constructor), any trip/stopTime/pattern/transfer/
-   * tripOnServiceDate left referencing a service id with no remaining dates is removed first.
+   * tripOnServiceDate/flexTrip left referencing a service id with no remaining dates is removed
+   * first - before flex trips are created, stop times are validated/interpolated, pending
+   * transfers are resolved, and trip patterns are generated, in that order. A second,
+   * safety-net prune then catches anything those later steps created that references a since
+   * pruned trip.
    */
   public TransitDataImport build() {
+    removeEntitiesWithInvalidReferences();
+    if (OTPFeature.FlexRouting.isOn()) {
+      flexTripsById.addAll(FlexTripsMapper.createFlexTrips(this, issueStore));
+    }
+    if (stopTimeValidation != StopTimeValidation.SKIP) {
+      new ValidateAndInterpolateStopTimesForEachTrip(
+        stopTimesByTrip,
+        stopTimeValidation == StopTimeValidation.INTERPOLATE,
+        issueStore
+      ).run();
+    }
+    resolvePendingTransfers();
+    patternGenerator.generate(this, issueStore);
     removeEntitiesWithInvalidReferences();
     return new DefaultTransitDataImport(this);
   }
@@ -323,6 +426,7 @@ public class TransitDataImportBuilder {
     fixOrRemovePatternsWhichReferenceNoneExistingTrips();
     removeTransfersForNoneExistingTrips();
     removeTripOnServiceDateForNonExistingTrip();
+    removeFlexTripsForNoneExistingTrips();
   }
 
   /** Remove all trips which reference none existing service ids */
@@ -413,6 +517,96 @@ public class TransitDataImportBuilder {
         );
       }
     }
+  }
+
+  /** Remove all flex trips which reference none existing trips */
+  private void removeFlexTripsForNoneExistingTrips() {
+    int orgSize = flexTripsById.size();
+    flexTripsById.removeIf(
+      t -> !tripsById.containsKey(t.getTrip().getId()),
+      t ->
+        issueStore.add(
+          "RemovedMissingServiceIdFlexTrip",
+          "Removed flex trip %s as trip %s does not exist",
+          t.getId(),
+          t.getTrip().getId()
+        )
+    );
+    logRemove("FlexTrip", orgSize, flexTripsById.size(), "Trip for FlexTrip does not exist.");
+  }
+
+  /**
+   * Resolve every {@link #pendingTransfers} entry's stop position(s) against the now-final
+   * {@link #stopTimesByTrip} - see {@link DeferredConstrainedTransferPoint}. Must run after stop times have
+   * been pruned/validated/interpolated, and before {@link DefaultTransitDataImport} takes its
+   * snapshot of {@link #transfers}.
+   */
+  private void resolvePendingTransfers() {
+    for (PendingConstrainedTransfer pending : pendingTransfers) {
+      TransferPoint from = resolveTransferPoint(pending.from());
+      TransferPoint to = resolveTransferPoint(pending.to());
+      if (from == null || to == null) {
+        issueStore.add(
+          "InvalidTransfer",
+          "Dropped transfer %s: could not resolve a stop position for one of its trip endpoints",
+          pending.id()
+        );
+        continue;
+      }
+      transfers.add(new ConstrainedTransfer(pending.id(), from, to, pending.constraint()));
+    }
+    pendingTransfers.clear();
+  }
+
+  @Nullable
+  private TransferPoint resolveTransferPoint(DeferredConstrainedTransferPoint point) {
+    return switch (point) {
+      case DeferredConstrainedTransferPoint.Resolved r -> r.point();
+      case DeferredConstrainedTransferPoint.PendingTripPosition p -> {
+        int pos = p.boardTrip()
+          ? boardStopPosition(p.trip(), p.stop(), p.station())
+          : alightStopPosition(p.trip(), p.stop(), p.station());
+        yield pos < 0 ? null : new TripTransferPoint(p.trip(), pos);
+      }
+    };
+  }
+
+  private int boardStopPosition(Trip trip, @Nullable RegularStop stop, @Nullable Station station) {
+    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
+    Predicate<StopLocation> stopMatches =
+      station != null
+        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
+        : s -> s == stop;
+
+    for (int i = 0; i < stopTimes.size() - 1; i++) {
+      StopTime stopTime = stopTimes.get(i);
+      if (stopTime.getPickupType().isNotRoutable()) {
+        continue;
+      }
+      if (stopMatches.test(stopTime.getStop())) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private int alightStopPosition(Trip trip, @Nullable RegularStop stop, @Nullable Station station) {
+    List<StopTime> stopTimes = stopTimesByTrip.get(trip);
+    Predicate<StopLocation> stopMatches =
+      station != null
+        ? s -> s instanceof RegularStop regStop && regStop.getParentStation() == station
+        : s -> s == stop;
+
+    for (int i = stopTimes.size() - 1; i > 0; i--) {
+      StopTime stopTime = stopTimes.get(i);
+      if (stopTime.getDropOffType().isNotRoutable()) {
+        continue;
+      }
+      if (stopMatches.test(stopTime.getStop())) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /** Return {@code true} if the from/to trip reference is none null, but do not exist. */

@@ -269,7 +269,10 @@ public class GTFSToTransitDataImportMapper {
   }
 
   /**
-   * Note! Trip-pattens must be added BEFORE mapping transfers
+   * The resulting transfers still need their stop position resolved against each trip's final, post-filtering
+   * stop-time sequence - see {@link org.opentripplanner.transfer.constrained.model.DeferredConstrainedTransferPoint}. That
+   * happens in {@link org.opentripplanner.model.impl.TransitDataImportBuilder#build()}, so this can safely be
+   * called any time before {@code build()}.
    */
   public void mapAndAddTransfersToBuilder(GtfsDao data) {
     TransferMapper transferMapper = new TransferMapper(
@@ -277,12 +280,11 @@ public class GTFSToTransitDataImportMapper {
       stationMapper,
       stopMapper,
       tripMapper,
-      builder.getStopTimesSortedByTrip(),
       discardMinTransferTimes,
       issueStore
     );
     var result = transferMapper.map(data.getAllTransfers());
-    builder.getTransfers().addAll(result.constrainedTransfers());
+    builder.getPendingTransfers().addAll(result.pendingConstrainedTransfers());
     builder.getStaySeatedNotAllowed().addAll(result.staySeatedNotAllowed());
   }
 }

@@ -7,6 +7,8 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.model.impl.TransitDataImportBuilder.StopTimeValidation;
+import org.opentripplanner.model.impl.TripPatternGenerator;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -53,7 +55,9 @@ public class NetexConfigure {
       var transitServiceBuilder = new TransitDataImportBuilder(
         transitRepository.getSiteRepository(),
         issueStore,
-        buildConfig.getTransitServicePeriod()
+        buildConfig.getTransitServicePeriod(),
+        StopTimeValidation.VALIDATE,
+        TripPatternGenerator.NONE
       );
       netexBundles.add(netexBundle(transitServiceBuilder, it));
     }

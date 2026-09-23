@@ -103,6 +103,8 @@ public class GenerateTripPatternsOperation {
       freqCount,
       scheduledCount
     );
+
+    transitServiceBuilder.markServiceType(hasFrequencyBasedTrips(), hasScheduledTrips());
   }
 
   public boolean hasFrequencyBasedTrips() {

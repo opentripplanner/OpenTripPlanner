@@ -5,16 +5,12 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
-import org.opentripplanner.ext.flex.FlexTripsMapper;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToTimetable;
 import org.opentripplanner.graph_builder.module.TransitWithFutureDateValidator;
-import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.TransitDataImport;
-import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -79,14 +75,6 @@ public class NetexModule implements GraphBuilderModule {
       while (!netexBundles.isEmpty()) {
         TransitDataImportBuilder transitBuilder = loadNextBundle();
 
-        if (OTPFeature.FlexRouting.isOn()) {
-          transitBuilder
-            .getFlexTripsById()
-            .addAll(FlexTripsMapper.createFlexTrips(transitBuilder, issueStore));
-        }
-
-        validateStopTimesForEachTrip(transitBuilder.getStopTimesSortedByTrip());
-
         TransitDataImport otpService = transitBuilder.build();
 
         AddTransitEntitiesToTimetable.addToTimetable(
@@ -132,10 +120,6 @@ public class NetexModule implements GraphBuilderModule {
       netexBundle.checkInputs();
       return netexBundle.loadBundle(deduplicator, issueStore);
     }
-  }
-
-  private void validateStopTimesForEachTrip(TripStopTimes stopTimesByTrip) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, issueStore).run();
   }
 
   @Override

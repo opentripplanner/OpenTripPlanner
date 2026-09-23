@@ -79,6 +79,16 @@ public interface TransitDataImport {
   boolean hasActiveTransit();
 
   /**
+   * @return {@code true} if any trip in this import is frequency-based (GTFS {@code frequencies.txt}).
+   */
+  boolean hasFrequencyBasedTrips();
+
+  /**
+   * @return {@code true} if any trip in this import has a scheduled (non-frequency-based) timetable.
+   */
+  boolean hasScheduledTrips();
+
+  /**
    * @see org.opentripplanner.transit.service.TransitRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
   Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint();

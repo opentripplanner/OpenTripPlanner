@@ -67,6 +67,9 @@ class DefaultTransitDataImport implements TransitDataImport {
   private final Collection<FlexTrip<?, ?>> flexTrips;
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint;
 
+  private final boolean hasFrequencyBasedTrips;
+  private final boolean hasScheduledTrips;
+
   /**
    * Create a read only version of the {@link TransitDataImport}.
    */
@@ -88,6 +91,8 @@ class DefaultTransitDataImport implements TransitDataImport {
     this.stopsByScheduledStopPoint = Collections.unmodifiableMap(
       builder.stopsByScheduledStopPoints()
     );
+    this.hasFrequencyBasedTrips = builder.hasFrequencyBasedTrips();
+    this.hasScheduledTrips = builder.hasScheduledTrips();
   }
 
   @Override
@@ -172,6 +177,16 @@ class DefaultTransitDataImport implements TransitDataImport {
   @Override
   public boolean hasActiveTransit() {
     return !tripCalendars.isEmpty();
+  }
+
+  @Override
+  public boolean hasFrequencyBasedTrips() {
+    return hasFrequencyBasedTrips;
+  }
+
+  @Override
+  public boolean hasScheduledTrips() {
+    return hasScheduledTrips;
   }
 
   /**
