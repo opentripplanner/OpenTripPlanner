@@ -145,7 +145,17 @@ class ServiceLinkMapper {
       .getProjectionRefOrProjection()) {
       Object projectionObj = projectionElement.getValue();
       if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
-        return mapServiceLink(serviceLink, stopPattern, stopIndex, linkSequenceProjection);
+        LineStringType lineString = linkSequenceProjection.getLineString();
+        if (lineString == null) {
+          issueStore.add(
+            "ServiceLinkWithoutLineString",
+            "Ignore linkSequenceProjection without linestring for: %s",
+            linkSequenceProjection.getId()
+          );
+          return null;
+        }
+
+        return mapLineString(lineString, stopPattern, stopIndex, serviceLink.getId());
       }
     }
 
@@ -158,33 +168,13 @@ class ServiceLinkMapper {
   }
 
   @Nullable
-  private LineString mapServiceLink(
-    ServiceLink serviceLink,
-    StopPattern stopPattern,
-    int stopIndex,
-    LinkSequenceProjection_VersionStructure linkSequenceProjection
-  ) {
-    LineStringType lineString = linkSequenceProjection.getLineString();
-    if (lineString == null) {
-      issueStore.add(
-        "ServiceLinkWithoutLineString",
-        "Ignore linkSequenceProjection without linestring for: %s",
-        linkSequenceProjection.getId()
-      );
-      return null;
-    }
-
-    return mapLineString(lineString, stopPattern, stopIndex, serviceLink.getId());
-  }
-
-  @Nullable
   private LineString mapLineString(
     LineStringType lineString,
     StopPattern stopPattern,
     int stopIndex,
     String id
   ) {
-    final var geometry = lineStringMapper.getLineString(lineString, id);
+    var geometry = lineStringMapper.mapLineString(lineString, id);
     if (geometry == null) {
       return null;
     }

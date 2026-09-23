@@ -21,7 +21,7 @@ class LineStringMapper {
   }
 
   @Nullable
-  LineString getLineString(LineStringType lineString, String issueId) {
+  LineString mapLineString(LineStringType lineString, String issueId) {
     var coordinates = extractCoordinates(lineString);
 
     if (!isProjectionValid(coordinates, issueId)) {
@@ -103,8 +103,8 @@ class LineStringMapper {
   }
 
   private boolean isGeometryValid(LineString geometry, String id) {
-    Coordinate[] coordinates = geometry.getCoordinates();
-    if (coordinates.length < 2) {
+    var sequence = geometry.getCoordinateSequence();
+    if (sequence.size() < 2) {
       issueStore.add(
         "ServiceLinkGeometryError",
         "Ignore linkSequenceProjection with invalid linestring, " +
@@ -121,8 +121,8 @@ class LineStringMapper {
       );
       return false;
     }
-    for (Coordinate coordinate : coordinates) {
-      if (Double.isNaN(coordinate.x) || Double.isNaN(coordinate.y)) {
+    for (int i = 0; i < sequence.size(); i++) {
+      if (Double.isNaN(sequence.getX(i)) || Double.isNaN(sequence.getY(i))) {
         issueStore.add(
           "ServiceLinkGeometryError",
           "Ignore linkSequenceProjection with invalid linestring, " +

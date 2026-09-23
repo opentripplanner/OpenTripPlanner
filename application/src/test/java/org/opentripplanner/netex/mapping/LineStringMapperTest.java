@@ -42,9 +42,9 @@ class LineStringMapperTest {
 
   @Test
   void posListWithValidCoordinates() {
-    LineStringType lineString = lineStringFromPosList(COORDINATES);
+    var lineString = lineStringFromPosList(COORDINATES);
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertEquals(0, issueStore.listIssues().size());
     assertCoordinatesMatch(COORDINATES, geometry);
@@ -52,9 +52,9 @@ class LineStringMapperTest {
 
   @Test
   void posListWithTooFewCoordinates() {
-    LineStringType lineString = lineStringFromPosList(COORDINATES[0], COORDINATES[1]);
+    var lineString = lineStringFromPosList(COORDINATES[0], COORDINATES[1]);
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertNull(geometry);
     assertEquals(1, issueStore.listIssues().size());
@@ -62,13 +62,9 @@ class LineStringMapperTest {
 
   @Test
   void posListWithOddNumberOfCoordinates() {
-    LineStringType lineString = lineStringFromPosList(
-      COORDINATES[0],
-      COORDINATES[1],
-      COORDINATES[2]
-    );
+    var lineString = lineStringFromPosList(COORDINATES[0], COORDINATES[1], COORDINATES[2]);
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertNull(geometry);
     assertEquals(1, issueStore.listIssues().size());
@@ -76,9 +72,9 @@ class LineStringMapperTest {
 
   @Test
   void posOrPointPropertyWithValidCoordinates() {
-    LineStringType lineString = lineStringFromPosOrPointProperty(COORDINATES);
+    var lineString = lineStringFromPosOrPointProperty(COORDINATES);
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertEquals(0, issueStore.listIssues().size());
     assertCoordinatesMatch(COORDINATES, geometry);
@@ -86,9 +82,9 @@ class LineStringMapperTest {
 
   @Test
   void posOrPointPropertyWithTooFewCoordinates() {
-    LineStringType lineString = lineStringFromPosOrPointProperty(COORDINATES[0], COORDINATES[1]);
+    var lineString = lineStringFromPosOrPointProperty(COORDINATES[0], COORDINATES[1]);
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertNull(geometry);
     assertEquals(1, issueStore.listIssues().size());
@@ -102,9 +98,9 @@ class LineStringMapperTest {
     // this mapper only understands DirectPositionType elements.
     posOrPoints.add(new PointPropertyType());
     posOrPoints.add(new DirectPositionType().withValue(COORDINATES[2], COORDINATES[3]));
-    LineStringType lineString = new LineStringType().withPosOrPointProperty(posOrPoints);
+    var lineString = new LineStringType().withPosOrPointProperty(posOrPoints);
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertNotNull(geometry);
     assertEquals(1, issueStore.listIssues().size());
@@ -118,14 +114,14 @@ class LineStringMapperTest {
   @Test
   void zeroLengthGeometryIsRejected() {
     // both points are identical, so the resulting linestring has zero length
-    LineStringType lineString = lineStringFromPosList(
+    var lineString = lineStringFromPosList(
       COORDINATES[0],
       COORDINATES[1],
       COORDINATES[0],
       COORDINATES[1]
     );
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertNull(geometry);
     assertEquals(1, issueStore.listIssues().size());
@@ -134,9 +130,9 @@ class LineStringMapperTest {
 
   @Test
   void neitherPosListNorPosOrPointProperty() {
-    LineStringType lineString = new LineStringType();
+    var lineString = new LineStringType();
 
-    LineString geometry = lineStringMapper.getLineString(lineString, ID);
+    var geometry = lineStringMapper.mapLineString(lineString, ID);
 
     assertNull(geometry);
     assertEquals(1, issueStore.listIssues().size());

@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.locationtech.jts.algorithm.ConvexHull;
@@ -76,13 +75,6 @@ public class GeometryUtils {
 
   public static LineString makeLineString(Coordinate... coordinates) {
     return GF.createLineString(coordinates);
-  }
-
-  public static LineString makeLineString(Iterable<Double> coordinates) {
-    double[] coords = StreamSupport.stream(coordinates.spliterator(), false)
-      .mapToDouble(Double::doubleValue)
-      .toArray();
-    return makeLineString(coords);
   }
 
   public static LineString makeLineString(WgsCoordinate... coordinates) {
