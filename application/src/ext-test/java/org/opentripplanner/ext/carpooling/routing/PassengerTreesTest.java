@@ -1,7 +1,10 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import java.time.Duration;
 import java.util.List;
@@ -71,6 +74,40 @@ class PassengerTreesTest {
       Duration.ZERO,
       PassengerTrees.treeLimit(far, waypoints, legLimits, MAX_SPEED, Direction.FROM)
     );
+  }
+
+  @Test
+  void theDriversSideTreeNeedsEachWaypointOnlyWithinItsLegsReach() {
+    // Two legs a0 -> a1 -> a2, allowed 20 and 30 minutes; the passenger is 1 km past a0.
+    var a0 = vertexEastOfOrigin(0);
+    var a1 = vertexEastOfOrigin(10_000);
+    var a2 = vertexEastOfOrigin(20_000);
+    var passenger = vertexEastOfOrigin(1_000);
+    var trip = new RoutableCarpoolTrip(
+      createTripWithStops(
+        a0.toWgsCoordinate(),
+        List.of(createStopAt(a1.toWgsCoordinate())),
+        a2.toWgsCoordinate()
+      ),
+      List.of(a0, a1, a2),
+      new CarpoolCorridor(
+        List.of(Duration.ofMinutes(10), Duration.ofMinutes(10)),
+        List.of(Duration.ofMinutes(20), Duration.ofMinutes(30)),
+        List.of()
+      )
+    );
+
+    // Reverse tree, a_k -> passenger: the leg's limit minus the drive on to a_(k+1).
+    var inward = PassengerTrees.waypointReach(passenger, List.of(trip), MAX_SPEED, Direction.TO);
+    assertThat(inward.keySet()).containsExactly(a0, a1);
+    assertWithinTwoSeconds(Duration.ofMinutes(20).minusSeconds(9_000 / 40), inward.get(a0));
+    assertWithinTwoSeconds(Duration.ofMinutes(30).minusSeconds(19_000 / 40), inward.get(a1));
+
+    // Forward tree, passenger -> a_(k+1): the leg's limit minus the drive from a_k.
+    var outward = PassengerTrees.waypointReach(passenger, List.of(trip), MAX_SPEED, Direction.FROM);
+    assertThat(outward.keySet()).containsExactly(a1, a2);
+    assertWithinTwoSeconds(Duration.ofMinutes(20).minusSeconds(1_000 / 40), outward.get(a1));
+    assertWithinTwoSeconds(Duration.ofMinutes(30).minusSeconds(9_000 / 40), outward.get(a2));
   }
 
   private static Vertex vertexEastOfOrigin(double meters) {

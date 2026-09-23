@@ -458,6 +458,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var passengerRouter = PassengerTrees.router(
         passengerVertex,
         candidateTrips,
+        accessOrEgress.isAccess(),
         maxCarSpeed,
         parameters.maxTripDuration()
       );

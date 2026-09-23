@@ -3,22 +3,32 @@ package org.opentripplanner.ext.carpooling.routing;
 import static org.opentripplanner.ext.carpooling.util.BeelineEstimator.minDriveSeconds;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter.Direction;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * The passenger's two car trees of an access/egress request, outward from the passenger and inward
- * to it.
+ * to it. The tree on the driver's side of the passenger, inward for access and outward for egress,
+ * only serves segments between the passenger and the trips' waypoints, so it stops once it has
+ * them.
  */
 public final class PassengerTrees {
 
   private PassengerTrees() {}
 
-  /** A router with the passenger's vertex registered in both directions. */
+  /**
+   * A router with the passenger's vertex registered in both directions.
+   *
+   * @param access whether the request is an access request, whose driver's side of the passenger is
+   *               the inward tree; for egress it is the outward one
+   */
   public static CarpoolTreeStreetRouter router(
     Vertex passenger,
     List<RoutableCarpoolTrip> trips,
+    boolean access,
     double maxCarSpeed,
     Duration maxTree
   ) {
@@ -26,12 +36,14 @@ public final class PassengerTrees {
     router.addVertex(
       passenger,
       Direction.FROM,
-      min(treeLimit(passenger, trips, maxCarSpeed, Direction.FROM), maxTree)
+      min(treeLimit(passenger, trips, maxCarSpeed, Direction.FROM), maxTree),
+      access ? null : waypointReach(passenger, trips, maxCarSpeed, Direction.FROM)
     );
     router.addVertex(
       passenger,
       Direction.TO,
-      min(treeLimit(passenger, trips, maxCarSpeed, Direction.TO), maxTree)
+      min(treeLimit(passenger, trips, maxCarSpeed, Direction.TO), maxTree),
+      access ? waypointReach(passenger, trips, maxCarSpeed, Direction.TO) : null
     );
     return router;
   }
@@ -83,6 +95,33 @@ public final class PassengerTrees {
       }
     }
     return limit;
+  }
+
+  /**
+   * How far the passenger's tree has to reach for each waypoint the driver passes on the far side
+   * of the passenger: the forward tree serves {@code passenger → a_(k+1)}, the reverse tree
+   * {@code a_k → passenger}, each within the reach of its leg, see {@link #treeLimit}.
+   * Package-private for testing.
+   */
+  static Map<Vertex, Duration> waypointReach(
+    Vertex passenger,
+    List<RoutableCarpoolTrip> trips,
+    double maxCarSpeed,
+    Direction direction
+  ) {
+    var reach = new HashMap<Vertex, Duration>();
+    for (var trip : trips) {
+      var waypoints = trip.vertices();
+      var legLimits = trip.corridor().legLimits();
+      for (int leg = 0; leg < legLimits.size(); leg++) {
+        var waypoint = direction == Direction.FROM ? waypoints.get(leg + 1) : waypoints.get(leg);
+        var needed = legReach(passenger, waypoints, legLimits, leg, maxCarSpeed, direction);
+        if (!needed.isNegative()) {
+          reach.merge(waypoint, needed, (a, b) -> a.compareTo(b) >= 0 ? a : b);
+        }
+      }
+    }
+    return reach;
   }
 
   /** The leg's limit minus the beeline the driver needs on the other side of the passenger. */

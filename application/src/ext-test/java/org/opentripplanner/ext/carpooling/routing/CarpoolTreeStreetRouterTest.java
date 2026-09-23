@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,16 +89,43 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
   @Test
   void ellipseBoundsKeepTheLegAndDropTheRest() {
-    var unbounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, null);
+    var unbounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, null, null);
     long legSeconds = unbounded.getState(vertexC).getElapsedTimeSeconds();
     // The bound admits the leg A -> C with 5 s to spare; D lies beyond C and can never lead back to
     // it within that, while everything on the way to C stays.
     var bounds = new EllipseBounds(vertexC.getCoordinate(), legSeconds + 5, 40.0);
-    var bounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, bounds);
+    var bounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, bounds, null);
 
     assertEquals(legSeconds, bounded.getState(vertexC).getElapsedTimeSeconds());
     assertNotNull(bounded.getState(vertexB));
     assertNull(bounded.getState(vertexD));
+  }
+
+  @Test
+  void aTreeWithTargetsStopsOnceTheyAreReached() {
+    var tree = CarpoolTreeStreetRouter.carTree(
+      vertexA,
+      false,
+      SEARCH_LIMIT,
+      null,
+      Map.of(vertexB, SEARCH_LIMIT)
+    );
+
+    assertNotNull(tree.getState(vertexB));
+    assertNull(tree.getState(vertexD), "nothing later than B is expanded");
+  }
+
+  @Test
+  void aTargetThatIsNeverReachedKeepsItsWholeReach() {
+    var tree = CarpoolTreeStreetRouter.carTree(
+      vertexA,
+      false,
+      SEARCH_LIMIT,
+      null,
+      Map.of(vertexB, SEARCH_LIMIT, vertexDisconnected, SEARCH_LIMIT)
+    );
+
+    assertNotNull(tree.getState(vertexD), "Z might still be reached within the limit");
   }
 
   @Test

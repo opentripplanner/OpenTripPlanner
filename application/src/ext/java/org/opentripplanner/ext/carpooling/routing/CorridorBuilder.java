@@ -84,13 +84,15 @@ public class CorridorBuilder {
         from,
         false,
         searchLimit,
-        new EllipseBounds(to.getCoordinate(), bound, maxCarSpeedMetersPerSecond)
+        new EllipseBounds(to.getCoordinate(), bound, maxCarSpeedMetersPerSecond),
+        null
       );
       var reverse = CarpoolTreeStreetRouter.carTree(
         to,
         true,
         searchLimit,
-        new EllipseBounds(from.getCoordinate(), bound, maxCarSpeedMetersPerSecond)
+        new EllipseBounds(from.getCoordinate(), bound, maxCarSpeedMetersPerSecond),
+        null
       );
       double reachMeters = bound * maxCarSpeedMetersPerSecond + 2 * stopIndex.walkMeters();
       for (var stop : stopIndex.stopsWithin(envelope)) {

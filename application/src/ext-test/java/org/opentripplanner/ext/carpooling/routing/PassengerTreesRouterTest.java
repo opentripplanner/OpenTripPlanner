@@ -76,12 +76,25 @@ class PassengerTreesRouterTest extends GraphRoutingTest {
   @Test
   void passengerTreesAreCapped() {
     // a0 and a1 are two streets from the passenger; capped at two minutes, each tree drives one.
-    var capped = PassengerTrees.router(passenger, trips, MAX_SPEED, Duration.ofMinutes(2));
+    var capped = PassengerTrees.router(passenger, trips, true, MAX_SPEED, Duration.ofMinutes(2));
     assertNull(capped.route(passenger, a1));
     assertNull(capped.route(a0, passenger));
 
-    var uncapped = PassengerTrees.router(passenger, trips, MAX_SPEED, AN_HOUR);
+    var uncapped = PassengerTrees.router(passenger, trips, true, MAX_SPEED, AN_HOUR);
     assertNotNull(uncapped.route(passenger, a1));
     assertNotNull(uncapped.route(a0, passenger));
+  }
+
+  @Test
+  void onlyTheDriversSideTreeStopsAtTheTripsWaypoints() {
+    var access = PassengerTrees.router(passenger, trips, true, MAX_SPEED, AN_HOUR);
+    assertNotNull(access.route(a0, passenger), "the driver's side reaches a0");
+    assertNull(access.route(beforeStart, passenger), "the driver's side stops at a0");
+    assertNotNull(access.route(passenger, afterEnd), "the ride goes on past a1");
+
+    var egress = PassengerTrees.router(passenger, trips, false, MAX_SPEED, AN_HOUR);
+    assertNotNull(egress.route(passenger, a1), "the driver's side reaches a1");
+    assertNull(egress.route(passenger, afterEnd), "the driver's side stops at a1");
+    assertNotNull(egress.route(beforeStart, passenger), "the ride comes from before a0");
   }
 }
