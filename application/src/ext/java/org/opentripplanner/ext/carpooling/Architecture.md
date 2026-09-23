@@ -15,7 +15,9 @@ org.opentripplanner.ext.carpooling/
 ├── routing/                  # Routing and insertion algorithms
 │   ├── InsertionEvaluator   # Finds optimal passenger insertion
 │   ├── InsertionCandidate   # Represents a viable insertion
-│   └── CarpoolStreetRouter  # Street routing for carpooling
+│   ├── CarpoolCorridor      # Per-trip stops and driving times, computed at ingest
+│   ├── CarpoolStreetRouter  # Goal-directed street routing
+│   └── CompactCarTree       # One-to-many car search for the passenger's trees
 ├── filter/                   # Pre- and post-screening
 │   ├── CarpoolingRequest    # Passenger-side request abstraction
 │   ├── CarpoolTripFilter    # Pre-filter interface (raw trips)
@@ -25,8 +27,6 @@ org.opentripplanner.ext.carpooling/
 │   ├── TimeTripFilter       # Pre-filter: loose time-window check
 │   ├── TimeItineraryFilter  # Post-filter: tight time-window enforcement
 │   └── DistanceTripFilter   # Pre-filter: geographic proximity
-├── constraints/              # Post-routing constraints
-│   └── PassengerDelayConstraints # Protects existing passengers
 ├── util/                     # Utilities
 │   └── BeelineEstimator     # Fast travel time estimates
 ├── updater/                  # Real-time updates
@@ -51,10 +51,11 @@ tight enforcement is deferred to the post-filter once actual times are known:
 
 ### 2. Routing Phase
 Optimal insertion point calculation:
-- Uses beeline estimates for early rejection
-- Routes baseline segments once and caches results
-- Evaluates all viable insertion positions
-- Selects position with minimum additional travel time
+- Direct: goal-directed street searches between the passenger and the legs of each candidate trip
+- Access/egress: the trip's corridor (computed when the trip arrives) supplies the stops it can
+  serve and the driver's driving times; the passenger's two street trees supply the rest
+- Every pair of pickup and dropoff legs is evaluated in constant time from those durations
+- Selects the pair with minimum additional travel time within every stop's deviation budget
 
 ### 3. Post-Filter Phase
 Applied to fully-routed itineraries with actual computed times:
