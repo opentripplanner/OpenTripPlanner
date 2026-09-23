@@ -268,8 +268,8 @@ class ServiceLinkMapper {
         if (values == null || values.size() != 2) {
           continue;
         }
-        list.add(values.getFirst());
         list.add(values.getLast());
+        list.add(values.getFirst());
       } else {
         issueStore.add(
           "BadLineStringElementType",
@@ -278,7 +278,7 @@ class ServiceLinkMapper {
         );
       }
     }
-    return swapLatLon(list.toArray());
+    return list.toArray();
   }
 
   /**
