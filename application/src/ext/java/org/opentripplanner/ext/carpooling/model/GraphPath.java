@@ -69,20 +69,6 @@ public class GraphPath<
   }
 
   /**
-   * Returns the start time of the trip in seconds since the epoch.
-   */
-  public long getStartTime() {
-    return states.getFirst().getTimeSeconds();
-  }
-
-  /**
-   * Returns the end time of the trip in seconds since the epoch.
-   */
-  public long getEndTime() {
-    return states.getLast().getTimeSeconds();
-  }
-
-  /**
    * Returns the duration of the trip in seconds.
    */
   public int getDuration() {
@@ -110,7 +96,4 @@ public class GraphPath<
   public String toString() {
     return "GraphPath(nStates=" + states.size() + ")";
   }
-  /****
-   * Private Methods
-   ****/
 }
