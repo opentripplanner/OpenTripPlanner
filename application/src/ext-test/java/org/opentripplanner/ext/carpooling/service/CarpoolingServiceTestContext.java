@@ -66,7 +66,8 @@ record CarpoolingServiceTestContext(
       repository,
       STREET_LIMITATION_PARAMETERS,
       vertexCreationService,
-      carReachableVertexSnapper
+      carReachableVertexSnapper,
+      stopIndex
     );
     return new CarpoolingServiceTestContext(
       service,

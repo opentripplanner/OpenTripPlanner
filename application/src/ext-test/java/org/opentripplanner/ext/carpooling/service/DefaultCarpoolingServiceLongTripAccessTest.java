@@ -22,10 +22,9 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
  * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a driver trip whose end-to-end
- * driving time exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS}, 60
+ * driving time exceeds the former nearby-stop search radius (60
  * minutes). Each leg's tree is sized from OTP's own routed leg duration (see
- * {@link DefaultCarpoolingService#driverLegTreeLimits} and {@code resolveLegDurations}), not from
+ * {@link org.opentripplanner.ext.carpooling.routing.DriverLegLimits#legLimits}), not from
  * the radius, so the leg's far waypoint stays inside the tree and the trip produces access
  * candidates.
  *
@@ -41,7 +40,7 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * leg A to D in ~80 min, with a 10-min deviation budget at A and D. The access request has the
  * passenger at P, dropped at stop S — both 10 meters from A.
  * <p>
- * The leg tree is sized from the routed baseline: 80 + 1 (slack) + 10 (budget) = 91 min, wider
+ * The leg tree is sized from the routed baseline: 80 + 10 (budget) = 90 min, wider
  * than the 60-min radius. After dropping the passenger at S the carpool still drives on to D, so
  * the S-to-D segment (~80 min) must be routed; it goes only through D's waypoint tree (inserted
  * passenger segments have no goal-directed fallback). A tree capped at the 60-min radius could not
@@ -106,7 +105,7 @@ class DefaultCarpoolingServiceLongTripAccessTest extends GraphRoutingTest {
 
   @Test
   void findsAccessResultsForTripLongerThanNearbyStopRadius() {
-    // Routed leg ~80 min → tree limit 80 + 1 min slack + 10 min budget = 91 min, spanning the
+    // Routed leg ~80 min → tree limit 80 + 10 min budget = 90 min, spanning the
     // A → D baseline.
     var tripStart = SEARCH_TIME.plusMinutes(30);
     var tripEnd = tripStart.plusMinutes(60);
