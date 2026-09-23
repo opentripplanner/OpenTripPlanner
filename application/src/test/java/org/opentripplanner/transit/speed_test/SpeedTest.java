@@ -27,12 +27,10 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
-import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
-import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
 import org.opentripplanner.standalone.OtpStartupInfo;
@@ -41,8 +39,6 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -192,18 +188,6 @@ public class SpeedTest {
       timetableHandle.repositorySnapshot(transactionScope)
     );
 
-    RegularTransferService transferService = TransferServiceTestFactory.transferService(
-      transferRepository
-    );
-    StreetDetailsService streetDetailsService = TestServerContext.createStreetDetailsService();
-    LinkingContextFactory linkingContextFactory = TestServerContext.createLinkingContextFactory(
-      graph,
-      vertexLinker,
-      this.transitService
-    );
-    StreetLimitationParametersService streetLimitationParametersService =
-      TestServerContext.createStreetLimitationParametersService();
-
     var transitAlertService = TestServerContext.createTransitAlertService();
 
     this.routingService = new DefaultRoutingService(
@@ -211,10 +195,10 @@ public class SpeedTest {
       graph,
       raptorConfig,
       timer.getRegistry(),
-      streetLimitationParametersService,
+      TestServerContext.createStreetLimitationParametersService(),
       TestServerContext.createVehicleRentalService(),
-      streetDetailsService,
-      transferService,
+      TestServerContext.createStreetDetailsService(),
+      TransferServiceTestFactory.transferService(transferRepository),
       transitAlertService,
       routerConfig.flexParameters(),
       List.of(),
@@ -224,7 +208,7 @@ public class SpeedTest {
       null,
       null,
       null,
-      linkingContextFactory,
+      TestServerContext.createLinkingContextFactory(graph, vertexLinker, this.transitService),
       routerConfig.transitTuningConfig(),
       routerConfig.transitTuningConfig(),
       null

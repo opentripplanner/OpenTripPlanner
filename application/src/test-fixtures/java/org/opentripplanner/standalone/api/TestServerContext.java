@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
-import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.internal.TransactionFactory;
@@ -23,7 +22,6 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
-import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
@@ -47,7 +45,6 @@ import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -121,20 +118,13 @@ public class TestServerContext {
     var routerConfig = RouterConfig.DEFAULT;
     var raptorConfig = createRaptorConfig();
     var vertexLinker = createVertexLinker(graph);
-    LinkingContextFactory linkingContextFactory = createLinkingContextFactory(
-      graph,
-      vertexLinker,
-      transitService
-    );
-    StreetLimitationParametersService streetLimitationParametersService =
-      createStreetLimitationParametersService();
 
     return new DefaultRoutingService(
       transitService,
       graph,
       raptorConfig,
       Metrics.globalRegistry,
-      streetLimitationParametersService,
+      createStreetLimitationParametersService(),
       createVehicleRentalService(),
       createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
@@ -147,7 +137,7 @@ public class TestServerContext {
       null,
       createEmissionsItineraryDecorator(),
       null,
-      linkingContextFactory,
+      createLinkingContextFactory(graph, vertexLinker, transitService),
       routerConfig.transitTuningConfig(),
       routerConfig.transitTuningConfig(),
       null
@@ -223,34 +213,6 @@ public class TestServerContext {
         var group = transitService.getStopLocationsGroup(id);
         return Optional.ofNullable(group).map(locationsGroup -> locationsGroup.getCoordinate());
       }
-    );
-  }
-
-  public static RealtimeResolver createRealTimeResolver(
-    TransitService transitService,
-    RefetchItineraryService refetchItineraryService,
-    TransitAlertServiceImpl transitAlertService
-  ) {
-    return new RealtimeResolver(refetchItineraryService, transitService, transitAlertService);
-  }
-
-  public static RefetchItineraryService createRefetchItineraryService(
-    Graph graph,
-    TransitService transitService,
-    TransitAlertServiceImpl transitAlertService,
-    RegularTransferService transferService,
-    StreetDetailsService streetDetailsService,
-    LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
-  ) {
-    return new RefetchItineraryService(
-      graph,
-      transitService,
-      transitAlertService,
-      transferService,
-      streetDetailsService,
-      linkingContextFactory,
-      streetLimitationParametersService
     );
   }
 }

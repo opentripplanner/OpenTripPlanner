@@ -106,7 +106,7 @@ public class DefaultRoutingService implements RoutingService {
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
     RaptorTuningParameters raptorTuningParameters,
-    RealtimeResolver realtimeResolver
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;

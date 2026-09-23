@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
@@ -24,7 +25,7 @@ public class RoutingResponseMapper {
     Set<RoutingError> routingErrors,
     DebugTimingAggregator debugTimingAggregator,
     PagingService pagingService,
-    RealtimeResolver realtimeResolver
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     // Search is performed without realtime, but we still want to
     // include realtime information in the result

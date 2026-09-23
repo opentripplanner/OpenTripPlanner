@@ -140,7 +140,7 @@ public class RoutingWorker {
     TransitTuningParameters transitTuningParameters,
     RaptorTuningParameters raptorTuningParameters,
     RoutingWorkerRequest workerRequest,
-    RealtimeResolver realtimeResolver
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     this.request = workerRequest.request();
     this.transitSearchTimeZero = workerRequest.transitSearchTimeZero();

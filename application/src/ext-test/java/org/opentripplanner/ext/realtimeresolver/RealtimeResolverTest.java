@@ -128,7 +128,7 @@ class RealtimeResolverTest {
   );
 
   @Test
-  void populateItineraryLegsWithNoRealTime() {
+  void populateLegsWithNoRealTime() {
     var transitEnv = TRANSIT_ENV.build();
     var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
@@ -174,7 +174,7 @@ class RealtimeResolverTest {
   }
 
   @Test
-  void populateItineraryLegsWithRealTimeAndChangeQuay() {
+  void populateLegsWithRealTimeAndChangeQuay() {
     var transitEnv = TRANSIT_ENV.build();
     var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
@@ -242,8 +242,8 @@ class RealtimeResolverTest {
       Objects.requireNonNull(legs.get(1)).endTime().toString()
     );
 
-    assertEquals(Place.forStop(STOP_B).stop.getId(), legs.get(1).from().stop.getId());
-    assertEquals(Place.forStop(STOP_C).stop.getId(), legs.get(1).to().stop.getId());
+    assertEquals(STOP_B.getId(), legs.get(1).from().stop.getId());
+    assertEquals(STOP_C.getId(), legs.get(1).to().stop.getId());
 
     //No realtime on last leg
     assertEquals("2020-03-03T08:30+01:00[Europe/Paris]", legs.getLast().startTime().toString());
@@ -251,7 +251,7 @@ class RealtimeResolverTest {
   }
 
   @Test
-  void populateTransitLegsWithRealtime() {
+  void populateLegsWithRealtime() {
     var transitEnv = TRANSIT_ENV.build();
     TripOnDateDataFetcher trip5 = transitEnv.tripData("trip5");
     TripOnDateDataFetcher trip6 = transitEnv.tripData("trip6");
@@ -350,7 +350,7 @@ class RealtimeResolverTest {
   }
 
   @Test
-  void populateTransitLegsKeepStaySeated() {
+  void populateLegsKeepStaySeated() {
     var transitEnv = TRANSIT_ENV.build();
     var refetchService = createRefetchService(new TransitAlertServiceImpl(), transitEnv);
     TripOnDateDataFetcher trip1 = transitEnv.tripData("trip1");
