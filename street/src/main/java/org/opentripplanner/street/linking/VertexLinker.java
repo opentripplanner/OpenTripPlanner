@@ -259,7 +259,7 @@ public class VertexLinker {
       null,
       edges
         .stream()
-        .map(e -> new DistanceTo(e, squaredDistance(vertex, e, xscale)))
+        .map(e -> new CandidateEdge(e, squaredDistance(vertex, e, xscale)))
         .toList(),
       xscale
     );
@@ -284,7 +284,7 @@ public class VertexLinker {
     // The spatial index returns whole grid cells, so in a dense city centre a small envelope still
     // yields hundreds or thousands of candidate edges of which only a handful are kept. Visit the
     // candidates in place and apply the cheap, allocation-free mode and distance tests first; only
-    // the survivors are deduplicated, reachability-checked and materialised as DistanceTo.
+    // the survivors are deduplicated, reachability-checked and materialised as CandidateEdge.
     var collector = new NearbyStreetEdgeCollector(vertex, traverseModes, radiusDeg, xscale);
     graph.forEachEdgeCandidate(env, scope, collector);
 
@@ -344,13 +344,13 @@ public class VertexLinker {
     LinkingDirection direction,
     Scope scope,
     @Nullable DisposableEdgeCollection tempEdges,
-    List<DistanceTo> candidateEdges,
+    List<CandidateEdge> candidateEdges,
     double xscale
   ) {
     if (candidateEdges.isEmpty()) {
       return Set.of();
     }
-    Set<DistanceTo> closestEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
+    Set<CandidateEdge> closestEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
     HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
     return closestEdges
       .stream()
@@ -364,9 +364,9 @@ public class VertexLinker {
    * by all the specified modes. We use a set here to avoid duplicates in the case that edges are
    * traversable by more than one of the modes specified.
    */
-  private Set<DistanceTo> getClosestEdgesPerMode(
+  private Set<CandidateEdge> getClosestEdgesPerMode(
     TraverseModeSet traverseModeSet,
-    List<DistanceTo> candidateEdges
+    List<CandidateEdge> candidateEdges
   ) {
     // The following logic has gone through several different versions using different approaches.
     // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
@@ -379,7 +379,7 @@ public class VertexLinker {
     // other half lost. It seems like this was based on some incorrect premises about floating point calculations
     // being non-deterministic.
 
-    Set<DistanceTo> closestEdges = new HashSet<>();
+    Set<CandidateEdge> closestEdges = new HashSet<>();
     for (TraverseMode mode : traverseModeSet.getModes()) {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
@@ -405,7 +405,7 @@ public class VertexLinker {
       double band = Math.sqrt(closestSquaredDistance) + DUPLICATE_WAY_EPSILON_DEGREES;
       double bandSquared = band * band;
 
-      // Because this is a set, each instance of DistanceTo will only be added once
+      // Because this is a set, each instance of CandidateEdge will only be added once
       // Note: add only closest edges of each mode
       closestEdges.addAll(
         candidateEdgesForMode
