@@ -17,11 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Street routing service for carpooling insertion evaluation.
- * <p>
- * This router encapsulates all dependencies needed for A* street routing between two street
- * vertices during carpool insertion optimization. It handles search configuration and path
- * selection for CAR mode routing.
+ * Finds the path of a corridor segment: an A* car search between its two vertices.
  *
  * <h2>Routing Strategy</h2>
  * <ul>
@@ -32,8 +28,6 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning); a
  *       cancelled request propagates, see {@link CarpoolRouter#route}</li>
  * </ul>
- *
- * @see InsertionEvaluator for usage in insertion evaluation
  */
 public class CarpoolStreetRouter implements CarpoolRouter {
 
@@ -91,9 +85,6 @@ public class CarpoolStreetRouter implements CarpoolRouter {
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withHeuristic(new EuclideanRemainingWeightHeuristic(streetLimitationParametersService))
-      // Bound the search at the carpool trip ceiling rather than the passenger request's
-      // maxDirectDuration: a driver leg is not a passenger direct trip, and a request-independent
-      // bound keeps the cached baseline leg durations request-independent too.
       .withSkipEdgeStrategy(
         new ComposingSkipEdgeStrategy<>(
           TraversalScope.withOwnLinkingOf(fromVertex, toVertex),

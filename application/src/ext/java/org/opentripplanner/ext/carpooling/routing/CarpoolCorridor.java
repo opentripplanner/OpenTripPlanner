@@ -75,4 +75,14 @@ public record CarpoolCorridor(
   public int legCount() {
     return legDurations.size();
   }
+
+  /** The detour bound of the leg from waypoint {@code leg} to the next. */
+  DetourBound legBound(int leg) {
+    return new DetourBound(
+      waypoints.get(leg),
+      waypoints.get(leg + 1),
+      legLimits.get(leg),
+      maxCarSpeed
+    );
+  }
 }

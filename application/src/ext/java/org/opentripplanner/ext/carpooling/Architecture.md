@@ -18,7 +18,9 @@ org.opentripplanner.ext.carpooling/
 │   ├── CarpoolCorridor      # Per-trip stops and driving times
 │   ├── CorridorBuilder      # Computes a trip's corridor
 │   ├── CarpoolStopIndex     # Transit stops with their car-reachable snaps
-│   └── CarpoolStreetRouter  # Street routing for carpooling
+│   ├── CarpoolStreetRouter  # Goal-directed street routing
+│   ├── CorridorRouter       # Driving times: corridors and passenger trees
+│   └── PassengerTrees       # The passenger's car trees of a request
 ├── filter/                   # Pre- and post-screening
 │   ├── CarpoolingRequest    # Passenger-side request abstraction
 │   ├── CarpoolTripFilter    # Pre-filter interface (raw trips)
@@ -55,7 +57,6 @@ tight enforcement is deferred to the post-filter once actual times are known:
 ### 2. Routing Phase
 Optimal insertion point calculation:
 - Uses beeline estimates for early rejection
-- Routes baseline segments once and caches results
 - Evaluates all viable insertion positions
 - Selects position with minimum additional travel time
 

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * Finds viable insertion positions for a passenger in a carpool trip using fast heuristics.
  * <p>
  * This class performs early-stage filtering to identify pickup/dropoff position pairs that are
- * worth evaluating with expensive A* routing. It validates positions using:
+ * worth evaluating with driving times. It validates positions using:
  * <ul>
  *   <li>Capacity constraints - ensures available seats throughout the journey</li>
  *   <li>Beeline delay heuristic - optimistic straight-line time estimates</li>

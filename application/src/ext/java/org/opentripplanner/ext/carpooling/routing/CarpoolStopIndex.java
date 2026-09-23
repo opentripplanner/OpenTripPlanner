@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * stops inside an envelope, from a grid over their coordinates, which the corridor computation
  * uses.
  * <p>
- * Thread-safe: the updaters of all feeds share one instance.
+ * Thread-safe: requests and the updater share one instance.
  */
 public class CarpoolStopIndex {
 

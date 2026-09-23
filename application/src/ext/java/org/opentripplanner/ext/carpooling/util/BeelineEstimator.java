@@ -9,9 +9,9 @@ import org.opentripplanner.street.model.StreetConstants;
 /**
  * Provides fast, low-resolution travel time estimates based on beeline (straight-line) distances.
  * <p>
- * Used as a heuristic to quickly reject incompatible insertion positions before performing
- * expensive A* street routing. The estimates are intentionally optimistic (lower bounds) so that
- * valid insertions are never incorrectly rejected.
+ * Used as a heuristic to quickly reject incompatible insertion positions before their driving
+ * times are looked up. The estimates are intentionally optimistic (lower bounds) so that valid
+ * insertions are never incorrectly rejected.
  * <p>
  * Formula: duration = beeline_distance / speed (in m/s)
  * <p>

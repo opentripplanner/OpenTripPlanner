@@ -115,6 +115,7 @@ public class CarpoolingModule {
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
     @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+    @Nullable CarpoolStopIndex stopIndex,
     @Nullable CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {
@@ -125,6 +126,7 @@ public class CarpoolingModule {
       streetLimitationParametersService,
       vertexCreationService,
       carReachableVertexSnapper,
+      stopIndex,
       parameters
     );
   }
