@@ -8,12 +8,12 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  * vertex being linked, expressed in degrees latitude. Equality is based on the edge only, so a
  * {@code Set} of candidates holds each edge once whatever its recorded distance.
  */
-final class DistanceTo {
+final class CandidateEdge {
 
   private final StreetEdge edge;
   private final double squaredDistanceDegreesLat;
 
-  DistanceTo(StreetEdge edge, double squaredDistanceDegreesLat) {
+  CandidateEdge(StreetEdge edge, double squaredDistanceDegreesLat) {
     this.edge = edge;
     this.squaredDistanceDegreesLat = squaredDistanceDegreesLat;
   }
@@ -39,7 +39,7 @@ final class DistanceTo {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    DistanceTo that = (DistanceTo) o;
+    CandidateEdge that = (CandidateEdge) o;
     return Objects.equals(edge, that.edge);
   }
 }

@@ -29,7 +29,7 @@ final class NearbyStreetEdgeCollector implements Consumer<Edge> {
   private final double radiusDegSq;
   private final TraverseModeSet traverseModes;
   private final Set<StreetEdge> seen = new HashSet<>();
-  private final List<DistanceTo> nearbyEdges = new ArrayList<>();
+  private final List<CandidateEdge> nearbyEdges = new ArrayList<>();
 
   NearbyStreetEdgeCollector(
     Vertex vertex,
@@ -58,11 +58,11 @@ final class NearbyStreetEdgeCollector implements Consumer<Edge> {
       return;
     }
     if (streetEdge.isReachableFromGraph()) {
-      nearbyEdges.add(new DistanceTo(streetEdge, squaredDistance));
+      nearbyEdges.add(new CandidateEdge(streetEdge, squaredDistance));
     }
   }
 
-  List<DistanceTo> nearbyEdges() {
+  List<CandidateEdge> nearbyEdges() {
     return nearbyEdges;
   }
 }
