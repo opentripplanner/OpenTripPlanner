@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
@@ -59,6 +60,42 @@ class PassengerTreesTest {
 
     var far = vertexEastOfOrigin(200_000);
     assertEquals(Duration.ZERO, trees(trip).limit(far, Direction.FROM));
+  }
+
+  @Test
+  void eachWaypointIsNeededOnlyWithinItsLegsReach() {
+    var a0 = vertexEastOfOrigin(0);
+    var a1 = vertexEastOfOrigin(10_000);
+    var a2 = vertexEastOfOrigin(20_000);
+    var trip = trip(List.of(a0, a1, a2), 20, 30);
+    var passenger = vertexEastOfOrigin(1_000);
+
+    // Inward, a_k -> passenger: the leg's limit minus the drive on to a_(k+1).
+    var inward = trees(trip).waypointReach(passenger, Direction.TO, true);
+    assertThat(inward.keySet()).containsExactly(a0, a1);
+    assertWithinTwoSeconds(Duration.ofMinutes(20).minusSeconds(9_000 / 40), inward.get(a0));
+    assertWithinTwoSeconds(Duration.ofMinutes(30).minusSeconds(19_000 / 40), inward.get(a1));
+
+    // Outward, passenger -> a_(k+1): the leg's limit minus the drive from a_k.
+    var outward = trees(trip).waypointReach(passenger, Direction.FROM, false);
+    assertThat(outward.keySet()).containsExactly(a1, a2);
+    assertWithinTwoSeconds(Duration.ofMinutes(20).minusSeconds(1_000 / 40), outward.get(a1));
+    assertWithinTwoSeconds(Duration.ofMinutes(30).minusSeconds(9_000 / 40), outward.get(a2));
+  }
+
+  @Test
+  void aPickupNeverNeedsTheLastStopNorADropoffTheFirst() {
+    var a0 = vertexEastOfOrigin(0);
+    var a1 = vertexEastOfOrigin(10_000);
+    var a2 = vertexEastOfOrigin(20_000);
+    var trip = trip(List.of(a0, a1, a2), 20, 30);
+    var passenger = vertexEastOfOrigin(1_000);
+
+    var pickupOutward = trees(trip).waypointReach(passenger, Direction.FROM, true);
+    var dropoffInward = trees(trip).waypointReach(passenger, Direction.TO, false);
+
+    assertThat(pickupOutward.keySet()).containsExactly(a1);
+    assertThat(dropoffInward.keySet()).containsExactly(a1);
   }
 
   private static PassengerTrees trees(RoutableCarpoolTrip trip) {
