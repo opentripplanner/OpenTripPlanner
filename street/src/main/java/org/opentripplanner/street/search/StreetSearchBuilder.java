@@ -20,6 +20,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 public class StreetSearchBuilder {
 
@@ -118,9 +119,7 @@ public class StreetSearchBuilder {
   /// sorting by elapsed time is equivalent to sorting by arrival time ascending (depart-after) or
   /// departure time descending (arrive-by) without needing to build a chronological path first.
   public List<StreetPath> getPathsToTarget() {
-    return buildAstar()
-      .getFinalStates()
-      .stream()
+    return StreamUtils.ofIterable(buildAstar().listFinalStates())
       .sorted(Comparator.comparingLong(State::getElapsedTimeSeconds))
       .map(StreetPath::new)
       .toList();

@@ -128,10 +128,10 @@ public class AStar<
    * {@link State#getBackEdge()}, or the {@code listBackStates()}/{@code listBackEdges()}
    * iterables on the concrete state implementation.
    */
-  public List<State> getFinalStates() {
+  public Iterable<State> listFinalStates() {
     runSearch();
 
-    return targetAcceptedStates.stream().filter(State::isFinal).collect(Collectors.toList());
+    return () -> targetAcceptedStates.stream().filter(State::isFinal).iterator();
   }
 
   private boolean iterate() {

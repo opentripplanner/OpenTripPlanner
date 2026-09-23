@@ -34,24 +34,16 @@ public class StreetPath {
   }
 
   /**
-   * Build a chronologically-ordered path by following the back-state chain of {@code endState}
-   * all the way back to the origin of the search. When {@code endState} comes from an arriveBy
+   * Build a chronologically ordered path by following the back-state chain of {@code finalState}
+   * all the way back to the origin of the search. When {@code finalState} comes from an arriveBy
    * search, the chain is reversed first, since the back-state chain otherwise runs the "wrong"
    * way for that search direction.
    */
-  public StreetPath(State endState) {
-    var chronological = chronological(endState);
-    this(chronological.states, chronological.edges);
-  }
-
-  private record ChronologicalPath(List<State> states, List<Edge> edges) {}
-
-  private static ChronologicalPath chronological(State endState) {
-    State lastState = endState.getRequest().arriveBy() ? endState.reverse() : endState;
-    return new ChronologicalPath(
-      reversedList(lastState.listBackStates()),
-      reversedList(lastState.listBackEdges())
-    );
+  public StreetPath(State finalState) {
+    var state = finalState.getRequest().arriveBy() ? finalState.reverse() : finalState;
+    var states = reversedList(state.listBackStates());
+    var edges = reversedList(state.listBackEdges());
+    this(states, edges);
   }
 
   private static <T> List<T> reversedList(Iterable<T> backIterable) {
