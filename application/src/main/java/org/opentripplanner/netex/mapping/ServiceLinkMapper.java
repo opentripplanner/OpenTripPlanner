@@ -8,11 +8,8 @@ import javax.annotation.Nullable;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
@@ -35,7 +32,6 @@ import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStru
  */
 class ServiceLinkMapper {
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   private final FeedScopedIdFactory idFactory;
   private final ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById;
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
@@ -151,7 +147,7 @@ class ServiceLinkMapper {
         for (int i = 0; i < positionList.size(); i += 2) {
           coordinates[i / 2] = new Coordinate(positionList.get(i + 1), positionList.get(i));
         }
-        final LineString geometry = GEOMETRY_FACTORY.createLineString(coordinates);
+        final LineString geometry = GeometryUtils.makeLineString(coordinates);
 
         if (
           !isGeometryValid(geometry, serviceLink.getId()) ||
@@ -178,13 +174,7 @@ class ServiceLinkMapper {
 
   /** create a 2-point linestring (a straight line segment) between the two stops */
   private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
-    Coordinate[] coordinates = new Coordinate[] {
-      s0.getCoordinate().asJtsCoordinate(),
-      s1.getCoordinate().asJtsCoordinate(),
-    };
-    CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
-
-    return GEOMETRY_FACTORY.createLineString(sequence);
+    return GeometryUtils.makeLineString(s0.getCoordinate(), s1.getCoordinate());
   }
 
   private boolean isFromToPointRefsValid(

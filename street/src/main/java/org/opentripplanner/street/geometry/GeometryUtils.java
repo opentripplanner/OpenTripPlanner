@@ -70,13 +70,11 @@ public class GeometryUtils {
   }
 
   public static LineString makeLineString(List<Coordinate> coordinates) {
-    GeometryFactory factory = getGeometryFactory();
-    return factory.createLineString(coordinates.toArray(new Coordinate[] {}));
+    return GF.createLineString(coordinates.toArray(new Coordinate[] {}));
   }
 
   public static LineString makeLineString(Coordinate... coordinates) {
-    GeometryFactory factory = getGeometryFactory();
-    return factory.createLineString(coordinates);
+    return GF.createLineString(coordinates);
   }
 
   public static LineString makeLineString(WgsCoordinate... coordinates) {
