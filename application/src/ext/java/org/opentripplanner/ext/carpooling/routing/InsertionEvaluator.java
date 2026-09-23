@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.constraints.PassengerDelayConstraints;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,19 +109,17 @@ public class InsertionEvaluator {
   }
 
   /**
-   * @return A list containing the best insertion that can be found for every NearbyStop in
+   * @return A list containing the best insertion that can be found for every stop in
    * the list tripWithViableAccessEgress.viableAccessEgress. If there are no valid insertions
-   * for a NearbyStop, then no candidate for that stop will be returned.
+   * for a stop, then no candidate for that stop will be returned.
    */
   public List<InsertionCandidate> findBestInsertions(
     TripWithViableAccessEgress tripWithViableAccessEgress
   ) {
     var routableTrip = tripWithViableAccessEgress.routableTrip();
 
-    // No nearby stop produced a viable insertion position for this trip, so there is nothing to
-    // evaluate. Return before routing the baseline: that routing builds the trip's street trees,
-    // which are expensive for long trips — wasted work for a trip that cannot yield an
-    // access/egress leg.
+    // No stop produced a viable insertion position for this trip, so there is nothing to
+    // evaluate.
     if (tripWithViableAccessEgress.viableAccessEgress().isEmpty()) {
       return List.of();
     }
@@ -219,7 +217,7 @@ public class InsertionEvaluator {
     PassengerSnap snap,
     RoutedSegment[] baselineSegments,
     Duration[] cumulativeDurations,
-    NearbyStop transitStop
+    @Nullable StopLocation transitStop
   ) {
     InsertionCandidate bestCandidate = null;
 
@@ -266,7 +264,7 @@ public class InsertionEvaluator {
     PassengerSnap snap,
     RoutedSegment[] baselineSegments,
     Duration[] originalCumulativeDurations,
-    NearbyStop transitStop
+    @Nullable StopLocation transitStop
   ) {
     List<RoutedSegment> modifiedSegments = buildModifiedSegments(
       routableTrip.vertices(),

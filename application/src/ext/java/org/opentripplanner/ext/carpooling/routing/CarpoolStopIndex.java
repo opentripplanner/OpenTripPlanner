@@ -24,8 +24,10 @@ import org.slf4j.LoggerFactory;
  * A passenger is dropped off for a stop at a vertex a car can reach and leave, then walks to the
  * stop; picked up likewise after walking from the stop to such a vertex. Both snaps depend only on
  * the static street graph, so they are computed once per stop, on first use, and shared by every
- * request. The index also finds the stops inside an envelope, from a grid over their coordinates,
- * which the corridor computation uses.
+ * request; the walk is timed with default street preferences, a request replays it with its own
+ * (see {@link org.opentripplanner.ext.carpooling.util.GraphPathUtils#replay}). The index also
+ * finds the stops inside an envelope, from a grid over their coordinates, which the corridor
+ * computation uses.
  * <p>
  * Thread-safe: requests and the updater share one instance.
  */
