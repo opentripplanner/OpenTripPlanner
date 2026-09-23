@@ -275,7 +275,7 @@ type EstimatedCall {
   realTimeJourneyState: RealTimeJourneyState!
   "Whether this call has been updated with real time information."
   realtime: Boolean!
-  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state.")
+  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state.")
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   "The scheduled quay for this call. Equal to 'quay' unless the quay has been changed by a real time update"

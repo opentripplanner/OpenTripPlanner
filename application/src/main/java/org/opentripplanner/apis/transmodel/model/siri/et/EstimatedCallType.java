@@ -197,7 +197,7 @@ public class EstimatedCallType {
             .name("realtimeState")
             .type(new GraphQLNonNull(EnumTypes.REALTIME_STATE))
             .deprecate(
-              "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state."
+              "Use realTimeJourneyState for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state."
             )
             .dataFetcher(EstimatedCallType::getRealtimeStateOnStop)
             .build()
