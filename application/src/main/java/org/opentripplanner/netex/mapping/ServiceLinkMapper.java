@@ -1,11 +1,9 @@
 package org.opentripplanner.netex.mapping;
 
-import gnu.trove.list.array.TDoubleArrayList;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
-import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -38,6 +36,7 @@ class ServiceLinkMapper {
   private final ImmutableEntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
+  private final LineStringMapper lineStringMapper;
 
   ServiceLinkMapper(
     FeedScopedIdFactory idFactory,
@@ -53,6 +52,7 @@ class ServiceLinkMapper {
     this.stopById = stopById;
     this.issueStore = issueStore;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.lineStringMapper = new LineStringMapper(issueStore);
   }
 
   List<LineString> getGeometriesByJourneyPattern(
@@ -184,16 +184,12 @@ class ServiceLinkMapper {
     int stopIndex,
     String id
   ) {
-    var coordinates = extractCoordinates(lineString);
-
-    if (!isProjectionValid(coordinates, id)) {
+    final var geometry = lineStringMapper.getLineString(lineString, id);
+    if (geometry == null) {
       return null;
     }
 
-    var geometry = GeometryUtils.makeLineString(coordinates);
-
     if (
-      !isGeometryValid(geometry, id) ||
       !areEndpointsWithinTolerance(
         geometry,
         stopPattern.getStop(stopIndex),
@@ -247,104 +243,6 @@ class ServiceLinkMapper {
         toPointQuayId
       );
       return false;
-    }
-    return true;
-  }
-
-  private double[] extractCoordinates(LineStringType lineString) {
-    if (lineString.getPosList() != null) {
-      var values = lineString
-        .getPosList()
-        .getValue()
-        .stream()
-        .mapToDouble(Double::doubleValue)
-        .toArray();
-      return swapLatLon(values);
-    }
-    var list = new TDoubleArrayList();
-    for (Object o : lineString.getPosOrPointProperty()) {
-      if (o instanceof DirectPositionType directPosition) {
-        var values = directPosition.getValue();
-        if (values == null || values.size() != 2) {
-          continue;
-        }
-        list.add(values.getLast());
-        list.add(values.getFirst());
-      } else {
-        issueStore.add(
-          "BadLineStringElementType",
-          "Unhandled and unknown lineString element type: %s",
-          o.getClass().getName()
-        );
-      }
-    }
-    return list.toArray();
-  }
-
-  /**
-   * NeTEx posList/pos coordinates are ordered (latitude, longitude), but JTS
-   * {@link Coordinate}s are always (x=longitude, y=latitude). Swap each pair in place so the
-   * resulting array can be fed directly into {@link GeometryUtils#makeLineString(double...)}.
-   */
-  private static double[] swapLatLon(double[] coords) {
-    for (int i = 0; i + 1 < coords.length; i += 2) {
-      double lat = coords[i];
-      coords[i] = coords[i + 1];
-      coords[i + 1] = lat;
-    }
-    return coords;
-  }
-
-  private boolean isProjectionValid(double[] coordinates, String id) {
-    if (coordinates.length < 4) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, " +
-          "containing fewer than two coordinates for: %s",
-        id
-      );
-      return false;
-    } else if (coordinates.length % 2 != 0) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, " +
-          "containing odd number of values for coordinates: %s",
-        id
-      );
-      return false;
-    }
-    return true;
-  }
-
-  private boolean isGeometryValid(Geometry geometry, String id) {
-    Coordinate[] coordinates = geometry.getCoordinates();
-    if (coordinates.length < 2) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, " +
-          "containing fewer than two coordinates for: %s",
-        id
-      );
-      return false;
-    }
-    if (geometry.getLength() == 0) {
-      issueStore.add(
-        "ServiceLinkGeometryError",
-        "Ignore linkSequenceProjection with invalid linestring, having distance of 0 for: %s",
-        id
-      );
-      return false;
-    }
-    for (Coordinate coordinate : coordinates) {
-      if (Double.isNaN(coordinate.x) || Double.isNaN(coordinate.y)) {
-        issueStore.add(
-          "ServiceLinkGeometryError",
-          "Ignore linkSequenceProjection with invalid linestring, " +
-            "containing coordinate with NaN for: %s",
-          id
-        );
-        return false;
-      }
     }
     return true;
   }
