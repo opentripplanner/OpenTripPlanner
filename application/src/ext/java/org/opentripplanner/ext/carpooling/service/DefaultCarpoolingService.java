@@ -459,19 +459,24 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       // The passenger's two trees, outward and inward, sized to the widest leg any candidate trip
       // can insert the passenger into, are the request's only searches for driving times: the
-      // trips' legs and stop times come from their corridors. Neither reaches further than the
-      // longest trip that is modelled, whatever the budgets.
+      // trips' legs and stop times come from their corridors. The tree on the driver's side of the
+      // passenger, inward for access and outward for egress, only serves segments between the
+      // passenger and the trips' waypoints, so it stops once it has them. Neither reaches further
+      // than the longest trip that is modelled, whatever the budgets.
+      boolean access = accessOrEgress.isAccess();
       var maxTree = parameters.maxTripDuration();
       var passengerRouter = new CarpoolTreeStreetRouter();
       passengerRouter.addVertex(
         passengerVertex,
         CarpoolTreeStreetRouter.Direction.FROM,
-        min(passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, true), maxTree)
+        min(passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, true), maxTree),
+        access ? null : waypointReach(passengerVertex, candidateTrips, maxCarSpeed, true)
       );
       passengerRouter.addVertex(
         passengerVertex,
         CarpoolTreeStreetRouter.Direction.TO,
-        min(passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, false), maxTree)
+        min(passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, false), maxTree),
+        access ? waypointReach(passengerVertex, candidateTrips, maxCarSpeed, false) : null
       );
       var pathRouter = new CarpoolStreetRouter(
         streetLimitationParametersService,
@@ -678,6 +683,33 @@ public class DefaultCarpoolingService implements CarpoolingService {
       }
     }
     return limit;
+  }
+
+  /**
+   * How far the passenger's tree has to reach for each waypoint the driver passes on the far side
+   * of the passenger: the forward tree serves {@code passenger → a_(k+1)}, the reverse tree
+   * {@code a_k → passenger}, each within the reach of its leg, see {@link #passengerTreeLimit}.
+   * Package-private for testing.
+   */
+  static Map<Vertex, Duration> waypointReach(
+    Vertex passenger,
+    List<RoutableCarpoolTrip> trips,
+    double maxCarSpeed,
+    boolean forward
+  ) {
+    var reach = new HashMap<Vertex, Duration>();
+    for (var trip : trips) {
+      var waypoints = trip.vertices();
+      var legLimits = trip.corridor().legLimits();
+      for (int leg = 0; leg < legLimits.size(); leg++) {
+        var waypoint = forward ? waypoints.get(leg + 1) : waypoints.get(leg);
+        var needed = legReach(passenger, waypoints, legLimits, leg, maxCarSpeed, forward);
+        if (!needed.isNegative()) {
+          reach.merge(waypoint, needed, (a, b) -> a.compareTo(b) >= 0 ? a : b);
+        }
+      }
+    }
+    return reach;
   }
 
   /** The leg's limit minus the beeline the driver needs on the other side of the passenger. */
