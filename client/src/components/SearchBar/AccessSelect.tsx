@@ -22,13 +22,13 @@ export function AccessSelect({
             ...tripQueryVariables,
             modes: {
               ...tripQueryVariables.modes,
-              accessMode: e.target.value === 'not_selected' ? undefined : (e.target.value as StreetMode),
+              accessMode: e.target.value === 'none' ? undefined : (e.target.value as StreetMode),
             },
           });
         }}
-        value={tripQueryVariables.modes?.accessMode || 'not_selected'}
+        value={tripQueryVariables.modes?.accessMode || 'none'}
       >
-        <option value="not_selected">Not selected</option>
+        <option value="none">None</option>
         {Object.values(StreetMode).map((mode) => (
           <option key={mode} value={mode}>
             {mode}

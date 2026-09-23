@@ -40,6 +40,7 @@ export function TransitModeSelect({
   return (
     <MultiSelectDropdown
       label="Transit mode"
+      emptySelectionText="All"
       options={Object.values(TransportMode).map((mode) => ({
         id: mode,
         label: mode.toString(),

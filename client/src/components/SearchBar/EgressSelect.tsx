@@ -22,13 +22,13 @@ export function EgressSelect({
             ...tripQueryVariables,
             modes: {
               ...tripQueryVariables.modes,
-              egressMode: e.target.value === 'not_selected' ? undefined : (e.target.value as StreetMode),
+              egressMode: e.target.value === 'none' ? undefined : (e.target.value as StreetMode),
             },
           });
         }}
-        value={tripQueryVariables.modes?.egressMode || 'not_selected'}
+        value={tripQueryVariables.modes?.egressMode || 'none'}
       >
-        <option value="not_selected">Not selected</option>
+        <option value="none">None</option>
         {Object.values(StreetMode).map((mode) => (
           <option key={mode} value={mode}>
             {mode}

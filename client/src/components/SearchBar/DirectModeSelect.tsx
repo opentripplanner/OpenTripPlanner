@@ -22,13 +22,13 @@ export function DirectModeSelect({
             ...tripQueryVariables,
             modes: {
               ...tripQueryVariables.modes,
-              directMode: e.target.value === 'not_selected' ? undefined : (e.target.value as StreetMode),
+              directMode: e.target.value === 'none' ? undefined : (e.target.value as StreetMode),
             },
           });
         }}
-        value={tripQueryVariables.modes?.directMode || 'not_selected'}
+        value={tripQueryVariables.modes?.directMode || 'none'}
       >
-        <option value="not_selected">Not selected</option>
+        <option value="none">None</option>
         {Object.values(StreetMode).map((mode) => (
           <option key={mode} value={mode}>
             {mode}
