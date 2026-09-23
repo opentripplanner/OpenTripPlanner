@@ -9,9 +9,9 @@ public class InsertionPosition {
    * Represents a pickup and dropoff position pair that passed heuristic validation.
    * <p>
    * This is an intermediate value used between finding viable positions (via heuristics) and
-   * evaluating them (via A* routing). Positions are 0-based indices of the passenger's pickup and
-   * dropoff stops in the modified route (the route after the passenger's stops have been inserted
-   * into the carpool trip).
+   * evaluating them (via driving times). Positions are 0-based indices of the passenger's pickup
+   * and dropoff stops in the modified route (the route after the passenger's stops have been
+   * inserted into the carpool trip).
    *
    * @param pickupPos  0-based index of the passenger's pickup in the modified route
    * @param dropoffPos 0-based index of the passenger's dropoff in the modified route (always >

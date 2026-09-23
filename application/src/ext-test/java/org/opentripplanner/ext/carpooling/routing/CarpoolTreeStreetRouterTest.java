@@ -110,8 +110,9 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   }
 
   @Test
-  void routeWithBothDirectionTree() {
-    router.addVertex(vertexB, CarpoolTreeStreetRouter.Direction.BOTH, SEARCH_LIMIT);
+  void routeWithBothTreesOfOneVertex() {
+    router.addVertex(vertexB, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexB, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
 
     var fromB = router.route(vertexB, vertexC);
     var toB = router.route(vertexA, vertexB);

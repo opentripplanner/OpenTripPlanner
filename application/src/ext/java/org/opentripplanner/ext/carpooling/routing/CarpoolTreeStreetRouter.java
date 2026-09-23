@@ -58,10 +58,6 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
      * We want to calculate paths to the vertex
      */
     TO,
-    /**
-     * We want to calculate paths both from and to the vertex
-     */
-    BOTH,
   }
 
   private record VertexRegistration(Vertex vertex, Duration searchLimit) {}
@@ -150,8 +146,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * unreachable.
    *
    * @param vertex      the street vertex to build trees from/to
-   * @param direction   whether to build a forward tree ({@link Direction#FROM}), a reverse tree
-   *                    ({@link Direction#TO}), or both ({@link Direction#BOTH})
+   * @param direction   whether to build a forward tree ({@link Direction#FROM}) or a reverse tree
+   *                    ({@link Direction#TO})
    * @param searchLimit maximum duration for the tree expansion
    * @throws IllegalStateException if called after {@link #route} has already been invoked
    */
@@ -162,24 +158,17 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
           "Register all vertices before calling route()."
       );
     }
-    if (direction == Direction.FROM || direction == Direction.BOTH) {
+    if (direction == Direction.FROM) {
       registerLargest(forwardRegistrations, vertex, searchLimit);
-    }
-    if (direction == Direction.TO || direction == Direction.BOTH) {
+    } else {
       registerLargest(reverseRegistrations, vertex, searchLimit);
     }
   }
 
   /**
    * Registers {@code vertex} keeping the larger of any already-registered limit and
-   * {@code searchLimit}. Distinct
-   * {@link org.opentripplanner.street.model.vertex.TemporaryStreetLocation}s at the same coordinate
-   * compare equal, so two trips — or two legs of one trip — routing through the same point collapse
-   * to a single registration here. The shared tree must span the longest leg registered at that
-   * point, so the largest limit wins: a smaller limit would build a tree too short for a longer
-   * leg's baseline, making it unroutable. An over-large tree only widens the search — any insertion
-   * it would wrongly admit is rejected by the delay constraints — so taking the maximum is always
-   * safe.
+   * {@code searchLimit}: a vertex registered twice gets one tree, which has to serve both
+   * registrations. A larger tree only widens the search, so taking the maximum is always safe.
    */
   private static void registerLargest(
     Map<Vertex, VertexRegistration> registrations,

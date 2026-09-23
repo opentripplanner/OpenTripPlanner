@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetConstants;
@@ -9,9 +10,9 @@ import org.opentripplanner.street.model.StreetConstants;
 /**
  * Provides fast, low-resolution travel time estimates based on beeline (straight-line) distances.
  * <p>
- * Used as a heuristic to quickly reject incompatible insertion positions before performing
- * expensive A* street routing. The estimates are intentionally optimistic (lower bounds) so that
- * valid insertions are never incorrectly rejected.
+ * Used as a heuristic to quickly reject incompatible insertion positions before their driving
+ * times are looked up. The estimates are intentionally optimistic (lower bounds) so that valid
+ * insertions are never incorrectly rejected.
  * <p>
  * Formula: duration = beeline_distance / speed (in m/s)
  * <p>
@@ -83,6 +84,11 @@ public class BeelineEstimator {
     double maxCarSpeed
   ) {
     return SphericalDistanceLibrary.fastDistance(fromLat, fromLon, toLat, toLon) / maxCarSpeed;
+  }
+
+  /** Like {@link #minDriveSeconds(double, double, double, double, double)}, for two coordinates. */
+  public static double minDriveSeconds(Coordinate from, Coordinate to, double maxCarSpeed) {
+    return SphericalDistanceLibrary.fastDistance(from, to) / maxCarSpeed;
   }
 
   /**
