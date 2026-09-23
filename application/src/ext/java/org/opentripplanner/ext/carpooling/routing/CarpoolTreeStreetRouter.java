@@ -25,7 +25,9 @@ import org.slf4j.LoggerFactory;
  * A {@link #route} answer is read straight off the tree: the tree's elapsed time at the far end
  * gives the segment's duration, and the full path is only assembled by the tree if
  * {@link RoutedSegment#path()} is called — which happens for the few segments that make it into
- * an itinerary, not for the thousands evaluated and discarded per request.
+ * an itinerary, not for the thousands evaluated and discarded per request. A segment that has to
+ * outlive the router keeps its edge chain after {@link RoutedSegment#detach()} and no longer
+ * references the tree.
  * <p>
  * Vertices must be registered via {@link #addVertex} before routing.
  * The router first attempts to use a forward tree from the origin;
@@ -200,15 +202,21 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * A segment answered from a shortest-path tree. {@code farEnd} is the end of the segment that
    * is not the tree's root: the segment's {@code to} for a forward tree, its {@code from} for a
    * reverse tree. The tree's elapsed time there is the segment's duration; the tree replays the
-   * path, in chronological order for both search directions.
+   * path, in chronological order for both search directions, or, once detached, the edge chain
+   * taken from the tree does.
    */
   static final class TreeSegment implements RoutedSegment {
 
     private final Vertex from;
     private final Vertex to;
     private final int durationSeconds;
-    private final CompactCarTree tree;
     private final Vertex farEnd;
+
+    @Nullable
+    private CompactCarTree tree;
+
+    @Nullable
+    private Edge[] edges;
 
     @Nullable
     private GraphPath<State, Edge, Vertex> path;
@@ -239,9 +247,25 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     @Override
     public GraphPath<State, Edge, Vertex> path() {
       if (path == null) {
-        path = tree.path(farEnd);
+        detach();
+        boolean reverse = farEnd == from;
+        path = CompactCarTree.path(edges, reverse ? to : from, reverse);
       }
       return path;
+    }
+
+    /** Takes the edge chain from the tree and lets go of the tree. */
+    @Override
+    public void detach() {
+      if (edges == null) {
+        edges = tree.edgesTo(farEnd);
+        tree = null;
+      }
+    }
+
+    /** Whether {@link #detach()} has let go of the tree. Package-private for testing. */
+    boolean isDetached() {
+      return tree == null;
     }
 
     /** Whether {@link #path()} has been called. Package-private for testing. */

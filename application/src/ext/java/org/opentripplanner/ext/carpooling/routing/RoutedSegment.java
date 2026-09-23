@@ -31,6 +31,13 @@ public interface RoutedSegment {
   /** The street path in chronological order, built on the first call. Never {@code null}. */
   GraphPath<State, Edge, Vertex> path();
 
+  /**
+   * Makes the segment independent of the search structure it was answered from, so that structure
+   * can be garbage collected while {@link #path()} stays available. Cheap: a tree-backed segment
+   * keeps its edge chain, not a path.
+   */
+  default void detach() {}
+
   /** Wraps an already materialised path. */
   static RoutedSegment of(GraphPath<State, Edge, Vertex> path) {
     return new PathSegment(path);
