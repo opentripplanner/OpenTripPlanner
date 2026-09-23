@@ -467,6 +467,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var passengerRouter = PassengerTrees.accessEgressRouter(
         passengerVertex,
         candidateTrips,
+        accessOrEgress.isAccess(),
         parameters.maxTripDuration()
       );
       var pathRouter = new CarpoolStreetRouter(

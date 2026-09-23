@@ -59,14 +59,20 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     TO,
   }
 
-  private record VertexRegistration(Vertex vertex, Duration searchLimit) {}
+  private record VertexRegistration(
+    Vertex vertex,
+    Duration searchLimit,
+    @Nullable Map<Vertex, Duration> targets
+  ) {}
 
   private ShortestPathTree<State, Edge, Vertex> createTree(
     Vertex vertex,
     boolean reverse,
-    Duration searchLimit
+    VertexRegistration registration
   ) {
-    return carTree(vertex, reverse, searchLimit, null);
+    var targets = registration.targets();
+    var targetReach = targets == null ? null : new TargetReach(targets);
+    return carTree(vertex, reverse, registration.searchLimit(), targetReach);
   }
 
   /**
@@ -108,7 +114,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     if (reg == null) {
       return null;
     }
-    tree = createTree(vertex, false, reg.searchLimit());
+    tree = createTree(vertex, false, reg);
     forwardTrees.put(vertex, tree);
     forwardRegistrations.remove(vertex);
     return tree;
@@ -123,7 +129,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     if (reg == null) {
       return null;
     }
-    tree = createTree(vertex, true, reg.searchLimit());
+    tree = createTree(vertex, true, reg);
     reverseTrees.put(vertex, tree);
     reverseRegistrations.remove(vertex);
     return tree;
@@ -144,6 +150,20 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * @throws IllegalStateException if called after {@link #route} has already been invoked
    */
   public void addVertex(Vertex vertex, Direction direction, Duration searchLimit) {
+    addVertex(vertex, direction, searchLimit, null);
+  }
+
+  /**
+   * Like {@link #addVertex(Vertex, Direction, Duration)}, for a tree that only has to reach the
+   * given target vertices, each within its own reach: it stops expanding once no target can be
+   * reached earlier than it already has.
+   */
+  public void addVertex(
+    Vertex vertex,
+    Direction direction,
+    Duration searchLimit,
+    @Nullable Map<Vertex, Duration> targets
+  ) {
     if (routingStarted) {
       throw new IllegalStateException(
         "Cannot add vertices after routing has started. " +
@@ -151,9 +171,9 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       );
     }
     if (direction == Direction.FROM) {
-      registerLargest(forwardRegistrations, vertex, searchLimit);
+      registerLargest(forwardRegistrations, vertex, searchLimit, targets);
     } else {
-      registerLargest(reverseRegistrations, vertex, searchLimit);
+      registerLargest(reverseRegistrations, vertex, searchLimit, targets);
     }
   }
 
@@ -165,11 +185,48 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   private static void registerLargest(
     Map<Vertex, VertexRegistration> registrations,
     Vertex vertex,
-    Duration searchLimit
+    Duration searchLimit,
+    @Nullable Map<Vertex, Duration> targets
   ) {
-    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit), (existing, added) ->
-      existing.searchLimit().compareTo(added.searchLimit()) >= 0 ? existing : added
+    // A tree shared by two registrations must serve both, so it stops at neither one's targets.
+    registrations.merge(vertex, new VertexRegistration(vertex, searchLimit, targets), (a, b) ->
+      new VertexRegistration(vertex, max(a.searchLimit(), b.searchLimit()), null)
     );
+  }
+
+  private static Duration max(Duration a, Duration b) {
+    return a.compareTo(b) >= 0 ? a : b;
+  }
+
+  /**
+   * Bounds a tree that only has to reach some targets, each within its own reach: no state later
+   * than what the targets still need is expanded, and a target that has been reached needs no more
+   * than the time it was reached at. A later state cannot lead to an earlier arrival.
+   */
+  static final class TargetReach implements SkipEdgeStrategy<State, Edge> {
+
+    private final Map<Vertex, Long> needed = new HashMap<>();
+    private long bound;
+
+    TargetReach(Map<Vertex, Duration> reach) {
+      reach.forEach((target, duration) -> needed.put(target, duration.toSeconds()));
+      bound = maxNeeded();
+    }
+
+    @Override
+    public boolean shouldSkipEdge(State current, Edge edge) {
+      long elapsed = current.getElapsedTimeSeconds();
+      var stillNeeded = needed.get(current.getVertex());
+      if (stillNeeded != null && elapsed < stillNeeded) {
+        needed.put(current.getVertex(), elapsed);
+        bound = maxNeeded();
+      }
+      return elapsed > bound;
+    }
+
+    private long maxNeeded() {
+      return needed.values().stream().mapToLong(Long::longValue).max().orElse(0);
+    }
   }
 
   /**

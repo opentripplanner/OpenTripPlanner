@@ -11,10 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.ext.carpooling.routing.CarpoolTreeStreetRouter.TargetReach;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -103,6 +105,31 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertEquals(legSeconds, bounded.getState(vertexC).getElapsedTimeSeconds());
     assertNotNull(bounded.getState(vertexB));
     assertNull(bounded.getState(vertexD));
+  }
+
+  @Test
+  void aTreeWithTargetsStopsOnceTheyAreReached() {
+    var tree = CarpoolTreeStreetRouter.carTree(
+      vertexA,
+      false,
+      SEARCH_LIMIT,
+      new TargetReach(Map.of(vertexB, SEARCH_LIMIT))
+    );
+
+    assertNotNull(tree.getState(vertexB));
+    assertNull(tree.getState(vertexD), "nothing later than B is expanded");
+  }
+
+  @Test
+  void aTargetThatIsNeverReachedKeepsItsWholeReach() {
+    var tree = CarpoolTreeStreetRouter.carTree(
+      vertexA,
+      false,
+      SEARCH_LIMIT,
+      new TargetReach(Map.of(vertexB, SEARCH_LIMIT, vertexDisconnected, SEARCH_LIMIT))
+    );
+
+    assertNotNull(tree.getState(vertexD), "Z might still be reached within the limit");
   }
 
   @Test
