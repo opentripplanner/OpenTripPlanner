@@ -23,12 +23,7 @@ public class StreetPath {
   private final List<Edge> edges;
 
   public StreetPath(List<State> states, List<Edge> edges) {
-    if (states.isEmpty()) {
-      throw new IllegalArgumentException("A path needs at least one state");
-    }
-    if (edges.size() != states.size() - 1) {
-      throw new IllegalArgumentException("A path needs an edge between each state");
-    }
+    validate(states, edges);
     this.states = states;
     this.edges = edges;
   }
@@ -41,18 +36,30 @@ public class StreetPath {
    */
   public StreetPath(State finalState) {
     var state = finalState.getRequest().arriveBy() ? finalState.reverse() : finalState;
-    var states = reversedList(state.listBackStates());
-    var edges = reversedList(state.listBackEdges());
-    this(states, edges);
+
+    List<State> states = new ArrayList<>();
+    for (State s : state.listBackStates()) {
+      states.add(s);
+    }
+    Collections.reverse(states);
+
+    List<Edge> edges = new ArrayList<>(states.size() - 1);
+    for (int i = 1; i < states.size(); i++) {
+      edges.add(states.get(i).getBackEdge());
+    }
+
+    validate(states, edges);
+    this.states = states;
+    this.edges = edges;
   }
 
-  private static <T> List<T> reversedList(Iterable<T> backIterable) {
-    List<T> list = new ArrayList<>();
-    for (T t : backIterable) {
-      list.add(t);
+  private static void validate(List<State> states, List<Edge> edges) {
+    if (states.isEmpty()) {
+      throw new IllegalArgumentException("A path needs at least one state");
     }
-    Collections.reverse(list);
-    return list;
+    if (edges.size() != states.size() - 1) {
+      throw new IllegalArgumentException("A path needs an edge between each state");
+    }
   }
 
   /// The start of the path in seconds
