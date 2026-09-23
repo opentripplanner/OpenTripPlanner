@@ -269,6 +269,26 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertSame(path, segment.path(), "The path is memoised");
   }
 
+  /**
+   * A segment that has to outlive the router takes its edge chain from the tree and builds the
+   * same path later.
+   */
+  @Test
+  void pathSurvivesDetaching() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+
+    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
+    assertNotNull(segment);
+    assertFalse(segment.isDetached());
+
+    segment.detach();
+    assertTrue(segment.isDetached());
+    var path = segment.path();
+    assertEquals(segment.durationSeconds(), path.getDuration());
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
+  }
+
   @Test
   void durationIsTheMaterializedPathDurationForBothTreeDirections() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);

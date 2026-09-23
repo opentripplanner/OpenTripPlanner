@@ -29,7 +29,9 @@ import org.opentripplanner.ext.carpooling.routing.InsertionEvaluator;
 import org.opentripplanner.ext.carpooling.routing.InsertionPosition;
 import org.opentripplanner.ext.carpooling.routing.InsertionPositionFinder;
 import org.opentripplanner.ext.carpooling.routing.PassengerSnap;
+import org.opentripplanner.ext.carpooling.routing.PerStopCandidateCap;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
@@ -348,6 +350,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       two street trees, via {@link CorridorRouter}.</li>
    *   <li>Converts the best insertions into {@link CarpoolAccessEgress} objects with timing
    *       information relative to {@code transitSearchTimeZero} for Raptor integration.</li>
+   *   <li>Keeps at most a fixed number of them per transit stop, see
+   *       {@link PerStopCandidateCap}.</li>
    * </ol>
    *
    * @param request the routing request
@@ -475,7 +479,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var carpoolReluctance = request.preferences().car().reluctance();
 
       var stopSnaps = new HashMap<FeedScopedId, Optional<SnapResult>>();
-      var accessEgresses = new ArrayList<CarpoolAccessEgress>();
+      var cap = new PerStopCandidateCap<CarpoolAccessEgress>(
+        PerStopCandidateCap.DEFAULT_MAX_PER_STOP,
+        accessOrEgress.isAccess(),
+        request.arriveBy(),
+        TimeUtils.toTransitTimeSeconds(transitSearchTimeZero, request.dateTime()),
+        (int) carpoolingRequest.getSearchWindow().toSeconds()
+      );
       for (var trip : candidateTrips) {
         var viableStops = registerCorridor(
           trip,
@@ -500,16 +510,30 @@ public class DefaultCarpoolingService implements CarpoolingService {
           if (accessEgress.durationInSeconds() > maxLegSeconds) {
             continue;
           }
-          accessEgresses.add(accessEgress);
+          cap.add(
+            accessEgress,
+            accessEgress.stop(),
+            accessEgress.getPassengerDepartureTime(),
+            accessEgress.getPassengerArrivalTime()
+          );
         }
       }
+
+      var kept = cap.kept();
+      // The survivors outlive the passenger's trees (Raptor holds them): every segment keeps its
+      // edge chain instead of the tree, so the trees can be collected when this method returns.
+      for (var accessEgress : kept) {
+        accessEgress.insertionCandidate().routeSegments().forEach(RoutedSegment::detach);
+      }
       LOG.debug(
-        "{} carpool {} candidates from {} trips",
-        accessEgresses.size(),
+        "{} carpool {} candidates from {} trips: {} unusable, {} handed to Raptor",
+        cap.added(),
         accessOrEgress,
-        candidateTrips.size()
+        candidateTrips.size(),
+        cap.unusable(),
+        kept.size()
       );
-      return accessEgresses;
+      return kept;
     }
   }
 

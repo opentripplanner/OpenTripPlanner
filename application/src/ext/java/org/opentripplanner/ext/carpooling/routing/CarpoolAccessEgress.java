@@ -217,6 +217,14 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
+   * The insertion this leg was built from. The service detaches its segments once the request's
+   * set of legs is final, so only the legs Raptor gets keep their street paths.
+   */
+  public InsertionCandidate insertionCandidate() {
+    return insertionCandidate;
+  }
+
+  /**
    * Label data for the first leg's {@code from} place. For an access this carries the passenger
    * origin; for an egress, the transit stop the passenger alighted from. Read by the itinerary
    * mapper to name the chain's outermost start endpoint.
