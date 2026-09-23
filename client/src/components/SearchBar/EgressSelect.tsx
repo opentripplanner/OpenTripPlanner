@@ -18,26 +18,13 @@ export function EgressSelect({
         size="sm"
         className="input-medium"
         onChange={(e) => {
-          if (e.target.value !== 'not_selected') {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes: {
-                ...tripQueryVariables.modes,
-                egressMode: e.target.value as StreetMode,
-              },
-            });
-          } else {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes:
-                tripQueryVariables.modes?.directMode || tripQueryVariables.modes?.transportModes
-                  ? {
-                      ...tripQueryVariables.modes,
-                      egressMode: undefined,
-                    }
-                  : undefined,
-            });
-          }
+          setTripQueryVariables({
+            ...tripQueryVariables,
+            modes: {
+              ...tripQueryVariables.modes,
+              egressMode: e.target.value === 'not_selected' ? undefined : (e.target.value as StreetMode),
+            },
+          });
         }}
         value={tripQueryVariables.modes?.egressMode || 'not_selected'}
       >

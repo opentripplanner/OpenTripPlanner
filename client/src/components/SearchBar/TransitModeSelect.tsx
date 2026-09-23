@@ -1,4 +1,4 @@
-import { StreetMode, TransportMode, TripQueryVariables } from '../../gql/graphql.ts';
+import { TransportMode, TripQueryVariables } from '../../gql/graphql.ts';
 import MultiSelectDropdown from './MultiSelectDropdown.tsx';
 import { useCallback, useMemo } from 'react';
 
@@ -25,31 +25,14 @@ export function TransitModeSelect({
           transportMode: v,
         }));
 
-      if (newTransportModes.length === 0) {
-        // Remove transportModes entirely when empty
-        const updatedModes = { ...tripQueryVariables.modes };
-        delete updatedModes.transportModes;
-
-        // Check if modes object has any other properties
-        const hasOtherModes = updatedModes.directMode || updatedModes.accessMode || updatedModes.egressMode;
-
-        setTripQueryVariables({
-          ...tripQueryVariables,
-          modes: hasOtherModes ? updatedModes : undefined,
-        });
-      } else {
-        const accessMode = tripQueryVariables.modes?.accessMode || StreetMode.Foot;
-        const egressMode = tripQueryVariables.modes?.egressMode || StreetMode.Foot;
-        setTripQueryVariables({
-          ...tripQueryVariables,
-          modes: {
-            ...tripQueryVariables.modes,
-            transportModes: newTransportModes,
-            accessMode: accessMode,
-            egressMode: egressMode,
-          },
-        });
-      }
+      setTripQueryVariables({
+        ...tripQueryVariables,
+        modes: {
+          ...tripQueryVariables.modes,
+          // Remove transportModes entirely when empty
+          transportModes: newTransportModes.length === 0 ? undefined : newTransportModes,
+        },
+      });
     },
     [tripQueryVariables, setTripQueryVariables],
   );

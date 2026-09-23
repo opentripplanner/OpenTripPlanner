@@ -18,28 +18,13 @@ export function DirectModeSelect({
         size="sm"
         className="input-medium"
         onChange={(e) => {
-          if (e.target.value !== 'not_selected') {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes: {
-                ...tripQueryVariables.modes,
-                directMode: e.target.value as StreetMode,
-              },
-            });
-          } else {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes:
-                tripQueryVariables.modes?.accessMode ||
-                tripQueryVariables.modes?.egressMode ||
-                tripQueryVariables.modes?.transportModes
-                  ? {
-                      ...tripQueryVariables.modes,
-                      directMode: undefined,
-                    }
-                  : undefined,
-            });
-          }
+          setTripQueryVariables({
+            ...tripQueryVariables,
+            modes: {
+              ...tripQueryVariables.modes,
+              directMode: e.target.value === 'not_selected' ? undefined : (e.target.value as StreetMode),
+            },
+          });
         }}
         value={tripQueryVariables.modes?.directMode || 'not_selected'}
       >
