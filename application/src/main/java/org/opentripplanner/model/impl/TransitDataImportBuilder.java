@@ -147,10 +147,6 @@ public class TransitDataImportBuilder {
 
   private final TripPatternGenerator patternGenerator;
 
-  private boolean hasFrequencyBasedTrips = false;
-
-  private boolean hasScheduledTrips = false;
-
   /**
    * Create a builder with no transit period limit - see
    * {@link #TransitDataImportBuilder(SiteRepository, DataImportIssueStore, LocalDateRange)}.
@@ -348,24 +344,6 @@ public class TransitDataImportBuilder {
    */
   public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints() {
     return stopsByScheduledStopPoints;
-  }
-
-  /**
-   * Set by the {@link TripPatternGenerator} passed in at construction time. Exposed on the built
-   * {@link TransitDataImport} - see {@link TransitDataImport#hasFrequencyBasedTrips()}/
-   * {@link TransitDataImport#hasScheduledTrips()} - rather than read back off this builder.
-   */
-  public void markServiceType(boolean hasFrequencyBasedTrips, boolean hasScheduledTrips) {
-    this.hasFrequencyBasedTrips = this.hasFrequencyBasedTrips || hasFrequencyBasedTrips;
-    this.hasScheduledTrips = this.hasScheduledTrips || hasScheduledTrips;
-  }
-
-  boolean hasFrequencyBasedTrips() {
-    return hasFrequencyBasedTrips;
-  }
-
-  boolean hasScheduledTrips() {
-    return hasScheduledTrips;
   }
 
   /**

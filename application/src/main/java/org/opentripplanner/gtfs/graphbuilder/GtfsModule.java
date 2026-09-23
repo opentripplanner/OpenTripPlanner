@@ -165,12 +165,6 @@ public class GtfsModule implements GraphBuilderModule {
         // pending transfers and generates trip patterns, in that fixed order - see
         // TransitDataImportBuilder#build().
         TransitDataImport dataImport = builder.build();
-        transitRepository.setHasFrequencyService(
-          transitRepository.hasFrequencyService() || dataImport.hasFrequencyBasedTrips()
-        );
-        transitRepository.setHasScheduledService(
-          transitRepository.hasScheduledService() || dataImport.hasScheduledTrips()
-        );
 
         addTransitRepositoryToGraph(graph, transitRepository, streetDetailsRepository, dataImport);
 
@@ -256,8 +250,7 @@ public class GtfsModule implements GraphBuilderModule {
   }
 
   /**
-   * The GTFS {@link TripPatternGenerator}: generates trip patterns and records whether any
-   * frequency-based/scheduled trips were found, via {@link TransitDataImportBuilder#markServiceType}.
+   * The GTFS {@link TripPatternGenerator}.
    * <p>
    * This wraps {@link GenerateTripPatternsOperation} rather than having it implement {@link TripPatternGenerator}
    * directly, because its {@code calendarServiceIds} constructor argument can only be known once the builder has data
@@ -265,8 +258,6 @@ public class GtfsModule implements GraphBuilderModule {
    * mapping has happened, so it must derive {@code builder.tripCalendars().listServiceIds()} at {@link #generate} time,
    * not upfront. Folding that derivation into {@code GenerateTripPatternsOperation} itself would remove the ability its
    * own unit tests rely on to inject an arbitrary {@code calendarServiceIds} independent of any real calendar data.
-   * <p>
-   * This is NOT fixed now because the service-ids are subject to removal in the future.
    */
   private static class GtfsTripPatternGenerator implements TripPatternGenerator {
 
@@ -286,8 +277,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     @Override
     public void generate(TransitDataImportBuilder builder, DataImportIssueStore issueStore) {
-      // NB! run() has side effects: it adds trip patterns to builder and, as its last step,
-      // records hasFrequencyBasedTrips/hasScheduledTrips on it via markServiceType().
+      // NB! run() has side effects: it adds trip patterns to builder.
       new GenerateTripPatternsOperation(
         builder,
         issueStore,
