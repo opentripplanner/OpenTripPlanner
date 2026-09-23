@@ -154,6 +154,13 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
       .withTo(GenericLocation.fromCoordinate(coordM.latitude(), coordM.longitude()))
       .withDateTime(SEARCH_TIME.toInstant())
       .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL)))
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, Duration.ofHours(3)))
+          )
+        )
+      )
       .buildRequest();
 
     var results = service.routeAccessEgress(

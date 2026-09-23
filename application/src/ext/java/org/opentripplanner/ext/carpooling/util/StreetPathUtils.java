@@ -2,12 +2,17 @@ package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
 import javax.annotation.Nullable;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.state.EdgeTraverser;
+import org.opentripplanner.street.search.state.State;
 
 /**
  * Helpers for reading the duration and A* weight of {@link StreetPath} segments, where a missing
- * segment counts as zero, and for turning a sequence of segment durations into cumulative arrival
- * times with a stop delay at each intermediate stop.
+ * segment counts as zero, for replaying a walk with another request's preferences, and for turning
+ * a sequence of segment durations into cumulative arrival times with a stop delay at each
+ * intermediate stop.
  */
 public final class StreetPathUtils {
 
@@ -27,6 +32,21 @@ public final class StreetPathUtils {
    */
   public static double weightOrZero(@Nullable StreetPath path) {
     return path == null ? 0 : path.weight();
+  }
+
+  /**
+   * The same walk timed and weighted with {@code request}'s preferences: drives the path's edges
+   * through the real traversals from its first vertex, no search involved. {@code null} when an
+   * edge cannot be traversed under the request, for instance by a wheelchair user.
+   */
+  @Nullable
+  public static StreetPath replay(StreetPath path, StreetSearchRequest request) {
+    var walkRequest = StreetSearchRequest.copyOf(request)
+      .withMode(StreetMode.WALK)
+      .withArriveBy(false)
+      .build();
+    var edges = path.states().stream().skip(1).map(State::getBackEdge).toList();
+    return EdgeTraverser.createPath(edges, walkRequest).orElse(null);
   }
 
   /**

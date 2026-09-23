@@ -91,9 +91,6 @@ public class CarpoolStreetRouter implements CarpoolRouter {
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
       .withHeuristic(new EuclideanRemainingWeightHeuristic(streetLimitationParametersService))
-      // Bound the search at the carpool trip ceiling rather than the passenger request's
-      // maxDirectDuration: a driver leg is not a passenger direct trip, and a request-independent
-      // bound keeps the cached baseline leg durations request-independent too.
       .withSkipEdgeStrategy(
         new ComposingSkipEdgeStrategy<>(
           TraversalScope.withOwnLinkingOf(fromVertex, toVertex),

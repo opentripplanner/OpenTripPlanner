@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.util;
 
 import java.time.Duration;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetConstants;
@@ -83,6 +84,11 @@ public class BeelineEstimator {
     double maxCarSpeed
   ) {
     return SphericalDistanceLibrary.fastDistance(fromLat, fromLon, toLat, toLon) / maxCarSpeed;
+  }
+
+  /** Like {@link #minDriveSeconds(double, double, double, double, double)}, for two coordinates. */
+  public static double minDriveSeconds(Coordinate from, Coordinate to, double maxCarSpeed) {
+    return SphericalDistanceLibrary.fastDistance(from, to) / maxCarSpeed;
   }
 
   /**
