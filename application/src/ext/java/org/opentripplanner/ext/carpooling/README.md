@@ -8,7 +8,7 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 
 **Why it exists**: Provides flexible, demand-responsive carpooling as a complement to fixed-route transit.
 
-**How it works**: Three-phase algorithm (filter → pre-screen → route → validate) finds optimal passenger insertion points in driver routes using A* street routing with intelligent position pre-screening and segment caching.
+**How it works**: Pre-filters the driver trips, evaluates the best insertion of the passenger into each from street driving times (searched per request for direct trips, precomputed per trip for access and egress), and validates the result against the passenger's time window.
 
 ## Key Features
 
@@ -37,18 +37,13 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │     - Distance check                       │
 │     - Direction check                      │
 │                                            │
-│  2. Insertion Phase                        │
-│     2a. Position Pre-screening             │
-│         (InsertionPositionFinder)          │
-│         - Capacity check                   │
-│         - Beeline delay heuristic          │
-│                                            │
-│     2b. Routing & Selection                │
-│         (InsertionEvaluator)               │
-│         - Route baseline segments (cached) │
-│         - Route viable positions           │
-│         - Endpoint-matching segment reuse  │
-│         - Select minimum additional time   │
+│  2. Insertion Phase (InsertionEvaluator)   │
+│     - Driving times per leg and point      │
+│       (street search, or the trip's       │
+│       corridor for access/egress)          │
+│     - Every pickup/dropoff pair of legs    │
+│       checked against budgets + capacity   │
+│     - Select minimum additional time       │
 │                                            │
 └────────┬───────────────────────────────────┘
          │
@@ -83,23 +78,27 @@ org.opentripplanner.ext.carpooling/
 │   └── DistanceTripFilter.java # Distance check
 │
 ├── routing/                         # Insertion optimization
-│   ├── InsertionEvaluator.java        # Routing evaluation and selection
-│   ├── InsertionPositionFinder.java   # Viable position pre-screening
-│   ├── InsertionPosition.java      # Position pair (pickup, dropoff)
-│   └── InsertionCandidate.java     # Result of insertion computation
+│   ├── InsertionEvaluator.java     # Best insertion per trip
+│   ├── InsertionCandidate.java     # Result of insertion computation
+│   ├── CarpoolCorridor.java        # Per-trip stops and driving times, built at ingest
+│   ├── CorridorBuilder.java        # Builds corridors from ellipse-bounded car trees
+│   ├── CarpoolStopIndex.java       # Transit stops with their car-reachable snaps
+│   ├── CompactCarTree.java         # One-to-many car search over flat arrays
+│   ├── CarpoolTreeStreetRouter.java # Tree-backed router (passenger's trees)
+│   ├── CorridorRouter.java         # Access/egress router over corridor + passenger trees
+│   ├── CarpoolStreetRouter.java    # Goal-directed street router (direct mode)
+│   └── PerStopCandidateCap.java    # Bounds the access/egress candidates per stop
 │
 ├── internal/                        # Implementation details
-│   ├── DefaultCarpoolingRepository.java  # In-memory repository
+│   ├── DefaultCarpoolingRepository.java  # In-memory repository with a spatial index
 │   └── CarpoolItineraryMapper.java # Maps insertions to itineraries
 │
 ├── updater/                         # Real-time updates
-│   └── SiriETCarpoolingUpdater.java  # SIRI-ET message processing
+│   ├── SiriETCarpoolingUpdater.java  # SIRI-ET message processing
+│   └── CarpoolTripResolutionQueue.java # Background resolution of incoming trips
 │
 ├── util/                            # Utilities
 │   └── BeelineEstimator.java       # Straight-line distance estimation
-│
-├── constraints/                     # Constraint definitions
-│   └── PassengerDelayConstraints.java  # Delay limits for passengers
 │
 └── configure/                       # Dependency injection
     └── CarpoolingModule.java       # Dagger module
@@ -118,55 +117,26 @@ Filters eliminate obviously incompatible trips **without any street routing**:
 
 ### Phase 2: Insertion Optimization (Finding Best Position)
 
-For trips that pass filtering, computes optimal pickup/dropoff positions using a two-stage approach:
+For every candidate trip the `InsertionEvaluator` picks the pair of legs (one for the pickup,
+one for the dropoff, possibly the same) that adds the least driving time while every later stop
+stays within its deviation budget and the car has a free seat on every leg the passenger rides.
 
-#### Stage 1: Position Pre-screening (InsertionPositionFinder)
+The detour of putting a point into a leg is `drive(leg start -> point) + drive(point -> leg end)
+- leg + dwell` and does not depend on where the other point goes, so each pair of legs is a few
+additions and comparisons once the driving times per leg and point are known. Only the winning
+route is assembled; street paths are built only for the insertions that end up in an itinerary.
 
-Fast heuristic checks eliminate impossible positions **before any A* routing**:
+Where the driving times come from:
 
-```
-For each remaining trip:
-  1. Generate all position combinations (pickup, dropoff) where:
-     - Pickup: between any two consecutive stops (0-based index in modified route)
-     - Dropoff: after pickup position
-
-  2. For each position pair, check:
-     a. Capacity: Does insertion exceed vehicle capacity at any point?
-     b. Beeline delay: Do straight-line estimates exceed delay threshold?
-
-  3. Return only "viable" positions that pass all checks
-```
-
-**Key optimizations**:
-- **Capacity validation**: Uses `CarpoolTrip.hasCapacityForInsertion()` to check entire journey range
-- **Beeline heuristic**: Optimistic straight-line estimates eliminate positions early
-- **No routing yet**: All checks use geometric calculations only
-
-#### Stage 2: Routing and Selection (InsertionEvaluator)
-
-For viable positions from Stage 1, perform A* routing to find the optimal insertion:
-
-```
-For each trip with viable positions:
-  1. Route baseline segments (driver's original route) and cache results
-
-  2. For each viable position:
-     a. Build modified route with passenger inserted
-     b. Route only segments with changed endpoints
-     c. Reuse cached segments where endpoints match exactly
-     d. Calculate total duration and additional time vs. baseline
-     e. Check passenger delay constraints
-
-  3. Select insertion with minimum additional time
-  4. Ensure additional time ≤ driver's deviation budget
-```
-
-**Critical optimization - Endpoint-matching segment reuse**:
-- Baseline segments are cached after first routing
-- For modified routes, segments are reused **only if both endpoints match exactly**
-- Endpoint matching uses `WgsCoordinate.equals()` with 7-decimal precision (~1cm)
-- Only segments with changed endpoints are re-routed
-- Prevents incorrect reuse when passenger insertion splits existing segments
+- **Direct**: goal-directed street searches (`CarpoolStreetRouter`). A leg whose beeline detour
+  already exceeds the following stop's budget is not searched. At most the 50 trips passing closest
+  to the passenger are evaluated (`ClosestCandidateTrips`).
+- **Access/egress**: when a trip arrives, `CorridorBuilder` computes its `CarpoolCorridor`: the
+  routed baseline legs and, per leg, every transit stop inside the leg's feasibility ellipse with
+  the driving times to serve it. A request then builds only the passenger's two street trees
+  (`CompactCarTree`) and reads everything else from the corridors of the trips found near the
+  passenger by the repository's spatial index. A transit stop with more candidates than Raptor can
+  use hands over the first, the last and one per slot of the search window (`PerStopCandidateCap`).
 
 ## Usage Examples
 
@@ -283,13 +253,6 @@ Waypoint along a carpool route:
 - **deviationBudget**: Extra time the driver is willing to spend on deviations before reaching this stop
 - **onboardCount**: Number of passengers onboard (including the driver) when departing this stop
 
-### InsertionPosition
-
-Represents a viable pickup/dropoff position pair:
-
-- **pickupPos**: 0-based index of the passenger's pickup in the modified route
-- **dropoffPos**: 0-based index of the passenger's dropoff in the modified route
-
 ### InsertionCandidate
 
 Result of finding optimal passenger insertion:
@@ -307,9 +270,11 @@ Result of finding optimal passenger insertion:
 ### Performance Bottlenecks
 
 If performance degrades:
-1. **Too many active trips**: Filter more aggressively
-2. **Large route deviation budgets**: Increases insertion positions to test
-3. **Complex street networks**: A* routing takes longer
+1. **Too many candidate trips near the passenger**: at most 50 are evaluated per request, but each
+   still costs a few street searches in direct mode
+2. **Large route deviation budgets**: widen the feasibility ellipses, so corridors hold more stops
+   and the passenger's trees grow
+3. **Complex street networks**: street searches take longer
 
 ## Thread Safety
 
