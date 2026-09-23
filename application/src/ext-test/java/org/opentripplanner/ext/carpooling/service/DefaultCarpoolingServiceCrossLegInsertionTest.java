@@ -29,7 +29,7 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a cross-leg insertion — pickup on
  * one leg of a multi-stop driver trip, dropoff on a later leg — whose
  * {@code passenger → next waypoint} drive exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS},
+ * (the former nearby-stop search radius,
  * 60 minutes). It is found only because the passenger's routing tree is sized to the largest
  * candidate leg limit, not to a fixed cap.
  *
@@ -154,6 +154,14 @@ class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
       .withTo(GenericLocation.fromCoordinate(coordM.latitude(), coordM.longitude()))
       .withDateTime(SEARCH_TIME.toInstant())
       .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL)))
+      // The ride itself takes over an hour: allow it, the test is about finding the insertion.
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, Duration.ofHours(3)))
+          )
+        )
+      )
       .buildRequest();
 
     var results = service.routeAccessEgress(

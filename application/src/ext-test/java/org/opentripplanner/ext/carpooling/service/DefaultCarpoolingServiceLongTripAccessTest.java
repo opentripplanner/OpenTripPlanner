@@ -23,7 +23,7 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
 /**
  * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a driver trip whose end-to-end
  * driving time exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS}, 60
+ * (the former nearby-stop search radius, 60
  * minutes). Each leg's tree is sized from OTP's own routed leg duration (see
  * {@link DefaultCarpoolingService#driverLegTreeLimits} and {@code resolveLegDurations}), not from
  * the radius, so the leg's far waypoint stays inside the tree and the trip produces access

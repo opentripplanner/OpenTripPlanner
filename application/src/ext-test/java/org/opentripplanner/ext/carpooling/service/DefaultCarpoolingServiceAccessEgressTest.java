@@ -333,6 +333,35 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
   }
 
   @Test
+  void legsLongerThanTheRequestsMaximumCarpoolDurationAreDropped() {
+    var departureTime = SEARCH_TIME.plusMinutes(30);
+    context.upsertTrip(CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime));
+    var request = RouteRequest.of()
+      .withFrom(GenericLocation.fromCoordinate(coordP2.latitude(), coordP2.longitude()))
+      .withTo(GenericLocation.fromCoordinate(coordP3.latitude(), coordP3.longitude()))
+      .withDateTime(SEARCH_TIME.toInstant())
+      .withJourney(j -> j.withAccess(new StreetRequest(StreetMode.CARPOOL)))
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae ->
+            ae.withMaxDuration(b -> b.with(StreetMode.CARPOOL, Duration.ofSeconds(30)))
+          )
+        )
+      )
+      .buildRequest();
+
+    var results = service.routeAccessEgress(
+      request,
+      new StreetRequest(StreetMode.CARPOOL),
+      AccessEgressType.ACCESS,
+      transitServiceResolver,
+      SEARCH_TIME
+    );
+
+    assertTrue(results.isEmpty(), "every carpool leg here takes more than 30 s: " + results);
+  }
+
+  @Test
   void findsEgressResultsForCompatibleTrip() {
     var departureTime = SEARCH_TIME.plusMinutes(30);
     var trip = CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime);

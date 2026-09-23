@@ -3,18 +3,18 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * A transit stop that has been determined viable for carpooling access or egress,
  * along with the pre-computed insertion positions where the passenger can be
  * picked up and dropped off on the carpool trip's route.
  *
- * @param transitStop the nearby transit stop
+ * @param transitStop the transit stop
  * @param transitVertex the street graph vertex where the driver stops to pick up or drop off the
  *        passenger at the transit-stop side (already snapped to a car-reachable vertex)
  * @param passengerVertex the street graph vertex where the driver stops at the passenger side
@@ -27,7 +27,7 @@ import org.opentripplanner.street.search.state.State;
  *        no walking is needed at the dropoff end.
  */
 public record ViableAccessEgress(
-  NearbyStop transitStop,
+  StopLocation transitStop,
   Vertex transitVertex,
   Vertex passengerVertex,
   AccessEgressType accessEgress,

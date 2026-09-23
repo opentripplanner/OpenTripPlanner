@@ -5,10 +5,10 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * Represents a viable insertion of a passenger into a carpool trip.
@@ -30,7 +30,7 @@ public record InsertionCandidate(
   int dropoffPosition,
   List<RoutedSegment> routeSegments,
   Duration stopDuration,
-  NearbyStop transitStop,
+  @Nullable StopLocation transitStop,
   Duration totalTripDuration,
   @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
   @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
@@ -70,7 +70,7 @@ public record InsertionCandidate(
     int dropoffPosition,
     List<RoutedSegment> routeSegments,
     Duration stopDuration,
-    NearbyStop transitStop,
+    @Nullable StopLocation transitStop,
     @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
     @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
   ) {
