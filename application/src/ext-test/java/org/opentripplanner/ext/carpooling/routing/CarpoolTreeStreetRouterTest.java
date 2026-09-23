@@ -238,15 +238,21 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertFalse(path.edges.isEmpty(), "Path edges should not be empty");
   }
 
-  /** Insertion evaluation only reads durations; the path is assembled on demand and memoised. */
+  /**
+   * Insertion evaluation only reads durations; the path is assembled on demand. A segment that
+   * has to outlive the router takes its edge chain from the tree and builds the same path later.
+   */
   @Test
-  void pathIsBuiltOnDemand() {
+  void pathIsBuiltOnDemandAndSurvivesDetaching() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var segment = router.route(vertexA, vertexD);
+    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
     assertNotNull(segment);
     assertTrue(segment.durationSeconds() > 0);
+    assertFalse(segment.isDetached());
 
+    segment.detach();
+    assertTrue(segment.isDetached());
     var path = segment.path();
     assertSame(path, segment.path(), "The path is memoised");
     assertEquals(segment.durationSeconds(), path.getDuration());

@@ -19,7 +19,8 @@ import org.opentripplanner.street.search.state.State;
  * <p>
  * A segment's duration is read straight off the tree; its path is only assembled if
  * {@link RoutedSegment#path()} is called, which happens for the few segments that end up in an
- * itinerary.
+ * itinerary. A segment that has to outlive the router keeps its edge chain after
+ * {@link RoutedSegment#detach()} and no longer references the tree.
  * <p>
  * Not thread-safe; one instance per request.
  */
@@ -114,15 +115,20 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   /**
    * A segment answered from a tree. {@code farEnd} is the end that is not the tree's root. The
-   * path is built on demand from the tree.
+   * path is built on demand from the tree, or from the edge chain once detached.
    */
   static final class TreeSegment implements RoutedSegment {
 
     private final Vertex from;
     private final Vertex to;
     private final int durationSeconds;
-    private final CompactCarTree tree;
     private final Vertex farEnd;
+
+    @Nullable
+    private CompactCarTree tree;
+
+    @Nullable
+    private Edge[] edges;
 
     @Nullable
     private GraphPath<State, Edge, Vertex> path;
@@ -153,9 +159,25 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     @Override
     public GraphPath<State, Edge, Vertex> path() {
       if (path == null) {
-        path = tree.path(farEnd);
+        detach();
+        boolean reverse = farEnd == from;
+        path = CompactCarTree.path(edges, reverse ? to : from, reverse);
       }
       return path;
+    }
+
+    /** Takes the edge chain from the tree and lets go of the tree. */
+    @Override
+    public void detach() {
+      if (edges == null) {
+        edges = tree.edgesTo(farEnd);
+        tree = null;
+      }
+    }
+
+    /** Whether {@link #detach()} has let go of the tree. Package-private for testing. */
+    boolean isDetached() {
+      return tree == null;
     }
 
     @Override
