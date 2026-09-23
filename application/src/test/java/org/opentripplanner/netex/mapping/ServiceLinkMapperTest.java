@@ -84,10 +84,22 @@ class ServiceLinkMapperTest {
         SERVICE_LINKS_COORDINATES[5],
       }
     );
+    ServiceLink serviceLink3 = createServiceLinkWithDirectLineString(
+      "RUT:ServiceLink:3",
+      "RUT:StopPoint:1",
+      "RUT:StopPoint:2",
+      new Double[] {
+        SERVICE_LINKS_COORDINATES[0],
+        SERVICE_LINKS_COORDINATES[1],
+        SERVICE_LINKS_COORDINATES[2],
+        SERVICE_LINKS_COORDINATES[3],
+      }
+    );
 
     HierarchicalMapById<ServiceLink> serviceLinksById = new HierarchicalMapById<>();
     serviceLinksById.add(serviceLink1);
     serviceLinksById.add(serviceLink2);
+    serviceLinksById.add(serviceLink3);
 
     Quay quay1 = new Quay()
       .withId("NSR:Quay:1")
@@ -261,6 +273,54 @@ class ServiceLinkMapperTest {
     assertEquals(QUAY3_COORDINATES[1], coordinates[1].getX(), FLOATING_POINT_COMPARISON_PRECISION);
   }
 
+  @Test
+  void testMapServiceLinkWithDirectLineString() {
+    JourneyPattern journeyPattern = new JourneyPattern().withId("RUT:JourneyPattern:1300");
+    journeyPattern.setLinksInSequence(
+      new LinksInJourneyPattern_RelStructure()
+        .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:3")
+          )
+        )
+        .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2")
+          )
+        )
+    );
+
+    List<LineString> shape = serviceLinkMapper.getGeometriesByJourneyPattern(
+      journeyPattern,
+      stopPatternBuilder.build()
+    );
+
+    assertEquals(0, issueStore.listIssues().size());
+
+    Coordinate[] coordinates = shape.get(0).getCoordinates();
+
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[0],
+      coordinates[0].getY(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[1],
+      coordinates[0].getX(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[2],
+      coordinates[1].getY(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[3],
+      coordinates[1].getX(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+  }
+
   private SimplePoint_VersionStructure getLocation(double latitude, double longitude) {
     return new SimplePoint_VersionStructure().withLocation(
       new LocationStructure()
@@ -314,5 +374,26 @@ class ServiceLinkMapperTest {
       .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
       .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
       .withProjections(projections_relStructure);
+  }
+
+  /**
+   * Some NeTEx producers put the {@link LineStringType} directly on the {@link ServiceLink}
+   * instead of wrapping it in a {@code Projections_RelStructure}.
+   */
+  private ServiceLink createServiceLinkWithDirectLineString(
+    String id,
+    String from,
+    String to,
+    Double[] coordinates
+  ) {
+    DirectPositionListType directPositionListType = new DirectPositionListType().withValue(
+      coordinates
+    );
+
+    return new ServiceLink()
+      .withId(id)
+      .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
+      .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
+      .withLineString(new LineStringType().withPosList(directPositionListType));
   }
 }

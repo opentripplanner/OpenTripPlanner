@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import jakarta.xml.bind.JAXBElement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -122,6 +122,14 @@ class ServiceLinkMapper {
     StopPattern stopPattern,
     int stopIndex
   ) {
+    if (serviceLink.getLineString() != null) {
+      return mapLineString(
+        serviceLink.getLineString(),
+        stopPattern,
+        stopIndex,
+        serviceLink.getId()
+      );
+    }
     if (
       serviceLink.getProjections() == null ||
       serviceLink.getProjections().getProjectionRefOrProjection() == null
@@ -137,30 +145,7 @@ class ServiceLinkMapper {
       .getProjectionRefOrProjection()) {
       Object projectionObj = projectionElement.getValue();
       if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
-        LineStringType lineString = linkSequenceProjection.getLineString();
-        if (!isProjectionValid(lineString, serviceLink.getId())) {
-          return null;
-        }
-
-        List<Double> positionList = getLineStringCoordinates(lineString);
-        Coordinate[] coordinates = new Coordinate[positionList.size() / 2];
-        for (int i = 0; i < positionList.size(); i += 2) {
-          coordinates[i / 2] = new Coordinate(positionList.get(i + 1), positionList.get(i));
-        }
-        final LineString geometry = GeometryUtils.makeLineString(coordinates);
-
-        if (
-          !isGeometryValid(geometry, serviceLink.getId()) ||
-          !areEndpointsWithinTolerance(
-            geometry,
-            stopPattern.getStop(stopIndex),
-            stopPattern.getStop(stopIndex + 1),
-            serviceLink.getId()
-          )
-        ) {
-          return null;
-        }
-        return geometry;
+        return mapServiceLink(serviceLink, stopPattern, stopIndex, linkSequenceProjection);
       }
     }
 
@@ -170,6 +155,55 @@ class ServiceLinkMapper {
       serviceLink.getId()
     );
     return null;
+  }
+
+  @Nullable
+  private LineString mapServiceLink(
+    ServiceLink serviceLink,
+    StopPattern stopPattern,
+    int stopIndex,
+    LinkSequenceProjection_VersionStructure linkSequenceProjection
+  ) {
+    LineStringType lineString = linkSequenceProjection.getLineString();
+    if (lineString == null) {
+      issueStore.add(
+        "ServiceLinkWithoutLineString",
+        "Ignore linkSequenceProjection without linestring for: %s",
+        linkSequenceProjection.getId()
+      );
+      return null;
+    }
+
+    return mapLineString(lineString, stopPattern, stopIndex, serviceLink.getId());
+  }
+
+  @Nullable
+  private LineString mapLineString(
+    LineStringType lineString,
+    StopPattern stopPattern,
+    int stopIndex,
+    String id
+  ) {
+    var coordinates = extractCoordinates(lineString);
+
+    if (!isProjectionValid(coordinates, id)) {
+      return null;
+    }
+
+    var geometry = GeometryUtils.makeLineString(coordinates);
+
+    if (
+      !isGeometryValid(geometry, id) ||
+      !areEndpointsWithinTolerance(
+        geometry,
+        stopPattern.getStop(stopIndex),
+        stopPattern.getStop(stopIndex + 1),
+        id
+      )
+    ) {
+      return null;
+    }
+    return geometry;
   }
 
   /** create a 2-point linestring (a straight line segment) between the two stops */
@@ -217,18 +251,25 @@ class ServiceLinkMapper {
     return true;
   }
 
-  private List<Double> getLineStringCoordinates(LineStringType lineString) {
+  private double[] extractCoordinates(LineStringType lineString) {
     if (lineString.getPosList() != null) {
-      return lineString.getPosList().getValue();
+      var values = lineString
+        .getPosList()
+        .getValue()
+        .stream()
+        .mapToDouble(Double::doubleValue)
+        .toArray();
+      return swapLatLon(values);
     }
-    var list = new ArrayList<Double>();
+    var list = new TDoubleArrayList();
     for (Object o : lineString.getPosOrPointProperty()) {
       if (o instanceof DirectPositionType directPosition) {
         var values = directPosition.getValue();
         if (values == null || values.size() != 2) {
           continue;
         }
-        list.addAll(values);
+        list.add(values.getFirst());
+        list.add(values.getLast());
       } else {
         issueStore.add(
           "BadLineStringElementType",
@@ -237,20 +278,25 @@ class ServiceLinkMapper {
         );
       }
     }
-    return list;
+    return swapLatLon(list.toArray());
   }
 
-  private boolean isProjectionValid(LineStringType lineString, String id) {
-    if (lineString == null) {
-      issueStore.add(
-        "ServiceLinkWithoutLineString",
-        "Ignore linkSequenceProjection without linestring for: %s",
-        id
-      );
-      return false;
+  /**
+   * NeTEx posList/pos coordinates are ordered (latitude, longitude), but JTS
+   * {@link Coordinate}s are always (x=longitude, y=latitude). Swap each pair in place so the
+   * resulting array can be fed directly into {@link GeometryUtils#makeLineString(double...)}.
+   */
+  private static double[] swapLatLon(double[] coords) {
+    for (int i = 0; i + 1 < coords.length; i += 2) {
+      double lat = coords[i];
+      coords[i] = coords[i + 1];
+      coords[i + 1] = lat;
     }
-    List<Double> coordinates = getLineStringCoordinates(lineString);
-    if (coordinates.size() < 4) {
+    return coords;
+  }
+
+  private boolean isProjectionValid(double[] coordinates, String id) {
+    if (coordinates.length < 4) {
       issueStore.add(
         "ServiceLinkGeometryError",
         "Ignore linkSequenceProjection with invalid linestring, " +
@@ -258,7 +304,7 @@ class ServiceLinkMapper {
         id
       );
       return false;
-    } else if (coordinates.size() % 2 != 0) {
+    } else if (coordinates.length % 2 != 0) {
       issueStore.add(
         "ServiceLinkGeometryError",
         "Ignore linkSequenceProjection with invalid linestring, " +
