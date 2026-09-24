@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 
 class PerStopCandidateCapTest {
 
@@ -111,7 +112,7 @@ class PerStopCandidateCapTest {
   @Test
   void neverHandsOverMoreThanTheCapPerStop() {
     var cap = new PerStopCandidateCap<C>(
-      PerStopCandidateCap.DEFAULT_MAX_PER_STOP,
+      CarpoolingParameters.DEFAULT.maxCandidatesPerStop(),
       false,
       false,
       T,
@@ -121,7 +122,7 @@ class PerStopCandidateCapTest {
       add(cap, new C("t+" + m, 1, T + m * MIN, T + (m + 30) * MIN));
     }
     var kept = names(cap);
-    assertTrue(kept.size() <= PerStopCandidateCap.DEFAULT_MAX_PER_STOP, kept.toString());
+    assertTrue(kept.size() <= CarpoolingParameters.DEFAULT.maxCandidatesPerStop(), kept.toString());
     assertTrue(kept.size() >= 20, "one car per slot is kept: " + kept);
     assertTrue(kept.contains("t+0") && kept.contains("t+118"), kept.toString());
   }
