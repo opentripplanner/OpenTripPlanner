@@ -65,6 +65,7 @@ class CallAtStopServiceTest {
       Set.of(),
       Set.of(),
       Set.of(),
+      Set.of(),
       Set.of()
     );
   }
