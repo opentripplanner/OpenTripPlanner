@@ -78,7 +78,12 @@ public class GeometryUtils {
   }
 
   public static LineString makeLineString(WgsCoordinate... coordinates) {
-    return makeLineString(Arrays.stream(coordinates).map(WgsCoordinate::asJtsCoordinate).toList());
+    var coords = new double[coordinates.length * 2];
+    for (int i = 0; i < coordinates.length; i++) {
+      coords[i * 2] = coordinates[i].longitude();
+      coords[i * 2 + 1] = coordinates[i].latitude();
+    }
+    return makeLineString(coords);
   }
 
   /// Convert an iterable of T by applying a mapping function to each element and concatenating the
