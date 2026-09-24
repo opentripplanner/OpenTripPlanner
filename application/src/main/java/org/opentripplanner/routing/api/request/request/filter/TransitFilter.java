@@ -12,7 +12,7 @@ public interface TransitFilter {
   /**
    * Return false is tripTimes are banned, otherwise return true
    */
-  boolean matchTripTimes(TripTimes trip);
+  boolean matchTripTimes(TripTimes<?> trip);
 
   /**
    * Returns {@code true} if this filter contains mode-selective constraints that may require

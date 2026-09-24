@@ -6,10 +6,14 @@ import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.GtfsSchema;
-import org.opentripplanner.apis.gtfs.configure.SchemaModule;
+import org.opentripplanner.apis.gtfs.configure.GtfsSchemaModule;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchema;
 import org.opentripplanner.apis.transmodel.configure.TransmodelSchemaModule;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.framework.transaction.configure.StreetDomain;
+import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
@@ -27,11 +31,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
-import org.opentripplanner.framework.transaction.UpdateManager;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.configure.StreetDomain;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
-import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
@@ -99,7 +99,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     LinkingServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
     RideHailingServicesModule.class,
-    SchemaModule.class,
+    GtfsSchemaModule.class,
     TransmodelSchemaModule.class,
     SorlandsbanenNorwayModule.class,
     StopConsolidationServiceModule.class,

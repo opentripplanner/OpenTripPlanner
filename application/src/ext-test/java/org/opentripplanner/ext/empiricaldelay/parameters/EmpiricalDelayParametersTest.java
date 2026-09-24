@@ -7,8 +7,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner._support.net.URIUtils;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 
 class EmpiricalDelayParametersTest {
 

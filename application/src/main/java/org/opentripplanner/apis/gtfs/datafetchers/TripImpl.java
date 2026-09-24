@@ -41,7 +41,6 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -155,7 +154,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant();
         Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
 
-        TripTimes tripTimes = timetable.getTripTimes(trip);
+        var tripTimes = timetable.getTripTimes(trip);
         if (tripTimes == null) {
           return null;
         }
@@ -211,7 +210,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant();
         Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
 
-        TripTimes tripTimes = timetable.getTripTimes(trip);
+        var tripTimes = timetable.getTripTimes(trip);
         if (tripTimes == null) {
           return null;
         }
@@ -329,7 +328,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   @Override
   public DataFetcher<String> serviceId() {
-    return environment -> getSource(environment).getServiceId().toString();
+    // Deprecated: GTFS service-id is being phased out as an internal OTP concept, see
+    // https://github.com/opentripplanner/OpenTripPlanner/issues/7972
+    return environment -> null;
   }
 
   @Override

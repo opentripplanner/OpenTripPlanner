@@ -27,7 +27,8 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.apis.support.graphql.DataFetchingSupport;
-import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.apis.transmodel.TransmodelAPITestContextBuilder;
+import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -38,13 +39,12 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
-import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
-import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -53,6 +53,11 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class TripRequestMapperTest implements PlanTestConstants {
+
+  private static final TransitTestEnvironment TRANSIT_ENV = TransitTestEnvironment.of(
+    LocalDate.of(2024, 5, 7),
+    ZoneIds.STOCKHOLM
+  ).build();
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
@@ -66,7 +71,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private static final RegularStop STOP3 = TEST_MODEL.stop("ST:stop3", 3, 1).build();
 
   private static final Graph GRAPH = new Graph();
-  private static final TransitRepository TIMETABLE_REPOSITORY;
+  private static final TransitRepository TRANSIT_REPOSITORY;
   private static final TransferRepository TRANSFER_REPOSITORY;
   private static final Map.Entry<String, Object> ARGUMENT_FROM = entry(
     "from",
@@ -78,7 +83,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   );
 
   private static final TripRequestMapper MAPPER = new TripRequestMapper(new DefaultFeedIdMapper());
-  private TransmodelRequestContext context;
+  private TransmodelGraphQLRequestContext context;
 
   static {
     var itinerary = newItinerary(Place.forStop(STOP1), time("11:00"))
@@ -86,30 +91,30 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .bus(ROUTE2, 2, time("11:20"), time("11:40"), Place.forStop(STOP3))
       .build();
     var patterns = itineraryPatterns(itinerary);
-    var siteRepository = TEST_MODEL.siteRepositoryBuilder()
-      .withRegularStop(STOP1)
-      .withRegularStop(STOP2)
-      .withRegularStop(STOP3)
-      .build();
+
+    //TEST_MODEL.siteRepositoryBuilder()
+    //  .withRegularStop(STOP1)
+    //  .withRegularStop(STOP2)
+    //  .withRegularStop(STOP3)
+    //  .build();
 
     TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
-    TIMETABLE_REPOSITORY = new TransitRepository(siteRepository);
-    TIMETABLE_REPOSITORY.initTimeZone(ZoneIds.STOCKHOLM);
+    TRANSIT_REPOSITORY = TRANSIT_ENV.transitRepository();
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
-      TIMETABLE_REPOSITORY.addTripPattern(pattern.getId(), pattern);
+      TRANSIT_REPOSITORY.addTripPattern(pattern.getId(), pattern);
       final int serviceCode = pattern
         .getScheduledTimetable()
         .getTripTimes()
         .getFirst()
         .getServiceCode();
-      TIMETABLE_REPOSITORY.putServiceCode(pattern.getId(), serviceCode);
+      TRANSIT_REPOSITORY.putServiceCode(pattern.getId(), serviceCode);
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    TIMETABLE_REPOSITORY.updateCalendarServiceData(calendarServiceData);
-    TIMETABLE_REPOSITORY.index();
+    TRANSIT_REPOSITORY.updateCalendarServiceData(calendarServiceData);
+    TRANSIT_REPOSITORY.index();
   }
 
   @BeforeEach
@@ -128,26 +133,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
       )
       .buildDefault();
 
-    var transitService = TestServerContext.createTransitService(
-      TIMETABLE_REPOSITORY,
-      TRANSFER_REPOSITORY
-    );
-    var vertexLinker = VertexLinkerTestFactory.of(GRAPH);
-
-    context = new TransmodelRequestContext(
-      TestServerContext.createRoutingService(GRAPH, transitService, TRANSFER_REPOSITORY),
-      transitService,
-      null,
-      null,
-      defaultRequest,
-      TestServerContext.createVehicleRentalService(),
-      TestServerContext.createVehicleParkingService(),
-      GRAPH,
-      TransferServiceTestFactory.transferService(TRANSFER_REPOSITORY),
-      TestServerContext.createStreetDetailsService(),
-      TestServerContext.createLinkingContextFactory(GRAPH, vertexLinker, transitService),
-      TestServerContext.createStreetLimitationParametersService()
-    );
+    context = TransmodelAPITestContextBuilder.of(TRANSIT_ENV)
+      .withGraph(GRAPH)
+      .withTransferRepository(TRANSFER_REPOSITORY)
+      .withDefaultRequest(defaultRequest)
+      .build();
   }
 
   private static final List<Map<String, Object>> DURATIONS = List.of(

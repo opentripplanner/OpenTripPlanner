@@ -120,7 +120,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -559,7 +558,7 @@ class GraphQLIntegrationTest {
     );
 
     var routeRequest = RouteRequest.defaultValue();
-    context = new GtfsGraphQLRequestContext(
+    context = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
       transitAlertService,
@@ -599,7 +598,7 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          TripTimes scheduledTimes = stl.tripTimes();
+          var scheduledTimes = stl.tripTimes();
           var builder = scheduledTimes.createRealTimeFromScheduledTimes();
 
           for (var i = 0; i < scheduledTimes.getNumStops(); i++) {

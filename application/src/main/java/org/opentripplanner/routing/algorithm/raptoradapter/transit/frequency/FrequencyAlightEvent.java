@@ -12,7 +12,7 @@ final class FrequencyAlightEvent<T extends DefaultTripSchedule> extends Frequenc
 
   public FrequencyAlightEvent(
     TripPatternForDates raptorTripPattern,
-    TripTimes tripTimes,
+    TripTimes<?> tripTimes,
     int stopPositionInPattern,
     int earliestDepartureTime,
     int departureTime,

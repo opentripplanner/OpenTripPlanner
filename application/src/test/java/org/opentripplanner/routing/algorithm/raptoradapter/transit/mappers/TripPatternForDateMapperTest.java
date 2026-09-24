@@ -71,7 +71,7 @@ public class TripPatternForDateMapperTest {
 
     //Each of the mapped trip times should be in the original timetable. (For this specific date)
     //Can't simply do a check by index, as the trip times for date are sorted during mapping.
-    for (TripTimes times : mappedPattern.tripTimes()) {
+    for (TripTimes<?> times : mappedPattern.tripTimes()) {
       boolean timeTableContainsTimes = timetable.getTripTimes().contains(times);
       assertTrue(timeTableContainsTimes);
     }

@@ -5,7 +5,6 @@ import java.util.Set;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -51,7 +50,7 @@ public class SiriFuzzyTripMatcherCache {
       }
       String lastStopId = tripPattern.lastStop().getId().getId();
 
-      TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
+      var tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
       if (tripTimes != null) {
         int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
         startStopTrips.put(startStopKey(lastStopId, arrivalTime), trip);

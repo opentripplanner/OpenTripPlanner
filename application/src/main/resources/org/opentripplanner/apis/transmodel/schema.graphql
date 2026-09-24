@@ -2102,6 +2102,7 @@ enum TransportMode {
   metro
   monorail
   rail
+  snowAndIce
   taxi
   tram
   trolleybus

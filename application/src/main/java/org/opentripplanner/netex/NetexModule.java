@@ -3,7 +3,7 @@ package org.opentripplanner.netex;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;

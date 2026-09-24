@@ -1,6 +1,6 @@
 package org.opentripplanner.service.realtimevehicles.internal;
 
-import org.opentripplanner.framework.transaction.api.RepositoryLifecycle;
+import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 

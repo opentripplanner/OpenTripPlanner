@@ -123,6 +123,7 @@ Add the `script/custom-release-env.json` file to your branch. The content of the
   "release_branch": "<release branch>",
   "ser_ver_id_prefix": "<organization abbrivation, max 2 characters>",
   "include_prs_label": "<organization name> Test",
+  "include_prs_labelers": [ "<github login>", "<github login>" ],
   "ext_branches" : [ "<release config branch>"],
   "otp_production_url" : "<URL to OTP server endpoint>"
 }
@@ -135,6 +136,7 @@ If you organization is _Curium_, then the file would look like this:
   "release_branch": "main",
   "ser_ver_id_prefix": "CU",
   "include_prs_label": "Curium Test",
+  "include_prs_labelers": [ "alice", "bob" ],
   "ext_branches" : [ "main_config"],
   "otp_production_url" : "https://otp.curium.org/otp"
 }
@@ -145,6 +147,10 @@ Git clone. Use `git remote -v` to list all remote repos.
 
 The `otp_production_url` is optional. If provided, the release script will include a changelog diff 
 in the release summary between the production and built version.
+
+The `include_prs_labelers` is optional, but recommended. It lists the GitHub logins of the users
+who are allowed to label PRs for your releases, see [Pending Pull Requests](#pending-pull-requests).
+If it is omitted or empty, the script does not verify who set the label.
 
 ```
 # git remote -v 
@@ -211,6 +217,20 @@ team member can do the release. This allows us to test features at Entur before 
 and merged in the upstream repo. We combine this with config, and sometimes the OTPFeature toggle
 to turn _on_ new features in over test environment. When the new feature is tested ok, we can 
 enable it by changing the config.
+
+#### Who may label PRs for a release
+
+Anyone with triage access to the upstream repository can put a label on a PR, and a labeled PR is
+merged, built and released without further review. To protect your release, list the GitHub logins
+of the users you trust to label PRs in the `include_prs_labelers` config. For each PR the script
+looks at who set the label _last_ - the label can be removed and set again - and stops the release
+if that user is not in the list. The check runs before anything is merged. To resolve it, remove the
+label from the PR or add the user to the list. The login of the labeler is also printed in the
+release summary.
+
+The head commit of each PR is read together with the label. When the PR is fetched a moment later,
+the script verifies that the head has not moved; if it has, the release stops and can be started
+over.
 
 
 ## How To Make The First Release

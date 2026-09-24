@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater.mqtt;
 
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -33,9 +32,7 @@ public class SiriETMqttUpdater implements GraphUpdater<TransitRealTimeUpdateCont
   }
 
   @Override
-  public void setup(
-    @Nonnull WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback
-  ) {
+  public void setup(WriteToGraphCallback<TransitRealTimeUpdateContext> writeToGraphCallback) {
     this.writeToGraphCallback = writeToGraphCallback;
   }
 

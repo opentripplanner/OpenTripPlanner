@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -368,11 +368,11 @@ class TripPatternMapper {
     return otpRouteById.get(idFactory.createId(lineId));
   }
 
-  private List<TripTimes> createTripTimes(
+  private List<TripTimes<?>> createTripTimes(
     List<Trip> trips,
     Map<Trip, List<StopTime>> tripStopTimes
   ) {
-    var tripTimesResult = new ArrayList<TripTimes>();
+    var tripTimesResult = new ArrayList<TripTimes<?>>();
     for (Trip trip : trips) {
       List<StopTime> stopTimes = tripStopTimes.get(trip);
       if (stopTimes.isEmpty()) {
@@ -383,7 +383,7 @@ class TripPatternMapper {
         );
       } else {
         try {
-          TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
+          var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
           tripTimesResult.add(tripTimes);
         } catch (DataValidationException e) {
           issueStore.add(e.error());

@@ -136,7 +136,7 @@ public class DefaultTransitService implements TransitService {
     Timetable timetable = findTimetable(pattern, serviceDate);
 
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
-    TripTimes times = timetable.getTripTimes(trip);
+    var times = timetable.getTripTimes(trip);
     if (
       times == null ||
       !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
@@ -152,7 +152,7 @@ public class DefaultTransitService implements TransitService {
   }
 
   @Override
-  public Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate) {
+  public Optional<TripTimes<?>> findTripTimes(Trip trip, LocalDate serviceDate) {
     return Optional.ofNullable(findPattern(trip, serviceDate))
       .map(pattern -> findTimetable(pattern, serviceDate))
       .map(timetable -> timetable.getTripTimes(trip));

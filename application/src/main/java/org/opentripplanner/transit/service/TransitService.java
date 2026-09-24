@@ -461,7 +461,7 @@ public interface TransitService {
    *         for the given trip on the given service date, or empty if the
    *         trip does not run on that date.
    */
-  Optional<TripTimes> findTripTimes(Trip trip, LocalDate serviceDate);
+  Optional<TripTimes<?>> findTripTimes(Trip trip, LocalDate serviceDate);
 
   /**
    * The vehicle assignment for the given trip on its service date, combining the planned
