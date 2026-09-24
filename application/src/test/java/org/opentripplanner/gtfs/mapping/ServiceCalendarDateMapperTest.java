@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
@@ -78,7 +79,7 @@ public class ServiceCalendarDateMapperTest {
 
     subject.map(addDate, calendars);
 
-    assertEquals(java.util.List.of(LOCAL_DATE), calendars.listServiceDates(serviceId));
+    assertEquals(List.of(LOCAL_DATE), calendars.listServiceDates(serviceId));
   }
 
   @Test
@@ -89,6 +90,8 @@ public class ServiceCalendarDateMapperTest {
     var calendars = TripCalendars.of();
 
     assertDoesNotThrow(() -> subject.map(input, calendars));
+    // A null date is a no-op - the service id is never registered.
+    assertFalse(calendars.listServiceIds().iterator().hasNext());
   }
 
   @Test

@@ -6,9 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
@@ -71,7 +74,7 @@ public class ServiceCalendarMapperTest {
   @Test
   public void testMapCollection() {
     var calendars = TripCalendars.of();
-    subject.map((java.util.Collection<ServiceCalendar>) null, calendars);
+    subject.map((Collection<ServiceCalendar>) null, calendars);
     subject.map(Collections.emptyList(), calendars);
     assertFalse(calendars.listServiceIds().iterator().hasNext());
 
@@ -94,10 +97,15 @@ public class ServiceCalendarMapperTest {
     List<LocalDate> dates = built.listServiceDates(SERVICE_ID).stream().sorted().toList();
     assertTrue(dates.size() > 0);
     for (LocalDate date : dates) {
-      assertTrue(expectedDays.contains(date.getDayOfWeek()), date.toString());
       assertFalse(date.isBefore(PERIOD_START), date.toString());
       assertFalse(date.isAfter(PERIOD_END), date.toString());
     }
+    // Every day-of-week set on CALENDAR is represented, and no other day-of-week is - a
+    // one-directional contains() check would still pass with a day dropped from daysOfWeek().
+    Set<DayOfWeek> actualDays = EnumSet.copyOf(
+      dates.stream().map(LocalDate::getDayOfWeek).collect(Collectors.toSet())
+    );
+    assertEquals(expectedDays, actualDays);
   }
 
   @Test
