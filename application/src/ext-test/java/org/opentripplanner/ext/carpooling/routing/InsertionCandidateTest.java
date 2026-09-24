@@ -246,4 +246,27 @@ class InsertionCandidateTest {
       .minus(candidateSmall.getPassengerRideDuration());
     assertEquals(Duration.ofMinutes(8), difference);
   }
+
+  @Test
+  void getPassengerRideWeight_isRideSecondsTimesReluctancePlusBoardCost() {
+    var trip = createSimpleTrip(OSLO_CENTER, OSLO_NORTH);
+    var candidate = new InsertionCandidate(
+      trip,
+      1,
+      2,
+      List.of(createGraphPath(Duration.ofMinutes(5)), createGraphPath(Duration.ofMinutes(10))),
+      STOP_DURATION,
+      null,
+      null,
+      null
+    );
+
+    // 10 min shared ride + 2 min boarding dwell
+    assertEquals(720, candidate.getPassengerRideDuration().getSeconds());
+
+    assertEquals(720 * 4.0, candidate.getPassengerRideWeight(4.0, 0));
+    assertEquals(720 * 4.0 + 2400.0, candidate.getPassengerRideWeight(4.0, 2400));
+    // The board cost is a flat term: it does not scale with the ride.
+    assertEquals(2400.0, candidate.getPassengerRideWeight(0.0, 2400));
+  }
 }

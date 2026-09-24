@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
@@ -132,6 +133,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
    */
   private final CarReachableVertexSnapper carReachableVertexSnapper;
 
+  /** Deployment-wide carpool tuning from the {@code carpooling} router-config section. */
+  private final CarpoolingParameters carpoolingParameters;
+
   /**
    * Creates a new carpooling service with the specified dependencies.
    * <p>
@@ -146,13 +150,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *        from coordinates, must not be null
    * @param carReachableVertexSnapper snaps passenger-side locations onto car-reachable vertices,
    *        must not be null
+   * @param carpoolingParameters deployment-wide carpool tuning, must not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
     CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
-    CarReachableVertexSnapper carReachableVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper,
+    CarpoolingParameters carpoolingParameters
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
     this.streetLimitationParametersService = Objects.requireNonNull(
@@ -172,6 +178,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
     this.carReachableVertexSnapper = Objects.requireNonNull(
       carReachableVertexSnapper,
       "carReachableVertexSnapper"
+    );
+    this.carpoolingParameters = Objects.requireNonNull(
+      carpoolingParameters,
+      "carpoolingParameters"
     );
   }
 
@@ -320,7 +330,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
       itineraries = insertionCandidates
         .stream()
         .map(candidate ->
-          itineraryMapper.toItinerary(candidate, carpoolReluctance, request.from(), request.to())
+          itineraryMapper.toItinerary(
+            candidate,
+            carpoolReluctance,
+            carpoolingParameters.boardCost(),
+            request.from(),
+            request.to()
+          )
         )
         .filter(Objects::nonNull)
         .filter(itinerary -> postFilters.isValidItinerary(itinerary, carpoolingRequest))
@@ -775,6 +791,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       insertionCandidate,
       TimeAndCost.ZERO,
       carpoolReluctance,
+      carpoolingParameters.boardCost(),
       startLabel,
       endLabel
     );
