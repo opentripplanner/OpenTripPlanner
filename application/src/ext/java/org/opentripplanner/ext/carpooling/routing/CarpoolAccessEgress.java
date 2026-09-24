@@ -52,6 +52,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   private final InsertionCandidate insertionCandidate;
   private final TimeAndCost penalty;
   private final double carpoolReluctance;
+  private final int boardCost;
 
   private final EndpointLabel startLabel;
   private final EndpointLabel endLabel;
@@ -67,6 +68,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    *        {@link #withPenalty(TimeAndCost)}; pass {@link TimeAndCost#ZERO} for no penalty.
    * @param carpoolReluctance multiplier on ride seconds when computing {@link #c1()}; the walk
    *        portions are billed at the walks' own A* weights and are not multiplied by this.
+   * @param boardCost fixed cost added once for getting into the car, see
+   *        {@link org.opentripplanner.ext.carpooling.CarpoolingParameters#boardCost()}.
    * @param startLabel label data for the first leg's {@code from} place. For an access this is
    *        the passenger origin ({@link EndpointLabel#forLocation(org.opentripplanner.model.GenericLocation)});
    *        for an egress it is the transit stop the passenger alighted from
@@ -81,6 +84,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     InsertionCandidate insertionCandidate,
     TimeAndCost penalty,
     double carpoolReluctance,
+    int boardCost,
     EndpointLabel startLabel,
     EndpointLabel endLabel
   ) {
@@ -89,6 +93,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
     this.insertionCandidate = insertionCandidate;
     this.penalty = penalty;
     this.carpoolReluctance = carpoolReluctance;
+    this.boardCost = boardCost;
     this.startLabel = startLabel;
     this.endLabel = endLabel;
     this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
@@ -103,7 +108,8 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
     double walkWeight =
       GraphPathUtils.weightOrZero(walkToPickup) + GraphPathUtils.weightOrZero(walkFromDropoff);
-    double totalWeight = walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance);
+    double totalWeight =
+      walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance, boardCost);
     this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
   }
 
@@ -114,9 +120,9 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
   /**
    * The Raptor cost of this leg, equal to {@code walkToPickupWeight + walkFromDropoffWeight +
-   * rideSeconds * carpoolReluctance}, converted to Raptor's centi-second unit. The walk weights
-   * already encode the user's walk preferences (reluctance, safety, slope, ...) — only the ride
-   * portion is multiplied by {@code carpoolReluctance}.
+   * rideSeconds * carpoolReluctance + boardCost}, converted to Raptor's centi-second unit. The walk
+   * weights already encode the user's walk preferences (reluctance, safety, slope, ...) — only the
+   * ride portion is multiplied by {@code carpoolReluctance}.
    */
   @Override
   public int c1() {
@@ -201,6 +207,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
       this.insertionCandidate,
       penalty,
       this.carpoolReluctance,
+      this.boardCost,
       this.startLabel,
       this.endLabel
     );
@@ -343,6 +350,6 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * with the ride contribution to {@link #c1()}.
    */
   public double getPassengerRideWeight() {
-    return insertionCandidate.getPassengerRideWeight(carpoolReluctance);
+    return insertionCandidate.getPassengerRideWeight(carpoolReluctance, boardCost);
   }
 }

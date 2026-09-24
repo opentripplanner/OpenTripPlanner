@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.carpooling.service;
 
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -58,7 +59,8 @@ record CarpoolingServiceTestContext(
       repository,
       STREET_LIMITATION_PARAMETERS,
       vertexCreationService,
-      carReachableVertexSnapper
+      carReachableVertexSnapper,
+      CarpoolingParameters.DEFAULT
     );
     return new CarpoolingServiceTestContext(
       service,
