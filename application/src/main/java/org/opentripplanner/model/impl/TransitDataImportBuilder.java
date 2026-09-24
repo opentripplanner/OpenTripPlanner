@@ -518,8 +518,9 @@ public class TransitDataImportBuilder {
       if (from == null || to == null) {
         issueStore.add(
           "InvalidTransfer",
-          "Dropped transfer %s: could not resolve a stop position for one of its trip endpoints",
-          pending.id()
+          "Dropped a transfer from %s to %s: could not resolve a stop position",
+          describeTransferPointForIssueReport(pending.from(), from),
+          describeTransferPointForIssueReport(pending.to(), to)
         );
         continue;
       }
@@ -596,5 +597,26 @@ public class TransitDataImportBuilder {
     }
     var trip = point.asTripTransferPoint().getTrip();
     return !tripsById.containsKey(trip.getId());
+  }
+
+  private static String describeTransferPointForIssueReport(
+    DeferredConstrainedTransferPoint pending,
+    @Nullable TransferPoint resolved
+  ) {
+    if (resolved != null) {
+      return resolved.toString();
+    }
+    var p = (DeferredConstrainedTransferPoint.PendingTripPosition) pending;
+    String location =
+      p.station() != null
+        ? "station " + p.station().getId()
+        : p.stop() != null
+          ? "stop " + p.stop().getId()
+          : "an unresolved stop/station";
+    return "trip %s (%s at %s not found)".formatted(
+      p.trip().getId(),
+      p.boardTrip() ? "board" : "alight",
+      location
+    );
   }
 }
