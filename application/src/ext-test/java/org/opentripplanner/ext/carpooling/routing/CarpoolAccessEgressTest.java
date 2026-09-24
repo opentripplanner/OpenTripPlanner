@@ -28,6 +28,7 @@ class CarpoolAccessEgressTest {
   private static final int STOP = 0;
   private static final Duration STOP_DURATION = Duration.ofMinutes(2);
   private static final int DWELL_SECONDS = (int) STOP_DURATION.getSeconds();
+  private static final int BOARD_COST = 0;
   private static final int PICKUP_POSITION = 1;
   private static final int DROPOFF_POSITION = 2;
   private static final Duration PICKUP_SEGMENT_DURATION = Duration.ofMinutes(1);
@@ -269,8 +270,72 @@ class CarpoolAccessEgressTest {
       candidate,
       TimeAndCost.ZERO,
       carpoolReluctance,
+      BOARD_COST,
       startLabel,
       endLabel
+    );
+  }
+
+  /**
+   * The board cost is added once to the leg, on top of the ride and the walks, and it is the
+   * same value the direct itinerary pays — so a carpool ride costs the same whether it is the
+   * whole journey or the leg to a transit stop. It is a cost, not a duration: the leg's timing
+   * is untouched.
+   */
+  @Test
+  void c1IncludesBoardCostOnce() {
+    int boardCost = 2400;
+
+    var withoutBoardCost = newAccessEgressWithBoardCost(0);
+    var withBoardCost = newAccessEgressWithBoardCost(boardCost);
+
+    assertEquals(
+      RaptorCostConverter.toRaptorCost(boardCost),
+      withBoardCost.c1() - withoutBoardCost.c1()
+    );
+    assertEquals(
+      withoutBoardCost.getPassengerRideWeight() + boardCost,
+      withBoardCost.getPassengerRideWeight()
+    );
+    assertEquals(withoutBoardCost.durationInSeconds(), withBoardCost.durationInSeconds());
+    assertEquals(
+      withoutBoardCost.getPassengerArrivalTime(),
+      withBoardCost.getPassengerArrivalTime()
+    );
+  }
+
+  /** The board cost survives the Raptor penalty pass, which copies the leg. */
+  @Test
+  void withPenaltyKeepsBoardCost() {
+    var original = newAccessEgressWithBoardCost(2400);
+
+    var withPenalty = (CarpoolAccessEgress) original.withPenalty(
+      new TimeAndCost(Duration.ofSeconds(30), Cost.costOfSeconds(45))
+    );
+
+    assertEquals(original.getPassengerRideWeight(), withPenalty.getPassengerRideWeight());
+  }
+
+  private static CarpoolAccessEgress newAccessEgressWithBoardCost(int boardCost) {
+    var candidate = new InsertionCandidate(
+      createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
+      PICKUP_POSITION,
+      DROPOFF_POSITION,
+      List.of(createGraphPath(PICKUP_SEGMENT_DURATION), createGraphPath(Duration.ofSeconds(60))),
+      STOP_DURATION,
+      null,
+      createGraphPath(Duration.ofSeconds(80)),
+      createGraphPath(Duration.ofSeconds(40))
+    );
+    return new CarpoolAccessEgress(
+      STOP,
+      1_000,
+      candidate,
+      TimeAndCost.ZERO,
+      1.0,
+      boardCost,
+      EndpointLabel.EMPTY,
+      EndpointLabel.EMPTY
     );
   }
 }
