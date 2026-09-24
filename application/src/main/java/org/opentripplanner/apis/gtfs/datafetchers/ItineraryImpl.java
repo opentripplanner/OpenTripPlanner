@@ -13,12 +13,22 @@ import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
+import org.opentripplanner.routing.refetch.UnsupportedItineraryReferenceException;
 
 public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   /// The key used to store the itinerary in the GraphQL context for looking it up during
   /// the fare resolution in [LegImpl#fareProducts].
   static final String ITINERARY_CONTEXT_KEY = "itinerary";
+
+  /// The key used to store the original planning [RouteRequest] in the GraphQL context, so
+  /// [#id] can build a stable [org.opentripplanner.model.plan.itineraryreference.ItineraryReference]
+  /// from it. Set once in [QueryTypeImpl#getPlanResult] and forwarded unchanged through
+  /// [PlanConnectionImpl#edges].
+  static final String ROUTE_REQUEST_CONTEXT_KEY = "routeRequest";
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
@@ -59,6 +69,29 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   @Override
   public DataFetcher<Integer> generalizedCost() {
     return environment -> getSource(environment).generalizedCost();
+  }
+
+  @Override
+  public DataFetcher<String> id() {
+    return environment -> {
+      Map<String, ?> ctx = environment.getLocalContext();
+      if (ctx == null) {
+        return null;
+      }
+      RouteRequest routeRequest = (RouteRequest) ctx.get(ROUTE_REQUEST_CONTEXT_KEY);
+      if (routeRequest == null) {
+        return null;
+      }
+      try {
+        var reference = ItineraryReferenceMapper.toItineraryReference(
+          getSource(environment),
+          routeRequest
+        );
+        return ItineraryReferenceSerializer.encode(reference);
+      } catch (UnsupportedItineraryReferenceException e) {
+        return null;
+      }
+    };
   }
 
   @Override

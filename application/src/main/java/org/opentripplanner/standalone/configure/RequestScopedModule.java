@@ -29,6 +29,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -228,5 +229,33 @@ public class RequestScopedModule {
   @HttpRequestScoped
   static GtfsGraphQLRequestContext graphQLRequestContext(RequestScopedFactory factory) {
     return new DaggerGtfsGraphQLRequestContext(factory);
+  }
+
+  /**
+   * Shared by both the GTFS and Transmodel GraphQL APIs' single-id itinerary refetch queries
+   * (#7878). Assembled from the same request-scoped {@link TransitService}, alerts, transfer
+   * service, and linking context as {@link #routingService}, so refetching uses the request's
+   * consistent realtime view rather than an independently constructed transit snapshot.
+   */
+  @Provides
+  @HttpRequestScoped
+  static RefetchItineraryService refetchItineraryService(
+    Graph graph,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
+  ) {
+    return new RefetchItineraryService(
+      graph,
+      transitService,
+      transitAlertService,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
+    );
   }
 }

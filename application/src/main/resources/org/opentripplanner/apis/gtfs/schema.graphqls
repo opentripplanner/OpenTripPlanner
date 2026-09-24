@@ -819,6 +819,13 @@ type Itinerary {
   "Generalized cost of the itinerary. Used for debugging search results."
   generalizedCost: Int
   """
+  An opaque, versioned identifier for this itinerary. It can be used to refetch this exact
+  itinerary later (with current realtime data applied) using the `itinerary` query, without
+  resending the original search parameters. `null` if this itinerary cannot currently be
+  refetched (for example, if it contains no scheduled transit legs).
+  """
+  id: String
+  """
   A list of Legs. Each Leg is either a walking (cycling, car) portion of the
   itinerary, or a transit leg on a particular vehicle. So a itinerary where the
   user walks to the Q train, transfers to the 6, then walks to their
@@ -1634,6 +1641,12 @@ type QueryType {
     "Departure time of the trip, format: seconds since midnight of the departure date"
     time: Int!
   ): Trip @timingData
+  """
+  Refetch a previously planned itinerary using its stable `id` (see `Itinerary.id`), with current
+  realtime data applied. Returns `null` if the id is invalid, malformed, or refers to an
+  itinerary shape that cannot be refetched (for example, a street-only itinerary).
+  """
+  itinerary(id: String!): Itinerary @timingData
   """
   Try refetching the current state of a transit leg using its id.
   This fails when the underlying transit data (mostly IDs) has changed or are no longer available.

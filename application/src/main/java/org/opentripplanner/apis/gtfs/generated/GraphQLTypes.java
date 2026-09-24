@@ -3477,6 +3477,25 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeItineraryArgs {
+
+    private String id;
+
+    public GraphQLQueryTypeItineraryArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.id = (String) args.get("id");
+      }
+    }
+
+    public String getGraphQLId() {
+      return this.id;
+    }
+
+    public void setGraphQLId(String id) {
+      this.id = id;
+    }
+  }
+
   public static class GraphQLQueryTypeLegArgs {
 
     private String id;

@@ -454,6 +454,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Long> endTime();
     public DataFetcher<Iterable<Object>> fares();
     public DataFetcher<Integer> generalizedCost();
+    public DataFetcher<String> id();
     public DataFetcher<Iterable<Leg>> legs();
     public DataFetcher<Integer> numberOfTransfers();
     public DataFetcher<java.time.OffsetDateTime> start();
@@ -743,6 +744,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<PatternAtStop> departureRow();
     public DataFetcher<Iterable<String>> feeds();
     public DataFetcher<Trip> fuzzyTrip();
+    public DataFetcher<Itinerary> itinerary();
     public DataFetcher<Leg> leg();
     public DataFetcher<Connection<PlaceAtDistance>> nearest();
     public DataFetcher<Object> node();
