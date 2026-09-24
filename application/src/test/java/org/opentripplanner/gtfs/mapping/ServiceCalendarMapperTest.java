@@ -73,10 +73,10 @@ public class ServiceCalendarMapperTest {
     var calendars = TripCalendars.of();
     subject.map((java.util.Collection<ServiceCalendar>) null, calendars);
     subject.map(Collections.emptyList(), calendars);
-    assertTrue(calendars.listServiceIds().isEmpty());
+    assertFalse(calendars.listServiceIds().iterator().hasNext());
 
     subject.map(Collections.singleton(CALENDAR), calendars);
-    assertEquals(1, calendars.listServiceIds().size());
+    assertEquals(SERVICE_ID, calendars.listServiceIds().iterator().next());
   }
 
   @Test

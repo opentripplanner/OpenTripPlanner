@@ -20,6 +20,7 @@ import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 public class TransitDataImportBuilderTest {
 
@@ -46,10 +47,7 @@ public class TransitDataImportBuilderTest {
   public void testGetAllCalendars() {
     assertEquals(
       "[F:alldays, F:weekdays]",
-      subject
-        .tripCalendars()
-        .listServiceIds()
-        .stream()
+      StreamUtils.ofIterable(subject.tripCalendars().listServiceIds())
         .map(Object::toString)
         .sorted()
         .toList()

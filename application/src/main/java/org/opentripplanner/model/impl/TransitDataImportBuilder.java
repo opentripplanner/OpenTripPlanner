@@ -380,13 +380,6 @@ public class TransitDataImportBuilder {
     stopsByScheduledStopPoints.put(sspid, stop);
   }
 
-  /**
-   * Find all serviceIds registered on {@link #tripCalendars()}.
-   */
-  Set<FeedScopedId> findAllServiceIds() {
-    return tripCalendars.listServiceIds();
-  }
-
   private static void logRemove(String type, int orgSize, int newSize, String reason) {
     if (orgSize == newSize) {
       return;
@@ -407,12 +400,11 @@ public class TransitDataImportBuilder {
     removeFlexTripsForNoneExistingTrips();
   }
 
-  /** Remove all trips which reference none existing service ids */
+  /** Remove all trips that reference none existing service ids */
   private void removeTripsWithNoneExistingServiceIds() {
-    Set<FeedScopedId> serviceIds = findAllServiceIds();
     int orgSize = tripsById.size();
     tripsById.removeIf(
-      t -> !serviceIds.contains(t.getServiceId()),
+      t -> !tripCalendars.containsServiceId(t.getServiceId()),
       t ->
         issueStore.add(
           "RemovedMissingServiceIdTrip",
@@ -424,7 +416,7 @@ public class TransitDataImportBuilder {
     logRemove("Trip", orgSize, tripsById.size(), "Trip service id does not exist.");
   }
 
-  /** Remove all stopTimes which reference none existing trips */
+  /** Remove all stopTimes that reference none existing trips */
   private void removeStopTimesForNoneExistingTrips() {
     int orgSize = stopTimesByTrip.size();
     stopTimesByTrip.removeIf(t -> !tripsById.containsKey(t.getId()));

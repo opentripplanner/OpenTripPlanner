@@ -252,12 +252,11 @@ public class GtfsModule implements GraphBuilderModule {
   /**
    * The GTFS {@link TripPatternGenerator}.
    * <p>
-   * This wraps {@link GenerateTripPatternsOperation} rather than having it implement {@link TripPatternGenerator}
-   * directly, because its {@code calendarServiceIds} constructor argument can only be known once the builder has data
-   * - but this generator is itself constructed and handed to {@link TransitDataImportBuilder}'s constructor before any
-   * mapping has happened, so it must derive {@code builder.tripCalendars().listServiceIds()} at {@link #generate} time,
-   * not upfront. Folding that derivation into {@code GenerateTripPatternsOperation} itself would remove the ability its
-   * own unit tests rely on to inject an arbitrary {@code calendarServiceIds} independent of any real calendar data.
+   * This wraps {@link GenerateTripPatternsOperation} rather than having it implement
+   * {@link TripPatternGenerator} directly, because building its {@link GeometryProcessor} needs
+   * the real {@link TransitDataImportBuilder} - but this generator is itself constructed and
+   * handed to {@link TransitDataImportBuilder}'s constructor before that builder exists, so the
+   * {@code GeometryProcessor} can only be built at {@link #generate} time, not upfront.
    */
   private static class GtfsTripPatternGenerator implements TripPatternGenerator {
 
@@ -282,7 +281,6 @@ public class GtfsModule implements GraphBuilderModule {
         builder,
         issueStore,
         deduplicator,
-        builder.tripCalendars().listServiceIds(),
         new GeometryProcessor(
           builder,
           maxStopToShapeSnapDistance,

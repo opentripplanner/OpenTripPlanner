@@ -2,6 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -19,6 +20,8 @@ public class ServiceCalendarDateMapperTest {
   private static final ServiceCalendarDate SERVICE_DATE = new ServiceCalendarDate();
 
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+
+  private static final FeedScopedId SERVICE_ID = new FeedScopedId("A", "1");
 
   private static final Integer ID = 45;
 
@@ -46,10 +49,10 @@ public class ServiceCalendarDateMapperTest {
     var calendars = TripCalendars.of();
     subject.map((Collection<ServiceCalendarDate>) null, calendars);
     subject.map(Collections.emptyList(), calendars);
-    assertTrue(calendars.listServiceIds().isEmpty());
+    assertFalse(calendars.listServiceIds().iterator().hasNext());
 
     subject.map(Collections.singleton(SERVICE_DATE), calendars);
-    assertEquals(1, calendars.listServiceIds().size());
+    assertEquals(SERVICE_ID, calendars.listServiceIds().iterator().next());
   }
 
   @Test

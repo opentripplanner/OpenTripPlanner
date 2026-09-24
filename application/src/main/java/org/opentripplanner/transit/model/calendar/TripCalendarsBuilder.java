@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.calendar;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +25,7 @@ import org.opentripplanner.core.model.time.LocalDateRange;
  * {@code periodLimit} is ignored.
  * <p>
  * Unlike {@link TripCalendars} itself, this builder is a plain mutable accumulator: it is meant to
- * be queried (see {@link #listServiceIds()}, {@link #listServiceDates}) while a graph build module
- * is still adding data to it, one feed at a time.
+ * be queried while a graph build module is still adding data to it, one feed at a time.
  */
 public class TripCalendarsBuilder {
 
@@ -115,11 +115,21 @@ public class TripCalendarsBuilder {
   }
 
   /**
-   * @return all service ids added to this builder so far.
+   * @return true if the service id exists.
    */
-  public Set<FeedScopedId> listServiceIds() {
+  public boolean containsServiceId(FeedScopedId serviceId) {
     resolvePendingIfNeeded();
-    return serviceDatesByServiceId.keySet();
+    return serviceDatesByServiceId.containsKey(serviceId);
+  }
+
+  /**
+   * Iterate over all service ids added to this builder so far.
+   * <p>
+   * THIS METHOD IS NOT THREAD-SAFE, AND YOU SHOULD NOT MODIFY THE BUILDER WHILE ITERATING OVER THE RESULT.
+   */
+  public Iterable<FeedScopedId> listServiceIds() {
+    resolvePendingIfNeeded();
+    return Collections.unmodifiableSet(serviceDatesByServiceId.keySet());
   }
 
   /**

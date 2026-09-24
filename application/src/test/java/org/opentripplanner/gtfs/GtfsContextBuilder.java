@@ -2,9 +2,7 @@ package org.opentripplanner.gtfs;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
@@ -26,7 +24,6 @@ public class GtfsContextBuilder {
   private final String feedId;
 
   private final TransitDataImportBuilder transitBuilder;
-  private Set<FeedScopedId> serviceIds = null;
   private DataImportIssueStore issueStore = null;
   private Deduplicator deduplicator;
 
@@ -127,16 +124,8 @@ public class GtfsContextBuilder {
       transitBuilder,
       issueStore,
       deduplicator(),
-      serviceIds(),
       new GeometryProcessor(transitBuilder, 150, 0.0, issueStore)
     ).run();
-  }
-
-  private Set<FeedScopedId> serviceIds() {
-    if (serviceIds == null) {
-      serviceIds = transitBuilder.tripCalendars().listServiceIds();
-    }
-    return serviceIds;
   }
 
   private Deduplicator deduplicator() {

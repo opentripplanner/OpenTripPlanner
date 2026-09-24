@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -45,7 +44,6 @@ public class GenerateTripPatternsOperation {
   private final TransitDataImportBuilder transitServiceBuilder;
   private final DataImportIssueStore issueStore;
   private final DeduplicatorService deduplicator;
-  private final Set<FeedScopedId> calendarServiceIds;
   private final GeometryProcessor geometryProcessor;
 
   // TODO the linked hashset configuration ensures that TripPatterns are created in the same order
@@ -61,13 +59,11 @@ public class GenerateTripPatternsOperation {
     TransitDataImportBuilder builder,
     DataImportIssueStore issueStore,
     DeduplicatorService deduplicator,
-    Set<FeedScopedId> calendarServiceIds,
     GeometryProcessor geometryProcessor
   ) {
     this.transitServiceBuilder = builder;
     this.issueStore = issueStore;
     this.deduplicator = deduplicator;
-    this.calendarServiceIds = calendarServiceIds;
     this.geometryProcessor = geometryProcessor;
   }
 
@@ -118,7 +114,7 @@ public class GenerateTripPatternsOperation {
 
   private void buildTripPatternForTrip(Trip trip) {
     // TODO: move to a validator module
-    if (!calendarServiceIds.contains(trip.getServiceId())) {
+    if (!transitServiceBuilder.tripCalendars().containsServiceId(trip.getServiceId())) {
       issueStore.add(new TripUndefinedService(trip));
       // Invalid trip, skip it, it will break later
       return;

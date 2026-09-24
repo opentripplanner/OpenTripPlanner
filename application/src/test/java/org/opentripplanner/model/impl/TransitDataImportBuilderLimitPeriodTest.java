@@ -1,5 +1,6 @@
 package org.opentripplanner.model.impl;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -120,7 +121,10 @@ public class TransitDataImportBuilderLimitPeriodTest {
   public void testLimitPeriod() {
     // Calendar data is filtered as it is added: SERVICE_C_OUT's period does not overlap [D2, D3],
     // and SERVICE_D_OUT's only date (D1) falls outside it - neither was ever registered.
-    assertEquals(Set.of(SERVICE_C_IN, SERVICE_D_IN), subject.tripCalendars().listServiceIds());
+    assertThat(subject.tripCalendars().listServiceIds()).containsExactly(
+      SERVICE_C_IN,
+      SERVICE_D_IN
+    );
 
     // Trips/patterns referencing the dropped service ids are still present, until
     // removeEntitiesWithInvalidReferences() below removes entities with no remaining valid
