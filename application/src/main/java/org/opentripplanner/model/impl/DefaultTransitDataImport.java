@@ -125,7 +125,7 @@ class DefaultTransitDataImport implements TransitDataImport {
   }
 
   @Override
-  public Collection<FeedScopedId> getAllServiceIds() {
+  public Iterable<FeedScopedId> getAllServiceIds() {
     return tripCalendars.listServiceIds();
   }
 

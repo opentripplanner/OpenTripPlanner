@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,7 +110,7 @@ public class TripCalendars implements Serializable {
   /**
    * @return all service ids used in the data set.
    */
-  public Set<FeedScopedId> listServiceIds() {
+  public Iterable<FeedScopedId> listServiceIds() {
     return serviceDatesByServiceId.keySet();
   }
 
@@ -272,7 +271,7 @@ public class TripCalendars implements Serializable {
    * @throws IllegalArgumentException if service id is added more than once.
    * @return a new instance with the service codes registered.
    */
-  public TripCalendars withNextServiceCodes(Collection<FeedScopedId> serviceIds) {
+  public TripCalendars withNextServiceCodes(Iterable<FeedScopedId> serviceIds) {
     Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
     for (FeedScopedId serviceId : serviceIds) {
       var previousValue = updated.put(Objects.requireNonNull(serviceId), updated.size());

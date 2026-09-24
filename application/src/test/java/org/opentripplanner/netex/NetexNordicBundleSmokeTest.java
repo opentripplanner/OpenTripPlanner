@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,7 +15,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -37,6 +37,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded
@@ -237,20 +238,15 @@ public class NetexNordicBundleSmokeTest {
     assertEquals(1, list.size());
   }
 
-  private void assertServiceIds(Collection<Trip> trips, Collection<FeedScopedId> serviceIds) {
-    Set<FeedScopedId> tripServiceIds = trips
-      .stream()
-      .map(Trip::getServiceId)
-      .collect(Collectors.toSet());
-    assertEquals(tripServiceIds, Set.copyOf(serviceIds));
+  private void assertServiceIds(Collection<Trip> trips, Iterable<FeedScopedId> serviceIds) {
+    var tripServiceIds = trips.stream().map(Trip::getServiceId).distinct().toList();
+    assertThat(serviceIds).containsExactlyElementsIn(tripServiceIds);
   }
 
   private void assetServiceCalendar(TripCalendars cal) {
-    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.listServiceIds());
-    assertEquals(3, sIds.size());
+    assertThat(cal.listServiceIds()).hasSize(3);
 
-    var dates = sIds
-      .stream()
+    var dates = StreamUtils.ofIterable(cal.listServiceIds())
       .map(id -> cal.listServiceDates(id).stream().sorted().toList())
       .sorted(Comparator.comparing(List::size))
       .toList();

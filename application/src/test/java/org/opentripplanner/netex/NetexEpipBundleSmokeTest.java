@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -30,6 +31,8 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /**
  * Load a small NeTEx file set without failing. This is just a smoke test and should be excluded
@@ -67,7 +70,7 @@ class NetexEpipBundleSmokeTest {
     assertStations(otpModel.siteRepository().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
-    assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
+    assertServiceIds(otpModel.getAllTrips(), ListUtils.ofIterable(otpModel.getAllServiceIds()));
 
     // And then - smoke test service calendar
     assetServiceCalendar(transitBuilder.tripCalendars().build());
@@ -174,14 +177,12 @@ class NetexEpipBundleSmokeTest {
   }
 
   private void assetServiceCalendar(TripCalendars cal) {
-    ArrayList<FeedScopedId> sIds = new ArrayList<>(cal.listServiceIds());
-    assertEquals(2, sIds.size());
+    assertThat(cal.listServiceIds()).hasSize(2);
 
     // Service ids are auto-generated in file-processing order, which is not deterministic
     // (see java.io.File#listFiles), so pick the calendar to assert on by its own content
     // instead of relying on which generated id happens to be first.
-    List<LocalDate> dates = sIds
-      .stream()
+    List<LocalDate> dates = StreamUtils.ofIterable(cal.listServiceIds())
       .map(id -> cal.listServiceDates(id).stream().sorted().toList())
       .min(Comparator.comparing(List::getFirst))
       .orElseThrow();

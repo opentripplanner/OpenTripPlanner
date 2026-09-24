@@ -111,7 +111,7 @@ public class TimetableDataImport {
   /**
    * Assign each of the given service ids the next free service code, in iteration order.
    */
-  public void addNextServiceCodes(Collection<FeedScopedId> serviceIds) {
+  public void addNextServiceCodes(Iterable<FeedScopedId> serviceIds) {
     assertModificationsAllowed();
     tripCalendars = tripCalendars.withNextServiceCodes(serviceIds);
   }

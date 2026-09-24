@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -95,7 +96,7 @@ public class ServiceCalendarMapperTest {
       DayOfWeek.SUNDAY
     );
     List<LocalDate> dates = built.listServiceDates(SERVICE_ID).stream().sorted().toList();
-    assertTrue(dates.size() > 0);
+    assertFalse(dates.isEmpty());
     for (LocalDate date : dates) {
       assertFalse(date.isBefore(PERIOD_START), date.toString());
       assertFalse(date.isAfter(PERIOD_END), date.toString());
@@ -117,7 +118,7 @@ public class ServiceCalendarMapperTest {
     var built = calendars.build();
 
     // No days of week are set, so no dates are active, but the service id is still registered.
-    assertTrue(built.listServiceIds().contains(SERVICE_ID));
+    assertThat(built.listServiceIds()).containsExactly(SERVICE_ID);
     assertTrue(built.listServiceDates(SERVICE_ID).isEmpty());
   }
 
@@ -129,7 +130,7 @@ public class ServiceCalendarMapperTest {
 
     // The duplicate row is dropped, not thrown - the first one's data is unaffected.
     var built = calendars.build();
-    assertTrue(built.listServiceIds().contains(SERVICE_ID));
+    assertThat(built.listServiceIds()).containsExactly(SERVICE_ID);
     assertFalse(built.listServiceDates(SERVICE_ID).isEmpty());
 
     assertEquals(1, issueStore.listIssues().size());

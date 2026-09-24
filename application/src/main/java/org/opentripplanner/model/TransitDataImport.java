@@ -51,7 +51,7 @@ public interface TransitDataImport {
    * @return all service ids used in the imported data, equivalent to
    * {@code getTripCalendars().listServiceIds()}.
    */
-  Collection<FeedScopedId> getAllServiceIds();
+  Iterable<FeedScopedId> getAllServiceIds();
 
   /**
    * The trip calendars with service dates.

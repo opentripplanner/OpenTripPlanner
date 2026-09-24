@@ -26,6 +26,7 @@ import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.FeedInfoTestFactory;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TripCalendarsBuilderTest {
@@ -50,7 +51,10 @@ public class TripCalendarsBuilderTest {
 
   @Test
   public void testListServiceIds() {
-    assertEquals("[F:alldays, F:weekdays]", toString(tripCalendars.listServiceIds()));
+    assertEquals(
+      "[F:alldays, F:weekdays]",
+      CollectionUtils.toString(tripCalendars.listServiceIds())
+    );
   }
 
   @Test
@@ -128,10 +132,6 @@ public class TripCalendarsBuilderTest {
 
   private static <T> List<T> sort(Collection<? extends T> c) {
     return c.stream().sorted(comparing(T::toString)).collect(toList());
-  }
-
-  private static String toString(Collection<?> c) {
-    return c.stream().sorted(comparing(Object::toString)).toList().toString();
   }
 
   private static List<String> sevenFirstDays(Collection<LocalDate> dates) {

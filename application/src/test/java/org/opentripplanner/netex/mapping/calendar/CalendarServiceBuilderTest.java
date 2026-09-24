@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.FEED_ID;
 
@@ -77,7 +78,7 @@ public class CalendarServiceBuilderTest {
     // Then the service that only ran on D1 is gone entirely, and the other one is trimmed to D2
     assertEquals(Set.of(), tripCalendars.listServiceIdsOnServiceDate(D1));
     assertEquals(Set.of(D2), tripCalendars.listServiceDates(EXP_SID_2));
-    assertEquals(Set.of(EXP_SID_2), tripCalendars.listServiceIds());
+    assertThat(tripCalendars.listServiceIds()).containsExactly(EXP_SID_2);
   }
 
   @Test
