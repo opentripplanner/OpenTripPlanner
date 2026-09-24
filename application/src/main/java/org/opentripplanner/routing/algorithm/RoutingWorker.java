@@ -33,7 +33,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouterFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -300,14 +300,6 @@ public class RoutingWorker {
     if (request.isStartOnBoardAccessRequest()) {
       return RoutingResult.empty();
     }
-    // TODO: Add support for via search to the direct-street search and remove this.
-    //       The direct search is used to prune away silly transit results and it
-    //       would be nice to also support via as a feature in the direct-street
-    //       search.
-    if (request.isViaSearch()) {
-      return RoutingResult.empty();
-    }
-
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
@@ -327,8 +319,9 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
+      var directRouter = DirectStreetRouterFactory.create(request);
       return RoutingResult.ok(
-        DirectStreetRouter.route(
+        directRouter.route(
           graph,
           transitService,
           streetLimitationParametersService,
@@ -361,6 +354,8 @@ public class RoutingWorker {
           graph,
           transitService,
           transferService,
+          vehicleRentalService,
+          streetLimitationParametersService,
           streetDetailsService,
           flexParameters,
           dataOverlayParameterBindings,
@@ -404,6 +399,8 @@ public class RoutingWorker {
         meterRegistry,
         streetDetailsService,
         transferService,
+        vehicleRentalService,
+        streetLimitationParametersService,
         flexParameters,
         rideHailingServices,
         dataOverlayParameterBindings,

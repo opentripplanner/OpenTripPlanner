@@ -42,7 +42,9 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -60,6 +62,8 @@ public class TransitRouter {
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
+  private final GeofencingZoneService geofencingZoneService;
+  private final StreetLimitationParametersService streetLimitationParametersService;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
 
@@ -85,6 +89,8 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
+    GeofencingZoneService geofencingZoneService,
+    StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -104,6 +110,8 @@ public class TransitRouter {
     this.meterRegistry = meterRegistry;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
+    this.geofencingZoneService = geofencingZoneService;
+    this.streetLimitationParametersService = streetLimitationParametersService;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
@@ -125,6 +133,8 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
+    GeofencingZoneService geofencingZoneService,
+    StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -145,6 +155,8 @@ public class TransitRouter {
       meterRegistry,
       streetDetailsService,
       transferService,
+      geofencingZoneService,
+      streetLimitationParametersService,
       flexParameters,
       rideHailingServices,
       dataOverlayParameterBindings,
@@ -181,6 +193,8 @@ public class TransitRouter {
       transitService,
       graph,
       transferService,
+      geofencingZoneService,
+      streetLimitationParametersService,
       streetDetailsService,
       flexParameters,
       rideHailingServices,

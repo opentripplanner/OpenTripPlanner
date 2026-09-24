@@ -3,37 +3,43 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.NearbyStopFactory;
-import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This uses a street search to find paths to all the access/egress stop within range
+ * Abstract class for a street search to find paths to all the access/egress stop within range.
+ * Follows template method pattern.
  */
-public class AccessEgressRouter {
+public abstract class AccessEgressRouter {
 
   private static final Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
   /**
    * Find accesses or egresses.
    */
-  public static Collection<NearbyStop> findAccessEgresses(
+  public Collection<NearbyStop> findAccessEgresses(
     RouteRequest request,
     StreetMode streetMode,
     Collection<ExtensionRequestContext> extensionRequestContexts,
     AccessEgressType accessOrEgress,
     Duration durationLimit,
     int maxStopCount,
-    LinkingContext linkingContext
+    LinkingContext linkingContext,
+    StreetLimitationParametersService streetLimitationParametersService,
+    GeofencingZoneService geofencingZoneService
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -50,24 +56,21 @@ public class AccessEgressRouter {
     // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
     var ignoreVertices = zeroDistanceAccessEgress
       .stream()
-      .map(nearbyStop -> nearbyStop.state.getVertex())
+      .map(nearbyStop -> nearbyStop.finalStates.getLast().getVertex())
       .collect(Collectors.toSet());
 
-    var originVertices = accessOrEgress.isAccess()
-      ? linkingContext.findVertices(request.from())
-      : linkingContext.findVertices(request.to());
-    var streetAccessEgress = StreetNearbyStopFinder.of(null)
-      .withIgnoreVertices(ignoreVertices)
-      .withExtensionRequestContexts(extensionRequestContexts)
-      .build()
-      .findNearbyStops(
-        originVertices,
-        request,
-        streetMode,
-        accessOrEgress.isEgress(),
-        durationLimit,
-        maxStopCount
-      );
+    var streetAccessEgress = findStreetAccessEgresses(
+      request,
+      streetMode,
+      extensionRequestContexts,
+      accessOrEgress,
+      durationLimit,
+      maxStopCount,
+      linkingContext,
+      ignoreVertices,
+      streetLimitationParametersService,
+      geofencingZoneService
+    );
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
     LOG.debug("Found {} {} stops", results.size(), accessOrEgress);
@@ -75,10 +78,26 @@ public class AccessEgressRouter {
   }
 
   /**
+   * Find accesses or egresses using street routing.
+   */
+  abstract Collection<NearbyStop> findStreetAccessEgresses(
+    RouteRequest request,
+    StreetMode streetMode,
+    Collection<ExtensionRequestContext> extensionRequestContexts,
+    AccessEgressType accessOrEgress,
+    Duration durationLimit,
+    int maxStopCount,
+    LinkingContext linkingContext,
+    Set<Vertex> ignoreVertices,
+    StreetLimitationParametersService streetLimitationParametersService,
+    GeofencingZoneService geofencingZoneService
+  );
+
+  /**
    * Return a list of direct accesses/egresses that do not require any street search. This will
    * return an empty list if the source/destination is not a stopId.
    */
-  private static List<NearbyStop> findAccessEgressWithZeroDistance(
+  private List<NearbyStop> findAccessEgressWithZeroDistance(
     RouteRequest routeRequest,
     StreetMode streetMode,
     AccessEgressType accessOrEgress,

@@ -17,8 +17,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
+import org.opentripplanner.service.vehiclerental.GeofencingZoneService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -28,6 +30,8 @@ public class DirectFlexRouter {
     Graph graph,
     TransitService transitService,
     RegularTransferService transferService,
+    GeofencingZoneService geofencingZoneService,
+    StreetLimitationParametersService streetLimitationParametersService,
     StreetDetailsService streetDetailsService,
     FlexParameters flexParameters,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -39,28 +43,33 @@ public class DirectFlexRouter {
       return Collections.emptyList();
     }
     OTPRequestTimeoutException.checkForTimeout();
+    var accessEgressRouter = new DefaultAccessEgressRouter();
     // Prepare access/egress transfers
     var dataOverlayContext = DataOverlayContext.listExtensionRequestContexts(
       request.preferences().system().dataOverlay(),
       dataOverlayParameterBindings
     );
-    Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> accessStops = accessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
       AccessEgressType.ACCESS,
       flexParameters.maxAccessWalkDuration(),
       0,
-      linkingContext
+      linkingContext,
+      streetLimitationParametersService,
+      geofencingZoneService
     );
-    Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
+    Collection<NearbyStop> egressStops = accessEgressRouter.findAccessEgresses(
       request,
       request.journey().direct().mode(),
       dataOverlayContext,
       AccessEgressType.EGRESS,
       flexParameters.maxEgressWalkDuration(),
       0,
-      linkingContext
+      linkingContext,
+      streetLimitationParametersService,
+      geofencingZoneService
     );
 
     var flexRouter = new FlexRouter(
