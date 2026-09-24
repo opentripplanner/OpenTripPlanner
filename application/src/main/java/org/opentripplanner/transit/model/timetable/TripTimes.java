@@ -119,6 +119,8 @@ public sealed interface TripTimes<T extends TripTimes<T>>
 
   BookingInfo getPickupBookingInfo(int stopPos);
 
+  RealTimeTripState realtimeTripState();
+
   /**
    * Return {@code false} if the trip is unmodified, a scheduled trip from a published timetable.
    * Return {@code true} if the trip is an updated, cancelled, or otherwise modified one.

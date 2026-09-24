@@ -19,7 +19,7 @@ import java.util.Objects;
  * <p>Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
  * stop pattern will always also have {@code timesModified == true}.
  */
-final class RealTimeTripState {
+public final class RealTimeTripState {
 
   private final boolean timesModified;
   private final boolean canceled;
@@ -35,32 +35,32 @@ final class RealTimeTripState {
     this.deleted = builder.deleted;
   }
 
-  static Builder of() {
+  public static Builder of() {
     return new Builder();
   }
 
-  boolean timesModified() {
+  public boolean timesModified() {
     return timesModified;
   }
 
-  boolean canceled() {
+  public boolean canceled() {
     return canceled;
   }
 
-  boolean added() {
+  public boolean added() {
     return added;
   }
 
-  boolean tripPatternModified() {
+  public boolean tripPatternModified() {
     return tripPatternModified;
   }
 
-  boolean deleted() {
+  public boolean deleted() {
     return deleted;
   }
 
   /** Returns {@code true} if any real-time information is present for this trip. */
-  boolean hasAnyUpdates() {
+  public boolean hasAnyUpdates() {
     return timesModified || canceled || added || tripPatternModified || deleted;
   }
 
@@ -87,7 +87,7 @@ final class RealTimeTripState {
     return Objects.hash(timesModified, canceled, added, tripPatternModified, deleted);
   }
 
-  static class Builder {
+  public static class Builder {
 
     private boolean timesModified = false;
     private boolean canceled = false;
@@ -97,52 +97,52 @@ final class RealTimeTripState {
 
     private Builder() {}
 
-    Builder withTimesModified() {
+    public Builder withTimesModified() {
       this.timesModified = true;
       return this;
     }
 
-    Builder withCanceled() {
+    public Builder withCanceled() {
       this.canceled = true;
       return this;
     }
 
-    Builder withAdded() {
+    public Builder withAdded() {
       this.added = true;
       return this;
     }
 
-    Builder withTripPatternModified() {
+    public Builder withTripPatternModified() {
       this.tripPatternModified = true;
       return this;
     }
 
-    Builder withDeleted() {
+    public Builder withDeleted() {
       this.deleted = true;
       return this;
     }
 
-    boolean isTimesModified() {
+    public boolean isTimesModified() {
       return timesModified;
     }
 
-    boolean isCanceled() {
+    public boolean isCanceled() {
       return canceled;
     }
 
-    boolean isAdded() {
+    public boolean isAdded() {
       return added;
     }
 
-    boolean isTripPatternModified() {
+    public boolean isTripPatternModified() {
       return tripPatternModified;
     }
 
-    boolean isDeleted() {
+    public boolean isDeleted() {
       return deleted;
     }
 
-    RealTimeTripState build() {
+    public RealTimeTripState build() {
       return new RealTimeTripState(this);
     }
   }
