@@ -12,7 +12,7 @@ import org.opentripplanner.street.search.state.State;
  * Implementation note: As stated in the RoutingAccessEgress interface contract {@link RoutingAccessEgress#getFinalState()},
  * this class exposes the final A* state in search order, not in chronological order. For egress searches this State is
  * unreversed ({@code request.arriveBy() == true}) — reversal is deferred to
- * {@link org.opentripplanner.astar.model.GraphPath} construction, which only happens for
+ * {@link org.opentripplanner.street.model.path.StreetPath} construction, which only happens for
  * winning paths during itinerary mapping. This avoids the cost of cloning and reversing the entire State
  * chain for every egress candidate.
  * <p>
@@ -104,7 +104,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   /**
    * The final state from the access/egress street search. For egress searches this State is
    * unreversed ({@code request.arriveBy() == true}) — reversal is deferred to
-   * {@link org.opentripplanner.astar.model.GraphPath} construction, which only happens for
+   * {@link org.opentripplanner.street.model.path.StreetPath} construction, which only happens for
    * winning paths during itinerary mapping. This avoids the cost of cloning and reversing the entire State
    * chain for every egress candidate.
    * <p>

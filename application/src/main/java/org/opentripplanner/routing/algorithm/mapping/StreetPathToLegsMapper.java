@@ -38,7 +38,7 @@ import org.opentripplanner.transit.SiteResolver;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
- * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
+ * A mapper class used in converting internal StreetPaths to Itineraries, which are returned by the
  * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
  * parts of itineraries containing transit, while the whole transit itinerary is produced by
  * {@link RaptorPathToItineraryMapper}.

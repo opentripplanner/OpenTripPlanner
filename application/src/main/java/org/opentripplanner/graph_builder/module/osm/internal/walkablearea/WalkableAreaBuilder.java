@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -537,9 +536,11 @@ public class WalkableAreaBuilder {
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {
-        GraphPath<State, Edge, Vertex> path = spt.getPath(endVertex);
-        if (path != null) {
-          usedEdges.addAll(path.edges);
+        State state = spt.getState(endVertex);
+        if (state != null) {
+          for (Edge edge : state.listBackEdges()) {
+            usedEdges.add(edge);
+          }
         }
       }
     }

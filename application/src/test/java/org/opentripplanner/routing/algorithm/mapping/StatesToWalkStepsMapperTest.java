@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
@@ -25,6 +24,7 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.StairsUse;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.site.Entrance;
 
@@ -156,9 +156,9 @@ class StatesToWalkStepsMapperTest {
 
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
-    var path = new GraphPath<>(result);
+    var path = new StreetPath(result);
     var mapper = new StatesToWalkStepsMapper(
-      path.states,
+      path.states(),
       null,
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       id -> Entrance.of(id).withCoordinate(WgsCoordinate.GREENWICH).build(),

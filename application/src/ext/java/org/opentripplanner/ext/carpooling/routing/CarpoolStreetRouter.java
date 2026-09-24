@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.carpooling.routing;
 
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -13,6 +13,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +99,8 @@ public class CarpoolStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    return paths.getFirst().toGraphPath();
+    var streetPath = paths.getFirst();
+    var edges = ListUtils.ofIterable(streetPath.lastState().listBackEdges());
+    return new GraphPath<>(streetPath.states(), edges);
   }
 }

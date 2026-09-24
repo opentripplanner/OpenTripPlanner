@@ -17,13 +17,10 @@ class AStarTest {
 
     var tree = TestAStarBuilder.ofDefault(vA, vC).build().getShortestPathTree();
 
-    var path = tree.getPath(vC);
+    var state = tree.getState(vC);
 
-    var states = path.states;
-
-    assertEquals(1, states.size());
-    assertEquals(20, path.getWeight());
-    assertEquals(vC, states.getFirst().getVertex());
+    assertEquals(20, state.getWeight());
+    assertEquals(vC, state.getVertex());
   }
 
   @Test
@@ -40,13 +37,10 @@ class AStarTest {
 
     var tree = TestAStarBuilder.ofDefault(vA, vC).build().getShortestPathTree();
 
-    var path = tree.getPath(vC);
+    var state = tree.getState(vC);
 
-    var states = path.states;
-
-    assertEquals(1, states.size());
-    assertEquals(21, path.getWeight());
-    assertEquals(vC, states.getFirst().getVertex());
+    assertEquals(21, state.getWeight());
+    assertEquals(vC, state.getVertex());
   }
 
   @Test
@@ -65,13 +59,10 @@ class AStarTest {
 
     var tree = TestAStarBuilder.ofDefault(from, to).build().getShortestPathTree();
 
-    var path = tree.getPath(to);
+    var state = tree.getState(to);
 
-    var states = path.states;
-
-    assertEquals(1, states.size());
-    assertEquals(15, path.getWeight());
-    assertEquals(to, states.getFirst().getVertex());
+    assertEquals(15, state.getWeight());
+    assertEquals(to, state.getVertex());
   }
 
   private TestVertex vertex(String label) {
