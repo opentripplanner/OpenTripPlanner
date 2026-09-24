@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -111,7 +112,11 @@ class CorridorBuilderTest extends GraphRoutingTest {
       }
     );
     snapper = CarReachableVertexSnapper.createDefault();
-    stopIndex = new CarpoolStopIndex(model.graph(), snapper);
+    stopIndex = new CarpoolStopIndex(
+      model.graph(),
+      snapper,
+      CarpoolingParameters.DEFAULT.maxStopWalk()
+    );
     vertexCreationService = new VertexCreationService(VertexLinkerTestFactory.of(model.graph()));
     resolver = new RoutableCarpoolTripResolver(
       vertexCreationService,

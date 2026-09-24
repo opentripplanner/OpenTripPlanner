@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
@@ -163,6 +164,7 @@ public class SpeedTest {
       // repository nor a resolver.
       null,
       null,
+      CarpoolingParameters.DEFAULT,
       transitUpdateManager,
       streetUpdateManager,
       timetableHandle,

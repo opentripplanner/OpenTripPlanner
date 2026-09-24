@@ -35,25 +35,25 @@ public class CarpoolStopIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(CarpoolStopIndex.class);
 
-  /**
-   * Walk budget of the snap searches. The snap is the nearest car-reachable vertex whatever the
-   * budget, so it does not depend on a request's maximum walk; a request with a smaller maximum
-   * simply drops the stops whose walk exceeds it. Stops farther than this from any drivable
-   * street are not served by carpool.
-   */
-  public static final Duration MAX_STOP_WALK = Duration.ofMinutes(15);
-
   /** Grid cell size in degrees, roughly 2 km north-south. */
   private static final double CELL_DEGREES = 0.02;
 
   private final CarReachableVertexSnapper snapper;
+  /**
+   * Walk budget of the snap searches. The snap is the nearest car-reachable vertex whatever the
+   * budget, so it does not depend on a request's maximum walk; a request with a smaller maximum
+   * simply drops the stops whose walk exceeds it.
+   */
+  private final Duration maxStopWalk;
   private final Map<FeedScopedId, TransitStopVertex> stops = new HashMap<>();
   private final Map<Long, List<TransitStopVertex>> grid = new HashMap<>();
   private final Map<FeedScopedId, Optional<SnapResult>> dropoffSnaps = new ConcurrentHashMap<>();
   private final Map<FeedScopedId, Optional<SnapResult>> pickupSnaps = new ConcurrentHashMap<>();
 
-  public CarpoolStopIndex(Graph graph, CarReachableVertexSnapper snapper) {
+  /** @param maxStopWalk stops farther than this from any drivable street are not served */
+  public CarpoolStopIndex(Graph graph, CarReachableVertexSnapper snapper, Duration maxStopWalk) {
     this.snapper = snapper;
+    this.maxStopWalk = maxStopWalk;
     for (var vertex : graph.getVerticesOfType(TransitStopVertex.class)) {
       stops.put(vertex.getId(), vertex);
       grid
@@ -79,8 +79,8 @@ public class CarpoolStopIndex {
   }
 
   /**
-   * Where a driver drops a passenger off for the stop: a car-reachable vertex within
-   * {@link #MAX_STOP_WALK} of it, with the walk from the vertex to the stop. {@code null} if the
+   * Where a driver drops a passenger off for the stop: a car-reachable vertex within the walk
+   * budget of it, with the walk from the vertex to the stop. {@code null} if the
    * stop is unknown or there is none.
    */
   @Nullable
@@ -89,8 +89,8 @@ public class CarpoolStopIndex {
   }
 
   /**
-   * Where a driver picks up a passenger coming from the stop: a car-reachable vertex within
-   * {@link #MAX_STOP_WALK} of it, with the walk from the stop to the vertex. {@code null} if the
+   * Where a driver picks up a passenger coming from the stop: a car-reachable vertex within the
+   * walk budget of it, with the walk from the stop to the vertex. {@code null} if the
    * stop is unknown or there is none.
    */
   @Nullable
@@ -117,8 +117,8 @@ public class CarpoolStopIndex {
       .computeIfAbsent(stopId, id ->
         Optional.ofNullable(
           dropoff
-            ? snapper.snapDropoff(StreetSearchRequest.DEFAULT, stop, MAX_STOP_WALK)
-            : snapper.snapPickup(StreetSearchRequest.DEFAULT, stop, MAX_STOP_WALK)
+            ? snapper.snapDropoff(StreetSearchRequest.DEFAULT, stop, maxStopWalk)
+            : snapper.snapPickup(StreetSearchRequest.DEFAULT, stop, maxStopWalk)
         )
       )
       .orElse(null);
