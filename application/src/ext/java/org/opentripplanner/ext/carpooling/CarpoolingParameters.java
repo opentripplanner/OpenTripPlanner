@@ -42,6 +42,9 @@ import java.time.Duration;
  * @param defaultSearchWindow         the search window of a request that has none; wide, because
  *                                    carpool trips are sparse and a narrow window would lose
  *                                    matches the passenger would accept
+ * @param boardCost                   cost added once to every carpool leg — direct, access and
+ *                                    egress alike — for being picked up. The default of 740 is
+ *                                    500 m of walking at the default walk speed and reluctance.
  */
 public record CarpoolingParameters(
   int maxCandidateTripsPerRequest,
@@ -53,7 +56,8 @@ public record CarpoolingParameters(
   Duration expirySweepInterval,
   Duration maxRoutePointSnap,
   double minCarEscapeMeters,
-  Duration defaultSearchWindow
+  Duration defaultSearchWindow,
+  int boardCost
 ) {
   public static final CarpoolingParameters DEFAULT = new CarpoolingParameters(
     30,
@@ -65,7 +69,8 @@ public record CarpoolingParameters(
     Duration.ofHours(1),
     Duration.ofMinutes(5),
     500,
-    Duration.ofMinutes(300)
+    Duration.ofMinutes(300),
+    740
   );
 
   public CarpoolingParameters {
@@ -87,6 +92,9 @@ public record CarpoolingParameters(
       throw new IllegalArgumentException("minCarEscapeMeters must be positive");
     }
     requirePositive(defaultSearchWindow, "defaultSearchWindow");
+    if (boardCost < 0) {
+      throw new IllegalArgumentException("boardCost must not be negative");
+    }
   }
 
   private static void requirePositive(Duration value, String name) {

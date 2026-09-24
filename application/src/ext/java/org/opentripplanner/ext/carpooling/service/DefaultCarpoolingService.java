@@ -317,7 +317,13 @@ public class DefaultCarpoolingService implements CarpoolingService {
       itineraries = insertionCandidates
         .stream()
         .map(candidate ->
-          itineraryMapper.toItinerary(candidate, carpoolReluctance, request.from(), request.to())
+          itineraryMapper.toItinerary(
+            candidate,
+            carpoolReluctance,
+            parameters.boardCost(),
+            request.from(),
+            request.to()
+          )
         )
         .filter(Objects::nonNull)
         .filter(itinerary -> postFilters.isValidItinerary(itinerary, carpoolingRequest))
@@ -673,6 +679,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       insertionCandidate,
       TimeAndCost.ZERO,
       carpoolReluctance,
+      parameters.boardCost(),
       startLabel,
       endLabel
     );
