@@ -53,14 +53,6 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   private static final Duration TRIP_EXPIRY = Duration.ofDays(2);
 
-  /**
-   * The most carpool trips one instance holds. Each resolved trip costs about a hundred kilobytes
-   * of corridor and a tenth of a second of resolution, so this bounds both the heap and the time a
-   * restarted instance needs to catch up. Trips arriving while the repository is full are dropped
-   * (logged once per poll); updates and cancellations of held trips are always applied.
-   */
-  public static final int DEFAULT_MAX_TRIPS = 10_000;
-
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
@@ -81,19 +73,23 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   @Nullable
   private final ExecutorService ownedExecutor;
 
+  /**
+   * @param maxTrips the most trips the instance holds, over all feeds; each updater checks the
+   *        total and drops the new trips that would exceed it
+   */
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
-    CarpoolTripVertexResolver vertexResolver
+    CarpoolTripVertexResolver vertexResolver,
+    int maxTrips
   ) {
-    this(config, repository, vertexResolver, resolverThread(config.feedId()), DEFAULT_MAX_TRIPS);
+    this(config, repository, vertexResolver, resolverThread(config.feedId()), maxTrips);
   }
 
   /**
    * @param resolutionExecutor runs the trip resolutions handed over by the polls; the production
    *        constructor uses one daemon thread, tests may run them inline
-   * @param maxTrips the most trips this updater lets the repository hold, see
-   *        {@link #DEFAULT_MAX_TRIPS}
+   * @param maxTrips the most trips the instance holds, over all feeds
    */
   SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,

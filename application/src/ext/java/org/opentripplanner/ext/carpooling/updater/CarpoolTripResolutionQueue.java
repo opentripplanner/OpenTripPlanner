@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Resolves incoming carpool trips (street vertices and corridor, ~100 ms each) on a background
- * executor, so that a SIRI poll only parses and delegates, and the updater is primed as soon as
- * the first poll has been read rather than after every trip in the feed has been resolved.
+ * Resolves incoming carpool trips (street vertices and corridor, a fraction of a second each) on a
+ * background executor, so that a SIRI poll only parses and delegates, and the updater is primed as
+ * soon as the first poll has been read rather than after every trip in the feed has been resolved.
  * <p>
  * A trip is invisible to routing until its resolution is stored. Each submission carries a
  * version, checked before resolving and again before storing, so a newer delivery or a

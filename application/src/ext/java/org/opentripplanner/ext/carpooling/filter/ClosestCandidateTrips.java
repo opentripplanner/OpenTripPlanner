@@ -12,18 +12,14 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Bounds the number of candidate trips a request evaluates: when more trips pass the pre-filters
- * than {@link #DEFAULT_MAX_CANDIDATE_TRIPS}, only the ones whose route passes closest to the
- * passenger are kept.
+ * than the configured maximum, only the ones whose route passes closest to the passenger are kept.
  * <p>
  * Every candidate trip costs a fixed amount of work per request, so without a bound the request
  * time grows with the feed. The distance from the passenger to the route is a cheap proxy for how
  * promising a trip is: the farther the driver has to leave the route, the more of the deviation
- * budget the detour eats. With real data a request rarely has this many candidates.
+ * budget the detour eats.
  */
 public final class ClosestCandidateTrips {
-
-  /** Candidate trips evaluated per request, per direction. */
-  public static final int DEFAULT_MAX_CANDIDATE_TRIPS = 50;
 
   private ClosestCandidateTrips() {}
 

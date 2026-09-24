@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
@@ -65,7 +66,7 @@ class SiriETCarpoolingUpdaterTest {
       repository,
       resolver,
       Runnable::run,
-      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+      CarpoolingParameters.DEFAULT.maxTrips()
     );
   }
 

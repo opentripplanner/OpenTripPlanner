@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
@@ -81,6 +82,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
   private final CarpoolStopIndex stopIndex;
+  private final CarpoolingParameters parameters;
 
   /**
    * @param repository the active driver trips with their resolved street vertices and corridors
@@ -89,13 +91,15 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * @param vertexCreationService links passenger coordinates to temporary street vertices
    * @param carReachableVertexSnapper snaps passenger locations onto car-reachable vertices
    * @param stopIndex the transit stops with their car-reachable snaps
+   * @param parameters the configured limits
    */
   public DefaultCarpoolingService(
     CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
     CarReachableVertexSnapper carReachableVertexSnapper,
-    CarpoolStopIndex stopIndex
+    CarpoolStopIndex stopIndex,
+    CarpoolingParameters parameters
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
     this.streetLimitationParametersService = Objects.requireNonNull(
@@ -111,6 +115,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       "carReachableVertexSnapper"
     );
     this.stopIndex = Objects.requireNonNull(stopIndex, "stopIndex");
+    this.parameters = Objects.requireNonNull(parameters, "parameters");
   }
 
   /**
@@ -145,7 +150,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var candidateTrips = ClosestCandidateTrips.closest(
       preFiltered,
       List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff()),
-      ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+      parameters.maxCandidateTripsPerRequest()
     );
     LOG.debug(
       "Evaluating {} of {} candidate carpool trips",
@@ -270,7 +275,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var candidateTrips = ClosestCandidateTrips.closest(
       preFiltered,
       List.of(passengerCoordinates),
-      ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+      parameters.maxCandidateTripsPerRequest()
     );
     LOG.debug(
       "Evaluating {} of {} candidate carpool trips near {}",
@@ -342,7 +347,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var stopSnaps = new HashMap<FeedScopedId, Optional<SnapResult>>();
       var cap = new PerStopCandidateCap<CarpoolAccessEgress>(
-        PerStopCandidateCap.DEFAULT_MAX_PER_STOP,
+        parameters.maxCandidatesPerStop(),
         accessOrEgress.isAccess(),
         request.arriveBy(),
         TimeUtils.toTransitTimeSeconds(transitSearchTimeZero, request.dateTime()),

@@ -4,6 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
@@ -73,15 +74,22 @@ public class CarpoolingModule {
 
   @Provides
   @Singleton
+  public static CarpoolingParameters provideCarpoolingParameters() {
+    return CarpoolingParameters.DEFAULT;
+  }
+
+  @Provides
+  @Singleton
   @Nullable
   public static CarpoolStopIndex provideCarpoolStopIndex(
     Graph graph,
-    @Nullable CarReachableVertexSnapper carReachableVertexSnapper
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+    CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new CarpoolStopIndex(graph, carReachableVertexSnapper);
+    return new CarpoolStopIndex(graph, carReachableVertexSnapper, parameters.maxStopWalk());
   }
 
   @Provides
@@ -92,7 +100,8 @@ public class CarpoolingModule {
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
     @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
-    @Nullable CarpoolStopIndex stopIndex
+    @Nullable CarpoolStopIndex stopIndex,
+    CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
@@ -102,7 +111,8 @@ public class CarpoolingModule {
       streetLimitationParametersService,
       vertexCreationService,
       carReachableVertexSnapper,
-      stopIndex
+      stopIndex,
+      parameters
     );
   }
 }

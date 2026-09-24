@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * Keeps at most {@link #DEFAULT_MAX_PER_STOP} carpool access/egress candidates per transit stop.
+ * Keeps at most a configured number of carpool access/egress candidates per transit stop.
  * <p>
  * The evaluator yields one candidate per trip and corridor stop, and Raptor keeps every candidate
  * with opening hours and checks each once per minute of the search window. A stop with few cars
@@ -31,8 +31,6 @@ import javax.annotation.Nullable;
  * @param <T> the candidate type
  */
 public final class PerStopCandidateCap<T> {
-
-  public static final int DEFAULT_MAX_PER_STOP = 24;
 
   private final int maxPerStop;
   /** Window slots plus the overflow slot for candidates past the window. */
