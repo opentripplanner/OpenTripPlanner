@@ -87,7 +87,8 @@ public class TripCalendarsBuilderTest {
   }
 
   @Test
-  public void addWeeklyCalendarTwiceForSameServiceIdThrowsEvenWhenFirstCalendarIsOutsidePeriodLimit() {
+  public void addWeeklyCalendarTwiceForSameServiceIdThrowsEvenWhenFirstCalendarIsOutsidePeriodLimit()
+    throws MultipleCalendarsForServiceIdException {
     // The period limit excludes the first calendar's period entirely, so it is never stored -
     // but a service id may still only have one weekly calendar registered against it.
     LocalDateRange periodLimit = LocalDateRange.ofInclusiveEnd(A_MONDAY, A_MONDAY);

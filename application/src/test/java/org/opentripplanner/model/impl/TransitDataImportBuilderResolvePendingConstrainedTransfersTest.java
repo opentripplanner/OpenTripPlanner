@@ -18,6 +18,7 @@ import org.opentripplanner.transfer.constrained.model.PendingConstrainedTransfer
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.MultipleCalendarsForServiceIdException;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -43,7 +44,8 @@ class TransitDataImportBuilderResolvePendingConstrainedTransfersTest {
   );
 
   @Test
-  void boardResolvesToFirstOccurrenceAndAlightToLastOccurrenceOfARepeatedStop() {
+  void boardResolvesToFirstOccurrenceAndAlightToLastOccurrenceOfARepeatedStop()
+    throws MultipleCalendarsForServiceIdException {
     var builder = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP,

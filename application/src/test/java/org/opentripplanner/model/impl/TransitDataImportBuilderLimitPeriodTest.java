@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
+import org.opentripplanner.transit.model.calendar.MultipleCalendarsForServiceIdException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.Route;
@@ -70,7 +71,7 @@ public class TransitDataImportBuilderLimitPeriodTest {
   private TransitDataImportBuilder subject;
 
   @BeforeEach
-  public void setUp() {
+  public void setUp() throws MultipleCalendarsForServiceIdException {
     subject = new TransitDataImportBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP,

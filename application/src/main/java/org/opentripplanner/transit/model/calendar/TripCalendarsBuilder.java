@@ -46,18 +46,17 @@ public class TripCalendarsBuilder {
   }
 
   /**
-   * Register a recurring weekly service pattern for {@code serviceId}: it runs on each of the
-   * given days of week within {@code period}. At most one weekly calendar can be registered per
-   * service id, even if it falls entirely outside this builder's period limit.
+   * Register a recurring weekly service pattern for {@code serviceId}: it runs on each of the given days of the week
+   * within {@code period}. At most one weekly calendar can be registered per service id, even if it falls entirely
+   * outside this builder's period limit.
    *
-   * @throws MultipleCalendarsForServiceIdException if a weekly calendar was already registered
-   * for this service id.
+   * @throws MultipleCalendarsForServiceIdException if a weekly calendar was already registered for this service-id.
    */
   public TripCalendarsBuilder addWeeklyCalendar(
     FeedScopedId serviceId,
     Set<DayOfWeek> daysOfWeek,
     LocalDateRange period
-  ) {
+  ) throws MultipleCalendarsForServiceIdException {
     if (!registeredWeeklyCalendarServiceIds.add(serviceId)) {
       throw new MultipleCalendarsForServiceIdException(serviceId);
     }

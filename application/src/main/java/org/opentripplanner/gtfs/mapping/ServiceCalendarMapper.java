@@ -5,15 +5,19 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.transit.model.calendar.MultipleCalendarsForServiceIdException;
 import org.opentripplanner.transit.model.calendar.TripCalendarsBuilder;
 
 /** Responsible for mapping GTFS ServiceCalendar rows into the OTP model. */
 class ServiceCalendarMapper {
 
   private final IdFactory idFactory;
+  private final DataImportIssueStore issueStore;
 
-  ServiceCalendarMapper(IdFactory idFactory) {
+  ServiceCalendarMapper(IdFactory idFactory, DataImportIssueStore issueStore) {
     this.idFactory = idFactory;
+    this.issueStore = issueStore;
   }
 
   void map(Collection<ServiceCalendar> allServiceCalendars, TripCalendarsBuilder calendars) {
@@ -28,11 +32,20 @@ class ServiceCalendarMapper {
     if (rhs == null) {
       return;
     }
-    calendars.addWeeklyCalendar(
-      idFactory.createId(rhs.getServiceId(), "service calendar"),
-      daysOfWeek(rhs),
-      ServiceDateMapper.mapServiceDateInterval(rhs.getStartDate(), rhs.getEndDate())
-    );
+    var serviceId = idFactory.createId(rhs.getServiceId(), "service calendar");
+    try {
+      calendars.addWeeklyCalendar(
+        serviceId,
+        daysOfWeek(rhs),
+        ServiceDateMapper.mapServiceDateInterval(rhs.getStartDate(), rhs.getEndDate())
+      );
+    } catch (MultipleCalendarsForServiceIdException e) {
+      issueStore.add(
+        "MultipleCalendarsForServiceId",
+        "Multiple calendar.txt rows found for service id %s. The first row is kept.",
+        serviceId
+      );
+    }
   }
 
   private static Set<DayOfWeek> daysOfWeek(ServiceCalendar c) {

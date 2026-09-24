@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.calendar;
 
 import org.opentripplanner.core.model.id.FeedScopedId;
 
-class MultipleCalendarsForServiceIdException extends RuntimeException {
+public class MultipleCalendarsForServiceIdException extends Exception {
 
   MultipleCalendarsForServiceIdException(FeedScopedId serviceId) {
     super("multiple calendars found for serviceId=" + serviceId);

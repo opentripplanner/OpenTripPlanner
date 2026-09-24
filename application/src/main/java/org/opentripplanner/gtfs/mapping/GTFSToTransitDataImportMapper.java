@@ -110,7 +110,7 @@ public class GTFSToTransitDataImportMapper {
     Function<FeedScopedId, RegularStop> stopLookup = id -> builder.getStops().get(id);
 
     this.discardMinTransferTimes = discardMinTransferTimes;
-    serviceCalendarMapper = new ServiceCalendarMapper(idFactory);
+    serviceCalendarMapper = new ServiceCalendarMapper(idFactory, issueStore);
     serviceCalendarDateMapper = new ServiceCalendarDateMapper(idFactory);
     shapePointMapper = new ShapePointMapper(idFactory);
     translationHelper = new TranslationHelper();

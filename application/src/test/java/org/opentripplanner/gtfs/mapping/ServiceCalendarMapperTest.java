@@ -2,7 +2,6 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
@@ -15,6 +14,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 
 public class ServiceCalendarMapperTest {
@@ -48,7 +48,11 @@ public class ServiceCalendarMapperTest {
   private static final LocalDate PERIOD_END = LocalDate.of(2018, 1, 2);
 
   private static final ServiceCalendar CALENDAR = new ServiceCalendar();
-  private final ServiceCalendarMapper subject = new ServiceCalendarMapper(new IdFactory("A"));
+  private final DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
+  private final ServiceCalendarMapper subject = new ServiceCalendarMapper(
+    new IdFactory("A"),
+    issueStore
+  );
 
   static {
     CALENDAR.setId(ID);
@@ -110,9 +114,17 @@ public class ServiceCalendarMapperTest {
   }
 
   @Test
-  public void testMapTwiceForSameServiceIdThrows() {
+  public void testMapTwiceForSameServiceIdKeepsFirstAndReportsIssue() {
     var calendars = TripCalendars.of();
     subject.map(CALENDAR, calendars);
-    assertThrows(RuntimeException.class, () -> subject.map(CALENDAR, calendars));
+    subject.map(CALENDAR, calendars);
+
+    // The duplicate row is dropped, not thrown - the first one's data is unaffected.
+    var built = calendars.build();
+    assertTrue(built.listServiceIds().contains(SERVICE_ID));
+    assertFalse(built.listServiceDates(SERVICE_ID).isEmpty());
+
+    assertEquals(1, issueStore.listIssues().size());
+    assertEquals("MultipleCalendarsForServiceId", issueStore.listIssues().getFirst().getType());
   }
 }
