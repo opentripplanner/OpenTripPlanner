@@ -3,7 +3,9 @@ package org.opentripplanner.place.nearbystopfinder;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
@@ -38,10 +40,13 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
 
   public PatternConsideringNearbyStopFinder(
     TransitService transitService,
-    NearbyStopFinder delegateNearbyStopFinder
+    NearbyStopFinder delegateNearbyStopFinder,
+    Set<FeedScopedId> stopsWithRegularTransfers
   ) {
     this.transitService = transitService;
-    var builder = CompositeNearbyStopFilter.of().add(new PatternNearbyStopFilter(transitService));
+    var builder = CompositeNearbyStopFilter.of().add(
+      new PatternNearbyStopFilter(transitService, stopsWithRegularTransfers)
+    );
 
     if (OTPFeature.FlexRouting.isOn()) {
       builder.add(new FlexTripNearbyStopFilter(transitService));
