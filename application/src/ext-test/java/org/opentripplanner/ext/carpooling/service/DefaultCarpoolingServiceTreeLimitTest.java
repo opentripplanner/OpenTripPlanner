@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
@@ -18,9 +19,9 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Unit tests for {@link DefaultCarpoolingService#driverLegTreeLimits}: each leg gets
- * {@code leg + slack + smallestDownstreamBudget} capped at {@link CarpoolTrip#MAX_TRIP_DURATION},
- * and multi-leg trips get per-leg limits well below the whole-trip limit. The leg durations are
- * passed in explicitly here; in production they are OTP's own routed durations (see
+ * {@code leg + slack + smallestDownstreamBudget} capped at the maximum trip duration, and multi-leg
+ * trips get per-leg limits well below the whole-trip limit. The leg durations are passed in
+ * explicitly here; in production they are OTP's own routed durations (see
  * {@link DefaultCarpoolingService#resolveLegDurations}).
  */
 class DefaultCarpoolingServiceTreeLimitTest {
@@ -29,6 +30,7 @@ class DefaultCarpoolingServiceTreeLimitTest {
   private static final ZonedDateTime BASE = LocalDateTime.of(2025, 1, 1, 12, 0).atZone(ZONE);
   private static final WgsCoordinate COORD = new WgsCoordinate(59.9139, 10.7522);
   private static final Duration BUDGET = Duration.ofMinutes(10);
+  private static final Duration MAX_TRIP_DURATION = CarpoolingParameters.DEFAULT.maxTripDuration();
 
   private static int idCounter = 0;
 
@@ -50,10 +52,11 @@ class DefaultCarpoolingServiceTreeLimitTest {
       stop(Duration.ofMinutes(40))
     );
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
-      Duration.ofMinutes(60),
-      Duration.ofMinutes(100),
-    });
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(
+      trip,
+      new Duration[] { Duration.ofMinutes(60), Duration.ofMinutes(100) },
+      MAX_TRIP_DURATION
+    );
 
     assertEquals(2, limits.length);
     // Leg 0 allowance = min(downstream budgets) = min(5, 40) = 5.
@@ -78,10 +81,11 @@ class DefaultCarpoolingServiceTreeLimitTest {
       stop(Duration.ofMinutes(2))
     );
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
-      Duration.ofMinutes(5),
-      Duration.ofMinutes(5),
-    });
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(
+      trip,
+      new Duration[] { Duration.ofMinutes(5), Duration.ofMinutes(5) },
+      MAX_TRIP_DURATION
+    );
 
     var leg = expectedLimit(Duration.ofMinutes(5), Duration.ofMinutes(2));
     assertEquals(leg, limits[0]);
@@ -96,9 +100,11 @@ class DefaultCarpoolingServiceTreeLimitTest {
   void twoWaypointTripSizesTheSingleLeg() {
     var trip = trip(stop(BUDGET), stop(BUDGET));
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
-      Duration.ofMinutes(60),
-    });
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(
+      trip,
+      new Duration[] { Duration.ofMinutes(60) },
+      MAX_TRIP_DURATION
+    );
 
     assertEquals(1, limits.length);
     assertEquals(expectedLimit(Duration.ofMinutes(60), BUDGET), limits[0]);
@@ -111,11 +117,13 @@ class DefaultCarpoolingServiceTreeLimitTest {
     // request could expand a multi-hour street tree.
     var trip = trip(stop(BUDGET), stop(BUDGET));
 
-    var limits = DefaultCarpoolingService.driverLegTreeLimits(trip, new Duration[] {
-      Duration.ofHours(4),
-    });
+    var limits = DefaultCarpoolingService.driverLegTreeLimits(
+      trip,
+      new Duration[] { Duration.ofHours(4) },
+      MAX_TRIP_DURATION
+    );
 
-    assertEquals(CarpoolTrip.MAX_TRIP_DURATION, limits[0]);
+    assertEquals(MAX_TRIP_DURATION, limits[0]);
   }
 
   private static CarpoolTrip trip(CarpoolStop... stops) {

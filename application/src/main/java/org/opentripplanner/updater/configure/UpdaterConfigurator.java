@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater;
@@ -84,6 +85,9 @@ public class UpdaterConfigurator {
   @Nullable
   private final CarpoolTripVertexResolver carpoolTripVertexResolver;
 
+  @Nullable
+  private final CarpoolingParameters carpoolingParameters;
+
   private final VehicleParkingRepository parkingRepository;
   private final UpdateManager transitUpdateManager;
   private final UpdateManager streetUpdateManager;
@@ -110,6 +114,7 @@ public class UpdaterConfigurator {
     TransitService staticTransitService,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
+    @Nullable CarpoolingParameters carpoolingParameters,
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
@@ -131,6 +136,7 @@ public class UpdaterConfigurator {
     this.timetableRepositoryHandle = timetableRepositoryHandle;
     this.carpoolingRepository = carpoolingRepository;
     this.carpoolTripVertexResolver = carpoolTripVertexResolver;
+    this.carpoolingParameters = carpoolingParameters;
     this.transitAlertService = transitAlertService;
     this.gbfsNetworkOverrides = gbfsNetworkOverrides;
   }
@@ -149,6 +155,7 @@ public class UpdaterConfigurator {
     TransitService staticTransitService,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
+    @Nullable CarpoolingParameters carpoolingParameters,
     UpdateManager transitUpdateManager,
     UpdateManager streetUpdateManager,
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableRepositoryHandle,
@@ -167,6 +174,7 @@ public class UpdaterConfigurator {
       staticTransitService,
       carpoolingRepository,
       carpoolTripVertexResolver,
+      carpoolingParameters,
       transitUpdateManager,
       streetUpdateManager,
       timetableRepositoryHandle,
@@ -295,7 +303,12 @@ public class UpdaterConfigurator {
     if (OTPFeature.CarPooling.isOn()) {
       for (var configItem : updatersParameters.getSiriETCarpoolingUpdaterParameters()) {
         updaters.add(
-          new SiriETCarpoolingUpdater(configItem, carpoolingRepository, carpoolTripVertexResolver)
+          new SiriETCarpoolingUpdater(
+            configItem,
+            carpoolingRepository,
+            carpoolTripVertexResolver,
+            carpoolingParameters
+          )
         );
       }
     }

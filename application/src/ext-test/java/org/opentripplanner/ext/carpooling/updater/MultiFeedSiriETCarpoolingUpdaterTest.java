@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
@@ -42,18 +43,36 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updaterA;
   private SiriETCarpoolingUpdater updaterB;
-  private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(FEED_A);
-  private final CarpoolSiriMapper mapperB = new CarpoolSiriMapper(FEED_B);
+  private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(
+    FEED_A,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
+  private final CarpoolSiriMapper mapperB = new CarpoolSiriMapper(
+    FEED_B,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @BeforeEach
   void setUp() {
-    repository = new DefaultCarpoolingRepository();
+    repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var resolver = mock(CarpoolTripVertexResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
       CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );
-    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
-    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
+    updaterA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      CarpoolingParameters.DEFAULT
+    );
+    updaterB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      CarpoolingParameters.DEFAULT
+    );
   }
 
   @Test

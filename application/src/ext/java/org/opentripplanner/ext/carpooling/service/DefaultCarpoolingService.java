@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
@@ -131,6 +132,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * and leave.
    */
   private final CarReachableVertexSnapper carReachableVertexSnapper;
+  private final CarpoolingParameters parameters;
 
   /**
    * Creates a new carpooling service with the specified dependencies.
@@ -152,7 +154,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
-    CarReachableVertexSnapper carReachableVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper,
+    CarpoolingParameters parameters
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
     this.streetLimitationParametersService = Objects.requireNonNull(
@@ -173,6 +176,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       carReachableVertexSnapper,
       "carReachableVertexSnapper"
     );
+    this.parameters = Objects.requireNonNull(parameters, "parameters");
   }
 
   /**
@@ -204,7 +208,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     validateRequest(request);
 
-    var carpoolingRequest = CarpoolingRequest.of(request);
+    var carpoolingRequest = CarpoolingRequest.of(request, parameters.defaultSearchWindow());
 
     LOG.debug(
       "Finding carpool itineraries from {} to {} at {}",
@@ -233,7 +237,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     var itineraries = List.<Itinerary>of();
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var router = new CarpoolStreetRouter(streetLimitationParametersService);
+      var router = new CarpoolStreetRouter(
+        streetLimitationParametersService,
+        parameters.maxTripDuration()
+      );
 
       var streetVertexUtils = new StreetVertexUtils(
         this.vertexCreationService,
@@ -382,7 +389,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
     }
 
     validateRequest(request);
-    var carpoolingRequest = CarpoolingRequest.of(request, accessOrEgress);
+    var carpoolingRequest = CarpoolingRequest.of(
+      request,
+      accessOrEgress,
+      parameters.defaultSearchWindow()
+    );
 
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
@@ -503,7 +514,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // Sizes each leg's tree from OTP's own routed leg durations (cached per trip) and re-routes
       // any baseline leg the tree misses — see resolveLegDurations and the InsertionEvaluator
       // fallback below.
-      var baselineRouter = new CarpoolStreetRouter(streetLimitationParametersService);
+      var baselineRouter = new CarpoolStreetRouter(
+        streetLimitationParametersService,
+        parameters.maxTripDuration()
+      );
 
       // Each waypoint's tree only has to span its own leg plus the feasible insertion detour —
       // see driverLegTreeLimits.
@@ -516,7 +530,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
         if (legDurations == null) {
           continue;
         }
-        var legLimits = driverLegTreeLimits(tripWithVertices.trip(), legDurations);
+        var legLimits = driverLegTreeLimits(
+          tripWithVertices.trip(),
+          legDurations,
+          parameters.maxTripDuration()
+        );
         var vertices = tripWithVertices.vertices();
         for (int leg = 0; leg < legLimits.length; leg++) {
           carpoolTreeVertexRouter.addVertex(
@@ -623,11 +641,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * smallest downstream budget is the most a feasible detour can add — a stop beyond the tree would
    * be rejected by the delay constraints anyway.
    * <p>
-   * Each limit is finally capped at {@link CarpoolTrip#MAX_TRIP_DURATION}, the same bound the
-   * SIRI mapper rejects over-long trips at. A consistent trip's leg never approaches that bound, so
-   * the cap only trims the detour margin of a trip at the very edge of the accepted range; its real
-   * purpose is to keep every driver tree bounded should a trip with inconsistent geometry slip past
-   * the mapper's checks, so that no single request can expand a multi-hour tree.
+   * Each limit is finally capped at the maximum trip duration, the same bound the SIRI mapper
+   * rejects over-long trips at. A consistent trip's leg never approaches that bound, so the cap
+   * only trims the detour margin of a trip at the very edge of the accepted range; its real purpose
+   * is to keep every driver tree bounded should a trip with inconsistent geometry slip past the
+   * mapper's checks, so that no single request can expand a multi-hour tree.
    *
    * @param legDurations the travel duration of each leg, one entry per leg (length
    *                     {@code stops().size() - 1}). The caller passes OTP's own routed durations
@@ -635,7 +653,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *                     routing model it is built with; a leg's tree then spans its baseline
    *                     whatever the SIRI schedule claimed.
    */
-  static Duration[] driverLegTreeLimits(CarpoolTrip trip, Duration[] legDurations) {
+  static Duration[] driverLegTreeLimits(
+    CarpoolTrip trip,
+    Duration[] legDurations,
+    Duration maxTripDuration
+  ) {
     var stops = trip.stops();
     int n = stops.size();
 
@@ -650,10 +672,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     var detourAllowance = stops.get(n - 1).getDeviationBudget();
     for (int k = n - 2; k >= 0; k--) {
       detourAllowance = min(detourAllowance, stops.get(k + 1).getDeviationBudget());
-      legLimits[k] = min(
-        legDurations[k].plus(slack).plus(detourAllowance),
-        CarpoolTrip.MAX_TRIP_DURATION
-      );
+      legLimits[k] = min(legDurations[k].plus(slack).plus(detourAllowance), maxTripDuration);
     }
     return legLimits;
   }
@@ -665,13 +684,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * The outcome is memoized on the repository
    * ({@link CarpoolingRepository#cachedBaselineRouting}) — both success and failure — because the
    * baseline route depends only on the trip's waypoint geometry and the static street graph, never
-   * on the passenger request: the baseline router is bounded by
-   * {@link CarpoolTrip#MAX_TRIP_DURATION}, a fixed ceiling, not by any request preference. On a
-   * cache miss every leg is routed with {@code baselineRouter}; the result — the durations if all
-   * legs route, or unroutable if any leg cannot be driven within that ceiling — is cached either
-   * way, so a trip that cannot carry a passenger is routed once and skipped cheaply thereafter. The
-   * cache validates its entry against the trip's current route points, so a re-routed trip never
-   * reads a stale verdict.
+   * on the passenger request: the baseline router is bounded by the maximum trip duration, a fixed
+   * ceiling, not by any request preference. On a cache miss every leg is routed with
+   * {@code baselineRouter}; the result — the durations if all legs route, or unroutable if any leg
+   * cannot be driven within that ceiling — is cached either way, so a trip that cannot carry a
+   * passenger is routed once and skipped cheaply thereafter. The cache validates its entry against
+   * the trip's current route points, so a re-routed trip never reads a stale verdict.
    */
   @Nullable
   private Duration[] resolveLegDurations(
@@ -691,9 +709,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
   /**
    * Routes every leg of the trip with {@code baselineRouter} and returns OTP's travel duration for
    * each, or {@code null} if any leg cannot be routed. {@code baselineRouter} is a goal-directed
-   * search bounded by {@link CarpoolTrip#MAX_TRIP_DURATION} — the same ceiling the trees are capped
-   * at — so a {@code null} here means the leg cannot be driven within the carpool bound: no tree
-   * could route it either, and the trip is dropped.
+   * search bounded by the maximum trip duration — the same ceiling the trees are capped at — so a
+   * {@code null} here means the leg cannot be driven within the carpool bound: no tree could route
+   * it either, and the trip is dropped.
    */
   @Nullable
   private static Duration[] routeBaselineLegDurations(

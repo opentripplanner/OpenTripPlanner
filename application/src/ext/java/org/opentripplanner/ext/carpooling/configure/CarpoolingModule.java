@@ -4,6 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
@@ -20,21 +21,25 @@ public class CarpoolingModule {
   @Provides
   @Singleton
   @Nullable
-  public CarpoolingRepository provideCarpoolingRepository() {
+  public CarpoolingRepository provideCarpoolingRepository(
+    @Nullable CarpoolingParameters parameters
+  ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new DefaultCarpoolingRepository();
+    return new DefaultCarpoolingRepository(parameters.expirySweepInterval());
   }
 
   @Provides
   @Singleton
   @Nullable
-  public static CarReachableVertexSnapper provideCarReachableVertexSnapper() {
+  public static CarReachableVertexSnapper provideCarReachableVertexSnapper(
+    @Nullable CarpoolingParameters parameters
+  ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return CarReachableVertexSnapper.createDefault();
+    return new CarReachableVertexSnapper(parameters.minCarEscapeMeters());
   }
 
   @Provides
@@ -42,12 +47,27 @@ public class CarpoolingModule {
   @Nullable
   public static CarpoolTripVertexResolver provideCarpoolTripVertexResolver(
     VertexCreationService vertexCreationService,
-    @Nullable CarReachableVertexSnapper carReachableVertexSnapper
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+    @Nullable CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
     }
-    return new CarpoolTripVertexResolver(vertexCreationService, carReachableVertexSnapper);
+    return new CarpoolTripVertexResolver(
+      vertexCreationService,
+      carReachableVertexSnapper,
+      parameters.maxRoutePointSnap()
+    );
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  public static CarpoolingParameters provideCarpoolingParameters() {
+    if (OTPFeature.CarPooling.isOff()) {
+      return null;
+    }
+    return CarpoolingParameters.DEFAULT;
   }
 
   @Provides
@@ -57,7 +77,8 @@ public class CarpoolingModule {
     @Nullable CarpoolingRepository repository,
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
-    @Nullable CarReachableVertexSnapper carReachableVertexSnapper
+    @Nullable CarReachableVertexSnapper carReachableVertexSnapper,
+    @Nullable CarpoolingParameters parameters
   ) {
     if (OTPFeature.CarPooling.isOff()) {
       return null;
@@ -66,7 +87,8 @@ public class CarpoolingModule {
       repository,
       streetLimitationParametersService,
       vertexCreationService,
-      carReachableVertexSnapper
+      carReachableVertexSnapper,
+      parameters
     );
   }
 }
