@@ -19,6 +19,7 @@ Sections follow that describe particular settings in more depth.
 | Config Parameter                                                                            |         Type         | Summary                                                                                                                                                        |  Req./Opt. | Default Value                     | Since |
 |---------------------------------------------------------------------------------------------|:--------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
 | [areaVisibility](#areaVisibility)                                                           |       `boolean`      | Perform visibility calculations.                                                                                                                               | *Optional* | `false`                           |  1.5  |
+| [boardingLocationCoordinateSource](#boardingLocationCoordinateSource)                       |        `enum`        | Which coordinate is used to place a boarding location vertex when linking a stop to an OSM platform.                                                           | *Optional* | `"osm"`                           |  2.11 |
 | [buildReportDir](#buildReportDir)                                                           |         `uri`        | URI to the directory where the graph build report should be written to.                                                                                        | *Optional* |                                   |  2.0  |
 | [configVersion](#configVersion)                                                             |       `string`       | Deployment version of the *build-config.json*.                                                                                                                 | *Optional* |                                   |  2.1  |
 | [dataImportReport](#dataImportReport)                                                       |       `boolean`      | Generate nice HTML report of Graph errors/warnings                                                                                                             | *Optional* | `false`                           |  2.0  |
@@ -401,6 +402,34 @@ Perform visibility calculations.
 
 If this is `true` OTP attempts to calculate a path straight through an OSM area using the
 shortest way rather than around the edge of it. (These calculations can be time consuming).
+
+
+<h3 id="boardingLocationCoordinateSource">boardingLocationCoordinateSource</h3>
+
+**Since version:** `2.11` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"osm"`   
+**Path:** /   
+**Enum values:** `osm` | `transit`
+
+Which coordinate is used to place a boarding location vertex when linking a stop to an OSM platform.
+
+When a transit stop is linked to an OSM `boarding_location` platform (a way or an area), OTP
+creates an `OsmBoardingLocationVertex` and connects it to the street graph. This parameter
+selects where that vertex is placed.
+
+The default `OSM` places it at the platform centroid, so several stops sharing a platform
+collapse onto the same vertex — which can result in unrealistically long on-platform
+transfers. Setting this to `TRANSIT` places each vertex at the stop coordinate from the
+transit data instead, so stops on the same platform stay distinct and are connected by a
+short path.
+
+A `TRANSIT` coordinate is never moved. A stop falling outside the OSM platform polygon stays
+put and is connected to the platform by a single edge of the real distance, so the walk is
+always of the right length. A gap too large to be a surveying discrepancy is reported as a
+data import issue.
+
+This applies to platforms mapped as ways or areas and to stops matching a tagged OSM node
+alike, so the coordinate a stop is placed at always comes from the transit data. The OSM
+features themselves are never moved.
 
 
 <h3 id="buildReportDir">buildReportDir</h3>

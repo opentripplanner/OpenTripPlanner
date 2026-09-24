@@ -1,7 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.linking.TransitStopVertexBuilderFactory.ofStop;
 
@@ -12,24 +16,41 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
+import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.linking.VertexLinker;
+import org.opentripplanner.street.model.StreetModelForTest;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
+import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -123,13 +144,12 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(
+    buildBoardingLocations(
       graph,
       transitRepository,
-      VertexLinkerTestFactory.of(graph),
-      osmService
-    ).buildGraph();
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
@@ -299,38 +319,38 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
+    // The stop attaches at a split vertex on the way, not at a vertex on the centroid itself, so
+    // capture the expected centroid from the platform geometry before linking splits it.
+    var centroids = testCases
+      .stream()
+      .collect(
+        Collectors.toMap(
+          testCase -> testCase.platform.getId().getId(),
+          testCase -> platformCentroid(graph, osmInfoRepository, testCase.platform)
+        )
+      );
+
     var siteRepo = testModel
       .siteRepositoryBuilder()
       .withRegularStops(List.of(platform9, platform7))
       .build();
-    new OsmBoardingLocationsModule(
+    buildBoardingLocations(
       graph,
       new TransitRepository(siteRepo),
-      VertexLinkerTestFactory.of(graph),
-      new DefaultOsmInfoGraphBuildService(osmInfoRepository)
-    ).buildGraph();
-
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
 
     for (var testCase : testCases) {
       var platformVertex = testCase.getPlatformVertex();
       var fromVertex = Objects.requireNonNull(graph.getVertex(testCase.beginLabel));
       var toVertex = Objects.requireNonNull(graph.getVertex(testCase.endLabel));
+      var centroid = centroids.get(testCase.platform.getId().getId());
 
-      var centroid = boardingLocations
-        .stream()
-        .filter(b -> b.references.contains(testCase.platform.getId().getId()))
-        .findFirst()
-        .orElseThrow();
-
-      // TODO: we should ideally place the centroid vertex directly on the platform by splitting
-      // the platform edge, but it is too difficult to touch the splitter code to use a given
-      // centroid vertex instead of a generated split vertex, so what we actually do is to directly
+      // TODO: we should ideally place the boarding location vertex directly on the platform by
+      // splitting the platform edge, but it is too difficult to touch the splitter code to use a
+      // given vertex instead of a generated split vertex, so what we actually do is to directly
       // connect the platform vertex to the split vertex
-
-      // the actual centroid isn't used
-      assertEquals(0, centroid.getDegreeIn());
-      assertEquals(0, centroid.getDegreeOut());
 
       for (var vertex : platformVertex.getIncoming()) {
         assertSplitVertex(vertex.getFromVertex(), centroid, fromVertex, toVertex);
@@ -340,6 +360,33 @@ class OsmBoardingLocationsModuleTest {
         assertSplitVertex(vertex.getToVertex(), centroid, fromVertex, toVertex);
       }
     }
+
+    // The vertex that only carried the centroid into the linker is not left behind in the graph.
+    assertThat(
+      graph
+        .getVerticesOfType(OsmBoardingLocationVertex.class)
+        .stream()
+        .filter(v -> v.getDegreeIn() == 0 && v.getDegreeOut() == 0)
+        .toList()
+    ).isEmpty();
+  }
+
+  /** The centroid of the OSM platform way a stop references, as the module computes it. */
+  private static Coordinate platformCentroid(
+    Graph graph,
+    DefaultOsmInfoGraphBuildRepository osmInfoRepository,
+    RegularStop stop
+  ) {
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+    return Stream.of(graph.findEdges(StreetEdge.class))
+      .flatMap(edges -> StreamSupport.stream(edges.spliterator(), false))
+      .flatMap(edge -> osmService.findPlatform(edge).stream())
+      .filter(platform -> platform.references().contains(stop.getId().getId()))
+      .findFirst()
+      .orElseThrow()
+      .geometry()
+      .getCentroid()
+      .getCoordinate();
   }
 
   /**
@@ -397,13 +444,12 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex2.getIncoming().size());
     assertEquals(0, platformVertex2.getOutgoing().size());
 
-    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(
+    buildBoardingLocations(
       graph,
       transitRepository,
-      VertexLinkerTestFactory.of(graph),
-      osmService
-    ).buildGraph();
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
 
     // Both vertices should now be linked
     assertEquals(1, platformVertex1.getIncoming().size());
@@ -449,20 +495,1225 @@ class OsmBoardingLocationsModuleTest {
     );
   }
 
+  private static void buildBoardingLocations(
+    Graph graph,
+    TransitRepository transitRepository,
+    DefaultOsmInfoGraphBuildRepository osmInfoRepository,
+    BoardingLocationCoordinateSource coordinateSource
+  ) {
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      coordinateSource,
+      DataImportIssueStore.NOOP
+    );
+  }
+
+  private static void buildBoardingLocations(
+    Graph graph,
+    TransitRepository transitRepository,
+    DefaultOsmInfoGraphBuildRepository osmInfoRepository,
+    BoardingLocationCoordinateSource coordinateSource,
+    DataImportIssueStore issueStore
+  ) {
+    new OsmBoardingLocationsModule(
+      graph,
+      transitRepository,
+      VertexLinkerTestFactory.of(graph),
+      new DefaultOsmInfoGraphBuildService(osmInfoRepository),
+      osmInfoRepository,
+      coordinateSource,
+      issueStore
+    ).buildGraph();
+  }
+
+  /**
+   * With {@link BoardingLocationCoordinateSource#TRANSIT}, two stops that share the same OSM
+   * platform area get their own boarding location vertex at their own transit coordinate (rather
+   * than collapsing onto a single shared centroid vertex), and each vertex is placed exactly at the
+   * stop coordinate.
+   */
+  @Test
+  void testTransitCoordinateForAreaPlatform() {
+    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
+      "herrenberg-minimal.osm.pbf"
+    );
+
+    // Two stops that both match the same platform area via ref:IFOPT, but at distinct coordinates.
+    RegularStop platform1 = testModel
+      .stop("de:08115:4512:4:101")
+      .withCoordinate(48.59328, 8.86128)
+      .build();
+    RegularStop platform2 = testModel
+      .stop("de:08115:4512:4:102")
+      .withCoordinate(48.59332, 8.86142)
+      .build();
+
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(platform1, platform2))
+      .build();
+
+    var graph = new Graph();
+    var transitRepository = new TransitRepository(siteRepo);
+    var factory = new VertexFactory(graph);
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmModule = OsmModuleTestFactory.of(new DefaultOsmProvider(file, false))
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
+      .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
+      .withAreaVisibility(true)
+      .build();
+
+    osmModule.buildGraph();
+
+    var platformVertex1 = factory.transitStop(ofStop(platform1));
+    var platformVertex2 = factory.transitStop(ofStop(platform2));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    // Both stops should be linked.
+    assertEquals(1, platformVertex1.getOutgoing().size());
+    assertEquals(1, platformVertex2.getOutgoing().size());
+
+    // The vertex each stop is linked to (identified via its own stop link, since both vertices
+    // carry the shared platform ref set and cannot be told apart by references alone).
+    var boardingLocation1 = linkedBoardingLocation(platformVertex1);
+    var boardingLocation2 = linkedBoardingLocation(platformVertex2);
+
+    // Each stop gets its own, distinct boarding location vertex (no deduplication to a centroid).
+    assertNotSame(
+      boardingLocation1,
+      boardingLocation2,
+      "Each stop should get its own boarding location vertex in TRANSIT mode"
+    );
+
+    // Each vertex is placed exactly at the stop coordinate from the transit data.
+    assertVertexAtStop(boardingLocation1, platform1);
+    assertVertexAtStop(boardingLocation2, platform2);
+
+    // The two stops end up close together (they are on the same platform), not routed via a detour.
+    var distance = SphericalDistanceLibrary.distance(
+      boardingLocation1.getCoordinate(),
+      boardingLocation2.getCoordinate()
+    );
+    assertTrue(
+      distance < 50,
+      "Boarding locations on the same platform should be close, but were " + distance + " m apart"
+    );
+
+    // Each boarding location is wired into the area with visibility edges (AreaEdge), in addition
+    // to the stop link. This is what connects it into the street network; without it the vertex
+    // would be placed at the stop coordinate but left floating.
+    assertConnections(boardingLocation1, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
+    assertConnections(boardingLocation2, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
+
+    // Stronger check: the visibility edges make the vertex reachable through the area in both
+    // directions (you can both enter and leave it via the area), so routing can actually use it.
+    assertReachableThroughArea(boardingLocation1);
+    assertReachableThroughArea(boardingLocation2);
+  }
+
+  /**
+   * Regression test for a "sparse visibility" bug with {@link BoardingLocationCoordinateSource#TRANSIT}:
+   * a stop coordinate can sit just outside the platform polygon it should be linked into, and
+   * {@link VertexLinker} rejects visibility edges that leave the polygon. The module puts an access
+   * point just inside on the stop's behalf, so a stop just outside ends up as well connected as one
+   * inside it, pays only a centimetre-scale edge, and is not moved.
+   *
+   * @see #testTransitCoordinateFarOutsideAreaPlatformKeepsItsDistance()
+   */
+  @Test
+  void testTransitCoordinateJustOutsideAreaPlatformIsStillWellConnected() {
+    var graph = new Graph();
+
+    // A small rectangular platform, corners as (lon, lat), with an entrance at every corner.
+    Coordinate[] corners = {
+      new Coordinate(10, 60.0006),
+      new Coordinate(10.0008, 60.0006),
+      new Coordinate(10.0008, 60),
+      new Coordinate(10, 60),
+    };
+    var area = buildRectangularPlatformArea(graph, corners);
+
+    // One stop safely inside the platform, for comparison.
+    var insideStop = testModel.stop("inside-stop").withCoordinate(60.0003, 10.0004).build();
+    // One stop 5 cm south of the bottom edge (lat 60.0) - just outside the platform, well within the
+    // kind of surveying discrepancy real GTFS/OSM data can have.
+    var outsideLat = 60.0 - SphericalDistanceLibrary.metersToDegrees(0.05);
+    var outsideStop = testModel.stop("outside-stop").withCoordinate(outsideLat, 10.0004).build();
+
+    var platform = new Platform(
+      I18NString.of("platform"),
+      area.getGeometry().getInteriorPoint(),
+      Set.of(insideStop.getId().getId(), outsideStop.getId().getId())
+    );
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(area, platform);
+
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(insideStop, outsideStop))
+      .build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var factory = new VertexFactory(graph);
+    var insideStopVertex = factory.transitStop(ofStop(insideStop));
+    var outsideStopVertex = factory.transitStop(ofStop(outsideStop));
+
+    transitRepository.index();
+    graph.index();
+
+    var issueStore = new DefaultDataImportIssueStore();
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT,
+      issueStore
+    );
+
+    assertFalse(insideStopVertex.getOutgoing().isEmpty(), "the inside stop should be linked");
+    assertFalse(outsideStopVertex.getOutgoing().isEmpty(), "the outside stop should be linked");
+
+    // A centimetre-scale discrepancy is normal and must not be reported.
+    assertThat(issueTypes(issueStore)).isEmpty();
+
+    var insideBoardingLocation = linkedBoardingLocation(insideStopVertex);
+    var outsideBoardingLocation = linkedBoardingLocation(outsideStopVertex);
+
+    // The inside stop links into the area directly, seeing at least the rectangle's 4 corners.
+    assertTrue(
+      areaEdgesOf(insideBoardingLocation).size() >= 4,
+      "the inside stop should see at least all 4 platform corners, but saw " +
+        areaEdgesOf(insideBoardingLocation).size()
+    );
+
+    // Not moved onto the platform, and it only pays the 5 cm it is off by (plus the margin that
+    // puts the access point safely inside the boundary).
+    assertVertexAtStop(outsideBoardingLocation, outsideStop);
+    var connector = onlyConnectorEdge(outsideBoardingLocation);
+    assertTrue(
+      connector.getDistanceMeters() < 1,
+      "a 5 cm discrepancy should cost a centimetre-scale edge, but was " +
+        connector.getDistanceMeters() +
+        " m"
+    );
+
+    // The access point carries the connectivity, as well as a stop placed inside would.
+    var accessPoint = connector.getToVertex();
+    assertEquals(
+      areaEdgesOf(insideBoardingLocation).size(),
+      areaEdgesOf(accessPoint).size(),
+      "the outside stop's access point should end up exactly as well-connected as a stop inside " +
+        "the platform"
+    );
+
+    // So linking succeeded, the access point was registered as a visibility vertex, and the two
+    // stops on the platform are connected directly rather than via a detour.
+    assertTrue(
+      getEdge(accessPoint, insideBoardingLocation).isPresent() &&
+        getEdge(insideBoardingLocation, accessPoint).isPresent(),
+      "the two stops on the platform should be connected directly, in both directions"
+    );
+  }
+
+  /**
+   * The counterpart to {@link #testTransitCoordinateJustOutsideAreaPlatformIsStillWellConnected()}:
+   * a stop far outside the polygon is a real distance to walk, not a surveying discrepancy, so the
+   * edge to its access point carries the true length and the gap is reported as a data import issue
+   * - while the stop still gets the same connectivity into the platform.
+   */
+  @Test
+  void testTransitCoordinateFarOutsideAreaPlatformKeepsItsDistance() {
+    var graph = new Graph();
+
+    // The same platform as in the "just outside" test, corners as (lon, lat).
+    Coordinate[] corners = {
+      new Coordinate(10, 60.0006),
+      new Coordinate(10.0008, 60.0006),
+      new Coordinate(10.0008, 60),
+      new Coordinate(10, 60),
+    };
+    var area = buildRectangularPlatformArea(graph, corners);
+
+    // 30 m south of the bottom edge - far beyond any plausible surveying discrepancy.
+    var farLat = 60.0 - SphericalDistanceLibrary.metersToDegrees(30);
+    var farStop = testModel.stop("far-stop").withCoordinate(farLat, 10.0004).build();
+
+    var platform = new Platform(
+      I18NString.of("platform"),
+      area.getGeometry().getInteriorPoint(),
+      Set.of(farStop.getId().getId())
+    );
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(area, platform);
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(farStop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var farStopVertex = new VertexFactory(graph).transitStop(ofStop(farStop));
+
+    transitRepository.index();
+    graph.index();
+
+    var issueStore = new DefaultDataImportIssueStore();
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT,
+      issueStore
+    );
+
+    assertFalse(farStopVertex.getOutgoing().isEmpty(), "the far stop should still be linked");
+    var boardingLocation = linkedBoardingLocation(farStopVertex);
+
+    // Not drawn onto the platform, and the 30 m is walked rather than swallowed.
+    assertVertexAtStop(boardingLocation, farStop);
+    var connector = onlyConnectorEdge(boardingLocation);
+    assertEquals(
+      30,
+      connector.getDistanceMeters(),
+      1,
+      "the edge to the access point should carry the real walking distance"
+    );
+
+    // And the access point is still properly linked into the platform.
+    assertTrue(
+      areaEdgesOf(connector.getToVertex()).size() >= 4,
+      "the access point should see at least all 4 platform corners, but saw " +
+        areaEdgesOf(connector.getToVertex()).size()
+    );
+
+    assertThat(issueTypes(issueStore)).contains("StopFarFromBoardingLocation");
+  }
+
+  /**
+   * {@link BoardingLocationCoordinateSource#TRANSIT} applies to the node path too: the stop is placed
+   * at its own coordinate and walks to the tagged OSM node, rather than taking the node's coordinate
+   * as its own. The node itself is not moved - it keeps its coordinate and its street links.
+   */
+  @Test
+  void testTransitCoordinateWalksFromTheStopToTheNode() {
+    var graph = new Graph();
+    var factory = new VertexFactory(graph);
+
+    // A tagged OSM node, and a stop matching it whose own coordinate is 20 m away.
+    var nodeCoordinate = new WgsCoordinate(53.55, 10.0);
+    var stopCoordinate = SphericalDistanceLibrary.moveMeters(nodeCoordinate, 20, 0);
+    var stop = testModel
+      .stop("node-stop")
+      .withCoordinate(stopCoordinate.latitude(), stopCoordinate.longitude())
+      .build();
+
+    // A street the node can be linked into.
+    var a = StreetModelForTest.intersectionVertex("A", 53.5498, 9.9995);
+    var b = StreetModelForTest.intersectionVertex("B", 53.5498, 10.0005);
+    graph.addVertex(a);
+    graph.addVertex(b);
+    StreetModelForTest.streetEdge(a, b, StreetTraversalPermission.PEDESTRIAN);
+    StreetModelForTest.streetEdge(b, a, StreetTraversalPermission.PEDESTRIAN);
+
+    var boardingLocation = factory.osmBoardingLocation(
+      nodeCoordinate.asJtsCoordinate(),
+      "osm-node",
+      Set.of(stop.getId().getId()),
+      I18NString.of("boarding location node")
+    );
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = factory.transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      new DefaultOsmInfoGraphBuildRepository(),
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    // The stop is placed at its own coordinate, not the node's.
+    var stopPoint = linkedBoardingLocation(stopVertex);
+    assertNotSame(boardingLocation, stopPoint);
+    assertVertexAtStop(stopPoint, stop);
+
+    // The OSM node is untouched: same coordinate, still linked into the street network.
+    assertEquals(
+      nodeCoordinate.asJtsCoordinate(),
+      boardingLocation.getCoordinate(),
+      "the OSM node must not be moved"
+    );
+    assertTrue(boardingLocation.isConnectedToStreetNetwork());
+
+    // The 20 m between them is walked, in both directions.
+    assertEquals(
+      Set.<Vertex>of(boardingLocation),
+      attachmentPointsOf(stopPoint),
+      "the stop point should walk to the OSM node"
+    );
+    var connector = onlyConnectorEdge(stopPoint);
+    assertEquals(20, connector.getDistanceMeters(), 0.5);
+    assertTrue(
+      getEdge(boardingLocation, stopPoint).isPresent(),
+      "the node should walk back to the stop point"
+    );
+  }
+
+  /**
+   * A platform mapped as a way that turns out not to be linkable - here because no edge of it is
+   * walkable - must report failure, so the search falls through to the area path instead of leaving
+   * the stop unlinked.
+   */
+  @Test
+  void testUnlinkableWayPlatformFallsBackToAreaPlatform() {
+    var graph = new Graph();
+
+    // The platform is also mapped as an area, 4 corners as (lon, lat).
+    Coordinate[] corners = {
+      new Coordinate(10, 60.0006),
+      new Coordinate(10.0008, 60.0006),
+      new Coordinate(10.0008, 60),
+      new Coordinate(10, 60),
+    };
+    var area = buildRectangularPlatformArea(graph, corners);
+
+    var stop = testModel.stop("both-ways-stop").withCoordinate(60.0003, 10.0004).build();
+
+    // ... and as a nearby way no pedestrian can use, so linking to it yields no vertex at all.
+    var p = StreetModelForTest.intersectionVertex("P", 60.0009, 10.0002);
+    var q = StreetModelForTest.intersectionVertex("Q", 60.0009, 10.0006);
+    graph.addVertex(p);
+    graph.addVertex(q);
+    var carOnlyPlatformWay = StreetModelForTest.streetEdge(p, q, StreetTraversalPermission.CAR);
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var references = Set.of(stop.getId().getId());
+    osmInfoRepository.addPlatform(
+      carOnlyPlatformWay,
+      new Platform(I18NString.of("platform way"), carOnlyPlatformWay.getGeometry(), references)
+    );
+    osmInfoRepository.addPlatform(
+      area,
+      new Platform(
+        I18NString.of("platform area"),
+        area.getGeometry().getInteriorPoint(),
+        references
+      )
+    );
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    assertFalse(
+      stopVertex.getOutgoing().isEmpty(),
+      "the stop should fall back to the area platform, not be left unlinked by the way path"
+    );
+    var boardingLocation = linkedBoardingLocation(stopVertex);
+    assertTrue(
+      areaEdgesOf(boardingLocation).size() >= 4,
+      "the stop should be linked into the platform area, but saw " +
+        areaEdgesOf(boardingLocation).size() +
+        " visibility edges"
+    );
+  }
+
+  /**
+   * The edge to an access point runs across the platform, so it must carry the platform's
+   * permission, safety factors and wheelchair accessibility, as {@link VertexLinker}'s own
+   * visibility edges in that area do. The builder's defaults would, for instance, claim a
+   * wheelchair-accessible walk across a platform mapped as not accessible.
+   */
+  @Test
+  void testAccessPointConnectorCarriesPlatformProperties() {
+    var graph = new Graph();
+
+    Coordinate[] corners = {
+      new Coordinate(10, 60.0006),
+      new Coordinate(10.0008, 60.0006),
+      new Coordinate(10.0008, 60),
+      new Coordinate(10, 60),
+    };
+    var area = buildRectangularPlatformArea(
+      graph,
+      corners,
+      Area.of()
+        .withName(I18NString.of("platform"))
+        .withGeometry(polygonOf(corners))
+        .withPermission(StreetTraversalPermission.PEDESTRIAN)
+        .withWalkSafety(2.5f)
+        .withBicycleSafety(3.5f)
+        .withWheelchairAccessible(false)
+        .build()
+    );
+
+    // Just outside the platform, so an access point and a connector edge are created.
+    var outsideLat = 60.0 - SphericalDistanceLibrary.metersToDegrees(0.05);
+    var stop = testModel.stop("outside-stop").withCoordinate(outsideLat, 10.0004).build();
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(
+      area,
+      new Platform(
+        I18NString.of("platform"),
+        area.getGeometry().getInteriorPoint(),
+        Set.of(stop.getId().getId())
+      )
+    );
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    assertFalse(stopVertex.getOutgoing().isEmpty(), "the stop should be linked");
+    var connector = onlyConnectorEdge(linkedBoardingLocation(stopVertex));
+
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, connector.getPermission());
+    assertFalse(
+      connector.isWheelchairAccessible(),
+      "the connector must not claim to be wheelchair accessible across a platform that is not"
+    );
+    assertEquals(2.5f, connector.getWalkSafetyFactor());
+    assertEquals(3.5f, connector.getBicycleSafetyFactor());
+  }
+
+  /**
+   * Regression test for an access point landing far along the platform instead of next to the stop.
+   * On a long narrow platform the line from an outside stop to the platform's interior point is so
+   * oblique that it first crosses the boundary tens of metres away, so aiming at the interior point
+   * put the access point - and with it the walk onto the platform - there. The access point must sit
+   * at the foot of the perpendicular instead.
+   */
+  @Test
+  void testAccessPointOnLongPlatformSitsNextToTheStop() {
+    var graph = new Graph();
+
+    // A 200 m x 8 m platform running east-west, as a real station platform is shaped.
+    var southWest = new WgsCoordinate(60, 10);
+    var southEast = SphericalDistanceLibrary.moveMeters(southWest, 0, 200);
+    var northWest = SphericalDistanceLibrary.moveMeters(southWest, 8, 0);
+    var northEast = SphericalDistanceLibrary.moveMeters(southWest, 8, 200);
+    var area = buildRectangularPlatformArea(graph, new Coordinate[] {
+      southWest.asJtsCoordinate(),
+      southEast.asJtsCoordinate(),
+      northEast.asJtsCoordinate(),
+      northWest.asJtsCoordinate(),
+    });
+
+    // 2 m south of the platform, 10 m from its west end - so the line to the platform's centre runs
+    // at roughly 3 degrees to the long edge and crosses it about 33 m to the east.
+    var stopCoordinate = SphericalDistanceLibrary.moveMeters(southWest, -2, 10);
+    var stop = testModel
+      .stop("beside-long-platform")
+      .withCoordinate(stopCoordinate.latitude(), stopCoordinate.longitude())
+      .build();
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(
+      area,
+      new Platform(
+        I18NString.of("platform"),
+        area.getGeometry().getInteriorPoint(),
+        Set.of(stop.getId().getId())
+      )
+    );
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    assertFalse(stopVertex.getOutgoing().isEmpty(), "the stop should be linked");
+    var boardingLocation = linkedBoardingLocation(stopVertex);
+    assertVertexAtStop(boardingLocation, stop);
+
+    // The walk onto the platform is the 2 m it actually is, plus the margin that puts the access
+    // point inside the boundary - not the ~33 m to where an oblique line would have crossed it.
+    var connector = onlyConnectorEdge(boardingLocation);
+    assertEquals(
+      2.2,
+      connector.getDistanceMeters(),
+      0.3,
+      "the access point should sit next to the stop, but the walk onto the platform was " +
+        connector.getDistanceMeters() +
+        " m"
+    );
+  }
+
+  /**
+   * On a platform way, a {@code TRANSIT} stop keeps its own coordinate and walks to the point where
+   * it meets the way. Attaching it straight to that projection instead would make the offset onto
+   * the platform free, the stop-to-boarding-location link having no length.
+   */
+  @Test
+  void testTransitCoordinateOffPlatformWayWalksOntoIt() {
+    var graph = new Graph();
+
+    var west = new WgsCoordinate(53.55, 10.0);
+    var east = SphericalDistanceLibrary.moveMeters(west, 0, 300);
+    var x = StreetModelForTest.intersectionVertex("X", west.latitude(), west.longitude());
+    var y = StreetModelForTest.intersectionVertex("Y", east.latitude(), east.longitude());
+    graph.addVertex(x);
+    graph.addVertex(y);
+    var platformEdgeXy = StreetModelForTest.streetEdge(x, y, StreetTraversalPermission.PEDESTRIAN);
+    var platformEdgeYx = StreetModelForTest.streetEdge(y, x, StreetTraversalPermission.PEDESTRIAN);
+
+    // 12 m off the platform line, halfway along it.
+    var stopCoordinate = SphericalDistanceLibrary.moveMeters(west, 12, 150);
+    var stop = testModel
+      .stop("off-the-way")
+      .withCoordinate(stopCoordinate.latitude(), stopCoordinate.longitude())
+      .build();
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var platform = new Platform(
+      I18NString.of("platform"),
+      platformEdgeXy.getGeometry(),
+      Set.of(stop.getId().getId())
+    );
+    osmInfoRepository.addPlatform(platformEdgeXy, platform);
+    osmInfoRepository.addPlatform(platformEdgeYx, platform);
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    var issueStore = new DefaultDataImportIssueStore();
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT,
+      issueStore
+    );
+
+    assertFalse(stopVertex.getOutgoing().isEmpty(), "the stop should be linked");
+    var boardingLocation = linkedBoardingLocation(stopVertex);
+    assertVertexAtStop(boardingLocation, stop);
+
+    // One connector per traversal direction of the way, each carrying the real 12 m.
+    var connectors = boardingLocation
+      .getOutgoing()
+      .stream()
+      .filter(StreetEdge.class::isInstance)
+      .map(StreetEdge.class::cast)
+      .toList();
+    assertEquals(2, connectors.size(), "one connector per traversal direction of the platform way");
+    for (var connector : connectors) {
+      assertEquals(
+        12,
+        connector.getDistanceMeters(),
+        0.5,
+        "the offset onto the platform is walked"
+      );
+      assertEquals(StreetTraversalPermission.PEDESTRIAN, connector.getPermission());
+    }
+
+    // 12 m is beyond what a surveying discrepancy explains, so it is reported.
+    assertThat(issueTypes(issueStore)).contains("StopFarFromBoardingLocation");
+  }
+
+  /**
+   * A stop matching a tagged OSM node far from its own coordinate is a data error - either the node
+   * or the feed coordinate is misplaced - so it is reported even though the stop is still linked.
+   */
+  @Test
+  void testFarAwayNodeBoardingLocationIsReported() {
+    var graph = new Graph();
+    var factory = new VertexFactory(graph);
+
+    var nodeCoordinate = new WgsCoordinate(53.55, 10.0);
+    var stopCoordinate = SphericalDistanceLibrary.moveMeters(nodeCoordinate, 60, 0);
+    var stop = testModel
+      .stop("far-from-node")
+      .withCoordinate(stopCoordinate.latitude(), stopCoordinate.longitude())
+      .build();
+
+    var a = StreetModelForTest.intersectionVertex("A", 53.5498, 9.9995);
+    var b = StreetModelForTest.intersectionVertex("B", 53.5498, 10.0005);
+    graph.addVertex(a);
+    graph.addVertex(b);
+    StreetModelForTest.streetEdge(a, b, StreetTraversalPermission.PEDESTRIAN);
+    StreetModelForTest.streetEdge(b, a, StreetTraversalPermission.PEDESTRIAN);
+
+    factory.osmBoardingLocation(
+      nodeCoordinate.asJtsCoordinate(),
+      "osm-node",
+      Set.of(stop.getId().getId()),
+      I18NString.of("boarding location node")
+    );
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = factory.transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    var issueStore = new DefaultDataImportIssueStore();
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      new DefaultOsmInfoGraphBuildRepository(),
+      BoardingLocationCoordinateSource.TRANSIT,
+      issueStore
+    );
+
+    assertFalse(stopVertex.getOutgoing().isEmpty(), "the stop should still be linked");
+    assertThat(issueTypes(issueStore)).contains("StopFarFromBoardingLocation");
+  }
+
+  private static List<String> issueTypes(DataImportIssueStore issueStore) {
+    return issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
+  }
+
+  /**
+   * The single street edge from a boarding location to the access point standing in for it inside
+   * the platform polygon.
+   */
+  private static StreetEdge onlyConnectorEdge(OsmBoardingLocationVertex boardingLocation) {
+    var connectors = boardingLocation
+      .getOutgoing()
+      .stream()
+      .filter(StreetEdge.class::isInstance)
+      .map(StreetEdge.class::cast)
+      .toList();
+    assertEquals(
+      1,
+      connectors.size(),
+      "expected exactly one edge from the boarding location to its access point"
+    );
+    return connectors.getFirst();
+  }
+
+  private static List<Edge> areaEdgesOf(Vertex vertex) {
+    return vertex.getOutgoing().stream().filter(AreaEdge.class::isInstance).toList();
+  }
+
+  private static Polygon polygonOf(Coordinate[] corners) {
+    var ring = new Coordinate[corners.length + 1];
+    System.arraycopy(corners, 0, ring, 0, corners.length);
+    ring[corners.length] = corners[0];
+    return GeometryUtils.getGeometryFactory().createPolygon(ring);
+  }
+
+  private static Area buildRectangularPlatformArea(Graph graph, Coordinate[] corners) {
+    return buildRectangularPlatformArea(
+      graph,
+      corners,
+      Area.of()
+        .withName(I18NString.of("platform"))
+        .withWalkSafety(1.0f)
+        .withBicycleSafety(1.0f)
+        .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+        .withGeometry(polygonOf(corners))
+        .build()
+    );
+  }
+
+  private static Area buildRectangularPlatformArea(Graph graph, Coordinate[] corners, Area area) {
+    var polygon = polygonOf(corners);
+
+    var visibilityVertices = new IntersectionVertex[corners.length];
+    for (int i = 0; i < corners.length; i++) {
+      visibilityVertices[i] = StreetModelForTest.intersectionVertex(corners[i]);
+      graph.addVertex(visibilityVertices[i]);
+    }
+
+    var areaGroup = AreaGroup.of(polygon)
+      .withVisibilityVertices(Set.of(visibilityVertices))
+      .addArea(area)
+      .build();
+
+    for (int i = 0; i < visibilityVertices.length; i++) {
+      var from = visibilityVertices[i];
+      var to = visibilityVertices[(i + 1) % visibilityVertices.length];
+      buildAreaBoundaryEdge(from, to, areaGroup, false);
+      buildAreaBoundaryEdge(to, from, areaGroup, true);
+    }
+    return area;
+  }
+
+  private static void buildAreaBoundaryEdge(
+    IntersectionVertex from,
+    IntersectionVertex to,
+    AreaGroup areaGroup,
+    boolean back
+  ) {
+    var geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
+      from.getCoordinate(),
+      to.getCoordinate(),
+    });
+    new AreaEdgeBuilder()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(geometry)
+      .withName(I18NString.of("platform boundary"))
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withBack(back)
+      .withArea(areaGroup)
+      .buildAndConnect();
+  }
+
+  /**
+   * With {@link BoardingLocationCoordinateSource#TRANSIT}, linking a stop to a linear platform way
+   * splits the platform edge at the projected stop coordinate. The platform association is keyed by
+   * edge reference and is not carried over to the split halves by the splitter, so the module must
+   * re-register them; otherwise a later stop on the same platform can no longer match it. This test
+   * asserts that after linking, the edges incident to the split vertex are registered with the
+   * platform in the repository.
+   */
+  @Test
+  void testSplitEdgesAreReRegisteredWithPlatform() {
+    var graph = new Graph();
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmModule = OsmModuleTestFactory.of(
+      new DefaultOsmProvider(
+        ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
+        false
+      )
+    )
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
+      .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
+      .build();
+    osmModule.buildGraph();
+    graph.index();
+
+    var factory = new VertexFactory(graph);
+
+    var platform9 = testModel
+      .stop("9100MRGT9")
+      .withName(I18NString.of("Moorgate (Platform 9)"))
+      .withCoordinate(51.51922107872304, -0.08767468698832413)
+      .withPlatformCode("9")
+      .build();
+
+    var platformVertex9 = factory.transitStop(ofStop(platform9));
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(platform9)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    transitRepository.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    assertFalse(platformVertex9.getOutgoing().isEmpty(), "the stop should be linked");
+
+    // In TRANSIT mode the stop keeps its own coordinate and walks to the platform, so the split
+    // vertices are one hop further out, past the boarding location.
+    var attachmentPoints = attachmentPointsOf(linkedBoardingLocation(platformVertex9));
+
+    // Guard: this test is only meaningful if linking actually split a platform edge (otherwise
+    // there are no new edge halves to re-register).
+    assertTrue(
+      attachmentPoints.stream().anyMatch(SplitterVertex.class::isInstance),
+      "expected linking to split a platform edge"
+    );
+
+    // The freshly created split-edge halves must be re-registered with the platform, so a later
+    // stop on the same platform could still find it.
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+    var platformHalves = attachmentPoints
+      .stream()
+      .flatMap(splitVertex ->
+        Stream.concat(splitVertex.getIncoming().stream(), splitVertex.getOutgoing().stream())
+      )
+      .filter(StreetEdge.class::isInstance)
+      // The connector the stop walks in over is not part of the platform and must not be tagged.
+      .filter(
+        e ->
+          !(
+            e.getFromVertex() instanceof OsmBoardingLocationVertex ||
+            e.getToVertex() instanceof OsmBoardingLocationVertex
+          )
+      )
+      .toList();
+
+    assertFalse(platformHalves.isEmpty(), "expected the stop to be linked to a split vertex");
+    assertTrue(
+      platformHalves.stream().allMatch(e -> osmService.findPlatform(e).isPresent()),
+      "the split halves of the platform way should be re-registered with the platform"
+    );
+  }
+
+  /**
+   * Regression guard for {@code reRegisterSplitEdgesWithPlatform} in the default
+   * {@link BoardingLocationCoordinateSource#OSM} mode. Two stops reference the same linear platform
+   * way. Linking the first stop splits the platform edge and removes the original edge from the
+   * graph, unless the split halves are re-registered with the platform, the second stop can no
+   * longer find the platform via {@code connectVertexToWay} and would be left unlinked (or linked
+   * elsewhere). This asserts that both stops end up linked to the platform.
+   */
+  @Test
+  void testSecondStopOnSameLinearPlatformIsLinkedInOsmMode() {
+    var graph = new Graph();
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmModule = OsmModuleTestFactory.of(
+      new DefaultOsmProvider(
+        ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
+          "two-stops-linear-platform.osm.pbf"
+        ),
+        false
+      )
+    )
+      .withGraph(graph)
+      .withOsmInfoGraphBuildRepository(osmInfoRepository)
+      .builder()
+      .withBoardingAreaRefTags(Set.of("ref"))
+      .build();
+    osmModule.buildGraph();
+    graph.index();
+
+    var factory = new VertexFactory(graph);
+
+    // Two stops that both reference the single linear platform way (ref=STOP_A;STOP_B), at distinct
+    // coordinates along it so each projects to a different, interior point (a genuine split).
+    var stopA = testModel.stop("STOP_A").withCoordinate(48.5928, 8.86288).build();
+    var stopB = testModel.stop("STOP_B").withCoordinate(48.5928, 8.86312).build();
+
+    var stopVertexA = factory.transitStop(ofStop(stopA));
+    var stopVertexB = factory.transitStop(ofStop(stopB));
+
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(stopA, stopB))
+      .build();
+    var transitRepository = new TransitRepository(siteRepo);
+    transitRepository.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
+
+    // Both stops must be linked. Without re-registering the split halves, the second stop cannot
+    // find the platform (its edges were replaced by the first stop's split) and stays unlinked.
+    assertFalse(
+      stopVertexA.getOutgoing().isEmpty(),
+      "the first stop on the linear platform should be linked"
+    );
+    assertFalse(
+      stopVertexB.getOutgoing().isEmpty(),
+      "the second stop on the same linear platform should also be linked"
+    );
+
+    // On a linear platform the stop links to the split vertex on the platform edge (not to the
+    // centroid vertex directly). The split vertices must still be registered with the platform.
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+    for (var stopVertex : List.of(stopVertexA, stopVertexB)) {
+      var incidentPlatformEdges = stopVertex
+        .getOutgoing()
+        .stream()
+        .map(Edge::getToVertex)
+        .flatMap(v -> Stream.concat(v.getIncoming().stream(), v.getOutgoing().stream()))
+        .filter(StreetEdge.class::isInstance)
+        .toList();
+      assertTrue(
+        incidentPlatformEdges.stream().anyMatch(e -> osmService.findPlatform(e).isPresent()),
+        "the vertex the stop is linked to should sit on a platform-registered edge"
+      );
+    }
+  }
+
+  /**
+   * Regression guard for {@code reRegisterSplitEdgesWithPlatform}: when linking snaps the boarding
+   * location to an <em>existing</em> endpoint of the platform edge instead of splitting it, no
+   * {@link SplitterVertex} is produced and the method must return early. In particular it must not
+   * re-register the endpoint's <em>other</em> incident edges with the platform — otherwise an
+   * unrelated street edge that merely happens to share the endpoint would be wrongly tagged as part
+   * of the platform, letting a later stop "match" a platform it is not on.
+   * <p>
+   * The scenario is built synthetically: a linear platform way (A—B) shares endpoint A with an
+   * unrelated street (A—C). The stop sits exactly on A, so linking snaps to A (within the
+   * end-tolerance) rather than splitting the platform edge.
+   */
+  @Test
+  void testSnapToEndpointDoesNotReRegisterUnrelatedEdges() {
+    var graph = new Graph();
+
+    // A is the shared endpoint: the platform way (A—B) and an unrelated street (A—C) both touch it.
+    var a = StreetModelForTest.intersectionVertex("A", 48.59, 8.86);
+    var b = StreetModelForTest.intersectionVertex("B", 48.59, 8.8613);
+    var c = StreetModelForTest.intersectionVertex("C", 48.5893, 8.86);
+    graph.addVertex(a);
+    graph.addVertex(b);
+    graph.addVertex(c);
+
+    var platformEdgeAb = StreetModelForTest.streetEdge(a, b, StreetTraversalPermission.PEDESTRIAN);
+    var platformEdgeBa = StreetModelForTest.streetEdge(b, a, StreetTraversalPermission.PEDESTRIAN);
+    // Unrelated edges sharing endpoint A - these must never be tagged with the platform.
+    var unrelatedEdgeAc = StreetModelForTest.streetEdge(a, c, StreetTraversalPermission.PEDESTRIAN);
+    var unrelatedEdgeCa = StreetModelForTest.streetEdge(c, a, StreetTraversalPermission.PEDESTRIAN);
+
+    // A stop placed exactly on endpoint A, matching the platform via its id.
+    var stop = testModel.stop("stop-on-endpoint").withCoordinate(48.59, 8.86).build();
+    var platform = new Platform(
+      I18NString.of("platform"),
+      platformEdgeAb.getGeometry(),
+      Set.of(stop.getId().getId())
+    );
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(platformEdgeAb, platform);
+    osmInfoRepository.addPlatform(platformEdgeBa, platform);
+
+    var siteRepo = testModel.siteRepositoryBuilder().withRegularStops(List.of(stop)).build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var stopVertex = new VertexFactory(graph).transitStop(ofStop(stop));
+
+    transitRepository.index();
+    graph.index();
+
+    // The coordinate source does not matter for this guard, but TRANSIT places the boarding
+    // location exactly on the stop (endpoint A), which is what makes linking snap rather than split.
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    // The stop is linked to the shared endpoint A itself, not to a freshly created split vertex.
+    assertTrue(!stopVertex.getOutgoing().isEmpty(), "the stop should be linked");
+    var linkedVertex = stopVertex.getOutgoing().iterator().next().getToVertex();
+    assertTrue(
+      !(linkedVertex instanceof SplitterVertex),
+      "linking should have snapped to the existing endpoint, not split the platform edge"
+    );
+
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+
+    // The platform edges are still registered (untouched by the early return).
+    assertTrue(osmService.findPlatform(platformEdgeAb).isPresent());
+    assertTrue(osmService.findPlatform(platformEdgeBa).isPresent());
+
+    // The unrelated edges sharing endpoint A must NOT have been tagged with the platform.
+    assertTrue(
+      osmService.findPlatform(unrelatedEdgeAc).isEmpty(),
+      "an unrelated edge sharing the snapped endpoint must not be re-registered with the platform"
+    );
+    assertTrue(
+      osmService.findPlatform(unrelatedEdgeCa).isEmpty(),
+      "an unrelated edge sharing the snapped endpoint must not be re-registered with the platform"
+    );
+  }
+
+  /**
+   * Regression test for a "duplicate way" false positive in {@code connectVertexToWay}: with
+   * {@link BoardingLocationCoordinateSource#TRANSIT}, each stop on a platform way gets its own
+   * coordinate (rather than sharing one centroid), so linking one stop can split the platform edge
+   * right next to where a nearby stop will later project onto it. {@link VertexLinker}'s
+   * duplicate-way heuristic (meant to catch genuinely parallel edges, e.g. dual carriageways) can
+   * then treat the two resulting split halves as "duplicates" and link the second stop to both,
+   * producing a spurious fork instead of a single attachment point.
+   * <p>
+   * It must still be linked to <em>both</em> vertices at the point it does sit next to: the forward
+   * and back edge are split separately into two co-located, mutually unconnected vertices, one per
+   * traversal direction, and a stop linked to only one is reachable from one end only.
+   */
+  @Test
+  void testCloseStopsOnLinearPlatformDoNotFanOutToDuplicateVertices() {
+    var graph = new Graph();
+
+    // A platform way running east-west, long enough that its midpoint is far from either endpoint
+    // (so linking there never snaps to an endpoint instead of splitting).
+    var origin = new WgsCoordinate(53.55, 10.0);
+    var end = SphericalDistanceLibrary.moveMeters(origin, 0, 300);
+    var midpoint = SphericalDistanceLibrary.moveMeters(origin, 0, 150);
+
+    var x = StreetModelForTest.intersectionVertex("X", origin.latitude(), origin.longitude());
+    var y = StreetModelForTest.intersectionVertex("Y", end.latitude(), end.longitude());
+    graph.addVertex(x);
+    graph.addVertex(y);
+
+    var platformEdgeXy = StreetModelForTest.streetEdge(x, y, StreetTraversalPermission.PEDESTRIAN);
+    var platformEdgeYx = StreetModelForTest.streetEdge(y, x, StreetTraversalPermission.PEDESTRIAN);
+
+    // Stop A projects onto the platform line at its midpoint - linking it splits the edge there.
+    var stopACoordinate = SphericalDistanceLibrary.moveMeters(midpoint, 1, 0);
+    var stopA = testModel
+      .stop("close-stop-a")
+      .withCoordinate(stopACoordinate.latitude(), stopACoordinate.longitude())
+      .build();
+    // Stop B is on the same platform, close to stop A: 30 m off the platform line but only 15 cm
+    // further along it than stop A. That 15 cm gap is enough to force a genuine new split for stop B
+    // (VertexLinker's 10 cm "snap to existing endpoint" tolerance doesn't apply), but small enough
+    // relative to the 30 m offset that stop B's distance to the *other* split half - the one it does
+    // not actually sit next to - comes within VertexLinker's ~1 mm "duplicate way" tolerance of its
+    // distance to the correct one, which is what triggers the false positive being guarded against.
+    var stopBCoordinate = SphericalDistanceLibrary.moveMeters(midpoint, 30, 0.15);
+    var stopB = testModel
+      .stop("close-stop-b")
+      .withCoordinate(stopBCoordinate.latitude(), stopBCoordinate.longitude())
+      .build();
+
+    var platform = new Platform(
+      I18NString.of("platform"),
+      platformEdgeXy.getGeometry(),
+      Set.of(stopA.getId().getId(), stopB.getId().getId())
+    );
+
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    osmInfoRepository.addPlatform(platformEdgeXy, platform);
+    osmInfoRepository.addPlatform(platformEdgeYx, platform);
+
+    var siteRepo = testModel
+      .siteRepositoryBuilder()
+      .withRegularStops(List.of(stopA, stopB))
+      .build();
+    var transitRepository = new TransitRepository(siteRepo);
+    var factory = new VertexFactory(graph);
+    var stopVertexA = factory.transitStop(ofStop(stopA));
+    var stopVertexB = factory.transitStop(ofStop(stopB));
+
+    transitRepository.index();
+    graph.index();
+
+    buildBoardingLocations(
+      graph,
+      transitRepository,
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.TRANSIT
+    );
+
+    for (var stopVertex : List.of(stopVertexA, stopVertexB)) {
+      // One vertex per traversal direction, and nothing from the spurious second attachment point.
+      var attachments = attachmentPointsOf(linkedBoardingLocation(stopVertex));
+      assertEquals(
+        2,
+        attachments.size(),
+        stopVertex.getId() +
+          " should link to the two co-located vertices of its own attachment point on the " +
+          "platform, not fan out to a second one"
+      );
+
+      // The two are one point, not a fork in the platform geometry.
+      assertEquals(
+        1,
+        attachments.stream().map(Vertex::getCoordinate).distinct().count(),
+        stopVertex.getId() + " should be linked to vertices at a single point on the platform"
+      );
+
+      // Together they reach either end of the platform; linked to one only, the stop is a stub.
+      var nextHops = attachments
+        .stream()
+        .flatMap(v -> v.getOutgoing().stream())
+        .filter(StreetEdge.class::isInstance)
+        .map(Edge::getToVertex)
+        .filter(v -> !(v instanceof OsmBoardingLocationVertex))
+        .collect(Collectors.toSet());
+      assertEquals(
+        2,
+        nextHops.size(),
+        stopVertex.getId() + " should be able to walk towards either end of the platform"
+      );
+    }
+
+    // The two stops must not have collapsed onto the same attachment point either.
+    var attachmentA = attachmentPointsOf(linkedBoardingLocation(stopVertexA))
+      .iterator()
+      .next()
+      .getCoordinate();
+    var attachmentB = attachmentPointsOf(linkedBoardingLocation(stopVertexB))
+      .iterator()
+      .next()
+      .getCoordinate();
+    assertNotEquals(
+      attachmentA,
+      attachmentB,
+      "each stop should attach at its own point on the platform"
+    );
+  }
+
+  /** The platform vertices a boarding location walks to, over its connector edges. */
+  private static Set<Vertex> attachmentPointsOf(OsmBoardingLocationVertex boardingLocation) {
+    return boardingLocation
+      .getOutgoing()
+      .stream()
+      .filter(StreetEdge.class::isInstance)
+      .map(Edge::getToVertex)
+      .collect(Collectors.toSet());
+  }
+
+  private static OsmBoardingLocationVertex linkedBoardingLocation(TransitStopVertex stopVertex) {
+    return (OsmBoardingLocationVertex) stopVertex.getOutgoing().iterator().next().getToVertex();
+  }
+
+  private static void assertVertexAtStop(OsmBoardingLocationVertex vertex, RegularStop stop) {
+    var distance = SphericalDistanceLibrary.distance(
+      vertex.getCoordinate(),
+      stop.getCoordinate().asJtsCoordinate()
+    );
+    assertTrue(
+      distance < 0.5,
+      "Boarding location vertex should be at the stop coordinate, but was " + distance + " m away"
+    );
+  }
+
   /**
    * Assert that a split vertex is near to the given centroid, and it is possible to travel between
    * the original vertices through the split vertex in a straight line
    */
   private static void assertSplitVertex(
     Vertex splitVertex,
-    OsmBoardingLocationVertex centroid,
+    Coordinate centroid,
     Vertex begin,
     Vertex end
   ) {
-    var distance = SphericalDistanceLibrary.distance(
-      splitVertex.getCoordinate(),
-      centroid.getCoordinate()
-    );
+    var distance = SphericalDistanceLibrary.distance(splitVertex.getCoordinate(), centroid);
     // FIXME: I am not sure why the calculated centroid from the original OSM geometry is about 2 m
     // from the platform
     assertTrue(distance < 4, "The split vertex is more than 4 m apart from the centroid");
@@ -508,6 +1759,23 @@ class OsmBoardingLocationsModuleTest {
   ) {
     Stream.of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing()).forEach(edges ->
       assertEquals(expected, edges.stream().map(Edge::getClass).collect(Collectors.toSet()))
+    );
+  }
+
+  /**
+   * Assert that the boarding location vertex is wired into the area via visibility edges
+   * ({@link AreaEdge}), so it can both be entered and left through the area. A vertex that was
+   * placed but not connected (e.g. because its coordinate fell outside the polygon and no
+   * visibility edge could be added) would fail this.
+   */
+  private static void assertReachableThroughArea(OsmBoardingLocationVertex boardingLocation) {
+    assertTrue(
+      boardingLocation.getIncoming().stream().anyMatch(AreaEdge.class::isInstance),
+      "boarding location should be reachable through the area (incoming AreaEdge)"
+    );
+    assertTrue(
+      boardingLocation.getOutgoing().stream().anyMatch(AreaEdge.class::isInstance),
+      "boarding location should be able to leave through the area (outgoing AreaEdge)"
     );
   }
 

@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
@@ -32,6 +33,7 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.ext.vehiclerentalgeofencing.config.VehicleRentalGeofencingConfig;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
+import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -124,6 +126,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final boolean embedRouterConfig;
 
   public final boolean areaVisibility;
+
+  public final BoardingLocationCoordinateSource boardingLocationCoordinateSource;
 
   public final boolean platformEntriesLinking;
 
@@ -225,6 +229,36 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
+    this.boardingLocationCoordinateSource = root
+      .of("boardingLocationCoordinateSource")
+      .since(V2_11)
+      .summary(
+        "Which coordinate is used to place a boarding location vertex when linking a stop to an " +
+          "OSM platform."
+      )
+      .description(
+        """
+        When a transit stop is linked to an OSM `boarding_location` platform (a way or an area), OTP
+        creates an `OsmBoardingLocationVertex` and connects it to the street graph. This parameter
+        selects where that vertex is placed.
+
+        The default `OSM` places it at the platform centroid, so several stops sharing a platform
+        collapse onto the same vertex — which can result in unrealistically long on-platform
+        transfers. Setting this to `TRANSIT` places each vertex at the stop coordinate from the
+        transit data instead, so stops on the same platform stay distinct and are connected by a
+        short path.
+
+        A `TRANSIT` coordinate is never moved. A stop falling outside the OSM platform polygon stays
+        put and is connected to the platform by a single edge of the real distance, so the walk is
+        always of the right length. A gap too large to be a surveying discrepancy is reported as a
+        data import issue.
+
+        This applies to platforms mapped as ways or areas and to stops matching a tagged OSM node
+        alike, so the coordinate a stop is placed at always comes from the transit data. The OSM
+        features themselves are never moved.
+        """
+      )
+      .asEnum(BoardingLocationCoordinateSource.OSM);
     this.cache = GraphBuildCacheConfig.fromConfig(root);
     this.configVersion = root
       .of("configVersion")

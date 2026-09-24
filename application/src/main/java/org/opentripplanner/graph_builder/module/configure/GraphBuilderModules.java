@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
@@ -46,6 +47,7 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -118,6 +120,28 @@ public class GraphBuilderModules {
       .withCacheManager(cacheManager)
       .withIssueStore(issueStore)
       .build();
+  }
+
+  @Provides
+  @Singleton
+  static OsmBoardingLocationsModule provideOsmBoardingLocationsModule(
+    Graph graph,
+    BuildConfig config,
+    TransitRepository transitRepository,
+    VertexLinker linker,
+    OsmInfoGraphBuildService osmInfoGraphBuildService,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    DataImportIssueStore issueStore
+  ) {
+    return new OsmBoardingLocationsModule(
+      graph,
+      transitRepository,
+      linker,
+      osmInfoGraphBuildService,
+      osmInfoGraphBuildRepository,
+      config.boardingLocationCoordinateSource,
+      issueStore
+    );
   }
 
   @Provides
