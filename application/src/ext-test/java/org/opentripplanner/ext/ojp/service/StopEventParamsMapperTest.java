@@ -193,7 +193,7 @@ class StopEventParamsMapperTest {
       new PlaceContextStructure().withDepArrTime(new XmlDateTime(ZDT))
     );
     var params = MAPPER.extractStopEventParams(ser);
-    assertThat(params.optionalFeatures()).isEmpty();
+    assertThat(params.optionalFeatures()).containsExactly(REALTIME_DATA);
   }
 
   @Test

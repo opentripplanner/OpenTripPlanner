@@ -71,7 +71,7 @@ public class StopEventParamsMapper {
       .orElse(DEFAULT_RADIUS_METERS);
     var optional = Optional.ofNullable(ser.getParams())
       .map(StopEventParamsMapper::mapOptionalFeatures)
-      .orElse(Set.of());
+      .orElse(Set.of(REALTIME_DATA));
     return new CallAtStopService.StopEventRequestParams(
       time,
       arrivalDeparture,
