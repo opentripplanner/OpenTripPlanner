@@ -518,6 +518,8 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
+                    <!-- Only the application module builds a container image, see application/pom.xml -->
+                    <skip>true</skip>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
                         <entrypoint>/docker-entrypoint.sh</entrypoint>
