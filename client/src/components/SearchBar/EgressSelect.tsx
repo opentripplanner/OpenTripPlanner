@@ -18,30 +18,17 @@ export function EgressSelect({
         size="sm"
         className="input-medium"
         onChange={(e) => {
-          if (e.target.value !== 'not_selected') {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes: {
-                ...tripQueryVariables.modes,
-                egressMode: e.target.value as StreetMode,
-              },
-            });
-          } else {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes:
-                tripQueryVariables.modes?.directMode || tripQueryVariables.modes?.transportModes
-                  ? {
-                      ...tripQueryVariables.modes,
-                      egressMode: undefined,
-                    }
-                  : undefined,
-            });
-          }
+          setTripQueryVariables({
+            ...tripQueryVariables,
+            modes: {
+              ...tripQueryVariables.modes,
+              egressMode: e.target.value === 'none' ? undefined : (e.target.value as StreetMode),
+            },
+          });
         }}
-        value={tripQueryVariables.modes?.egressMode || 'not_selected'}
+        value={tripQueryVariables.modes?.egressMode || 'none'}
       >
-        <option value="not_selected">Not selected</option>
+        <option value="none">None</option>
         {Object.values(StreetMode).map((mode) => (
           <option key={mode} value={mode}>
             {mode}
