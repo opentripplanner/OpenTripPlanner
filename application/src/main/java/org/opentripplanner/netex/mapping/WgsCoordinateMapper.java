@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import javax.annotation.Nullable;
 import net.opengis.gml._3.DirectPositionType;
+import org.opentripplanner.netex.config.EPIP;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
@@ -21,9 +22,10 @@ class WgsCoordinateMapper {
     final DirectPositionType pos = loc.getPos();
     if (loc.getLongitude() != null && loc.getLatitude() != null) {
       return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
-    }
-    // seen in Italian NeTEx data
-    else if (pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3)) {
+    } else if (pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3)) {
+      // seen in Italian NeTEx data - it's not clear if EPIP-compliant or not, adding the annotation
+      // just in case
+      @EPIP
       var coordinates = pos.getValue();
       return new WgsCoordinate(coordinates.getFirst(), coordinates.get(1));
     } else {

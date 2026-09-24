@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
+import org.opentripplanner.netex.config.EPIP;
+import org.opentripplanner.netex.config.NordicProfile;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -123,12 +125,15 @@ class ServiceLinkMapper {
     int stopIndex
   ) {
     if (serviceLink.getLineString() != null) {
-      return mapLineString(
+      @EPIP
+      LineString ret = mapLineString(
         serviceLink.getLineString(),
         stopPattern,
         stopIndex,
         serviceLink.getId()
       );
+
+      return ret;
     }
     if (
       serviceLink.getProjections() == null ||
@@ -143,6 +148,7 @@ class ServiceLinkMapper {
     for (JAXBElement<?> projectionElement : serviceLink
       .getProjections()
       .getProjectionRefOrProjection()) {
+      @NordicProfile
       Object projectionObj = projectionElement.getValue();
       if (projectionObj instanceof LinkSequenceProjection_VersionStructure linkSequenceProjection) {
         LineStringType lineString = linkSequenceProjection.getLineString();
