@@ -127,7 +127,7 @@ public class GtfsContextBuilder {
       issueStore,
       deduplicator(),
       calendarService().getServiceIds(),
-      new GeometryProcessor(transitBuilder, 150, issueStore)
+      new GeometryProcessor(transitBuilder, 150, 0.0, issueStore)
     ).run();
   }
 
