@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
@@ -32,7 +33,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void removesTripsThatEndedBeforeTheThreshold() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var ended = withDummyVertices(tripEndingAt(NOON));
     var ongoing = withDummyVertices(tripEndingAt(NOON.plusHours(2)));
     repository.upsertCarpoolTrip(ended);
@@ -46,7 +49,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void keepsTripsEndingExactlyAtTheThreshold() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = withDummyVertices(tripEndingAt(NOON));
     repository.upsertCarpoolTrip(trip);
 
@@ -58,7 +63,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void returnsStoredTripById() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = withDummyVertices(tripEndingAt(NOON));
     repository.upsertCarpoolTrip(trip);
 
@@ -68,7 +75,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void appliesTheExpiryDurationToTheCutOff() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var ended = withDummyVertices(tripEndingAt(NOON));
     var ongoing = withDummyVertices(tripEndingAt(NOON.plusHours(2)));
     repository.upsertCarpoolTrip(ended);
@@ -83,7 +92,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void throttlesSweepsToOncePerInterval() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     repository.upsertCarpoolTrip(withDummyVertices(tripEndingAt(NOON)));
 
     // First sweep runs and purges the expired trip.
@@ -110,7 +121,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void keepsCachedRoutingAcrossASameGeometryUpsert() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = tripWithCoordinates("kept", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
     repository.upsertCarpoolTrip(withDummyVertices(trip));
     repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
@@ -126,7 +139,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void cachesAnUnroutableBaseline() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = tripWithCoordinates("unroutable", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
     repository.upsertCarpoolTrip(withDummyVertices(trip));
     repository.cacheBaselineRouting(trip, null);
@@ -139,7 +154,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void ignoresCachedRoutingWhenQueriedWithDifferentGeometry() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = tripWithCoordinates("guard", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
     repository.upsertCarpoolTrip(withDummyVertices(trip));
     repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
@@ -153,7 +170,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void dropsCachedRoutingWhenTripRemoved() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = tripWithCoordinates("removed", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
     repository.upsertCarpoolTrip(withDummyVertices(trip));
     repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
@@ -165,7 +184,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void dropsCachedRoutingWhenTripExpires() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = tripWithCoordinates("expired", OSLO_CENTER, OSLO_EAST, NOON);
     repository.upsertCarpoolTrip(withDummyVertices(trip));
     repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
@@ -177,7 +198,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void returnsADefensiveCopyOfCachedDurations() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = tripWithCoordinates("copy", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
     repository.upsertCarpoolTrip(withDummyVertices(trip));
     var stored = new Duration[] { Duration.ofMinutes(12) };

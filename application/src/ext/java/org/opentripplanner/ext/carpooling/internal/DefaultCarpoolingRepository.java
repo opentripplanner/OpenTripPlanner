@@ -25,7 +25,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
    * repository on every poll is wasteful; sweeping at most this often keeps the work negligible
    * regardless of how short — or how many — the polling feeds are.
    */
-  private static final Duration SWEEP_INTERVAL = Duration.ofHours(1);
+  private final Duration sweepInterval;
 
   private final Map<FeedScopedId, CarpoolTripWithVertices> trips = new ConcurrentHashMap<>();
 
@@ -39,6 +39,14 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
   /** The earliest instant at which the next expiry sweep is allowed to run. */
   private final AtomicReference<Instant> nextSweep = new AtomicReference<>(Instant.MIN);
+
+  /**
+   * @param sweepInterval see
+   *        {@link org.opentripplanner.ext.carpooling.CarpoolingParameters#expirySweepInterval()}
+   */
+  public DefaultCarpoolingRepository(Duration sweepInterval) {
+    this.sweepInterval = sweepInterval;
+  }
 
   @Override
   public Collection<CarpoolTripWithVertices> getCarpoolTrips() {
@@ -83,7 +91,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   @Override
   public int removeExpiredTrips(Instant now, Duration expiry) {
     Instant allowedAt = nextSweep.get();
-    if (now.isBefore(allowedAt) || !nextSweep.compareAndSet(allowedAt, now.plus(SWEEP_INTERVAL))) {
+    if (now.isBefore(allowedAt) || !nextSweep.compareAndSet(allowedAt, now.plus(sweepInterval))) {
       return 0;
     }
 

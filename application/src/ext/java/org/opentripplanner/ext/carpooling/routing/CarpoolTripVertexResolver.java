@@ -27,7 +27,7 @@ public class CarpoolTripVertexResolver {
    * does not already sit on a car-reachable vertex; bounded by search travel time (~400 m). A point
    * beyond this is unresolvable.
    */
-  private static final Duration MAX_SNAP_SEARCH = Duration.ofMinutes(5);
+  private final Duration maxRoutePointSnap;
 
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
@@ -37,7 +37,8 @@ public class CarpoolTripVertexResolver {
    */
   public CarpoolTripVertexResolver(
     VertexCreationService vertexCreationService,
-    CarReachableVertexSnapper carReachableVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper,
+    Duration maxRoutePointSnap
   ) {
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
@@ -47,6 +48,7 @@ public class CarpoolTripVertexResolver {
       carReachableVertexSnapper,
       "carReachableVertexSnapper"
     );
+    this.maxRoutePointSnap = Objects.requireNonNull(maxRoutePointSnap, "maxRoutePointSnap");
   }
 
   /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */
@@ -78,7 +80,7 @@ public class CarpoolTripVertexResolver {
     var snap = carReachableVertexSnapper.snapToPermanentVertex(
       StreetSearchRequest.DEFAULT,
       linked,
-      MAX_SNAP_SEARCH
+      maxRoutePointSnap
     );
     return snap == null ? null : snap.vertex();
   }
