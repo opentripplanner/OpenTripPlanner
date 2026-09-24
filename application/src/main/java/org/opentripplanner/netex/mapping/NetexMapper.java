@@ -148,7 +148,7 @@ public class NetexMapper {
     calendarServiceBuilder.addServiceCalendarsTo(transitBuilder.tripCalendars());
 
     // TODO - This code should be removed. Instead this should be handled by the OTP core model
-    //        builders. See https://github.com/opentripplanner/OpenTripPlanner/issues/7972The
+    //        builders. See https://github.com/opentripplanner/OpenTripPlanner/issues/7972
     // Add the empty service id, as it can be used for routes expected to be added from realtime
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
     var emptyServiceId = calendarServiceBuilder.emptyServiceId();

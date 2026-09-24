@@ -48,7 +48,8 @@ public interface TransitDataImport {
   Collection<Pathway> getAllPathways();
 
   /**
-   * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
+   * @return all service ids used in the imported data, equivalent to
+   * {@code getTripCalendars().listServiceIds()}.
    */
   Collection<FeedScopedId> getAllServiceIds();
 
