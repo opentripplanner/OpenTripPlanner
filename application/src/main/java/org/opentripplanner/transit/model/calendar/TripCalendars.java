@@ -244,7 +244,12 @@ public class TripCalendars implements Serializable {
     Map<FeedScopedId, List<LocalDate>> newServiceDatesByServiceId = new HashMap<>(
       serviceDatesByServiceId
     );
-    Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = deepCopy(serviceIdsByDate);
+    // Share this instance's per-date sets by reference - copy-on-write below - instead of deep
+    // copying the whole reverse index up front. Only dates the merged-in feed actually touches
+    // ever get copied, so cost scales with that feed's own footprint, not the accumulated total.
+    Map<LocalDate, Set<FeedScopedId>> newServiceIdsByDate = new HashMap<>(serviceIdsByDate);
+    Set<LocalDate> copiedDates = new HashSet<>();
+
     for (FeedScopedId serviceId : other.listServiceIds()) {
       List<LocalDate> dates = other.serviceDatesByServiceId
         .get(serviceId)
@@ -252,8 +257,19 @@ public class TripCalendars implements Serializable {
         .sorted()
         .toList();
       newServiceDatesByServiceId.put(serviceId, dates);
+
       for (LocalDate date : dates) {
-        newServiceIdsByDate.computeIfAbsent(date, _ -> new HashSet<>()).add(serviceId);
+        Set<FeedScopedId> ids = newServiceIdsByDate.get(date);
+        if (ids == null) {
+          ids = new HashSet<>();
+          newServiceIdsByDate.put(date, ids);
+        } else if (copiedDates.add(date)) {
+          // First time this merge() call touches this date - it's still this.serviceIdsByDate's
+          // own frozen (unmodifiable) set, so copy it before mutating.
+          ids = new HashSet<>(ids);
+          newServiceIdsByDate.put(date, ids);
+        }
+        ids.add(serviceId);
       }
     }
     return new TripCalendars(
@@ -390,14 +406,6 @@ public class TripCalendars implements Serializable {
       return false;
     }
     return !serviceDate.isBefore(startDate) && !serviceDate.isAfter(endDate);
-  }
-
-  private static Map<LocalDate, Set<FeedScopedId>> deepCopy(
-    Map<LocalDate, Set<FeedScopedId>> serviceIdsByDate
-  ) {
-    Map<LocalDate, Set<FeedScopedId>> copy = new HashMap<>();
-    serviceIdsByDate.forEach((date, serviceIds) -> copy.put(date, new HashSet<>(serviceIds)));
-    return copy;
   }
 
   private static Map<LocalDate, Set<FeedScopedId>> freezeServiceIds(

@@ -11,6 +11,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 
@@ -81,6 +82,26 @@ class TripCalendarsTest {
 
     assertThat(updated.getServiceCodes()).containsExactly(a, 0, b, 1, c, 2);
     assertThat(calendar.getServiceCodes()).containsExactly(a, 0);
+  }
+
+  @Test
+  void mergeDoesNotMutateTheOriginalInstance() {
+    // merge()'s copy-on-write optimization must never mutate a date's set of service ids in
+    // place when that set is shared with an earlier, still-referenced instance.
+    LocalDate sharedDate = LocalDate.of(2024, 1, 15);
+    var serviceA = id("A");
+    var serviceB = id("B");
+
+    var builderA = TripCalendars.of();
+    builderA.putServiceDatesForServiceId(serviceA, List.of(sharedDate));
+    TripCalendars original = TripCalendars.empty().merge(builderA.build());
+
+    var builderB = TripCalendars.of();
+    builderB.putServiceDatesForServiceId(serviceB, List.of(sharedDate));
+    TripCalendars merged = original.merge(builderB.build());
+
+    assertEquals(Set.of(serviceA), original.listServiceIdsOnServiceDate(sharedDate));
+    assertEquals(Set.of(serviceA, serviceB), merged.listServiceIdsOnServiceDate(sharedDate));
   }
 
   @Test
