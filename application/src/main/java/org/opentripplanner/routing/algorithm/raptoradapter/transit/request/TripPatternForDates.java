@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.Tri
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -42,18 +43,11 @@ public class TripPatternForDates
 
   private final boolean isFrequencyBased;
 
-  /**
-   * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
-   * by the stop position and then by trip index, so with stops 1 and 2, and trips A and B, the
-   * order is [1A, 1B, 2A, 2B]
-   */
-  private final int[] arrivalTimes;
+  /** The source trip-times for each globally sorted trip index. */
+  private final TripTimes[] tripTimesByIndex;
 
-  /**
-   * The arrival times in a nStops * numberOfTripSchedules sized array. The order is the same as in
-   * arrivalTimes.
-   */
-  private final int[] departureTimes;
+  /** The service-day offset for each globally sorted trip index. */
+  private final int[] offsetsByTrip;
 
   private final Accessibility[] wheelchairBoardings;
 
@@ -92,9 +86,8 @@ public class TripPatternForDates
 
     this.wheelchairBoardings = new Accessibility[numberOfTripSchedules];
 
-    final int nStops = tripPattern.numberOfStopsInPattern();
-    this.arrivalTimes = new int[nStops * numberOfTripSchedules];
-    this.departureTimes = new int[nStops * numberOfTripSchedules];
+    this.tripTimesByIndex = new TripTimes[numberOfTripSchedules];
+    this.offsetsByTrip = new int[numberOfTripSchedules];
 
     var tripIndex = createTripTimesForDaysIndex(tripPatternForDates, offsets);
 
@@ -103,11 +96,9 @@ public class TripPatternForDates
       int offset = this.offsets[day];
       var tt = tripPatternForDates[day].tripTimes().get(tripIndex.tripIndexForDay(i));
 
+      tripTimesByIndex[i] = tt;
+      offsetsByTrip[i] = offset;
       wheelchairBoardings[i] = tt.getWheelchairAccessibility();
-      for (int s = 0; s < nStops; s++) {
-        this.arrivalTimes[s * numberOfTripSchedules + i] = tt.getArrivalTime(s) + offset;
-        this.departureTimes[s * numberOfTripSchedules + i] = tt.getDepartureTime(s) + offset;
-      }
     }
   }
 
@@ -206,12 +197,16 @@ public class TripPatternForDates
 
   @Override
   public int arrivalTime(int stopPositionInPattern, int tripIndex) {
-    return arrivalTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
+    return (
+      tripTimesByIndex[tripIndex].getArrivalTime(stopPositionInPattern) + offsetsByTrip[tripIndex]
+    );
   }
 
   @Override
   public int departureTime(int stopPositionInPattern, int tripIndex) {
-    return departureTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
+    return (
+      tripTimesByIndex[tripIndex].getDepartureTime(stopPositionInPattern) + offsetsByTrip[tripIndex]
+    );
   }
 
   @Override
