@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
@@ -36,11 +37,16 @@ class SiriETCarpoolingUpdaterTest {
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updater;
   private CarpoolTripVertexResolver resolver;
-  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(FEED_ID);
+  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
+    FEED_ID,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @BeforeEach
   void setUp() {
-    repository = new DefaultCarpoolingRepository();
+    repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     resolver = mock(CarpoolTripVertexResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
       CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
@@ -58,7 +64,12 @@ class SiriETCarpoolingUpdaterTest {
       HttpHeaders.empty(),
       false
     );
-    updater = new SiriETCarpoolingUpdater(params, repository, resolver);
+    updater = new SiriETCarpoolingUpdater(
+      params,
+      repository,
+      resolver,
+      CarpoolingParameters.DEFAULT
+    );
   }
 
   @Test

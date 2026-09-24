@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -135,7 +136,8 @@ class CarpoolTripVertexResolverTest extends GraphRoutingTest {
   private static CarpoolTripVertexResolver resolverFor(TestOtpModel model) {
     return new CarpoolTripVertexResolver(
       new VertexCreationService(VertexLinkerTestFactory.of(model.graph())),
-      SNAPPER
+      SNAPPER,
+      CarpoolingParameters.DEFAULT.maxRoutePointSnap()
     );
   }
 }

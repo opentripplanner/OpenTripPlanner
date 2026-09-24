@@ -33,11 +33,15 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import uk.org.siri.siri21.EstimatedCall;
 
 public class CarpoolSiriMapperTest {
 
-  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper("EN");
+  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
+    "EN",
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @Test
   void mapSiriToCarpoolTrip_arrivalIsAfterDepartureTime_throwsIllegalArgumentException() {

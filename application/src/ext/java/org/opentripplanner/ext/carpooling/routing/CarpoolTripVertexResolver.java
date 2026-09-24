@@ -22,12 +22,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  */
 public class CarpoolTripVertexResolver {
 
-  /**
-   * Reach of the fallback search that relocates a route point onto the drivable network when it
-   * does not already sit on a car-reachable vertex; bounded by search travel time (~400 m). A point
-   * beyond this is unresolvable.
-   */
-  private static final Duration MAX_SNAP_SEARCH = Duration.ofMinutes(5);
+  private final Duration maxRoutePointSnap;
 
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
@@ -37,7 +32,8 @@ public class CarpoolTripVertexResolver {
    */
   public CarpoolTripVertexResolver(
     VertexCreationService vertexCreationService,
-    CarReachableVertexSnapper carReachableVertexSnapper
+    CarReachableVertexSnapper carReachableVertexSnapper,
+    Duration maxRoutePointSnap
   ) {
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
@@ -47,6 +43,7 @@ public class CarpoolTripVertexResolver {
       carReachableVertexSnapper,
       "carReachableVertexSnapper"
     );
+    this.maxRoutePointSnap = Objects.requireNonNull(maxRoutePointSnap, "maxRoutePointSnap");
   }
 
   /**
@@ -80,7 +77,7 @@ public class CarpoolTripVertexResolver {
     var snap = carReachableVertexSnapper.snapToPermanentVertex(
       StreetSearchRequest.DEFAULT,
       linked,
-      MAX_SNAP_SEARCH
+      maxRoutePointSnap
     );
     return snap == null ? null : snap.vertex();
   }

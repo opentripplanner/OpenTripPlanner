@@ -12,6 +12,7 @@ import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
@@ -92,6 +93,7 @@ class ConstructApplicationFactoryIntegrationTest {
     of(WorldEnvelopeRepository.class),
     of(WorldEnvelopeService.class),
     // Sandbox
+    of(CarpoolingParameters.class),
     of(CarpoolingRepository.class),
     of(CarpoolingService.class),
     of(CarpoolTripVertexResolver.class),
