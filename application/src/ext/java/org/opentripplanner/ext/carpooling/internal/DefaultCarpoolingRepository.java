@@ -18,17 +18,24 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultCarpoolingRepository.class);
 
-  /**
-   * Minimum time between expiry sweeps. Trips expire on a multi-day timescale, so scanning the
-   * repository on every poll is wasteful; sweeping at most this often keeps the work negligible
-   * regardless of how short — or how many — the polling feeds are.
-   */
-  private static final Duration SWEEP_INTERVAL = Duration.ofHours(1);
-
   private final Map<FeedScopedId, RoutableCarpoolTrip> trips = new ConcurrentHashMap<>();
 
   /** The earliest instant at which the next expiry sweep is allowed to run. */
   private final AtomicReference<Instant> nextSweep = new AtomicReference<>(Instant.MIN);
+
+  /**
+   * Minimum time between expiry sweeps; sweeping at most this often keeps the work negligible
+   * regardless of how short, or how many, the polling feeds are.
+   */
+  private final Duration sweepInterval;
+
+  /**
+   * @param sweepInterval see
+   *        {@link org.opentripplanner.ext.carpooling.CarpoolingParameters#expirySweepInterval()}
+   */
+  public DefaultCarpoolingRepository(Duration sweepInterval) {
+    this.sweepInterval = sweepInterval;
+  }
 
   @Override
   public Collection<RoutableCarpoolTrip> getCarpoolTrips() {
@@ -65,7 +72,7 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
   @Override
   public int removeExpiredTrips(Instant now, Duration expiry) {
     Instant allowedAt = nextSweep.get();
-    if (now.isBefore(allowedAt) || !nextSweep.compareAndSet(allowedAt, now.plus(SWEEP_INTERVAL))) {
+    if (now.isBefore(allowedAt) || !nextSweep.compareAndSet(allowedAt, now.plus(sweepInterval))) {
       return 0;
     }
 

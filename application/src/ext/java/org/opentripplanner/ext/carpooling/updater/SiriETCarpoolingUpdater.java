@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
@@ -46,23 +47,6 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETCarpoolingUpdater.class);
 
-  /**
-   * How long a carpool trip is kept after its latest end time before it is purged. The SIRI-ET
-   * source is not guaranteed to send an explicit cancellation once a journey has completed, so
-   * completed trips are removed once their latest end time is further in the past than this
-   * duration. This keeps instances that run for a long time from accumulating trips that can no
-   * longer be routed.
-   */
-  private static final Duration TRIP_EXPIRY = Duration.ofDays(2);
-
-  /**
-   * The most live carpool trips one feed may have. Each resolved trip costs about a hundred
-   * kilobytes of corridor and a tenth of a second of resolution, so this bounds both the heap and
-   * the time a restarted instance needs to catch up. New trips arriving while the feed is full are
-   * dropped (logged once per poll); updates and cancellations of its live trips are always applied.
-   */
-  public static final int DEFAULT_MAX_TRIPS = 10_000;
-
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
@@ -85,36 +69,45 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   private final Map<FeedScopedId, CarpoolTrip> liveTrips = new HashMap<>();
   private final CarpoolTripResolutionQueue resolutionQueue;
   private final int maxTrips;
+
+  /**
+   * How long a trip is kept after its latest end time, so instances that run for a long time do
+   * not accumulate trips that can no longer be routed.
+   */
+  private final Duration tripExpiry;
   private int rejectedThisPoll;
 
   @Nullable
   private final ExecutorService ownedExecutor;
 
+  /**
+   * @param parameters the limits: the most live trips this feed may have, how long a trip is kept
+   *        after it has ended, and the longest trip that is modelled
+   */
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
-    RoutableCarpoolTripResolver tripResolver
+    RoutableCarpoolTripResolver tripResolver,
+    CarpoolingParameters parameters
   ) {
-    this(config, repository, tripResolver, resolverThread(config.feedId()), DEFAULT_MAX_TRIPS);
+    this(config, repository, tripResolver, resolverThread(config.feedId()), parameters);
   }
 
   /**
    * @param resolutionExecutor runs the trip changes handed over by the polls, one at a time and in
    *        order; the production constructor uses one daemon thread, tests may run them inline
-   * @param maxTrips the most live trips this feed may have, see {@link #DEFAULT_MAX_TRIPS}
+   * @param parameters the limits, see the public constructor
    */
   SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
     RoutableCarpoolTripResolver tripResolver,
     Executor resolutionExecutor,
-    int maxTrips
+    CarpoolingParameters parameters
   ) {
     super(config);
-    if (maxTrips < 1) {
-      throw new IllegalArgumentException("maxTrips must be positive");
-    }
-    this.maxTrips = maxTrips;
+    this.maxTrips = parameters.maxTrips();
+    this.tripExpiry = parameters.tripExpiry();
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
     this.tripResolver = tripResolver;
@@ -128,7 +121,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    this.mapper = new CarpoolSiriMapper(config.feedId());
+    this.mapper = new CarpoolSiriMapper(config.feedId(), parameters.maxTripDuration());
   }
 
   private static ExecutorService resolverThread(String feedId) {
@@ -172,14 +165,14 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Purges trips that ended more than {@link #TRIP_EXPIRY} ago, so completed trips are removed even
+   * Purges trips that ended more than the trip expiry ago, so completed trips are removed even
    * when the source stops updating them. Cached resolution failures and the live trips are swept on
    * the same expiry.
    */
   private void removeExpiredTrips() {
     var now = Instant.now();
-    repository.removeExpiredTrips(now, TRIP_EXPIRY);
-    var cutoff = now.minus(TRIP_EXPIRY);
+    repository.removeExpiredTrips(now, tripExpiry);
+    var cutoff = now.minus(tripExpiry);
     failedResolutions
       .values()
       .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));

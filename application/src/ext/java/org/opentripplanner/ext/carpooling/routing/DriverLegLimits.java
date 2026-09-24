@@ -13,12 +13,17 @@ public final class DriverLegLimits {
    * after the leg. A detour on a leg delays every later stop, each of which allows at most its own
    * budget, so no feasible detour adds more than the smallest of them. A zero or negative budget
    * leaves the leg its own duration: only stops on the route itself remain.
-   * Capped at {@link CarpoolTrip#MAX_TRIP_DURATION} so that a trip with inconsistent geometry
-   * cannot demand a multi-hour street search.
+   * Capped at {@code maxTripDuration} so that a trip with inconsistent geometry cannot demand a
+   * multi-hour street search.
    *
    * @param legDurations the travel duration of each leg, from the same routing model the searches use
+   * @param maxTripDuration the longest trip that is modelled
    */
-  public static Duration[] legLimits(CarpoolTrip trip, Duration[] legDurations) {
+  public static Duration[] legLimits(
+    CarpoolTrip trip,
+    Duration[] legDurations,
+    Duration maxTripDuration
+  ) {
     var stops = trip.stops();
     int n = stops.size();
     if (legDurations.length != n - 1) {
@@ -31,7 +36,7 @@ public final class DriverLegLimits {
     for (int k = n - 2; k >= 0; k--) {
       detourAllowance = min(detourAllowance, stops.get(k + 1).getDeviationBudget());
       var allowance = detourAllowance.isNegative() ? Duration.ZERO : detourAllowance;
-      legLimits[k] = min(legDurations[k].plus(allowance), CarpoolTrip.MAX_TRIP_DURATION);
+      legLimits[k] = min(legDurations[k].plus(allowance), maxTripDuration);
     }
     return legLimits;
   }

@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
@@ -102,7 +103,11 @@ class CorridorBuilderTest extends GraphRoutingTest {
         }
       }
     );
-    stopIndex = new CarpoolStopIndex(model.graph(), CarReachableVertexSnapper.createDefault());
+    stopIndex = new CarpoolStopIndex(
+      model.graph(),
+      new CarReachableVertexSnapper(CarpoolingParameters.DEFAULT.minCarEscapeMeters()),
+      CarpoolingParameters.DEFAULT.maxStopWalk()
+    );
   }
 
   @Test
@@ -147,7 +152,12 @@ class CorridorBuilderTest extends GraphRoutingTest {
 
   @Test
   void aTripWhoseLegCannotBeRoutedHasNoCorridor() {
-    var unroutable = new CorridorBuilder(stopIndex, (from, to) -> null, 40.0);
+    var unroutable = new CorridorBuilder(
+      stopIndex,
+      (from, to) -> null,
+      40.0,
+      CarpoolingParameters.DEFAULT.maxTripDuration()
+    );
     assertNull(unroutable.build(trip(Duration.ofMinutes(10)), List.of(a, d)));
   }
 
@@ -181,7 +191,11 @@ class CorridorBuilderTest extends GraphRoutingTest {
   }
 
   private CarpoolCorridor corridor(Duration budget) {
-    var builder = new CorridorBuilder(stopIndex, StreetLimitationParametersService.DEFAULT);
+    var builder = new CorridorBuilder(
+      stopIndex,
+      StreetLimitationParametersService.DEFAULT,
+      CarpoolingParameters.DEFAULT.maxTripDuration()
+    );
     return builder.build(trip(budget), List.of(a, d));
   }
 

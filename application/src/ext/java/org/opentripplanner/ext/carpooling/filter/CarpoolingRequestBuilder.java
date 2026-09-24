@@ -10,16 +10,9 @@ import org.opentripplanner.street.model.StreetMode;
 /**
  * Builder for {@link CarpoolingRequest}. Can be constructed directly for testing, or from a
  * {@link org.opentripplanner.routing.api.request.RouteRequest} via
- * {@link CarpoolingRequest#of(org.opentripplanner.routing.api.request.RouteRequest)}.
+ * {@link CarpoolingRequest#of(org.opentripplanner.routing.api.request.RouteRequest, Duration)}.
  */
 public class CarpoolingRequestBuilder {
-
-  /**
-   * Fallback search window applied when the {@link RouteRequest} carries none. Five hours wide
-   * because carpool repositories are sparse: rejecting trips outside a narrow window would lose
-   * matches the passenger would accept.
-   */
-  static final Duration DEFAULT_SEARCH_WINDOW = Duration.ofMinutes(300);
 
   private AccessEgressType accessOrEgress;
   private boolean isArriveByRequest;
@@ -33,7 +26,8 @@ public class CarpoolingRequestBuilder {
 
   public CarpoolingRequestBuilder() {}
 
-  CarpoolingRequestBuilder(RouteRequest request) {
+  /** @param defaultSearchWindow the search window when the request carries none */
+  CarpoolingRequestBuilder(RouteRequest request, Duration defaultSearchWindow) {
     this.isArriveByRequest = request.arriveBy();
     this.passengerPickup = new WgsCoordinate(request.from().getCoordinate());
     this.passengerDropoff = new WgsCoordinate(request.to().getCoordinate());
@@ -45,7 +39,7 @@ public class CarpoolingRequestBuilder {
       .maxDuration()
       .valueOf(StreetMode.WALK);
     this.searchWindow =
-      request.searchWindow() == null ? DEFAULT_SEARCH_WINDOW : request.searchWindow();
+      request.searchWindow() == null ? defaultSearchWindow : request.searchWindow();
     this.stopDuration = request.preferences().car().pickupTime();
     this.maxJourneyDuration = request.preferences().system().maxJourneyDuration();
   }

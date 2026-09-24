@@ -34,26 +34,31 @@ public class CorridorBuilder {
   private final CarpoolStopIndex stopIndex;
   private final CarpoolRouter baselineRouter;
   private final double maxCarSpeedMetersPerSecond;
+  private final Duration maxTripDuration;
 
   public CorridorBuilder(
     CarpoolStopIndex stopIndex,
-    StreetLimitationParametersService streetLimitationParametersService
+    StreetLimitationParametersService streetLimitationParametersService,
+    Duration maxTripDuration
   ) {
     this(
       stopIndex,
-      new CarpoolStreetRouter(streetLimitationParametersService),
-      streetLimitationParametersService.maxCarSpeed()
+      new CarpoolStreetRouter(streetLimitationParametersService, maxTripDuration),
+      streetLimitationParametersService.maxCarSpeed(),
+      maxTripDuration
     );
   }
 
   /**
    * @param baselineRouter goal-directed router for the baseline legs
    * @param maxCarSpeedMetersPerSecond the graph's maximum car speed, which bounds the ellipses
+   * @param maxTripDuration the longest trip that is modelled, which caps every leg's limit
    */
   public CorridorBuilder(
     CarpoolStopIndex stopIndex,
     CarpoolRouter baselineRouter,
-    double maxCarSpeedMetersPerSecond
+    double maxCarSpeedMetersPerSecond,
+    Duration maxTripDuration
   ) {
     this.stopIndex = Objects.requireNonNull(stopIndex, "stopIndex");
     this.baselineRouter = Objects.requireNonNull(baselineRouter, "baselineRouter");
@@ -61,6 +66,7 @@ public class CorridorBuilder {
       throw new IllegalArgumentException("maxCarSpeed must be positive");
     }
     this.maxCarSpeedMetersPerSecond = maxCarSpeedMetersPerSecond;
+    this.maxTripDuration = Objects.requireNonNull(maxTripDuration, "maxTripDuration");
   }
 
   /**
@@ -80,7 +86,7 @@ public class CorridorBuilder {
       }
       legDurations[leg] = segment.duration();
     }
-    var legLimits = DriverLegLimits.legLimits(trip, legDurations);
+    var legLimits = DriverLegLimits.legLimits(trip, legDurations, maxTripDuration);
 
     var stops = new ArrayList<CarpoolCorridor.CorridorStop>();
     for (int leg = 0; leg < legs; leg++) {

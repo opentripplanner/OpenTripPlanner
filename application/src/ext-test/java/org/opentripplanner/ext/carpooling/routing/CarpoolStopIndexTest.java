@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -76,7 +77,11 @@ class CarpoolStopIndexTest extends GraphRoutingTest {
         }
       }
     );
-    index = new CarpoolStopIndex(model.graph(), CarReachableVertexSnapper.createDefault());
+    index = new CarpoolStopIndex(
+      model.graph(),
+      new CarReachableVertexSnapper(CarpoolingParameters.DEFAULT.minCarEscapeMeters()),
+      CarpoolingParameters.DEFAULT.maxStopWalk()
+    );
   }
 
   @Test

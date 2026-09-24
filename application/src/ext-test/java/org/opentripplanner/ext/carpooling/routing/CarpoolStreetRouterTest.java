@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -17,7 +18,8 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   private static final WgsCoordinate ORIGIN = new WgsCoordinate(59.9139, 10.7522);
 
   private static final CarpoolStreetRouter ROUTER = new CarpoolStreetRouter(
-    StreetLimitationParametersService.DEFAULT
+    StreetLimitationParametersService.DEFAULT,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
   );
 
   private IntersectionVertex vertexA;

@@ -23,6 +23,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
@@ -36,11 +37,16 @@ class SiriETCarpoolingUpdaterTest {
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updater;
   private RoutableCarpoolTripResolver resolver;
-  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(FEED_ID);
+  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
+    FEED_ID,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @BeforeEach
   void setUp() {
-    repository = new DefaultCarpoolingRepository();
+    repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
       RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
@@ -63,7 +69,7 @@ class SiriETCarpoolingUpdaterTest {
       repository,
       resolver,
       Runnable::run,
-      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+      CarpoolingParameters.DEFAULT
     );
   }
 

@@ -10,9 +10,10 @@ import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripW
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 
 class DriverLegLimitsTest {
+
+  private static final Duration MAX_TRIP_DURATION = Duration.ofHours(3);
 
   @Test
   void eachLegMayGrowByTheSmallestBudgetOfTheStopsAfterIt() {
@@ -24,7 +25,11 @@ class DriverLegLimitsTest {
       minutes(40)
     );
 
-    var limits = DriverLegLimits.legLimits(trip, new Duration[] { minutes(60), minutes(100) });
+    var limits = DriverLegLimits.legLimits(
+      trip,
+      new Duration[] { minutes(60), minutes(100) },
+      MAX_TRIP_DURATION
+    );
 
     assertArrayEquals(new Duration[] { minutes(65), minutes(140) }, limits);
   }
@@ -33,9 +38,13 @@ class DriverLegLimitsTest {
   void aLimitNeverExceedsTheMaximumTripDuration() {
     var trip = createTripWithStops(OSLO_CENTER, List.of(), OSLO_NORTH, minutes(10));
 
-    var limits = DriverLegLimits.legLimits(trip, new Duration[] { Duration.ofHours(4) });
+    var limits = DriverLegLimits.legLimits(
+      trip,
+      new Duration[] { Duration.ofHours(4) },
+      MAX_TRIP_DURATION
+    );
 
-    assertArrayEquals(new Duration[] { CarpoolTrip.MAX_TRIP_DURATION }, limits);
+    assertArrayEquals(new Duration[] { MAX_TRIP_DURATION }, limits);
   }
 
   private static Duration minutes(long minutes) {

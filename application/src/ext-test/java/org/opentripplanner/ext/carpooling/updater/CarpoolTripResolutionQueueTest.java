@@ -13,6 +13,7 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.carpooling.CarpoolTestCoordinates;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
@@ -21,7 +22,9 @@ import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 
 class CarpoolTripResolutionQueueTest {
 
-  private final DefaultCarpoolingRepository repository = new DefaultCarpoolingRepository();
+  private final DefaultCarpoolingRepository repository = new DefaultCarpoolingRepository(
+    CarpoolingParameters.DEFAULT.expirySweepInterval()
+  );
   /** The background thread's work, run when a test calls {@link #runQueued()}. */
   private final Deque<Runnable> queued = new ArrayDeque<>();
   private final CarpoolTrip trip = newTrip();

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.filter.CarpoolingRequest;
@@ -121,6 +122,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    */
   private final CarReachableVertexSnapper carReachableVertexSnapper;
   private final CarpoolStopIndex stopIndex;
+  private final CarpoolingParameters parameters;
 
   /**
    * Creates a new carpooling service with the specified dependencies.
@@ -137,6 +139,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * @param carReachableVertexSnapper snaps passenger-side locations onto car-reachable vertices,
    *        must not be null
    * @param stopIndex the transit stops with their car-reachable snaps, must not be null
+   * @param parameters the routing limits and heuristics, must not be null
    * @throws NullPointerException if any parameter is null
    */
   public DefaultCarpoolingService(
@@ -144,7 +147,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
     StreetLimitationParametersService streetLimitationParametersService,
     VertexCreationService vertexCreationService,
     CarReachableVertexSnapper carReachableVertexSnapper,
-    CarpoolStopIndex stopIndex
+    CarpoolStopIndex stopIndex,
+    CarpoolingParameters parameters
   ) {
     this.repository = Objects.requireNonNull(repository, "repository");
     this.streetLimitationParametersService = Objects.requireNonNull(
@@ -163,6 +167,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       "carReachableVertexSnapper"
     );
     this.stopIndex = Objects.requireNonNull(stopIndex, "stopIndex");
+    this.parameters = Objects.requireNonNull(parameters, "parameters");
   }
 
   /**
@@ -174,7 +179,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       trips from the repository are filtered by time window and by whether their corridor can
    *       reach both the snapped pickup and the snapped dropoff, to quickly eliminate incompatible
    *       matches. Of the survivors, at most
-   *       {@link ClosestCandidateTrips#DEFAULT_MAX_CANDIDATE_TRIPS}, those passing closest to the
+   *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
    *       passenger, are evaluated.</li>
    *   <li><strong>Insertion evaluation:</strong> Insertion positions are evaluated with A* street
    *       routing to find the insertion that minimizes additional driver travel time while
@@ -196,7 +201,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     validateRequest(request);
 
-    var carpoolingRequest = CarpoolingRequest.of(request);
+    var carpoolingRequest = CarpoolingRequest.of(request, parameters.defaultSearchWindow());
 
     LOG.debug(
       "Finding carpool itineraries from {} to {} at {}",
@@ -214,7 +219,10 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
     var itineraries = List.<Itinerary>of();
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {
-      var router = new CarpoolStreetRouter(streetLimitationParametersService);
+      var router = new CarpoolStreetRouter(
+        streetLimitationParametersService,
+        parameters.maxTripDuration()
+      );
 
       var streetVertexUtils = new StreetVertexUtils(
         this.vertexCreationService,
@@ -270,7 +278,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var candidateTrips = ClosestCandidateTrips.closest(
         preFilteredTrips,
         List.of(carpoolingRequest.getPassengerPickup(), carpoolingRequest.getPassengerDropoff()),
-        ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+        parameters.maxCandidateTripsPerRequest()
       );
 
       if (candidateTrips.isEmpty()) {
@@ -327,7 +335,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <ol>
    *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time
    *       window and by whether their corridor can reach the passenger. Of the survivors, at most
-   *       {@link ClosestCandidateTrips#DEFAULT_MAX_CANDIDATE_TRIPS}, those passing closest to the
+   *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
    *       passenger, are evaluated.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping
    *       those the passenger can walk to or from within the walk budget.</li>
@@ -369,7 +377,11 @@ public class DefaultCarpoolingService implements CarpoolingService {
     }
 
     validateRequest(request);
-    var carpoolingRequest = CarpoolingRequest.of(request, accessOrEgress);
+    var carpoolingRequest = CarpoolingRequest.of(
+      request,
+      accessOrEgress,
+      parameters.defaultSearchWindow()
+    );
 
     var allTrips = repository.getCarpoolTrips();
     LOG.debug("Repository contains {} carpool trips", allTrips.size());
@@ -438,7 +450,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var candidateTrips = ClosestCandidateTrips.closest(
         preFilteredTrips,
         List.of(passengerCoordinates),
-        ClosestCandidateTrips.DEFAULT_MAX_CANDIDATE_TRIPS
+        parameters.maxCandidateTripsPerRequest()
       );
 
       if (candidateTrips.isEmpty()) {
@@ -461,7 +473,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       var corridorRouter = new CorridorRouter(
         passengerRouter,
         passengerVertex,
-        new CarpoolStreetRouter(streetLimitationParametersService)
+        new CarpoolStreetRouter(streetLimitationParametersService, parameters.maxTripDuration())
       );
 
       var stopDuration = request.preferences().car().pickupTime();

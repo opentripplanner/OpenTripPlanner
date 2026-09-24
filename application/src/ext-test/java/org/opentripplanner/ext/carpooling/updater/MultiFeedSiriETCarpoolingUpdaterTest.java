@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.CarpoolingParametersTestData;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
@@ -43,12 +45,20 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   private RoutableCarpoolTripResolver resolver;
   private SiriETCarpoolingUpdater updaterA;
   private SiriETCarpoolingUpdater updaterB;
-  private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(FEED_A);
-  private final CarpoolSiriMapper mapperB = new CarpoolSiriMapper(FEED_B);
+  private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(
+    FEED_A,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
+  private final CarpoolSiriMapper mapperB = new CarpoolSiriMapper(
+    FEED_B,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @BeforeEach
   void setUp() {
-    repository = new DefaultCarpoolingRepository();
+    repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
       RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
@@ -58,14 +68,14 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
       repository,
       resolver,
       Runnable::run,
-      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+      CarpoolingParameters.DEFAULT
     );
     updaterB = new SiriETCarpoolingUpdater(
       paramsFor(FEED_B),
       repository,
       resolver,
       Runnable::run,
-      SiriETCarpoolingUpdater.DEFAULT_MAX_TRIPS
+      CarpoolingParameters.DEFAULT
     );
   }
 
@@ -150,14 +160,14 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
       repository,
       resolver,
       Runnable::run,
-      1
+      CarpoolingParametersTestData.withMaxTrips(1)
     );
     var feedB = new SiriETCarpoolingUpdater(
       paramsFor(FEED_B),
       repository,
       resolver,
       Runnable::run,
-      1
+      CarpoolingParametersTestData.withMaxTrips(1)
     );
     var first = journey("first");
     var second = journey("second");

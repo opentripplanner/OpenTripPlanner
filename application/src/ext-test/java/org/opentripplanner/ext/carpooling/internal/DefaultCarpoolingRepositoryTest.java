@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 
 class DefaultCarpoolingRepositoryTest {
@@ -28,7 +29,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void removesTripsThatEndedBeforeTheThreshold() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var ended = withDummyVertices(tripEndingAt(NOON));
     var ongoing = withDummyVertices(tripEndingAt(NOON.plusHours(2)));
     repository.upsertCarpoolTrip(ended);
@@ -42,7 +45,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void keepsTripsEndingExactlyAtTheThreshold() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = withDummyVertices(tripEndingAt(NOON));
     repository.upsertCarpoolTrip(trip);
 
@@ -54,7 +59,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void returnsStoredTripById() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var trip = withDummyVertices(tripEndingAt(NOON));
     repository.upsertCarpoolTrip(trip);
 
@@ -64,7 +71,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void appliesTheExpiryDurationToTheCutOff() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     var ended = withDummyVertices(tripEndingAt(NOON));
     var ongoing = withDummyVertices(tripEndingAt(NOON.plusHours(2)));
     repository.upsertCarpoolTrip(ended);
@@ -79,7 +88,9 @@ class DefaultCarpoolingRepositoryTest {
 
   @Test
   void throttlesSweepsToOncePerInterval() {
-    var repository = new DefaultCarpoolingRepository();
+    var repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
     repository.upsertCarpoolTrip(withDummyVertices(tripEndingAt(NOON)));
 
     // First sweep runs and purges the expired trip.

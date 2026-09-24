@@ -64,12 +64,20 @@ public class CarpoolingRequest {
     );
   }
 
-  public static CarpoolingRequest of(RouteRequest request) {
-    return new CarpoolingRequestBuilder(request).build();
+  /** @param defaultSearchWindow the search window when the request carries none */
+  public static CarpoolingRequest of(RouteRequest request, Duration defaultSearchWindow) {
+    return new CarpoolingRequestBuilder(request, defaultSearchWindow).build();
   }
 
-  public static CarpoolingRequest of(RouteRequest request, AccessEgressType accessOrEgress) {
-    return new CarpoolingRequestBuilder(request).withAccessOrEgress(accessOrEgress).build();
+  /** @param defaultSearchWindow the search window when the request carries none */
+  public static CarpoolingRequest of(
+    RouteRequest request,
+    AccessEgressType accessOrEgress,
+    Duration defaultSearchWindow
+  ) {
+    return new CarpoolingRequestBuilder(request, defaultSearchWindow)
+      .withAccessOrEgress(accessOrEgress)
+      .build();
   }
 
   /**

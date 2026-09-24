@@ -12,6 +12,8 @@ import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.CarpoolingParametersTestData;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
@@ -23,8 +25,13 @@ class SiriETCarpoolingUpdaterLimitTest {
 
   private static final String FEED_ID = "EN";
 
-  private final DefaultCarpoolingRepository repository = new DefaultCarpoolingRepository();
-  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(FEED_ID);
+  private final DefaultCarpoolingRepository repository = new DefaultCarpoolingRepository(
+    CarpoolingParameters.DEFAULT.expirySweepInterval()
+  );
+  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
+    FEED_ID,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
   /** The resolution queue's work, run when a test calls {@link #runQueued()}. */
   private final Deque<Runnable> queued = new ArrayDeque<>();
 
@@ -117,7 +124,13 @@ class SiriETCarpoolingUpdaterLimitTest {
       HttpHeaders.empty(),
       false
     );
-    return new SiriETCarpoolingUpdater(params, repository, resolver, queued::add, maxTrips);
+    return new SiriETCarpoolingUpdater(
+      params,
+      repository,
+      resolver,
+      queued::add,
+      CarpoolingParametersTestData.withMaxTrips(maxTrips)
+    );
   }
 
   private void runQueued() {

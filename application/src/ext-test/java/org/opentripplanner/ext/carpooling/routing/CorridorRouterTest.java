@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -57,7 +58,10 @@ class CorridorRouterTest extends GraphRoutingTest {
     );
     passengerRouter = new CarpoolTreeStreetRouter();
     passengerRouter.addVertex(p, CarpoolTreeStreetRouter.Direction.BOTH, Duration.ofHours(1));
-    var goalDirected = new CarpoolStreetRouter(StreetLimitationParametersService.DEFAULT);
+    var goalDirected = new CarpoolStreetRouter(
+      StreetLimitationParametersService.DEFAULT,
+      CarpoolingParameters.DEFAULT.maxTripDuration()
+    );
     CarpoolRouter countingPathRouter = (from, to) -> {
       pathRouterCalls++;
       return goalDirected.route(from, to);

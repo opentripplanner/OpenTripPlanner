@@ -14,6 +14,7 @@ import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.UpdateManager;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.carpooling.configure.CarpoolingModule;
@@ -155,6 +156,8 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   RoutableCarpoolTripResolver routableCarpoolTripResolver();
+
+  CarpoolingParameters carpoolingParameters();
 
   @Nullable
   EmissionRepository emissionRepository();

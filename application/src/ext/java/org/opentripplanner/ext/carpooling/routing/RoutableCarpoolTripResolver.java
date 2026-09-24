@@ -24,16 +24,15 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  */
 public class RoutableCarpoolTripResolver {
 
-  /**
-   * Reach of the fallback search that relocates a route point onto the drivable network when it
-   * does not already sit on a car-reachable vertex; bounded by search travel time (~400 m). A point
-   * beyond this is unresolvable.
-   */
-  private static final Duration MAX_SNAP_SEARCH = Duration.ofMinutes(5);
-
   private final VertexCreationService vertexCreationService;
   private final CarReachableVertexSnapper carReachableVertexSnapper;
   private final CorridorBuilder corridorBuilder;
+
+  /**
+   * Reach of the fallback search that relocates a route point onto the drivable network when it
+   * does not already sit on a car-reachable vertex; a point beyond this is unresolvable.
+   */
+  private final Duration maxRoutePointSnap;
 
   /**
    * @throws NullPointerException if any parameter is null
@@ -41,7 +40,8 @@ public class RoutableCarpoolTripResolver {
   public RoutableCarpoolTripResolver(
     VertexCreationService vertexCreationService,
     CarReachableVertexSnapper carReachableVertexSnapper,
-    CorridorBuilder corridorBuilder
+    CorridorBuilder corridorBuilder,
+    Duration maxRoutePointSnap
   ) {
     this.vertexCreationService = Objects.requireNonNull(
       vertexCreationService,
@@ -52,6 +52,7 @@ public class RoutableCarpoolTripResolver {
       "carReachableVertexSnapper"
     );
     this.corridorBuilder = Objects.requireNonNull(corridorBuilder, "corridorBuilder");
+    this.maxRoutePointSnap = Objects.requireNonNull(maxRoutePointSnap, "maxRoutePointSnap");
   }
 
   /**
@@ -98,7 +99,7 @@ public class RoutableCarpoolTripResolver {
     var snap = carReachableVertexSnapper.snapToPermanentVertex(
       StreetSearchRequest.DEFAULT,
       linked,
-      MAX_SNAP_SEARCH
+      maxRoutePointSnap
     );
     return snap == null ? null : snap.vertex();
   }
