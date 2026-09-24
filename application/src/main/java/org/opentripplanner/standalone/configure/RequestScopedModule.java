@@ -19,6 +19,7 @@ import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.transaction.RepositoryRegistry;
 import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.framework.transaction.api.TransactionScope;
@@ -94,6 +95,19 @@ public class RequestScopedModule {
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
     return new DefaultTransitService(transitRepository, timetableSnapshot);
+  }
+
+  @Provides
+  @Nullable
+  @HttpRequestScoped
+  RealtimeResolver realTimeResolver(
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
+  ) {
+    return OTPFeature.RealtimeResolver.isOn()
+      ? new RealtimeResolver(refetchItineraryService, transitService, transitAlertService)
+      : null;
   }
 
   @Provides
@@ -190,7 +204,7 @@ public class RequestScopedModule {
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitRoutingConfig transitRoutingConfig,
-    RealtimeResolver realtimeResolver
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     return new DefaultRoutingService(
       transitService,

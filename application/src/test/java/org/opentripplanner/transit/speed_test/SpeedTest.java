@@ -188,8 +188,6 @@ public class SpeedTest {
       timetableHandle.repositorySnapshot(transactionScope)
     );
 
-    var transitAlertService = TestServerContext.createTransitAlertService();
-
     this.routingService = new DefaultRoutingService(
       this.transitService,
       graph,
@@ -199,7 +197,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
-      transitAlertService,
+      new DelegatingTransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),
       null,

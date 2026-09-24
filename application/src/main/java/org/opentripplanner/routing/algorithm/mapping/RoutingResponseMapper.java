@@ -30,7 +30,9 @@ public class RoutingResponseMapper {
     // Search is performed without realtime, but we still want to
     // include realtime information in the result
     if (
-      request.preferences().transit().ignoreRealtimeUpdates() && OTPFeature.RealtimeResolver.isOn()
+      request.preferences().transit().ignoreRealtimeUpdates() &&
+      OTPFeature.RealtimeResolver.isOn() &&
+      realtimeResolver != null
     ) {
       itineraries = realtimeResolver.addRealtimeInfo(itineraries, request);
     }

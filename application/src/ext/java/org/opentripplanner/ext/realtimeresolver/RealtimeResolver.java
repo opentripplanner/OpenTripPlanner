@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -23,7 +22,6 @@ public class RealtimeResolver {
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
 
-  @Inject
   public RealtimeResolver(
     RefetchItineraryService refetchItineraryService,
     TransitService transitService,

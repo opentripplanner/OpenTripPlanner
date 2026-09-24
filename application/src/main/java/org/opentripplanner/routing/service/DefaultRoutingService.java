@@ -64,6 +64,8 @@ public class DefaultRoutingService implements RoutingService {
   private final LinkingContextFactory linkingContextFactory;
   private final TransitTuningParameters transitTuningParameters;
   private final RaptorTuningParameters raptorTuningParameters;
+
+  @Nullable
   private final RealtimeResolver realtimeResolver;
 
   //private final TransitRoutingConfig transitRoutingConfig;

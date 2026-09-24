@@ -91,6 +91,8 @@ public class RoutingWorker {
   private final LinkingContextFactory linkingContextFactory;
   private final TransitTuningParameters transitTuningParameters;
   private final RaptorTuningParameters raptorTuningParameters;
+
+  @Nullable
   private final RealtimeResolver realtimeResolver;
 
   @Nullable

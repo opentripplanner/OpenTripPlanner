@@ -189,10 +189,6 @@ public class TestServerContext {
     return new DefaultStreetLimitationParametersService(new DefaultStreetRepository());
   }
 
-  public static TransitAlertServiceImpl createTransitAlertService() {
-    return new TransitAlertServiceImpl();
-  }
-
   public static ViaCoordinateTransferFactory createViaTransferResolver(
     Graph graph,
     TransitService transitService
