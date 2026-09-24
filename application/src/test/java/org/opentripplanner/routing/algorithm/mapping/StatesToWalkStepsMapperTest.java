@@ -154,6 +154,23 @@ class StatesToWalkStepsMapperTest {
     assertEquals(sign, step.getDirectionText().toString());
   }
 
+  @Test
+  void signpostedPathwayBetweenUnsignedPathwaysIsPreserved() {
+    final String sign = "follow signs to platform 1";
+    final TestStateBuilder builder = TestStateBuilder.ofWalking()
+      .streetEdge()
+      .pathway(null, 10)
+      .pathway(sign, 10)
+      .pathway(null, 10);
+    var walkSteps = buildWalkSteps(builder);
+    var followSigns = walkSteps
+      .stream()
+      .filter(s -> s.getRelativeDirection() == FOLLOW_SIGNS)
+      .toList();
+    assertEquals(1, followSigns.size());
+    assertEquals(sign, followSigns.get(0).getDirectionText().toString());
+  }
+
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
     var path = new GraphPath<>(result);

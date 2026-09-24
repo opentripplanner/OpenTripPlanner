@@ -310,6 +310,16 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder pathway(String s, double distance) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var tov = StreetModelFactory.intersectionVertex(count, count);
+    var name = s == null ? null : I18NString.of(s);
+    var edge = PathwayEdge.createPathwayEdge(from, tov, name, 0, distance, 0, 0, true);
+    currentState = edge.traverse(currentState)[0];
+    return this;
+  }
+
   private static StreetVertex intersection(int count) {
     return StreetModelFactory.intersectionVertex(count, count);
   }
