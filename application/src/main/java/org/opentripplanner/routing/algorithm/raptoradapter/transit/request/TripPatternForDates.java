@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.BitSet;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.raptor.spi.IntIterator;
@@ -275,15 +275,15 @@ public class TripPatternForDates
     TripPatternForDate[] tripPatternForDates,
     int[] offsets
   ) {
-    var departureTimes = Arrays.stream(tripPatternForDates)
-      .map(TripPatternForDate::tripTimes)
-      .map(l ->
-        l
-          .stream()
-          .mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN))
-          .toArray()
-      )
-      .toList();
+    var departureTimes = new ArrayList<int[]>(tripPatternForDates.length);
+    for (var tripPatternForDate : tripPatternForDates) {
+      var tripTimes = tripPatternForDate.tripTimes();
+      var times = new int[tripTimes.size()];
+      for (int i = 0; i < times.length; i++) {
+        times[i] = tripTimes.get(i).getDepartureTime(FIRST_STOP_POS_IN_PATTERN);
+      }
+      departureTimes.add(times);
+    }
     return TripTimesForDaysIndex.ofTripTimesForDay(departureTimes, offsets);
   }
 }
