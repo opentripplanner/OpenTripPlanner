@@ -15,7 +15,8 @@ public class CarpoolingParametersTestData {
       d.expirySweepInterval(),
       d.maxRoutePointSnap(),
       d.minCarEscapeMeters(),
-      d.defaultSearchWindow()
+      d.defaultSearchWindow(),
+      d.boardCost()
     );
   }
 
@@ -32,7 +33,8 @@ public class CarpoolingParametersTestData {
       d.expirySweepInterval(),
       d.maxRoutePointSnap(),
       d.minCarEscapeMeters(),
-      d.defaultSearchWindow()
+      d.defaultSearchWindow(),
+      d.boardCost()
     );
   }
 }
