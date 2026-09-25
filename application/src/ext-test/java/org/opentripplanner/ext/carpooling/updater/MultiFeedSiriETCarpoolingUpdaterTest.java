@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
@@ -48,11 +49,25 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   void setUp() {
     repository = new DefaultCarpoolingRepository();
     var resolver = mock(CarpoolTripVertexResolver.class);
+    // Production resolvers hand the trip back with its corridor; the mock passes it through.
+    when(resolver.withCorridor(any())).thenAnswer(invocation -> invocation.getArgument(0));
     when(resolver.resolve(any())).thenAnswer(invocation ->
       CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
     );
-    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
-    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
+    updaterA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParameters.DEFAULT.maxTrips()
+    );
+    updaterB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParameters.DEFAULT.maxTrips()
+    );
   }
 
   @Test

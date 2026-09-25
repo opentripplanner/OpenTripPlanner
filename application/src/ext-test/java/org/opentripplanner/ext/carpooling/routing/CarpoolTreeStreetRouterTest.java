@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
@@ -108,17 +109,6 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     var path = router.route(vertexA, vertexC);
 
     assertNull(path, "Should return null when no tree exists for either vertex");
-  }
-
-  @Test
-  void routeCachesResults() {
-    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
-
-    var first = router.route(vertexA, vertexC);
-    var second = router.route(vertexA, vertexC);
-
-    assertNotNull(first);
-    assertSame(first, second, "Second call should return cached path");
   }
 
   @Test
@@ -238,13 +228,54 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routePathIsNonEmpty() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path);
+    assertNotNull(segment);
+    var path = segment.path();
     assertNotNull(path.states, "Path should have states");
     assertFalse(path.states.isEmpty(), "Path states should not be empty");
     assertNotNull(path.edges, "Path should have edges");
     assertFalse(path.edges.isEmpty(), "Path edges should not be empty");
+  }
+
+  /**
+   * Insertion evaluation only reads durations; the path is assembled on demand. A segment that
+   * has to outlive the router takes its edge chain from the tree and builds the same path later.
+   */
+  @Test
+  void pathIsBuiltOnDemandAndSurvivesDetaching() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+
+    var segment = (CarpoolTreeStreetRouter.TreeSegment) router.route(vertexA, vertexD);
+    assertNotNull(segment);
+    assertTrue(segment.durationSeconds() > 0);
+    assertFalse(segment.isDetached());
+
+    segment.detach();
+    assertTrue(segment.isDetached());
+    var path = segment.path();
+    assertSame(path, segment.path(), "The path is memoised");
+    assertEquals(segment.durationSeconds(), path.getDuration());
+    assertEquals(vertexA, path.states.getFirst().getVertex());
+    assertEquals(vertexD, path.states.getLast().getVertex());
+  }
+
+  @Test
+  void durationIsTheMaterializedPathDurationForBothTreeDirections() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexD, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
+
+    var forward = router.route(vertexA, vertexC);
+    var reverse = router.route(vertexB, vertexD);
+
+    assertNotNull(forward);
+    assertNotNull(reverse);
+    assertEquals(forward.path().getDuration(), forward.durationSeconds());
+    assertEquals(reverse.path().getDuration(), reverse.durationSeconds());
+    assertEquals(vertexA, forward.from());
+    assertEquals(vertexC, forward.to());
+    assertEquals(vertexB, reverse.path().states.getFirst().getVertex());
+    assertEquals(vertexD, reverse.path().states.getLast().getVertex());
   }
 
   @Test
@@ -304,9 +335,10 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routeFromAToDContainsExpectedEdges() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexD);
+    var segment = router.route(vertexA, vertexD);
 
-    assertNotNull(path, "Should find path from A to D");
+    assertNotNull(segment, "Should find path from A to D");
+    var path = segment.path();
     assertEquals(3, path.edges.size(), "Path should have 3 edges (A->B, B->C, C->D)");
 
     var edgeAB = path.edges.get(0);

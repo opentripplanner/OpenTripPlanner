@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -43,6 +44,21 @@ public class CarpoolGraphPathBuilder {
     builder.streetEdge("segment-0", distanceMeters);
 
     return new GraphPath<>(builder.build());
+  }
+
+  /** A driver route segment of the default 5-minute duration, see {@link #createGraphPath()}. */
+  public static RoutedSegment createSegment() {
+    return RoutedSegment.of(createGraphPath());
+  }
+
+  /** A driver route segment of the given duration, wrapping {@link #createGraphPath(Duration)}. */
+  public static RoutedSegment createSegment(Duration duration) {
+    return RoutedSegment.of(createGraphPath(duration));
+  }
+
+  /** {@link #createGraphPaths(int)} wrapped as driver route segments. */
+  public static List<RoutedSegment> createSegments(int count) {
+    return createGraphPaths(count).stream().map(RoutedSegment::of).toList();
   }
 
   /**

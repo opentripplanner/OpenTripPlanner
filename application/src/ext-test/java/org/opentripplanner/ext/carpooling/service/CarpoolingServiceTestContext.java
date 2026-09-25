@@ -1,10 +1,13 @@
 package org.opentripplanner.ext.carpooling.service;
 
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.CarpoolStopIndex;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.CorridorBuilder;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -53,12 +56,24 @@ record CarpoolingServiceTestContext(
     TransitService transitService = new DefaultTransitService(model.transitRepository());
     var repository = new DefaultCarpoolingRepository();
     var carReachableVertexSnapper = CarReachableVertexSnapper.createDefault();
-    var resolver = new CarpoolTripVertexResolver(vertexCreationService, carReachableVertexSnapper);
+    var stopIndex = new CarpoolStopIndex(
+      model.graph(),
+      carReachableVertexSnapper,
+      CarpoolingParameters.DEFAULT.maxStopWalk()
+    );
+    var corridorBuilder = new CorridorBuilder(stopIndex, STREET_LIMITATION_PARAMETERS);
+    var resolver = new CarpoolTripVertexResolver(
+      vertexCreationService,
+      carReachableVertexSnapper,
+      corridorBuilder
+    );
     var service = new DefaultCarpoolingService(
       repository,
       STREET_LIMITATION_PARAMETERS,
       vertexCreationService,
-      carReachableVertexSnapper
+      carReachableVertexSnapper,
+      stopIndex,
+      CarpoolingParameters.DEFAULT
     );
     return new CarpoolingServiceTestContext(
       service,

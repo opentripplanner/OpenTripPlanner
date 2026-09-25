@@ -5,20 +5,15 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * Represents a viable insertion of a passenger into a carpool trip.
- * <p>
- * Contains all information needed to construct an itinerary, including:
- * - The original trip
- * - Insertion positions (where pickup and dropoff occur in the modified route)
- * - Route segments (all GraphPaths forming the complete modified route)
- * - Timing information
+ * A viable insertion of a passenger into a carpool trip: the trip, where the pickup and dropoff
+ * sit in the modified route, and the {@link RoutedSegment}s of that route, whose street paths are
+ * only built when an itinerary is (see {@link #getSharedPaths()}).
  * <p>
  * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
  * pickup and dropoff stops in the modified route (the route after the passenger's stops have
@@ -28,20 +23,17 @@ public record InsertionCandidate(
   CarpoolTrip trip,
   int pickupPosition,
   int dropoffPosition,
-  List<GraphPath<State, Edge, Vertex>> routeSegments,
+  List<RoutedSegment> routeSegments,
   Duration stopDuration,
-  NearbyStop transitStop,
+  @Nullable StopLocation transitStop,
   Duration totalTripDuration,
   @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
   @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
 ) {
   /**
-   * {@link InsertionPositionFinder} guarantees {@code 1 <= pickupPosition < dropoffPosition}
-   * (pickup is never at the driver's origin, and dropoff is always strictly after pickup).
-   * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
-   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at
-   * the trip's start. Enforce both invariants here so a regression upstream fails loud at
-   * construction instead of silently producing inconsistent durations.
+   * {@code 1 <= pickupPosition < dropoffPosition}: the pickup is never at the driver's origin and
+   * the dropoff is strictly after the pickup. {@link #getPassengerRideDuration()} relies on the
+   * lower bound, as it always adds a boarding dwell.
    */
   public InsertionCandidate {
     if (pickupPosition < 1) {
@@ -68,9 +60,9 @@ public record InsertionCandidate(
     CarpoolTrip trip,
     int pickupPosition,
     int dropoffPosition,
-    List<GraphPath<State, Edge, Vertex>> routeSegments,
+    List<RoutedSegment> routeSegments,
     Duration stopDuration,
-    NearbyStop transitStop,
+    @Nullable StopLocation transitStop,
     @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
     @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
   ) {
@@ -88,13 +80,10 @@ public record InsertionCandidate(
   }
 
   private static Duration computeTotalTripDuration(
-    List<GraphPath<State, Edge, Vertex>> routeSegments,
+    List<RoutedSegment> routeSegments,
     Duration stopDuration
   ) {
-    Duration[] cumulativeDurations = GraphPathUtils.calculateCumulativeDurations(
-      routeSegments.toArray(new GraphPath[0]),
-      stopDuration
-    );
+    Duration[] cumulativeDurations = RoutedSegment.cumulativeDurations(routeSegments, stopDuration);
     return cumulativeDurations[cumulativeDurations.length - 1];
   }
 
@@ -102,7 +91,7 @@ public record InsertionCandidate(
    * Gets the pickup route segment(s) - from boarding to passenger pickup.
    * Returns all segments before the pickup position.
    */
-  public List<GraphPath<State, Edge, Vertex>> getPickupSegments() {
+  public List<RoutedSegment> getPickupSegments() {
     if (pickupPosition == 0) {
       return List.of();
     }
@@ -113,15 +102,24 @@ public record InsertionCandidate(
    * Gets the shared route segment(s) - from passenger pickup to dropoff.
    * Returns all segments between pickup and dropoff positions.
    */
-  public List<GraphPath<State, Edge, Vertex>> getSharedSegments() {
+  public List<RoutedSegment> getSharedSegments() {
     return routeSegments.subList(pickupPosition, dropoffPosition);
+  }
+
+  /**
+   * The street paths of the {@link #getSharedSegments() shared segments}, in order. This
+   * materialises the paths, which is the expensive part of a segment — call it when building an
+   * itinerary from the candidate, not while evaluating candidates.
+   */
+  public List<GraphPath<State, Edge, Vertex>> getSharedPaths() {
+    return getSharedSegments().stream().map(RoutedSegment::path).toList();
   }
 
   /**
    * Gets the dropoff route segment(s) - from passenger dropoff to alighting.
    * Returns all segments after the dropoff position.
    */
-  public List<GraphPath<State, Edge, Vertex>> getDropoffSegments() {
+  public List<RoutedSegment> getDropoffSegments() {
     if (dropoffPosition >= routeSegments.size()) {
       return List.of();
     }
@@ -157,10 +155,10 @@ public record InsertionCandidate(
   }
 
   private static Duration totalSegmentDuration(
-    List<GraphPath<State, Edge, Vertex>> segments,
+    List<RoutedSegment> segments,
     Duration stopDuration
   ) {
-    long segmentSeconds = segments.stream().mapToLong(GraphPath::getDuration).sum();
+    long segmentSeconds = segments.stream().mapToLong(RoutedSegment::durationSeconds).sum();
     return Duration.ofSeconds(segmentSeconds).plus(
       stopDuration.multipliedBy(Math.max(0, segments.size() - 1))
     );
