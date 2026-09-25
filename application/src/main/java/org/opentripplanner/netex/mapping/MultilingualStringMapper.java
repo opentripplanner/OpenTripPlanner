@@ -30,6 +30,10 @@ public class MultilingualStringMapper {
    * Returns {@code null} only if the element is absent. An empty element (e.g.
    * {@code <Description/>}) returns an empty string, like {@code getValue()} did before NeTEx 2.0.
    * Use {@link #nullableValueOf(MultilingualString)} to map empty values to {@code null}.
+   * <p>
+   * Tabs, carriage returns and line feeds are each replaced by a space ({@code xs:normalizedString}
+   * semantics), like the {@code NormalizedStringAdapter} applied to {@code getValue()} before
+   * NeTEx 2.0. Text is neither trimmed nor collapsed.
    */
   @Nullable
   public static String getStringValue(@Nullable MultilingualString multilingualString) {
@@ -46,6 +50,16 @@ public class MultilingualStringMapper {
         sb.append(s);
       }
     }
-    return sb.toString();
+    return normalize(sb);
+  }
+
+  private static String normalize(StringBuilder text) {
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      if (c == '\t' || c == '\n' || c == '\r') {
+        text.setCharAt(i, ' ');
+      }
+    }
+    return text.toString();
   }
 }
