@@ -246,4 +246,4 @@ jobs:
           
           MAVEN_SKIP_ARGS="-P prettierSkip,checkstyleSkip -Dmaven.test.skip=true -Dmaven.source.skip=true"
           
-          mvn $MAVEN_SKIP_ARGS package com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version
+          mvn $MAVEN_SKIP_ARGS package -Djib.skip=false -Djib.to.tags=latest,$image_version
