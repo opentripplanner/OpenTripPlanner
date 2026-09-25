@@ -11,7 +11,8 @@ public record TransmodelRealTimeTripStateModel(
   boolean cancellation,
   boolean timesModified,
   boolean journeyPatternModified,
-  boolean updated
+  boolean updated,
+  boolean monitored
 ) {
   public static TransmodelRealTimeTripStateModel of(RealTimeTripState state) {
     return new TransmodelRealTimeTripStateModel(
@@ -19,7 +20,8 @@ public record TransmodelRealTimeTripStateModel(
       state.canceled(),
       state.timesModified(),
       state.tripPatternModified(),
-      state.hasAnyUpdates()
+      state.hasAnyUpdates(),
+      state.monitored()
     );
   }
 }
