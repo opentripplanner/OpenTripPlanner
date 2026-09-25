@@ -2,7 +2,6 @@ package org.opentripplanner.netex.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
 import jakarta.xml.bind.JAXBElement;
@@ -448,9 +447,9 @@ class ServiceLinkMapperTest {
       stopPatternBuilder.build()
     );
 
-
     assertThat(issueTypes()).contains("ServiceLinkQuayMismatch");
-    assertNull(shape);
+
+    assertStraightLine(shape.get(0), QUAY1_COORDINATES, QUAY2_COORDINATES);
   }
 
   private static JourneyPattern journeyPatternOf(String... serviceLinkRefs) {

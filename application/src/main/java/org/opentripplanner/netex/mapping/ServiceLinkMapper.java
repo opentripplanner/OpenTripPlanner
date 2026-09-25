@@ -122,6 +122,9 @@ class ServiceLinkMapper {
     StopPattern stopPattern,
     int stopIndex
   ) {
+    if (!isFromToPointRefsValid(serviceLink, stopPattern, stopIndex)) {
+      return null;
+    }
     // in EPIP the line string is a direct property on the service link
     if (serviceLink.getLineString() != null) {
       LineString ret = mapLineString(
@@ -138,8 +141,6 @@ class ServiceLinkMapper {
       serviceLink.getProjections().getProjectionRefOrProjection() == null
     ) {
       issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
-      return null;
-    } else if (!isFromToPointRefsValid(serviceLink, stopPattern, stopIndex)) {
       return null;
     }
 
