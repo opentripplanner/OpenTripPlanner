@@ -161,16 +161,11 @@ class RealtimeResolverTest {
     );
 
     List<Leg> legs = itineraries.getFirst().legs();
-    Leg walkingLeg = legs.stream().filter(Leg::isWalkingLeg).findFirst().orElse(null);
     assertEquals(3, legs.size());
-    assertEquals(
-      "2020-03-03T11:01+01:00[Europe/Paris]",
-      Objects.requireNonNull(walkingLeg).startTime().toString()
-    );
-    assertEquals(
-      "2020-03-03T11:10+01:00[Europe/Paris]",
-      Objects.requireNonNull(walkingLeg).endTime().toString()
-    );
+    assertEquals("2020-03-03T10:00+01:00[Europe/Paris]", legs.getFirst().startTime().toString());
+    assertEquals("2020-03-03T11:00+01:00[Europe/Paris]", legs.getFirst().endTime().toString());
+    assertEquals("2020-03-03T08:30+01:00[Europe/Paris]", legs.getLast().startTime().toString());
+    assertEquals("2020-03-03T09:30+01:00[Europe/Paris]", legs.getLast().endTime().toString());
   }
 
   @Test
@@ -345,8 +340,8 @@ class RealtimeResolverTest {
 
     var legs = itinerary.legs();
     assertEquals(2, legs.size());
-    assertTrue(legs.get(1).isWalkingLeg());
     assertTrue(legs.get(0).isTransitLeg());
+    assertTrue(legs.get(1).isWalkingLeg());
   }
 
   @Test
