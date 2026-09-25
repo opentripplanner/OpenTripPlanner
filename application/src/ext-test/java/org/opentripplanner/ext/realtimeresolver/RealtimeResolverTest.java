@@ -226,6 +226,8 @@ class RealtimeResolverTest {
     //Realtime on first leg
     assertEquals("2020-03-03T10:10+01:00[Europe/Paris]", legs.getFirst().startTime().toString());
     assertEquals("2020-03-03T11:12+01:00[Europe/Paris]", legs.getFirst().endTime().toString());
+    assertEquals(STOP_A.getId(), legs.getFirst().from().stop.getId());
+    assertEquals(STOP_B.getId(), legs.getFirst().to().stop.getId());
 
     //Assert that refetch has updated leg data with realtime data
     assertEquals(
@@ -243,6 +245,8 @@ class RealtimeResolverTest {
     //No realtime on last leg
     assertEquals("2020-03-03T08:30+01:00[Europe/Paris]", legs.getLast().startTime().toString());
     assertEquals("2020-03-03T09:30+01:00[Europe/Paris]", legs.getLast().endTime().toString());
+    assertEquals(STOP_C.getId(), legs.getLast().from().stop.getId());
+    assertEquals(STOP_D.getId(), legs.getLast().to().stop.getId());
   }
 
   @Test
@@ -293,9 +297,9 @@ class RealtimeResolverTest {
     assertFalse(itinerariesWithRealtime.isEmpty());
 
     var legs = itinerariesWithRealtime.getFirst().legs();
-    var leg1ArrivalDelay = legs.getFirst().asScheduledTransitLeg().endTime();
+    var leg1ArrivalTime = legs.getFirst().asScheduledTransitLeg().endTime();
 
-    assertEquals("2020-03-03T11:22:03+01:00[Europe/Paris]", leg1ArrivalDelay.toString());
+    assertEquals("2020-03-03T11:22:03+01:00[Europe/Paris]", leg1ArrivalTime.toString());
     assertEquals(1, legs.get(0).listTransitAlerts().size());
     assertEquals(0, legs.get(1).listTransitAlerts().size());
     assertEquals(1, itinerariesWithRealtime.size());
