@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This decorator help unzip the content of any underling data source(the delegate). This make it
  * easier to provide a store implementation - since this code can be reused.
- * <p/>
+ * <p>
  * See the Google Cloud Store implementation for an example on hwo to use it.
  */
 public class ZipStreamDataSourceDecorator implements CompositeDataSource {
@@ -52,8 +52,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
   /**
    * Create a Zip Stream data source decorator around another data source. The given delegate is
-   * responsible for retrieving meta-data and providing an input stream to fetch the zipped
-   * content.
+   * responsible for retrieving meta-data and providing an input stream to fetch the zipped content.
    */
   public ZipStreamDataSourceDecorator(DataSource delegate) {
     this(delegate, DEFAULT_MAX_ZIP_ENTRY_SIZE_IN_MEMORY);
@@ -219,8 +218,8 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   }
 
   /**
-   * Copies at maximum maxLength bytes from inputStream to outputStream
-   * Inlined partially from IOUtils.copyLarge
+   * Copies at maximum maxLength bytes from inputStream to outputStream Inlined partially from
+   * IOUtils.copyLarge
    */
   private long copy(InputStream inputStream, OutputStream outputStream, long maxLength)
     throws IOException {

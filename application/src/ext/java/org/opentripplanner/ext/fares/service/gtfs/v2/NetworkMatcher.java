@@ -24,8 +24,8 @@ class NetworkMatcher {
   }
 
   /**
-   * Get the fare products that match the network_id. If the network id of the product is null, the result
-   * depends on the presence/absence of other rules with that network id.
+   * Get the fare products that match the network_id. If the network id of the product is null, the
+   * result depends on the presence/absence of other rules with that network id.
    */
   boolean matchesNetworkId(TransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg

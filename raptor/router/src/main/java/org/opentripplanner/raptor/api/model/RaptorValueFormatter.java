@@ -19,12 +19,12 @@ final class RaptorValueFormatter {
   private static final DecimalFormat FORMAT_CENTI = new DecimalFormat("#,##0.0#", DECIMAL_SYMBOLS);
   private static final DecimalFormat FORMAT_INT = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
 
-  /** Format integers in centi units like 1234 => 12.34.  */
+  /** Format integers in centi units like 1234 => 12.34. */
   static String format(int value) {
     return FORMAT_INT.format(value);
   }
 
-  /** Format integers in centi units like 1234 => 12.34.  */
+  /** Format integers in centi units like 1234 => 12.34. */
   static String formatCenti(int value) {
     if (value % 100 == 0) {
       value /= 100;

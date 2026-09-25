@@ -8,8 +8,8 @@ package org.opentripplanner.ext.dataoverlay.api;
  * ozone} on the API or in config. Instead there will be the two types, {@code ozone_} and {@code
  * ozone_}.
  * <p>
- * If the parameter you need is not listed, you can ask for  it  to be added. Make a PR or issue, or
- * contact the community.
+ * If the parameter you need is not listed, you can ask for it to be added. Make a PR or issue,
+ * or contact the community.
  */
 public enum ParameterName {
   AIR_QUALITY_INDEX,

@@ -9,9 +9,9 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 /**
  * This class provides transferSlack, boardSlack and alightSlack for the Raptor algorithm.
  * <p>
- * Implementation notes: The board-slack and alight-slack is kept in an array, indexed by the mode
- * ordinal, and not in a {@link Map}, because it is faster. The board-slack and alight-slack lookup
- * is done for every strop-arrival computation, and should be as fast as possible.
+ * Implementation notes: The board-slack and alight-slack is kept in an array, indexed by the
+ * mode ordinal, and not in a {@link Map}, because it is faster. The board-slack and alight-slack
+ * lookup is done for every strop-arrival computation, and should be as fast as possible.
  */
 public final class DefaultSlackProvider implements RaptorSlackProvider {
 

@@ -6,13 +6,12 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * Label data for one outermost endpoint of a carpool itinerary, consumed by the itinerary mapper
- * to name the corresponding {@code Place} in the API response.
+ * Label data for one outermost endpoint of a carpool itinerary, consumed by the itinerary mapper to
+ * name the corresponding {@code Place} in the API response.
  * <p>
  * The carpool flow has two independent label sources at each endpoint: a resolved transit stop
- * (for the transit-side end of an access/egress chain) or the user's {@code from}/{@code to}
- * input (for the passenger-side end). Exactly three states are valid, each produced by a single
- * factory:
+ * (for the transit-side end of an access/egress chain) or the user's {@code from}/{@code to} input
+ * (for the passenger-side end). Exactly three states are valid, each produced by a single factory:
  * <ul>
  *   <li>{@link #forStop(StopLocation)} — transit stop only</li>
  *   <li>{@link #forLocation(GenericLocation)} — user input location only</li>
@@ -24,16 +23,16 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * The mapper enforces the precedence transit stop &gt; user input &gt; vertex; this record only
  * carries the two pre-resolved candidates.
  *
- * @param stop the transit-side stop, set on the transit end of an access/egress chain;
- *        {@code null} when the endpoint is not a transit stop.
- * @param location the passenger-side input location (the request's {@code from} or {@code to}),
- *        set on the user end of an access/egress chain or on both ends of a direct carpool
- *        itinerary; {@code null} when the endpoint is not the user's input.
+ * @param stop     the transit-side stop, set on the transit end of an access/egress chain;
+ *                 {@code null} when the endpoint is not a transit stop.
+ * @param location the passenger-side input location (the request's {@code from} or {@code to}), set
+ *                 on the user end of an access/egress chain or on both ends of a direct carpool
+ *                 itinerary; {@code null} when the endpoint is not the user's input.
  */
 public record EndpointLabel(@Nullable StopLocation stop, @Nullable GenericLocation location) {
   /**
-   * Use when the caller has neither a transit stop nor a user input location — the mapper will
-   * name the endpoint from the underlying street vertex instead.
+   * Use when the caller has neither a transit stop nor a user input location — the mapper will name
+   * the endpoint from the underlying street vertex instead.
    */
   public static final EndpointLabel EMPTY = new EndpointLabel(null, null);
 

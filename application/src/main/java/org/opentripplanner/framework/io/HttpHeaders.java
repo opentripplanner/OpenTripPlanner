@@ -6,10 +6,9 @@ import java.util.Objects;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 
 /**
- * Encapsulate HTTP header parameters for use in HTTP requests. The builder
- * will use the {@link EnvironmentVariableReplacer} to substitute TOKENS in the
- * values passed in. There is also a convenience method for adding
- * {@link Builder#acceptApplicationXML()}.
+ * Encapsulate HTTP header parameters for use in HTTP requests. The builder will use the
+ * {@link EnvironmentVariableReplacer} to substitute TOKENS in the values passed in. There is also a
+ * convenience method for adding {@link Builder#acceptApplicationXML()}.
  */
 public class HttpHeaders {
 
@@ -89,8 +88,8 @@ public class HttpHeaders {
     /**
      * Merge another instance of {@link HttpHeaders} into this builder.
      * <p>
-     * NOTE: if there are headers with the same name then the added ones override the
-     * already set ones!
+     * NOTE: if there are headers with the same name then the added ones override the already set
+     * ones!
      */
     public Builder add(HttpHeaders other) {
       headers.putAll(other.asMap());

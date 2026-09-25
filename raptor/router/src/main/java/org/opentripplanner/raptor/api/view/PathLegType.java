@@ -14,8 +14,8 @@ public enum PathLegType {
    */
   TRANSIT,
   /**
-   * A transfer can not follow another transfer, and can only be connected to access and egress
-   * if the access/egress has arrived/departed from the stop by a ride.
+   * A transfer can not follow another transfer, and can only be connected to access and egress if
+   * the access/egress has arrived/departed from the stop by a ride.
    */
   TRANSFER,
   /**

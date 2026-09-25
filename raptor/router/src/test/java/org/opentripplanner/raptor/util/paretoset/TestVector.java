@@ -3,8 +3,8 @@ package org.opentripplanner.raptor.util.paretoset;
 import java.util.Objects;
 
 /**
- * Create a value object type to test the ParetoSet "generic" type criteria. We create a new type
- * to isolate the tests in this package from any other randomly chosen type.
+ * Create a value object type to test the ParetoSet "generic" type criteria. We create a new type to
+ * isolate the tests in this package from any other randomly chosen type.
  */
 class TestVector {
 

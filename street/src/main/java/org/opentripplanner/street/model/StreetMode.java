@@ -56,7 +56,8 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
   CAR_RENTAL(Feature.ACCESS, Feature.EGRESS, Feature.WALKING, Feature.DRIVING, Feature.RENTING),
 
   /**
-   * Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
+   * Using a car hailing app like Uber or Lyft to get to a train station or all the way to the
+   * destination.
    */
   CAR_HAILING(Feature.ACCESS, Feature.EGRESS, Feature.DRIVING, Feature.PICKUP),
 
@@ -72,9 +73,9 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
    *
    * The reason why the features DRIVING and PICKUP are not used even though CARPOOLING obviously
    * involves driving and pickup, is because we don't want to get results involving car if there are
-   * not carpooling trips available. Carpooling has to be handled differently from ordinary
-   * driving. It does on the other hand make sense to return results involving only walking and
-   * no carpooling if those results are practical for the user.
+   * not carpooling trips available. Carpooling has to be handled differently from ordinary driving.
+   * It does on the other hand make sense to return results involving only walking and no carpooling
+   * if those results are practical for the user.
    */
   CARPOOL(Feature.ACCESS, Feature.EGRESS, Feature.WALKING),
 

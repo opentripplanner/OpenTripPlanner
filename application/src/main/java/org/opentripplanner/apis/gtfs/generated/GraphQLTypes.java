@@ -326,8 +326,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Enum for limiting the returned calls depending on pickup/drop off status on a stop
-   * based on the original schedules.
+   * Enum for limiting the returned calls depending on pickup/drop off status on a stop based on the
+   * original schedules.
    */
   public enum GraphQLArrivalDeparture {
     ARRIVALS,
@@ -1034,8 +1034,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Predefined optimization alternatives for bicycling routing. For more customization,
-   * one can use the triangle factors.
+   * Predefined optimization alternatives for bicycling routing. For more customization, one can use
+   * the triangle factors.
    */
   public enum GraphQLCyclingOptimizationType {
     FLAT_STREETS,
@@ -1132,8 +1132,8 @@ public class GraphQLTypes {
    *
    * This enum allows filtering of the dependencies.
    *
-   * Since it is recognised that this is not covered well in the specification, it is discussed here:
-   * https://github.com/google/transit/pull/423
+   * Since it is recognised that this is not covered well in the specification, it is discussed
+   * here: https://github.com/google/transit/pull/423
    */
   public enum GraphQLDependentFareProductFilter {
     ALL,
@@ -2900,8 +2900,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Additional qualifier for a transport mode.
-   * Note that qualifiers can only be used with certain transport modes.
+   * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain
+   * transport modes.
    */
   public enum GraphQLQualifier {
     ACCESS,
@@ -5104,9 +5104,9 @@ public class GraphQLTypes {
   }
 
   /**
-   * A direction that is not absolute but rather fuzzy and context-dependent.
-   * It provides the passenger with information what they should do in this step depending on where they
-   * were in the previous one.
+   * A direction that is not absolute but rather fuzzy and context-dependent. It provides the
+   * passenger with information what they should do in this step depending on where they were in the
+   * previous one.
    */
   public enum GraphQLRelativeDirection {
     CIRCLE_CLOCKWISE,
@@ -5286,8 +5286,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Predefined optimization alternatives for scooter routing. For more customization,
-   * one can use the triangle factors.
+   * Predefined optimization alternatives for scooter routing. For more customization, one can use
+   * the triangle factors.
    */
   public enum GraphQLScooterOptimizationType {
     FLAT_STREETS,
@@ -5992,9 +5992,9 @@ public class GraphQLTypes {
   }
 
   /**
-   * Transit modes include modes that are used within organized transportation networks
-   * run by public transportation authorities, taxi companies etc.
-   * Equivalent to GTFS route_type or to NeTEx TransportMode.
+   * Transit modes include modes that are used within organized transportation networks run by
+   * public transportation authorities, taxi companies etc. Equivalent to GTFS route_type or to
+   * NeTEx TransportMode.
    */
   public enum GraphQLTransitMode {
     AIRPLANE,
@@ -6452,8 +6452,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they
-   * may be represented differently to the user.
+   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
+   * they may be represented differently to the user.
    */
   public enum GraphQLVehicleParkingState {
     CLOSED,

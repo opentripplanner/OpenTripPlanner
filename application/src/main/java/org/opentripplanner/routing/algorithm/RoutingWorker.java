@@ -268,8 +268,8 @@ public class RoutingWorker {
   }
 
   /**
-   * Calculate the earliest-departure-time used in the transit search.
-   * This method returns {@code null} if no transit search is performed.
+   * Calculate the earliest-departure-time used in the transit search. This method returns
+   * {@code null} if no transit search is performed.
    */
   @Nullable
   private Instant earliestDepartureTimeUsed() {
@@ -285,8 +285,8 @@ public class RoutingWorker {
   }
 
   /**
-   * Calculate the search-window earliest-departure-time used in the transit search.
-   * This method returns {@code null} if no transit search is performed.
+   * Calculate the search-window earliest-departure-time used in the transit search. This method
+   * returns {@code null} if no transit search is performed.
    */
   @Nullable
   private Duration searchWindowUsed() {
@@ -461,8 +461,8 @@ public class RoutingWorker {
   }
 
   /**
-   * If this is a direct-only search (no transit) and no itineraries were found, return an error
-   * so the client knows why no results were returned.
+   * If this is a direct-only search (no transit) and no itineraries were found, return an error so
+   * the client knows why no results were returned.
    */
   private Collection<RoutingError> checkForEmptyDirectModeResult(RoutingResult result) {
     if (

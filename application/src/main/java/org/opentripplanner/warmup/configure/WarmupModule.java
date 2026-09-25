@@ -14,9 +14,9 @@ import org.opentripplanner.warmup.api.WarmupParameters;
  * Dagger wiring for the application warmup feature.
  * <p>
  * Provides the {@link WarmupParameters} binding (mapped from the JSON config section by {@code
- * WarmupConfig}) and the {@link WarmupLauncher} that {@link
- * org.opentripplanner.standalone.configure.ConstructApplication} uses to start the warmup thread
- * after Raptor transit data and updaters have been set up.
+ * WarmupConfig}) and the {@link WarmupLauncher} that
+ * {@link org.opentripplanner.standalone.configure.ConstructApplication} uses to start the warmup
+ * thread after Raptor transit data and updaters have been set up.
  */
 @Module
 public class WarmupModule {

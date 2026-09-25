@@ -219,8 +219,9 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   /**
    * These tests are designed to specifically validate ATL fares. Since these fares are hard-coded,
    * it is acceptable to make direct calls to the ATL fare service with predefined routes. Where the
-   * default fare is applied a test substitute {@link AtlantaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is
-   * used. This will be the same for all cash fare types except when overriden above.
+   * default fare is applied a test substitute
+   * {@link AtlantaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all
+   * cash fare types except when overriden above.
    */
   private static void calculateFare(List<Leg> rides, Money expectedFare) {
     var fare = atlFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);

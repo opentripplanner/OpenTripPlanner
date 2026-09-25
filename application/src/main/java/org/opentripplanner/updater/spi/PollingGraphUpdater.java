@@ -45,9 +45,8 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
   private WriteToGraphCallback<C> saveResultOnGraph;
 
   /**
-   * A Future representing pending completion of most recently submitted task.
-   * If the updater posts several tasks during one polling cycle, the handle will point to the
-   * latest posted task.
+   * A Future representing pending completion of most recently submitted task. If the updater posts
+   * several tasks during one polling cycle, the handle will point to the latest posted task.
    * Initially null when the polling updater starts.
    */
   @Nullable
@@ -105,8 +104,11 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
    * Allow clients to wait for all realtime data to be loaded before submitting any travel plan
    * requests. This does not block use of the OTP server. The client must voluntarily hit an
    * endpoint and wait for readiness.
+   * <p>
+   * <pre>
    * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
    *           and not bring the router online until they have finished.
+   * </pre>
    */
   @Override
   public boolean isPrimed() {
@@ -129,11 +131,9 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
   protected abstract void runPolling() throws Exception;
 
   /**
-   * Post an update task to the GraphWriter queue.
-   * This is non-blocking.
-   * This can be called several times during one polling cycle.
-   * This is the sole way for polling updater implementations to submit real-time update tasks,
-   * while technical details about the execution of these tasks
+   * Post an update task to the GraphWriter queue. This is non-blocking. This can be called several
+   * times during one polling cycle. This is the sole way for polling updater implementations to
+   * submit real-time update tasks, while technical details about the execution of these tasks
    * (frequency, concurrency, waiting, ...) are encapsulated in this parent class.
    */
   protected final void updateGraph(GraphWriterRunnable<C> task) {
@@ -141,11 +141,10 @@ public abstract class PollingGraphUpdater<C> implements GraphUpdater<C> {
   }
 
   /**
-   * If the previous task takes longer than the polling interval,
-   * we delay the next polling cycle until the task is complete.
-   * This prevents tasks from piling up.
-   * If the updater sends several tasks during a polling cycle, we wait on the latest posted task.
-   * */
+   * If the previous task takes longer than the polling interval, we delay the next polling cycle
+   * until the task is complete. This prevents tasks from piling up. If the updater sends several
+   * tasks during a polling cycle, we wait on the latest posted task.
+   */
   private void waitForPreviousTask() throws InterruptedException, ExecutionException {
     if (previousTask != null && !previousTask.isDone()) {
       LOG.info("Delaying polling until the previous task is complete");

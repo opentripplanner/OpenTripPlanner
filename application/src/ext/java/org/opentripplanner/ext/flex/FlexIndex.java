@@ -86,9 +86,9 @@ public class FlexIndex {
   }
 
   /**
-   * For a given stop location returns the flex routes that visit it, taking care to resolve
-   * members of group stops (which are visited "transitively", ie. not directly but by
-   * them being members of the group stop).
+   * For a given stop location returns the flex routes that visit it, taking care to resolve members
+   * of group stops (which are visited "transitively", ie. not directly but by them being members of
+   * the group stop).
    */
   public Collection<Route> findRoutes(StopLocation stop) {
     return routeByStop.get(stop);

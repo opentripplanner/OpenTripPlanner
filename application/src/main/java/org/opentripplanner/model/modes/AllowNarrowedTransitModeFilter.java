@@ -62,9 +62,10 @@ public class AllowNarrowedTransitModeFilter implements AllowTransitModeFilter {
 
   /**
    * This value is currently calculated at query time, but we are moving toward having it constantly
-   * up to date in the model. That will enable us to do much faster selection of matching trips and/or
-   * patterns with bitfields and logical operations, at which point this entire filter mechanism
-   * will be removed as unnecessary. This will also simplify the IGNORED logic by quite a bit.
+   * up to date in the model. That will enable us to do much faster selection of matching trips
+   * and/or patterns with bitfields and logical operations, at which point this entire filter
+   * mechanism will be removed as unnecessary. This will also simplify the IGNORED logic by quite a
+   * bit.
    */
   private static boolean isTripReplacement(
     SubMode netexSubmode,

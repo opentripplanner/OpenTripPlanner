@@ -39,11 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilderModule} plugin that links various
- * objects in the graph to the street network. It should be run after both the transit network and
- * street network are loaded. It links four things: transit stops, transit entrances, bike rental
- * stations, and bike parks. Therefore, it should be run even when there's no GTFS data present to
- * make bike rental services and bike parks usable.
+ * {@link GraphBuilderModule} plugin that links various objects in the graph to the street network.
+ * It should be run after both the transit network and street network are loaded. It links four
+ * things: transit stops, transit entrances, bike rental stations, and bike parks. Therefore, it
+ * should be run even when there's no GTFS data present to make bike rental services and bike parks
+ * usable.
  */
 public class StreetLinkerModule implements GraphBuilderModule {
 
@@ -136,7 +136,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * the {@link OsmBoardingLocationsModule}, which runs before this one, often links stops to
    * walkable edges only.
    *
-   * @param stopVertex The transit stop vertex to be checked.
+   * @param stopVertex                    The transit stop vertex to be checked.
    * @param stopLocationsUsedForFlexTrips A set of stop locations that are used for flexible trips.
    */
   private static boolean isAlreadyLinked(
@@ -155,8 +155,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * Link a stop to the nearest "relevant" edges.
    * <p>
    * These are mostly walk edges but if a stop is used by a flex pattern it also needs to be
-   * car-accessible. Therefore, flex stops are ensured to be connected to the car-accessible
-   * edge. This may lead to several links being created.
+   * car-accessible. Therefore, flex stops are ensured to be connected to the car-accessible edge.
+   * This may lead to several links being created.
    */
   private void linkStopToStreetNetwork(TransitStopVertex tStop, StopLinkType linkType) {
     vertexLinker.linkVertexPermanently(
@@ -388,13 +388,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private enum StopLinkType {
     /**
-     * Only ensure that the link leads to a walkable edge.
-     * (The same edge may also be drivable but this is not guaranteed.)
+     * Only ensure that the link leads to a walkable edge. (The same edge may also be drivable but
+     * this is not guaranteed.)
      */
     WALK_ONLY,
     /**
-     * Make sure that the stop is linked to an edge each that is walkable and drivable.
-     * This may lead to several links being created.
+     * Make sure that the stop is linked to an edge each that is walkable and drivable. This may
+     * lead to several links being created.
      */
     WALK_AND_CAR,
   }

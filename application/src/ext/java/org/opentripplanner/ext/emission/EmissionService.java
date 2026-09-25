@@ -15,17 +15,16 @@ public interface EmissionService {
    * configured number of people in the car and the average car emissions.
    *
    * @return The emissions per passenger for the whole given distance. {@link Emission#ZERO} is
-   * returned if no emission exist.
+   *         returned if no emission exist.
    */
   Emission calculateCarPassengerEmission(double distanceMeters);
 
   /**
-   * Calculate the passenger emissions for a specific [route and distance] or [trip, from stop,
-   * to stop ]. The service implementation will decide which of the two calculation methods
-   * is used.
+   * Calculate the passenger emissions for a specific [route and distance] or [trip, from stop, to
+   * stop ]. The service implementation will decide which of the two calculation methods is used.
    *
-   * @return The emissions per passenger for the whole. {@code empty} is returned if no
-   * emission exist.
+   * @return The emissions per passenger for the whole. {@code empty} is returned if no emission
+   *         exist.
    */
   Optional<Emission> calculateTransitPassengerEmissionForTripHops(
     Trip trip,

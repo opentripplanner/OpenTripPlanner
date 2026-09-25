@@ -5,17 +5,17 @@ package org.opentripplanner.updater.spi;
  * make changes to the Graph and associated transit data to reflect the current situation. This is
  * typically information about disruptions to service, bicycle or parking availability, etc.
  * <p>
- * Each GraphUpdater implementation will be run in a separate thread, allowing it to make blocking
- * calls to fetch data or even sleep between periodic polling operations without affecting the rest
- * of the OTP instance.
+ * Each GraphUpdater implementation will be run in a separate thread, allowing it to make
+ * blocking calls to fetch data or even sleep between periodic polling operations without affecting
+ * the rest of the OTP instance.
  * <p>
- * GraphUpdater implementations are instantiated by UpdaterConfigurator. Each updater configuration
- * item in the router-config for a ThingUpdater is mapped to a corresponding configuration class
- * ThingUpdaterParameters, which is passed to the ThingUpdater constructor.
+ * GraphUpdater implementations are instantiated by UpdaterConfigurator. Each updater
+ * configuration item in the router-config for a ThingUpdater is mapped to a corresponding
+ * configuration class ThingUpdaterParameters, which is passed to the ThingUpdater constructor.
  * <p>
- * GraphUpdater implementations are only allowed to make changes to the Graph and related structures
- * by submitting instances implementing GraphWriterRunnable (often anonymous functions) to the
- * Graph writing callback function supplied to them by the GraphUpdaterManager after they're
+ * GraphUpdater implementations are only allowed to make changes to the Graph and related
+ * structures by submitting instances implementing GraphWriterRunnable (often anonymous functions)
+ * to the Graph writing callback function supplied to them by the GraphUpdaterManager after they're
  * constructed. In this way, changes are queued up by many GraphUpdaters running in parallel on
  * different threads, but are applied sequentially in a single-threaded manner to simplify reasoning
  * about concurrent reads and writes to the Graph.
@@ -25,8 +25,8 @@ package org.opentripplanner.updater.spi;
 public interface GraphUpdater<C> {
   /**
    * After a GraphUpdater is instantiated, the GraphUpdaterManager that instantiated it will
-   * immediately supply a callback via this method. The GraphUpdater will employ that callback
-   * every time it wants to queue up a write modification to the Graph or related data structures.
+   * immediately supply a callback via this method. The GraphUpdater will employ that callback every
+   * time it wants to queue up a write modification to the Graph or related data structures.
    */
   void setup(WriteToGraphCallback<C> writeToGraphCallback);
 
@@ -54,8 +54,11 @@ public interface GraphUpdater<C> {
    * Allow clients to wait for all realtime data to be loaded before submitting any travel plan
    * requests. This does not block use of the OTP server. The client must voluntarily hit an
    * endpoint and wait for readiness.
+   * <p>
+   * <pre>
    * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
    *           and not bring the router online until they have finished.
+   * </pre>
    */
   default boolean isPrimed() {
     return true;

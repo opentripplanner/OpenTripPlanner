@@ -1,8 +1,8 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 /**
- * Used to tell which way the paging is going, to the {@link #NEXT_PAGE} or to the {@link
- * #PREVIOUS_PAGE}.
+ * Used to tell which way the paging is going, to the {@link #NEXT_PAGE} or to the
+ * {@link #PREVIOUS_PAGE}.
  */
 public enum PageType {
   /**

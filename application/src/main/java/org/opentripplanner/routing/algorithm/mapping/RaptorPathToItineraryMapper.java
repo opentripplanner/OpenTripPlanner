@@ -77,7 +77,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   /**
    * Constructs an itinerary mapper for a request and a set of results
    *
-   * @param raptorTransitData          the currently active transit layer (may have real-time data
+   * @param raptorTransitData     the currently active transit layer (may have real-time data
    *                              applied)
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
@@ -310,8 +310,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   /**
    * If a routing result transfers at the very same stop, RAPTOR doesn't add a path leg. However,
-   * sometimes we want to create a zero distance leg so a UI can show a transfer. Since it would
-   * be considered backwards-incompatible, this is an opt-in feature.
+   * sometimes we want to create a zero distance leg so a UI can show a transfer. Since it would be
+   * considered backwards-incompatible, this is an opt-in feature.
    */
   private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
     var transferStop = Place.forStop(raptorTransitData.getStopByIndex(previousLeg.toStop()));
@@ -462,8 +462,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
    * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
    * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
+   * <p>
+   * <pre>
    * TODO: the logic should be revisited when adding support for transfer between on-board flex
    *       access and transit.
+   * </pre>
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (

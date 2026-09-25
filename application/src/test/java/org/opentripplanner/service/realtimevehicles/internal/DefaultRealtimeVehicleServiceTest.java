@@ -121,8 +121,8 @@ class DefaultRealtimeVehicleServiceTest implements RealtimeTestConstants {
   }
 
   /**
-   * Change the quay of the second call (from B to C in the same station) so that a realtime
-   * pattern replaces the scheduled one.
+   * Change the quay of the second call (from B to C in the same station) so that a realtime pattern
+   * replaces the scheduled one.
    */
   private void applyQuayChange(TransitTestEnvironment env) {
     var siri = SiriTestHelper.of(env);

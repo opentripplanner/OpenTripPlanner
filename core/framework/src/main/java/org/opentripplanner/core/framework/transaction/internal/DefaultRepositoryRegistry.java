@@ -9,11 +9,12 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
 /**
  * Default implementation of {@link RepositoryRegistry}.
  *
- * <p>Wraps a {@link TransactionManager} to coordinate transactions across all registered
- * repositories. Each call to {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)} creates a
- * {@link TransactionalRepository} and wraps it in a {@link DefaultRepositoryHandle}, which exposes
- * mutable access to {@link DefaultWriteContext} via an internal cast without surfacing it on the
- * public {@link RepositoryHandle} API.
+ * <p>
+ * Wraps a {@link TransactionManager} to coordinate transactions across all registered
+ * repositories. Each call to {@link #registerRepositorySnapshot(Object, RepositoryLifecycle)}
+ * creates a {@link TransactionalRepository} and wraps it in a {@link DefaultRepositoryHandle},
+ * which exposes mutable access to {@link DefaultWriteContext} via an internal cast without
+ * surfacing it on the public {@link RepositoryHandle} API.
  */
 class DefaultRepositoryRegistry implements RepositoryRegistry {
 
@@ -46,8 +47,7 @@ class DefaultRepositoryRegistry implements RepositoryRegistry {
   }
 
   /**
-   * Returns the transaction manager for use during wiring of the
-   * {@link UpdateManager}.
+   * Returns the transaction manager for use during wiring of the {@link UpdateManager}.
    */
   TransactionManager transactionManager() {
     return transactionManager;

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 
 /**
- * Helper class to build up JSON nodes that can be pretty-printed and inserted into the documentation.
+ * Helper class to build up JSON nodes that can be pretty-printed and inserted into the
+ * documentation.
  *
  */
 public class JsonExampleBuilder {

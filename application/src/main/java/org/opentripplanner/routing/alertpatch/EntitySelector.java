@@ -9,10 +9,11 @@ import org.opentripplanner.transit.model.timetable.Direction;
 
 /**
  * Describes which elements in the internal transit data model are affected by a realtime alert.
- * Note that this is specific to alerts and doesn't seem to be used by anything else.
- * This is probably because alerts are unique in their ability to attach themselves to many
- * different routes, stops, etc. at once, while non-alert elements tend to be associated with very
- * specific single other elements.
+ * Note that this is specific to alerts and doesn't seem to be used by anything else. This is
+ * probably because alerts are unique in their ability to attach themselves to many different
+ * routes, stops, etc. at once, while non-alert elements tend to be associated with very specific
+ * single other elements.
+ *
  * @see EntityKey
  */
 public sealed interface EntitySelector {
@@ -80,10 +81,11 @@ public sealed interface EntitySelector {
     }
   }
 
-  /// EntitySelector for a stop and a route. The stop can optionally be restricted to certain stopConditions
-  /// and the line can be restricted to certain directions.
+  /// EntitySelector for a stop and a route. The stop can optionally be restricted to certain
+  /// stopConditions and the line can be restricted to certain directions.
   ///
-  /// @param directions If set the selector will only match trips with one of the specified directions. An empty list will match nothing.
+  /// @param directions If set the selector will only match trips with one of the specified
+  ///                   directions. An empty list will match nothing.
   record StopAndRoute(
     FeedScopedId stopId,
     FeedScopedId routeId,

@@ -12,9 +12,9 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /**
- * A disconnected street network that only serves a ferry stop is never pruned, no matter how
- * small it is: a ferry stop cannot be reached from elsewhere in the street network, so its
- * connecting street network is retained even below the pruning threshold.
+ * A disconnected street network that only serves a ferry stop is never pruned, no matter how small
+ * it is: a ferry stop cannot be reached from elsewhere in the street network, so its connecting
+ * street network is retained even below the pruning threshold.
  */
 class FerryStopIslandRetainedTest {
 

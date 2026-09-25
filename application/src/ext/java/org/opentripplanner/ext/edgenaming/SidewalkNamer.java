@@ -26,10 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A namer that assigns names of nearby streets to sidewalks if they meet certain
- * geometric similarity criteria.
+ * A namer that assigns names of nearby streets to sidewalks if they meet certain geometric
+ * similarity criteria.
  * <p>
  * The algorithm works as follows:
+ * <pre>
  *  - for each sidewalk we look up (named) street edges nearby
  *  - group those edges into groups where each edge has the same name
  *  - draw a flat-capped buffer around the sidewalk, like this: https://tinyurl.com/4fpe882h
@@ -37,11 +38,12 @@ import org.slf4j.LoggerFactory;
  *  - remove those groups which are below MIN_PERCENT_IN_BUFFER
  *  - take the group that has the highest percentage (as a proportion of the sidewalk length) inside
  *    the buffer and apply its name to the sidewalk.
+ * </pre>
  * <p>
  * This works very well for OSM data where the sidewalk runs a parallel to the street and at each
- * intersection the sidewalk is also split. It doesn't work well for sidewalks that go around
- * the corner, like https://www.openstreetmap.org/way/1059101564. These cases are, however, detected
- * by the above algorithm and the sidewalk name remains the same.
+ * intersection the sidewalk is also split. It doesn't work well for sidewalks that go around the
+ * corner, like https://www.openstreetmap.org/way/1059101564. These cases are, however, detected by
+ * the above algorithm and the sidewalk name remains the same.
  */
 class SidewalkNamer implements EdgeNamer {
 
@@ -120,8 +122,8 @@ class SidewalkNamer implements EdgeNamer {
   }
 
   /**
-   * Compute the length of the group that is inside the buffer and return it as a percentage
-   * of the length of the sidewalk.
+   * Compute the length of the group that is inside the buffer and return it as a percentage of the
+   * length of the sidewalk.
    */
   private static NamedEdgeGroup computePercentInsideBuffer(
     CandidateGroup g,
@@ -134,9 +136,9 @@ class SidewalkNamer implements EdgeNamer {
   }
 
   /**
-   * If a single street is split into several edges, each individual part of the street would potentially
-   * have a low similarity with the (longer) sidewalk. For that reason we combine them into a group
-   * and have a better basis for comparison.
+   * If a single street is split into several edges, each individual part of the street would
+   * potentially have a low similarity with the (longer) sidewalk. For that reason we combine them
+   * into a group and have a better basis for comparison.
    */
   private static Stream<CandidateGroup> groupEdgesByName(List<EdgeOnLevel> candidates) {
     return candidates
@@ -165,8 +167,8 @@ class SidewalkNamer implements EdgeNamer {
   }
 
   /**
-   * A group of edges that are near a sidewalk that have the same name. These groups are used
-   * to figure out if the name of the group can be applied to a nearby sidewalk.
+   * A group of edges that are near a sidewalk that have the same name. These groups are used to
+   * figure out if the name of the group can be applied to a nearby sidewalk.
    */
   private record CandidateGroup(I18NString name, List<StreetEdge> edges, Set<OsmLevel> levels) {
     /**

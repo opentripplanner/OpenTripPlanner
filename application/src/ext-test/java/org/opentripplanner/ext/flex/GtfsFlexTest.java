@@ -15,8 +15,8 @@ import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the City of
- * Aspen Downtown taxi service, which is a completely unscheduled trip that takes you door-to-door in
- * the city.
+ * Aspen Downtown taxi service, which is a completely unscheduled trip that takes you door-to-door
+ * in the city.
  * <p>
  * It only contains a single stop time which in GTFS static would not work but is valid in GTFS
  * Flex.

@@ -161,9 +161,8 @@ public class WayPropertySetBuilder {
   }
 
   /**
-   * Takes another way property set and adds its pickers to this builder.
-   * Note: It does not add the max car speed, default car speed or the function for the default
-   * safety resolver.
+   * Takes another way property set and adds its pickers to this builder. Note: It does not add the
+   * max car speed, default car speed or the function for the default safety resolver.
    */
   public WayPropertySetBuilder addPickers(WayPropertySet other) {
     this.wayProperties.addAll(other.listWayProperties());

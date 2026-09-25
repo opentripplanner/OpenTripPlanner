@@ -68,7 +68,8 @@ public class PageCursorFactory {
   }
 
   /**
-   * This adds the page cursor input to the factory. The cursor input contains information about filtering results.
+   * This adds the page cursor input to the factory. The cursor input contains information about
+   * filtering results.
    * <p>
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
@@ -127,8 +128,8 @@ public class PageCursorFactory {
 
   /**
    * If the first search is an arrive by search (PREVIOUS_PAGE type), the current search window is
-   * misleading. Instead of using the current search window to set the page cursor of the next
-   * page, the departure time of the latest itinerary result is used to avoid missing itineraries.
+   * misleading. Instead of using the current search window to set the page cursor of the next page,
+   * the departure time of the latest itinerary result is used to avoid missing itineraries.
    */
   private Instant resolveFirstSearchLatestItineraryDeparture(
     @Nullable PageType pageType,

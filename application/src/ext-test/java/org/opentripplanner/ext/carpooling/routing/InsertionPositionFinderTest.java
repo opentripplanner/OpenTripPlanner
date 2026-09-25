@@ -21,8 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link InsertionPositionFinder}.
- * Focuses on heuristic validation: capacity and beeline delays.
+ * Tests for {@link InsertionPositionFinder}. Focuses on heuristic validation: capacity and beeline
+ * delays.
  */
 class InsertionPositionFinderTest {
 

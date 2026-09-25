@@ -7,8 +7,8 @@ import org.onebusaway.gtfs.model.RouteNetworkAssignment;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
- * Keeps the mapping between GTFS route and their network IDs. These assignments don't result
- * in a separate entity in the OTP model, but are used to assign networks to routes.
+ * Keeps the mapping between GTFS route and their network IDs. These assignments don't result in a
+ * separate entity in the OTP model, but are used to assign networks to routes.
  */
 class RouteNetworkAssignmentMapper {
 
