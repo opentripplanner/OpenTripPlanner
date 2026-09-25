@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.stopconnectivity;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.strategy.DurationTerminationStrategy;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -12,7 +13,6 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -27,18 +27,18 @@ public class StopConnectivityModule implements GraphBuilderModule {
 
   private static final Duration DURATION = Duration.ofMinutes(10);
   private final Graph graph;
-  private final SiteRepository siteRepository;
+  private final IntSupplier regularStopCountSupplier;
   private final DataImportIssueStore issueStore;
 
   private static final Logger LOG = LoggerFactory.getLogger(StopConnectivityModule.class);
 
   public StopConnectivityModule(
     Graph graph,
-    SiteRepository siteRepository,
+    IntSupplier regularStopCountSupplier,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
-    this.siteRepository = siteRepository;
+    this.regularStopCountSupplier = regularStopCountSupplier;
     this.issueStore = issueStore;
   }
 
@@ -50,7 +50,7 @@ public class StopConnectivityModule implements GraphBuilderModule {
     var progress = ProgressTracker.track(
       "Stop connectivity analysis",
       5000,
-      siteRepository.listRegularStops().size()
+      regularStopCountSupplier.getAsInt()
     );
     LOG.info(progress.startMessage());
     var stopVertices = graph.findVertices(TransitStopVertex.class);

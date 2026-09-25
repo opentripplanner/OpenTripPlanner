@@ -192,7 +192,11 @@ public class GraphBuilderModules {
     TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
-    return new StopConnectivityModule(graph, transitRepository.getSiteRepository(), issueStore);
+    return new StopConnectivityModule(
+      graph,
+      () -> transitRepository.getSiteRepository().listRegularStops().size(),
+      issueStore
+    );
   }
 
   @Provides
