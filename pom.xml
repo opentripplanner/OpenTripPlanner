@@ -101,6 +101,7 @@
     <modules>
         <module>application</module>
         <module>astar</module>
+        <module>container</module>
         <module>core</module>
         <module>gtfs-realtime-protobuf</module>
         <module>otp-shaded</module>
@@ -512,61 +513,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.5.2</version>
-                <configuration>
-                    <!-- Only the application module builds a container image, see application/pom.xml -->
-                    <skip>true</skip>
-                    <container>
-                        <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
-                        <entrypoint>/docker-entrypoint.sh</entrypoint>
-                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                        <volumes>
-                            <volume>
-                                /var/opentripplanner/
-                            </volume>
-                        </volumes>
-                        <ports>
-                            <port>8080</port>
-                            <port>8081</port>
-                        </ports>
-                    </container>
-                    <from>
-                        <image>eclipse-temurin:25-jre</image>
-                        <platforms>
-                            <platform>
-                                <architecture>amd64</architecture>
-                                <os>linux</os>
-                            </platform>
-                            <platform>
-                                <architecture>arm64</architecture>
-                                <os>linux</os>
-                            </platform>
-                        </platforms>
-                    </from>
-                    <to>
-                        <image>${env.CONTAINER_REPO}</image>
-                        <auth>
-                            <username>${env.CONTAINER_REGISTRY_USER}</username>
-                            <password>${env.CONTAINER_REGISTRY_PASSWORD}</password>
-                        </auth>
-                    </to>
-                    <extraDirectories>
-                        <permissions>
-                            <permission>
-                                <file>/docker-entrypoint.sh</file>
-                                <mode>755</mode>
-                            </permission>
-                            <permission>
-                                <file>/var/opentripplanner/</file>
-                                <mode>755</mode>
-                            </permission>
-                        </permissions>
-                    </extraDirectories>
-                </configuration>
             </plugin>
         </plugins>
     </build>
