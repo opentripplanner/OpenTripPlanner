@@ -201,16 +201,21 @@ class ServiceLinkMapper {
     return GeometryUtils.makeLineString(s0.getCoordinate(), s1.getCoordinate());
   }
 
+  @Nullable
+  private RegularStop findStop(@Nullable String quayId) {
+    return quayId == null ? null : stopById.get(idFactory.createId(quayId));
+  }
+
   private boolean isFromToPointRefsValid(
     ServiceLink serviceLink,
     StopPattern stopPattern,
     int stopIndex
   ) {
     String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
-    RegularStop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
+    RegularStop fromPointStop = findStop(fromPointQuayId);
 
     String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
-    RegularStop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
+    RegularStop toPointStop = findStop(toPointQuayId);
 
     if (fromPointStop == null || toPointStop == null) {
       issueStore.add(
