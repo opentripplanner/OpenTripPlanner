@@ -80,7 +80,7 @@ class RouteMapper {
     builder.withOperator(findOperator(line));
     builder.withBranding(findBranding(line));
     NonLocalizedString longName = NonLocalizedString.ofNullable(
-      MultilingualStringMapper.nullableValueOf(line.getName())
+      MultilingualStringMapper.getStringValue(line.getName())
     );
     builder.withLongName(longName);
     builder.withShortName(line.getPublicCode() != null ? line.getPublicCode().getValue() : null);

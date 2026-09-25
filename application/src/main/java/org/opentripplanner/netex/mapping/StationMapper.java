@@ -69,7 +69,7 @@ class StationMapper {
       .withShouldRouteToCentroid(shouldRouteToCentroid(id))
       .withDescription(
         NonLocalizedString.ofNullable(
-          MultilingualStringMapper.nullableValueOf(stopPlace.getDescription())
+          MultilingualStringMapper.getStringValue(stopPlace.getDescription())
         )
       )
       .withPriority(StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting()))
