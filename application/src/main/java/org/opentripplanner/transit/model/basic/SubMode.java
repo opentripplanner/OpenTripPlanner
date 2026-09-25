@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class wraps a string and creates an index for it, so we can use a BitSet for matching a
- * trip netex SubMode. SubModes are used in trip filtering for every request.
+ * This class wraps a string and creates an index for it, so we can use a BitSet for matching a trip
+ * netex SubMode. SubModes are used in trip filtering for every request.
  * <p>
  * Naming; This class is named SubMode, not NetexSubMode because we want to migrate gtfsRouteType
  * into the same concept.
@@ -28,9 +28,8 @@ public record SubMode(String name, int index) implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(SubMode.class);
 
   /**
-   * Note! This caches all sub-modes used in the static scheduled transit data. When
-   * serializing the static fields need to be explicitly serialized, it is not enough
-   * to serialize the instances.
+   * Note! This caches all sub-modes used in the static scheduled transit data. When serializing the
+   * static fields need to be explicitly serialized, it is not enough to serialize the instances.
    */
   private static final Map<String, SubMode> ALL = new ConcurrentHashMap<>();
   private static final AtomicInteger COUNTER = new AtomicInteger(0);
@@ -38,10 +37,10 @@ public record SubMode(String name, int index) implements Serializable {
   public static final SubMode UNKNOWN = getOrBuildAndCacheForever("unknown");
 
   /**
-   * This method is safe to use in a request scope. Usually you want to fetch an instant to
-   * pass in as a request parameter. This method will fetch an existing object - not creating
-   * a duplicate object, if at least one Route, Trip or Stop has this submode. If it does not
-   * exist in the model a new is created, but not put on the "deduplication" map.
+   * This method is safe to use in a request scope. Usually you want to fetch an instant to pass in
+   * as a request parameter. This method will fetch an existing object - not creating a duplicate
+   * object, if at least one Route, Trip or Stop has this submode. If it does not exist in the model
+   * a new is created, but not put on the "deduplication" map.
    */
   public static SubMode of(String name) {
     if (name == null) {
@@ -52,11 +51,11 @@ public record SubMode(String name, int index) implements Serializable {
   }
 
   /**
-   * Make sure to use this during graph build or when creating new Trips in realTime
-   * updates. Do NOT use this in an OTP routing request - that will lead to memory leaks.
+   * Make sure to use this during graph build or when creating new Trips in realTime updates. Do NOT
+   * use this in an OTP routing request - that will lead to memory leaks.
    * <p>
-   * The builders in the transit model take care of calling this method, so there is no
-   * reason to call this method outside the transit model package.
+   * The builders in the transit model take care of calling this method, so there is no reason to
+   * call this method outside the transit model package.
    */
   public static SubMode getOrBuildAndCacheForever(String name) {
     if (name == null) {
@@ -95,8 +94,8 @@ public record SubMode(String name, int index) implements Serializable {
   }
 
   /**
-   * Only name is used in the equals, not index, so we need to override the
-   * default record implementation of equals.
+   * Only name is used in the equals, not index, so we need to override the default record
+   * implementation of equals.
    */
   @Override
   public boolean equals(Object o) {

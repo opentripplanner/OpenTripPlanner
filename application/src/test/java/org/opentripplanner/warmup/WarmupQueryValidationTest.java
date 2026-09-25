@@ -16,9 +16,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
- * Validates that the warmup GraphQL queries are syntactically and structurally valid
- * against the actual schemas. This catches field renames, removed arguments, or
- * invalid enum values at build time rather than at runtime.
+ * Validates that the warmup GraphQL queries are syntactically and structurally valid against the
+ * actual schemas. This catches field renames, removed arguments, or invalid enum values at build
+ * time rather than at runtime.
  */
 class WarmupQueryValidationTest {
 

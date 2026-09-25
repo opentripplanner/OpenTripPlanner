@@ -68,8 +68,8 @@ public class ScheduledTripTimesBuilder {
   }
 
   /**
-   * Add the {@code delta} to the existing timeShift. This is useful when moving a trip
-   * from one time-zone to another.
+   * Add the {@code delta} to the existing timeShift. This is useful when moving a trip from one
+   * time-zone to another.
    */
   public ScheduledTripTimesBuilder plusTimeShift(int delta) {
     this.timeShift += delta;

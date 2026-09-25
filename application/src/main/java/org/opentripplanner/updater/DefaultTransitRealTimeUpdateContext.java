@@ -25,15 +25,17 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
    * all in-progress real-time additions that have not yet been committed to a published snapshot.
    * <p>
    * A {@link TimetableRepository} cannot be used directly for these lookups, because every
-   * lookup must also fall back to scheduled data in the {@link TransitRepository} when an entity
-   * is not found in the real-time repository. The {@link DefaultTransitService} combines both: it
+   * lookup must also fall back to scheduled data in the {@link TransitRepository} when an entity is
+   * not found in the real-time repository. The {@link DefaultTransitService} combines both: it
    * checks the repository first, then falls back to the static index.
    * <p>
-   * {@link DefaultTransitService} accepts a {@link org.opentripplanner.transit.repository.TimetableRepositorySnapshot},
-   * because in request scope it must never receive the mutable repository. Passing the repository
-   * here is safe because {@link TimetableRepository} extends
-   * {@link org.opentripplanner.transit.repository.TimetableRepositorySnapshot}. A cleaner separation
-   * would require merging scheduled and real-time data into a single unified store - this is the end goal!
+   * {@link DefaultTransitService} accepts a
+   * {@link org.opentripplanner.transit.repository.TimetableRepositorySnapshot}, because in request
+   * scope it must never receive the mutable repository. Passing the repository here is safe because
+   * {@link TimetableRepository} extends
+   * {@link org.opentripplanner.transit.repository.TimetableRepositorySnapshot}. A cleaner
+   * separation would require merging scheduled and real-time data into a single unified store -
+   * this is the end goal!
    */
   public DefaultTransitRealTimeUpdateContext(
     TransitRepository transitRepository,

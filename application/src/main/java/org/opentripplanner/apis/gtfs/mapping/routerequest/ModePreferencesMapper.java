@@ -125,9 +125,9 @@ public class ModePreferencesMapper {
   }
 
   /**
-   * It may be a little surprising that the transit filters are mapped here. This
-   * is because the mapping function needs to know the modes to build the correct
-   * select request as it needs to be the first one in each transit filter request.
+   * It may be a little surprising that the transit filters are mapped here. This is because the
+   * mapping function needs to know the modes to build the correct select request as it needs to be
+   * the first one in each transit filter request.
    */
   private static void setTransitFilters(
     JourneyRequestBuilder journey,
@@ -153,8 +153,8 @@ public class ModePreferencesMapper {
   }
 
   /**
-   * return car rental duration, if it was set in graphql query.
-   * This method exist, to handle all the null checks.
+   * return car rental duration, if it was set in graphql query. This method exist, to handle all
+   * the null checks.
    */
   @Nullable
   private static Duration getRentalDurationByQueryArgs(

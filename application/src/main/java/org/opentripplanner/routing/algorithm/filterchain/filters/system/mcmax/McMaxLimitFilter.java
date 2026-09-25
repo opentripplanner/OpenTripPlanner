@@ -7,27 +7,28 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCr
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
- * This filter is used to reduce a set of itineraries down to the specified limit, if possible.
- * The filter is guaranteed to keep at least the given {@code minNumItineraries} and/or the best
+ * This filter is used to reduce a set of itineraries down to the specified limit, if possible. The
+ * filter is guaranteed to keep at least the given {@code minNumItineraries} and/or the best
  * itinerary for each criterion. The criterion is defined using the list of {@code comparators}.
  * <p>
- * The main usage of this filter is to combine it with a transit grouping filter and for each group
- * make sure there is at least {@code minNumItineraries} and that the best itinerary with respect
- * to each criterion is kept. So, if the grouping is based on time and riding common trips, then
- * this filter will use the remaining criterion (transfers, generalized-cost,
- * [transit-group-priority]) to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA
- * USED TO GROUP THE ITINERARIES, ONLY THE REMAINING CRITERION USED IN THE RAPTOR SEARCH.
+ * The main usage of this filter is to combine it with a transit grouping filter and for each
+ * group make sure there is at least {@code minNumItineraries} and that the best itinerary with
+ * respect to each criterion is kept. So, if the grouping is based on time and riding common trips,
+ * then this filter will use the remaining criterion (transfers, generalized-cost,
+ * [transit-group-priority]) to filter the grouped set of itineraries. DO NOT INCLUDE CRITERIA USED
+ * TO GROUP THE ITINERARIES, ONLY THE REMAINING CRITERION USED IN THE RAPTOR SEARCH.
  * <p>
  * <b>IMPLEMENTATION DETAILS</b>
  * <p>
- * This is not a trivial problem. In most cases, the best itinerary for a given criteria is unique,
- * but there might be ties - same number of transfers, same cost, and/or different priority groups.
- * In case of a tie, we will look if an itinerary is "best-in-group" for more than one criterion,
- * if so we pick the one which is best in the highest number of groups. Again, if there is a tie
- * (best in the same number of groups), then we fall back to the given itinerary sorting order.
+ * This is not a trivial problem. In most cases, the best itinerary for a given criteria is
+ * unique, but there might be ties - same number of transfers, same cost, and/or different priority
+ * groups. In case of a tie, we will look if an itinerary is "best-in-group" for more than one
+ * criterion, if so we pick the one which is best in the highest number of groups. Again, if there
+ * is a tie (best in the same number of groups), then we fall back to the given itinerary sorting
+ * order.
  * <p>
- * This filter will use the order of the input itineraries to break ties. So, make sure to call the
- * appropriate sort function before this filter is invoked.
+ * This filter will use the order of the input itineraries to break ties. So, make sure to call
+ * the appropriate sort function before this filter is invoked.
  * <p>
  * Note! For criteria like num-of-transfers or generalized-cost, there is only one set of "best"
  * itineraries, and usually there are only one or a few itineraries. In case there is more than one,
@@ -53,15 +54,15 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  *   ]
  * </pre>
  * The best itineraries by generalized-cost are (#0, #1, #2). The best itineraries by
- * min-num-transfers are (#3, #4). The best itineraries by transit-group-priority are
- * (a:(#0, #4), b:(#2), c:(#5, #6)).
+ * min-num-transfers are (#3, #4). The best itineraries by transit-group-priority are (a:(#0, #4),
+ * b:(#2), c:(#5, #6)).
  * <p>
  * So we need to pick one from each group (#0, #1, #2), (#3, #4), (#0, #4), (#2), and (#5, #6).
- * Since #2 is a single, we pick it first. Itinerary #2 is also one of the best
- * generalized-cost itineraries - so we are done with generalized-cost itineraries as well. The two
- * groups left are (#3, #4), (#0, #4), and (#5, #6). #4 exists in 2 groups, so we pick it next. Now
- * we are left with (#5, #6). To break the tie, we look at the sort-order. We pick
- * itinerary #5. Result: #2, #4, and #5.
+ * Since #2 is a single, we pick it first. Itinerary #2 is also one of the best generalized-cost
+ * itineraries - so we are done with generalized-cost itineraries as well. The two groups left are
+ * (#3, #4), (#0, #4), and (#5, #6). #4 exists in 2 groups, so we pick it next. Now we are left with
+ * (#5, #6). To break the tie, we look at the sort-order. We pick itinerary #5. Result: #2, #4, and
+ * #5.
  * <p>
  * The `minNumItineraries` limit is not met, so we need to pick another itinerary, we use the
  * sort-order again and add itinerary #0. The result returned is: [#0, #2, #4, #5]

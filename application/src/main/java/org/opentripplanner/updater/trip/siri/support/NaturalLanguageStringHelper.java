@@ -10,8 +10,8 @@ import uk.org.siri.siri21.NaturalLanguageStringStructure;
 public class NaturalLanguageStringHelper {
 
   /**
-   * Return the first element in a list of SIRI natural language strings.
-   * Default to an empty string if the list is null or empty.
+   * Return the first element in a list of SIRI natural language strings. Default to an empty string
+   * if the list is null or empty.
    */
   public static String getFirstStringFromList(
     @Nullable List<NaturalLanguageStringStructure> strings

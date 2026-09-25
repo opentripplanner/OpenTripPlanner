@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for capacity checking methods on {@link CarpoolTrip}.
  * <p>
- * All trips created via {@code createTripWithStops} have totalCapacity=5.
- * The method wraps intermediate stops with an Origin (onboard=1) at the front
- * and a Destination (onboard=1) at the end.
+ * All trips created via {@code createTripWithStops} have totalCapacity=5. The method wraps
+ * intermediate stops with an Origin (onboard=1) at the front and a Destination (onboard=1) at the
+ * end.
  * <p>
- * {@code pickupPosition} and {@code dropoffPosition} in {@code hasCapacityForInsertion}
- * are 0-based indices of the passenger's stops in the modified route (the route after the
- * passenger's pickup and dropoff have been inserted into the carpool trip).
+ * {@code pickupPosition} and {@code dropoffPosition} in {@code hasCapacityForInsertion} are
+ * 0-based indices of the passenger's stops in the modified route (the route after the passenger's
+ * pickup and dropoff have been inserted into the carpool trip).
  */
 class CarpoolTripCapacityTest {
 

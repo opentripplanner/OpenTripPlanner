@@ -27,9 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Indexed access to Transit entities.
- * For performance reasons these indexes are not part of the serialized state of the graph.
- * They are rebuilt at runtime after graph deserialization.
+ * Indexed access to Transit entities. For performance reasons these indexes are not part of the
+ * serialized state of the graph. They are rebuilt at runtime after graph deserialization.
  */
 class TransitRepositoryIndex {
 
@@ -133,8 +132,8 @@ class TransitRepositoryIndex {
   }
 
   /**
-   * Checks if the last scheduled service date for the stop is on or after the given date.
-   * This does not include real-time updates, so it only checks the scheduled service dates.
+   * Checks if the last scheduled service date for the stop is on or after the given date. This does
+   * not include real-time updates, so it only checks the scheduled service dates.
    *
    * @param date the date to check against
    * @param stop the stop to check

@@ -3,8 +3,8 @@ package org.opentripplanner.street.model.vertex;
 import org.opentripplanner.core.model.i18n.I18NString;
 
 /**
- * An intersection vertex that has a label that is generated outside of it rather than
- * derived from its properties.
+ * An intersection vertex that has a label that is generated outside of it rather than derived from
+ * its properties.
  */
 public class LabelledIntersectionVertex extends IntersectionVertex {
 

@@ -11,16 +11,16 @@ import javax.annotation.Nullable;
  */
 public interface I18NString {
   /**
-   * Return {@code true} if the given value is not {@code null} or has at least one none
-   * white-space character.
+   * Return {@code true} if the given value is not {@code null} or has at least one none white-space
+   * character.
    */
   static boolean hasValue(@Nullable I18NString value) {
     return !hasNoValue(value);
   }
 
   /**
-   * Return {@code true} if the given value has at least one none white-space character.
-   * Return {@code false} if the value is {@code null} or blank.
+   * Return {@code true} if the given value has at least one none white-space character. Return
+   * {@code false} if the value is {@code null} or blank.
    */
   static boolean hasNoValue(@Nullable I18NString value) {
     return value == null || value.toString().isBlank();

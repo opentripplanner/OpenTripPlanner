@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * This module creates hop geometries from GTFS shapes.
  *
  * <p>
- * THREAD SAFETY The computation runs in parallel so be careful about thread safety when modifying
- * the logic here.
+ * THREAD SAFETY The computation runs in parallel so be careful about thread safety when
+ * modifying the logic here.
  */
 public class GeometryProcessor {
 
@@ -67,11 +67,11 @@ public class GeometryProcessor {
   }
 
   /**
-   * Generate the per-hop geometry for the trip. The returned list is never null and always
-   * contains one entry per hop ({@code stopTimes.size() - 1}). When the trip has no usable
-   * shape data, the hops fall back to straight lines between consecutive stops, mirroring the
-   * NeTEx {@link org.opentripplanner.netex.mapping.ServiceLinkMapper} behaviour. Assumes that
-   * there are already vertices in the graph for the stops.
+   * Generate the per-hop geometry for the trip. The returned list is never null and always contains
+   * one entry per hop ({@code stopTimes.size() - 1}). When the trip has no usable shape data, the
+   * hops fall back to straight lines between consecutive stops, mirroring the NeTEx
+   * {@link org.opentripplanner.netex.mapping.ServiceLinkMapper} behaviour. Assumes that there are
+   * already vertices in the graph for the stops.
    * <p>
    * THREAD SAFETY The geometries for the trip patterns are computed in parallel. The collections
    * needed for this are concurrent implementations and therefore threadsafe but the issue store,

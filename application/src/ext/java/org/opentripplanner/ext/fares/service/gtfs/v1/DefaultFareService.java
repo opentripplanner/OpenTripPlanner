@@ -64,11 +64,11 @@ class FareSearch {
 }
 
 /**
- * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute
- * is only applicable for legs that operated by an agency within the same feed. Interfeed transfer rules
- * are not considered in this fare service and for those situations you get to implement your own Fare Service
- * See this thread on gtfs-changes explaining the proper interpretation of
- * fares.txt:
+ * This fare service module handles GTFS fares in multiple feeds separately so that each fare
+ * attribute is only applicable for legs that operated by an agency within the same feed. Interfeed
+ * transfer rules are not considered in this fare service and for those situations you get to
+ * implement your own Fare Service See this thread on gtfs-changes explaining the proper
+ * interpretation of fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
 public class DefaultFareService implements FareService {
@@ -159,9 +159,9 @@ public class DefaultFareService implements FareService {
   /**
    * Builds the Fare object for the given currency, fareType and fareRules.
    * <p>
-   * Besides calculating the lowest fare, we also break down the fare and which routes correspond to
-   * which components. Note that even if we cannot get a lowest fare (if some rides don't have fare
-   * rules), there will still be a breakdown for those parts which have fares.
+   * Besides calculating the lowest fare, we also break down the fare and which routes correspond
+   * to which components. Note that even if we cannot get a lowest fare (if some rides don't have
+   * fare rules), there will still be a breakdown for those parts which have fares.
    * <p>
    * As an example, given the rides A-B and B-C. Where A-B and B-C have fares of 10 each, 2 fare
    * detail objects are added, one with fare 10 for A-B and one with fare 10 for B-C.
@@ -321,7 +321,8 @@ public class DefaultFareService implements FareService {
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
    * @see DefaultFareService#combineInterlinedLegs(List)
-   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
+   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg,
+   *      ScheduledTransitLeg)
    * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(

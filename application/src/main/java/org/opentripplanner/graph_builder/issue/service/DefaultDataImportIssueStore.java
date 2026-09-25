@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Thread-safe implementation of {@link DataImportIssueStore}. NeTEx bundles are loaded in
- * parallel, so {@link #add} and {@link #listIssues} synchronize on the internal list.
+ * Thread-safe implementation of {@link DataImportIssueStore}. NeTEx bundles are loaded in parallel,
+ * so {@link #add} and {@link #listIssues} synchronize on the internal list.
  */
 @Singleton
 public class DefaultDataImportIssueStore implements DataImportIssueStore {

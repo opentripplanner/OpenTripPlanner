@@ -26,8 +26,8 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <p>
  * The variable name can be one of `t`, `T`, `x` or `X`.
  * <p>
- * The constant is parsed with {@link DurationUtils#duration(String)}. In the case where
- * the function is a function of cost the duration should be converted to a cost using
+ * The constant is parsed with {@link DurationUtils#duration(String)}. In the case where the
+ * function is a function of cost the duration should be converted to a cost using
  * {@link Cost#costOfSeconds(int)}.
  */
 public class LinearFunctionSerialization {
@@ -48,8 +48,9 @@ public class LinearFunctionSerialization {
   /**
    * Parse a string on the format: {@code 2m30s + 1.2 t }.
    * <p>
-   * The coefficient must be a number between 0.0 and 100.0. and is normalized: if < 2.0 to
-   * 2 decimals, if 2.0 < 10.0 to 1 decimal and to whole numbers above 10.0.
+   * The coefficient must be a number between 0.0 and 100.0. and is normalized: if < 2.0 to 2
+   * decimals, if 2.0 < 10.0 to 1 decimal and to whole numbers above 10.0.
+   *
    * @throws NumberFormatException
    * @throws IllegalArgumentException
    */
@@ -87,12 +88,11 @@ public class LinearFunctionSerialization {
   }
 
   /**
-   * Parse a String as a Duration.
-   * Unfortunately, to be backwards compatible we need to support decimal numbers.
-   * If the text represents a decimal number, then the value is converted to seconds.
-   * <br/>
-   * The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot be used
-   * here since it supports only integer seconds, not decimal seconds.
+   * Parse a String as a Duration. Unfortunately, to be backwards compatible we need to support
+   * decimal numbers. If the text represents a decimal number, then the value is converted to
+   * seconds. <br/>
+   * The parsing function {@link DurationUtils#parseSecondsOrDuration(String)} cannot be used here
+   * since it supports only integer seconds, not decimal seconds.
    *
    */
   private static Duration parseDecimalSecondsOrDuration(String text) {

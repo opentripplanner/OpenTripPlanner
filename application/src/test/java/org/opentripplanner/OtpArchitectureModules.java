@@ -37,8 +37,8 @@ public interface OtpArchitectureModules {
   Package RAPTOR_SPI = RAPTOR_ROOT.subPackage("spi..");
 
   /**
-   * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks
-   * (except true utilities like slf4j).
+   * This is a bag of TRUE util classes - no dependencies to other OTP classes or frameworks (except
+   * true utilities like slf4j).
    */
   Module OTP_UTILS = Module.of(
     UTILS_PACKAGE.subPackage("collection"),

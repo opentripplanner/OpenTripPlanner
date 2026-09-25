@@ -13,8 +13,7 @@ class SpeedParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(SpeedParser.class);
   /**
-   * regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
-   * and edited
+   * regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed and edited
    */
   private static final Pattern MAX_SPEED_PATTERN = Pattern.compile(
     "^([0-9][.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$"

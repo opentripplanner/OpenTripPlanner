@@ -21,13 +21,13 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
- * This class is responsible for loading configuration and setting up the OTP data store.
- * This is used to load the graph, and finally this class can create the
- * {@link ConstructApplication} for the next phase.
+ * This class is responsible for loading configuration and setting up the OTP data store. This is
+ * used to load the graph, and finally this class can create the {@link ConstructApplication} for
+ * the next phase.
  * <p>
- * By splitting these two responsibilities into two separate phases we are sure all
- * components (graph and transit model) created in the load phase will be available for
- * creating the application using Dagger dependency injection.
+ * By splitting these two responsibilities into two separate phases we are sure all components
+ * (graph and transit model) created in the load phase will be available for creating the
+ * application using Dagger dependency injection.
  */
 public class LoadApplication {
 

@@ -33,8 +33,8 @@ import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 
 /**
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 @SuppressWarnings("UnusedReturnValue")
@@ -248,10 +248,11 @@ public class TestTransitData
   /**
    * Create constraint for a given transfer. If trip passes through the stop more than once
    * constraint will be placed on stop position for the first visit.
-   * @param fromTrip initial trip
-   * @param fromStop initial stop index
-   * @param toTrip destination trip
-   * @param toStop destination trip index
+   *
+   * @param fromTrip   initial trip
+   * @param fromStop   initial stop index
+   * @param toTrip     destination trip
+   * @param toStop     destination trip index
    * @param constraint constraint to set
    */
   public TestTransitData withConstrainedTransfer(

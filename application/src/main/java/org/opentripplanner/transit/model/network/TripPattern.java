@@ -34,27 +34,26 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * stop). Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a
  * later trip.
  * <p>
- * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All trips
- * grouped under a TripPattern should have the same values for these characteristics (with possible
- * exceptions for TransitMode and SubMode).
+ * The key of the TripPattern includes the Route, StopPattern, TransitMode, and SubMode. All
+ * trips grouped under a TripPattern should have the same values for these characteristics (with
+ * possible exceptions for TransitMode and SubMode).
  * <p>
  * TODO RT_AB: We need to clarify exactly which characteristics are identical across the trips.
- *   Grouping into patterns serves more than one purpose: it conserves memory by not replicating
- *   details shared across all trips in the TripPattern; it reflects business practices outside
- *   routing; it is essential to optimizations in routing algorithms like Raptor. We may be
- *   conflating a domain model grouping with an internal routing grouping.
+ * Grouping into patterns serves more than one purpose: it conserves memory by not replicating
+ * details shared across all trips in the TripPattern; it reflects business practices outside
+ * routing; it is essential to optimizations in routing algorithms like Raptor. We may be conflating
+ * a domain model grouping with an internal routing grouping.
  * <p>
  * TODO RT_TG In addition to AB comment: this does not map cleanly to NeTEx JourneyPattern, the
- *   concept does not exist in GTFS. The TripPattern ID is unfortunatly exposed in the OTP APIs.
- *   This class has a 1-to-1 relationship with RoutingTripPattern. To support a more flexible
- *   system and more use-cases we should consider keeping "routing-tables" apart from the bussiness
- *   domain model. One example, if the wheelchair accessability differ between trips within the
- *   same pattern, then we can not support it - wheelchair is not part of the TripPattern key.
- *   Putting everything into the key is not a good options either, the fragmentation will have a
- *   negative performance impact.
+ * concept does not exist in GTFS. The TripPattern ID is unfortunatly exposed in the OTP APIs. This
+ * class has a 1-to-1 relationship with RoutingTripPattern. To support a more flexible system and
+ * more use-cases we should consider keeping "routing-tables" apart from the bussiness domain model.
+ * One example, if the wheelchair accessability differ between trips within the same pattern, then
+ * we can not support it - wheelchair is not part of the TripPattern key. Putting everything into
+ * the key is not a good options either, the fragmentation will have a negative performance impact.
  * <p>
- * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel
- * JOURNEY a "trip", thus TripPattern.
+ * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a
+ * Transmodel JOURNEY a "trip", thus TripPattern.
  * <p>
  * The {@code id} is a unique identifier for this trip pattern. For GTFS feeds this is generally
  * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
@@ -69,7 +68,7 @@ public final class TripPattern
 
   /**
    * This field should not be accessed outside this class. All access to the StopPattern is
-   * performed through method  delegation, like the {@link #numberOfStops()} and
+   * performed through method delegation, like the {@link #numberOfStops()} and
    * {@link #canBoard(int)} methods.
    */
   private final StopPattern stopPattern;
@@ -78,11 +77,11 @@ public final class TripPattern
    * TripPatterns hold a reference to a Timetable (i.e. TripTimes for all Trips in the pattern) for
    * only scheduled trips from the GTFS or NeTEx data. If any trips were later updated in real time,
    * there will be another Timetable holding those updates and reading through to the scheduled one.
-   * That other realtime Timetable is retrieved from a TimetableRepositorySnapshot (see end of Javadoc on
-   * DefaultTimetableRepository for more details).
+   * That other realtime Timetable is retrieved from a TimetableRepositorySnapshot (see end of
+   * Javadoc on DefaultTimetableRepository for more details).
    * <p>
    * TODO RT_AB: The above system should be changed to integrate realtime and scheduled data more
-   *   closely. The Timetable may become obsolete or change significantly when they are integrated.
+   * closely. The Timetable may become obsolete or change significantly when they are integrated.
    */
   private final Timetable scheduledTimetable;
 
@@ -99,8 +98,8 @@ public final class TripPattern
 
   /**
    * Geometries of each inter-stop segment of the tripPattern, together with the precomputed
-   * cumulative distance along the pattern. Not used in routing, only for API listing and
-   * per-leg distance computation via {@link #distanceBetween(int, int)}.
+   * cumulative distance along the pattern. Not used in routing, only for API listing and per-leg
+   * distance computation via {@link #distanceBetween(int, int)}.
    */
   private final CompactLineStringSequence patternGeometry;
 
@@ -205,8 +204,8 @@ public final class TripPattern
   }
 
   /**
-   * Geometry of the pattern segment between the boarding and alighting stop positions,
-   * obtained by concatenating the underlying hop geometries.
+   * Geometry of the pattern segment between the boarding and alighting stop positions, obtained by
+   * concatenating the underlying hop geometries.
    */
   public LineString geometryBetween(int boardingStopPosition, int alightingStopPosition) {
     return patternGeometry.concatenate(boardingStopPosition, alightingStopPosition);
@@ -218,11 +217,11 @@ public final class TripPattern
 
   /**
    * Return the "original"/planned stop pattern as a builder. This is used when a realtime-update
-   * contains a full set of stops/pickup/dropoff for a pattern. This will wipe out any changes
-   * to the stop-pattern from previous updates.
+   * contains a full set of stops/pickup/dropoff for a pattern. This will wipe out any changes to
+   * the stop-pattern from previous updates.
    * <p>
-   * Be aware, if the same update is applied twice, then the first instance will be reused to avoid
-   * unnecessary objects creation and gc.
+   * Be aware, if the same update is applied twice, then the first instance will be reused to
+   * avoid unnecessary objects creation and gc.
    */
   public StopPattern.StopPatternBuilder copyPlannedStopPattern() {
     return isModified()
@@ -231,10 +230,10 @@ public final class TripPattern
   }
 
   /**
-   * The concatenated hop geometry of the whole pattern. For patterns built without shape data
-   * (GTFS without {@code shapes.txt}, NeTEx without ServiceLink projections, real-time added
-   * trips), this is composed of straight-line segments between consecutive stops. The returned
-   * geometry is never null; it is empty for degenerate patterns with no hops (one stop or fewer).
+   * The concatenated hop geometry of the whole pattern. For patterns built without shape data (GTFS
+   * without {@code shapes.txt}, NeTEx without ServiceLink projections, real-time added trips), this
+   * is composed of straight-line segments between consecutive stops. The returned geometry is never
+   * null; it is empty for degenerate patterns with no hops (one stop or fewer).
    */
   public LineString getGeometry() {
     return patternGeometry.concatenate(0, patternGeometry.size());
@@ -314,38 +313,35 @@ public final class TripPattern
   }
 
   /**
-   * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given
-   * stop position, ONLY use this method if you would like to search the stop-pattern for
-   * if it contains a bording for the given stop.
+   * Use {@link #canBoard(int)} if you want to check if a stop can be boarded at a given stop
+   * position, ONLY use this method if you would like to search the stop-pattern for if it contains
+   * a bording for the given stop.
    * <p>
-   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern,
-   * considering all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can board at a given stop SOMEWHERE in the pattern, considering
+   * all stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
-   * WARNING! This does not produce the same result as the {@link #canBoard(int)},
-   *          this method ALWAYS returns {@code false} for the last stop, while the
-   *          other method returns whatever is in the data. This method is probably the
-   *          correct way - but this is not a clear decision.
+   * WARNING! This does not produce the same result as the {@link #canBoard(int)}, this method
+   * ALWAYS returns {@code false} for the last stop, while the other method returns whatever is in
+   * the data. This method is probably the correct way - but this is not a clear decision.
    */
   public boolean boardingExist(StopLocation stop) {
     return stopPattern.boardingExist(stop);
   }
 
   /**
-   * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given
-   * stop position, ONLY use this method if you would like to search the stop-pattern for a
-   * alighting.
+   * Use {@link #canAlight(int)} if you want to check if a stop can be alighted at a given stop
+   * position, ONLY use this method if you would like to search the stop-pattern for a alighting.
    * <p>
-   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern,
-   * considering all stops in case the pattern visit the same stop twice.
+   * Returns whether passengers can alight at a given stop SOMEWHERE in the pattern, considering
+   * all stops in case the pattern visit the same stop twice.
    * <p>
    * WARNING! This is an inefficient method iterating over the stops, do not use it in routing.
    * <p>
-   * WARNING! This does not produce the same result as the {@link #canAlight(int)},
-   *          this method ALWAYS returns {@code false} for the first stop, while the
-   *          other method returns whatever is in the data. This method is probably the
-   *          correct way - but this is not a clear decision.
+   * WARNING! This does not produce the same result as the {@link #canAlight(int)}, this method
+   * ALWAYS returns {@code false} for the first stop, while the other method returns whatever is in
+   * the data. This method is probably the correct way - but this is not a clear decision.
    */
   public boolean alightingExist(StopLocation stop) {
     return stopPattern.alightingExist(stop);
@@ -371,8 +367,8 @@ public final class TripPattern
   /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
 
   /**
-   * Checks that this is TripPattern is based off the provided TripPattern and contains the same stops
-   * (but not necessarily with same pickup and dropoff values).
+   * Checks that this is TripPattern is based off the provided TripPattern and contains the same
+   * stops (but not necessarily with same pickup and dropoff values).
    */
   public boolean isModifiedFromTripPatternWithEqualStops(TripPattern other) {
     return (
@@ -383,8 +379,8 @@ public final class TripPattern
   }
 
   /**
-   * Return the direction for all the trips in this pattern.
-   * By construction, all trips in a pattern have the same direction:
+   * Return the direction for all the trips in this pattern. By construction, all trips in a pattern
+   * have the same direction:
    * <pre>
    * - trips derived from NeTEx data belong to a ServiceJourney that belongs to a JourneyPattern
    *   that belongs to a NeTEx Route that specifies a single direction.
@@ -446,8 +442,8 @@ public final class TripPattern
    * field will be {@code true}.
    * <p>
    * Returns {@code true} if this TripPattern is a modified version of a scheduled TripPattern.
-   * If this method returns {@code false}, this TripPattern is either a scheduled TripPattern or
-   * a TripPattern generated from scratch in real-time (GTFS ADDED/NeTEx ExtraJourney).
+   * If this method returns {@code false}, this TripPattern is either a scheduled TripPattern or a
+   * TripPattern generated from scratch in real-time (GTFS ADDED/NeTEx ExtraJourney).
    */
   public boolean isStopPatternModifiedInRealTime() {
     return stopPatternModifiedInRealTime;
@@ -455,8 +451,8 @@ public final class TripPattern
 
   /**
    * Returns {@code true} if this TripPattern is created in real time, {@code false} if the
-   * TripPattern is created from planned/scheduled data. Note! This trip pattern can represent a
-   * new trip (GTFS ADDED or NeTEx Extra Journey) or a modification of a scheduled trip.
+   * TripPattern is created from planned/scheduled data. Note! This trip pattern can represent a new
+   * trip (GTFS ADDED or NeTEx Extra Journey) or a modification of a scheduled trip.
    */
   public boolean isRealTimeTripPattern() {
     return realTimeTripPattern;
@@ -464,7 +460,8 @@ public final class TripPattern
 
   /**
    * @deprecated This method is not clearly defined. Use {@link #isStopPatternModifiedInRealTime()}
-   * or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed for.
+   *             or {@link #isRealTimeTripPattern()} if possible, or clarify what this is needed
+   *             for.
    */
   @Deprecated
   public boolean isModified() {
@@ -514,8 +511,8 @@ public final class TripPattern
   }
 
   /**
-   * Does the pattern contain any stops passed in as argument?
-   * This method is not optimized for performance so don't use it where that is critical.
+   * Does the pattern contain any stops passed in as argument? This method is not optimized for
+   * performance so don't use it where that is critical.
    */
   public boolean containsAnyStopId(Collection<FeedScopedId> ids) {
     return ids

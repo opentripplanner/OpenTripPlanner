@@ -5,17 +5,18 @@ import static com.google.common.truth.Truth.assertThat;
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies the real Dagger scoping added for issue #7441: bindings inside one {@link
- * RequestScopedFactory} build (one simulated HTTP request) are cached and shared, while two
- * separate builds (two requests) get independent instances. {@link
- * org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext} is one such binding, so this test needs
- * a fully wired application-level Dagger component to build a {@link RequestScopedFactory} from.
+ * Verifies the real Dagger scoping added for issue #7441: bindings inside one
+ * {@link RequestScopedFactory} build (one simulated HTTP request) are cached and shared, while two
+ * separate builds (two requests) get independent instances.
+ * {@link org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext} is one such binding, so this test
+ * needs a fully wired application-level Dagger component to build a {@link RequestScopedFactory}
+ * from.
  * <p>
  * This test builds the real production {@link ConstructApplicationFactory} — the same component
- * {@link ConstructApplication} builds when OTP boots — via {@link
- * TestConstructApplicationFactoryBuilder}. That way every real module (including the ones outside
- * {@link RequestScopedModule} itself) is actually exercised through Dagger, not substituted with a
- * hand-built instance.
+ * {@link ConstructApplication} builds when OTP boots — via
+ * {@link TestConstructApplicationFactoryBuilder}. That way every real module (including the ones
+ * outside {@link RequestScopedModule} itself) is actually exercised through Dagger, not substituted
+ * with a hand-built instance.
  */
 class RequestScopedFactoryIntegrationTest {
 

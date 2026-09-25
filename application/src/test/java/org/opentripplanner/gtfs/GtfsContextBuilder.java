@@ -73,8 +73,8 @@ public class GtfsContextBuilder {
   /**
    * This method will:
    * <ol>
-   *     <li>generate TripPatterns (if enabled)</li>
-   *     <li>create a new context</li>
+   *   <li>generate TripPatterns (if enabled)</li>
+   *   <li>create a new context</li>
    * </ol>
    */
   public GtfsContext build() {

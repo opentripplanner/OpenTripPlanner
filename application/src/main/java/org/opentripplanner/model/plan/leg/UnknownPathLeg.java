@@ -18,9 +18,9 @@ import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A transit search may return an unknown transit path. A path consisting of a mix of
- * access, transit , transfers and egress - but where the specific legs are unknown.
- * This leg represent such path.
+ * A transit search may return an unknown transit path. A path consisting of a mix of access,
+ * transit , transfers and egress - but where the specific legs are unknown. This leg represent such
+ * path.
  */
 public class UnknownPathLeg implements Leg {
 

@@ -36,8 +36,8 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
  * Update-scoped object produced by {@link SiriRealTimeTripUpdateAdapter#forUpdate}. Holds a
- * per-task {@link TransitService} backed by the update's mutable timetable snapshot, so all
- * pattern and trip lookups within the task see in-progress real-time additions.
+ * per-task {@link TransitService} backed by the update's mutable timetable snapshot, so all pattern
+ * and trip lookups within the task see in-progress real-time additions.
  */
 public class SiriRealTimeUpdateHandler {
 
@@ -72,10 +72,10 @@ public class SiriRealTimeUpdateHandler {
   /**
    * Method to apply estimated timetables to the most recent version of the timetable snapshot.
    *
-   * @param incrementality  the incrementality of the update, for example if updates represent all
-   *                        updates that are active right now, i.e. all previous updates should be
-   *                        disregarded
-   * @param updates    SIRI EstimatedTimetable deliveries that should be applied atomically.
+   * @param incrementality the incrementality of the update, for example if updates represent all
+   *                       updates that are active right now, i.e. all previous updates should be
+   *                       disregarded
+   * @param updates        SIRI EstimatedTimetable deliveries that should be applied atomically.
    */
   public UpdateResult applyEstimatedTimetable(
     EntityResolver entityResolver,
@@ -173,8 +173,9 @@ public class SiriRealTimeUpdateHandler {
    * (because {@code isExtraJourney()} is {@code null}/false), and {@code ModifiedTripBuilder}
    * handles the cancellation.
    *
-   * <p>This is why the {@link RealTimeTripTimesBuilder} never needs to hold both
-   * {@code added=true} and {@code canceled=true} at the same time for a SIRI source.
+   * <p>
+   * This is why the {@link RealTimeTripTimesBuilder} never needs to hold both {@code added=true}
+   * and {@code canceled=true} at the same time for a SIRI source.
    */
   private SiriUpdateType updateType(
     EstimatedVehicleJourneyWrapper journey,
@@ -197,7 +198,8 @@ public class SiriRealTimeUpdateHandler {
   /**
    * Get the latest timetable for TripPattern for a given service date.
    * <p>
-   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
+   * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if
+   * not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
     return buffer.resolve(tripPattern, serviceDate);
@@ -358,19 +360,17 @@ public class SiriRealTimeUpdateHandler {
    */
   private enum SiriUpdateType {
     /**
-     * Update of an existing trip.
-     * This can be either a trip defined in planned data or a replacement departure
-     * that was previously added by a real-time message.
-     * The update can consist in updated passing times and/or cancellation of some stops.
-     * A stop can be substituted by another if they belong to the same station.
-     * The whole trip can also be marked as cancelled.
+     * Update of an existing trip. This can be either a trip defined in planned data or a
+     * replacement departure that was previously added by a real-time message. The update can
+     * consist in updated passing times and/or cancellation of some stops. A stop can be substituted
+     * by another if they belong to the same station. The whole trip can also be marked as
+     * cancelled.
      */
     TRIP_UPDATE,
 
     /**
-     * Addition of a new trip, not currently present in the system.
-     * The new trip has a new unique id.
-     * The trip can replace one or more existing trips, another SIRI message should handle the
+     * Addition of a new trip, not currently present in the system. The new trip has a new unique
+     * id. The trip can replace one or more existing trips, another SIRI message should handle the
      * cancellation of the replaced trips.
      */
     REPLACEMENT_DEPARTURE,

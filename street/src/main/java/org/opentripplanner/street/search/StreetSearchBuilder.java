@@ -94,8 +94,8 @@ public class StreetSearchBuilder {
   }
 
   /**
-   * Set a function that will be called before the search begins. Useful for checking that
-   * a timeout has not been reached before the search begins.
+   * Set a function that will be called before the search begins. Useful for checking that a timeout
+   * has not been reached before the search begins.
    */
   public StreetSearchBuilder withPreStartHook(Runnable hook) {
     aStarBuilder.withPreStartHook(hook);

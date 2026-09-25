@@ -3,8 +3,8 @@ package org.opentripplanner.raptor.api.request;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 
 /**
- * A dummy implementation of the {@link RaptorTransitGroupPriorityCalculator} interface to
- * allow unit test priority group features in Raptor.
+ * A dummy implementation of the {@link RaptorTransitGroupPriorityCalculator} interface to allow
+ * unit test priority group features in Raptor.
  */
 public class TestGroupPriorityCalculator implements RaptorTransitGroupPriorityCalculator {
 

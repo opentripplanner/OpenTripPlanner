@@ -6,8 +6,9 @@ import org.opentripplanner.street.search.state.State;
 /**
  * Set-level invariant: a renting state inside a traversal-banned zone set must not progress.
  *
- * <p>Distinct from the per-zone {@link GeofencingBoundaryEnforcement} strategies — the answer depends
- * on the priority-resolved view of {@code currentZones} for the state's network, not on any
+ * <p>
+ * Distinct from the per-zone {@link GeofencingBoundaryEnforcement} strategies — the answer
+ * depends on the priority-resolved view of {@code currentZones} for the state's network, not on any
  * single zone in isolation, so this check doesn't fit the per-zone dispatch shape.
  */
 class TraversalBanHandler {

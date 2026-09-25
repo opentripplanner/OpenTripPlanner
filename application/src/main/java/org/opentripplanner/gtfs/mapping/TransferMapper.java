@@ -30,8 +30,9 @@ import org.opentripplanner.transit.model.timetable.Trip;
 /**
  * Responsible for mapping GTFS Transfer into the OTP model.
  *
- * <p>This mapper is stateful and not thread safe. Create a new mapper for every set
- * of transfers you want to map.
+ * <p>
+ * This mapper is stateful and not thread safe. Create a new mapper for every set of transfers
+ * you want to map.
  */
 class TransferMapper {
 

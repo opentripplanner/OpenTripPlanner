@@ -55,10 +55,9 @@ import org.slf4j.LoggerFactory;
  * running the application. The whole idea of this class is to separate application construction
  * from running it.
  * <p>
- * The top level construction class(this class) may delegate to other construction classes
- * to inject configuration and services into submodules. An instance of this class is created
- * using the {@link LoadApplication} - An application is constructed AFTER config and input files
- * are loaded.
+ * The top level construction class(this class) may delegate to other construction classes to
+ * inject configuration and services into submodules. An instance of this class is created using the
+ * {@link LoadApplication} - An application is constructed AFTER config and input files are loaded.
  * <p>
  * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The
  * constructor performs the heavy Raptor data mapping before handing results to Dagger; all other
@@ -71,8 +70,8 @@ public class ConstructApplication {
   private final CommandLineParameters cli;
   private final GraphBuilderDataSources graphBuilderDataSources;
   /**
-   * The OSM Info is injected into the graph-builder, but not the web-server; Hence not part of
-   * the application context.
+   * The OSM Info is injected into the graph-builder, but not the web-server; Hence not part of the
+   * application context.
    */
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private final ConstructApplicationFactory factory;

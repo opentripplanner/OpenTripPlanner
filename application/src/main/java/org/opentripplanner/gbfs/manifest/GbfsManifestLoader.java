@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  * Loads a GBFS v3 {@code manifest.json}, which lists the systems a provider publishes and the GBFS
  * versions available for each.
  * <p>
- * Shared by the two sandboxes that discover their feeds from a manifest: the vehicle rental graph
- * builder (build phase) and the vehicle rental service directory (serve phase).
+ * Shared by the two sandboxes that discover their feeds from a manifest: the vehicle rental
+ * graph builder (build phase) and the vehicle rental service directory (serve phase).
  */
 public class GbfsManifestLoader {
 
@@ -35,8 +35,8 @@ public class GbfsManifestLoader {
    * Loads the manifest from a remote URL or a local {@code file:} path.
    *
    * @return the parsed manifest, or {@code null} if it could not be fetched or parsed. Failing to
-   *   reach a manifest must not fail the whole graph build or server startup, so this is logged
-   *   and reported to the caller rather than thrown.
+   *         reach a manifest must not fail the whole graph build or server startup, so this is
+   *         logged and reported to the caller rather than thrown.
    */
   @Nullable
   public static GBFSManifest loadManifest(URI url, HttpHeaders headers) {

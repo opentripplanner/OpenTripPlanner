@@ -6,12 +6,11 @@ import org.opentripplanner.core.model.doc.DocumentedEnum;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
- * This converts strings appearing in configuration files into enum values.
- * The values appearing in config files are case-insensitive and can use either dashes
- * or underscores indiscriminately.
- * Dashes are replaced with underscores, and the string is converted to upper case.
- * In practice, this serves to convert from kebab-case to SCREAMING_SNAKE_CASE (which is
- * conventional for Java enum values), leaving the latter unchanged if it's used in the config file.
+ * This converts strings appearing in configuration files into enum values. The values appearing in
+ * config files are case-insensitive and can use either dashes or underscores indiscriminately.
+ * Dashes are replaced with underscores, and the string is converted to upper case. In practice,
+ * this serves to convert from kebab-case to SCREAMING_SNAKE_CASE (which is conventional for Java
+ * enum values), leaving the latter unchanged if it's used in the config file.
  */
 public class EnumMapper {
 
@@ -38,8 +37,8 @@ public class EnumMapper {
   }
 
   /**
-   * Used to create a list of all values with description of each value which can be included
-   * in documentation. The list will look like this:
+   * Used to create a list of all values with description of each value which can be included in
+   * documentation. The list will look like this:
    * <pre>
    *  - `on` Turn on.
    *  - `off` Turn off.

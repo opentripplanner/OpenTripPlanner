@@ -20,8 +20,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 /**
  * Verify that OSM ways that represent proposed or as yet unbuilt roads are not used for routing.
- * This tests functionality in or around the method isWayRoutable() in the OSM graph builder
- * module.
+ * This tests functionality in or around the method isWayRoutable() in the OSM graph builder module.
  *
  * @author abyrd
  */

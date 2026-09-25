@@ -8,16 +8,16 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 
 /**
- * Extracts the geometry and distance from a {@link State} chain produced by
- * an A* street search. The state chain is a linked list from the final state back to the origin via
+ * Extracts the geometry and distance from a {@link State} chain produced by an A* street search.
+ * The state chain is a linked list from the final state back to the origin via
  * {@link State#getBackState()}/{@link State#getBackEdge()}.
  * <p>
- * This utility encapsulates the direction-dependent ordering: for depart-after searches the chain
- * yields a geometry in reverse chronological order (newest first), while for arriveBy searches the chain
- * already yields edges in chronological order.
- * Implementation note: an earlier design relied on {@link org.opentripplanner.astar.model.GraphPath}
- * to extract the list of edges in chronological order / reverse chronological order.
- * The current implementation is optimized for reducing memory allocation and CPU usage.
+ * This utility encapsulates the direction-dependent ordering: for depart-after searches the
+ * chain yields a geometry in reverse chronological order (newest first), while for arriveBy
+ * searches the chain already yields edges in chronological order. Implementation note: an earlier
+ * design relied on {@link org.opentripplanner.astar.model.GraphPath} to extract the list of edges
+ * in chronological order / reverse chronological order. The current implementation is optimized for
+ * reducing memory allocation and CPU usage.
  */
 class StateToFlexPathMapper {
 

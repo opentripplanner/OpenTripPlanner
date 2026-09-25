@@ -10,20 +10,20 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
- * Used to filter the elements in a {@link RaptorTransitData}
- * when constructing a {@link RaptorRoutingRequestTransitData} for a request.
+ * Used to filter the elements in a {@link RaptorTransitData} when constructing a
+ * {@link RaptorRoutingRequestTransitData} for a request.
  * <p>
- * {@link TripPatternForDate} and {@link TripTimes} are filtered based on the request parameters to
- * only included components which are allowed by the request. Such filters may include bike or
+ * {@link TripPatternForDate} and {@link TripTimes} are filtered based on the request parameters
+ * to only included components which are allowed by the request. Such filters may include bike or
  * wheelchair accessibility, banned routes and transit modes.
  *
  * @see DefaultTransitDataProviderFilter
  */
 public interface TransitDataProviderFilter {
   /**
-   * For performance reasons filtering is done in a two-step process. First you apply the pattern. If it doesn't match you
-   * get a null value. If it does match you get a Predicate&lt;TripTimes&gt; that you use to match a TripTimes
-   * object.
+   * For performance reasons filtering is done in a two-step process. First you apply the pattern.
+   * If it doesn't match you get a null value. If it does match you get a Predicate&lt;TripTimes&gt;
+   * that you use to match a TripTimes object.
    */
   @Nullable
   Predicate<TripTimes<?>> createTripFilter(TripPattern tripPattern);

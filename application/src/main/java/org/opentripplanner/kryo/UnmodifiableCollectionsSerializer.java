@@ -45,8 +45,8 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
 
   /**
    * Creates a new {@link UnmodifiableCollectionsSerializer} and registers its serializer for the
-   * several unmodifiable Collections that can be created via {@link Collections}, including {@link
-   * Map}s.
+   * several unmodifiable Collections that can be created via {@link Collections}, including
+   * {@link Map}s.
    *
    * @param kryo the {@link Kryo} instance to set the serializer on.
    * @see Collections#unmodifiableCollection(Collection)
@@ -108,11 +108,11 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
 
   /**
    * Each variant converts to/from a plain, Kryo-friendly intermediate representation on write/copy
-   * ({@link #toKryoSerializedObject}), and reconstructs the concrete collection/map type it needs before
-   * wrapping it back up as unmodifiable on read/copy ({@link #fromKryoSerializedObject}). This is deliberately not
-   * symmetric (e.g. {@code Map} isn't a {@code Collection}, and the intermediate {@code ArrayList}
-   * read back for a {@code Set} isn't itself a {@code Set}), so each side needs its own conversion
-   * rather than a single shared cast.
+   * ({@link #toKryoSerializedObject}), and reconstructs the concrete collection/map type it needs
+   * before wrapping it back up as unmodifiable on read/copy ({@link #fromKryoSerializedObject}).
+   * This is deliberately not symmetric (e.g. {@code Map} isn't a {@code Collection}, and the
+   * intermediate {@code ArrayList} read back for a {@code Set} isn't itself a {@code Set}), so each
+   * side needs its own conversion rather than a single shared cast.
    */
   private enum UnmodifiableCollection {
     COLLECTION(Collections.unmodifiableCollection(Arrays.asList("")).getClass()) {

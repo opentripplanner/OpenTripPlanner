@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.Siri;
 
 /**
- * Load real-time updates from SIRI-SX and SIRI-ET feeds from a local directory. The
- * files are renamed during the processing like this:
+ * Load real-time updates from SIRI-SX and SIRI-ET feeds from a local directory. The files are
+ * renamed during the processing like this:
  * <pre>
  * update.xml  ➞  update.xml.inProgress  ➞  ( update.xml.ok | update.xml.failed )
  * </pre>
- * The renaming of the file guarantees that the file is not processed twice. A {@code .ok} file
- * indicate that the file is processed and the content parsed ok. The status of the update
+ * The renaming of the file guarantees that the file is not processed twice. A {@code .ok}
+ * file indicate that the file is processed and the content parsed ok. The status of the update
  * might be different - see logs for update errors.
  * <p>
  * The file updater will pick up any file matching {@code *.xml} in the configured directory.

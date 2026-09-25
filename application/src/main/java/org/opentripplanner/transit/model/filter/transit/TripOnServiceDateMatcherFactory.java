@@ -26,8 +26,8 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 /**
  * A factory for creating matchers for TripOnServiceDates.
  * <p>
- * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a request.
- * The resulting matcher can be used to filter a list of TripOnServiceDate objects.
+ * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a
+ * request. The resulting matcher can be used to filter a list of TripOnServiceDate objects.
  */
 public class TripOnServiceDateMatcherFactory {
 
@@ -93,8 +93,8 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   /**
-   * Builds a matcher from a single {@link TripOnServiceDateSelectRequest}, combining its
-   * agencies, routes, and transport modes with AND logic.
+   * Builds a matcher from a single {@link TripOnServiceDateSelectRequest}, combining its agencies,
+   * routes, and transport modes with AND logic.
    */
   private static Matcher<TripOnServiceDate> buildSelectorMatcher(
     TripOnServiceDateSelectRequest selector,

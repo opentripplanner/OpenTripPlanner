@@ -248,8 +248,8 @@ class InsertionEvaluatorTest {
   }
 
   /**
-   * Given two viable insertion positions with different total trip durations,
-   * the evaluator should select the one with the shorter total.
+   * Given two viable insertion positions with different total trip durations, the evaluator should
+   * select the one with the shorter total.
    * <pre>
    * Trip: SOUTH → CENTER → NORTH (baseline: 10 + 10 = 20 min)
    * Passenger: pickup at EAST, dropoff at WEST

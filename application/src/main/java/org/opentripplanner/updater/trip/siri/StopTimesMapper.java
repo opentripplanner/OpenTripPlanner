@@ -18,7 +18,8 @@ class StopTimesMapper {
   }
 
   /**
-   * Map the call to the aimed StopTime or return null if the stop cannot be found in the site repository.
+   * Map the call to the aimed StopTime or return null if the stop cannot be found in the site
+   * repository.
    */
   @Nullable
   StopTime createAimedStopTime(

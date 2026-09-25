@@ -10,7 +10,8 @@ import org.opentripplanner.utils.time.TimeUtils;
 /**
  * This tests the entire paging service module.
  * <p>
- * To debug this test, set either the system property 'testDebug' or the environment variable 'testDebug' to 'true'.
+ * To debug this test, set either the system property 'testDebug' or the environment variable
+ * 'testDebug' to 'true'.
  */
 @SuppressWarnings("DataFlowIssue")
 class PS1_LegacyMetaDataTest {

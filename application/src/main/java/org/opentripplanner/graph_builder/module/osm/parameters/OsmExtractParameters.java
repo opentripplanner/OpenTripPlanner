@@ -7,8 +7,8 @@ import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
 
 /**
- * Configure an OpenStreetMap extract.
- * Example: {@code "osm" : [ {source: "file:///path/to/otp/norway.pbf"} ] }
+ * Configure an OpenStreetMap extract. Example:
+ * {@code "osm" : [ {source: "file:///path/to/otp/norway.pbf"} ] }
  *
  */
 public record OsmExtractParameters(

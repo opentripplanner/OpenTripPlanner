@@ -452,8 +452,8 @@ public class SiriAzureUpdater implements GraphUpdater<TransitRealTimeUpdateConte
 
   /**
    * Make some sensible logging on error and if Service Bus is busy, sleep for some time before try
-   * again to get messages. This code snippet is taken from Microsoft example <a
-   * href="https://docs.microsoft.com/sv-se/azure/service-bus-messaging/service-bus-java-how-to-use-queues">...</a>.
+   * again to get messages. This code snippet is taken from Microsoft example <a href=
+   * "https://docs.microsoft.com/sv-se/azure/service-bus-messaging/service-bus-java-how-to-use-queues">...</a>.
    *
    * @param errorContext Context for errors handled by the ServiceBusProcessorClient.
    */
