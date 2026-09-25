@@ -29,8 +29,10 @@ class NoticeMapper {
 
     if (otpNotice == null) {
       otpNotice = Notice.of(id)
-        .withPublicCode(netexNotice.getPublicCode())
-        .withText(netexNotice.getText().getValue())
+        .withPublicCode(
+          netexNotice.getPublicCode() != null ? netexNotice.getPublicCode().getValue() : null
+        )
+        .withText(MultilingualStringMapper.getStringValue(netexNotice.getText()))
         .build();
 
       cache.add(otpNotice);

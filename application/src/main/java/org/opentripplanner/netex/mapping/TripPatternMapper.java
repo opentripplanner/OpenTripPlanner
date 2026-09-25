@@ -248,7 +248,11 @@ class TripPatternMapper {
       .withMode(trips.get(0).getMode())
       .withNetexSubmode(trips.get(0).getNetexSubMode())
       .withContainsMultipleModes(hasMultipleModes || hasMultipleSubmodes)
-      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
+      .withName(
+        journeyPattern.getName() == null
+          ? ""
+          : MultilingualStringMapper.getStringValue(journeyPattern.getName())
+      )
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
       )
