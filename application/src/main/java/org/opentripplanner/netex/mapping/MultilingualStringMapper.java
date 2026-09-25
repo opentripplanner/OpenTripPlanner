@@ -26,6 +26,10 @@ public class MultilingualStringMapper {
    * Extract the string value from a MultilingualString.
    * In NeTEx 2.0, MultilingualString uses a mixed content model where
    * the text is stored in getContent() as a list of serializable objects.
+   * <p>
+   * Returns {@code null} only if the element is absent. An empty element (e.g.
+   * {@code <Description/>}) returns an empty string, like {@code getValue()} did before NeTEx 2.0.
+   * Use {@link #nullableValueOf(MultilingualString)} to map empty values to {@code null}.
    */
   @Nullable
   public static String getStringValue(@Nullable MultilingualString multilingualString) {
@@ -33,8 +37,8 @@ public class MultilingualStringMapper {
       return null;
     }
     List<Serializable> content = multilingualString.getContent();
-    if (content == null || content.isEmpty()) {
-      return null;
+    if (content == null) {
+      return "";
     }
     StringBuilder sb = new StringBuilder();
     for (Serializable item : content) {
@@ -42,6 +46,6 @@ public class MultilingualStringMapper {
         sb.append(s);
       }
     }
-    return sb.length() > 0 ? sb.toString() : null;
+    return sb.toString();
   }
 }
