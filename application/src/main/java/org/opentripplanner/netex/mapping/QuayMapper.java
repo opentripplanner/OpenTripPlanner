@@ -97,7 +97,7 @@ class QuayMapper {
       .withPlatformCode(quay.getPublicCode() != null ? quay.getPublicCode().getValue() : null)
       .withDescription(
         NonLocalizedString.ofNullable(
-          MultilingualStringMapper.nullableValueOf(quay.getDescription())
+          MultilingualStringMapper.getStringValue(quay.getDescription())
         )
       )
       .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))

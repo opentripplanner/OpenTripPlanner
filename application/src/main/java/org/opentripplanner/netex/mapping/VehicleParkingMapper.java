@@ -46,7 +46,7 @@ class VehicleParkingMapper {
     return VehicleParking.of()
       .id(idFactory.createId(parking.getId()))
       .name(
-        NonLocalizedString.ofNullable(MultilingualStringMapper.nullableValueOf(parking.getName()))
+        NonLocalizedString.ofNullable(MultilingualStringMapper.getStringValue(parking.getName()))
       )
       .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))
       .capacity(mapCapacity(parking))
