@@ -1097,6 +1097,8 @@ type RealTimeJourneyState {
   extraJourney: Boolean!
   "Has the quay sequence changed from the planned journey pattern? True if quays were added, removed, reordered, or reassigned to a different quay's location. False if the journey was cancelled"
   journeyPatternModified: Boolean!
+  "The trip is marked as monitored and is reporting real-time data."
+  monitored: Boolean!
   "Have any quay's arrival or departure times been modified from the scheduled times?"
   timesModified: Boolean!
   "Have there been any real-time updates on this journey?"

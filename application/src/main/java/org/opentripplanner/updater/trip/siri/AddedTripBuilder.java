@@ -60,6 +60,7 @@ class AddedTripBuilder {
   private final boolean isJourneyPredictionInaccurate;
   private final OccupancyStatus occupancy;
   private final boolean cancellation;
+  private final boolean monitored;
   private final String shortName;
   private final String headsign;
   private final List<TripOnServiceDate> replacedTrips;
@@ -112,6 +113,7 @@ class AddedTripBuilder {
     isJourneyPredictionInaccurate = journey.isPredictionInaccurate();
     occupancy = journey.occupancy().orElse(null);
     cancellation = journey.isCancellation();
+    monitored = journey.isMonitored();
     headsign = journey.destinationName();
     vehicleRef = journey.vehicleRef().orElse(null);
 
@@ -144,6 +146,7 @@ class AddedTripBuilder {
     boolean isJourneyPredictionInaccurate,
     OccupancyStatus occupancy,
     boolean cancellation,
+    boolean monitored,
     String shortName,
     String headsign,
     List<TripOnServiceDate> replacedTrips,
@@ -168,6 +171,7 @@ class AddedTripBuilder {
     this.isJourneyPredictionInaccurate = isJourneyPredictionInaccurate;
     this.occupancy = occupancy;
     this.cancellation = cancellation;
+    this.monitored = monitored;
     this.shortName = shortName;
     this.headsign = headsign;
     this.replacedTrips = replacedTrips;
@@ -248,6 +252,10 @@ class AddedTripBuilder {
       .build();
 
     RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
+
+    if (monitored) {
+      builder.withMonitored();
+    }
 
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {

@@ -14,6 +14,7 @@ import java.util.Objects;
  *   <li>{@code tripPatternModified} – the trip retains its identity but its stop pattern has
  *       been changed by a real-time update.</li>
  *   <li>{@code deleted} – the trip is soft-deleted and must not be visible to end users.</li>
+ *   <li>{@code monitored} – the trip is reporting realtime data.</li>
  * </ul>
  *
  * <p>Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
@@ -26,6 +27,7 @@ public final class RealTimeTripState {
   private final boolean added;
   private final boolean tripPatternModified;
   private final boolean deleted;
+  private final boolean monitored;
 
   private RealTimeTripState(Builder builder) {
     this.timesModified = builder.timesModified;
@@ -33,6 +35,7 @@ public final class RealTimeTripState {
     this.added = builder.added;
     this.tripPatternModified = builder.tripPatternModified;
     this.deleted = builder.deleted;
+    this.monitored = builder.monitored;
   }
 
   public static Builder of() {
@@ -59,9 +62,13 @@ public final class RealTimeTripState {
     return deleted;
   }
 
+  public boolean monitored() {
+    return monitored;
+  }
+
   /** Returns {@code true} if any real-time information is present for this trip. */
   public boolean hasAnyUpdates() {
-    return timesModified || canceled || added || tripPatternModified || deleted;
+    return timesModified || canceled || added || tripPatternModified || deleted || monitored;
   }
 
   @Override
@@ -78,13 +85,14 @@ public final class RealTimeTripState {
       canceled == that.canceled &&
       added == that.added &&
       tripPatternModified == that.tripPatternModified &&
-      deleted == that.deleted
+      deleted == that.deleted &&
+      monitored == that.monitored
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(timesModified, canceled, added, tripPatternModified, deleted);
+    return Objects.hash(timesModified, canceled, added, tripPatternModified, deleted, monitored);
   }
 
   public static class Builder {
@@ -94,6 +102,7 @@ public final class RealTimeTripState {
     private boolean added = false;
     private boolean tripPatternModified = false;
     private boolean deleted = false;
+    private boolean monitored = false;
 
     private Builder() {}
 
@@ -119,6 +128,11 @@ public final class RealTimeTripState {
 
     public Builder withDeleted() {
       this.deleted = true;
+      return this;
+    }
+
+    Builder withMonitored() {
+      this.monitored = true;
       return this;
     }
 
