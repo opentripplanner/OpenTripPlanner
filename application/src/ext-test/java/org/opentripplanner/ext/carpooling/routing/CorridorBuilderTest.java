@@ -41,28 +41,6 @@ class CorridorBuilderTest extends GraphRoutingTest {
   private static final ZonedDateTime TIME = LocalDateTime.of(2025, 6, 15, 12, 0).atZone(
     ZoneId.of("Europe/Oslo")
   );
-  private static final StreetLimitationParametersService LIMITS =
-    new StreetLimitationParametersService() {
-      @Override
-      public float maxCarSpeed() {
-        return 40.0f;
-      }
-
-      @Override
-      public int maxAreaNodes() {
-        return 500;
-      }
-
-      @Override
-      public float getBestWalkSafety() {
-        return 1;
-      }
-
-      @Override
-      public float getBestBikeSafety() {
-        return 1;
-      }
-    };
 
   private CarpoolStopIndex stopIndex;
   private CarReachableVertexSnapper snapper;
@@ -142,7 +120,7 @@ class CorridorBuilderTest extends GraphRoutingTest {
     resolver = new CarpoolTripVertexResolver(
       vertexCreationService,
       snapper,
-      new CorridorBuilder(stopIndex, LIMITS)
+      new CorridorBuilder(stopIndex, StreetLimitationParametersService.DEFAULT)
     );
   }
 

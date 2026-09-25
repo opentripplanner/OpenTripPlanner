@@ -278,8 +278,6 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertEquals(vertexD, reverse.path().states.getLast().getVertex());
   }
 
-  /** Two legs from the same start unite their ellipses: what either leg needs stays reachable. */
-  /** Without a detach, a released tree's segment still yields a path — by re-routing. */
   @Test
   void coLocatedVerticesKeepTheLargestLimit() {
     // Two driver-waypoint vertices at the same coordinate are distinct objects but compare equal

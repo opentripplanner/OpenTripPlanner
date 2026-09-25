@@ -418,42 +418,25 @@ class InsertionEvaluatorTest {
     var mid = origin.moveEastMeters(200);
     var end = origin.moveEastMeters(400);
     var farNorth = origin.moveNorthMeters(30_000);
+    for (var c : List.of(origin, mid, end, farNorth)) {
+      vertexMap.put(c, new SimpleVertex("v-" + c, c.latitude(), c.longitude()));
+    }
     var stop = createStopAt(mid, Duration.ofMinutes(1));
     var trip = createTripWithStops(origin, List.of(stop), end, Duration.ofMinutes(60));
-    var points = new HashMap<WgsCoordinate, Vertex>();
-    for (var c : List.of(origin, mid, end, farNorth)) {
-      points.put(
-        c,
-        new SimpleVertex("v-" + c.latitude() + "-" + c.longitude(), c.latitude(), c.longitude())
-      );
-    }
-    var vertices = trip
-      .stops()
-      .stream()
-      .map(s -> points.get(s.getCoordinate()))
-      .toList();
-    var tripWithVertices = new CarpoolTripWithVertices(trip, vertices);
-    var routed = new java.util.ArrayList<String>();
-    CarpoolRouter counting = (from, to) -> {
-      routed.add(from.getLabelString() + ">" + to.getLabelString());
+    var routed = new ArrayList<Pair<WgsCoordinate>>();
+    CarpoolRouter recording = (from, to) -> {
+      routed.add(new Pair<>(getCoordinate(from), getCoordinate(to)));
       return RoutedSegment.of(createGraphPath(Duration.ofMinutes(3)));
     };
-    var evaluator = new InsertionEvaluator(counting, Duration.ZERO, 30.0);
+    var evaluator = new InsertionEvaluator(recording, Duration.ZERO, 30.0);
 
     evaluator.findBestInsertion(
-      tripWithVertices,
-      new PassengerSnap(points.get(farNorth), points.get(farNorth), null, null)
+      createTripWithVertices(trip),
+      new PassengerSnap(vertexMap.get(farNorth), vertexMap.get(farNorth), null, null)
     );
 
-    var farLabel = points.get(farNorth).getLabelString();
-    var originLabel = points.get(origin).getLabelString();
-    assertFalse(routed.contains(originLabel + ">" + farLabel), "leg 0 was routed into: " + routed);
-    assertTrue(
-      routed
-        .stream()
-        .anyMatch(r -> r.startsWith(points.get(mid).getLabelString() + ">" + farLabel)),
-      "leg 1 was routed into: " + routed
-    );
+    assertFalse(routed.contains(new Pair<>(origin, farNorth)), "leg 0 was routed into: " + routed);
+    assertTrue(routed.contains(new Pair<>(mid, farNorth)), "leg 1 was routed into: " + routed);
   }
 
   @Test

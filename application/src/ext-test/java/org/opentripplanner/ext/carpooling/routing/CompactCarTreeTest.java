@@ -57,11 +57,8 @@ class CompactCarTreeTest extends GraphRoutingTest {
   private IntersectionVertex g00;
   private IntersectionVertex g22;
   private IntersectionVertex g02;
-  private IntersectionVertex g12;
   private IntersectionVertex x;
   private IntersectionVertex p;
-  private IntersectionVertex n1;
-  private IntersectionVertex n2;
   private TemporaryStreetLocation t;
   private TransitStopVertex stop;
 
@@ -95,7 +92,6 @@ class CompactCarTreeTest extends GraphRoutingTest {
           }
           g00 = grid[0][0];
           g02 = grid[0][2];
-          g12 = grid[1][2];
           g22 = grid[2][2];
 
           // One-way street out of the north-east corner.
@@ -115,11 +111,11 @@ class CompactCarTreeTest extends GraphRoutingTest {
           streetVertices.add(p);
 
           // A no-through-traffic pocket that would be a shortcut between G02 and G12.
-          n1 = intersection("N1", ORIGIN.moveEastMeters(100).moveNorthMeters(1000));
-          n2 = intersection("N2", ORIGIN.moveEastMeters(200).moveNorthMeters(1000));
+          var n1 = intersection("N1", ORIGIN.moveEastMeters(100).moveNorthMeters(1000));
+          var n2 = intersection("N2", ORIGIN.moveEastMeters(200).moveNorthMeters(1000));
           noThru(g02, n1, 60);
           noThru(n1, n2, 60);
-          noThru(n2, g12, 60);
+          noThru(n2, grid[1][2], 60);
           streetVertices.add(n1);
           streetVertices.add(n2);
 
@@ -148,6 +144,7 @@ class CompactCarTreeTest extends GraphRoutingTest {
   @Test
   void forwardTreeMatchesTheGenericSearch() {
     assertMatchesReference(g00, false, UNLIMITED);
+    assertMatchesReference(g02, false, UNLIMITED);
     assertMatchesReference(t, false, UNLIMITED);
   }
 
@@ -163,36 +160,6 @@ class CompactCarTreeTest extends GraphRoutingTest {
     var limit = Duration.ofSeconds(45);
     assertMatchesReference(g00, false, limit);
     assertMatchesReference(g22, true, limit);
-  }
-
-  @Test
-  void pedestrianStreetIsNotDriven() {
-    var tree = CompactCarTree.build(g00, false, UNLIMITED, null);
-    assertEquals(-1, tree.elapsedSeconds(p));
-  }
-
-  @Test
-  void oneWayStreetIsDrivenInItsDirectionOnly() {
-    var forward = CompactCarTree.build(g00, false, UNLIMITED, null);
-    assertTrue(forward.elapsedSeconds(x) > 0, "X is reachable along the one-way street");
-
-    var reverseFromX = CompactCarTree.build(x, false, UNLIMITED, null);
-    assertEquals(-1, reverseFromX.elapsedSeconds(g22), "X is a dead end for a car");
-  }
-
-  @Test
-  void noThroughTrafficPocketIsNoShortcut() {
-    var tree = CompactCarTree.build(g02, false, UNLIMITED, null);
-    // The pocket itself may be entered ...
-    assertTrue(tree.elapsedSeconds(n1) > 0);
-    assertTrue(tree.elapsedSeconds(n2) > 0);
-    // ... but G12 must be reached along the normal street, not through the pocket, which would
-    // take 180 m instead of 300 m.
-    int viaPocket = tree.elapsedSeconds(n2) + secondsFor(60);
-    assertTrue(
-      tree.elapsedSeconds(g12) > viaPocket,
-      "G12 reached in " + tree.elapsedSeconds(g12) + "s, the pocket would give " + viaPocket
-    );
   }
 
   @Test
@@ -292,15 +259,5 @@ class CompactCarTreeTest extends GraphRoutingTest {
     return reverse
       ? builder.withTo(root).getShortestPathTree()
       : builder.withFrom(root).getShortestPathTree();
-  }
-
-  /** Whole seconds a car needs for {@code meters} of test street at the builder's default speed. */
-  private int secondsFor(int meters) {
-    // Read the speed off an actual edge rather than assuming the builder's default.
-    var edge = (org.opentripplanner.street.model.edge.StreetEdge) g00
-      .getOutgoing()
-      .iterator()
-      .next();
-    return (int) Math.floor(meters / edge.getCarSpeed());
   }
 }
