@@ -35,7 +35,6 @@ public enum UpdateErrorType {
   INVALID_STOP_SEQUENCE,
   NOT_IMPLEMENTED_UNSCHEDULED,
   NOT_IMPLEMENTED_DIFFERENTIAL_DUPLICATED,
-  NOT_MONITORED,
   CANNOT_RESOLVE_AGENCY,
   // there are several trips that would match the reference
   AMBIGIOUS_TRIP_REFERENCE,

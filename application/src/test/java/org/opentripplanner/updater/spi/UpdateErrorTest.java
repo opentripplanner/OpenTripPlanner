@@ -19,7 +19,7 @@ class UpdateErrorTest {
   void fallBackToTripReferenceWhenTripIdIsMissing() {
     var error = new UpdateError(
       null,
-      UpdateErrorType.NOT_MONITORED,
+      UpdateErrorType.NO_TRIP_ID,
       null,
       null,
       "SJ:1 (2026-06-29)"
@@ -29,7 +29,7 @@ class UpdateErrorTest {
 
   @Test
   void noTripIdWhenNeitherIsAvailable() {
-    var error = new UpdateError(null, UpdateErrorType.NOT_MONITORED, null, null, null);
+    var error = new UpdateError(null, UpdateErrorType.NO_TRIP_ID, null, null, null);
     assertEquals("no trip id", error.debugId());
   }
 

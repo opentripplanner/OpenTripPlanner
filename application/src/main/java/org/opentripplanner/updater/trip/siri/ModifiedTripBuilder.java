@@ -41,6 +41,7 @@ class ModifiedTripBuilder {
   private final List<CallWrapper> calls;
   private final boolean cancellation;
   private final boolean added;
+  private final boolean monitored;
   private final OccupancyStatus occupancy;
   private final boolean predictionInaccurate;
   private final String dataSource;
@@ -65,6 +66,7 @@ class ModifiedTripBuilder {
     this.calls = journey.calls();
     cancellation = journey.isCancellation();
     added = journey.isExtraJourney();
+    monitored = journey.isMonitored();
     predictionInaccurate = journey.isPredictionInaccurate();
     occupancy = journey.occupancy().orElse(null);
     dataSource = journey.dataSource().orElse(null);
@@ -87,6 +89,7 @@ class ModifiedTripBuilder {
     boolean predictionInaccurate,
     String dataSource,
     boolean added,
+    boolean monitored,
     @Nullable String vehicleRef
   ) {
     this.existingTripTimes = existingTripTimes;
@@ -100,6 +103,7 @@ class ModifiedTripBuilder {
     this.predictionInaccurate = predictionInaccurate;
     this.dataSource = dataSource;
     this.added = added;
+    this.monitored = monitored;
     this.vehicleRef = vehicleRef;
     this.journeyRelations = List.of();
   }
@@ -116,6 +120,10 @@ class ModifiedTripBuilder {
 
     if (added) {
       builder.withAdded();
+    }
+
+    if (monitored) {
+      builder.withMonitored();
     }
 
     if (cancellation) {

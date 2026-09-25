@@ -164,6 +164,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     );
 
@@ -202,6 +203,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     ).build();
 
@@ -242,6 +244,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     ).build();
 
@@ -288,6 +291,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     );
 
@@ -331,6 +335,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     ).build();
 
@@ -377,6 +382,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     ).build();
 
@@ -553,6 +559,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       "BUS-42"
     ).build();
 
@@ -593,6 +600,7 @@ class ModifiedTripBuilderTest {
       false,
       "DATASOURCE",
       false,
+      true,
       null
     ).build();
 

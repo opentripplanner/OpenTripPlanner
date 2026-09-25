@@ -68,6 +68,14 @@ public class RealTimeTripStateType {
           .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).updated())
           .build()
       )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("monitored")
+          .description("The trip is marked as monitored and is reporting real-time data.")
+          .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
+          .dataFetcher(env -> ((TransmodelRealTimeTripStateModel) env.getSource()).monitored())
+          .build()
+      )
       .build();
   }
 }
