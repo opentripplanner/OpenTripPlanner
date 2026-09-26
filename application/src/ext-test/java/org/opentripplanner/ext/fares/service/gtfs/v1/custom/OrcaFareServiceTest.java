@@ -623,6 +623,38 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
   }
 
+  static Stream<Arguments> monorailElectronicFares() {
+    return Stream.of(
+      Arguments.of(FareType.electronicRegular, THREE_DOLLARS, usDollars(4.00f)),
+      Arguments.of(FareType.electronicSenior, ONE_DOLLAR, TWO_DOLLARS),
+      Arguments.of(FareType.electronicSpecial, ONE_DOLLAR, TWO_DOLLARS),
+      Arguments.of(FareType.electronicYouth, ZERO_USD, ZERO_USD)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("monorailElectronicFares")
+  void monorailChargesFareOnEveryElectronicRide(
+    FareType fareType,
+    Money metroFare,
+    Money monorailFare
+  ) {
+    var rides = List.of(
+      getLeg(KC_METRO_AGENCY_ID, 0),
+      getLeg(MONORAIL_AGENCY_ID, 30),
+      getLeg(MONORAIL_AGENCY_ID, 60)
+    );
+
+    calculateFare(rides, fareType, metroFare.plus(monorailFare.times(2)));
+
+    var fares = orcaFareService.calculateFaresForType(USD, fareType, rides, null);
+    for (var monorailRide : rides.subList(1, rides.size())) {
+      var offers = fares.getLegProducts().get(monorailRide);
+      assertEquals(1, offers.size());
+      assertEquals(monorailFare, offers.iterator().next().fareProduct().price());
+    }
+  }
+
   static Stream<Arguments> allTypes() {
     return Arrays.stream(FareType.values()).map(Arguments::of);
   }
