@@ -21,6 +21,9 @@ import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +51,7 @@ import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
@@ -226,6 +230,36 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicRegular, usDollars(2.5f));
     calculateFare(rides, FareType.electronicSenior, usDollars(1.00f));
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
+  }
+
+  @Test
+  void communityTransitRideFreeWeek() {
+    var seattle = ZoneId.of("America/Los_Angeles");
+    var octoberFirst = LocalDate.of(2026, 10, 1).atStartOfDay(seattle);
+    var octoberNinth = LocalDate.of(2026, 10, 9).atStartOfDay(seattle);
+
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst.minusMinutes(1))),
+      regular,
+      usDollars(2.5f)
+    );
+    calculateFare(List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst)), regular, ZERO_USD);
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_FLEX_AGENCY_ID, "DART", octoberNinth.minusMinutes(1))),
+      FareType.electronicSenior,
+      ZERO_USD
+    );
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberNinth)),
+      regular,
+      usDollars(2.5f)
+    );
+    // Sound Transit routes retain their fare even when operated by Community Transit.
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "512", octoberFirst)),
+      regular,
+      THREE_DOLLARS
+    );
   }
 
   /**
@@ -710,6 +744,15 @@ public class OrcaFareServiceTest {
 
   private static Leg getLeg(String agencyId, String shortName, long startTimeMins) {
     return createLeg(agencyId, shortName, 3, startTimeMins, "test", "test", "");
+  }
+
+  private static Leg getLegAt(String agencyId, String shortName, ZonedDateTime startTime) {
+    return ((ScheduledTransitLeg) getLeg(agencyId, shortName, 0))
+      .copyOf()
+      .withStartTime(startTime)
+      .withEndTime(startTime.plusMinutes(12))
+      .withServiceDate(startTime.toLocalDate())
+      .build();
   }
 
   private static Leg getLeg(
