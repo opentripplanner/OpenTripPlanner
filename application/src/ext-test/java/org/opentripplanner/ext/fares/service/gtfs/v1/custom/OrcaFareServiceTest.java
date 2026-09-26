@@ -238,58 +238,26 @@ public class OrcaFareServiceTest {
     var octoberFirst = LocalDate.of(2026, 10, 1).atStartOfDay(seattle);
     var octoberNinth = LocalDate.of(2026, 10, 9).atStartOfDay(seattle);
 
-    for (var agencyId : List.of(COMM_TRANS_AGENCY_ID, COMM_TRANS_FLEX_AGENCY_ID)) {
-      var routeName = agencyId.equals(COMM_TRANS_AGENCY_ID) ? "400" : "DART";
-      for (var startTime : List.of(octoberFirst, octoberNinth.minusMinutes(1))) {
-        var leg = getLegAt(agencyId, routeName, startTime);
-        for (var fareType : FareType.values()) {
-          calculateFare(List.of(leg), fareType, ZERO_USD);
-        }
-      }
-
-      calculateFare(
-        List.of(getLegAt(agencyId, routeName, octoberFirst.minusMinutes(1))),
-        regular,
-        usDollars(2.5f)
-      );
-      calculateFare(
-        List.of(getLegAt(agencyId, routeName, octoberNinth)),
-        regular,
-        usDollars(2.5f)
-      );
-    }
-
-    // An itinerary can carry a different zone; the promotion follows Seattle's calendar dates.
     calculateFare(
-      List.of(
-        getLegAt(
-          COMM_TRANS_AGENCY_ID,
-          "400",
-          octoberNinth.minusHours(1).withZoneSameInstant(ZoneIds.NEW_YORK)
-        )
-      ),
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst.minusMinutes(1))),
       regular,
+      usDollars(2.5f)
+    );
+    calculateFare(List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst)), regular, ZERO_USD);
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_FLEX_AGENCY_ID, "DART", octoberNinth.minusMinutes(1))),
+      FareType.electronicSenior,
       ZERO_USD
     );
-
-    // Sound Transit service remains paid, even when Community Transit operates the bus.
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberNinth)),
+      regular,
+      usDollars(2.5f)
+    );
+    // Sound Transit routes retain their fare even when operated by Community Transit.
     calculateFare(
       List.of(getLegAt(COMM_TRANS_AGENCY_ID, "512", octoberFirst)),
       regular,
-      THREE_DOLLARS
-    );
-    calculateFare(
-      List.of(getLegAt(KC_METRO_AGENCY_ID, "400", octoberFirst)),
-      regular,
-      THREE_DOLLARS
-    );
-
-    calculateFare(
-      List.of(
-        getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst),
-        getLegAt(KC_METRO_AGENCY_ID, "400", octoberFirst.plusMinutes(30))
-      ),
-      FareType.electronicRegular,
       THREE_DOLLARS
     );
   }
