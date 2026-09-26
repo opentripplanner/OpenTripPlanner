@@ -577,39 +577,82 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * We explicitly do not calculate monorail fares
-   */
-  @Test
-  void calculateMonorailFares() {
-    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
-
-    calculateFare(rides, regular, usDollars(0.00f));
-    calculateFare(rides, FareType.senior, usDollars(0.00f));
-    calculateFare(rides, FareType.youth, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSpecial, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSenior, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
-  }
-
-  /**
    * Test monorail fares with transfers to ensure transfer logic works correctly
-   * with monorail's unique fare structure. Update: we now exclude monorail from fare calcs
+   * with monorail's unique fare structure. Update: monorail doesn't accept transfers anymore
    */
   @Test
   void calculateMonorailFaresWithTransfers() {
     List<Leg> rides = List.of(
-      getLeg(MONORAIL_AGENCY_ID, 0),
-      getLeg(KC_METRO_AGENCY_ID, 30),
+      getLeg(KC_METRO_AGENCY_ID, 0),
+      getLeg(MONORAIL_AGENCY_ID, 30),
       getLeg(COMM_TRANS_AGENCY_ID, 60)
     );
 
-    calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f)));
-    calculateFare(rides, FareType.youth, ZERO_USD);
-    calculateFare(rides, FareType.electronicRegular, usDollars(3.00f));
-    calculateFare(rides, FareType.electronicSenior, usDollars(1.00f));
+    calculateFare(rides, regular, THREE_DOLLARS.plus(usDollars(2.50f).plus(usDollars(4.00f))));
+    calculateFare(rides, FareType.senior, usDollars(4.00f));
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(3.00f).plus(usDollars(4.00f)));
+    // Monorail charges $2.00 reduced fare for senior/LIFT (no free transfer to/from monorail)
+    calculateFare(rides, FareType.electronicSenior, usDollars(3.00f));
     calculateFare(rides, FareType.electronicYouth, usDollars(0.00f));
-    calculateFare(rides, FareType.electronicSpecial, usDollars(1.00f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(3.00f));
+
+    var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
+
+    // KC Metro is charged its normal fare
+    assertLegFareEquals(300, rides.get(0), fares, false);
+    // Monorail doesn't accept or give transfers
+    assertLegFareEquals(400, rides.get(1), fares, false);
+    // CommTrans still gets a free transfer from KC Metro (monorail doesn't break the chain)
+    assertLegFareEquals(0, rides.get(2), fares, true);
+  }
+
+  /**
+   * Test single-leg monorail fares to confirm the reduced rate of $2.00 for senior and LIFT
+   * categories, and the regular adult fare of $4.00.
+   */
+  @Test
+  void calculateMonorailReducedFares() {
+    List<Leg> rides = List.of(getLeg(MONORAIL_AGENCY_ID, 0));
+    calculateFare(rides, regular, usDollars(4.00f));
+    calculateFare(rides, FareType.senior, TWO_DOLLARS);
+    calculateFare(rides, FareType.youth, usDollars(2.00f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(4.00f));
+    calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicYouth, ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
+  }
+
+  static Stream<Arguments> monorailElectronicFares() {
+    return Stream.of(
+      Arguments.of(FareType.electronicRegular, THREE_DOLLARS, usDollars(4.00f)),
+      Arguments.of(FareType.electronicSenior, ONE_DOLLAR, TWO_DOLLARS),
+      Arguments.of(FareType.electronicSpecial, ONE_DOLLAR, TWO_DOLLARS),
+      Arguments.of(FareType.electronicYouth, ZERO_USD, ZERO_USD)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("monorailElectronicFares")
+  void monorailChargesFareOnEveryElectronicRide(
+    FareType fareType,
+    Money metroFare,
+    Money monorailFare
+  ) {
+    var rides = List.of(
+      getLeg(KC_METRO_AGENCY_ID, 0),
+      getLeg(MONORAIL_AGENCY_ID, 30),
+      getLeg(MONORAIL_AGENCY_ID, 60)
+    );
+
+    calculateFare(rides, fareType, metroFare.plus(monorailFare.times(2)));
+
+    var fares = orcaFareService.calculateFaresForType(USD, fareType, rides, null);
+    for (var monorailRide : rides.subList(1, rides.size())) {
+      var offers = fares.getLegProducts().get(monorailRide);
+      assertEquals(1, offers.size());
+      assertEquals(monorailFare, offers.iterator().next().fareProduct().price());
+    }
   }
 
   static Stream<Arguments> allTypes() {
