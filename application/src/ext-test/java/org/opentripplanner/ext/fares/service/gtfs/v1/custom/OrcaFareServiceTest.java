@@ -21,6 +21,9 @@ import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +51,7 @@ import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.Money;
@@ -226,6 +230,68 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicRegular, usDollars(2.5f));
     calculateFare(rides, FareType.electronicSenior, usDollars(1.00f));
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
+  }
+
+  @Test
+  void communityTransitRideFreeWeek() {
+    var seattle = ZoneId.of("America/Los_Angeles");
+    var octoberFirst = LocalDate.of(2026, 10, 1).atStartOfDay(seattle);
+    var octoberNinth = LocalDate.of(2026, 10, 9).atStartOfDay(seattle);
+
+    for (var agencyId : List.of(COMM_TRANS_AGENCY_ID, COMM_TRANS_FLEX_AGENCY_ID)) {
+      var routeName = agencyId.equals(COMM_TRANS_AGENCY_ID) ? "400" : "DART";
+      for (var startTime : List.of(octoberFirst, octoberNinth.minusMinutes(1))) {
+        var leg = getLegAt(agencyId, routeName, startTime);
+        for (var fareType : FareType.values()) {
+          calculateFare(List.of(leg), fareType, ZERO_USD);
+        }
+      }
+
+      calculateFare(
+        List.of(getLegAt(agencyId, routeName, octoberFirst.minusMinutes(1))),
+        regular,
+        usDollars(2.5f)
+      );
+      calculateFare(
+        List.of(getLegAt(agencyId, routeName, octoberNinth)),
+        regular,
+        usDollars(2.5f)
+      );
+    }
+
+    // An itinerary can carry a different zone; the promotion follows Seattle's calendar dates.
+    calculateFare(
+      List.of(
+        getLegAt(
+          COMM_TRANS_AGENCY_ID,
+          "400",
+          octoberNinth.minusHours(1).withZoneSameInstant(ZoneIds.NEW_YORK)
+        )
+      ),
+      regular,
+      ZERO_USD
+    );
+
+    // Sound Transit service remains paid, even when Community Transit operates the bus.
+    calculateFare(
+      List.of(getLegAt(COMM_TRANS_AGENCY_ID, "512", octoberFirst)),
+      regular,
+      THREE_DOLLARS
+    );
+    calculateFare(
+      List.of(getLegAt(KC_METRO_AGENCY_ID, "400", octoberFirst)),
+      regular,
+      THREE_DOLLARS
+    );
+
+    calculateFare(
+      List.of(
+        getLegAt(COMM_TRANS_AGENCY_ID, "400", octoberFirst),
+        getLegAt(KC_METRO_AGENCY_ID, "400", octoberFirst.plusMinutes(30))
+      ),
+      FareType.electronicRegular,
+      THREE_DOLLARS
+    );
   }
 
   /**
@@ -710,6 +776,15 @@ public class OrcaFareServiceTest {
 
   private static Leg getLeg(String agencyId, String shortName, long startTimeMins) {
     return createLeg(agencyId, shortName, 3, startTimeMins, "test", "test", "");
+  }
+
+  private static Leg getLegAt(String agencyId, String shortName, ZonedDateTime startTime) {
+    return ((ScheduledTransitLeg) getLeg(agencyId, shortName, 0))
+      .copyOf()
+      .withStartTime(startTime)
+      .withEndTime(startTime.plusMinutes(12))
+      .withServiceDate(startTime.toLocalDate())
+      .build();
   }
 
   private static Leg getLeg(

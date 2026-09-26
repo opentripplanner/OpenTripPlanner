@@ -4,6 +4,8 @@ import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +62,9 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
+  private static final ZoneId COMMUNITY_TRANSIT_TIME_ZONE = ZoneId.of("America/Los_Angeles");
+  private static final LocalDate COMMUNITY_TRANSIT_FREE_FARE_START = LocalDate.of(2026, 10, 1);
+  private static final LocalDate COMMUNITY_TRANSIT_FREE_FARE_END = LocalDate.of(2026, 10, 9);
 
   public static final String COMM_TRANS_AGENCY_ID = "29";
   public static final String COMM_TRANS_FLEX_AGENCY_ID = "4969";
@@ -287,6 +292,15 @@ public class OrcaFareService extends DefaultFareService {
   ) {
     if (rideType == null) {
       return defaultFare;
+    }
+    if (rideType == RideType.COMM_TRANS_LOCAL_SWIFT) {
+      var date = leg.startTime().withZoneSameInstant(COMMUNITY_TRANSIT_TIME_ZONE).toLocalDate();
+      if (
+        !date.isBefore(COMMUNITY_TRANSIT_FREE_FARE_START) &&
+        date.isBefore(COMMUNITY_TRANSIT_FREE_FARE_END)
+      ) {
+        return Optional.of(ZERO_USD);
+      }
     }
     // Filter out agencies that don't accept ORCA from the electronic fare type
     if (usesOrca(fareType) && !rideType.agencyAcceptsOrca()) {
