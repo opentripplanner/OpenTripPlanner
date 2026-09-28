@@ -2,8 +2,6 @@ package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.utils.time.TimeUtils.time;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -15,16 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.time.TimePeriod;
-import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
-import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -63,10 +57,6 @@ public class RealtimeStopsLayerTest {
     var transitService = new DefaultTransitService(timetableRepository);
     var transitAlertService = new TransitAlertServiceImpl();
 
-    Route route = TransitRepositoryForTest.route("route").build();
-    var itinerary = newItinerary(Place.forStop(stop), time("11:00"))
-      .bus(route, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
-      .build();
     var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toInstant();
     var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toInstant();
     var calendar = AlertCalendar.of(TimePeriod.of(startDate, endDate));
@@ -100,14 +90,6 @@ public class RealtimeStopsLayerTest {
       .build();
 
     transitAlertService.setAlerts(List.of(alert, severeAlert, infoAlert, expiredAlert));
-
-    // TODO Why is these 2 lines here - the test works without them?
-    var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(
-      itineraries,
-      transitService,
-      transitAlertService
-    );
 
     DigitransitRealtimeStopPropertyMapper mapper = new DigitransitRealtimeStopPropertyMapper(
       transitService,

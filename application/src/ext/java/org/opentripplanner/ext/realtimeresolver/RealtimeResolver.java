@@ -1,44 +1,105 @@
 package org.opentripplanner.ext.realtimeresolver;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
 
+  private final RefetchItineraryService refetchItineraryService;
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
 
-  public RealtimeResolver(TransitService transitService, TransitAlertService transitAlertService) {
+  public RealtimeResolver(
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
+  ) {
+    this.refetchItineraryService = refetchItineraryService;
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
   }
 
   /**
-   * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
+   * Loop through all itineraries and populate legs with real-time data using legReference from the
+   * original leg
    */
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
+    RefetchItineraryService refetchItineraryService,
     TransitService transitService,
-    TransitAlertService transitAlertService
+    TransitAlertService transitAlertService,
+    RouteRequest routeRequest
   ) {
-    return new RealtimeResolver(transitService, transitAlertService).addRealtimeInfo(itineraries);
+    return new RealtimeResolver(
+      refetchItineraryService,
+      transitService,
+      transitAlertService
+    ).addRealtimeInfo(itineraries, routeRequest);
   }
 
-  private List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::decorateItinerary).toList();
+  public List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries, RouteRequest routeRequest) {
+    return itineraries
+      .stream()
+      .map(o -> decorateItinerary(o, routeRequest))
+      .toList();
   }
 
-  private Itinerary decorateItinerary(Itinerary it) {
-    // TODO Skip if leg does not contain transit
-    if (it.isFlaggedForDeletion()) {
-      return it;
+  private Itinerary decorateItinerary(Itinerary itinerary, RouteRequest routeRequest) {
+    if (itinerary.isFlaggedForDeletion()) {
+      return itinerary;
     }
-    return it.copyOf().transformLegs(this::mapLeg).build();
+
+    List<LegReference> legReferences = itinerary
+      .legs()
+      .stream()
+      .map(Leg::legReference)
+      .filter(Objects::nonNull)
+      .toList();
+
+    GenericLocation fromLocation = getStreetLocation(itinerary.legs().getFirst(), true);
+    GenericLocation toLocation = getStreetLocation(itinerary.legs().getLast(), false);
+
+    boolean hasItineraryStopsChanged = hasItineraryStopsChanged(itinerary);
+
+    //We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
+    if (hasItineraryStopsChanged) {
+      return refetchItineraryService.refetchItinerary(
+        fromLocation,
+        toLocation,
+        legReferences,
+        routeRequest
+      );
+    }
+    return itinerary.copyOf().transformLegs(this::mapLeg).build();
+  }
+
+  private static boolean hasItineraryStopsChanged(Itinerary itinerary) {
+    var legs = itinerary.legs();
+
+    return IntStream.range(1, legs.size()).anyMatch(i -> {
+      var legA = legs.get(i - 1);
+      var legB = legs.get(i);
+
+      StopLocation toStopLegA = legA.to().stop;
+      StopLocation fromStopLegB = legB.from().stop;
+      if (toStopLegA == null || fromStopLegB == null) {
+        return false;
+      }
+      return !toStopLegA.getId().equals(fromStopLegB.getId());
+    });
   }
 
   private Leg mapLeg(Leg leg) {
@@ -71,5 +132,20 @@ public class RealtimeResolver {
       .withGeneralizedCost(original.generalizedCost())
       .withAccessibilityScore(original.accessibilityScore())
       .build();
+  }
+
+  @Nullable
+  private GenericLocation getStreetLocation(Leg leg, boolean from) {
+    if (!leg.isStreetLeg()) {
+      return null;
+    }
+
+    var place = from ? leg.from() : leg.to();
+
+    if (place.stop != null) {
+      return GenericLocation.fromStopId(place.stop.getId());
+    }
+
+    return GenericLocation.fromCoordinate(place.coordinate);
   }
 }

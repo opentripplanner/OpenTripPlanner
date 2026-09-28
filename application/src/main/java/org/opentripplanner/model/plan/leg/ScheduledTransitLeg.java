@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.accessibility.Accessibility;
@@ -359,11 +360,13 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  @Nonnull
   public Integer boardStopPosInPattern() {
     return boardStopPosInPattern;
   }
 
   @Override
+  @Nonnull
   public Integer alightStopPosInPattern() {
     return alightStopPosInPattern;
   }
