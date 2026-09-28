@@ -8,27 +8,15 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
  * and was therefore skipped.
  */
 public record TaxiTripSkipped(FeedScopedId tripId, String reason) implements DataImportIssue {
-  private static final String REQUIREMENTS = """
-  Taxi trips must satisfy all of the following requirements:
-    1. The trip must be an unscheduled GTFS Flex trip (UnscheduledTrip).
-    2. The trip's route mode must be TAXI (GTFS route_type 1500-1599).
-    3. At most one trip may be kept per route; if multiple trips otherwise satisfy all of the
-       requirements below for the same route, only the first one is kept and the rest are
-       skipped.
-    4. Stops must not have a time restriction: start_pickup_dropoff_window /
-       end_pickup_dropoff_window must not be set, or must span the full day
-       (0:00:00-24:00:00).
-    5. The trip must have exactly 2 stop times: one pickup stop and one drop-off stop.
-    6. Both stop times must reference the same GTFS Flex area (location_id) with a geometry.
-    7. pickup_type at stop 0 and drop_off_type at stop 1 must both be 2 (CALL_AGENCY).\
-  """;
+  private static final String REQUIREMENTS_URL =
+    "https://docs.opentripplanner.org/en/latest/sandbox/Taxi/";
 
   @Override
   public String getMessage() {
-    return "Skipping taxi trip %s.\n%s\nReason this trip was skipped: %s".formatted(
+    return "Skipping taxi trip %s. Reason: %s. See %s for the data requirements.".formatted(
       tripId,
-      REQUIREMENTS,
-      reason
+      reason,
+      REQUIREMENTS_URL
     );
   }
 }
