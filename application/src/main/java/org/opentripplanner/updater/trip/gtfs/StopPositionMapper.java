@@ -18,10 +18,10 @@ import org.opentripplanner.updater.trip.gtfs.model.StopTimeUpdate;
 class StopPositionMapper {
 
   private final FeedScopedId tripId;
-  private final TripTimes tripTimes;
+  private final TripTimes<?> tripTimes;
   private final List<String> stopIds;
 
-  StopPositionMapper(FeedScopedId tripId, TripTimes tripTimes, Timetable timetable) {
+  StopPositionMapper(FeedScopedId tripId, TripTimes<?> tripTimes, Timetable timetable) {
     this.tripId = tripId;
     this.tripTimes = tripTimes;
     this.stopIds = timetable

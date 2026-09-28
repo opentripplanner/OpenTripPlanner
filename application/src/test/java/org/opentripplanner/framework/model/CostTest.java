@@ -10,8 +10,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
 
 class CostTest {
 

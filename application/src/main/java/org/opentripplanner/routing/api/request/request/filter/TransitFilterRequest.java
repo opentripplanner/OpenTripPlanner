@@ -86,7 +86,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   }
 
   @Override
-  public boolean matchTripTimes(TripTimes tripTimes) {
+  public boolean matchTripTimes(TripTimes<?> tripTimes) {
     if (select.length != 0) {
       var anyMatch = false;
       for (var selectRequest : select) {

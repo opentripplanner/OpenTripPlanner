@@ -45,7 +45,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     ZonedDateTime startOfTime = ServiceDateUtils.asStartOfService(second, ZoneIds.LONDON);
 
-    List<TripTimes> tripTimes = List.of(createTripTimesForTest());
+    List<TripTimes<?>> tripTimes = List.of(createTripTimesForTest());
 
     // Total available trip patterns
     RoutingTripPattern tripPattern1 = createTripPattern(TP_ID_1);
@@ -98,7 +98,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   @Test
   public void testCreateTripPatterns() {
     var date = LocalDate.of(2025, 10, 10);
-    List<TripTimes> tripTimes = List.of(
+    List<TripTimes<?>> tripTimes = List.of(
       ScheduledTripTimes.of()
         .withTrip(TransitRepositoryForTest.trip("Test").build())
         .withDepartureTimes("23:45 23:55")

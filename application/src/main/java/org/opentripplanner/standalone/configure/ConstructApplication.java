@@ -2,7 +2,8 @@ package org.opentripplanner.standalone.configure;
 
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
@@ -11,7 +12,6 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;

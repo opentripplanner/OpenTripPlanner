@@ -8,6 +8,8 @@ import com.google.common.collect.Multimap;
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -263,7 +265,7 @@ public class VertexGenerator {
   }
 
   public void initIntersectionNodes() {
-    Set<Long> possibleIntersectionNodes = new HashSet<>();
+    TLongSet possibleIntersectionNodes = new TLongHashSet();
     for (OsmWay way : osmdb.getWays()) {
       TLongList nodes = way.getNodeRefs();
       nodes.forEach(node -> {
@@ -393,7 +395,7 @@ public class VertexGenerator {
     return elevatorVertices;
   }
 
-  private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
+  private void intersectAreaRingNodes(TLongSet possibleIntersectionNodes, Ring outerRing) {
     for (OsmNode node : outerRing.nodes) {
       long nodeId = node.getId();
       if (possibleIntersectionNodes.contains(nodeId)) {
