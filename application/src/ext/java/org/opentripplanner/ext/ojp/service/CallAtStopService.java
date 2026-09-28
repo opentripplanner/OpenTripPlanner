@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.place.NearbyStopFinder;
@@ -134,7 +135,8 @@ public class CallAtStopService {
     Set<FeedScopedId> excludedAgencies,
     Set<FeedScopedId> excludedRoutes,
     Set<TransitMode> includedModes,
-    Set<TransitMode> excludedModes
+    Set<TransitMode> excludedModes,
+    Set<OptionalFeature> optionalFeatures
   ) {
     public boolean includesAgencies() {
       return !includedAgencies.isEmpty();

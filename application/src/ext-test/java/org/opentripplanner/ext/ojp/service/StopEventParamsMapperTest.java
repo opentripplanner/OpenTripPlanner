@@ -4,6 +4,9 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
@@ -15,6 +18,7 @@ import de.vdv.ojp20.OJPStopEventRequestStructure;
 import de.vdv.ojp20.PersonalModesEnumeration;
 import de.vdv.ojp20.PlaceContextStructure;
 import de.vdv.ojp20.StopEventParamStructure;
+import de.vdv.ojp20.UseRealtimeDataEnumeration;
 import de.vdv.ojp20.siri.LineDirectionStructure;
 import de.vdv.ojp20.siri.LineRefStructure;
 import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
@@ -175,6 +179,75 @@ class StopEventParamsMapperTest {
     assertThat(params.excludedRoutes()).isEmpty();
     assertEquals(Set.of(BUS), params.includedModes());
     assertThat(params.excludedModes()).isEmpty();
+  }
+
+  @Test
+  void optionalFeaturesDefault() {
+    var params = MAPPER.extractStopEventParams(stopEvent(new StopEventParamStructure()));
+    assertThat(params.optionalFeatures()).containsExactly(REALTIME_DATA);
+  }
+
+  @Test
+  void optionalFeaturesWithoutParams() {
+    var ser = new OJPStopEventRequestStructure().withLocation(
+      new PlaceContextStructure().withDepArrTime(new XmlDateTime(ZDT))
+    );
+    var params = MAPPER.extractStopEventParams(ser);
+    assertThat(params.optionalFeatures()).containsExactly(REALTIME_DATA);
+  }
+
+  @Test
+  void optionalFeaturesPreviousCalls() {
+    var params = MAPPER.extractStopEventParams(
+      stopEvent(
+        new StopEventParamStructure()
+          .withIncludePreviousCalls(true)
+          .withUseRealtimeData(UseRealtimeDataEnumeration.NONE)
+      )
+    );
+    assertThat(params.optionalFeatures()).containsExactly(PREVIOUS_CALLS);
+  }
+
+  @Test
+  void optionalFeaturesOnwardCalls() {
+    var params = MAPPER.extractStopEventParams(
+      stopEvent(
+        new StopEventParamStructure()
+          .withIncludeOnwardCalls(true)
+          .withUseRealtimeData(UseRealtimeDataEnumeration.NONE)
+      )
+    );
+    assertThat(params.optionalFeatures()).containsExactly(ONWARD_CALLS);
+  }
+
+  @Test
+  void optionalFeaturesAll() {
+    var params = MAPPER.extractStopEventParams(
+      stopEvent(
+        new StopEventParamStructure()
+          .withIncludePreviousCalls(true)
+          .withIncludeOnwardCalls(true)
+          .withUseRealtimeData(UseRealtimeDataEnumeration.FULL)
+      )
+    );
+    assertThat(params.optionalFeatures()).containsExactly(
+      PREVIOUS_CALLS,
+      ONWARD_CALLS,
+      REALTIME_DATA
+    );
+  }
+
+  @Test
+  void optionalFeaturesExplicitlyDisabled() {
+    var params = MAPPER.extractStopEventParams(
+      stopEvent(
+        new StopEventParamStructure()
+          .withIncludePreviousCalls(false)
+          .withIncludeOnwardCalls(false)
+          .withUseRealtimeData(UseRealtimeDataEnumeration.NONE)
+      )
+    );
+    assertThat(params.optionalFeatures()).isEmpty();
   }
 
   /**
