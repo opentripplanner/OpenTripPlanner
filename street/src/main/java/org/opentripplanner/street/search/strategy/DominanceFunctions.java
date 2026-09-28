@@ -153,7 +153,6 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       int length = 0;
       while (true) {
         if (a.getBackState() == null) {
-          System.out.println(length);
           return length;
         }
         a = a.getBackState();
