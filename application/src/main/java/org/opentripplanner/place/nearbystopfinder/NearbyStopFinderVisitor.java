@@ -117,7 +117,6 @@ class NearbyStopFinderVisitor
 
   @Override
   public boolean shouldSearchTerminate(State current) {
-    System.out.println(transitStopsFound);
     return maxCount > 0 && transitStopsFound.size() + statesForAreaStopIds().size() >= maxCount;
   }
 }
