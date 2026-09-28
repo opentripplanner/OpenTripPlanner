@@ -100,7 +100,7 @@ public class AStar<
     this.terminationStrategy = terminationStrategy;
     this.timeout = Objects.requireNonNull(timeout);
 
-    this.spt = new ShortestPathTree<>(Objects.requireNonNull(dominanceFunction));
+    this.spt = new ShortestPathTree<>(Objects.requireNonNull(dominanceFunction), arriveBy);
 
     this.preSearchHook = Objects.requireNonNull(preSearchHook);
     this.statisticsCallback = Objects.requireNonNull(statisticsCallback);

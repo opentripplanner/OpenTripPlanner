@@ -8,7 +8,7 @@ public class TestEdge implements AStarEdge<TestState, TestEdge, TestVertex> {
   private final TestVertex to;
   private final double weight;
 
-  TestEdge(TestVertex from, TestVertex to, double weight) {
+  public TestEdge(TestVertex from, TestVertex to, double weight) {
     this.from = from;
     this.to = to;
     this.weight = weight;

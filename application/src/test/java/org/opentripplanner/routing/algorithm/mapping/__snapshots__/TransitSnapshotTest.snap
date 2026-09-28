@@ -4134,11 +4134,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 1567,
+      "duration" : 1565,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T18:38:59.000+00:00",
-      "generalizedCost" : 3202,
+      "endTime" : "2009-11-17T18:38:57.000+00:00",
+      "generalizedCost" : 3199,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -4436,8 +4436,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 1003.22,
-          "endTime" : "2009-11-17T18:38:59.000+00:00",
+          "distance" : 1002.39,
+          "endTime" : "2009-11-17T18:38:57.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:26:22.000+00:00",
             "departure" : "2009-11-17T18:26:22.000+00:00",
@@ -4449,7 +4449,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1715,
+          "generalizedCost" : 1712,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4476,50 +4476,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 785.26,
+              "distance" : 861.45,
               "elevation" : "",
               "lat" : 45.5234583,
               "lon" : -122.6982868,
               "relativeDirection" : "RIGHT",
-              "stayOn" : false,
-              "streetName" : "Northwest 23rd Avenue",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "WEST",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 4.77,
-              "elevation" : "",
-              "lat" : 45.5305094,
-              "lon" : -122.698646,
-              "relativeDirection" : "LEFT",
-              "stayOn" : false,
-              "streetName" : "Northwest Marshall Street",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTH",
-              "area" : false,
-              "bogusName" : true,
-              "distance" : 7.27,
-              "elevation" : "",
-              "lat" : 45.5305085,
-              "lon" : -122.6987072,
-              "relativeDirection" : "RIGHT",
-              "stayOn" : false,
-              "streetName" : "path",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTH",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 64.97,
-              "elevation" : "",
-              "lat" : 45.5305739,
-              "lon" : -122.6987094,
-              "relativeDirection" : "CONTINUE",
               "stayOn" : false,
               "streetName" : "Northwest 23rd Avenue",
               "walkingBike" : false
@@ -4552,7 +4513,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T18:38:59.000+00:00",
+            "arrival" : "2009-11-17T18:38:57.000+00:00",
             "lat" : 45.531,
             "lon" : -122.70029,
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
@@ -4567,17 +4528,17 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers" : 0,
       "transitTime" : 742,
       "waitingTime" : 0,
-      "walkDistance" : 1090.26,
+      "walkDistance" : 1089.43,
       "walkLimitExceeded" : false,
-      "walkTime" : 825
+      "walkTime" : 823
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
-      "duration" : 1589,
+      "duration" : 1587,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
-      "endTime" : "2009-11-17T18:54:21.000+00:00",
-      "generalizedCost" : 3224,
+      "endTime" : "2009-11-17T18:54:19.000+00:00",
+      "generalizedCost" : 3221,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -28800000,
@@ -4875,8 +4836,8 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyTimeZoneOffset" : -28800000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 1003.22,
-          "endTime" : "2009-11-17T18:54:21.000+00:00",
+          "distance" : 1002.39,
+          "endTime" : "2009-11-17T18:54:19.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:41:44.000+00:00",
             "departure" : "2009-11-17T18:41:44.000+00:00",
@@ -4888,7 +4849,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             "vertexType" : "TRANSIT",
             "zoneId" : "1"
           },
-          "generalizedCost" : 1715,
+          "generalizedCost" : 1712,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "WALK",
@@ -4915,50 +4876,11 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "absoluteDirection" : "NORTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 785.26,
+              "distance" : 861.45,
               "elevation" : "",
               "lat" : 45.5234583,
               "lon" : -122.6982868,
               "relativeDirection" : "RIGHT",
-              "stayOn" : false,
-              "streetName" : "Northwest 23rd Avenue",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "WEST",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 4.77,
-              "elevation" : "",
-              "lat" : 45.5305094,
-              "lon" : -122.698646,
-              "relativeDirection" : "LEFT",
-              "stayOn" : false,
-              "streetName" : "Northwest Marshall Street",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTH",
-              "area" : false,
-              "bogusName" : true,
-              "distance" : 7.27,
-              "elevation" : "",
-              "lat" : 45.5305085,
-              "lon" : -122.6987072,
-              "relativeDirection" : "RIGHT",
-              "stayOn" : false,
-              "streetName" : "path",
-              "walkingBike" : false
-            },
-            {
-              "absoluteDirection" : "NORTH",
-              "area" : false,
-              "bogusName" : false,
-              "distance" : 64.97,
-              "elevation" : "",
-              "lat" : 45.5305739,
-              "lon" : -122.6987094,
-              "relativeDirection" : "CONTINUE",
               "stayOn" : false,
               "streetName" : "Northwest 23rd Avenue",
               "walkingBike" : false
@@ -4991,7 +4913,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
             }
           ],
           "to" : {
-            "arrival" : "2009-11-17T18:54:21.000+00:00",
+            "arrival" : "2009-11-17T18:54:19.000+00:00",
             "lat" : 45.531,
             "lon" : -122.70029,
             "name" : "NW Northrup St. & NW 24th Ave. (P3)",
@@ -5006,9 +4928,9 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
       "transfers" : 0,
       "transitTime" : 764,
       "waitingTime" : 0,
-      "walkDistance" : 1090.26,
+      "walkDistance" : 1089.43,
       "walkLimitExceeded" : false,
-      "walkTime" : 825
+      "walkTime" : 823
     },
     {
       "arrivedAtDestinationWithRentedBicycle" : false,

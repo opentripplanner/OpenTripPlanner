@@ -27,7 +27,7 @@ class NearbyStopFinderVisitorTest {
 
   @Test
   void collectsTransitStops() {
-    var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false);
+    var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false, 0);
 
     var state = TestStateBuilder.ofWalking().streetEdge().stop(STOP).build();
     visitor.visitVertex(state);
@@ -40,7 +40,7 @@ class NearbyStopFinderVisitorTest {
   void skipsOriginVertices() {
     var state = TestStateBuilder.ofWalking().streetEdge().stop(STOP).build();
     var originVertices = Set.of(state.getVertex());
-    var visitor = new NearbyStopFinderVisitor(originVertices, Set.of(), false);
+    var visitor = new NearbyStopFinderVisitor(originVertices, Set.of(), false, 0);
 
     visitor.visitVertex(state);
 
@@ -51,7 +51,7 @@ class NearbyStopFinderVisitorTest {
   void skipsIgnoreVertices() {
     var state = TestStateBuilder.ofWalking().streetEdge().stop(STOP).build();
     var ignoreVertices = Set.of(state.getVertex());
-    var visitor = new NearbyStopFinderVisitor(Set.of(), ignoreVertices, false);
+    var visitor = new NearbyStopFinderVisitor(Set.of(), ignoreVertices, false, 0);
 
     visitor.visitVertex(state);
 
@@ -60,7 +60,7 @@ class NearbyStopFinderVisitorTest {
 
   @Test
   void skipsNonTransitVertices() {
-    var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false);
+    var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false, 0);
 
     // State at a regular intersection, not a transit stop
     var state = TestStateBuilder.ofWalking().streetEdge().build();
@@ -78,7 +78,7 @@ class NearbyStopFinderVisitorTest {
       vertex.addAreaStops(Set.of(AREA_STOP_ID));
 
       var state = new State(vertex, StreetSearchRequest.of().withStartTime(Instant.EPOCH).build());
-      var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false);
+      var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false, 0);
       visitor.visitVertex(state);
 
       assertEquals(1, visitor.statesForAreaStopIds().size());
@@ -98,7 +98,7 @@ class NearbyStopFinderVisitorTest {
       vertex.addAreaStops(Set.of(AREA_STOP_ID));
 
       var state = new State(vertex, StreetSearchRequest.of().withStartTime(Instant.EPOCH).build());
-      var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false);
+      var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), false, 0);
       visitor.visitVertex(state);
 
       assertTrue(visitor.statesForAreaStopIds().isEmpty());
@@ -115,7 +115,7 @@ class NearbyStopFinderVisitorTest {
       vertex.addAreaStops(Set.of(AREA_STOP_ID));
 
       var state = new State(vertex, StreetSearchRequest.of().withStartTime(Instant.EPOCH).build());
-      var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), true);
+      var visitor = new NearbyStopFinderVisitor(Set.of(), Set.of(), true, 0);
       visitor.visitVertex(state);
 
       assertEquals(1, visitor.statesForAreaStopIds().size());
