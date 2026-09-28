@@ -49,7 +49,7 @@ import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
+import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.place.NearbyPlaceFinder;
@@ -392,16 +392,23 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     return environment -> {
       GtfsGraphQLRequestContext context = environment.<GtfsGraphQLRequestContext>getContext();
       var args = new GraphQLTypes.GraphQLQueryTypeItineraryArgs(environment.getArguments());
-      var reference = ItineraryReferenceSerializer.decode(args.getGraphQLId());
+      var reference = ItineraryReference.decode(args.getGraphQLId());
       if (reference == null) {
         return null;
       }
       try {
-        return ItineraryReferenceMapper.refetch(
+        var routeRequest = ItineraryReferenceMapper.toRouteRequest(
           reference,
-          context.defaultRouteRequest(),
-          context.refetchItineraryService()
+          context.defaultRouteRequest()
         );
+        return context
+          .refetchItineraryService()
+          .refetchItinerary(
+            reference.from(),
+            reference.to(),
+            reference.legReferences(),
+            routeRequest
+          );
       } catch (RefetchItineraryException | IllegalArgumentException e) {
         return null;
       }

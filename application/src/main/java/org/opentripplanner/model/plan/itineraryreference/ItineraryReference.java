@@ -50,4 +50,24 @@ public record ItineraryReference(
       throw new IllegalArgumentException("legReferences must not be empty");
     }
   }
+
+  /**
+   * The opaque, versioned token for this reference. Delegates to
+   * {@link ItineraryReferenceSerializer#encode}.
+   */
+  @Override
+  public String toString() {
+    return encode();
+  }
+
+  /** Alias for {@link #toString()}, for callers that prefer an explicit name. */
+  public String encode() {
+    return ItineraryReferenceSerializer.encode(this);
+  }
+
+  /** Delegates to {@link ItineraryReferenceSerializer#decode}. */
+  @Nullable
+  public static ItineraryReference decode(@Nullable String itineraryReference) {
+    return ItineraryReferenceSerializer.decode(itineraryReference);
+  }
 }

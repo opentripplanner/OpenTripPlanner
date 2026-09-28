@@ -13,7 +13,6 @@ import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
 import org.opentripplanner.routing.refetch.UnsupportedItineraryReferenceException;
@@ -87,7 +86,7 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
           getSource(environment),
           routeRequest
         );
-        return ItineraryReferenceSerializer.encode(reference);
+        return reference.encode();
       } catch (UnsupportedItineraryReferenceException e) {
         return null;
       }

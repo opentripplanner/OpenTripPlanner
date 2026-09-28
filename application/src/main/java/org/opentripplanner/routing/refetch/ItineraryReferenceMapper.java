@@ -69,12 +69,17 @@ public final class ItineraryReferenceMapper {
     );
   }
 
-  public static Itinerary refetch(
+  /**
+   * Reconstructs the {@link RouteRequest} that was in effect when {@code ref}'s itinerary was
+   * originally planned, by overlaying {@code ref}'s fields onto {@code defaultRouteRequest}.
+   * Callers pass the result, together with {@link ItineraryReference#legReferences()}, to
+   * {@link RefetchItineraryService#refetchItinerary}.
+   */
+  public static RouteRequest toRouteRequest(
     ItineraryReference ref,
-    RouteRequest defaultRouteRequest,
-    RefetchItineraryService refetchItineraryService
+    RouteRequest defaultRouteRequest
   ) {
-    var routeRequest = defaultRouteRequest
+    return defaultRouteRequest
       .copyOf()
       .withJourney(journey ->
         journey
@@ -109,13 +114,6 @@ public final class ItineraryReferenceMapper {
           )
       )
       .buildRequest();
-
-    return refetchItineraryService.refetchItinerary(
-      ref.from(),
-      ref.to(),
-      ref.legReferences(),
-      routeRequest
-    );
   }
 
   private static LegReference requireSupportedLegReference(LegReference legReference) {

@@ -90,10 +90,15 @@ class ItineraryReferenceMapperTest {
     var decodedReference = ItineraryReferenceSerializer.decode(encoded);
     assertNotNull(decodedReference);
 
-    var refetchedItinerary = ItineraryReferenceMapper.refetch(
+    var refetchRouteRequest = ItineraryReferenceMapper.toRouteRequest(
       decodedReference,
-      routeRequest,
-      refetchService
+      routeRequest
+    );
+    var refetchedItinerary = refetchService.refetchItinerary(
+      decodedReference.from(),
+      decodedReference.to(),
+      decodedReference.legReferences(),
+      refetchRouteRequest
     );
 
     assertEquals(originalItinerary.toStr(), refetchedItinerary.toStr());
@@ -195,8 +200,8 @@ class ItineraryReferenceMapperTest {
 
     // A coordinate that doesn't match a stop, on the edge-less test GRAPH, forces
     // RefetchItineraryService to attempt (and fail) a real access search - this only happens if
-    // ItineraryReferenceMapper.refetch(...) actually passes the reference's `from` through,
-    // rather than always passing null as it used to.
+    // the reference's `from` is actually passed through, rather than always passing null as it
+    // used to.
     var reference = new ItineraryReference(
       List.of(legRef()),
       GenericLocation.fromCoordinate(0, 0),
@@ -212,8 +217,14 @@ class ItineraryReferenceMapperTest {
       false
     );
 
+    var routeRequest = ItineraryReferenceMapper.toRouteRequest(reference, routeRequest());
     var e = assertThrows(RefetchItineraryException.class, () ->
-      ItineraryReferenceMapper.refetch(reference, routeRequest(), refetchService)
+      refetchService.refetchItinerary(
+        reference.from(),
+        reference.to(),
+        reference.legReferences(),
+        routeRequest
+      )
     );
     assertEquals("Could not calculate access", e.getMessage());
   }
