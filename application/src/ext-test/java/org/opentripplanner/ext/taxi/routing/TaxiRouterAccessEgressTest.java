@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.taxi.routing;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -19,10 +17,11 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.TransitService;
 
 class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
@@ -78,20 +77,18 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
     List.of(COVERING_ROUTE, OVERLAPPING_ROUTE)
   );
 
-  private static final RegularStop COVERED_STOP = TEST_MODEL.stop(
-    "covered-stop",
-    TO_LAT,
-    TO_LON
-  ).build();
-  private static final RegularStop UNCOVERED_STOP = TEST_MODEL.stop(
-    "uncovered-stop",
-    65.0,
-    20.0
-  ).build();
+  private static final TransitTestEnvironmentBuilder TEST_ENV_BUILDER = TransitTestEnvironment.of();
+  private static final RegularStop COVERED_STOP = TEST_ENV_BUILDER.stop("covered-stop", b ->
+    b.withCoordinate(TO_LAT, TO_LON)
+  );
+  private static final RegularStop UNCOVERED_STOP = TEST_ENV_BUILDER.stop("uncovered-stop", b ->
+    b.withCoordinate(65.0, 20.0)
+  );
+  private static final TransitTestEnvironment TEST_ENV = TEST_ENV_BUILDER.build();
 
   @Test
   void filterNearbyStopsKeepsOnlyAccessStopsSharingARouteWithTheOrigin() {
-    var transitService = mockTransitService();
+    var transitService = TEST_ENV.transitService();
     var subject = new TaxiRouter(COVERING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
     var uncovered = nearbyStop(UNCOVERED_STOP);
@@ -108,7 +105,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
   @Test
   void filterNearbyStopsKeepsOnlyEgressStopsSharingARouteWithTheDestination() {
-    var transitService = mockTransitService();
+    var transitService = TEST_ENV.transitService();
     var subject = new TaxiRouter(COVERING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
     var uncovered = nearbyStop(UNCOVERED_STOP);
@@ -125,7 +122,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
   @Test
   void filterNearbyStopsDropsAllAccessStopsWhenNoRouteCoversAny() {
-    var transitService = mockTransitService();
+    var transitService = TEST_ENV.transitService();
     var subject = new TaxiRouter(EMPTY_INDEX);
 
     var result = subject.filterNearbyStops(
@@ -140,7 +137,7 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
 
   @Test
   void filterNearbyStopsKeepsStopCoveredByMultipleOverlappingRoutesOnlyOnce() {
-    var transitService = mockTransitService();
+    var transitService = TEST_ENV.transitService();
     var subject = new TaxiRouter(OVERLAPPING_INDEX);
     var covered = nearbyStop(COVERED_STOP);
 
@@ -195,13 +192,6 @@ class TaxiRouterAccessEgressTest implements PlanTestConstants {
     );
 
     assertThat(result).containsExactly(driveLeg);
-  }
-
-  private static TransitService mockTransitService() {
-    var transitService = mock(TransitService.class);
-    when(transitService.getStopLocation(COVERED_STOP.getId())).thenReturn(COVERED_STOP);
-    when(transitService.getStopLocation(UNCOVERED_STOP.getId())).thenReturn(UNCOVERED_STOP);
-    return transitService;
   }
 
   private static NearbyStop nearbyStop(RegularStop stop) {
