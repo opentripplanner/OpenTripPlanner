@@ -266,7 +266,7 @@ public class RaptorPathToItineraryMapperTest {
     assertTrue(itinerary.isSearchWindowAware());
   }
 
-  private TripTimes buildTripTimes(TripPattern originalPattern) {
+  private TripTimes<?> buildTripTimes(TripPattern originalPattern) {
     var trip = TransitRepositoryForTest.trip("test").build();
     var stopTimes = new ArrayList<StopTime>();
     for (int i = 0; i < originalPattern.numberOfStops(); i++) {

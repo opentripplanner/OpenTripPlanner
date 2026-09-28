@@ -3,12 +3,13 @@ package org.opentripplanner.transit.repository;
 import java.time.LocalDate;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 
 /**
  * The mutable repository for the realtime-updated timetables and trip calendar. It is managed by
  * the transaction framework: trip updaters obtain it through a
- * {@link org.opentripplanner.framework.transaction.api.WriteContext} on the single writer thread,
+ * {@link WriteContext} on the single writer thread,
  * and {@link #createSnapshot()} is called at commit time to publish a new immutable
  * {@link TimetableRepositorySnapshot} for the request threads.
  */

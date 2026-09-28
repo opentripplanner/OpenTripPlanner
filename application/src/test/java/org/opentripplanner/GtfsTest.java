@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -211,8 +212,7 @@ public abstract class GtfsTest {
       transferRepository
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
-    var registry =
-      org.opentripplanner.framework.transaction.internal.TransactionFactory.createRepositoryRegistry();
+    var registry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new org.opentripplanner.transit.repository.DefaultTimetableRepository(
       new RaptorTransitData(scheduledRaptorData),
       transitRepository.getTripCalendar()
@@ -225,12 +225,11 @@ public abstract class GtfsTest {
         LocalDate::now
       )
     );
-    var updateManager =
-      org.opentripplanner.framework.transaction.internal.TransactionFactory.createUpdateManagerWithAtomicCommits(
-        "test",
-        registry,
-        java.util.concurrent.Executors.defaultThreadFactory()
-      );
+    var updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
+      "test",
+      registry,
+      java.util.concurrent.Executors.defaultThreadFactory()
+    );
 
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
       transitRepository,

@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  */
 record TripUpdate(
   StopPattern stopPattern,
-  TripTimes tripTimes,
+  TripTimes<?> tripTimes,
   LocalDate serviceDate,
   @Nullable TripOnServiceDate addedTripOnServiceDate,
   @Nullable TripPattern addedTripPattern,
