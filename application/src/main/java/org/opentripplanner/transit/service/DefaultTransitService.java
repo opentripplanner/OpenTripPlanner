@@ -166,7 +166,7 @@ public class DefaultTransitService implements TransitService {
       tripOnServiceDate.getTrip(),
       tripOnServiceDate.getServiceDate()
     )
-      .flatMap(tripTimes -> ((TripTimes<?>) tripTimes).getVehicleId())
+      .flatMap(TripTimes::getVehicleId)
       .orElse(null);
     return Optional.ofNullable(
       VehicleAssignmentOnServiceDate.of(tripOnServiceDate.getVehicleAssignment(), realTimeVehicleId)
