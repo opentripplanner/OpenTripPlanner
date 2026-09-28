@@ -15,28 +15,21 @@ For a transit itinerary with a `TAXI` access and/or egress leg:
   dropped and never reaches the transit search. Access and egress are filtered independently of
   each other.
 - Once the transit search has picked a surviving access/egress candidate and the itinerary's legs
-  are built, the plain driving leg is replaced with a `TaxiLeg` decorated with the provider's
-  route, agency, and booking information from the matched flex trip. This is done by
-  `RaptorPathToItineraryMapper` calling `TaxiService.decorateAccessEgressLegs(...)`. Because
-  the candidate has already passed the pre-search check, a matching provider is expected to
-  always be found here.
-
-Both of these are implemented by `TaxiRouter`, which `TaxiService` delegates to
-for the transit access/egress case.
+  are built, the plain driving leg is decorated with the matched provider's route, agency, and
+  booking information. Because the candidate has already passed the pre-search check, a matching
+  provider is expected to always be found here.
 
 For a direct (non-transit) `TAXI` itinerary, the same two-phase approach is used:
-`RoutingWorker.routeDirectTaxi()` calls `TaxiService.routeDirect(...)`, which delegates to
-`TaxiRouter.routeDirect(...)`:
-- Before the street search runs, it checks whether the request's origin and destination share a
-  common provider; if not, an empty result is returned immediately without running
-  `DirectStreetRouter` (the same taxi-agnostic router used for all other direct street routing).
-- Otherwise, once `DirectStreetRouter` has built the itinerary, the driving leg is replaced with a
-  `TaxiLeg`, looked up using those same request origin/destination coordinates rather than the
-  leg's own local coordinates. There is no itinerary filter-chain step involved.
+- Before the street search runs, OTP checks whether the request's origin and destination share a
+  common provider; if not, an empty result is returned immediately without running a street
+  search.
+- Otherwise, once the itinerary has been built, the driving leg is decorated the same way,
+  looked up using those same request origin/destination coordinates rather than the leg's own
+  local coordinates.
 
 Decoration is only applied when the request's access, egress, or direct mode is `TAXI`, and only
-when the feature flag is on and a `TaxiService` is configured (see Configuration). If the flag
-is off or no service is configured, direct `TAXI` requests return no itineraries rather than
+when the feature flag is on and taxi provider data is configured (see Configuration). If the flag
+is off or no taxi provider data is configured, `TAXI` requests return no itineraries rather than
 falling back to undecorated street routing.
 
 **TODO:**
@@ -108,30 +101,17 @@ Internally this maps to the `TAXI` street mode, which behaves identically to
 
 ### Decorated Leg Fields
 
-When a taxi leg matches a route, it is replaced by a `TaxiLeg`. It implements the plain `Leg`
-interface directly (**not** `TransitLeg`), even though it carries route/agency/booking
-information from the matched provider's flex trip. This means `transitLeg`/`isTransit` is
-`false` in the API for a taxi leg, and the itinerary's own `isTransit`-based fields are
-unaffected by it. The physical street route (geometry, distance, elevation, steps, generalized
-cost, emissions, etc.) of the original driving leg is preserved by delegating to the wrapped
-street leg. Some fields e.g. `mode`, `serviceDate`,
-`accessibilityScore`, `fareOffers`, and the vehicle-rental fields are not delegated.
+A decorated taxi leg is **not** considered a transit leg (`transitLeg`/`isTransit` is `false` in
+the API), even though it carries operator and booking information from the matched provider.
+Everything else about the leg (geometry, distance, duration, generalized cost, etc.) is the same
+as for a plain driving leg.
 
-| Field (GTFS GraphQL / Transmodel) | Source                                                       |
-|:-----------------------------------|:--------------------------------------------------------------|
-| `transitLeg` / n\/a                | Always `false` — `TaxiLeg` is not a `TransitLeg`.          |
-| `agency` / `authority`             | Agency from the matched route.                                |
-| `route` / `line`                   | Route from the matched flex trip.                              |
-| `mode`                              | `TAXI`, resolved via an explicit `instanceof TaxiLeg` branch in `LegImpl`/`LegType`, since it isn't a `TransitLeg`. |
-| `serviceDate`                      | Always `null` (not meaningful for a taxi leg). |
-| `boardStopPosInPattern`            | Always `0` (the pickup stop).                                  |
-| `alightStopPosInPattern`           | Always `1` (the drop-off stop).                                |
-| `pickupBookingInfo`                | Booking info from stop 0 of the matched flex trip.             |
-| `dropOffBookingInfo`               | Booking info from stop 1 of the matched flex trip.             |
-| `accessibilityScore`               | Always `null` (not meaningful for a taxi leg). |
-| `fareOffers`                       | Always empty (same as for a plain driving leg). |
-| `rentedBike` and related vehicle-rental fields | Always `false`/`null` (not applicable to a taxi leg). |
-| `trip`, `tripOnServiceDate`, `alerts`, `stopCalls` | Not applicable — fall back to the `Leg` interface's defaults (`null`/empty), since there is no scheduled trip driving the leg. |
+| Field (GTFS GraphQL / Transmodel)  | Description                                       |
+|:------------------------------------|:--------------------------------------------------|
+| `agency` / `authority`              | Operator of the matched taxi provider.            |
+| `route` / `line`                    | Route of the matched taxi provider.               |
+| `pickupBookingInfo` / `bookingArrangements` | Booking info for the pickup.               |
+| `dropOffBookingInfo` (GTFS GraphQL only) | Booking info for the drop-off.               |
 
 A `TAXI` request whose origin and destination (for direct routing) or whose logical
 access/egress endpoints (for transit routing) don't share a common provider never reaches leg
