@@ -144,6 +144,7 @@ public class OrcaFareService extends DefaultFareService {
           WHATCOM_LOCAL,
           WHATCOM_CROSS_COUNTY,
           KITSAP_TRANSIT_FAST_FERRY,
+          MONORAIL,
           SKAGIT_CROSS_COUNTY -> false;
         default -> true;
       };
@@ -307,7 +308,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.empty();
     }
     return switch (fareType) {
-      case youth, electronicYouth -> getYouthFare(rideType, defaultFare);
+      case youth, electronicYouth -> getYouthFare(fareType, rideType, defaultFare);
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
@@ -354,7 +355,7 @@ public class OrcaFareService extends DefaultFareService {
         SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
         ? Optional.empty()
         : defaultFare;
-      case MONORAIL -> Optional.empty();
+      case MONORAIL -> optionalUSD(4.00f);
       default -> defaultFare;
     };
   }
@@ -382,7 +383,7 @@ public class OrcaFareService extends DefaultFareService {
         EVERETT_TRANSIT,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR -> optionalUSD(1.00f);
-      case MONORAIL -> Optional.empty();
+      case MONORAIL -> optionalUSD(2.00f);
       case WASHINGTON_STATE_FERRIES -> defaultFare.map(df ->
         getWashingtonStateFerriesFare(route.getLongName(), FareType.electronicSpecial, df)
       );
@@ -422,7 +423,7 @@ public class OrcaFareService extends DefaultFareService {
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
         KITSAP_TRANSIT -> optionalUSD(1f);
-      case MONORAIL -> Optional.empty();
+      case MONORAIL -> optionalUSD(2.00f);
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
       case KITSAP_TRANSIT_FAST_FERRY -> defaultFare.map(Money::half);
@@ -438,15 +439,21 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
-  private Optional<Money> getYouthFare(RideType rideType, Optional<Money> defaultFare) {
+  private Optional<Money> getYouthFare(
+    FareType fareType,
+    RideType rideType,
+    Optional<Money> defaultFare
+  ) {
     return switch (rideType) {
       case
         UNKNOWN,
         SKAGIT_TRANSIT,
         SKAGIT_LOCAL,
         SKAGIT_CROSS_COUNTY,
-        MONORAIL,
         LINK_SHUTTLE -> Optional.empty();
+      case MONORAIL -> fareType == FareType.electronicYouth
+        ? Optional.of(ZERO_USD)
+        : optionalUSD(2.00f);
       default -> Optional.of(ZERO_USD);
     };
   }
