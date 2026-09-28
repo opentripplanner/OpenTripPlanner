@@ -204,7 +204,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var path = isReverse ? tree.getPath(from) : tree.getPath(to);
+    var path = tree.getPath(isReverse ? from : to);
     pathCache.put(key, path);
     return path;
   }

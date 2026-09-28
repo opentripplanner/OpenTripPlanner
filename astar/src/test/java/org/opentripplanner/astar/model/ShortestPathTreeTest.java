@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.astar.TestEdge;
 import org.opentripplanner.astar.TestState;
 import org.opentripplanner.astar.TestVertex;
 import org.opentripplanner.astar.spi.DominanceFunction;
@@ -23,7 +24,7 @@ class ShortestPathTreeTest {
 
   @Test
   void singleState() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
     var v = new TestVertex();
     var s = new TestState(v, 1.0);
 
@@ -34,10 +35,12 @@ class ShortestPathTreeTest {
 
   @Test
   void dominatedStateReplacement() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
+    var v0 = new TestVertex();
     var v = new TestVertex();
-    var worse = new TestState(v, 10.0);
-    var better = new TestState(v, 1.0);
+    var e = new TestEdge(v0, v, 1.0);
+    var worse = new TestState(v, 10.0, e);
+    var better = new TestState(v, 1.0, e);
 
     assertTrue(spt.add(worse));
     assertTrue(spt.add(better));
@@ -48,10 +51,12 @@ class ShortestPathTreeTest {
 
   @Test
   void dominatedStateRejected() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
+    var v0 = new TestVertex();
     var v = new TestVertex();
-    var better = new TestState(v, 1.0);
-    var worse = new TestState(v, 10.0);
+    var e = new TestEdge(v0, v, 1.0);
+    var better = new TestState(v, 1.0, e);
+    var worse = new TestState(v, 10.0, e);
 
     assertTrue(spt.add(better));
     assertFalse(spt.add(worse));
@@ -59,7 +64,7 @@ class ShortestPathTreeTest {
 
   @Test
   void coDominantStates() {
-    var spt = new ShortestPathTree<>(NONE);
+    var spt = new ShortestPathTree<>(NONE, false);
     var v = new TestVertex();
     var s1 = new TestState(v, 1.0);
     var s2 = new TestState(v, 2.0);
@@ -72,7 +77,7 @@ class ShortestPathTreeTest {
 
   @Test
   void visitReturnsFalseForAbsentVertex() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
     var v1 = new TestVertex();
     var v2 = new TestVertex();
     var s1 = new TestState(v1, 1.0);
@@ -85,13 +90,13 @@ class ShortestPathTreeTest {
 
   @Test
   void getStateNullForAbsentVertex() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
     assertNull(spt.getState(new TestVertex()));
   }
 
   @Test
   void getAllStatesAcrossMixedVertices() {
-    var spt = new ShortestPathTree<>(NONE);
+    var spt = new ShortestPathTree<>(NONE, false);
     var v1 = new TestVertex();
     var v2 = new TestVertex();
     var s1 = new TestState(v1, 1.0);
@@ -111,13 +116,13 @@ class ShortestPathTreeTest {
 
   @Test
   void getPathReturnsNullForAbsentVertex() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
     assertNull(spt.getPath(new TestVertex()));
   }
 
   @Test
   void getPathReturnsFinalState() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
     var v = new TestVertex();
     var s = new TestState(v, 1.0);
     spt.add(s);
@@ -126,7 +131,7 @@ class ShortestPathTreeTest {
 
   @Test
   void toStringShowsVertexCount() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
+    var spt = new ShortestPathTree<>(BY_WEIGHT, false);
     spt.add(new TestState(new TestVertex(), 1.0));
     assertEquals("ShortestPathTree(1 vertices)", spt.toString());
   }

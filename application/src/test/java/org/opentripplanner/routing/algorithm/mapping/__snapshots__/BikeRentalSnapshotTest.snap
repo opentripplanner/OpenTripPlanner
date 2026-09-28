@@ -2462,20 +2462,20 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
   [
     {
       "arrivedAtDestinationWithRentedBicycle" : true,
-      "duration" : 327,
+      "duration" : 328,
       "elevationGained" : 0.0,
       "elevationLost" : 0.0,
       "endTime" : "2009-10-21T23:10:00.000+00:00",
-      "generalizedCost" : 711,
+      "generalizedCost" : 710,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
           "distance" : 106.59,
-          "endTime" : "2009-10-21T23:06:59.000+00:00",
+          "endTime" : "2009-10-21T23:06:58.000+00:00",
           "from" : {
-            "departure" : "2009-10-21T23:04:33.000+00:00",
+            "departure" : "2009-10-21T23:04:32.000+00:00",
             "lat" : 45.52832,
             "lon" : -122.70059,
             "name" : "SW Johnson St. & NW 24th Ave. (P1)",
@@ -2489,7 +2489,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "realTime" : false,
           "rentedBike" : false,
           "route" : "",
-          "startTime" : "2009-10-21T23:04:33.000+00:00",
+          "startTime" : "2009-10-21T23:04:32.000+00:00",
           "steps" : [
             {
               "absoluteDirection" : "SOUTH",
@@ -2532,9 +2532,9 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             }
           ],
           "to" : {
-            "arrival" : "2009-10-21T23:06:59.000+00:00",
+            "arrival" : "2009-10-21T23:06:58.000+00:00",
             "bikeShareId" : "-102309",
-            "departure" : "2009-10-21T23:06:59.000+00:00",
+            "departure" : "2009-10-21T23:06:58.000+00:00",
             "lat" : 45.5277374,
             "lon" : -122.7003879,
             "name" : "-102309",
@@ -2550,12 +2550,12 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "agencyTimeZoneOffset" : -25200000,
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 711.97,
+          "distance" : 712.45,
           "endTime" : "2009-10-21T23:10:00.000+00:00",
           "from" : {
-            "arrival" : "2009-10-21T23:06:59.000+00:00",
+            "arrival" : "2009-10-21T23:06:58.000+00:00",
             "bikeShareId" : "-102309",
-            "departure" : "2009-10-21T23:06:59.000+00:00",
+            "departure" : "2009-10-21T23:06:58.000+00:00",
             "lat" : 45.5277374,
             "lon" : -122.7003879,
             "name" : "-102309",
@@ -2564,7 +2564,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
             ],
             "vertexType" : "BIKESHARE"
           },
-          "generalizedCost" : 390,
+          "generalizedCost" : 389,
           "interlineWithPreviousLeg" : false,
           "legGeometry" : { },
           "mode" : "BICYCLE",
@@ -2572,7 +2572,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "realTime" : false,
           "rentedBike" : true,
           "route" : "",
-          "startTime" : "2009-10-21T23:06:59.000+00:00",
+          "startTime" : "2009-10-21T23:06:58.000+00:00",
           "steps" : [
             {
               "absoluteDirection" : "SOUTH",
@@ -2591,7 +2591,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "absoluteDirection" : "EAST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 144.55,
+              "distance" : 302.89,
               "elevation" : "",
               "lat" : 45.5276173,
               "lon" : -122.7003923,
@@ -2604,23 +2604,23 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
               "absoluteDirection" : "SOUTH",
               "area" : false,
               "bogusName" : false,
-              "distance" : 77.98,
+              "distance" : 78.25,
               "elevation" : "",
-              "lat" : 45.5276519,
-              "lon" : -122.6985374,
+              "lat" : 45.5276898,
+              "lon" : -122.6965055,
               "relativeDirection" : "RIGHT",
               "stayOn" : false,
-              "streetName" : "Northwest 23rd Avenue",
+              "streetName" : "Northwest 22nd Avenue",
               "walkingBike" : false
             },
             {
               "absoluteDirection" : "EAST",
               "area" : false,
               "bogusName" : false,
-              "distance" : 476.09,
+              "distance" : 317.96,
               "elevation" : "",
-              "lat" : 45.5269509,
-              "lon" : -122.6985103,
+              "lat" : 45.5269863,
+              "lon" : -122.696481,
               "relativeDirection" : "LEFT",
               "stayOn" : false,
               "streetName" : "Northwest Hoyt Street",
@@ -2638,14 +2638,14 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.directBikeR
           "walkingBike" : false
         }
       ],
-      "startTime" : "2009-10-21T23:04:33.000+00:00",
+      "startTime" : "2009-10-21T23:04:32.000+00:00",
       "tooSloped" : false,
       "transfers" : 0,
       "transitTime" : 0,
       "waitingTime" : 0,
-      "walkDistance" : 818.56,
+      "walkDistance" : 819.04,
       "walkLimitExceeded" : false,
-      "walkTime" : 327
+      "walkTime" : 328
     }
   ]
 ]

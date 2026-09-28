@@ -8,15 +8,25 @@ public class TestState implements AStarState<TestState, TestEdge, TestVertex> {
 
   private final TestVertex vertex;
   private final double weight;
+  private final TestEdge edge;
   private final long elapsedTimeSeconds;
 
   public TestState(TestVertex vertex, double weight) {
     this(vertex, weight, 0);
   }
 
+  public TestState(TestVertex vertex, double weight, TestEdge edge) {
+    this(vertex, weight, edge, 0);
+  }
+
   public TestState(TestVertex vertex, double weight, long elapsedTimeSeconds) {
+    this(vertex, weight, null, elapsedTimeSeconds);
+  }
+
+  public TestState(TestVertex vertex, double weight, TestEdge edge, long elapsedTimeSeconds) {
     this.vertex = vertex;
     this.weight = weight;
+    this.edge = edge;
     this.elapsedTimeSeconds = elapsedTimeSeconds;
   }
 
@@ -37,7 +47,7 @@ public class TestState implements AStarState<TestState, TestEdge, TestVertex> {
 
   @Override
   public TestEdge getBackEdge() {
-    return null;
+    return edge;
   }
 
   @Override

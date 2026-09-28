@@ -133,7 +133,32 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
     /** Return true if the first state has lower elapsed time than the second state. */
     @Override
     public boolean betterOrEqual(State a, State b) {
-      return a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds();
+      return a.getElapsedTimeMilliseconds() <= b.getElapsedTimeMilliseconds();
+    }
+  }
+
+  public static class EarliestArrivalOrShortestPath extends DominanceFunctions {
+
+    @Override
+    public boolean betterOrEqual(State a, State b) {
+      var at = a.getElapsedTimeMilliseconds();
+      var bt = b.getElapsedTimeMilliseconds();
+      if (at == bt) {
+        return pathLength(a) <= pathLength(b);
+      }
+      return at < bt;
+    }
+
+    private int pathLength(State a) {
+      int length = 0;
+      while (true) {
+        if (a.getBackState() == null) {
+          System.out.println(length);
+          return length;
+        }
+        a = a.getBackState();
+        length++;
+      }
     }
   }
 
