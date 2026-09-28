@@ -230,8 +230,8 @@ class ServiceLinkMapper {
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
         serviceLink,
-        stopPattern.getStop(stopIndex).getId().getId(),
-        fromPointQuayId
+        fromPointQuayId,
+        stopPattern.getStop(stopIndex).getId().getId()
       );
       return false;
     } else if (!toPointStop.equals(stopPattern.getStop(stopIndex + 1))) {
@@ -239,8 +239,11 @@ class ServiceLinkMapper {
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
         serviceLink,
-        stopPattern.getStop(stopIndex).getId().getId(),
-        toPointQuayId
+        toPointQuayId,
+        stopPattern
+          .getStop(stopIndex + 1)
+          .getId()
+          .getId()
       );
       return false;
     }
