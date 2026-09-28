@@ -110,9 +110,9 @@ public class GtfsConfig {
           .docDefaultValue(docDefaults.maxInterlineDistance())
           .asInt(defaults.maxInterlineDistance())
       )
-      .withTaxiProvider(
+      .withIsTaxiData(
         node
-          .of("taxiProvider")
+          .of("isTaxiData")
           .since(V2_11)
           .summary(
             "When true, this GTFS feed is used exclusively as a source of taxi provider data." +
@@ -127,8 +127,8 @@ public class GtfsConfig {
             Requires the `TaxiRouting` sandbox feature to be enabled.
             """
           )
-          .docDefaultValue(docDefaults.taxiProvider())
-          .asBoolean(defaults.taxiProvider())
+          .docDefaultValue(docDefaults.isTaxiData())
+          .asBoolean(defaults.isTaxiData())
       )
       .build();
   }

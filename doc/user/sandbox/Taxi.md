@@ -47,8 +47,8 @@ falling back to undecorated street routing.
 
 Taxi provider data is provided as standard GTFS Flex zip files, configured explicitly in the
 `transitFeeds` list in `build-config.json` like any other GTFS feed (with `"type": "gtfs"`), but
-with `taxiProvider` set to `true` (this can also be set as a default for all GTFS feeds via
-the top-level `gtfsDefaults.taxiProvider`, overridable per-feed). Such feeds are **not** added
+with `isTaxiData` set to `true` (this can also be set as a default for all GTFS feeds via
+the top-level `gtfsDefaults.isTaxiData`, overridable per-feed). Such feeds are **not** added
 to normal transit or flex routing — they are processed exclusively by this module.
 
 Example graph directory layout:
@@ -72,7 +72,7 @@ graph/
       "type": "gtfs",
       "source": "TaxiProvider-gtfs.zip",
       "feedId": "TaxiProvider",
-      "taxiProvider": true
+      "isTaxiData": true
     }
   ]
 }
@@ -155,7 +155,7 @@ Enable the feature flag in `otp-config.json`:
 
 - Initial implementation: spatial route index, itinerary filtering, and leg decoration with
   provider information from GTFS Flex data. Taxi provider feeds are configured explicitly in
-  `transitFeeds` with `taxiProvider: true`.
+  `transitFeeds` with `isTaxiData: true`.
 - Moved route checking before routing runs (for both transit access/egress and direct routing),
   filtering out non-matching requests instead of discarding built itineraries afterward, and
   decorate using request-level origin/destination coordinates rather than a leg's own local

@@ -149,7 +149,7 @@ public class GraphBuilderDataSources implements Closeable {
   public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDataSource() {
     return ofStream(GTFS)
       .map(this::mapGtfsFeed)
-      .filter(ds -> !ds.config().taxiProvider())
+      .filter(ds -> !ds.config().isTaxiData())
       .toList();
   }
 
@@ -166,7 +166,7 @@ public class GraphBuilderDataSources implements Closeable {
   public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getTaxiConfiguredDataSource() {
     return ofStream(GTFS)
       .map(this::mapGtfsFeed)
-      .filter(ds -> ds.config().taxiProvider())
+      .filter(ds -> ds.config().isTaxiData())
       .toList();
   }
 
@@ -253,7 +253,7 @@ public class GraphBuilderDataSources implements Closeable {
   private boolean hasNonTaxiGtfs() {
     return ofStream(GTFS)
       .map(this::mapGtfsFeed)
-      .anyMatch(ds -> !ds.config().taxiProvider());
+      .anyMatch(ds -> !ds.config().isTaxiData());
   }
 
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {

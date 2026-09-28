@@ -26,14 +26,14 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
     boolean discardMinTransferTimes,
     boolean blockBasedInterlining,
     int maxInterlineDistance,
-    boolean taxiProvider
+    boolean isTaxiData
   ) {
     super(
       stationTransferPreference,
       discardMinTransferTimes,
       blockBasedInterlining,
       maxInterlineDistance,
-      taxiProvider
+      isTaxiData
     );
     this.feedId = feedId;
     this.source = Objects.requireNonNull(source);
