@@ -416,7 +416,7 @@ class RealtimeVehiclePatternMatcher {
   }
 
   @Nullable
-  private static TripTimes matchFrequencyTripTimes(
+  private static TripTimes<?> matchFrequencyTripTimes(
     VehiclePosition vehiclePosition,
     Timetable scheduledTimetable
   ) {

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ArrayListMultimap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -20,10 +19,9 @@ import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.ReplacedJourneys_RelStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 class TripPatternMapperTest {
@@ -79,7 +77,7 @@ class TripPatternMapperTest {
 
     assertEquals(1, r.tripPattern().getScheduledTimetable().getTripTimes().size());
 
-    TripTimes tripTimes = r.tripPattern().getScheduledTimetable().getTripTimes().get(0);
+    var tripTimes = r.tripPattern().getScheduledTimetable().getTripTimes().get(0);
 
     assertEquals(4, tripTimes.getNumStops());
 
@@ -128,11 +126,16 @@ class TripPatternMapperTest {
     DatedServiceJourney dsjReplacing = sample.getDatedServiceJourneyById(
       NetexTestDataSample.DATED_SERVICE_JOURNEY_ID_2
     );
-    dsjReplacing.withJourneyRef(
-      List.of(
-        MappingSupport.createWrappedRef(dsjReplaced.getId(), DatedServiceJourneyRefStructure.class)
-      )
-    );
+    ReplacedJourneys_RelStructure replacedJourneys = new ReplacedJourneys_RelStructure();
+    replacedJourneys
+      .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
+      .add(
+        MappingSupport.createWrappedRef(
+          dsjReplaced.getId(),
+          org.rutebanken.netex.model.VehicleJourneyRefStructure.class
+        )
+      );
+    dsjReplacing.withReplacedJourneys(replacedJourneys);
     Optional<TripPatternMapperResult> res = mapTripPattern(sample);
 
     assertTrue(res.isPresent());

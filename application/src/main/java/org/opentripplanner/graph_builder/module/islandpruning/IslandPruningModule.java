@@ -2,8 +2,8 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,7 +139,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     LOG.debug("nothru pruning");
     Map<Vertex, Subgraph> subgraphs = new HashMap<>();
     Map<Vertex, Subgraph> extgraphs = new HashMap<>();
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<>();
+    ArrayMultimap<Vertex, Vertex> neighborsForVertex = new ArrayMultimap<>();
     Map<Edge, Boolean> isolated = new HashMap<>();
     ArrayList<Subgraph> islands = new ArrayList<>();
     int count;
@@ -270,7 +270,7 @@ public class IslandPruningModule implements GraphBuilderModule {
   }
 
   private void collectNeighbourVertices(
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
@@ -290,8 +290,7 @@ public class IslandPruningModule implements GraphBuilderModule {
       State s0 = new State(gv, request);
       for (Edge e : gv.getOutgoing()) {
         if (
-          e instanceof StreetEdge &&
-          shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
+          e instanceof StreetEdge se && shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)
         ) {
           continue;
         }
@@ -299,22 +298,19 @@ public class IslandPruningModule implements GraphBuilderModule {
         if (State.isEmpty(states)) {
           continue;
         }
-        Arrays.stream(states)
-          .map(State::getVertex)
-          .forEach(out -> {
-            var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
-            vertexList.add(out);
+        for (State state : states) {
+          Vertex out = state.getVertex();
+          neighborsForVertex.put(gv, out);
 
-            // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-            vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
-            vertexList.add(gv);
-          });
+          // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
+          neighborsForVertex.put(out, gv);
+        }
       }
     }
   }
 
   private int collectSubGraphs(
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
     // put new subgraphs here
     Map<Vertex, Subgraph> newgraphs,
     // optional isolation map from a previous round
@@ -465,13 +461,13 @@ public class IslandPruningModule implements GraphBuilderModule {
   }
 
   private Subgraph computeConnectedSubgraph(
-    Map<Vertex, ArrayList<Vertex>> neighborsForVertex,
+    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
     Vertex startVertex,
     Map<Vertex, Subgraph> anchors,
     Map<Vertex, Subgraph> alreadyMapped
   ) {
     Subgraph subgraph = new Subgraph();
-    Queue<Vertex> q = new LinkedList<>();
+    Queue<Vertex> q = new ArrayDeque<>();
     Subgraph anchor = null;
 
     if (anchors != null) {

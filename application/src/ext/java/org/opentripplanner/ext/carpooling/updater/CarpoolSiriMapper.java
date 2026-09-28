@@ -20,6 +20,7 @@ import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
+import org.opentripplanner.ext.carpooling.util.BookingUrlTemplate;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -29,6 +30,7 @@ import uk.org.siri.siri21.AimedFlexibleArea;
 import uk.org.siri.siri21.CircularAreaStructure;
 import uk.org.siri.siri21.EstimatedCall;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.SimpleContactStructure;
 
 /**
  * Maps SIRI EstimatedVehicleJourney messages to {@link CarpoolTrip} instances.
@@ -190,15 +192,45 @@ public class CarpoolSiriMapper {
 
     var publicContact = journey.getPublicContact();
     if (publicContact != null) {
-      builder.withPublicContactInformation(
-        ContactInfo.of()
-          .withPhoneNumber(publicContact.getPhoneNumber())
-          .withBookingUrl(publicContact.getUrl())
-          .build()
-      );
+      var contactInformation = mapPublicContact(publicContact, tripId);
+      if (contactInformation != null) {
+        builder.withPublicContactInformation(contactInformation);
+      }
     }
 
     return builder.build();
+  }
+
+  /**
+   * Maps the journey's public contact, dropping a booking URL the passenger could not open.
+   *
+   * @return the contact information, or {@code null} if neither channel survives.
+   */
+  @Nullable
+  private static ContactInfo mapPublicContact(SimpleContactStructure publicContact, String tripId) {
+    var phoneNumber = publicContact.getPhoneNumber();
+    var bookingUrl = usableBookingUrl(publicContact.getUrl(), tripId);
+
+    if (phoneNumber == null && bookingUrl == null) {
+      return null;
+    }
+    return ContactInfo.of().withPhoneNumber(phoneNumber).withBookingUrl(bookingUrl).build();
+  }
+
+  /**
+   * Returns the booking URL template, or {@code null} when it would expand to a URL the passenger
+   * cannot open.
+   */
+  @Nullable
+  private static String usableBookingUrl(@Nullable String bookingUrl, String tripId) {
+    if (bookingUrl == null) {
+      return null;
+    }
+    if (!BookingUrlTemplate.isUsable(bookingUrl)) {
+      LOG.info("Trip {}: dropping unusable public contact booking URL '{}'.", tripId, bookingUrl);
+      return null;
+    }
+    return bookingUrl;
   }
 
   /**

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
-    <artifactId>otp-root</artifactId>
+    <artifactId>otp</artifactId>
     <version>2.11.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>278</otp.serialization.version.id>
+        <otp.serialization.version.id>280</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>34.5</geotools.version>
@@ -66,13 +66,13 @@
         <jackson.version>2.22.2</jackson.version>
         <jaxb-runtime.version>4.0.9</jaxb-runtime.version>
         <jersey.version>3.1.12</jersey.version>
-        <junit.version>6.1.2</junit.version>
+        <junit.version>6.1.3</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.6.3</logback.version>
         <lucene.version>10.5.0</lucene.version>
         <micrometer.version>1.17.1</micrometer.version>
-        <netex-java-model.version>2.0.15.4</netex-java-model.version>
+        <netex-java-model.version>2.0.16.1</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.36.1</protobuf.version>
         <siri-java-model.version>2.0.6</siri-java-model.version>
@@ -99,15 +99,15 @@
     </properties>
 
     <modules>
-        <module>utils</module>
-        <module>domain-core</module>
-        <module>raptor</module>
-        <module>astar</module>
-        <module>gtfs-realtime-protobuf</module>
         <module>application</module>
+        <module>astar</module>
+        <module>core</module>
+        <module>gtfs-realtime-protobuf</module>
         <module>otp-shaded</module>
-        <module>test/integration</module>
+        <module>raptor</module>
         <module>street</module>
+        <module>test/integration</module>
+        <module>transit</module>
     </modules>
 
 
@@ -518,6 +518,8 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <version>3.5.2</version>
                 <configuration>
+                    <!-- Only the application module builds a container image, see application/pom.xml -->
+                    <skip>true</skip>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
                         <entrypoint>/docker-entrypoint.sh</entrypoint>
@@ -618,6 +620,28 @@
                 <version>33.7.1-jre</version>
             </dependency>
 
+            <!--
+             Not declared directly anywhere; pulled in transitively by both azure-identity and
+             azure-messaging-servicebus (application/otp-shaded/integration-test). Pinned so the
+             resolved version doesn't depend on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-core-http-netty</artifactId>
+                <version>1.16.6</version>
+            </dependency>
+
+            <!--
+             Not declared directly; pulled in transitively by both io.micrometer:micrometer-core
+             and com.google.truth:truth (via guava). Pinned so the resolved version doesn't depend
+             on the declaration order of those two dependencies.
+            -->
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+
             <!-- Logging API -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -700,7 +724,7 @@
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
-                <version>1.4.2</version>
+                <version>1.5.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>

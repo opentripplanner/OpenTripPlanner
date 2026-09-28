@@ -39,7 +39,7 @@ public class SemanticHash {
     StringBuilder sb = new StringBuilder(50);
     sb.append(encoder.encodeToString(forStopPattern(tripPattern, murmur).asBytes()));
     if (trip != null) {
-      TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
+      var tripTimes = tripPattern.getScheduledTimetable().getTripTimes(trip);
       if (tripTimes == null) {
         return null;
       }
@@ -83,7 +83,7 @@ public class SemanticHash {
    * <li>this hash function needs to stay stable when users switch from 0.10.x to 1.0</li>
    * </ol>
    */
-  private static HashCode forTripTimes(TripTimes tripTimes, final HashFunction hashFunction) {
+  private static HashCode forTripTimes(TripTimes<?> tripTimes, final HashFunction hashFunction) {
     final Hasher hasher = hashFunction.newHasher();
     for (int hop = 0; hop < tripTimes.getNumStops() - 1; hop++) {
       hasher.putInt(tripTimes.getScheduledDepartureTime(hop));

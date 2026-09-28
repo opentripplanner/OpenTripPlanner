@@ -219,7 +219,7 @@ public class SerializedGraphObject implements Serializable {
       serObj.reconstructEdgeLists();
       serObj.transitRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.transitRepository.index();
-      logSerializationCompleteStatus(serObj.graph, serObj.transitRepository);
+      serObj.logSerializationCompleteStatus();
       return serObj;
     } catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -290,10 +290,7 @@ public class SerializedGraphObject implements Serializable {
     // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
   }
 
-  private static void logSerializationCompleteStatus(
-    Graph graph,
-    TransitRepository transitRepository
-  ) {
+  private void logSerializationCompleteStatus() {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(
@@ -301,7 +298,7 @@ public class SerializedGraphObject implements Serializable {
     );
     var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
-    var nEdges = f.formatNumber(graph.countEdges());
+    var nEdges = f.formatNumber(edges.size());
 
     LOG.info("Graph loaded.   |V|={} |E|={}", nVertices, nEdges);
     LOG.info(

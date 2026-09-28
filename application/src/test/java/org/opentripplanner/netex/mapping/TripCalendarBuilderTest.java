@@ -151,9 +151,9 @@ public class TripCalendarBuilderTest {
   private ArrayListMultimap<String, DatedServiceJourney> dsj_2020_11_02(String sjId) {
     var dsj = new DatedServiceJourney();
     dsj.withOperatingDayRef(new OperatingDayRefStructure().withRef(OD_1));
-    dsj
-      .getJourneyRef()
-      .add(jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class));
+    dsj.setJourneyRef(
+      jaxbElement(new JourneyRefStructure().withRef(sjId), JourneyRefStructure.class)
+    );
     ArrayListMultimap<String, DatedServiceJourney> map = ArrayListMultimap.create();
     map.put(sjId, dsj);
     return map;

@@ -15,9 +15,9 @@ class StopArrivalMapper {
 
   private final ZoneId zoneId;
   private final LocalDate serviceDate;
-  private final TripTimes tripTimes;
+  private final TripTimes<?> tripTimes;
 
-  public StopArrivalMapper(ZoneId zoneId, LocalDate serviceDate, TripTimes tripTimes) {
+  public StopArrivalMapper(ZoneId zoneId, LocalDate serviceDate, TripTimes<?> tripTimes) {
     this.zoneId = Objects.requireNonNull(zoneId);
     this.serviceDate = Objects.requireNonNull(serviceDate);
     this.tripTimes = Objects.requireNonNull(tripTimes);
