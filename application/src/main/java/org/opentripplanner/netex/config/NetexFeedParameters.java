@@ -34,7 +34,6 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final Set<IgnorableFeature> IGNORED_FEATURES = Set.of(PARKING);
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
-  private static final Set<String> ROUTE_TO_CENTROID_STATION_IDS = Collections.emptySet();
 
   public static final NetexFeedParameters DEFAULT = new NetexFeedParameters();
 
@@ -51,6 +50,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private final String ignoreFilePattern;
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final boolean noTransfersOnIsolatedStops;
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
   private final Set<IgnorableFeature> ignoredFeatures;
 
   private NetexFeedParameters() {
@@ -66,6 +66,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     }
     this.ferryIdsNotAllowedForBicycle = FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE;
     this.noTransfersOnIsolatedStops = NO_TRANSFERS_ON_ISOLATED_STOPS;
+    this.allowStopPlaceAsPassengerStopAssignment = false;
     this.ignoredFeatures = IGNORED_FEATURES;
   }
 
@@ -78,6 +79,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     this.ignoreFilePattern = requireNonNull(builder.ignoreFilePattern);
     this.ferryIdsNotAllowedForBicycle = Set.copyOf(builder.ferryIdsNotAllowedForBicycle);
     this.noTransfersOnIsolatedStops = builder.noTransfersOnIsolatedStops;
+    this.allowStopPlaceAsPassengerStopAssignment = builder.allowStopPlaceAsPassengerStopAssignment;
     this.ignoredFeatures = Set.copyOf(builder.ignoredFeatures);
   }
 
@@ -126,6 +128,11 @@ public class NetexFeedParameters implements DataSourceConfig {
   /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public boolean noTransfersOnIsolatedStops() {
     return noTransfersOnIsolatedStops;
+  }
+
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
+  public boolean allowStopPlaceAsPassengerStopAssignment() {
+    return allowStopPlaceAsPassengerStopAssignment;
   }
 
   /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
@@ -202,6 +209,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     private final Set<String> ferryIdsNotAllowedForBicycle = new HashSet<>();
     private final Set<String> routeToCentroidStopPlaceIds = new HashSet<>();
     private boolean noTransfersOnIsolatedStops;
+    private boolean allowStopPlaceAsPassengerStopAssignment;
     private final Set<IgnorableFeature> ignoredFeatures;
 
     private Builder(NetexFeedParameters original) {
@@ -272,6 +280,11 @@ public class NetexFeedParameters implements DataSourceConfig {
 
     public Builder withIgnoreParking(boolean ignoreParking) {
       return applyIgnore(ignoreParking, PARKING);
+    }
+
+    public Builder withAllowStopPlaceAsPassengerStopAssignment(boolean allow) {
+      this.allowStopPlaceAsPassengerStopAssignment = allow;
+      return this;
     }
 
     private Builder applyIgnore(boolean ignore, IgnorableFeature feature) {

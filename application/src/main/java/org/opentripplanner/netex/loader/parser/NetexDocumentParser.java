@@ -35,10 +35,16 @@ public class NetexDocumentParser {
 
   private final NetexEntityIndex netexIndex;
   private final Set<IgnorableFeature> ignoredFeatures;
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
 
-  private NetexDocumentParser(NetexEntityIndex netexIndex, Set<IgnorableFeature> ignoredFeatures) {
+  private NetexDocumentParser(
+    NetexEntityIndex netexIndex,
+    Set<IgnorableFeature> ignoredFeatures,
+    boolean allowStopPlaceAsPassengerStopAssignment
+  ) {
     this.netexIndex = netexIndex;
     this.ignoredFeatures = ignoredFeatures;
+    this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
   }
 
   /**
@@ -48,9 +54,12 @@ public class NetexDocumentParser {
   public static void parseAndPopulateIndex(
     NetexEntityIndex index,
     PublicationDeliveryStructure doc,
-    Set<IgnorableFeature> ignoredFeatures
+    Set<IgnorableFeature> ignoredFeatures,
+    boolean allowStopPlaceAsPassengerStopAssignment
   ) {
-    new NetexDocumentParser(index, ignoredFeatures).parse(doc);
+    new NetexDocumentParser(index, ignoredFeatures, allowStopPlaceAsPassengerStopAssignment).parse(
+      doc
+    );
   }
 
   /** Top level parse method - parses the document. */
@@ -72,7 +81,13 @@ public class NetexDocumentParser {
     } else if (value instanceof TimetableFrame frame) {
       parse(frame, new TimeTableFrameParser());
     } else if (value instanceof ServiceFrame frame) {
-      parse(frame, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
+      parse(
+        frame,
+        new ServiceFrameParser(
+          netexIndex.flexibleStopPlaceById,
+          allowStopPlaceAsPassengerStopAssignment
+        )
+      );
     } else if (value instanceof SiteFrame frame) {
       parse(frame, new SiteFrameParser(ignoredFeatures));
     } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame fareFrame) {

@@ -31,7 +31,7 @@ class ServiceFrameParserTest {
 
   @BeforeEach
   void setUp() {
-    serviceFrameParser = new ServiceFrameParser(new HierarchicalMapById<>());
+    serviceFrameParser = new ServiceFrameParser(new HierarchicalMapById<>(), true);
     serviceFrame = OBJECT_FACTORY.createService_VersionFrameStructure();
     netexEntityIndex = new NetexEntityIndex();
   }
@@ -66,6 +66,22 @@ class ServiceFrameParserTest {
       STOP_PLACE_REF,
       netexEntityIndex.stopPlaceIdByStopPointRef.lookup(STOP_POINT_REF_2)
     );
+    assertNull(netexEntityIndex.quayIdByStopPointRef.lookup(STOP_POINT_REF_2));
+  }
+
+  @Test
+  void testPassengerStopAssignmentWithStopPlaceRefIsIgnoredWhenFeatureDisabled() {
+    serviceFrameParser = new ServiceFrameParser(new HierarchicalMapById<>(), false);
+    addPassengerStopAssignment(
+      new PassengerStopAssignment()
+        .withScheduledStopPointRef(createScheduledStopPointRef(STOP_POINT_REF_2))
+        .withStopPlaceRef(createStopPlaceRef(STOP_PLACE_REF))
+    );
+
+    serviceFrameParser.parse(serviceFrame);
+    serviceFrameParser.setResultOnIndex(netexEntityIndex);
+
+    assertNull(netexEntityIndex.stopPlaceIdByStopPointRef.lookup(STOP_POINT_REF_2));
     assertNull(netexEntityIndex.quayIdByStopPointRef.lookup(STOP_POINT_REF_2));
   }
 
