@@ -53,10 +53,6 @@ public class NetexDocumentParser {
     new NetexDocumentParser(index, ignoredFeatures).parse(doc);
   }
 
-  public static void finishUp() {
-    ServiceFrameParser.logSummary();
-  }
-
   /** Top level parse method - parses the document. */
   private void parse(PublicationDeliveryStructure doc) {
     parseFrameList(doc.getDataObjects().getCompositeFrameOrCommonFrame());
