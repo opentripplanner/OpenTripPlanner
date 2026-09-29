@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.logging.MaxCountLogger;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -64,9 +63,14 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   private final Collection<ServiceLink> serviceLinks = new ArrayList<>();
 
   private final NoticeParser noticeParser = new NoticeParser();
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
 
-  ServiceFrameParser(ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById) {
+  ServiceFrameParser(
+    ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById,
+    boolean allowStopPlaceAsPassengerStopAssignment
+  ) {
     this.flexibleStopPlaceById = flexibleStopPlaceById;
+    this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
   }
 
   @Override
@@ -146,7 +150,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         if (assignment.getQuayRef() != null) {
           String quayRef = assignment.getQuayRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
-        } else if (assignment.getStopPlaceRef() != null) {
+        } else if (
+          allowStopPlaceAsPassengerStopAssignment && assignment.getStopPlaceRef() != null
+        ) {
           var stopPlaceRef = assignment.getStopPlaceRef().getValue().getRef();
           stopPlaceByStopPointRef.put(stopPointRef, stopPlaceRef);
         }
