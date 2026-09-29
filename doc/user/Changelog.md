@@ -19,6 +19,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Avoid counting edges when logging the graph load status [#8037](https://github.com/opentripplanner/OpenTripPlanner/pull/8037)
 - Simplify debug UI transit- and street mode selector behavior [#8033](https://github.com/opentripplanner/OpenTripPlanner/pull/8033)
 - Make the note about dev meetings more prominent in the PR template [#8040](https://github.com/opentripplanner/OpenTripPlanner/pull/8040)
+- Add `Taxi` sandbox module for taxi transit data decoration for `TAXI` legs [#7785](https://github.com/opentripplanner/OpenTripPlanner/pull/7785)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
