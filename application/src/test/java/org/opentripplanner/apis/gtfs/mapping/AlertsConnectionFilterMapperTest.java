@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.support.InvalidInputException;
@@ -15,9 +17,15 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.AlertEntityType;
+import org.opentripplanner.transit.model.filter.transit.TransitAlertEntityResolver;
+import org.opentripplanner.transit.model.filter.transit.TransitAlertEntitySelectRequest;
 import org.opentripplanner.transit.model.filter.transit.TransitAlertMatcherFactory;
 
 class AlertsConnectionFilterMapperTest {
@@ -140,6 +148,126 @@ class AlertsConnectionFilterMapperTest {
     );
   }
 
+  @Test
+  void entitiesAreMapped() {
+    var entities = mapEntities(
+      Map.of(
+        "entityTypes",
+        List.of("ROUTE", "STOP_ON_ROUTE"),
+        "routes",
+        List.of(Map.of("modes", List.of("BUS"))),
+        "stopsOrStations",
+        List.of(
+          Map.of(
+            "ids",
+            List.of("test:bar"),
+            "includeParentStationAlerts",
+            true,
+            "includeChildStopAlerts",
+            false
+          )
+        )
+      )
+    );
+
+    assertEquals(
+      Set.of(AlertEntityType.ROUTE, AlertEntityType.STOP_ON_ROUTE),
+      entities.entityTypes()
+    );
+    var route = entities.routes().get().iterator().next();
+    assertEquals(Set.of(TransitMode.BUS), Set.copyOf(route.modes().get()));
+    assertTrue(route.ids().includeEverything());
+    var stop = entities.stopsOrStations().get().iterator().next();
+    assertEquals(Set.of(STOP_ID), Set.copyOf(stop.ids().get()));
+    assertTrue(stop.includeParentStationAlerts());
+    assertFalse(stop.includeChildStopAlerts());
+  }
+
+  @Test
+  void entityTypesDefaultToDirectTypes() {
+    var routeIds = Map.<String, Object>of("ids", List.of("test:foo"));
+    var stopIds = Map.<String, Object>of("ids", List.of("test:bar"));
+
+    assertEquals(
+      Set.of(AlertEntityType.ROUTE),
+      mapEntities(Map.of("routes", List.of(routeIds))).entityTypes()
+    );
+    assertEquals(
+      Set.of(AlertEntityType.STOP),
+      mapEntities(Map.of("stopsOrStations", List.of(stopIds))).entityTypes()
+    );
+    assertEquals(
+      Set.of(AlertEntityType.STOP_ON_ROUTE),
+      mapEntities(
+        Map.of("routes", List.of(routeIds), "stopsOrStations", List.of(stopIds))
+      ).entityTypes()
+    );
+  }
+
+  @Test
+  void emptyEntitySelectorIsRejected() {
+    assertThrows(InvalidInputException.class, () -> mapEntities(Map.of()));
+  }
+
+  @Test
+  void idsAndModesCantBeCombined() {
+    var both = Map.<String, Object>of("ids", List.of("test:foo"), "modes", List.of("BUS"));
+    assertThrows(InvalidInputException.class, () -> mapEntities(Map.of("routes", List.of(both))));
+    assertThrows(InvalidInputException.class, () ->
+      mapEntities(Map.of("stopsOrStations", List.of(both)))
+    );
+  }
+
+  @Test
+  void idsOrModesAreRequired() {
+    assertThrows(InvalidInputException.class, () ->
+      mapEntities(Map.of("routes", List.of(Map.of())))
+    );
+    assertThrows(InvalidInputException.class, () ->
+      mapEntities(Map.of("stopsOrStations", List.of(Map.of("includeChildStopAlerts", true))))
+    );
+  }
+
+  @Test
+  void invalidIdIsRejected() {
+    assertThrows(InvalidInputException.class, () ->
+      mapEntities(Map.of("routes", List.of(Map.of("ids", List.of("no-feed")))))
+    );
+  }
+
+  @Test
+  void emptyEntityListsAreRejected() {
+    assertThrows(InvalidInputException.class, () -> mapEntities(Map.of("routes", List.of())));
+    assertThrows(InvalidInputException.class, () -> mapEntities(Map.of("entityTypes", List.of())));
+    assertThrows(InvalidInputException.class, () ->
+      mapEntities(Map.of("routes", List.of(Map.of("ids", List.of()))))
+    );
+  }
+
+  @Test
+  void entitiesMatchAlertsOfSelectedEntities() {
+    var request = AlertsConnectionFilterMapper.map(
+      List.of(
+        filter(
+          "include",
+          Map.of("entities", List.of(Map.of("routes", List.of(Map.of("ids", List.of("test:foo"))))))
+        )
+      )
+    );
+    var service = new TransitAlertServiceImpl();
+    service.setAlerts(List.of(ROUTE_ALERT, STOP_ALERT));
+    TransitAlertEntityResolver resolver = entities -> new EntityKey.Route(ROUTE_ID)::equals;
+
+    assertEquals(List.of(ROUTE_ALERT), service.findAlerts(request, resolver));
+  }
+
+  private static TransitAlertEntitySelectRequest mapEntities(Map<String, Object> entities) {
+    var request = AlertsConnectionFilterMapper.map(
+      List.of(filter("include", Map.of("entities", List.of(entities))))
+    );
+    return request.filters().getFirst().select().getFirst().entities().get().iterator().next();
+  }
+
   private static GraphQLTypes.GraphQLAlertsFilterInput filter(
     String direction,
     Map<String, Object>... selectors
@@ -158,6 +286,9 @@ class AlertsConnectionFilterMapperTest {
   }
 
   private static Matcher<TransitAlert> matcher(GraphQLTypes.GraphQLAlertsFilterInput filter) {
-    return TransitAlertMatcherFactory.of(AlertsConnectionFilterMapper.map(List.of(filter)));
+    return TransitAlertMatcherFactory.of(
+      AlertsConnectionFilterMapper.map(List.of(filter)),
+      entities -> key -> false
+    );
   }
 }

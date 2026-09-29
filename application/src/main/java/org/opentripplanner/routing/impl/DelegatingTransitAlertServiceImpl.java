@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -54,6 +55,24 @@ public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
       .map(TransitAlertService::getAllAlerts)
       .flatMap(Collection::stream)
       .collect(Collectors.toList());
+  }
+
+  @Override
+  public Collection<EntityKey> listEntityKeys() {
+    return transitAlertServices
+      .stream()
+      .map(TransitAlertService::listEntityKeys)
+      .flatMap(Collection::stream)
+      .toList();
+  }
+
+  @Override
+  public Collection<TransitAlert> findAlerts(Collection<EntityKey> entityKeys) {
+    return transitAlertServices
+      .stream()
+      .map(transitAlertService -> transitAlertService.findAlerts(entityKeys))
+      .flatMap(Collection::stream)
+      .toList();
   }
 
   @Override

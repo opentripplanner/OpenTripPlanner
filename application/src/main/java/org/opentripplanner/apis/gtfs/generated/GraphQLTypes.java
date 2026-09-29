@@ -164,12 +164,180 @@ public class GraphQLTypes {
     UNKNOWN_EFFECT,
   }
 
+  public static class GraphQLAlertEntitySelectInput {
+
+    private List<GraphQLAlertEntityType> entityTypes;
+    private List<GraphQLAlertRouteSelectInput> routes;
+    private List<GraphQLAlertStopOrStationSelectInput> stopsOrStations;
+
+    public GraphQLAlertEntitySelectInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("entityTypes") != null) {
+          this.entityTypes = ((List<Object>) args.get("entityTypes"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLAlertEntityType
+                ? item
+                : GraphQLAlertEntityType.valueOf((String) item)
+            )
+            .map(GraphQLAlertEntityType.class::cast)
+            .collect(Collectors.toList());
+        }
+        if (args.get("routes") != null) {
+          this.routes = ((List<Map<String, Object>>) args.get("routes"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLAlertRouteSelectInput(o))
+            .collect(Collectors.toList());
+        }
+        if (args.get("stopsOrStations") != null) {
+          this.stopsOrStations = ((List<Map<String, Object>>) args.get("stopsOrStations"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLAlertStopOrStationSelectInput(o))
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<GraphQLAlertEntityType> getGraphQLEntityTypes() {
+      return this.entityTypes;
+    }
+
+    public List<GraphQLAlertRouteSelectInput> getGraphQLRoutes() {
+      return this.routes;
+    }
+
+    public List<GraphQLAlertStopOrStationSelectInput> getGraphQLStopsOrStations() {
+      return this.stopsOrStations;
+    }
+
+    public void setGraphQLEntityTypes(List<GraphQLAlertEntityType> entityTypes) {
+      this.entityTypes = entityTypes;
+    }
+
+    public void setGraphQLRoutes(List<GraphQLAlertRouteSelectInput> routes) {
+      this.routes = routes;
+    }
+
+    public void setGraphQLStopsOrStations(
+      List<GraphQLAlertStopOrStationSelectInput> stopsOrStations
+    ) {
+      this.stopsOrStations = stopsOrStations;
+    }
+  }
+
+  /** The type of an entity affected by an alert. These correspond to the types in `AlertEntity`. */
+  public enum GraphQLAlertEntityType {
+    AGENCY,
+    PATTERN,
+    ROUTE,
+    ROUTE_TYPE,
+    STOP,
+    STOP_ON_ROUTE,
+    STOP_ON_TRIP,
+    TRIP,
+    UNKNOWN,
+  }
+
+  public static class GraphQLAlertRouteSelectInput {
+
+    private List<String> ids;
+    private List<GraphQLTransitMode> modes;
+
+    public GraphQLAlertRouteSelectInput(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (List<String>) args.get("ids");
+        if (args.get("modes") != null) {
+          this.modes = ((List<Object>) args.get("modes"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
+            )
+            .map(GraphQLTransitMode.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<String> getGraphQLIds() {
+      return this.ids;
+    }
+
+    public List<GraphQLTransitMode> getGraphQLModes() {
+      return this.modes;
+    }
+
+    public void setGraphQLIds(List<String> ids) {
+      this.ids = ids;
+    }
+
+    public void setGraphQLModes(List<GraphQLTransitMode> modes) {
+      this.modes = modes;
+    }
+  }
+
   /** Severity level of a alert */
   public enum GraphQLAlertSeverityLevelType {
     INFO,
     SEVERE,
     UNKNOWN_SEVERITY,
     WARNING,
+  }
+
+  public static class GraphQLAlertStopOrStationSelectInput {
+
+    private List<String> ids;
+    private Boolean includeChildStopAlerts;
+    private Boolean includeParentStationAlerts;
+    private List<GraphQLTransitMode> modes;
+
+    public GraphQLAlertStopOrStationSelectInput(Map<String, Object> args) {
+      if (args != null) {
+        this.ids = (List<String>) args.get("ids");
+        this.includeChildStopAlerts = (Boolean) args.get("includeChildStopAlerts");
+        this.includeParentStationAlerts = (Boolean) args.get("includeParentStationAlerts");
+        if (args.get("modes") != null) {
+          this.modes = ((List<Object>) args.get("modes"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
+            )
+            .map(GraphQLTransitMode.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<String> getGraphQLIds() {
+      return this.ids;
+    }
+
+    public Boolean getGraphQLIncludeChildStopAlerts() {
+      return this.includeChildStopAlerts;
+    }
+
+    public Boolean getGraphQLIncludeParentStationAlerts() {
+      return this.includeParentStationAlerts;
+    }
+
+    public List<GraphQLTransitMode> getGraphQLModes() {
+      return this.modes;
+    }
+
+    public void setGraphQLIds(List<String> ids) {
+      this.ids = ids;
+    }
+
+    public void setGraphQLIncludeChildStopAlerts(Boolean includeChildStopAlerts) {
+      this.includeChildStopAlerts = includeChildStopAlerts;
+    }
+
+    public void setGraphQLIncludeParentStationAlerts(Boolean includeParentStationAlerts) {
+      this.includeParentStationAlerts = includeParentStationAlerts;
+    }
+
+    public void setGraphQLModes(List<GraphQLTransitMode> modes) {
+      this.modes = modes;
+    }
   }
 
   public static class GraphQLAlertsFilterInput {
@@ -216,6 +384,7 @@ public class GraphQLTypes {
     private List<GraphQLOffsetDateTimeRangeInput> activePeriods;
     private List<GraphQLAlertCauseType> causes;
     private List<GraphQLAlertEffectType> effects;
+    private List<GraphQLAlertEntitySelectInput> entities;
     private List<String> feeds;
     private List<GraphQLAlertSeverityLevelType> severityLevels;
 
@@ -249,6 +418,12 @@ public class GraphQLTypes {
             .map(GraphQLAlertEffectType.class::cast)
             .collect(Collectors.toList());
         }
+        if (args.get("entities") != null) {
+          this.entities = ((List<Map<String, Object>>) args.get("entities"))
+            .stream()
+            .map(o -> o == null ? null : new GraphQLAlertEntitySelectInput(o))
+            .collect(Collectors.toList());
+        }
         this.feeds = (List<String>) args.get("feeds");
         if (args.get("severityLevels") != null) {
           this.severityLevels = ((List<Object>) args.get("severityLevels"))
@@ -276,6 +451,10 @@ public class GraphQLTypes {
       return this.effects;
     }
 
+    public List<GraphQLAlertEntitySelectInput> getGraphQLEntities() {
+      return this.entities;
+    }
+
     public List<String> getGraphQLFeeds() {
       return this.feeds;
     }
@@ -294,6 +473,10 @@ public class GraphQLTypes {
 
     public void setGraphQLEffects(List<GraphQLAlertEffectType> effects) {
       this.effects = effects;
+    }
+
+    public void setGraphQLEntities(List<GraphQLAlertEntitySelectInput> entities) {
+      this.entities = entities;
     }
 
     public void setGraphQLFeeds(List<String> feeds) {
