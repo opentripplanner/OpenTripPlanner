@@ -11,7 +11,7 @@ public interface TransitEntity {
    * ordering, but the sort order itself will rarely carry semantic meaning and so usually shouldn't
    * be relied on.
    */
-  static <T extends AbstractTransitEntity<?, ?>> Comparator<T> idComparator() {
-    return Comparator.comparing(AbstractTransitEntity::getId);
+  static <T extends TransitEntity> Comparator<T> idComparator() {
+    return Comparator.comparing(TransitEntity::getId);
   }
 }
