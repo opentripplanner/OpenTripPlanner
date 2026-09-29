@@ -17,6 +17,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Treat negative `stair_count` as stairs in `PathwayEdge` [#8027](https://github.com/opentripplanner/OpenTripPlanner/pull/8027)
 - Update NeTEx Java Model to v2.0.16 [#7257](https://github.com/opentripplanner/OpenTripPlanner/pull/7257)
 - Avoid counting edges when logging the graph load status [#8037](https://github.com/opentripplanner/OpenTripPlanner/pull/8037)
+- Simplify debug UI transit- and street mode selector behavior [#8033](https://github.com/opentripplanner/OpenTripPlanner/pull/8033)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
