@@ -15,6 +15,7 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
@@ -142,9 +143,9 @@ public class TurnRestrictionModuleTest {
       .findFirst()
       .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, newB);
-    var newOutB = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var newOutB = GraphSummarizer.successors(newB);
     assertThat(newOutB).containsExactly(A, C, D);
-    var outB = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var outB = GraphSummarizer.successors(B);
     assertThat(outB).containsExactly(A, C, D, E);
   }
 
@@ -215,13 +216,13 @@ public class TurnRestrictionModuleTest {
       .findFirst()
       .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, F, G, H, newB, newE);
-    var newOutB = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var newOutB = GraphSummarizer.successors(newB);
     assertThat(newOutB).containsExactly(A, C, D);
-    var outB = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var outB = GraphSummarizer.successors(B);
     assertThat(outB).containsExactly(A, C, D, newE);
-    var newOutE = newE.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var newOutE = GraphSummarizer.successors(newE);
     assertThat(newOutE).containsExactly(B, F, G);
-    var outE = E.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var outE = GraphSummarizer.successors(E);
     assertThat(outE).containsExactly(B, F, G, H);
 
     var newInB = newB.getIncoming().stream().map(Edge::getFromVertex).toList();

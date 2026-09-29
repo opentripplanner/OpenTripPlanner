@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.module.boardinglocations;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -10,7 +8,7 @@ import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepo
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
@@ -20,25 +18,28 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 /** The graph a {@link BoardingLocationsEnvironment} produced, with the lookups tests need. */
 public record LinkedGraph(
-  Graph graph,
+  Graph rawGraph,
   DefaultOsmInfoGraphBuildRepository osmInfoRepository,
   DefaultDataImportIssueStore issueStore
 ) {
+  /**
+   * The shared read-only query API over the linked graph, the same door
+   * {@code LinkingEnvironment} and {@code IslandPruningEnvironment} hand out. Generic graph
+   * questions belong here; this class only adds the boarding-location specific ones.
+   */
+  public GraphSummarizer graph() {
+    return new GraphSummarizer(rawGraph);
+  }
+
   private TransitStopVertex stopVertex(RegularStop stop) {
-    return graph
-      .getVerticesOfType(TransitStopVertex.class)
-      .stream()
-      .filter(v -> v.getId().equals(stop.getId()))
-      .findFirst()
+    return rawGraph
+      .findStopVertex(stop.getId())
       .orElseThrow(() -> new IllegalStateException("no transit stop vertex for " + stop.getId()));
   }
 
-  public Set<Vertex> linkedVertices(RegularStop stop) {
-    return stopVertex(stop)
-      .getOutgoing()
-      .stream()
-      .map(Edge::getToVertex)
-      .collect(Collectors.toSet());
+  /** Every vertex the stop is linked to. */
+  public List<Vertex> linkedVertices(RegularStop stop) {
+    return GraphSummarizer.successors(stopVertex(stop));
   }
 
   /** The single boarding location the stop is linked to. */
@@ -60,22 +61,17 @@ public record LinkedGraph(
 
   /** The street edges a boarding location walks out over, excluding the link to its stop. */
   public List<StreetEdge> connectors(RegularStop stop) {
-    return boardingLocation(stop)
-      .getOutgoing()
-      .stream()
-      .filter(StreetEdge.class::isInstance)
-      .map(StreetEdge.class::cast)
-      .toList();
+    return boardingLocation(stop).getOutgoingStreetEdges();
   }
 
   /** The vertices a boarding location walks to, over its connector edges. */
-  public Set<Vertex> attachmentPoints(RegularStop stop) {
-    return connectors(stop).stream().map(Edge::getToVertex).collect(Collectors.toSet());
+  public List<Vertex> attachmentPoints(RegularStop stop) {
+    return connectors(stop).stream().map(Edge::getToVertex).toList();
   }
 
   /** How many visibility edges a boarding location has into its platform area. */
   public long areaEdgeCount(Vertex vertex) {
-    return vertex.getOutgoing().stream().filter(AreaEdge.class::isInstance).count();
+    return GraphSummarizer.outgoingAreaEdges(vertex).size();
   }
 
   /** How far the boarding location ended up from the stop's own coordinate. */
@@ -89,7 +85,7 @@ public record LinkedGraph(
   /** How many street edges in the whole graph are registered as belonging to a platform. */
   public long platformEdgeCount() {
     var service = osmInfoService();
-    return StreamSupport.stream(graph.findEdges(StreetEdge.class).spliterator(), false)
+    return StreamSupport.stream(rawGraph.findEdges(StreetEdge.class).spliterator(), false)
       .filter(edge -> service.findPlatform(edge).isPresent())
       .count();
   }

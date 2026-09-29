@@ -9,6 +9,7 @@ import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinat
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource;
@@ -160,6 +161,48 @@ class PlatformWayTest {
       2,
       result.platformEdgeCount(),
       "only the platform way's own two directions should carry the platform"
+    );
+  }
+
+  /**
+   * A platform mapped as a way that turns out not to be linkable - here because no edge of it is
+   * walkable - must report failure, so the search falls through to the area path instead of leaving
+   * the stop unlinked.
+   */
+  @Test
+  void anUnlinkableWayFallsBackToTheAreaPlatform() {
+    // The same ref on a car-only platform way and on a platform area beside it.
+    var corner = node(1, WEST_END);
+    var provider = TestOsmProvider.of()
+      .addWayFromNodes(
+        way ->
+          way
+            .withTag("public_transport", "platform")
+            .withTag("ref", "both-ways")
+            .withTag("access", "no")
+            .withTag("motor_vehicle", "permissive"),
+        node(10, offset(20, 0)),
+        node(11, offset(20, 40))
+      )
+      .addAreaFromNodes(
+        way -> way.withTag("public_transport", "platform").withTag("ref", "both-ways"),
+        List.of(corner, node(2, offset(0, 40)), node(3, offset(8, 40)), node(4, offset(8, 0)))
+      )
+      .addWayFromNodes(node(5, offset(-20, 0)), corner)
+      .build();
+
+    var test = BoardingLocationsEnvironment.of(TRANSIT, provider);
+    var stop = test.stop("both-ways", offset(4, 20));
+
+    var result = test.build();
+
+    assertFalse(
+      result.linkedVertices(stop).isEmpty(),
+      "the stop should fall back to the area platform, not be left unlinked by the way path"
+    );
+    assertTrue(
+      result.areaEdgeCount(result.boardingLocation(stop)) > 0,
+      "the stop should be linked into the platform area"
     );
   }
 
