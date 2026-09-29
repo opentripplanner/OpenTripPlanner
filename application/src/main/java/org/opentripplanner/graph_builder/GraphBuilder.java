@@ -161,7 +161,7 @@ public class GraphBuilder implements Runnable {
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily
     if ((dataSources.hasOsm() && !saveStreetGraph) || loadStreetGraph) {
-      graphBuilder.addModule(factory.pruneIslands());
+      //graphBuilder.addModule(factory.pruneIslands());
     }
 
     // Load elevation data and apply it to the streets.

@@ -31,6 +31,8 @@ public class Validator {
 
   private void run() {
     validate(index.quayIdByStopPointRef, new PassengerStopAssignmentQuayNotFound());
+    validate(index.stopPlaceIdByStopPointRef, new PassengerStopAssignmentStopPlaceNotFound());
+    validate(index.stopPlaceIdByStopPointRef, new PassengerStopAssignmentToStopPlaceWithoutQuays());
     validate(index.serviceJourneyById, new JourneyPatternNotFoundInSJ());
     validate(index.serviceJourneyById, new JourneyPatternSJMismatch());
     validate(index.serviceJourneyById, new InvalidPointInJourneyPatternRef());
