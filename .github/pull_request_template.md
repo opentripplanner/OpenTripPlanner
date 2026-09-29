@@ -1,17 +1,15 @@
 ## PR Instructions
 
-Please read our [contribution guidelines](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md) before creating a PR.
+Please read our [contribution guidelines](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CONTRIBUTING.md) before creating a PR. Additionally, please note that
+you should join the twice-weekly developer meetings to get a reviewer assigned to the PR. This is
+especially true for first-time contributors. See the contribution guidelines for when these meetings occur.
 
 When creating a pull request, please follow the format below. For each section, *replace* the
 guidance text with your own text, keeping the section heading. If you have nothing to say in a
 particular section, you can completely delete the section including its heading to indicate that you
 have taken the requested steps. None of these instructions or the guidance text (non-heading text)
 should be present in the submitted PR. These sections serve as a checklist: when you have replaced
-or deleted all of them, the PR is considered complete. As of 2021, most regular OTP contributors
-participate in our twice-weekly conference calls. For all but the simplest and smallest PRs,
-participation in these discussions is necessary to facilitate the review and merge process. Other
-developers can ask questions and provide immediate feedback on technical design and code style, and
-resolve any concerns about long term maintenance and comprehension of new code.
+or deleted all of them, the PR is considered complete.
 
 ### Summary
 
