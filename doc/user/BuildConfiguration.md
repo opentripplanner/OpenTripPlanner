@@ -66,6 +66,7 @@ Sections follow that describe particular settings in more depth.
 | gtfsDefaults                                                                                |       `object`       | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
 |    blockBasedInterlining                                                                    |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
 |    [discardMinTransferTimes](#gd_discardMinTransferTimes)                                   |       `boolean`      | Should minimum transfer times in GTFS files be discarded.                                                                                                      | *Optional* | `false`                           |  2.3  |
+|    [isTaxiData](#gd_isTaxiData)                                                             |       `boolean`      | When true, this GTFS feed is used exclusively as a source of taxi provider data.                                                                               | *Optional* | `false`                           |  2.11 |
 |    maxInterlineDistance                                                                     |       `integer`      | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)                               |        `enum`        | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
 | islandPruning                                                                               |       `object`       | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
@@ -115,6 +116,7 @@ Sections follow that describe particular settings in more depth.
 |       blockBasedInterlining                                                                 |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id. Overrides the value specified in `gtfsDefaults`.                          | *Optional* | `true`                            |  2.3  |
 |       [discardMinTransferTimes](#tf_0_discardMinTransferTimes)                              |       `boolean`      | Should minimum transfer times in GTFS files be discarded. Overrides the value specified in `gtfsDefaults`.                                                     | *Optional* | `false`                           |  2.3  |
 |       feedId                                                                                |       `string`       | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                                        | *Optional* |                                   |  2.2  |
+|       [isTaxiData](#tf_0_isTaxiData)                                                        |       `boolean`      | When true, this GTFS feed is used exclusively as a source of taxi provider data. Overrides the value specified in `gtfsDefaults`.                              | *Optional* | `false`                           |  2.11 |
 |       maxInterlineDistance                                                                  |       `integer`      | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle. Overrides the value specified in `gtfsDefaults`. | *Optional* | `200`                             |  2.3  |
 |       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [stationTransferPreference](#tf_0_stationTransferPreference)                          |        `enum`        | Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.                | *Optional* | `"allowed"`                       |  2.3  |
@@ -814,6 +816,20 @@ This is useful eg. when the minimum transfer time is only set for ticketing purp
 but we want to calculate the transfers always from OSM data.
 
 
+<h3 id="gd_isTaxiData">isTaxiData</h3>
+
+**Since version:** `2.11` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /gtfsDefaults 
+
+When true, this GTFS feed is used exclusively as a source of taxi provider data.
+
+The feed is not used for normal transit routing. Its stops, routes and trips are
+used only to decorate taxi legs with provider information and to spatially filter
+out itineraries that don't fall within a recognized taxi provider's coverage area.
+
+Requires the `TaxiRouting` sandbox feature to be enabled.
+
+
 <h3 id="gd_stationTransferPreference">stationTransferPreference</h3>
 
 **Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
@@ -1040,7 +1056,7 @@ The named set of mapping rules applied when parsing OSM tags.
 
 **Since version:** `2.7` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
 **Path:** /   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `taxi` | `car-rental` | `car-hailing` | `carpool` | `flexible`
 
 Configures mode-specific properties for transfer calculations.
 
@@ -1229,6 +1245,20 @@ Should minimum transfer times in GTFS files be discarded. Overrides the value sp
 
 This is useful eg. when the minimum transfer time is only set for ticketing purposes,
 but we want to calculate the transfers always from OSM data.
+
+
+<h3 id="tf_0_isTaxiData">isTaxiData</h3>
+
+**Since version:** `2.11` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /transitFeeds/[0] 
+
+When true, this GTFS feed is used exclusively as a source of taxi provider data. Overrides the value specified in `gtfsDefaults`.
+
+The feed is not used for normal transit routing. Its stops, routes and trips are
+used only to decorate taxi legs with provider information and to spatially filter
+out itineraries that don't fall within a recognized taxi provider's coverage area.
+
+Requires the `TaxiRouting` sandbox feature to be enabled.
 
 
 <h3 id="tf_0_stationTransferPreference">stationTransferPreference</h3>

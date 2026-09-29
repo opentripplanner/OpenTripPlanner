@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -21,6 +22,9 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
  * StreetEdges may contain mode changes between CAR / WALK
  * <p>
  * arriveBy and departAt paths should be symmetric.
+ * <p>
+ * Parametrized over {@code CAR_PICKUP} and {@code TAXI}, since both share the identical
+ * walk-drive-walk state machine.
  */
 public class CarPickupTest extends GraphRoutingTest {
 
@@ -32,72 +36,87 @@ public class CarPickupTest extends GraphRoutingTest {
   private StreetVertex D;
   private StreetVertex E;
 
-  @Test
-  public void testCarPickupCarOnly() {
-    assertPath(B, C, "null - IN_CAR - null, CAR - IN_CAR - BC street");
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupCarOnly(StreetMode mode) {
+    assertPath(mode, B, C, "null - IN_CAR - null, CAR - IN_CAR - BC street");
   }
 
-  @Test
-  public void testCarPickupCarThenWalk() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupCarThenWalk(StreetMode mode) {
     assertPath(
+      mode,
       A,
       C,
       "null - WALK_TO_PICKUP - null, WALK - WALK_TO_PICKUP - AB street, CAR - IN_CAR - BC street"
     );
   }
 
-  @Test
-  public void testCarPickupFromEntranceThenCar() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupFromEntranceThenCar(StreetMode mode) {
     assertPath(
+      mode,
       S1,
       C,
       "null - WALK_TO_PICKUP - null, null - WALK_TO_PICKUP - S1, CAR - IN_CAR - BC street"
     );
   }
 
-  @Test
-  public void testCarPickupWalkFromEntranceThenCarThenWalk() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupWalkFromEntranceThenCarThenWalk(StreetMode mode) {
     assertPath(
+      mode,
       S1,
       D,
       "null - WALK_TO_PICKUP - null, null - WALK_TO_PICKUP - S1, CAR - IN_CAR - BC street, WALK - WALK_FROM_DROP_OFF - CD street"
     );
   }
 
-  @Test
-  public void testCarPickupCarThenWalkToStop() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupCarThenWalkToStop(StreetMode mode) {
     assertPath(
+      mode,
       B,
       E1,
       "null - IN_CAR - null, CAR - IN_CAR - BC street, null - WALK_FROM_DROP_OFF - E1"
     );
   }
 
-  @Test
-  public void testCarPickupWalkFromEntranceThenCarThenWalkToStop() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupWalkFromEntranceThenCarThenWalkToStop(StreetMode mode) {
     assertPath(
+      mode,
       S1,
       E1,
       "null - WALK_TO_PICKUP - null, null - WALK_TO_PICKUP - S1, CAR - IN_CAR - BC street, null - WALK_FROM_DROP_OFF - E1"
     );
   }
 
-  @Test
-  public void testCarPickupWalkThenCarThenWalk() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testCarPickupWalkThenCarThenWalk(StreetMode mode) {
     assertPath(
+      mode,
       A,
       D,
       "null - WALK_TO_PICKUP - null, WALK - WALK_TO_PICKUP - AB street, CAR - IN_CAR - BC street, WALK - WALK_FROM_DROP_OFF - CD street"
     );
   }
 
-  @Test
-  public void testWalkOnlyCarPickup() {
+  @ParameterizedTest
+  @EnumSource(value = StreetMode.class, names = { "CAR_PICKUP", "TAXI" })
+  public void testWalkOnlyCarPickup(StreetMode mode) {
     // This is a special case where the reverse states differ, due to both starting in the IN_CAR
     // state and switching to walking when encountering the first edge. This is the only valid
     // path since a CarPickup must be in `IN_CAR` or `WALK_FROM_DROP_OFF` to be a final state,
     // and the path can't be traversed by car.
     assertPath(
+      mode,
       A,
       B,
       "null - WALK_TO_PICKUP - null, WALK - WALK_TO_PICKUP - AB street",
@@ -136,21 +155,22 @@ public class CarPickupTest extends GraphRoutingTest {
     );
   }
 
-  private void assertPath(Vertex fromVertex, Vertex toVertex, String descriptor) {
-    String departAt = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, false);
-    String arriveBy = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, true);
+  private void assertPath(StreetMode mode, Vertex fromVertex, Vertex toVertex, String descriptor) {
+    String departAt = runStreetSearchAndCreateDescriptor(mode, fromVertex, toVertex, false);
+    String arriveBy = runStreetSearchAndCreateDescriptor(mode, fromVertex, toVertex, true);
 
     assertDescriptors(descriptor, descriptor, arriveBy, departAt);
   }
 
   private void assertPath(
+    StreetMode mode,
     Vertex fromVertex,
     Vertex toVertex,
     String expectedDepartAt,
     String expectedArriveBy
   ) {
-    String departAt = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, false);
-    String arriveBy = runStreetSearchAndCreateDescriptor(fromVertex, toVertex, true);
+    String departAt = runStreetSearchAndCreateDescriptor(mode, fromVertex, toVertex, false);
+    String arriveBy = runStreetSearchAndCreateDescriptor(mode, fromVertex, toVertex, true);
 
     assertDescriptors(expectedDepartAt, expectedArriveBy, arriveBy, departAt);
   }
@@ -170,14 +190,12 @@ public class CarPickupTest extends GraphRoutingTest {
   }
 
   private String runStreetSearchAndCreateDescriptor(
+    StreetMode mode,
     Vertex fromVertex,
     Vertex toVertex,
     boolean arriveBy
   ) {
-    var request = StreetSearchRequest.of()
-      .withMode(StreetMode.CAR_PICKUP)
-      .withArriveBy(arriveBy)
-      .build();
+    var request = StreetSearchRequest.of().withMode(mode).withArriveBy(arriveBy).build();
 
     var tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())

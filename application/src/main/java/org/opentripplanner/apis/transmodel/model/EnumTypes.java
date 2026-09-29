@@ -480,6 +480,17 @@ public class EnumTypes {
         "flexible transportation, ride to an eligible drop-off area and then walk the rest of " +
         "the way."
     )
+    .value(
+      GraphQLEnumValueDefinition.newEnumValueDefinition()
+        .name("taxi")
+        .value(StreetMode.TAXI)
+        .description(
+          "Traveling by taxi. This can include walking before being picked up and/or after " +
+            "being dropped off."
+        )
+        .deprecationReason("This value is experimental.")
+        .build()
+    )
     .build();
 
   public static final GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType.newEnum()

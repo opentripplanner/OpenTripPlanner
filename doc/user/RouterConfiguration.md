@@ -567,6 +567,7 @@ Ordered list of `StreetMode` values used as access modes. Each entry is paired w
    This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
    _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
  - `car-pickup` Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.
+ - `taxi` Walking to a pickup point along the road, being driven by a taxi to a drop-off point along the road, and walking the rest of the way.
  - `car-rental` Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
    This can include car rental at fixed locations or free-floating services.
    
@@ -616,6 +617,7 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
    This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
    _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
  - `car-pickup` Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.
+ - `taxi` Walking to a pickup point along the road, being driven by a taxi to a drop-off point along the road, and walking the rest of the way.
  - `car-rental` Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
    This can include car rental at fixed locations or free-floating services.
    

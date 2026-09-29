@@ -13,6 +13,7 @@ import static org.opentripplanner.street.model.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.street.model.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.street.model.StreetMode.FLEXIBLE;
 import static org.opentripplanner.street.model.StreetMode.SCOOTER_RENTAL;
+import static org.opentripplanner.street.model.StreetMode.TAXI;
 import static org.opentripplanner.street.model.StreetModelFactory.intersectionVertex;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
@@ -65,6 +66,8 @@ class StateTest {
       of(FLEXIBLE, false, NULL_RENTAL_STATES, Set.of(WALK)),
       of(CAR_PICKUP, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
       of(CAR_PICKUP, true, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+      of(TAXI, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
+      of(TAXI, true, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
       of(CAR_HAILING, false, NULL_RENTAL_STATES, Set.of(CAR, WALK)),
       of(CAR_HAILING, true, NULL_RENTAL_STATES, Set.of(CAR, WALK))
     );
