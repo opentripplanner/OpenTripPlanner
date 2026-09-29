@@ -277,10 +277,9 @@ public class TripPatternForDates
   ) {
     var departureTimes = new ArrayList<int[]>(tripPatternForDates.length);
     for (var tripPatternForDate : tripPatternForDates) {
-      var tripTimes = tripPatternForDate.tripTimes();
-      var times = new int[tripTimes.size()];
+      var times = new int[tripPatternForDate.numberOfTripSchedules()];
       for (int i = 0; i < times.length; i++) {
-        times[i] = tripTimes.get(i).getDepartureTime(FIRST_STOP_POS_IN_PATTERN);
+        times[i] = tripPatternForDate.getTripTimes(i).getDepartureTime(FIRST_STOP_POS_IN_PATTERN);
       }
       departureTimes.add(times);
     }
