@@ -42,8 +42,6 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.rutebanken.netex.model.Via_VersionedChildStructure;
 import org.rutebanken.netex.model.Vias_RelStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the
@@ -55,7 +53,6 @@ import org.slf4j.LoggerFactory;
  */
 class StopTimesMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopTimesMapper.class);
   private static final int DAY_IN_SECONDS = 3600 * 24;
   private final DataImportIssueStore issueStore;
   private final FeedScopedIdFactory idFactory;
