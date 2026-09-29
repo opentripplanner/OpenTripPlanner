@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.BrandingRefStructure;
 import org.rutebanken.netex.model.GroupOfLinesRefStructure;
@@ -31,6 +31,7 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.PresentationStructure;
+import org.rutebanken.netex.model.PublicCodeStructure;
 import org.rutebanken.netex.model.TransportOrganisationRefStructure;
 
 class RouteMapperTest {
@@ -262,9 +263,9 @@ class RouteMapperTest {
   private Line createExampleLine() {
     Line line = new Line();
     line.setId(LINE_ID);
-    line.setTransportMode(AllVehicleModesOfTransportEnumeration.METRO);
-    line.setName(new MultilingualString().withValue("Line 1"));
-    line.setPublicCode("L1");
+    line.setTransportMode(AllPublicTransportModesEnumeration.METRO);
+    line.setName(new MultilingualString().withContent("Line 1"));
+    line.setPublicCode(new PublicCodeStructure().withValue("L1"));
     line.setRepresentedByGroupRef(new GroupOfLinesRefStructure().withRef(NETWORK_ID));
     line.setBrandingRef(new BrandingRefStructure().withRef(BRANDING_ID));
     return line;
@@ -273,7 +274,7 @@ class RouteMapperTest {
   private Line createExampleFerry(String id) {
     var ferry = createExampleLine();
     ferry.setId(id);
-    ferry.setTransportMode(AllVehicleModesOfTransportEnumeration.WATER);
+    ferry.setTransportMode(AllPublicTransportModesEnumeration.WATER);
     return ferry;
   }
 

@@ -91,7 +91,7 @@ class FlexStopsMapper {
         AreaStop areaStop = mapFlexArea(
           flexibleArea,
           flexibleAreaGeometry,
-          flexibleStopPlace.getName().getValue()
+          MultilingualStringMapper.getStringValue(flexibleStopPlace.getName())
         );
         if (areaStop != null) {
           stops.add(areaStop);
@@ -106,7 +106,11 @@ class FlexStopsMapper {
       // get the ids for the area and stop place correct
       var builder = siteRepositoryBuilder
         .groupStop(idFactory.createId(flexibleStopPlace.getId()))
-        .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()))
+        .withName(
+          new NonLocalizedString(
+            MultilingualStringMapper.getStringValue(flexibleStopPlace.getName())
+          )
+        )
         .withEncompassingAreaGeometries(areaGeometries);
       stops.forEach(builder::addLocation);
       return builder.build();
@@ -125,7 +129,11 @@ class FlexStopsMapper {
     var areaName = area.getName();
     return siteRepositoryBuilder
       .areaStop(idFactory.createId(area.getId()))
-      .withName(new NonLocalizedString(areaName != null ? areaName.getValue() : backupName))
+      .withName(
+        new NonLocalizedString(
+          areaName != null ? MultilingualStringMapper.getStringValue(areaName) : backupName
+        )
+      )
       .withGeometry(geometry)
       .build();
   }

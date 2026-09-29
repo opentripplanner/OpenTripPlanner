@@ -17,7 +17,7 @@ import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.Line;
@@ -156,8 +156,8 @@ class NetexMapperTest {
 
     Line line = new Line()
       .withId("RUT:Line:1")
-      .withName(new MultilingualString().withValue("Line 1"))
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+      .withName(new MultilingualString().withContent("Line 1"))
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS);
     index.lineById.add(line);
 
     var lineRef = MappingSupport.createWrappedRef(line.getId(), LineRefStructure.class);
@@ -221,7 +221,7 @@ class NetexMapperTest {
     var index = new NetexEntityIndex();
     var notice = new Notice()
       .withId("RUT:Notice:1")
-      .withText(new MultilingualString().withValue("Notice text"));
+      .withText(new MultilingualString().withContent("Notice text"));
 
     var noticeAssignment = new NoticeAssignment()
       .withId("RUT:NoticeAssignment:1")

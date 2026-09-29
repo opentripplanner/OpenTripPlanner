@@ -34,8 +34,8 @@ public class GroupOfRoutesMapperTest {
     return new GroupOfLines()
       .withId(ID)
       .withPrivateCode(new PrivateCodeStructure().withValue(PRIVATE_CODE))
-      .withName(new MultilingualString().withValue(NAME))
-      .withShortName(new MultilingualString().withValue(SHORT_NAME))
-      .withDescription(new MultilingualString().withValue(DESCRIPTION));
+      .withName(new MultilingualString().withContent(NAME))
+      .withShortName(new MultilingualString().withContent(SHORT_NAME))
+      .withDescription(new MultilingualString().withContent(DESCRIPTION));
   }
 }

@@ -11,7 +11,7 @@ import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.CarAccess;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 /**
@@ -30,7 +30,7 @@ class TransportModeMapper {
   );
 
   public NetexMainAndSubMode map(
-    AllVehicleModesOfTransportEnumeration netexMode,
+    AllPublicTransportModesEnumeration netexMode,
     TransportSubmodeStructure submode
   ) throws UnsupportedModeException {
     if (submode == null) {
@@ -40,7 +40,7 @@ class TransportModeMapper {
     }
   }
 
-  public TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode)
+  public TransitMode mapAllVehicleModesOfTransport(AllPublicTransportModesEnumeration mode)
     throws UnsupportedModeException {
     if (mode == null) {
       throw new UnsupportedModeException(null);
@@ -113,9 +113,9 @@ class TransportModeMapper {
 
   static class UnsupportedModeException extends Exception {
 
-    final AllVehicleModesOfTransportEnumeration mode;
+    final AllPublicTransportModesEnumeration mode;
 
-    public UnsupportedModeException(AllVehicleModesOfTransportEnumeration mode) {
+    public UnsupportedModeException(AllPublicTransportModesEnumeration mode) {
       this.mode = mode;
     }
   }

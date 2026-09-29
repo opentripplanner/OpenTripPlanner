@@ -41,7 +41,7 @@ class BookingInfoMapperTest {
     StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern().withBookingArrangements(
       new BookingArrangementsStructure().withBookingContact(
         new ContactStructure().withContactPerson(
-          new MultilingualString().withValue(STOP_POINT_CONTACT)
+          new MultilingualString().withContent(STOP_POINT_CONTACT)
         )
       )
     );
@@ -49,14 +49,14 @@ class BookingInfoMapperTest {
     ServiceJourney serviceJourney = new ServiceJourney().withFlexibleServiceProperties(
       new FlexibleServiceProperties().withBookingContact(
         new ContactStructure().withContactPerson(
-          new MultilingualString().withValue(SERVICE_JOURNEY_CONTACT)
+          new MultilingualString().withContent(SERVICE_JOURNEY_CONTACT)
         )
       )
     );
 
     FlexibleLine flexibleLine = new FlexibleLine().withBookingContact(
       new ContactStructure().withContactPerson(
-        new MultilingualString().withValue(FLEXIBLE_LINE_CONTACT)
+        new MultilingualString().withContent(FLEXIBLE_LINE_CONTACT)
       )
     );
 
@@ -94,7 +94,7 @@ class BookingInfoMapperTest {
 
     FlexibleLine flexibleLine = new FlexibleLine().withBookingContact(
       new ContactStructure().withContactPerson(
-        new MultilingualString().withValue(FLEXIBLE_LINE_CONTACT)
+        new MultilingualString().withContent(FLEXIBLE_LINE_CONTACT)
       )
     );
 
@@ -106,10 +106,10 @@ class BookingInfoMapperTest {
   @Test
   void testMapBookingInfo() {
     ContactStructure contactStructure = new ContactStructure();
-    contactStructure.setContactPerson(new MultilingualString().withValue(PERSON));
+    contactStructure.setContactPerson(new MultilingualString().withContent(PERSON));
     contactStructure.setPhone(PHONE);
     contactStructure.setEmail(EMAIL);
-    contactStructure.setFurtherDetails(new MultilingualString().withValue(DETAILS));
+    contactStructure.setFurtherDetails(new MultilingualString().withContent(DETAILS));
 
     BookingArrangementsStructure bookingArrangements = new BookingArrangementsStructure();
     bookingArrangements.setBookingContact(contactStructure);
@@ -128,7 +128,7 @@ class BookingInfoMapperTest {
   @Test
   void testMapEarliestLatestBookingTime() {
     ContactStructure contactStructure = new ContactStructure();
-    contactStructure.setContactPerson(new MultilingualString().withValue(PERSON));
+    contactStructure.setContactPerson(new MultilingualString().withContent(PERSON));
 
     BookingArrangementsStructure bookingArrangements = new BookingArrangementsStructure();
     bookingArrangements.setBookingContact(contactStructure);
@@ -177,7 +177,7 @@ class BookingInfoMapperTest {
   @Test
   void testMapMinimumBookingNotice() {
     ContactStructure contactStructure = new ContactStructure();
-    contactStructure.setContactPerson(new MultilingualString().withValue(PERSON));
+    contactStructure.setContactPerson(new MultilingualString().withContent(PERSON));
 
     BookingArrangementsStructure bookingArrangements = new BookingArrangementsStructure();
     bookingArrangements.setBookingContact(contactStructure);
