@@ -10,13 +10,13 @@ import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 
-public class GeometryUtilsTest {
+class GeometryUtilsTest {
 
-  public static final Coordinate BERLIN = new Coordinate(13.4105, 52.5212);
-  public static final Coordinate HAMBURG = new Coordinate(10.0003, 53.5566);
+  private static final Coordinate BERLIN = new Coordinate(13.4105, 52.5212);
+  private static final Coordinate HAMBURG = new Coordinate(10.0003, 53.5566);
 
   @Test
-  public final void testSplitGeometryAtFraction() {
+  final void testSplitGeometryAtFraction() {
     Coordinate[] coordinates = new Coordinate[4];
 
     coordinates[0] = new Coordinate(0, 0);

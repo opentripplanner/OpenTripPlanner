@@ -126,6 +126,7 @@ class GenerateTripPatternsOperationTest {
     geometryProcessor = new GeometryProcessor(
       transitServiceBuilder,
       maxStopToShapeSnapDistance,
+      0.0,
       issueStore
     );
   }

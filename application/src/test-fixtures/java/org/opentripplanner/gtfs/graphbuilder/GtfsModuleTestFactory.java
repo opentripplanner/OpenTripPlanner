@@ -27,6 +27,7 @@ public class GtfsModuleTestFactory {
       transitPeriodLimit,
       new GtfsFareServiceFactory(),
       150.0,
+      0.0,
       120
     );
   }
