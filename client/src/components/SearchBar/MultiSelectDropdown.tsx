@@ -8,12 +8,19 @@ type MultiSelectDropdownOption<T> = {
 
 type MultiSelectDropdownProps<T> = {
   label: string;
+  emptySelectionText: string;
   options: MultiSelectDropdownOption<T>[];
   values: T[];
   onChange: (value: T[]) => void;
 };
 
-const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }: MultiSelectDropdownProps<T>) => {
+const MultiSelectDropdown = <T = unknown,>({
+  label,
+  emptySelectionText,
+  options,
+  values,
+  onChange,
+}: MultiSelectDropdownProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +66,7 @@ const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }:
         id="multiSelectDropdown"
         size="sm"
         className="input-medium"
-        value={values.length > 0 ? values.join(', ') : 'Not selected'}
+        value={values.length > 0 ? values.join(', ') : emptySelectionText}
         onClick={toggleDropdown}
         onChange={() => {}}
       />

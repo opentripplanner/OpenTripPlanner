@@ -2402,7 +2402,7 @@ input Modes {
   accessMode: StreetMode
   "The mode used to get from the origin to the destination directly, without using the transit network. If the element is not present or null,direct travel without using transit will be disallowed."
   directMode: StreetMode
-  "The mode used to get from the egress stops in the transit network tothe destination (last-mile). If the element is not present or null,only transit that can immediately arrive at the origin will be used."
+  "The mode used to get from the egress stops in the transit network to the destination (last-mile). If the element is not present or null, only transit that can immediately arrive at the destination will be used."
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
@@ -2501,7 +2501,7 @@ input StreetModes {
   accessMode: StreetMode
   "The mode used to get from the origin to the destination directly, without using the transit network. If the element is not present or null,direct travel without using transit will be disallowed."
   directMode: StreetMode
-  "The mode used to get from the egress stops in the transit network tothe destination (last-mile). If the element is not present or null,only transit that can immediately arrive at the origin will be used."
+  "The mode used to get from the egress stops in the transit network to the destination (last-mile). If the element is not present or null, only transit that can immediately arrive at the destination will be used."
   egressMode: StreetMode
 }
 
