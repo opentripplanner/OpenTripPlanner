@@ -203,7 +203,7 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
 
   @Override
   public RealTimeTripState realtimeTripState() {
-    return RealTimeTripState.of().build();
+    return RealTimeTripState.SCHEDULED;
   }
 
   @Override

@@ -27,6 +27,8 @@ public final class RealTimeTripState {
   private final boolean tripPatternModified;
   private final boolean deleted;
 
+  static final RealTimeTripState SCHEDULED = of().build();
+
   private RealTimeTripState(Builder builder) {
     this.timesModified = builder.timesModified;
     this.canceled = builder.canceled;
@@ -35,7 +37,7 @@ public final class RealTimeTripState {
     this.deleted = builder.deleted;
   }
 
-  public static Builder of() {
+  static Builder of() {
     return new Builder();
   }
 
@@ -87,7 +89,7 @@ public final class RealTimeTripState {
     return Objects.hash(timesModified, canceled, added, tripPatternModified, deleted);
   }
 
-  public static class Builder {
+  static class Builder {
 
     private boolean timesModified = false;
     private boolean canceled = false;
@@ -97,52 +99,52 @@ public final class RealTimeTripState {
 
     private Builder() {}
 
-    public Builder withTimesModified() {
+    Builder withTimesModified() {
       this.timesModified = true;
       return this;
     }
 
-    public Builder withCanceled() {
+    Builder withCanceled() {
       this.canceled = true;
       return this;
     }
 
-    public Builder withAdded() {
+    Builder withAdded() {
       this.added = true;
       return this;
     }
 
-    public Builder withTripPatternModified() {
+    Builder withTripPatternModified() {
       this.tripPatternModified = true;
       return this;
     }
 
-    public Builder withDeleted() {
+    Builder withDeleted() {
       this.deleted = true;
       return this;
     }
 
-    public boolean isTimesModified() {
+    boolean isTimesModified() {
       return timesModified;
     }
 
-    public boolean isCanceled() {
+    boolean isCanceled() {
       return canceled;
     }
 
-    public boolean isAdded() {
+    boolean isAdded() {
       return added;
     }
 
-    public boolean isTripPatternModified() {
+    boolean isTripPatternModified() {
       return tripPatternModified;
     }
 
-    public boolean isDeleted() {
+    boolean isDeleted() {
       return deleted;
     }
 
-    public RealTimeTripState build() {
+    RealTimeTripState build() {
       return new RealTimeTripState(this);
     }
   }
