@@ -1,0 +1,80 @@
+package org.opentripplanner.transit.transfer.regular.internal;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
+import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
+import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
+import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+
+/**
+ * Graph-build-time implementation of {@link TransferGenerator} - see that interface's doc. There
+ * is no {@code TransferRealtimeUpdater} implementation yet.
+ *
+ * @param <P> the transfer path/template type
+ * @param <U> the user preferences type
+ */
+public class DefaultTransferGenerator<P, U> implements TransferGenerator {
+
+  private final StopIndex stopIndex;
+  private final Collection<FeedScopedId> stopsWithTrips;
+  private final TransferPathProvider<P, U> pathProvider;
+  private final TransferProfiles<U> orderedProfiles;
+  private final RegularTransferRepository<P> repository;
+
+  public DefaultTransferGenerator(
+    StopIndex stopIndex,
+    Collection<FeedScopedId> stopsWithTrips,
+    TransferPathProvider<P, U> pathProvider,
+    TransferProfiles<U> profiles,
+    RegularTransferRepository<P> repository
+  ) {
+    this.stopIndex = stopIndex;
+    this.stopsWithTrips = stopsWithTrips;
+    this.pathProvider = pathProvider;
+    this.orderedProfiles = profiles;
+    this.repository = repository;
+  }
+
+  @Override
+  public void generateTransfersForAllStops() {
+    for (var profile : orderedProfiles) {
+      for (FeedScopedId stop : stopsWithTrips) {
+        generateForStop(profile, stop);
+      }
+    }
+  }
+
+  /**
+   * Run the profile's own discovery search and keep only the cheapest candidate per target stop.
+   * <p>
+   * Only the cheapest(generalized-cost) candidate per target stop is kept. We assume that the diffrence between the
+   * best time and generalized-cost is small. The {@link TransferPathProvider} may return multiple candidates for the
+   * same target stop.
+   */
+  private void generateForStop(TransferProfile<U> profile, FeedScopedId fromStopId) {
+    int fromStop = stopIndex.toStopIndex(fromStopId);
+    Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
+
+    var nearbyStops = pathProvider.findNearbyStops(
+      fromStopId,
+      profile.profileType(),
+      profile.userPreferences()
+    );
+    for (var candidate : nearbyStops) {
+      int toStop = stopIndex.toStopIndex(candidate.toStop());
+      var existing = bestCandidatePerTargetStop.get(toStop);
+      if (existing == null || candidate.criteria().c1() < existing.criteria().c1()) {
+        bestCandidatePerTargetStop.put(toStop, candidate);
+      }
+    }
+
+    for (var entry : bestCandidatePerTargetStop.entrySet()) {
+      repository.setPath(profile.profileType(), fromStop, entry.getKey(), entry.getValue().path());
+    }
+  }
+}
