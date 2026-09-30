@@ -2570,6 +2570,7 @@ input TripPassThroughViaLocationInput {
   A list of stop locations. A stop location can be a quay, a stop place, a multimodal
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
+  The list must contain at least one stop location.
   """
   stopLocationIds: [String!]!
 }

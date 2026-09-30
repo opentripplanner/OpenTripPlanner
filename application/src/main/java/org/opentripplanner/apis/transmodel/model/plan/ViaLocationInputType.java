@@ -61,6 +61,8 @@ public class ViaLocationInputType {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """;
+  private static final String DOC_PASS_THROUGH_STOP_LOCATION_IDS =
+    DOC_STOP_LOCATION_IDS + "The list must contain at least one stop location.\n";
   private static final String DOC_COORDINATE = "A coordinate to route through.";
 
   static final GraphQLInputObjectType VISIT_VIA_LOCATION_INPUT =
@@ -94,7 +96,7 @@ public class ViaLocationInputType {
       .field(b ->
         b
           .name(FIELD_STOP_LOCATION_IDS)
-          .description(DOC_STOP_LOCATION_IDS)
+          .description(DOC_PASS_THROUGH_STOP_LOCATION_IDS)
           // This is NOT nonNull, because we might add other parameters later, like 'list of line-ids'
           .type(requiredListOfNonNullStrings())
       )
