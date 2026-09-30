@@ -89,5 +89,14 @@ public class RegularTransferRepository<P> implements Serializable {
     return result;
   }
 
+  public int calculateNumberOfTransferPaths() {
+    return pathsByProfile
+      .values()
+      .stream()
+      .flatMap(byFromStop -> byFromStop.values().stream())
+      .mapToInt(Map::size)
+      .sum();
+  }
+
   public record StoredPath<P>(int fromStop, int toStop, P path) {}
 }

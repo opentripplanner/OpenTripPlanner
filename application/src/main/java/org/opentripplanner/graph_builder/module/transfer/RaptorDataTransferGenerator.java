@@ -119,9 +119,22 @@ public class RaptorDataTransferGenerator implements GraphBuilderModule {
         }
       }
     }
+    logSummary(profileList, stopsWithTrips);
+  }
 
+  private void logSummary(
+    List<TransferProfile<AbstractUserPreferences<?>>> profileList,
+    List<FeedScopedId> stopsWithTrips
+  ) {
+    int sum = 0;
+    for (var profile : profileList) {
+      int size = regularTransferRepository.pathsFor(profile.profileType()).size();
+      LOG.info("Created {} regular transfers for profile {}.", size, profile.profileType());
+      sum += size;
+    }
     LOG.info(
-      "Done generating raptor-data regular transfers for {} profiles, {} stops with trips.",
+      "Done generating regular transfers. paths: {}, profiles: {} stops: {}",
+      sum,
       profileList.size(),
       stopsWithTrips.size()
     );

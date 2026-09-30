@@ -10,6 +10,9 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.utils.logging.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Graph-build-time implementation of {@link TransferGenerator} - see that interface's doc. There
@@ -20,12 +23,17 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  */
 public class DefaultTransferGenerator<P, U> implements TransferGenerator {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
   private final StopIndex stopIndex;
   private final Collection<FeedScopedId> stopsWithTrips;
   private final TransferPathProvider<P, U> pathProvider;
   private final TransferProfiles<U> orderedProfiles;
   private final RegularTransferRepository<P> repository;
 
+  /**
+   * @param progressCallback invoked once per (profile, stop) generated - lets the caller report
+   *                         progress without this class taking on a logging dependency itself.
+   */
   public DefaultTransferGenerator(
     StopIndex stopIndex,
     Collection<FeedScopedId> stopsWithTrips,
@@ -42,11 +50,14 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
 
   @Override
   public void generateTransfersForAllStops() {
-    for (var profile : orderedProfiles) {
-      for (FeedScopedId stop : stopsWithTrips) {
+    var progress = ProgressTracker.track("Generate regular transfers", 1000, stopsWithTrips.size());
+    stopsWithTrips.parallelStream().forEach(stop -> {
+      for (var profile : orderedProfiles) {
         generateForStop(profile, stop);
       }
-    }
+      progress.step(m -> LOG.info(m));
+    });
+    LOG.info(progress.completeMessage());
   }
 
   /**
@@ -73,8 +84,15 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
       }
     }
 
-    for (var entry : bestCandidatePerTargetStop.entrySet()) {
-      repository.setPath(profile.profileType(), fromStop, entry.getKey(), entry.getValue().path());
+    synchronized (this) {
+      for (var entry : bestCandidatePerTargetStop.entrySet()) {
+        repository.setPath(
+          profile.profileType(),
+          fromStop,
+          entry.getKey(),
+          entry.getValue().path()
+        );
+      }
     }
   }
 }
