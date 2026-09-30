@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import graphql.execution.DataFetcherResult;
 import graphql.relay.ConnectionCursor;
 import graphql.relay.DefaultConnectionCursor;
 import graphql.relay.DefaultEdge;
@@ -28,24 +27,17 @@ public class PlanConnectionImpl implements GraphQLDataFetchers.GraphQLPlanConnec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public DataFetcher<Iterable<DefaultEdge<Itinerary>>> edges() {
-    // Returns a DataFetcherResult so Itinerary-level resolvers (e.g. ItineraryImpl#id) can look
-    // up the original RouteRequest via localContext, forwarded unchanged from the parent
-    // PlanConnection's own local context (set in QueryTypeImpl#getPlanResult). The cast is to the
-    // raw fetcher type, same reasoning as ItineraryImpl#legs.
-    DataFetcher<?> fetcher = environment -> {
-      var edges = getSource(environment)
+    // No DataFetcherResult wrapper is needed to reach Itinerary-level resolvers such as
+    // ItineraryImpl#id: graphql-java propagates the parent's local context (set in
+    // QueryTypeImpl#getPlanResult) to child fields automatically, and only a resolver that needs
+    // to *add* to it has to return a DataFetcherResult (as ItineraryImpl#legs does).
+    return environment ->
+      getSource(environment)
         .getTripPlan()
         .itineraries.stream()
         .map(itinerary -> new DefaultEdge<>(itinerary, new DefaultConnectionCursor("NoCursor")))
         .toList();
-      return DataFetcherResult.<Iterable<DefaultEdge<Itinerary>>>newResult()
-        .data(edges)
-        .localContext(environment.getLocalContext())
-        .build();
-    };
-    return (DataFetcher<Iterable<DefaultEdge<Itinerary>>>) fetcher;
   }
 
   @Override
