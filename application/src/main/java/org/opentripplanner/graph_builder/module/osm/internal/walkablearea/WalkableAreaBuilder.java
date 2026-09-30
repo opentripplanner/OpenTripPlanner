@@ -531,7 +531,7 @@ public class WalkableAreaBuilder {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(new ListedEdgesOnly(edges))
-        .withDominanceFunction(new DominanceFunctions.EarliestArrival())
+        .withDominanceFunction(new DominanceFunctions.EarliestArrivalOrShortestPath())
         .withRequest(request)
         .withFrom(vertex)
         .getShortestPathTree();

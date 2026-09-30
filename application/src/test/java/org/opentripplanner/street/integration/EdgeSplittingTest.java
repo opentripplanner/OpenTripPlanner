@@ -294,9 +294,10 @@ public class EdgeSplittingTest {
       assertFalse(fromVertices.isEmpty());
       var toVertices = linkingContext.findVertices(to);
       assertFalse(toVertices.isEmpty());
+      var request = StreetSearchRequestMapper.map(walking).build();
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .withHeuristic(new EuclideanRemainingWeightHeuristic())
-        .withRequest(StreetSearchRequestMapper.map(walking).build())
+        .withRequest(request)
         .withFrom(fromVertices)
         .withTo(toVertices)
         .getShortestPathTree();

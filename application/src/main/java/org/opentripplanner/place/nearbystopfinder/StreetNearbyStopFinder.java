@@ -169,7 +169,12 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
     stopsFound = new ArrayList<>(stopsFound);
 
-    var visitor = new NearbyStopFinderVisitor(originVertices, ignoreVertices, reverseDirection);
+    var visitor = new NearbyStopFinderVisitor(
+      originVertices,
+      ignoreVertices,
+      reverseDirection,
+      maxStopCount - stopsFound.size()
+    );
 
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
@@ -187,9 +192,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       .withTo(reverseDirection ? originVertices : null);
 
     if (maxStopCount > 0) {
-      streetSearch.withTerminationStrategy(
-        new MaxCountTerminationStrategy<>(maxStopCount, this::hasReachedStop)
-      );
+      streetSearch.withTerminationStrategy(visitor);
     }
 
     streetSearch.getShortestPathTree();

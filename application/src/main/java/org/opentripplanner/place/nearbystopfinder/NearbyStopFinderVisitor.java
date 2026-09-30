@@ -5,10 +5,12 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -30,7 +32,9 @@ import org.opentripplanner.utils.collection.MinMap;
  * called exactly once per vertex with the optimal state, producing the same result set as
  * post-scan filtering of {@code getAllStates()}.
  */
-class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
+class NearbyStopFinderVisitor
+  implements TraverseVisitor<State, Edge>, SearchTerminationStrategy<State>
+{
 
   private static final Predicate<Edge> CAN_BOARD_FLEX_PREDICATE = e ->
     e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR);
@@ -38,7 +42,9 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
   private final Set<Vertex> originVertices;
   private final Set<Vertex> ignoreVertices;
   private final boolean reverseDirection;
+  private final int maxCount;
 
+  private final Set<Vertex> processedVertices = new HashSet<>();
   private final List<NearbyStop> transitStopsFound = new ArrayList<>();
   private final MinMap<FeedScopedId, State> statesForAreaStopIds = new MinMap<>(
     Comparator.comparingDouble(State::getWeight)
@@ -47,11 +53,13 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
   NearbyStopFinderVisitor(
     Set<Vertex> originVertices,
     Set<Vertex> ignoreVertices,
-    boolean reverseDirection
+    boolean reverseDirection,
+    int maxCount
   ) {
     this.originVertices = requireNonNull(originVertices);
     this.ignoreVertices = requireNonNull(ignoreVertices);
     this.reverseDirection = reverseDirection;
+    this.maxCount = maxCount;
   }
 
   @Override
@@ -63,6 +71,10 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
     }
 
     if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
+      if (processedVertices.contains(vertex)) {
+        return;
+      }
+      processedVertices.add(vertex);
       transitStopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getId()));
     }
 
@@ -71,6 +83,10 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
       vertex instanceof StreetVertex streetVertex &&
       !streetVertex.areaStops().isEmpty()
     ) {
+      if (processedVertices.contains(vertex)) {
+        return;
+      }
+      processedVertices.add(vertex);
       for (FeedScopedId id : streetVertex.areaStops()) {
         if (canBoardFlex(state)) {
           statesForAreaStopIds.putMin(id, state);
@@ -97,5 +113,10 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
     return reverseDirection
       ? state.getVertex().hasAnyIncomingMatching(CAN_BOARD_FLEX_PREDICATE)
       : state.getVertex().hasAnyOutgoingMatching(CAN_BOARD_FLEX_PREDICATE);
+  }
+
+  @Override
+  public boolean shouldSearchTerminate(State current) {
+    return maxCount > 0 && transitStopsFound.size() + statesForAreaStopIds().size() >= maxCount;
   }
 }
