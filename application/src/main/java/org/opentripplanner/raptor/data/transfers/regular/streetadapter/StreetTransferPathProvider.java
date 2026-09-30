@@ -62,7 +62,7 @@ public class StreetTransferPathProvider
   /**
    * Shared by the graph-build (generator) and request-time (factory) call sites, so both build
    * this collaborator the same way: streets if the graph has them, straight-line distance
-   * otherwise (mirrors {@code DirectTransferGenerator.createNearbyStopFinder}).
+   * otherwise (mirrors {@code FlexTransferGenerator.createNearbyStopFinder}).
    */
   public static NearbyStopFinder createNearbyStopFinder(
     Graph graph,

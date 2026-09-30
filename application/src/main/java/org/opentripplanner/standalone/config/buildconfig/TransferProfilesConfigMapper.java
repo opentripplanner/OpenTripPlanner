@@ -14,7 +14,7 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileTy
  * Parses the new {@code transfers:} build-config block (see
  * {@code opentripplanner/OpenTripPlanner#7998}) into a {@link TransferProfilesConfig}. Entirely
  * separate from {@link RegularTransferConfig}/{@code transferRequests}, which
- * {@code DirectTransferGenerator} keeps reading unchanged for FLEX.
+ * {@code FlexTransferGenerator} keeps reading unchanged for FLEX.
  * <p>
  * Only {@code walk} is supported for now (see {@code TransferProfileType}) - support for other
  * profiles, and for a duration limit, is deliberately deferred until designed further.
