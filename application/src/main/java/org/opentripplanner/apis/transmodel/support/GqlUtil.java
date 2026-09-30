@@ -105,6 +105,22 @@ public class GqlUtil {
   }
 
   /**
+   * Return the double value of the argument or throw an exception if the value is null.
+   * This should generally be handled at the GraphQL schema level, but must sometimes be
+   * implemented programmatically to preserve backward compatibility.
+   */
+  public static double getNonNullDoubleArgument(
+    DataFetchingEnvironment environment,
+    String argumentName
+  ) {
+    Double argumentValue = environment.getArgument(argumentName);
+    if (argumentValue == null) {
+      throw new InvalidInputException("The argument '" + argumentName + "' is required.");
+    }
+    return argumentValue;
+  }
+
+  /**
    * Helper method to support the deprecated 'lang' argument.
    */
   public static Locale getLocale(DataFetchingEnvironment environment) {
