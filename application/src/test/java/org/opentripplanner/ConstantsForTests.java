@@ -23,7 +23,7 @@ import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
-import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.FlexTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
@@ -179,7 +179,7 @@ public class ConstantsForTests {
       addPortlandVehicleRentals(graph);
 
       var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
-      new DirectTransferGenerator(
+      new FlexTransferGenerator(
         graph,
         transitRepository,
         transferRepository,

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * builds always have one, even without OSM data - see {@code StreetTransferPathProvider}'s
  * straight-line fallback).
  * <p>
- * Runs unconditionally, alongside {@link DirectTransferGenerator}: that module now only
+ * Runs unconditionally, alongside {@link FlexTransferGenerator}: that module now only
  * generates the FLEX-relevant transfers (walking connectors between {@code RegularStop}s and
  * flex {@code AreaStop}/{@code GroupStop}s) - regular transfers between {@code RegularStop}s are
  * exclusively this pipeline's responsibility, so callers that build {@code RaptorTransitData}

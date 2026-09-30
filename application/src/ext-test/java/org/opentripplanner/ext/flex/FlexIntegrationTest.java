@@ -21,7 +21,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
-import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.FlexTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModuleTestFactory;
@@ -218,7 +218,7 @@ public class FlexIntegrationTest {
     var req = RouteRequest.defaultValue();
 
     // we don't have a complete coverage of the entire area so use straight lines for transfers
-    new DirectTransferGenerator(
+    new FlexTransferGenerator(
       graph,
       transitRepository,
       transferRepository,

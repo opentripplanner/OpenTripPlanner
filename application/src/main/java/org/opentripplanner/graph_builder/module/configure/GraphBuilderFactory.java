@@ -38,7 +38,7 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningModul
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
-import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.FlexTransferGenerator;
 import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
@@ -76,8 +76,7 @@ public interface GraphBuilderFactory {
   AreaStopsToVerticesMapper areaStopsToVerticesMapper();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
   DataImportIssueReporter dataImportIssueReporter();
-  DirectTransferGenerator directTransferGenerator();
-
+  FlexTransferGenerator flexTransferGenerator();
   RaptorDataTransferGenerator raptorDataTransferGenerator();
 
   DirectTransferAnalyzer directTransferAnalyzer();

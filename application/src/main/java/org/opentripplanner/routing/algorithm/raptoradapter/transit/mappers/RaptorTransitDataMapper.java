@@ -80,7 +80,7 @@ public class RaptorTransitDataMapper {
   }
 
   /**
-   * Without raptor-data wiring - the graph-less entry point. {@code DirectTransferGenerator} no
+   * Without raptor-data wiring - the graph-less entry point. {@code FlexTransferGenerator} no
    * longer generates regular (non-FLEX) transfers, so {@code transferRepository} has none to fall
    * back on here: regular transfers will be empty unless the raptor-data pipeline (see the other
    * {@code map} overload, and {@code RaptorDataTransferGenerator}) is run first.

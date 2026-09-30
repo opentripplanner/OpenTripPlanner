@@ -176,9 +176,9 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.areaStopsToVerticesMapper(), OTPFeature.FlexRouting);
 
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
-      // Runs unconditionally - FLEX transfers, and the graph-less/test fallback for regular
-      // transfers, depend on its PathTransfer output regardless of the module below.
-      graphBuilder.addModule(factory.directTransferGenerator());
+      // Generates the FLEX-relevant transfers only; regular transfers are the raptor-data
+      // pipeline's responsibility exclusively - see the module below.
+      graphBuilder.addModule(factory.flexTransferGenerator());
 
       // Generates the raptor-data regular-transfer pipeline (per-profile transfers), the primary
       // source of regular transfers for Raptor routing whenever a Graph is available.

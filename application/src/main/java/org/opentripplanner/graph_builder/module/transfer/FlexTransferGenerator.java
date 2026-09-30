@@ -41,9 +41,9 @@ import org.slf4j.LoggerFactory;
  * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
  * will use straight-line distance between stops.
  */
-public class DirectTransferGenerator implements GraphBuilderModule {
+public class FlexTransferGenerator implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FlexTransferGenerator.class);
 
   private static final int NO_STOP_COUNT_LIMIT = 0;
 
@@ -56,7 +56,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   /**
    * Constructor used in tests.
    */
-  public DirectTransferGenerator(
+  public FlexTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
@@ -70,7 +70,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.transferRepository = transferRepository;
   }
 
-  public DirectTransferGenerator(
+  public FlexTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
@@ -178,11 +178,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(
-        "Creating direct transfer edges between stops using straight line distance (not streets)..."
+        "Creating flex transfer edges between stops using straight line distance (not streets)..."
       );
       finder = new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
     } else {
-      LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
+      LOG.info("Creating flex transfer edges between stops using the street network from OSM...");
       finder = StreetNearbyStopFinder.of(null).build();
     }
 
