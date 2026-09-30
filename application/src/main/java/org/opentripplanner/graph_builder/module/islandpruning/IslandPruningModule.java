@@ -6,7 +6,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -29,6 +28,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,11 +93,9 @@ public class IslandPruningModule implements GraphBuilderModule {
     // note that visibility vertices must not be removed from the graph
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
-    HashSet<Vertex> visibilityVertices = new HashSet<>();
-
-    for (AreaEdge ae : graph.findEdges(AreaEdge.class)) {
-      visibilityVertices.addAll(ae.getArea().visibilityVertices());
-    }
+    var visibilityVertices = StreamUtils.ofIterable(graph.findEdges(AreaEdge.class)).collect(
+      Collectors.toSet()
+    );
 
     int removed = 0;
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
