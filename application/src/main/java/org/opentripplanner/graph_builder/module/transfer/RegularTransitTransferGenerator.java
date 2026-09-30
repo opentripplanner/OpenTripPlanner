@@ -38,9 +38,9 @@ import org.slf4j.LoggerFactory;
  * populated in place here, so the same instance can be threaded through
  * {@code SerializedGraphObject} and survive a build-then-load-later-process deployment.
  */
-public class RaptorDataTransferGenerator implements GraphBuilderModule {
+public class RegularTransitTransferGenerator implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RaptorDataTransferGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RegularTransitTransferGenerator.class);
 
   private final Graph graph;
   private final TransitRepository transitRepository;
@@ -48,7 +48,7 @@ public class RaptorDataTransferGenerator implements GraphBuilderModule {
   private final RegularTransferRepository<NearbyStop> regularTransferRepository;
   private final DataImportIssueStore issueStore;
 
-  public RaptorDataTransferGenerator(
+  public RegularTransitTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferProfilesConfig config,
