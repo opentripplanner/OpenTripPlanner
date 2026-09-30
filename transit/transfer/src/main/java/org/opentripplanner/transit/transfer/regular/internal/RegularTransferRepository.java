@@ -63,6 +63,17 @@ public class RegularTransferRepository<P> implements Serializable {
     return byFromStop.getOrDefault(fromStop, Map.of());
   }
 
+  /**
+   * Whether {@code fromStop} has at least one outgoing transfer, in any profile. Used by
+   * {@code RaptorDataTransferGenerator} to flag stops that could not be linked to any other stop.
+   */
+  public boolean hasTransfersFrom(int fromStop) {
+    return pathsByProfile
+      .values()
+      .stream()
+      .anyMatch(byFromStop -> !byFromStop.getOrDefault(fromStop, Map.of()).isEmpty());
+  }
+
   /** Every stored {@code (fromStop, toStop, path)} for a profile. Empty if it has none. */
   public List<StoredPath<P>> pathsFor(TransferProfileType profileId) {
     var byFromStop = pathsByProfile.get(profileId);

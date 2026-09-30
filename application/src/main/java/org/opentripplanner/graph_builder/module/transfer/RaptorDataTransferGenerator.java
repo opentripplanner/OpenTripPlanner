@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.transfer;
 
 import java.util.List;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.place.api.NearbyStop;
@@ -45,17 +46,20 @@ public class RaptorDataTransferGenerator implements GraphBuilderModule {
   private final TransitRepository transitRepository;
   private final TransferProfilesConfig config;
   private final RegularTransferRepository<NearbyStop> regularTransferRepository;
+  private final DataImportIssueStore issueStore;
 
   public RaptorDataTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferProfilesConfig config,
-    RegularTransferRepository<NearbyStop> regularTransferRepository
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
     this.config = config;
     this.regularTransferRepository = regularTransferRepository;
+    this.issueStore = issueStore;
   }
 
   @Override
@@ -106,6 +110,15 @@ public class RaptorDataTransferGenerator implements GraphBuilderModule {
       profiles,
       regularTransferRepository
     ).generateTransfersForAllStops();
+
+    for (FeedScopedId stopId : stopsWithTrips) {
+      if (!regularTransferRepository.hasTransfersFrom(stopIndex.toStopIndex(stopId))) {
+        var stopVertex = graph.getStopVertex(stopId);
+        if (stopVertex != null) {
+          issueStore.add(new StopNotLinkedForTransfers(stopVertex));
+        }
+      }
+    }
 
     LOG.info(
       "Done generating raptor-data regular transfers for {} profiles, {} stops with trips.",
