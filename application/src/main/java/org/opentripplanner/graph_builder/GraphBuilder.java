@@ -182,7 +182,7 @@ public class GraphBuilder implements Runnable {
 
       // Generates the raptor-data regular-transfer pipeline (per-profile transfers), the primary
       // source of regular transfers for Raptor routing whenever a Graph is available.
-      graphBuilder.addModule(factory.raptorDataTransferGenerator());
+      graphBuilder.addModule(factory.regularTransitTransferGenerator());
 
       // Analyze routing between stops to generate report
       graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);

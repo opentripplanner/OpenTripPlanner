@@ -39,7 +39,7 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.FlexTransferGenerator;
-import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.RegularTransitTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.place.api.NearbyStop;
@@ -77,7 +77,7 @@ public interface GraphBuilderFactory {
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
   DataImportIssueReporter dataImportIssueReporter();
   FlexTransferGenerator flexTransferGenerator();
-  RaptorDataTransferGenerator raptorDataTransferGenerator();
+  RegularTransitTransferGenerator regularTransitTransferGenerator();
 
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();

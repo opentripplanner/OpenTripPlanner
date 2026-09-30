@@ -36,7 +36,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.FlexTransferGenerator;
-import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.RegularTransitTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -272,14 +272,14 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static RaptorDataTransferGenerator provideRaptorDataTransferGenerator(
+  static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
     RegularTransferRepository<NearbyStop> regularTransferRepository,
     DataImportIssueStore issueStore
   ) {
-    return new RaptorDataTransferGenerator(
+    return new RegularTransitTransferGenerator(
       graph,
       transitRepository,
       config.transferProfiles(),
