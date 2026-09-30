@@ -116,7 +116,14 @@ public class ConstructApplication {
     }
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
+      RaptorTransitDataMapper.map(
+        tuningParameters,
+        graph,
+        transitRepository,
+        transferRepository,
+        regularTransferRepository,
+        config.buildConfig().transferProfiles()
+      )
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
