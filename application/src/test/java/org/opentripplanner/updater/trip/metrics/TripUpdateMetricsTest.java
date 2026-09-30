@@ -9,7 +9,7 @@ import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 class TripUpdateMetricsTest {
 
   @Test
-  void optionalParametersAreTaggedWithAnEmptyValue() {
+  void missingUrlIsTaggedWithAnEmptyValue() {
     var metrics = new StreamingTripUpdateMetrics(
       new UrlUpdaterParameters() {
         @Override
@@ -24,14 +24,14 @@ class TripUpdateMetricsTest {
 
         @Override
         public String feedId() {
-          return null;
+          return "RB";
         }
       }
     );
     assertThat(metrics.baseTags).containsExactly(
       Tag.of("configRef", "updaters.[0]"),
       Tag.of("url", ""),
-      Tag.of("feedId", "")
+      Tag.of("feedId", "RB")
     );
   }
 }
