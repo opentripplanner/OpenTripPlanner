@@ -10,21 +10,21 @@ import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 
 /**
- * The transit calculator is used to calculate transit related stuff, like calculating
+ * The transit calculator is used to calculate transit-related stuff, like calculating
  * <em>earliest boarding time</em> and time-shifting the access paths.
  * <p/>
- * The calculator is shared between the state, worker and path mapping code. This make the
- * calculations consistent and let us hide the request parameters. Hiding the request parameters
- * ensure that this calculator is used.
+ * The calculator is shared between the state, worker and path mapping code. This makes the
+ * calculations consistent and lets us hide the request parameters. Hiding the request parameters
+ * ensures that this calculator is used.
  * <p>
  * There is one calculator for FORWARD search and one for REVERSE search. The documentation and
- * argument names uses a search-direction agnostic vocabulary. We try to use the terms "source" and
- * "target", in stead of "from/to" and "board/alight".
+ * argument names use search-direction agnostic vocabulary. We try to use the terms "source" and
+ * "target", instead of "from/to" and "board/alight".
  * <ul>
  * <li>
  *     In a FORWARD search the "source" means "from" and "target" means "to".
@@ -137,23 +137,23 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule> extends
   RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> timeTable);
 
   /**
-   * Return a transfer provider for the given pattern. When searching forward the given {@code
-   * target} is the TO pattern/stop, while when searching in reverse the given target is the FROM
+   * Return a transfer provider for the given pattern. When searching forward, the given {@code
+   * target} is the TO pattern/stop, while when searching in reverse, the given target is the FROM
    * pattern/stop.
    */
   RaptorConstrainedBoardingSearch<T> transferConstraintsSearch(
-    RaptorTransitDataProvider<T> transitData,
+    RaptorTransferDataProvider<T> transferProvider,
     int routeIndex
   );
 
   /**
    * Returns an iterator over all transfers "from" (or "to" for reverse searches) a stopIndex.
    *
-   * @see RaptorTransitDataProvider#getTransfersFromStop(int)
-   * @see RaptorTransitDataProvider#getTransfersToStop(int)
+   * @see RaptorTransferDataProvider#getTransfersFromStop(int)
+   * @see RaptorTransferDataProvider#getTransfersToStop(int)
    */
   Iterator<? extends RaptorTransfer> getTransfers(
-    RaptorTransitDataProvider<T> transitDataProvider,
+    RaptorTransferDataProvider<T> transferData,
     int fromStop
   );
 

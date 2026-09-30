@@ -10,7 +10,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 
 /**
  * The given Raptor module-test configuration should result in the given expected path string,
@@ -47,7 +47,7 @@ public record RaptorModuleTestCase(
 
   public String run(
     RaptorService<TestTripSchedule> raptorService,
-    RaptorTransitDataProvider<TestTripSchedule> data,
+    RaptorDataProvider<TestTripSchedule> data,
     RaptorRequestBuilder<TestTripSchedule> requestBuilder
   ) {
     return pathsToString(runTest(raptorService, data, requestBuilder));
@@ -55,7 +55,7 @@ public record RaptorModuleTestCase(
 
   public String runDetailedResult(
     RaptorService<TestTripSchedule> raptorService,
-    RaptorTransitDataProvider<TestTripSchedule> data,
+    RaptorDataProvider<TestTripSchedule> data,
     RaptorRequestBuilder<TestTripSchedule> requestBuilder
   ) {
     return pathsToStringDetailed(runTest(raptorService, data, requestBuilder));
@@ -73,7 +73,7 @@ public record RaptorModuleTestCase(
 
   private RaptorResponse<TestTripSchedule> runTest(
     RaptorService<TestTripSchedule> raptorService,
-    RaptorTransitDataProvider<TestTripSchedule> data,
+    RaptorDataProvider<TestTripSchedule> data,
     RaptorRequestBuilder<TestTripSchedule> requestBuilder
   ) {
     return raptorService.route(withConfig(requestBuilder), data);

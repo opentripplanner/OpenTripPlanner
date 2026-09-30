@@ -9,7 +9,7 @@ import org.opentripplanner.raptor.rangeraptor.RangeRaptor;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouter;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -31,7 +31,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private final SearchDirection direction;
   private final String name;
   private final RaptorConfig<T> config;
-  private final RaptorTransitDataProvider<T> transitData;
+  private final RaptorDataProvider<T> data;
 
   private boolean run = false;
   private RaptorRouter<T> search = null;
@@ -42,9 +42,9 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   public HeuristicSearchTask(
     RaptorRequest<T> request,
     RaptorConfig<T> config,
-    RaptorTransitDataProvider<T> transitData
+    RaptorDataProvider<T> data
   ) {
-    this(request.searchDirection(), request.alias(), config, transitData);
+    this(request.searchDirection(), request.alias(), config, data);
     this.originalRequest = request;
   }
 
@@ -52,12 +52,12 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     SearchDirection direction,
     String name,
     RaptorConfig<T> config,
-    RaptorTransitDataProvider<T> transitData
+    RaptorDataProvider<T> data
   ) {
     this.direction = direction;
     this.name = name;
     this.config = config;
-    this.transitData = transitData;
+    this.data = data;
   }
 
   public String name() {
@@ -81,7 +81,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (result == null) {
       return null;
     }
-    return config.createHeuristic(transitData, heuristicRequest, result);
+    return config.createHeuristic(data, heuristicRequest, result);
   }
 
   public HeuristicSearchTask<T> withRequest(RaptorRequest<T> request) {
@@ -145,7 +145,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
       );
 
       heuristicRequest = builder.build();
-      search = config.createRangeRaptorWithHeuristicSearch(transitData, heuristicRequest);
+      search = config.createRangeRaptorWithHeuristicSearch(data, heuristicRequest);
     }
   }
 }

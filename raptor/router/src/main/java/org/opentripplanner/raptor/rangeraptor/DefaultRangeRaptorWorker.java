@@ -14,6 +14,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -66,6 +67,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
   private final RaptorWorkerState<T> state;
 
   private final RaptorTransitDataProvider<T> transitData;
+  private final RaptorTransferDataProvider<T> transferData;
 
   private final SlackProvider slackProvider;
 
@@ -89,6 +91,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
     RaptorWorkerState<T> state,
     RoutingStrategy<T> transitWorker,
     RaptorTransitDataProvider<T> transitData,
+    RaptorTransferDataProvider<T> transferData,
     SlackProvider slackProvider,
     AccessPaths accessPaths,
     RaptorTransitCalculator<T> calculator,
@@ -99,6 +102,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
     this.transitWorker = transitWorker;
     this.state = state;
     this.transitData = transitData;
+    this.transferData = transferData;
     this.slackProvider = slackProvider;
     this.calculator = calculator;
     this.timers = timers;
@@ -174,7 +178,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
         final int fromStop = it.next();
         // no need to consider loop transfers, since we don't mark patterns here any more
         // loop transfers are already included by virtue of those stops having been reached
-        state.transferToStops(fromStop, calculator.getTransfers(transitData, fromStop));
+        state.transferToStops(fromStop, calculator.getTransfers(transferData, fromStop));
       }
     });
   }
@@ -211,7 +215,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule> implem
     IntIterator stopPositions
   ) {
     var txSearch = enableTransferConstraints
-      ? calculator.transferConstraintsSearch(transitData, routeIndex)
+      ? calculator.transferConstraintsSearch(transferData, routeIndex)
       : null;
 
     int alightSlack = slackProvider.alightSlack(pattern.slackIndex());

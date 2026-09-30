@@ -35,15 +35,17 @@ import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorDataProvider;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripPattern;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
 
 /**
- * The search context is used to hold search scoped instances and to pass these to whom ever needs
+ * The search context is used to hold search-scoped instances and to pass these to whom ever needs
  * them. It is one search-context pr RangeRaptor
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -58,7 +60,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /**
    * the transit data role needed for routing
    */
-  protected final RaptorTransitDataProvider<T> transitData;
+  protected final RaptorDataProvider<T> data;
 
   private final RaptorTransitCalculator<T> calculator;
   private final RaptorTuningParameters tuningParameters;
@@ -68,20 +70,22 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
   private final List<SearchContextViaSegments<T>> segments;
 
-  /** Lazy initialized */
+  /**
+   * Lazy initialized
+   */
   private RaptorCostCalculator<T> costCalculator = null;
 
   SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transitData,
+    RaptorDataProvider<T> data,
     AccessPaths accessPaths,
     List<ViaConnections> viaConnections,
     EgressPaths egressPaths
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
-    this.transitData = transitData;
+    this.data = data;
 
     this.calculator = createCalculator(request, tuningParameters);
     this.roundTracker = new RoundTracker(
@@ -96,9 +100,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
   public static <T extends RaptorTripSchedule> SearchContextBuilder<T> of(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit
+    RaptorDataProvider<T> data
   ) {
-    return new SearchContextBuilder<>(request, tuningParameters, transit);
+    return new SearchContextBuilder<>(request, tuningParameters, data);
   }
 
   public List<SearchContextViaSegments<T>> segments() {
@@ -122,7 +126,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   public RaptorTransitDataProvider<T> transitData() {
-    return transitData;
+    return data.transitData();
+  }
+
+  public RaptorTransferDataProvider transferData() {
+    return data.transferData();
   }
 
   public RaptorTransitCalculator<T> calculator() {
@@ -138,7 +146,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   public RaptorSlackProvider raptorSlackProvider() {
-    return transitData.slackProvider();
+    return transitData().slackProvider();
   }
 
   /**
@@ -155,7 +163,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   @Nullable
   public RaptorCostCalculator<T> costCalculator() {
     if (costCalculator == null) {
-      this.costCalculator = transitData.multiCriteriaCostCalculator();
+      this.costCalculator = transitData().multiCriteriaCostCalculator();
     }
     return costCalculator;
   }
@@ -168,12 +176,16 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return request.performanceTimers();
   }
 
-  /** Number of stops in transit graph. */
+  /**
+   * Number of stops in transit graph.
+   */
   public int nStops() {
-    return transitData.numberOfStops();
+    return transitData().numberOfStops();
   }
 
-  /** Calculate the maximum number of rounds to perform. */
+  /**
+   * Calculate the maximum number of rounds to perform.
+   */
   public int nRounds() {
     if (request.searchParams().isMaxNumberOfTransfersSet()) {
       return request.searchParams().maxNumberOfTransfers() + 1;
@@ -211,7 +223,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /* private methods */
 
   public RaptorStopNameResolver stopNameResolver() {
-    return transitData.stopNameResolver();
+    return transitData().stopNameResolver();
   }
 
   public TimeBasedBoardingSupport<T> createTimeBasedBoardingSupport() {

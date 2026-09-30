@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTransferDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.StopTime;
@@ -38,18 +38,19 @@ public class TransferGenerator<T extends RaptorTripSchedule> {
 
   private final TransferServiceAdaptor<T> transferServiceAdaptor;
   private final RaptorSlackProvider slackProvider;
-  private final RaptorTransitDataProvider<T> stdTransfers;
+  private final RaptorTransferDataProvider<T> stdTransfers;
 
   private T fromTrip;
   private T toTrip;
 
   public TransferGenerator(
     TransferServiceAdaptor<T> transferServiceAdaptor,
-    RaptorTransitDataProvider<T> stdTransfers
+    RaptorSlackProvider slackProvider,
+    RaptorTransferDataProvider<T> transferData
   ) {
     this.transferServiceAdaptor = transferServiceAdaptor;
-    this.slackProvider = stdTransfers.slackProvider();
-    this.stdTransfers = stdTransfers;
+    this.slackProvider = slackProvider;
+    this.stdTransfers = transferData;
   }
 
   public List<List<TripToTripTransfer<T>>> findAllPossibleTransfers(
