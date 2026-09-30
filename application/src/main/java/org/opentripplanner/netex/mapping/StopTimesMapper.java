@@ -391,11 +391,17 @@ class StopTimesMapper {
       // the validation takes care of checking that the stop place exists and that it has at
       // least one quay
       var station = stationsById.get(idFactory.createId(stopPlaceId));
-      stopLocation = station
-        .getChildStops()
-        .stream()
-        .min(TransitEntity.idComparator())
-        .orElse(null);
+      stopLocation =
+        station
+          .getChildStops()
+          .stream()
+          .min(TransitEntity.idComparator())
+          // if you see this exception then the validation didn't filter out the passenger stop assignment
+          .orElseThrow(() ->
+            new RuntimeException(
+              "Stop place %s has no quays. This indicates a bug.".formatted(stopPlaceId)
+            )
+          );
     } else if (flexibleStopPlaceId != null) {
       AreaStop areaStop = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
       GroupStop groupStop = groupStopById.get(idFactory.createId(flexibleStopPlaceId));
