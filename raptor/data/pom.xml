@@ -28,6 +28,11 @@
             <artifactId>router</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.core</groupId>
+            <artifactId>model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- 3rd party dependencies -->
         <dependency>
