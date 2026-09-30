@@ -11,6 +11,10 @@ import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferProfileConfig;
+import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
@@ -56,22 +60,28 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 public class TestServerContext {
 
   private TestServerContext() {}
 
   /**
-   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds raptor
-   * transit data, and wraps a pinned timetable snapshot.
+   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds
+   * raptor transit data (including regular transfers through the raptor-data pipeline, mirroring
+   * production graph builds), and wraps a pinned timetable snapshot.
    */
   public static TransitService createTransitService(
+    Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository
   ) {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableHandle = indexAndRegisterTimetableSnapshot(
+      graph,
       transitRepository,
       timetableDataImport.toScheduledTimetableData(),
       transferRepository,
@@ -87,6 +97,7 @@ public class TestServerContext {
     TimetableRepositorySnapshot,
     TimetableRepository
   > indexAndRegisterTimetableSnapshot(
+    Graph graph,
     TransitRepository transitRepository,
     ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository,
@@ -94,12 +105,26 @@ public class TestServerContext {
   ) {
     transitRepository.index();
 
+    var regularTransferRepository = new RegularTransferRepository<NearbyStop>();
+    var transferProfilesConfig = new TransferProfilesConfig(
+      List.of(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT))
+    );
+    new RaptorDataTransferGenerator(
+      graph,
+      transitRepository,
+      transferProfilesConfig,
+      regularTransferRepository
+    ).buildGraph();
+
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
+      graph,
       transitRepository,
       scheduledTimetableData,
-      transferRepository
+      transferRepository,
+      regularTransferRepository,
+      transferProfilesConfig
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
 

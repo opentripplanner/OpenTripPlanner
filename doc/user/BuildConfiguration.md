@@ -1567,27 +1567,9 @@ network that is also built here applies the zones twice.
       "wheelchairAccessibility" : {
         "enabled" : true
       }
-    },
-    {
-      "modes" : "BICYCLE"
-    },
-    {
-      "modes" : "CAR"
     }
   ],
   "stopConsolidationFile" : "consolidated-stops.csv",
-  "transferParametersForMode" : {
-    "CAR" : {
-      "disableDefaultTransfers" : true,
-      "carsAllowedStopMaxTransferDuration" : "3h"
-    },
-    "BIKE" : {
-      "disableDefaultTransfers" : true,
-      "maxTransferDuration" : "30m",
-      "carsAllowedStopMaxTransferDuration" : "3h",
-      "bikesAllowedStopMaxTransferDuration" : "1h"
-    }
-  },
   "cache" : {
     "enabled" : true
   },

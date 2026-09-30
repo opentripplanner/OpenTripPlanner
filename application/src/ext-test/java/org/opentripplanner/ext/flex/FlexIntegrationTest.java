@@ -20,7 +20,6 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
@@ -86,6 +85,7 @@ public class FlexIntegrationTest {
       )
     );
     var transitService = TestServerContext.createTransitService(
+      graph,
       transitRepository,
       timetableDataImport,
       transferRepository
@@ -231,7 +231,6 @@ public class FlexIntegrationTest {
       transitRepository,
       timetableDataImport,
       transferRepository,
-      DataImportIssueStore.NOOP,
       Duration.ofMinutes(10),
       List.of(req)
     ).buildGraph();

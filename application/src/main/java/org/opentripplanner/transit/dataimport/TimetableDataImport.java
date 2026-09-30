@@ -136,16 +136,6 @@ public class TimetableDataImport {
   }
 
   /**
-   * The stops used by scheduled trips that allow bikes, including the regular stops of group
-   * stops.
-   */
-  public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
-    return getStopLocationsUsedByTripTimes(
-      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
-    );
-  }
-
-  /**
    * Convert the content into the immutable scheduled data. The content is copied, so later
    * modifications would not be reflected in it: this freezes the data import, and any later
    * modification fails.

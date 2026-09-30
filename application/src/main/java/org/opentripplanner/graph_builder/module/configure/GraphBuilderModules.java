@@ -310,15 +310,13 @@ public class GraphBuilderModules {
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
-    TransferRepository transferRepository,
-    DataImportIssueStore issueStore
+    TransferRepository transferRepository
   ) {
     return new DirectTransferGenerator(
       graph,
       transitRepository,
       timetableDataImport,
       transferRepository,
-      issueStore,
       config.regularTransferParameters()
     );
   }

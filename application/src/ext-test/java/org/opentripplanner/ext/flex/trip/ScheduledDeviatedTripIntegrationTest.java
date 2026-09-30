@@ -101,6 +101,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var feedId = transitRepository.getFeedIds().iterator().next();
 
     var transitService = TestServerContext.createTransitService(
+      graph,
       transitRepository,
       timetableDataImport,
       transferRepository
@@ -149,6 +150,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var feedId = transitRepository.getFeedIds().iterator().next();
 
     var transitService = TestServerContext.createTransitService(
+      graph,
       transitRepository,
       timetableDataImport,
       transferRepository
