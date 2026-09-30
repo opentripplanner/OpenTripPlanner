@@ -140,9 +140,12 @@ public class ConstructApplication {
     transitRepository.initRaptorTransitData(
       RaptorTransitDataMapper.map(
         tuningParameters,
+        graph,
         transitRepository,
         scheduledTimetableData,
-        transferRepository
+        transferRepository,
+        regularTransferRepository,
+        config.buildConfig().transferProfiles()
       )
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
