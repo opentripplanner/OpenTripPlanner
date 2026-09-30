@@ -289,22 +289,21 @@ public class IslandPruningModule implements GraphBuilderModule {
 
           // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
           neighborsForVertex.put(out, gv);
-          continue;
-        }
-
-        // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
-        // rental/parking edges) that don't behave like a plain permission-gated street edge.
-        if (s0 == null) {
-          s0 = new State(gv, request);
-        }
-        State[] states = e.traverse(s0);
-        if (State.isEmpty(states)) {
-          continue;
-        }
-        for (State state : states) {
-          Vertex out = state.getVertex();
-          neighborsForVertex.put(gv, out);
-          neighborsForVertex.put(out, gv);
+        } else {
+          // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
+          // rental/parking edges) that don't behave like a plain permission-gated street edge.
+          if (s0 == null) {
+            s0 = new State(gv, request);
+          }
+          State[] states = e.traverse(s0);
+          if (State.isEmpty(states)) {
+            continue;
+          }
+          for (State state : states) {
+            Vertex out = state.getVertex();
+            neighborsForVertex.put(gv, out);
+            neighborsForVertex.put(out, gv);
+          }
         }
       }
     }
