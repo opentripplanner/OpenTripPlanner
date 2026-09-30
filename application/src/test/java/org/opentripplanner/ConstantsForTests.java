@@ -183,7 +183,6 @@ public class ConstantsForTests {
         graph,
         transitRepository,
         transferRepository,
-        DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
         List.of(RouteRequest.defaultValue())
       ).buildGraph();

@@ -35,7 +35,6 @@ import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTrans
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -539,16 +538,6 @@ public class TransitRepository implements Serializable {
   public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
     return getStopLocationsUsedByTripTimes(
       tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED
-    );
-  }
-
-  /**
-   * Get the stops that are used by transit capable of transporting bikes.
-   * Real-time updates are not considered.
-   */
-  public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
-    return getStopLocationsUsedByTripTimes(
-      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
     );
   }
 

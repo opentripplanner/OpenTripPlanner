@@ -32,6 +32,7 @@ class DebugVectorTilesResourceTest {
     var graph = new Graph();
     var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     var transitService = TestServerContext.createTransitService(
+      graph,
       new TransitRepository(),
       transferRepository
     );

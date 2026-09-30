@@ -26,10 +26,12 @@ import org.slf4j.LoggerFactory;
  * builds always have one, even without OSM data - see {@code StreetTransferPathProvider}'s
  * straight-line fallback).
  * <p>
- * Runs unconditionally, alongside {@link DirectTransferGenerator}: that module's own
- * {@code PathTransfer} output is still needed for FLEX and as the graph-less fallback
- * ({@code RaptorTransferIndex}) used when {@code RaptorTransitData} is built without this
- * pipeline's wiring (e.g. in tests).
+ * Runs unconditionally, alongside {@link DirectTransferGenerator}: that module now only
+ * generates the FLEX-relevant transfers (walking connectors between {@code RegularStop}s and
+ * flex {@code AreaStop}/{@code GroupStop}s) - regular transfers between {@code RegularStop}s are
+ * exclusively this pipeline's responsibility, so callers that build {@code RaptorTransitData}
+ * without this pipeline's wiring (e.g. in tests, see {@code TestServerContext}) must run this
+ * generator too, or regular transfers will be missing.
  * <p>
  * {@code regularTransferRepository} is injected empty (mirroring {@code TransferRepository}) and
  * populated in place here, so the same instance can be threaded through

@@ -16,123 +16,112 @@ Sections follow that describe particular settings in more depth.
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                                            |         Type         | Summary                                                                                                                                                        |  Req./Opt. | Default Value                     | Since |
-|---------------------------------------------------------------------------------------------|:--------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
-| [areaVisibility](#areaVisibility)                                                           |       `boolean`      | Perform visibility calculations.                                                                                                                               | *Optional* | `false`                           |  1.5  |
-| [buildReportDir](#buildReportDir)                                                           |         `uri`        | URI to the directory where the graph build report should be written to.                                                                                        | *Optional* |                                   |  2.0  |
-| [configVersion](#configVersion)                                                             |       `string`       | Deployment version of the *build-config.json*.                                                                                                                 | *Optional* |                                   |  2.1  |
-| [dataImportReport](#dataImportReport)                                                       |       `boolean`      | Generate nice HTML report of Graph errors/warnings                                                                                                             | *Optional* | `false`                           |  2.0  |
-| [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)                         |       `double`       | The distance between elevation samples in meters.                                                                                                              | *Optional* | `10.0`                            |  2.0  |
-| [elevationTileCacheSizeMB](#elevationTileCacheSizeMB)                                       |       `integer`      | Memory budget in megabytes for the Imagen tile cache used during elevation processing.                                                                         | *Optional* | `100`                             |  2.10 |
-| embedRouterConfig                                                                           |       `boolean`      | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                                   | *Optional* | `true`                            |  2.0  |
-| [graph](#graph)                                                                             |         `uri`        | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
-| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)                     |       `boolean`      | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
-| includeInclinedEdgeLevelInfo                                                                |       `boolean`      | Whether level info for inclined edges should be stored in the graph for use during runtime.                                                                    | *Optional* | `false`                           |  2.9  |
-| maxAreaNodes                                                                                |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
-| [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                                   |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
-| maxElevationPropagationMeters                                                               |       `integer`      | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
-| [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                                   |       `double`       | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
-| maxTransferDuration                                                                         |      `duration`      | Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph.                                               | *Optional* | `"PT30M"`                         |  2.1  |
-| [multiThreadElevationCalculations](#multiThreadElevationCalculations)                       |       `boolean`      | Configuring multi-threading during elevation calculations.                                                                                                     | *Optional* | `false`                           |  2.0  |
-| [osmCacheDataInMem](#osmCacheDataInMem)                                                     |       `boolean`      | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
-| [osmNaming](#osmNaming)                                                                     |        `enum`        | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
-| [platformEntriesLinking](#platformEntriesLinking)                                           |       `boolean`      | Link stairways, elevators and other entries that fall inside a platform's outline into that platform's walking area.                                           | *Optional* | `false`                           |  2.0  |
-| staticBikeParkAndRide                                                                       |       `boolean`      | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
-| staticParkAndRide                                                                           |       `boolean`      | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
-| stopConsolidationFile                                                                       |         `uri`        | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
-| [streetGraph](#streetGraph)                                                                 |         `uri`        | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
-| [subwayAccessTime](#subwayAccessTime)                                                       |       `double`       | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
-| [transitModelTimeZone](#transitModelTimeZone)                                               |      `time-zone`     | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
-| [transitServiceEnd](#transitServiceEnd)                                                     |      `duration`      | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
-| [transitServiceStart](#transitServiceStart)                                                 |      `duration`      | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
-| [boardingLocationTags](#boardingLocationTags)                                               |      `string[]`      | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
-| [cache](#cache)                                                                             |       `object`       | Configuration for the graph-build file cache.                                                                                                                  | *Optional* |                                   |  2.10 |
-|    [enabled](#cache_enabled)                                                                |       `boolean`      | Master switch for the graph-build cache.                                                                                                                       | *Optional* | `false`                           |  2.10 |
-|    [path](#cache_path)                                                                      |         `uri`        | Root directory for cache files.                                                                                                                                | *Optional* |                                   |  2.10 |
-|    [tasks](#cache_tasks)                                                                    |      `enum set`      | Which graph-build computations to cache between builds.                                                                                                        | *Optional* |                                   |  2.10 |
-| [dataOverlay](sandbox/DataOverlay.md)                                                       |       `object`       | Config for the DataOverlay Sandbox module                                                                                                                      | *Optional* |                                   |  2.2  |
-| [dem](#dem)                                                                                 |      `object[]`      | Specify parameters for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.2  |
-|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)                             |       `double`       | Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.                                         | *Optional* | `1.0`                             |  2.3  |
-|       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
-| demDefaults                                                                                 |       `object`       | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
-|    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)                          |       `double`       | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
-| [elevationBucket](#elevationBucket)                                                         |       `object`       | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
-| [elevatorRefTags](#elevatorRefTags)                                                         |      `object[]`      | Groups of OSM tags whose values are combined into an elevator id.                                                                                              | *Optional* |                                   |  2.10 |
-|       [tagGroup](#elevatorRefTags_0_tagGroup)                                               |      `string[]`      | The ordered OSM tag keys whose values are combined into one id.                                                                                                | *Optional* |                                   |  2.10 |
-| [emission](sandbox/Emission.md)                                                             |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
-| empiricalDelay                                                                              |       `object`       | Empirical delay configuration.                                                                                                                                 | *Optional* |                                   |  2.9  |
-| [fares](sandbox/Fares.md)                                                                   |       `object`       | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
-| gsConfig                                                                                    |       `object`       | Configuration for Google Cloud Storage                                                                                                                         | *Optional* |                                   |  2.8  |
-| gtfsDefaults                                                                                |       `object`       | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
-|    blockBasedInterlining                                                                    |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
-|    [discardMinTransferTimes](#gd_discardMinTransferTimes)                                   |       `boolean`      | Should minimum transfer times in GTFS files be discarded.                                                                                                      | *Optional* | `false`                           |  2.3  |
-|    maxInterlineDistance                                                                     |       `integer`      | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
-|    [stationTransferPreference](#gd_stationTransferPreference)                               |        `enum`        | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
-| islandPruning                                                                               |       `object`       | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
-|    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)                        |       `integer`      | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
-|    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)                            |       `double`       | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
-|    [islandWithStopsMaxSize](#islandPruning_islandWithStopsMaxSize)                          |       `integer`      | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `2`                               |  2.3  |
-|    [islandWithoutStopsMaxSize](#islandPruning_islandWithoutStopsMaxSize)                    |       `integer`      | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `10`                              |  2.3  |
-| [localFileNamePatterns](#localFileNamePatterns)                                             |       `object`       | Patterns for matching OTP file types in the base directory                                                                                                     | *Optional* |                                   |  2.0  |
-|    [dem](#lfp_dem)                                                                          |       `regexp`       | Pattern for matching elevation DEM files.                                                                                                                      | *Optional* | `"(?i)\.tiff?$"`                  |  2.0  |
-|    [gtfs](#lfp_gtfs)                                                                        |       `regexp`       | Patterns for matching GTFS zip-files or directories.                                                                                                           | *Optional* | `"(?i)gtfs"`                      |  2.0  |
-|    [netex](#lfp_netex)                                                                      |       `regexp`       | Patterns for matching NeTEx zip files or directories.                                                                                                          | *Optional* | `"(?i)netex"`                     |  2.0  |
-|    [osm](#lfp_osm)                                                                          |       `regexp`       | Pattern for matching Open Street Map input files.                                                                                                              | *Optional* | `"(?i)(\.pbf¦\.osm¦\.osm\.xml)$"` |  2.0  |
-| netexDefaults                                                                               |       `object`       | The netexDefaults section allows you to specify default properties for NeTEx files.                                                                            | *Optional* |                                   |  2.2  |
-|    feedId                                                                                   |       `string`       | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Optional* | `"NETEX"`                         |  2.2  |
-|    [groupFilePattern](#nd_groupFilePattern)                                                 |       `regexp`       | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
-|    ignoreFareFrame                                                                          |       `boolean`      | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
-|    [ignoreFilePattern](#nd_ignoreFilePattern)                                               |       `regexp`       | Pattern for matching ignored files in a NeTEx bundle.                                                                                                          | *Optional* | `"$^"`                            |  2.0  |
-|    ignoreParking                                                                            |       `boolean`      | Ignore Parking elements.                                                                                                                                       | *Optional* | `true`                            |  2.6  |
-|    noTransfersOnIsolatedStops                                                               |       `boolean`      | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                                                       | *Optional* | `false`                           |  2.2  |
-|    [sharedFilePattern](#nd_sharedFilePattern)                                               |       `regexp`       | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
-|    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                                     |       `regexp`       | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
-|    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)                         |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
-| [osm](#osm)                                                                                 |      `object[]`      | Configure properties for a given OpenStreetMap feed.                                                                                                           | *Optional* |                                   |  2.2  |
-|       includeOsmStationEntrances                                                            |       `boolean`      | Whether to include station entrances from the OSM data. Overrides the value specified in `osmDefaults`.                                                        | *Optional* | `false`                           |  2.10 |
-|       [osmTagMapping](#osm_0_osmTagMapping)                                                 |        `enum`        | The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.                                                  | *Optional* | `"default"`                       |  2.2  |
-|       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
-|       timeZone                                                                              |      `time-zone`     | The timezone used to resolve opening hours in OSM data. Overrides the value specified in `osmDefaults`.                                                        | *Optional* |                                   |  2.2  |
-| osmDefaults                                                                                 |       `object`       | Default properties for OpenStreetMap feeds.                                                                                                                    | *Optional* |                                   |  2.2  |
-|    includeOsmStationEntrances                                                               |       `boolean`      | Whether to include station entrances from the OSM data.                                                                                                        | *Optional* | `false`                           |  2.10 |
-|    [osmTagMapping](#od_osmTagMapping)                                                       |        `enum`        | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
-|    timeZone                                                                                 |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
-| [transferParametersForMode](#transferParametersForMode)                                     | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
-|    BIKE                                                                                     |       `object`       | NA                                                                                                                                                             | *Optional* |                                   |  2.7  |
-|       [bikesAllowedStopMaxTransferDuration](#tpfm_BIKE_bikesAllowedStopMaxTransferDuration) |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.9  |
-|       [carsAllowedStopMaxTransferDuration](#tpfm_BIKE_carsAllowedStopMaxTransferDuration)   |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow cars.                      | *Optional* |                                   |  2.7  |
-|       [disableDefaultTransfers](#tpfm_BIKE_disableDefaultTransfers)                         |       `boolean`      | This disables default transfer calculations.                                                                                                                   | *Optional* | `false`                           |  2.7  |
-|       [maxTransferDuration](#tpfm_BIKE_maxTransferDuration)                                 |      `duration`      | This overwrites the default `maxTransferDuration` for the given mode.                                                                                          | *Optional* |                                   |  2.7  |
-|    CAR                                                                                      |       `object`       | NA                                                                                                                                                             | *Optional* |                                   |  2.7  |
-|       [bikesAllowedStopMaxTransferDuration](#tpfm_CAR_bikesAllowedStopMaxTransferDuration)  |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow bikes.                     | *Optional* |                                   |  2.9  |
-|       [carsAllowedStopMaxTransferDuration](#tpfm_CAR_carsAllowedStopMaxTransferDuration)    |      `duration`      | This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow cars.                      | *Optional* |                                   |  2.7  |
-|       [disableDefaultTransfers](#tpfm_CAR_disableDefaultTransfers)                          |       `boolean`      | This disables default transfer calculations.                                                                                                                   | *Optional* | `false`                           |  2.7  |
-|       [maxTransferDuration](#tpfm_CAR_maxTransferDuration)                                  |      `duration`      | This overwrites the default `maxTransferDuration` for the given mode.                                                                                          | *Optional* |                                   |  2.7  |
-| [transferRequests](RouteRequest.md)                                                         |      `object[]`      | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
-| [transfers](#transfers)                                                                     |       `object`       | Transfer profiles for the raptor-data regular-transfer pipeline.                                                                                               | *Optional* |                                   |  2.10 |
-| [transitFeeds](#transitFeeds)                                                               |      `object[]`      | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
-|    { object }                                                                               |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
-|       type = "gtfs"                                                                         |        `enum`        | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
-|       blockBasedInterlining                                                                 |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id. Overrides the value specified in `gtfsDefaults`.                          | *Optional* | `true`                            |  2.3  |
-|       [discardMinTransferTimes](#tf_0_discardMinTransferTimes)                              |       `boolean`      | Should minimum transfer times in GTFS files be discarded. Overrides the value specified in `gtfsDefaults`.                                                     | *Optional* | `false`                           |  2.3  |
-|       feedId                                                                                |       `string`       | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                                        | *Optional* |                                   |  2.2  |
-|       maxInterlineDistance                                                                  |       `integer`      | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle. Overrides the value specified in `gtfsDefaults`. | *Optional* | `200`                             |  2.3  |
-|       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
-|       [stationTransferPreference](#tf_0_stationTransferPreference)                          |        `enum`        | Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.                | *Optional* | `"allowed"`                       |  2.3  |
-|    { object }                                                                               |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
-|       type = "netex"                                                                        |        `enum`        | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
-|       feedId                                                                                |       `string`       | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Required* |                                   |  2.2  |
-|       [groupFilePattern](#tf_1_groupFilePattern)                                            |       `regexp`       | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
-|       ignoreFareFrame                                                                       |       `boolean`      | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
-|       [ignoreFilePattern](#tf_1_ignoreFilePattern)                                          |       `regexp`       | Pattern for matching ignored files in a NeTEx bundle.                                                                                                          | *Optional* | `"$^"`                            |  2.0  |
-|       ignoreParking                                                                         |       `boolean`      | Ignore Parking elements.                                                                                                                                       | *Optional* | `true`                            |  2.6  |
-|       noTransfersOnIsolatedStops                                                            |       `boolean`      | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                                                       | *Optional* | `false`                           |  2.2  |
-|       [sharedFilePattern](#tf_1_sharedFilePattern)                                          |       `regexp`       | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
-|       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)                                |       `regexp`       | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
-|       source                                                                                |         `uri`        | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
-|       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle)                    |      `string[]`      | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
-| [transitRouteToStationCentroid](#transitRouteToStationCentroid)                             |  `feed-scoped-id[]`  | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
-| [vehicleRentalGeofencing](#vehicleRentalGeofencing)                                         |       `object`       | Load GBFS geofencing zones into the graph during graph build.                                                                                                  | *Optional* |                                   |  2.10 |
+| Config Parameter                                                         |        Type        | Summary                                                                                                                                                        |  Req./Opt. | Default Value                     | Since |
+|--------------------------------------------------------------------------|:------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
+| [areaVisibility](#areaVisibility)                                        |      `boolean`     | Perform visibility calculations.                                                                                                                               | *Optional* | `false`                           |  1.5  |
+| [buildReportDir](#buildReportDir)                                        |        `uri`       | URI to the directory where the graph build report should be written to.                                                                                        | *Optional* |                                   |  2.0  |
+| [configVersion](#configVersion)                                          |      `string`      | Deployment version of the *build-config.json*.                                                                                                                 | *Optional* |                                   |  2.1  |
+| [dataImportReport](#dataImportReport)                                    |      `boolean`     | Generate nice HTML report of Graph errors/warnings                                                                                                             | *Optional* | `false`                           |  2.0  |
+| [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |      `double`      | The distance between elevation samples in meters.                                                                                                              | *Optional* | `10.0`                            |  2.0  |
+| [elevationTileCacheSizeMB](#elevationTileCacheSizeMB)                    |      `integer`     | Memory budget in megabytes for the Imagen tile cache used during elevation processing.                                                                         | *Optional* | `100`                             |  2.10 |
+| embedRouterConfig                                                        |      `boolean`     | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                                   | *Optional* | `true`                            |  2.0  |
+| [graph](#graph)                                                          |        `uri`       | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
+| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |      `boolean`     | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
+| includeInclinedEdgeLevelInfo                                             |      `boolean`     | Whether level info for inclined edges should be stored in the graph for use during runtime.                                                                    | *Optional* | `false`                           |  2.9  |
+| maxAreaNodes                                                             |      `integer`     | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
+| [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |      `integer`     | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
+| maxElevationPropagationMeters                                            |      `integer`     | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
+| [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                |      `double`      | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
+| maxTransferDuration                                                      |     `duration`     | Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph.                                               | *Optional* | `"PT30M"`                         |  2.1  |
+| [multiThreadElevationCalculations](#multiThreadElevationCalculations)    |      `boolean`     | Configuring multi-threading during elevation calculations.                                                                                                     | *Optional* | `false`                           |  2.0  |
+| [osmCacheDataInMem](#osmCacheDataInMem)                                  |      `boolean`     | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
+| [osmNaming](#osmNaming)                                                  |       `enum`       | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
+| [platformEntriesLinking](#platformEntriesLinking)                        |      `boolean`     | Link stairways, elevators and other entries that fall inside a platform's outline into that platform's walking area.                                           | *Optional* | `false`                           |  2.0  |
+| staticBikeParkAndRide                                                    |      `boolean`     | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
+| staticParkAndRide                                                        |      `boolean`     | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
+| stopConsolidationFile                                                    |        `uri`       | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
+| [streetGraph](#streetGraph)                                              |        `uri`       | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
+| [subwayAccessTime](#subwayAccessTime)                                    |      `double`      | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
+| [transitModelTimeZone](#transitModelTimeZone)                            |     `time-zone`    | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
+| [transitServiceEnd](#transitServiceEnd)                                  |     `duration`     | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
+| [transitServiceStart](#transitServiceStart)                              |     `duration`     | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
+| [boardingLocationTags](#boardingLocationTags)                            |     `string[]`     | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
+| [cache](#cache)                                                          |      `object`      | Configuration for the graph-build file cache.                                                                                                                  | *Optional* |                                   |  2.10 |
+|    [enabled](#cache_enabled)                                             |      `boolean`     | Master switch for the graph-build cache.                                                                                                                       | *Optional* | `false`                           |  2.10 |
+|    [path](#cache_path)                                                   |        `uri`       | Root directory for cache files.                                                                                                                                | *Optional* |                                   |  2.10 |
+|    [tasks](#cache_tasks)                                                 |     `enum set`     | Which graph-build computations to cache between builds.                                                                                                        | *Optional* |                                   |  2.10 |
+| [dataOverlay](sandbox/DataOverlay.md)                                    |      `object`      | Config for the DataOverlay Sandbox module                                                                                                                      | *Optional* |                                   |  2.2  |
+| [dem](#dem)                                                              |     `object[]`     | Specify parameters for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.2  |
+|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |      `double`      | Specify a multiplier to convert elevation units from source to meters. Overrides the value specified in `demDefaults`.                                         | *Optional* | `1.0`                             |  2.3  |
+|       source                                                             |        `uri`       | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
+| demDefaults                                                              |      `object`      | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
+|    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |      `double`      | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
+| [elevationBucket](#elevationBucket)                                      |      `object`      | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
+| [elevatorRefTags](#elevatorRefTags)                                      |     `object[]`     | Groups of OSM tags whose values are combined into an elevator id.                                                                                              | *Optional* |                                   |  2.10 |
+|       [tagGroup](#elevatorRefTags_0_tagGroup)                            |     `string[]`     | The ordered OSM tag keys whose values are combined into one id.                                                                                                | *Optional* |                                   |  2.10 |
+| [emission](sandbox/Emission.md)                                          |      `object`      | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
+| empiricalDelay                                                           |      `object`      | Empirical delay configuration.                                                                                                                                 | *Optional* |                                   |  2.9  |
+| [fares](sandbox/Fares.md)                                                |      `object`      | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
+| gsConfig                                                                 |      `object`      | Configuration for Google Cloud Storage                                                                                                                         | *Optional* |                                   |  2.8  |
+| gtfsDefaults                                                             |      `object`      | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
+|    blockBasedInterlining                                                 |      `boolean`     | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
+|    [discardMinTransferTimes](#gd_discardMinTransferTimes)                |      `boolean`     | Should minimum transfer times in GTFS files be discarded.                                                                                                      | *Optional* | `false`                           |  2.3  |
+|    maxInterlineDistance                                                  |      `integer`     | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
+|    [stationTransferPreference](#gd_stationTransferPreference)            |       `enum`       | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
+| islandPruning                                                            |      `object`      | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
+|    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |      `integer`     | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
+|    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |      `double`      | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
+|    [islandWithStopsMaxSize](#islandPruning_islandWithStopsMaxSize)       |      `integer`     | When a graph island with stops in it should be pruned.                                                                                                         | *Optional* | `2`                               |  2.3  |
+|    [islandWithoutStopsMaxSize](#islandPruning_islandWithoutStopsMaxSize) |      `integer`     | When a graph island without stops should be pruned.                                                                                                            | *Optional* | `10`                              |  2.3  |
+| [localFileNamePatterns](#localFileNamePatterns)                          |      `object`      | Patterns for matching OTP file types in the base directory                                                                                                     | *Optional* |                                   |  2.0  |
+|    [dem](#lfp_dem)                                                       |      `regexp`      | Pattern for matching elevation DEM files.                                                                                                                      | *Optional* | `"(?i)\.tiff?$"`                  |  2.0  |
+|    [gtfs](#lfp_gtfs)                                                     |      `regexp`      | Patterns for matching GTFS zip-files or directories.                                                                                                           | *Optional* | `"(?i)gtfs"`                      |  2.0  |
+|    [netex](#lfp_netex)                                                   |      `regexp`      | Patterns for matching NeTEx zip files or directories.                                                                                                          | *Optional* | `"(?i)netex"`                     |  2.0  |
+|    [osm](#lfp_osm)                                                       |      `regexp`      | Pattern for matching Open Street Map input files.                                                                                                              | *Optional* | `"(?i)(\.pbf¦\.osm¦\.osm\.xml)$"` |  2.0  |
+| netexDefaults                                                            |      `object`      | The netexDefaults section allows you to specify default properties for NeTEx files.                                                                            | *Optional* |                                   |  2.2  |
+|    feedId                                                                |      `string`      | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Optional* | `"NETEX"`                         |  2.2  |
+|    [groupFilePattern](#nd_groupFilePattern)                              |      `regexp`      | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
+|    ignoreFareFrame                                                       |      `boolean`     | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
+|    [ignoreFilePattern](#nd_ignoreFilePattern)                            |      `regexp`      | Pattern for matching ignored files in a NeTEx bundle.                                                                                                          | *Optional* | `"$^"`                            |  2.0  |
+|    ignoreParking                                                         |      `boolean`     | Ignore Parking elements.                                                                                                                                       | *Optional* | `true`                            |  2.6  |
+|    noTransfersOnIsolatedStops                                            |      `boolean`     | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                                                       | *Optional* | `false`                           |  2.2  |
+|    [sharedFilePattern](#nd_sharedFilePattern)                            |      `regexp`      | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
+|    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                  |      `regexp`      | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
+|    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)      |     `string[]`     | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
+| [osm](#osm)                                                              |     `object[]`     | Configure properties for a given OpenStreetMap feed.                                                                                                           | *Optional* |                                   |  2.2  |
+|       includeOsmStationEntrances                                         |      `boolean`     | Whether to include station entrances from the OSM data. Overrides the value specified in `osmDefaults`.                                                        | *Optional* | `false`                           |  2.10 |
+|       [osmTagMapping](#osm_0_osmTagMapping)                              |       `enum`       | The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.                                                  | *Optional* | `"default"`                       |  2.2  |
+|       source                                                             |        `uri`       | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
+|       timeZone                                                           |     `time-zone`    | The timezone used to resolve opening hours in OSM data. Overrides the value specified in `osmDefaults`.                                                        | *Optional* |                                   |  2.2  |
+| osmDefaults                                                              |      `object`      | Default properties for OpenStreetMap feeds.                                                                                                                    | *Optional* |                                   |  2.2  |
+|    includeOsmStationEntrances                                            |      `boolean`     | Whether to include station entrances from the OSM data.                                                                                                        | *Optional* | `false`                           |  2.10 |
+|    [osmTagMapping](#od_osmTagMapping)                                    |       `enum`       | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
+|    timeZone                                                              |     `time-zone`    | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
+| [transferRequests](RouteRequest.md)                                      |     `object[]`     | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
+| [transfers](#transfers)                                                  |      `object`      | Transfer profiles for the raptor-data regular-transfer pipeline.                                                                                               | *Optional* |                                   |  2.10 |
+| [transitFeeds](#transitFeeds)                                            |     `object[]`     | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
+|    { object }                                                            |      `object`      | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
+|       type = "gtfs"                                                      |       `enum`       | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
+|       blockBasedInterlining                                              |      `boolean`     | Whether to create stay-seated transfers in between two trips with the same block id. Overrides the value specified in `gtfsDefaults`.                          | *Optional* | `true`                            |  2.3  |
+|       [discardMinTransferTimes](#tf_0_discardMinTransferTimes)           |      `boolean`     | Should minimum transfer times in GTFS files be discarded. Overrides the value specified in `gtfsDefaults`.                                                     | *Optional* | `false`                           |  2.3  |
+|       feedId                                                             |      `string`      | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                                        | *Optional* |                                   |  2.2  |
+|       maxInterlineDistance                                               |      `integer`     | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle. Overrides the value specified in `gtfsDefaults`. | *Optional* | `200`                             |  2.3  |
+|       source                                                             |        `uri`       | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
+|       [stationTransferPreference](#tf_0_stationTransferPreference)       |       `enum`       | Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.                | *Optional* | `"allowed"`                       |  2.3  |
+|    { object }                                                            |      `object`      | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
+|       type = "netex"                                                     |       `enum`       | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
+|       feedId                                                             |      `string`      | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                                    | *Required* |                                   |  2.2  |
+|       [groupFilePattern](#tf_1_groupFilePattern)                         |      `regexp`      | Pattern for matching group NeTEx files.                                                                                                                        | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
+|       ignoreFareFrame                                                    |      `boolean`     | Ignore contents of the FareFrame                                                                                                                               | *Optional* | `false`                           |  2.3  |
+|       [ignoreFilePattern](#tf_1_ignoreFilePattern)                       |      `regexp`      | Pattern for matching ignored files in a NeTEx bundle.                                                                                                          | *Optional* | `"$^"`                            |  2.0  |
+|       ignoreParking                                                      |      `boolean`     | Ignore Parking elements.                                                                                                                                       | *Optional* | `true`                            |  2.6  |
+|       noTransfersOnIsolatedStops                                         |      `boolean`     | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                                                       | *Optional* | `false`                           |  2.2  |
+|       [sharedFilePattern](#tf_1_sharedFilePattern)                       |      `regexp`      | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                                                     | *Optional* | `"shared-data\.xml"`              |  2.0  |
+|       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |      `regexp`      | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
+|       source                                                             |        `uri`       | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
+|       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |     `string[]`     | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
+| [transitRouteToStationCentroid](#transitRouteToStationCentroid)          | `feed-scoped-id[]` | List stations that should route to centroid.                                                                                                                   | *Optional* |                                   |  2.7  |
+| [vehicleRentalGeofencing](#vehicleRentalGeofencing)                      |      `object`      | Load GBFS geofencing zones into the graph during graph build.                                                                                                  | *Optional* |                                   |  2.10 |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -1037,174 +1026,6 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 The named set of mapping rules applied when parsing OSM tags.
 
-<h3 id="transferParametersForMode">transferParametersForMode</h3>
-
-**Since version:** `2.7` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
-**Path:** /   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `carpool` | `flexible`
-
-Configures mode-specific properties for transfer calculations.
-
-This field enables configuring mode-specific parameters for transfer calculations.
-To configure mode-specific parameters, the modes should also be used in the `transferRequests` field in the build config.
-
-**Example**
-
-```JSON
-// build-config.json
-{
-  "transferParametersForMode": {
-    "CAR": {
-      "disableDefaultTransfers": true,
-      "carsAllowedStopMaxTransferDuration": "3h"
-    },
-    "BIKE": {
-      "maxTransferDuration": "30m",
-      "carsAllowedStopMaxTransferDuration": "3h"
-    }
-  }
-}
-```
-
-
-<h3 id="tpfm_BIKE_bikesAllowedStopMaxTransferDuration">bikesAllowedStopMaxTransferDuration</h3>
-
-**Since version:** `2.9` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
-**Path:** /transferParametersForMode/BIKE 
-
-This is used for specifying a `maxTransferDuration` value to use with transfers between
-stops which are visited by trips that allow bikes.
-
-
-Configures a separate `maxTransferDuration` for the given mode, used only for transfers
-between stops visited by trips that allow bikes, instead of the given mode's
-`maxTransferDuration`.
-
-In combination with the mode's `maxTransferDuration` you can include transfers for bikes
-between all stops in a smaller radius, and use a larger radius for transfers between
-stops where bikes are explicit allowed.
-
-
-<h3 id="tpfm_BIKE_carsAllowedStopMaxTransferDuration">carsAllowedStopMaxTransferDuration</h3>
-
-**Since version:** `2.7` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
-**Path:** /transferParametersForMode/BIKE 
-
-This is used for specifying a `maxTransferDuration` value to use with transfers between
-stops which are visited by trips that allow cars.
-
-
-Configures a separate `maxTransferDuration` for the given mode, used only for transfers
-between stops visited by trips that allow cars (e.g. car ferries), instead of the given
-mode's `maxTransferDuration`.
-
-This can also be configured for other modes. For example, for bikes, this can enable
-transfers between ferry stops that would otherwise be out of range, since car ferries
-usually also allow bikes. This is useful for bike routes using ferries near the Turku
-archipelago in Finland, for example.
-
-
-<h3 id="tpfm_BIKE_disableDefaultTransfers">disableDefaultTransfers</h3>
-
-**Since version:** `2.7` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /transferParametersForMode/BIKE 
-
-This disables default transfer calculations.
-
-By default, transfers are calculated between all stop pairs within the given mode's
-`maxTransferDuration`. This parameter disables that default calculation for the mode.
-
-This is used together with `carsAllowedStopMaxTransferDuration` or
-`bikesAllowedStopMaxTransferDuration`, so that only the restricted, relevant transfers are
-calculated.
-
-
-<h3 id="tpfm_BIKE_maxTransferDuration">maxTransferDuration</h3>
-
-**Since version:** `2.7` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
-**Path:** /transferParametersForMode/BIKE 
-
-This overwrites the default `maxTransferDuration` for the given mode.
-
-A car or a bike can cover a much larger distance than walking within the same duration.
-Reusing this value would reduce the search radius, calculating fewer transfers and
-decreases the graph memory usage.
-
-If it isn't known which stops actually allow cars/bikes, combine a lower value here with
-`carsAllowedStopMaxTransferDuration` or `bikesAllowedStopMaxTransferDuration` as a
-compromise: this bounds memory usage for stops in general, while the allowed-stop field
-still supplies a longer range for the stops it is known to be needed for.
-
-
-<h3 id="tpfm_CAR_bikesAllowedStopMaxTransferDuration">bikesAllowedStopMaxTransferDuration</h3>
-
-**Since version:** `2.9` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
-**Path:** /transferParametersForMode/CAR 
-
-This is used for specifying a `maxTransferDuration` value to use with transfers between
-stops which are visited by trips that allow bikes.
-
-
-Configures a separate `maxTransferDuration` for the given mode, used only for transfers
-between stops visited by trips that allow bikes, instead of the given mode's
-`maxTransferDuration`.
-
-In combination with the mode's `maxTransferDuration` you can include transfers for bikes
-between all stops in a smaller radius, and use a larger radius for transfers between
-stops where bikes are explicit allowed.
-
-
-<h3 id="tpfm_CAR_carsAllowedStopMaxTransferDuration">carsAllowedStopMaxTransferDuration</h3>
-
-**Since version:** `2.7` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
-**Path:** /transferParametersForMode/CAR 
-
-This is used for specifying a `maxTransferDuration` value to use with transfers between
-stops which are visited by trips that allow cars.
-
-
-Configures a separate `maxTransferDuration` for the given mode, used only for transfers
-between stops visited by trips that allow cars (e.g. car ferries), instead of the given
-mode's `maxTransferDuration`.
-
-This can also be configured for other modes. For example, for bikes, this can enable
-transfers between ferry stops that would otherwise be out of range, since car ferries
-usually also allow bikes. This is useful for bike routes using ferries near the Turku
-archipelago in Finland, for example.
-
-
-<h3 id="tpfm_CAR_disableDefaultTransfers">disableDefaultTransfers</h3>
-
-**Since version:** `2.7` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /transferParametersForMode/CAR 
-
-This disables default transfer calculations.
-
-By default, transfers are calculated between all stop pairs within the given mode's
-`maxTransferDuration`. This parameter disables that default calculation for the mode.
-
-This is used together with `carsAllowedStopMaxTransferDuration` or
-`bikesAllowedStopMaxTransferDuration`, so that only the restricted, relevant transfers are
-calculated.
-
-
-<h3 id="tpfm_CAR_maxTransferDuration">maxTransferDuration</h3>
-
-**Since version:** `2.7` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`   
-**Path:** /transferParametersForMode/CAR 
-
-This overwrites the default `maxTransferDuration` for the given mode.
-
-A car or a bike can cover a much larger distance than walking within the same duration.
-Reusing this value would reduce the search radius, calculating fewer transfers and
-decreases the graph memory usage.
-
-If it isn't known which stops actually allow cars/bikes, combine a lower value here with
-`carsAllowedStopMaxTransferDuration` or `bikesAllowedStopMaxTransferDuration` as a
-compromise: this bounds memory usage for stops in general, while the allowed-stop field
-still supplies a longer range for the stops it is known to be needed for.
-
-
 <h3 id="transfers">transfers</h3>
 
 **Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
@@ -1471,27 +1292,9 @@ network that is also built here applies the zones twice.
       "wheelchairAccessibility" : {
         "enabled" : true
       }
-    },
-    {
-      "modes" : "BICYCLE"
-    },
-    {
-      "modes" : "CAR"
     }
   ],
   "stopConsolidationFile" : "consolidated-stops.csv",
-  "transferParametersForMode" : {
-    "CAR" : {
-      "disableDefaultTransfers" : true,
-      "carsAllowedStopMaxTransferDuration" : "3h"
-    },
-    "BIKE" : {
-      "disableDefaultTransfers" : true,
-      "maxTransferDuration" : "30m",
-      "carsAllowedStopMaxTransferDuration" : "3h",
-      "bikesAllowedStopMaxTransferDuration" : "1h"
-    }
-  },
   "cache" : {
     "enabled" : true
   }

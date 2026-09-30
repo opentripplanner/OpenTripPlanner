@@ -20,7 +20,6 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -121,46 +120,6 @@ class TransitRepositoryTest {
     var stop = TransitRepositoryForTest.of().stop("stop-1").build();
     repo.addScheduledStopPointMapping(Map.of(sspId, stop));
     assertEquals(stop, repo.findStopByScheduledStopPoint(sspId).get());
-  }
-
-  @Test
-  void testGetStopLocationsUsedForBikesAllowedTrips() {
-    var repo = new TransitRepository();
-    var S11 = TransitRepositoryForTest.of().stop("S11").build();
-    var S12 = TransitRepositoryForTest.of().stop("S12").build();
-    var S13 = TransitRepositoryForTest.of().stop("S13").build();
-    var S21 = TransitRepositoryForTest.of().stop("S21").build();
-    var S22 = TransitRepositoryForTest.of().stop("S22").build();
-    var S23 = TransitRepositoryForTest.of().stop("S23").build();
-    var R1 = route("R1").withMode(TransitMode.BUS).build();
-    var R2 = route("R2").withMode(TransitMode.BUS).build();
-    var TP1 = tripPattern("TP1", R1)
-      .withStopPattern(stopPattern(S11, S12, S13))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
-          ScheduledTripTimes.of()
-            .withTrip(TransitRepositoryForTest.trip("T1").build())
-            .withDepartureTimes("00:00 01:00 02:00")
-            .build()
-        )
-      )
-      .build();
-    var TP2 = tripPattern("TP2", R2)
-      .withStopPattern(stopPattern(S21, S22, S23))
-      .withScheduledTimeTableBuilder(builder ->
-        builder.addTripTimes(
-          ScheduledTripTimes.of()
-            .withTrip(
-              TransitRepositoryForTest.trip("T2").withBikesAllowed(BikeAccess.ALLOWED).build()
-            )
-            .withDepartureTimes("00:00 01:00 02:00")
-            .build()
-        )
-      )
-      .build();
-    repo.addTripPattern(id("TP1"), TP1);
-    repo.addTripPattern(id("TP2"), TP2);
-    assertEquals(Set.of(S21, S22, S23), repo.getStopLocationsUsedForBikesAllowedTrips());
   }
 
   @Test

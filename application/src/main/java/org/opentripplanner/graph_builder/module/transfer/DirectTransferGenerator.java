@@ -3,20 +3,15 @@ package org.opentripplanner.graph_builder.module.transfer;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferParametersForMode;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.PatternConsideringNearbyStopFinder;
@@ -38,9 +33,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilderModule} module that links up the
- * stops of a transit network among themselves. This is necessary for routing in long-distance
- * mode.
+ * {@link GraphBuilderModule} module that generates the transfers used by FLEX routing: walking
+ * connectors between {@link RegularStop}s and the flex {@code AreaStop}/{@code GroupStop}s, in
+ * both directions - stop-to-flex-stop (used for flex egress) and flex-stop-to-stop (used for flex
+ * access).
  * <p>
  * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
  * will use straight-line distance between stops.
@@ -49,51 +45,44 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(DirectTransferGenerator.class);
 
-  private final Duration defaultMaxTransferDuration;
+  private static final int NO_STOP_COUNT_LIMIT = 0;
 
+  private final Duration maxTransferDuration;
   private final List<RouteRequest> transferRequests;
-  private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final TransferRepository transferRepository;
-  private final DataImportIssueStore issueStore;
-
-  private static final int NO_STOP_COUNT_LIMIT = 0;
 
   /**
-   * Constructor used in tests. This initializes transferParametersForMode as an empty map.
+   * Constructor used in tests.
    */
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    DataImportIssueStore issueStore,
-    Duration defaultMaxTransferDuration,
+    Duration maxTransferDuration,
     List<RouteRequest> transferRequests
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
-    this.issueStore = issueStore;
-    this.defaultMaxTransferDuration = defaultMaxTransferDuration;
+    this.maxTransferDuration = maxTransferDuration;
     this.transferRequests = transferRequests;
     this.transferRepository = transferRepository;
-    this.transferParametersForMode = Map.of();
   }
 
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    DataImportIssueStore issueStore,
     RegularTransferParameters parameters
   ) {
-    this.graph = graph;
-    this.transitRepository = transitRepository;
-    this.issueStore = issueStore;
-    this.defaultMaxTransferDuration = parameters.maxDuration();
-    this.transferRequests = parameters.requests();
-    this.transferParametersForMode = parameters.parametersForMode();
-    this.transferRepository = transferRepository;
+    this(
+      graph,
+      transitRepository,
+      transferRepository,
+      parameters.maxDuration(),
+      parameters.requests()
+    );
   }
 
   @Override
@@ -105,21 +94,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
-    Set<StopLocation> carsAllowedStops =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
-    Set<StopLocation> bikesAllowedStops =
-      transitRepository.getStopLocationsUsedForBikesAllowedTrips();
 
-    LOG.info("Creating transfers based on requests:");
-    transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
-    if (transferParametersForMode.isEmpty()) {
-      LOG.info("No mode-specific transfer configurations provided.");
-    } else {
-      LOG.info("Using transfer configurations for modes:");
-      transferParametersForMode.forEach((mode, transferParameters) ->
-        LOG.info(mode + ": " + transferParameters)
-      );
-    }
+    // Flex transfers only use the WALK mode, and are only needed when flex routing is enabled.
+    List<RouteRequest> flexTransferRequests = OTPFeature.FlexRouting.isOn()
+      ? transferRequests
+          .stream()
+          .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
+          .toList()
+      : List.of();
+
+    LOG.info("Creating flex transfers based on requests:");
+    flexTransferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
 
     ProgressTracker progress = ProgressTracker.track(
       "Create transfer edges for stops",
@@ -135,32 +120,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       HashMultimap.create()
     );
 
-    // Parse the transfer configuration from the parameters given in the build config.
-    TransferConfiguration transferConfiguration = parseTransferParameters();
-
-    var transitService = new DefaultTransitService(transitRepository);
-    var emptyStops = transitRepository
-      .getSiteRepository()
-      .listStopLocations()
-      .stream()
-      .filter(stop -> transitService.findPatterns(stop).isEmpty())
-      .toList();
-
-    /*
-     * Mark all empty stops as bike allowed stops.
-     *
-     * This is needed when trains carrying bikes can change platforms.
-     * TODO: This will not work when a bike-carrying train changes platforms to one which is
-     *  scheduled to be used only by non-bike-carrying trains.
-     */
-    bikesAllowedStops.addAll(emptyStops);
-
     stops
       .stream()
       .parallel()
       .forEach(ts0 -> {
-        /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
-         * Use map based on the list of edges, so that only distinct transfers are stored. */
+        /* Use a map based on the list of edges, so that only distinct transfers are stored. */
         Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
         RegularStop stop = Objects.requireNonNull(
           transitRepository.getSiteRepository().getRegularStop(ts0.getId())
@@ -172,45 +136,16 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        calculateDefaultTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers
-        );
         calculateFlexTransfers(
           nearbyStopFinder,
-          transferConfiguration,
+          flexTransferRequests,
           ts0,
           stop,
           distinctTransfers
         );
-        calculateCarsAllowedTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers,
-          carsAllowedStops
-        );
-        calculateBikesAllowedTransfers(
-          nearbyStopFinder,
-          transferConfiguration,
-          ts0,
-          stop,
-          distinctTransfers,
-          bikesAllowedStops
-        );
 
-        LOG.debug(
-          "Linked stop {} with {} transfers to stops with different patterns.",
-          stop,
-          distinctTransfers.size()
-        );
-        if (distinctTransfers.isEmpty()) {
-          issueStore.add(new StopNotLinkedForTransfers(ts0));
-        } else {
+        LOG.debug("Linked stop {} with {} flex transfers.", stop, distinctTransfers.size());
+        if (!distinctTransfers.isEmpty()) {
           distinctTransfers
             .values()
             .forEach(transfer -> transfersByStop.put(transfer.from, transfer));
@@ -227,21 +162,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     LOG.info(progress.completeMessage());
     LOG.info(
-      "Done connecting stops to one another. Created a total of {} transfers from {} stops.",
+      "Done connecting stops to one another. Created a total of {} flex transfers from {} stops.",
       nTransfersTotal,
       nLinkedStops
     );
-    transferRequests
-      .stream()
-      .map(transferProfile -> transferProfile.journey().transfer().mode())
-      .distinct()
-      .forEach(mode ->
-        LOG.info(
-          "Created {} transfers for mode {}.",
-          transferRepository.findTransfersByMode(mode).size(),
-          mode
-        )
-      );
   }
 
   /**
@@ -291,266 +215,52 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method parses the given transfer parameters into a transfer configuration and checks for invalid input.
+   * Generates the flex transfers for a stop, in both directions: {@code Stop -> AreaStop/GroupStop}
+   * (used for flex egress) and {@code AreaStop/GroupStop -> Stop} (used for flex access).
    */
-  private TransferConfiguration parseTransferParameters() {
-    List<RouteRequest> defaultTransferRequests = new ArrayList<>();
-    List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<>();
-    List<RouteRequest> bikesAllowedStopTransferRequests = new ArrayList<>();
-    List<RouteRequest> flexTransferRequests = new ArrayList<>();
-    Map<StreetMode, Duration> defaultDurationLimitForMode = new HashMap<>();
-    // These are used for calculating transfers only between carsAllowedStops.
-    Map<StreetMode, Duration> carsAllowedStopDurationLimitForMode = new HashMap<>();
-    Map<StreetMode, Duration> bikesAllowedStopDurationLimitForMode = new HashMap<>();
-
-    // Check that the mode specified in transferParametersForMode can also be found in transferRequests.
-    for (StreetMode mode : transferParametersForMode.keySet()) {
-      if (
-        transferRequests
-          .stream()
-          .noneMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
-      ) {
-        throw new IllegalArgumentException(
-          String.format(
-            "Mode %s is used in transferParametersForMode but not in transferRequests",
-            mode
-          )
-        );
-      }
-    }
-
-    for (RouteRequest transferProfile : transferRequests) {
-      StreetMode mode = transferProfile.journey().transfer().mode();
-      var transferParameters = transferParametersForMode.get(mode);
-      if (transferParameters != null) {
-        // WALK mode transfers can not be disabled. For example, flex transfers need them.
-        if (transferParameters.disableDefaultTransfers() && mode == StreetMode.WALK) {
-          throw new IllegalArgumentException("WALK mode transfers can not be disabled");
-        }
-        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers
-        // is set in the build config.
-        if (!transferParameters.disableDefaultTransfers()) {
-          defaultTransferRequests.add(transferProfile);
-          // Set mode-specific maxDuration, if it is set in the build config.
-          Duration maxDuration = transferParameters.maxDuration();
-          if (maxDuration != null) {
-            defaultDurationLimitForMode.put(mode, maxDuration);
-          } else {
-            defaultDurationLimitForMode.put(mode, defaultMaxTransferDuration);
-          }
-        }
-        // Create transfers between carsAllowedStops for the specific mode if
-        // carsAllowedStopMaxDuration is set in the build config.
-        Duration carsAllowedStopMaxDuration = transferParameters.carsAllowedStopMaxDuration();
-        if (carsAllowedStopMaxDuration != null) {
-          carsAllowedStopTransferRequests.add(transferProfile);
-          carsAllowedStopDurationLimitForMode.put(mode, carsAllowedStopMaxDuration);
-        }
-        // Create transfers between bikesAllowedStops for the specific mode if
-        // bikesAllowedStopMaxDuration is set in the build config.
-        Duration bikesAllowedStopMaxDuration = transferParameters.bikesAllowedStopMaxDuration();
-        if (bikesAllowedStopMaxDuration != null) {
-          bikesAllowedStopTransferRequests.add(transferProfile);
-          bikesAllowedStopDurationLimitForMode.put(mode, bikesAllowedStopMaxDuration);
-        }
-      } else {
-        defaultTransferRequests.add(transferProfile);
-        defaultDurationLimitForMode.put(mode, defaultMaxTransferDuration);
-      }
-    }
-
-    // Flex transfer requests only use the WALK mode.
-    if (OTPFeature.FlexRouting.isOn()) {
-      flexTransferRequests.addAll(
-        transferRequests
-          .stream()
-          .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
-          .toList()
-      );
-    }
-
-    return new TransferConfiguration(
-      defaultTransferRequests,
-      carsAllowedStopTransferRequests,
-      bikesAllowedStopTransferRequests,
-      flexTransferRequests,
-      defaultDurationLimitForMode,
-      carsAllowedStopDurationLimitForMode,
-      bikesAllowedStopDurationLimitForMode
-    );
-  }
-
-  /**
-   * This method calculates default transfers.
-   */
-  private void calculateDefaultTransfers(
+  private void calculateFlexTransfers(
     NearbyStopFinder nearbyStopFinder,
-    TransferConfiguration transferConfiguration,
+    List<RouteRequest> flexTransferRequests,
     TransitStopVertex ts0,
     RegularStop stop,
     Map<TransferKey, PathTransfer> distinctTransfers
   ) {
-    for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
-      StreetMode mode = transferProfile.journey().transfer().mode();
-      Duration durationLimit = transferConfiguration.defaultDurationLimitForMode().get(mode);
-      var nearbyStops = nearbyStopFinder.findNearbyStops(
+    var repository = transitRepository.getSiteRepository();
+    for (RouteRequest transferProfile : flexTransferRequests) {
+      // Flex transfer requests only use the WALK mode.
+      StreetMode mode = StreetMode.WALK;
+
+      for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
         ts0,
         transferProfile,
         mode,
         false,
-        durationLimit,
+        maxTransferDuration,
         NO_STOP_COUNT_LIMIT
-      );
-      var repository = transitRepository.getSiteRepository();
-      for (NearbyStop sd : nearbyStops) {
-        // Skip the origin stop, loop transfers are not needed.
+      )) {
         var nearbyStop = repository.getStopLocation(sd.stopId);
-        if (nearbyStop.equals(stop)) {
+        if (nearbyStop.equals(stop) || nearbyStop instanceof RegularStop) {
           continue;
         }
         createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
       }
-    }
-  }
 
-  /**
-   * This method calculates flex transfers if flex routing is enabled.
-   */
-  private void calculateFlexTransfers(
-    NearbyStopFinder nearbyStopFinder,
-    TransferConfiguration transferConfiguration,
-    TransitStopVertex ts0,
-    RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers
-  ) {
-    for (RouteRequest transferProfile : transferConfiguration.flexTransferRequests()) {
-      // Flex transfer requests only use the WALK mode.
-      StreetMode mode = StreetMode.WALK;
-      Duration durationLimit = transferConfiguration.defaultDurationLimitForMode().get(mode);
-      var nearbyStops = nearbyStopFinder.findNearbyStops(
+      for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
         ts0,
         transferProfile,
         mode,
         true,
-        durationLimit,
+        maxTransferDuration,
         NO_STOP_COUNT_LIMIT
-      );
-      // This code is for finding transfers from AreaStops to Stops, transfers
-      // from Stops to AreaStops and between Stops are already covered above.
-      var repository = transitRepository.getSiteRepository();
-      for (NearbyStop sd : nearbyStops) {
-        // Skip the origin stop, loop transfers are not needed.
+      )) {
         var nearbyStop = repository.getStopLocation(sd.stopId);
-        if (nearbyStop.equals(stop)) {
+        if (nearbyStop.equals(stop) || nearbyStop instanceof RegularStop) {
           continue;
         }
-        if (nearbyStop instanceof RegularStop) {
-          continue;
-        }
-        // The TransferKey and PathTransfer are created differently for flex routing.
         createPathTransfer(nearbyStop, stop, sd, distinctTransfers, mode);
       }
     }
   }
-
-  /**
-   * This method calculates transfers between stops that are visited by trips that allow cars, if configured.
-   */
-  private void calculateCarsAllowedTransfers(
-    NearbyStopFinder nearbyStopFinder,
-    TransferConfiguration transferConfiguration,
-    TransitStopVertex ts0,
-    RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers,
-    Set<StopLocation> carsAllowedStops
-  ) {
-    if (carsAllowedStops.contains(stop)) {
-      for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
-        calculateTransfersForStopWithAllowedStops(
-          nearbyStopFinder,
-          ts0,
-          stop,
-          distinctTransfers,
-          carsAllowedStops,
-          transferProfile,
-          transferConfiguration.carsAllowedStopDurationLimitForMode
-        );
-      }
-    }
-  }
-
-  /**
-   * This method calculates transfers between stops that are visited by trips that allow bikes, if configured.
-   */
-  private void calculateBikesAllowedTransfers(
-    NearbyStopFinder nearbyStopFinder,
-    TransferConfiguration transferConfiguration,
-    TransitStopVertex ts0,
-    RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers,
-    Set<StopLocation> bikesAllowedStops
-  ) {
-    if (bikesAllowedStops.contains(stop)) {
-      for (RouteRequest transferProfile : transferConfiguration.bikesAllowedStopTransferRequests()) {
-        calculateTransfersForStopWithAllowedStops(
-          nearbyStopFinder,
-          ts0,
-          stop,
-          distinctTransfers,
-          bikesAllowedStops,
-          transferProfile,
-          transferConfiguration.bikesAllowedStopDurationLimitForMode
-        );
-      }
-    }
-  }
-
-  private void calculateTransfersForStopWithAllowedStops(
-    NearbyStopFinder nearbyStopFinder,
-    TransitStopVertex ts0,
-    RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers,
-    Set<StopLocation> allowedStops,
-    RouteRequest transferProfile,
-    Map<StreetMode, Duration> durationLimitForMode
-  ) {
-    StreetMode mode = transferProfile.journey().transfer().mode();
-    Duration durationLimit = durationLimitForMode.get(mode);
-    var nearbyStops = nearbyStopFinder.findNearbyStops(
-      ts0,
-      transferProfile,
-      mode,
-      false,
-      durationLimit,
-      NO_STOP_COUNT_LIMIT
-    );
-    var repository = transitRepository.getSiteRepository();
-    for (NearbyStop sd : nearbyStops) {
-      var nearbyStop = repository.getStopLocation(sd.stopId);
-      // Skip the origin stop, loop transfers are not needed.
-      if (nearbyStop.equals(stop)) {
-        continue;
-      }
-      if (nearbyStop.transfersNotAllowed()) {
-        continue;
-      }
-      // Only calculate transfers between allowedStops.
-      if (!allowedStops.contains(nearbyStop)) {
-        continue;
-      }
-      createPathTransfer(stop, nearbyStop, sd, distinctTransfers, mode);
-    }
-  }
-
-  private record TransferConfiguration(
-    List<RouteRequest> defaultTransferRequests,
-    List<RouteRequest> carsAllowedStopTransferRequests,
-    List<RouteRequest> bikesAllowedStopTransferRequests,
-    List<RouteRequest> flexTransferRequests,
-    Map<StreetMode, Duration> defaultDurationLimitForMode,
-    Map<StreetMode, Duration> carsAllowedStopDurationLimitForMode,
-    Map<StreetMode, Duration> bikesAllowedStopDurationLimitForMode
-  ) {}
 
   private record TransferKey(StopLocation source, StopLocation target, List<Edge> edges) {}
 }

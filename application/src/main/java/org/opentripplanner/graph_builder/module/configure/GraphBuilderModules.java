@@ -260,14 +260,12 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
-    TransferRepository transferRepository,
-    DataImportIssueStore issueStore
+    TransferRepository transferRepository
   ) {
     return new DirectTransferGenerator(
       graph,
       transitRepository,
       transferRepository,
-      issueStore,
       config.regularTransferParameters()
     );
   }

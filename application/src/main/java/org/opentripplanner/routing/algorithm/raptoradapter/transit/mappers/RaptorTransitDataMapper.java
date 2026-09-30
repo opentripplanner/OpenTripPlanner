@@ -80,9 +80,10 @@ public class RaptorTransitDataMapper {
   }
 
   /**
-   * Without raptor-data wiring - the permanent graph-less/test entry point. Regular transfers
-   * fall back to the {@code RaptorTransferIndex} mechanism built from {@code transferRepository}.
-   * Used by tests and any deployment building {@code RaptorTransitData} without a {@code Graph}.
+   * Without raptor-data wiring - the graph-less entry point. {@code DirectTransferGenerator} no
+   * longer generates regular (non-FLEX) transfers, so {@code transferRepository} has none to fall
+   * back on here: regular transfers will be empty unless the raptor-data pipeline (see the other
+   * {@code map} overload, and {@code RaptorDataTransferGenerator}) is run first.
    */
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,

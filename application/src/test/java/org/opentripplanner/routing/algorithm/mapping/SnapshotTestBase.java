@@ -91,6 +91,7 @@ public abstract class SnapshotTestBase {
     if (routingService == null) {
       TestOtpModel model = getGraph();
       transitService = TestServerContext.createTransitService(
+        model.graph(),
         model.transitRepository(),
         model.transferRepository()
       );

@@ -96,6 +96,7 @@ public class BicycleRoutingTest {
     var linkingRequest = LinkingContextRequestMapper.map(request);
     var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
     var transitService = TestServerContext.createTransitService(
+      graph,
       new TransitRepository(),
       TransferServiceTestFactory.defaultTransferRepository()
     );
