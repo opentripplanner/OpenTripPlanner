@@ -276,13 +276,15 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    DataImportIssueStore issueStore
   ) {
     return new RaptorDataTransferGenerator(
       graph,
       transitRepository,
       config.transferProfiles(),
-      regularTransferRepository
+      regularTransferRepository,
+      issueStore
     );
   }
 

@@ -11,6 +11,7 @@ import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfileConfig;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
@@ -108,7 +109,8 @@ public class TestServerContext {
       graph,
       transitRepository,
       transferProfilesConfig,
-      regularTransferRepository
+      regularTransferRepository,
+      DataImportIssueStore.NOOP
     ).buildGraph();
 
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
