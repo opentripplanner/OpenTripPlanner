@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -93,9 +94,10 @@ public class IslandPruningModule implements GraphBuilderModule {
     // note that visibility vertices must not be removed from the graph
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
-    var visibilityVertices = StreamUtils.ofIterable(graph.findEdges(AreaEdge.class)).collect(
-      Collectors.toSet()
-    );
+    Set<Vertex> visibilityVertices = StreamUtils.ofIterable(graph.findEdges(AreaEdge.class))
+      .distinct()
+      .flatMap(v -> v.getArea().visibilityVertices().stream())
+      .collect(Collectors.toSet());
 
     int removed = 0;
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
