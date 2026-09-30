@@ -37,6 +37,7 @@ import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.plan.Emission;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -55,6 +56,7 @@ import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -108,6 +110,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.transferRepository(),
+      new RegularTransferRepository<>(),
       weRepo,
       parkingRepository,
       emissionRepository,
@@ -141,6 +144,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.transferRepository(),
+      new RegularTransferRepository<>(),
       worldEnvelopeRepository,
       parkingRepository,
       emissionRepository,
@@ -249,6 +253,7 @@ public class GraphSerializationTest {
     StreetRepository streetRepository,
     TransitRepository originalTransitRepository,
     TransferRepository originalTransferRepository,
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
     EmissionRepository emissionRepository,
@@ -264,6 +269,7 @@ public class GraphSerializationTest {
       streetRepository,
       originalTransitRepository,
       originalTransferRepository,
+      regularTransferRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
       BuildConfig.DEFAULT,

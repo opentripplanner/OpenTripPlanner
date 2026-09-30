@@ -63,6 +63,11 @@
             <artifactId>router</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.opentripplanner.raptor</groupId>
+            <artifactId>data</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- 3rd party dependencies -->
         <dependency>
