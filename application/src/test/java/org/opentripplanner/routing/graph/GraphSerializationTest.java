@@ -40,6 +40,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.plan.Emission;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
@@ -61,6 +62,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 import org.slf4j.Logger;
 
 /**
@@ -116,6 +118,7 @@ public class GraphSerializationTest {
       model.transitRepository(),
       model.timetableDataImport(),
       model.transferRepository(),
+      new RegularTransferRepository<>(),
       weRepo,
       parkingRepository,
       emissionRepository,
@@ -150,6 +153,7 @@ public class GraphSerializationTest {
       model.transitRepository(),
       model.timetableDataImport(),
       model.transferRepository(),
+      new RegularTransferRepository<>(),
       worldEnvelopeRepository,
       parkingRepository,
       emissionRepository,
@@ -292,6 +296,7 @@ public class GraphSerializationTest {
     TransitRepository originalTransitRepository,
     TimetableDataImport originalTimetableDataImport,
     TransferRepository originalTransferRepository,
+    RegularTransferRepository<NearbyStop> regularTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
     EmissionRepository emissionRepository,
@@ -308,6 +313,7 @@ public class GraphSerializationTest {
       originalTransitRepository,
       originalTimetableDataImport,
       originalTransferRepository,
+      regularTransferRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
       BuildConfig.DEFAULT,

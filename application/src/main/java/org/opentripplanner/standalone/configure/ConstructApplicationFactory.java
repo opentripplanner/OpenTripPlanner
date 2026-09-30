@@ -35,6 +35,7 @@ import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.ext.taxi.configure.TaxiServiceModule;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -78,6 +79,7 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
 
@@ -128,6 +130,7 @@ public interface ConstructApplicationFactory {
   TransitRepository transitRepository();
 
   TransferRepository transferRepository();
+  RegularTransferRepository<NearbyStop> regularTransferRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RepositoryHandle<
@@ -227,6 +230,11 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
+
+    @BindsInstance
+    Builder regularTransferRepository(
+      RegularTransferRepository<NearbyStop> regularTransferRepository
+    );
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

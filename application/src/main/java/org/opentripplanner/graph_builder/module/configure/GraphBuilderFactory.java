@@ -42,8 +42,10 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.configure.VertexLinkerGraphBuildingModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -58,6 +60,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 
 @Singleton
 @Component(
@@ -79,6 +82,9 @@ public interface GraphBuilderFactory {
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
   DataImportIssueReporter dataImportIssueReporter();
   DirectTransferGenerator directTransferGenerator();
+
+  RaptorDataTransferGenerator raptorDataTransferGenerator();
+
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
   GraphBuilder graphBuilder();
@@ -139,6 +145,11 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
+
+    @BindsInstance
+    Builder regularTransferRepository(
+      RegularTransferRepository<NearbyStop> regularTransferRepository
+    );
 
     @BindsInstance
     Builder osmInfoGraphBuildRepository(OsmInfoGraphBuildRepository osmInfoGraphBuildRepository);

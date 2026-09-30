@@ -37,6 +37,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
 import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
+import org.opentripplanner.graph_builder.module.transfer.RaptorDataTransferGenerator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -44,6 +45,7 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -58,6 +60,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
 
 /**
  * Configure all modules that are not simple enough to be injected.
@@ -317,6 +320,22 @@ public class GraphBuilderModules {
       transferRepository,
       issueStore,
       config.regularTransferParameters()
+    );
+  }
+
+  @Provides
+  @Singleton
+  static RaptorDataTransferGenerator provideRaptorDataTransferGenerator(
+    BuildConfig config,
+    Graph graph,
+    TransitRepository transitRepository,
+    RegularTransferRepository<NearbyStop> regularTransferRepository
+  ) {
+    return new RaptorDataTransferGenerator(
+      graph,
+      transitRepository,
+      config.transferProfiles(),
+      regularTransferRepository
     );
   }
 
