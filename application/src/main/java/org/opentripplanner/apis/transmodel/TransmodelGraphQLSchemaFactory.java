@@ -1373,10 +1373,10 @@ public class TransmodelGraphQLSchemaFactory {
           )
           .dataFetcher(environment ->
             GqlUtil.getVehicleRentalService(environment).getVehicleRentalStationForEnvelope(
-              environment.getArgument("minimumLongitude"),
-              environment.getArgument("minimumLatitude"),
-              environment.getArgument("maximumLongitude"),
-              environment.getArgument("maximumLatitude")
+              GqlUtil.getNonNullDoubleArgument(environment, "minimumLongitude"),
+              GqlUtil.getNonNullDoubleArgument(environment, "minimumLatitude"),
+              GqlUtil.getNonNullDoubleArgument(environment, "maximumLongitude"),
+              GqlUtil.getNonNullDoubleArgument(environment, "maximumLatitude")
             )
           )
           .build()

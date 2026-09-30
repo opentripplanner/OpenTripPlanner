@@ -64,7 +64,29 @@ public class GqlUtilTest {
     );
   }
 
-  private static DataFetchingEnvironment buildEnvWithTestValue(Integer value) {
+  @Test
+  void testGetNonNullDoubleArgumentWithValue() {
+    var env = buildEnvWithTestValue(59.9);
+    assertEquals(59.9, GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT));
+  }
+
+  @Test
+  void testGetNonNullDoubleArgumentWithNullValue() {
+    var env = buildEnvWithTestValue(null);
+    assertThrows(InvalidInputException.class, () ->
+      GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT)
+    );
+  }
+
+  @Test
+  void testGetNonNullDoubleArgumentWithoutValue() {
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT).build();
+    assertThrows(InvalidInputException.class, () ->
+      GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT)
+    );
+  }
+
+  private static DataFetchingEnvironment buildEnvWithTestValue(Object value) {
     Map<String, Object> argsMap = new HashMap<>();
     argsMap.put(TEST_ARGUMENT, value);
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)
