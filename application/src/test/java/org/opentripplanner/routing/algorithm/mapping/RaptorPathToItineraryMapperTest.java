@@ -208,6 +208,7 @@ public class RaptorPathToItineraryMapperTest {
     PathLeg<RaptorTripSchedule> transferLeg = new TransferPathLeg<>(
       S1.getIndex(),
       0,
+      S2.getIndex(),
       0,
       0,
       raptorTransfer,
