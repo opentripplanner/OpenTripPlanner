@@ -115,6 +115,15 @@
       "minimumReleaseAge": "7 days"
     },
     {
+      "groupName": "Trusted libraries (major versions)",
+      "matchPackageNames": [
+        "com.google.errorprone:error_prone_annotations"
+      ],
+      "schedule": "monthly",
+      "automerge": true,
+      "minimumReleaseAge": "7 days"
+    },
+    {
       // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
       "description": "GraphQL Java (ignoring snapshot builds)",
       "matchPackageNames": [
