@@ -244,15 +244,30 @@ public class CarpoolTrip
     return getId().toString();
   }
 
+  /** Value comparison: same id and content, the stops compared by value too. */
   @Override
   public boolean sameAs(CarpoolTrip other) {
     return (
       getId().equals(other.getId()) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
-      stops.equals(other.stops) &&
+      Objects.equals(provider, other.provider) &&
+      totalCapacity == other.totalCapacity &&
+      sameStops(other.stops) &&
       Objects.equals(publicContactInformation, other.publicContactInformation)
     );
+  }
+
+  private boolean sameStops(List<CarpoolStop> otherStops) {
+    if (stops.size() != otherStops.size()) {
+      return false;
+    }
+    for (int i = 0; i < stops.size(); i++) {
+      if (!stops.get(i).sameAs(otherStops.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

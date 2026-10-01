@@ -3,18 +3,19 @@ package org.opentripplanner.ext.carpooling.internal;
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_EAST;
-import static org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData.withDummyVertices;
+import static org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData.withDummyVertices;
 
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolTripTestData;
-import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.model.CarpoolTripBuilder;
+import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 class DefaultCarpoolingRepositoryTest {
@@ -29,6 +30,51 @@ class DefaultCarpoolingRepositoryTest {
     0,
     ZoneId.of("Europe/Oslo")
   );
+
+  /** A one-leg trip whose corridor envelope is the given box. */
+  private static RoutableCarpoolTrip tripCovering(ZonedDateTime endTime, Envelope envelope) {
+    var trip = withDummyVertices(tripEndingAt(endTime));
+    var corridor = new CarpoolCorridor(
+      List.of(Duration.ofMinutes(10)),
+      List.of(Duration.ofMinutes(21)),
+      List.of(),
+      List.of(envelope)
+    );
+    return new RoutableCarpoolTrip(trip.trip(), trip.vertices(), corridor);
+  }
+
+  @Test
+  void findsTripsWhoseCorridorEnvelopeContainsThePoint() {
+    var repository = new DefaultCarpoolingRepository();
+    var trondheim = tripCovering(NOON.plusHours(2), new Envelope(10.2, 10.6, 63.3, 63.5));
+    var steinkjer = tripCovering(NOON.plusHours(3), new Envelope(11.3, 11.7, 63.9, 64.1));
+    repository.upsertCarpoolTrip(trondheim);
+    repository.upsertCarpoolTrip(steinkjer);
+
+    assertThat(repository.getCarpoolTripsNear(new WgsCoordinate(63.43, 10.39))).containsExactly(
+      trondheim
+    );
+    assertThat(repository.getCarpoolTripsNear(new WgsCoordinate(64.0, 11.5))).containsExactly(
+      steinkjer
+    );
+    assertThat(repository.getCarpoolTripsNear(new WgsCoordinate(60.0, 10.0))).isEmpty();
+  }
+
+  @Test
+  void indexFollowsReplacementRemovalAndExpiry() {
+    var repository = new DefaultCarpoolingRepository();
+    var trip = tripCovering(NOON, new Envelope(10.2, 10.6, 63.3, 63.5));
+    var trondheim = new WgsCoordinate(63.43, 10.39);
+    repository.upsertCarpoolTrip(trip);
+    assertThat(repository.getCarpoolTripsNear(trondheim)).containsExactly(trip);
+
+    repository.removeCarpoolTrip(trip.trip().getId());
+    assertThat(repository.getCarpoolTripsNear(trondheim)).isEmpty();
+
+    repository.upsertCarpoolTrip(trip);
+    repository.removeExpiredTrips(NOON.plusHours(1).toInstant(), Duration.ZERO);
+    assertThat(repository.getCarpoolTripsNear(trondheim)).isEmpty();
+  }
 
   @Test
   void removesTripsThatEndedBeforeTheThreshold() {
@@ -106,115 +152,6 @@ class DefaultCarpoolingRepositoryTest {
       repository.removeExpiredTrips(NOON.plusHours(2).toInstant(), Duration.ZERO)
     ).isEqualTo(1);
     assertThat(repository.getCarpoolTrips()).isEmpty();
-  }
-
-  @Test
-  void keepsCachedRoutingAcrossASameGeometryUpsert() {
-    var repository = new DefaultCarpoolingRepository();
-    var trip = tripWithCoordinates("kept", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
-    repository.upsertCarpoolTrip(withDummyVertices(trip));
-    repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
-
-    // A budget- or time-only update keeps the same route points, so the cache survives.
-    var updated = tripWithCoordinates("kept", OSLO_CENTER, OSLO_EAST, NOON.plusHours(2));
-    repository.upsertCarpoolTrip(withDummyVertices(updated));
-
-    var cached = repository.cachedBaselineRouting(updated);
-    assertThat(cached).isNotNull();
-    assertThat(cached.legDurations()).asList().containsExactly(Duration.ofMinutes(12));
-  }
-
-  @Test
-  void cachesAnUnroutableBaseline() {
-    var repository = new DefaultCarpoolingRepository();
-    var trip = tripWithCoordinates("unroutable", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
-    repository.upsertCarpoolTrip(withDummyVertices(trip));
-    repository.cacheBaselineRouting(trip, null);
-
-    // A cached failure is a hit (so the trip is not re-routed) whose durations are absent.
-    var cached = repository.cachedBaselineRouting(trip);
-    assertThat(cached).isNotNull();
-    assertThat(cached.legDurations()).isNull();
-  }
-
-  @Test
-  void ignoresCachedRoutingWhenQueriedWithDifferentGeometry() {
-    var repository = new DefaultCarpoolingRepository();
-    var trip = tripWithCoordinates("guard", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
-    repository.upsertCarpoolTrip(withDummyVertices(trip));
-    repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
-
-    // A concurrent re-route can leave an entry under this id while the trip already has new
-    // geometry. Validating against the trip's route points treats that as a miss rather than
-    // serving a stale verdict.
-    var moved = tripWithCoordinates("guard", OSLO_CENTER, new WgsCoordinate(60.0, 11.0), NOON);
-    assertThat(repository.cachedBaselineRouting(moved)).isNull();
-  }
-
-  @Test
-  void dropsCachedRoutingWhenTripRemoved() {
-    var repository = new DefaultCarpoolingRepository();
-    var trip = tripWithCoordinates("removed", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
-    repository.upsertCarpoolTrip(withDummyVertices(trip));
-    repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
-
-    repository.removeCarpoolTrip(trip.getId());
-
-    assertThat(repository.cachedBaselineRouting(trip)).isNull();
-  }
-
-  @Test
-  void dropsCachedRoutingWhenTripExpires() {
-    var repository = new DefaultCarpoolingRepository();
-    var trip = tripWithCoordinates("expired", OSLO_CENTER, OSLO_EAST, NOON);
-    repository.upsertCarpoolTrip(withDummyVertices(trip));
-    repository.cacheBaselineRouting(trip, new Duration[] { Duration.ofMinutes(12) });
-
-    repository.removeExpiredTrips(NOON.plusHours(1).toInstant(), Duration.ZERO);
-
-    assertThat(repository.cachedBaselineRouting(trip)).isNull();
-  }
-
-  @Test
-  void returnsADefensiveCopyOfCachedDurations() {
-    var repository = new DefaultCarpoolingRepository();
-    var trip = tripWithCoordinates("copy", OSLO_CENTER, OSLO_EAST, NOON.plusHours(1));
-    repository.upsertCarpoolTrip(withDummyVertices(trip));
-    var stored = new Duration[] { Duration.ofMinutes(12) };
-    repository.cacheBaselineRouting(trip, stored);
-
-    // Neither mutating the stored source array nor the returned array may corrupt the cache.
-    stored[0] = Duration.ofMinutes(99);
-    repository.cachedBaselineRouting(trip).legDurations()[0] = Duration.ofMinutes(7);
-
-    assertThat(repository.cachedBaselineRouting(trip).legDurations())
-      .asList()
-      .containsExactly(Duration.ofMinutes(12));
-  }
-
-  private static CarpoolTrip tripWithCoordinates(
-    String id,
-    WgsCoordinate origin,
-    WgsCoordinate destination,
-    ZonedDateTime endTime
-  ) {
-    return new CarpoolTripBuilder(FeedScopedId.ofNullable("TEST", id))
-      .withStops(
-        List.of(
-          CarpoolStop.of(FeedScopedId.ofNullable("TEST", id + "-origin"))
-            .withCoordinate(origin)
-            .withOnboardCount(1)
-            .build(),
-          CarpoolStop.of(FeedScopedId.ofNullable("TEST", id + "-destination"))
-            .withCoordinate(destination)
-            .withOnboardCount(1)
-            .build()
-        )
-      )
-      .withTotalCapacity(CarpoolTrip.DEFAULT_TOTAL_CAPACITY)
-      .withStartTime(NOON)
-      .withEndTime(endTime)
-      .build();
   }
 
   private static CarpoolTrip tripEndingAt(ZonedDateTime endTime) {

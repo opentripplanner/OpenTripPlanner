@@ -217,6 +217,14 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
+   * The insertion this leg was built from. The service detaches its segments once the request's
+   * set of legs is final, so only the legs Raptor gets keep their street paths.
+   */
+  public InsertionCandidate insertionCandidate() {
+    return insertionCandidate;
+  }
+
+  /**
    * Label data for the first leg's {@code from} place. For an access this carries the passenger
    * origin; for an egress, the transit stop the passenger alighted from. Read by the itinerary
    * mapper to name the chain's outermost start endpoint.
@@ -302,12 +310,16 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * The carpool route segments traversed by the passenger between pickup and dropoff (inclusive of
-   * intermediate stops the driver makes along the way for other passengers). Never empty for a
-   * valid leg.
+   * The street paths of the carpool route segments traversed by the passenger between pickup and
+   * dropoff (inclusive of intermediate stops the driver makes along the way for other
+   * passengers). Never empty for a valid leg.
+   * <p>
+   * This materialises the paths (see {@link InsertionCandidate#getSharedPaths()}), so it is meant
+   * for the itinerary mapper and {@link #getFinalState()}, both of which run only for the legs
+   * Raptor kept — not for every access/egress candidate.
    */
   public List<GraphPath<State, Edge, Vertex>> sharedSegments() {
-    return insertionCandidate.getSharedSegments();
+    return insertionCandidate.getSharedPaths();
   }
 
   /**

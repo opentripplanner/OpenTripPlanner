@@ -3,30 +3,31 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.StreetSearchBuilder;
-import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A {@link CarpoolRouter} implementation that lazily computes shortest-path trees (SPTs)
- * from/to registered vertices.
+ * from/to registered vertices, as {@link CompactCarTree}s.
  * <p>
  * This is more efficient than individual A* searches when many routes share common
  * origin or destination vertices, as each SPT is computed at most once and reused for all
  * queries involving that vertex. Trees are only computed when first needed by a
  * {@link #route} call, so vertices that are never routed through never incur the cost
  * of tree expansion. Results are cached to avoid redundant tree lookups.
+ * <p>
+ * A {@link #route} answer is read straight off the tree: the tree's elapsed time at the far end
+ * gives the segment's duration, and the full path is only assembled by the tree if
+ * {@link RoutedSegment#path()} is called — which happens for the few segments that make it into
+ * an itinerary, not for the thousands evaluated and discarded per request. A segment that has to
+ * outlive the router keeps its edge chain after {@link RoutedSegment#detach()} and no longer
+ * references the tree.
  * <p>
  * Vertices must be registered via {@link #addVertex} before routing.
  * The router first attempts to use a forward tree from the origin;
@@ -40,9 +41,9 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private final Map<Vertex, VertexRegistration> forwardRegistrations = new HashMap<>();
   private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> forwardTrees = new HashMap<>();
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> reverseTrees = new HashMap<>();
-  private final Map<Pair<Vertex>, GraphPath<State, Edge, Vertex>> pathCache = new HashMap<>();
+  private final Map<Vertex, CompactCarTree> forwardTrees = new HashMap<>();
+  private final Map<Vertex, CompactCarTree> reverseTrees = new HashMap<>();
+  private final Map<Pair<Vertex>, RoutedSegment> segmentCache = new HashMap<>();
   private boolean routingStarted = false;
 
   public enum Direction {
@@ -62,28 +63,11 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
 
   private record VertexRegistration(Vertex vertex, Duration searchLimit) {}
 
-  private ShortestPathTree<State, Edge, Vertex> createTree(
-    Vertex vertex,
-    boolean reverse,
-    Duration searchLimit
-  ) {
-    var streetSearchRequest = reverse
-      ? StreetSearchRequest.of().withMode(StreetMode.CAR).withArriveBy(true).build()
-      : StreetSearchRequest.of().withMode(StreetMode.CAR).build();
-    var builder = StreetSearchBuilder.of()
-      .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
-      .withSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(searchLimit))
-      .withDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .withRequest(streetSearchRequest);
-
-    if (reverse) {
-      return builder.withTo(vertex).getShortestPathTree();
-    }
-
-    return builder.withFrom(vertex).getShortestPathTree();
+  private CompactCarTree createTree(Vertex vertex, boolean reverse, Duration searchLimit) {
+    return CompactCarTree.build(vertex, reverse, searchLimit, null);
   }
 
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateForwardTree(Vertex vertex) {
+  private CompactCarTree getOrCreateForwardTree(Vertex vertex) {
     var tree = forwardTrees.get(vertex);
     if (tree != null) {
       return tree;
@@ -98,7 +82,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     return tree;
   }
 
-  private ShortestPathTree<State, Edge, Vertex> getOrCreateReverseTree(Vertex vertex) {
+  private CompactCarTree getOrCreateReverseTree(Vertex vertex) {
     var tree = reverseTrees.get(vertex);
     if (tree != null) {
       return tree;
@@ -183,14 +167,17 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * been registered with {@link #addVertex} in the matching direction; a call whose endpoints were
    * both left unregistered cannot be served and returns {@code null}. A registered endpoint whose
    * tree does not reach the other endpoint within its search limit returns {@code null} as well.
+   * <p>
+   * The returned segment holds the tree and its far end. Its duration is the tree's elapsed time
+   * there; its path is only assembled when {@link RoutedSegment#path()} is called.
    */
   @Override
-  public GraphPath<State, Edge, Vertex> route(Vertex from, Vertex to) {
+  public RoutedSegment route(Vertex from, Vertex to) {
     routingStarted = true;
 
     var key = new Pair<>(from, to);
-    if (pathCache.containsKey(key)) {
-      return pathCache.get(key);
+    if (segmentCache.containsKey(key)) {
+      return segmentCache.get(key);
     }
 
     var isReverse = false;
@@ -204,8 +191,91 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var path = isReverse ? tree.getPath(from) : tree.getPath(to);
-    pathCache.put(key, path);
-    return path;
+    var farEnd = isReverse ? from : to;
+    int seconds = tree.elapsedSeconds(farEnd);
+    var segment = seconds < 0 ? null : new TreeSegment(from, to, seconds, tree, farEnd);
+    segmentCache.put(key, segment);
+    return segment;
+  }
+
+  /**
+   * A segment answered from a shortest-path tree. {@code farEnd} is the end of the segment that
+   * is not the tree's root: the segment's {@code to} for a forward tree, its {@code from} for a
+   * reverse tree. The tree's elapsed time there is the segment's duration; the tree replays the
+   * path, in chronological order for both search directions, or, once detached, the edge chain
+   * taken from the tree does.
+   */
+  static final class TreeSegment implements RoutedSegment {
+
+    private final Vertex from;
+    private final Vertex to;
+    private final int durationSeconds;
+    private final Vertex farEnd;
+
+    @Nullable
+    private CompactCarTree tree;
+
+    @Nullable
+    private Edge[] edges;
+
+    @Nullable
+    private GraphPath<State, Edge, Vertex> path;
+
+    TreeSegment(Vertex from, Vertex to, int durationSeconds, CompactCarTree tree, Vertex farEnd) {
+      this.from = from;
+      this.to = to;
+      this.durationSeconds = durationSeconds;
+      this.tree = tree;
+      this.farEnd = farEnd;
+    }
+
+    @Override
+    public Vertex from() {
+      return from;
+    }
+
+    @Override
+    public Vertex to() {
+      return to;
+    }
+
+    @Override
+    public int durationSeconds() {
+      return durationSeconds;
+    }
+
+    @Override
+    public GraphPath<State, Edge, Vertex> path() {
+      if (path == null) {
+        detach();
+        boolean reverse = farEnd == from;
+        path = CompactCarTree.path(edges, reverse ? to : from, reverse);
+      }
+      return path;
+    }
+
+    /** Takes the edge chain from the tree and lets go of the tree. */
+    @Override
+    public void detach() {
+      if (edges == null) {
+        edges = tree.edgesTo(farEnd);
+        tree = null;
+      }
+    }
+
+    /** Whether {@link #detach()} has let go of the tree. Package-private for testing. */
+    boolean isDetached() {
+      return tree == null;
+    }
+
+    /** Whether {@link #path()} has been called. Package-private for testing. */
+    boolean isPathMaterialized() {
+      return path != null;
+    }
+
+    @Override
+    public String toString() {
+      return "TreeSegment{" + from + " -> " + to + ", " + durationSeconds() + "s}";
+    }
   }
 }

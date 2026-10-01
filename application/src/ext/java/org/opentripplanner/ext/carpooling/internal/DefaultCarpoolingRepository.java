@@ -2,8 +2,8 @@ package org.opentripplanner.ext.carpooling.internal;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,41 +27,51 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
    */
   private static final Duration SWEEP_INTERVAL = Duration.ofHours(1);
 
-  private final Map<FeedScopedId, CarpoolTripWithVertices> trips = new ConcurrentHashMap<>();
-
-  /**
-   * Outcome of routing each trip's baseline, memoized across requests and tagged with the geometry
-   * it was routed against. Kept in lockstep with {@link #trips}: an entry is dropped whenever the
-   * corresponding trip's route points change or the trip leaves the repository, and a geometry
-   * mismatch is ignored on read. See {@link #cachedBaselineRouting}.
-   */
-  private final Map<FeedScopedId, CacheEntry> baselineRouting = new ConcurrentHashMap<>();
+  private final Map<FeedScopedId, RoutableCarpoolTrip> trips = new ConcurrentHashMap<>();
 
   /** The earliest instant at which the next expiry sweep is allowed to run. */
   private final AtomicReference<Instant> nextSweep = new AtomicReference<>(Instant.MIN);
 
+  /**
+   * Trips by the grid cells their corridor envelopes cover, kept in lockstep with {@link #trips}:
+   * registered when stored with a corridor, forgotten when replaced, removed or expired.
+   */
+  private final TripSpatialIndex spatialIndex = new TripSpatialIndex();
+
   @Override
-  public Collection<CarpoolTripWithVertices> getCarpoolTrips() {
+  public Collection<RoutableCarpoolTrip> getCarpoolTrips() {
     return trips.values();
   }
 
   @Override
   @Nullable
-  public CarpoolTripWithVertices getCarpoolTrip(FeedScopedId id) {
+  public RoutableCarpoolTrip getCarpoolTrip(FeedScopedId id) {
     return trips.get(id);
   }
 
   @Override
-  public void upsertCarpoolTrip(CarpoolTripWithVertices tripWithVertices) {
-    CarpoolTrip trip = tripWithVertices.trip();
-    CarpoolTripWithVertices existing = trips.put(trip.getId(), tripWithVertices);
-    // A read already validates the cached entry against the trip's geometry, so correctness does
-    // not depend on this drop; it just promptly frees an entry whose route points changed instead
-    // of letting it linger until the trip is removed or expires. A budget- or time-only update
-    // keeps the same route points, so the entry survives and is reused.
-    if (existing == null || !existing.trip().routePoints().equals(trip.routePoints())) {
-      baselineRouting.remove(trip.getId());
+  public Collection<RoutableCarpoolTrip> getCarpoolTripsNear(WgsCoordinate point) {
+    var result = new ArrayList<RoutableCarpoolTrip>();
+    for (var id : spatialIndex.near(point.latitude(), point.longitude())) {
+      var trip = trips.get(id);
+      if (trip == null) {
+        continue;
+      }
+      for (var envelope : trip.corridor().legEnvelopes()) {
+        if (envelope.contains(point.longitude(), point.latitude())) {
+          result.add(trip);
+          break;
+        }
+      }
     }
+    return result;
+  }
+
+  @Override
+  public void upsertCarpoolTrip(RoutableCarpoolTrip routableTrip) {
+    CarpoolTrip trip = routableTrip.trip();
+    RoutableCarpoolTrip existing = trips.put(trip.getId(), routableTrip);
+    spatialIndex.put(trip.getId(), routableTrip.corridor().legEnvelopes());
     if (existing != null) {
       LOG.debug("Updated carpool trip {} with {} stops", trip.getId(), trip.stops().size());
     } else {
@@ -71,8 +81,8 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
   @Override
   public void removeCarpoolTrip(FeedScopedId id) {
-    CarpoolTripWithVertices removed = trips.remove(id);
-    baselineRouting.remove(id);
+    RoutableCarpoolTrip removed = trips.remove(id);
+    spatialIndex.remove(id);
     if (removed != null) {
       LOG.debug("Removed carpool trip {}", id);
     } else {
@@ -89,13 +99,13 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
 
     Instant expiryThreshold = now.minus(expiry);
     int removed = 0;
-    for (CarpoolTripWithVertices tripWithVertices : trips.values()) {
-      CarpoolTrip trip = tripWithVertices.trip();
+    for (RoutableCarpoolTrip routableTrip : trips.values()) {
+      CarpoolTrip trip = routableTrip.trip();
       if (
         trip.latestEndTime().toInstant().isBefore(expiryThreshold) &&
-        trips.remove(trip.getId(), tripWithVertices)
+        trips.remove(trip.getId(), routableTrip)
       ) {
-        baselineRouting.remove(trip.getId());
+        spatialIndex.remove(trip.getId());
         removed++;
       }
     }
@@ -104,31 +114,4 @@ public class DefaultCarpoolingRepository implements CarpoolingRepository {
     }
     return removed;
   }
-
-  @Override
-  @Nullable
-  public CachedBaselineRouting cachedBaselineRouting(CarpoolTrip trip) {
-    CacheEntry entry = baselineRouting.get(trip.getId());
-    if (entry == null || !entry.routePoints().equals(trip.routePoints())) {
-      return null;
-    }
-    Duration[] legDurations = entry.legDurations();
-    return new CachedBaselineRouting(legDurations == null ? null : legDurations.clone());
-  }
-
-  @Override
-  public void cacheBaselineRouting(CarpoolTrip trip, @Nullable Duration[] legDurations) {
-    // routePoints() already returns a fresh immutable snapshot, so it is safe to store directly.
-    baselineRouting.put(
-      trip.getId(),
-      new CacheEntry(trip.routePoints(), legDurations == null ? null : legDurations.clone())
-    );
-  }
-
-  /**
-   * A cached baseline-routing outcome together with the route-point geometry it was computed for,
-   * so a trip whose geometry changed is treated as a miss on read. A {@code null}
-   * {@code legDurations} marks the baseline as unroutable.
-   */
-  private record CacheEntry(List<WgsCoordinate> routePoints, @Nullable Duration[] legDurations) {}
 }

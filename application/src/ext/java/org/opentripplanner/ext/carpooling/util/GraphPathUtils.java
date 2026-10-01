@@ -3,8 +3,10 @@ package org.opentripplanner.ext.carpooling.util;
 import java.time.Duration;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 
 public final class GraphPathUtils {
@@ -28,21 +30,34 @@ public final class GraphPathUtils {
   }
 
   /**
-   * Calculates cumulative durations from pre-routed segments, including stop duration
-   * at each intermediate stop.
-   *
-   * @param segments Pre-routed segments
-   * @param stopDuration Duration added at each intermediate stop
+   * The same walk timed and weighted with {@code request}'s preferences: drives the path's edges
+   * through the real traversals from its first vertex, no search involved. {@code null} when an
+   * edge cannot be traversed under the request, for instance by a wheelchair user.
    */
-  public static Duration[] calculateCumulativeDurations(
-    GraphPath<State, Edge, Vertex>[] segments,
-    Duration stopDuration
+  @Nullable
+  public static GraphPath<State, Edge, Vertex> replay(
+    GraphPath<State, Edge, Vertex> path,
+    StreetSearchRequest request
   ) {
-    Duration[] segmentDurations = new Duration[segments.length];
-    for (int i = 0; i < segments.length; i++) {
-      segmentDurations[i] = Duration.ofSeconds(segments[i].getDuration());
+    var walkRequest = StreetSearchRequest.copyOf(request)
+      .withMode(StreetMode.WALK)
+      .withArriveBy(false)
+      .build();
+    State state = new State(path.states.getFirst().getVertex(), walkRequest);
+    for (Edge edge : path.edges) {
+      State next = null;
+      for (State candidate : edge.traverse(state)) {
+        if (candidate.getVertex() == edge.getToVertex()) {
+          next = candidate;
+          break;
+        }
+      }
+      if (next == null) {
+        return null;
+      }
+      state = next;
     }
-    return calculateCumulativeDurations(segmentDurations, stopDuration);
+    return new GraphPath<>(state);
   }
 
   /**
