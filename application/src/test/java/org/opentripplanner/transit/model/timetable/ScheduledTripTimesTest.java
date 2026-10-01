@@ -168,4 +168,13 @@ class ScheduledTripTimesTest {
   void copyDepartureTimes() {
     assertArrayEquals(new int[] { T10_01, T11_02, T12_03 }, subject.copyDepartureTimes());
   }
+
+  @Test
+  void realtimeTripState() {
+    assertFalse(subject.realtimeTripState().timesModified());
+    assertFalse(subject.realtimeTripState().canceled());
+    assertFalse(subject.realtimeTripState().added());
+    assertFalse(subject.realtimeTripState().tripPatternModified());
+    assertFalse(subject.realtimeTripState().deleted());
+  }
 }

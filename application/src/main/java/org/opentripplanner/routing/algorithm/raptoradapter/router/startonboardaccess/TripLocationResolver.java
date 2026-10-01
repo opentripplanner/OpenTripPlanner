@@ -128,7 +128,7 @@ public class TripLocationResolver {
   private List<LocationInTripPatternReference> matchingLocations(
     TripPattern tripPattern,
     FeedScopedId stopOrStationId,
-    TripTimes tripTimes,
+    TripTimes<?> tripTimes,
     @Nullable Integer targetSeconds
   ) {
     var locations = new ArrayList<LocationInTripPatternReference>();

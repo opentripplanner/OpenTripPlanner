@@ -31,9 +31,9 @@ public class ViaSegmentInputType {
         GraphQLInputObjectField.newInputObjectField()
           .name("egressMode")
           .description(
-            "The mode used to get from the egress stops in the transit network to" +
-              "the destination (last-mile). If the element is not present or null," +
-              "only transit that can immediately arrive at the origin will be used."
+            "The mode used to get from the egress stops in the transit network to " +
+              "the destination (last-mile). If the element is not present or null, " +
+              "only transit that can immediately arrive at the destination will be used."
           )
           .type(EnumTypes.STREET_MODE)
           .build()

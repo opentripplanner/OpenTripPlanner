@@ -6,6 +6,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -86,6 +87,28 @@ public class GqlUtil {
   }
 
   /**
+   * Return the epoch-milliseconds argument as an {@link Instant}, or the current time if the
+   * argument is omitted or explicitly {@code null}. An explicit null makes
+   * {@code containsArgument} return {@code true}, so it cannot be used as a presence check.
+   */
+  public static Instant getInstantOrNow(DataFetchingEnvironment environment, String argumentName) {
+    return getInstantOrElse(environment, argumentName, Instant.now());
+  }
+
+  /**
+   * Return the epoch-milliseconds argument as an {@link Instant}, or the given default value if
+   * the argument is omitted or explicitly {@code null}.
+   */
+  static Instant getInstantOrElse(
+    DataFetchingEnvironment environment,
+    String argumentName,
+    Instant defaultValue
+  ) {
+    Long epochMillis = environment.getArgument(argumentName);
+    return epochMillis != null ? Instant.ofEpochMilli(epochMillis) : defaultValue;
+  }
+
+  /**
    * Return the integer value of the argument or throw an exception if the value is null
    * or strictly negative.
    * This should generally be handled at the GraphQL schema level,
@@ -100,6 +123,22 @@ public class GqlUtil {
       throw new InvalidInputException(
         "The argument '" + argumentName + "' should be a non-null positive value: " + argumentValue
       );
+    }
+    return argumentValue;
+  }
+
+  /**
+   * Return the double value of the argument or throw an exception if the value is null.
+   * This should generally be handled at the GraphQL schema level, but must sometimes be
+   * implemented programmatically to preserve backward compatibility.
+   */
+  public static double getNonNullDoubleArgument(
+    DataFetchingEnvironment environment,
+    String argumentName
+  ) {
+    Double argumentValue = environment.getArgument(argumentName);
+    if (argumentValue == null) {
+      throw new InvalidInputException("The argument '" + argumentName + "' is required.");
     }
     return argumentValue;
   }

@@ -1,10 +1,12 @@
 package org.opentripplanner.osm;
 
-import crosby.binary.file.BlockInputStream;
+import crosby.binary.file.ParallelBlockInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.time.ZoneId;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
@@ -18,9 +20,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Implementation of the provider interface that reads OSM binary files from disk.
- */
+/// Implementation of the provider interface that reads OSM binary files from disk.
 public class DefaultOsmProvider implements OsmProvider {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultOsmProvider.class);
@@ -35,6 +35,10 @@ public class DefaultOsmProvider implements OsmProvider {
   private final OsmTagMapper osmTagMapper;
 
   private final WayPropertySet wayPropertySet;
+  /// since reading from disk is still serial, this only controls how many threads _decode_ the zip
+  /// stream. past 3-4, more threads don't make it faster anymore.
+  private final int decodeParallelism = Math.min(4, Runtime.getRuntime().availableProcessors());
+  private final ExecutorService executorService = Executors.newFixedThreadPool(decodeParallelism);
   private byte[] cachedBytes = null;
 
   /** For tests */
@@ -55,6 +59,8 @@ public class DefaultOsmProvider implements OsmProvider {
     this.cacheDataInMem = cacheDataInMem;
   }
 
+  /// Parses the OSM data from the source. Shuts down the executor service and will therefore throw an exception if
+  /// called a second time.
   public void readOsm(OsmDatabase osmdb) {
     try {
       OsmParser parser = new OsmParser(osmdb, this);
@@ -69,6 +75,8 @@ public class DefaultOsmProvider implements OsmProvider {
       osmdb.doneThirdPhaseNodes();
     } catch (Exception ex) {
       throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
+    } finally {
+      executorService.shutdown();
     }
   }
 
@@ -95,7 +103,14 @@ public class DefaultOsmProvider implements OsmProvider {
 
   private void parsePhase(OsmParser parser, OsmParserPhase phase) {
     parser.setPhase(phase);
-    try (BlockInputStream in = new BlockInputStream(createInputStream(phase), parser)) {
+    try (
+      var in = new ParallelBlockInputStream(
+        createInputStream(phase),
+        parser,
+        executorService,
+        decodeParallelism
+      )
+    ) {
       in.process();
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);

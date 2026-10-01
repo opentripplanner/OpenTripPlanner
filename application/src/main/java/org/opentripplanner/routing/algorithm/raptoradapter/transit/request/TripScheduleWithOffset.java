@@ -23,7 +23,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   private final int tripIndexForDates;
 
   // Computed when needed later for RaptorPathToItineraryMapper
-  private TripTimes tripTimes = null;
+  private TripTimes<?> tripTimes = null;
   private LocalDate serviceDate = null;
   private int secondsOffset;
 
@@ -77,7 +77,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
    * Following methods are only called in RaptorPathToItineraryMapper, instantiation or debug/tests, these are not optimised for performance
    */
   @Override
-  public TripTimes getOriginalTripTimes() {
+  public TripTimes<?> getOriginalTripTimes() {
     if (tripTimes == null) {
       this.findTripTimes();
     }

@@ -84,7 +84,7 @@ jobs:
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: stCarolas/setup-maven@v5.1
         with:
-          maven-version: 3.9.12
+          maven-version: 3.10.0
 
       - name: Build jar
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'

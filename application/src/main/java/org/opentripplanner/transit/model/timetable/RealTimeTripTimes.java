@@ -286,6 +286,11 @@ public final class RealTimeTripTimes implements TripTimes<RealTimeTripTimes> {
     return result;
   }
 
+  @Override
+  public RealTimeTripState realtimeTripState() {
+    return state;
+  }
+
   /**
    * if a RealTimeTripTimes is constructed and no updates are applied, it is considered scheduled
    */

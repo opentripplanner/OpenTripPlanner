@@ -44,7 +44,8 @@ public class DatedServiceJourneyType {
     GraphQLType quayType,
     GraphQLOutputType replacedByType,
     GraphQLOutputType replacementForType,
-    GraphQLOutputType realTimeJourneyStateType
+    GraphQLOutputType realTimeJourneyStateType,
+    GraphQLOutputType datedServiceJourneyVehicleAssignmentType
   ) {
     return GraphQLObjectType.newObject()
       .name(NAME)
@@ -87,6 +88,23 @@ public class DatedServiceJourneyType {
           )
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
           .dataFetcher(environment -> tripOnServiceDate(environment).isExtraJourney())
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("vehicleAssignment")
+          .type(datedServiceJourneyVehicleAssignmentType)
+          .description(
+            """
+            The aimed and expected vehicle assignment for this dated service journey.
+            The aimed references fall back to the service journey's when the dated service journey has none of its own.
+            """
+          )
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment)
+              .findVehicleAssignmentOnServiceDate(tripOnServiceDate(environment))
+              .orElse(null)
+          )
+          .build()
       )
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
@@ -210,13 +228,7 @@ public class DatedServiceJourneyType {
                     "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                   );
                 }
-                return new TransmodelRealTimeTripStateModel(
-                  tripTimes.isAdded(),
-                  tripTimes.isCanceled(),
-                  tripTimes.isTimesModified(),
-                  tripTimes.isTripPatternModified(),
-                  tripTimes.hasAnyUpdates()
-                );
+                return TransmodelRealTimeTripStateModel.of(tripTimes.realtimeTripState());
               })
               .orElse(null);
           })

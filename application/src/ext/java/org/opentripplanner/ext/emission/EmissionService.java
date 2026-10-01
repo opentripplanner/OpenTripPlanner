@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission;
 
 import java.util.Optional;
 import org.opentripplanner.model.plan.Emission;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.lang.Sandbox;
 
@@ -18,6 +19,12 @@ public interface EmissionService {
    * returned if no emission exist.
    */
   Emission calculateCarPassengerEmission(double distanceMeters);
+
+  /**
+   * Calculate the passenger emissions for a specific route and distance. Returns
+   * {@code empty} if no route emission data is registered for the given route.
+   */
+  Optional<Emission> calculateTransitPassengerEmissionForRoute(Route route, double distanceMeters);
 
   /**
    * Calculate the passenger emissions for a specific [route and distance] or [trip, from stop,

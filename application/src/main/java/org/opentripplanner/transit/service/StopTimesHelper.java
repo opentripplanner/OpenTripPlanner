@@ -192,7 +192,7 @@ public class StopTimesHelper {
           if (skipByStopCancellation(pattern, includeCancellations, i)) {
             continue;
           }
-          for (TripTimes t : tt.getTripTimes()) {
+          for (TripTimes<?> t : tt.getTripTimes()) {
             if (TripTimesHelper.skipByTripCancellationOrDeletion(t, includeCancellations)) {
               continue;
             }
@@ -329,7 +329,7 @@ public class StopTimesHelper {
             continue;
           }
 
-          for (TripTimes tripTimes : timetable.getTripTimes()) {
+          for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
             if (!servicesRunning.contains(tripTimes.getServiceCode())) {
               continue;
             }

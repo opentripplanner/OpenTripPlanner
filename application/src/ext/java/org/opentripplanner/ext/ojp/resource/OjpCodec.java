@@ -4,20 +4,20 @@ import de.vdv.ojp20.OJP;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import java.io.ByteArrayInputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 
 class OjpCodec {
 
   private static final JAXBContext CONTEXT = jaxbContext();
 
+  /**
+   * Reads an OJP request received from a client. The input is untrusted, so it is read with
+   * {@link SecureXml} rather than relying on the JAXB implementation's default restrictions.
+   */
   static OJP deserialize(String trias) throws JAXBException, TransformerException {
-    var source = new StreamSource(new ByteArrayInputStream(trias.getBytes(StandardCharsets.UTF_8)));
     var unmarshaller = CONTEXT.createUnmarshaller();
-    return (OJP) unmarshaller.unmarshal(source);
+    return (OJP) unmarshaller.unmarshal(SecureXml.source(trias));
   }
 
   static StreamingOutput serialize(OJP ojpOutput) {
