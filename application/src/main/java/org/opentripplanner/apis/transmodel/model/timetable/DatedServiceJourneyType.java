@@ -228,13 +228,7 @@ public class DatedServiceJourneyType {
                     "Trip has been deleted. this should not be exposed to the API and is probably a bug"
                   );
                 }
-                return new TransmodelRealTimeTripStateModel(
-                  tripTimes.isAdded(),
-                  tripTimes.isCanceled(),
-                  tripTimes.isTimesModified(),
-                  tripTimes.isTripPatternModified(),
-                  tripTimes.hasAnyUpdates()
-                );
+                return TransmodelRealTimeTripStateModel.of(tripTimes.realtimeTripState());
               })
               .orElse(null);
           })
