@@ -3,22 +3,27 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created by
  * {@link DefaultRegularTransferRepository#freeze()}. The snapshot owns its profile and
  * {@code fromStop} maps; the {@code toStop} maps are shared with repositories, which never modify
- * them. Hence, the snapshot is effectively immutable and safe to read from any number of request
- * threads.
+ * them. Hence, the paths are effectively immutable and safe to read from any number of request
+ * threads. The transfer-service cache is the only mutable state, and it is thread-safe.
  *
  * @param <P> the transfer path/template type
  */
 class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepositorySnapshot<P> {
 
   private final Map<TransferProfileType, Map<Integer, Map<Integer, P>>> pathsByProfile;
+  private final RegularTransferServiceCache transferServiceCache =
+    new RegularTransferServiceCache();
 
   DefaultRegularTransferRepositorySnapshot(
     Map<TransferProfileType, Map<Integer, Map<Integer, P>>> pathsByProfile
@@ -58,6 +63,15 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
       }
     }
     return result;
+  }
+
+  @Override
+  public RaptorRegularTransferService getOrCreateTransferService(
+    TransferProfileType profileType,
+    AbstractUserPreferences<?> preferences,
+    Supplier<RaptorRegularTransferService> factory
+  ) {
+    return transferServiceCache.getOrCreate(profileType, preferences, factory);
   }
 
   /**

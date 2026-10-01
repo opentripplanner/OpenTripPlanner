@@ -8,17 +8,17 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileTy
 /**
  * Builds a {@link RaptorTransferStore} for a given {@code (profileId, preferences)} by re-costing the
  * path templates in a {@link RegularTransferRepositorySnapshot}, generated at graph-build time, under
- * request-time preferences. Results are cached, bounded LRU, keyed on
- * {@code (profileId, preferences)} - normalizing {@code U} so equivalent requests share a cache
- * entry is the caller's responsibility, not this factory's.
+ * request-time preferences. Results are cached in the snapshot, keyed on
+ * {@code (profileId, preferences)} - normalizing the preferences so equivalent requests share a
+ * cache entry is the caller's responsibility, not this factory's.
  *
  * @param <P> the transfer path/template type
  */
 public interface RegularTransferServiceFactory<P> {
   /**
-   * Coarse-grained lock: a cache miss rebuilds the whole {@link RaptorTransferStore} for that
-   * {@code (profileId, preferences)}, which is CPU-bound, not I/O - acceptable for the expected
-   * handful of distinct combinations, revisit if contention shows up under load.
+   * Return the transfer service for {@code (profileType, preferences)}, built on a cache miss. See
+   * {@link RegularTransferRepositorySnapshot#getOrCreateTransferService} for the caching and
+   * locking.
    */
   public RaptorRegularTransferService create(
     TransferProfileType profileType,

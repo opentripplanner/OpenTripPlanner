@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.stop.StopIndex;
@@ -19,60 +17,33 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 /**
  * Builds a {@link RaptorTransferStore} for a given {@code (profileId, preferences)} by re-costing the
  * path templates in a {@link RegularTransferRepositorySnapshot}, generated at graph-build time, under
- * request-time preferences. Results are cached, bounded LRU, keyed on
- * {@code (profileId, preferences)} - normalizing {@code U} so equivalent requests share a cache
- * entry is the caller's responsibility, not this factory's.
+ * request-time preferences. The result is cached in the snapshot, see
+ * {@link RegularTransferRepositorySnapshot#getOrCreateTransferService}.
  *
  * @param <P> the transfer path/template type
  */
 public class DefaultRegularTransferServiceFactory<P> implements RegularTransferServiceFactory<P> {
 
-  private static final int DEFAULT_MAX_CACHE_SIZE = 32;
-
   private final StopIndex stopIndex;
-  private final RegularTransferRepositorySnapshot<P> repository;
+  private final RegularTransferRepositorySnapshot<P> snapshot;
   private final TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider;
 
-  // TODO TX - Split out cache into encapsulated class <- move to Repo, this means snapshot will be mutable, but only additions and they happen during request scope
-  private final Map<CacheKey<AbstractUserPreferences<?>>, RaptorRegularTransferService> cache;
-
   public DefaultRegularTransferServiceFactory(
     StopIndex stopIndex,
-    RegularTransferRepositorySnapshot<P> repository,
+    RegularTransferRepositorySnapshot<P> snapshot,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
   ) {
-    this(stopIndex, repository, pathProvider, DEFAULT_MAX_CACHE_SIZE);
-  }
-
-  public DefaultRegularTransferServiceFactory(
-    StopIndex stopIndex,
-    RegularTransferRepositorySnapshot<P> repository,
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
-    int maxCacheSize
-  ) {
     this.stopIndex = stopIndex;
-    this.repository = repository;
+    this.snapshot = snapshot;
     this.pathProvider = pathProvider;
-    this.cache = new LinkedHashMap<>(16, 0.75f, true) {
-      @Override
-      protected boolean removeEldestEntry(
-        Map.Entry<CacheKey<AbstractUserPreferences<?>>, RaptorRegularTransferService> eldest
-      ) {
-        return size() > maxCacheSize;
-      }
-    };
   }
 
-  /**
-   * Coarse-grained lock: a cache miss rebuilds the whole {@link RaptorTransferStore} for that
-   * {@code (profileId, preferences)}, which is CPU-bound, not I/O - acceptable for the expected
-   * handful of distinct combinations, revisit if contention shows up under load.
-   */
-  public synchronized RaptorRegularTransferService create(
+  @Override
+  public RaptorRegularTransferService create(
     TransferProfileType profileType,
     AbstractUserPreferences<?> preferences
   ) {
-    return cache.computeIfAbsent(new CacheKey<>(profileType, preferences), key ->
+    return snapshot.getOrCreateTransferService(profileType, preferences, () ->
       build(profileType, preferences)
     );
   }
@@ -83,8 +54,9 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
    * carries {@code (stop, duration, c1)}, not the path itself.
    */
   @Nullable
+  @Override
   public P findPath(TransferProfileType profileType, int fromStop, int toStop) {
-    return repository.findPath(profileType, fromStop, toStop);
+    return snapshot.findPath(profileType, fromStop, toStop);
   }
 
   private RaptorRegularTransferService build(
@@ -92,7 +64,7 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
     AbstractUserPreferences<?> preferences
   ) {
     var builder = RaptorTransferStore.of(stopIndex.size());
-    for (var stored : repository.pathsFor(profileType)) {
+    for (var stored : snapshot.pathsFor(profileType)) {
       Optional<PathCriteria> criteria = pathProvider.computePathCriteria(
         stored.path(),
         profileType,
@@ -129,9 +101,4 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
       }
     };
   }
-
-  private record CacheKey<U>(
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences
-  ) {}
 }
