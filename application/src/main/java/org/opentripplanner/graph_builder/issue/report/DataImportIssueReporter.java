@@ -72,14 +72,13 @@ public class DataImportIssueReporter implements GraphBuilderModule {
 
       for (Bucket bucket : buckets) {
         boolean addGeoJSONLink = new GeoJsonWriter(reportDirectory, bucket).writeFile();
-        new HTMLWriter(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
+        HTMLWriter.forIssueType(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
         //noinspection Convert2MethodRef
         progress.step(m -> LOG.info(m));
       }
 
       try {
-        HTMLWriter indexFileWriter = new HTMLWriter(reportDirectory, "index", keys, buckets);
-        indexFileWriter.writeFile();
+        HTMLWriter.forIndex(reportDirectory, keys, buckets).writeFile();
       } catch (Exception e) {
         LOG.error("Index file couldn't be created:{}", e.getMessage());
       }

@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 class HTMLWriter {
 
   private static final Logger LOG = LoggerFactory.getLogger(HTMLWriter.class);
+  private static final String INDEX_FILENAME = "index";
+
   private final DataSource target;
   private final Bucket bucket;
   private final List<Bucket> indexBuckets;
@@ -20,34 +22,61 @@ class HTMLWriter {
   private final boolean addGeoJSONLink;
   private final List<BucketKey> keys;
 
-  HTMLWriter(
+  private HTMLWriter(
+    DataSource target,
+    BucketKey bucketKey,
+    List<BucketKey> keys,
+    Bucket bucket,
+    List<Bucket> indexBuckets,
+    boolean addGeoJSONLink
+  ) {
+    this.target = target;
+    this.bucketKey = bucketKey;
+    this.keys = keys;
+    this.bucket = bucket;
+    this.indexBuckets = indexBuckets;
+    this.addGeoJSONLink = addGeoJSONLink;
+  }
+
+  /**
+   * Create a writer for the report page listing the issues in the given bucket.
+   */
+  static HTMLWriter forIssueType(
     CompositeDataSource reportDirectory,
     Bucket bucket,
     List<BucketKey> keys,
     boolean addGeoJSONLink
   ) {
-    LOG.debug("Creating file: {}", bucket.key().key());
-    this.bucketKey = bucket.key();
-    this.addGeoJSONLink = addGeoJSONLink;
-    this.target = reportDirectory.entry(bucketKey.key() + ".html");
-    this.keys = keys;
-    this.bucket = bucket;
-    this.indexBuckets = null;
+    BucketKey bucketKey = bucket.key();
+    LOG.debug("Creating file: {}", bucketKey.key());
+    return new HTMLWriter(
+      reportDirectory.entry(bucketKey.key() + ".html"),
+      bucketKey,
+      keys,
+      bucket,
+      null,
+      addGeoJSONLink
+    );
   }
 
-  HTMLWriter(
+  /**
+   * Create a writer for the index page, linking to all issue pages and summarizing the number of
+   * issues of each type.
+   */
+  static HTMLWriter forIndex(
     CompositeDataSource reportDirectory,
-    String filename,
     List<BucketKey> keys,
     List<Bucket> buckets
   ) {
-    LOG.debug("Creating index file: {}", filename);
-    this.target = reportDirectory.entry(filename + ".html");
-    this.keys = keys;
-    this.bucket = null;
-    this.indexBuckets = buckets;
-    this.bucketKey = new BucketKey(filename, null);
-    this.addGeoJSONLink = false;
+    LOG.debug("Creating index file: {}", INDEX_FILENAME);
+    return new HTMLWriter(
+      reportDirectory.entry(INDEX_FILENAME + ".html"),
+      new BucketKey(INDEX_FILENAME, null),
+      keys,
+      null,
+      buckets,
+      false
+    );
   }
 
   void writeFile() {
