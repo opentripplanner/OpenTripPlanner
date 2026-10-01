@@ -56,7 +56,8 @@ import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRepository;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -110,7 +111,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.transferRepository(),
-      new RegularTransferRepository<>(),
+      new DefaultRegularTransferRepository<>(),
       weRepo,
       parkingRepository,
       emissionRepository,
@@ -144,7 +145,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.transferRepository(),
-      new RegularTransferRepository<>(),
+      new DefaultRegularTransferRepository<>(),
       worldEnvelopeRepository,
       parkingRepository,
       emissionRepository,

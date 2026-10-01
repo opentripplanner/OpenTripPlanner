@@ -19,7 +19,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRepository;
 
 /**
  * Builds the real production {@link ConstructApplicationFactory} — the same Dagger component
@@ -51,7 +51,7 @@ public final class TestConstructApplicationFactoryBuilder {
       .graph(new Graph())
       .transitRepository(transitRepository)
       .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
-      .regularTransferRepository(new RegularTransferRepository<NearbyStop>())
+      .regularTransferRepository(new DefaultRegularTransferRepository<NearbyStop>())
       .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
       .stopConsolidationRepository(null)
       .vehicleParkingRepository(new DefaultVehicleParkingRepository())

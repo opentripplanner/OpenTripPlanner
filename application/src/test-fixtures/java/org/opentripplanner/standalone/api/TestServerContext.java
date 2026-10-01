@@ -60,7 +60,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 public class TestServerContext {
@@ -101,7 +101,7 @@ public class TestServerContext {
   ) {
     transitRepository.index();
 
-    var regularTransferRepository = new RegularTransferRepository<NearbyStop>();
+    var regularTransferRepository = new DefaultRegularTransferRepository<NearbyStop>();
     var transferProfilesConfig = new TransferProfilesConfig(
       List.of(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT))
     );

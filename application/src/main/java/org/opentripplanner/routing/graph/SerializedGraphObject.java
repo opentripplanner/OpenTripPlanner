@@ -42,7 +42,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.ProgressTracker;

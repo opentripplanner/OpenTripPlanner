@@ -4,7 +4,8 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRepository;
 
 /**
  * Mirrors {@code TransferRepositoryModule}: an empty singleton, populated in place by
@@ -17,6 +18,6 @@ public class RegularTransferRepositoryModule {
   @Provides
   @Singleton
   public RegularTransferRepository<NearbyStop> provideRegularTransferRepository() {
-    return new RegularTransferRepository<>();
+    return new DefaultRegularTransferRepository<>();
   }
 }

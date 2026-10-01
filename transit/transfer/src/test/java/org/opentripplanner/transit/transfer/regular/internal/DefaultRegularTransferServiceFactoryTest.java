@@ -11,6 +11,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
@@ -34,13 +35,13 @@ class DefaultRegularTransferServiceFactoryTest {
     return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
   }
 
-  /** Populates the repository the same way graph build would, via the real generator. */
-  private static RegularTransferRepository<FakeTransferPathProvider.FakePath> generate(
+  /** Populates a repository the same way graph build would, via the real generator. */
+  private static RegularTransferRepositorySnapshot<FakeTransferPathProvider.FakePath> generate(
     StopIndex stopIndex,
     FakeTransferPathProvider provider,
     double buildTimeReluctance
   ) {
-    var repository = new RegularTransferRepository<FakeTransferPathProvider.FakePath>();
+    var repository = new DefaultRegularTransferRepository<FakeTransferPathProvider.FakePath>();
     AbstractUserPreferences<?> preferences = withReluctance(buildTimeReluctance);
     // configuredRequestParameters (R) is unread by DefaultTransferGenerator today - reuse the
     // preferences instance as a type-compatible placeholder. Explicit type witnesses throughout,
@@ -59,7 +60,7 @@ class DefaultRegularTransferServiceFactoryTest {
       profiles,
       repository
     ).generateTransfersForAllStops();
-    return repository;
+    return repository.freeze();
   }
 
   /**

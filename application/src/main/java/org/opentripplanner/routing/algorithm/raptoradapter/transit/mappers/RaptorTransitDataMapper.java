@@ -34,9 +34,10 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferServiceFactory;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,11 +173,12 @@ public class RaptorTransitDataMapper {
       transitRepository
     );
     var pathProvider = new StreetTransferPathProvider(graph, nearbyStopFinder);
-    return new DefaultRegularTransferServiceFactory<NearbyStop>(
-      stopIndex,
-      regularTransferRepository,
-      pathProvider
+    // TODO TX - Temporary: freeze one snapshot for the process lifetime. Replace with the snapshot
+    //           of the request's TransactionScope, once the factory is request-scoped.
+    var snapshot = new RegularTransferRepositoryLifecycle<NearbyStop>().freeze(
+      regularTransferRepository
     );
+    return new DefaultRegularTransferServiceFactory<NearbyStop>(stopIndex, snapshot, pathProvider);
   }
 
   /**

@@ -9,6 +9,7 @@ import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
@@ -17,7 +18,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
  * Builds a {@link RaptorTransferStore} for a given {@code (profileId, preferences)} by re-costing the
- * path templates {@link RegularTransferRepository} generated once at graph-build time, under
+ * path templates in a {@link RegularTransferRepositorySnapshot}, generated at graph-build time, under
  * request-time preferences. Results are cached, bounded LRU, keyed on
  * {@code (profileId, preferences)} - normalizing {@code U} so equivalent requests share a cache
  * entry is the caller's responsibility, not this factory's.
@@ -29,15 +30,15 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
   private static final int DEFAULT_MAX_CACHE_SIZE = 32;
 
   private final StopIndex stopIndex;
-  private final RegularTransferRepository<P> repository;
+  private final RegularTransferRepositorySnapshot<P> repository;
   private final TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider;
 
-  // TODO TX - Split out cache into encapsulated class
+  // TODO TX - Split out cache into encapsulated class <- move to Repo, this means snapshot will be mutable, but only additions and they happen during request scope
   private final Map<CacheKey<AbstractUserPreferences<?>>, RaptorRegularTransferService> cache;
 
   public DefaultRegularTransferServiceFactory(
     StopIndex stopIndex,
-    RegularTransferRepository<P> repository,
+    RegularTransferRepositorySnapshot<P> repository,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
   ) {
     this(stopIndex, repository, pathProvider, DEFAULT_MAX_CACHE_SIZE);
@@ -45,7 +46,7 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
 
   public DefaultRegularTransferServiceFactory(
     StopIndex stopIndex,
-    RegularTransferRepository<P> repository,
+    RegularTransferRepositorySnapshot<P> repository,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
     int maxCacheSize
   ) {
