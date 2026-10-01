@@ -6,11 +6,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -21,7 +20,6 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -31,6 +29,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,26 +94,17 @@ public class IslandPruningModule implements GraphBuilderModule {
     // note that visibility vertices must not be removed from the graph
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
-    HashSet<AreaGroup> areas = new HashSet<>();
-    HashSet<Vertex> visibilityVertices = new HashSet<>();
-
-    for (AreaEdge ae : graph.findEdges(AreaEdge.class)) {
-      areas.add(ae.getArea());
-    }
-    for (AreaGroup a : areas) {
-      visibilityVertices.addAll(a.visibilityVertices());
-    }
+    Set<Vertex> visibilityVertices = StreamUtils.ofIterable(graph.findEdges(AreaEdge.class))
+      .distinct()
+      .flatMap(v -> v.getArea().visibilityVertices().stream())
+      .collect(Collectors.toSet());
 
     int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
     for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
-        toRemove.add(v);
+        graph.remove(v);
+        removed += 1;
       }
-    }
-    for (Vertex v : toRemove) {
-      graph.remove(v);
-      removed += 1;
     }
     LOG.info("Removed {} edgeless street vertices", removed);
 
@@ -287,26 +277,52 @@ public class IslandPruningModule implements GraphBuilderModule {
       if (!(gv instanceof StreetVertex)) {
         continue;
       }
-      State s0 = new State(gv, request);
+      State s0 = null;
       for (Edge e : gv.getOutgoing()) {
-        if (
-          e instanceof StreetEdge se && shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)
-        ) {
-          continue;
-        }
-        State[] states = e.traverse(s0);
-        if (State.isEmpty(states)) {
-          continue;
-        }
-        for (State state : states) {
-          Vertex out = state.getVertex();
+        if (e instanceof StreetEdge se) {
+          if (shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)) {
+            continue;
+          }
+          if (!canTraverse(se, traverseMode)) {
+            continue;
+          }
+          Vertex out = se.getToVertex();
           neighborsForVertex.put(gv, out);
 
           // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
           neighborsForVertex.put(out, gv);
+        } else {
+          // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
+          // rental/parking edges) that don't behave like a plain permission-gated street edge.
+          if (s0 == null) {
+            s0 = new State(gv, request);
+          }
+          State[] states = e.traverse(s0);
+          if (State.isEmpty(states)) {
+            continue;
+          }
+          for (State state : states) {
+            Vertex out = state.getVertex();
+            neighborsForVertex.put(gv, out);
+            neighborsForVertex.put(out, gv);
+          }
         }
       }
     }
+  }
+
+  /**
+   * Cheap connectivity-only equivalent of {@link StreetEdge#traverse}, for the plain WALK/
+   * BICYCLE/CAR travel modes this module cares about: a permission (incl. barrier vertex) check,
+   * with the same "walk the bike if it can't be ridden" fallback {@link StreetEdge#traverse}
+   * applies. This avoids allocating a {@link State}/{@code StateEditor} and computing speed/cost,
+   * none of which this module reads - it only needs to know whether the edge can be used at all.
+   */
+  private static boolean canTraverse(StreetEdge edge, TraverseMode traverseMode) {
+    if (traverseMode == TraverseMode.BICYCLE) {
+      return edge.canTraverse(TraverseMode.BICYCLE) || edge.canTraverse(TraverseMode.WALK);
+    }
+    return edge.canTraverse(traverseMode);
   }
 
   private int collectSubGraphs(
