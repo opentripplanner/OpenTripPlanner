@@ -18,7 +18,7 @@ import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;

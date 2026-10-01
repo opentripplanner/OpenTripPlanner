@@ -25,6 +25,7 @@ import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -206,10 +207,11 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(T_DEST)
       .getShortestPathTree();
 
-    var path = tree.getPath(T_ORIGIN);
-    assertNotNull(path, "arriveBy should find a path");
+    var state = tree.getState(T_ORIGIN);
+    assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = path.states
+    var descriptor = new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(s -> formatState(s))
@@ -412,10 +414,11 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(T_DEST)
       .getShortestPathTree();
 
-    var path = tree.getPath(T_ORIGIN);
-    assertNotNull(path, "arriveBy should find a path");
+    var state = tree.getState(T_ORIGIN);
+    assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = path.states
+    var descriptor = new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -592,10 +595,11 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(T_DEST)
       .getShortestPathTree();
 
-    var path = tree.getPath(T_ORIGIN);
-    assertNotNull(path, "arriveBy should find a path");
+    var state = tree.getState(T_ORIGIN);
+    assertNotNull(state, "arriveBy should find a path");
 
-    var arriveBy = path.states
+    var arriveBy = new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -655,12 +659,13 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       .withTo(to)
       .getShortestPathTree();
 
-    var path = tree.getPath(arriveBy ? from : to);
-    if (path == null) {
+    var state = tree.getState(arriveBy ? from : to);
+    if (state == null) {
       return null;
     }
 
-    return path.states
+    return new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)

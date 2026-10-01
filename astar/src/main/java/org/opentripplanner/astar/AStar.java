@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.BinHeap;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
@@ -122,14 +121,17 @@ public class AStar<
     return spt;
   }
 
-  public List<GraphPath<State, Edge, Vertex>> getPathsToTarget() {
+  /**
+   * Returns the final states of the accepted target paths found during the search. Building a
+   * full path (with reconstructed, chronologically-ordered states and edges) from one of these is
+   * the caller's responsibility, e.g. by walking {@link State#getBackState()}/
+   * {@link State#getBackEdge()}, or the {@code listBackStates()}/{@code listBackEdges()}
+   * iterables on the concrete state implementation.
+   */
+  public Iterable<State> listFinalStates() {
     runSearch();
 
-    return targetAcceptedStates
-      .stream()
-      .filter(State::isFinal)
-      .map(GraphPath::new)
-      .collect(Collectors.toList());
+    return () -> targetAcceptedStates.stream().filter(State::isFinal).iterator();
   }
 
   private boolean iterate() {

@@ -1,4 +1,4 @@
-package org.opentripplanner.astar.model;
+package org.opentripplanner.ext.carpooling.model;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +10,10 @@ import org.opentripplanner.astar.spi.AStarVertex;
  * A shortest path on the graph.
  * <p>
  * WARNING: This class is often a hotspot as it eagerly traverses the state chain. Avoid
- * as much as possible.
+ * as much as possible; prefer {@code State.listBackEdges()}/{@code State.listBackStates()}
+ * where only the edges or states are needed rather than a fully materialized, chronologically
+ * ordered path. This class only exists for the carpooling sandbox feature; core OTP code must not
+ * depend on it.
  */
 public class GraphPath<
   State extends AStarState<State, Edge, Vertex>,
@@ -66,20 +69,6 @@ public class GraphPath<
   }
 
   /**
-   * Returns the start time of the trip in seconds since the epoch.
-   */
-  public long getStartTime() {
-    return states.getFirst().getTimeSeconds();
-  }
-
-  /**
-   * Returns the end time of the trip in seconds since the epoch.
-   */
-  public long getEndTime() {
-    return states.getLast().getTimeSeconds();
-  }
-
-  /**
    * Returns the duration of the trip in seconds.
    */
   public int getDuration() {
@@ -107,7 +96,4 @@ public class GraphPath<
   public String toString() {
     return "GraphPath(nStates=" + states.size() + ")";
   }
-  /****
-   * Private Methods
-   ****/
 }

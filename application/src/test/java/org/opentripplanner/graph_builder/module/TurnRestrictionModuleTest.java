@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.graph.Graph;
@@ -22,6 +21,7 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -357,8 +357,7 @@ public class TurnRestrictionModuleTest {
       .withFrom(A)
       .withTo(F)
       .getShortestPathTree();
-    GraphPath<State, Edge, Vertex> path = spt.getPath(F);
-    List<State> states = path.states;
+    List<State> states = new StreetPath(spt.getState(F)).states();
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);
@@ -432,7 +431,7 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(B)
         .getShortestPathTree()
-        .getPath(B)
+        .getState(B)
     );
     assertNull(
       StreetSearchBuilder.of()
@@ -440,17 +439,17 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(C)
         .getShortestPathTree()
-        .getPath(C)
+        .getState(C)
     );
-    GraphPath<State, Edge, Vertex> path = StreetSearchBuilder.of()
+    State state = StreetSearchBuilder.of()
       .withRequest(request)
       .withFrom(A)
       .withTo(E)
       .getShortestPathTree()
-      .getPath(E);
-    assertNotNull(path);
+      .getState(E);
+    assertNotNull(state);
 
-    for (Edge edge : path.edges) {
+    for (Edge edge : state.listBackEdges()) {
       assertEquals(StreetTraversalPermission.CAR, ((StreetEdge) edge).getPermission());
     }
   }
