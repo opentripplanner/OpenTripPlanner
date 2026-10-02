@@ -49,8 +49,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.StopType;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
@@ -73,21 +71,10 @@ public class LuceneIndex implements Serializable {
   private final StopClusterMapper stopClusterMapper;
 
   /**
-   * Since the {@link TransitService} is request scoped, we don't inject it into this class.
-   * However, we do need some methods in the service and that's why we instantiate it manually in this
-   * constructor.
+   * @param transitService a service without real-time data, the index is built once from the
+   *                       scheduled data.
    */
   public LuceneIndex(
-    TransitRepository transitRepository,
-    StopConsolidationService stopConsolidationService
-  ) {
-    this(new DefaultTransitService(transitRepository), stopConsolidationService);
-  }
-
-  /**
-   * This method is only visible for testing.
-   */
-  LuceneIndex(
     TransitService transitService,
     @Nullable StopConsolidationService stopConsolidationService
   ) {

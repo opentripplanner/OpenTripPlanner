@@ -221,6 +221,7 @@ public class ConstructApplication {
       vehicleRentalRepository(),
       vehicleParkingRepository(),
       transitRepository(),
+      factory.transitService(),
       carpoolingRepository(),
       carpoolTripVertexResolver(),
       factory.transitUpdateManager(),

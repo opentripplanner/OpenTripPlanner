@@ -12,6 +12,7 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
@@ -109,7 +110,9 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
   private static TripAndPattern match(EstimatedVehicleJourney evj, TransitTestEnvironment env)
     throws UpdateException {
     var transitService = env.transitService();
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
     var fuzzyMatcher = new SiriFuzzyTripMatcher(cache, transitService);
     return fuzzyMatcher.match(
       EstimatedVehicleJourneyWrapper.of(evj),
