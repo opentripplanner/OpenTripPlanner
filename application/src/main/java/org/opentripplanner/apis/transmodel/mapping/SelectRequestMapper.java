@@ -8,7 +8,6 @@ import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 class SelectRequestMapper {
 
@@ -42,7 +41,9 @@ class SelectRequestMapper {
 
       var transportModes = (List<Map<String, ?>>) input.get("transportModes");
       for (Map<String, ?> modeWithSubModes : transportModes) {
-        var mainMode = (TransitMode) modeWithSubModes.get("transportMode");
+        var mainMode = TransportModeInputMapper.mapTransitMode(
+          modeWithSubModes.get("transportMode")
+        );
         if (modeWithSubModes.containsKey("transportSubModes")) {
           var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubModes.get(
             "transportSubModes"

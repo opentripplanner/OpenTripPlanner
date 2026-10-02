@@ -2110,7 +2110,8 @@ enum TransportMode {
   taxi
   tram
   trolleybus
-  unknown
+  "Unknown transport mode. No trip, line or stop has this mode."
+  unknown @deprecated(reason : "Matches nothing. Ignored in `whiteListedModes` and `filterByModes`, rejected as invalid input in other filters. Will be removed.")
   water
 }
 
