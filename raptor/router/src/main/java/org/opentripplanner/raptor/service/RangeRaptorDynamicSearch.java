@@ -27,14 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This search helps the {@link RaptorService} to configure
- * heuristics and set dynamic search parameters like EDT, LAT and raptor-search-window.
+ * This search helps the {@link RaptorService} to configure heuristics and set dynamic search
+ * parameters like EDT, LAT and raptor-search-window.
  * <p>
  * If possible the forward and reverse heuristics will be run in parallel.
  * <p>
- * Depending on which optimization is enabled and which search parameters are set a forward and/or a
- * reverse "single-iteration" raptor search is performed and heuristics are collected. This is used
- * to configure the "main" multi-iteration RangeRaptor search.
+ * Depending on which optimization is enabled and which search parameters are set a forward
+ * and/or a reverse "single-iteration" raptor search is performed and heuristics are collected. This
+ * is used to configure the "main" multi-iteration RangeRaptor search.
  */
 public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
@@ -239,11 +239,11 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   /**
    * If the earliest-departure-time(EDT) is set, the task order should be:
    * <ol>
-   *     <li>{@code FORWARD}</li>
-   *     <li>{@code REVERSE}</li>
+   *   <li>{@code FORWARD}</li>
+   *   <li>{@code REVERSE}</li>
    * </ol>
-   * If not EDT is set, the latest-arrival-time is set, and the order should be the opposite,
-   * with {@code REVERSE} first
+   * If not EDT is set, the latest-arrival-time is set, and the order should be the opposite, with
+   * {@code REVERSE} first
    */
   private List<HeuristicSearchTask<T>> listTasksInOrder() {
     boolean performForwardFirst = originalRequest.searchParams().isEarliestDepartureTimeSet();

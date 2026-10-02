@@ -62,8 +62,8 @@ public interface EmissionTestData {
   }
 
   /**
-   * The DataSource framwork should prevent this from happening, but we add it here
-   * as a test-case so we can see that the parsers handle it gracefully.
+   * The DataSource framwork should prevent this from happening, but we add it here as a test-case
+   * so we can see that the parsers handle it gracefully.
    */
   default DataSource emissionMissingFile() {
     return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMISSION);

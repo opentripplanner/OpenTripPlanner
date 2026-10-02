@@ -188,14 +188,15 @@ class StopTimeUpdateTest {
   // -----------------------------------------------------------------------
 
   /**
-   * Before the fix, {@code hasRealTimeUpdate()} used {@code &&} instead of {@code ||}.
-   * With {@code &&}, a stop that only received one of the two times (a common SIRI pattern,
-   * especially for first/last stops) was incorrectly treated as NO_DATA and its realtime
-   * information was discarded entirely.
+   * Before the fix, {@code hasRealTimeUpdate()} used {@code &&} instead of {@code ||}. With
+   * {@code &&}, a stop that only received one of the two times (a common SIRI pattern, especially
+   * for first/last stops) was incorrectly treated as NO_DATA and its realtime information was
+   * discarded entirely.
    *
-   * <p>This test documents the old broken contract so the regression is explicit: if the
-   * condition were reverted to {@code &&}, exactly these two cases would silently return
-   * {@code false} and the caller would call {@code withNoData(stop)} instead of applying delays.
+   * <p>
+   * This test documents the old broken contract so the regression is explicit: if the condition
+   * were reverted to {@code &&}, exactly these two cases would silently return {@code false} and
+   * the caller would call {@code withNoData(stop)} instead of applying delays.
    */
   @Test
   void regression_oldAndCondition_wouldHaveDiscardedArrivalOnlyUpdate() {

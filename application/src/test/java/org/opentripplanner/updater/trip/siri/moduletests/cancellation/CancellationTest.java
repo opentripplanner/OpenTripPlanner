@@ -84,8 +84,8 @@ class CancellationTest implements RealtimeTestConstants {
   }
 
   /**
-   * When a scheduled trip is modified (both trip times and stops) and subsequently cancelled,
-   * it should be marked as cancelled and reverted to its scheduled trip times and stops.
+   * When a scheduled trip is modified (both trip times and stops) and subsequently cancelled, it
+   * should be marked as cancelled and reverted to its scheduled trip times and stops.
    */
   @Test
   void testChangeQuayAndCancelScheduledTrip() {
@@ -105,8 +105,8 @@ class CancellationTest implements RealtimeTestConstants {
   }
 
   /**
-   * When an added trip is modified (both trip times and stops) and subsequently cancelled,
-   * it should be marked as cancelled and reverted to its initial trip times and stops
+   * When an added trip is modified (both trip times and stops) and subsequently cancelled, it
+   * should be marked as cancelled and reverted to its initial trip times and stops
    */
   @Test
   void testChangeQuayAndCancelAddedTrip() {

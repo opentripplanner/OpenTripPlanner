@@ -126,8 +126,8 @@ public class AlertsConnectionFilterMapper {
   }
 
   /**
-   * A dimension is either unset or has at least one non-null value. An empty list would filter
-   * away everything, which is never what the caller wants, so it is rejected.
+   * A dimension is either unset or has at least one non-null value. An empty list would filter away
+   * everything, which is never what the caller wants, so it is rejected.
    */
   @Nullable
   private static <T> List<T> requireNullOrNonEmpty(@Nullable List<T> values, String path) {

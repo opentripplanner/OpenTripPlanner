@@ -18,8 +18,8 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * <p>
  * An example of such a geometry is https://www.openstreetmap.org/relation/8513460.
  * <p>
- * There we want to make sure that the node https://www.openstreetmap.org/node/6136980344
- * can be used as the start point of the search, and you can leave the area.
+ * There we want to make sure that the node https://www.openstreetmap.org/node/6136980344 can be
+ * used as the start point of the search, and you can leave the area.
  * <p>
  * Further reading: https://github.com/opentripplanner/OpenTripPlanner/pull/6486
  */

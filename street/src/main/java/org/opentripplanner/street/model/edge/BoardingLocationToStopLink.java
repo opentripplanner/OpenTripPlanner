@@ -6,8 +6,8 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /**
- * This represents the connection between a boarding location and a transit vertex where going from the
- * street to the vehicle is immediate and you don't want to display a polyline to the user.
+ * This represents the connection between a boarding location and a transit vertex where going from
+ * the street to the vehicle is immediate and you don't want to display a polyline to the user.
  */
 public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 

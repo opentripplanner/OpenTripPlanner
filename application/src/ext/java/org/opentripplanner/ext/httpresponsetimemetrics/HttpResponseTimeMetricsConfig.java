@@ -7,7 +7,8 @@ import java.util.Set;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
- * This class is responsible for mapping HTTP response time metrics JSON configuration into parameters.
+ * This class is responsible for mapping HTTP response time metrics JSON configuration into
+ * parameters.
  */
 public class HttpResponseTimeMetricsConfig {
 

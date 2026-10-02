@@ -8,11 +8,11 @@ import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 
 /**
  * This utility help converting a Raptor path to a string which is used in several unit tests for
- * easy comparison. The Stop index(1..n) is translated to stop names(A..N) using {@link
- * RaptorTestConstants#stopIndexToName(int)}.
+ * easy comparison. The Stop index(1..n) is translated to stop names(A..N) using
+ * {@link RaptorTestConstants#stopIndexToName(int)}.
  *
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 public class PathUtils {

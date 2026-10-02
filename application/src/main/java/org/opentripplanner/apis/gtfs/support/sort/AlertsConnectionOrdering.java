@@ -14,16 +14,16 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
  * The order is fixed, deterministic and not configurable through the API:
  * <ol>
  *   <li>{@link AlertSeverity} descending, using {@link AlertSeverity#sortingIndex()}, so the most
- *   severe alerts come first. An alert without a severity is treated as
- *   {@link AlertSeverity#UNKNOWN_SEVERITY}.</li>
+ *       severe alerts come first. An alert without a severity is treated as
+ *       {@link AlertSeverity#UNKNOWN_SEVERITY}.</li>
  *   <li>Within the same severity, the effective start of the alert's validity
- *   ({@link TransitAlert#getEffectiveStartDate()}) ascending. Alerts with an open start (or which
- *   are never active) have no effective start and come first.</li>
+ *       ({@link TransitAlert#getEffectiveStartDate()}) ascending. Alerts with an open start (or which are
+ *       never active) have no effective start and come first.</li>
  *   <li>The alert id ascending. This is a pure tiebreaker which makes the order stable, so that
- *   paging through the connection never skips or duplicates an alert.</li>
+ *       paging through the connection never skips or duplicates an alert.</li>
  * </ol>
- * The connection uses index based cursors, so the ordering only needs to be applied to the
- * complete list before the connection is built.
+ * The connection uses index based cursors, so the ordering only needs to be applied to the complete
+ * list before the connection is built.
  */
 public class AlertsConnectionOrdering {
 

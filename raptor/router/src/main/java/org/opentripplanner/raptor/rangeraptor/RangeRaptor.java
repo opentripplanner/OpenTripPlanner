@@ -23,25 +23,24 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * Headway-Based Networks.” Transportation Research Record 2653 (2017). doi:10.3141/2653-06.
  * <p>
  * <a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2012/01/raptor_alenex.pdf">
- *   Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing”,
- *   January 1, 2012.
- * </a>.
+ * Delling, Daniel, Thomas Pajor, and Renato Werneck. “Round-Based Public Transit Routing”, January
+ * 1, 2012. </a>.
  * <p>
  * This version supports the following features:
  * <ul>
- *     <li>Raptor (R)
- *     <li>Range Raptor (RR)
- *     <li>Multi-criteria pareto optimal Range Raptor (McRR)
- *     <li>Reverse search in combination with R and RR
+ *   <li>Raptor (R)
+ *   <li>Range Raptor (RR)
+ *   <li>Multi-criteria pareto optimal Range Raptor (McRR)
+ *   <li>Reverse search in combination with R and RR
  * </ul>
  * This version does NOT support the following features:
  * <ul>
- *     <li>Frequency routes, supported by the original code using Monte Carlo methods
- *     (generating randomized schedules)
+ *   <li>Frequency routes, supported by the original code using Monte Carlo methods (generating
+ *       randomized schedules)
  * </ul>
  * <p>
- * This class originated as a rewrite of
- * <a href="https://github.com/conveyal/r5">Conveyals RAPTOR code</a>.
+ * This class originated as a rewrite of <a href="https://github.com/conveyal/r5">Conveyals
+ * RAPTOR code</a>.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

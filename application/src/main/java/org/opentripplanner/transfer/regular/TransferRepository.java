@@ -12,8 +12,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * This repository holds all transfers that are calculated between different stops for different
  * modes. It is populated during the graph build process and saved into the serialized graph object.
  * It should only be accessed directly during graph building, not during OTP server runtime. Use the
- * {@link RegularTransferService} instead, once transfer updates are implemented it will handle mutability
- * correctly.
+ * {@link RegularTransferService} instead, once transfer updates are implemented it will handle
+ * mutability correctly.
  */
 public interface TransferRepository extends Serializable {
   Collection<PathTransfer> findTransfersByStop(StopLocation stop);

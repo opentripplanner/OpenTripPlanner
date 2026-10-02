@@ -5,9 +5,10 @@ import java.util.function.Consumer;
 /**
  * A minimal open-addressing identity hash map with segmented interleaved key/value storage.
  * <p>
- * Splits the hash table into fixed-size segments so no single {@code Object[]} allocation exceeds
- * ~256KB. Each segment is an independent interleaved key/value array where {@code segment[2*i]} is
- * the key and {@code segment[2*i+1]} is the value. Linear probing wraps within a segment.
+ * Splits the hash table into fixed-size segments so no single {@code Object[]} allocation
+ * exceeds ~256KB. Each segment is an independent interleaved key/value array where
+ * {@code segment[2*i]} is the key and {@code segment[2*i+1]} is the value. Linear probing wraps
+ * within a segment.
  * <p>
  * Uses identity semantics ({@code ==}) for key comparison and
  * {@link System#identityHashCode(Object)} for hashing. Power-of-2 capacity with 2/3 load factor.

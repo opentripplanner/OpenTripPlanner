@@ -23,8 +23,8 @@ public final class IntUtils {
   }
 
   /**
-   * Convert an integer array to a string of comma separated numbers. If the array is empty, then
-   * an empty string is returned.
+   * Convert an integer array to a string of comma separated numbers. If the array is empty, then an
+   * empty string is returned.
    */
   public static String intArrayToString(int... values) {
     var buf = new StringBuilder();
@@ -35,9 +35,8 @@ public final class IntUtils {
   }
 
   /**
-   * Round a given value from a 64 bit double to an 32 bit int - potential overflow is
-   * ignored. ONLY USE THIS FUNCTION IF THE DOUBLE IS GUARANTEED TO BE LESS THAN THE
-   * {@link Integer#MIN_VALUE}.
+   * Round a given value from a 64 bit double to an 32 bit int - potential overflow is ignored. ONLY
+   * USE THIS FUNCTION IF THE DOUBLE IS GUARANTEED TO BE LESS THAN THE {@link Integer#MIN_VALUE}.
    * <p>
    * Use the {@link Math#round(double)} if you need support for large numbers.
    * <p>
@@ -95,8 +94,8 @@ public final class IntUtils {
   }
 
   /**
-   * Check is given {@code value} is in range {@code [min .. max]}. Both {@code min} and
-   * {@code max} is inclusive. Throws a {@link IllegalArgumentException} if not in range.
+   * Check is given {@code value} is in range {@code [min .. max]}. Both {@code min} and {@code max}
+   * is inclusive. Throws a {@link IllegalArgumentException} if not in range.
    */
   public static int requireInRange(int value, int min, int max, String field) {
     if (value < min || value > max) {

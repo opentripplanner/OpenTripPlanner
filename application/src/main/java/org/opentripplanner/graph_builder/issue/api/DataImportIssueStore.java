@@ -5,8 +5,8 @@ import org.opentripplanner.framework.error.OtpError;
 
 /**
  * Thread-safe service for storing issues encountered during data import. When the import is
- * complete all issues are written to a report. For tests there is a NO-OP implementation, see
- * the constant {@link #NOOP}.
+ * complete all issues are written to a report. For tests there is a NO-OP implementation, see the
+ * constant {@link #NOOP}.
  *
  * When creating issues try to avoid creating the string message; this will take a lot of memory
  * during graph build. Instead, keep references to values you want to include in the message and
@@ -27,9 +27,8 @@ public interface DataImportIssueStore {
   void add(String type, String message);
 
   /**
-   * Add an issue to the issue report without the need of creating an issue class.
-   * The given list of {@code arguments} is injected into the message using
-   * {@link String#format(String, Object...)}.
+   * Add an issue to the issue report without the need of creating an issue class. The given list of
+   * {@code arguments} is injected into the message using {@link String#format(String, Object...)}.
    */
   void add(String type, String message, Object... arguments);
 

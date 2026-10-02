@@ -29,8 +29,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * auto-scanning of any kind, and keeps injection to a bare minimum using HK2, the injection library
  * Jersey itself uses.
  * <p>
- * Jersey has its own ResourceConfig class which is a subclass of Application. We can get away with
- * not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
+ * Jersey has its own ResourceConfig class which is a subclass of Application. We can get away
+ * with not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
  */
 public class OTPWebApplication extends Application {
 
@@ -92,7 +92,8 @@ public class OTPWebApplication extends Application {
    * implementation. However, these are single instances that will be reused for all requests (they
    * are singleton-scoped).
    * <p>
-   * See https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
+   * See
+   * https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
    * Leave {@code <Object>} out of method signature to avoid confusing the Guava type inference.
    */
   @Override
@@ -132,8 +133,8 @@ public class OTPWebApplication extends Application {
   }
 
   /**
-   * Disable auto-discovery of features because it's extremely obnoxious to debug and
-   * interacts in confusing ways with manually registered features.
+   * Disable auto-discovery of features because it's extremely obnoxious to debug and interacts in
+   * confusing ways with manually registered features.
    */
   @Override
   public Map<String, Object> getProperties() {

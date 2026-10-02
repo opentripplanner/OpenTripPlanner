@@ -129,7 +129,7 @@ public class TripPatternForDates
 
   /**
    * @deprecated This is exposed because it is needed in the TripFrequencyNnnSearch classes, but is
-   * an implementation detail that should not leak outside the class.
+   *             an implementation detail that should not leak outside the class.
    */
   @Deprecated
   public int tripPatternForDateOffsets(int dayIndex) {
@@ -228,11 +228,11 @@ public class TripPatternForDates
   }
 
   /**
-   * Raptor provides a trips search for regular trip schedules, but in some cases it makes
-   * sense to be able to override this - for example for frequency based trips.
+   * Raptor provides a trips search for regular trip schedules, but in some cases it makes sense to
+   * be able to override this - for example for frequency based trips.
    *
-   * @return {@code true} If you do not want to use the built-in trip search and instead
-   *         will provide your own. Make sure to implement the
+   * @return {@code true} If you do not want to use the built-in trip search and instead will
+   *         provide your own. Make sure to implement the
    *         {@link #createCustomizedTripSearch(SearchDirection)} for both forward and reverse
    *         searches.
    */
@@ -242,6 +242,7 @@ public class TripPatternForDates
 
   /**
    * Factory method to provide an alternative trip search in Raptor.
+   *
    * @see #useCustomizedTripSearch()
    */
   public RaptorTripScheduleSearch<TripSchedule> createCustomizedTripSearch(
@@ -268,8 +269,8 @@ public class TripPatternForDates
   /**
    * Return a list with all departure times for the first stop for each trip per day.
    *
-   * There are no unit-tests on this method, so the surface to {@link TripPatternForDate}
-   * should be kept as thin as possible.
+   * There are no unit-tests on this method, so the surface to {@link TripPatternForDate} should be
+   * kept as thin as possible.
    */
   private static TripTimesForDaysIndex createTripTimesForDaysIndex(
     TripPatternForDate[] tripPatternForDates,

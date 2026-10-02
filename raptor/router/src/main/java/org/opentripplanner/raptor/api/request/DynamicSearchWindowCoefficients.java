@@ -19,14 +19,15 @@ import java.time.Duration;
  *     LAT = EDT + DW + minTransitTime
  *     EDT = LAT - (DW + minTransitTime)
  * </pre>
- * The {@code round_N(...)} method is will round the input to the closest multiplication of N.
+ * The {@code round_N(...)} method is will round the input to the closest multiplication of
+ * N.
  * <p>
  * The 3 coefficients above are:
  * <ol>
- *     <li>{@code C} - {@link #minWindow()}</li>
- *     <li>{@code T} - {@link #minTransitTimeCoefficient()}</li>
- *     <li>{@code W} - {@link #minWaitTimeCoefficient()}</li>
- *     <li>{@code N} - {@link #stepMinutes()}</li>
+ *   <li>{@code C} - {@link #minWindow()}</li>
+ *   <li>{@code T} - {@link #minTransitTimeCoefficient()}</li>
+ *   <li>{@code W} - {@link #minWaitTimeCoefficient()}</li>
+ *   <li>{@code N} - {@link #stepMinutes()}</li>
  * </ol>
  * In addition the this an upper bound on the calculation of the search window:
  * {@link #maxWindow()}.
@@ -60,8 +61,8 @@ public interface DynamicSearchWindowCoefficients {
 
   /**
    * Set an upper limit to the calculation of the dynamic search window to prevent exceptionable
-   * cases to cause very long search windows. Long search windows consume a lot of resources and
-   * may take a long time. Use this parameter to tune the desired maximum search time.
+   * cases to cause very long search windows. Long search windows consume a lot of resources and may
+   * take a long time. Use this parameter to tune the desired maximum search time.
    * <p>
    * This is the parameter that affects the response time the most.
    * <p>

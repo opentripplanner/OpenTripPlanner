@@ -49,7 +49,9 @@ public class CarpoolTripVertexResolver {
     );
   }
 
-  /** Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved. */
+  /**
+   * Resolves every route point to a permanent vertex, or {@code null} if any cannot be resolved.
+   */
   @Nullable
   public CarpoolTripWithVertices resolve(CarpoolTrip trip) {
     try (var temporaryVerticesContainer = new TemporaryVerticesContainer()) {

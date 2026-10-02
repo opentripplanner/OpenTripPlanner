@@ -30,8 +30,9 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
  * That's normally fine: a test that doesn't care about vehicle parking data, for example, doesn't
  * need real vehicle parking data to exercise the DI wiring around it.
  * <p>
- * Add a {@code withRepositoryX}/{@code withTestEnvironmentX} method to the builder on a need basis,
- * when a test actually needs to override one of the other defaults — don't add one speculatively.
+ * Add a {@code withRepositoryX}/{@code withTestEnvironmentX} method to the builder on a need
+ * basis, when a test actually needs to override one of the other defaults — don't add one
+ * speculatively.
  */
 public final class TestConstructApplicationFactoryBuilder {
 

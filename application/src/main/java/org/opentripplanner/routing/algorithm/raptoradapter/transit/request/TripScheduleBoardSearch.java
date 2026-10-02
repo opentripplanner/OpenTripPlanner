@@ -84,14 +84,14 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
   /* TripScheduleSearch implementation */
 
   /**
-   * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but
-   * before the given trip ({@code tripIndexUpperBound}).
+   * Find the first trip leaving from the given stop AFTER the the 'earliestTime', but before the
+   * given trip ({@code tripIndexUpperBound}).
    *
-   * @param earliestTime     The time of arrival at the given stop for the previous trip.
+   * @param earliestTime          The time of arrival at the given stop for the previous trip.
    * @param stopPositionInPattern The stop to board
    * @param tripIndexUpperBound   Upper bound for trip index to search for. Exclusive - search start
-   *                              at {@code tripIndexUpperBound - 1}.
-   *                              Use {@code -1} (negative value) for an unbounded search.
+   *                              at {@code tripIndexUpperBound - 1}. Use {@code -1} (negative
+   *                              value) for an unbounded search.
    */
   @Override
   public RaptorBoardOrAlightEvent<T> search(
@@ -151,8 +151,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
   }
 
   /**
-   * This method search for the first scheduled trip boarding, after or equals to the
-   * given {@code earliestBoardTime}. Only trips with a trip index smaller than the given
+   * This method search for the first scheduled trip boarding, after or equals to the given
+   * {@code earliestBoardTime}. Only trips with a trip index smaller than the given
    * {@code tripIndexUpperBound} is considered.
    * <p>
    * The search searches backwards until index 0 is reached (inclusive).
@@ -179,8 +179,8 @@ public final class TripScheduleBoardSearch<T extends RaptorTripSchedule> impleme
   }
 
   /**
-   * This method search for the first scheduled trip boarding, after or equals to
-   * the given {@code earliestBoardTime}.
+   * This method search for the first scheduled trip boarding, after or equals to the given
+   * {@code earliestBoardTime}.
    *
    * @param tripIndexLowerBound The trip index lower bound, where search start (inclusive).
    */

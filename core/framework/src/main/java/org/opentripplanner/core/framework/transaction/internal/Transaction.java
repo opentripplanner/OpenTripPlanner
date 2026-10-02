@@ -8,7 +8,8 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
 /**
  * An opaque identity token representing a single committed state of the repository set.
  *
- * <p>A new token is minted on every {@link UpdateManager#submit(Consumer)} call. Readers that
+ * <p>
+ * A new token is minted on every {@link UpdateManager#submit(Consumer)} call. Readers that
  * captured an older token continue to see the state as of that commit; readers that create a new
  * {@link TransactionScope} after the commit see the updated state.
  */

@@ -48,17 +48,17 @@ import org.opentripplanner.street.search.TraverseModeSet;
  * independent of the order in which the JVM decides to iterate over Maps and even in the presence
  * of points that are exactly halfway between multiple candidate linking points.
  * <p>
- * It would be wise to keep this new incarnation of the linking code relatively simple, considering
- * what happened before.
+ * It would be wise to keep this new incarnation of the linking code relatively simple,
+ * considering what happened before.
  * <p>
- * See discussion in pull request #1922, follow up issue #1934, and the original issue calling for
- * replacement of the stop linker, #1305.
+ * See discussion in pull request #1922, follow up issue #1934, and the original issue calling
+ * for replacement of the stop linker, #1305.
  * <p>
  * <b>Expanding-envelope search.</b> Linking searches for nearby street edges with an expanding
  * envelope: a small radius is tried first and widened only if nothing is found. This keeps the
  * common case cheap, because the spatial index ({@code HashGridSpatialIndex}) returns whole grid
- * cells as candidates, so a smaller envelope touches fewer cells and yields fewer candidate edges to
- * distance-check, filter and dedup. The per-scope radius steps are defined in {@link SearchPlan}
+ * cells as candidates, so a smaller envelope touches fewer cells and yields fewer candidate edges
+ * to distance-check, filter and dedup. The per-scope radius steps are defined in {@link SearchPlan}
  * (e.g. real-time GBFS rental linking starts at 25 m — the vast majority of rental vehicles sit
  * within ~25 m of a street — and expands to 100 m).
  */
@@ -86,8 +86,8 @@ public class VertexLinker {
   );
 
   /**
-   * If vertex linking tries to split an edge very close to the endpoint, do not split the edge,
-   * use the existing edge endpoint instead. This is the limit of how far we still use the endpoint.
+   * If vertex linking tries to split an edge very close to the endpoint, do not split the edge, use
+   * the existing edge endpoint instead. This is the limit of how far we still use the endpoint.
    */
   private static final double EDGE_SPLIT_END_TOLERANCE_METERS = 0.1;
 
@@ -179,10 +179,10 @@ public class VertexLinker {
    * This method will link the provided vertex into the street graph. This may involve splitting an
    * existing edge (if the scope is not PERMANENT, the existing edge will be kept).
    * <p>
-   * In OTP2 where the transit search can be quite fast, searching for a good linking point can be a
-   * significant fraction of response time. Hannes Junnila has reported >70% speedups in searches by
-   * making the search radius smaller. Therefore we use an expanding-envelope search, which is more
-   * efficient in dense areas.
+   * In OTP2 where the transit search can be quite fast, searching for a good linking point can
+   * be a significant fraction of response time. Hannes Junnila has reported >70% speedups in
+   * searches by making the search radius smaller. Therefore we use an expanding-envelope search,
+   * which is more efficient in dense areas.
    *
    * @param vertex        Vertex to be linked into the street graph
    * @param traverseModes Only street edges allowing one of these modes will be linked
@@ -190,7 +190,8 @@ public class VertexLinker {
    * @param scope         The scope of the split
    * @param edgeFunction  How the provided vertex should be linked into the street graph
    * @return A DisposableEdgeCollection with edges created by this method. It is the caller's
-   * responsibility to call the dispose method on this object when the edges are no longer needed.
+   *         responsibility to call the dispose method on this object when the edges are no longer
+   *         needed.
    */
   private DisposableEdgeCollection link(
     Vertex vertex,
@@ -242,7 +243,8 @@ public class VertexLinker {
   /**
    * Link a boarding location vertex to specific street edges.
    * <p>
-   * This is used if a platform is mapped as a linear way, where the given edges form the platform.
+   * This is used if a platform is mapped as a linear way, where the given edges form the
+   * platform.
    */
   public Set<StreetVertex> linkToSpecificStreetEdgesPermanently(
     Vertex vertex,
@@ -315,8 +317,8 @@ public class VertexLinker {
   /**
    * Expanding-envelope search: the radius steps (smallest first) to try per linking {@link Scope}.
    * {@link #link} tries each step in turn and stops at the first that links, so a wider (more
-   * expensive) search only runs when the smaller one finds nothing; the largest step is that scope's
-   * maximum reach, so the set of vertices that link at all is unchanged.
+   * expensive) search only runs when the smaller one finds nothing; the largest step is that
+   * scope's maximum reach, so the set of vertices that link at all is unchanged.
    */
   private enum SearchPlan {
     /** GBFS rental — the vast majority of rental vehicles sit within ~25 m of a street. */
@@ -677,8 +679,8 @@ public class VertexLinker {
   }
 
   /**
-   * Add a vertex to an area. This creates edges to all visibility vertices
-   * unless those edges would cross one of the area boundary edges
+   * Add a vertex to an area. This creates edges to all visibility vertices unless those edges would
+   * cross one of the area boundary edges
    */
   private boolean addAreaVertex(
     IntersectionVertex newVertex,

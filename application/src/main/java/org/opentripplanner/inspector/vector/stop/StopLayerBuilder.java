@@ -14,8 +14,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * A vector tile layer for {@link StopLocation}s inside the vector tile bounds. These can be further
- * filtered to get only a subset of stop implementations like {@link RegularStop}
- * or {@link AreaStop}.
+ * filtered to get only a subset of stop implementations like {@link RegularStop} or
+ * {@link AreaStop}.
  */
 public class StopLayerBuilder<T extends StopLocation> extends LayerBuilder<StopLocation> {
 

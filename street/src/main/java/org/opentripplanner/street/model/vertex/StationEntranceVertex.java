@@ -6,8 +6,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A station entrance extracted from OSM and therefore not (yet) associated with the transit
- * entity {@link org.opentripplanner.transit.model.site.Station}.
+ * A station entrance extracted from OSM and therefore not (yet) associated with the transit entity
+ * {@link org.opentripplanner.transit.model.site.Station}.
  */
 public class StationEntranceVertex extends BarrierVertex {
 
@@ -33,8 +33,8 @@ public class StationEntranceVertex extends BarrierVertex {
   }
 
   /**
-   * Short human-readable code of the exit, like A or H3.
-   * If we need a proper name like "Oranienplatz" we have to add a name field.
+   * Short human-readable code of the exit, like A or H3. If we need a proper name like
+   * "Oranienplatz" we have to add a name field.
    */
   @Nullable
   public String code() {

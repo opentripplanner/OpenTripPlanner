@@ -107,16 +107,15 @@ public final class WgsCoordinate implements Serializable {
    * location. The comparison uses an EPSILON of 1E-7 for each axis, for both latitude and
    * longitude.
    *
-   * When we compare two coordinates we want to see if they are within a given distance,
-   * roughly within a square centimeter. This is not
-   * <em>transitive</em>, hence violating the equals/hasCode guideline. Consider 3 point along
-   * one of the axis:
+   * When we compare two coordinates we want to see if they are within a given distance, roughly
+   * within a square centimeter. This is not <em>transitive</em>, hence violating the equals/hasCode
+   * guideline. Consider 3 point along one of the axis:
    * <pre>
    *      | 8mm | 8mm |
    *      x --- y --- z
    *     </pre>
-   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is {@code true},
-   * but {@code x.sameLocation(z)} is {@code false}.
+   * Then {@code x.sameLocation(y)} is {@code true} and {@code y.sameLocation(z)} is
+   * {@code true}, but {@code x.sameLocation(z)} is {@code false}.
    */
   public boolean sameLocation(WgsCoordinate other) {
     return equals(other);
@@ -165,8 +164,8 @@ public final class WgsCoordinate implements Serializable {
 
   /**
    * Compute a fairly accurate distance between two coordinates. Use the fast version in
-   * {@link SphericalDistanceLibrary} if many computations are needed. Return the distance in
-   * meters between the two coordinates.
+   * {@link SphericalDistanceLibrary} if many computations are needed. Return the distance in meters
+   * between the two coordinates.
    */
   public double distanceTo(WgsCoordinate other) {
     return SphericalDistanceLibrary.distance(
@@ -219,9 +218,9 @@ public final class WgsCoordinate implements Serializable {
   }
 
   /**
-   * Return true if the coordinates are numerically equal. The coordinate latitude and longitude
-   * are rounded to the closest number of 1E-7 when constructed. This enforces two coordinates
-   * that is close together to be equals.
+   * Return true if the coordinates are numerically equal. The coordinate latitude and longitude are
+   * rounded to the closest number of 1E-7 when constructed. This enforces two coordinates that is
+   * close together to be equals.
    */
   @Override
   public boolean equals(Object o) {

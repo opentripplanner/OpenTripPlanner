@@ -31,8 +31,8 @@ public sealed interface TileSource {
   }
 
   /**
-   * Represents a raster-based source for map tiles. These are used mainly for background
-   * map layers with vector data being rendered on top of it.
+   * Represents a raster-based source for map tiles. These are used mainly for background map layers
+   * with vector data being rendered on top of it.
    */
   record RasterSource(
     String name,

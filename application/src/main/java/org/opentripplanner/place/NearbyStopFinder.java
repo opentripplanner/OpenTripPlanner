@@ -10,8 +10,8 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
- * Interface for finding nearby stops from a given vertex. It is used by access
- * and egress searches, and in transfer generation.
+ * Interface for finding nearby stops from a given vertex. It is used by access and egress searches,
+ * and in transfer generation.
  */
 public interface NearbyStopFinder {
   /**

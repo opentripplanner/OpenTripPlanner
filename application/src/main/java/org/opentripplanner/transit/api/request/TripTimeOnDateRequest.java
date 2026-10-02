@@ -115,10 +115,9 @@ public class TripTimeOnDateRequest {
   }
 
   /**
-   * Limit the returned output to the defined periods of time based on when the vehicle is
-   * scheduled to visit the stop. At least one of the periods has to overlap with the visit at the
-   * stop, which lasts from the scheduled arrival at the stop until the scheduled departure from
-   * it.
+   * Limit the returned output to the defined periods of time based on when the vehicle is scheduled
+   * to visit the stop. At least one of the periods has to overlap with the visit at the stop, which
+   * lasts from the scheduled arrival at the stop until the scheduled departure from it.
    */
   public FilterValues<TimePeriod> includeCallTimePeriods() {
     return includeCallTimePeriods;

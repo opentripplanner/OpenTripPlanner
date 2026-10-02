@@ -8,8 +8,8 @@ import org.opentripplanner.transit.model.filter.transit.TransitAlertSelectReques
 /**
  * A request for {@link TransitAlert}s.
  * <p>
- * The request holds a list of filters which are combined with OR semantics: an alert matches if it
- * matches at least one of the filters. An empty list of filters matches all alerts.
+ * The request holds a list of filters which are combined with OR semantics: an alert matches if
+ * it matches at least one of the filters. An empty list of filters matches all alerts.
  */
 public class TransitAlertRequest {
 

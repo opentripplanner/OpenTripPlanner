@@ -29,8 +29,8 @@ public class BookingTime implements Serializable {
   }
 
   /**
-   * Get the relative time of day, can be negative if the {@code daysPrior} is set. This method
-   * does account for DST changes within the relative time.
+   * Get the relative time of day, can be negative if the {@code daysPrior} is set. This method does
+   * account for DST changes within the relative time.
    */
   public int relativeTimeSeconds() {
     return time.toSecondOfDay() - daysPrior * TimeUtils.ONE_DAY_SECONDS;

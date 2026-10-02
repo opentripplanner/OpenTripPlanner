@@ -18,8 +18,8 @@ import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
 
 /**
- * Stitches together multiple elevation maps into a single elevation map, hackily.  This is
- * horrible, but the geotools way of doing things is too slow.
+ * Stitches together multiple elevation maps into a single elevation map, hackily. This is horrible,
+ * but the geotools way of doing things is too slow.
  *
  * @author novalis
  */

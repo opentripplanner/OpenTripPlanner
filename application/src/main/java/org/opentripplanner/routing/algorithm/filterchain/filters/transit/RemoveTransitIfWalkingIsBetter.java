@@ -12,8 +12,9 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 public class RemoveTransitIfWalkingIsBetter implements RemoveItineraryFlagger {
 
   /**
-   * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
-   * to know which filters removed
+   * Required for
+   * {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain}, to know
+   * which filters removed
    */
   public static final String TAG = "transit-vs-walk-filter";
 

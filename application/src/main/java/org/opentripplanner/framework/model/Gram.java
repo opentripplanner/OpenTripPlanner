@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 
 /**
- * A representation of the weight of something in grams. The precision is 1 mg, if needed
- * it should be possible to refactor this to support micrograms.
+ * A representation of the weight of something in grams. The precision is 1 mg, if needed it should
+ * be possible to refactor this to support micrograms.
  */
 public final class Gram implements Serializable, Comparable<Gram> {
 
@@ -42,8 +42,8 @@ public final class Gram implements Serializable, Comparable<Gram> {
   }
 
   /**
-   * Create a new Gram object based on the string input. An optional unit can be added.
-   * 'g'(grams) and 'kg'(kilograms) is supported.
+   * Create a new Gram object based on the string input. An optional unit can be added. 'g'(grams)
+   * and 'kg'(kilograms) is supported.
    * <p>
    * Format: {@code [Decimal number] ('g'|'kg')?}
    * <p>

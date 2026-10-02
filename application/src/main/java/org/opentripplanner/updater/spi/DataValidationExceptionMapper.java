@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Converts a {@link TimetableValidationError} to the model of the updater ready to be consumed
- * by the metrics APIS and logs.
+ * Converts a {@link TimetableValidationError} to the model of the updater ready to be consumed by
+ * the metrics APIS and logs.
  */
 public class DataValidationExceptionMapper {
 

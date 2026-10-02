@@ -8,7 +8,7 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-///  All preferences related to the Direct Transit Search
+/// All preferences related to the Direct Transit Search
 public class DirectTransitPreferences {
 
   // The next constants are package-local to be readable in the unit-test.
@@ -58,8 +58,8 @@ public class DirectTransitPreferences {
   }
 
   /// This is used to limit the results from the search. Paths are compared with the cheapest path
-  /// in the search window and are included in the result if they fall within the limit given by the
-  /// costRelaxFunction.
+  /// in the search window and are included in the result if they fall within the limit given by
+  /// the costRelaxFunction.
   public CostLinearFunction costRelaxFunction() {
     return costRelaxFunction;
   }
@@ -69,7 +69,7 @@ public class DirectTransitPreferences {
     return extraAccessEgressReluctance;
   }
 
-  ///  Whether there is any extra access/egress reluctance
+  /// Whether there is any extra access/egress reluctance
   public boolean isExtraReluctanceAddedToAccessAndEgress() {
     return extraAccessEgressReluctance != DEFAULT_RELUCTANCE;
   }

@@ -3,8 +3,8 @@ package org.opentripplanner.osm.model;
 /**
  * Represents the traverse direction for a way in OpenStreetMap.
  * <p>
- * See <a href="https://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right">the Wiki page</a>
- * for a detailed explanation
+ * See <a href="https://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right">the
+ * Wiki page</a> for a detailed explanation
  */
 public enum TraverseDirection {
   /**

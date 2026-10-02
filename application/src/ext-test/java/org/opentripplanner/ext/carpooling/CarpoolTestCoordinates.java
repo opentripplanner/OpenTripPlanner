@@ -3,8 +3,8 @@ package org.opentripplanner.ext.carpooling;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
- * Shared test coordinates and constants for carpooling tests.
- * Uses Oslo area coordinates for realistic geographic testing.
+ * Shared test coordinates and constants for carpooling tests. Uses Oslo area coordinates for
+ * realistic geographic testing.
  */
 public class CarpoolTestCoordinates {
 

@@ -10,8 +10,8 @@ import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 /**
  * The Twin Cities of Minneapolis and St. Paul, Minnesota have so-called skyways, which are elevated
  * walkways that connect buildings and neighborhoods. These skyways are typically pedestrian-only.
- * Access to them is time-restricted and can be unpredictable.
- * Therefore, we don't add them to the graph.
+ * Access to them is time-restricted and can be unpredictable. Therefore, we don't add them to the
+ * graph.
  */
 class TwinCitiesMapper extends OsmTagMapper {
 

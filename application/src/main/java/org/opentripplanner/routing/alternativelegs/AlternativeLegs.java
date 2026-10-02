@@ -31,9 +31,9 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * A helper class to fetch previous/next alternative legs for a scheduled transit leg.
- * The replacement legs arrive/depart from/to the same station as the original leg, but uses other
- * trips for the leg.
+ * A helper class to fetch previous/next alternative legs for a scheduled transit leg. The
+ * replacement legs arrive/depart from/to the same station as the original leg, but uses other trips
+ * for the leg.
  *
  * Generalized cost and constrained transfers are not included in the alternative legs.
  */

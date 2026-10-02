@@ -14,10 +14,10 @@ import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 /**
  * Tests that a cancelled stop on a delayed trip gets correct real-time times applied.
  * <p>
- * When a stop is cancelled on a delayed trip, the real-time times from the SIRI message must still
- * be applied to avoid NEGATIVE_HOP_TIME errors. Otherwise, the cancelled stop retains
- * scheduled times while surrounding stops have delayed times, causing the previous stop's
- * departure to exceed the cancelled stop's arrival.
+ * When a stop is cancelled on a delayed trip, the real-time times from the SIRI message must
+ * still be applied to avoid NEGATIVE_HOP_TIME errors. Otherwise, the cancelled stop retains
+ * scheduled times while surrounding stops have delayed times, causing the previous stop's departure
+ * to exceed the cancelled stop's arrival.
  */
 class CancelledStopOnDelayedTripTest implements RealtimeTestConstants {
 

@@ -257,8 +257,8 @@ public class TransitRepositoryForTest {
   }
 
   /**
-   * Generates a list of stop times of length {@code count} where each stop is 5 minutes after
-   * the previous one.
+   * Generates a list of stop times of length {@code count} where each stop is 5 minutes after the
+   * previous one.
    * <p>
    * The first stop has stop sequence 10, the following one has 20 and so on.
    */

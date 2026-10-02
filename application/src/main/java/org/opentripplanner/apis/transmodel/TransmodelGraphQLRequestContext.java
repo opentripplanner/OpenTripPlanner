@@ -22,9 +22,9 @@ import org.opentripplanner.utils.lang.Sandbox;
  * bundling the services a query may need (routing, transit, empirical delay, ...).
  * <p>
  * Implementations should resolve these dependencies lazily rather than up front: the production
- * implementation delegates to the request-scoped Dagger component, so a service is only
- * constructed if some data fetcher actually asks for it during that request. This interface also
- * lets tests substitute a plain, hand-built implementation (e.g. {@code
+ * implementation delegates to the request-scoped Dagger component, so a service is only constructed
+ * if some data fetcher actually asks for it during that request. This interface also lets tests
+ * substitute a plain, hand-built implementation (e.g. {@code
  * TestTransmodelGraphQLRequestContext}) without needing a Dagger component at all.
  */
 public interface TransmodelGraphQLRequestContext {

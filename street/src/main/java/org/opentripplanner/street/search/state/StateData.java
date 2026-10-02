@@ -52,7 +52,10 @@ public class StateData implements Cloneable {
 
   public PropulsionType rentalVehiclePropulsionType;
 
-  /** This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
+  /**
+   * This boolean is set to true upon transition from a normal street to a no-through-traffic
+   * street.
+   */
   protected boolean enteredNoThroughTrafficArea;
 
   /**
@@ -63,13 +66,14 @@ public class StateData implements Cloneable {
   protected Set<GeofencingZone> currentGeofencingZones = Set.of();
 
   /**
-   * Tracks networks for which forking a committed branch from this generic state would be
-   * illegal (the path crossed the network's no-traversal zone) or duplicate the deferred BA
-   * fork. Read by NetworkCommitmentHandler and VehicleRentalEdge to skip the redundant work.
+   * Tracks networks for which forking a committed branch from this generic state would be illegal
+   * (the path crossed the network's no-traversal zone) or duplicate the deferred BA fork. Read by
+   * NetworkCommitmentHandler and VehicleRentalEdge to skip the redundant work.
    *
-   * <p>Not consulted by {@link
-   * org.opentripplanner.street.search.strategy.DominanceFunctions} for performance: treating
-   * differing sets as incomparable would split the SPT into a plane per subset.
+   * <p>
+   * Not consulted by {@link org.opentripplanner.street.search.strategy.DominanceFunctions} for
+   * performance: treating differing sets as incomparable would split the SPT into a plane per
+   * subset.
    */
   protected Set<String> committedNetworks = Set.of();
 
@@ -108,9 +112,9 @@ public class StateData implements Cloneable {
   }
 
   /**
-   * Returns an initial StateData based on the options from the {@link StreetSearchRequest}. This returns always
-   * only a single state, which is considered the "base case", should there be several possible for
-   * the given {@code request}.
+   * Returns an initial StateData based on the options from the {@link StreetSearchRequest}. This
+   * returns always only a single state, which is considered the "base case", should there be
+   * several possible for the given {@code request}.
    */
   public static StateData getBaseCaseStateData(StreetSearchRequest request) {
     var stateDatas = getInitialStateDatas(

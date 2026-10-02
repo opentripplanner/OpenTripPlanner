@@ -10,17 +10,17 @@ import java.util.regex.Pattern;
 /**
  * This utility class substitute variable placeholders in a given text on the format ${variable}.
  *
- * The pattern matching a placeholder must start with '${' and end with '}'. The variable name
- * must consist of only alphanumerical characters (a-z, A-Z, 0-9), dot `.` and underscore '_'.
+ * The pattern matching a placeholder must start with '${' and end with '}'. The variable name must
+ * consist of only alphanumerical characters (a-z, A-Z, 0-9), dot `.` and underscore '_'.
  */
 public class TextVariablesSubstitution {
 
   private static final Pattern PATTERN = Pattern.compile("\\$\\{([.\\w]+)}");
 
   /**
-   * This method uses the {@link #insertVariables(String, Function, Consumer)} to substitute
-   * all variable tokens in all values in the given {@code properties}. It supports nesting, but
-   * you must avoid cyclic references.
+   * This method uses the {@link #insertVariables(String, Function, Consumer)} to substitute all
+   * variable tokens in all values in the given {@code properties}. It supports nesting, but you
+   * must avoid cyclic references.
    * <p>
    * Example:
    * <pre>

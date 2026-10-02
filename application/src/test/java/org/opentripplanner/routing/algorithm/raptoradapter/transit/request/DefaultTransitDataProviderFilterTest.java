@@ -256,8 +256,8 @@ class DefaultTransitDataProviderFilterTest {
   }
 
   /**
-   * Filtering trips with 2 filters: a selection by submode filter and an exclusion by agency filter.
-   * A trip matches if it matches either of them.
+   * Filtering trips with 2 filters: a selection by submode filter and an exclusion by agency
+   * filter. A trip matches if it matches either of them.
    */
   @Test
   void matchModeFilterAndBannedAgencyFilter() {
@@ -287,8 +287,8 @@ class DefaultTransitDataProviderFilterTest {
   }
 
   /**
-   * Filtering trips with one filter combining selection by submode amd exclusion by agency:
-   * a trip matches if it matches both of them.
+   * Filtering trips with one filter combining selection by submode amd exclusion by agency: a trip
+   * matches if it matches both of them.
    */
   @Test
   void matchCombinedModesAndBannedAgencyFilter() {
@@ -382,8 +382,8 @@ class DefaultTransitDataProviderFilterTest {
   }
 
   /**
-   * When the filter matches the pattern's declared mode, trips with a different mode
-   * should still be excluded by trip-level filtering.
+   * When the filter matches the pattern's declared mode, trips with a different mode should still
+   * be excluded by trip-level filtering.
    */
   @Test
   void multiModePatternFilterMatchesPatternModeExcludesNonMatchingTrips() {
@@ -404,8 +404,8 @@ class DefaultTransitDataProviderFilterTest {
   }
 
   /**
-   * When the filter does NOT match the pattern's declared mode, trips whose mode matches
-   * the filter should still be included by trip-level filtering.
+   * When the filter does NOT match the pattern's declared mode, trips whose mode matches the filter
+   * should still be included by trip-level filtering.
    */
   @Test
   void multiModePatternFilterDoesNotMatchPatternModeIncludesMatchingTrips() {
@@ -423,9 +423,9 @@ class DefaultTransitDataProviderFilterTest {
   }
 
   /**
-   * On a single-mode pattern, filtering is done at the pattern level only. This test uses
-   * a contrived scenario where the trip mode differs from the pattern mode (which would not
-   * happen in practice) to verify that only the pattern-level mode is checked.
+   * On a single-mode pattern, filtering is done at the pattern level only. This test uses a
+   * contrived scenario where the trip mode differs from the pattern mode (which would not happen in
+   * practice) to verify that only the pattern-level mode is checked.
    */
   @Test
   void singleModePatternDoesNotApplyTripLevelModeFiltering() {

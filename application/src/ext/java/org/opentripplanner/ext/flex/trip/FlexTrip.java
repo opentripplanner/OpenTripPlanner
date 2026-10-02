@@ -42,8 +42,8 @@ public abstract class FlexTrip<
   }
 
   /**
-   * Earliest departure time from boardStopPosition to alightStopPosition, which departs after departureTime,
-   * and for which the flex trip has a duration of flexTime seconds.
+   * Earliest departure time from boardStopPosition to alightStopPosition, which departs after
+   * departureTime, and for which the flex trip has a duration of flexTime seconds.
    *
    * @return {@link StopTime#MISSING_VALUE} is returned if a departure does not exist.
    */
@@ -62,8 +62,8 @@ public abstract class FlexTrip<
   public abstract int earliestDepartureTime(int stopIndex);
 
   /**
-   * Latest arrival time to alightStopPosition from boardStopPosition, which arrives before arrivalTime,
-   * and for which the flex trip has a duration of flexTime seconds.
+   * Latest arrival time to alightStopPosition from boardStopPosition, which arrives before
+   * arrivalTime, and for which the flex trip has a duration of flexTime seconds.
    *
    * @return {@link StopTime#MISSING_VALUE} is returned if a departure does not exist.
    */
@@ -105,8 +105,8 @@ public abstract class FlexTrip<
   public abstract Set<StopLocation> getStops();
 
   /**
-   * Return a stop at given stop-index. Note! The visited order may not be the same as the
-   * indexing order.
+   * Return a stop at given stop-index. Note! The visited order may not be the same as the indexing
+   * order.
    */
   public abstract StopLocation getStop(int stopIndex);
 
@@ -127,16 +127,14 @@ public abstract class FlexTrip<
   public abstract boolean isAlightingPossible(FeedScopedId stopId);
 
   /**
-   * Find the first stop-position matching the given {@code fromStopId} where
-   * boarding is allowed.
+   * Find the first stop-position matching the given {@code fromStopId} where boarding is allowed.
    *
    * @return stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */
   public abstract int findBoardIndex(FeedScopedId fromStopId);
 
   /**
-   * Find the first stop-position matching the given {@code toStopId} where
-   * alighting is allowed.
+   * Find the first stop-position matching the given {@code toStopId} where alighting is allowed.
    *
    * @return the stop position in the pattern or {@link #STOP_INDEX_NOT_FOUND} if not found.
    */

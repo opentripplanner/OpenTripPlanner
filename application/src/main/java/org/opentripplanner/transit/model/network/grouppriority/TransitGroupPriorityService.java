@@ -28,16 +28,13 @@ public class TransitGroupPriorityService {
    *
    * There are two ways we can treat the base (local-traffic) transit priority group:
    * <ol>
-   *   <li>
-   *     We can assign group id 1 (one) to the base group and it will be treated as any other group.
+   *   <li>We can assign group id 1 (one) to the base group and it will be treated as any other group.
    *   </li>
-   *   <li>
-   *     We can assign group id 0 (zero) to the base and it will not be added to the set of groups
-   *     a given path has.
-   *   </li>
+   *   <li>We can assign group id 0 (zero) to the base and it will not be added to the set of groups a
+   *       given path has.</li>
    * </ol>
-   * When we compare paths, we compare sets of group ids. A set is dominating another set if it is
-   * a smaller subset or different from the other set.
+   * When we compare paths, we compare sets of group ids. A set is dominating another set if it is a
+   * smaller subset or different from the other set.
    */
   private static final int GROUP_INDEX_COUNTER_START = 1;
 
@@ -102,6 +99,7 @@ public class TransitGroupPriorityService {
   /**
    * Fetch/lookup the transit-group-id for the given pattern.
    * <p>
+   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(TripPattern tripPattern) {
@@ -113,6 +111,7 @@ public class TransitGroupPriorityService {
   /**
    * Fetch/lookup the transit-group-id for the given trip.
    * <p>
+   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   public int lookupTransitGroupPriorityId(Trip trip) {
@@ -122,6 +121,7 @@ public class TransitGroupPriorityService {
   /**
    * Fetch/lookup the transit-group-id for the given entity.
    * <p>
+   *
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
   private int lookupTransitGroupPriorityId(EntityAdapter entity) {
@@ -151,8 +151,8 @@ public class TransitGroupPriorityService {
   }
 
   /**
-   * This is the group-id assigned to all transit trips/patterns which does not match a
-   * specific group.
+   * This is the group-id assigned to all transit trips/patterns which does not match a specific
+   * group.
    */
   public int baseGroupId() {
     return baseGroupId;

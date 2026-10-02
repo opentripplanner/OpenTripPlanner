@@ -18,7 +18,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Represents a transfer for a set of modes between stops with the street network path attached to it.
+ * Represents a transfer for a set of modes between stops with the street network path attached to
+ * it.
  * <p>
  * Do not confuse this with {@link ConstrainedTransfer}.
  *

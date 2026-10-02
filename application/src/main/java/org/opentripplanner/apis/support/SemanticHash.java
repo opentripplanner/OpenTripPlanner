@@ -79,8 +79,8 @@ public class SemanticHash {
    * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS
    * feed versions. Use hops rather than stops because:
    * <ol>
-   * <li>arrival at stop zero and departure from last stop are irrelevant</li>
-   * <li>this hash function needs to stay stable when users switch from 0.10.x to 1.0</li>
+   *   <li>arrival at stop zero and departure from last stop are irrelevant</li>
+   *   <li>this hash function needs to stay stable when users switch from 0.10.x to 1.0</li>
    * </ol>
    */
   private static HashCode forTripTimes(TripTimes<?> tripTimes, final HashFunction hashFunction) {

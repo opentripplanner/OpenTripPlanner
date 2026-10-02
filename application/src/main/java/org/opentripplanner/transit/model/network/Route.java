@@ -151,8 +151,8 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   }
 
   /**
-   * The visual sort priority of this route when displayed in a graphical interface.
-   * A lower number means that the route has a higher priority.
+   * The visual sort priority of this route when displayed in a graphical interface. A lower number
+   * means that the route has a higher priority.
    * <p>
    * Pass-through information from GTFS. This information is not used by OTP.
    */

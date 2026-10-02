@@ -292,7 +292,7 @@ public class StreetPathToLegsMapper {
   /**
    * Generate one leg of an itinerary from a list of {@link State}.
    *
-   * @param subPath       The street path to base the leg on
+   * @param subPath      The street path to base the leg on
    * @param previousStep the previous walk step, so that the first relative turn direction is
    *                     calculated correctly
    * @return The generated leg

@@ -60,13 +60,13 @@ class SkippedTest implements RealtimeTestConstants {
   }
 
   /**
-   * Test realtime system behavior under one very particular case from issue #5725.
-   * When applying differential realtime updates, an update may cancel some stops on a trip. A
-   * later update may then revert the trip back to its originally scheduled sequence of stops.
-   * When this happens, we expect the trip to be associated with a new trip pattern (where some
-   * stops have no pickup or dropoff) then dissociated from that new pattern and re-associated
-   * with its originally scheduled pattern. Any trip times that were created in timetables under
-   * the new stop-skipping trip pattern should also be removed.
+   * Test realtime system behavior under one very particular case from issue #5725. When applying
+   * differential realtime updates, an update may cancel some stops on a trip. A later update may
+   * then revert the trip back to its originally scheduled sequence of stops. When this happens, we
+   * expect the trip to be associated with a new trip pattern (where some stops have no pickup or
+   * dropoff) then dissociated from that new pattern and re-associated with its originally scheduled
+   * pattern. Any trip times that were created in timetables under the new stop-skipping trip
+   * pattern should also be removed.
    */
   @Test
   void scheduledTripWithPreviouslySkipped() {

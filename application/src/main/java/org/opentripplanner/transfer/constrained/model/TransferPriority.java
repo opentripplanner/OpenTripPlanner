@@ -5,17 +5,11 @@ package org.opentripplanner.transfer.constrained.model;
  * highest priority PREFERRED. This follow the NeTEx/Transmodel naming and functionality. In GTFS
  * the priority is mapped using {@code transfer_type}:
  * <ol>
- *     <li>
- *         {@code 0 or empty -> PREFERRED}. Recommended transfer point between routes.
- *     </li>
- *     <li>
- *         {@code 1 -> ALLOWED}. Timed transfer point between two routes. The departing vehicle is
- *         expected to wait for the arriving one and leave sufficient time for a rider to transfer
- *         between routes. The transfer is also set as GUARANTEED.
- *     </li>
- *     <li>
- *         {@code 3 -> NOT_ALLOWED}. Transfers are not possible
- *     /li>
+ *   <li>{@code 0 or empty -> PREFERRED}. Recommended transfer point between routes.</li>
+ *   <li>{@code 1 -> ALLOWED}. Timed transfer point between two routes. The departing vehicle is
+ *       expected to wait for the arriving one and leave sufficient time for a rider to transfer between
+ *       routes. The transfer is also set as GUARANTEED.</li>
+ *   <li>{@code 3 -> NOT_ALLOWED}. Transfers are not possible /li>
  * </ol>
  * <p>
  * Note that for {@code transfer_type=1} the guaranteed flag is also set causing it to take
@@ -73,10 +67,10 @@ public enum TransferPriority {
    * generalized-cost. A regular transfer (without any constraints) has the same cost as ALLOWED.
    * <p>
    * <ol>
-   * <li>{@code PREFERRED} - cost: 1 points.</li>
-   * <li>{@code RECOMMENDED} - cost: 2 points.</li>
-   * <li>{@code ALLOWED} - cost: 3 points.</li>
-   * <li>{@code NOT_ALLOWED} - cost: 1000 points.</li>
+   *   <li>{@code PREFERRED} - cost: 1 points.</li>
+   *   <li>{@code RECOMMENDED} - cost: 2 points.</li>
+   *   <li>{@code ALLOWED} - cost: 3 points.</li>
+   *   <li>{@code NOT_ALLOWED} - cost: 1000 points.</li>
    * </ol>
    */
   public int cost() {

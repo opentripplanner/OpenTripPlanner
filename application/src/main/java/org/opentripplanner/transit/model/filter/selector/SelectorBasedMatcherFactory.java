@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.filter.expr.OrMatcher;
 public class SelectorBasedMatcherFactory {
 
   /**
-   * Creates a matcher from a list of {@link FilterRequest} filters.
-   * A T matches if it matches at least one of the filters (OR between filters).
+   * Creates a matcher from a list of {@link FilterRequest} filters. A T matches if it matches at
+   * least one of the filters (OR between filters).
    *
    * <p>
    * Each filter implements select/not semantics, meaning each selector will:

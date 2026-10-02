@@ -6,6 +6,7 @@ package org.opentripplanner.raptor.spi;
  * the implementation of this interface. Raptor uses a binary search to find the right
  * trip-schedule, so even for long time-tables the Raptor search perform quite well.
  * <p>
+ *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface RaptorTimeTable<T extends RaptorTripSchedule> {

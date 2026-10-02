@@ -37,12 +37,12 @@ import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 
 /**
- * This class is the central point where all vertices that are supposed to be permanently part
- * of the graph are built. It is the responsibility of this class to make sure that the vertices
- * are added to the graph.
+ * This class is the central point where all vertices that are supposed to be permanently part of
+ * the graph are built. It is the responsibility of this class to make sure that the vertices are
+ * added to the graph.
  * <p>
- * Vertices that are not supposed to be part of the graph, like temporary splitter vertices, don't
- * need to be added to the graph and hence are not listed here.
+ * Vertices that are not supposed to be part of the graph, like temporary splitter vertices,
+ * don't need to be added to the graph and hence are not listed here.
  */
 public class VertexFactory {
 

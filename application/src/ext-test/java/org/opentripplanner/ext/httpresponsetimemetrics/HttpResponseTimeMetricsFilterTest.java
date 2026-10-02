@@ -23,7 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
 
 /**
- * Note: The unit tests relies on mocks to abstract out the micrometer API (request and response objects).
+ * Note: The unit tests relies on mocks to abstract out the micrometer API (request and response
+ * objects).
  */
 class HttpResponseTimeMetricsFilterTest {
 

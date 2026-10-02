@@ -16,9 +16,9 @@ public interface DocsTestConstants {
   File SANDBOX_USER_DOC_PATH = new File(USER_DOC_PATH, "sandbox");
 
   /**
-   * This method return {@code true} if both the /doc/user and /doc/templates directories are available. If not, a warning is
-   * logged and the method returns {@code false}. This is used by the {@link GeneratesDocumentation}
-   * annotation.
+   * This method return {@code true} if both the /doc/user and /doc/templates directories are
+   * available. If not, a warning is logged and the method returns {@code false}. This is used by
+   * the {@link GeneratesDocumentation} annotation.
    */
   static boolean docsExistOrWarn() {
     if (USER_DOC_PATH.exists() && TEMPLATE_PATH.exists()) {

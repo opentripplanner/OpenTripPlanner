@@ -9,15 +9,15 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 
 /**
  * Defines a via location which the journey must route through. At least one stop location or
- * coordinate must exist. When routing, the via-location is visited if at least one of the stops
- * or coordinates is visited, before the journey continues. There is no need to visit any other
- * stop location or coordinate.
+ * coordinate must exist. When routing, the via-location is visited if at least one of the stops or
+ * coordinates is visited, before the journey continues. There is no need to visit any other stop
+ * location or coordinate.
  * <p>
  * The stop locations and coordinates are distinct locations. In earlier versions of OTP the
  * coordinates were used as a fallback for when a stop was not found. But in this version, a
- * {@link org.opentripplanner.transit.model.framework.EntityNotFoundException} is thrown if
- * one of the stops does not exist. The search does NOT try to be smart and recover from an
- * entity not found exception.
+ * {@link org.opentripplanner.transit.model.framework.EntityNotFoundException} is thrown if one of
+ * the stops does not exist. The search does NOT try to be smart and recover from an entity not
+ * found exception.
  */
 public interface ViaLocation {
   /**
@@ -48,8 +48,8 @@ public interface ViaLocation {
   List<FeedScopedId> stopLocationIds();
 
   /**
-   * A coordinate used together with the {@code stopLocationIds} as the via location.
-   * This is optional.
+   * A coordinate used together with the {@code stopLocationIds} as the via location. This is
+   * optional.
    */
   default Optional<WgsCoordinate> coordinate() {
     return Optional.empty();

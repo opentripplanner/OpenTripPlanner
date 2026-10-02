@@ -116,8 +116,8 @@ class StreetEdgePropulsionCostTest {
   }
 
   /**
-   * Test cases for propulsion type slope sensitivity.
-   * Each case specifies: propulsion type, form factor, street mode, slope sensitivity factor.
+   * Test cases for propulsion type slope sensitivity. Each case specifies: propulsion type, form
+   * factor, street mode, slope sensitivity factor.
    * <p>
    * Slope sensitivity determines how much the elevation profile affects travel time:
    * <pre>

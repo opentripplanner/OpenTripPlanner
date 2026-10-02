@@ -11,8 +11,8 @@ import org.opentripplanner.routing.api.response.RoutingError;
 
 /**
  * This class maintain routing results/itineraries and errors. It is used to merge set of
- * itineraries from multiple routers (direct street/transit/flex) into one set. It also has
- * methods to transform the current set of itineraries to a new set, see {@link #transform(Function)}.
+ * itineraries from multiple routers (direct street/transit/flex) into one set. It also has methods
+ * to transform the current set of itineraries to a new set, see {@link #transform(Function)}.
  */
 class RoutingResult {
 
@@ -71,13 +71,12 @@ class RoutingResult {
   /**
    * This method is used to decorate the itineraries with additonal information. The itinerary
    * filter chain is the main place to add decorating filters. This is ment to extend/support the
-   * router logic - maybe compansate for diffrences in the specific routers. For example setting
-   * the {@code generalizedCost2} for direct FLEX results, to allow them to be compared with
-   * transit results where the transit router already calculated the {@code generalizedCost2}
-   * value. This should not be used for things like fares which is just adding more info to the
-   * itineraries, this should be done in the filter chain. Another way to look at it is to use
-   * this for services which must allways run, while the filter-chain is for configurable
-   * (optional) features.
+   * router logic - maybe compansate for diffrences in the specific routers. For example setting the
+   * {@code generalizedCost2} for direct FLEX results, to allow them to be compared with transit
+   * results where the transit router already calculated the {@code generalizedCost2} value. This
+   * should not be used for things like fares which is just adding more info to the itineraries,
+   * this should be done in the filter chain. Another way to look at it is to use this for services
+   * which must allways run, while the filter-chain is for configurable (optional) features.
    */
   void transform(Function<List<Itinerary>, List<Itinerary>> transform) {
     var list = transform.apply(this.itineraries);

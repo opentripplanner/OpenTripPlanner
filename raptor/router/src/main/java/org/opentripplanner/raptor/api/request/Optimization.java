@@ -20,10 +20,10 @@ public enum Optimization {
    * at the destination. Then this "vector" is checked if it qualify in the existing set of pareto
    * optimal destination arrivals.
    * <p>
-   * On the Norwegian graph this improve the average search time from 1.15 seconds to 0.55 seconds
-   * for a test set of 27 different test cases with an average search-window of 1 hour and 20
-   * minutes. The longer searches have search-windows up to 3 hours. The SpeedTest is used to obtain
-   * the results.
+   * On the Norwegian graph this improve the average search time from 1.15 seconds to 0.55
+   * seconds for a test set of 27 different test cases with an average search-window of 1 hour and
+   * 20 minutes. The longer searches have search-windows up to 3 hours. The SpeedTest is used to
+   * obtain the results.
    * <p>
    * This optimization was not implemented based on the [Restricted Pareto Sets]
    * (https://epubs.siam.org/doi/pdf/10.1137/1.9781611975499.5), but it is very similar. The current

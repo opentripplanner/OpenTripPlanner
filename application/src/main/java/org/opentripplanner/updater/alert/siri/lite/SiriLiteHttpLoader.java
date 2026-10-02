@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.Siri;
 
 /**
- * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP via a single request
- * that contains all updates.
+ * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP via a single request that
+ * contains all updates.
  */
 public class SiriLiteHttpLoader implements SiriLoader {
 

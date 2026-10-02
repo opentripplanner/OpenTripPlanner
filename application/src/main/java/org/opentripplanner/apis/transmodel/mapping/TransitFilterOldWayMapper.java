@@ -91,9 +91,9 @@ class TransitFilterOldWayMapper {
   }
 
   /**
-   * Return transit modes. If this method returns empty the transit search should be disabled.
-   * This happens is the transit "modes" is defined and empty. If not defined the default is
-   * ALL transit modes.
+   * Return transit modes. If this method returns empty the transit search should be disabled. This
+   * happens is the transit "modes" is defined and empty. If not defined the default is ALL transit
+   * modes.
    */
   private static List<MainAndSubMode> mapTransitModes(DataFetchingEnvironment environment) {
     final List<MainAndSubMode> tModes = new ArrayList<>();
@@ -127,8 +127,8 @@ class TransitFilterOldWayMapper {
   }
 
   /**
-   * Finish building the selectors. Add modes to all existing selectors, or create a new
-   * selector using the provided modes.
+   * Finish building the selectors. Add modes to all existing selectors, or create a new selector
+   * using the provided modes.
    */
   private static List<SelectRequest> buildFiltersWithModes(
     ArrayList<SelectRequest.Builder> selectors,

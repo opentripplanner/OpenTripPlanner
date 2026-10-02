@@ -9,8 +9,7 @@ import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
- * Contains logic for storing edge level info in the
- * {@link StreetDetailsRepository}.
+ * Contains logic for storing edge level info in the {@link StreetDetailsRepository}.
  */
 public interface InclinedEdgeLevelInfoProcessor {
   InclinedEdgeLevelInfoProcessor NOOP = new NoopInclinedEdgeLevelInfoProcessor();

@@ -20,7 +20,7 @@ class OHCalendarTest {
 
   @Test
   void simpleCase() {
-    ///////// GRAPH BUILD  /////////
+    ///////// GRAPH BUILD
 
     // Create a new service (one instance for the entire graph build) with
     // first and last day of service
@@ -69,7 +69,7 @@ class OHCalendarTest {
       c.toString()
     );
 
-    ///////// ROUTING SEARCH  /////////
+    ///////// ROUTING SEARCH
 
     // The start of the search, this is used to optimize the calculation
     Instant dateTime = Instant.parse("2022-10-25T00:30:00Z");

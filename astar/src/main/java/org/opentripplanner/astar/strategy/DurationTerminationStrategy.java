@@ -5,8 +5,8 @@ import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 
 /**
- * This termination strategy is used to terminate an a-star search after a fixed duration
- * has elapsed.
+ * This termination strategy is used to terminate an a-star search after a fixed duration has
+ * elapsed.
  */
 public class DurationTerminationStrategy<State extends AStarState<State, ?, ?>> implements
   SearchTerminationStrategy<State> {

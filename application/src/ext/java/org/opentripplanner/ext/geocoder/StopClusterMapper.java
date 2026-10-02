@@ -43,8 +43,7 @@ class StopClusterMapper {
 
   /**
    * De-duplicates collections of {@link StopLocation} and {@link StopLocationsGroup} into a stream
-   * of {@link StopCluster}.
-   * Deduplication means
+   * of {@link StopCluster}. Deduplication means
    * <pre>
    * - stop/station relationships are resolved and only the station returned
    * - of "identical" stops which are very close to each other and have an identical name, only one

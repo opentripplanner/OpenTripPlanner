@@ -23,10 +23,10 @@ public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
   }
 
   /**
-   * Return the complement of the given list of {@code modes} with {@link #all()} main modes
-   * as a starting point. Hence, take all main modes and remove all modes matching one of the
-   * given input {@code modes}. If one of the given modes is not a main mode
-   * ({@link #isMainModeOnly()}), then it is simply ignored.
+   * Return the complement of the given list of {@code modes} with {@link #all()} main modes as a
+   * starting point. Hence, take all main modes and remove all modes matching one of the given input
+   * {@code modes}. If one of the given modes is not a main mode ({@link #isMainModeOnly()}), then
+   * it is simply ignored.
    */
   public static List<MainAndSubMode> notMainModes(Collection<MainAndSubMode> modes) {
     return MainAndSubMode.all().stream().filter(Predicate.not(modes::contains)).toList();
@@ -54,8 +54,8 @@ public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
   }
 
   /**
-   * Make sure the String serialization is deterministic by sorting the elements in
-   * alphabetic order.
+   * Make sure the String serialization is deterministic by sorting the elements in alphabetic
+   * order.
    */
   public static String toString(Collection<MainAndSubMode> modes) {
     return modes != null

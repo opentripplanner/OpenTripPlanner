@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
  * using a pareto set. The comparator is passed in as an argument to the constructor. This make is
  * possible to collect different sets in different scenarios.
  * <p>
- * Depending on the pareto comparator passed into the constructor this class grantee that the best
- * paths with respect to <em>arrival time</em>, <em>rounds</em> and <em>travel duration</em> are
- * found. You may also add <em>cost</em> as a criteria (multi-criteria search).
+ * Depending on the pareto comparator passed into the constructor this class grantee that the
+ * best paths with respect to <em>arrival time</em>, <em>rounds</em> and <em>travel duration</em>
+ * are found. You may also add <em>cost</em> as a criteria (multi-criteria search).
  * <p>
  * This class is a thin wrapper around a ParetoSet of {@link RaptorPath}s. Before paths are added
  * the arrival time is checked against the arrival time limit.

@@ -81,8 +81,8 @@ public class TaxiLeg implements Leg {
 
   /**
    * Taxi trips always consist of exactly one pickup stop and one drop-off stop (see
-   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these
-   * positions are fixed.
+   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these positions are
+   * fixed.
    */
   @Override
   public Integer boardStopPosInPattern() {
@@ -91,8 +91,8 @@ public class TaxiLeg implements Leg {
 
   /**
    * Taxi trips always consist of exactly one pickup stop and one drop-off stop (see
-   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these
-   * positions are fixed.
+   * {@link org.opentripplanner.ext.taxi.internal.graphbuilder.TaxiBuilder}), so these positions are
+   * fixed.
    */
   @Override
   public Integer alightStopPosInPattern() {

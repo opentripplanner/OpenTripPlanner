@@ -18,11 +18,11 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
 
 /**
- * Loads files from the resources folder relative to the package name of the class/instances
- * passed to initializers.
+ * Loads files from the resources folder relative to the package name of the class/instances passed
+ * to initializers.
  * <p>
- * So if your class' package is org.opentripplanner.foo, then the corresponding resources
- * must be placed in src/test/resources/org/opentripplanner/foo.
+ * So if your class' package is org.opentripplanner.foo, then the corresponding resources must be
+ * placed in src/test/resources/org/opentripplanner/foo.
  */
 public class ResourceLoader {
 

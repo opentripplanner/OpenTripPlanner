@@ -12,8 +12,8 @@ import org.locationtech.jts.geom.LineString;
  * "Vertex position" is the index of the boundary <i>between</i> two consecutive members:
  * <ul>
  *   <li>position {@code 0} is the start of member {@code 0}</li>
- *   <li>position {@code i} (for {@code 0 < i < size()}) is the shared seam between member
- *       {@code i-1} and member {@code i}</li>
+ *   <li>position {@code i} (for {@code 0 < i < size()}) is the shared seam between member {@code i-1}
+ *       and member {@code i}</li>
  *   <li>position {@code size()} is the end of the last member</li>
  * </ul>
  * <p>

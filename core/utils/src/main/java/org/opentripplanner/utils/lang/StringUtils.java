@@ -10,8 +10,8 @@ public class StringUtils {
   /**
    * Regex to find unprintable characters like newlines and 'ZERO WIDTH SPACE' (U+200B).
    * <p>
-   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in the
-   * middle of a word.
+   * \p{C} was chosen over \p{Cntrl} because it also recognises invisible control characters in
+   * the middle of a word.
    */
   private static final String INVISIBLE_CHARS_REGEX = "\\p{C}";
   /**
@@ -35,7 +35,7 @@ public class StringUtils {
    * true if the given text is {@code null}, empty, only white-space or the string {@code "null"}.
    * This is convenient when parsing untrusted external client requests, and we do not care to
    * differentiate.
-   * */
+   */
   public static boolean hasNoValueOrNullAsString(String text) {
     return hasNoValue(text) || "null".equals(text);
   }
@@ -51,6 +51,7 @@ public class StringUtils {
 
   /**
    * Verify String value is NOT {@code null}, empty or only whitespace.
+   *
    * @param errorMessage optional custom message to be displayed as the exception message.
    * @param placeholders optional placeholders used in the error message format.
    * @throws IllegalArgumentException if given value is {@code null}, empty or only whitespace.
@@ -68,9 +69,10 @@ public class StringUtils {
 
   /**
    * Add the given number of characters to the buffer.
+   *
    * @param buffer the buffer to append to.
-   * @param ch the character to add to the buffer.
-   * @param count the number of characters to add. If 0 or negative nothing is added.
+   * @param ch     the character to add to the buffer.
+   * @param count  the number of characters to add. If 0 or negative nothing is added.
    * @return the given buffer input for convenient chaining
    */
   public static StringBuilder append(StringBuilder buffer, char ch, int count) {
@@ -117,7 +119,7 @@ public class StringUtils {
     return StringUtils.append(new StringBuilder(value), ch, width - value.length()).toString();
   }
 
-  /** Replace single quotes with double quotes.  */
+  /** Replace single quotes with double quotes. */
   public static String quoteReplace(String text) {
     return text.replace('\'', '\"');
   }
@@ -140,8 +142,8 @@ public class StringUtils {
   }
 
   /**
-   * Detects unprintable control characters like newlines, tabs and invisible whitespace
-   * like 'ZERO WIDTH SPACE' (U+200B) that don't have an immediate visual representation.
+   * Detects unprintable control characters like newlines, tabs and invisible whitespace like 'ZERO
+   * WIDTH SPACE' (U+200B) that don't have an immediate visual representation.
    * <p>
    * Note that "regular" whitespace characters like U+0020 and U+2000 are considered visible.
    */

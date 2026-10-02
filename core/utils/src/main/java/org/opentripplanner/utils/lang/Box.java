@@ -5,8 +5,9 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
- * A box around a mutable value reference. This can be used inside a lambda or passed into
- * a function.
+ * A box around a mutable value reference. This can be used inside a lambda or passed into a
+ * function.
+ *
  * @param <T> the type of the wrapped value.
  */
 public class Box<T> {

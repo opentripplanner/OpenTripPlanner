@@ -26,8 +26,8 @@ import org.opentripplanner.utils.collection.MinMap;
  * A {@link TraverseVisitor} that collects transit stops and flex area stops during an A* search,
  * replacing the post-search scan of all SPT states in {@link StreetNearbyStopFinder}.
  * <p>
- * With {@code MinimumWeight} dominance and a trivial heuristic (Dijkstra), {@code visitVertex} is
- * called exactly once per vertex with the optimal state, producing the same result set as
+ * With {@code MinimumWeight} dominance and a trivial heuristic (Dijkstra), {@code visitVertex}
+ * is called exactly once per vertex with the optimal state, producing the same result set as
  * post-scan filtering of {@code getAllStates()}.
  */
 class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {

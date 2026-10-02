@@ -22,9 +22,9 @@ public class OsmDatabaseTest {
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmDatabaseTest.class);
 
   /**
-   * The way https://www.openstreetmap.org/way/13876983 does not contain the tag lcn (local cycling network)
-   * but because it is part of a relation that _does_, the tag is copied from the relation to the way.
-   * This test assert that this is really happening.
+   * The way https://www.openstreetmap.org/way/13876983 does not contain the tag lcn (local cycling
+   * network) but because it is part of a relation that _does_, the tag is copied from the relation
+   * to the way. This test assert that this is really happening.
    */
   @Test
   void bicycleRouteRelations() {

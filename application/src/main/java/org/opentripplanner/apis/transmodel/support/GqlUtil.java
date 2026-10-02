@@ -88,16 +88,16 @@ public class GqlUtil {
 
   /**
    * Return the epoch-milliseconds argument as an {@link Instant}, or the current time if the
-   * argument is omitted or explicitly {@code null}. An explicit null makes
-   * {@code containsArgument} return {@code true}, so it cannot be used as a presence check.
+   * argument is omitted or explicitly {@code null}. An explicit null makes {@code containsArgument}
+   * return {@code true}, so it cannot be used as a presence check.
    */
   public static Instant getInstantOrNow(DataFetchingEnvironment environment, String argumentName) {
     return getInstantOrElse(environment, argumentName, Instant.now());
   }
 
   /**
-   * Return the epoch-milliseconds argument as an {@link Instant}, or the given default value if
-   * the argument is omitted or explicitly {@code null}.
+   * Return the epoch-milliseconds argument as an {@link Instant}, or the given default value if the
+   * argument is omitted or explicitly {@code null}.
    */
   static Instant getInstantOrElse(
     DataFetchingEnvironment environment,
@@ -109,10 +109,9 @@ public class GqlUtil {
   }
 
   /**
-   * Return the integer value of the argument or throw an exception if the value is null
-   * or strictly negative.
-   * This should generally be handled at the GraphQL schema level,
-   * but must sometimes be implemented programmatically to preserve backward compatibility.
+   * Return the integer value of the argument or throw an exception if the value is null or strictly
+   * negative. This should generally be handled at the GraphQL schema level, but must sometimes be
+   * implemented programmatically to preserve backward compatibility.
    */
   public static int getPositiveNonNullIntegerArgument(
     DataFetchingEnvironment environment,
@@ -128,9 +127,9 @@ public class GqlUtil {
   }
 
   /**
-   * Return the double value of the argument or throw an exception if the value is null.
-   * This should generally be handled at the GraphQL schema level, but must sometimes be
-   * implemented programmatically to preserve backward compatibility.
+   * Return the double value of the argument or throw an exception if the value is null. This should
+   * generally be handled at the GraphQL schema level, but must sometimes be implemented
+   * programmatically to preserve backward compatibility.
    */
   public static double getNonNullDoubleArgument(
     DataFetchingEnvironment environment,

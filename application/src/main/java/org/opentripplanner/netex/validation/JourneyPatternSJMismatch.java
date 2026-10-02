@@ -10,9 +10,8 @@ import org.rutebanken.netex.model.StopUseEnumeration;
 
 /**
  * Validates that the number of passing times in the journey and the number of stop points in the
- * pattern are equal.
- * It also takes into account that some points in the pattern can be set to stopUse=passthrough
- * which means that those must not be referenced in the journey.
+ * pattern are equal. It also takes into account that some points in the pattern can be set to
+ * stopUse=passthrough which means that those must not be referenced in the journey.
  */
 class JourneyPatternSJMismatch extends AbstractHMapValidationRule<String, ServiceJourney> {
 

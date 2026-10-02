@@ -86,12 +86,12 @@ public final class TransitPreferences implements Serializable {
 
   /**
    * Has information how much time alighting a vehicle takes; The number of seconds to add after
-   * alighting a transit leg. Can be significant for airplanes or ferries.  It is recommended to
-   * use the `alightTimes` in the `router-config.json` to set this for each mode.
+   * alighting a transit leg. Can be significant for airplanes or ferries. It is recommended to use
+   * the `alightTimes` in the `router-config.json` to set this for each mode.
    * <p>
-   * Alight-slack can be configured per mode. The default value is used if not set for a given mode.
-   * This enables configuring the alight-slack for train alighting to be 4 minutes and a bus alight
-   * slack to be 0 minutes.
+   * Alight-slack can be configured per mode. The default value is used if not set for a given
+   * mode. This enables configuring the alight-slack for train alighting to be 4 minutes and a bus
+   * alight slack to be 0 minutes.
    * <p>
    * Unit is seconds. Default value is 0.
    */
@@ -106,8 +106,8 @@ public final class TransitPreferences implements Serializable {
    * <p>
    * If set, it overrides the default value {@code 1.0}.
    * <p>
-   * This is a scalar multiplied with the time in second on-board the transit vehicle. Default value
-   * is not-set(empty map).
+   * This is a scalar multiplied with the time in second on-board the transit vehicle. Default
+   * value is not-set(empty map).
    * <p>
    * The returned map is READ-ONLY and IMMUTABLE. The map is not an EnumMap(mutable), so convert
    * the type into something more performant if needed.
@@ -132,10 +132,9 @@ public final class TransitPreferences implements Serializable {
   }
 
   /**
-   * This is used to relax the cost when comparing transit-groups. The default is the
-   * NORMAL function({@code f(t) = t}. This is the same as not using priority-groups. The
-   * coefficient must be in range {@code [1.0 to 4.0]} and the constant must be in range
-   * {@code [$0 to $1440(4h)]}.
+   * This is used to relax the cost when comparing transit-groups. The default is the NORMAL
+   * function({@code f(t) = t}. This is the same as not using priority-groups. The coefficient must
+   * be in range {@code [1.0 to 4.0]} and the constant must be in range {@code [$0 to $1440(4h)]}.
    */
   public CostLinearFunction relaxTransitGroupPriority() {
     return relaxTransitGroupPriority;

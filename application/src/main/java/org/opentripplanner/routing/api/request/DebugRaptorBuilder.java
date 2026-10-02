@@ -36,8 +36,7 @@ public class DebugRaptorBuilder implements Serializable {
 
   /**
    * Add a list of stops to debug as a string. Both Raptor stop indexes and stop ids are acepted.
-   * Use a space and/or comma to separate the stops. Example:
-   * {@code "12322, 567, 1234"}
+   * Use a space and/or comma to separate the stops. Example: {@code "12322, 567, 1234"}
    * <p>
    * See {@link DebugRaptor} for more info.
    */
@@ -50,10 +49,10 @@ public class DebugRaptorBuilder implements Serializable {
   }
 
   /**
-   * Add a list of stops that define the path you want to debug. Only paths visiting all stops
-   * are debugged. You may add an asterisk {@code '*'} after one of the stops. Stop events for the
-   * stops before the tagged stop are ignored. Both Raptor stop indexes and stop ids are accepted.
-   * Use a space and/or comma to separate the stops. Example: {@code "12322, 567*, 1234"}
+   * Add a list of stops that define the path you want to debug. Only paths visiting all stops are
+   * debugged. You may add an asterisk {@code '*'} after one of the stops. Stop events for the stops
+   * before the tagged stop are ignored. Both Raptor stop indexes and stop ids are accepted. Use a
+   * space and/or comma to separate the stops. Example: {@code "12322, 567*, 1234"}
    * <p>
    * See {@link DebugRaptor} for more info.
    */

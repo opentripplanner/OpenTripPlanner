@@ -4,8 +4,10 @@ import java.util.function.Function;
 
 /**
  * A matcher that validates that a value is not null before applying another matcher. A useful case
- * is when you want to check that a String field is not null before applying a {@link CaseInsensitiveStringPrefixMatcher}.
+ * is when you want to check that a String field is not null before applying a
+ * {@link CaseInsensitiveStringPrefixMatcher}.
  * <p>
+ *
  * @param <T> The type of the entity being matched.
  * @param <V> The type of the value that the matcher will test for not null.
  */
@@ -16,9 +18,9 @@ public class NullSafeWrapperMatcher<T, V> implements Matcher<T> {
   private final Matcher<T> valueMatcher;
 
   /**
-   * @param typeName The typeName appears in the toString for easier debugging.
-   * @param valueProvider The function that maps the entity being matched by this matcher (T) to
-   *                      the value being checked for non-null.
+   * @param typeName      The typeName appears in the toString for easier debugging.
+   * @param valueProvider The function that maps the entity being matched by this matcher (T) to the
+   *                      value being checked for non-null.
    */
   public NullSafeWrapperMatcher(
     String typeName,

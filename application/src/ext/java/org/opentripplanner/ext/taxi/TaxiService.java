@@ -17,8 +17,8 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public interface TaxiService {
   /**
-   * Drops access/egress candidates whose logical endpoints (the request origin/destination and
-   * the stop) are not covered by a common taxi provider.
+   * Drops access/egress candidates whose logical endpoints (the request origin/destination and the
+   * stop) are not covered by a common taxi provider.
    */
   Collection<NearbyStop> filterNearbyStops(
     TransitService transitService,

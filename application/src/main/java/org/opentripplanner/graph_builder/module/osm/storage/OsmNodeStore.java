@@ -20,12 +20,12 @@ import org.opentripplanner.osm.model.OsmNode;
  * <p>
  * This is the single largest in-memory structure during OSM processing, so instead of a
  * {@code TLongObjectMap<OsmNode>} (which needs a full {@link OsmNode} object, including a nested
- * tags map, per node) node data is split into three parallel, node ID-keyed stores. {@link
- * #get(long)} reassembles an {@link OsmNode} on demand from these.
+ * tags map, per node) node data is split into three parallel, node ID-keyed stores.
+ * {@link #get(long)} reassembles an {@link OsmNode} on demand from these.
  * <p>
  * Because nodes are reassembled on every {@link #get(long)} call, two {@link OsmNode} instances
- * returned for the same ID are generally <b>not</b> the same object. Callers must rely on {@link
- * OsmEntity#equals} (which compares by ID and type) rather than reference equality.
+ * returned for the same ID are generally <b>not</b> the same object. Callers must rely on
+ * {@link OsmEntity#equals} (which compares by ID and type) rather than reference equality.
  */
 class OsmNodeStore {
 
@@ -104,9 +104,9 @@ class OsmNodeStore {
   }
 
   /**
-   * Returns just the coordinate of the node with the given id, or {@code null} if it isn't
-   * stored. Cheaper than {@link #get(long)} for the (common) call sites that don't need the
-   * node's tags or provider, since it skips reassembling a full {@link OsmNode}.
+   * Returns just the coordinate of the node with the given id, or {@code null} if it isn't stored.
+   * Cheaper than {@link #get(long)} for the (common) call sites that don't need the node's tags or
+   * provider, since it skips reassembling a full {@link OsmNode}.
    */
   @Nullable
   Coordinate getCoordinate(long id) {
@@ -147,8 +147,8 @@ class OsmNodeStore {
    * Latitude must be in {@code [-90, 90]} and longitude in {@code [-180, 180]}, so both
    * fixed-point values comfortably fit in a (signed) {@code int}. Packing relies on
    * two's-complement bit patterns: {@code lonFixed} is masked with {@code 0xFFFFFFFFL} before the
-   * {@code long}/{@code int} widths differ (this zero-extends it, dropping its sign), and OR-ing
-   * it into the low bits of the shifted {@code latFixed} recombines the two without the sign bits
+   * {@code long}/{@code int} widths differ (this zero-extends it, dropping its sign), and OR-ing it
+   * into the low bits of the shifted {@code latFixed} recombines the two without the sign bits
    * interfering with each other. {@link #unpackLat} and {@link #unpackLon} reverse this by
    * shifting/narrowing back down to {@code int}, which restores the correct sign for each half.
    *

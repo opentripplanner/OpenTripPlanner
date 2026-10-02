@@ -11,9 +11,10 @@ import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * @see <a href="https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
- * Specification</a>
- * <p>
+ * @see <a href=
+ *      "https://github.com/NABSA/gbfs/blob/master/gbfs.md#vehicle_typesjson-added-in-v21">GBFS
+ *      Specification</a>
+ *      <p>
  */
 public final class RentalVehicleType implements Serializable, Comparable<RentalVehicleType> {
 

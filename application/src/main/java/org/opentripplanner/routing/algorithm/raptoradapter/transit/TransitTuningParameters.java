@@ -33,9 +33,9 @@ public interface TransitTuningParameters {
    * The maximum search window that can be set through the searchWindow API parameter. Due to the
    * way timetable data are collected before a Raptor trip search, using a search window larger than
    * 24 hours may lead to inconsistent search results. Limiting the search window prevents also
-   * potential performance issues. The recommended maximum value is 24 hours.
-   * This parameter does not restrict the maximum duration of a dynamic search window (use
-   * the parameter transit.dynamicSearchWindow.maxWindow to specify such a restriction).
+   * potential performance issues. The recommended maximum value is 24 hours. This parameter does
+   * not restrict the maximum duration of a dynamic search window (use the parameter
+   * transit.dynamicSearchWindow.maxWindow to specify such a restriction).
    */
   Duration maxSearchWindow();
 
@@ -52,10 +52,10 @@ public interface TransitTuningParameters {
    * duration is added to the existing search-window and inserted into the next and previous page
    * cursor.
    * <p>
-   * This parameter controls how the search-window is increased. OTP also reduces the search-window
-   * when more than the requested itineraries are fetched. This is done automatically and acn not be
-   * configured. Do not be afraid of scaling up fast, it will be reduced to the appropriate level in
-   * the next search.
+   * This parameter controls how the search-window is increased. OTP also reduces the
+   * search-window when more than the requested itineraries are fetched. This is done automatically
+   * and acn not be configured. Do not be afraid of scaling up fast, it will be reduced to the
+   * appropriate level in the next search.
    * <p>
    * The extra time is added to the search-window for the next request if the current result have
    * few itineraries.
@@ -66,7 +66,8 @@ public interface TransitTuningParameters {
   List<Duration> pagingSearchWindowAdjustments();
 
   /**
-   * {@link RouteRequest}s which will be used at server startup to pre-fill the raptor transfer cache.
+   * {@link RouteRequest}s which will be used at server startup to pre-fill the raptor transfer
+   * cache.
    * {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache}
    */
   List<RouteRequest> transferCacheRequests();

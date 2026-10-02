@@ -13,8 +13,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * If the header line exceeds 2000 characters and you compare all elements the comparison is
  * aborted.
  * <p>
- * Both regular numbers and time is supported. The time uses the {@link
- * TimeUtils#timeToStrCompact(int)} to print all times.
+ * Both regular numbers and time is supported. The time uses the
+ * {@link TimeUtils#timeToStrCompact(int)} to print all times.
  */
 public class CompareIntArrays {
 

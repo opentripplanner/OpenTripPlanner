@@ -42,9 +42,8 @@ public class PlatformLinkingTest {
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
   /**
-   * Link stop outside platform area to platform.
-   * Stop gets linked to the closest edge pair and optimal paths from
-   * the splitting points to visibility points are added
+   * Link stop outside platform area to platform. Stop gets linked to the closest edge pair and
+   * optimal paths from the splitting points to visibility points are added
    */
   @Test
   void testLinkStopOutsideArea() {
@@ -72,8 +71,8 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link stop inside platform area to platform.
-   * Connects stop with visibility points and to closest edge.
+   * Link stop inside platform area to platform. Connects stop with visibility points and to closest
+   * edge.
    */
   @Test
   void testLinkStopInsideArea() {
@@ -113,8 +112,7 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link stop which is very close to a platform vertex.
-   * Linking snaps directly to the vertex.
+   * Link stop which is very close to a platform vertex. Linking snaps directly to the vertex.
    * Connections to other vertices are not created.
    */
   @Test
@@ -139,9 +137,9 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link an interior vertex which is very close to a visibility vertex by
-   * calling directly addPermanentAreaVertex used in boarding location linking
-   * A connecting edge pair is created despite of the small distance
+   * Link an interior vertex which is very close to a visibility vertex by calling directly
+   * addPermanentAreaVertex used in boarding location linking A connecting edge pair is created
+   * despite of the small distance
    */
   @Test
   void testAddPermanentAreaVertex() {
@@ -194,8 +192,8 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link a stop which is inside an area and very close to its edge.
-   * Linking snaps directly to the edge without short connecting edges
+   * Link a stop which is inside an area and very close to its edge. Linking snaps directly to the
+   * edge without short connecting edges
    */
   @Test
   void testLinkStopNearPlatformEdge() {
@@ -221,8 +219,7 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link two stops inside platform area to platform.
-   * Stops will get linked directly.
+   * Link two stops inside platform area to platform. Stops will get linked directly.
    */
   @Test
   void testLinkTwoStopsInsideArea() {
@@ -264,13 +261,13 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Link stop inside a concave platform. Stop gets connected to the graph,
-   * but visibility edges which would cross the area boundary are not added
+   * Link stop inside a concave platform. Stop gets connected to the graph, but visibility edges
+   * which would cross the area boundary are not added
    */
   @Test
   void testLinkStopToConcaveArea() {
     /* test platform has a L shape with 12 edges:
-
+    
       0                    1
        ____________________
       |                    |
@@ -355,10 +352,9 @@ public class PlatformLinkingTest {
   }
 
   /**
-   * Test that the edge split point connects to other visibility points.
-   * This used to occasionally fail due to jts geometry.contains accuracy limitations.
-   * The test geometry is taken from Bletchley station platform 6, where
-   * the problem was easy to duplicate.
+   * Test that the edge split point connects to other visibility points. This used to occasionally
+   * fail due to jts geometry.contains accuracy limitations. The test geometry is taken from
+   * Bletchley station platform 6, where the problem was easy to duplicate.
    */
   @Test
   void boundaryTest() {

@@ -54,8 +54,8 @@ class QuayChangeTest implements RealtimeTestConstants {
   }
 
   /**
-   * Change quay (B to C) producing a PATTERN_MODIFIED pattern, then send a second update referencing the
-   * original stop B, reverting the pattern back to the scheduled one.
+   * Change quay (B to C) producing a PATTERN_MODIFIED pattern, then send a second update
+   * referencing the original stop B, reverting the pattern back to the scheduled one.
    */
   @Test
   void testChangeQuayThenRevertToOriginalStops() {
@@ -100,8 +100,8 @@ class QuayChangeTest implements RealtimeTestConstants {
   }
 
   /**
-   * Change quay (B to C), then send a second update that keeps the same quay change (C)
-   * but with different delay. The quay change must be preserved across updates.
+   * Change quay (B to C), then send a second update that keeps the same quay change (C) but with
+   * different delay. The quay change must be preserved across updates.
    */
   @Test
   void testChangeQuayThenUpdateTimesKeepsQuayChange() {

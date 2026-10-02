@@ -9,16 +9,16 @@ import org.opentripplanner.utils.lang.IntUtils;
 
 /**
  * A single delta-packed line string, <b>self-contained</b>: the line string's endpoints are encoded
- * into the packed form (by padding with {@code (0,0)} sentinels), so decode is fully described by the
- * bytes alone. This is the instance/value-object API ({@link #of(LineString)} /
+ * into the packed form (by padding with {@code (0,0)} sentinels), so decode is fully described by
+ * the bytes alone. This is the instance/value-object API ({@link #of(LineString)} /
  * {@link #toLineString(boolean)}) where a {@code CompactLineString} owns its bytes; used by
  * {@link CompactLineStringSequence}.
  * <p>
  * The same packed-bytes format and delta engine ({@link #packIntermediateDeltas} /
  * {@link #decodeInto}) also back the <b>endpoint-context</b> contract, where the endpoints are
  * <i>omitted</i> from the packed form and re-supplied at decode time from external context (e.g. a
- * street edge's from/to vertex). That stateless, {@code byte[]}-based API (used by {@code StreetEdge})
- * lives in {@link EndpointContextLineString}.
+ * street edge's from/to vertex). That stateless, {@code byte[]}-based API (used by
+ * {@code StreetEdge}) lives in {@link EndpointContextLineString}.
  */
 public final class CompactLineString implements Serializable {
 
@@ -105,7 +105,9 @@ public final class CompactLineString implements Serializable {
     return DlugoszVarLenIntPacker.countValues(packed) / 2;
   }
 
-  /** Package-private accessor for the endpoint-context glue and {@link CompactLineStringSequence}. */
+  /**
+   * Package-private accessor for the endpoint-context glue and {@link CompactLineStringSequence}.
+   */
   byte[] packed() {
     return packed;
   }
@@ -118,11 +120,13 @@ public final class CompactLineString implements Serializable {
    * offset (one past the last double written).
    * <p>
    * Streams through the packed bytes without allocating an intermediate {@code int[]} or boxing.
-   * This is the single home of the decode logic; both the self-contained {@link #toLineString(boolean)}
-   * and the endpoint-context {@link EndpointContextLineString#uncompact} call it.
+   * This is the single home of the decode logic; both the self-contained
+   * {@link #toLineString(boolean)} and the endpoint-context
+   * {@link EndpointContextLineString#uncompact} call it.
    *
    * @param packed         the compact line string, or {@code null} / empty for a no-op
-   * @param out            target array to write decoded coordinates into (flat: [x0, y0, x1, y1, …])
+   * @param out            target array to write decoded coordinates into (flat: [x0, y0, x1, y1,
+   *                       …])
    * @param offset         starting index in {@code out} to write to
    * @param oix            initial x in fixed-point (start of delta chain)
    * @param oiy            initial y in fixed-point (start of delta chain)

@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.network.grouppriority;
 
 /**
- * This is a "BitSet" implementation for groupId. It can store up to 31 groups,
- * a set with few elements does NOT dominate a set with more elements.
+ * This is a "BitSet" implementation for groupId. It can store up to 31 groups, a set with few
+ * elements does NOT dominate a set with more elements.
  */
 class TransitGroupPriority32n {
 
@@ -24,8 +24,8 @@ class TransitGroupPriority32n {
   }
 
   /**
-   * Use this method to map from a continuous group index [0..32) to the groupId used
-   * during routing. The ID is implementation-specific and optimized for performance.
+   * Use this method to map from a continuous group index [0..32) to the groupId used during
+   * routing. The ID is implementation-specific and optimized for performance.
    */
   static int groupId(final int priorityGroupIndex) {
     assertValidGroupSeqNo(priorityGroupIndex);

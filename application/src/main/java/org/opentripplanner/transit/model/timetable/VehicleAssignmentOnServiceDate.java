@@ -32,8 +32,8 @@ public class VehicleAssignmentOnServiceDate {
 
   /**
    * Combine the scheduled vehicle assignment with a vehicle id reported by real-time data. The
-   * real-time vehicle id falls back to the scheduled one when no vehicle has been reported.
-   * Returns {@code null} when no reference is known.
+   * real-time vehicle id falls back to the scheduled one when no vehicle has been reported. Returns
+   * {@code null} when no reference is known.
    */
   @Nullable
   public static VehicleAssignmentOnServiceDate of(
@@ -66,8 +66,8 @@ public class VehicleAssignmentOnServiceDate {
   }
 
   /**
-   * The vehicle reported by real-time data to operate the trip on the service date, falling back
-   * to the scheduled vehicle when none has been reported.
+   * The vehicle reported by real-time data to operate the trip on the service date, falling back to
+   * the scheduled vehicle when none has been reported.
    */
   @Nullable
   public FeedScopedId realtimeVehicleId() {

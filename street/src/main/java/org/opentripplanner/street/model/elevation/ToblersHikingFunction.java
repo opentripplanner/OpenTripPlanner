@@ -3,8 +3,8 @@ package org.opentripplanner.street.model.elevation;
 /**
  * Tobler's hiking function is an exponential function determining the hiking speed, taking into
  * account the slope angle. It was formulated by Waldo Tobler. This function was estimated from
- * empirical data of Eduard Imhof. [ <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function">Wikipedia</a>
- * ]
+ * empirical data of Eduard Imhof. [
+ * <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function">Wikipedia</a> ]
  * <pre>
  * Walking speed(W):
  *

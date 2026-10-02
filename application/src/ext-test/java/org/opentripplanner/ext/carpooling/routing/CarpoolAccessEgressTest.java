@@ -57,7 +57,9 @@ class CarpoolAccessEgressTest {
     assertEquals(RaptorCostConverter.toRaptorCost(expectedWeight), accessEgress.c1());
   }
 
-  /** With no walk, the cost reduces to {@code (sharedSegmentSeconds + dwell) * carpoolReluctance}. */
+  /**
+   * With no walk, the cost reduces to {@code (sharedSegmentSeconds + dwell) * carpoolReluctance}.
+   */
   @Test
   void c1WithoutWalkUsesOnlyCarpoolReluctance() {
     var accessEgress = newAccessEgress(0, null, Duration.ofSeconds(300), null, 1.5);
@@ -84,9 +86,9 @@ class CarpoolAccessEgressTest {
 
   /**
    * {@code withPenalty} installs the new penalty and preserves the leg's stop and time anchors.
-   * Mirroring {@code DefaultAccessEgress}, the penalty's cost is folded into {@link
-   * CarpoolAccessEgress#c1()} (Raptor itself does not propagate the time-penalty into c1) and the
-   * penalty's time is exposed via {@link CarpoolAccessEgress#timePenalty()}. The wall-clock
+   * Mirroring {@code DefaultAccessEgress}, the penalty's cost is folded into
+   * {@link CarpoolAccessEgress#c1()} (Raptor itself does not propagate the time-penalty into c1)
+   * and the penalty's time is exposed via {@link CarpoolAccessEgress#timePenalty()}. The wall-clock
    * {@code durationInSeconds} is unchanged because the time-penalty is virtual time inside Raptor,
    * not part of the leg's actual duration.
    */
@@ -220,11 +222,11 @@ class CarpoolAccessEgressTest {
   }
 
   /**
-   * Builds a CarpoolAccessEgress with the passenger picked up mid-trip (pickupPos = 1, dropoffPos
-   * = 2). The route segments list is therefore [pickupSegment, sharedSegment]: the driver runs
-   * the first to reach the passenger and the second is the passenger's shared ride. The
-   * passenger's ride duration is {@code sharedSegmentDuration + STOP_DURATION} — the boarding
-   * dwell at the pickup stop is part of the ride.
+   * Builds a CarpoolAccessEgress with the passenger picked up mid-trip (pickupPos = 1, dropoffPos =
+   * 2). The route segments list is therefore [pickupSegment, sharedSegment]: the driver runs the
+   * first to reach the passenger and the second is the passenger's shared ride. The passenger's
+   * ride duration is {@code sharedSegmentDuration + STOP_DURATION} — the boarding dwell at the
+   * pickup stop is part of the ride.
    */
   private static CarpoolAccessEgress newAccessEgress(
     int passengerDepartureTime,

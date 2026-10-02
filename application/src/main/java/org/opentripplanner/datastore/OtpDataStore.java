@@ -86,8 +86,8 @@ public class OtpDataStore {
    * Never use this method in the OTP application to access the graph, use the data-store.
    *
    * @param path the location where the graph file must exist.
-   * @return The graph file - the graph is not loaded, you can use the {@link
-   * SerializedGraphObject#load(File)} to load the graph.
+   * @return The graph file - the graph is not loaded, you can use the
+   *         {@link SerializedGraphObject#load(File)} to load the graph.
    */
   public static File graphFile(File path) {
     return new File(path, GRAPH_FILENAME);
@@ -140,8 +140,8 @@ public class OtpDataStore {
    * <p>
    * This method should not be called after this data store is closed. The behavior is undefined.
    *
-   * @return The collection may contain elements of type {@link DataSource} or {@link
-   * CompositeDataSource}.
+   * @return The collection may contain elements of type {@link DataSource} or
+   *         {@link CompositeDataSource}.
    */
   public Collection<DataSource> listExistingSourcesFor(FileType type) {
     assertDataStoreIsOpened();
@@ -168,8 +168,8 @@ public class OtpDataStore {
   }
 
   /**
-   * Returns a {@link CompositeDataSource} for the graph-build cache directory. When {@code path}
-   * is {@code null}, defaults to the OTP base directory (the same directory that contains
+   * Returns a {@link CompositeDataSource} for the graph-build cache directory. When {@code path} is
+   * {@code null}, defaults to the OTP base directory (the same directory that contains
    * {@code build-config.json}).
    * <p>
    * Using the data-store abstraction means the cache works with any configured repository —

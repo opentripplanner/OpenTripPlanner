@@ -213,8 +213,7 @@ class RealtimeVehiclePatternMatcher {
   }
 
   /**
-   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehicle which can be used by
-   * the API.
+   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehicle which can be used by the API.
    *
    * @param stopIndexOfGtfsSequence A function that takes a GTFS stop_sequence and returns the index
    *                                of the stop in the trip.

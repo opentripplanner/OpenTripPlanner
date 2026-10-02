@@ -3,16 +3,26 @@ package org.opentripplanner.routing.algorithm.mapping._support.model;
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
  * <p>
- * Turn onto Broadway from W 57th St (coming from 7th Ave): <br> distance = 100 (say) <br>
- * walkDirection = RIGHT <br> streetName = Broadway <br> everything else null/false <br>
+ * Turn onto Broadway from W 57th St (coming from 7th Ave): <br>
+ * distance = 100 (say) <br>
+ * walkDirection = RIGHT <br>
+ * streetName = Broadway <br>
+ * everything else null/false <br>
  * <p>
- * Now, turn from Broadway onto Central Park S via Columbus Circle <br> distance = 200 (say) <br>
- * walkDirection = CIRCLE_COUNTERCLOCKWISE <br> streetName = Central Park S <br> exit = 1 (first
- * exit) <br> immediately everything else false <br>
+ * Now, turn from Broadway onto Central Park S via Columbus Circle <br>
+ * distance = 200 (say) <br>
+ * walkDirection = CIRCLE_COUNTERCLOCKWISE <br>
+ * streetName = Central Park S <br>
+ * exit = 1 (first exit) <br>
+ * immediately everything else false <br>
  * <p>
- * Instead, go through the circle to continue on Broadway <br> distance = 100 (say) <br>
- * walkDirection = CIRCLE_COUNTERCLOCKWISE <br> streetName = Broadway <br> exit = 3 <br> stayOn =
- * true <br> everything else false <br>
+ * Instead, go through the circle to continue on Broadway <br>
+ * distance = 100 (say) <br>
+ * walkDirection = CIRCLE_COUNTERCLOCKWISE <br>
+ * streetName = Broadway <br>
+ * exit = 3 <br>
+ * stayOn = true <br>
+ * everything else false <br>
  */
 @Deprecated
 public class ApiWalkStep {

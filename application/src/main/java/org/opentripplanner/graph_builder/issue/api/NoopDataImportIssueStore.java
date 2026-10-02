@@ -4,8 +4,8 @@ import java.util.List;
 import org.opentripplanner.framework.error.OtpError;
 
 /**
- * A no-op implementation of the issue store, convenient for unit testing. No issues are
- * added, and the {@link #listIssues()} will always return an empty list.
+ * A no-op implementation of the issue store, convenient for unit testing. No issues are added, and
+ * the {@link #listIssues()} will always return an empty list.
  */
 class NoopDataImportIssueStore implements DataImportIssueStore {
 

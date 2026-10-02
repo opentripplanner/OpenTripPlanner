@@ -17,7 +17,8 @@ public class MaxCountTerminationStrategy<State extends AStarState<State, ?, ?>> 
   private int count;
 
   /**
-   * @param maxCount Terminate the search after this many matching states have been reached.
+   * @param maxCount            Terminate the search after this many matching states have been
+   *                            reached.
    * @param shouldIncreaseCount A predicate to check if a state should increase the count or not.
    */
   public MaxCountTerminationStrategy(int maxCount, Predicate<State> shouldIncreaseCount) {

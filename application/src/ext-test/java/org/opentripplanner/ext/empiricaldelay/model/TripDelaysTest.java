@@ -32,9 +32,9 @@ class TripDelaysTest {
   }
 
   /**
-   * A missing service-id may happen if there is no empirical delay data on a given
-   * day of week, but there exist data for another day. Note! There is typical a
-   * delay calendar-service for each day-of-week.
+   * A missing service-id may happen if there is no empirical delay data on a given day of week, but
+   * there exist data for another day. Note! There is typical a delay calendar-service for each
+   * day-of-week.
    */
   @Test
   void missingServiceIdShouldReturnEmpty() {

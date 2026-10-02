@@ -24,8 +24,8 @@ import org.opentripplanner.raptor.spi.TestSlackProvider;
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should add transit-slack + board-slack after flex access, and transit-slack + alight-slack
- * before flex egress.
+ * Raptor should add transit-slack + board-slack after flex access, and transit-slack +
+ * alight-slack before flex egress.
  */
 public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorTestConstants {
 

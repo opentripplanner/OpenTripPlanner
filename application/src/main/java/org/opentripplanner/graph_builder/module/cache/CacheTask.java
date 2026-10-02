@@ -3,10 +3,10 @@ package org.opentripplanner.graph_builder.module.cache;
 import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
- * Identifies a graph-build computation that can be persisted to a file cache between builds.
- * Each task carries its own serialization version ID, maintained manually in code and independent
- * of the global OTP serialization version. Bump the ID when the cache file format changes for
- * that specific task.
+ * Identifies a graph-build computation that can be persisted to a file cache between builds. Each
+ * task carries its own serialization version ID, maintained manually in code and independent of the
+ * global OTP serialization version. Bump the ID when the cache file format changes for that
+ * specific task.
  */
 public enum CacheTask implements DocumentedEnum<CacheTask> {
   ELEVATION(1),

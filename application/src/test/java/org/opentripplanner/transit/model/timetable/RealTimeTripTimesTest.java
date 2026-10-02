@@ -196,9 +196,8 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test hop time with stop cancellations when buses run late.
-   * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 421, 6 cancelled (with delay passing through skipped stop at 481), 7 at 420
+   * Test hop time with stop cancellations when buses run late. Scheduled: 5 at 300, 6 at 360, 7 at
+   * 420 Test case: 5 at 421, 6 cancelled (with delay passing through skipped stop at 481), 7 at 420
    * Result: Error to be present at stop 7, due to negative hop time.
    */
   @Test
@@ -219,10 +218,9 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test hop time with stop cancellations when buses run early.
-   * Scheduled: 5 at 300, 6 at 360, 7 at 420
-   * Test case: 5 at 300, 6 cancelled (without delay from schedule), 7 at 320.
-   * Result: Expect error at stop 7, due to negative hop time.
+   * Test hop time with stop cancellations when buses run early. Scheduled: 5 at 300, 6 at 360, 7 at
+   * 420 Test case: 5 at 300, 6 cancelled (without delay from schedule), 7 at 320. Result: Expect
+   * error at stop 7, due to negative hop time.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
@@ -240,10 +238,10 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test positive hop time with stop cancellations at the beginning of the trip.
-   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
-   * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
-   * Result: Expect error, since the arrival time at 2 is earlier than the departure time at 1.
+   * Test positive hop time with stop cancellations at the beginning of the trip. Scheduled: 0 at 0,
+   * 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420 Test case: 0 and 1
+   * cancelled, start trip at stop 2 at time 0. Result: Expect error, since the arrival time at 2 is
+   * earlier than the departure time at 1.
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
@@ -262,9 +260,8 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test multiple cancelled stops together.
-   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
-   * Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
+   * Test multiple cancelled stops together. Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at
+   * 240, 5 at 300, 6 at 360, 7 at 420 Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
    * Result: Expect errors, since 7 is less than the scheduled time at 6.
    */
   @Test
@@ -288,10 +285,9 @@ class RealTimeTripTimesTest {
   }
 
   /**
-   * Test multiple cancelled stops together.
-   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
-   * Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7 at time 240.
-   * Result: Expect errors, since 3 is less than scheduled time at 2.
+   * Test multiple cancelled stops together. Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at
+   * 240, 5 at 300, 6 at 360, 7 at 420 Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7
+   * at time 240. Result: Expect errors, since 3 is less than scheduled time at 2.
    */
   @Test
   public void testMultipleStopCancellations2() {

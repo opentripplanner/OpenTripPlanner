@@ -32,23 +32,22 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles taxi routing, filtering and decoration, backed by a single {@link TaxiRouteIndex}.
  * <ol>
- *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request
- *   origin and destination are covered by a common taxi provider; if not, an empty result
- *   is returned immediately without running {@link DirectStreetRouter}.
- *   <li>Before a transit search runs, {@link #filterNearbyStops} drops candidate access/egress
- *   stops whose logical endpoints (the request origin/destination and the stop) are not covered
- *   by a common taxi provider, so RAPTOR never considers a combination that would later be
- *   rejected.
+ *   <li>Before a direct taxi street search runs, {@link #routeDirect} checks that the request origin
+ *       and destination are covered by a common taxi provider; if not, an empty result is returned
+ *       immediately without running {@link DirectStreetRouter}.
+ *   <li>Before a transit search runs, {@link #filterNearbyStops} drops candidate access/egress stops
+ *       whose logical endpoints (the request origin/destination and the stop) are not covered by a common
+ *       taxi provider, so RAPTOR never considers a combination that would later be rejected.
  *   <li>Once a search has produced results, {@link #decorateItineraries} (direct routing) and
- *   {@link #decorateAccessEgressLegs} (transit access/egress) replace each {@link
- *   TraverseMode#CAR} {@link StreetLeg} with a {@link TaxiLeg} decorated with the matching
- *   provider, looked up using the same logical coordinates rather than the leg's own local
- *   coordinates, which may differ slightly when the route is a walk-drive-walk chain.
+ *       {@link #decorateAccessEgressLegs} (transit access/egress) replace each {@link TraverseMode#CAR}
+ *       {@link StreetLeg} with a {@link TaxiLeg} decorated with the matching provider, looked up using
+ *       the same logical coordinates rather than the leg's own local coordinates, which may differ
+ *       slightly when the route is a walk-drive-walk chain.
  * </ol>
  *
  * <p>
- * TODO: Multi-provider support. Currently only the first matching provider is used. In the future
- * all matching providers should be available so users can choose.
+ * TODO: Multi-provider support. Currently only the first matching provider is used. In the
+ * future all matching providers should be available so users can choose.
  */
 @Sandbox
 public class TaxiRouter {
@@ -62,8 +61,8 @@ public class TaxiRouter {
   }
 
   /**
-   * Routes a direct taxi itinerary by delegating to {@link DirectStreetRouter} and
-   * decorating the resulting itineraries with taxi provider information.
+   * Routes a direct taxi itinerary by delegating to {@link DirectStreetRouter} and decorating the
+   * resulting itineraries with taxi provider information.
    */
   public List<Itinerary> routeDirect(
     Graph graph,
@@ -108,8 +107,8 @@ public class TaxiRouter {
   }
 
   /**
-   * Drops access/egress candidates whose logical endpoints (the request origin/destination and
-   * the stop) are not covered by a common taxi provider.
+   * Drops access/egress candidates whose logical endpoints (the request origin/destination and the
+   * stop) are not covered by a common taxi provider.
    */
   public Collection<NearbyStop> filterNearbyStops(
     TransitService transitService,
@@ -148,11 +147,10 @@ public class TaxiRouter {
   }
 
   /**
-   * Decorates the {@link TraverseMode#CAR} leg among an access or egress leg chain with taxi
-   * route information, looking up the route using the given logical {@code pickup} and
-   * {@code dropoff} coordinates (the request origin/destination and the stop), rather than the
-   * leg's own local coordinates, which may differ slightly when the access/egress path is a
-   * walk-drive-walk chain.
+   * Decorates the {@link TraverseMode#CAR} leg among an access or egress leg chain with taxi route
+   * information, looking up the route using the given logical {@code pickup} and {@code dropoff}
+   * coordinates (the request origin/destination and the stop), rather than the leg's own local
+   * coordinates, which may differ slightly when the access/egress path is a walk-drive-walk chain.
    * <p>
    * Candidates are expected to already have been filtered for route coverage (see
    * {@link #filterNearbyStops}), so a common route is expected to always exist; if none is found
@@ -167,10 +165,10 @@ public class TaxiRouter {
   }
 
   /**
-   * Replaces every {@link TraverseMode#CAR} {@link StreetLeg} among {@code legs} with a {@link
-   * TaxiLeg}, looking up the covering route via {@code pickup}/{@code dropoff} once (not per
-   * leg, since they're invariant across the whole call) and reusing the result for every
-   * matching leg.
+   * Replaces every {@link TraverseMode#CAR} {@link StreetLeg} among {@code legs} with a
+   * {@link TaxiLeg}, looking up the covering route via {@code pickup}/{@code dropoff} once (not per
+   * leg, since they're invariant across the whole call) and reusing the result for every matching
+   * leg.
    */
   private List<Leg> decorateLegs(List<Leg> legs, WgsCoordinate pickup, WgsCoordinate dropoff) {
     var taxiRoute = taxiRouteIndex.findFirstRoute(pickup, dropoff);

@@ -63,9 +63,9 @@ public class RaptorService<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Find all transit options for the given request. The result should contain ALL options,
-   * not just the parato-optimal result return by the {@link #route(RaptorRequest, RaptorTransitDataProvider)}
-   * method.
+   * Find all transit options for the given request. The result should contain ALL options, not just
+   * the parato-optimal result return by the
+   * {@link #route(RaptorRequest, RaptorTransitDataProvider)} method.
    */
   public Collection<RaptorPath<T>> findAllDirectTransit(
     RaptorDirectTransitRequest request,

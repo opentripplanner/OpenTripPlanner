@@ -11,10 +11,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * This a just an adaptor to look up transfers constraints. The adaptor hides the {@link
- * ConstrainedTransferService} specific API and functions as a bridge to the {@code transferoptimization}
- * model. The best solution would be to use the same mechanism in Raptor and here, but that would
- * require the main transit model to be refactored.
+ * This a just an adaptor to look up transfers constraints. The adaptor hides the
+ * {@link ConstrainedTransferService} specific API and functions as a bridge to the
+ * {@code transferoptimization} model. The best solution would be to use the same mechanism in
+ * Raptor and here, but that would require the main transit model to be refactored.
  * <p>
  * The adaptor makes it easy to test the {@link TransferGenerator} by mocking.
  *
@@ -55,8 +55,8 @@ public class TransferServiceAdaptor<T extends RaptorTripSchedule> {
   }
 
   /**
-   * @param toStopPosition First possible stop position in target trip. This is needed because trip pattern
-   *                         may visit same stop more than once.
+   * @param toStopPosition First possible stop position in target trip. This is needed because trip
+   *                       pattern may visit same stop more than once.
    */
   @Nullable
   protected ConstrainedTransfer findTransfer(

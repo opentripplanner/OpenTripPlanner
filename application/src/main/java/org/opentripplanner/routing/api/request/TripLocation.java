@@ -6,22 +6,21 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
 /**
- * Identifies a position on-board a specific transit trip. Used to start a trip planning search
- * from on-board a vehicle.
+ * Identifies a position on-board a specific transit trip. Used to start a trip planning search from
+ * on-board a vehicle.
  * <p>
  * The stop location is always identified by its {@code stopLocationId}. A stop location can be a
- * quay or a stop place. Optionally, an
- * {@code aimedDepartureTime} can be provided to disambiguate when the same stop is visited
- * multiple times in the pattern (e.g. ring lines).
+ * quay or a stop place. Optionally, an {@code aimedDepartureTime} can be provided to disambiguate
+ * when the same stop is visited multiple times in the pattern (e.g. ring lines).
  *
- * @param tripOnDateReference Identifies the trip and service date, either by trip ID +
- *                            service date or by a trip-on-service-date ID.
- * @param stopLocationId      The stop location at which the traveler is considered to be
- *                            boarding. Used together with the trip to identify the exact stop
- *                            position in the pattern.
- * @param aimedDepartureTime  The aimed departure time at this stop. Used for disambiguation
- *                            when the stop appears more than once in the pattern. May be null
- *                            if not needed.
+ * @param tripOnDateReference Identifies the trip and service date, either by trip ID + service date
+ *                            or by a trip-on-service-date ID.
+ * @param stopLocationId      The stop location at which the traveler is considered to be boarding.
+ *                            Used together with the trip to identify the exact stop position in the
+ *                            pattern.
+ * @param aimedDepartureTime  The aimed departure time at this stop. Used for disambiguation when
+ *                            the stop appears more than once in the pattern. May be null if not
+ *                            needed.
  */
 public record TripLocation(
   TripOnDateReference tripOnDateReference,

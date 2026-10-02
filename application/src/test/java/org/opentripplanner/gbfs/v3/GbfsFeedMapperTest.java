@@ -27,8 +27,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPicku
 import org.slf4j.LoggerFactory;
 
 /**
- * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station
- * models.
+ * This tests the mapping between data coming from a {@link GbfsFeedLoader} to OTP station models.
  */
 class GbfsFeedMapperTest {
 

@@ -20,8 +20,8 @@ import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * A simple data structure that is used by the {@link TransitTestEnvironment} to create
- * trips, trips on date and patterns.
+ * A simple data structure that is used by the {@link TransitTestEnvironment} to create trips, trips
+ * on date and patterns.
  */
 public class TripInput {
 

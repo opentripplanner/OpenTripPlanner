@@ -373,7 +373,8 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
 
     /**
      * When the filtering of direct flex by the transit search window is deactivated, the direct
-     * flex result should _not_ be filtered even though it starts before the earliest departure time.
+     * flex result should _not_ be filtered even though it starts before the earliest departure
+     * time.
      */
     @Test
     void keepDirectFlexWhenFilteringByEarliestDepartureIsDisabled() {

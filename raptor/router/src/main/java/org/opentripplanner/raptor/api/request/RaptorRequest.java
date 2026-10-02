@@ -58,8 +58,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
   /**
    * A unique short name for the request based on {@code profile}, {@code searchDirection},
-   * {@code optimizations} for use in logging, debugging and performance monitoring. It is
-   * not ment to identify a request, but it is used to group requests of the same "type".
+   * {@code optimizations} for use in logging, debugging and performance monitoring. It is not ment
+   * to identify a request, but it is used to group requests of the same "type".
    */
   public String alias() {
     return alias;
@@ -85,12 +85,12 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
    * A dynamic search is a search which uses heuristics to resolve search parameters as
    * earliest-departure-time, latest-arrival-time and search-window. This is an aggregated value:
    * <ul>
-   *     <li>A multi-criteria search is a dynamic search.</li>
-   *     <li>A standard range-raptor search with more than one iteration.</li>
+   *   <li>A multi-criteria search is a dynamic search.</li>
+   *   <li>A standard range-raptor search with more than one iteration.</li>
    * </ul>
-   * In principle any search could be run using dynamic resolving of EDT, LAT and search-window,
-   * but for other "simpler" searches we would rather have it fail than magically run, if
-   * configured wrong.
+   * In principle any search could be run using dynamic resolving of EDT, LAT and search-window, but
+   * for other "simpler" searches we would rather have it fail than magically run, if configured
+   * wrong.
    */
   public boolean isDynamicSearch() {
     if (profile().is(RaptorProfile.MULTI_CRITERIA)) {

@@ -12,9 +12,8 @@ public class Distance {
   private final int millimeters;
 
   /**
-   * Represents a distance.
-   * The class ensures that the distance, saved as an integer
-   * representing the millimeters, is not negative.
+   * Represents a distance. The class ensures that the distance, saved as an integer representing
+   * the millimeters, is not negative.
    */
   private Distance(int distanceInMillimeters) {
     this.millimeters = distanceInMillimeters;

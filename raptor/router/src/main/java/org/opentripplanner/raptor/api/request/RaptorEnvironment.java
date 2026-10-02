@@ -31,8 +31,8 @@ public interface RaptorEnvironment {
   }
 
   /**
-   * Inject a thread pool into Raptor to run part of the raptor search in parallel. If no
-   * thread pool is provided, then Raptor runs everything in the caller thread.
+   * Inject a thread pool into Raptor to run part of the raptor search in parallel. If no thread
+   * pool is provided, then Raptor runs everything in the caller thread.
    */
   @Nullable
   default ExecutorService threadPool() {

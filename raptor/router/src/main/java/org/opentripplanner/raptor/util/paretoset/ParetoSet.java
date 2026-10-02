@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 /**
  * This {@link java.util.Collection} stores all pareto-optimal elements. The {@link #add(Object)}
  * method returns {@code true} if and only if the element was added successfully. When an element is
- *  added, other elements which are no longer pareto-optimal are dropped.
+ * added, other elements which are no longer pareto-optimal are dropped.
  * <p>
  * Like the {@link java.util.ArrayList} the elements are stored internally in an array for
  * performance reasons, and the order is guaranteed to be the same as the order the elements are
@@ -70,8 +70,8 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   /**
    * Return an iterator over the contained collection.
    * <p>
-   * This is NOT thread-safe and the behavior is undefined if the collection is modified during the
-   * iteration.
+   * This is NOT thread-safe and the behavior is undefined if the collection is modified during
+   * the iteration.
    */
   public final Iterator<T> iterator() {
     return tailIterator(0);

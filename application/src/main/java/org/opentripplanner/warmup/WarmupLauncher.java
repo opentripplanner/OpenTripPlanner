@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Launches the application warmup background thread.
  * <p>
- * Injected dependencies come from the Dagger {@link
- * org.opentripplanner.warmup.configure.WarmupModule}. The launcher decides whether a warmup run
- * is applicable (parameters present, updaters present, selected API enabled) and, when it is,
+ * Injected dependencies come from the Dagger
+ * {@link org.opentripplanner.warmup.configure.WarmupModule}. The launcher decides whether a warmup
+ * run is applicable (parameters present, updaters present, selected API enabled) and, when it is,
  * starts a daemon thread running a {@link WarmupWorker}.
  */
 public class WarmupLauncher {
@@ -41,8 +41,8 @@ public class WarmupLauncher {
    * Start the application warmup thread if configured and applicable.
    * <p>
    * No warmup is started if parameters are null (warmup section absent in router-config.json),
-   * if no updaters are configured (health probe would immediately return "UP"), or if the
-   * selected API schema is not available.
+   * if no updaters are configured (health probe would immediately return "UP"), or if the selected
+   * API schema is not available.
    */
   public void start() {
     if (parameters == null) {

@@ -12,8 +12,8 @@ import org.opentripplanner.datastore.OtpDataStore;
  */
 public interface OtpDataStoreConfig {
   /**
-   * Save the build issue report to this location (URI). If {@code null} the {@code baseDirectory}
-   * + {@code /report} is used.
+   * Save the build issue report to this location (URI). If {@code null} the {@code baseDirectory} +
+   * {@code /report} is used.
    */
   URI reportDirectory();
 
@@ -39,20 +39,22 @@ public interface OtpDataStoreConfig {
   /**
    * List of URIs to GTFS data files .
    * <p>
-   * This parameter is optional. If {@code null} GTFS files are loaded from {@code baseDirectory}.
+   * This parameter is optional. If {@code null} GTFS files are loaded from
+   * {@code baseDirectory}.
    */
   List<URI> gtfsFiles();
 
   /**
    * List of URIs to Netex data files.
    * <p>
-   * This parameter is optional. If {@code null} Netex files are loaded from {@code baseDirectory}.
+   * This parameter is optional. If {@code null} Netex files are loaded from
+   * {@code baseDirectory}.
    */
   List<URI> netexFiles();
 
   /**
-   * List of URIs to Emission data files. This does not include emission files inside a
-   * GTFS bundle, only configured emission feed files.
+   * List of URIs to Emission data files. This does not include emission files inside a GTFS bundle,
+   * only configured emission feed files.
    */
   List<URI> emissionFiles();
 

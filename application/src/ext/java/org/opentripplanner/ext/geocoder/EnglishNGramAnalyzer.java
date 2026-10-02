@@ -14,9 +14,9 @@ import org.apache.lucene.analysis.pattern.PatternReplaceFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 
 /**
- * A custom analyzer for stop names. It removes english stop words (at,the...) and splits
- * the input into NGrams (https://en.wikipedia.org/wiki/N-gram) so that the middle
- * of a stop name can be matched efficiently.
+ * A custom analyzer for stop names. It removes english stop words (at,the...) and splits the input
+ * into NGrams (https://en.wikipedia.org/wiki/N-gram) so that the middle of a stop name can be
+ * matched efficiently.
  * <p>
  * For example the query of "exanderpl" will match the stop name "Alexanderplatz".
  * <p>

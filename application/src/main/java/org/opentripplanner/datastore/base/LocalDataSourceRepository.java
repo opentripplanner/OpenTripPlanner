@@ -49,7 +49,7 @@ public interface LocalDataSourceRepository extends DataSourceRepository {
    *
    * @param type the file type to load.
    * @return the datasource wrapper that can be used to access the data source. Depending on the
-   * type, the returned data source can be safely casted to a sub-type.
+   *         type, the returned data source can be safely casted to a sub-type.
    */
   List<DataSource> listExistingSources(FileType type);
 }

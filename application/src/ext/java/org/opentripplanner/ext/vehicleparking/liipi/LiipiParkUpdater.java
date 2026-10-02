@@ -76,9 +76,9 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
   /**
    * Update the data from the sources. It first fetches parks from the facilities URL and park
-   * groups from hubs URL and then real-time updates from utilizations URL. If facilitiesFrequencySec
-   * is configured to be over 0, it also occasionally retches the parks as new parks might have been
-   * added or the state of the old parks might have changed.
+   * groups from hubs URL and then real-time updates from utilizations URL. If
+   * facilitiesFrequencySec is configured to be over 0, it also occasionally retches the parks as
+   * new parks might have been added or the state of the old parks might have changed.
    *
    * @return true if there might have been changes
    */
@@ -160,8 +160,8 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
   /**
    * @return true if facilities and hubs have not been successfully downloaded before, or
-   * facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last successful
-   * fetch
+   *         facilitiesFrequencySec > 0 and over facilitiesFrequencySec has passed since last
+   *         successful fetch
    */
   private boolean fetchFacilitiesAndHubsNow() {
     if (parks == null) {

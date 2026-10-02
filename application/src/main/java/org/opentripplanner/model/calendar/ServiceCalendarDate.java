@@ -10,9 +10,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * This class explicitly activate or disable a service by date. It can be used in two ways.
  * <ol>
- *     <li>in conjunction with {@link ServiceCalendar} to define exceptions to the default service
- *     patterns defined.
- *     <li>Omit {@link ServiceCalendar} and use this class to specify each date of service.
+ *   <li>in conjunction with {@link ServiceCalendar} to define exceptions to the default service
+ *       patterns defined.
+ *   <li>Omit {@link ServiceCalendar} and use this class to specify each date of service.
  * </ol>
  * <p>
  * This class is immutable.

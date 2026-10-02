@@ -19,7 +19,8 @@ public class RealtimeResolver {
   }
 
   /**
-   * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
+   * Loop through all itineraries and populate legs with real-time data using legReference from the
+   * original leg
    */
   public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,

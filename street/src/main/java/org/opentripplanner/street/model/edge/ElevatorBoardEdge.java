@@ -54,8 +54,8 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
   }
 
   /**
-   * Since board edges are always called ElevatorBoardEdge, the name is complete bogus but is
-   * never included in plans.
+   * Since board edges are always called ElevatorBoardEdge, the name is complete bogus but is never
+   * included in plans.
    */
   @Override
   public boolean nameIsDerived() {

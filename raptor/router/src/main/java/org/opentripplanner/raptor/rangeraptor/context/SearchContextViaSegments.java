@@ -13,9 +13,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * point between each segment.
  * <p>
  * The {@code parent} search context holds a list of segment contexts, one for each segment. The
- * access and egress paths are assigned to the appropriate segment based on how many via points
- * they pass through, as given by
- * {@link RaptorAccessEgress#numberOfViaLocationsVisited()}.
+ * access and egress paths are assigned to the appropriate segment based on how many via points they
+ * pass through, as given by {@link RaptorAccessEgress#numberOfViaLocationsVisited()}.
  * <p>
  * If an access or egress path does not visit any via locations, then:
  * <ul>
@@ -23,8 +22,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  *   <li>all such {@code egressPaths} are added to the last segment.</li>
  * </ul>
  * <p>
- * Each segment is linked to the next by copying stop arrivals at via stops from one segment to the
- * following segment. This is implemented using Pareto set event listeners.
+ * Each segment is linked to the next by copying stop arrivals at via stops from one segment to
+ * the following segment. This is implemented using Pareto set event listeners.
  */
 @SuppressWarnings("ClassCanBeRecord")
 public class SearchContextViaSegments<T extends RaptorTripSchedule> {
@@ -57,16 +56,16 @@ public class SearchContextViaSegments<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Returns the set of access paths to be used to board in this segment. This method always
-   * returns a non-null instance; if there are no access paths, the set is simply empty.
+   * Returns the set of access paths to be used to board in this segment. This method always returns
+   * a non-null instance; if there are no access paths, the set is simply empty.
    */
   public AccessPaths accessPaths() {
     return accessPaths;
   }
 
   /**
-   * Returns the via connections for the via location at which this segment ends, or {@code null}
-   * if this is the last segment.
+   * Returns the via connections for the via location at which this segment ends, or {@code null} if
+   * this is the last segment.
    */
   @Nullable
   public ViaConnections viaConnections() {

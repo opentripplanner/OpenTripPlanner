@@ -38,9 +38,9 @@ public class WorldEnvelopeBuilder {
   /**
    * Calculates the center from median of coordinates of the elements in the given collection.
    * <p>
-   * This speeds up calculation, but problem is that median needs to have all latitudes/longitudes
-   * in memory, this can become problematic in large installations. It works without a issues on New
-   * York State.
+   * This speeds up calculation, but problem is that median needs to have all
+   * latitudes/longitudes in memory, this can become problematic in large installations. It works
+   * without a issues on New York State.
    */
   public <T> WorldEnvelopeBuilder expandToIncludeTransitEntities(
     Collection<T> collection,

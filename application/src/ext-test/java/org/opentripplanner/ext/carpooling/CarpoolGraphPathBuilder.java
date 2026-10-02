@@ -10,8 +10,8 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 /**
- * Builder for creating GraphPath objects for carpooling tests using real State chains.
- * This replaces MockGraphPathFactory with OTP's preferred TestStateBuilder pattern.
+ * Builder for creating GraphPath objects for carpooling tests using real State chains. This
+ * replaces MockGraphPathFactory with OTP's preferred TestStateBuilder pattern.
  */
 public class CarpoolGraphPathBuilder {
 
@@ -26,11 +26,10 @@ public class CarpoolGraphPathBuilder {
   }
 
   /**
-   * Creates a GraphPath with specified duration using State chain.
-   * Uses a single edge with floor distance to avoid rounding errors: the edge traversal
-   * applies ceiling when converting to milliseconds, and State.getTime() applies ceiling
-   * when converting to seconds, so floor distance ensures the final second-precision
-   * duration matches the requested value.
+   * Creates a GraphPath with specified duration using State chain. Uses a single edge with floor
+   * distance to avoid rounding errors: the edge traversal applies ceiling when converting to
+   * milliseconds, and State.getTime() applies ceiling when converting to seconds, so floor distance
+   * ensures the final second-precision duration matches the requested value.
    *
    * @param duration Total duration for the path
    * @return GraphPath with real State objects and accurate timing
@@ -46,8 +45,8 @@ public class CarpoolGraphPathBuilder {
   }
 
   /**
-   * Creates multiple GraphPaths with varying durations.
-   * Each path has duration = 5 minutes + index minutes.
+   * Creates multiple GraphPaths with varying durations. Each path has duration = 5 minutes + index
+   * minutes.
    *
    * @param count Number of paths to create
    * @return List of GraphPaths with incrementing durations
