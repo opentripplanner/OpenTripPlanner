@@ -18,32 +18,17 @@ export function DirectModeSelect({
         size="sm"
         className="input-medium"
         onChange={(e) => {
-          if (e.target.value !== 'not_selected') {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes: {
-                ...tripQueryVariables.modes,
-                directMode: e.target.value as StreetMode,
-              },
-            });
-          } else {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes:
-                tripQueryVariables.modes?.accessMode ||
-                tripQueryVariables.modes?.egressMode ||
-                tripQueryVariables.modes?.transportModes
-                  ? {
-                      ...tripQueryVariables.modes,
-                      directMode: undefined,
-                    }
-                  : undefined,
-            });
-          }
+          setTripQueryVariables({
+            ...tripQueryVariables,
+            modes: {
+              ...tripQueryVariables.modes,
+              directMode: e.target.value === 'none' ? undefined : (e.target.value as StreetMode),
+            },
+          });
         }}
-        value={tripQueryVariables.modes?.directMode || 'not_selected'}
+        value={tripQueryVariables.modes?.directMode || 'none'}
       >
-        <option value="not_selected">Not selected</option>
+        <option value="none">None</option>
         {Object.values(StreetMode).map((mode) => (
           <option key={mode} value={mode}>
             {mode}

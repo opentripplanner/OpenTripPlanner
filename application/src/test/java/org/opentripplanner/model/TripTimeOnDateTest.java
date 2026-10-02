@@ -264,7 +264,7 @@ class TripTimeOnDateTest {
     assertEquals(stopC, third.getScheduledStop(shorterScheduledPattern));
   }
 
-  private static TripTimes tripTimesFor(int stops) {
+  private static TripTimes<?> tripTimesFor(int stops) {
     var trip = TransitRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(stops, trip, "11:00");
     return TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());

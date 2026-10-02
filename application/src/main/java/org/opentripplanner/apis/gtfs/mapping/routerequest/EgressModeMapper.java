@@ -15,6 +15,7 @@ public class EgressModeMapper {
       case CAR -> StreetMode.CAR;
       case CAR_RENTAL -> StreetMode.CAR_RENTAL;
       case CAR_PICKUP -> StreetMode.CAR_PICKUP;
+      case TAXI -> StreetMode.TAXI;
       case FLEX -> StreetMode.FLEXIBLE;
       case SCOOTER_RENTAL -> StreetMode.SCOOTER_RENTAL;
       case WALK -> StreetMode.WALK;
@@ -28,6 +29,7 @@ public class EgressModeMapper {
       case CAR -> GraphQLTypes.GraphQLPlanEgressMode.CAR;
       case CAR_RENTAL -> GraphQLTypes.GraphQLPlanEgressMode.CAR_RENTAL;
       case CAR_PICKUP -> GraphQLTypes.GraphQLPlanEgressMode.CAR_PICKUP;
+      case TAXI -> GraphQLTypes.GraphQLPlanEgressMode.TAXI;
       case FLEXIBLE -> GraphQLTypes.GraphQLPlanEgressMode.FLEX;
       case SCOOTER_RENTAL -> GraphQLTypes.GraphQLPlanEgressMode.SCOOTER_RENTAL;
       case

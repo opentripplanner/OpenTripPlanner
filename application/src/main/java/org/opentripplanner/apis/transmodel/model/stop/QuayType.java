@@ -304,9 +304,7 @@ public class QuayType {
             Duration timeRange = Duration.ofSeconds(timeRangeInput);
             StopLocation stop = environment.getSource();
 
-            Long startTimeInput = environment.getArgument("startTime");
-            Instant startTime =
-              startTimeInput != null ? Instant.ofEpochMilli(startTimeInput) : Instant.now();
+            Instant startTime = GqlUtil.getInstantOrNow(environment, "startTime");
 
             List<Map<String, ?>> filtersInput = environment.getArgument("filters");
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);

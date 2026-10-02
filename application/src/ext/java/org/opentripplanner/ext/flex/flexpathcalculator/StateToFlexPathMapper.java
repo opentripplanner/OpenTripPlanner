@@ -15,9 +15,10 @@ import org.opentripplanner.street.search.state.State;
  * This utility encapsulates the direction-dependent ordering: for depart-after searches the chain
  * yields a geometry in reverse chronological order (newest first), while for arriveBy searches the chain
  * already yields edges in chronological order.
- * Implementation note: an earlier design relied on {@link org.opentripplanner.astar.model.GraphPath}
- * to extract the list of edges in chronological order / reverse chronological order.
- * The current implementation is optimized for reducing memory allocation and CPU usage.
+ * Implementation note: an earlier design relied on eagerly materializing the list of edges in
+ * chronological order (allocating a full copy and, for arriveBy searches, reversing the state
+ * chain). The current implementation walks {@link State#listBackEdges()} lazily instead, which is
+ * optimized for reducing memory allocation and CPU usage.
  */
 class StateToFlexPathMapper {
 

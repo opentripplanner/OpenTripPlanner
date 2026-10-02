@@ -197,6 +197,21 @@ type DatedServiceJourney {
   serviceJourney: ServiceJourney!
   "Alterations specified on the Trip in the planned data. Note: realtime alterations are not included"
   tripAlteration: ServiceAlteration
+  """
+  The aimed and expected vehicle assignment for this dated service journey.
+  The aimed references fall back to the service journey's when the dated service journey has none of its own.
+  """
+  vehicleAssignment: DatedServiceJourneyVehicleAssignment
+}
+
+"The vehicle and vehicle type aimed to operate a dated service journey, and the vehicle expected to operate it based on real-time data."
+type DatedServiceJourneyVehicleAssignment {
+  "Id of the vehicle aimed to operate the dated service journey."
+  aimedVehicleId: String
+  "Id of the type of vehicle aimed to operate the dated service journey."
+  aimedVehicleTypeId: String
+  "Id of the vehicle expected to operate the dated service journey. Updated with real-time information if available."
+  expectedVehicleId: String
 }
 
 "An advertised destination of a specific journey pattern, usually displayed on a head sign or at other on-board locations."
@@ -271,9 +286,11 @@ type EstimatedCall {
   "Whether the updated estimates are expected to be inaccurate."
   predictionInaccurate: Boolean!
   quay: Quay!
+  "The real-time state of the dated service journey this call belongs to."
+  realTimeJourneyState: RealTimeJourneyState!
   "Whether this call has been updated with real time information."
   realtime: Boolean!
-  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState on datedServiceJourney for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state.")
+  realtimeState: RealtimeState! @deprecated(reason : "Use realTimeJourneyState for the journey's real-time state, or the individual boolean fields (cancellation, predictionInaccurate, extraCall) for the quay's state.")
   "Whether vehicle will only stop on request."
   requestStop: Boolean!
   "The scheduled quay for this call. Equal to 'quay' unless the quay has been changed by a real time update"
@@ -876,7 +893,7 @@ type QueryType {
   "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
   trip(
     "Time and cost penalty on access/egress modes."
-    accessEgressPenalty: [PenaltyForStreetMode!] = [{streetMode : car_park, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_pickup, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_rental, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : flexible, timePenalty : "10m + 1.3 t", costFactor : 1.3}],
+    accessEgressPenalty: [PenaltyForStreetMode!] = [{streetMode : car_park, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_pickup, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : car_rental, timePenalty : "20m + 2.0 t", costFactor : 1.5}, {streetMode : flexible, timePenalty : "10m + 1.3 t", costFactor : 1.3}, {streetMode : taxi, timePenalty : "20m + 2.0 t", costFactor : 1.5}],
     "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
     alightSlackDefault: Int = 0,
     "List of alightSlack for a given set of modes. Defaults: []"
@@ -1354,8 +1371,18 @@ type ServiceJourney {
   situations: [PtSituationElement!]!
   transportMode: TransportMode
   transportSubmode: TransportSubmode
+  "The vehicle and vehicle type aimed to operate the service journey."
+  vehicleAssignment: ServiceJourneyVehicleAssignment
   "Whether service journey is accessible with wheelchair."
   wheelchairAccessible: WheelchairBoarding
+}
+
+"The vehicle and vehicle type aimed to operate a service journey."
+type ServiceJourneyVehicleAssignment {
+  "Id of the vehicle aimed to operate the service journey."
+  aimedVehicleId: String
+  "Id of the type of vehicle aimed to operate the service journey."
+  aimedVehicleTypeId: String
 }
 
 "Named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location."
@@ -2064,6 +2091,8 @@ enum StreetMode {
   foot
   "Walk to a scooter rental point, ride a scooter to a scooter rental drop-off point, and walk the rest of the way. This can include scooter rental at fixed locations or free-floating services."
   scooter_rental
+  "Traveling by taxi. This can include walking before being picked up and/or after being dropped off."
+  taxi @deprecated(reason : "This value is experimental.")
 }
 
 enum TransportMode {
@@ -2402,7 +2431,7 @@ input Modes {
   accessMode: StreetMode
   "The mode used to get from the origin to the destination directly, without using the transit network. If the element is not present or null,direct travel without using transit will be disallowed."
   directMode: StreetMode
-  "The mode used to get from the egress stops in the transit network tothe destination (last-mile). If the element is not present or null,only transit that can immediately arrive at the origin will be used."
+  "The mode used to get from the egress stops in the transit network to the destination (last-mile). If the element is not present or null, only transit that can immediately arrive at the destination will be used."
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
@@ -2501,7 +2530,7 @@ input StreetModes {
   accessMode: StreetMode
   "The mode used to get from the origin to the destination directly, without using the transit network. If the element is not present or null,direct travel without using transit will be disallowed."
   directMode: StreetMode
-  "The mode used to get from the egress stops in the transit network tothe destination (last-mile). If the element is not present or null,only transit that can immediately arrive at the origin will be used."
+  "The mode used to get from the egress stops in the transit network to the destination (last-mile). If the element is not present or null, only transit that can immediately arrive at the destination will be used."
   egressMode: StreetMode
 }
 
@@ -2568,6 +2597,7 @@ input TripPassThroughViaLocationInput {
   A list of stop locations. A stop location can be a quay, a stop place, a multimodal
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
+  The list must contain at least one stop location.
   """
   stopLocationIds: [String!]!
 }

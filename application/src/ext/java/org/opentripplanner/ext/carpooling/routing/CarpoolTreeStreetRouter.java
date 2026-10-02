@@ -3,9 +3,9 @@ package org.opentripplanner.ext.carpooling.routing;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
@@ -204,7 +204,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var path = isReverse ? tree.getPath(from) : tree.getPath(to);
+    var state = isReverse ? tree.getState(from) : tree.getState(to);
+    var path = state == null ? null : new GraphPath<>(state);
     pathCache.put(key, path);
     return path;
   }

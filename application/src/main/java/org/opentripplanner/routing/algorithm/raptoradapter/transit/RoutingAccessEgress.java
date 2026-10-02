@@ -22,7 +22,7 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
    * refers to the search order, not chronological order — for egress searches
    * ({@code request.arriveBy() == true}) the state chain runs backward in time and is not
    * reversed. Callers that need a chronological state chain must wrap this in a
-   * {@link org.opentripplanner.astar.model.GraphPath}.
+   * {@link org.opentripplanner.street.model.path.StreetPath}.
    */
   State getFinalState();
 

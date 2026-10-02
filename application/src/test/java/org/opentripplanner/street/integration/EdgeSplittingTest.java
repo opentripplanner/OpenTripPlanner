@@ -1,6 +1,7 @@
 package org.opentripplanner.street.integration;
 
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.size;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -12,7 +13,6 @@ import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
@@ -174,9 +174,9 @@ public class EdgeSplittingTest {
       .withTo(end)
       .getShortestPathTree();
 
-    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
-    assertNotNull(path, "There must be a path from start to end");
-    assertEquals(1, path.edges.size());
+    State state = spt.getState(end);
+    assertNotNull(state, "There must be a path from start to end");
+    assertEquals(1, size(state.listBackEdges()));
     connection.disposeEdges();
   }
 
@@ -217,9 +217,9 @@ public class EdgeSplittingTest {
       .withTo(end)
       .getShortestPathTree();
 
-    GraphPath<State, Edge, Vertex> path = spt.getPath(end);
-    assertNotNull(path, "There must be a path from start to end");
-    assertTrue(path.edges.size() > 1);
+    State state = spt.getState(end);
+    assertNotNull(state, "There must be a path from start to end");
+    assertTrue(size(state.listBackEdges()) > 1);
     connection.disposeEdges();
   }
 
@@ -300,8 +300,8 @@ public class EdgeSplittingTest {
         .withFrom(fromVertices)
         .withTo(toVertices)
         .getShortestPathTree();
-      GraphPath<State, Edge, Vertex> path = spt.getPath(toVertices.iterator().next());
-      for (State s : path.states) {
+      State state = spt.getState(toVertices.iterator().next());
+      for (State s : state.listBackStates()) {
         assertNotSame(s.getBackEdge(), top);
       }
     }

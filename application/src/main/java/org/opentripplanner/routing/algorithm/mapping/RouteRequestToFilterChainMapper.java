@@ -9,7 +9,6 @@ import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
@@ -116,7 +115,7 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (OTPFeature.Emission.isOn()) {
+    if (emissionItineraryDecorator != null) {
       builder.withEmissionItineraryDecorator(emissionItineraryDecorator);
     }
 
@@ -130,15 +129,9 @@ public class RouteRequestToFilterChainMapper {
   }
 
   private static double minBikeParkingDistance(RouteRequest request) {
-    var modes = request.journey().modes();
-    boolean hasBikePark = List.of(modes.accessMode, modes.egressMode).contains(
-      StreetMode.BIKE_TO_PARK
-    );
-
-    double minBikeParkingDistance = 0;
-    if (hasBikePark) {
-      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+    if (request.journey().modes().hasAccessOrEgressMode(StreetMode.BIKE_TO_PARK)) {
+      return request.preferences().itineraryFilter().minBikeParkingDistance();
     }
-    return minBikeParkingDistance;
+    return 0;
   }
 }

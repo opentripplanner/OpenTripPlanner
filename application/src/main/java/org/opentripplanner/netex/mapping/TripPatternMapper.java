@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -34,8 +34,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
@@ -44,6 +44,7 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteView;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern
@@ -301,49 +302,59 @@ class TripPatternMapper {
       datedServiceJourney.getServiceAlteration()
     );
 
-    var replacementFor = datedServiceJourney
-      .getJourneyRef()
-      .stream()
-      .map(JAXBElement::getValue)
-      .filter(DatedServiceJourneyRefStructure.class::isInstance)
-      .map(DatedServiceJourneyRefStructure.class::cast)
-      .map(DatedServiceJourneyRefStructure::getRef)
-      .map(datedServiceJourneyById::lookup)
-      .filter(Objects::nonNull)
-      .map(replacement -> {
-        if (datedServiceJourney.equals(replacement)) {
-          issueStore.add(
-            "InvalidDatedServiceJourneyRef",
-            "DatedServiceJourney %s has reference to itself, skipping",
-            datedServiceJourney.getId()
+    List<TripOnServiceDate> replacementFor;
+    if (datedServiceJourney.getReplacedJourneys() != null) {
+      replacementFor = datedServiceJourney
+        .getReplacedJourneys()
+        .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
+        .stream()
+        .map(JAXBElement::getValue)
+        .map(VehicleJourneyRefStructure::getRef)
+        .map(datedServiceJourneyById::lookup)
+        .filter(Objects::nonNull)
+        .map(replacement -> {
+          if (datedServiceJourney.equals(replacement)) {
+            issueStore.add(
+              "InvalidDatedServiceJourneyRef",
+              "DatedServiceJourney %s has reference to itself, skipping",
+              datedServiceJourney.getId()
+            );
+            return null;
+          }
+          String serviceJourneyRef = replacement.getJourneyRef().getValue().getRef();
+          ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
+          if (serviceJourney == null) {
+            issueStore.add(
+              "InvalidDatedServiceJourneyRef",
+              "DatedServiceJourney %s has reference to %s, which is not found, skipping",
+              datedServiceJourney.getId(),
+              serviceJourneyRef
+            );
+            return null;
+          }
+          return mapDatedServiceJourney(
+            journeyPattern,
+            mapTrip(journeyPattern, serviceJourney),
+            replacement
           );
-          return null;
-        }
-        String serviceJourneyRef = replacement.getJourneyRef().get(0).getValue().getRef();
-        ServiceJourney serviceJourney = serviceJourneyById.lookup(serviceJourneyRef);
-        if (serviceJourney == null) {
-          issueStore.add(
-            "InvalidDatedServiceJourneyRef",
-            "DatedServiceJourney %s has reference to %s, which is not found, skipping",
-            datedServiceJourney.getId(),
-            serviceJourneyRef
-          );
-          return null;
-        }
-        return mapDatedServiceJourney(
-          journeyPattern,
-          mapTrip(journeyPattern, serviceJourney),
-          replacement
-        );
-      })
-      .filter(Objects::nonNull)
-      .toList();
+        })
+        .filter(Objects::nonNull)
+        .toList();
+    } else {
+      replacementFor = List.of();
+    }
+
+    var vehicleAssignment = VehicleAssignment.ofNullable(
+      null,
+      VehicleTypeRefMapper.mapVehicleTypeRef(datedServiceJourney.getVehicleTypeRef())
+    );
 
     return TripOnServiceDate.of(id)
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .withTripAlteration(alteration)
       .withReplacementFor(replacementFor)
+      .withVehicleAssignment(vehicleAssignment)
       .build();
   }
 
@@ -361,11 +372,11 @@ class TripPatternMapper {
     return otpRouteById.get(idFactory.createId(lineId));
   }
 
-  private List<TripTimes> createTripTimes(
+  private List<TripTimes<?>> createTripTimes(
     List<Trip> trips,
     Map<Trip, List<StopTime>> tripStopTimes
   ) {
-    var tripTimesResult = new ArrayList<TripTimes>();
+    var tripTimesResult = new ArrayList<TripTimes<?>>();
     for (Trip trip : trips) {
       List<StopTime> stopTimes = tripStopTimes.get(trip);
       if (stopTimes.isEmpty()) {
@@ -376,7 +387,7 @@ class TripPatternMapper {
         );
       } else {
         try {
-          TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
+          var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
           tripTimesResult.add(tripTimes);
         } catch (DataValidationException e) {
           issueStore.add(e.error());

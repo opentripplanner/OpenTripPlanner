@@ -20,6 +20,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
@@ -92,6 +93,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
   public final @Nullable EmissionRepository emissionRepository;
+  public final @Nullable TaxiRepository taxiRepository;
   public final @Nullable EmpiricalDelayRepository empiricalDelayRepository;
   public final FareServiceFactory fareServiceFactory;
   public final StreetRepository streetRepository;
@@ -110,6 +112,7 @@ public class SerializedGraphObject implements Serializable {
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     StopConsolidationRepository stopConsolidationRepository,
     FareServiceFactory fareServiceFactory
@@ -127,6 +130,7 @@ public class SerializedGraphObject implements Serializable {
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
     this.emissionRepository = emissionRepository;
+    this.taxiRepository = taxiRepository;
     this.empiricalDelayRepository = empiricalDelayRepository;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
@@ -215,7 +219,7 @@ public class SerializedGraphObject implements Serializable {
       serObj.reconstructEdgeLists();
       serObj.transitRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.transitRepository.index();
-      logSerializationCompleteStatus(serObj.graph, serObj.transitRepository);
+      serObj.logSerializationCompleteStatus();
       return serObj;
     } catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -286,10 +290,7 @@ public class SerializedGraphObject implements Serializable {
     // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
   }
 
-  private static void logSerializationCompleteStatus(
-    Graph graph,
-    TransitRepository transitRepository
-  ) {
+  private void logSerializationCompleteStatus() {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(
@@ -297,7 +298,7 @@ public class SerializedGraphObject implements Serializable {
     );
     var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
-    var nEdges = f.formatNumber(graph.countEdges());
+    var nEdges = f.formatNumber(edges.size());
 
     LOG.info("Graph loaded.   |V|={} |E|={}", nVertices, nEdges);
     LOG.info(
