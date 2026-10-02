@@ -1,0 +1,77 @@
+package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.street.model.StreetMode.WALK;
+import static org.opentripplanner.street.model.StreetModelForTest.intersectionVertex;
+import static org.opentripplanner.street.model.StreetModelForTest.streetEdge;
+
+import java.time.OffsetDateTime;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.ItinerarySummarizer;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.linking.LinkingContext;
+import org.opentripplanner.standalone.api.TestServerContext;
+import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.service.TransitRepository;
+
+class DefaultDirectStreetRouterTest {
+
+  private static final double FROM_LAT = 59.9000;
+  private static final double FROM_LON = 10.7000;
+  private static final double TO_LAT = 59.9010;
+  private static final double TO_LON = 10.7010;
+
+  @Test
+  void directWalkRouteReturnsItinerary() {
+    var fromVertex = intersectionVertex("from", FROM_LAT, FROM_LON);
+    var toVertex = intersectionVertex("to", TO_LAT, TO_LON);
+
+    streetEdge(fromVertex, toVertex);
+    streetEdge(toVertex, fromVertex);
+
+    var fromLocation = GenericLocation.fromCoordinate(FROM_LAT, FROM_LON);
+    var toLocation = GenericLocation.fromCoordinate(TO_LAT, TO_LON);
+
+    var request = RouteRequest.of()
+      .withDateTime(OffsetDateTime.parse("2026-05-13T12:00Z").toInstant())
+      .withFrom(fromLocation)
+      .withTo(toLocation)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(WALK)))
+      .buildRequest();
+
+    var linkingContext = new LinkingContext(
+      Map.of(fromLocation, Set.of(fromVertex), toLocation, Set.of(toVertex)),
+      Set.of(),
+      Set.of()
+    );
+
+    var transitService = TestServerContext.createTransitService(
+      new TransitRepository(),
+      TransferServiceTestFactory.defaultTransferRepository()
+    );
+
+    var itineraries = new DefaultDirectStreetRouter().route(
+      new Graph(),
+      transitService,
+      TestServerContext.createStreetLimitationParametersService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createStreetDetailsService(),
+      null,
+      request,
+      linkingContext
+    );
+
+    assertThat(itineraries).isNotEmpty();
+
+    var first = new ItinerarySummarizer(itineraries.getFirst());
+
+    assertThat(first.summarizeLegs()).containsExactly(
+      "[2026-05-13T12:00Z from_to (59.9, 10.7)] → [2026-05-13T12:01:33Z to_from (59.901, 10.701)]"
+    );
+  }
+}
