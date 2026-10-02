@@ -98,7 +98,7 @@ public class ReplacementHelper {
     return (
       !transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
       (timetableSnapshot != null &&
-        timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
+        !timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
     );
   }
 
