@@ -12,6 +12,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -31,7 +32,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   void railTripIsIndexedByInternalPlanningCode() {
     var env = ENV_BUILDER.addTrip(railTrip(TRIP_1_ID, PLANNING_CODE)).build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(tripIds(cache.tripsByInternalPlanningCode(PLANNING_CODE))).containsExactly(
       TRIP_1_ID
@@ -44,7 +47,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
       .addTrip(railTrip(TRIP_2_ID, PLANNING_CODE))
       .build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(tripIds(cache.tripsByInternalPlanningCode(PLANNING_CODE))).containsExactly(
       TRIP_1_ID,
@@ -60,7 +65,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
       .withNetexInternalPlanningCode(PLANNING_CODE);
     var env = ENV_BUILDER.addTrip(busTrip).build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(cache.tripsByInternalPlanningCode(PLANNING_CODE)).isEmpty();
   }
@@ -69,7 +76,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   void unknownPlanningCodeReturnsEmptySet() {
     var env = ENV_BUILDER.addTrip(railTrip(TRIP_1_ID, PLANNING_CODE)).build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(cache.tripsByInternalPlanningCode("unknown")).isEmpty();
   }
@@ -78,7 +87,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   void tripIsIndexedByLastStopAndScheduledArrivalTime() {
     var env = ENV_BUILDER.addTrip(tripInput(TRIP_1_ID)).build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(tripIds(cache.tripsByLastStopArrival(STOP_B_ID, LAST_STOP_ARRIVAL))).containsExactly(
       TRIP_1_ID
@@ -89,7 +100,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   void lookupWithWrongStopOrArrivalTimeReturnsEmptySet() {
     var env = ENV_BUILDER.addTrip(tripInput(TRIP_1_ID)).build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(cache.tripsByLastStopArrival(STOP_A_ID, LAST_STOP_ARRIVAL)).isEmpty();
     assertThat(cache.tripsByLastStopArrival(STOP_B_ID, LAST_STOP_ARRIVAL + 1)).isEmpty();
@@ -99,7 +112,9 @@ class SiriFuzzyTripMatcherCacheTest implements RealtimeTestConstants {
   void tripsWithSameLastStopAndArrivalAreGroupedTogether() {
     var env = ENV_BUILDER.addTrip(tripInput(TRIP_1_ID)).addTrip(tripInput(TRIP_2_ID)).build();
 
-    var cache = SiriFuzzyTripMatcherCache.create(env.transitRepository());
+    var cache = SiriFuzzyTripMatcherCache.create(
+      new DefaultTransitService(env.transitRepository())
+    );
 
     assertThat(tripIds(cache.tripsByLastStopArrival(STOP_B_ID, LAST_STOP_ARRIVAL))).containsExactly(
       TRIP_1_ID,

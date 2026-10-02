@@ -6,8 +6,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +29,11 @@ public class SiriFuzzyTripMatcherCache {
     this.startStopTripCache = startStopTripCache;
   }
 
-  public static SiriFuzzyTripMatcherCache create(TransitRepository transitRepository) {
-    TransitService index = new DefaultTransitService(transitRepository, null);
+  /**
+   * @param index a transit service without real-time data, the cache is built from the scheduled
+   *              trips only.
+   */
+  public static SiriFuzzyTripMatcherCache create(TransitService index) {
     var internalPlanningCodes = ImmutableSetMultimap.<String, Trip>builder();
     var startStopTrips = ImmutableSetMultimap.<String, Trip>builder();
 

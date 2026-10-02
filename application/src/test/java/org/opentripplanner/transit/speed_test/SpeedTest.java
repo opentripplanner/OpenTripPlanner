@@ -159,6 +159,7 @@ public class SpeedTest {
       new DefaultVehicleRentalRepository(),
       new DefaultVehicleParkingRepository(),
       transitRepository,
+      new DefaultTransitService(transitRepository),
       // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling
       // repository nor a resolver.
       null,
