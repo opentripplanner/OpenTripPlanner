@@ -32,13 +32,13 @@ jobs:
           fetch-depth: 0
 
       # nodejs is needed because Spotless runs Prettier through node/npm
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
       # Java setup step completes very fast, no need to run in a preconfigured docker container
       - name: Set up JDK 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 25
           distribution: temurin
@@ -81,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Set up JDK 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 25
           distribution: temurin
@@ -127,7 +127,7 @@ jobs:
         if: github.event_name != 'push'
         run: mkdocs build
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
 
@@ -189,7 +189,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Run code generator
@@ -198,7 +198,7 @@ jobs:
           yarn install
           yarn generate
       - name: Set up JDK 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 25
           distribution: temurin
@@ -217,7 +217,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up JDK 25
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 25
           distribution: temurin
