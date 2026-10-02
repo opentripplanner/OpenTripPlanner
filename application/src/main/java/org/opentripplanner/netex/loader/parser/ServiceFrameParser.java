@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.logging.MaxCountLogger;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -36,7 +35,6 @@ import org.slf4j.LoggerFactory;
 class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ServiceFrameParser.class);
-  private static final MaxCountLogger PASSENGER_STOP_ASSIGNMENT_LOGGER = MaxCountLogger.of(LOG);
 
   private final ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
 
@@ -56,6 +54,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
   private final Collection<DestinationDisplay> destinationDisplays = new ArrayList<>();
 
+  private final Map<String, String> stopPlaceByStopPointRef = new HashMap<>();
+
   private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
   private final Map<String, String> flexibleStopPlaceByStopPointRef = new HashMap<>();
@@ -63,13 +63,14 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
   private final Collection<ServiceLink> serviceLinks = new ArrayList<>();
 
   private final NoticeParser noticeParser = new NoticeParser();
+  private final boolean allowStopPlaceAsPassengerStopAssignment;
 
-  ServiceFrameParser(ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById) {
+  ServiceFrameParser(
+    ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById,
+    boolean allowStopPlaceAsPassengerStopAssignment
+  ) {
     this.flexibleStopPlaceById = flexibleStopPlaceById;
-  }
-
-  static void logSummary() {
-    PASSENGER_STOP_ASSIGNMENT_LOGGER.logTotal("PassengerStopAssignment with empty quay ref.");
+    this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
   }
 
   @Override
@@ -129,6 +130,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     index.networkById.addAll(networks);
     noticeParser.setResultOnIndex(index);
     index.quayIdByStopPointRef.addAll(quayIdByStopPointRef);
+    index.stopPlaceIdByStopPointRef.addAll(stopPlaceByStopPointRef);
     index.flexibleStopPlaceByStopPointRef.addAll(flexibleStopPlaceByStopPointRef);
     index.routeById.addAll(routes);
     index.serviceLinkById.addAll(serviceLinks);
@@ -144,15 +146,15 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
       if (stopAssignment.getValue() instanceof PassengerStopAssignment assignment) {
-        if (assignment.getQuayRef() == null) {
-          PASSENGER_STOP_ASSIGNMENT_LOGGER.info(
-            "PassengerStopAssignment with empty quay ref is dropped. Assigment: {}",
-            assignment.getId()
-          );
-        } else {
+        var stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
+        if (assignment.getQuayRef() != null) {
           String quayRef = assignment.getQuayRef().getValue().getRef();
-          String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
+        } else if (
+          allowStopPlaceAsPassengerStopAssignment && assignment.getStopPlaceRef() != null
+        ) {
+          var stopPlaceRef = assignment.getStopPlaceRef().getValue().getRef();
+          stopPlaceByStopPointRef.put(stopPointRef, stopPlaceRef);
         }
       } else if (stopAssignment.getValue() instanceof FlexibleStopAssignment assignment) {
         if (OTPFeature.FlexRouting.isOn()) {
