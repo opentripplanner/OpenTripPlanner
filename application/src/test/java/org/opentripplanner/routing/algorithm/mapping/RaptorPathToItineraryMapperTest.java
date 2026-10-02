@@ -56,6 +56,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -320,7 +321,7 @@ public class RaptorPathToItineraryMapperTest {
       new DefaultTransitService(transitRepository),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
-      null,
+      NoRegularTransfers.factory(),
       dateTime.atZone(ZoneIds.CET),
       RouteRequest.defaultValue()
     );

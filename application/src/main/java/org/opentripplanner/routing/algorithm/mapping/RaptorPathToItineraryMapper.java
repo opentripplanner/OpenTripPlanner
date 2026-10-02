@@ -69,7 +69,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final RaptorTransitData raptorTransitData;
 
-  @Nullable
   private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
 
   private final RouteRequest request;
@@ -87,7 +86,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * @param raptorTransitData          the currently active transit layer (may have real-time data
    *                              applied)
    * @param regularTransferServiceFactory the request's regular-transfer pipeline, used to recover
-   *                              the street path of a regular transfer; {@code null} without it
+   *                              the street path of a regular transfer
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
    */
@@ -96,7 +95,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     StreetDetailsService streetDetailsService,
     RaptorTransitData raptorTransitData,
-    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request
   ) {
@@ -354,9 +353,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
-    // Not a type raptorTransitData's graph-less fallback would produce - must be a transfer from
-    // the raptor-data regular-transfer pipeline. Recover its street path template for the leg's
-    // geometry/walk-steps.
+    // Not a legacy transfer - must be a transfer from the regular-transfer pipeline. Recover its
+    // street path template for the leg's geometry/walk-steps.
     var regularTransferPath = findRegularTransferPath(pathLeg.fromStop(), pathLeg.toStop());
     if (regularTransferPath != null) {
       return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
@@ -366,14 +364,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   /**
    * Recover the street path template for a transfer produced by the regular-transfer pipeline.
-   * {@code null} without the pipeline, or if no template is stored for this stop pair under the
-   * request's profile.
+   * {@code null} if no template is stored for this stop pair under the request's profile.
    */
   @Nullable
   private NearbyStop findRegularTransferPath(int fromStop, int toStop) {
-    if (regularTransferServiceFactory == null) {
-      return null;
-    }
     var profileType = RaptorTransferProfileMapper.fromRouteRequest(request);
     return regularTransferServiceFactory.findPath(profileType, fromStop, toStop);
   }

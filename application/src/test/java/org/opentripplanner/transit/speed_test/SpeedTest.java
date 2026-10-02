@@ -39,6 +39,7 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -196,7 +197,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
-      null,
+      NoRegularTransfers.factory(),
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),

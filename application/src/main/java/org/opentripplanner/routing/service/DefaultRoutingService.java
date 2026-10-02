@@ -59,10 +59,7 @@ public class DefaultRoutingService implements RoutingService {
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
-
-  @Nullable
   private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
-
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
@@ -98,7 +95,7 @@ public class DefaultRoutingService implements RoutingService {
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     TransitAlertService transitAlertService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,

@@ -40,6 +40,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -276,7 +277,7 @@ public abstract class GtfsTest {
       graph,
       transitService,
       transferRepository,
-      null
+      NoRegularTransfers.factory()
     );
   }
 }

@@ -65,10 +65,7 @@ public class TransitRouter {
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
-
-  @Nullable
   private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
-
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
 
@@ -94,7 +91,7 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -136,7 +133,7 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -369,15 +366,7 @@ public class TransitRouter {
     );
   }
 
-  /**
-   * {@code null} without the regular-transfer pipeline, Raptor then uses the transfers in
-   * {@link RaptorTransitData} instead.
-   */
-  @Nullable
   private RaptorRegularTransferService regularTransferService() {
-    if (regularTransferServiceFactory == null) {
-      return null;
-    }
     return regularTransferServiceFactory.create(
       RaptorTransferProfileMapper.fromRouteRequest(request),
       RegularTransferPreferencesMapper.fromRouteRequest(request)

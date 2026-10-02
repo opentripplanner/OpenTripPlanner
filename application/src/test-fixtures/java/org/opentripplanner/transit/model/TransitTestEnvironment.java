@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -199,7 +200,7 @@ public final class TransitTestEnvironment {
     );
     return new RaptorRoutingRequestTransitData(
       transitRepository.getRaptorTransitData(),
-      null,
+      NoRegularTransfers.service(),
       TransitGroupPriorityService.empty(),
       transitSearchTimeZero,
       0,

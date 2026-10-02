@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
@@ -52,6 +51,7 @@ import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
@@ -147,14 +147,14 @@ public class TestServerContext {
   }
 
   /**
-   * Create a {@link RoutingService} for unit testing. Without a {@code regularTransferServiceFactory}
-   * routing falls back to the transfers in {@code transferRepository}.
+   * Create a {@link RoutingService} for unit testing. Pass {@link NoRegularTransfers#factory()} to
+   * route without regular transfers.
    */
   public static RoutingService createRoutingService(
     Graph graph,
     TransitService transitService,
     TransferRepository transferRepository,
-    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory
   ) {
     var routerConfig = RouterConfig.DEFAULT;
     var raptorConfig = createRaptorConfig();
