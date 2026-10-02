@@ -94,5 +94,9 @@
   },
   "cache": {
     "enabled": true
+  },
+  "boardingLocations": {
+    "refTags": ["ref", "ref:IFOPT"],
+    "coordinateSource": "transit"
   }
 }

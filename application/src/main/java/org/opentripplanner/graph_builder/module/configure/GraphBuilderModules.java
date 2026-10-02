@@ -114,7 +114,7 @@ public class GraphBuilderModules {
       .withStaticBikeParkAndRide(config.staticBikeParkAndRide)
       .withIncludeInclinedEdgeLevelInfo(config.includeInclinedEdgeLevelInfo)
       .withMaxAreaNodes(config.maxAreaNodes)
-      .withBoardingAreaRefTags(config.boardingLocationTags)
+      .withBoardingAreaRefTags(config.boardingLocations.refTags())
       .withElevatorRefTags(config.elevatorRefTags)
       .withIncludeOsmStationEntrances(config.osmDefaults.includeOsmStationEntrances())
       .withCacheManager(cacheManager)
@@ -139,7 +139,7 @@ public class GraphBuilderModules {
       linker,
       osmInfoGraphBuildService,
       osmInfoGraphBuildRepository,
-      config.boardingLocationCoordinateSource,
+      config.boardingLocations.coordinateSource(),
       issueStore
     );
   }

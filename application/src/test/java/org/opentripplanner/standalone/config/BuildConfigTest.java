@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
@@ -39,11 +40,20 @@ class BuildConfigTest {
 
   @Test
   public void boardingLocationRefs() {
-    var node = jsonNodeForTest("{ 'boardingLocationTags' : ['a-ha', 'royksopp'] }");
+    var node = jsonNodeForTest("{ 'boardingLocations' : { 'refTags' : ['a-ha', 'royksopp'] } }");
 
     var subject = new BuildConfig(node, "Test", false);
 
-    assertEquals(Set.of("a-ha", "royksopp"), subject.boardingLocationTags);
+    assertEquals(Set.of("a-ha", "royksopp"), subject.boardingLocations.refTags());
+  }
+
+  @Test
+  public void boardingLocationCoordinateSource() {
+    var node = jsonNodeForTest("{ 'boardingLocations' : { 'coordinateSource' : 'transit' } }");
+
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(TRANSIT, subject.boardingLocations.coordinateSource());
   }
 
   @Test

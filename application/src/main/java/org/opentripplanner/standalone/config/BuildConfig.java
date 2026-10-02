@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
@@ -33,7 +32,6 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.ext.vehiclerentalgeofencing.config.VehicleRentalGeofencingConfig;
 import org.opentripplanner.ext.vehiclerentalgeofencing.parameters.VehicleRentalGeofencingParameters;
-import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
@@ -44,6 +42,7 @@ import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferPara
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
+import org.opentripplanner.standalone.config.buildconfig.BoardingLocationsConfig;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
@@ -127,7 +126,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean areaVisibility;
 
-  public final BoardingLocationCoordinateSource boardingLocationCoordinateSource;
+  public final BoardingLocationsConfig boardingLocations;
 
   public final boolean platformEntriesLinking;
 
@@ -175,7 +174,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
-  public final Set<String> boardingLocationTags;
   public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
   public final DemExtractParametersList dem;
@@ -229,31 +227,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
-    this.boardingLocationCoordinateSource = root
-      .of("boardingLocationCoordinateSource")
-      .since(V2_11)
-      .summary(
-        "Which position OTP uses for a stop that matches an OSM platform or boarding location node."
-      )
-      .description(
-        """
-        When a stop's reference tag matches an OSM platform (a way or an area) or a tagged node, OTP
-        has two candidate positions for where the passenger waits: the one in the OSM data and the
-        one in the transit data.
-
-        The default `OSM` uses the OSM feature. Every stop matching one platform shares a single
-        point at its centre, so walking between them is free however far apart they really are, and
-        every walk to or from the platform starts at that centre rather than at the stop — on a long
-        platform, up to half its length of detour.
-
-        `TRANSIT` keeps each stop where the transit data puts it and connects it to the platform by
-        a walk of the real distance, so stops on one platform stay separate. This applies to
-        platforms mapped as ways or areas and to stops matching a tagged node alike; the OSM
-        features themselves are never moved. A gap too large to be a surveying discrepancy is
-        reported as a data import issue.
-        """
-      )
-      .asEnum(BoardingLocationCoordinateSource.OSM);
+    this.boardingLocations = BoardingLocationsConfig.fromConfig(root);
     this.cache = GraphBuildCacheConfig.fromConfig(root);
     this.configVersion = root
       .of("configVersion")
@@ -524,14 +498,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       .since(V1_5)
       .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
       .asInt(2000);
-    this.boardingLocationTags = root
-      .of("boardingLocationTags")
-      .since(V2_2)
-      .summary(
-        "What OSM tags should be looked on for the source of matching stops to platforms and stops."
-      )
-      .description("[Detailed documentation](BoardingLocations.md)")
-      .asStringSet(List.copyOf(Set.of("ref")));
     elevatorRefTags = root
       .of("elevatorRefTags")
       .since(V2_10)
