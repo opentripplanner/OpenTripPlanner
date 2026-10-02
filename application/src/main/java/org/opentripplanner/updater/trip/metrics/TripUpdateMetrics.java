@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.metrics;
 
 import io.micrometer.core.instrument.Tag;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -16,7 +17,7 @@ public class TripUpdateMetrics {
   TripUpdateMetrics(UrlUpdaterParameters parameters) {
     this.baseTags = List.of(
       Tag.of("configRef", parameters.configRef()),
-      Tag.of("url", parameters.url()),
+      Tag.of("url", Objects.requireNonNullElse(parameters.url(), "")),
       Tag.of("feedId", parameters.feedId())
     );
   }
