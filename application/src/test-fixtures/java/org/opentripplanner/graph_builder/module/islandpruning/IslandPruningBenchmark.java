@@ -60,7 +60,7 @@ public class IslandPruningBenchmark {
     Graph graph = IslandPruningUtils.buildStreetGraph(osmFile);
     Duration osmDuration = Duration.between(osmStart, Instant.now());
 
-    int streetVertices = graph.getVerticesOfType(StreetVertex.class).size();
+    int streetVertices = ListUtils.countIterable(graph.findVertices(StreetVertex.class));
     int streetEdges = countEdges(graph);
     System.out.printf(
       "OSM module: %s, %d street vertices, %d street edges%n",
@@ -93,7 +93,7 @@ public class IslandPruningBenchmark {
     System.out.printf("Heap after forced GC post-pruning: %,d MB%n", heapAfterGc / 1_000_000);
     System.out.printf(
       "Remaining street vertices/edges after pruning: %d / %d%n",
-      graph.getVerticesOfType(StreetVertex.class).size(),
+      streetEdges,
       countEdges(graph)
     );
   }

@@ -100,7 +100,7 @@ public class IslandPruningModule implements GraphBuilderModule {
       .collect(Collectors.toSet());
 
     int removed = 0;
-    for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
+    for (Vertex v : graph.findVertices(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
         graph.remove(v);
         removed += 1;

@@ -44,7 +44,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   }
 
   void initializeMainAndSubsidiaryVertices() {
-    for (var vertex : graph.getVerticesOfType(SubsidiaryVertex.class)) {
+    for (var vertex : graph.findVertices(SubsidiaryVertex.class)) {
       Vertex parent = vertex.getParent();
       if (parent instanceof IntersectionVertex intersectionVertex) {
         mainVertices.put(vertex, intersectionVertex);

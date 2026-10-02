@@ -83,7 +83,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
     int stopsAnalyzed = 0;
 
-    for (TransitStopVertex originStopVertex : graph.getVerticesOfType(TransitStopVertex.class)) {
+    for (TransitStopVertex originStopVertex : graph.findVertices(TransitStopVertex.class)) {
       if (++stopsAnalyzed % 1000 == 0) {
         LOG.info("{} stops analyzed", stopsAnalyzed);
       }
