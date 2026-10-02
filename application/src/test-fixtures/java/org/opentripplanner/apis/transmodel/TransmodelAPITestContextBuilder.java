@@ -66,7 +66,7 @@ public class TransmodelAPITestContextBuilder {
     var vertexLinker = VertexLinkerTestFactory.of(graph);
 
     return new TestTransmodelGraphQLRequestContext(
-      TestServerContext.createRoutingService(graph, transitService, transferRepository),
+      TestServerContext.createRoutingService(graph, transitService, transferRepository, null),
       transitService,
       null,
       null,

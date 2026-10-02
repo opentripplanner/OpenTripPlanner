@@ -199,6 +199,7 @@ public final class TransitTestEnvironment {
     );
     return new RaptorRoutingRequestTransitData(
       transitRepository.getRaptorTransitData(),
+      null,
       TransitGroupPriorityService.empty(),
       transitSearchTimeZero,
       0,

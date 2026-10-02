@@ -196,6 +196,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
+      null,
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),

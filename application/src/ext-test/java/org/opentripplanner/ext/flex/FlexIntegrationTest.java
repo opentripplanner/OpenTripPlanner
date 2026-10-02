@@ -80,11 +80,15 @@ public class FlexIntegrationTest {
       )
     );
     var transitService = TestServerContext.createTransitService(
-      graph,
       transitRepository,
       transferRepository
     );
-    service = TestServerContext.createRoutingService(graph, transitService, transferRepository);
+    service = TestServerContext.createRoutingService(
+      graph,
+      transitService,
+      transferRepository,
+      TestServerContext.createRegularTransferServiceFactory(graph, transitRepository)
+    );
   }
 
   @Test

@@ -69,8 +69,7 @@ public class RaptorRoutingRequestTransitData
   private final RaptorTransferIndex transferIndex;
 
   /**
-   * {@code null} unless raptor-data wiring (a {@code Graph} + configured transfer profiles) was
-   * supplied when {@code RaptorTransitData} was mapped - {@link #getTransfersFromStop}/
+   * {@code null} without the regular-transfer pipeline - {@link #getTransfersFromStop}/
    * {@link #getTransfersToStop} fall back to {@link #transferIndex} in that case. This is the
    * permanent graph-less fallback (used by tests, and any deployment without a street graph), not
    * a temporary code path.
@@ -92,6 +91,7 @@ public class RaptorRoutingRequestTransitData
 
   public RaptorRoutingRequestTransitData(
     RaptorTransitData raptorTransitData,
+    @Nullable RaptorRegularTransferService regularTransferService,
     TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
@@ -119,7 +119,7 @@ public class RaptorRoutingRequestTransitData
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
     this.transferIndex = raptorTransitData.getRaptorTransfersForRequest(request);
-    this.regularTransferService = raptorTransitData.getRegularTransferServiceForRequest(request);
+    this.regularTransferService = regularTransferService;
     this.constrainedTransfers = raptorTransitData.getConstrainedTransfers();
 
     var mcCostParams = GeneralizedCostParametersMapper.map(

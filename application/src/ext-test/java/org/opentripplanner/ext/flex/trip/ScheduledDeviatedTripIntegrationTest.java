@@ -99,7 +99,6 @@ class ScheduledDeviatedTripIntegrationTest {
     var feedId = transitRepository.getFeedIds().iterator().next();
 
     var transitService = TestServerContext.createTransitService(
-      graph,
       transitRepository,
       transferRepository
     );
@@ -147,7 +146,6 @@ class ScheduledDeviatedTripIntegrationTest {
     var feedId = transitRepository.getFeedIds().iterator().next();
 
     var transitService = TestServerContext.createTransitService(
-      graph,
       transitRepository,
       transferRepository
     );
@@ -244,6 +242,7 @@ class ScheduledDeviatedTripIntegrationTest {
         Metrics.globalRegistry,
         TestServerContext.createStreetDetailsService(),
         TransferServiceTestFactory.transferService(transferRepository),
+        TestServerContext.createRegularTransferServiceFactory(graph, transitRepository),
         RouterConfig.DEFAULT.flexParameters(),
         List.of(),
         null,

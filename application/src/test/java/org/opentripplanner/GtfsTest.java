@@ -275,7 +275,8 @@ public abstract class GtfsTest {
     routingService = TestServerContext.createRoutingService(
       graph,
       transitService,
-      transferRepository
+      transferRepository,
+      null
     );
   }
 }

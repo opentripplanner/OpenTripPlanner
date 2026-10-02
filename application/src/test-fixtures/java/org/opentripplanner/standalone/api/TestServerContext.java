@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
@@ -17,6 +18,7 @@ import org.opentripplanner.graph_builder.module.transfer.api.TransferProfileConf
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferServiceFactoryCreator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -59,8 +61,10 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 public class TestServerContext {
@@ -69,17 +73,15 @@ public class TestServerContext {
 
   /**
    * Create a {@link TransitService} for unit testing: indexes the transit repository, builds
-   * raptor transit data (including regular transfers through the raptor-data pipeline, mirroring
-   * production graph builds), and wraps a pinned timetable snapshot.
+   * raptor transit data, and wraps a pinned timetable snapshot. Regular transfers are not part of
+   * it, see {@link #createRegularTransferServiceFactory}.
    */
   public static TransitService createTransitService(
-    Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository
   ) {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableHandle = indexAndRegisterTimetableSnapshot(
-      graph,
       transitRepository,
       transferRepository,
       registry
@@ -94,33 +96,17 @@ public class TestServerContext {
     TimetableRepositorySnapshot,
     TimetableRepository
   > indexAndRegisterTimetableSnapshot(
-    Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
     RepositoryRegistry registry
   ) {
     transitRepository.index();
 
-    var regularTransferRepository = new DefaultRegularTransferRepository<NearbyStop>();
-    var transferProfilesConfig = new TransferProfilesConfig(
-      List.of(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT))
-    );
-    new RegularTransitTransferGenerator(
-      graph,
-      transitRepository,
-      transferProfilesConfig,
-      regularTransferRepository,
-      DataImportIssueStore.NOOP
-    ).buildGraph();
-
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
-      graph,
       transitRepository,
-      transferRepository,
-      regularTransferRepository,
-      transferProfilesConfig
+      transferRepository
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
 
@@ -135,12 +121,40 @@ public class TestServerContext {
   }
 
   /**
-   * Create a {@link RoutingService} for unit testing.
+   * Generate the regular transfers through the raptor-data pipeline, mirroring production graph
+   * builds, and create the factory routing reads them from. The transit repository must be indexed
+   * first, see {@link #createTransitService}.
+   */
+  public static RegularTransferServiceFactory<NearbyStop> createRegularTransferServiceFactory(
+    Graph graph,
+    TransitRepository transitRepository
+  ) {
+    var regularTransferRepository = new DefaultRegularTransferRepository<NearbyStop>();
+    var transferProfilesConfig = new TransferProfilesConfig(
+      List.of(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT))
+    );
+    new RegularTransitTransferGenerator(
+      graph,
+      transitRepository,
+      transferProfilesConfig,
+      regularTransferRepository,
+      DataImportIssueStore.NOOP
+    ).buildGraph();
+    var snapshot = new RegularTransferRepositoryLifecycle<NearbyStop>().freeze(
+      regularTransferRepository
+    );
+    return RegularTransferServiceFactoryCreator.of(graph, transitRepository).create(snapshot);
+  }
+
+  /**
+   * Create a {@link RoutingService} for unit testing. Without a {@code regularTransferServiceFactory}
+   * routing falls back to the transfers in {@code transferRepository}.
    */
   public static RoutingService createRoutingService(
     Graph graph,
     TransitService transitService,
-    TransferRepository transferRepository
+    TransferRepository transferRepository,
+    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory
   ) {
     var routerConfig = RouterConfig.DEFAULT;
     var raptorConfig = createRaptorConfig();
@@ -155,6 +169,7 @@ public class TestServerContext {
       createVehicleRentalService(),
       createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
+      regularTransferServiceFactory,
       new TransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),

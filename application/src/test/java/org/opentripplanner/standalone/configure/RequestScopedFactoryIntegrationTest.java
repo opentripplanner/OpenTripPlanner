@@ -1,8 +1,13 @@
 package org.opentripplanner.standalone.configure;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
+import java.util.List;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.place.api.NearbyStop;
 
 /**
  * Verifies the real Dagger scoping added for issue #7441: bindings inside one {@link
@@ -19,12 +24,26 @@ import org.junit.jupiter.api.Test;
  */
 class RequestScopedFactoryIntegrationTest {
 
+  private static final int AWAIT_COMMIT_TIMEOUT_MS = 5_000;
+  private static final int AWAIT_COMMIT_POLL_INTERVAL_MS = 20;
+  private static final int FROM_STOP = 0;
+  private static final int TO_STOP = 1;
+  private static final NearbyStop PATH = new NearbyStop(
+    FeedScopedId.of("F", "B"),
+    100.0,
+    List.of(),
+    null
+  );
+
   @Test
   void requestScopedBindingsAreCachedWithinOneRequestButNotAcrossRequests() {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
 
     var requestOne = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isSameInstanceAs(requestOne.transitService());
+    assertThat(requestOne.regularTransferServiceFactory()).isSameInstanceAs(
+      requestOne.regularTransferServiceFactory()
+    );
     assertThat(requestOne.transactionScope()).isSameInstanceAs(requestOne.transactionScope());
     assertThat(requestOne.gtfsRequestContext()).isSameInstanceAs(requestOne.gtfsRequestContext());
     assertThat(requestOne.gtfsRequestContext().transitService()).isSameInstanceAs(
@@ -33,6 +52,9 @@ class RequestScopedFactoryIntegrationTest {
 
     var requestTwo = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isNotSameInstanceAs(requestTwo.transitService());
+    assertThat(requestOne.regularTransferServiceFactory()).isNotSameInstanceAs(
+      requestTwo.regularTransferServiceFactory()
+    );
     assertThat(requestOne.gtfsRequestContext()).isNotSameInstanceAs(
       requestTwo.gtfsRequestContext()
     );
@@ -42,5 +64,50 @@ class RequestScopedFactoryIntegrationTest {
     assertThat(requestOne.transmodelGraphQLSchema()).isSameInstanceAs(
       requestTwo.transmodelGraphQLSchema()
     );
+  }
+
+  /**
+   * A request reads the regular transfers of the snapshot it started with, also after an update
+   * is committed. Requests started after the commit see the update.
+   */
+  @Test
+  void regularTransferServiceFactoryReadsTheSnapshotOfItsRequest() throws Exception {
+    var factory = TestConstructApplicationFactoryBuilder.of().build();
+    var handle = factory.regularTransferRepositoryHandle();
+    var updateManager = factory.transitUpdateManager();
+    try {
+      var before = factory.requestScopedFactoryBuilder().build();
+      assertThat(findPath(before)).isNull();
+
+      updateManager
+        .submit(ctx -> ctx.repository(handle).setPath(WALK, FROM_STOP, TO_STOP, PATH))
+        .get();
+      var after = awaitRequestSeeing(factory, PATH);
+
+      assertThat(findPath(after)).isSameInstanceAs(PATH);
+      assertThat(findPath(before)).isNull();
+    } finally {
+      updateManager.shutdown();
+    }
+  }
+
+  @Nullable
+  private static NearbyStop findPath(RequestScopedFactory request) {
+    return request.regularTransferServiceFactory().findPath(WALK, FROM_STOP, TO_STOP);
+  }
+
+  /** The transit domain commits periodically, so poll until a new request sees the update. */
+  private static RequestScopedFactory awaitRequestSeeing(
+    ConstructApplicationFactory factory,
+    NearbyStop expected
+  ) throws InterruptedException {
+    long timeout = System.currentTimeMillis() + AWAIT_COMMIT_TIMEOUT_MS;
+    while (true) {
+      var request = factory.requestScopedFactoryBuilder().build();
+      if (findPath(request) == expected || System.currentTimeMillis() > timeout) {
+        return request;
+      }
+      Thread.sleep(AWAIT_COMMIT_POLL_INTERVAL_MS);
+    }
   }
 }

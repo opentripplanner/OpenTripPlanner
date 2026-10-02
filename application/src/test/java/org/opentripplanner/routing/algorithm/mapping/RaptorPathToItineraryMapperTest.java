@@ -320,6 +320,7 @@ public class RaptorPathToItineraryMapperTest {
       new DefaultTransitService(transitRepository),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
+      null,
       dateTime.atZone(ZoneIds.CET),
       RouteRequest.defaultValue()
     );
