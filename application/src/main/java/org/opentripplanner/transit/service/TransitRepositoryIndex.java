@@ -99,7 +99,10 @@ class TransitRepositoryIndex {
     initializeServiceData(transitRepository.getTripCalendar());
 
     if (OTPFeature.FlexRouting.isOn()) {
-      flexIndex = new FlexIndex(transitRepository);
+      flexIndex = new FlexIndex(
+        transitRepository.getAllFlexTrips(),
+        transitRepository.getTripCalendar()
+      );
       for (Route route : flexIndex.getAllFlexRoutes()) {
         routeForId.put(route.getId(), route);
       }
