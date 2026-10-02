@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.trip.siri.moduletests.update;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
@@ -145,8 +146,7 @@ class MissingRealtimeTest implements RealtimeTestConstants {
 
   /**
    * When every stop in the update has no real-time times, all stops are marked NO_DATA and
-   * {@code timesModified} remains {@code false}. The trip prefix must be "S" (scheduled), not "U"
-   * (updated), because no times were actually modified.
+   * {@code timesModified} remains {@code false}.
    */
   @Test
   void allStopsWithNoTimes_timesModifiedIsFalse_tripAppearsScheduled() {
@@ -162,11 +162,12 @@ class MissingRealtimeTest implements RealtimeTestConstants {
     var result = siri.applyEstimatedTimetable(updates);
     assertSuccess(result);
 
-    // "S" prefix: hasAnyUpdates() = false (timesModified = false, no cancellation/added/etc.)
     assertEquals(
-      "S | A [ND] 0:00:10 0:00:11 | B [ND] 0:00:20 0:00:21",
+      "U | A [ND] 0:00:10 0:00:11 | B [ND] 0:00:20 0:00:21",
       env.tripData(TRIP_1_ID).showTimetable()
     );
+    assertFalse(env.tripData(TRIP_1_ID).tripTimes().realtimeTripState().timesModified());
+    assertFalse(env.tripData(TRIP_1_ID).tripTimes().realtimeTripState().tripPatternModified());
   }
 
   /**

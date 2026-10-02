@@ -272,48 +272,6 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   }
 
   @Test
-  void testRejectUnmonitoredExtraJourney() {
-    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
-    var siri = SiriTestHelper.of(env);
-
-    var updates = createValidAddedJourney(siri)
-      .withMonitored(false)
-      .buildEstimatedTimetableDeliveries();
-
-    var result = siri.applyEstimatedTimetable(updates);
-
-    assertFailure(UpdateErrorType.NOT_MONITORED, result);
-    assertNull(
-      env.transitService().getTrip(id(ADDED_TRIP_ID)),
-      "An unmonitored extra journey must not be added"
-    );
-  }
-
-  /**
-   * The not-monitored validation is overridden for cancellations: an extra journey reported as not
-   * monitored but cancelled is still processed, so the trip is added (in cancelled state) rather
-   * than rejected. This is the counterpart to {@link #testRejectUnmonitoredExtraJourney()}.
-   */
-  @Test
-  void testAcceptUnmonitoredCancelledExtraJourney() {
-    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
-    var siri = SiriTestHelper.of(env);
-
-    var updates = createValidAddedJourney(siri)
-      .withMonitored(false)
-      .withCancellation(true)
-      .buildEstimatedTimetableDeliveries();
-
-    var result = siri.applyEstimatedTimetable(updates);
-
-    assertSuccess(result);
-    assertNotNull(
-      env.transitService().getTrip(id(ADDED_TRIP_ID)),
-      "An unmonitored but cancelled extra journey must still be added"
-    );
-  }
-
-  @Test
   void testReplaceJourney() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[S]");

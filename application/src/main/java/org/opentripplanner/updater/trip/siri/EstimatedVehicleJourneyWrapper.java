@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper;
-import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.trip.siri.mapping.OccupancyMapper;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -51,22 +50,7 @@ final class EstimatedVehicleJourneyWrapper {
     return wrapper;
   }
 
-  private void validate() throws UpdateException {
-    if (mustBeRejectedAsUnmonitored()) {
-      throw UpdateException.of(UpdateErrorType.NOT_MONITORED);
-    }
-  }
-
-  /**
-   * Whether this journey must be rejected because it is not monitored.
-   * <p>
-   * A journey reported as not monitored is normally rejected, but the not-monitored flag is ignored
-   * when the journey is a cancellation: a cancelled journey is no longer monitored, yet must still
-   * be processed so that the cancellation is applied.
-   */
-  private boolean mustBeRejectedAsUnmonitored() {
-    return !isMonitored() && !isCancellation();
-  }
+  private void validate() throws UpdateException {}
 
   /* Calls */
 

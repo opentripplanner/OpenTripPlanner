@@ -194,6 +194,11 @@ public class RealTimeTripTimesBuilder {
     return this;
   }
 
+  public RealTimeTripTimesBuilder withMonitored() {
+    stateBuilder.withMonitored();
+    return this;
+  }
+
   boolean isTripPatternModified() {
     return stateBuilder.isTripPatternModified();
   }
