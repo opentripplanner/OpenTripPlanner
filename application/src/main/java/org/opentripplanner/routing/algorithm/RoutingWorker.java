@@ -34,7 +34,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouterFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -308,13 +308,6 @@ public class RoutingWorker {
     if (request.isStartOnBoardAccessRequest()) {
       return RoutingResult.empty();
     }
-    // TODO: Add support for via search to the direct-street search and remove this.
-    //       The direct search is used to prune away silly transit results and it
-    //       would be nice to also support via as a feature in the direct-street
-    //       search.
-    if (request.isViaSearch()) {
-      return RoutingResult.empty();
-    }
     // Direct taxi routing is handled separately in routeDirectTaxi().
     if (request.journey().direct().mode() == StreetMode.TAXI) {
       return RoutingResult.empty();
@@ -339,8 +332,9 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
+      var directRouter = DirectStreetRouterFactory.create(request);
       return RoutingResult.ok(
-        DirectStreetRouter.route(
+        directRouter.route(
           graph,
           transitService,
           streetLimitationParametersService,
@@ -373,6 +367,8 @@ public class RoutingWorker {
           graph,
           transitService,
           transferService,
+          vehicleRentalService,
+          streetLimitationParametersService,
           streetDetailsService,
           flexParameters,
           dataOverlayParameterBindings,
@@ -408,10 +404,6 @@ public class RoutingWorker {
   private RoutingResult routeDirectTaxi() {
     // Start-on-board trip locations don't have street vertices, so direct routing is not applicable
     if (request.isStartOnBoardAccessRequest()) {
-      return RoutingResult.empty();
-    }
-    // See the equivalent TODO in routeDirectStreet() for why via search is not supported here.
-    if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
     if (request.journey().direct().mode() != StreetMode.TAXI) {
@@ -453,6 +445,8 @@ public class RoutingWorker {
         meterRegistry,
         streetDetailsService,
         transferService,
+        vehicleRentalService,
+        streetLimitationParametersService,
         flexParameters,
         rideHailingServices,
         dataOverlayParameterBindings,

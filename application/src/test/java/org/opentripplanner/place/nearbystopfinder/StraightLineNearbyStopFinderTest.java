@@ -40,8 +40,8 @@ class StraightLineNearbyStopFinderTest extends GraphRoutingTest {
 
   @Test
   void findNearbyStops() {
-    var ns1 = new NearbyStop(S1.getId(), 0, null, null);
-    var ns2 = new NearbyStop(S2.getId(), 1112, null, null);
+    var ns1 = new NearbyStop(S1.getId(), 0, List.of(), List.of());
+    var ns2 = new NearbyStop(S2.getId(), 1112, List.of(), List.of());
 
     var subject = new StraightLineNearbyStopFinder(siteRepository::findRegularStops);
     var coordinate = new Coordinate(19.000, 47.500);
@@ -52,8 +52,8 @@ class StraightLineNearbyStopFinderTest extends GraphRoutingTest {
 
   @Test
   void findNearbyStopsWithMaxStopCount() {
-    var ns1 = new NearbyStop(S1.getId(), 0, null, null);
-    var ns2 = new NearbyStop(S2.getId(), 1112, null, null);
+    var ns1 = new NearbyStop(S1.getId(), 0, List.of(), List.of());
+    var ns2 = new NearbyStop(S2.getId(), 1112, List.of(), List.of());
 
     var subject = new StraightLineNearbyStopFinder(siteRepository::findRegularStops);
 

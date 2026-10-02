@@ -487,12 +487,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
         var snap = accessOrEgress.isAccess()
           ? carReachableVertexSnapper.snapDropoff(
               streetSearchRequest,
-              stop.state.getVertex(),
+              stop.finalStates.getFirst().getVertex(),
               maxWalkToCarpool
             )
           : carReachableVertexSnapper.snapPickup(
               streetSearchRequest,
-              stop.state.getVertex(),
+              stop.finalStates.getFirst().getVertex(),
               maxWalkToCarpool
             );
         if (snap != null) {
