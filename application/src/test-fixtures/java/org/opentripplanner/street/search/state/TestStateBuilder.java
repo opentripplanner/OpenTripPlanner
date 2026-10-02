@@ -305,6 +305,16 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder pathway(String s, double distance) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var tov = StreetModelForTest.intersectionVertex(count, count);
+    var name = s == null ? null : I18NString.of(s);
+    var edge = PathwayEdge.createPathwayEdge(from, tov, name, 0, distance, 0, 0, true);
+    currentState = edge.traverse(currentState)[0];
+    return this;
+  }
+
   private TestStateBuilder arriveAtStop(RegularStop stop) {
     var from = (StreetVertex) currentState.vertex;
     var to = TransitStopVertex.of().withId(stop.getId()).withPoint(stop.getGeometry()).build();
