@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.boardinglocations;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
@@ -15,6 +14,7 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /** The graph a {@link BoardingLocationsEnvironment} produced, with the lookups tests need. */
 public record LinkedGraph(
@@ -22,15 +22,6 @@ public record LinkedGraph(
   DefaultOsmInfoGraphBuildRepository osmInfoRepository,
   DefaultDataImportIssueStore issueStore
 ) {
-  /**
-   * The shared read-only query API over the linked graph, the same door
-   * {@code LinkingEnvironment} and {@code IslandPruningEnvironment} hand out. Generic graph
-   * questions belong here; this class only adds the boarding-location specific ones.
-   */
-  public GraphSummarizer graph() {
-    return new GraphSummarizer(rawGraph);
-  }
-
   private TransitStopVertex stopVertex(RegularStop stop) {
     return rawGraph
       .findStopVertex(stop.getId())
@@ -59,12 +50,12 @@ public record LinkedGraph(
     );
   }
 
-  /** The street edges a boarding location walks out over, excluding the link to its stop. */
+  /** The street edges leading out of a boarding location, excluding the link to its stop. */
   public List<StreetEdge> connectors(RegularStop stop) {
     return boardingLocation(stop).getOutgoingStreetEdges();
   }
 
-  /** The vertices a boarding location walks to, over its connector edges. */
+  /** The vertices a boarding location is connected to, over its connector edges. */
   public List<Vertex> attachmentPoints(RegularStop stop) {
     return connectors(stop).stream().map(Edge::getToVertex).toList();
   }
@@ -85,7 +76,7 @@ public record LinkedGraph(
   /** How many street edges in the whole graph are registered as belonging to a platform. */
   public long platformEdgeCount() {
     var service = osmInfoService();
-    return StreamSupport.stream(rawGraph.findEdges(StreetEdge.class).spliterator(), false)
+    return StreamUtils.ofIterable(rawGraph.findEdges(StreetEdge.class))
       .filter(edge -> service.findPlatform(edge).isPresent())
       .count();
   }

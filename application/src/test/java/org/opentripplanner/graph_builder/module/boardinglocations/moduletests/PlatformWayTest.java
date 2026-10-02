@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource;
 import org.opentripplanner.graph_builder.module.boardinglocations.BoardingLocationsEnvironment;
 import org.opentripplanner.osm.TestOsmProvider;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -31,13 +30,13 @@ class PlatformWayTest {
 
   /**
    * With {@link BoardingLocationCoordinateSource#TRANSIT} the stop keeps its own coordinate and
-   * walks onto the way. Attaching it to its own projection instead would make the offset free, the
-   * stop-to-boarding-location link having no length.
+   * reaches the way over an edge of the offset. Attaching it to its own projection instead would
+   * make that offset free, the stop-to-boarding-location link having no length.
    */
   @Test
-  void aStopOffThePlatformWalksOntoIt() {
+  void aStopOffThePlatformKeepsItsOffset() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform("off-the-way"));
-    var stop = test.stop("off-the-way", offset(12, 150));
+    var stop = test.stop("off-the-way", WEST_END.moveNorthMeters(12).moveEastMeters(150));
 
     var result = test.build();
 
@@ -47,7 +46,7 @@ class PlatformWayTest {
     var connectors = result.connectors(stop);
     assertEquals(2, connectors.size(), "one connector per traversal direction");
     connectors.forEach(c ->
-      assertEquals(12, c.getDistanceMeters(), 0.5, "the offset onto the platform is walked")
+      assertEquals(12, c.getDistanceMeters(), 0.5, "the offset onto the platform costs its length")
     );
     assertThat(result.issueTypes()).contains("StopFarFromBoardingLocation");
   }
@@ -59,9 +58,9 @@ class PlatformWayTest {
   @Test
   void closeStopsAttachToBothDirectionsAtTheirOwnPoint() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform("a;b"));
-    var stopA = test.stop("a", offset(1, 150));
+    var stopA = test.stop("a", WEST_END.moveNorthMeters(1).moveEastMeters(150));
     // 30 m off the line but only 15 cm further along it, which is what triggers the false positive.
-    var stopB = test.stop("b", offset(30, 150.15));
+    var stopB = test.stop("b", WEST_END.moveNorthMeters(30).moveEastMeters(150.15));
 
     var result = test.build();
 
@@ -104,8 +103,8 @@ class PlatformWayTest {
   @Test
   void aSecondStopOnTheSamePlatformStillFindsIt() {
     var test = BoardingLocationsEnvironment.of(OSM, platform("a;b"));
-    var stopA = test.stop("a", offset(0, 100));
-    var stopB = test.stop("b", offset(0, 200));
+    var stopA = test.stop("a", WEST_END.moveEastMeters(100));
+    var stopB = test.stop("b", WEST_END.moveEastMeters(200));
 
     var result = test.build();
 
@@ -117,7 +116,7 @@ class PlatformWayTest {
     }
 
     // The freshly created halves carry the platform, so a third stop would find it too. The
-    // connector a stop walks in over is not part of the platform and must not be tagged.
+    // connector a stop is linked in over is not part of the platform and must not be tagged.
     var osmService = result.osmInfoService();
     var platformHalves = result
       .linkedVertices(stopA)
@@ -145,14 +144,14 @@ class PlatformWayTest {
       .addWayFromNodes(
         way -> way.withTag("public_transport", "platform").withTag("ref", "on-the-end"),
         node(1, WEST_END),
-        node(2, offset(0, 300))
+        node(2, WEST_END.moveEastMeters(300))
       )
-      .addWayFromNodes(node(1, WEST_END), node(3, offset(-50, 0)))
+      .addWayFromNodes(node(1, WEST_END), node(3, WEST_END.moveSouthMeters(50)))
       .build();
 
     var test = BoardingLocationsEnvironment.of(TRANSIT, provider);
     // The stop sits exactly on the platform way's western end, which an unrelated footway shares.
-    var stop = test.stop("on-the-end", offset(0, 0));
+    var stop = test.stop("on-the-end", WEST_END);
 
     var result = test.build();
 
@@ -181,18 +180,23 @@ class PlatformWayTest {
             .withTag("ref", "both-ways")
             .withTag("access", "no")
             .withTag("motor_vehicle", "permissive"),
-        node(10, offset(20, 0)),
-        node(11, offset(20, 40))
+        node(10, WEST_END.moveNorthMeters(20)),
+        node(11, WEST_END.moveNorthMeters(20).moveEastMeters(40))
       )
       .addAreaFromNodes(
         way -> way.withTag("public_transport", "platform").withTag("ref", "both-ways"),
-        List.of(corner, node(2, offset(0, 40)), node(3, offset(8, 40)), node(4, offset(8, 0)))
+        List.of(
+          corner,
+          node(2, WEST_END.moveEastMeters(40)),
+          node(3, WEST_END.moveNorthMeters(8).moveEastMeters(40)),
+          node(4, WEST_END.moveNorthMeters(8))
+        )
       )
-      .addWayFromNodes(node(5, offset(-20, 0)), corner)
+      .addWayFromNodes(node(5, WEST_END.moveSouthMeters(20)), corner)
       .build();
 
     var test = BoardingLocationsEnvironment.of(TRANSIT, provider);
-    var stop = test.stop("both-ways", offset(4, 20));
+    var stop = test.stop("both-ways", WEST_END.moveNorthMeters(4).moveEastMeters(20));
 
     var result = test.build();
 
@@ -206,17 +210,13 @@ class PlatformWayTest {
     );
   }
 
-  private static WgsCoordinate offset(double metresNorth, double metresEast) {
-    return SphericalDistanceLibrary.moveMeters(WEST_END, metresNorth, metresEast);
-  }
-
   /** A 300 m platform way running east from {@link #WEST_END}. */
   private static TestOsmProvider platform(String refs) {
     return TestOsmProvider.of()
       .addWayFromNodes(
         way -> way.withTag("public_transport", "platform").withTag("ref", refs),
         node(1, WEST_END),
-        node(2, offset(0, 300))
+        node(2, WEST_END.moveEastMeters(300))
       )
       .build();
   }

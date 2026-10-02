@@ -1,9 +1,7 @@
 package org.opentripplanner.graph_builder.issues;
 
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
@@ -13,7 +11,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
  * should not.
  * <p>
  * The stop is still linked, keeping its own coordinate and connected by an edge of this length, so
- * the gap is reported rather than silently walked on every itinerary.
+ * the gap is reported rather than silently added to every itinerary.
  *
  * @param boardingLocation what the stop was linked to, for looking the feature up in OSM
  */
@@ -32,8 +30,6 @@ public record StopFarFromBoardingLocation(
 
   @Override
   public Geometry getGeometry() {
-    return GeometryUtils.getGeometryFactory().createPoint(
-      new Coordinate(stop.getLon(), stop.getLat())
-    );
+    return stop.getGeometry();
   }
 }

@@ -226,41 +226,54 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .entrySet()
       .stream()
       .findFirst()
-      .map(entry -> {
-        Platform platform = entry.getKey();
-        var platformEdges = entry
-          .getValue()
-          .stream()
-          .map(StreetEdge.class::cast)
-          .collect(Collectors.toSet());
-        var boardingLocation = makeBoardingLocationForPlatform(stop, platform, platform.name());
-        var attachmentPoints = closestAttachmentPoint(
-          boardingLocation,
-          linker.linkToSpecificStreetEdgesPermanently(
-            boardingLocation,
-            new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BIDIRECTIONAL,
-            platformEdges
-          )
-        );
-        for (var vertex : attachmentPoints) {
-          reRegisterSplitEdgesWithPlatform(vertex, platform);
-        }
-        linkToPlatformWay(ts, stop, boardingLocation, attachmentPoints, platformEdges);
-        // In OSM mode the boarding location only carried the centroid to link from and is left with
-        // no edges. Don't serialize it.
-        graph.removeIfUnconnected(boardingLocation);
-        // On failure the caller falls back to looking for a platform mapped as an area.
-        return !attachmentPoints.isEmpty();
-      })
+      .map(entry ->
+        linkToPlatform(
+          ts,
+          stop,
+          entry.getKey(),
+          entry.getValue().stream().map(StreetEdge.class::cast).collect(Collectors.toSet())
+        )
+      )
       .orElse(false);
   }
 
   /**
+   * Split the platform's edges where the stop meets them and attach it there.
+   *
+   * @return whether the stop was attached; on failure the caller falls back to looking for a
+   *         platform mapped as an area
+   */
+  private boolean linkToPlatform(
+    TransitStopVertex ts,
+    RegularStop stop,
+    Platform platform,
+    Set<StreetEdge> platformEdges
+  ) {
+    var boardingLocation = makeBoardingLocationForPlatform(stop, platform, platform.name());
+    var attachmentPoints = closestAttachmentPoint(
+      boardingLocation,
+      linker.linkToSpecificStreetEdgesPermanently(
+        boardingLocation,
+        new TraverseModeSet(TraverseMode.WALK),
+        LinkingDirection.BIDIRECTIONAL,
+        platformEdges
+      )
+    );
+    for (var vertex : attachmentPoints) {
+      reRegisterSplitEdgesWithPlatform(vertex, platform);
+    }
+    linkToPlatformWay(ts, stop, boardingLocation, attachmentPoints, platformEdges);
+    // In OSM mode the boarding location only carried the centroid to link from and is left with no
+    // edges. Don't serialize it.
+    graph.removeIfUnconnected(boardingLocation);
+    return !attachmentPoints.isEmpty();
+  }
+
+  /**
    * Attach the stop to the points where it meets the platform way. In {@code TRANSIT} mode it keeps
-   * its own coordinate and walks to them over an edge of the true length, rather than being attached
-   * to its own projection onto the way and getting that offset for free. In {@code OSM} mode it is
-   * attached to them directly, the boarding location being a centroid nobody stands on.
+   * its own coordinate and reaches them over an edge of the true length; attaching it to its own
+   * projection onto the way instead would make that offset free. In {@code OSM} mode it is attached
+   * to them directly, the boarding location being a centroid nobody stands on.
    */
   private void linkToPlatformWay(
     TransitStopVertex ts,
@@ -335,7 +348,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * Attach the stop to the tagged OSM node. In {@code TRANSIT} mode the stop keeps its own
-   * coordinate and walks to the node over an edge of the real length, so that the coordinate a stop
+   * coordinate and reaches the node over an edge of the real length, so that the coordinate a stop
    * is placed at comes from the transit data on every linking path. In {@code OSM} mode it takes the
    * node's coordinate as its position on the street network, as it always has.
    */
@@ -611,7 +624,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     float bicycleSafety,
     boolean wheelchairAccessible
   ) {
-    /** For a connector with no platform to inheri  nt from, such as one up to a tagged OSM node. */
+    /** For a connector with no platform to inherit from, such as one up to a tagged OSM node. */
     static final ConnectorProperties DEFAULT = new ConnectorProperties(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
       1f,

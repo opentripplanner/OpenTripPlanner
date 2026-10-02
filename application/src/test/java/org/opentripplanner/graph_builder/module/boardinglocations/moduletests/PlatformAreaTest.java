@@ -17,7 +17,6 @@ import org.opentripplanner.graph_builder.module.boardinglocations.BoardingLocati
 import org.opentripplanner.graph_builder.module.boardinglocations.LinkedGraph;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmWayBuilder;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -39,8 +38,8 @@ class PlatformAreaTest {
   @Test
   void stopsOnOnePlatformStayDistinctAndConnected() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform(40, 8, "west;east"));
-    var westStop = test.stop("west", offset(4, 10));
-    var eastStop = test.stop("east", offset(4, 30));
+    var westStop = test.stop("west", SOUTH_WEST.moveNorthMeters(4).moveEastMeters(10));
+    var eastStop = test.stop("east", SOUTH_WEST.moveNorthMeters(4).moveEastMeters(30));
 
     var result = test.build();
     var west = result.boardingLocation(westStop);
@@ -62,8 +61,8 @@ class PlatformAreaTest {
   @Test
   void osmModeSharesOneCentroidBetweenStops() {
     var test = BoardingLocationsEnvironment.of(OSM, platform(40, 8, "west;east"));
-    var westStop = test.stop("west", offset(4, 10));
-    var eastStop = test.stop("east", offset(4, 30));
+    var westStop = test.stop("west", SOUTH_WEST.moveNorthMeters(4).moveEastMeters(10));
+    var eastStop = test.stop("east", SOUTH_WEST.moveNorthMeters(4).moveEastMeters(30));
 
     var result = test.build();
 
@@ -81,10 +80,10 @@ class PlatformAreaTest {
    * boarding location placed inside in the first place.
    */
   @Test
-  void aStopJustOutsideWalksOntoThePlatform() {
+  void aStopJustOutsideReachesThePlatformViaAnAccessPoint() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform(40, 8, "inside;outside"));
-    var insideStop = test.stop("inside", offset(4, 10));
-    var outsideStop = test.stop("outside", offset(-0.05, 30));
+    var insideStop = test.stop("inside", SOUTH_WEST.moveNorthMeters(4).moveEastMeters(10));
+    var outsideStop = test.stop("outside", SOUTH_WEST.moveSouthMeters(0.05).moveEastMeters(30));
 
     var result = test.build();
 
@@ -114,7 +113,7 @@ class PlatformAreaTest {
   @Test
   void aStopFarOutsideKeepsItsDistanceAndIsReported() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform(40, 8, "far"));
-    var farStop = test.stop("far", offset(-30, 20));
+    var farStop = test.stop("far", SOUTH_WEST.moveSouthMeters(30).moveEastMeters(20));
 
     var result = test.build();
 
@@ -137,7 +136,7 @@ class PlatformAreaTest {
   void theAccessPointSitsNextToTheStopOnALongPlatform() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform(200, 8, "beside"));
     // 2 m south of a 200 m x 8 m platform, 10 m from its western end.
-    var besideStop = test.stop("beside", offset(-2, 10));
+    var besideStop = test.stop("beside", SOUTH_WEST.moveSouthMeters(2).moveEastMeters(10));
 
     var result = test.build();
 
@@ -166,7 +165,7 @@ class PlatformAreaTest {
           .withTag("bicycle", "no")
       )
     );
-    var outsideStop = test.stop("outside", offset(-3, 20));
+    var outsideStop = test.stop("outside", SOUTH_WEST.moveSouthMeters(3).moveEastMeters(20));
 
     var result = test.build();
     var connector = result.connectors(outsideStop).getFirst();
@@ -200,11 +199,6 @@ class PlatformAreaTest {
       .orElseThrow();
   }
 
-  /** A coordinate {@code metresNorth}/{@code metresEast} of the platform's south-west corner. */
-  private static WgsCoordinate offset(double metresNorth, double metresEast) {
-    return SphericalDistanceLibrary.moveMeters(SOUTH_WEST, metresNorth, metresEast);
-  }
-
   private static TestOsmProvider platform(double lengthMetres, double widthMetres, String refs) {
     return platform(lengthMetres, widthMetres, way ->
       way.withTag("public_transport", "platform").withTag("ref", refs)
@@ -226,12 +220,12 @@ class PlatformAreaTest {
         tags,
         List.of(
           corner,
-          node(2, offset(0, lengthMetres)),
-          node(3, offset(widthMetres, lengthMetres)),
-          node(4, offset(widthMetres, 0))
+          node(2, SOUTH_WEST.moveEastMeters(lengthMetres)),
+          node(3, SOUTH_WEST.moveNorthMeters(widthMetres).moveEastMeters(lengthMetres)),
+          node(4, SOUTH_WEST.moveNorthMeters(widthMetres))
         )
       )
-      .addWayFromNodes(node(5, offset(-20, 0)), corner)
+      .addWayFromNodes(node(5, SOUTH_WEST.moveSouthMeters(20)), corner)
       .build();
   }
 }

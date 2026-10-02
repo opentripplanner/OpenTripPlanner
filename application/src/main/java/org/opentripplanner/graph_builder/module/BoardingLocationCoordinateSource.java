@@ -4,7 +4,7 @@ import org.opentripplanner.core.model.doc.DocumentedEnum;
 
 /**
  * Selects which coordinate is used to place an {@link org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex}
- * when a transit stop is linked to an OSM {@code boarding_location} platform (way or area).
+ * when a transit stop is linked to an OSM {@code boarding_location} (way, area or node).
  *
  * @see OsmBoardingLocationsModule
  */
@@ -13,15 +13,16 @@ public enum BoardingLocationCoordinateSource
 {
   OSM(
     """
-    Place the vertex at the centroid of the OSM platform. This is the historical behaviour: stops
-    sharing a platform collapse onto one centroid vertex, which can produce unrealistically long
-    on-platform transfers."""
+    Use the position from the OSM data. This is the historical behaviour: every stop matching one
+    platform shares a single point at its centre, so walking between them is free however far apart
+    they really are, and every walk to or from the platform starts at that centre rather than at the
+    stop."""
   ),
   TRANSIT(
     """
-    Place the vertex at the stop coordinate from the transit data. Each stop gets its own vertex, so
-    stops on one platform become distinct, nearby vertices connected by a short path. A coordinate
-    far from the mapped platform intentionally produces a non-trivial walk."""
+    Use the position from the transit data. Each stop keeps its own coordinate and is connected to
+    the platform by a walk of the real distance, so stops on one platform stay separate. The OSM
+    features themselves are never moved."""
   );
 
   private final String description;
@@ -32,7 +33,7 @@ public enum BoardingLocationCoordinateSource
 
   @Override
   public String typeDescription() {
-    return "Which coordinate is used to place the boarding location vertex when linking a stop to an OSM platform.";
+    return "Which position OTP uses for a stop that matches an OSM platform or boarding location node.";
   }
 
   @Override
