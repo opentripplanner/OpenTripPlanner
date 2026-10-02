@@ -45,7 +45,8 @@ To learn how to deactivate it, read the
         'Speed': 3.4,
         'Cost': 100,
         'Ratio': 0.25,
-        'Locale': 'en'
+        'Locale': 'en',
+        'Grams': 75
       },
     }
   },
