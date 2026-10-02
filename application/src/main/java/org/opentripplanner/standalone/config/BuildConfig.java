@@ -42,6 +42,7 @@ import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferPara
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
+import org.opentripplanner.standalone.config.buildconfig.BoardingLocationsConfig;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
@@ -125,6 +126,8 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean areaVisibility;
 
+  public final BoardingLocationsConfig boardingLocations;
+
   public final boolean platformEntriesLinking;
 
   /** See {@link S3BucketConfig}. */
@@ -171,7 +174,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
-  public final Set<String> boardingLocationTags;
   public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
   public final DemExtractParametersList dem;
@@ -225,6 +227,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
+    this.boardingLocations = BoardingLocationsConfig.fromConfig(root);
     this.cache = GraphBuildCacheConfig.fromConfig(root);
     this.configVersion = root
       .of("configVersion")
@@ -495,14 +498,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       .since(V1_5)
       .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
       .asInt(2000);
-    this.boardingLocationTags = root
-      .of("boardingLocationTags")
-      .since(V2_2)
-      .summary(
-        "What OSM tags should be looked on for the source of matching stops to platforms and stops."
-      )
-      .description("[Detailed documentation](BoardingLocations.md)")
-      .asStringSet(List.copyOf(Set.of("ref")));
     elevatorRefTags = root
       .of("elevatorRefTags")
       .since(V2_10)

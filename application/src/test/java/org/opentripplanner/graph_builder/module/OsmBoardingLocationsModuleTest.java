@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,12 +13,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModuleTestFactory;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -123,13 +127,12 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
-    new OsmBoardingLocationsModule(
+    buildBoardingLocations(
       graph,
       transitRepository,
-      VertexLinkerTestFactory.of(graph),
-      osmService
-    ).buildGraph();
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
@@ -299,38 +302,38 @@ class OsmBoardingLocationsModuleTest {
       );
     }
 
+    // The stop attaches at a split vertex on the way, not at a vertex on the centroid itself, so
+    // capture the expected centroid from the platform geometry before linking splits it.
+    var centroids = testCases
+      .stream()
+      .collect(
+        Collectors.toMap(
+          testCase -> testCase.platform.getId().getId(),
+          testCase -> platformCentroid(graph, osmInfoRepository, testCase.platform)
+        )
+      );
+
     var siteRepo = testModel
       .siteRepositoryBuilder()
       .withRegularStops(List.of(platform9, platform7))
       .build();
-    new OsmBoardingLocationsModule(
+    buildBoardingLocations(
       graph,
       new TransitRepository(siteRepo),
-      VertexLinkerTestFactory.of(graph),
-      new DefaultOsmInfoGraphBuildService(osmInfoRepository)
-    ).buildGraph();
-
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+      osmInfoRepository,
+      BoardingLocationCoordinateSource.OSM
+    );
 
     for (var testCase : testCases) {
       var platformVertex = testCase.getPlatformVertex();
       var fromVertex = Objects.requireNonNull(graph.getVertex(testCase.beginLabel));
       var toVertex = Objects.requireNonNull(graph.getVertex(testCase.endLabel));
+      var centroid = centroids.get(testCase.platform.getId().getId());
 
-      var centroid = boardingLocations
-        .stream()
-        .filter(b -> b.references.contains(testCase.platform.getId().getId()))
-        .findFirst()
-        .orElseThrow();
-
-      // TODO: we should ideally place the centroid vertex directly on the platform by splitting
-      // the platform edge, but it is too difficult to touch the splitter code to use a given
-      // centroid vertex instead of a generated split vertex, so what we actually do is to directly
+      // TODO: we should ideally place the boarding location vertex directly on the platform by
+      // splitting the platform edge, but it is too difficult to touch the splitter code to use a
+      // given vertex instead of a generated split vertex, so what we actually do is to directly
       // connect the platform vertex to the split vertex
-
-      // the actual centroid isn't used
-      assertEquals(0, centroid.getDegreeIn());
-      assertEquals(0, centroid.getDegreeOut());
 
       for (var vertex : platformVertex.getIncoming()) {
         assertSplitVertex(vertex.getFromVertex(), centroid, fromVertex, toVertex);
@@ -340,113 +343,49 @@ class OsmBoardingLocationsModuleTest {
         assertSplitVertex(vertex.getToVertex(), centroid, fromVertex, toVertex);
       }
     }
+
+    // The vertex that only carried the centroid into the linker is not left behind in the graph.
+    assertThat(
+      graph
+        .getVerticesOfType(OsmBoardingLocationVertex.class)
+        .stream()
+        .filter(v -> v.getDegreeIn() == 0 && v.getDegreeOut() == 0)
+        .toList()
+    ).isEmpty();
   }
 
-  /**
-   * Test that when two stops reference the same OSM platform area (via ref:IFOPT), only one
-   * OsmBoardingLocationVertex centroid is created for that area and both stops are linked to it.
-   * <p>
-   * The Herrenberg platform area (way 27558650) has
-   * ref:IFOPT=de:08115:4512:4:101;de:08115:4512:4:102, so both stop IDs match the same area.
-   */
-  @Test
-  void testDeduplicationOfAreaBoardinglocations() {
-    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
-      "herrenberg-minimal.osm.pbf"
-    );
-
-    // Two stops that both match the same platform area via ref:IFOPT
-    RegularStop platform1 = testModel
-      .stop("de:08115:4512:4:101")
-      .withCoordinate(48.59328, 8.86128)
-      .build();
-    RegularStop platform2 = testModel
-      .stop("de:08115:4512:4:102")
-      .withCoordinate(48.59328, 8.86128)
-      .build();
-
-    var siteRepo = testModel
-      .siteRepositoryBuilder()
-      .withRegularStops(List.of(platform1, platform2))
-      .build();
-
-    var graph = new Graph();
-    var transitRepository = new TransitRepository(siteRepo);
-    var factory = new VertexFactory(graph);
-
-    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModuleTestFactory.of(new DefaultOsmProvider(file, false))
-      .withGraph(graph)
-      .withOsmInfoGraphBuildRepository(osmInfoRepository)
-      .builder()
-      .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
-      .withAreaVisibility(true)
-      .build();
-
-    osmModule.buildGraph();
-
-    var platformVertex1 = factory.transitStop(ofStop(platform1));
-    var platformVertex2 = factory.transitStop(ofStop(platform2));
-
-    transitRepository.index();
-    graph.index();
-
-    // Both vertices should start unlinked
-    assertEquals(0, platformVertex1.getIncoming().size());
-    assertEquals(0, platformVertex1.getOutgoing().size());
-    assertEquals(0, platformVertex2.getIncoming().size());
-    assertEquals(0, platformVertex2.getOutgoing().size());
-
+  /** The centroid of the OSM platform way a stop references, as the module computes it. */
+  private static Coordinate platformCentroid(
+    Graph graph,
+    DefaultOsmInfoGraphBuildRepository osmInfoRepository,
+    RegularStop stop
+  ) {
     var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+    return Stream.of(graph.findEdges(StreetEdge.class))
+      .flatMap(edges -> StreamSupport.stream(edges.spliterator(), false))
+      .flatMap(edge -> osmService.findPlatform(edge).stream())
+      .filter(platform -> platform.references().contains(stop.getId().getId()))
+      .findFirst()
+      .orElseThrow()
+      .geometry()
+      .getCentroid()
+      .getCoordinate();
+  }
+
+  private static void buildBoardingLocations(
+    Graph graph,
+    TransitRepository transitRepository,
+    DefaultOsmInfoGraphBuildRepository osmInfoRepository,
+    BoardingLocationCoordinateSource coordinateSource
+  ) {
     new OsmBoardingLocationsModule(
       graph,
       transitRepository,
       VertexLinkerTestFactory.of(graph),
-      osmService
+      new DefaultOsmInfoGraphBuildService(osmInfoRepository),
+      coordinateSource,
+      DataImportIssueStore.NOOP
     ).buildGraph();
-
-    // Both vertices should now be linked
-    assertEquals(1, platformVertex1.getIncoming().size());
-    assertEquals(1, platformVertex1.getOutgoing().size());
-    assertEquals(1, platformVertex2.getIncoming().size());
-    assertEquals(1, platformVertex2.getOutgoing().size());
-
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
-
-    // Only one centroid should exist for the shared platform area
-    var areaCentroids = boardingLocations
-      .stream()
-      .filter(
-        bl ->
-          bl.references.contains(platform1.getId().getId()) ||
-          bl.references.contains(platform2.getId().getId())
-      )
-      .toList();
-    assertEquals(
-      1,
-      areaCentroids.size(),
-      "Expected exactly one OsmBoardingLocationVertex for the shared platform area, but found " +
-        areaCentroids.size()
-    );
-
-    // Both transit stop vertices should be connected to the same boarding location vertex
-    var linkedVertex1 = platformVertex1
-      .getOutgoing()
-      .stream()
-      .findFirst()
-      .orElseThrow()
-      .getToVertex();
-    var linkedVertex2 = platformVertex2
-      .getOutgoing()
-      .stream()
-      .findFirst()
-      .orElseThrow()
-      .getToVertex();
-    assertEquals(
-      linkedVertex1,
-      linkedVertex2,
-      "Both stops should be linked to the same deduplicated boarding location vertex"
-    );
   }
 
   /**
@@ -455,14 +394,11 @@ class OsmBoardingLocationsModuleTest {
    */
   private static void assertSplitVertex(
     Vertex splitVertex,
-    OsmBoardingLocationVertex centroid,
+    Coordinate centroid,
     Vertex begin,
     Vertex end
   ) {
-    var distance = SphericalDistanceLibrary.distance(
-      splitVertex.getCoordinate(),
-      centroid.getCoordinate()
-    );
+    var distance = SphericalDistanceLibrary.distance(splitVertex.getCoordinate(), centroid);
     // FIXME: I am not sure why the calculated centroid from the original OSM geometry is about 2 m
     // from the platform
     assertTrue(distance < 4, "The split vertex is more than 4 m apart from the centroid");
