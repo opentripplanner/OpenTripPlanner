@@ -27,6 +27,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
@@ -95,8 +96,12 @@ class RealtimeResolverTest {
       .build();
 
     var model = new TransitRepository();
+    var modelBuildRepository = new TimetableBuildRepository();
     model.index();
-    var transitService = new DefaultTransitService(model);
+    var transitService = new DefaultTransitService(
+      model,
+      modelBuildRepository.toScheduledTimetableData()
+    );
 
     var itineraries = List.of(itinerary);
     itineraries = RealtimeResolver.populateLegsWithRealtime(
@@ -174,20 +179,24 @@ class RealtimeResolverTest {
     LocalDate serviceDate
   ) {
     var transitRepository = new TransitRepository();
+    var timetableBuildRepository = new TimetableBuildRepository();
     CalendarServiceData calendarServiceData = new CalendarServiceData();
 
     patterns.forEach(pattern -> {
-      transitRepository.addTripPattern(pattern.getId(), pattern);
+      timetableBuildRepository.addTripPattern(pattern.getId(), pattern);
 
       var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
-      transitRepository.putServiceCode(pattern.getId(), serviceCode);
+      timetableBuildRepository.putServiceCode(pattern.getId(), serviceCode);
 
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
-    return new DefaultTransitService(transitRepository);
+    return new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
   }
 }

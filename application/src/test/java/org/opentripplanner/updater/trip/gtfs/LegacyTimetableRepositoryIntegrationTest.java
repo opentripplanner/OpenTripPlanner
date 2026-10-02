@@ -30,6 +30,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
@@ -53,11 +54,12 @@ public class LegacyTimetableRepositoryIntegrationTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
+    TimetableBuildRepository timetableBuildRepository = model.timetableBuildRepository();
 
     feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : timetableBuildRepository.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));

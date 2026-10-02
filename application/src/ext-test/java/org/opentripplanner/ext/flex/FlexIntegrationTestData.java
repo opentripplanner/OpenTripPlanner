@@ -17,6 +17,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsModuleTestFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -45,10 +46,12 @@ public final class FlexIntegrationTestData {
   private static TestOtpModel buildFlexGraph(File file) {
     var graph = new Graph();
     var transitRepository = new TransitRepository(new SiteRepository());
+    var timetableBuildRepository = new TimetableBuildRepository();
     GtfsBundle gtfsBundle = GtfsBundleTestFactory.forTest(file);
     GtfsModule module = GtfsModuleTestFactory.forTest(
       List.of(gtfsBundle),
       transitRepository,
+      timetableBuildRepository,
       graph,
       LocalDateRange.ofInclusiveEnd(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
@@ -57,7 +60,12 @@ public final class FlexIntegrationTestData {
     transitRepository.index();
     graph.index();
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
-    assertTrue(transitRepository.hasFlexTrips());
-    return new TestOtpModel(graph, transitRepository, TransferServiceTestFactory.withFlex());
+    assertTrue(timetableBuildRepository.hasFlexTrips());
+    return new TestOtpModel(
+      graph,
+      transitRepository,
+      timetableBuildRepository,
+      TransferServiceTestFactory.withFlex()
+    );
   }
 }

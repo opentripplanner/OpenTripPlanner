@@ -37,6 +37,7 @@ import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -53,13 +54,14 @@ class ScheduledDeviatedTripIntegrationTest {
 
   static Graph graph;
   static TransitRepository transitRepository;
+  static TimetableBuildRepository timetableBuildRepository;
   static TransferRepository transferRepository;
 
   float delta = 0.01f;
 
   @Test
   void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = transitRepository.getAllFlexTrips();
+    var flexTrips = timetableBuildRepository.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -100,6 +102,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
+      timetableBuildRepository,
       transferRepository
     );
 
@@ -147,6 +150,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var transitService = TestServerContext.createTransitService(
       transitRepository,
+      timetableBuildRepository,
       transferRepository
     );
 
@@ -189,7 +193,9 @@ class ScheduledDeviatedTripIntegrationTest {
   @Test
   void shouldNotInterpolateFlexTimes() {
     var feedId = transitRepository.getFeedIds().iterator().next();
-    var pattern = transitRepository.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
+    var pattern = timetableBuildRepository.getTripPatternForId(
+      new FeedScopedId(feedId, "090z:0:01")
+    );
 
     assertEquals(4, pattern.numberOfStops());
 
@@ -204,6 +210,7 @@ class ScheduledDeviatedTripIntegrationTest {
     TestOtpModel model = FlexIntegrationTestData.cobbFlexGtfs();
     graph = model.graph();
     transitRepository = model.transitRepository();
+    timetableBuildRepository = model.timetableBuildRepository();
     transferRepository = TransferServiceTestFactory.defaultTransferRepository();
   }
 
@@ -262,6 +269,6 @@ class ScheduledDeviatedTripIntegrationTest {
   private static FlexTrip<?, ?> getFlexTrip() {
     var feedId = transitRepository.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return transitRepository.getFlexTrip(tripId);
+    return timetableBuildRepository.getFlexTrip(tripId);
   }
 }

@@ -30,6 +30,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -123,13 +124,14 @@ class ModifiedTripBuilderTest {
     .withRegularStop(STOP_D)
     .build();
   private final TransitRepository transitRepository = new TransitRepository(siteRepository);
+  private final TimetableBuildRepository timetableBuildRepository = new TimetableBuildRepository();
   private EntityResolver entityResolver;
 
   @BeforeEach
   void setUp() {
     // Add entities to transit model for the entity resolver
     transitRepository.addAgency(AGENCY);
-    transitRepository.addTripPattern(PATTERN.getId(), PATTERN);
+    timetableBuildRepository.addTripPattern(PATTERN.getId(), PATTERN);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -137,15 +139,18 @@ class ModifiedTripBuilderTest {
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    transitRepository.putServiceCode(SERVICE_ID, 0);
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableBuildRepository.putServiceCode(SERVICE_ID, 0);
+    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
 
     // Create transit model index
     transitRepository.index();
 
     // Create the entity resolver only after the model has been indexed
     entityResolver = new EntityResolver(
-      new DefaultTransitService(transitRepository),
+      new DefaultTransitService(
+        transitRepository,
+        timetableBuildRepository.toScheduledTimetableData()
+      ),
       TransitRepositoryForTest.FEED_ID
     );
   }

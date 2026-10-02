@@ -52,6 +52,86 @@ public interface TimetableRepositorySnapshot {
   boolean hasNewTripPatternsForModifiedTrips();
 
   /**
+   * The scheduled (non-realtime) timetable data. Shared, unchanged, by every snapshot.
+   */
+  ScheduledTimetableData getScheduledTimetableData();
+
+  /**
+   * Return a route for a given id, including routes created by real-time updates, falling back to
+   * the scheduled route if there is no real-time-added route with this id.
+   */
+  @Nullable
+  Route getRoute(FeedScopedId id);
+
+  /**
+   * Return all routes, including those created by real-time updates.
+   */
+  Collection<Route> listRoutes();
+
+  /**
+   * Return the trip for the given id, including trips created by real-time updates, falling back
+   * to the scheduled trip if there is no real-time-added trip with this id.
+   */
+  @Nullable
+  Trip getTrip(FeedScopedId id);
+
+  /**
+   * Return the trip for the given id, not including trips created by real-time updates.
+   */
+  @Nullable
+  Trip getScheduledTrip(FeedScopedId id);
+
+  /**
+   * Return all trips, including those created by real-time updates.
+   */
+  Collection<Trip> listTrips();
+
+  /**
+   * Return true if a trip with the given id exists, either in the scheduled data or among the
+   * trips created by real-time updates.
+   */
+  boolean containsTrip(FeedScopedId id);
+
+  /**
+   * Return the scheduled trip pattern for a given trip, or, if the trip was added by a real-time
+   * update (extra journey), the pattern it was created with.
+   */
+  TripPattern findPattern(Trip trip);
+
+  /**
+   * Return the trip pattern for a given trip on a service date. The real-time updated version is
+   * returned if it exists, otherwise the scheduled (or real-time-added) trip pattern is returned.
+   */
+  TripPattern findPattern(Trip trip, @Nullable LocalDate serviceDate);
+
+  /**
+   * Return all the trip patterns used in the given route, including those added by real-time
+   * updates.
+   */
+  Collection<TripPattern> findPatterns(Route route);
+
+  /**
+   * Return the trip-on-service-date for a given id, including those created by real-time updates,
+   * falling back to the scheduled trip-on-service-date if there is none real-time-added with this
+   * id.
+   */
+  @Nullable
+  TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
+
+  /**
+   * Return the trip-on-service-date for a given trip and service date, including those created by
+   * real-time updates, falling back to the scheduled trip-on-service-date if there is none
+   * real-time-added for this trip and date.
+   */
+  @Nullable
+  TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate);
+
+  /**
+   * Return all trips-on-service-date, including those created by real-time updates.
+   */
+  Collection<TripOnServiceDate> listTripsOnServiceDate();
+
+  /**
    * Return the route created by a realtime update for the given id, or null if no route was added
    * with this id.
    */

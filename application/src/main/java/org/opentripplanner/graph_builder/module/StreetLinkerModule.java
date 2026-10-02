@@ -33,6 +33,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final TransitRepository transitRepository;
+  private final TimetableBuildRepository timetableBuildRepository;
   private final DataImportIssueStore issueStore;
   private final VertexLinker vertexLinker;
 
@@ -61,11 +63,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
     VertexLinker linker,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.parkingRepository = parkingRepository;
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
     this.issueStore = issueStore;
     this.vertexLinker = linker;
   }
@@ -93,11 +97,11 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
     if (OTPFeature.FlexRouting.isOn()) {
-      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(transitRepository);
+      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips();
     }
 
     Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
+      timetableBuildRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex stopVertex : vertices) {
       var stop = Objects.requireNonNull(
@@ -368,8 +372,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private Set<StopLocation> getStopLocationsUsedForFlexTrips(TransitRepository transitRepository) {
-    Set<StopLocation> stopLocations = transitRepository
+  private Set<StopLocation> getStopLocationsUsedForFlexTrips() {
+    Set<StopLocation> stopLocations = timetableBuildRepository
       .getAllFlexTrips()
       .stream()
       .flatMap(t -> t.getStops().stream())

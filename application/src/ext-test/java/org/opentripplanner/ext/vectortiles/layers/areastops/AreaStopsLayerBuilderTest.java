@@ -13,6 +13,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
@@ -56,12 +57,17 @@ class AreaStopsLayerBuilderTest {
     siteRepositoryBuilder.withAreaStop(AREA_STOP).build()
   );
 
+  private final TimetableBuildRepository timetableBuildRepository = new TimetableBuildRepository();
+
   @Test
   void getAreaStops() {
     transitRepository.index();
 
     var subject = new AreaStopsLayerBuilder(
-      new DefaultTransitService(transitRepository),
+      new DefaultTransitService(
+        transitRepository,
+        timetableBuildRepository.toScheduledTimetableData()
+      ),
       LAYER_CONFIG,
       Locale.ENGLISH
     );

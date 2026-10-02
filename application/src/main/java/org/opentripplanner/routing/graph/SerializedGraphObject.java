@@ -40,6 +40,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
@@ -69,6 +70,7 @@ public class SerializedGraphObject implements Serializable {
 
   public final StreetDetailsRepository streetDetailsRepository;
   public final TransitRepository transitRepository;
+  public final TimetableBuildRepository timetableBuildRepository;
   public final TransferRepository transferRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
@@ -103,6 +105,7 @@ public class SerializedGraphObject implements Serializable {
     StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -120,6 +123,7 @@ public class SerializedGraphObject implements Serializable {
     this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
     this.transferRepository = transferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
@@ -215,7 +219,11 @@ public class SerializedGraphObject implements Serializable {
       serObj.reconstructEdgeLists();
       serObj.transitRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.transitRepository.index();
-      logSerializationCompleteStatus(serObj.graph, serObj.transitRepository);
+      logSerializationCompleteStatus(
+        serObj.graph,
+        serObj.transitRepository,
+        serObj.timetableBuildRepository
+      );
       return serObj;
     } catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -288,14 +296,15 @@ public class SerializedGraphObject implements Serializable {
 
   private static void logSerializationCompleteStatus(
     Graph graph,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository
   ) {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(
       transitRepository.getConstrainedTransferService().listAll().size()
     );
-    var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
+    var nPatterns = f.formatNumber(timetableBuildRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 

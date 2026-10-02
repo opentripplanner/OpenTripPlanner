@@ -37,6 +37,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -81,6 +82,8 @@ class AddedTripBuilderTest {
 
   private final Deduplicator DEDUPLICATOR = new Deduplicator();
   private final TransitRepository TRANSIT_MODEL = new TransitRepository(SITE_REPOSITORY);
+  private final TimetableBuildRepository TIMETABLE_BUILD_REPOSITORY =
+    new TimetableBuildRepository();
   private TransitService transitService;
   private EntityResolver ENTITY_RESOLVER;
   private DefaultTimetableRepository timetableRepository;
@@ -95,7 +98,7 @@ class AddedTripBuilderTest {
     )
       .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
       .build();
-    TRANSIT_MODEL.addTripPattern(pattern.getId(), pattern);
+    TIMETABLE_BUILD_REPOSITORY.addTripPattern(pattern.getId(), pattern);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -104,14 +107,16 @@ class AddedTripBuilderTest {
       cal_id,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    TRANSIT_MODEL.putServiceCode(cal_id, 0);
-    TRANSIT_MODEL.updateCalendarServiceData(calendarServiceData);
+    TIMETABLE_BUILD_REPOSITORY.putServiceCode(cal_id, 0);
+    TIMETABLE_BUILD_REPOSITORY.updateCalendarServiceData(calendarServiceData);
 
     // Create transit model index
     TRANSIT_MODEL.index();
+    var scheduledTimetableData = TIMETABLE_BUILD_REPOSITORY.toScheduledTimetableData();
     timetableRepository = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TRANSIT_MODEL.getTripCalendar()
+      scheduledTimetableData.getTripCalendars(),
+      scheduledTimetableData
     );
     transitService = new DefaultTransitService(TRANSIT_MODEL, timetableRepository);
 

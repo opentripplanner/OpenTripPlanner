@@ -2,7 +2,9 @@ package org.opentripplanner.transit.model;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -16,6 +18,7 @@ import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 
 public class TransitTestEnvironmentBuilder {
@@ -24,6 +27,9 @@ public class TransitTestEnvironmentBuilder {
   private final TransitRepositoryTestBuilder timetable;
 
   private final LocalDate defaultServiceDate;
+
+  private final List<Consumer<TimetableBuildRepository>> timetableBuildCustomizers =
+    new ArrayList<>();
 
   TransitTestEnvironmentBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
     this.defaultServiceDate = defaultServiceDate;
@@ -34,12 +40,26 @@ public class TransitTestEnvironmentBuilder {
 
   public TransitTestEnvironment build() {
     var siteRepository = site.build();
-    var transitRepository = timetable.build(siteRepository);
+    var timetableBuildRepository = new TimetableBuildRepository();
+    var transitRepository = timetable.build(siteRepository, timetableBuildRepository);
+    timetableBuildCustomizers.forEach(it -> it.accept(timetableBuildRepository));
     return new TransitTestEnvironment(
       transitRepository,
+      timetableBuildRepository.toScheduledTimetableData(),
       TransferServiceTestFactory.defaultTransferRepository(),
       defaultServiceDate
     );
+  }
+
+  /**
+   * Add scheduled timetable data directly, after the trips added with this builder and before the
+   * data is converted into the environment's immutable scheduled data.
+   */
+  public TransitTestEnvironmentBuilder withTimetableBuildRepository(
+    Consumer<TimetableBuildRepository> customizer
+  ) {
+    timetableBuildCustomizers.add(customizer);
+    return this;
   }
 
   /**

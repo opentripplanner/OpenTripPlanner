@@ -20,6 +20,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -37,6 +38,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public final class TransitTestEnvironment {
 
   private final TransitRepository transitRepository;
+  private final ScheduledTimetableData scheduledTimetableData;
   private final RepositoryRegistry repositoryRegistry;
   private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
   private final UpdateManager updateManager;
@@ -56,16 +58,19 @@ public final class TransitTestEnvironment {
 
   TransitTestEnvironment(
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository,
     LocalDate defaultServiceDate
   ) {
     this.transitRepository = transitRepository;
+    this.scheduledTimetableData = scheduledTimetableData;
     this.defaultServiceDate = defaultServiceDate;
 
     this.transitRepository.index();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       new TestTransitTuningParameters(),
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
     this.transitRepository.initRaptorTransitData(scheduledRaptorData);
@@ -73,7 +78,8 @@ public final class TransitTestEnvironment {
     this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData.getTripCalendars(),
+      scheduledTimetableData
     );
     this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
@@ -135,6 +141,10 @@ public final class TransitTestEnvironment {
 
   public TransitRepository transitRepository() {
     return transitRepository;
+  }
+
+  public ScheduledTimetableData scheduledTimetableData() {
+    return scheduledTimetableData;
   }
 
   public RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle() {

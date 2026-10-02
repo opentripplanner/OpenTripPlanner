@@ -34,6 +34,7 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRe
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -63,8 +64,12 @@ class _RouteRequestTestContext {
 
     Graph graph = new Graph();
     var transitRepository = new TransitRepository();
+    var timetableBuildRepository = new TimetableBuildRepository();
     transitRepository.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(transitRepository);
+    final DefaultTransitService transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
     var transferService = TransferServiceTestFactory.defaultTransferService();
     var routeRequest = RouteRequest.defaultValue();
     var vertexLinker = VertexLinkerTestFactory.of(graph);

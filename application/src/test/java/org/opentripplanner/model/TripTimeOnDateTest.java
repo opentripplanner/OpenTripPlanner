@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -177,6 +178,7 @@ class TripTimeOnDateTest {
     var trip = TransitRepositoryForTest.trip("123").build();
     var siteRepository = testModel.siteRepositoryBuilder().build();
     var transitRepository = new TransitRepository(siteRepository);
+    var timetableBuildRepository = new TimetableBuildRepository();
     var tripTimes = ScheduledTripTimes.of()
       .withTrip(trip)
       .withDepartureTimes(new int[] { 0, 1 })
@@ -185,7 +187,7 @@ class TripTimeOnDateTest {
       .pattern(TransitMode.BUS)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
+    timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
     transitRepository.index();
     var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),

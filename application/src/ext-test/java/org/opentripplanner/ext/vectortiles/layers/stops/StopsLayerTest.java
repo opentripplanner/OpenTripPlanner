@@ -14,6 +14,7 @@ import org.opentripplanner.ext.vectortiles.layers.TestTransitService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -75,8 +76,12 @@ public class StopsLayerTest {
   @Test
   public void digitransitStopPropertyMapperTranslationTest() {
     var transitRepository = new TransitRepository(new SiteRepository());
+    var timetableBuildRepository = new TimetableBuildRepository();
     transitRepository.index();
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,

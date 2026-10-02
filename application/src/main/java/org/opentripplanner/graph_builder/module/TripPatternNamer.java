@@ -12,24 +12,24 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TripPatternNamer implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternNamer.class);
-  private final TransitRepository transitRepository;
+  private final TimetableBuildRepository timetableBuildRepository;
 
   @Inject
-  public TripPatternNamer(TransitRepository transitRepository) {
-    this.transitRepository = transitRepository;
+  public TripPatternNamer(TimetableBuildRepository timetableBuildRepository) {
+    this.timetableBuildRepository = timetableBuildRepository;
   }
 
   @Override
   public void buildGraph() {
     /* Generate unique human-readable names for all the TableTripPatterns. */
-    generateUniqueNames(transitRepository.getAllTripPatterns());
+    generateUniqueNames(timetableBuildRepository.getAllTripPatterns());
   }
 
   /**

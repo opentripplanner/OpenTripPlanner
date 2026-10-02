@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.configure;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
@@ -12,8 +11,8 @@ import org.opentripplanner.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -30,9 +29,15 @@ public abstract class TransitModule {
    * snapshot-consistent {@link TransitService} is a distinct binding inside {@link
    * RequestScopedFactory} — do not retarget this one.
    */
-  @Binds
+  @Provides
+  @Singleton
   @StaticTransitService
-  abstract TransitService bind(DefaultTransitService service);
+  static TransitService staticTransitService(
+    TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData
+  ) {
+    return new DefaultTransitService(transitRepository, scheduledTimetableData);
+  }
 
   @Provides
   @Singleton
@@ -48,11 +53,15 @@ public abstract class TransitModule {
   > timetableRepositoryHandle(
     TimetableSnapshotParameters parameters,
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     @TransitDomain RepositoryRegistry repositoryRegistry,
-    RaptorTransitData scheduledRaptorTransitData,
-    TripCalendars tripCalendars
+    RaptorTransitData scheduledRaptorTransitData
   ) {
-    var buffer = new DefaultTimetableRepository(scheduledRaptorTransitData, tripCalendars);
+    var buffer = new DefaultTimetableRepository(
+      scheduledRaptorTransitData,
+      scheduledTimetableData.getTripCalendars(),
+      scheduledTimetableData
+    );
     var lifecycle = new TimetableRepositoryLifecycle(buffer, parameters.purgeExpiredData(), () ->
       LocalDate.now(transitRepository.getTimeZone())
     );

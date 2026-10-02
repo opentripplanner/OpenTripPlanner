@@ -31,6 +31,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -123,8 +124,12 @@ class LuceneIndexTest {
       siteRepository::withStation
     );
     var transitRepository = new TransitRepository(siteRepository.build());
+    var timetableBuildRepository = new TimetableBuildRepository();
     transitRepository.index();
-    var transitService = new DefaultTransitService(transitRepository) {
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    ) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
         StopLocation,
         TransitMode

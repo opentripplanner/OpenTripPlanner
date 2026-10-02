@@ -19,6 +19,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 
 class StopTimesHelperTest {
 
@@ -34,7 +35,11 @@ class StopTimesHelperTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
-    transitService = new DefaultTransitService(transitRepository);
+    TimetableBuildRepository timetableBuildRepository = model.timetableBuildRepository();
+    transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
     feedId = transitRepository.getFeedIds().iterator().next();
     stopId = new FeedScopedId(feedId, "J");
     var originalPattern = transitService.findPattern(
@@ -48,9 +53,12 @@ class StopTimesHelperTest {
       .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes.build()))
       .build();
     // replace the original pattern by the updated pattern in the transit model
-    transitRepository.addTripPattern(pattern.getId(), pattern);
+    timetableBuildRepository.addTripPattern(pattern.getId(), pattern);
     transitRepository.index();
-    transitService = new DefaultTransitService(transitRepository);
+    transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
     stopTimesHelper = new StopTimesHelper(transitService);
   }
 

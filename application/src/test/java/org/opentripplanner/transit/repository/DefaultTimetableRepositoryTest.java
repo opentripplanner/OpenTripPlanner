@@ -56,11 +56,12 @@ public class DefaultTimetableRepositoryTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
+    TimetableBuildRepository timetableBuildRepository = model.timetableBuildRepository();
 
     feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : timetableBuildRepository.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
@@ -231,7 +232,8 @@ public class DefaultTimetableRepositoryTest {
       TripCalendars.empty(),
       RaptorTransitDataTestFactory.empty(),
       false,
-      new TimetableUpdateMapper()
+      new TimetableUpdateMapper(),
+      null
     );
     assertFalse(snapshot.isEmpty());
     snapshot.clear(id.getFeedId());

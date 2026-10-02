@@ -111,7 +111,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     throws UpdateException {
     var transitService = env.transitService();
     var cache = SiriFuzzyTripMatcherCache.create(
-      new DefaultTransitService(env.transitRepository())
+      new DefaultTransitService(env.transitRepository(), env.scheduledTimetableData())
     );
     var fuzzyMatcher = new SiriFuzzyTripMatcher(cache, transitService);
     return fuzzyMatcher.match(

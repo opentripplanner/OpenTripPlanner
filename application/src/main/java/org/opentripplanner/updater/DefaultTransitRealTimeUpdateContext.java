@@ -2,6 +2,8 @@ package org.opentripplanner.updater;
 
 import java.util.function.Supplier;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -46,14 +48,27 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
   }
 
   /**
-   * Constructor for unit tests only.
+   * Constructor for unit tests only. Builds a throwaway, never-committed {@link
+   * TimetableRepository} seeded with the given scheduled data, so entity lookups still resolve
+   * scheduled routes/trips/patterns even though no real-time update has ever been applied.
    */
-  public DefaultTransitRealTimeUpdateContext(TransitRepository transitRepository) {
-    this(transitRepository, null, () -> {
-      throw new UnsupportedOperationException(
-        "The realtime-vehicle repository is not available in this test context"
-      );
-    });
+  public DefaultTransitRealTimeUpdateContext(
+    TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData
+  ) {
+    this(
+      transitRepository,
+      new DefaultTimetableRepository(
+        null,
+        scheduledTimetableData.getTripCalendars(),
+        scheduledTimetableData
+      ),
+      () -> {
+        throw new UnsupportedOperationException(
+          "The realtime-vehicle repository is not available in this test context"
+        );
+      }
+    );
   }
 
   @Override

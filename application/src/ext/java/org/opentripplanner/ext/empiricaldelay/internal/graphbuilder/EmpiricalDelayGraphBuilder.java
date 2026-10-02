@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
   private final EmpiricalDelayParameters parameters;
   private final EmpiricalDelayRepository repository;
-  private final TransitRepository transitRepository;
+  private final TimetableBuildRepository timetableBuildRepository;
 
   public EmpiricalDelayGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>> dataSources,
@@ -41,14 +41,14 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
     DataImportIssueStore issueStore,
     EmpiricalDelayParameters parameters,
     EmpiricalDelayRepository repository,
-    TransitRepository transitRepository
+    TimetableBuildRepository timetableBuildRepository
   ) {
     this.dataSources = Objects.requireNonNull(dataSources);
     this.deduplicator = Objects.requireNonNull(deduplicator);
     this.issueStore = Objects.requireNonNull(issueStore);
     this.parameters = Objects.requireNonNull(parameters);
     this.repository = Objects.requireNonNull(repository);
-    this.transitRepository = Objects.requireNonNull(transitRepository);
+    this.timetableBuildRepository = Objects.requireNonNull(timetableBuildRepository);
   }
 
   public void buildGraph() {
@@ -58,7 +58,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
       return;
     }
     var mapper = new TripDelaysMapper(
-      createStopIdsByTripIdMap(transitRepository.getAllTripPatterns()),
+      createStopIdsByTripIdMap(timetableBuildRepository.getAllTripPatterns()),
       issueStore,
       deduplicator
     );

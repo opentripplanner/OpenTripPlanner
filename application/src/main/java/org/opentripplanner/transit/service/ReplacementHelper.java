@@ -32,33 +32,26 @@ public class ReplacementHelper {
   );
 
   private final TransitService transitService;
-  private final TransitRepository transitRepository;
 
-  @Nullable
   private final TimetableRepositorySnapshot timetableSnapshot;
 
   public ReplacementHelper(
     TransitService transitService,
-    TransitRepository transitRepository,
-    @Nullable TimetableRepositorySnapshot timetableSnapshot
+    TimetableRepositorySnapshot timetableSnapshot
   ) {
     this.transitService = transitService;
-    this.transitRepository = transitRepository;
     this.timetableSnapshot = timetableSnapshot;
   }
 
   public Collection<ReplacedByRelation> getReplacedBy(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
-    var replacedBy = transitRepository.getReplacedByTripOnServiceDate(id);
-    Stream<TripOnServiceDate> tripsOnServiceDate;
-    if (timetableSnapshot != null) {
-      tripsOnServiceDate = Stream.concat(
-        replacedBy.stream(),
-        timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).stream()
-      );
-    } else {
-      tripsOnServiceDate = replacedBy.stream();
-    }
+    var replacedBy = timetableSnapshot
+      .getScheduledTimetableData()
+      .getReplacedByTripOnServiceDate(id);
+    Stream<TripOnServiceDate> tripsOnServiceDate = Stream.concat(
+      replacedBy.stream(),
+      timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).stream()
+    );
     return tripsOnServiceDate.map(ReplacedByRelation::new).toList();
   }
 
@@ -96,9 +89,8 @@ public class ReplacementHelper {
   private boolean hasReplacedByTripOnServiceDates(TripOnServiceDate tripOnServiceDate) {
     var id = tripOnServiceDate.getId();
     return (
-      !transitRepository.getReplacedByTripOnServiceDate(id).isEmpty() ||
-      (timetableSnapshot != null &&
-        !timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty())
+      !timetableSnapshot.getScheduledTimetableData().getReplacedByTripOnServiceDate(id).isEmpty() ||
+      !timetableSnapshot.getRealTimeReplacedByTripOnServiceDate(id).isEmpty()
     );
   }
 

@@ -17,6 +17,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -76,6 +77,7 @@ public class LinkingTest {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
+    var timetableBuildRepository = new TimetableBuildRepository();
     var file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
     var provider = new DefaultOsmProvider(file, false);
 
@@ -84,6 +86,7 @@ public class LinkingTest {
     return new TestOtpModel(
       graph,
       transitRepository,
+      timetableBuildRepository,
       TransferServiceTestFactory.defaultTransferRepository()
     );
   }

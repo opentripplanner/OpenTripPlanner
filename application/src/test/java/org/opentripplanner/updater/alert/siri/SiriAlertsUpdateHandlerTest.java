@@ -86,9 +86,15 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void setUp() throws Exception {
     super.setUp();
 
-    realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(transitRepository);
+    realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
     if (transitService == null) {
-      transitService = new DefaultTransitService(transitRepository);
+      transitService = new DefaultTransitService(
+        transitRepository,
+        timetableBuildRepository.toScheduledTimetableData()
+      );
     } else {
       transitAlertService.getAllAlerts().clear();
     }

@@ -26,6 +26,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -58,9 +59,13 @@ public class RealtimeStopsLayerTest {
   @Test
   void realtimeStopLayer() {
     var timetableRepository = new TransitRepository(new SiteRepository());
+    var timetableRepositoryBuildRepository = new TimetableBuildRepository();
     timetableRepository.initTimeZone(ZoneIds.HELSINKI);
     timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(
+      timetableRepository,
+      timetableRepositoryBuildRepository.toScheduledTimetableData()
+    );
     var transitAlertService = new TransitAlertServiceImpl();
 
     Route route = TransitRepositoryForTest.route("route").build();

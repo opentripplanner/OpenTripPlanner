@@ -155,6 +155,7 @@ public class OTPMain {
         app.streetDetailsRepository(),
         app.streetRepository(),
         app.transitRepository(),
+        app.timetableBuildRepository(),
         app.transferRepository(),
         app.worldEnvelopeRepository(),
         app.vehicleParkingRepository(),

@@ -2,54 +2,35 @@ package org.opentripplanner.transit.service;
 
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import gnu.trove.set.TIntSet;
 import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.internal.DefaultConstrainedTransferService;
 import org.opentripplanner.transit.model.basic.Notice;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.CarAccess;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.logging.PowerOfTwoThrottle;
-import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +41,10 @@ import org.slf4j.LoggerFactory;
  * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
  * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
  * only in NeTEx, the NeTEx name is used in the internal model.
+ * <p>
+ * The scheduled trip patterns, trips and trip calendars are not part of this repository. At
+ * runtime the timetable repository owns them as
+ * {@link org.opentripplanner.transit.repository.ScheduledTimetableData}.
  * <p>
  * A TransitRepository instance also includes references to some transient indexes of its contents, to
  * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
@@ -90,12 +75,18 @@ public class TransitRepository implements Serializable {
   private SiteRepository siteRepository;
 
   /**
-   * The RaptorTransitData representation (optimized and rearranged for Raptor) of this TransitRepository's
-   * scheduled (non-realtime) contents.
+   * The RaptorTransitData representation (optimized and rearranged for Raptor) of the scheduled
+   * (non-realtime) timetable data, mapped at server startup.
+   * <p>
+   * TODO: This does not belong here. The scheduled timetable data itself is no longer part of this
+   *       repository (see ScheduledTimetableData, owned by the timetable repository), and the
+   *       timetable repository already owns the real-time Raptor data seeded from a copy of this.
+   *       The candidate owner is the timetable repository, exposing the scheduled Raptor data via
+   *       its snapshots. It is not ScheduledTimetableData: the Raptor data is also derived from
+   *       transfers, stops and tuning parameters, contains mutable caches, and is mapped from the
+   *       scheduled data. Left here until the Raptor-data creation at startup is refactored.
    */
   private transient RaptorTransitData raptorTransitData;
-
-  private TripCalendars tripCalendars = TripCalendars.empty();
 
   private transient TransitRepositoryIndex index;
   private ZoneId timeZone = null;
@@ -105,13 +96,6 @@ public class TransitRepository implements Serializable {
 
   private boolean hasFrequencyService = false;
   private boolean hasScheduledService = false;
-
-  private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
-  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = new HashMap<>();
-  private final ListMultimap<FeedScopedId, TripOnServiceDate> replacedByTripOnServiceDates =
-    ArrayListMultimap.create();
-
-  private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
@@ -139,7 +123,6 @@ public class TransitRepository implements Serializable {
     assertModificationsAllowed();
     if (index == null) {
       LOG.info("Index timetable repository...");
-      this.tripCalendars = this.tripCalendars.initializeServiceCodesRunningForDate();
       this.index = new TransitRepositoryIndex(this);
       LOG.info("Index timetable repository complete.");
     }
@@ -154,7 +137,7 @@ public class TransitRepository implements Serializable {
     this.frozen = true;
   }
 
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
+  /** Data model for Raptor routing of the scheduled data, without real-time updates. */
   public RaptorTransitData getRaptorTransitData() {
     return raptorTransitData;
   }
@@ -168,40 +151,6 @@ public class TransitRepository implements Serializable {
 
   public ConstrainedTransferService getConstrainedTransferService() {
     return constrainedTransferService;
-  }
-
-  /**
-   * Returns true if this repository contains any transit data at the given instant.
-   */
-  public boolean transitFeedCovers(Instant time) {
-    return !time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds());
-  }
-
-  /**
-   * The build-time scheduled calendar. Also used to seed the runtime write buffer held by the
-   * timetable repository at startup; since {@link TripCalendars} is immutable, sharing this same
-   * instance is safe, and all further calendar mutations (e.g. real-time trip additions) happen on
-   * that buffer, not on this repository's own {@code tripCalendars}. Prefer reading trip calendars
-   * through {@link org.opentripplanner.transit.service.TransitService#getTripCalendars()} on the
-   * request/write path, which resolves a cached, transaction-consistent snapshot instead.
-   */
-  public TripCalendars getTripCalendar() {
-    return tripCalendars;
-  }
-
-  public void updateCalendarServiceData(CalendarServiceData data) {
-    assertModificationsAllowed();
-    invalidateIndex();
-    tripCalendars = tripCalendars.merge(data);
-  }
-
-  /**
-   * Register {@code code} as the service code for {@code serviceId}. Used during graph build only.
-   */
-  public void putServiceCode(FeedScopedId serviceId, int code) {
-    assertModificationsAllowed();
-    invalidateIndex();
-    tripCalendars = tripCalendars.withServiceCode(serviceId, code);
   }
 
   public Collection<String> getFeedIds() {
@@ -306,28 +255,6 @@ public class TransitRepository implements Serializable {
   }
 
   /**
-   * The time when the transit service start. Will return EPOCH if there is no transit.
-   */
-  public Instant getTransitServiceStarts() {
-    return tripCalendars
-      .startDate()
-      .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toInstant())
-      .orElse(Instant.EPOCH);
-  }
-
-  /**
-   * The time when the transit service ends. Will return EPOCH if there is no transit.
-   */
-  public Instant getTransitServiceEnds() {
-    return tripCalendars
-      .endDate()
-      .map(serviceDate ->
-        ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone()).toInstant()
-      )
-      .orElse(Instant.EPOCH);
-  }
-
-  /**
    * Allows a notice element to be attached to an object in the OTP model by its id and then
    * retrieved by the API when navigating from that object. The map key is entity id:
    * {@link AbstractTransitEntity#getId()}. The notice is part of the static transit data.
@@ -342,40 +269,8 @@ public class TransitRepository implements Serializable {
     this.noticesByElement.putAll(noticesByElement);
   }
 
-  public TripPattern getTripPatternForId(FeedScopedId id) {
-    return tripPatternForId.get(id);
-  }
-
-  public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
-    assertModificationsAllowed();
-    invalidateIndex();
-    tripOnServiceDates.put(tripOnServiceDate.getId(), tripOnServiceDate);
-    for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
-      replacedByTripOnServiceDates.put(replacementFor.getId(), tripOnServiceDate);
-    }
-  }
-
-  public List<TripOnServiceDate> getReplacedByTripOnServiceDate(FeedScopedId id) {
-    return replacedByTripOnServiceDates.get(id);
-  }
-
-  /**
-   * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of
-   * {@code Set<Object>}. An empty Map is created before the Graph is built to allow registering IDs
-   * from multiple feeds.
-   */
-  public Map<FeedScopedId, Integer> getServiceCodes() {
-    return tripCalendars.getServiceCodes();
-  }
-
   public SiteRepository getSiteRepository() {
     return siteRepository;
-  }
-
-  public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
-    assertModificationsAllowed();
-    invalidateIndex();
-    tripPatternForId.put(id, tripPattern);
   }
 
   public void addScheduledStopPointMapping(Map<FeedScopedId, RegularStop> mapping) {
@@ -399,22 +294,6 @@ public class TransitRepository implements Serializable {
    */
   public Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint) {
     return Optional.ofNullable(stopsByScheduledStopPointRefs.get(scheduledStopPoint));
-  }
-
-  /**
-   * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
-   * vertices/edges anymore.
-   */
-  public Collection<TripPattern> getAllTripPatterns() {
-    return tripPatternForId.values();
-  }
-
-  public TripOnServiceDate getTripOnServiceDateById(FeedScopedId tripOnServiceDateId) {
-    return tripOnServiceDates.get(tripOnServiceDateId);
-  }
-
-  public Collection<TripOnServiceDate> getAllTripsOnServiceDates() {
-    return Collections.unmodifiableCollection(tripOnServiceDates.values());
   }
 
   /**
@@ -446,15 +325,6 @@ public class TransitRepository implements Serializable {
     return updaterManager;
   }
 
-  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
-    return flexTripsById.values();
-  }
-
-  /** True if there are active transit services loaded into this Graph. */
-  public boolean hasTransit() {
-    return !tripCalendars.isEmpty();
-  }
-
   public Optional<Agency> findAgencyById(FeedScopedId id) {
     return agencies
       .stream()
@@ -469,12 +339,6 @@ public class TransitRepository implements Serializable {
     assertModificationsAllowed();
     invalidateIndex();
     this.siteRepository = this.siteRepository.merge(childSiteRepository);
-  }
-
-  public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
-    assertModificationsAllowed();
-    invalidateIndex();
-    flexTripsById.put(id, flexTrip);
   }
 
   /**
@@ -511,65 +375,8 @@ public class TransitRepository implements Serializable {
     return index;
   }
 
-  /**
-   * For all dates in the system get the service codes that run on it.
-   */
-  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
-    return tripCalendars.getServiceCodesRunningForDate();
-  }
-
   public boolean isIndexed() {
     return index != null;
-  }
-
-  public boolean hasFlexTrips() {
-    return !flexTripsById.isEmpty();
-  }
-
-  public FlexTrip getFlexTrip(FeedScopedId tripId) {
-    return flexTripsById.get(tripId);
-  }
-
-  /**
-   * The stops that are used by transit capable of transporting cars need to be
-   * connected to the road network (e.g. car ferries). This method returns the
-   * stops that are used by trips that allow cars.
-   * @return set of stop locations that are used for trips that allow cars
-   */
-  public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
-    return getStopLocationsUsedByTripTimes(
-      tt -> tt.getTrip().getCarsAllowed() == CarAccess.ALLOWED
-    );
-  }
-
-  /**
-   * Get the stops that are used by transit capable of transporting bikes.
-   * Real-time updates are not considered.
-   */
-  public Set<StopLocation> getStopLocationsUsedForBikesAllowedTrips() {
-    return getStopLocationsUsedByTripTimes(
-      tt -> tt.getTrip().getBikesAllowed() == BikeAccess.ALLOWED
-    );
-  }
-
-  private Set<StopLocation> getStopLocationsUsedByTripTimes(
-    Predicate<TripTimes> tripTimesPredicate
-  ) {
-    Set<StopLocation> stopLocations = getAllTripPatterns()
-      .stream()
-      .filter(t -> t.getScheduledTimetable().getTripTimes().stream().anyMatch(tripTimesPredicate))
-      .flatMap(t -> t.getStops().stream())
-      .collect(Collectors.toSet());
-
-    stopLocations.addAll(
-      stopLocations
-        .stream()
-        .filter(GroupStop.class::isInstance)
-        .map(GroupStop.class::cast)
-        .flatMap(g -> g.getChildLocations().stream().filter(RegularStop.class::isInstance))
-        .toList()
-    );
-    return stopLocations;
   }
 
   private void invalidateIndex() {

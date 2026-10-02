@@ -54,10 +54,7 @@ import org.opentripplanner.transit.service.TransitRepository;
 
 public class TripRequestMapperTest implements PlanTestConstants {
 
-  private static final TransitTestEnvironment TRANSIT_ENV = TransitTestEnvironment.of(
-    LocalDate.of(2024, 5, 7),
-    ZoneIds.STOCKHOLM
-  ).build();
+  private static final TransitTestEnvironment TRANSIT_ENV;
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
@@ -99,21 +96,24 @@ public class TripRequestMapperTest implements PlanTestConstants {
     //  .build();
 
     TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
-    TRANSIT_REPOSITORY = TRANSIT_ENV.transitRepository();
-    var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
-    patterns.forEach(pattern -> {
-      TRANSIT_REPOSITORY.addTripPattern(pattern.getId(), pattern);
-      final int serviceCode = pattern
-        .getScheduledTimetable()
-        .getTripTimes()
-        .getFirst()
-        .getServiceCode();
-      TRANSIT_REPOSITORY.putServiceCode(pattern.getId(), serviceCode);
-      calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
-    });
-
-    TRANSIT_REPOSITORY.updateCalendarServiceData(calendarServiceData);
+    TRANSIT_ENV = TransitTestEnvironment.of(LocalDate.of(2024, 5, 7), ZoneIds.STOCKHOLM)
+      .withTimetableBuildRepository(timetableBuildRepository -> {
+        var calendarServiceData = new CalendarServiceData();
+        patterns.forEach(pattern -> {
+          timetableBuildRepository.addTripPattern(pattern.getId(), pattern);
+          final int serviceCode = pattern
+            .getScheduledTimetable()
+            .getTripTimes()
+            .getFirst()
+            .getServiceCode();
+          timetableBuildRepository.putServiceCode(pattern.getId(), serviceCode);
+          calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
+        });
+        timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+      })
+      .build();
+    TRANSIT_REPOSITORY = TRANSIT_ENV.transitRepository();
     TRANSIT_REPOSITORY.index();
   }
 

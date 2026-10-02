@@ -36,7 +36,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testPreviousLegs() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "1.2"),
@@ -69,7 +72,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testNextLegs() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "2.2"),
@@ -102,7 +108,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testCircularRoutes() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),
@@ -129,7 +138,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testComplexCircularRoutes() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      timetableBuildRepository.toScheduledTimetableData()
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),

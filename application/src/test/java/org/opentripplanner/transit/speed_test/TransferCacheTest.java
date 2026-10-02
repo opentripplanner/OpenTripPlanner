@@ -28,6 +28,7 @@ public class TransferCacheTest {
       SetupHelper.loadOtpFeatures(opts);
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var transitRepository = model.transitRepository();
+      var timetableBuildRepository = model.timetableBuildRepository();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
 
@@ -38,7 +39,12 @@ public class TransferCacheTest {
       // we do it manually here
       TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
       transitRepository.initRaptorTransitData(
-        RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
+        RaptorTransitDataMapper.map(
+          tuningParameters,
+          transitRepository,
+          timetableBuildRepository.toScheduledTimetableData(),
+          transferRepository
+        )
       );
 
       assertTestDateHasData(transitRepository, config, buildConfig);

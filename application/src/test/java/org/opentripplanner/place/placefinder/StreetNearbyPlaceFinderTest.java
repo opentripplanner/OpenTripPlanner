@@ -126,7 +126,10 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       }
     );
 
-    transitService = new DefaultTransitService(otpModel.transitRepository());
+    transitService = new DefaultTransitService(
+      otpModel.transitRepository(),
+      otpModel.scheduledTimetableData()
+    );
     var vertexLinker = VertexLinkerTestFactory.of(otpModel.graph());
     var linkingContextFactory = new LinkingContextFactory(
       otpModel.graph(),
