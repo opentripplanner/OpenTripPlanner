@@ -55,12 +55,6 @@ public record ItineraryReference(
    * The opaque, versioned token for this reference. Delegates to
    * {@link ItineraryReferenceSerializer#encode}.
    */
-  @Override
-  public String toString() {
-    return encode();
-  }
-
-  /** Alias for {@link #toString()}, for callers that prefer an explicit name. */
   public String encode() {
     return ItineraryReferenceSerializer.encode(this);
   }

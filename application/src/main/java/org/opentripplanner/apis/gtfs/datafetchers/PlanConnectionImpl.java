@@ -28,10 +28,6 @@ public class PlanConnectionImpl implements GraphQLDataFetchers.GraphQLPlanConnec
 
   @Override
   public DataFetcher<Iterable<DefaultEdge<Itinerary>>> edges() {
-    // No DataFetcherResult wrapper is needed to reach Itinerary-level resolvers such as
-    // ItineraryImpl#id: graphql-java propagates the parent's local context (set in
-    // QueryTypeImpl#getPlanResult) to child fields automatically, and only a resolver that needs
-    // to *add* to it has to return a DataFetcherResult (as ItineraryImpl#legs does).
     return environment ->
       getSource(environment)
         .getTripPlan()
