@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
@@ -15,14 +13,9 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.utils.collection.StreamUtils;
 
 /** The graph a {@link BoardingLocationsEnvironment} produced, with the lookups tests need. */
-public record LinkedGraph(
-  Graph rawGraph,
-  DefaultOsmInfoGraphBuildRepository osmInfoRepository,
-  DefaultDataImportIssueStore issueStore
-) {
+public record LinkedGraph(Graph rawGraph, DefaultDataImportIssueStore issueStore) {
   private TransitStopVertex stopVertex(RegularStop stop) {
     return rawGraph
       .findStopVertex(stop.getId())
@@ -74,14 +67,6 @@ public record LinkedGraph(
     );
   }
 
-  /** How many street edges in the whole graph are registered as belonging to a platform. */
-  public long platformEdgeCount() {
-    var service = osmInfoService();
-    return StreamUtils.ofIterable(rawGraph.findEdges(StreetEdge.class))
-      .filter(edge -> service.findPlatform(edge).isPresent())
-      .count();
-  }
-
   /** Every edge in the graph as a readable string, to assert the shape of the linking against. */
   public Collection<String> summarizeEdges() {
     return new GraphSummarizer(rawGraph).summarizeEdges();
@@ -94,9 +79,5 @@ public record LinkedGraph(
 
   public List<String> issueTypes() {
     return issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
-  }
-
-  public DefaultOsmInfoGraphBuildService osmInfoService() {
-    return new DefaultOsmInfoGraphBuildService(osmInfoRepository);
   }
 }

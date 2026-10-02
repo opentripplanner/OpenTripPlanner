@@ -10,14 +10,11 @@ import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinat
 import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource;
 import org.opentripplanner.graph_builder.module.boardinglocations.BoardingLocationsEnvironment;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.SplitterVertex;
 
 /** Linking stops to a platform mapped as an OSM way. */
 class PlatformWayTest {
@@ -109,7 +106,7 @@ class PlatformWayTest {
   @Test
   void aSecondStopOnTheSamePlatformStillFindsIt() {
     var test = BoardingLocationsEnvironment.of(OSM, platform("a;b"));
-    var stopA = test.stop("a", WEST_END.moveEastMeters(100));
+    test.stop("a", WEST_END.moveEastMeters(100));
     test.stop("b", WEST_END.moveEastMeters(200));
 
     var result = test.build();
@@ -132,32 +129,15 @@ class PlatformWayTest {
         "(53.55,10.002271) linked to (53.55,10.001514)[F:a]",
         "(53.55,10.001514)[F:a] linked to (53.55,10.002271)"
       );
-
-    // The freshly created halves carry the platform, so a third stop would find it too. The
-    // connector a stop is linked in over is not part of the platform and must not be tagged.
-    var osmService = result.osmInfoService();
-    var platformHalves = result
-      .linkedVertices(stopA)
-      .stream()
-      .filter(SplitterVertex.class::isInstance)
-      .flatMap(v -> Stream.concat(v.getIncoming().stream(), v.getOutgoing().stream()))
-      .filter(StreetEdge.class::isInstance)
-      .toList();
-    assertFalse(platformHalves.isEmpty(), "expected linking to split the platform way");
-    assertTrue(
-      platformHalves.stream().allMatch(e -> osmService.findPlatform(e).isPresent()),
-      "the split halves should be re-registered with the platform"
-    );
   }
 
   /**
-   * When linking snaps the stop to an existing endpoint of the platform way instead of splitting it,
-   * no split vertex is produced and nothing must be re-registered. An unrelated street
-   * sharing that endpoint must not be tagged as part of the platform, which would let a later stop
-   * match a platform it is not on.
+   * A stop sitting on an existing endpoint of the platform way snaps to it rather than splitting
+   * the way, leaving the way and the street sharing that endpoint intact. That nothing is then
+   * recorded as part of the platform is {@code PlatformLookupTest}'s subject.
    */
   @Test
-  void snappingToAnEndpointDoesNotTagUnrelatedEdges() {
+  void aStopOnAnEndpointSnapsToItWithoutSplitting() {
     var provider = TestOsmProvider.of()
       .addWayFromNodes(
         way -> way.withTag("public_transport", "platform").withTag("ref", "on-the-end"),
@@ -174,11 +154,17 @@ class PlatformWayTest {
     var result = test.build();
 
     assertFalse(result.linkedVertices(stop).isEmpty(), "the stop should be linked");
-    assertEquals(
-      2,
-      result.platformEdgeCount(),
-      "only the platform way's own two directions should carry the platform"
-    );
+    // No split vertex: the platform way and the footway are still one edge pair each.
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.54955,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.004541) PEDESTRIAN ♿✅",
+        "(53.55,10) linked to (53.55,10)[F:on-the-end]",
+        "(53.54955,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.004541) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10)[F:on-the-end] linked to (53.55,10)"
+      );
   }
 
   /**

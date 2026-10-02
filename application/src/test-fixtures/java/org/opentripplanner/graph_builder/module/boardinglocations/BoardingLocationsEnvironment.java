@@ -84,11 +84,10 @@ public class BoardingLocationsEnvironment {
       transitRepository,
       VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository),
-      osmInfoRepository,
       coordinateSource,
       issueStore
     ).buildGraph();
 
-    return new LinkedGraph(graph, osmInfoRepository, issueStore);
+    return new LinkedGraph(graph, issueStore);
   }
 }

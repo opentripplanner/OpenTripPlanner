@@ -383,7 +383,6 @@ class OsmBoardingLocationsModuleTest {
       transitRepository,
       VertexLinkerTestFactory.of(graph),
       new DefaultOsmInfoGraphBuildService(osmInfoRepository),
-      osmInfoRepository,
       coordinateSource,
       DataImportIssueStore.NOOP
     ).buildGraph();

@@ -130,7 +130,6 @@ public class GraphBuilderModules {
     TransitRepository transitRepository,
     VertexLinker linker,
     OsmInfoGraphBuildService osmInfoGraphBuildService,
-    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     DataImportIssueStore issueStore
   ) {
     return new OsmBoardingLocationsModule(
@@ -138,7 +137,6 @@ public class GraphBuilderModules {
       transitRepository,
       linker,
       osmInfoGraphBuildService,
-      osmInfoGraphBuildRepository,
       config.boardingLocations.coordinateSource(),
       issueStore
     );

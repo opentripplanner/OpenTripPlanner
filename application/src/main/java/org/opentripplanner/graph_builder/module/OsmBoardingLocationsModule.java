@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -20,7 +19,6 @@ import org.opentripplanner.core.model.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopFarFromBoardingLocation;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.geometry.GeometryUtils;
@@ -37,7 +35,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
-import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -84,8 +81,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final Graph graph;
 
   private final StopResolver stopResolver;
-  private final OsmInfoGraphBuildService osmInfoGraphBuildService;
-  private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
+  private final PlatformLookup platforms;
   private final VertexFactory vertexFactory;
   private final VertexLinker linker;
   private final BoardingLocationCoordinateSource coordinateSource;
@@ -102,15 +98,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     TransitRepository transitRepository,
     VertexLinker linker,
     OsmInfoGraphBuildService osmInfoGraphBuildService,
-    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     BoardingLocationCoordinateSource coordinateSource,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.stopResolver = id ->
       Objects.requireNonNull(transitRepository.getSiteRepository().getRegularStop(id));
-    this.osmInfoGraphBuildService = osmInfoGraphBuildService;
-    this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
+    this.platforms = new PlatformLookup(osmInfoGraphBuildService);
     this.vertexFactory = new VertexFactory(graph);
     this.linker = linker;
     this.coordinateSource = coordinateSource;
@@ -185,7 +179,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     // stop code or id in ref= tag matches the GTFS stop code of this StopVertex.
     for (var areaGroup : nearbyAreaGroups) {
       for (Area area : areaGroup.getAreas()) {
-        var platOpt = osmInfoGraphBuildService.findPlatform(area);
+        var platOpt = platforms.findPlatform(area);
         if (platOpt.isPresent()) {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
@@ -215,7 +209,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     var nearbyEdges = new HashMap<Platform, List<Edge>>();
 
     for (var edge : graph.findEdges(getEnvelope(ts))) {
-      osmInfoGraphBuildService.findPlatform(edge).ifPresent(platform -> {
+      platforms.findPlatform(edge).ifPresent(platform -> {
         if (matchesReference(stop, platform.references())) {
           nearbyEdges.computeIfAbsent(platform, _ -> new ArrayList<>()).add(edge);
         }
@@ -260,7 +254,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       )
     );
     for (var vertex : attachmentPoints) {
-      reRegisterSplitEdgesWithPlatform(vertex, platform);
+      platforms.addSplitEdges(vertex, platform);
     }
     linkToPlatformWay(ts, stop, boardingLocation, attachmentPoints, platformEdges);
     // In OSM mode the boarding location only carried the centroid to link from and is left with no
@@ -495,22 +489,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     I18NString name
   ) {
     return vertexFactory.osmBoardingLocation(coordinate, label, refs, name);
-  }
-
-  /**
-   * {@link OsmInfoGraphBuildRepository} keys platforms by edge reference and does not carry that over
-   * when linking splits a platform edge, so re-register the halves; otherwise a later stop on the
-   * same platform can no longer find it. Only a genuine split produces a {@link SplitterVertex}: if
-   * the boarding location snapped to an existing endpoint, the original edge is still registered and
-   * that endpoint's other incident edges must not be tagged.
-   */
-  private void reRegisterSplitEdgesWithPlatform(StreetVertex vertex, Platform platform) {
-    if (!(vertex instanceof SplitterVertex)) {
-      return;
-    }
-    Stream.concat(vertex.getIncoming().stream(), vertex.getOutgoing().stream())
-      .filter(StreetEdge.class::isInstance)
-      .forEach(edge -> osmInfoGraphBuildRepository.addPlatform(edge, platform));
   }
 
   /**
