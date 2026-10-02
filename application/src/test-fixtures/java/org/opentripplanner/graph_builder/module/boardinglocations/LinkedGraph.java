@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.boardinglocations;
 
+import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -79,6 +80,16 @@ public record LinkedGraph(
     return StreamUtils.ofIterable(rawGraph.findEdges(StreetEdge.class))
       .filter(edge -> service.findPlatform(edge).isPresent())
       .count();
+  }
+
+  /** Every edge in the graph as a readable string, to assert the shape of the linking against. */
+  public Collection<String> summarizeEdges() {
+    return new GraphSummarizer(rawGraph).summarizeEdges();
+  }
+
+  /** A link that draws the graph on a map, for the message of a failing {@link #summarizeEdges()}. */
+  public String geoJsonUrl() {
+    return new GraphSummarizer(rawGraph).geoJsonUrl();
   }
 
   public List<String> issueTypes() {

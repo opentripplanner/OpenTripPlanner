@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module.boardinglocations.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.OSM;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
@@ -16,12 +16,8 @@ import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource
 import org.opentripplanner.graph_builder.module.boardinglocations.BoardingLocationsEnvironment;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.site.RegularStop;
 
 /** Linking stops to a platform mapped as an OSM way. */
 class PlatformWayTest {
@@ -42,7 +38,23 @@ class PlatformWayTest {
 
     assertEquals(0, result.distanceFromStop(stop), 0.1, "the stop must not be moved");
 
-    // One connector per traversal direction of the way, each carrying the real offset.
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.004541) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.55,10.004541) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.550108,10.002271) PEDESTRIAN ♿✅",
+        "(53.550108,10.002271) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.550108,10.002271) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.550108,10.002271) linked to (53.550108,10.002271)[F:off-the-way]",
+        "(53.55,10.002271) → (53.550108,10.002271) PEDESTRIAN ♿✅",
+        "(53.550108,10.002271)[F:off-the-way] linked to (53.550108,10.002271)"
+      );
+
+    // One connector per traversal direction of the way, each carrying the real offset. The length
+    // is the point of TRANSIT mode and is not part of the edge summary above.
     var connectors = result.connectors(stop);
     assertEquals(2, connectors.size(), "one connector per traversal direction");
     connectors.forEach(c ->
@@ -58,42 +70,36 @@ class PlatformWayTest {
   @Test
   void closeStopsAttachToBothDirectionsAtTheirOwnPoint() {
     var test = BoardingLocationsEnvironment.of(TRANSIT, platform("a;b"));
-    var stopA = test.stop("a", WEST_END.moveNorthMeters(1).moveEastMeters(150));
+    test.stop("a", WEST_END.moveNorthMeters(1).moveEastMeters(150));
     // 30 m off the line but only 15 cm further along it, which is what triggers the false positive.
-    var stopB = test.stop("b", WEST_END.moveNorthMeters(30).moveEastMeters(150.15));
+    test.stop("b", WEST_END.moveNorthMeters(30).moveEastMeters(150.15));
 
     var result = test.build();
 
-    for (var stop : new RegularStop[] { stopA, stopB }) {
-      var attachments = result.attachmentPoints(stop);
-      assertEquals(
-        2,
-        attachments.size(),
-        stop.getId() + " should attach to both traversal directions at one point"
+    // Each stop attaches at its own point - and at both of them, since the way's forward and back
+    // edge are split separately. Linked to one only, a stop would reach one end of the platform.
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10.002271) → (53.55,10.002273) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.550009,10.002271) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.550009,10.002271) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.004541) → (53.55,10.002273) PEDESTRIAN ♿✅",
+        "(53.55,10.002273) → (53.55,10.004541) PEDESTRIAN ♿✅",
+        "(53.55,10.002273) → (53.55027,10.002273) PEDESTRIAN ♿✅",
+        "(53.55,10.002273) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55027,10.002273) → (53.55,10.002273) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.550009,10.002271) PEDESTRIAN ♿✅",
+        "(53.550009,10.002271) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55027,10.002273)[F:b] linked to (53.55027,10.002273)",
+        "(53.55027,10.002273) linked to (53.55027,10.002273)[F:b]",
+        "(53.55,10.002273) → (53.55027,10.002273) PEDESTRIAN ♿✅",
+        "(53.55027,10.002273) → (53.55,10.002273) PEDESTRIAN ♿✅",
+        "(53.550009,10.002271)[F:a] linked to (53.550009,10.002271)",
+        "(53.550009,10.002271) linked to (53.550009,10.002271)[F:a]"
       );
-      assertEquals(
-        1,
-        attachments.stream().map(Vertex::getCoordinate).distinct().count(),
-        stop.getId() + " should attach at a single point, not fork the platform"
-      );
-
-      // Together they reach either end of the platform; linked to one only, the stop is a stub.
-      var nextHops = attachments
-        .stream()
-        .flatMap(v -> v.getOutgoing().stream())
-        .filter(StreetEdge.class::isInstance)
-        .map(Edge::getToVertex)
-        .filter(v -> !(v instanceof OsmBoardingLocationVertex))
-        .distinct()
-        .count();
-      assertEquals(2, nextHops, stop.getId() + " should reach either end of the platform");
-    }
-
-    assertNotEquals(
-      result.attachmentPoints(stopA).iterator().next().getCoordinate(),
-      result.attachmentPoints(stopB).iterator().next().getCoordinate(),
-      "each stop should attach at its own point"
-    );
   }
 
   /**
@@ -104,16 +110,28 @@ class PlatformWayTest {
   void aSecondStopOnTheSamePlatformStillFindsIt() {
     var test = BoardingLocationsEnvironment.of(OSM, platform("a;b"));
     var stopA = test.stop("a", WEST_END.moveEastMeters(100));
-    var stopB = test.stop("b", WEST_END.moveEastMeters(200));
+    test.stop("b", WEST_END.moveEastMeters(200));
 
     var result = test.build();
 
-    for (var stop : new RegularStop[] { stopA, stopB }) {
-      assertFalse(
-        result.linkedVertices(stop).isEmpty(),
-        stop.getId() + " should be linked to the platform"
+    // Both stops reach the platform: the second only can because the halves the first stop's split
+    // created were re-registered with it.
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.004541) → (53.55,10.002271) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) → (53.55,10.004541) PEDESTRIAN ♿✅",
+        "(53.55,10.002271) linked to (53.55,10.003027)[F:b]",
+        "(53.55,10.002271) linked to (53.55,10.001514)[F:a]",
+        "(53.55,10.003027)[F:b] linked to (53.55,10.002271)",
+        "(53.55,10.001514)[F:a] linked to (53.55,10.002271)",
+        "(53.55,10.003027)[F:b] linked to (53.55,10.002271)",
+        "(53.55,10.002271) linked to (53.55,10.003027)[F:b]",
+        "(53.55,10.002271) linked to (53.55,10.001514)[F:a]",
+        "(53.55,10.001514)[F:a] linked to (53.55,10.002271)"
       );
-    }
 
     // The freshly created halves carry the platform, so a third stop would find it too. The
     // connector a stop is linked in over is not part of the platform and must not be tagged.
@@ -208,6 +226,26 @@ class PlatformWayTest {
       result.areaEdgeCount(result.boardingLocation(stop)) > 0,
       "the stop should be linked into the platform area"
     );
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550036,10.000303) PEDESTRIAN ♿✅",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550036,10.000303) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550036,10.000303)[F:both-ways] linked to (53.550036,10.000303)",
+        "(53.550036,10.000303) linked to (53.550036,10.000303)[F:both-ways]",
+        "(53.55018,10) → (53.55018,10.000606) CAR ♿✅ noThru=WALK,BICYCLE",
+        "(53.55018,10.000606) → (53.55018,10) CAR ♿✅ noThru=WALK,BICYCLE"
+      );
   }
 
   /** A 300 m platform way running east from {@link #WEST_END}. */

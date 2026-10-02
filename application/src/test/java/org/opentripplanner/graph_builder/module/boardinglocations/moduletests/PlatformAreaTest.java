@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.boardinglocations.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -51,6 +52,30 @@ class PlatformAreaTest {
 
     // Both are registered as visibility vertices of the platform, so they see each other directly.
     assertTrue(west.isConnected(east), "the two stops should be connected across the platform");
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550036,10.000454) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550036,10.000151) PEDESTRIAN ♿✅",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550036,10.000454) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550036,10.000151) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550036,10.000454)[F:east] linked to (53.550036,10.000454)",
+        "(53.550036,10.000454) linked to (53.550036,10.000454)[F:east]",
+        "(53.550036,10.000151) → (53.550036,10.000454) PEDESTRIAN ♿✅",
+        "(53.550036,10.000151) linked to (53.550036,10.000151)[F:west]",
+        "(53.550036,10.000454) → (53.550036,10.000151) PEDESTRIAN ♿✅",
+        "(53.550036,10.000151)[F:west] linked to (53.550036,10.000151)"
+      );
     assertThat(result.issueTypes()).isEmpty();
   }
 
@@ -103,6 +128,32 @@ class PlatformAreaTest {
       result.areaEdgeCount(accessPoint),
       "the access point should be as well connected as a stop inside the platform"
     );
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10.000454)[F:outside] linked to (53.55,10.000454)",
+        "(53.55,10.000454) linked to (53.55,10.000454)[F:outside]",
+        "(53.550036,10.000151) → (53.550002,10.000454) PEDESTRIAN ♿✅",
+        "(53.550036,10.000151) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550036,10.000151) linked to (53.550036,10.000151)[F:inside]",
+        "(53.550002,10.000454) → (53.550036,10.000151) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550036,10.000151) PEDESTRIAN ♿✅",
+        "(53.550036,10.000151)[F:inside] linked to (53.550036,10.000151)",
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550002,10.000454) PEDESTRIAN ♿✅",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550002,10.000454) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.55,10.000454) → (53.550002,10.000454) PEDESTRIAN ♿✅",
+        "(53.550002,10.000454) → (53.55,10.000454) PEDESTRIAN ♿✅"
+      );
     assertThat(result.issueTypes()).isEmpty();
   }
 
@@ -178,6 +229,27 @@ class PlatformAreaTest {
       connector.getPermission().allows(StreetTraversalPermission.BICYCLE),
       "a platform tagged bicycle=no must not produce a cyclable connector"
     );
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.549973,10.000303)[F:outside] linked to (53.549973,10.000303)",
+        "(53.549973,10.000303) linked to (53.549973,10.000303)[F:outside]",
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.55,10) → (53.55,10.000606) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.55,10) → (53.550002,10.000303) PEDESTRIAN ♿❌",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.55,10.000606) → (53.55,10) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.550002,10.000303) → (53.55,10) PEDESTRIAN ♿❌",
+        "(53.55,10.000606) → (53.550072,10.000606) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.550072,10.000606) → (53.55,10.000606) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.550072,10.000606) → (53.550072,10) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.550072,10) → (53.550072,10.000606) PEDESTRIAN ♿❌ noThru=BICYCLE",
+        "(53.549973,10.000303) → (53.550002,10.000303) PEDESTRIAN ♿❌",
+        "(53.550002,10.000303) → (53.549973,10.000303) PEDESTRIAN ♿❌"
+      );
+    // The safety factor is not part of the edge summary above.
     assertEquals(
       areaEdgeOf(result, outsideStop).getWalkSafetyFactor(),
       connector.getWalkSafetyFactor(),

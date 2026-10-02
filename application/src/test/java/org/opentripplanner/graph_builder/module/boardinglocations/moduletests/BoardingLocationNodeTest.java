@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.boardinglocations.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.OSM;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
-import static org.opentripplanner.osm.model.NodeBuilder.node;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource;
@@ -43,6 +43,19 @@ class BoardingLocationNodeTest {
       "the 20 m offset must cost its real distance"
     );
 
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.55,9.999546) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000454) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55018,10) PEDESTRIAN_AND_BICYCLE ♿✅",
+        "(53.55,9.999546) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000454) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55018,10) → (53.55,10) PEDESTRIAN_AND_BICYCLE ♿✅",
+        "(53.55018,10)[F:node-stop] linked to (53.55018,10)",
+        "(53.55018,10) linked to (53.55018,10)[F:node-stop]"
+      );
+
     var osmNode = connectors.getFirst().getToVertex();
     assertEquals(NODE.asJtsCoordinate(), osmNode.getCoordinate(), "the OSM node must not be moved");
     assertInstanceOf(
@@ -76,15 +89,9 @@ class BoardingLocationNodeTest {
    * vertex when it is part of a way, which is what makes it linkable.
    */
   private static TestOsmProvider footwayWithNode(String ref) {
-    var boardingLocation = NodeBuilder.of(2, NODE)
-      .withTag("highway", "bus_stop")
-      .withTag("ref", ref)
-      .build();
     return TestOsmProvider.of()
-      .addWayFromNodes(
-        node(1, NODE.moveWestMeters(30)),
-        boardingLocation,
-        node(3, NODE.moveEastMeters(30))
+      .addWayThroughNode(
+        NodeBuilder.of(1, NODE).withTag("highway", "bus_stop").withTag("ref", ref).build()
       )
       .build();
   }
