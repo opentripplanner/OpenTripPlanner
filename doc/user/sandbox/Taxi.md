@@ -10,6 +10,7 @@ The taxi module filters and decorates taxi itineraries using spatial provider da
 loaded from dedicated GTFS Flex feeds.
 
 For a transit itinerary with a `TAXI` access and/or egress leg:
+
 - Before the transit search runs, each candidate access/egress stop is checked against
   the request's origin/destination coordinate: if **no provider covers both**, the candidate is
   dropped and never reaches the transit search. Access and egress are filtered independently of
@@ -20,6 +21,7 @@ For a transit itinerary with a `TAXI` access and/or egress leg:
   provider is expected to always be found here.
 
 For a direct (non-transit) `TAXI` itinerary, the same two-phase approach is used:
+
 - Before the street search runs, OTP checks whether the request's origin and destination share a
   common provider; if not, an empty result is returned immediately without running a street
   search.
@@ -33,6 +35,7 @@ is off or no taxi provider data is configured, `TAXI` requests return no itinera
 falling back to undecorated street routing.
 
 **TODO:**
+
 - Multi-provider support. Currently only the first matching provider is used.
 - Calendar/service-date validation?
 
