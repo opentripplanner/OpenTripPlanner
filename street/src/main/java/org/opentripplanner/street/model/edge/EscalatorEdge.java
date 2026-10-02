@@ -56,6 +56,7 @@ public class EscalatorEdge extends Edge {
 
   /**
    * Parsed content of duration tag in OSM, if any. Not a calculated value.
+   *
    * @return Duration, or empty
    */
   public Optional<Duration> getDuration() {

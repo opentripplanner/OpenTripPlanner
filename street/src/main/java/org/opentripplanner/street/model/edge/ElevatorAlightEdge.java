@@ -29,7 +29,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
 
   /**
    * @param from the vertex inside the elevator
-   * @param to the vertex on the street network
+   * @param to   the vertex on the street network
    */
   private ElevatorAlightEdge(ElevatorHopVertex from, Vertex to) {
     super(from, to);

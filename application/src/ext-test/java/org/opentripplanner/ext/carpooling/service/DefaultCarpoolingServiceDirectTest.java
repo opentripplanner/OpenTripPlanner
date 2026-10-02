@@ -31,8 +31,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Integration tests for {@link DefaultCarpoolingService#routeDirect}.
  * <p>
- * These tests use a real street graph to verify the full direct routing pipeline
- * including filtering, position finding, insertion evaluation, and itinerary mapping.
+ * These tests use a real street graph to verify the full direct routing pipeline including
+ * filtering, position finding, insertion evaluation, and itinerary mapping.
  * <p>
  * Graph layout (main road going east, P and Q sit south of the road):
  * <pre>
@@ -409,12 +409,12 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
   /**
    * Verifies that the booking URL template on the carpool leg has its {@code {from}} and
-   * {@code {to}} placeholders expanded with the passenger's carpool boarding and alighting
-   * points. In this graph the passenger's requested pickup is itself a graph vertex
-   * (P) and the carpool ride goes P → Q, so the URL coordinates equal P/Q (which are also the
-   * passenger's request endpoints here — distinguishing them from a separate walk leg is the job
-   * of {@link DefaultCarpoolingServiceWalkLegsTest}). The exact-equality assertion also pins
-   * down that the URL does NOT use the driver's origin (A) or destination (D).
+   * {@code {to}} placeholders expanded with the passenger's carpool boarding and alighting points.
+   * In this graph the passenger's requested pickup is itself a graph vertex (P) and the carpool
+   * ride goes P → Q, so the URL coordinates equal P/Q (which are also the passenger's request
+   * endpoints here — distinguishing them from a separate walk leg is the job of
+   * {@link DefaultCarpoolingServiceWalkLegsTest}). The exact-equality assertion also pins down that
+   * the URL does NOT use the driver's origin (A) or destination (D).
    */
   @Test
   void directItinerary_expandsCarpoolPickupAndDropoffCoordsIntoBookingUrl() {
@@ -442,8 +442,8 @@ class DefaultCarpoolingServiceDirectTest extends GraphRoutingTest {
 
   /**
    * When the trip has no {@code publicContactInformation} the carpool leg's
-   * {@code pickupBookingInfo} must be {@code null} — i.e. a {@code BookingInfo} is not
-   * fabricated out of thin air just because a trip is present.
+   * {@code pickupBookingInfo} must be {@code null} — i.e. a {@code BookingInfo} is not fabricated
+   * out of thin air just because a trip is present.
    */
   @Test
   void directItinerary_withoutPublicContact_hasNullPickupBookingInfo() {

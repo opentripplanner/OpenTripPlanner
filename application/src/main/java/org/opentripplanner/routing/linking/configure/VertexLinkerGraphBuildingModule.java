@@ -19,7 +19,8 @@ public class VertexLinkerGraphBuildingModule {
   /**
    * The linker doesn't need to be a singleton as all state is kept in the graph.
    *
-   * <p>Geofencing zones are registered at runtime by the vehicle-rental updater, so the build-phase
+   * <p>
+   * Geofencing zones are registered at runtime by the vehicle-rental updater, so the build-phase
    * linker uses an empty zone lookup.
    */
   @Provides

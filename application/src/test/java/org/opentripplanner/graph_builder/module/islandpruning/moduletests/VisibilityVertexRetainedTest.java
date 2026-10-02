@@ -13,8 +13,8 @@ import org.opentripplanner.street.model.edge.AreaGroup;
 
 /**
  * After pruning, street vertices without any edges are removed from the graph. Visibility vertices
- * of a walkable area are exempt even when edgeless, since the area still references them and
- * graph serialization breaks if they are missing.
+ * of a walkable area are exempt even when edgeless, since the area still references them and graph
+ * serialization breaks if they are missing.
  */
 class VisibilityVertexRetainedTest {
 

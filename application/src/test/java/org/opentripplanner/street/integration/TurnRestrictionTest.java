@@ -158,9 +158,9 @@ public class TurnRestrictionTest {
   }
 
   /**
-   * Helper to return the label of the parent vertex of a vertex, useful for not
-   * digging too deep in the details of the turn restriction graph application code,
-   * and instead checking that the returned vertex is in the expected group.
+   * Helper to return the label of the parent vertex of a vertex, useful for not digging too deep in
+   * the details of the turn restriction graph application code, and instead checking that the
+   * returned vertex is in the expected group.
    */
   public static String getParentLabelString(Vertex vertex) {
     return vertex.getParent().getLabelString();

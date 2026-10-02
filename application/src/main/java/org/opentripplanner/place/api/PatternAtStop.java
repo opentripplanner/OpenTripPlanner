@@ -55,8 +55,8 @@ public class PatternAtStop {
   /**
    * Returns a list of stop times for the specific pattern at the stop.
    *
-   * @param transitService               An instance of the TransitService to be used for the timetable
-   *                                     search
+   * @param transitService               An instance of the TransitService to be used for the
+   *                                     timetable search
    * @param startTime                    Start time for the search.
    * @param timeRange                    Searches forward for timeRange from startTime
    * @param numberOfDeparturesPerPattern Number of departures to fetch

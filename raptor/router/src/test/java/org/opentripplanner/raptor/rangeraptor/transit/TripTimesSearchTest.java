@@ -118,8 +118,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   }
 
   /**
-   * The trip-schedule may visit the same stop many times. For example in the case of a
-   * subway-loop.
+   * The trip-schedule may visit the same stop many times. For example in the case of a subway-loop.
    */
   @Test
   public void findTripWhenScheduleLoops() {

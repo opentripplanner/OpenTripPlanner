@@ -11,9 +11,9 @@ import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Represents a single selection criterion for filtering {@link TransitAlert}s.
- * Criteria within a single request are combined with AND logic: all specified criteria must
- * match for the request to match. Unset (null) criteria are ignored (match everything).
+ * Represents a single selection criterion for filtering {@link TransitAlert}s. Criteria within a
+ * single request are combined with AND logic: all specified criteria must match for the request to
+ * match. Unset (null) criteria are ignored (match everything).
  */
 public class TransitAlertSelectRequest {
 

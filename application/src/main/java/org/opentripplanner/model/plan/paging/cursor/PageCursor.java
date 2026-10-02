@@ -14,8 +14,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * as base64 when passed on to the client. The base64 encoding is done to prevent the client from
  * using the information inside the cursor.
  * <p>
- * The PageCursor class is internal to the router, only the serialized string is passed to/from the
- * clients.
+ * The PageCursor class is internal to the router, only the serialized string is passed to/from
+ * the clients.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  *

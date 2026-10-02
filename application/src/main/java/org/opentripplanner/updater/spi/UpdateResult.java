@@ -7,9 +7,8 @@ import com.google.common.collect.Multimaps;
 import java.util.List;
 
 /**
- * An aggregation of results of the application of realtime updates which makes it easy to get
- * an overview of what the success rate of the update was and which specific problems were
- * encountered.
+ * An aggregation of results of the application of realtime updates which makes it easy to get an
+ * overview of what the success rate of the update was and which specific problems were encountered.
  */
 public record UpdateResult(
   int successful,

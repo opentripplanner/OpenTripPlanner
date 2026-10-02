@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.framework.EntityById;
 
 /**
  * Maps NeTEx notice to OTP notice.
- * <p/>
+ * <p>
  * This Mapper is stateful, it caches objects it already have mapped. Because of this just one
  * instance of the mapper should be used in a context where the same Notice may appear more than
  * once.

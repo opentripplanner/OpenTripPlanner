@@ -30,7 +30,7 @@ public interface TransitDataImport {
 
   /**
    * @return a list of all Operators, the list may be empty if there are no Operators in the
-   * imported data.
+   *         imported data.
    */
   Collection<Operator> getAllOperators();
 
@@ -67,7 +67,8 @@ public interface TransitDataImport {
 
   /**
    * @return if transit service has any active services. The graph build might filter out all
-   * transit services if they are outside the configured 'transitServiceStart' and 'transitServiceEnd'
+   *         transit services if they are outside the configured 'transitServiceStart' and
+   *         'transitServiceEnd'
    */
   boolean hasActiveTransit();
 

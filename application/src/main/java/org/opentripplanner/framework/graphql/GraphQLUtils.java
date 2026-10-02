@@ -16,18 +16,11 @@ public class GraphQLUtils {
    * If input is {@code null}, return null. Otherwise, input is translated using a locale from this
    * prioritized list:
    * <ol>
-   *   <li>
-   *   {@code language} parameter of a queried field.
-   *   </li>
-   *   <li>
-   *   Locale from the DataFetchingEnvironment's local context (for journey planning queries this is {@code locale} parameter).
-   *   </li>
-   *   <li>
-   *   DataFetchingEnvironment's locale which comes from the accept-language header.
-   *   </li>
-   *   <li>
-   *   Default locale.
-   *   </li>
+   *   <li>{@code language} parameter of a queried field.</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
+   *       is {@code locale} parameter).</li>
+   *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
+   *   <li>Default locale.</li>
    * </ol>
    */
   @Nullable
@@ -44,18 +37,11 @@ public class GraphQLUtils {
   /**
    * Returns locale from this prioritized list:
    * <ol>
-   *   <li>
-   *   {@code language} parameter of a queried field.
-   *   </li>
-   *   <li>
-   *   Locale from the DataFetchingEnvironment's local context (for journey planning queries this is {@code locale} parameter).
-   *   </li>
-   *   <li>
-   *   DataFetchingEnvironment's locale which comes from the accept-language header.
-   *   </li>
-   *   <li>
-   *   Default locale.
-   *   </li>
+   *   <li>{@code language} parameter of a queried field.</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
+   *       is {@code locale} parameter).</li>
+   *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
+   *   <li>Default locale.</li>
    * </ol>
    */
   public static Locale getLocale(DataFetchingEnvironment environment) {
@@ -70,18 +56,11 @@ public class GraphQLUtils {
   /**
    * Returns locale from this prioritized list:
    * <ol>
-   *   <li>
-   *   {@code localeString}.
-   *   </li>
-   *   <li>
-   *   Locale from the DataFetchingEnvironment's local context (for journey planning queries this is {@code locale} parameter).
-   *   </li>
-   *   <li>
-   *   DataFetchingEnvironment's locale which comes from the accept-language header.
-   *   </li>
-   *   <li>
-   *   Default locale.
-   *   </li>
+   *   <li>{@code localeString}.</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
+   *       is {@code locale} parameter).</li>
+   *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
+   *   <li>Default locale.</li>
    * </ol>
    */
   public static Locale getLocale(
@@ -98,18 +77,11 @@ public class GraphQLUtils {
   /**
    * Returns locale from this prioritized list:
    * <ol>
-   *   <li>
-   *   {@code locale}.
-   *   </li>
-   *   <li>
-   *   Locale from the DataFetchingEnvironment's local context (for journey planning queries this is {@code locale} parameter).
-   *   </li>
-   *   <li>
-   *   DataFetchingEnvironment's locale which comes from the accept-language header.
-   *   </li>
-   *   <li>
-   *   Default locale.
-   *   </li>
+   *   <li>{@code locale}.</li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
+   *       is {@code locale} parameter).</li>
+   *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
+   *   <li>Default locale.</li>
    * </ol>
    */
   public static Locale getLocale(DataFetchingEnvironment environment, @Nullable Locale locale) {
@@ -123,15 +95,10 @@ public class GraphQLUtils {
   /**
    * Returns locale from this prioritized list:
    * <ol>
-   *   <li>
-   *   Locale from the DataFetchingEnvironment's local context (for journey planning queries this is {@code locale} parameter).
-   *   </li>
-   *   <li>
-   *   DataFetchingEnvironment's locale which comes from the accept-language header.
-   *   </li>
-   *   <li>
-   *   Default locale.
-   *   </li>
+   *   <li>Locale from the DataFetchingEnvironment's local context (for journey planning queries this
+   *       is {@code locale} parameter).</li>
+   *   <li>DataFetchingEnvironment's locale which comes from the accept-language header.</li>
+   *   <li>Default locale.</li>
    * </ol>
    */
   public static Locale getLocaleFromEnvironment(DataFetchingEnvironment environment) {

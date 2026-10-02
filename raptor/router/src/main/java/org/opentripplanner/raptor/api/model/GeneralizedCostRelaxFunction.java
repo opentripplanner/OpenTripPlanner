@@ -14,8 +14,8 @@ import org.opentripplanner.utils.time.DurationUtils;
  * <pre>
  *   v' := v * ratio + slack
  * </pre>
- * The {@code ratio} is rounded of to the closest 1/16. This is done for
- * performance reasons since we then can use shift-right 4 bit to divide by 16.
+ * The {@code ratio} is rounded of to the closest 1/16. This is done for performance reasons
+ * since we then can use shift-right 4 bit to divide by 16.
  * <p>
  * "Increasing" means that {@code v} is better than {@code u}, if {@code v < u}.
  */
@@ -26,8 +26,8 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
   private static final int SLACK_PRECISSION = 100;
 
   /**
-   * Min slack is 0s, max slack is set to the cost equivalent of riding transit for 4 hours.
-   * Raptor cost is in centi-seconds.
+   * Min slack is 0s, max slack is set to the cost equivalent of riding transit for 4 hours. Raptor
+   * cost is in centi-seconds.
    */
   static final IntRange SLACK_RANGE = IntRange.ofInclusive(0, FOUR_HOURS * SLACK_PRECISSION);
 
@@ -43,8 +43,8 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
   }
 
   /**
-   * Create a relax function for increasing cost values. The relax function will add to the
-   * value passed into it.
+   * Create a relax function for increasing cost values. The relax function will add to the value
+   * passed into it.
    */
   public static RelaxFunction of(double ratio, int slack) {
     assertRatioInRange(ratio);

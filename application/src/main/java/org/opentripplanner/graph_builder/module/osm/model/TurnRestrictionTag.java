@@ -7,8 +7,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
- * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
- * objects
+ * A temporary holder for turn restrictions while we have only way/node ids but not yet edge objects
  */
 public class TurnRestrictionTag {
 

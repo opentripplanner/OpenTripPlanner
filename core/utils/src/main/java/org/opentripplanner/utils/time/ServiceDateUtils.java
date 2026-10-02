@@ -50,19 +50,18 @@ public class ServiceDateUtils {
   }
 
   /**
-   * Calculate the service day from start of the service day. On days with daylight saving
-   * time adjustments this may not be the same as {@code startOfService.toLocalDate()}.
-   * Adding 12 hours is necessary.
+   * Calculate the service day from start of the service day. On days with daylight saving time
+   * adjustments this may not be the same as {@code startOfService.toLocalDate()}. Adding 12 hours
+   * is necessary.
    */
   public static LocalDate asServiceDay(ZonedDateTime startOfService) {
     return startOfService.plusHours(12).toLocalDate();
   }
 
   /**
-   * Create a ZonedDateTime based on the service date, time zone and seconds-offset. This
-   * method add the offset seconds to the service date start time, which is defined to be NOON - 12
-   * hours. This is midnight for most days, except days where the time is adjusted for daylight
-   * saving time.
+   * Create a ZonedDateTime based on the service date, time zone and seconds-offset. This method add
+   * the offset seconds to the service date start time, which is defined to be NOON - 12 hours. This
+   * is midnight for most days, except days where the time is adjusted for daylight saving time.
    */
   public static ZonedDateTime toZonedDateTime(
     LocalDate localDate,
@@ -121,15 +120,13 @@ public class ServiceDateUtils {
   ///
   /// The time-window is inclusive - inclusive.
   ///
-  /// > **NOTE! Day-light-saving(DST) handling**
-  /// >
-  /// > In case DST is used for the given `serviceZoneId`, then the service-day overlap when
-  /// > the transition from winter-time to summer-time occours. This method checks for this and
-  /// > includes the first service-day of summer-time, when the time is last-service-day in
-  /// > winter-time and the clock is between 23:00 to 23:59:59. There is **no** such check performed
-  /// > in fall. The method returns the first-day of winter-time, when the time is in the 1 hour gap
-  /// > between last day of summer and first day of winter. This overselection should not cause any
-  /// > problems.
+  /// > **NOTE! Day-light-saving(DST) handling** > > In case DST is used for the given
+  /// `serviceZoneId`, then the service-day overlap when > the transition from winter-time to
+  /// summer-time occours. This method checks for this and > includes the first service-day of
+  /// summer-time, when the time is last-service-day in > winter-time and the clock is between 23:00
+  /// to 23:59:59. There is **no** such check performed > in fall. The method returns the first-day
+  /// of winter-time, when the time is in the 1 hour gap > between last day of summer and first day
+  /// of winter. This overselection should not cause any > problems.
   ///
   public static List<LocalDate> calculateRunningDates(
     Instant startTime,
@@ -153,8 +150,8 @@ public class ServiceDateUtils {
   }
 
   /**
-   * Calculate the number of whole days from a duration in seconds. Returns 0 if the given input
-   * is negative.
+   * Calculate the number of whole days from a duration in seconds. Returns 0 if the given input is
+   * negative.
    */
   public static int wholeDays(int seconds) {
     return seconds < 0 ? 0 : seconds / SECONDS_IN_A_DAY;

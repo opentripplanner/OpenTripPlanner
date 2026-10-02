@@ -225,10 +225,9 @@ public class MultiCriteriaRoutingStrategy<
 
   /**
    * Calculate a cost for riding a trip. The cost is used to compare trips boarding in the same
-   * pattern with the same number of transfers. It is ok for the cost to be relative to any
-   * point in place or time - as long as it can be used to compare to paths that started at the
-   * origin in the same iteration, having used the same number-of-rounds to board trips in the same
-   * pattern.
+   * pattern with the same number of transfers. It is ok for the cost to be relative to any point in
+   * place or time - as long as it can be used to compare to paths that started at the origin in the
+   * same iteration, having used the same number-of-rounds to board trips in the same pattern.
    */
   private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
     return c1Calculator.transitCost(tripSchedule.relativeTravelDuration(boardTime), tripSchedule);

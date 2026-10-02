@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class help with mapping from an URI to String and  GCS {@link BlobId}.
+ * This class help with mapping from an URI to String and GCS {@link BlobId}.
  */
 class GsHelper {
 
@@ -15,12 +15,12 @@ class GsHelper {
    * GCS URL pattern for the Scheme Specific Part, without the 'gs:' prefix Not all rules are
    * validated here, but the following is:
    * <ul>
-   *     <li>Bucket names must contain only lowercase letters, numbers, dashes (-),
-   *     underscores (_), and dots (.)
-   *     <li>Bucket names must contain 3 to 222 characters.
-   *     <li>Object names must be at least one character.
-   *     <li>Object names should avoid using control characters
-   *     this is enforced here, and is strictly just a strong recommendation.
+   *   <li>Bucket names must contain only lowercase letters, numbers, dashes (-), underscores (_), and
+   *       dots (.)
+   *   <li>Bucket names must contain 3 to 222 characters.
+   *   <li>Object names must be at least one character.
+   *   <li>Object names should avoid using control characters this is enforced here, and is strictly
+   *       just a strong recommendation.
    * </ul>
    * One exception is allowed, the object name may be an empty string({@code ""}), this is used to
    * create a virtual root directory.

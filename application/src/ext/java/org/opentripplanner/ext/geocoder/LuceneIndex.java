@@ -74,8 +74,8 @@ public class LuceneIndex implements Serializable {
 
   /**
    * Since the {@link TransitService} is request scoped, we don't inject it into this class.
-   * However, we do need some methods in the service and that's why we instantiate it manually in this
-   * constructor.
+   * However, we do need some methods in the service and that's why we instantiate it manually in
+   * this constructor.
    */
   public LuceneIndex(
     TransitRepository transitRepository,
@@ -143,10 +143,11 @@ public class LuceneIndex implements Serializable {
    * Return all "stop clusters" for a given query.
    * <p>
    * Stop clusters are defined as follows.
-   * <p>
+   * <pre>
    *  - If a stop has a parent station, only the parent is returned.
    *  - If two stops have the same name *and* are less than 10 meters from each other, only
    *    one of those is chosen at random and returned.
+   * </pre>
    */
   public Stream<StopCluster> queryStopClusters(String query, @Nullable WgsCoordinate focusPoint) {
     return findDocuments(query, focusPoint).map(this::toStopCluster);

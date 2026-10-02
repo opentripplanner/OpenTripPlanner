@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 /**
- * Tests for {@link FlexServiceDate#requestedBookingTime()} to verify that booking time
- * is correctly calculated relative to each service date's start-of-service.
+ * Tests for {@link FlexServiceDate#requestedBookingTime()} to verify that booking time is correctly
+ * calculated relative to each service date's start-of-service.
  */
 class FlexServiceDateBookingTimeTest {
 

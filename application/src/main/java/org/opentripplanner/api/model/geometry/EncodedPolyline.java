@@ -12,8 +12,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * See <a href="http://code.google.com/apis/maps/documentation/polylinealgorithm.html">Encoded
  * polyline algorithm format</a>
  *
- * The attributes are lazy initialized to avoid unnecessary computation in case only the
- * line-string or the distance is requested, or none.
+ * The attributes are lazy initialized to avoid unnecessary computation in case only the line-string
+ * or the distance is requested, or none.
  *
  * THIS CLASS IS NOT THREAD-SAFE.
  */

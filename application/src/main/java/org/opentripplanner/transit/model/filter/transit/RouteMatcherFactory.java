@@ -26,7 +26,7 @@ public class RouteMatcherFactory {
    * transit service which has access to all routes and we don't want to pass all the routes into
    * this factory.
    *
-   * @param request the criteria for filtering Routes.
+   * @param request              the criteria for filtering Routes.
    * @param isFlexRoutePredicate a function that determines if a Route is a flexible route.
    * @return a matcher for filtering Routes.
    */

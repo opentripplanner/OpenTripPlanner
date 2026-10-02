@@ -12,8 +12,8 @@ public enum VisibilityMode {
    */
   COMPUTE_AREA_VISIBILITY_LINES,
   /**
-   * Areas are not crossed, but the edges at around the borders are traversed instead, leading to results
-   * that might be seen as detours. However, this mode is faster to compute.
+   * Areas are not crossed, but the edges at around the borders are traversed instead, leading to
+   * results that might be seen as detours. However, this mode is faster to compute.
    */
   TRAVERSE_AREA_EDGES;
 

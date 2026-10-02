@@ -9,10 +9,10 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 
 /**
- * This class will set the {@link Itinerary#generalizedCost2()} value if the feature is
- * enabled and no such value is set. The AStar router does not produce itineraries with this,
- * so we decorate itineraries with this here to make sure the `c2` is set correct and can be
- * used in the itinerary-filter-chain.
+ * This class will set the {@link Itinerary#generalizedCost2()} value if the feature is enabled and
+ * no such value is set. The AStar router does not produce itineraries with this, so we decorate
+ * itineraries with this here to make sure the `c2` is set correct and can be used in the
+ * itinerary-filter-chain.
  */
 public class TransitGroupPriorityItineraryDecorator {
 

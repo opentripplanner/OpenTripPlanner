@@ -135,8 +135,8 @@ public class CarpoolEstimatedVehicleJourneyData {
   }
 
   /**
-   * Aimed times are absent, so call-order validation cannot compare them — the inverted timeline
-   * is only visible on the derived expected start/end times.
+   * Aimed times are absent, so call-order validation cannot compare them — the inverted timeline is
+   * only visible on the derived expected start/end times.
    */
   public static EstimatedVehicleJourney expectedArrivalBeforeExpectedDeparture() {
     var journey = minimalCompleteJourney();
@@ -171,8 +171,8 @@ public class CarpoolEstimatedVehicleJourneyData {
   }
 
   /**
-   * A 3-stop journey where the intermediate call is flagged as cancelled — the driver still
-   * drives origin → destination but skips the middle waypoint.
+   * A 3-stop journey where the intermediate call is flagged as cancelled — the driver still drives
+   * origin → destination but skips the middle waypoint.
    */
   public static EstimatedVehicleJourney journeyWithCancelledIntermediateCall() {
     var journey = minimalCompleteJourney();
@@ -199,9 +199,9 @@ public class CarpoolEstimatedVehicleJourneyData {
   }
 
   /**
-   * Same trip id as {@link #minimalCompleteJourney()} but with the last call's aimed arrival
-   * time set before the first call's aimed departure time, causing the mapper to throw during
-   * call-order validation. Not flagged as cancelled.
+   * Same trip id as {@link #minimalCompleteJourney()} but with the last call's aimed arrival time
+   * set before the first call's aimed departure time, causing the mapper to throw during call-order
+   * validation. Not flagged as cancelled.
    */
   public static EstimatedVehicleJourney malformedNonCancelledJourney() {
     var journey = minimalCompleteJourney();
@@ -381,8 +381,8 @@ public class CarpoolEstimatedVehicleJourneyData {
   /**
    * Builds a 3-stop journey (origin, intermediate, destination) where the intermediate and
    * destination stops each get their own {@code expectedArrivalTime} and
-   * {@code latestExpectedArrivalTime}, enabling assertions on per-stop deviation budgets.
-   * Arrival times are offset from {@code now} in minutes.
+   * {@code latestExpectedArrivalTime}, enabling assertions on per-stop deviation budgets. Arrival
+   * times are offset from {@code now} in minutes.
    */
   public static EstimatedVehicleJourney journeyWithPerStopLatestExpectedArrivalTimes(
     int intermediateExpectedArrivalMinutes,

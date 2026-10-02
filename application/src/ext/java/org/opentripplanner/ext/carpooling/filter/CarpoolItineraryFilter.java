@@ -6,10 +6,10 @@ import org.opentripplanner.model.plan.Itinerary;
  * Post-filter applied to fully-routed carpool itineraries with actual computed times.
  * <p>
  * Unlike {@link CarpoolTripFilter}, which screens raw trip candidates before routing using
- * estimated times to limit computational cost, implementations receive complete
- * {@link Itinerary} objects with actual departure and arrival times. This filter limits the
- * suggestions returned to the passenger to those that are valid according to their requested
- * trip — enforcing exact time constraints that pre-filters can only approximate.
+ * estimated times to limit computational cost, implementations receive complete {@link Itinerary}
+ * objects with actual departure and arrival times. This filter limits the suggestions returned to
+ * the passenger to those that are valid according to their requested trip — enforcing exact time
+ * constraints that pre-filters can only approximate.
  */
 public interface CarpoolItineraryFilter {
   /**

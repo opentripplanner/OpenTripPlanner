@@ -12,24 +12,24 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * Early Pruning optimization for Standard Range Raptor transfer relaxation.
  * <p>
- * This optimization breaks the transfer loop early when the current arrival time exceeds the best
- * known destination arrival time. It requires transfers to be sorted by increasing duration, so
- * that once a transfer exceeds the bound, all subsequent transfers will too. Transfers with equal
- * duration are acceptable — they produce the same arrival time and are all pruned together.
+ * This optimization breaks the transfer loop early when the current arrival time exceeds the
+ * best known destination arrival time. It requires transfers to be sorted by increasing duration,
+ * so that once a transfer exceeds the bound, all subsequent transfers will too. Transfers with
+ * equal duration are acceptable — they produce the same arrival time and are all pruned together.
  * <p>
- * The optimization is only applied to Standard RAPTOR (not Multi-Criteria). In MC-Raptor, multiple
- * Pareto-optimal arrivals at each stop must be explored; pruning based on a single best destination
- * time would discard arrivals that are suboptimal in time but optimal in cost.
+ * The optimization is only applied to Standard RAPTOR (not Multi-Criteria). In MC-Raptor,
+ * multiple Pareto-optimal arrivals at each stop must be explored; pruning based on a single best
+ * destination time would discard arrivals that are suboptimal in time but optimal in cost.
  * <p>
  * Two bounds are maintained for correctness with Range Raptor:
  * <ol>
  *   <li>A per-round bound ({@code bestDestArrivalByRound}) tracking the best destination arrival
- *   across all Range Raptor iterations for the current round. This ensures that a fast path from an
- *   earlier iteration (later departure) does not incorrectly prune a path in the current iteration,
- *   since the Pareto set includes both departure time and arrival time.</li>
+ *       across all Range Raptor iterations for the current round. This ensures that a fast path from an
+ *       earlier iteration (later departure) does not incorrectly prune a path in the current iteration,
+ *       since the Pareto set includes both departure time and arrival time.</li>
  *   <li>A within-iteration bound ({@code bestDestCurrentIteration}) tracking the best destination
- *   arrival seen in earlier rounds of the current iteration. Within a fixed departure-time
- *   iteration, rounds are processed sequentially, so this bound is safe to apply.</li>
+ *       arrival seen in earlier rounds of the current iteration. Within a fixed departure-time iteration,
+ *       rounds are processed sequentially, so this bound is safe to apply.</li>
  * </ol>
  * See: Rohovyi, Abuaisha, Walsh — "Early Pruning for Public Transport Routing", WCTR 2026
  * (<a href="https://arxiv.org/abs/2603.12592">arxiv.org/abs/2603.12592</a>).

@@ -12,8 +12,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.plan.Emission;
 
 /**
- * This class handles reading the CO₂ emissions data from the files in the GTFS package
- * and saving it in a map.
+ * This class handles reading the CO₂ emissions data from the files in the GTFS package and saving
+ * it in a map.
  */
 public class RouteDataReader {
 
@@ -28,9 +28,10 @@ public class RouteDataReader {
   /**
    * Read emission data for routes. The given resolvedFeedId is used to create route ids which map
    * to the internal OTP Routes entities.
+   *
    * @return a map of emissions for each route id in the data set
    * @throws HeadersDoNotMatch - if the headers does not match, this can be used to try another
-   *                             reader, mainly to support multiple versions of the data.
+   *                           reader, mainly to support multiple versions of the data.
    */
   public Map<FeedScopedId, Emission> read(
     String resolvedFeedId,

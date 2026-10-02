@@ -20,9 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 /**
- * Indexed access to Stop entities.
- * For performance reasons these indexes are not part of the serialized state of the graph.
- * They are rebuilt at runtime after graph deserialization.
+ * Indexed access to Stop entities. For performance reasons these indexes are not part of the
+ * serialized state of the graph. They are rebuilt at runtime after graph deserialization.
  */
 class SiteRepositoryIndex {
 
@@ -103,8 +102,8 @@ class SiteRepositoryIndex {
   }
 
   /**
-   * A small number of holes in the stop-index is ok, but if there are many, it will affect
-   * the Raptor performance.
+   * A small number of holes in the stop-index is ok, but if there are many, it will affect the
+   * Raptor performance.
    */
   private void logHolesInIndex() {
     int c = (int) Arrays.stream(stopsByIndex).filter(Objects::isNull).count();

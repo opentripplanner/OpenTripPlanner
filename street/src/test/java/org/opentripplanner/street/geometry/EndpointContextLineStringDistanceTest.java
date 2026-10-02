@@ -10,8 +10,8 @@ import org.locationtech.jts.geom.Point;
 
 /**
  * Verifies that {@link EndpointContextLineString#squaredEquirectangularDistanceToPoint} (the
- * allocation-free walk used by the vertex linker) returns the same projected distance as the old JTS
- * path it replaced: {@code equirectangularProject(uncompact(...)).distance(point)}. The method
+ * allocation-free walk used by the vertex linker) returns the same projected distance as the old
+ * JTS path it replaced: {@code equirectangularProject(uncompact(...)).distance(point)}. The method
  * returns the squared distance, so the test compares its {@code sqrt} to the JTS distance.
  */
 class EndpointContextLineStringDistanceTest {

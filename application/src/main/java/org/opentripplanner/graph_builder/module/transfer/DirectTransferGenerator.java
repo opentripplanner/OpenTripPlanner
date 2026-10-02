@@ -38,12 +38,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilderModule} module that links up the
- * stops of a transit network among themselves. This is necessary for routing in long-distance
- * mode.
+ * {@link GraphBuilderModule} module that links up the stops of a transit network among themselves.
+ * This is necessary for routing in long-distance mode.
  * <p>
- * It will use the street network if OSM data has already been loaded into the graph. Otherwise it
- * will use straight-line distance between stops.
+ * It will use the street network if OSM data has already been loaded into the graph. Otherwise
+ * it will use straight-line distance between stops.
  */
 public class DirectTransferGenerator implements GraphBuilderModule {
 
@@ -291,7 +290,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method parses the given transfer parameters into a transfer configuration and checks for invalid input.
+   * This method parses the given transfer parameters into a transfer configuration and checks for
+   * invalid input.
    */
   private TransferConfiguration parseTransferParameters() {
     List<RouteRequest> defaultTransferRequests = new ArrayList<>();
@@ -454,7 +454,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method calculates transfers between stops that are visited by trips that allow cars, if configured.
+   * This method calculates transfers between stops that are visited by trips that allow cars, if
+   * configured.
    */
   private void calculateCarsAllowedTransfers(
     NearbyStopFinder nearbyStopFinder,
@@ -480,7 +481,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * This method calculates transfers between stops that are visited by trips that allow bikes, if configured.
+   * This method calculates transfers between stops that are visited by trips that allow bikes, if
+   * configured.
    */
   private void calculateBikesAllowedTransfers(
     NearbyStopFinder nearbyStopFinder,

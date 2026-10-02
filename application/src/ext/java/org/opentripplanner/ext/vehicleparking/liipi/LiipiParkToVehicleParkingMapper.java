@@ -250,9 +250,8 @@ public class LiipiParkToVehicleParkingMapper {
   }
 
   /**
-   * Parses a string with format "05" or "05:30" to a {@link LocalTime}.
-   * If a park is open until 24h, the end time will be 24 but it should be
-   * adjusted to be 23:59 for opening hours.
+   * Parses a string with format "05" or "05:30" to a {@link LocalTime}. If a park is open until
+   * 24h, the end time will be 24 but it should be adjusted to be 23:59 for opening hours.
    */
   private LocalTime convertTimeStringLocalTime(String timeString) {
     int hours = Integer.parseInt(timeString.substring(0, 2));

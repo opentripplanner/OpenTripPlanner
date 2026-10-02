@@ -55,9 +55,9 @@ import org.opentripplanner.utils.time.TimeUtils;
  * keep maintenance easy, create the minimum amount of data to focus your test - this also help
  * demonstrate which data is needed by the "code-under-test".
  * <p>
- * <b>Service Time in seconds</b>
- * Time in seconds past "midnight"(noon - 12h). The time is measured from "noon minus 12h" of the
- * service day (effectively midnight except for days on which daylight savings time changes occur).
+ * <b>Service Time in seconds</b> Time in seconds past "midnight"(noon - 12h). The time is
+ * measured from "noon minus 12h" of the service day (effectively midnight except for days on which
+ * daylight savings time changes occur).
  */
 public class TestItineraryBuilder implements PlanTestConstants {
 
@@ -450,8 +450,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
-   * Override any value set for c1. The given value will be assigned to the itinerary
-   * independent of any values set on the legs.
+   * Override any value set for c1. The given value will be assigned to the itinerary independent of
+   * any values set on the legs.
    */
   public Itinerary build(int c1) {
     return itineraryBuilder().withGeneralizedCost(Cost.costOfSeconds(c1)).build();

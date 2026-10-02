@@ -28,8 +28,8 @@ public interface StopArrivals {
   boolean reachedByTransit(int stopIndex);
 
   /**
-   * The earliest transit arrival time at the given stop. If the stop is not reached by transit,
-   * the behavior is undefined; It may return an arbitrary value or throw an exception.
+   * The earliest transit arrival time at the given stop. If the stop is not reached by transit, the
+   * behavior is undefined; It may return an arbitrary value or throw an exception.
    */
   int bestTransitArrivalTime(int stopIndex);
 }

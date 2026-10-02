@@ -70,8 +70,8 @@ public class JsonSupport {
   }
 
   /**
-   * Returns a pretty-printed version of the json node. In particular, array elements
-   * are put on a new line.
+   * Returns a pretty-printed version of the json node. In particular, array elements are put on a
+   * new line.
    */
   public static String prettyPrint(JsonNode body) {
     try {
@@ -82,8 +82,8 @@ public class JsonSupport {
   }
 
   /**
-   * Returns a pretty-printed version of the input string, which must be valid JSON.
-   * In particular, array elements are put on a new line.
+   * Returns a pretty-printed version of the input string, which must be valid JSON. In particular,
+   * array elements are put on a new line.
    */
   public static String prettyPrint(String input) {
     try {

@@ -207,8 +207,8 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   Yc --(car)-- Y --(walk 100 m, safety x1)-- S --(walk 50 m, safety x10)-- X --(car)-- Xc
    * </pre>
-   * The S–Y walk weighs ~100 while the shorter S–X walk weighs ~500, so Y wins on generalized weight
-   * despite being farther.
+   * The S–Y walk weighs ~100 while the shorter S–X walk weighs ~500, so Y wins on
+   * generalized weight despite being farther.
    */
   @Test
   void snapsToMinimumWeightVertex_notNearestByDistance() {
@@ -349,8 +349,8 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   Q2 --(car)-- Q1 --(car)-- Q --(ped)-- O --(ped)-- Isl --(car)-- IslC
    * </pre>
-   * {@code Isl↔IslC} spans ~33 m (below the 100 m escape) while {@code Q–Q1–Q2} spans ~111 m, so O
-   * snaps west to Q rather than to the island.
+   * {@code Isl↔IslC} spans ~33 m (below the 100 m escape) while {@code Q–Q1–Q2} spans ~111
+   * m, so O snaps west to Q rather than to the island.
    */
   @Test
   void islandCarVertex_isRejected_snapsToReachableVertex() {
@@ -410,9 +410,9 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    *              (ped)
    *                 O
    * </pre>
-   * The origin O is pedestrian-linked to T. A car reaches T from U2 over ~111 m (arrival passes),
-   * but leaving T dead-ends at Td after only ~67 m — below the 100 m escape — so T is rejected and
-   * the snap returns {@code null}.
+   * The origin O is pedestrian-linked to T. A car reaches T from U2 over ~111 m (arrival
+   * passes), but leaving T dead-ends at Td after only ~67 m — below the 100 m escape — so T is
+   * rejected and the snap returns {@code null}.
    */
   @Test
   void deadEndTooShortToEscape_isRejected() {
@@ -481,9 +481,9 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
    * <pre>
    *   M3 --(car)-- M2 --(car)-- M1 ==temp== hub ==temp== Isl --(car)-- IslC
    * </pre>
-   * {@code M1–M2–M3} spans ~111 m, so M1 is genuinely car-reachable; {@code Isl↔IslC} spans only
-   * ~33 m, so the island's sole escape is the temporary bridge — which the probe ignores, keeping
-   * Isl rejected.
+   * {@code M1–M2–M3} spans ~111 m, so M1 is genuinely car-reachable; {@code Isl↔IslC} spans
+   * only ~33 m, so the island's sole escape is the temporary bridge — which the probe ignores,
+   * keeping Isl rejected.
    */
   @Test
   void permanentVertexVerdict_ignoresTemporaryEdges() {
@@ -523,18 +523,18 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
   }
 
   /**
-   * A temporary vertex on a stranded island must not be judged reachable through a foreign request's
-   * mode-blind {@link org.opentripplanner.street.model.edge.TemporaryFreeEdge} bridge: the probe
-   * confines traversal to its own linking, so the snap walks out to the real mainland instead. Graph
-   * (west to east):
+   * A temporary vertex on a stranded island must not be judged reachable through a foreign
+   * request's mode-blind {@link org.opentripplanner.street.model.edge.TemporaryFreeEdge} bridge:
+   * the probe confines traversal to its own linking, so the snap walks out to the real mainland
+   * instead. Graph (west to east):
    * <pre>
    *   Q2 --(all)-- Q1 --(all)-- Q --(ped, ~56 m)-- Isl --(all, ~33 m)-- IslC
    *   Q2 =free= hub =free= IslC
    * </pre>
-   * The second line is a foreign, mode-blind bridge standing in for another request's linking. The
-   * island {@code Isl↔IslC} is too small to escape by car (~33 m); {@code Q–Q1–Q2} is a genuine car
-   * mainland reached from Isl on foot via Q. Honouring the bridge would wrongly accept the island,
-   * so the passenger (linked onto the island edge) must snap to {@code Q}.
+   * The second line is a foreign, mode-blind bridge standing in for another request's
+   * linking. The island {@code Isl↔IslC} is too small to escape by car (~33 m); {@code Q–Q1–Q2} is
+   * a genuine car mainland reached from Isl on foot via Q. Honouring the bridge would wrongly
+   * accept the island, so the passenger (linked onto the island edge) must snap to {@code Q}.
    */
   @Test
   void temporaryVertexProbe_ignoresForeignLinking() {

@@ -148,9 +148,9 @@ public final class ConstrainedBoardingSearch
    * <p>
    * This method sets the following parameters if successful:
    * <ul>
-   *     <li>{@code onTripIndex}
-   *     <li>{@code onTripTxConstraint}
-   *     <li>{@code onTripEarliestBoardTime}
+   *   <li>{@code onTripIndex}
+   *   <li>{@code onTripTxConstraint}
+   *   <li>{@code onTripEarliestBoardTime}
    * </ul>
    *
    * @return {@code true} if a matching trip is found

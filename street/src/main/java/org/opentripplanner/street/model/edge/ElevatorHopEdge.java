@@ -114,11 +114,11 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
-   * The id of the elevator, as extracted from OSM tags configured via the
-   * {@code elevatorRefTags} build-config option. Will be used for #6533.
+   * The id of the elevator, as extracted from OSM tags configured via the {@code elevatorRefTags}
+   * build-config option. Will be used for #6533.
    * <p>
-   * If multiple configured tag groups resolve to a value, the first one (in configured order)
-   * is used.
+   * If multiple configured tag groups resolve to a value, the first one (in configured order) is
+   * used.
    */
   public Optional<String> id() {
     return Optional.ofNullable(id);
@@ -132,8 +132,8 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   /**
-   * Returns the travel time of the elevator.
-   * If travelTime is 0 or below, returns an empty Optional.
+   * Returns the travel time of the elevator. If travelTime is 0 or below, returns an empty
+   * Optional.
    */
   public Optional<Duration> getTravelTime() {
     return travelTime > 0 ? Optional.of(Duration.ofSeconds(travelTime)) : Optional.empty();

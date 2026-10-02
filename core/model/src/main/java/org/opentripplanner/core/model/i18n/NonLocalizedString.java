@@ -65,7 +65,7 @@ public class NonLocalizedString implements I18NString, Serializable {
   }
 
   /**
-   * Check if name is non-null and returns an instance of {@link NonLocalizedString},  otherwise
+   * Check if name is non-null and returns an instance of {@link NonLocalizedString}, otherwise
    * returns a {@link I18NString} with the default name.
    */
   public static I18NString ofNullableOrElse(@Nullable String name, I18NString defaultName) {

@@ -4,9 +4,9 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
- * TODO: decide what to do with this. Currently temporary vertices have only incoming or outgoing edges
- * But this one needs to have both since different vertex is start vertex
- * Created by mabu on 20.5.2016.
+ * TODO: decide what to do with this. Currently temporary vertices have only incoming or outgoing
+ * edges But this one needs to have both since different vertex is start vertex Created by mabu on
+ * 20.5.2016.
  */
 public class TemporarySplitterVertex extends SplitterVertex implements TemporaryVertex {
 

@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
  * <em>parent</em> and <em>child</em> relationship with fallback from the child value to the parent
  * value [if the child does not have a value].
  * <p>
- * There is no reference from the parent to the child, enabling garbage collection of children, when
- * not referenced by the outer context any more.
+ * There is no reference from the parent to the child, enabling garbage collection of children,
+ * when not referenced by the outer context any more.
  *
  * @param <E> the element value type.
  */

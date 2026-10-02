@@ -487,8 +487,8 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   }
 
   /**
-   * When SIRI does not explicitly set boarding/alighting activity, the default rules should
-   * apply: no alighting at the first stop and no boarding at the last stop.
+   * When SIRI does not explicitly set boarding/alighting activity, the default rules should apply:
+   * no alighting at the first stop and no boarding at the last stop.
    */
   @Test
   void testExtraJourneyDefaultBoardingAlighting() {
@@ -610,8 +610,8 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   }
 
   /**
-   * First add a trip via extra journey, then send a regular update referencing the added trip.
-   * The added trip should be updated with the new times.
+   * First add a trip via extra journey, then send a regular update referencing the added trip. The
+   * added trip should be updated with the new times.
    */
   @Test
   void testUpdateTimesOnAddedJourney() {

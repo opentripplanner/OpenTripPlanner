@@ -42,8 +42,8 @@ class FlexTemplateFactoryTest {
   private static final TransitRepositoryForTest MODEL = TransitRepositoryForTest.of();
 
   /**
-   * Any calculator will do. The only thing we will test here is that a new scheduled calculator
-   * is created for scheduled-flex-trips.
+   * Any calculator will do. The only thing we will test here is that a new scheduled calculator is
+   * created for scheduled-flex-trips.
    */
   private static final FlexPathCalculator CALCULATOR = new StreetFlexPathCalculator(
     false,

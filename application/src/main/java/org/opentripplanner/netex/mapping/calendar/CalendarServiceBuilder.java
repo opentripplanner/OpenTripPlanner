@@ -52,7 +52,7 @@ public class CalendarServiceBuilder {
 
   /**
    * Generate service calendar.
-   * <p/>
+   * <p>
    * THIS METHOD IS NOT THREAD-SAFE, AND SHOULD ONLY BE CALLED ONCE FOR EACH BUNDLE.
    */
   public Collection<ServiceCalendarDate> createServiceCalendar() {

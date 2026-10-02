@@ -83,16 +83,16 @@ public final class CarRequest {
   }
 
   /**
-   * The acceleration speed of an automobile, in meters per second per second.
-   * Default is 2.9 m/s^2 (0 mph to 65 mph in 10 seconds)
+   * The acceleration speed of an automobile, in meters per second per second. Default is 2.9 m/s^2
+   * (0 mph to 65 mph in 10 seconds)
    */
   public double accelerationSpeed() {
     return accelerationSpeed;
   }
 
   /**
-   * The deceleration speed of an automobile, in meters per second per second.
-   * The default is 2.9 m/s/s: 65 mph - 0 mph in 10 seconds
+   * The deceleration speed of an automobile, in meters per second per second. The default is 2.9
+   * m/s/s: 65 mph - 0 mph in 10 seconds
    */
   public double decelerationSpeed() {
     return decelerationSpeed;

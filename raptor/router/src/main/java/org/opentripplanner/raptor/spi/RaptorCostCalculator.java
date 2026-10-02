@@ -1,12 +1,11 @@
 package org.opentripplanner.raptor.spi;
 
-///
 /// The responsibility is to calculate multi-criteria value (like the generalized cost).
 ///
 /// The implementation should be immutable and thread safe.
 ///
-/// See {@link RaptorCostConverter} for resolution and units for time/duration and
-/// c1(generalized-cost).
+/// See {@link RaptorCostConverter} for resolution and units for time/duration
+/// and c1(generalized-cost).
 ///
 public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
   /**
@@ -47,8 +46,8 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
   );
 
   /**
-   * Calculate the cost of waiting, when waiting between two transit legs. The wait duration is
-   * in seconds, and include board and alight slack.
+   * Calculate the cost of waiting, when waiting between two transit legs. The wait duration is in
+   * seconds, and include board and alight slack.
    */
   int waitCost(int waitDuration);
 
@@ -56,8 +55,8 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
    * Used for estimating the remaining value for a criteria at a given stop arrival. The calculated
    * value should be an optimistic estimate for the heuristics to work properly. So, to calculate
    * the generalized cost for given the {@code minTravelDuration} and {@code minNumTransfers}
-   * returning the greatest value, which is guaranteed to be less than the <em>real value</em>
-   * would be correct and a good choice.
+   * returning the greatest value, which is guaranteed to be less than the <em>real value</em> would
+   * be correct and a good choice.
    */
   int calculateRemainingMinCost(int minTravelDuration, int minNumTransfers, int fromStopIndex);
 

@@ -533,8 +533,8 @@ class ServiceLinkMapperTest {
   }
 
   /**
-   * Some NeTEx producers put the {@link LineStringType} directly on the {@link ServiceLink}
-   * instead of wrapping it in a {@code Projections_RelStructure}.
+   * Some NeTEx producers put the {@link LineStringType} directly on the {@link ServiceLink} instead
+   * of wrapping it in a {@code Projections_RelStructure}.
    */
   private ServiceLink createServiceLinkWithDirectLineString(
     String id,

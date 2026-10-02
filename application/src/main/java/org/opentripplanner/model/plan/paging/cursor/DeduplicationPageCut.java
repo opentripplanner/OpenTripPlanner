@@ -5,8 +5,8 @@ import org.opentripplanner.core.model.basic.NormalizedCost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 
 /**
- * This class contains all the information needed to dedupe itineraries when
- * paging - the exact same information as the {@link ItinerarySortKey}.
+ * This class contains all the information needed to dedupe itineraries when paging - the exact same
+ * information as the {@link ItinerarySortKey}.
  * <p>
  * It implements the ItinerarySortKey interface so that it can be sorted with itineraries which
  * potentially contain duplicates.

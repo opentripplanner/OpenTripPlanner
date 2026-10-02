@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 /**
  * This class can be used to log N logging events with level:
  * <ul>
- *     <li>INFO</li>
- *     <li>WARNING</li>
- *     <li>ERROR</li>
+ *   <li>INFO</li>
+ *   <li>WARNING</li>
+ *   <li>ERROR</li>
  * </ul>
  * DEBUG and TRACE events are not muted.
  * <p>
@@ -16,6 +16,7 @@ import org.slf4j.Logger;
  * <p>
  * THREAD SAFETY - The implementation is not thread safe.
  * <p>
+ *
  * @deprecated TODO: Rewrite the same way as the {@link Throttle} is done. See
  *             {@link AbstractFilterLogger} for deprecation details.
  */
@@ -30,8 +31,8 @@ public class MaxCountLogger extends AbstractFilterLogger {
   }
 
   /**
-   * Wrap given logger, and throttle INFO, WARN and ERROR messages. Maximum 10 messages is
-   * written to the log.
+   * Wrap given logger, and throttle INFO, WARN and ERROR messages. Maximum 10 messages is written
+   * to the log.
    */
   public static MaxCountLogger of(Logger log) {
     return new MaxCountLogger(log);

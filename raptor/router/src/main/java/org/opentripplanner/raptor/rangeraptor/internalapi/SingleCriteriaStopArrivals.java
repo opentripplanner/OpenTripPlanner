@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 /**
- * This interface is used to access the state produced by a Raptor for a given single criterion
- * for the best-overall-arrivals or best-transit-arrivals. The unit can be time, duration, any
+ * This interface is used to access the state produced by a Raptor for a given single criterion for
+ * the best-overall-arrivals or best-transit-arrivals. The unit can be time, duration, any
  * generalized-cost and/or number-of-transfers.
  */
 public interface SingleCriteriaStopArrivals {

@@ -37,11 +37,11 @@ public class VertexCreationService {
   /**
    * Creates a temporary vertex from a coordinate and links it to the graph.
    *
-   * @param container The container to add the temporary edges to
+   * @param container  The container to add the temporary edges to
    * @param coordinate The coordinate where the vertex should be created
-   * @param label Optional label for the vertex
-   * @param modes The traverse modes that should be available from this vertex
-   * @param type The type of location (origin, destination, or via)
+   * @param label      Optional label for the vertex
+   * @param modes      The traverse modes that should be available from this vertex
+   * @param type       The type of location (origin, destination, or via)
    * @return The created vertex
    */
   public Vertex createVertexFromCoordinate(
@@ -82,7 +82,7 @@ public class VertexCreationService {
    * Maps a street mode to the appropriate traverse mode for vertex linking.
    *
    * @param streetMode The street mode from the request
-   * @param type The location type (origin, destination, or via)
+   * @param type       The location type (origin, destination, or via)
    * @return The traverse mode to use for linking
    */
   public TraverseMode getTraverseModeForLinker(StreetMode streetMode, LocationType type) {

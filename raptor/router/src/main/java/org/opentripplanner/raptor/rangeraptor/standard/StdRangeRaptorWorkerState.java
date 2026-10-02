@@ -24,7 +24,8 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * steps of the algorithm. This also makes it possible to have more than one state implementation,
  * which has been used in the past to test different memory optimizations.
  * <p>
- * Note that this represents the entire state of the Range Raptor search for all rounds. The {@code
+ * Note that this represents the entire state of the Range Raptor search for all rounds. The
+ * {@code
  * stopArrivalsState} implementation can be swapped to achieve different results.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -144,12 +145,12 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
   /**
    * Return the "best time" found in the previous round. This is used to calculate the board/alight
    * time in the next round.
-   * <p/>
+   * <p>
    * PLEASE OVERRIDE!
-   * <p/>
-   * The implementation here is not correct - please override if you plan to use any result paths or
-   * "rounds" as "number of transfers". The implementation is OK if the only thing you care about is
-   * the "arrival time".
+   * <p>
+   * The implementation here is not correct - please override if you plan to use any result paths
+   * or "rounds" as "number of transfers". The implementation is OK if the only thing you care about
+   * is the "arrival time".
    */
   @Override
   public int bestTimePreviousRound(int stop) {
@@ -193,9 +194,9 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule> imple
   }
 
   /**
-   * @return {@code true} if the transfer loop should terminate early. The transfers are sorted
-   *     by duration, so if a transfer exceeds the time limit or the early pruning bound, so will
-   *     all later transfers also exceed the time limit or the early pruning bound.
+   * @return {@code true} if the transfer loop should terminate early. The transfers are sorted by
+   *         duration, so if a transfer exceeds the time limit or the early pruning bound, so will
+   *         all later transfers also exceed the time limit or the early pruning bound.
    */
   private boolean transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
     final int arrivalTime = calculator.plusDuration(

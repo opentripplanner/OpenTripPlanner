@@ -7,8 +7,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripS
 
 /**
  *
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 public class TestTripSearchTimetable implements TripSearchTimetable<TestTripSchedule> {

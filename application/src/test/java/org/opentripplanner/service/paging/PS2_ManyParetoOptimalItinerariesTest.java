@@ -15,8 +15,8 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
 /**
  * This test focus on testing the paging with many itineraries which all is pareto-optimal.
  * <p>
- * Each test do a next/prev search followed by another search (both prev/next) and verify
- * all properties in the page-token. There are 4 test:
+ * Each test do a next/prev search followed by another search (both prev/next) and verify all
+ * properties in the page-token. There are 4 test:
  * <pre>
  * - DEPART AFTER search -> verify NEXT -> search next -> verify NEXT & PREVIOUS
  * - DEPART AFTER search -> verify PREVIOUS -> search next -> verify NEXT & PREVIOUS
@@ -26,8 +26,8 @@ import org.opentripplanner.model.plan.paging.cursor.PageType;
  * Note! We are not doing the actual search, just emulating the search using the
  * {@link TestDriver} mock.
  * <p>
- * All components required to test paging is used including the {@link PagingService} and the
- * 3 filters:
+ * All components required to test paging is used including the {@link PagingService} and the 3
+ * filters:
  * <ol>
  *   <li>PagingFilter</li>
  *   <li>OutsideSearchWindowFilter</li>

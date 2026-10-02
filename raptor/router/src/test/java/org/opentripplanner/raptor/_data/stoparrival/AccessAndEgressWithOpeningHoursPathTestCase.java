@@ -31,18 +31,18 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * Case A with flex access and egress and one transit:
  * <ol>
- *     <li>Flex access</li>
- *     <li>Transit, BUS A</li>
- *     <li>Flex egress</li>
+ *   <li>Flex access</li>
+ *   <li>Transit, BUS A</li>
+ *   <li>Flex egress</li>
  * </ol>
  * <p>
  * Case B with walking between transit and flex:
  * <ol>
- *     <li>Flex access</li>
- *     <li>Walk transfer</li>
- *     <li>Transit. BUS B</li>
- *     <li>Walk transfer</li>
- *     <li>Flex egress</li>
+ *   <li>Flex access</li>
+ *   <li>Walk transfer</li>
+ *   <li>Transit. BUS B</li>
+ *   <li>Walk transfer</li>
+ *   <li>Flex egress</li>
  * </ol>
  */
 public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestConstants {

@@ -18,11 +18,12 @@ import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
- * OSM way properties for Finnish roads. {@link FinlandMapper} is derived from
- * {@link NorwayMapper} by seime
+ * OSM way properties for Finnish roads. {@link FinlandMapper} is derived from {@link NorwayMapper}
+ * by seime
  * <p>
- * The main difference compared to the default property set is that most of the highway=trunk roads
- * also allows walking and biking, where as some does not. http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
+ * The main difference compared to the default property set is that most of the highway=trunk
+ * roads also allows walking and biking, where as some does not.
+ * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
  * http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
  *
  * @author juusokor

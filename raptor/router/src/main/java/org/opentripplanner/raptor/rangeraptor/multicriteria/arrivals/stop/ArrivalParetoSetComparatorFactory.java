@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * search.
  *
  * The creation of the two {@link ParetoComparator}s should be done in such way that the JIT
- * compiler can inline all lamdas for the best possible performance. Changes to this class
- * should be checked with the SpeedTest to avoid degration in performance.
+ * compiler can inline all lamdas for the best possible performance. Changes to this class should be
+ * checked with the SpeedTest to avoid degration in performance.
  */
 public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
 
@@ -46,12 +46,12 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   }
 
   /**
-   * This comparator is used to compareFunction regular stop arrivals.
-   *  It uses {@code arrivalTime}, {@code paretoRound} and {@code c1} to compareFunction arrivals. It
-   *  does NOT include {@code arrivedOnBoard}. Normally arriving on-board should give the
-   *  arrival an advantage - you can continue on foot, walking to the next stop. But, we only
-   *  do this if it happens in the same Raptor iteration and round - if it does, it is taken
-   *  care of by the order which the algorithm works - not by this comparator.
+   * This comparator is used to compareFunction regular stop arrivals. It uses {@code arrivalTime},
+   * {@code paretoRound} and {@code c1} to compareFunction arrivals. It does NOT include
+   * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage - you
+   * can continue on foot, walking to the next stop. But, we only do this if it happens in the same
+   * Raptor iteration and round - if it does, it is taken care of by the order which the algorithm
+   * works - not by this comparator.
    */
   public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
     return compareRegularStopArrivals;
@@ -127,8 +127,8 @@ public final class ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>>
   }
 
   /**
-   * Compare arrivedOnBoard. On-board arrival dominate arrive by transfer(foot) since
-   * you can continue on foot; hence has more options.
+   * Compare arrivedOnBoard. On-board arrival dominate arrive by transfer(foot) since you can
+   * continue on foot; hence has more options.
    */
   private static <T extends McStopArrival<?>> boolean compareArrivedOnBoard(T l, T r) {
     return l.arrivedOnBoard() && !r.arrivedOnBoard();

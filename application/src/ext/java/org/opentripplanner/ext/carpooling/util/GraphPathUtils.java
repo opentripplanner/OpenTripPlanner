@@ -20,18 +20,18 @@ public final class GraphPathUtils {
 
   /**
    * Returns the A* weight of the given path, or {@code 0} if the path is {@code null}. The weight
-   * already accounts for the user's walk preferences (reluctance, safety factor, slope cost,
-   * etc.) since it comes from the search that produced the path.
+   * already accounts for the user's walk preferences (reluctance, safety factor, slope cost, etc.)
+   * since it comes from the search that produced the path.
    */
   public static double weightOrZero(@Nullable GraphPath<State, Edge, Vertex> path) {
     return path == null ? 0 : path.getWeight();
   }
 
   /**
-   * Calculates cumulative durations from pre-routed segments, including stop duration
-   * at each intermediate stop.
+   * Calculates cumulative durations from pre-routed segments, including stop duration at each
+   * intermediate stop.
    *
-   * @param segments Pre-routed segments
+   * @param segments     Pre-routed segments
    * @param stopDuration Duration added at each intermediate stop
    */
   public static Duration[] calculateCumulativeDurations(
@@ -46,11 +46,10 @@ public final class GraphPathUtils {
   }
 
   /**
-   * Calculates cumulative arrival times from segment durations, including a stop delay
-   * at each intermediate point. The stop delay is added <em>before</em> each segment
-   * except the first, modelling time spent at an intermediate stop before departing
-   * to the next point. No delay is added at the origin (before segment 0) or after the
-   * final segment.
+   * Calculates cumulative arrival times from segment durations, including a stop delay at each
+   * intermediate point. The stop delay is added <em>before</em> each segment except the first,
+   * modelling time spent at an intermediate stop before departing to the next point. No delay is
+   * added at the origin (before segment 0) or after the final segment.
    * <p>
    * Given N segments, the result has N+1 entries:
    * <pre>
@@ -63,7 +62,7 @@ public final class GraphPathUtils {
    * {@code [0, 10, 21, 32, 43, 54, 65]}
    *
    * @param segmentDurations Duration of each segment
-   * @param stopDuration Duration added before each segment except the first
+   * @param stopDuration     Duration added before each segment except the first
    * @return Array of cumulative durations with length segmentDurations.length + 1
    */
   public static Duration[] calculateCumulativeDurations(

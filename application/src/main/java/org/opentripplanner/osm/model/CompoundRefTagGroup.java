@@ -8,14 +8,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Represents a group of OpenStreetMap tags that together form a compound reference identifier for an entity.
+ * Represents a group of OpenStreetMap tags that together form a compound reference identifier for
+ * an entity.
  * <p>
  * Tags provided at construction time are sanitized by stripping surrounding whitespace and
- * filtering out null or blank values. The group can then produce a single compound value by
- * mapping each tag to its corresponding value and joining the results with a colon delimiter.
+ * filtering out null or blank values. The group can then produce a single compound value by mapping
+ * each tag to its corresponding value and joining the results with a colon delimiter.
  * <p>
- * A compound value is only produced when all tags in the group resolve to a non-null value.
- * If any tag cannot be resolved, the compound value is considered incomplete and absent.
+ * A compound value is only produced when all tags in the group resolve to a non-null value. If
+ * any tag cannot be resolved, the compound value is considered incomplete and absent.
  * <p>
  * Instances are created via the factory method {@link #of(String...)}.
  */
@@ -38,12 +39,12 @@ public class CompoundRefTagGroup {
   }
 
   /**
-   * Produces a compound value by mapping each tag in this group to its corresponding value
-   * using the provided mapper function, then joining the results with a colon delimiter.
+   * Produces a compound value by mapping each tag in this group to its corresponding value using
+   * the provided mapper function, then joining the results with a colon delimiter.
    *
-   * The compound value is only produced when all tags in the group resolve to a non-null value
-   * via the mapper. If any tag maps to null, the result is considered incomplete and an empty
-   * Optional is returned. Each resolved value is stripped of surrounding whitespace before joining.
+   * The compound value is only produced when all tags in the group resolve to a non-null value via
+   * the mapper. If any tag maps to null, the result is considered incomplete and an empty Optional
+   * is returned. Each resolved value is stripped of surrounding whitespace before joining.
    *
    * @param tagToValueMapper a function that maps an OpenStreetMap tag name to its corresponding
    *                         value, or null if the tag cannot be resolved

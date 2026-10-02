@@ -32,6 +32,7 @@ public class GeoJsonWriter {
 
   /**
    * Write the issues to a GeoJSON file
+   *
    * @return true if a GeoJSON was written, false if not
    */
   boolean writeFile() {
@@ -59,8 +60,8 @@ public class GeoJsonWriter {
   }
 
   /**
-   * Create a geotools feature collection from a list of data import issues.
-   * Once in a FeatureCollection, they can for example be exported as GeoJSON.
+   * Create a geotools feature collection from a list of data import issues. Once in a
+   * FeatureCollection, they can for example be exported as GeoJSON.
    */
   private static SimpleFeatureCollection makeContourFeatures(Collection<DataImportIssue> issues) {
     SimpleFeatureType schema = makeDataIssueSchema();

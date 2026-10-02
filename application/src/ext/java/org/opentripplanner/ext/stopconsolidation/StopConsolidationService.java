@@ -15,8 +15,8 @@ public interface StopConsolidationService {
   List<StopReplacement> replacements();
 
   /**
-   * Returns the list of secondary stops that need to be replaced in TripPatterns with their
-   * primary equivalent.
+   * Returns the list of secondary stops that need to be replaced in TripPatterns with their primary
+   * equivalent.
    */
   List<FeedScopedId> secondaryStops();
 
@@ -36,7 +36,8 @@ public interface StopConsolidationService {
   boolean isActive();
 
   /**
-   * For a given primary stop look up secondary feed as it was originally defined in the agency's feed.
+   * For a given primary stop look up secondary feed as it was originally defined in the agency's
+   * feed.
    */
   StopLocation agencySpecificStop(StopLocation stop, Agency agency);
 

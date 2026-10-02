@@ -17,8 +17,8 @@ import org.opentripplanner.utils.collection.MinMap;
  * Filters nearby stops based on trip pattern availability.
  * <p>
  * This filter ensures that transfers are only generated between stops that are served by trip
- * patterns. For each trip pattern passing nearby, it keeps only the closest stop where boarding
- * or alighting is possible (depending on direction).
+ * patterns. For each trip pattern passing nearby, it keeps only the closest stop where boarding or
+ * alighting is possible (depending on direction).
  * <p>
  * Stops without patterns may still be included if they are marked as sometimes-used by real-time
  * updates (when the IncludeStopsUsedRealTimeInTransfers feature is enabled).
@@ -70,8 +70,8 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
   }
 
   /**
-   * Find all candidate patterns for the given destination {@code stop}. Only return patterns
-   * where we can board(forward direction) or alight(reverse direction) at the given stop.
+   * Find all candidate patterns for the given destination {@code stop}. Only return patterns where
+   * we can board(forward direction) or alight(reverse direction) at the given stop.
    */
   private List<FeedScopedId> findPatternsForStop(RegularStop stop, boolean reverseDirection) {
     return transitService

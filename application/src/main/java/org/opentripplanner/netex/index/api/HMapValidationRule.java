@@ -7,16 +7,10 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
  * rule is applied to all local elements. Depending on the validation status on of 3 actions is
  * performed for each element in the map:
  * <ol>
- *   <li>
- *     OK - nothing is done
- *   </li>
- *   <li>
- *     WARN - A warning message is passed on to the log message consumer.
- *   </li>
- *   <li>
- *     DISCARD - The key/value pair is removed from the local map, and a waring is passed on to
- *     the log message consumer.
- *   </li>
+ *   <li>OK - nothing is done</li>
+ *   <li>WARN - A warning message is passed on to the log message consumer.</li>
+ *   <li>DISCARD - The key/value pair is removed from the local map, and a waring is passed on to the
+ *       log message consumer.</li>
  * </ol>
  */
 public interface HMapValidationRule<K, V> {

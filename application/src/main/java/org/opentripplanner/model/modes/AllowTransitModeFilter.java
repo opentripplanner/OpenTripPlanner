@@ -21,8 +21,8 @@ public interface AllowTransitModeFilter extends Serializable {
   }
 
   /**
-   * Check if this filter allows the provided TransitMode
-   * This version of match() was only left here to avoid changing lots of tests.
+   * Check if this filter allows the provided TransitMode This version of match() was only left here
+   * to avoid changing lots of tests.
    */
   default boolean match(TransitMode transitMode, SubMode netexSubMode) {
     return match(transitMode, netexSubMode, null);
@@ -34,8 +34,8 @@ public interface AllowTransitModeFilter extends Serializable {
   boolean match(TransitMode transitMode, SubMode netexSubMode, @Nullable Integer gtfsExtendedType);
 
   /**
-   * Returns {@code true} if this filter is selective about which modes it allows, i.e. it does
-   * not accept all modes. This is used to determine whether trip-level filtering is needed for
+   * Returns {@code true} if this filter is selective about which modes it allows, i.e. it does not
+   * accept all modes. This is used to determine whether trip-level filtering is needed for
    * {@link org.opentripplanner.transit.model.network.TripPattern}s that contain trips with
    * different modes or submodes. For such multi-mode patterns, pattern-level filtering alone is
    * insufficient and each trip must be checked individually against the mode filter.

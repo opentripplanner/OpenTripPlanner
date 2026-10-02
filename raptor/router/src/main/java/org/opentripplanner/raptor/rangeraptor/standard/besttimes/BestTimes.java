@@ -16,10 +16,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * times. In addition, it keeps track of times updated in the current round and previous round. It
  * is optimized for performance, all information here is also in the state, but this class keeps
  * things in the fastest possible data structure.
- * <p/>
+ * <p>
  * We keep track of the best over all times to be able to drop new arrivals exceeding the time
  * already found by another branch.
- * <p/>
+ * <p>
  * We need to keep track of the "on-board" arrivaltimes(transit and flex-on-board arrivals), not
  * only the overall bet times, to find all the best transfers. When arriving at a stop on-board, we
  * need to find all transfers to other stops, event if there is another transfer arrival with a

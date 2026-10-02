@@ -35,8 +35,8 @@ public class SiriAzureConfigDocTest {
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   /**
-   * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the latest
-   * version of the code.
+   * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the
+   * latest version of the code.
    */
   @Test
   public void updateSiriDoc() {

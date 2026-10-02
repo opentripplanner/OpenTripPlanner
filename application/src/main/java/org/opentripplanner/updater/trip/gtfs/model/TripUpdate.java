@@ -21,8 +21,8 @@ import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
- * A real-time update for trip, which may contain updated stop times and trip properties.
- * Instances of this class are validated and ready for further processing.
+ * A real-time update for trip, which may contain updated stop times and trip properties. Instances
+ * of this class are validated and ready for further processing.
  */
 public final class TripUpdate {
 

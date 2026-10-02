@@ -261,8 +261,8 @@ public class StopMapperTest {
   }
 
   /**
-   * Creates a basic Stop with standard fields needed for most tests
-   * (ID, name, latitude, longitude, and correct location type).
+   * Creates a basic Stop with standard fields needed for most tests (ID, name, latitude, longitude,
+   * and correct location type).
    */
   private static Stop createBasicStop() {
     Stop stop = new Stop();

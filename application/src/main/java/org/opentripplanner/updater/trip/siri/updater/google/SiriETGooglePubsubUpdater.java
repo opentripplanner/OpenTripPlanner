@@ -14,8 +14,9 @@ import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
 
 /**
  * Graph updater that processes a SIRI-ET feed based on a Google Pubsub subscription. This class
- * configures a {@link GooglePubsubEstimatedTimetableSource} and an {@link EstimatedTimetableHandler}
- * and delegates the update process to {@link AsyncEstimatedTimetableProcessor}
+ * configures a {@link GooglePubsubEstimatedTimetableSource} and an
+ * {@link EstimatedTimetableHandler} and delegates the update process to
+ * {@link AsyncEstimatedTimetableProcessor}
  */
 public class SiriETGooglePubsubUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 

@@ -8,7 +8,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A {@link AbstractPatternRide} with support for c1 {@code generalized-cost} and c2 (custom-use-case-cost).
+ * A {@link AbstractPatternRide} with support for c1 {@code generalized-cost} and c2
+ * (custom-use-case-cost).
  */
 public final class PatternRideC2<T extends RaptorTripSchedule> extends AbstractPatternRide<T> {
 

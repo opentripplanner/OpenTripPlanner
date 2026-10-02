@@ -18,8 +18,8 @@ public interface EdgeNamer {
   I18NString name(OsmEntity entity);
 
   /**
-   * Callback function for each way/edge combination so that more complicated names can be built
-   * in the post-processing step.
+   * Callback function for each way/edge combination so that more complicated names can be built in
+   * the post-processing step.
    */
   void recordEdges(OsmWay way, StreetEdgePair edge, OsmDatabase osmdb);
 

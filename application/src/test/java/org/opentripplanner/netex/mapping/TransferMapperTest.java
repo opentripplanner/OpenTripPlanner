@@ -301,9 +301,9 @@ class TransferMapperTest {
   }
 
   /**
-   * When two visits to the same Quay use distinct ScheduledStopPoint IDs, the interchange
-   * reference is unambiguous — the SSP appears only once in the stop list, so both indexOf and
-   * lastIndexOf return the correct position. This is the ideal data modeling for loop patterns.
+   * When two visits to the same Quay use distinct ScheduledStopPoint IDs, the interchange reference
+   * is unambiguous — the SSP appears only once in the stop list, so both indexOf and lastIndexOf
+   * return the correct position. This is the ideal data modeling for loop patterns.
    */
   @Test
   void distinctSspPerVisitDisambiguatesLoopPattern() {

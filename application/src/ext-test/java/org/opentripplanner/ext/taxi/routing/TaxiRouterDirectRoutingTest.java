@@ -137,9 +137,8 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
   }
 
   /**
-   * Routes a direct {@link StreetMode#TAXI} request through
-   * {@link TaxiRouter#routeDirect} on a minimal synthetic street graph, decorating the
-   * result with the given routes.
+   * Routes a direct {@link StreetMode#TAXI} request through {@link TaxiRouter#routeDirect} on a
+   * minimal synthetic street graph, decorating the result with the given routes.
    */
   private static List<Itinerary> routeDirect(List<TaxiRoute> routes) {
     var fromVertex = intersectionVertex("from", FROM_LAT, FROM_LON);

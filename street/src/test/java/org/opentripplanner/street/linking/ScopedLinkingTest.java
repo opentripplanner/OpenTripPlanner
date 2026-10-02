@@ -10,8 +10,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 /**
- * Tests that the right number of permanent edges are in the graph for the various linking
- * scopes.
+ * Tests that the right number of permanent edges are in the graph for the various linking scopes.
  */
 class ScopedLinkingTest {
 

@@ -26,13 +26,13 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
  * Holds the multi-criteria stop arrival state for all stops. Each stop has its own
- * {@link ParetoSet} of {@link McStopArrival}s, keeping only Pareto-optimal arrivals across
- * arrival time, round, and cost. Stops that need to distinguish on-board arrivals (e.g. for
- * via-connection pass-through) use an extended comparator.
+ * {@link ParetoSet} of {@link McStopArrival}s, keeping only Pareto-optimal arrivals across arrival
+ * time, round, and cost. Stops that need to distinguish on-board arrivals (e.g. for via-connection
+ * pass-through) use an extended comparator.
  * <p>
  * Also tracks which stops have been touched since the last call to
- * {@link #clearTouchedStopsAndSetStopMarkers()}, so the routing loop can iterate only over
- * relevant stops.
+ * {@link #clearTouchedStopsAndSetStopMarkers()}, so the routing loop can iterate only over relevant
+ * stops.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -48,12 +48,12 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   private final ParetoComparator<McStopArrival<T>> comparator;
 
   /**
-   * @param nStops             total number of stops in the transit network.
+   * @param nStops              total number of stops in the transit network.
    * @param onBoardArrivalStops stops where on-board arrivals is better than on-street arrivals;
-   *                           these stops need a pareto comparator that also considers whether the
-   *                           traveller arrived on board.
-   * @param arrivalListeners   per-stop listeners (via, egress, debug), keyed by stop index.
-   * @param comparatorFactory  factory for creating the Pareto comparators used per stop.
+   *                            these stops need a pareto comparator that also considers whether the
+   *                            traveller arrived on board.
+   * @param arrivalListeners    per-stop listeners (via, egress, debug), keyed by stop index.
+   * @param comparatorFactory   factory for creating the Pareto comparators used per stop.
    * @param debugHandlerFactory factory for debug handlers and loggers.
    */
   public McStopArrivals(
@@ -145,8 +145,8 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Add a stop arrival in the Pareto set for its stop. If the arrival is accepted,
-   * the stop is marked as touched.
+   * Add a stop arrival in the Pareto set for its stop. If the arrival is accepted, the stop is
+   * marked as touched.
    */
   public void addStopArrival(McStopArrival<T> arrival) {
     boolean added = findOrCreateSet(arrival.stop()).add(arrival);
@@ -175,11 +175,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * The semantics depend on when this is called in the round lifecycle:
    * <ul>
    *   <li>Called from the <b>boarding step</b>: returns transit and transfer arrivals from the
-   *       previous round (the marker was advanced past them at the end of that round's transit
-   *       scan, but the arrivals remain readable).</li>
+   *       previous round (the marker was advanced past them at the end of that round's transit scan, but
+   *       the arrivals remain readable).</li>
    *   <li>Called from the <b>transfer step</b>: returns only the transit alights from the current
-   *       round (the marker was just advanced past the previous round's arrivals and the new
-   *       transit alights were committed).</li>
+   *       round (the marker was just advanced past the previous round's arrivals and the new transit
+   *       alights were committed).</li>
    * </ul>
    */
   public Iterable<McStopArrival<T>> listArrivalsAfterMarker(final int stop) {
@@ -192,15 +192,15 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * For each touched stop, advance the marker to the end of its Pareto set, then clear the
    * touched-stop tracking.
    * <p>
-   * Called at two points in the round lifecycle (see
-   * {@link McRangeRaptorWorkerState} for the full lifecycle description):
+   * Called at two points in the round lifecycle (see {@link McRangeRaptorWorkerState} for the
+   * full lifecycle description):
    * <ul>
-   *   <li><b>Setup iteration</b>: advances the marker past all arrivals, including transfer
-   *       arrivals left over from the previous iteration's last round, so they are not
-   *       re-explored in the new iteration.</li>
-   *   <li><b>Transits for round complete</b>: advances the marker past the previous round's
-   *       arrivals before committing the current round's transit alights. This makes the new
-   *       transit alights visible to the transfer step while hiding the older arrivals.</li>
+   *   <li><b>Setup iteration</b>: advances the marker past all arrivals, including transfer arrivals
+   *       left over from the previous iteration's last round, so they are not re-explored in the new
+   *       iteration.</li>
+   *   <li><b>Transits for round complete</b>: advances the marker past the previous round's arrivals
+   *       before committing the current round's transit alights. This makes the new transit alights
+   *       visible to the transfer step while hiding the older arrivals.</li>
    * </ul>
    */
   public void clearTouchedStopsAndSetStopMarkers() {
@@ -221,9 +221,9 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Queue an on-board trip arrival for processing when the corresponding route is visited.
-   * The arrival is grouped by route index so that the routing loop can retrieve all on-board
-   * arrivals for a route in one call to {@link #consumeOnTripStopArrivalsForRoute}.
+   * Queue an on-board trip arrival for processing when the corresponding route is visited. The
+   * arrival is grouped by route index so that the routing loop can retrieve all on-board arrivals
+   * for a route in one call to {@link #consumeOnTripStopArrivalsForRoute}.
    * <p>
    * Also ensures the Pareto set for {@code applyToStopIndex} is initialised and marks the stop
    * as touched so the routing loop will visit it.

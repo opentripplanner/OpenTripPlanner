@@ -9,9 +9,9 @@ import org.opentripplanner.raptor._data.transit.TestTripPattern;
 
 public class RaptorTripPatternTest implements RaptorTestConstants {
 
-  /// Note! Even if the restrictions allow alighting at stop 0 and boarding at the last stop,
-  /// the general rule that you are not allowed to board at the last stop and alight at the first
-  /// should still be enforced.
+  /// Note! Even if the restrictions allow alighting at stop 0 and boarding at the last stop, the
+  /// general rule that you are not allowed to board at the last stop and alight at the first should
+  /// still be enforced.
   private TestTripPattern subject = TestTripPattern.of("L12", 1, 1, 1, 1, 8, 1, 1, 1, 1)
     .restrictions("* b - a * b - a *")
     .build();

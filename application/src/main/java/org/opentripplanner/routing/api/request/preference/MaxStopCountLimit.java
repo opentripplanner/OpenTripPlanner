@@ -128,10 +128,10 @@ public class MaxStopCountLimit {
     }
 
     /**
-     * Build a copy of the current values, excluding the defaultLimit from the map. This
-     * ensures equality and makes a defensive copy of the builder values. Hence, the builder
-     * can be used to generate new values if desired.
-     * */
+     * Build a copy of the current values, excluding the defaultLimit from the map. This ensures
+     * equality and makes a defensive copy of the builder values. Hence, the builder can be used to
+     * generate new values if desired.
+     */
     Map<StreetMode, Integer> copyCustomLimits() {
       if (limitsForModes == null) {
         // The limitForMode is protected and should never be mutated, so we can reuse it

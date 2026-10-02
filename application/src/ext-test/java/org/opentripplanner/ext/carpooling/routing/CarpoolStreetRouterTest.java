@@ -69,8 +69,8 @@ class CarpoolStreetRouterTest extends GraphRoutingTest {
   /**
    * A cancelled search has no verdict on whether the leg is routable, so it must not be reported as
    * a routing failure: the caller memoizes a null return as "unroutable" for every later request.
-   * The router carries no state between calls, so the pair routes for real once the cancellation
-   * is over.
+   * The router carries no state between calls, so the pair routes for real once the cancellation is
+   * over.
    */
   @Test
   void propagateCancellationInsteadOfReturningNull() {

@@ -12,8 +12,8 @@ class TokenFormatterConfiguration {
   private TokenFormatterConfiguration() {}
 
   /**
-   * We use the pipe '|' for field separations. The IDs included in the token frequently use
-   * ':' so the visual difference is better than the alternatives like ',' ';' and TAB.
+   * We use the pipe '|' for field separations. The IDs included in the token frequently use ':' so
+   * the visual difference is better than the alternatives like ',' ';' and TAB.
    */
   static char fieldSeparator() {
     return FIELD_SEPARATOR;

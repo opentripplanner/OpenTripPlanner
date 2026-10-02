@@ -9,8 +9,7 @@ import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 
 /**
- * Qualifies the {@link RepositoryRegistry} and
- * {@link UpdateManager} belonging to the transit write
+ * Qualifies the {@link RepositoryRegistry} and {@link UpdateManager} belonging to the transit write
  * domain: timetable data, alerts and realtime vehicles, updated by the SIRI and GTFS-RT updaters.
  * <p>
  * Each write domain has its own registry, transaction sequence and single writer thread, so

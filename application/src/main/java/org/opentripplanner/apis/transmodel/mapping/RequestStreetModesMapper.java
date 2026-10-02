@@ -19,7 +19,8 @@ class RequestStreetModesMapper {
   /**
    * Maps GraphQL Modes input type to RequestModes.
    * <p>
-   * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
+   * This only maps access, egress, direct & transfer modes. Transport modes are set using
+   * filters.
    */
   static RequestModes mapRequestStreetModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();

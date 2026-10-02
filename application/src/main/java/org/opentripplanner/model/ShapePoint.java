@@ -36,7 +36,7 @@ public final class ShapePoint implements Comparable<ShapePoint> {
 
   /**
    * @return the distance traveled along the shape path. If no distance was specified, the value is
-   * undefined. Check first with {@link #isDistTraveledSet()}
+   *         undefined. Check first with {@link #isDistTraveledSet()}
    */
   public double distTraveled() {
     return distTraveled;

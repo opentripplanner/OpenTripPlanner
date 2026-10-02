@@ -17,15 +17,17 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
  * Extends the stop-area platform scene with an underpass running beneath the platform and an
  * elevator connecting the two levels.
  *
- * <p>The platform (level 0) and the elevator node are both members of a
- * {@code public_transport=stop_area} relation. The platform is reached by a stair at its bottom-left
- * corner. The elevator is a single node in the middle of the platform. On the top level a footway
- * runs straight north from the elevator to an extra node inserted into the northern platform edge;
- * the underpass ({@code tunnel=yes}, level -1) shares the same elevator node from below. OTP
- * therefore builds elevator board/alight/hop edges linking the platform (level 0) to the underpass
- * (level -1).
+ * <p>
+ * The platform (level 0) and the elevator node are both members of a
+ * {@code public_transport=stop_area} relation. The platform is reached by a stair at its
+ * bottom-left corner. The elevator is a single node in the middle of the platform. On the top level
+ * a footway runs straight north from the elevator to an extra node inserted into the northern
+ * platform edge; the underpass ({@code tunnel=yes}, level -1) shares the same elevator node from
+ * below. OTP therefore builds elevator board/alight/hop edges linking the platform (level 0) to the
+ * underpass (level -1).
  *
- * <p>Platform entry linking is disabled, but area visibility is enabled. Because the elevator node
+ * <p>
+ * Platform entry linking is disabled, but area visibility is enabled. Because the elevator node
  * sits inside the walkable area and is shared with the footway, the visibility builder attaches it
  * to the platform corners in addition to the explicit footway. The node therefore gets two level-0
  * attachments — one from the platform area (WAY:100) and one from the footway (WAY:2) — joined by a

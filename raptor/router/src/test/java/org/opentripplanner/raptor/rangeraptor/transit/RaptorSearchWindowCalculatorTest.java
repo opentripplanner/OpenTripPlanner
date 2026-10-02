@@ -65,7 +65,7 @@ public class RaptorSearchWindowCalculatorTest {
            search-window: round_60(C + T * minTransitTime + W * minWaitTime)
                = round_60(600 + 0.6 * 500 + 0.4 * 200)
                = round_60(980) = 960
-
+    
            EDT = LAT - (search-window + minTripTime)
            EDT = 3000 - (960s + round_60(500))
            EDT = 3000 - (960s + 480s)
@@ -122,7 +122,7 @@ public class RaptorSearchWindowCalculatorTest {
            search-window: round_N(C + T * minTransitTime + W * minWaitTime)
                = round_60(600 + 0.6 * 300 + 0.4 * 100)
                = round_60(820) = 840
-
+    
            EDT = 10_200
            LAT = 10_200 + (840 + roundUp_60(300)) = 11_340
          */
@@ -147,7 +147,7 @@ public class RaptorSearchWindowCalculatorTest {
     /*
            search-window: round_N(C + T * minTransitTime + W * minWaitTime)
                = round_60(600 + 0.6 * 1_500 + 0.4 * 1_200) = 1_980
-
+    
            EDT = 12_000
            search-window = min(1_980, 1_800) = 1_800
            LAT = 12_000 + (1_500 + roundUp_60(1_800)) = 15_300

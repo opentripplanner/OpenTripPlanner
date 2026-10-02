@@ -26,10 +26,10 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Applies geofencing zone restrictions to the street graph. For restricted zones,
- * {@link GeofencingBoundaryExtension} is applied to boundary-crossing vertices for state-based
- * zone tracking. When {@code requireDropOffInsideBusinessArea} is false, boundary extensions are not created
- * for business-area-only zones, disabling boundary enforcement while keeping the zones in the
- * index for state tracking, speed limits, and debug tiles.
+ * {@link GeofencingBoundaryExtension} is applied to boundary-crossing vertices for state-based zone
+ * tracking. When {@code requireDropOffInsideBusinessArea} is false, boundary extensions are not
+ * created for business-area-only zones, disabling boundary enforcement while keeping the zones in
+ * the index for state tracking, speed limits, and debug tiles.
  */
 public class GeofencingZoneApplier {
 
@@ -65,16 +65,19 @@ public class GeofencingZoneApplier {
    * Pre-resolves the initial geofencing zones for each vehicle rental vertex by querying the
    * repository.
    *
-   * <p>Reads through {@link GeofencingZoneService} so a vertex is seeded whichever phase produced
+   * <p>
+   * Reads through {@link GeofencingZoneService} so a vertex is seeded whichever phase produced
    * its network's zones, including zones applied during graph build, which the updater does not
    * recompute.
    *
-   * <p>A rental vertex belongs to exactly one network, so only that network's index is queried.
+   * <p>
+   * A rental vertex belongs to exactly one network, so only that network's index is queried.
    * Other networks' zones are not inert: {@code DeferredForkHandler} and
    * {@code NetworkCommitmentHandler} read the zone set without filtering by the state's network.
    *
-   * <p>BAs are excluded when {@code requireDropOffInsideBusinessArea} is false. Without boundary markers
-   * a BA never leaves {@code currentZones}; left in the set, its permissive flags can win
+   * <p>
+   * BAs are excluded when {@code requireDropOffInsideBusinessArea} is false. Without boundary
+   * markers a BA never leaves {@code currentZones}; left in the set, its permissive flags can win
    * {@code resolveField} and mask lower-priority restrictive zones.
    */
   public static void preResolveVertexZones(
@@ -135,9 +138,9 @@ public class GeofencingZoneApplier {
   }
 
   /**
-   * Find candidate edges near a zone boundary. Uses per-segment spatial queries along the
-   * boundary line strings instead of a single bounding box query, which avoids returning
-   * millions of interior edges for zones with large geographic extent.
+   * Find candidate edges near a zone boundary. Uses per-segment spatial queries along the boundary
+   * line strings instead of a single bounding box query, which avoids returning millions of
+   * interior edges for zones with large geographic extent.
    */
   private Collection<Edge> getBoundaryEdgeCandidates(Geometry boundary) {
     if (boundary instanceof LineString ring) {

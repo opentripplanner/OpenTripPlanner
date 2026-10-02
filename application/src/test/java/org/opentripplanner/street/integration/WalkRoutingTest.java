@@ -40,8 +40,7 @@ class WalkRoutingTest {
   /**
    * Both https://www.openstreetmap.org/way/146988098 and
    * https://www.openstreetmap.org/way/146988099 are routable for pedestrians, the routing engine
-   * should return a path from any point of the first way to any point of the second.
-   * <br>
+   * should return a path from any point of the first way to any point of the second. <br>
    * See also <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/5706">issue
    * #5706</a>
    */

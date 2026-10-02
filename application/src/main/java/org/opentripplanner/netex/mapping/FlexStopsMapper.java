@@ -55,8 +55,8 @@ class FlexStopsMapper {
   }
 
   /**
-   * Maps NeTEx FlexibleStopPlace to FlexStopLocation. The support for GroupStop is
-   * dependent on a key/value in the NeTEx file, until proper NeTEx support is added.
+   * Maps NeTEx FlexibleStopPlace to FlexStopLocation. The support for GroupStop is dependent on a
+   * key/value in the NeTEx file, until proper NeTEx support is added.
    */
   StopLocation map(FlexibleStopPlace flexibleStopPlace) {
     List<StopLocation> stops = new ArrayList<>();
@@ -131,8 +131,8 @@ class FlexStopsMapper {
   }
 
   /**
-   * Allows pickup / drop off at all regular stops inside the area that match the transit mode of the
-   * flexible stop place.
+   * Allows pickup / drop off at all regular stops inside the area that match the transit mode of
+   * the flexible stop place.
    */
   List<RegularStop> findStopsInFlexArea(
     FlexibleArea area,

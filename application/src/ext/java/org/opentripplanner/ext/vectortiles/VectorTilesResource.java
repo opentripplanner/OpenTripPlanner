@@ -59,8 +59,8 @@ public class VectorTilesResource {
     @Context TransitAlertService transitAlertService,
     @Context Request grizzlyRequest,
     /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     * @deprecated The support for multiple routers are removed from OTP2. See
+     *             https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
@@ -198,8 +198,10 @@ public class VectorTilesResource {
     List<LayerParameters<T>> layers();
   }
 
-  /** The subset of services {@link #createLayerBuilder} needs, passed through {@link
-   * VectorTileResponseFactory#create} as its generic context parameter. */
+  /**
+   * The subset of services {@link #createLayerBuilder} needs, passed through
+   * {@link VectorTileResponseFactory#create} as its generic context parameter.
+   */
   private record LayerBuilderContext(
     TransitService transitService,
     VehicleRentalService vehicleRentalService,

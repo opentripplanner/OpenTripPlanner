@@ -19,8 +19,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
  * guidance that expresses certainty or uncertainty about the accessibility.
  * <p>
- * The intended audience for this score are frontend developers wanting to show a simple UI rather
- * than having to iterate over all the stops and trips.
+ * The intended audience for this score are frontend developers wanting to show a simple UI
+ * rather than having to iterate over all the stops and trips.
  * <p>
  * Note: the information to calculate this score are all available to the frontend, however
  * calculating them on the backend makes life a little easier and changes are automatically applied

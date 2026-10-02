@@ -65,7 +65,7 @@ public class TransitTestEnvironmentBuilder {
   }
 
   /**
-   * Add a stop at a station.  The station will be created if it does not already exist.
+   * Add a stop at a station. The station will be created if it does not already exist.
    */
   public RegularStop stopAtStation(String stopId, String stationId) {
     return site.stopAtStation(stopId, stationId);

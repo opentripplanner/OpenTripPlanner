@@ -9,9 +9,9 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 
 /**
- * This class creates a group identifier for an itinerary based on first or last trip. Two itineraries
- * are considered same if they begin ar end with same trip. Trips are considered equal if they have
- * same id and same service day. Non-transit legs are skipped during comparison.
+ * This class creates a group identifier for an itinerary based on first or last trip. Two
+ * itineraries are considered same if they begin ar end with same trip. Trips are considered equal
+ * if they have same id and same service day. Non-transit legs are skipped during comparison.
  */
 public class GroupBySameFirstOrLastTrip implements GroupId<GroupBySameFirstOrLastTrip> {
 

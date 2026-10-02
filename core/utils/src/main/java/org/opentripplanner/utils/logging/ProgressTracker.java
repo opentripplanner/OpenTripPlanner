@@ -13,13 +13,13 @@ import org.opentripplanner.utils.time.DurationUtils;
 /**
  * The progress tracker notify the caller based a time interval.
  * <p>
- * To avoid the caller from being notified to often the tracker uses a 'timer'. The 'timer' prevent
- * notification unless a minimum amount of time is passed since last time the caller was notified.
- * The quiet period is set to 5 seconds.
+ * To avoid the caller from being notified to often the tracker uses a 'timer'. The 'timer'
+ * prevent notification unless a minimum amount of time is passed since last time the caller was
+ * notified. The quiet period is set to 5 seconds.
  * <p>
- * There is also a 'minBlockSize' which prevent the tracker of calling the {@link
- * System#currentTimeMillis()} for each step, instead the timer is checked once for each block of
- * steps. This make the progress step up in regular, nice to read, chunks too.
+ * There is also a 'minBlockSize' which prevent the tracker of calling the
+ * {@link System#currentTimeMillis()} for each step, instead the timer is checked once for each
+ * block of steps. This make the progress step up in regular, nice to read, chunks too.
  * <p>
  * THIS CLASS IS THREAD SAFE The progress tracker is created to be thread-safe.
  */
@@ -46,8 +46,8 @@ public class ProgressTracker {
   private final boolean logFormatAsBytes;
 
   /**
-   * The minimum number of steps between each time check. This make sure the {@link
-   * System#currentTimeMillis()} is not called for every step.
+   * The minimum number of steps between each time check. This make sure the
+   * {@link System#currentTimeMillis()} is not called for every step.
    */
   private final int minBlockSize;
 
@@ -160,9 +160,8 @@ public class ProgressTracker {
    * This method calls {@code progressNotification} with the {@link #startMessage()} if it is the
    * first step, if not it calls the {@link #steps(int, Consumer)}.
    * <p>
-   * This method is used if you would like to avoid logging the start message - in case
-   * the progress completes before reaching the first {@link #startOrStep(Consumer)}
-   * statement.
+   * This method is used if you would like to avoid logging the start message - in case the
+   * progress completes before reaching the first {@link #startOrStep(Consumer)} statement.
    */
   public void startOrStep(Consumer<String> progressNotification) {
     long counter = stepCounter.incrementAndGet();

@@ -48,8 +48,8 @@ public interface LayerParameters<T extends Enum<T>> {
   }
 
   /**
-   * How much larger area, than the map tile should be used for fetching objects on the layer.
-   * See <a href="https://blog.cyclemap.link/2020-01-25-tilebuffer/">this</a> for more details.
+   * How much larger area, than the map tile should be used for fetching objects on the layer. See
+   * <a href="https://blog.cyclemap.link/2020-01-25-tilebuffer/">this</a> for more details.
    */
   default double expansionFactor() {
     return EXPANSION_FACTOR;

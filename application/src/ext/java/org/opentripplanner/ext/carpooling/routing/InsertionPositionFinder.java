@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Finds viable insertion positions for a passenger in a carpool trip using fast heuristics.
  * <p>
- * This class performs early-stage filtering to identify pickup/dropoff position pairs that
- * are worth evaluating with expensive A* routing. It validates positions using:
+ * This class performs early-stage filtering to identify pickup/dropoff position pairs that are
+ * worth evaluating with expensive A* routing. It validates positions using:
  * <ul>
  *   <li>Capacity constraints - ensures available seats throughout the journey</li>
  *   <li>Beeline delay heuristic - optimistic straight-line time estimates</li>
@@ -46,15 +46,15 @@ public class InsertionPositionFinder {
   }
 
   /**
-   * Finds insertion positions that pass validation and beeline checks.
-   * This is done BEFORE any expensive routing to eliminate positions early.
+   * Finds insertion positions that pass validation and beeline checks. This is done BEFORE any
+   * expensive routing to eliminate positions early.
    *
-   * @param trip The carpool trip being evaluated
-   * @param passengerPickup Passenger's pickup location
+   * @param trip             The carpool trip being evaluated
+   * @param passengerPickup  Passenger's pickup location
    * @param passengerDropoff Passenger's dropoff location
-   * @param stopDuration Dwell time added at each intermediate stop; used by the beeline delay
-   *                     heuristic so its cumulative-time estimates match the per-stop budget
-   *                     check used downstream
+   * @param stopDuration     Dwell time added at each intermediate stop; used by the beeline delay
+   *                         heuristic so its cumulative-time estimates match the per-stop budget
+   *                         check used downstream
    * @return List of viable insertion positions (may be empty)
    */
   public List<InsertionPosition> findViablePositions(
@@ -111,18 +111,17 @@ public class InsertionPositionFinder {
   }
 
   /**
-   * Checks if an insertion position passes the beeline delay heuristic.
-   * This is a fast, optimistic check using straight-line distance estimates.
-   * If this check fails, we know the actual A* routing will also fail, so we
-   * can skip the expensive routing calculation.
+   * Checks if an insertion position passes the beeline delay heuristic. This is a fast, optimistic
+   * check using straight-line distance estimates. If this check fails, we know the actual A*
+   * routing will also fail, so we can skip the expensive routing calculation.
    *
-   * @param originalCoords Original route coordinates
+   * @param originalCoords       Original route coordinates
    * @param originalBeelineTimes Beeline cumulative times for original route
-   * @param passengerPickup Passenger pickup location
-   * @param passengerDropoff Passenger dropoff location
-   * @param pickupPos 0-based index of the passenger's pickup in the modified route
-   * @param dropoffPos 0-based index of the passenger's dropoff in the modified route
-   * @param trip The carpool trip being evaluated
+   * @param passengerPickup      Passenger pickup location
+   * @param passengerDropoff     Passenger dropoff location
+   * @param pickupPos            0-based index of the passenger's pickup in the modified route
+   * @param dropoffPos           0-based index of the passenger's dropoff in the modified route
+   * @param trip                 The carpool trip being evaluated
    * @return true if insertion might satisfy delay constraints (proceed with A* routing)
    */
   private boolean passesBeelineDelayCheck(

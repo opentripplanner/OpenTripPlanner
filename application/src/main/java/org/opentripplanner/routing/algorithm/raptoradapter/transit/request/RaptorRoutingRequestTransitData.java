@@ -35,9 +35,9 @@ import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPrior
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * This is the data provider for the Range Raptor search engine. It uses data from the RaptorTransitData,
- * but filters it by dates and modes per request. Transfer durations are pre-calculated per request
- * based on walk speed.
+ * This is the data provider for the Range Raptor search engine. It uses data from the
+ * RaptorTransitData, but filters it by dates and modes per request. Transfer durations are
+ * pre-calculated per request based on walk speed.
  */
 public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvider<TripSchedule> {
 

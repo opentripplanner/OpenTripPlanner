@@ -18,8 +18,8 @@ import org.opentripplanner.transit.model.filter.selector.SelectorBasedMatcherFac
  * A factory for creating matchers for TripOnServiceDates.
  * <p>
  * This factory is used to create matchers for {@link org.opentripplanner.model.TripTimeOnDate}
- * objects based on a request. The resulting matcher can be used to filter a list of TripOnServiceDate
- * objects.
+ * objects based on a request. The resulting matcher can be used to filter a list of
+ * TripOnServiceDate objects.
  */
 public class TripTimeOnDateMatcherFactory {
 
@@ -61,8 +61,8 @@ public class TripTimeOnDateMatcherFactory {
   }
 
   /**
-   * Builds a matcher from a single {@link TripTimeOnDateSelectRequest}, combining its
-   * agencies, routes, and transport modes with AND logic.
+   * Builds a matcher from a single {@link TripTimeOnDateSelectRequest}, combining its agencies,
+   * routes, and transport modes with AND logic.
    */
   private static Matcher<TripTimeOnDate> buildSelectorMatcher(
     TripTimeOnDateSelectRequest selector

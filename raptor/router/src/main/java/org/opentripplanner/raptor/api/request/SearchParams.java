@@ -18,8 +18,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class SearchParams {
 
   /**
-   * The maximum number of via-locations is used as a check to avoid exploiting the
-   * search performance. Consider restricting this further in the upstream services.
+   * The maximum number of via-locations is used as a check to avoid exploiting the search
+   * performance. Consider restricting this further in the upstream services.
    */
   private static final int MAX_VIA_POINTS = 10;
 
@@ -70,8 +70,8 @@ public class SearchParams {
    * The earliest a journey can depart from the origin. The unit is seconds since midnight.
    * Inclusive.
    * <p>
-   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by' search
-   * this is optional, but it will improve performance if it is set.
+   * In the case of a 'depart after' search this is a required. In the case of a 'arrive by'
+   * search this is optional, but it will improve performance if it is set.
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
@@ -85,8 +85,8 @@ public class SearchParams {
    * The latest a journey may arrive at the destination. The unit is seconds since midnight.
    * Exclusive.
    * <p>
-   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after' search
-   * this is optional, but it will improve performance if it is set.
+   * In the case of a 'arrive by' search this is a required. In the case of a 'depart after'
+   * search this is optional, but it will improve performance if it is set.
    */
   public int latestArrivalTime() {
     return latestArrivalTime;
@@ -123,13 +123,14 @@ public class SearchParams {
 
   /**
    * Keep the latest departures arriving before the given latest-arrival-time(LAT). LAT is required
-   * if this parameter is set. This parameter is not allowed if the {@link #timetable} is
-   * enabled.
+   * if this parameter is set. This parameter is not allowed if the {@link #timetable} is enabled.
    * <p>
+   * <pre>
    * TODO - Reactor, we should use an Enum value instead of this and 'timetable':
    *      - timePreference : enum TimePreference{ TIMETABLE, DEPART_AFTER, ARRIVE_BY }
    *      - PS! There are some corner cases here. E.g. DEPART_AFTER must work when
    *        edt=null & lat!=null - same for ARRIVE_BY.
+   * </pre>
    */
   public boolean preferLateArrival() {
     return preferLateArrival;
@@ -138,7 +139,7 @@ public class SearchParams {
   /**
    * RangeRaptor is designed to search until the destination is reached and then {@code
    * numberOfAdditionalTransfers} more rounds.
-   * <p/>
+   * <p>
    * The default value is 5.
    */
   public int numberOfAdditionalTransfers() {
@@ -148,8 +149,9 @@ public class SearchParams {
   /**
    * This is an absolute limit to the number of transfers. The preferred way to limit the transfers
    * is to use the {@link #numberOfAdditionalTransfers()}.
-   * <p/>
-   * The default is to use the limit in the tuning parameters {@link RaptorTuningParameters#maxNumberOfTransfers()}.
+   * <p>
+   * The default is to use the limit in the tuning parameters
+   * {@link RaptorTuningParameters#maxNumberOfTransfers()}.
    */
   public int maxNumberOfTransfers() {
     return maxNumberOfTransfers;
@@ -164,10 +166,10 @@ public class SearchParams {
    * AFTER another Journey, even if the first departure have lower cost, number of transfers, and
    * shorter travel time. For two Journeys that depart at the same time only the best one will be
    * included (both if they are mutually dominating each other).
-   * <p/>
+   * <p>
    * Setting this parameter to "TRUE" will increase the number of paths returned. The performance
    * impact is small since the check only affect the pareto check at the destination.
-   * <p/>
+   * <p>
    * The default value is FALSE.
    */
   public boolean timetable() {
@@ -175,8 +177,8 @@ public class SearchParams {
   }
 
   /**
-   * If requested, constrained transfers(guaranteed, stay-seated ..) are used during routing, if
-   * not they are ignored. Some profiles do not support constrained transfers, for these profiles
+   * If requested, constrained transfers(guaranteed, stay-seated ..) are used during routing, if not
+   * they are ignored. Some profiles do not support constrained transfers, for these profiles
    * constrained transfers are NOT used - the 'constrainedTransfers' flag is ignored. Constrained
    * transfers are supported for all profiles returning paths.
    */
@@ -186,7 +188,7 @@ public class SearchParams {
 
   /**
    * List of access paths from the origin to all transit stops using the street network.
-   * <p/>
+   * <p>
    * Required, at least one access path must exist.
    */
   public Collection<RaptorAccessEgress> accessPaths() {
@@ -198,7 +200,7 @@ public class SearchParams {
    * <p>
    * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress path start, NOT the
    * destination - think of it as a reversed path.
-   * <p/>
+   * <p>
    * Required, at least one egress path must exist.
    */
   public Collection<RaptorAccessEgress> egressPaths() {
@@ -311,8 +313,8 @@ public class SearchParams {
   }
 
   /**
-   * Validates that access and egress paths via-visit locations. Note! At the moment only
-   * via-visit searches can have via-locations, not pass-through searches.
+   * Validates that access and egress paths via-visit locations. Note! At the moment only via-visit
+   * searches can have via-locations, not pass-through searches.
    */
   private void validateViaVisitAccessEgress() {
     int numberOfVias = this.viaLocations.size();

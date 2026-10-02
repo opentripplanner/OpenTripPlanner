@@ -8,9 +8,9 @@ import java.util.List;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 
 /**
- * This class contains the results for a given test case. A set of results
- * for each {@link SpeedTestProfile} is kept. A default set is also available,
- * which can be used if there is not set for a given profile.
+ * This class contains the results for a given test case. A set of results for each
+ * {@link SpeedTestProfile} is kept. A default set is also available, which can be used if there is
+ * not set for a given profile.
  */
 public class ExpectedResults {
 
@@ -32,8 +32,8 @@ public class ExpectedResults {
   }
 
   /**
-   * Retrive a set of results for the given profile. If not set exist for the
-   * profile, the default set is returned.
+   * Retrive a set of results for the given profile. If not set exist for the profile, the default
+   * set is returned.
    */
   public Collection<Result> get(SpeedTestProfile profile) {
     var c = map.get(profile);

@@ -34,12 +34,14 @@ class TripTimesForDaysIndexTest {
 
   /**
    * Return a list of test-cases with the input and the expected result, both as Strings.
+   * <pre>
    *  - input format:  1 2 | 3 4  Trips times, where each day is separated by a '|'.
    *  - expected format: (<day>:<tripIndex for day>) for each departure.
    *
    *  Note!
    *    A case like "1 | 1 | 1" is not valid, only two following days may overlap in time, and
    *    the behaviour of {@link TripTimesForDaysIndex} in such cases is undefined.
+   * </pre>
    */
   static List<Arguments> initializationTestCases() {
     return Arrays.stream(

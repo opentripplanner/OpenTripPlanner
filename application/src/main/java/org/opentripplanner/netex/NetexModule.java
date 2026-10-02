@@ -27,7 +27,8 @@ import org.opentripplanner.transit.service.TransitRepository;
 /**
  * This module is used for importing the NeTEx CEN Technical Standard for exchanging Public
  * Transport schedules and related data (<a href="http://netex-cen.eu/">http://netex-cen.eu/</a>).
- * Currently it only supports the Norwegian profile (<a href="https://enturas.atlassian.net/wiki/spaces/PUBLIC/">https://enturas.atlassian.net/wiki/spaces/PUBLIC/</a>),
+ * Currently it only supports the Norwegian profile (<a href=
+ * "https://enturas.atlassian.net/wiki/spaces/PUBLIC/">https://enturas.atlassian.net/wiki/spaces/PUBLIC/</a>),
  * but it is intended to be updated later to support other profiles.
  */
 public class NetexModule implements GraphBuilderModule {
@@ -48,8 +49,8 @@ public class NetexModule implements GraphBuilderModule {
   private final LocalDateRange transitPeriodLimit;
 
   /**
-   * This collection is a queue because the bundles contain state that remains after loading.
-   * They should be garbage collected after loading is finished.
+   * This collection is a queue because the bundles contain state that remains after loading. They
+   * should be garbage collected after loading is finished.
    */
   private final Queue<NetexBundle> netexBundles;
 

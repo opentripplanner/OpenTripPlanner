@@ -8,8 +8,8 @@ package org.opentripplanner.core.model.doc;
  */
 public interface DocumentedEnum<E extends Enum<E>> {
   /**
-   * Write a general description of the enum type. Avoid including default value, or
-   * including enum values in the description since this is use-case specific.
+   * Write a general description of the enum type. Avoid including default value, or including enum
+   * values in the description since this is use-case specific.
    */
   String typeDescription();
 
@@ -19,8 +19,8 @@ public interface DocumentedEnum<E extends Enum<E>> {
   String enumValueDescription();
 
   /**
-   * Cast an instance of this interface to a generic enum type. This is valid, because
-   * this interface should only be implemented by enum types.
+   * Cast an instance of this interface to a generic enum type. This is valid, because this
+   * interface should only be implemented by enum types.
    */
   @SuppressWarnings("unchecked")
   default E castToEnum() {

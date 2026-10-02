@@ -26,12 +26,12 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.service.TransitServiceResolver;
 
 /**
- * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a cross-leg insertion — pickup on
- * one leg of a multi-stop driver trip, dropoff on a later leg — whose
- * {@code passenger → next waypoint} drive exceeds the nearby-stop search radius
- * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS},
- * 60 minutes). It is found only because the passenger's routing tree is sized to the largest
- * candidate leg limit, not to a fixed cap.
+ * Tests {@link DefaultCarpoolingService#routeAccessEgress} on a cross-leg insertion — pickup on one
+ * leg of a multi-stop driver trip, dropoff on a later leg — whose {@code passenger → next waypoint}
+ * drive exceeds the nearby-stop search radius
+ * ({@link DefaultCarpoolingService#MAX_SEARCH_DURATION_FOR_NEARBY_STOPS_FOR_ACCESS_EGRESS}, 60
+ * minutes). It is found only because the passenger's routing tree is sized to the largest candidate
+ * leg limit, not to a fixed cap.
  *
  * <pre>
  *   Right = EAST. The two legs run opposite ways over the same ground, so they are
@@ -54,11 +54,11 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  *
  * Because the route loops far out to M and then doubles back to D right beside A, a cross-leg
  * insertion is the only feasible one (see below). The 2 km north offset of X and M is only there to
- * keep each waypoint off another street's geometry; every street length is declared (at a flat
- * 10 m/s), so the leg times above are exact. Deviation budget: 10 min at M and D, 0 at A.
+ * keep each waypoint off another street's geometry; every street length is declared (at a flat 10
+ * m/s), so the leg times above are exact. Deviation budget: 10 min at M and D, 0 at A.
  * <p>
- * Access request: passenger at P, dropped at the only stop S. S is 10 car-minutes from P over the
- * local road, so the nearby-stop search (≤ 60 min) finds it easily.
+ * Access request: passenger at P, dropped at the only stop S. S is 10 car-minutes from P over
+ * the local road, so the nearby-stop search (≤ 60 min) finds it easily.
  * <p>
  * The only insertion that fits the budget is cross-leg: pick up P on leg A → M and drop S on leg
  * M → D, giving A → P → M → S → D. Dropping S on the first leg instead (A → P → S → M) would reach
@@ -69,10 +69,10 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  * goal-directed fallback). So it routes only because that tree is sized to the largest leg limit:
  * 70 + 1 (slack) + 10 (budget) = 81 min.
  * <p>
- * X is what makes a too-small tree actually fail here: {@code DurationSkipEdgeStrategy} prunes an
- * edge by the elapsed time at its start, so a single 42-km A → M edge would be crossed in one step
- * from ~0 elapsed and defeat any limit. Splitting it at X (61.7 min) lets a 60-min tree reach X but
- * prune X → M, while the 81-min tree spans the whole leg.
+ * X is what makes a too-small tree actually fail here: {@code DurationSkipEdgeStrategy} prunes
+ * an edge by the elapsed time at its start, so a single 42-km A → M edge would be crossed in one
+ * step from ~0 elapsed and defeat any limit. Splitting it at X (61.7 min) lets a 60-min tree reach
+ * X but prune X → M, while the 81-min tree spans the whole leg.
  */
 class DefaultCarpoolingServiceCrossLegInsertionTest extends GraphRoutingTest {
 

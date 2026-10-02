@@ -42,8 +42,8 @@ class TripSegmentMapper {
   }
 
   /**
-   * The {@link StopTimeKey}s for the stops covered by the given {@code trip_segment_id}, or an empty
-   * list if no such trip segment was mapped.
+   * The {@link StopTimeKey}s for the stops covered by the given {@code trip_segment_id}, or an
+   * empty list if no such trip segment was mapped.
    */
   List<StopTimeKey> getStopTimeKeys(FeedScopedId tripSegmentId) {
     return mappedTripSegments.getOrDefault(tripSegmentId, List.of());

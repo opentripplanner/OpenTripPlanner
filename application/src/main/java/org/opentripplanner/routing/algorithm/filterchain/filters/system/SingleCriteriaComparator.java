@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
  * A set of instances of this interface can be used to create a pareto-set. See
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoSet} and
  * {@link org.opentripplanner.raptor.util.paretoset.ParetoComparator}.
- * <p/>
+ * <p>
  * This interface extends {@link Comparator} so elements can be sorted as well. Not all criteria
  * can be sorted, if so the {@link #strictOrder()} should return false (this is the default).
  */
@@ -25,9 +25,9 @@ public interface SingleCriteriaComparator {
     new DefaultTransitGroupPriorityCalculator();
 
   /**
-   * The left criteria dominates the right criteria. Note! The right criteria may dominate
-   * the left criteria if there is no {@link #strictOrder()}. If left and right are equals, then
-   * there is no dominance.
+   * The left criteria dominates the right criteria. Note! The right criteria may dominate the left
+   * criteria if there is no {@link #strictOrder()}. If left and right are equals, then there is no
+   * dominance.
    */
   boolean leftDominanceExist(Itinerary left, Itinerary right);
 

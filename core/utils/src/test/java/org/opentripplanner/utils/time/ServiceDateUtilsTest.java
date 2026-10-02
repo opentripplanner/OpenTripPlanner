@@ -150,14 +150,14 @@ public class ServiceDateUtilsTest {
     );
   }
 
-  /// The input time is in UTC and the the transit service time zone(Europe/Oslo) which is
-  /// +1 hour in winter and +2 in summer. This means that we switch to a new service-day at
-  /// 23:00Z in winter time and at 22:00Z in summer time.
+  /// The input time is in UTC and the the transit service time zone(Europe/Oslo) which is +1 hour
+  /// in winter and +2 in summer. This means that we switch to a new service-day at 23:00Z in winter
+  /// time and at 22:00Z in summer time.
   ///
-  /// Note! The last test cases test the transition from summer-time to winter-time and back.
-  /// Day light savings is adjusted:
-  /// - 29. March 2026    02:00 -> 03:00  First summer service-day start at 23:00, 1h overlap
-  /// - 25. October 2026  03:00 -> 02:00  First winter service-day start at 01:00, 1h gap
+  /// Note! The last test cases test the transition from summer-time to winter-time and back. Day
+  /// light savings is adjusted:
+  /// - 29. March 2026 02:00 -> 03:00 First summer service-day start at 23:00, 1h overlap
+  /// - 25. October 2026 03:00 -> 02:00 First winter service-day start at 01:00, 1h gap
   ///
   @ParameterizedTest
   @CsvSource(

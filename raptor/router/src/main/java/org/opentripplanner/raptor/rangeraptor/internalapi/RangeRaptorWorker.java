@@ -15,8 +15,8 @@ public interface RangeRaptorWorker<T extends RaptorTripSchedule> {
   boolean hasMoreRounds();
 
   /**
-   * Apply access for the current round, including round zero - before the first transit.
-   * This is applied in each round because the access may include transit (FLEX).
+   * Apply access for the current round, including round zero - before the first transit. This is
+   * applied in each round because the access may include transit (FLEX).
    */
   void applyAccessArrivedOnStreet();
 
