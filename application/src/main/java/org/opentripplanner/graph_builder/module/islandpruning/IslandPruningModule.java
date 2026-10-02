@@ -143,8 +143,6 @@ public class IslandPruningModule implements GraphBuilderModule {
     int vertexCount = vertexIndex.size();
     var thruNeighbours = new Adjacency(vertexCount, thruEdges);
     var allNeighbours = new Adjacency(vertexCount, thruEdges, noThruEdges);
-    thruEdges = null;
-    noThruEdges = null;
 
     var search = new SubgraphSearch(vertexIndex);
 
