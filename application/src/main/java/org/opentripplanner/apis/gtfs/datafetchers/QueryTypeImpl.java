@@ -297,11 +297,13 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       TransitService transitService = getTransitService(environment);
 
-      return new GtfsRealtimeFuzzyTripMatcher(transitService).getTrip(
-        transitService.getRoute(FeedScopedId.parseStrict(args.getGraphQLRoute())),
+      var route = transitService.getRoute(FeedScopedId.parseStrict(args.getGraphQLRoute()));
+      var date = ServiceDateUtils.parseString(args.getGraphQLDate());
+      return GtfsRealtimeFuzzyTripMatcher.findTrip(
+        transitService.findPatterns(route),
+        transitService.getServiceCodesRunningForDate(date),
         DIRECTION_MAPPER.map(args.getGraphQLDirection()),
-        args.getGraphQLTime(),
-        ServiceDateUtils.parseString(args.getGraphQLDate())
+        args.getGraphQLTime()
       );
     };
   }

@@ -126,7 +126,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   }
 
   private GtfsRealtimeFuzzyTripMatcher matcher() {
-    return new GtfsRealtimeFuzzyTripMatcher(env.transitService());
+    return new GtfsRealtimeFuzzyTripMatcher(env.newTimetableRepository());
   }
 
   private static TripDescriptor.Builder matchingTripUpdate() {

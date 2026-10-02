@@ -109,16 +109,17 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
   private static TripAndPattern match(EstimatedVehicleJourney evj, TransitTestEnvironment env)
     throws UpdateException {
-    var transitService = env.transitService();
+    var timetableRepository = env.newTimetableRepository();
+    var transitRepository = env.transitRepository();
     var cache = SiriFuzzyTripMatcherCache.create(
-      new DefaultTransitService(env.transitRepository(), env.scheduledTimetableData())
+      new DefaultTransitService(transitRepository, env.scheduledTimetableData())
     );
-    var fuzzyMatcher = new SiriFuzzyTripMatcher(cache, transitService);
+    var fuzzyMatcher = new SiriFuzzyTripMatcher(cache, timetableRepository, transitRepository);
     return fuzzyMatcher.match(
       EstimatedVehicleJourneyWrapper.of(evj),
-      new EntityResolver(transitService, env.feedId()),
-      transitService::findTimetable,
-      transitService::findNewTripPatternForModifiedTrip
+      new EntityResolver(timetableRepository, transitRepository, env.feedId()),
+      timetableRepository::resolve,
+      timetableRepository::getNewTripPatternForModifiedTrip
     );
   }
 

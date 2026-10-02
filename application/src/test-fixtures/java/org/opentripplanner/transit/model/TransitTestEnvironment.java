@@ -147,6 +147,19 @@ public final class TransitTestEnvironment {
     return scheduledTimetableData;
   }
 
+  /**
+   * A new timetable repository (write buffer) with the environment's scheduled data and no
+   * real-time updates, for testing code on the real-time update path. It is not registered with
+   * the environment and never committed.
+   */
+  public TimetableRepository newTimetableRepository() {
+    return new DefaultTimetableRepository(
+      new RaptorTransitData(transitRepository.getRaptorTransitData()),
+      scheduledTimetableData.getTripCalendars(),
+      scheduledTimetableData
+    );
+  }
+
   public RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle() {
     return timetableHandle;
   }

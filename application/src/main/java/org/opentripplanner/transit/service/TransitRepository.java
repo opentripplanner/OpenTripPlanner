@@ -249,6 +249,13 @@ public class TransitRepository implements Serializable {
     return Collections.unmodifiableCollection(operators);
   }
 
+  public Optional<Operator> findOperatorById(FeedScopedId id) {
+    return operators
+      .stream()
+      .filter(o -> o.getId().equals(id))
+      .findAny();
+  }
+
   public void addOperators(Collection<Operator> operators) {
     assertModificationsAllowed();
     this.operators.addAll(operators);

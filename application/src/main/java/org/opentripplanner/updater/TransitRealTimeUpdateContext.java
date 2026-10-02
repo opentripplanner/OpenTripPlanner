@@ -2,7 +2,7 @@ package org.opentripplanner.updater;
 
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
 
@@ -13,9 +13,19 @@ import org.opentripplanner.updater.trip.siri.EntityResolver;
 public interface TransitRealTimeUpdateContext {
   /**
    * Return the mutable realtime-timetable repository (write buffer) for this update task. Callers
-   * must only use this from the single writer thread.
+   * must only use this from the single writer thread. Entity lookups (trips, routes, patterns)
+   * on this repository already fall back to scheduled data, so this is also the way to resolve
+   * entities that see all in-progress real-time additions not yet committed to a published
+   * snapshot.
    */
   TimetableRepository timetableRepository();
+
+  /**
+   * Return the scheduled (non-realtime) transit repository. Use this only for lookups that have
+   * no realtime concept (agencies, operators, stops, time zone); for entity lookups that should
+   * see realtime data, use {@link #timetableRepository()} instead.
+   */
+  TransitRepository transitRepository();
 
   /**
    * Return the mutable realtime-vehicle repository for this update task. Callers must only use
@@ -24,13 +34,6 @@ public interface TransitRealTimeUpdateContext {
    * vehicle updates to apply.
    */
   RealtimeVehicleRepository realtimeVehicleRepository();
-
-  /**
-   * Return a transit service that can look up both scheduled and real-time data.
-   * The transit service has access to all real-time updates applied so far,
-   * including those not yet committed in a published snapshot.
-   */
-  TransitService transitService();
 
   /**
    * Return a GTFS-RT fuzzy trip matcher that can look up both scheduled and real-time data.

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.updater.spi.UpdateResult;
 import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
@@ -67,15 +66,11 @@ public class SiriTestHelper {
         .submit(ctx -> {
           var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
           var feedId = transitTestEnvironment.feedId();
-          var transitService = new DefaultTransitService(
-            transitTestEnvironment.transitRepository(),
-            buffer
-          );
           resultRef.set(
             adapter
               .forUpdate(buffer)
               .applyEstimatedTimetable(
-                new EntityResolver(transitService, feedId),
+                new EntityResolver(buffer, transitTestEnvironment.transitRepository(), feedId),
                 feedId,
                 DIFFERENTIAL,
                 updates

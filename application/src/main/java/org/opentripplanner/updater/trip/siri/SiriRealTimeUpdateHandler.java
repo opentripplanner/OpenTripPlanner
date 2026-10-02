@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateException;
@@ -36,15 +36,15 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
- * Update-scoped object produced by {@link SiriRealTimeTripUpdateAdapter#forUpdate}. Holds a
- * per-task {@link TransitService} backed by the update's mutable timetable snapshot, so all
- * pattern and trip lookups within the task see in-progress real-time additions.
+ * Update-scoped object produced by {@link SiriRealTimeTripUpdateAdapter#forUpdate}. Entity
+ * lookups go directly against the update's mutable {@code buffer} (which falls back to scheduled
+ * data), so they see in-progress real-time additions not yet committed to a published snapshot.
  */
 public class SiriRealTimeUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriRealTimeUpdateHandler.class);
 
-  private final TransitService transitService;
+  private final TransitRepository transitRepository;
   private final TimetableRepository buffer;
 
   @Nullable
@@ -55,14 +55,14 @@ public class SiriRealTimeUpdateHandler {
   private final TripPatternIdGenerator tripPatternIdGenerator;
 
   SiriRealTimeUpdateHandler(
-    TransitService transitService,
+    TransitRepository transitRepository,
     TimetableRepository buffer,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     TripPatternCache tripPatternCache,
     DeduplicatorService deduplicator,
     TripPatternIdGenerator tripPatternIdGenerator
   ) {
-    this.transitService = transitService;
+    this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.tripPatternCache = tripPatternCache;
@@ -129,7 +129,7 @@ public class SiriRealTimeUpdateHandler {
       TripUpdate result = switch (siriUpdateType) {
         case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
           journeyWrapper,
-          transitService,
+          transitRepository,
           buffer,
           deduplicator,
           entityResolver,
@@ -221,7 +221,7 @@ public class SiriRealTimeUpdateHandler {
 
     if (trip != null) {
       // Found exact match
-      pattern = transitService.findPattern(trip);
+      pattern = buffer.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       var tripAndPattern = fuzzyTripMatcher.match(
@@ -247,7 +247,7 @@ public class SiriRealTimeUpdateHandler {
       pattern,
       journey,
       serviceDate,
-      transitService.getTimeZone(),
+      transitRepository.getTimeZone(),
       entityResolver
     ).build();
 
@@ -275,7 +275,7 @@ public class SiriRealTimeUpdateHandler {
 
     if (trip != null) {
       // Found exact match
-      pattern = transitService.findPattern(trip);
+      pattern = buffer.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       var tripAndPattern = fuzzyTripMatcher.match(
@@ -299,7 +299,7 @@ public class SiriRealTimeUpdateHandler {
     }
     var tripUpdate = new ExtraCallTripBuilder(
       journey,
-      transitService,
+      transitRepository,
       buffer,
       deduplicator,
       entityResolver,
@@ -329,7 +329,7 @@ public class SiriRealTimeUpdateHandler {
       pattern = tripPatternCache.getOrCreateTripPattern(
         tripUpdate.stopPattern(),
         trip,
-        transitService.findPattern(trip)
+        buffer.findPattern(trip)
       );
     }
 

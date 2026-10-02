@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 class AddedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddedTripBuilder.class);
-  private final TransitService transitService;
+  private final TransitRepository transitRepository;
   private final TimetableRepository buffer;
   private final EntityResolver entityResolver;
   private final ZoneId timeZone;
@@ -71,7 +71,7 @@ class AddedTripBuilder {
 
   AddedTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
-    TransitService transitService,
+    TransitRepository transitRepository,
     TimetableRepository buffer,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
@@ -117,17 +117,17 @@ class AddedTripBuilder {
 
     this.calls = journey.calls();
 
-    this.transitService = transitService;
+    this.transitRepository = transitRepository;
     this.entityResolver = entityResolver;
     this.getTripPatternId = getTripPatternId;
-    timeZone = transitService.getTimeZone();
+    timeZone = transitRepository.getTimeZone();
 
     replacedTrips = getReplacedVehicleJourneys(journey);
     stopTimesMapper = new StopTimesMapper(entityResolver);
   }
 
   AddedTripBuilder(
-    TransitService transitService,
+    TransitRepository transitRepository,
     TimetableRepository buffer,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
@@ -150,11 +150,11 @@ class AddedTripBuilder {
     String dataSource,
     @Nullable String vehicleRef
   ) {
-    this.transitService = transitService;
+    this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.deduplicator = deduplicator;
     this.entityResolver = entityResolver;
-    this.timeZone = transitService.getTimeZone();
+    this.timeZone = transitRepository.getTimeZone();
     this.getTripPatternId = getTripPatternId;
     this.tripId = tripId;
     this.tripOnServiceDateId = tripOnServiceDateId;
@@ -234,7 +234,7 @@ class AddedTripBuilder {
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
     var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
-      transitService.getTripCalendars().getServiceCode(trip.getServiceId())
+      buffer.getTripCalendars().getServiceCode(trip.getServiceId())
     );
     tripTimes.validateNonIncreasingTimes();
 
@@ -319,7 +319,7 @@ class AddedTripBuilder {
    */
   @Nullable
   private Agency resolveAgency() {
-    return transitService
+    return buffer
       .listRoutes()
       .stream()
       .filter(r -> r != null && r.getOperator() != null && r.getOperator().equals(operator))

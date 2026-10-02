@@ -122,7 +122,8 @@ class AddedTripBuilderTest {
 
     // Create the entity resolver only after the model has been indexed
     ENTITY_RESOLVER = new EntityResolver(
-      new DefaultTransitService(TRANSIT_MODEL, timetableRepository),
+      timetableRepository,
+      TRANSIT_MODEL,
       TransitRepositoryForTest.FEED_ID
     );
   }
@@ -130,7 +131,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTrip() {
     var tripUpdate = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -252,7 +253,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripOnAddedRoute() {
     var firstAddedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -284,7 +285,7 @@ class AddedTripBuilderTest {
     var datedServiceJourneyId2 = id("DATED_SERVICE_JOURNEY_ID_2");
 
     var secondAddedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -328,7 +329,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripOnExistingRoute() {
     var addedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -364,7 +365,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripWithoutReplacedRoute() {
     var addedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -410,7 +411,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripFailOnMissingServiceId() {
     var addedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -465,7 +466,7 @@ class AddedTripBuilderTest {
     );
 
     var addedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -506,7 +507,7 @@ class AddedTripBuilderTest {
         .build()
     );
     var addedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -553,7 +554,7 @@ class AddedTripBuilderTest {
         .build()
     );
     var addedTrip = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -618,7 +619,7 @@ class AddedTripBuilderTest {
   @Test
   void vehicleRefIsSetOnTripTimes() {
     var tripUpdate = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,
@@ -650,7 +651,7 @@ class AddedTripBuilderTest {
   @Test
   void vehicleRefIsNullWhenAbsent() {
     var tripUpdate = new AddedTripBuilder(
-      transitService,
+      TRANSIT_MODEL,
       timetableRepository,
       DEDUPLICATOR,
       ENTITY_RESOLVER,

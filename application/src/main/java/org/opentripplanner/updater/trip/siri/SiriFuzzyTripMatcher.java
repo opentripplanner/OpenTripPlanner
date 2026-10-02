@@ -22,7 +22,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateErrorType;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -46,11 +47,17 @@ public class SiriFuzzyTripMatcher {
   private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
 
   private final SiriFuzzyTripMatcherCache cache;
-  private final TransitService transitService;
+  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
-  public SiriFuzzyTripMatcher(SiriFuzzyTripMatcherCache cache, TransitService transitService) {
+  public SiriFuzzyTripMatcher(
+    SiriFuzzyTripMatcherCache cache,
+    TimetableRepository timetableRepository,
+    TransitRepository transitRepository
+  ) {
     this.cache = cache;
-    this.transitService = transitService;
+    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
   }
 
   /**
@@ -123,7 +130,7 @@ public class SiriFuzzyTripMatcher {
   ) {
     List<FeedScopedId> matches = new ArrayList<>();
     for (Trip trip : cache.tripsByInternalPlanningCode(internalPlanningCode)) {
-      Set<LocalDate> serviceDates = transitService
+      Set<LocalDate> serviceDates = timetableRepository
         .getTripCalendars()
         .listServiceDates(trip.getServiceId());
       if (serviceDates.contains(serviceDate)) {
@@ -141,12 +148,12 @@ public class SiriFuzzyTripMatcher {
     int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime,
       arrivalTime,
-      transitService.getTimeZone()
+      transitRepository.getTimeZone()
     );
     int secondsSinceMidnightYesterday = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime.minusDays(1),
       arrivalTime,
-      transitService.getTimeZone()
+      transitRepository.getTimeZone()
     );
 
     String lastStopId = lastStop.getId().getId();
@@ -197,9 +204,9 @@ public class SiriFuzzyTripMatcher {
     int departureInSecondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       date,
       date,
-      transitService.getTimeZone()
+      transitRepository.getTimeZone()
     );
-    TripCalendars calendarService = transitService.getTripCalendars();
+    TripCalendars calendarService = timetableRepository.getTripCalendars();
     Set<TripAndPattern> possibleTrips = new HashSet<>();
     for (Trip trip : trips) {
       if (!calendarService.listServiceDates(trip.getServiceId()).contains(serviceDate)) {
@@ -213,7 +220,7 @@ public class SiriFuzzyTripMatcher {
       TripPattern tripPattern =
         newTripPatternForModifiedTrip != null
           ? newTripPatternForModifiedTrip
-          : transitService.findPattern(trip);
+          : timetableRepository.findPattern(trip);
 
       var firstStop = tripPattern.firstStop();
       var lastStop = tripPattern.lastStop();

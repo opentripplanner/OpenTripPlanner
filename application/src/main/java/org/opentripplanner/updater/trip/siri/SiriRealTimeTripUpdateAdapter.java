@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip.siri;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
@@ -44,18 +43,17 @@ public class SiriRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Create an update-scoped task for applying SIRI-ET estimated timetables. The task holds a
-   * {@link org.opentripplanner.transit.service.TransitService} constructed from the given
-   * buffer, so all pattern and trip lookups within the task see in-progress real-time additions.
+   * Create an update-scoped task for applying SIRI-ET estimated timetables. Entity lookups within
+   * the task go directly against the given mutable buffer (which falls back to scheduled data),
+   * so they see in-progress real-time additions not yet committed to a published snapshot.
    */
   public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
-    var transitService = new DefaultTransitService(transitRepository, buffer);
     var fuzzyTripMatcher =
       siriFuzzyTripMatcherCache != null
-        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, transitService)
+        ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, buffer, transitRepository)
         : null;
     return new SiriRealTimeUpdateHandler(
-      transitService,
+      transitRepository,
       buffer,
       fuzzyTripMatcher,
       tripPatternCache,

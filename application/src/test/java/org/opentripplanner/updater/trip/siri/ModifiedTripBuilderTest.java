@@ -30,8 +30,8 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableBuildRepository;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateErrorType;
@@ -146,11 +146,15 @@ class ModifiedTripBuilderTest {
     transitRepository.index();
 
     // Create the entity resolver only after the model has been indexed
+    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
+    var timetableRepository = new DefaultTimetableRepository(
+      null,
+      scheduledTimetableData.getTripCalendars(),
+      scheduledTimetableData
+    );
     entityResolver = new EntityResolver(
-      new DefaultTransitService(
-        transitRepository,
-        timetableBuildRepository.toScheduledTimetableData()
-      ),
+      timetableRepository,
+      transitRepository,
       TransitRepositoryForTest.FEED_ID
     );
   }
