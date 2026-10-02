@@ -57,7 +57,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 /**
  * Configure all modules that are not simple enough to be injected.
@@ -276,14 +276,14 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     DataImportIssueStore issueStore
   ) {
     return new RegularTransitTransferGenerator(
       graph,
       transitRepository,
       config.transferProfiles(),
-      regularTransferRepository,
+      regularTransferBuildRepository,
       issueStore
     );
   }

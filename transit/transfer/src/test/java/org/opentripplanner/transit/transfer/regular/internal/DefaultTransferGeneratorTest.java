@@ -48,17 +48,18 @@ class DefaultTransferGeneratorTest {
     >of(List.of(profile));
 
     var stopIndex = stopIndex();
-    var repository = new DefaultRegularTransferRepository<FakeTransferPathProvider.FakePath>();
+    var buildRepository =
+      new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
     var generator = new DefaultTransferGenerator<
       FakeTransferPathProvider.FakePath,
       AbstractUserPreferences<?>
-    >(stopIndex, List.of(A), provider, profiles, repository);
+    >(stopIndex, List.of(A), provider, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
     assertThat(
-      repository
-        .freeze()
+      buildRepository
+        .createInitialSnapshot()
         .findPath(TransferProfileType.WALK, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(cheapAB);
   }
@@ -77,17 +78,18 @@ class DefaultTransferGeneratorTest {
     >of(List.of(profile));
 
     var stopIndex = stopIndex();
-    var repository = new DefaultRegularTransferRepository<FakeTransferPathProvider.FakePath>();
+    var buildRepository =
+      new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
     var generator = new DefaultTransferGenerator<
       FakeTransferPathProvider.FakePath,
       AbstractUserPreferences<?>
-    >(stopIndex, List.of(A), provider, profiles, repository);
+    >(stopIndex, List.of(A), provider, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
     assertThat(
-      repository
-        .freeze()
+      buildRepository
+        .createInitialSnapshot()
         .findPath(TransferProfileType.WALK, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isNull();
   }

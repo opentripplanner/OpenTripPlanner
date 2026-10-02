@@ -154,30 +154,6 @@ class DefaultRegularTransferRepositoryTest {
     assertThat(secondSnapshot.findPath(WALK, A, C)).isEqualTo(PATH_CA);
   }
 
-  @Test
-  void hasTransfersFromIsFalseForAStopWithNoStoredPaths() {
-    var repository = new DefaultRegularTransferRepository<String>();
-    assertThat(repository.hasTransfersFrom(0)).isFalse();
-  }
-
-  @Test
-  void hasTransfersFromIsTrueOnceAPathIsStoredForAnyProfile() {
-    var repository = new DefaultRegularTransferRepository<String>();
-    repository.setPath(WALK, 0, 1, "A -> B");
-
-    assertThat(repository.hasTransfersFrom(0)).isTrue();
-    // Only the fromStop that was actually stored to is linked.
-    assertThat(repository.hasTransfersFrom(1)).isFalse();
-  }
-
-  @Test
-  void calculateNumberOfTransferPathsCountsAllStoredPaths() {
-    var repository = createSnapshot().copyOnWrite();
-
-    assertThat(repository.calculateNumberOfTransferPaths()).isEqualTo(3);
-    assertThat(repository.pathsFor(WALK)).hasSize(3);
-  }
-
   private static DefaultRegularTransferRepositorySnapshot<String> createSnapshot() {
     var repository = new DefaultRegularTransferRepository<String>();
     repository.setPath(WALK, A, B, PATH_AB);

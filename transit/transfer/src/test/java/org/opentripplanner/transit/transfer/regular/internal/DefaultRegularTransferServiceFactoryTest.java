@@ -41,7 +41,8 @@ class DefaultRegularTransferServiceFactoryTest {
     FakeTransferPathProvider provider,
     double buildTimeReluctance
   ) {
-    var repository = new DefaultRegularTransferRepository<FakeTransferPathProvider.FakePath>();
+    var buildRepository =
+      new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
     AbstractUserPreferences<?> preferences = withReluctance(buildTimeReluctance);
     // configuredRequestParameters (R) is unread by DefaultTransferGenerator today - reuse the
     // preferences instance as a type-compatible placeholder. Explicit type witnesses throughout,
@@ -58,9 +59,9 @@ class DefaultRegularTransferServiceFactoryTest {
       List.of(A),
       provider,
       profiles,
-      repository
+      buildRepository
     ).generateTransfersForAllStops();
-    return repository.freeze();
+    return buildRepository.createInitialSnapshot();
   }
 
   /**

@@ -78,6 +78,7 @@ import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.warmup.WarmupLauncher;
@@ -129,7 +130,7 @@ public interface ConstructApplicationFactory {
   VertexLinker vertexLinker();
   TransitRepository transitRepository();
   TransferRepository transferRepository();
-  RegularTransferRepository<NearbyStop> regularTransferRepository();
+  RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository();
 
   RepositoryHandle<
     RegularTransferRepositorySnapshot<NearbyStop>,
@@ -227,8 +228,8 @@ public interface ConstructApplicationFactory {
     Builder transferRepository(TransferRepository transferRepository);
 
     @BindsInstance
-    Builder regularTransferRepository(
-      RegularTransferRepository<NearbyStop> regularTransferRepository
+    Builder regularTransferBuildRepository(
+      RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
     );
 
     @BindsInstance

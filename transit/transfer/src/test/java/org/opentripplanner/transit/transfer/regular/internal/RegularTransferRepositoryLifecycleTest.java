@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ class RegularTransferRepositoryLifecycleTest {
   private static final String PATH_AC = "A-C";
   private static final String PATH_BC = "B-C";
 
+  private DefaultRegularTransferBuildRepository<String> buildRepository;
   private RepositoryRegistry registry;
   private UpdateManager updateManager;
   private RepositoryHandle<
@@ -38,11 +40,15 @@ class RegularTransferRepositoryLifecycleTest {
 
   @BeforeEach
   void setUp() {
-    var repository = new DefaultRegularTransferRepository<String>();
-    repository.setPath(WALK, A, B, PATH_AB);
+    buildRepository = new DefaultRegularTransferBuildRepository<>();
+    buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB));
 
+    var lifecycle = new RegularTransferRepositoryLifecycle<String>();
     registry = TransactionFactory.createRepositoryRegistry();
-    handle = registry.registerRepository(repository, new RegularTransferRepositoryLifecycle<>());
+    handle = registry.registerRepositorySnapshot(
+      buildRepository.createInitialSnapshot(),
+      lifecycle
+    );
     updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
       registry,
@@ -70,6 +76,14 @@ class RegularTransferRepositoryLifecycleTest {
     assertThat(before.findPath(WALK, A, C)).isNull();
     assertThat(after.findPath(WALK, A, C)).isEqualTo(PATH_AC);
     assertThat(after.findPath(WALK, A, B)).isEqualTo(PATH_AB);
+  }
+
+  @Test
+  void writesAreNotVisibleInTheBuildRepository() throws Exception {
+    updateManager.submit(ctx -> ctx.repository(handle).setPath(WALK, A, C, PATH_AC)).get();
+
+    assertThat(buildRepository.pathsFor(WALK)).hasSize(1);
+    assertThat(buildRepository.calculateNumberOfTransferPaths()).isEqualTo(1);
   }
 
   @Test

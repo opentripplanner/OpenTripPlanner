@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.StopIndex;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
@@ -29,7 +29,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
   private final Collection<FeedScopedId> stopsWithTrips;
   private final TransferPathProvider<P, U> pathProvider;
   private final TransferProfiles<U> orderedProfiles;
-  private final RegularTransferRepository<P> repository;
+  private final RegularTransferBuildRepository<P> buildRepository;
 
   /**
    * @param progressCallback invoked once per (profile, stop) generated - lets the caller report
@@ -40,13 +40,13 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     Collection<FeedScopedId> stopsWithTrips,
     TransferPathProvider<P, U> pathProvider,
     TransferProfiles<U> profiles,
-    RegularTransferRepository<P> repository
+    RegularTransferBuildRepository<P> buildRepository
   ) {
     this.stopIndex = stopIndex;
     this.stopsWithTrips = stopsWithTrips;
     this.pathProvider = pathProvider;
     this.orderedProfiles = profiles;
-    this.repository = repository;
+    this.buildRepository = buildRepository;
   }
 
   @Override
@@ -89,9 +89,9 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     bestCandidatePerTargetStop.forEach((toStop, candidate) ->
       pathsByToStop.put(toStop, candidate.path())
     );
-    // Stops are generated in parallel, the repository is not thread-safe
+    // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {
-      repository.setPaths(profile.profileType(), fromStop, pathsByToStop);
+      buildRepository.setPaths(profile.profileType(), fromStop, pathsByToStop);
     }
   }
 }

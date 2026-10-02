@@ -44,7 +44,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -89,7 +89,7 @@ public class ConstructApplication {
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
@@ -130,7 +130,7 @@ public class ConstructApplication {
       .streetDetailsRepository(streetDetailsRepository)
       .transitRepository(transitRepository)
       .transferRepository(transferRepository)
-      .regularTransferRepository(regularTransferRepository)
+      .regularTransferBuildRepository(regularTransferBuildRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
@@ -177,7 +177,7 @@ public class ConstructApplication {
       factory.streetRepository(),
       factory.transitRepository(),
       factory.transferRepository(),
-      factory.regularTransferRepository(),
+      factory.regularTransferBuildRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
@@ -293,8 +293,8 @@ public class ConstructApplication {
     return factory.transferRepository();
   }
 
-  public RegularTransferRepository<NearbyStop> regularTransferRepository() {
-    return factory.regularTransferRepository();
+  public RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository() {
+    return factory.regularTransferBuildRepository();
   }
 
   @Nullable
