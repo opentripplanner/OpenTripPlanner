@@ -45,7 +45,7 @@ class FlexIndexTest {
     calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
     repo.updateCalendarServiceData(calendarData);
 
-    FlexIndex index = new FlexIndex(repo);
+    FlexIndex index = new FlexIndex(repo.getAllFlexTrips(), repo.getTripCalendar());
 
     Collection<FlexTripForDate> tripsOnServiceDate = index.getFlexTripsForRunningDate(serviceDate);
     assertEquals(1, tripsOnServiceDate.size(), "Should have 1 trip on service date");
@@ -86,7 +86,7 @@ class FlexIndexTest {
     calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
     repo.updateCalendarServiceData(calendarData);
 
-    FlexIndex index = new FlexIndex(repo);
+    FlexIndex index = new FlexIndex(repo.getAllFlexTrips(), repo.getTripCalendar());
 
     Collection<FlexTripForDate> tripsOnServiceDay = index.getFlexTripsForRunningDate(serviceDate);
     assertEquals(1, tripsOnServiceDay.size(), "Should have 1 trip on service day");
@@ -112,7 +112,7 @@ class FlexIndexTest {
 
     repo.addFlexTrip(flexTrip.getId(), flexTrip);
 
-    var index = new FlexIndex(repo);
+    var index = new FlexIndex(repo.getAllFlexTrips(), repo.getTripCalendar());
 
     assertThat(index.findRoutes(st1.getStop())).containsExactly(ROUTE_2);
     assertThat(index.findRoutes(st2.getStop())).containsExactly(ROUTE_2);
@@ -132,7 +132,7 @@ class FlexIndexTest {
 
     repo.addFlexTrip(flexTrip.getId(), flexTrip);
 
-    var index = new FlexIndex(repo);
+    var index = new FlexIndex(repo.getAllFlexTrips(), repo.getTripCalendar());
 
     var groupStop = (GroupStop) st1.getStop();
     assertThat(groupStop.getChildLocations()).isNotEmpty();
