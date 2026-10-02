@@ -67,8 +67,11 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
       } else if (interpolate) {
-        interpolateStopTimes(stopTimes);
-        stopTimesByTrip.replace(trip, stopTimes);
+        if (interpolateStopTimes(stopTimes)) {
+          stopTimesByTrip.replace(trip, stopTimes);
+        } else {
+          stopTimesByTrip.replace(trip, List.of());
+        }
       } else {
         stopTimes.removeIf(st -> !st.isArrivalTimeSet() || !st.isDepartureTimeSet());
         stopTimesByTrip.replace(trip, stopTimes);
@@ -222,7 +225,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
    *
    * @param stopTimes the stoptimes (from a single trip) to be interpolated
    */
-  private void interpolateStopTimes(List<StopTime> stopTimes) {
+  private boolean interpolateStopTimes(List<StopTime> stopTimes) {
     int lastStop = stopTimes.size() - 1;
     int numInterpStops;
     int departureTime = -1;
@@ -237,7 +240,9 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
       // Interpolate, if necessary, the times of non-timepoint stops
       if (
-        !(st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) && !FlexTrip.isFlexStop(st0.getStop())
+        !(st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) &&
+        !st0.hasFlexWindow() &&
+        !FlexTrip.isFlexStop(st0.getStop())
       ) {
         // figure out how many such stops there are in a row.
         int j;
@@ -252,12 +257,13 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
           }
         }
         if (j == lastStop + 1) {
-          throw new RuntimeException(
-            "Could not interpolate arrival/departure time on stop " +
-              i +
-              " (missing final stop time) on trip " +
-              st0.getTrip()
+          issueStore.add(
+            "TripInterpolationFailed",
+            "Could not interpolate arrival/departure time on stop %d (missing final stop time) on trip %s",
+            i,
+            st0.getTrip().getId()
           );
+          return false;
         }
         numInterpStops = j - i;
         int arrivalTime;
@@ -268,7 +274,12 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         }
         interpStep = (arrivalTime - prevDepartureTime) / (numInterpStops + 1);
         if (interpStep < 0) {
-          throw new RuntimeException("trip goes backwards for some reason");
+          issueStore.add(
+            "TripInterpolationBackwards",
+            "Trip goes backwards during stop time interpolation on trip %s",
+            st0.getTrip().getId()
+          );
+          return false;
         }
         for (j = i; j < i + numInterpStops; ++j) {
           //System.out.println("interpolating " + j + " between " + prevDepartureTime + " and " + arrivalTime);
@@ -286,5 +297,6 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         i = j - 1;
       }
     }
+    return true;
   }
 }
