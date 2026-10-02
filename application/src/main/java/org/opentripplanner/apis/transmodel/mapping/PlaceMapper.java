@@ -24,7 +24,7 @@ public class PlaceMapper {
 
     return switch (api) {
       case QUAY, STOP_PLACE -> PlaceType.STOP;
-      case BICYCLE_RENT -> PlaceType.VEHICLE_RENT;
+      case BICYCLE_RENT, VEHICLE_RENT -> PlaceType.VEHICLE_RENT;
       case BIKE_PARK -> PlaceType.BIKE_PARK;
       case CAR_PARK -> PlaceType.CAR_PARK;
     };
