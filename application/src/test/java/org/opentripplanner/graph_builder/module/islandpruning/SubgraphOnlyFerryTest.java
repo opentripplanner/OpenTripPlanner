@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -20,7 +21,7 @@ class SubgraphOnlyFerryTest {
   void subgraphHasOnlyFerry() {
     TransitStopVertex transitStopVertex = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
 
-    Subgraph subgraph = new Subgraph();
+    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
     subgraph.addVertex(transitStopVertex);
 
     assertTrue(subgraph.hasOnlyFerryStops());
@@ -30,7 +31,7 @@ class SubgraphOnlyFerryTest {
   void subgraphHasOnlyNoFerry() {
     TransitStopVertex transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(false).build();
 
-    Subgraph subgraph = new Subgraph();
+    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
     subgraph.addVertex(transitStopVertex1);
 
     assertFalse(subgraph.hasOnlyFerryStops());
@@ -41,7 +42,7 @@ class SubgraphOnlyFerryTest {
     TransitStopVertex transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
     TransitStopVertex transitStopVertex2 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
 
-    Subgraph subgraph = new Subgraph();
+    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
     subgraph.addVertex(transitStopVertex1);
     subgraph.addVertex(transitStopVertex2);
 
@@ -53,7 +54,7 @@ class SubgraphOnlyFerryTest {
     TransitStopVertex transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
     TransitStopVertex transitStopVertex2 = vertexBuilder(REGULAR_STOP2).withIsFerry(false).build();
 
-    Subgraph subgraph = new Subgraph();
+    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
     subgraph.addVertex(transitStopVertex1);
     subgraph.addVertex(transitStopVertex2);
 

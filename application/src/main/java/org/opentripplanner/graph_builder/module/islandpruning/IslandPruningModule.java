@@ -1,14 +1,14 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import gnu.trove.list.array.TIntArrayList;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -45,6 +45,8 @@ public class IslandPruningModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(IslandPruningModule.class);
 
+  private static final int NO_SUBGRAPH = -1;
+
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final DataImportIssueStore issueStore;
@@ -80,9 +82,11 @@ public class IslandPruningModule implements GraphBuilderModule {
       parameters.adaptivePruningDistance()
     );
 
-    pruneIslands(TraverseMode.BICYCLE);
-    pruneIslands(TraverseMode.WALK);
-    pruneIslands(TraverseMode.CAR);
+    // vertices are only removed at the very end, so the index can be shared by all modes
+    var vertexIndex = new VertexIndex(graph.getVertices());
+    pruneIslands(vertexIndex, TraverseMode.BICYCLE);
+    pruneIslands(vertexIndex, TraverseMode.WALK);
+    pruneIslands(vertexIndex, TraverseMode.CAR);
 
     // reconnect stops that got disconnected
     if (streetLinkerModule != null) {
@@ -95,8 +99,9 @@ public class IslandPruningModule implements GraphBuilderModule {
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
     Set<Vertex> visibilityVertices = StreamUtils.ofIterable(graph.findEdges(AreaEdge.class))
+      .map(AreaEdge::getArea)
       .distinct()
-      .flatMap(v -> v.getArea().visibilityVertices().stream())
+      .flatMap(area -> area.visibilityVertices().stream())
       .collect(Collectors.toSet());
 
     int removed = 0;
@@ -125,44 +130,47 @@ public class IslandPruningModule implements GraphBuilderModule {
    *    noThruTraffic edges to noThruTraffic state. Remove traversal mode specific access from
    *    unreachable edges. Remove unconnected edges.
    */
-  private void pruneIslands(TraverseMode traverseMode) {
+  private void pruneIslands(VertexIndex vertexIndex, TraverseMode traverseMode) {
     LOG.debug("nothru pruning");
-    Map<Vertex, Subgraph> subgraphs = new HashMap<>();
-    Map<Vertex, Subgraph> extgraphs = new HashMap<>();
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex = new ArrayMultimap<>();
     Map<Edge, Boolean> isolated = new HashMap<>();
     ArrayList<Subgraph> islands = new ArrayList<>();
     int count;
 
-    /* establish vertex neighbourhood without currently relevant noThruTrafficEdges */
-    collectNeighbourVertices(neighborsForVertex, traverseMode, false);
+    /* establish vertex neighbourhood, with and without currently relevant noThruTrafficEdges */
+    var thruEdges = new TIntArrayList();
+    var noThruEdges = new TIntArrayList();
+    collectNeighbourVertices(vertexIndex, traverseMode, thruEdges, noThruEdges);
+    int vertexCount = vertexIndex.size();
+    var thruNeighbours = new Adjacency(vertexCount, thruEdges);
+    var allNeighbours = new Adjacency(vertexCount, thruEdges, noThruEdges);
+    thruEdges = null;
+    noThruEdges = null;
+
+    var search = new SubgraphSearch(vertexIndex);
 
     /* associate each connected vertex with a subgraph */
-    count = collectSubGraphs(neighborsForVertex, subgraphs, null, null);
+    int[] subgraphs = newSubgraphMapping(vertexCount);
+    count = search.collectSubGraphs(thruNeighbours, subgraphs, null, null);
     LOG.info("Islands when {} noThruTraffic is considered: {}", traverseMode, count);
 
-    /* Expand vertex neighbourhood with relevant noThruTrafficEdges
-       Note that we can reuse the original neighbour map here
-       and simply process a smaller set of noThruTrafficEdges */
-    collectNeighbourVertices(neighborsForVertex, traverseMode, true);
-
     /* Next: generate subgraphs without considering access limitations */
-    count = collectSubGraphs(neighborsForVertex, extgraphs, null, islands);
+    int[] extgraphs = newSubgraphMapping(vertexCount);
+    count = search.collectSubGraphs(allNeighbours, extgraphs, null, islands);
     LOG.info("Islands when {} noThruTraffic is ignored: {}", traverseMode, count);
 
     /* collect unreachable edges to a map */
     processIslands(islands, isolated, true, traverseMode);
 
-    extgraphs = new HashMap<>();
+    extgraphs = newSubgraphMapping(vertexCount);
     islands = new ArrayList<>();
 
     /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
        However, expansion is not allowed to jump from an original island to another one
      */
-    collectSubGraphs(neighborsForVertex, extgraphs, subgraphs, islands);
+    search.collectSubGraphs(allNeighbours, extgraphs, subgraphs, islands);
 
     /* Next round: generate purely noThruTraffic islands if such ones exist */
-    count = collectSubGraphs(neighborsForVertex, extgraphs, null, islands);
+    count = search.collectSubGraphs(allNeighbours, extgraphs, null, islands);
 
     LOG.info("{} noThruTraffic island count: {}", traverseMode, count);
 
@@ -170,6 +178,16 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     count = processIslands(islands, isolated, false, traverseMode);
     LOG.info("Modified {} islands", count);
+  }
+
+  /**
+   * A vertex to subgraph mapping, indexed on {@link VertexIndex} ids. Each subgraph has a unique
+   * id, {@link #NO_SUBGRAPH} marks vertices that do not belong to one.
+   */
+  private static int[] newSubgraphMapping(int vertexCount) {
+    int[] mapping = new int[vertexCount];
+    Arrays.fill(mapping, NO_SUBGRAPH);
+    return mapping;
   }
 
   private int processIslands(
@@ -259,10 +277,16 @@ public class IslandPruningModule implements GraphBuilderModule {
     return stats.modifiedIslands();
   }
 
+  /**
+   * Collect the vertex pairs connected by an edge traversable with the given mode, as interleaved
+   * {@code (from, to)} {@link VertexIndex} ids. Street edges which are noThruTraffic for the mode
+   * go to {@code noThruEdges}, all others to {@code thruEdges}.
+   */
   private void collectNeighbourVertices(
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
+    VertexIndex vertexIndex,
     TraverseMode traverseMode,
-    boolean shouldMatchNoThruType
+    TIntArrayList thruEdges,
+    TIntArrayList noThruEdges
   ) {
     StreetMode streetMode = switch (traverseMode) {
       case WALK -> StreetMode.WALK;
@@ -273,24 +297,23 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
-    for (Vertex gv : graph.getVertices()) {
-      if (!(gv instanceof StreetVertex)) {
+    // only the graph vertices, not those added to the index while collecting
+    int graphVertexCount = vertexIndex.size();
+    for (int from = 0; from < graphVertexCount; from++) {
+      if (!vertexIndex.isStreetVertex(from)) {
         continue;
       }
+      Vertex gv = vertexIndex.vertex(from);
       State s0 = null;
       for (Edge e : gv.getOutgoing()) {
         if (e instanceof StreetEdge se) {
-          if (shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)) {
-            continue;
-          }
           if (!canTraverse(se, traverseMode)) {
             continue;
           }
-          Vertex out = se.getToVertex();
-          neighborsForVertex.put(gv, out);
-
           // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-          neighborsForVertex.put(out, gv);
+          var edges = se.isNoThruTraffic(traverseMode) ? noThruEdges : thruEdges;
+          edges.add(from);
+          edges.add(vertexIndex.idOf(se.getToVertex()));
         } else {
           // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
           // rental/parking edges) that don't behave like a plain permission-gated street edge.
@@ -302,9 +325,8 @@ public class IslandPruningModule implements GraphBuilderModule {
             continue;
           }
           for (State state : states) {
-            Vertex out = state.getVertex();
-            neighborsForVertex.put(gv, out);
-            neighborsForVertex.put(out, gv);
+            thruEdges.add(from);
+            thruEdges.add(vertexIndex.idOf(state.getVertex()));
           }
         }
       }
@@ -323,44 +345,6 @@ public class IslandPruningModule implements GraphBuilderModule {
       return edge.canTraverse(TraverseMode.BICYCLE) || edge.canTraverse(TraverseMode.WALK);
     }
     return edge.canTraverse(traverseMode);
-  }
-
-  private int collectSubGraphs(
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
-    // put new subgraphs here
-    Map<Vertex, Subgraph> newgraphs,
-    // optional isolation map from a previous round
-    Map<Vertex, Subgraph> subgraphs,
-    // final list of islands or null
-    ArrayList<Subgraph> islands
-  ) {
-    int count = 0;
-    for (Vertex gv : graph.getVertices()) {
-      if (!(gv instanceof StreetVertex)) {
-        continue;
-      }
-
-      if (subgraphs != null && !subgraphs.containsKey(gv)) {
-        // do not start new graph generation from non-classified vertex
-        continue;
-      }
-      // already processed
-      if (newgraphs.containsKey(gv)) {
-        continue;
-      }
-      if (!neighborsForVertex.containsKey(gv)) {
-        continue;
-      }
-      Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs, newgraphs);
-      for (var subnode : subgraph.streetVertices()) {
-        newgraphs.put(subnode, subgraph);
-      }
-      if (islands != null) {
-        islands.add(subgraph);
-      }
-      count++;
-    }
-    return count;
   }
 
   private boolean restrictOrRemove(
@@ -476,37 +460,106 @@ public class IslandPruningModule implements GraphBuilderModule {
     return true;
   }
 
-  private Subgraph computeConnectedSubgraph(
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
-    Vertex startVertex,
-    Map<Vertex, Subgraph> anchors,
-    Map<Vertex, Subgraph> alreadyMapped
-  ) {
-    Subgraph subgraph = new Subgraph();
-    Queue<Vertex> q = new ArrayDeque<>();
-    Subgraph anchor = null;
+  /**
+   * Breadth-first search for connected subgraphs over an {@link Adjacency}. Keeps its scratch
+   * arrays between searches, so that each search only costs the size of the subgraph found.
+   */
+  private static class SubgraphSearch {
 
-    if (anchors != null) {
-      // anchor subgraph expansion to this subgraph
-      anchor = anchors.get(startVertex);
+    private final VertexIndex vertexIndex;
+    private final int[] queue;
+    /** The search that last visited each vertex, avoids clearing a visited set between searches. */
+    private final int[] visitedBy;
+    private int searchId = 0;
+    private int nextSubgraphId = 0;
+
+    SubgraphSearch(VertexIndex vertexIndex) {
+      this.vertexIndex = vertexIndex;
+      // a vertex is enqueued at most once per search, except the start vertex which is enqueued
+      // again when reached from one of its neighbours
+      this.queue = new int[vertexIndex.size() + 1];
+      this.visitedBy = new int[vertexIndex.size()];
     }
-    q.add(startVertex);
-    while (!q.isEmpty()) {
-      Vertex vertex = q.poll();
-      for (Vertex neighbor : neighborsForVertex.get(vertex)) {
-        if (!subgraph.contains(neighbor) && !alreadyMapped.containsKey(neighbor)) {
-          if (anchor != null) {
-            Subgraph compare = anchors.get(neighbor);
-            if (compare != null && compare != anchor) {
+
+    /**
+     * @param newgraphs put new subgraphs here
+     * @param anchors optional isolation mapping from a previous round
+     * @param islands final list of islands or null
+     */
+    int collectSubGraphs(
+      Adjacency neighbours,
+      int[] newgraphs,
+      @Nullable int[] anchors,
+      @Nullable List<Subgraph> islands
+    ) {
+      int count = 0;
+      for (int v = 0; v < newgraphs.length; v++) {
+        if (!vertexIndex.isStreetVertex(v)) {
+          continue;
+        }
+        if (anchors != null && anchors[v] == NO_SUBGRAPH) {
+          // do not start new graph generation from non-classified vertex
+          continue;
+        }
+        // already processed
+        if (newgraphs[v] != NO_SUBGRAPH) {
+          continue;
+        }
+        if (!neighbours.hasNeighbours(v)) {
+          continue;
+        }
+        Subgraph subgraph = computeConnectedSubgraph(neighbours, v, anchors, newgraphs);
+        if (islands != null) {
+          islands.add(subgraph);
+        }
+        count++;
+      }
+      return count;
+    }
+
+    /**
+     * Find the subgraph connected to {@code startVertex}, which may not enter a vertex already
+     * mapped in {@code alreadyMapped} or, if {@code anchors} is given, belonging to a different
+     * anchor subgraph than the start vertex. Stop vertices are not marked in {@code alreadyMapped},
+     * so they can be part of several subgraphs.
+     */
+    private Subgraph computeConnectedSubgraph(
+      Adjacency neighbours,
+      int startVertex,
+      @Nullable int[] anchors,
+      int[] alreadyMapped
+    ) {
+      int subgraphId = nextSubgraphId++;
+      int visited = ++searchId;
+      Subgraph subgraph = new Subgraph(vertexIndex);
+      int anchor = anchors == null ? NO_SUBGRAPH : anchors[startVertex];
+
+      int head = 0;
+      int tail = 0;
+      queue[tail++] = startVertex;
+      while (head < tail) {
+        int vertex = queue[head++];
+        for (int i = neighbours.firstNeighbour(vertex); i < neighbours.endNeighbour(vertex); i++) {
+          int neighbour = neighbours.neighbour(i);
+          if (visitedBy[neighbour] == visited || alreadyMapped[neighbour] != NO_SUBGRAPH) {
+            continue;
+          }
+          if (anchor != NO_SUBGRAPH) {
+            int compare = anchors[neighbour];
+            if (compare != NO_SUBGRAPH && compare != anchor) {
               // do not enter a new island
               continue;
             }
           }
-          subgraph.addVertex(neighbor);
-          q.add(neighbor);
+          visitedBy[neighbour] = visited;
+          if (!vertexIndex.isStopVertex(neighbour)) {
+            alreadyMapped[neighbour] = subgraphId;
+          }
+          subgraph.addVertex(neighbour);
+          queue[tail++] = neighbour;
         }
       }
+      return subgraph;
     }
-    return subgraph;
   }
 }
