@@ -36,7 +36,7 @@ class Subgraph {
   private final List<TransitStopVertex> stopVertices;
 
   /**
-   * Lookup set for {@link #contains}, only built on demand: subgraphs are often huge (the main
+   * Lookup set for checks, only built on demand: subgraphs are often huge (the main
    * component of a country graph has millions of vertices) but membership is only queried for
    * small ones.
    */
@@ -50,13 +50,6 @@ class Subgraph {
   }
 
   /**
-   * Add a vertex to the subgraph. The caller is responsible for not adding the same vertex twice.
-   */
-  void addVertex(Vertex vertex) {
-    addVertex(vertexIndex.idOf(vertex));
-  }
-
-  /**
    * Add a vertex by its {@link VertexIndex} id. The caller is responsible for not adding the same
    * vertex twice.
    */
@@ -67,18 +60,6 @@ class Subgraph {
       streetIds.add(vertexId);
     }
     allVertices = null;
-  }
-
-  boolean contains(Vertex vertex) {
-    return allVertices().contains(vertex);
-  }
-
-  private Set<Vertex> allVertices() {
-    if (allVertices == null) {
-      allVertices = new HashSet<>(streetVertices);
-      allVertices.addAll(stopVertices);
-    }
-    return allVertices;
   }
 
   int streetSize() {
@@ -110,6 +91,7 @@ class Subgraph {
   }
 
   // find minimal distance from a given vertex to vertices of this subgraph
+
   double vertexDistanceFromSubgraph(Vertex v, double searchRadius) {
     double d1 = computeDistance(v, searchRadius, streetVertices);
     double d2 = computeDistance(v, searchRadius, stopVertices);
@@ -167,7 +149,7 @@ class Subgraph {
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
     // build the lookup set before going parallel
-    Set<Vertex> members = allVertices();
+    Set<Vertex> members = materializeVertices();
     return graph
       .findVertices(envelope)
       .parallelStream()
@@ -205,6 +187,14 @@ class Subgraph {
       }
     }
     return true;
+  }
+
+  private Set<Vertex> materializeVertices() {
+    if (allVertices == null) {
+      allVertices = new HashSet<>(streetVertices);
+      allVertices.addAll(stopVertices);
+    }
+    return allVertices;
   }
 
   /** A read-only view of a list of vertex ids as the vertices themselves. */

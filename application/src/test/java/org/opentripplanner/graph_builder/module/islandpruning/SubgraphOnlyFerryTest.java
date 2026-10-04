@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
-import java.util.List;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -19,46 +19,48 @@ class SubgraphOnlyFerryTest {
 
   @Test
   void subgraphHasOnlyFerry() {
-    TransitStopVertex transitStopVertex = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
+    var transitStopVertex = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
 
-    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
-    subgraph.addVertex(transitStopVertex);
+    var subgraph = subgraph(transitStopVertex);
 
     assertTrue(subgraph.hasOnlyFerryStops());
   }
 
   @Test
   void subgraphHasOnlyNoFerry() {
-    TransitStopVertex transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(false).build();
+    var transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(false).build();
 
-    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
-    subgraph.addVertex(transitStopVertex1);
+    final Subgraph subgraph = subgraph(transitStopVertex1);
 
     assertFalse(subgraph.hasOnlyFerryStops());
   }
 
   @Test
   void subgraphHasOnlyFerryMoreStops() {
-    TransitStopVertex transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
-    TransitStopVertex transitStopVertex2 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
+    var transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
+    var transitStopVertex2 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
 
-    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
-    subgraph.addVertex(transitStopVertex1);
-    subgraph.addVertex(transitStopVertex2);
-
+    var subgraph = subgraph(transitStopVertex1, transitStopVertex2);
     assertTrue(subgraph.hasOnlyFerryStops());
   }
 
   @Test
   void subgraphHasNotOnlyFerryMoreStops() {
-    TransitStopVertex transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
-    TransitStopVertex transitStopVertex2 = vertexBuilder(REGULAR_STOP2).withIsFerry(false).build();
-
-    Subgraph subgraph = new Subgraph(new VertexIndex(List.of()));
-    subgraph.addVertex(transitStopVertex1);
-    subgraph.addVertex(transitStopVertex2);
+    var transitStopVertex1 = vertexBuilder(REGULAR_STOP1).withIsFerry(true).build();
+    var transitStopVertex2 = vertexBuilder(REGULAR_STOP2).withIsFerry(false).build();
+    var subgraph = subgraph(transitStopVertex1, transitStopVertex2);
 
     assertFalse(subgraph.hasOnlyFerryStops());
+  }
+
+  private static Subgraph subgraph(TransitStopVertex... transitStopVertex) {
+    var index = new VertexIndex(Arrays.asList(transitStopVertex));
+    Subgraph subgraph = new Subgraph(index);
+    for (var v : transitStopVertex) {
+      subgraph.addVertex(index.idOf(v));
+    }
+
+    return subgraph;
   }
 
   private static TransitStopVertexBuilder vertexBuilder(FeedScopedId id) {
