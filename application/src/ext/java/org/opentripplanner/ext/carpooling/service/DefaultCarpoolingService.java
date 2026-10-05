@@ -459,7 +459,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
         candidateTrips,
         accessOrEgress.isAccess(),
         maxCarSpeed,
-        parameters.maxTripDuration()
+        parameters.maxTripDuration(),
+        Duration.ofSeconds(maxLegSeconds)
       );
       var pathRouter = new CarpoolStreetRouter(
         streetLimitationParametersService,

@@ -13,7 +13,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * The passenger's two car trees of an access/egress request, outward from the passenger and inward
  * to it. The tree on the driver's side of the passenger, inward for access and outward for egress,
  * only serves segments between the passenger and the trips' waypoints, so it stops once it has
- * them.
+ * them. The tree on the side of the passenger's ride stops at the request's maximum carpool leg.
  */
 public final class PassengerTrees {
 
@@ -24,25 +24,35 @@ public final class PassengerTrees {
    *
    * @param access whether the request is an access request, whose driver's side of the passenger is
    *               the inward tree; for egress it is the outward one
+   * @param maxLeg the request's maximum carpool leg
    */
   public static CarpoolTreeStreetRouter router(
     Vertex passenger,
     List<RoutableCarpoolTrip> trips,
     boolean access,
     double maxCarSpeed,
-    Duration maxTree
+    Duration maxTree,
+    Duration maxLeg
   ) {
+    var outwardLimit = min(treeLimit(passenger, trips, maxCarSpeed, Direction.FROM), maxTree);
+    var inwardLimit = min(treeLimit(passenger, trips, maxCarSpeed, Direction.TO), maxTree);
+    // The passenger rides outward from the pickup for access, inward to the dropoff for egress.
+    if (access) {
+      outwardLimit = min(outwardLimit, maxLeg);
+    } else {
+      inwardLimit = min(inwardLimit, maxLeg);
+    }
     var router = new CarpoolTreeStreetRouter();
     router.addVertex(
       passenger,
       Direction.FROM,
-      min(treeLimit(passenger, trips, maxCarSpeed, Direction.FROM), maxTree),
+      outwardLimit,
       access ? null : waypointReach(passenger, trips, maxCarSpeed, Direction.FROM)
     );
     router.addVertex(
       passenger,
       Direction.TO,
-      min(treeLimit(passenger, trips, maxCarSpeed, Direction.TO), maxTree),
+      inwardLimit,
       access ? waypointReach(passenger, trips, maxCarSpeed, Direction.TO) : null
     );
     return router;
