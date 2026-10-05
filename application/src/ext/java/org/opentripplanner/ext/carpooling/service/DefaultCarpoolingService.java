@@ -458,18 +458,25 @@ public class DefaultCarpoolingService implements CarpoolingService {
       }
 
       // The passenger's two trees, outward and inward, sized to the widest leg any candidate trip
-      // can insert the passenger into, are the only street searches of the request.
+      // can insert the passenger into, are the only street searches of the request. The tree on
+      // the side of the passenger's ride (outward for access, inward for egress) only answers
+      // parts of that ride, and a ride longer than the request's maximum leg is dropped below, so
+      // that tree stops there.
+      var outwardLimit = passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, true);
+      var inwardLimit = passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, false);
+      var maxLeg = Duration.ofSeconds(maxLegSeconds);
+      if (accessOrEgress.isAccess()) {
+        outwardLimit = outwardLimit.compareTo(maxLeg) < 0 ? outwardLimit : maxLeg;
+      } else {
+        inwardLimit = inwardLimit.compareTo(maxLeg) < 0 ? inwardLimit : maxLeg;
+      }
       var passengerRouter = new CarpoolTreeStreetRouter();
       passengerRouter.addVertex(
         passengerVertex,
         CarpoolTreeStreetRouter.Direction.FROM,
-        passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, true)
+        outwardLimit
       );
-      passengerRouter.addVertex(
-        passengerVertex,
-        CarpoolTreeStreetRouter.Direction.TO,
-        passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, false)
-      );
+      passengerRouter.addVertex(passengerVertex, CarpoolTreeStreetRouter.Direction.TO, inwardLimit);
       var corridorRouter = new CorridorRouter(
         passengerRouter,
         passengerVertex,
