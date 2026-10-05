@@ -34,27 +34,17 @@ class VertexIndex {
     this.streetVertex = new boolean[vertices.size()];
     this.stopVertex = new boolean[vertices.size()];
     for (Vertex v : vertices) {
-      idOf(v);
+      addVertex(v);
     }
   }
 
-  /** Returns the id of the given vertex, assigning a new one if it does not have one yet. */
   int idOf(Vertex v) {
     int id = ids.get(v);
     if (id != NO_ID) {
       return id;
+    } else {
+      throw new RuntimeException("Cannot find index for vertex %s".formatted(v));
     }
-    id = vertices.size();
-    ids.put(v, id);
-    vertices.add(v);
-    if (id >= streetVertex.length) {
-      int newLength = Math.max(16, streetVertex.length * 2);
-      streetVertex = Arrays.copyOf(streetVertex, newLength);
-      stopVertex = Arrays.copyOf(stopVertex, newLength);
-    }
-    streetVertex[id] = v instanceof StreetVertex;
-    stopVertex[id] = v instanceof TransitStopVertex;
-    return id;
   }
 
   Vertex vertex(int id) {
@@ -71,5 +61,24 @@ class VertexIndex {
 
   boolean isStopVertex(int id) {
     return stopVertex[id];
+  }
+
+  /** Returns the id of the given vertex, assigning a new one if it does not have one yet. */
+  private int addVertex(Vertex v) {
+    int id = ids.get(v);
+    if (id != NO_ID) {
+      return id;
+    }
+    id = vertices.size();
+    ids.put(v, id);
+    vertices.add(v);
+    if (id >= streetVertex.length) {
+      int newLength = Math.max(16, streetVertex.length * 2);
+      streetVertex = Arrays.copyOf(streetVertex, newLength);
+      stopVertex = Arrays.copyOf(stopVertex, newLength);
+    }
+    streetVertex[id] = v instanceof StreetVertex;
+    stopVertex[id] = v instanceof TransitStopVertex;
+    return id;
   }
 }

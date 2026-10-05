@@ -128,7 +128,6 @@ public class IslandPruningModule implements GraphBuilderModule {
    *    unreachable edges. Remove unconnected edges.
    */
   private void pruneIslands(VertexIndex vertexIndex, TraverseMode traverseMode) {
-    LOG.debug("nothru pruning");
     Map<Edge, Boolean> isolated = new HashMap<>();
     ArrayList<Subgraph> islands = new ArrayList<>();
     int count;
@@ -283,8 +282,7 @@ public class IslandPruningModule implements GraphBuilderModule {
     StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
     // only the graph vertices, not those added to the index while collecting
-    int graphVertexCount = vertexIndex.size();
-    for (int from = 0; from < graphVertexCount; from++) {
+    for (int from = 0; from < vertexIndex.size(); from++) {
       if (!vertexIndex.isStreetVertex(from)) {
         continue;
       }
