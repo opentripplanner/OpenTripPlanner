@@ -461,21 +461,37 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // can insert the passenger into, are the request's only searches for driving times: the
       // trips' legs and stop times come from their corridors. The tree on the driver's side of the
       // passenger, inward for access and outward for egress, only serves segments between the
-      // passenger and the trips' waypoints, so it stops once it has them. Neither reaches further
+      // passenger and the trips' waypoints, so it stops once it has them. The tree on the side of
+      // the passenger's ride stops at the request's maximum carpool leg. Neither reaches further
       // than the longest trip that is modelled, whatever the budgets.
       boolean access = accessOrEgress.isAccess();
       var maxTree = parameters.maxTripDuration();
+      var outwardLimit = min(
+        passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, true),
+        maxTree
+      );
+      var inwardLimit = min(
+        passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, false),
+        maxTree
+      );
+      // The passenger rides outward from the pickup for access, inward to the dropoff for egress.
+      var maxLeg = Duration.ofSeconds(maxLegSeconds);
+      if (access) {
+        outwardLimit = min(outwardLimit, maxLeg);
+      } else {
+        inwardLimit = min(inwardLimit, maxLeg);
+      }
       var passengerRouter = new CarpoolTreeStreetRouter();
       passengerRouter.addVertex(
         passengerVertex,
         CarpoolTreeStreetRouter.Direction.FROM,
-        min(passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, true), maxTree),
+        outwardLimit,
         access ? null : waypointReach(passengerVertex, candidateTrips, maxCarSpeed, true)
       );
       passengerRouter.addVertex(
         passengerVertex,
         CarpoolTreeStreetRouter.Direction.TO,
-        min(passengerTreeLimit(passengerVertex, candidateTrips, maxCarSpeed, false), maxTree),
+        inwardLimit,
         access ? waypointReach(passengerVertex, candidateTrips, maxCarSpeed, false) : null
       );
       var pathRouter = new CarpoolStreetRouter(
