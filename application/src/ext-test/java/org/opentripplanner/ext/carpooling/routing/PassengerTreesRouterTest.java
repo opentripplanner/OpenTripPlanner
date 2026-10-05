@@ -81,27 +81,76 @@ class PassengerTreesRouterTest extends GraphRoutingTest {
       trips,
       true,
       MAX_SPEED,
-      Duration.ofMinutes(2)
+      Duration.ofMinutes(2),
+      AN_HOUR
     );
     assertNull(capped.route(passenger, a1));
     assertNull(capped.route(a0, passenger));
 
-    var uncapped = PassengerTrees.accessEgressRouter(passenger, trips, true, MAX_SPEED, AN_HOUR);
+    var uncapped = PassengerTrees.accessEgressRouter(
+      passenger,
+      trips,
+      true,
+      MAX_SPEED,
+      AN_HOUR,
+      AN_HOUR
+    );
     assertNotNull(uncapped.route(passenger, a1));
     assertNotNull(uncapped.route(a0, passenger));
   }
 
   @Test
   void onlyTheDriversSideTreeStopsAtTheTripsWaypoints() {
-    var access = PassengerTrees.accessEgressRouter(passenger, trips, true, MAX_SPEED, AN_HOUR);
+    var access = PassengerTrees.accessEgressRouter(
+      passenger,
+      trips,
+      true,
+      MAX_SPEED,
+      AN_HOUR,
+      AN_HOUR
+    );
     assertNotNull(access.route(a0, passenger), "the driver's side reaches a0");
     assertNull(access.route(beforeStart, passenger), "the driver's side stops at a0");
     assertNotNull(access.route(passenger, afterEnd), "the ride goes on past a1");
 
-    var egress = PassengerTrees.accessEgressRouter(passenger, trips, false, MAX_SPEED, AN_HOUR);
+    var egress = PassengerTrees.accessEgressRouter(
+      passenger,
+      trips,
+      false,
+      MAX_SPEED,
+      AN_HOUR,
+      AN_HOUR
+    );
     assertNotNull(egress.route(passenger, a1), "the driver's side reaches a1");
     assertNull(egress.route(passenger, afterEnd), "the driver's side stops at a1");
     assertNotNull(egress.route(beforeStart, passenger), "the ride comes from before a0");
+  }
+
+  @Test
+  void onlyTheRideSideTreeStopsAtTheRequestsMaximumRide() {
+    var maxRide = Duration.ofMinutes(2);
+
+    var access = PassengerTrees.accessEgressRouter(
+      passenger,
+      trips,
+      true,
+      MAX_SPEED,
+      AN_HOUR,
+      maxRide
+    );
+    assertNotNull(access.route(a0, passenger), "the driver's side reaches a0, six minutes away");
+    assertNull(access.route(passenger, a1), "the ride stops at two minutes");
+
+    var egress = PassengerTrees.accessEgressRouter(
+      passenger,
+      trips,
+      false,
+      MAX_SPEED,
+      AN_HOUR,
+      maxRide
+    );
+    assertNotNull(egress.route(passenger, a1), "the driver's side reaches a1, six minutes away");
+    assertNull(egress.route(a0, passenger), "the ride stops at two minutes");
   }
 
   @Test

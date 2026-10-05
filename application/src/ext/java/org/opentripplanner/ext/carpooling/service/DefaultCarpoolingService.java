@@ -462,12 +462,17 @@ public class DefaultCarpoolingService implements CarpoolingService {
         return List.of();
       }
 
+      // The leg includes the passenger's walk to or from the car, so the ride is that much shorter.
+      var maxRide = Duration.ofSeconds(maxLegSeconds).minus(
+        StreetPathUtils.durationOrZero(passengerSnap.walkPath())
+      );
       var passengerRouter = PassengerTrees.accessEgressRouter(
         passengerVertex,
         candidateTrips,
         accessOrEgress.isAccess(),
         maxCarSpeed,
-        parameters.maxTripDuration()
+        parameters.maxTripDuration(),
+        maxRide
       );
       var pathRouter = new CarpoolStreetRouter(
         streetLimitationParametersService,

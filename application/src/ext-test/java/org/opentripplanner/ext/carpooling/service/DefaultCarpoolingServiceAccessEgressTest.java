@@ -357,8 +357,8 @@ class DefaultCarpoolingServiceAccessEgressTest extends GraphRoutingTest {
     context.upsertTrip(CarpoolTripTestData.createSimpleTripWithTime(coordA, coordD, departureTime));
 
     assertFalse(routeAccessWithMaxCarpoolDuration(Duration.ofHours(2)).isEmpty());
-    // The shortest ride here, P2 to a stop, is 859 m: over a minute.
-    assertTrue(routeAccessWithMaxCarpoolDuration(Duration.ofSeconds(30)).isEmpty());
+    // P2 to the nearest stop drives 77 s; with the 60 s pickup dwell the leg takes 137 s.
+    assertTrue(routeAccessWithMaxCarpoolDuration(Duration.ofMinutes(2)).isEmpty());
   }
 
   @Test
