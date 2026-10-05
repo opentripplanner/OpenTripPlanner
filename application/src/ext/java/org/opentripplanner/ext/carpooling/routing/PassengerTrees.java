@@ -15,7 +15,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * the leg's limit minus that drive ({@link DetourBound}).
  * <p>
  * A tree that serves the segments between the point and the trips' waypoints stops once it has
- * them.
+ * them. The tree on the side of an access/egress passenger's ride stops at the longest ride the
+ * request allows.
  */
 public final class PassengerTrees {
 
@@ -56,12 +57,15 @@ public final class PassengerTrees {
    * access passenger is picked up: the driver comes in to the passenger, who then rides out. An
    * egress passenger is dropped off: the passenger rides in, and the driver goes on out. Only the
    * tree on the driver's side stops once it has reached the trips' waypoints.
+   *
+   * @param maxRide the longest ride the request allows
    */
   public static CarpoolTreeStreetRouter accessEgressRouter(
     Vertex passenger,
     List<RoutableCarpoolTrip> trips,
     boolean access,
-    Duration maxTree
+    Duration maxTree,
+    Duration maxRide
   ) {
     var trees = new PassengerTrees(trips, maxTree);
     var router = new CarpoolTreeStreetRouter();
@@ -70,7 +74,7 @@ public final class PassengerTrees {
     trees.addTree(router, passenger, driverSide, access);
 
     var rideSide = access ? Direction.FROM : Direction.TO;
-    router.addVertex(passenger, rideSide, trees.limit(passenger, rideSide));
+    router.addVertex(passenger, rideSide, min(trees.limit(passenger, rideSide), maxRide));
     return router;
   }
 
