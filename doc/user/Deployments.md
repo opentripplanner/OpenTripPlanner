@@ -84,6 +84,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 - **Leipzig, Germany** As of summer 2020 [Leipzig Move](https://leipzig-move.de/) has been using
   OpenTripPlanner.
 - **Iceland (nationwide)** – [Strætó](https://www.straeto.is/en) has used OTP from 2015.
+- **Netherlands (nationwide)** – [InfoPlaza Mobility](https://www.infoplaza.com/en/mobility) has been providing a trip planner based on OTP for [Transdev Netherlands](https://www.transdev.nl/nl/) and it's subsidiaries since 2025, including full support for nation-wide flex and shared-mobility.
 
 ## Independent Production
 
