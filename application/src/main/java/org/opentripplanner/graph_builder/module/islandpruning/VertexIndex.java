@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -25,15 +24,15 @@ class VertexIndex {
 
   private final TObjectIntMap<Vertex> ids;
   private final List<Vertex> vertices;
-  private boolean[] streetVertex;
-  private boolean[] stopVertex;
+  private final boolean[] streetVertex;
+  private final boolean[] stopVertex;
 
-  VertexIndex(Collection<Vertex> vertices) {
-    this.ids = new TObjectIntHashMap<>(vertices.size(), 0.5f, NO_ID);
-    this.vertices = new ArrayList<>(vertices.size());
-    this.streetVertex = new boolean[vertices.size()];
-    this.stopVertex = new boolean[vertices.size()];
-    for (Vertex v : vertices) {
+  VertexIndex(Collection<Vertex> graphVertices) {
+    this.ids = new TObjectIntHashMap<>(graphVertices.size(), 0.5f, NO_ID);
+    this.vertices = new ArrayList<>(graphVertices.size());
+    this.streetVertex = new boolean[graphVertices.size()];
+    this.stopVertex = new boolean[graphVertices.size()];
+    for (Vertex v : graphVertices) {
       addVertex(v);
     }
   }
@@ -72,11 +71,6 @@ class VertexIndex {
     id = vertices.size();
     ids.put(v, id);
     vertices.add(v);
-    if (id >= streetVertex.length) {
-      int newLength = Math.max(16, streetVertex.length * 2);
-      streetVertex = Arrays.copyOf(streetVertex, newLength);
-      stopVertex = Arrays.copyOf(stopVertex, newLength);
-    }
     streetVertex[id] = v instanceof StreetVertex;
     stopVertex[id] = v instanceof TransitStopVertex;
     return id;
