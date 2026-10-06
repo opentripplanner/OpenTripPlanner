@@ -29,7 +29,7 @@ class VertexIndex {
   private boolean[] stopVertex;
 
   VertexIndex(Collection<Vertex> vertices) {
-    this.ids = new TObjectIntHashMap<>(vertices.size() * 2, 0.5f, NO_ID);
+    this.ids = new TObjectIntHashMap<>(vertices.size(), 0.5f, NO_ID);
     this.vertices = new ArrayList<>(vertices.size());
     this.streetVertex = new boolean[vertices.size()];
     this.stopVertex = new boolean[vertices.size()];
