@@ -73,6 +73,7 @@ class CarpoolItineraryMapperTest {
   private static final Duration PICKUP_SEGMENT_DURATION = Duration.ofMinutes(1);
   private static final Duration SHARED_SEGMENT_DURATION = Duration.ofSeconds(60);
   private static final double CARPOOL_RELUCTANCE = 1.0;
+  private static final int BOARD_COST = 0;
 
   /**
    * Every GraphPath produced by {@link org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder}
@@ -197,6 +198,7 @@ class CarpoolItineraryMapperTest {
     var itinerary = mapper.toItinerary(
       candidate,
       CARPOOL_RELUCTANCE,
+      BOARD_COST,
       GenericLocation.fromCoordinate(59.91, 10.74, "Home"),
       GenericLocation.fromCoordinate(59.95, 10.80, "Office")
     );
@@ -220,6 +222,7 @@ class CarpoolItineraryMapperTest {
     var itinerary = mapper.toItinerary(
       candidate,
       CARPOOL_RELUCTANCE,
+      BOARD_COST,
       GenericLocation.fromCoordinate(59.91, 10.74, null),
       GenericLocation.fromCoordinate(59.95, 10.80, null)
     );
@@ -244,6 +247,7 @@ class CarpoolItineraryMapperTest {
     var itinerary = mapper.toItinerary(
       candidate,
       CARPOOL_RELUCTANCE,
+      BOARD_COST,
       GenericLocation.fromCoordinate(59.91, 10.74, ""),
       GenericLocation.fromCoordinate(59.95, 10.80, "")
     );
@@ -270,6 +274,7 @@ class CarpoolItineraryMapperTest {
     var itinerary = mapper.toItinerary(
       candidate,
       CARPOOL_RELUCTANCE,
+      BOARD_COST,
       GenericLocation.fromCoordinate(59.91, 10.74, "Home"),
       GenericLocation.fromCoordinate(59.95, 10.80, "Office")
     );
@@ -286,6 +291,29 @@ class CarpoolItineraryMapperTest {
     // "Office" label — that's the property under test.
     assertEquals(UNNAMED_INTERSECTION, legs.get(1).to().name.toString());
     assertEquals(UNNAMED_INTERSECTION, legs.getLast().from().name.toString());
+  }
+
+  /**
+   * The board cost is added once to the carpool leg of a direct itinerary, and so to the
+   * itinerary's generalized cost.
+   */
+  @Test
+  void directItineraryIncludesBoardCostOnce() {
+    var candidate = newCandidate(
+      createGraphPath(Duration.ofSeconds(80)),
+      createGraphPath(Duration.ofSeconds(40))
+    );
+    var from = GenericLocation.fromCoordinate(59.91, 10.74, "Home");
+    var to = GenericLocation.fromCoordinate(59.95, 10.80, "Office");
+
+    var withoutBoardCost = mapper.toItinerary(candidate, CARPOOL_RELUCTANCE, 0, from, to);
+    var withBoardCost = mapper.toItinerary(candidate, CARPOOL_RELUCTANCE, 2400, from, to);
+
+    assertEquals(
+      withoutBoardCost.legs().get(1).generalizedCost() + 2400,
+      withBoardCost.legs().get(1).generalizedCost()
+    );
+    assertEquals(withoutBoardCost.generalizedCost() + 2400, withBoardCost.generalizedCost());
   }
 
   /**
@@ -312,6 +340,7 @@ class CarpoolItineraryMapperTest {
       candidate,
       TimeAndCost.ZERO,
       CARPOOL_RELUCTANCE,
+      BOARD_COST,
       EndpointLabel.forLocation(passengerOrigin),
       EndpointLabel.forStop(stop)
     );
@@ -345,6 +374,7 @@ class CarpoolItineraryMapperTest {
       candidate,
       TimeAndCost.ZERO,
       CARPOOL_RELUCTANCE,
+      BOARD_COST,
       EndpointLabel.forStop(stop),
       EndpointLabel.forLocation(passengerDestination)
     );

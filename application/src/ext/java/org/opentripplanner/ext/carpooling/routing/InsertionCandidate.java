@@ -150,10 +150,15 @@ public record InsertionCandidate(
 
   /**
    * Generalized cost of the passenger's ride in raw weight units (seconds-equivalent), equal to
-   * {@link #getPassengerRideDuration()} multiplied by {@code carpoolReluctance}.
+   * {@link #getPassengerRideDuration()} multiplied by {@code carpoolReluctance}, plus a fixed
+   * {@code boardCost} for getting into the car.
+   * <p>
+   * This is the single place the ride is priced: the direct itinerary, the Raptor access cost and
+   * the Raptor egress cost all go through here, so a carpool ride costs the same whether it is the
+   * whole journey or the leg to a transit stop.
    */
-  public double getPassengerRideWeight(double carpoolReluctance) {
-    return getPassengerRideDuration().getSeconds() * carpoolReluctance;
+  public double getPassengerRideWeight(double carpoolReluctance, int boardCost) {
+    return getPassengerRideDuration().getSeconds() * carpoolReluctance + boardCost;
   }
 
   private static Duration totalSegmentDuration(
