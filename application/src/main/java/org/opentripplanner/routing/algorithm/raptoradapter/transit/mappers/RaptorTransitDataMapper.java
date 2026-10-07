@@ -34,9 +34,9 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
-import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferServiceFactory;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,14 +60,14 @@ public class RaptorTransitDataMapper {
   private final TransferRepository transferRepository;
   private final Graph graph;
   private final TransitRepository transitRepository;
-  private final RegularTransferRepository<NearbyStop> regularTransferRepository;
+  private final RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
   private final TransferProfilesConfig transferProfilesConfig;
 
   private RaptorTransitDataMapper(
     Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     TransferProfilesConfig transferProfilesConfig
   ) {
     this.transitService = new DefaultTransitService(transitRepository);
@@ -75,7 +75,7 @@ public class RaptorTransitDataMapper {
     this.transferRepository = transferRepository;
     this.graph = graph;
     this.transitRepository = transitRepository;
-    this.regularTransferRepository = regularTransferRepository;
+    this.regularTransferBuildRepository = regularTransferBuildRepository;
     this.transferProfilesConfig = transferProfilesConfig;
   }
 
@@ -98,14 +98,14 @@ public class RaptorTransitDataMapper {
     @Nullable Graph graph,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    @Nullable RegularTransferRepository<NearbyStop> regularTransferRepository,
+    @Nullable RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     @Nullable TransferProfilesConfig transferProfilesConfig
   ) {
     return new RaptorTransitDataMapper(
       graph,
       transitRepository,
       transferRepository,
-      regularTransferRepository,
+      regularTransferBuildRepository,
       transferProfilesConfig
     ).map(tuningParameters);
   }
@@ -158,7 +158,7 @@ public class RaptorTransitDataMapper {
    */
   @Nullable
   private RegularTransferServiceFactory<NearbyStop> createRegularTransferServiceFactory() {
-    if (graph == null || regularTransferRepository == null || transferProfilesConfig == null) {
+    if (graph == null || regularTransferBuildRepository == null || transferProfilesConfig == null) {
       return null;
     }
     var stopIndex = new StopIndex(
@@ -172,9 +172,11 @@ public class RaptorTransitDataMapper {
       transitRepository
     );
     var pathProvider = new StreetTransferPathProvider(graph, nearbyStopFinder);
-    return new DefaultRegularTransferServiceFactory<NearbyStop>(
+    // Temporary: one snapshot for the process lifetime, until routing reads the snapshot of the
+    // request's transaction scope.
+    return RegularTransferFactory.createServiceFactory(
       stopIndex,
-      regularTransferRepository,
+      regularTransferBuildRepository.createInitialSnapshot(),
       pathProvider
     );
   }

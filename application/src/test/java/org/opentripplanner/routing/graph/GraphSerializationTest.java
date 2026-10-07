@@ -56,7 +56,8 @@ import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -110,7 +111,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.transferRepository(),
-      new RegularTransferRepository<>(),
+      RegularTransferFactory.createBuildRepository(),
       weRepo,
       parkingRepository,
       emissionRepository,
@@ -144,7 +145,7 @@ public class GraphSerializationTest {
       streetRepository,
       model.transitRepository(),
       model.transferRepository(),
-      new RegularTransferRepository<>(),
+      RegularTransferFactory.createBuildRepository(),
       worldEnvelopeRepository,
       parkingRepository,
       emissionRepository,
@@ -253,7 +254,7 @@ public class GraphSerializationTest {
     StreetRepository streetRepository,
     TransitRepository originalTransitRepository,
     TransferRepository originalTransferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
     EmissionRepository emissionRepository,
@@ -269,7 +270,7 @@ public class GraphSerializationTest {
       streetRepository,
       originalTransitRepository,
       originalTransferRepository,
-      regularTransferRepository,
+      regularTransferBuildRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
       BuildConfig.DEFAULT,

@@ -59,8 +59,9 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 public class TestServerContext {
@@ -101,7 +102,8 @@ public class TestServerContext {
   ) {
     transitRepository.index();
 
-    var regularTransferRepository = new RegularTransferRepository<NearbyStop>();
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
+      RegularTransferFactory.createBuildRepository();
     var transferProfilesConfig = new TransferProfilesConfig(
       List.of(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT))
     );
@@ -109,7 +111,7 @@ public class TestServerContext {
       graph,
       transitRepository,
       transferProfilesConfig,
-      regularTransferRepository,
+      regularTransferBuildRepository,
       DataImportIssueStore.NOOP
     ).buildGraph();
 
@@ -119,7 +121,7 @@ public class TestServerContext {
       graph,
       transitRepository,
       transferRepository,
-      regularTransferRepository,
+      regularTransferBuildRepository,
       transferProfilesConfig
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);

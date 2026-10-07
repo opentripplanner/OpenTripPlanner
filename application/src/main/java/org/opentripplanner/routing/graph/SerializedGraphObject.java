@@ -42,7 +42,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -72,7 +72,7 @@ public class SerializedGraphObject implements Serializable {
   public final StreetDetailsRepository streetDetailsRepository;
   public final TransitRepository transitRepository;
   public final TransferRepository transferRepository;
-  public final RegularTransferRepository<NearbyStop> regularTransferRepository;
+  public final RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
 
@@ -107,7 +107,7 @@ public class SerializedGraphObject implements Serializable {
     StreetRepository streetRepository,
     TransitRepository transitRepository,
     TransferRepository transferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     BuildConfig buildConfig,
@@ -125,7 +125,7 @@ public class SerializedGraphObject implements Serializable {
     this.streetRepository = streetRepository;
     this.transitRepository = transitRepository;
     this.transferRepository = transferRepository;
-    this.regularTransferRepository = regularTransferRepository;
+    this.regularTransferBuildRepository = regularTransferBuildRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
     this.buildConfig = buildConfig;

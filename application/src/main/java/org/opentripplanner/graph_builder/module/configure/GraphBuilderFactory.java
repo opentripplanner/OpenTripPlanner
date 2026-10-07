@@ -56,7 +56,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 @Singleton
 @Component(
@@ -135,8 +135,8 @@ public interface GraphBuilderFactory {
     Builder transferRepository(TransferRepository transferRepository);
 
     @BindsInstance
-    Builder regularTransferRepository(
-      RegularTransferRepository<NearbyStop> regularTransferRepository
+    Builder regularTransferBuildRepository(
+      RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
     );
 
     @BindsInstance

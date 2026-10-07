@@ -9,6 +9,7 @@ import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
@@ -16,11 +17,11 @@ import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
- * Builds a {@link RaptorTransferStore} for a given {@code (profileId, preferences)} by re-costing the
- * path templates {@link RegularTransferRepository} generated once at graph-build time, under
- * request-time preferences. Results are cached, bounded LRU, keyed on
- * {@code (profileId, preferences)} - normalizing {@code U} so equivalent requests share a cache
- * entry is the caller's responsibility, not this factory's.
+ * Builds a {@link RaptorTransferStore} for a given {@code (profileType, preferences)} by re-costing
+ * the path templates of a {@link RegularTransferRepositorySnapshot} under request-time preferences.
+ * Results are cached, bounded LRU, keyed on {@code (profileType, preferences)} - normalizing the
+ * preferences so equivalent requests share a cache entry is the caller's responsibility, not this
+ * factory's.
  *
  * @param <P> the transfer path/template type
  */
@@ -29,7 +30,7 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
   private static final int DEFAULT_MAX_CACHE_SIZE = 32;
 
   private final StopIndex stopIndex;
-  private final RegularTransferRepository<P> repository;
+  private final RegularTransferRepositorySnapshot<P> snapshot;
   private final TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider;
 
   // TODO TX - Split out cache into encapsulated class
@@ -37,20 +38,20 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
 
   public DefaultRegularTransferServiceFactory(
     StopIndex stopIndex,
-    RegularTransferRepository<P> repository,
+    RegularTransferRepositorySnapshot<P> snapshot,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
   ) {
-    this(stopIndex, repository, pathProvider, DEFAULT_MAX_CACHE_SIZE);
+    this(stopIndex, snapshot, pathProvider, DEFAULT_MAX_CACHE_SIZE);
   }
 
   public DefaultRegularTransferServiceFactory(
     StopIndex stopIndex,
-    RegularTransferRepository<P> repository,
+    RegularTransferRepositorySnapshot<P> snapshot,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
     int maxCacheSize
   ) {
     this.stopIndex = stopIndex;
-    this.repository = repository;
+    this.snapshot = snapshot;
     this.pathProvider = pathProvider;
     this.cache = new LinkedHashMap<>(16, 0.75f, true) {
       @Override
@@ -83,7 +84,7 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
    */
   @Nullable
   public P findPath(TransferProfileType profileType, int fromStop, int toStop) {
-    return repository.findPath(profileType, fromStop, toStop);
+    return snapshot.findPath(profileType, fromStop, toStop);
   }
 
   private RaptorRegularTransferService build(
@@ -91,7 +92,7 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
     AbstractUserPreferences<?> preferences
   ) {
     var builder = RaptorTransferStore.of(stopIndex.size());
-    for (var stored : repository.pathsFor(profileType)) {
+    for (var stored : snapshot.pathsFor(profileType)) {
       Optional<PathCriteria> criteria = pathProvider.computePathCriteria(
         stored.path(),
         profileType,
