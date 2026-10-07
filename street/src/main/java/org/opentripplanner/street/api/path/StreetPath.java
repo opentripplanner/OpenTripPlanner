@@ -3,7 +3,6 @@ package org.opentripplanner.street.api.path;
 import java.time.Duration;
 import java.util.List;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 
@@ -30,9 +29,6 @@ public interface StreetPath {
 
   /// The time it takes to traverse the path, rounded up to whole seconds.
   Duration duration();
-
-  /// The distance traversed along the path.
-  Distance traversalDistance();
 
   /// Split this path into legs. Each change of street mode, like picking up a rental vehicle or
   /// parking a car, starts a new leg. Walking a bike does not.

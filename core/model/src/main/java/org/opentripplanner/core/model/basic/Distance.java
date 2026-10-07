@@ -55,15 +55,6 @@ public class Distance implements Serializable {
     return of((int) (value * multiplier), validationErrorHandler);
   }
 
-  /**
-   * Returns a Distance object representing the given number of meters.
-   *
-   * @throws IllegalArgumentException if the distance is negative
-   */
-  public static Distance ofMeters(double meters) {
-    return of((int) Math.round(meters * MILLIMETERS_PER_M));
-  }
-
   /** Returns a Distance object representing the given number of meters */
   public static Optional<Distance> ofMetersBoxed(
     @Nullable Double value,

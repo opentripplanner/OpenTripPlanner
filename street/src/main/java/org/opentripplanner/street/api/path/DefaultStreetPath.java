@@ -11,7 +11,6 @@ import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -77,11 +76,6 @@ final class DefaultStreetPath implements StreetPath {
       states.getLast().getTimeMilliseconds() - states.getFirst().getTimeMilliseconds()
     );
     return Duration.ofSeconds((millis + 999L) / 1000L);
-  }
-
-  @Override
-  public Distance traversalDistance() {
-    return Distance.ofMeters(distanceMeters());
   }
 
   @Override
