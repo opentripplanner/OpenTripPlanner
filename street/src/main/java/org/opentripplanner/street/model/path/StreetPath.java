@@ -95,6 +95,19 @@ public class StreetPath {
     return GeometryUtils.concatenateLineStrings(geometries::iterator);
   }
 
+  /// Split this path into legs. Each change of street mode, like picking up a rental vehicle or
+  /// parking a car, starts a new leg. Walking a bike does not.
+  ///
+  /// The legs are created on demand, and the expensive parts of each leg, like the turn-by-turn
+  /// directions, are computed lazily when accessed.
+  ///
+  /// @param ellipsoidToGeoidDifference The difference between the ellipsoid and the geoid
+  ///                                   elevation of the graph, applied to the elevations of the
+  ///                                   legs if requested.
+  public List<PathLeg> legs(double ellipsoidToGeoidDifference) {
+    return new StreetPathToLegsMapper(ellipsoidToGeoidDifference).map(this);
+  }
+
   /// Get all the states of this path
   public List<State> states() {
     return states;
@@ -156,8 +169,8 @@ public class StreetPath {
   /// Get a specific section of this path as a new path.
   ///
   /// @param startIdx the first state index (inclusive)
-  /// @param endIdx   the end state index (exclusive)
-  public StreetPath subPath(int startIdx, int endIdx) {
+  /// @param endIdx the end state index (exclusive)
+  StreetPath subPath(int startIdx, int endIdx) {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);
     return new StreetPath(subStates, subEdges);

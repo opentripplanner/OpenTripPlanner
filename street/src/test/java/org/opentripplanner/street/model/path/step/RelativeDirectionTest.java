@@ -1,15 +1,15 @@
-package org.opentripplanner.model.plan.walkstep;
+package org.opentripplanner.street.model.path.step;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.CIRCLE_CLOCKWISE;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.CONTINUE;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.HARD_LEFT;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.HARD_RIGHT;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.LEFT;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.RIGHT;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.SLIGHTLY_LEFT;
-import static org.opentripplanner.model.plan.walkstep.RelativeDirection.SLIGHTLY_RIGHT;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.CIRCLE_CLOCKWISE;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.CONTINUE;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.HARD_LEFT;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.HARD_RIGHT;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.LEFT;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.RIGHT;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.SLIGHTLY_LEFT;
+import static org.opentripplanner.street.model.path.step.RelativeDirection.SLIGHTLY_RIGHT;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;

@@ -9,6 +9,8 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTr
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
+import org.opentripplanner.street.model.path.step.AbsoluteDirection;
+import org.opentripplanner.street.model.path.step.RelativeDirection;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;

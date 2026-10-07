@@ -75,7 +75,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private final StreetMode transferMode;
   private final ZonedDateTime transitSearchTimeZero;
 
-  private final StreetPathToLegsMapper streetPathToLegsMapper;
+  private final StreetLegMapper streetLegMapper;
   private final TransitService transitService;
   private final CarpoolItineraryMapper carpoolItineraryMapper;
 
@@ -108,7 +108,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
     this.transferStreetRequest = StreetSearchRequestMapper.mapToTransferRequest(request).build();
-    this.streetPathToLegsMapper = new StreetPathToLegsMapper(
+    this.streetLegMapper = new StreetLegMapper(
       new TransitServiceResolver(transitService),
       transitService.getTimeZone(),
       streetDetailsService,
@@ -475,7 +475,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     }
     State[] states = transferStates.toArray(State[]::new);
     var graphPath = new StreetPath(states[states.length - 1]);
-    return streetPathToLegsMapper.map(graphPath, request);
+    return streetLegMapper.map(graphPath, request);
   }
 
   private Itinerary mapUnknownRaptorPath(RaptorPath<T> path) {
@@ -525,7 +525,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return accessEgress
       .findOriginal(DefaultAccessEgress.class)
       .map(DefaultAccessEgress::streetPath)
-      .map(path -> streetPathToLegsMapper.map(path, request, startTime))
+      .map(path -> streetLegMapper.map(path, request, startTime))
       .orElseThrow();
   }
 

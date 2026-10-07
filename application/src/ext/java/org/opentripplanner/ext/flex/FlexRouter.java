@@ -25,7 +25,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
-import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
+import org.opentripplanner.routing.algorithm.mapping.StreetLegMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
@@ -54,7 +54,7 @@ public class FlexRouter {
   private final FlexIndex flexIndex;
   private final FlexPathCalculator accessFlexPathCalculator;
   private final FlexPathCalculator egressFlexPathCalculator;
-  private final StreetPathToLegsMapper streetPathToLegsMapper;
+  private final StreetLegMapper streetLegMapper;
   private final FlexAccessEgressCallbackAdapter callbackService;
 
   /* Request data */
@@ -90,7 +90,7 @@ public class FlexRouter {
       transitService.getTripCalendars()::listServiceDates
     );
     this.callbackService = new CallbackAdapter();
-    this.streetPathToLegsMapper = new StreetPathToLegsMapper(
+    this.streetLegMapper = new StreetLegMapper(
       new TransitServiceResolver(transitService),
       transitService.getTimeZone(),
       streetDetailsService,
@@ -144,7 +144,7 @@ public class FlexRouter {
     for (DirectFlexPath it : directFlexPaths) {
       var startTime = startOfTime.plusSeconds(it.startTime());
       var path = new StreetPath(it.state());
-      var legs = streetPathToLegsMapper.map(path, request, startTime);
+      var legs = streetLegMapper.map(path, request, startTime);
       var itinerary = LegsToItineraryMapper.map(legs, false, path.calculateElevations());
       itinerary.ifPresent(itineraries::add);
     }

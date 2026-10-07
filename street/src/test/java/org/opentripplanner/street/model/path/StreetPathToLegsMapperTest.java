@@ -1,44 +1,46 @@
-package org.opentripplanner.routing.algorithm.mapping;
+package org.opentripplanner.street.model.path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
-import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.transit.service.NoopSiteResolver;
 
 class StreetPathToLegsMapperTest {
 
   @Test
-  void testCarRentalPickUp() {
-    var mapper = mapper();
+  void singleLeg() {
+    var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
 
+    var legs = new StreetPath(state).legs(0);
+
+    assertThat(legs).hasSize(1);
+    var leg = (StreetLeg) legs.getFirst();
+    assertThat(leg.mode()).isEqualTo(TraverseMode.WALK);
+    assertThat(leg.steps()).hasSize(2);
+    assertThat(leg.distanceMeters()).isEqualTo(200);
+    assertThat(leg.rentedVehicle()).isFalse();
+  }
+
+  @Test
+  void carRentalPickUp() {
     var state = TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build();
 
-    var legs = mapper.map(new StreetPath(state), RouteRequest.defaultValue());
+    var legs = new StreetPath(state).legs(0);
 
-    assertEquals(2, legs.size());
-    assertEquals(TraverseMode.WALK, traverseMode(legs.get(0)));
-    assertEquals(TraverseMode.CAR, traverseMode(legs.get(1)));
+    assertThat(legs).hasSize(2);
+    var walk = (StreetLeg) legs.get(0);
+    var car = (StreetLeg) legs.get(1);
+    assertThat(walk.mode()).isEqualTo(TraverseMode.WALK);
+    assertThat(car.mode()).isEqualTo(TraverseMode.CAR);
+    assertThat(car.rentedVehicle()).isTrue();
+    assertThat(walk.endTime()).isEqualTo(car.startTime());
   }
 
-  private TraverseMode traverseMode(Leg leg) {
-    return ((StreetLeg) leg).getMode();
-  }
+  @Test
+  void noLegsForEmptyPath() {
+    var state = TestStateBuilder.ofWalking().build();
 
-  private StreetPathToLegsMapper mapper() {
-    return new StreetPathToLegsMapper(
-      new NoopSiteResolver(),
-      ZoneIds.UTC,
-      new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
-      1
-    );
+    assertThat(new StreetPath(state).legs(0)).isEmpty();
   }
 }

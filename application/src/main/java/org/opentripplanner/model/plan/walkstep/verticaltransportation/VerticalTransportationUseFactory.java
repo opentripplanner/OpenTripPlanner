@@ -1,15 +1,14 @@
 package org.opentripplanner.model.plan.walkstep.verticaltransportation;
 
 import java.util.Optional;
-import org.jspecify.annotations.Nullable;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.streetdetails.model.InclinedEdgeLevelInfo;
 import org.opentripplanner.service.streetdetails.model.Level;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
+import org.opentripplanner.street.model.path.step.VerticalTransportation;
 import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.search.state.State;
 
 /**
  * This factory is responsible for creating {@link VerticalTransportationUse} objects. This applies
@@ -23,14 +22,18 @@ public class VerticalTransportationUseFactory {
     this.streetDetailsService = streetDetailsService;
   }
 
-  public ElevatorUse createElevatorUse(State backState, ElevatorAlightEdge elevatorAlightEdge) {
-    ElevatorBoardEdge elevatorBoardEdge = findElevatorBoardEdge(backState);
-    if (elevatorBoardEdge == null) {
-      throw new IllegalStateException(
-        "An ElevatorAlightEdge was reached without first traversing an ElevatorBoardEdge"
-      );
-    }
+  public VerticalTransportationUse create(VerticalTransportation verticalTransportation) {
+    return switch (verticalTransportation) {
+      case VerticalTransportation.Elevator e -> createElevatorUse(e.boardEdge(), e.alightEdge());
+      case VerticalTransportation.Escalator e -> createEscalatorUse(e.edge());
+      case VerticalTransportation.Stairs s -> createStairsUse(s.edge());
+    };
+  }
 
+  public ElevatorUse createElevatorUse(
+    ElevatorBoardEdge elevatorBoardEdge,
+    ElevatorAlightEdge elevatorAlightEdge
+  ) {
     Optional<Level> boardEdgeLevelOptional = streetDetailsService.findHorizontalEdgeLevelInfo(
       elevatorBoardEdge
     );
@@ -117,22 +120,5 @@ public class VerticalTransportationUseFactory {
       fromVertex.nodeId() == inclinedEdgeLevelInfo.lowerVertexInfo().osmNodeId()
       ? VerticalDirection.UP
       : VerticalDirection.DOWN;
-  }
-
-  /**
-   * Find the ElevatorBoardEdge that was used from the backState of an ElevatorAlightEdge. This
-   * function should never return null unless the graph is broken.
-   */
-  @Nullable
-  private ElevatorBoardEdge findElevatorBoardEdge(State backState) {
-    // The initial value is the first possible state that can be the ElevatorBoardEdge.
-    State currentState = backState.getBackState();
-    while (currentState != null) {
-      if (currentState.getBackEdge() instanceof ElevatorBoardEdge elevatorBoardEdge) {
-        return elevatorBoardEdge;
-      }
-      currentState = currentState.getBackState();
-    }
-    return null;
   }
 }
