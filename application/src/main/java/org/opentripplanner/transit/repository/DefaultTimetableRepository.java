@@ -494,11 +494,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * Return the route created by the updater for the given id.
    */
   @Nullable
-  public Route getRealtimeAddedRoute(FeedScopedId id) {
+  Route getRealtimeAddedRoute(FeedScopedId id) {
     return getByNullableKey(id, realtimeAddedRoutes);
   }
 
-  public Collection<Route> listRealTimeAddedRoutes() {
+  private Collection<Route> listRealTimeAddedRoutes() {
     return Collections.unmodifiableCollection(realtimeAddedRoutes.values());
   }
 
@@ -506,11 +506,11 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * Return the trip created by the updater for the given id.
    */
   @Nullable
-  public Trip getRealTimeAddedTrip(FeedScopedId id) {
+  Trip getRealTimeAddedTrip(FeedScopedId id) {
     return getByNullableKey(id, realTimeAddedTrips);
   }
 
-  public Collection<Trip> listRealTimeAddedTrips() {
+  private Collection<Trip> listRealTimeAddedTrips() {
     return Collections.unmodifiableCollection(realTimeAddedTrips.values());
   }
 
@@ -518,14 +518,14 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * Return the trip pattern created by the updater for the given trip.
    */
   @Nullable
-  public TripPattern getRealTimeAddedPatternForTrip(Trip trip) {
+  TripPattern getRealTimeAddedPatternForTrip(Trip trip) {
     return getByNullableKey(trip, realTimeAddedPatternForTrip);
   }
 
   /**
    * Return the trip patterns created by the updater for the given route.
    */
-  public Collection<TripPattern> getRealTimeAddedPatternForRoute(Route route) {
+  Collection<TripPattern> getRealTimeAddedPatternForRoute(Route route) {
     return realTimeAddedPatternsForRoute.get(route);
   }
 
@@ -533,7 +533,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * Return the trip on service date created by the updater for the given id.
    */
   @Nullable
-  public TripOnServiceDate getRealTimeAddedTripOnServiceDateById(FeedScopedId id) {
+  TripOnServiceDate getRealTimeAddedTripOnServiceDateById(FeedScopedId id) {
     return getByNullableKey(id, realTimeAddedTripOnServiceDateById);
   }
 
@@ -541,13 +541,13 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * Return the trip on service date created by the updater for the given trip and service date.
    */
   @Nullable
-  public TripOnServiceDate getRealTimeAddedTripOnServiceDateForTripAndDay(
+  TripOnServiceDate getRealTimeAddedTripOnServiceDateForTripAndDay(
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
     return getByNullableKey(tripIdAndServiceDate, realTimeAddedTripOnServiceDateForTripAndDay);
   }
 
-  public Collection<? extends TripOnServiceDate> listRealTimeAddedTripOnServiceDate() {
+  private Collection<? extends TripOnServiceDate> listRealTimeAddedTripOnServiceDate() {
     return Collections.unmodifiableCollection(realTimeAddedTripOnServiceDateForTripAndDay.values());
   }
 
