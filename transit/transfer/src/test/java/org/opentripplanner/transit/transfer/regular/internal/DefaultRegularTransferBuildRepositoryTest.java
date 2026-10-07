@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
 import java.util.Map;
@@ -65,6 +66,21 @@ class DefaultRegularTransferBuildRepositoryTest {
 
     assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.pathsFor(WALK)).hasSize(3);
+  }
+
+  @Test
+  void createInitialSnapshotSealsTheBuildRepository() {
+    var buildRepository = createBuildRepository();
+
+    buildRepository.createInitialSnapshot();
+
+    var ex = assertThrows(IllegalStateException.class, () ->
+      buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW))
+    );
+    assertThat(ex).hasMessageThat().contains("sealed");
+    // Reads still work
+    assertThat(buildRepository.hasTransfersFrom(A)).isTrue();
+    assertThat(buildRepository.calculateNumberOfTransferPaths()).isEqualTo(3);
   }
 
   @Test

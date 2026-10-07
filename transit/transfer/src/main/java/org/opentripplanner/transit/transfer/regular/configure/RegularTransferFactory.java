@@ -51,7 +51,7 @@ public final class RegularTransferFactory {
 
   /**
    * Register the runtime repository on the transaction framework, starting from the initial
-   * snapshot of the build repository.
+   * snapshot of the build repository. This seals the build repository.
    */
   public static <P> RepositoryHandle<
     RegularTransferRepositorySnapshot<P>,
