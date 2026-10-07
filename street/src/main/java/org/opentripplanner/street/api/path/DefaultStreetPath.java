@@ -79,6 +79,16 @@ final class DefaultStreetPath implements StreetPath {
   }
 
   @Override
+  public ElevationChange elevationChange() {
+    return calculateElevations();
+  }
+
+  @Override
+  public boolean arrivesWithRentedVehicleFromStation() {
+    return lastState().isRentingVehicleFromStation();
+  }
+
+  @Override
   public List<StreetLeg> computeLegs(double ellipsoidToGeoidDifference) {
     return new StreetPathToLegsMapper(ellipsoidToGeoidDifference).map(this);
   }

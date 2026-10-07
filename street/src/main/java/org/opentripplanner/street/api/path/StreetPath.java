@@ -30,6 +30,12 @@ public interface StreetPath {
   /// The time it takes to traverse the path, rounded up to whole seconds.
   Duration duration();
 
+  /// The total elevation gained and lost along the path.
+  ElevationChange elevationChange();
+
+  /// Whether the path ends while still renting a vehicle picked up at a rental station.
+  boolean arrivesWithRentedVehicleFromStation();
+
   /// Split this path into legs. Each change of street mode, like picking up a rental vehicle or
   /// parking a car, starts a new leg. Walking a bike does not.
   ///

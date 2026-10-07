@@ -66,10 +66,8 @@ class StreetPathToLegsMapperTest {
     assertThat(external.distance_m()).isEqualTo(5000);
     assertThat(external.geometrySupplier().get()).isEqualTo(edge.getGeometry());
     assertThat(external.rentedVehicle()).isFalse();
-    assertThat(external.arrivesWithRentedVehicleFromStation()).isFalse();
     assertThat(external.vehicleRentalNetwork()).isNull();
     assertThat(external.elevationProfile()).isNull();
-    assertThat(external.elevationChange()).isEqualTo(ElevationChange.ZERO);
     assertThat(external.steps()).isEmpty();
   }
 
