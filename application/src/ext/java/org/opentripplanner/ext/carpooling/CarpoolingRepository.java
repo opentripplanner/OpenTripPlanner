@@ -6,13 +6,13 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
 
 /**
  * Repository for managing carpooling trip ({@link CarpoolTrip}) data.
  * <p>
  * This repository maintains an in-memory index of driver trips, each paired with the permanent
- * street vertices its route points resolve to ({@link CarpoolTripWithVertices}).
+ * street vertices its route points resolve to ({@link RoutableCarpoolTrip}).
  *
  * @see CarpoolTrip for trip data model
  * @see org.opentripplanner.ext.carpooling.updater.SiriETCarpoolingUpdater for real-time updates
@@ -24,14 +24,14 @@ public interface CarpoolingRepository {
    * The returned collection includes all driver trips that have been added via {@link #upsertCarpoolTrip}
    * and not yet removed or expired.
    */
-  Collection<CarpoolTripWithVertices> getCarpoolTrips();
+  Collection<RoutableCarpoolTrip> getCarpoolTrips();
 
   /**
    * Returns the trip with the given id together with its resolved street vertices, or {@code null}
    * when no such trip exists.
    */
   @Nullable
-  CarpoolTripWithVertices getCarpoolTrip(FeedScopedId id);
+  RoutableCarpoolTrip getCarpoolTrip(FeedScopedId id);
 
   /**
    * Inserts a new carpooling trip or updates an existing trip with the same ID.
@@ -51,7 +51,7 @@ public interface CarpoolingRepository {
    *        If a trip with the same ID exists, it will be completely replaced.
    * @throws IllegalArgumentException if trip is null
    */
-  void upsertCarpoolTrip(CarpoolTripWithVertices trip);
+  void upsertCarpoolTrip(RoutableCarpoolTrip trip);
 
   /**
    * Removes the carpool trip with the given id. No-op if no trip with this id exists.
@@ -81,39 +81,4 @@ public interface CarpoolingRepository {
    * @return the number of trips removed, or {@code 0} when the call was throttled
    */
   int removeExpiredTrips(Instant now, Duration expiry);
-
-  /**
-   * Returns the cached outcome of routing the trip's baseline (its driver waypoints, in order), or
-   * {@code null} when there is no usable entry — either nothing is cached, or the cached entry was
-   * computed for a different route-point geometry than the trip now has.
-   * <p>
-   * This is a routing memoization, not part of the trip's domain data: the baseline route depends
-   * only on the trip's waypoint geometry and the static street graph, never on the passenger
-   * request, so it is computed once and reused across requests. The cache is keyed by trip id and
-   * validated against the trip's current route points, so a trip whose geometry changed — including
-   * after a concurrent re-route — never reads a stale entry; entries are also dropped when the trip
-   * is removed or expires. A successful outcome carries one routed duration per leg
-   * ({@code stops().size() - 1} entries); an unroutable outcome carries {@code null} durations (see
-   * {@link CachedBaselineRouting}). Returned durations are a copy the caller may not mutate into the
-   * cache.
-   */
-  @Nullable
-  CachedBaselineRouting cachedBaselineRouting(CarpoolTrip trip);
-
-  /**
-   * Stores the outcome of routing {@code trip}'s baseline, replacing any previous entry. Pass the
-   * routed per-leg durations, or {@code null} to record that the baseline is unroutable so later
-   * requests skip the trip without re-routing it. Durations are copied, so later mutation by the
-   * caller does not affect the cache. The entry is tagged with the trip's current route points and
-   * is ignored once those change (see {@link #cachedBaselineRouting}).
-   */
-  void cacheBaselineRouting(CarpoolTrip trip, @Nullable Duration[] legDurations);
-
-  /**
-   * A trip's cached baseline-routing outcome, valid only for the geometry it was routed against. A
-   * {@code null} {@link #legDurations()} means the baseline was found unroutable and the trip
-   * should be skipped without re-routing; otherwise the array holds one routed travel duration per
-   * leg.
-   */
-  record CachedBaselineRouting(@Nullable Duration[] legDurations) {}
 }

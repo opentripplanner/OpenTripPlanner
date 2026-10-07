@@ -11,8 +11,9 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * Encapsulates the passenger-facing parameters of a carpooling routing request: pickup and dropoff
  * coordinates, requested time, whether it is an arrive-by or depart-after search, the maximum time
  * the passenger is willing to walk between origin/destination and a carpool pickup/dropoff, the
- * search window applied to the requested time, and — for transit-combined searches — whether the
- * carpool leg is access or egress.
+ * search window applied to the requested time, the dwell the car makes at each stop, the longest
+ * journey the search accepts, and — for transit-combined searches — whether the carpool leg is
+ * access or egress.
  * <p>
  * Instances are constructed from a {@link org.opentripplanner.routing.api.request.RouteRequest}
  * via the {@link #of} factory methods.
@@ -26,6 +27,8 @@ public class CarpoolingRequest {
   private final Instant requestedDateTime;
   private final Duration maxWalkTime;
   private final Duration searchWindow;
+  private final Duration stopDuration;
+  private final Duration maxJourneyDuration;
 
   CarpoolingRequest(
     AccessEgressType accessOrEgress,
@@ -34,7 +37,9 @@ public class CarpoolingRequest {
     WgsCoordinate passengerDropoff,
     Instant requestedDateTime,
     Duration maxWalkTime,
-    Duration searchWindow
+    Duration searchWindow,
+    Duration stopDuration,
+    Duration maxJourneyDuration
   ) {
     this.accessOrEgress = accessOrEgress;
     this.isArriveByRequest = isArriveByRequest;
@@ -49,14 +54,30 @@ public class CarpoolingRequest {
       searchWindow,
       "searchWindow is required; populate it via the RouteRequest-based builder or withSearchWindow()"
     );
+    this.stopDuration = Objects.requireNonNull(
+      stopDuration,
+      "stopDuration is required; populate it via the RouteRequest-based builder or withStopDuration()"
+    );
+    this.maxJourneyDuration = Objects.requireNonNull(
+      maxJourneyDuration,
+      "maxJourneyDuration is required; use the RouteRequest-based builder or withMaxJourneyDuration()"
+    );
   }
 
-  public static CarpoolingRequest of(RouteRequest request) {
-    return new CarpoolingRequestBuilder(request).build();
+  /** @param defaultSearchWindow the search window when the request carries none */
+  public static CarpoolingRequest of(RouteRequest request, Duration defaultSearchWindow) {
+    return new CarpoolingRequestBuilder(request, defaultSearchWindow).build();
   }
 
-  public static CarpoolingRequest of(RouteRequest request, AccessEgressType accessOrEgress) {
-    return new CarpoolingRequestBuilder(request).withAccessOrEgress(accessOrEgress).build();
+  /** @param defaultSearchWindow the search window when the request carries none */
+  public static CarpoolingRequest of(
+    RouteRequest request,
+    AccessEgressType accessOrEgress,
+    Duration defaultSearchWindow
+  ) {
+    return new CarpoolingRequestBuilder(request, defaultSearchWindow)
+      .withAccessOrEgress(accessOrEgress)
+      .build();
   }
 
   /**
@@ -117,5 +138,21 @@ public class CarpoolingRequest {
    */
   public Duration getSearchWindow() {
     return searchWindow;
+  }
+
+  /**
+   * Returns the dwell the car makes at each stop, the passenger's pickup and dropoff included
+   * (the car {@code pickupTime} preference). Never {@code null}; enforced at construction.
+   */
+  public Duration getStopDuration() {
+    return stopDuration;
+  }
+
+  /**
+   * Returns the longest journey the search accepts, from leaving the origin to reaching the
+   * destination. Never {@code null}; enforced at construction.
+   */
+  public Duration getMaxJourneyDuration() {
+    return maxJourneyDuration;
   }
 }

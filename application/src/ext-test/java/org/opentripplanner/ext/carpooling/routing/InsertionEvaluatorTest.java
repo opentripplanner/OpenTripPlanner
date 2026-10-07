@@ -16,18 +16,21 @@ import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_SOU
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_WEST;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createStopAt;
+import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithCapacity;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithDeviationBudget;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createTripWithStops;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
@@ -37,13 +40,10 @@ import org.opentripplanner.utils.collection.Pair;
 
 class InsertionEvaluatorTest {
 
-  private InsertionPositionFinder positionFinder;
   private Map<WgsCoordinate, Vertex> vertexMap;
 
   @BeforeEach
   void setup() {
-    positionFinder = new InsertionPositionFinder(new BeelineEstimator());
-
     vertexMap = new HashMap<>();
 
     for (WgsCoordinate coord : List.of(
@@ -66,13 +66,13 @@ class InsertionEvaluatorTest {
     }
   }
 
-  private CarpoolTripWithVertices createTripWithVertices(CarpoolTrip trip) {
+  private RoutableCarpoolTrip createRoutableTrip(CarpoolTrip trip) {
     var vertices = trip
       .stops()
       .stream()
       .map(stop -> vertexMap.get(stop.getCoordinate()))
       .toList();
-    return new CarpoolTripWithVertices(trip, vertices);
+    return RoutableCarpoolTripTestData.withVertices(trip, vertices);
   }
 
   private WgsCoordinate getCoordinate(Vertex vertex) {
@@ -80,7 +80,7 @@ class InsertionEvaluatorTest {
   }
 
   /**
-   * Runs position finding followed by evaluation and returns the best insertion.
+   * Evaluates every insertion of the passenger into the trip and returns the best.
    */
   private InsertionCandidate findOptimalInsertion(
     CarpoolTrip trip,
@@ -88,22 +88,10 @@ class InsertionEvaluatorTest {
     WgsCoordinate passengerDropoff,
     CarpoolRouter carpoolRouter
   ) {
-    var tripWithVertices = createTripWithVertices(trip);
-    List<InsertionPosition> viablePositions = positionFinder.findViablePositions(
-      trip,
-      passengerPickup,
-      passengerDropoff,
-      Duration.ZERO
-    );
-
-    if (viablePositions.isEmpty()) {
-      return null;
-    }
-
+    var routableTrip = createRoutableTrip(trip);
     var evaluator = new InsertionEvaluator(carpoolRouter, Duration.ZERO);
     return evaluator.findBestInsertion(
-      tripWithVertices,
-      viablePositions,
+      routableTrip,
       new PassengerSnap(vertexMap.get(passengerPickup), vertexMap.get(passengerDropoff), null, null)
     );
   }
@@ -113,6 +101,12 @@ class InsertionEvaluatorTest {
       (coordinate1.latitude() + coordinate2.latitude()) / 2,
       (coordinate1.longitude() + coordinate2.longitude()) / 2
     );
+  }
+
+  /** Routers answer {@code null} for an unroutable pair; a path is wrapped as a segment. */
+  @Nullable
+  private static RoutedSegment segmentOrNull(@Nullable GraphPath<State, Edge, Vertex> path) {
+    return path == null ? null : RoutedSegment.of(path);
   }
 
   @Test
@@ -129,7 +123,7 @@ class InsertionEvaluatorTest {
     );
 
     var mockPath = createGraphPath(Duration.ofMinutes(4));
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(
       trip,
@@ -159,7 +153,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -187,7 +181,7 @@ class InsertionEvaluatorTest {
       ) {
         return null;
       } else {
-        return mockPath;
+        return RoutedSegment.of(mockPath);
       }
     };
 
@@ -213,7 +207,7 @@ class InsertionEvaluatorTest {
     // Additional = 50 min, exceeds 5 min budget
     var mockPath = createGraphPath(Duration.ofMinutes(20));
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -229,7 +223,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     assertDoesNotThrow(() ->
       findOptimalInsertion(trip, OSLO_MIDPOINT_NORTH, OSLO_NORTHEAST, routingFunction)
@@ -264,7 +258,7 @@ class InsertionEvaluatorTest {
   void findBestInsertion_selectsShorterTotalTripDuration() {
     var stop = createStopAt(OSLO_CENTER, Duration.ofMinutes(30));
     var trip = createTripWithStops(OSLO_SOUTH, List.of(stop), OSLO_NORTH, Duration.ofMinutes(30));
-    var tripWithVertices = createTripWithVertices(trip);
+    var routableTrip = createRoutableTrip(trip);
 
     final Map<Pair<WgsCoordinate>, GraphPath<State, Edge, Vertex>> pathsMap = new HashMap<>(
       Map.of(
@@ -290,14 +284,11 @@ class InsertionEvaluatorTest {
 
     @SuppressWarnings("ConstantConditions")
     CarpoolRouter routingFunction = (from, to) ->
-      pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
-
-    var viablePositions = List.of(new InsertionPosition(1, 2), new InsertionPosition(2, 3));
+      segmentOrNull(pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to))));
 
     var evaluator = new InsertionEvaluator(routingFunction, Duration.ZERO);
     var result = evaluator.findBestInsertion(
-      tripWithVertices,
-      viablePositions,
+      routableTrip,
       new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null)
     );
 
@@ -313,7 +304,7 @@ class InsertionEvaluatorTest {
 
     var mockPath = createGraphPath();
 
-    CarpoolRouter routingFunction = (from, to) -> mockPath;
+    CarpoolRouter routingFunction = (from, to) -> RoutedSegment.of(mockPath);
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, routingFunction);
 
@@ -364,7 +355,7 @@ class InsertionEvaluatorTest {
     @SuppressWarnings("ConstantConditions")
     CarpoolRouter routingFunction = (from, to) -> {
       callCount[0]++;
-      return pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to)));
+      return segmentOrNull(pathsMap.get(new Pair<>(getCoordinate(from), getCoordinate(to))));
     };
 
     // Passenger pickup at OSLO_EAST, dropoff at OSLO_MIDPOINT_NORTH
@@ -404,7 +395,7 @@ class InsertionEvaluatorTest {
     final int[] callCount = { 0 };
     CarpoolRouter carpoolRouter = (from, to) -> {
       callCount[0]++;
-      return mockPath;
+      return RoutedSegment.of(mockPath);
     };
 
     // Pickup exactly at OSLO_EAST (existing stop), dropoff at OSLO_NORTH (new)
@@ -421,6 +412,116 @@ class InsertionEvaluatorTest {
   }
 
   @Test
+  void legsTheBeelineRulesOutAreNotRouted() {
+    // Two legs; the passenger sits right on leg 1 and 30 km from leg 0, whose next stop allows
+    // one minute: at 30 m/s the beeline detour through leg 0 is far more than that, so nothing is
+    // routed into or out of leg 0.
+    var origin = new WgsCoordinate(63.43, 10.39);
+    var mid = origin.moveEastMeters(200);
+    var end = origin.moveEastMeters(400);
+    var farNorth = origin.moveNorthMeters(30_000);
+    for (var c : List.of(origin, mid, end, farNorth)) {
+      vertexMap.put(c, new SimpleVertex("v-" + c, c.latitude(), c.longitude()));
+    }
+    var stop = createStopAt(mid, Duration.ofMinutes(1));
+    var trip = createTripWithStops(origin, List.of(stop), end, Duration.ofMinutes(60));
+    var routed = new ArrayList<Pair<WgsCoordinate>>();
+    CarpoolRouter recording = (from, to) -> {
+      routed.add(new Pair<>(getCoordinate(from), getCoordinate(to)));
+      return RoutedSegment.of(createGraphPath(Duration.ofMinutes(3)));
+    };
+    var evaluator = new InsertionEvaluator(recording, Duration.ZERO, 30.0);
+
+    evaluator.findBestInsertion(
+      createRoutableTrip(trip),
+      new PassengerSnap(vertexMap.get(farNorth), vertexMap.get(farNorth), null, null)
+    );
+
+    assertFalse(routed.contains(new Pair<>(origin, farNorth)), "leg 0 was routed into: " + routed);
+    assertTrue(routed.contains(new Pair<>(mid, farNorth)), "leg 1 was routed into: " + routed);
+  }
+
+  @Test
+  void singleLegTrip_routesTheBaselineAndTheThreeNewSegmentsOnly() {
+    // With pickup and dropoff in the only leg, the pickup's way out of the leg and the dropoff's
+    // way into it are never needed, so they are not routed.
+    var trip = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
+    var routed = new ArrayList<Pair<WgsCoordinate>>();
+    CarpoolRouter recording = (from, to) -> {
+      routed.add(new Pair<>(getCoordinate(from), getCoordinate(to)));
+      return RoutedSegment.of(createGraphPath(Duration.ofMinutes(5)));
+    };
+
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, recording);
+
+    assertNotNull(result);
+    assertEquals(
+      List.of(
+        new Pair<>(OSLO_CENTER, OSLO_NORTH),
+        new Pair<>(OSLO_CENTER, OSLO_EAST),
+        new Pair<>(OSLO_WEST, OSLO_NORTH),
+        new Pair<>(OSLO_EAST, OSLO_WEST)
+      ),
+      routed
+    );
+  }
+
+  @Test
+  void theRideIsRoutedOncePerRequest() {
+    var rides = new int[] { 0 };
+    CarpoolRouter router = (from, to) -> {
+      if (getCoordinate(from).equals(OSLO_EAST) && getCoordinate(to).equals(OSLO_WEST)) {
+        rides[0]++;
+      }
+      return RoutedSegment.of(createGraphPath());
+    };
+    var evaluator = new InsertionEvaluator(router, Duration.ZERO);
+    var snap = new PassengerSnap(vertexMap.get(OSLO_EAST), vertexMap.get(OSLO_WEST), null, null);
+    var tripA = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_CENTER, OSLO_NORTH);
+    var tripB = createTripWithDeviationBudget(Duration.ofMinutes(20), OSLO_SOUTH, OSLO_NORTHEAST);
+
+    assertNotNull(evaluator.findBestInsertion(createRoutableTrip(tripA), snap));
+    assertNotNull(evaluator.findBestInsertion(createRoutableTrip(tripB), snap));
+
+    assertEquals(1, rides[0], "pickup -> dropoff does not depend on the trip");
+  }
+
+  @Test
+  void thePassengerRidesOnlyLegsWithAFreeSeat() {
+    // Room for two, both taken on the first leg: pickup and dropoff fit only into the second.
+    var trip = createTripWithCapacity(
+      2,
+      List.of(
+        createStopAt(2, OSLO_SOUTH),
+        createStopAt(1, OSLO_CENTER),
+        createStopAt(0, OSLO_NORTH)
+      )
+    );
+    CarpoolRouter router = (from, to) -> RoutedSegment.of(createGraphPath());
+
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, router);
+
+    assertNotNull(result);
+    assertEquals(2, result.pickupPosition());
+    assertEquals(3, result.dropoffPosition());
+  }
+
+  @Test
+  void aDetourMustFitTheBudgetOfEveryStopItDelays() {
+    // Every segment takes 5 minutes, so inserting the passenger adds 10. The intermediate stop
+    // allows 1 minute and the destination 30: the passenger fits only after the intermediate stop.
+    var stop = createStopAt(OSLO_CENTER, Duration.ofMinutes(1));
+    var trip = createTripWithStops(OSLO_SOUTH, List.of(stop), OSLO_NORTH, Duration.ofMinutes(30));
+    CarpoolRouter router = (from, to) -> RoutedSegment.of(createGraphPath());
+
+    var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, router);
+
+    assertNotNull(result);
+    assertEquals(2, result.pickupPosition());
+    assertEquals(3, result.dropoffPosition());
+  }
+
+  @Test
   void findOptimalInsertion_singleSegmentTrip_routesAllNewSegments() {
     // Edge case: Simplest possible trip (2 points, 1 segment)
     // Any insertion will require routing all new segments
@@ -432,7 +533,7 @@ class InsertionEvaluatorTest {
     final int[] callCount = { 0 };
     CarpoolRouter carpoolRouter = (from, to) -> {
       callCount[0]++;
-      return mockPath;
+      return RoutedSegment.of(mockPath);
     };
 
     var result = findOptimalInsertion(trip, OSLO_EAST, OSLO_WEST, carpoolRouter);

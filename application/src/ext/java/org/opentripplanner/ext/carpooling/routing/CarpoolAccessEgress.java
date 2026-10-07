@@ -302,12 +302,16 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   }
 
   /**
-   * The carpool route segments traversed by the passenger between pickup and dropoff (inclusive of
-   * intermediate stops the driver makes along the way for other passengers). Never empty for a
-   * valid leg.
+   * The street paths of the carpool route segments traversed by the passenger between pickup and
+   * dropoff (inclusive of intermediate stops the driver makes along the way for other
+   * passengers). Never empty for a valid leg.
+   * <p>
+   * This materialises the paths (see {@link InsertionCandidate#getSharedPaths()}), so it is meant
+   * for the itinerary mapper and {@link #getFinalState()}, both of which run only for the legs
+   * Raptor kept — not for every access/egress candidate.
    */
   public List<GraphPath<State, Edge, Vertex>> sharedSegments() {
-    return insertionCandidate.getSharedSegments();
+    return insertionCandidate.getSharedPaths();
   }
 
   /**

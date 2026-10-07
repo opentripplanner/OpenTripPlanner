@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.CarpoolingParametersTestData;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
  * Verifies that two {@link SiriETCarpoolingUpdater} instances can share a single
@@ -39,20 +42,41 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
   private static final String FEED_B = "AT";
 
   private DefaultCarpoolingRepository repository;
+  private RoutableCarpoolTripResolver resolver;
   private SiriETCarpoolingUpdater updaterA;
   private SiriETCarpoolingUpdater updaterB;
-  private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(FEED_A);
-  private final CarpoolSiriMapper mapperB = new CarpoolSiriMapper(FEED_B);
+  private final CarpoolSiriMapper mapperA = new CarpoolSiriMapper(
+    FEED_A,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
+  private final CarpoolSiriMapper mapperB = new CarpoolSiriMapper(
+    FEED_B,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @BeforeEach
   void setUp() {
-    repository = new DefaultCarpoolingRepository();
-    var resolver = mock(CarpoolTripVertexResolver.class);
-    when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+    repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
     );
-    updaterA = new SiriETCarpoolingUpdater(paramsFor(FEED_A), repository, resolver);
-    updaterB = new SiriETCarpoolingUpdater(paramsFor(FEED_B), repository, resolver);
+    resolver = mock(RoutableCarpoolTripResolver.class);
+    when(resolver.resolve(any())).thenAnswer(invocation ->
+      RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
+    );
+    updaterA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParameters.DEFAULT
+    );
+    updaterB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParameters.DEFAULT
+    );
   }
 
   @Test
@@ -112,8 +136,8 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
 
     // Every stop on every trip must inherit the trip's feed prefix — guards against
     // a half-finished refactor where the trip id is parameterised but stop ids are not.
-    for (var tripWithVertices : repository.getCarpoolTrips()) {
-      var trip = tripWithVertices.trip();
+    for (var routableTrip : repository.getCarpoolTrips()) {
+      var trip = routableTrip.trip();
       var expectedFeed = trip.getId().getFeedId();
       for (var stop : trip.stops()) {
         assertEquals(
@@ -127,6 +151,40 @@ class MultiFeedSiriETCarpoolingUpdaterTest {
         );
       }
     }
+  }
+
+  @Test
+  void eachFeedHasItsOwnTripLimit() {
+    var feedA = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_A),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParametersTestData.withMaxTrips(1)
+    );
+    var feedB = new SiriETCarpoolingUpdater(
+      paramsFor(FEED_B),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParametersTestData.withMaxTrips(1)
+    );
+    var first = journey("first");
+    var second = journey("second");
+
+    feedA.processEstimatedVehicleJourney(first);
+    feedA.processEstimatedVehicleJourney(second);
+    feedB.processEstimatedVehicleJourney(second);
+
+    assertTrue(tripIsInRepository(mapperA.tripId(first)));
+    assertFalse(tripIsInRepository(mapperA.tripId(second)), "feed A is full");
+    assertTrue(tripIsInRepository(mapperB.tripId(second)), "feed A's trips do not count for B");
+  }
+
+  private static EstimatedVehicleJourney journey(String code) {
+    var journey = minimalCompleteJourney();
+    journey.setEstimatedVehicleJourneyCode(code);
+    return journey;
   }
 
   private static DefaultSiriETUpdaterParameters paramsFor(String feedId) {

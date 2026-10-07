@@ -19,13 +19,20 @@ import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyD
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.malformedNonCancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolTripWithVerticesTestData;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
+import org.opentripplanner.ext.carpooling.CarpoolingParametersTestData;
+import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
 
@@ -33,32 +40,40 @@ class SiriETCarpoolingUpdaterTest {
 
   private static final String FEED_ID = "EN";
 
+  /** A SIRI-ET delivery without journeys that claims more data follows. */
+  private static final String PAGE_WITH_MORE_DATA = """
+  <Siri xmlns="http://www.siri.org.uk/siri" version="2.1">
+    <ServiceDelivery>
+      <ResponseTimestamp>%s</ResponseTimestamp>
+      <MoreData>true</MoreData>
+    </ServiceDelivery>
+  </Siri>
+  """;
+
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updater;
-  private CarpoolTripVertexResolver resolver;
-  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(FEED_ID);
+  private RoutableCarpoolTripResolver resolver;
+  private final CarpoolSiriMapper mapper = new CarpoolSiriMapper(
+    FEED_ID,
+    CarpoolingParameters.DEFAULT.maxTripDuration()
+  );
 
   @BeforeEach
   void setUp() {
-    repository = new DefaultCarpoolingRepository();
-    resolver = mock(CarpoolTripVertexResolver.class);
+    repository = new DefaultCarpoolingRepository(
+      CarpoolingParameters.DEFAULT.expirySweepInterval()
+    );
+    resolver = mock(RoutableCarpoolTripResolver.class);
     when(resolver.resolve(any())).thenAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
+      RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
-    var params = new DefaultSiriETUpdaterParameters(
-      "carpool-test",
-      FEED_ID,
-      false,
-      "http://localhost/never-fetched",
-      Duration.ofMinutes(1),
-      "test-requestor",
-      Duration.ofSeconds(30),
-      Duration.ofMinutes(15),
-      false,
-      HttpHeaders.empty(),
-      false
+    updater = new SiriETCarpoolingUpdater(
+      params("http://localhost/never-fetched"),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParameters.DEFAULT
     );
-    updater = new SiriETCarpoolingUpdater(params, repository, resolver);
   }
 
   @Test
@@ -122,9 +137,7 @@ class SiriETCarpoolingUpdaterTest {
     doReturn(null).when(resolver).resolve(any());
     updater.processEstimatedVehicleJourney(minimalCompleteJourney());
 
-    doAnswer(invocation ->
-      CarpoolTripWithVerticesTestData.withDummyVertices(invocation.getArgument(0))
-    )
+    doAnswer(invocation -> RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0)))
       .when(resolver)
       .resolve(any());
     var changedJourney = journeyWithMovedDestination();
@@ -199,5 +212,43 @@ class SiriETCarpoolingUpdaterTest {
       .getCarpoolTrips()
       .stream()
       .anyMatch(t -> t.trip().getId().equals(id));
+  }
+
+  @Test
+  void aPollReadsAtMostTheMaximumNumberOfPages(@TempDir Path feed) throws IOException {
+    // Three deliveries, each claiming that more data follows.
+    var page = PAGE_WITH_MORE_DATA.formatted(Instant.now());
+    for (int i = 1; i <= 3; i++) {
+      Files.writeString(feed.resolve("page-" + i + ".xml"), page);
+    }
+    var cappedUpdater = new SiriETCarpoolingUpdater(
+      params(feed.toUri().toString()),
+      repository,
+      resolver,
+      Runnable::run,
+      CarpoolingParametersTestData.withMaxPagesPerPoll(2)
+    );
+
+    cappedUpdater.runPolling();
+
+    try (var unread = Files.list(feed)) {
+      assertEquals(1, unread.filter(f -> f.toString().endsWith(".xml")).count());
+    }
+  }
+
+  private static DefaultSiriETUpdaterParameters params(String url) {
+    return new DefaultSiriETUpdaterParameters(
+      "carpool-test",
+      FEED_ID,
+      false,
+      url,
+      Duration.ofMinutes(1),
+      "test-requestor",
+      Duration.ofSeconds(30),
+      Duration.ofMinutes(15),
+      false,
+      HttpHeaders.empty(),
+      false
+    );
   }
 }

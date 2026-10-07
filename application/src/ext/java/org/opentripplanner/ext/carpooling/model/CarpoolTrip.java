@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.carpooling.model;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -60,13 +59,6 @@ public class CarpoolTrip
 
   /** Default total capacity (including driver) when no capacity information is provided. */
   public static final int DEFAULT_TOTAL_CAPACITY = 5;
-
-  /**
-   * The longest span a carpool trip may have — from the first stop's departure to the
-   * destination's latest expected arrival. A trip longer than this is not shaped like a carpool
-   * journey and is not modelled as one.
-   */
-  public static final Duration MAX_TRIP_DURATION = Duration.ofHours(2).plusMinutes(30);
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
@@ -186,73 +178,36 @@ public class CarpoolTrip
     return stops.get(stopIndex).getOnboardCount();
   }
 
-  /**
-   * Checks if there's capacity to insert a passenger at the given pickup and dropoff positions
-   * in the modified route.
-   * <p>
-   * The positions are 0-based indices of the passenger's pickup and dropoff stops in the
-   * modified route (the route after the passenger's stops have been inserted). For example,
-   * with original stops [Origin, A, B, Destination] and pickupPosition=1, dropoffPosition=3:
-   * the modified route is [Origin, Pickup, A, Dropoff, B, Destination].
-   * All stops between (inclusive) pickupPosition - 1 and dropoffPosition - 2 are checked for capacity.
-   * In the example this is between stops 0 and 1, meaning that stops Origin and A need to have sufficient
-   * capacity for {@code additionalPassengers} extra passengers.
-   * <p>
-   *
-   * @param pickupPosition 0-based index of the passenger's pickup in the modified route.
-   *        Must be >= 1 (position 0 is the driver's origin).
-   * @param dropoffPosition 0-based index of the passenger's dropoff in the modified route.
-   *        Must be > pickupPosition.
-   * @param additionalPassengers Number of passengers to add (typically 1)
-   * @return true if capacity is available throughout the entire range, false otherwise
-   * @throws IllegalArgumentException if pickupPosition < 1 or dropoffPosition <= pickupPosition
-   */
-  public boolean hasCapacityForInsertion(
-    int pickupPosition,
-    int dropoffPosition,
-    int additionalPassengers
-  ) {
-    if (pickupPosition < 1) {
-      throw new IllegalArgumentException(
-        "pickupPosition must be >= 1 (position 0 is the driver's origin), got: " + pickupPosition
-      );
-    }
-    if (dropoffPosition <= pickupPosition) {
-      throw new IllegalArgumentException(
-        "dropoffPosition must be > pickupPosition, got: pickupPosition=" +
-          pickupPosition +
-          ", dropoffPosition=" +
-          dropoffPosition
-      );
-    }
-
-    int firstOriginalStop = pickupPosition - 1;
-    int lastOriginalStop = dropoffPosition - 2;
-
-    for (int i = firstOriginalStop; i <= lastOriginalStop; i++) {
-      if (getPassengerCountAtDepartureOfStop(i) + additionalPassengers > totalCapacity) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   @Nullable
   @Override
   public String logName() {
     return getId().toString();
   }
 
+  /** Value comparison: same id and content, the stops compared by value too. */
   @Override
   public boolean sameAs(CarpoolTrip other) {
     return (
       getId().equals(other.getId()) &&
       startTime.equals(other.startTime) &&
       endTime.equals(other.endTime) &&
-      stops.equals(other.stops) &&
+      Objects.equals(provider, other.provider) &&
+      totalCapacity == other.totalCapacity &&
+      sameStops(other.stops) &&
       Objects.equals(publicContactInformation, other.publicContactInformation)
     );
+  }
+
+  private boolean sameStops(List<CarpoolStop> otherStops) {
+    if (stops.size() != otherStops.size()) {
+      return false;
+    }
+    for (int i = 0; i < stops.size(); i++) {
+      if (!stops.get(i).sameAs(otherStops.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

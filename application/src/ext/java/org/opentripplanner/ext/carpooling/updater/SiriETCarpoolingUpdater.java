@@ -5,12 +5,17 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripWithVertices;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteDomain;
@@ -31,24 +36,21 @@ import uk.org.siri.siri21.ServiceDelivery;
  * Polls carpool driver trips from a SIRI-ET HTTP source and maintains them in the
  * {@link CarpoolingRepository}. Each trip's route points are resolved to permanent, car-reachable
  * street vertices before insertion.
+ * <p>
+ * A poll only parses the delivery and hands every change, new and changed trips as well as
+ * removals, to a {@link CarpoolTripResolutionQueue} that applies them in order on a background
+ * thread. The updater is therefore primed, and the instance ready, once the first poll has been
+ * read, however many trips the feed holds; trips become routable one by one as their resolution
+ * completes.
  */
 public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTimeUpdateContext> {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETCarpoolingUpdater.class);
 
-  /**
-   * How long a carpool trip is kept after its latest end time before it is purged. The SIRI-ET
-   * source is not guaranteed to send an explicit cancellation once a journey has completed, so
-   * completed trips are removed once their latest end time is further in the past than this
-   * duration. This keeps instances that run for a long time from accumulating trips that can no
-   * longer be routed.
-   */
-  private static final Duration TRIP_EXPIRY = Duration.ofDays(2);
-
   private final EstimatedTimetableSource updateSource;
 
   private final CarpoolingRepository repository;
-  private final CarpoolTripVertexResolver vertexResolver;
+  private final RoutableCarpoolTripResolver tripResolver;
   private final CarpoolSiriMapper mapper;
 
   /**
@@ -57,22 +59,86 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * stored trip supplies the geometry to compare against and the end time that drives expiry (swept
    * on the same expiry as stored trips).
    */
-  private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new HashMap<>();
+  private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new ConcurrentHashMap<>();
 
+  /**
+   * The feed's live trips, with the version of each queued last, until the trip is removed or
+   * expires: what the repository holds of this feed once the queue has caught up, plus the trips
+   * that turned out unroutable. The trip limit counts them. Only touched by the polls.
+   */
+  private final Map<FeedScopedId, CarpoolTrip> liveTrips = new HashMap<>();
+  private final CarpoolTripResolutionQueue resolutionQueue;
+  private final int maxTrips;
+  private final int maxPagesPerPoll;
+
+  /**
+   * How long a trip is kept after its latest end time, so instances that run for a long time do
+   * not accumulate trips that can no longer be routed.
+   */
+  private final Duration tripExpiry;
+  private int rejectedThisPoll;
+
+  @Nullable
+  private final ExecutorService ownedExecutor;
+
+  /**
+   * @param parameters the limits: the most live trips this feed may have, how long a trip is kept
+   *        after it has ended, and the longest trip that is modelled
+   */
   public SiriETCarpoolingUpdater(
     DefaultSiriETUpdaterParameters config,
     CarpoolingRepository repository,
-    CarpoolTripVertexResolver vertexResolver
+    RoutableCarpoolTripResolver tripResolver,
+    CarpoolingParameters parameters
+  ) {
+    this(config, repository, tripResolver, resolverThread(config.feedId()), parameters);
+  }
+
+  /**
+   * @param resolutionExecutor runs the trip changes handed over by the polls, one at a time and in
+   *        order; the production constructor uses one daemon thread, tests may run them inline
+   * @param parameters the limits, see the public constructor
+   */
+  SiriETCarpoolingUpdater(
+    DefaultSiriETUpdaterParameters config,
+    CarpoolingRepository repository,
+    RoutableCarpoolTripResolver tripResolver,
+    Executor resolutionExecutor,
+    CarpoolingParameters parameters
   ) {
     super(config);
+    this.maxTrips = parameters.maxTrips();
+    this.maxPagesPerPoll = parameters.maxPagesPerPoll();
+    this.tripExpiry = parameters.tripExpiry();
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
-    this.vertexResolver = vertexResolver;
+    this.tripResolver = tripResolver;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+    this.ownedExecutor = resolutionExecutor instanceof ExecutorService owned ? owned : null;
+    this.resolutionQueue = new CarpoolTripResolutionQueue(
+      resolutionExecutor,
+      this::resolveTrip,
+      repository
+    );
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    this.mapper = new CarpoolSiriMapper(config.feedId());
+    this.mapper = new CarpoolSiriMapper(config.feedId(), parameters.maxTripDuration());
+  }
+
+  private static ExecutorService resolverThread(String feedId) {
+    return Executors.newSingleThreadExecutor(task -> {
+      var thread = new Thread(task, "carpool-trip-resolver-" + feedId);
+      thread.setDaemon(true);
+      return thread;
+    });
+  }
+
+  @Override
+  public void teardown() {
+    if (ownedExecutor != null) {
+      ownedExecutor.shutdownNow();
+    }
   }
 
   @Override
@@ -85,24 +151,43 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   @Override
   public void runPolling() {
+    int pages = 0;
     boolean moreData;
     do {
       moreData = fetchAndProcessUpdates();
-    } while (moreData);
+      pages++;
+    } while (moreData && pages < maxPagesPerPoll);
+    if (moreData) {
+      LOG.warn(
+        "Read the maximum of {} pages from {} in one poll; the rest follows on the next poll",
+        maxPagesPerPoll,
+        updateSource
+      );
+    }
     removeExpiredTrips();
+    if (rejectedThisPoll > 0) {
+      LOG.warn(
+        "Rejected {} new carpool trips: this feed has the maximum of {} trips",
+        rejectedThisPoll,
+        maxTrips
+      );
+      rejectedThisPoll = 0;
+    }
   }
 
   /**
-   * Purges trips that ended more than {@link #TRIP_EXPIRY} ago, so completed trips are removed even
-   * when the source stops updating them. Cached resolution failures are swept on the same expiry.
+   * Purges trips that ended more than the trip expiry ago, so completed trips are removed even
+   * when the source stops updating them. Cached resolution failures and the live trips are swept on
+   * the same expiry.
    */
   private void removeExpiredTrips() {
     var now = Instant.now();
-    repository.removeExpiredTrips(now, TRIP_EXPIRY);
-    var cutoff = now.minus(TRIP_EXPIRY);
+    repository.removeExpiredTrips(now, tripExpiry);
+    var cutoff = now.minus(tripExpiry);
     failedResolutions
       .values()
       .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));
+    liveTrips.values().removeIf(trip -> trip.latestEndTime().toInstant().isBefore(cutoff));
   }
 
   /**
@@ -149,28 +234,33 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Maps a journey to a carpool trip, resolves its route points, and upserts the result. Removes the
-   * trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails to
-   * resolve.
+   * Maps a journey to a carpool trip and queues it for resolution and insertion (see
+   * {@link CarpoolTripResolutionQueue}). Queues the trip's removal instead when the journey is
+   * cancelled or has fewer than 2 non-cancelled calls; a trip that fails to resolve is removed
+   * too.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
       FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
       if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
-        repository.removeCarpoolTrip(tripId);
+        remove(tripId);
         return;
       }
       var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
       if (carpoolTrip == null) {
-        repository.removeCarpoolTrip(tripId);
+        remove(tripId);
         return;
       }
-      var tripWithVertices = resolveVertices(carpoolTrip);
-      if (tripWithVertices == null) {
-        repository.removeCarpoolTrip(tripId);
+      if (isUnchanged(tripId, carpoolTrip)) {
         return;
       }
-      repository.upsertCarpoolTrip(tripWithVertices);
+      if (isFullFor(tripId)) {
+        rejectedThisPoll++;
+        LOG.debug("Rejected new carpool trip {}: the feed is full", tripId);
+        return;
+      }
+      liveTrips.put(tripId, carpoolTrip);
+      resolutionQueue.submit(carpoolTrip);
     } catch (Exception e) {
       LOG.info(
         "Failed to process EstimatedVehicleJourney {}",
@@ -181,16 +271,58 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Resolves the trip's route points to permanent vertices, or {@code null} if any cannot be
-   * resolved. Both outcomes are memoized on the route-point geometry: an unchanged geometry reuses
+   * Whether this delivery repeats the version of the trip queued last. A source that re-sends its
+   * whole feed on every poll then costs one comparison per trip instead of a resolution, and does
+   * not touch the trip limit.
+   */
+  private boolean isUnchanged(FeedScopedId tripId, CarpoolTrip delivered) {
+    var last = liveTrips.get(tripId);
+    return last != null && last.sameAs(delivered);
+  }
+
+  private void remove(FeedScopedId tripId) {
+    liveTrips.remove(tripId);
+    resolutionQueue.remove(tripId);
+  }
+
+  /**
+   * Whether a journey for this trip id has to be dropped because the feed is full: the trip is not
+   * one of the feed's live trips, and the feed already has as many as it may. A live trip already
+   * has its slot and may always be updated.
+   */
+  private boolean isFullFor(FeedScopedId tripId) {
+    return !liveTrips.containsKey(tripId) && liveTrips.size() >= maxTrips;
+  }
+
+  private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {
+    if (a.stops().size() != b.stops().size()) {
+      return false;
+    }
+    for (int i = 0; i < a.stops().size(); i++) {
+      if (!a.stops().get(i).getDeviationBudget().equals(b.stops().get(i).getDeviationBudget())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Resolves the trip's route points to permanent vertices and computes its corridor, or
+   * {@code null} if a point cannot be resolved or the baseline cannot be routed. Both outcomes are
+   * memoized on the route-point geometry: an unchanged geometry reuses
    * the stored vertices or skips a known failure without re-resolving. A first failure is logged; a
-   * resolution that throws is memoized as failed too, with its stack trace.
+   * resolution that throws is memoized as failed too, with its stack trace. Runs on the resolution
+   * queue's thread.
    */
   @Nullable
-  private CarpoolTripWithVertices resolveVertices(CarpoolTrip trip) {
+  private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
     var existing = repository.getCarpoolTrip(trip.getId());
     if (existing != null && existing.trip().routePoints().equals(trip.routePoints())) {
-      return new CarpoolTripWithVertices(trip, existing.vertices());
+      // The corridor also depends on the stops' deviation budgets: keep it while those are
+      // unchanged too, otherwise recompute it from the reused vertices.
+      return sameDeviationBudgets(existing.trip(), trip)
+        ? new RoutableCarpoolTrip(trip, existing.vertices(), existing.corridor())
+        : tripResolver.resolveOnVertices(trip, existing.vertices());
     }
     var failed = failedResolutions.get(trip.getId());
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {
@@ -200,9 +332,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       );
       return null;
     }
-    CarpoolTripWithVertices resolved;
+    RoutableCarpoolTrip resolved;
     try {
-      resolved = vertexResolver.resolve(trip);
+      resolved = tripResolver.resolve(trip);
     } catch (RuntimeException e) {
       LOG.warn("Dropping carpool trip {}: route-point resolution failed", trip.getId(), e);
       failedResolutions.put(trip.getId(), trip);
@@ -210,7 +342,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     }
     if (resolved == null) {
       LOG.warn(
-        "Dropping carpool trip {}: a route point has no car-reachable street vertex",
+        "Dropping carpool trip {}: a route point has no car-reachable street vertex, or a leg " +
+          "cannot be routed",
         trip.getId()
       );
       failedResolutions.put(trip.getId(), trip);

@@ -6,7 +6,7 @@ import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.carpooling.CarpoolingRepository;
-import org.opentripplanner.ext.carpooling.routing.CarpoolTripVertexResolver;
+import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -222,7 +222,8 @@ public class ConstructApplication {
       vehicleParkingRepository(),
       transitRepository(),
       carpoolingRepository(),
-      carpoolTripVertexResolver(),
+      routableCarpoolTripResolver(),
+      factory.carpoolingParameters(),
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
       factory.timetableRepositoryHandle(),
@@ -294,8 +295,8 @@ public class ConstructApplication {
   }
 
   @Nullable
-  public CarpoolTripVertexResolver carpoolTripVertexResolver() {
-    return factory.carpoolTripVertexResolver();
+  public RoutableCarpoolTripResolver routableCarpoolTripResolver() {
+    return factory.routableCarpoolTripResolver();
   }
 
   public DataImportIssueSummary dataImportIssueSummary() {
