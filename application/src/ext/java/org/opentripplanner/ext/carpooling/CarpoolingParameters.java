@@ -13,6 +13,10 @@ import java.time.Duration;
  *        pre-filters, the ones whose route passes closest to the passenger are kept
  * @param maxTrips the most live trips one SIRI feed may have; further new trips of the feed are
  *        dropped
+ * @param maxPagesPerPoll the most SIRI deliveries one poll reads while the feed reports more data;
+ *        the rest follows on the next poll, so a feed that always reports more data cannot keep a
+ *        poll, and with it OTP's readiness, going forever. An updater that polls only once has no
+ *        next poll and reads every delivery.
  * @param maxStopWalk the longest walk between a transit stop and the vertex where a car can stop
  *        for it; stops farther from any drivable street get no snap and are left out of the
  *        corridors
@@ -35,6 +39,7 @@ import java.time.Duration;
 public record CarpoolingParameters(
   int maxCandidateTripsPerRequest,
   int maxTrips,
+  int maxPagesPerPoll,
   Duration maxStopWalk,
   Duration maxTripDuration,
   Duration tripExpiry,
@@ -46,6 +51,7 @@ public record CarpoolingParameters(
   public static final CarpoolingParameters DEFAULT = new CarpoolingParameters(
     30,
     10_000,
+    50,
     Duration.ofMinutes(15),
     Duration.ofHours(2).plusMinutes(30),
     Duration.ofDays(2),
@@ -61,6 +67,9 @@ public record CarpoolingParameters(
     }
     if (maxTrips < 1) {
       throw new IllegalArgumentException("maxTrips must be positive");
+    }
+    if (maxPagesPerPoll < 1) {
+      throw new IllegalArgumentException("maxPagesPerPoll must be positive");
     }
     requirePositive(maxStopWalk, "maxStopWalk");
     requirePositive(maxTripDuration, "maxTripDuration");
