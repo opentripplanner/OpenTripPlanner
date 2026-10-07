@@ -110,4 +110,58 @@ class DefaultRegularTransferServiceFactoryTest {
 
     assertThat(first).isSameInstanceAs(second);
   }
+
+  @Test
+  void factoriesOfTheSameSnapshotShareItsCache() {
+    var provider = new FakeTransferPathProvider();
+    provider.addNearby(TransferProfileType.WALK, A, B, 100, 60);
+    var stopIndex = stopIndex();
+    var snapshot = generate(stopIndex, provider, 1.0);
+
+    var first = new DefaultRegularTransferServiceFactory<>(stopIndex, snapshot, provider).create(
+      TransferProfileType.WALK,
+      withReluctance(1.0)
+    );
+    var second = new DefaultRegularTransferServiceFactory<>(stopIndex, snapshot, provider).create(
+      TransferProfileType.WALK,
+      withReluctance(1.0)
+    );
+
+    assertThat(second).isSameInstanceAs(first);
+  }
+
+  @Test
+  void aNewSnapshotStartsWithAnEmptyCache() {
+    var provider = new FakeTransferPathProvider();
+    provider.addNearby(TransferProfileType.WALK, A, B, 100, 60);
+    var stopIndex = stopIndex();
+    var fromA = stopIndex.toStopIndex(A);
+    var original = generate(stopIndex, provider, 1.0);
+    var prefs = withReluctance(1.0);
+    var originalService = new DefaultRegularTransferServiceFactory<>(
+      stopIndex,
+      original,
+      provider
+    ).create(TransferProfileType.WALK, prefs);
+
+    // Commit a new path A -> C
+    var lifecycle = new RegularTransferRepositoryLifecycle<FakeTransferPathProvider.FakePath>();
+    var repository = lifecycle.copyOnWrite(original);
+    repository.setPath(
+      TransferProfileType.WALK,
+      fromA,
+      stopIndex.toStopIndex(C),
+      new FakeTransferPathProvider.FakePath(A, C, 200, 90)
+    );
+    var updated = lifecycle.freeze(repository);
+    var updatedService = new DefaultRegularTransferServiceFactory<>(
+      stopIndex,
+      updated,
+      provider
+    ).create(TransferProfileType.WALK, prefs);
+
+    assertThat(updatedService).isNotSameInstanceAs(originalService);
+    assertThat(collectC1(updatedService.getTransfersFromStop(fromA))).containsExactly(100, 200);
+    assertThat(collectC1(originalService.getTransfersFromStop(fromA))).containsExactly(100);
+  }
 }
