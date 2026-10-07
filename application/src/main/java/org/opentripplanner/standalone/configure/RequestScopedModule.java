@@ -25,7 +25,9 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferServiceFactoryCreator;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -54,6 +56,9 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 
 /**
  * Provides the bindings that live inside {@link RequestScopedFactory}. A single
@@ -96,6 +101,26 @@ public class RequestScopedModule {
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
     return new DefaultTransitService(transitRepository, timetableSnapshot);
+  }
+
+  /**
+   * Bound to the regular-transfer snapshot of this request's {@link TransactionScope}, so the
+   * transfers used for routing and the paths recovered for the itineraries come from the same
+   * snapshot.
+   */
+  @Provides
+  @HttpRequestScoped
+  static RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory(
+    RegularTransferServiceFactoryCreator regularTransferServiceFactoryCreator,
+    RepositoryHandle<
+      RegularTransferRepositorySnapshot<NearbyStop>,
+      RegularTransferRepository<NearbyStop>
+    > regularTransferRepositoryHandle,
+    TransactionScope transactionScope
+  ) {
+    return regularTransferServiceFactoryCreator.create(
+      regularTransferRepositoryHandle.repositorySnapshot(transactionScope)
+    );
   }
 
   @Provides
@@ -195,6 +220,7 @@ public class RequestScopedModule {
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -217,6 +243,7 @@ public class RequestScopedModule {
       vehicleRentalService,
       streetDetailsService,
       transferService,
+      regularTransferServiceFactory,
       transitAlertService,
       flexParameters,
       rideHailingServices,

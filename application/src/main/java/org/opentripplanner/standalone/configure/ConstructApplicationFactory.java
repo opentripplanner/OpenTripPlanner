@@ -37,6 +37,8 @@ import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.data.transfers.regular.configure.RegularTransferRepositoryModule;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferServiceFactoryCreator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -80,6 +82,8 @@ import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.warmup.WarmupLauncher;
 import org.opentripplanner.warmup.configure.WarmupModule;
 
@@ -103,6 +107,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     StreetDetailsServiceModule.class,
     LinkingServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
+    RegularTransferRepositoryModule.class,
     RideHailingServicesModule.class,
     GtfsSchemaModule.class,
     TransmodelSchemaModule.class,
@@ -131,6 +136,13 @@ public interface ConstructApplicationFactory {
 
   TransferRepository transferRepository();
   RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository();
+
+  RepositoryHandle<
+    RegularTransferRepositorySnapshot<NearbyStop>,
+    RegularTransferRepository<NearbyStop>
+  > regularTransferRepositoryHandle();
+
+  RegularTransferServiceFactoryCreator regularTransferServiceFactoryCreator();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
   RepositoryHandle<

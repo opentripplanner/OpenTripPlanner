@@ -71,6 +71,7 @@ import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
@@ -327,6 +328,7 @@ public class RaptorPathToItineraryMapperTest {
       ),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
+      NoRegularTransfers.factory(),
       dateTime.atZone(ZoneIds.CET),
       RouteRequest.defaultValue(),
       null

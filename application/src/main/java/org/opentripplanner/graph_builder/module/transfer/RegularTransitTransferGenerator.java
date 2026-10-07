@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  * Runs unconditionally, alongside {@link FlexTransferGenerator}: that module now only
  * generates the FLEX-relevant transfers (walking connectors between {@code RegularStop}s and
  * flex {@code AreaStop}/{@code GroupStop}s) - regular transfers between {@code RegularStop}s are
- * exclusively this pipeline's responsibility, so callers that build {@code RaptorTransitData}
- * without this pipeline's wiring (e.g. in tests, see {@code TestServerContext}) must run this
- * generator too, or regular transfers will be missing.
+ * exclusively this pipeline's responsibility. Routing reads them through the request-scoped
+ * {@code RegularTransferServiceFactory}, so a test that routes with regular transfers must run this
+ * generator, see {@code TestServerContext.createRegularTransferServiceFactory}.
  * <p>
  * {@code regularTransferBuildRepository} is injected empty (mirroring {@code TransferRepository})
  * and populated in place here, so the same instance can be threaded through
