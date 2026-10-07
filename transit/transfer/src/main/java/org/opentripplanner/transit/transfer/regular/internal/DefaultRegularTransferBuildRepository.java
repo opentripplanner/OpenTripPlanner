@@ -21,12 +21,24 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
 
   private final TransferPathMap<P> paths = new TransferPathMap<>();
 
+  /**
+   * Set when this repository is converted into the initial runtime snapshot. Not serialized, a
+   * loaded graph can be extended by a new graph build.
+   */
+  private transient boolean sealed = false;
+
   @Override
   public void setPaths(
     TransferProfileType profileType,
     int fromStop,
     Map<Integer, P> pathsByToStop
   ) {
+    if (sealed) {
+      throw new IllegalStateException(
+        "The build repository is sealed, regular transfers can only be updated through the " +
+          "repository now."
+      );
+    }
     paths.setPaths(profileType, fromStop, pathsByToStop);
   }
 
@@ -52,6 +64,7 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
 
   @Override
   public RegularTransferRepositorySnapshot<P> createInitialSnapshot() {
+    sealed = true;
     return new DefaultRegularTransferRepositorySnapshot<>(paths.copy());
   }
 }

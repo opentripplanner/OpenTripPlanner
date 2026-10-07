@@ -27,7 +27,7 @@ import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFac
 public class RegularTransferRepositoryModule {
 
   /**
-   * Converts the build repository into the initial snapshot of the runtime repository. From now on
+   * Converts the build repository into the initial snapshot of the runtime repository, and seals it. From now on
    * regular transfers are only updated through the handle.
    * <p>
    * Registration is not thread-safe, so the handle must be created at startup, before the updaters start - not lazily

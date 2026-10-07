@@ -14,21 +14,25 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileTy
  * This repository is only used at graph build, it is not the runtime repository. When the
  * application starts, it is converted into the initial snapshot of the
  * {@link RegularTransferRepository}, which is then only updated inside the transaction framework -
- * see {@link #createInitialSnapshot}.
+ * see {@link #createInitialSnapshot}. The conversion seals this repository: writing to it afterward
+ * throws an {@link IllegalStateException}.
  *
  * @param <P> the transfer path/template type
  */
 public interface RegularTransferBuildRepository<P> extends Serializable {
   /**
    * Create the initial snapshot of the {@link RegularTransferRepository} from the paths generated
-   * at graph build. Writes to the build repository after this can not change the snapshot, which
-   * owns a copy of the paths.
+   * at graph build, and seal the build repository: from now on regular transfers can only be
+   * updated through the runtime repository. Writes to the build repository after this throw - and
+   * even without the seal they could not change the snapshot, which owns a copy of the paths.
    */
   RegularTransferRepositorySnapshot<P> createInitialSnapshot();
 
   /**
    * Store the path templates for all transfers from {@code fromStop}, keyed by {@code toStop}.
    * Existing paths to other stops are kept. The given map is copied, not retained.
+   *
+   * @throws IllegalStateException if the repository is sealed
    */
   void setPaths(TransferProfileType profileType, int fromStop, Map<Integer, P> pathsByToStop);
 

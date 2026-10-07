@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
 import java.util.List;
@@ -71,7 +72,7 @@ class RequestScopedFactoryIntegrationTest {
 
   /**
    * The production wiring turns the build repository into the initial repository snapshot, which
-   * requests read through their scope.
+   * requests read through their scope, and seals the build repository.
    */
   @Test
   void requestsReadTheTransfersOfTheBuildRepository() {
@@ -85,6 +86,9 @@ class RequestScopedFactoryIntegrationTest {
     var request = factory.requestScopedFactoryBuilder().build();
 
     assertThat(findPath(request)).isSameInstanceAs(PATH);
+    assertThrows(IllegalStateException.class, () ->
+      buildRepository.setPaths(WALK, TO_STOP, Map.of(FROM_STOP, PATH))
+    );
   }
 
   /**
