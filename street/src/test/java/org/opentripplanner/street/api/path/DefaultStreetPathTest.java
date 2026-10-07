@@ -9,7 +9,7 @@ import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
-class StreetPathTest {
+class DefaultStreetPathTest {
 
   private static final Instant START_TIME = Instant.parse("2007-12-03T10:15:30.00Z");
 
