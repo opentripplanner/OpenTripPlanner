@@ -99,7 +99,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   private Collection<NearbyStop> removeTransferNotAllowedStops(Collection<NearbyStop> nearbyStops) {
     return nearbyStops
       .stream()
-      .filter(s -> !transitService.getStopLocation(s.stopId).transfersNotAllowed())
+      .filter(s -> !transitService.getStopLocation(s.stopId()).transfersNotAllowed())
       .toList();
   }
 }

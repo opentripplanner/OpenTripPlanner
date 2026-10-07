@@ -135,7 +135,7 @@ public class TaxiRouter {
     List<NearbyStop> result = new ArrayList<>(nearbyStops.size());
     for (NearbyStop nearbyStop : nearbyStops) {
       Point stopPoint = GeometryUtils.getGeometryFactory().createPoint(
-        transitService.getStopLocation(nearbyStop.stopId).getCoordinate().asJtsCoordinate()
+        transitService.getStopLocation(nearbyStop.stopId()).getCoordinate().asJtsCoordinate()
       );
       for (TaxiRoute route : routes) {
         if (taxiRouteIndex.getPreparedGeometry(route).contains(stopPoint)) {

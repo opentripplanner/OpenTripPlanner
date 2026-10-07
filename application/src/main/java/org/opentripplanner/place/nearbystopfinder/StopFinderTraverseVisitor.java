@@ -43,7 +43,7 @@ class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
    * @return A de-duplicated list of nearby stops found by this visitor.
    */
   List<NearbyStop> stopsFound() {
-    return ListUtils.distinctByKey(stopsFound, ns -> ns.stopId);
+    return ListUtils.distinctByKey(stopsFound, ns -> ns.stopId());
   }
 
   /**

@@ -59,7 +59,7 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
   }
 
   protected FlexPathDurations calculateFlexPathDurations(FlexTripEdge flexEdge, State state) {
-    int preFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
+    int preFlexTime = (int) accessEgress.state().getElapsedTimeSeconds();
     int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
     int postFlexTime = (int) state.getElapsedTimeSeconds() - preFlexTime - edgeTimeInSeconds;
     return new FlexPathDurations(
@@ -72,7 +72,7 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
 
   protected FlexTripEdge getFlexEdge(Vertex flexToVertex, FeedScopedId transferStopId) {
     var flexPath = calculator.calculateFlexPath(
-      accessEgress.state.getVertex(),
+      accessEgress.state().getVertex(),
       flexToVertex,
       boardStopPosition,
       alightStopPosition
@@ -83,9 +83,9 @@ class FlexAccessTemplate extends AbstractFlexTemplate {
     }
 
     return new FlexTripEdge(
-      accessEgress.state.getVertex(),
+      accessEgress.state().getVertex(),
       flexToVertex,
-      accessEgress.stopId,
+      accessEgress.stopId(),
       transferStopId,
       trip,
       boardStopPosition,
