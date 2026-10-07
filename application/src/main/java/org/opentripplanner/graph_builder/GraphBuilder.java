@@ -33,7 +33,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class GraphBuilder implements Runnable {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionRepository emissionRepository,
@@ -115,7 +115,7 @@ public class GraphBuilder implements Runnable {
       .transitRepository(transitRepository)
       .timetableDataImport(timetableDataImport)
       .transferRepository(transferRepository)
-      .regularTransferRepository(regularTransferRepository)
+      .regularTransferBuildRepository(regularTransferBuildRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)

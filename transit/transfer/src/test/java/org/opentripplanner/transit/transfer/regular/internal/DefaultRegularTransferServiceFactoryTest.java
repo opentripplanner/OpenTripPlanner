@@ -11,6 +11,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
@@ -34,13 +35,14 @@ class DefaultRegularTransferServiceFactoryTest {
     return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
   }
 
-  /** Populates the repository the same way graph build would, via the real generator. */
-  private static RegularTransferRepository<FakeTransferPathProvider.FakePath> generate(
+  /** Populates a repository the same way graph build would, via the real generator. */
+  private static RegularTransferRepositorySnapshot<FakeTransferPathProvider.FakePath> generate(
     StopIndex stopIndex,
     FakeTransferPathProvider provider,
     double buildTimeReluctance
   ) {
-    var repository = new RegularTransferRepository<FakeTransferPathProvider.FakePath>();
+    var buildRepository =
+      new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
     AbstractUserPreferences<?> preferences = withReluctance(buildTimeReluctance);
     // configuredRequestParameters (R) is unread by DefaultTransferGenerator today - reuse the
     // preferences instance as a type-compatible placeholder. Explicit type witnesses throughout,
@@ -57,9 +59,9 @@ class DefaultRegularTransferServiceFactoryTest {
       List.of(A),
       provider,
       profiles,
-      repository
+      buildRepository
     ).generateTransfersForAllStops();
-    return repository;
+    return buildRepository.createInitialSnapshot();
   }
 
   /**
@@ -102,9 +104,9 @@ class DefaultRegularTransferServiceFactoryTest {
     var repository = generate(stopIndex, provider, 1.0);
     var factory = new DefaultRegularTransferServiceFactory<>(stopIndex, repository, provider);
 
-    var prefs = withReluctance(1.0);
-    var first = factory.create(TransferProfileType.WALK, prefs);
-    var second = factory.create(TransferProfileType.WALK, prefs);
+    // Two equal, but separately created preferences - one is mapped for each request
+    var first = factory.create(TransferProfileType.WALK, withReluctance(1.0));
+    var second = factory.create(TransferProfileType.WALK, withReluctance(1.0));
 
     assertThat(first).isSameInstanceAs(second);
   }

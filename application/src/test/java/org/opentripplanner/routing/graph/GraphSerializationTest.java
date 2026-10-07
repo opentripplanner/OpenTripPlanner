@@ -62,7 +62,8 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.slf4j.Logger;
 
 /**
@@ -118,7 +119,7 @@ public class GraphSerializationTest {
       model.transitRepository(),
       model.timetableDataImport(),
       model.transferRepository(),
-      new RegularTransferRepository<>(),
+      RegularTransferFactory.createBuildRepository(),
       weRepo,
       parkingRepository,
       emissionRepository,
@@ -153,7 +154,7 @@ public class GraphSerializationTest {
       model.transitRepository(),
       model.timetableDataImport(),
       model.transferRepository(),
-      new RegularTransferRepository<>(),
+      RegularTransferFactory.createBuildRepository(),
       worldEnvelopeRepository,
       parkingRepository,
       emissionRepository,
@@ -296,7 +297,7 @@ public class GraphSerializationTest {
     TransitRepository originalTransitRepository,
     TimetableDataImport originalTimetableDataImport,
     TransferRepository originalTransferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
     EmissionRepository emissionRepository,
@@ -313,7 +314,7 @@ public class GraphSerializationTest {
       originalTransitRepository,
       originalTimetableDataImport,
       originalTransferRepository,
-      regularTransferRepository,
+      regularTransferBuildRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
       BuildConfig.DEFAULT,

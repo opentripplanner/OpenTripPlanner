@@ -18,7 +18,7 @@ import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.ext.taxi.configure.TaxiRepositoryModule;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.transfers.regular.configure.RegularTransferRepositoryModule;
+import org.opentripplanner.raptor.data.transfers.regular.configure.RegularTransferBuildRepositoryModule;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildRepositoryModule;
@@ -40,7 +40,7 @@ import org.opentripplanner.transfer.regular.configure.TransferRepositoryModule;
 import org.opentripplanner.transit.configure.TimetableDataImportModule;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 /**
  * Dagger dependency injection Factory to create components for the OTP load application phase.
@@ -62,7 +62,7 @@ import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepo
     StreetRepositoryModule.class,
     TransferRepositoryModule.class,
     TimetableDataImportModule.class,
-    RegularTransferRepositoryModule.class,
+    RegularTransferBuildRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
     FareModule.class,
     DeduplicatorServiceModule.class,
@@ -92,7 +92,7 @@ public interface LoadApplicationFactory {
   TransferRepository emptyTransferRepository();
 
   @Singleton
-  RegularTransferRepository<NearbyStop> emptyRegularTransferRepository();
+  RegularTransferBuildRepository<NearbyStop> emptyRegularTransferBuildRepository();
 
   @Singleton
   WorldEnvelopeRepository emptyWorldEnvelopeRepository();

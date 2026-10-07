@@ -12,9 +12,9 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
 import org.slf4j.Logger;
@@ -34,9 +34,10 @@ import org.slf4j.LoggerFactory;
  * without this pipeline's wiring (e.g. in tests, see {@code TestServerContext}) must run this
  * generator too, or regular transfers will be missing.
  * <p>
- * {@code regularTransferRepository} is injected empty (mirroring {@code TransferRepository}) and
- * populated in place here, so the same instance can be threaded through
- * {@code SerializedGraphObject} and survive a build-then-load-later-process deployment.
+ * {@code regularTransferBuildRepository} is injected empty (mirroring {@code TransferRepository})
+ * and populated in place here, so the same instance can be threaded through
+ * {@code SerializedGraphObject} and survive a build-then-load-later-process deployment. At runtime
+ * it is converted into the initial snapshot of the transactional repository.
  */
 public class RegularTransitTransferGenerator implements GraphBuilderModule {
 
@@ -45,20 +46,20 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final TransferProfilesConfig config;
-  private final RegularTransferRepository<NearbyStop> regularTransferRepository;
+  private final RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
   private final DataImportIssueStore issueStore;
 
   public RegularTransitTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferProfilesConfig config,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
     this.config = config;
-    this.regularTransferRepository = regularTransferRepository;
+    this.regularTransferBuildRepository = regularTransferBuildRepository;
     this.issueStore = issueStore;
   }
 
@@ -103,16 +104,16 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     );
     var pathProvider = new StreetTransferPathProvider(graph, nearbyStopFinder);
 
-    new DefaultTransferGenerator<NearbyStop, AbstractUserPreferences<?>>(
+    RegularTransferFactory.createTransferGenerator(
       stopIndex,
       stopsWithTrips,
       pathProvider,
       profiles,
-      regularTransferRepository
+      regularTransferBuildRepository
     ).generateTransfersForAllStops();
 
     for (FeedScopedId stopId : stopsWithTrips) {
-      if (!regularTransferRepository.hasTransfersFrom(stopIndex.toStopIndex(stopId))) {
+      if (!regularTransferBuildRepository.hasTransfersFrom(stopIndex.toStopIndex(stopId))) {
         var stopVertex = graph.getStopVertex(stopId);
         if (stopVertex != null) {
           issueStore.add(new StopNotLinkedForTransfers(stopVertex));
@@ -128,7 +129,9 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   ) {
     int sum = 0;
     for (var profile : profileList) {
-      int size = regularTransferRepository.pathsFor(profile.profileType()).size();
+      int size = regularTransferBuildRepository.calculateNumberOfTransferPaths(
+        profile.profileType()
+      );
       LOG.info("Created {} regular transfers for profile {}.", size, profile.profileType());
       sum += size;
     }

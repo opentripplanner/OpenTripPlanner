@@ -22,7 +22,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 /**
  * This class is responsible for loading configuration and setting up the OTP data store. This is
@@ -69,7 +69,7 @@ public class LoadApplication {
       obj.transitRepository,
       obj.timetableDataImport,
       obj.transferRepository,
-      obj.regularTransferRepository,
+      obj.regularTransferBuildRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
@@ -91,7 +91,7 @@ public class LoadApplication {
       factory.emptyTransitRepository(),
       factory.emptyTimetableDataImport(),
       factory.emptyTransferRepository(),
-      factory.emptyRegularTransferRepository(),
+      factory.emptyRegularTransferBuildRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
@@ -122,7 +122,7 @@ public class LoadApplication {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
-    RegularTransferRepository<NearbyStop> regularTransferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
@@ -141,7 +141,7 @@ public class LoadApplication {
       transitRepository,
       timetableDataImport,
       transferRepository,
-      regularTransferRepository,
+      regularTransferBuildRepository,
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),
