@@ -6,7 +6,6 @@ import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleReference;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
-import org.opentripplanner.street.search.state.State;
 
 public final class RoutingStartOnBoardAccess
   implements RaptorStartOnBoardAccess, RoutingAccessEgress
@@ -67,11 +66,19 @@ public final class RoutingStartOnBoardAccess
   }
 
   /**
-   * On-board access has no street state since it does not originate from a street search.
+   * On-board access does not originate from a street search, so no vehicle is rented.
    */
   @Override
-  public State getFinalState() {
-    return null;
+  public boolean isRentingVehicleFromStation() {
+    return false;
+  }
+
+  /**
+   * On-board access does not originate from a street search, so there is no car.
+   */
+  @Override
+  public boolean containsModeCar() {
+    return false;
   }
 
   @Override

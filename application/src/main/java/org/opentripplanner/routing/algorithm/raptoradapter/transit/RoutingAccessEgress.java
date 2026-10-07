@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
-import org.opentripplanner.street.search.state.State;
 
 /**
  * Encapsulate information about an access or egress path. This interface extends
@@ -18,13 +17,16 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
   RoutingAccessEgress withPenalty(TimeAndCost penalty);
 
   /**
-   * Return the final state of the A* street search that reached the transit stop. "Final" refers to
-   * the search order, not chronological order — for egress searches
-   * ({@code request.arriveBy() == true}) the state chain runs backward in time and is not reversed.
-   * Callers that need a chronological state chain must wrap this in a
-   * {@link org.opentripplanner.street.model.path.StreetPath}.
+   * Return true if a vehicle picked up at a rental station is still rented at the end of the
+   * street search, which is at the transit stop. For an egress, the search runs backward in time,
+   * so this means the passenger arrives at the destination with the rented vehicle.
    */
-  State getFinalState();
+  boolean isRentingVehicleFromStation();
+
+  /**
+   * Return true if any part of the access/egress is traversed by car.
+   */
+  boolean containsModeCar();
 
   /**
    * Return true if all edges are traversed on foot.

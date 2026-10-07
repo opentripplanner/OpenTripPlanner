@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -45,10 +46,10 @@ public class RideHailingAccessShifter {
       .map(ae -> {
         // only time-shift access legs on a car
         // (there could be walk-only accesses if you're close to the stop)
-        if (isAccess && ae.getFinalState().containsModeCar()) {
+        if (isAccess && ae.containsModeCar() && ae instanceof DefaultAccessEgress access) {
           var duration = fetchArrivalDelay(services, request, now);
           if (duration.isSuccess()) {
-            return new RideHailingAccessAdapter(ae, duration.successValue());
+            return new RideHailingAccessAdapter(access, duration.successValue());
           } else {
             return null;
           }

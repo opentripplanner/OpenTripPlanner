@@ -90,8 +90,29 @@ class DefaultAccessEgressTest {
   }
 
   @Test
-  void getFinalState() {
-    assertEquals(FINAL_STATE, subject.getFinalState());
+  void streetPath() {
+    assertEquals(
+      Duration.ofSeconds(FINAL_STATE.getElapsedTimeSeconds()),
+      subject.streetPath().duration()
+    );
+  }
+
+  @Test
+  void containsModeCar() {
+    assertFalse(subject.containsModeCar());
+    assertTrue(
+      new DefaultAccessEgress(
+        0,
+        TestStateBuilder.ofDriving().streetEdge().build()
+      ).containsModeCar()
+    );
+  }
+
+  @Test
+  void isRentingVehicleFromStation() {
+    assertFalse(subject.isRentingVehicleFromStation());
+    var rentalState = TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build();
+    assertTrue(new DefaultAccessEgress(0, rentalState).isRentingVehicleFromStation());
   }
 
   @Test
