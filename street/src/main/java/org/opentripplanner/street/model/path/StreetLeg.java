@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.path;
 
+import java.time.Instant;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
@@ -8,10 +9,14 @@ import org.opentripplanner.street.model.path.step.StreetStep;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**
- * A part of a {@link StreetPath} which is traversed in a single street mode. Note, walking a bike
- * does not start a new leg.
+ * A part of a {@link StreetPath} which is traversed in a single street mode, see
+ * {@link StreetPath#legs(double)}. Note, walking a bike does not start a new leg.
  */
-public non-sealed interface StreetLeg extends PathLeg {
+public interface StreetLeg {
+  Instant startTime();
+
+  Instant endTime();
+
   /**
    * The mode of the leg. If a vehicle is rented, this is the mode of the rented vehicle.
    */

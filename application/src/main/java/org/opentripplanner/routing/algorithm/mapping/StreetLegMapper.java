@@ -13,7 +13,6 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTransportationUseFactory;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -22,7 +21,7 @@ import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.path.ExternalEdgeLeg;
-import org.opentripplanner.street.model.path.PathLeg;
+import org.opentripplanner.street.model.path.StreetLeg;
 import org.opentripplanner.street.model.path.StreetLegPlace;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.path.step.StepEntrance;
@@ -105,23 +104,19 @@ public class StreetLegMapper {
     return legs;
   }
 
-  private Leg mapLeg(PathLeg pathLeg, List<ViaLocation> viaLocations, @Nullable Duration delay) {
-    return switch (pathLeg) {
-      case org.opentripplanner.street.model.path.StreetLeg streetLeg -> mapStreetLeg(
-        streetLeg,
-        viaLocations,
-        delay
-      );
-      case ExternalEdgeLeg externalEdgeLeg -> mapFlexLeg(externalEdgeLeg, delay);
-    };
+  private Leg mapLeg(StreetLeg pathLeg, List<ViaLocation> viaLocations, @Nullable Duration delay) {
+    if (pathLeg instanceof ExternalEdgeLeg externalEdgeLeg) {
+      return mapFlexLeg(externalEdgeLeg, delay);
+    }
+    return mapStreetLeg(pathLeg, viaLocations, delay);
   }
 
-  private StreetLeg mapStreetLeg(
-    org.opentripplanner.street.model.path.StreetLeg leg,
+  private org.opentripplanner.model.plan.leg.StreetLeg mapStreetLeg(
+    StreetLeg leg,
     List<ViaLocation> viaLocations,
     @Nullable Duration delay
   ) {
-    var builder = StreetLeg.of()
+    var builder = org.opentripplanner.model.plan.leg.StreetLeg.of()
       .withMode(leg.mode())
       .withStartTime(timeWithDelay(leg.startTime(), delay))
       .withEndTime(timeWithDelay(leg.endTime(), delay))

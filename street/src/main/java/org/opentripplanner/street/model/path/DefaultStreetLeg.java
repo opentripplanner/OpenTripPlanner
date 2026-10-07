@@ -5,15 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.model.path.step.StatesToStreetStepsMapper;
 import org.opentripplanner.street.model.path.step.StreetStep;
-import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -94,12 +89,12 @@ final class DefaultStreetLeg implements StreetLeg {
 
   @Override
   public StreetLegPlace from() {
-    return place(path.states().getFirst());
+    return StreetLegPlace.of(path.states().getFirst());
   }
 
   @Override
   public StreetLegPlace to() {
-    return place(path.lastState());
+    return StreetLegPlace.of(path.lastState());
   }
 
   @Override
@@ -158,42 +153,5 @@ final class DefaultStreetLeg implements StreetLeg {
     }
     var previousSteps = previous.steps();
     return previousSteps.isEmpty() ? null : previousSteps.getLast();
-  }
-
-  private static StreetLegPlace place(State state) {
-    Vertex vertex = state.getVertex();
-    I18NString name = vertex.getName();
-
-    // This gets nicer names instead of osm:node:id when changing mode of transport.
-    // Names are generated from all the streets in a corner, same as names in origin and
-    // destination. We use the name in TemporaryStreetLocation since this name generation already
-    // happened when the temporary location was generated.
-    if (
-      vertex instanceof StreetVertex streetVertex && !(vertex instanceof TemporaryStreetLocation)
-    ) {
-      name = streetVertex.getIntersectionName();
-    }
-
-    boolean realTimeVehicleParking =
-      vertex instanceof VehicleParkingEntranceVertex parkingVertex &&
-      hasRealTimeVehicleParkingData(parkingVertex, state);
-
-    return new StreetLegPlace(vertex, name, realTimeVehicleParking);
-  }
-
-  private static boolean hasRealTimeVehicleParkingData(
-    VehicleParkingEntranceVertex vertex,
-    State state
-  ) {
-    TraverseMode traverseMode = null;
-    var request = state.getRequest();
-    if (request.mode().includesDriving()) {
-      traverseMode = TraverseMode.CAR;
-    } else if (request.mode().includesBiking()) {
-      traverseMode = TraverseMode.BICYCLE;
-    }
-    return vertex
-      .getVehicleParking()
-      .hasRealTimeDataForMode(traverseMode, request.wheelchairEnabled());
   }
 }

@@ -104,7 +104,7 @@ public class StreetPath {
   /// @param ellipsoidToGeoidDifference The difference between the ellipsoid and the geoid
   ///                                   elevation of the graph, applied to the elevations of the
   ///                                   legs if requested.
-  public List<PathLeg> legs(double ellipsoidToGeoidDifference) {
+  public List<StreetLeg> legs(double ellipsoidToGeoidDifference) {
     return new StreetPathToLegsMapper(ellipsoidToGeoidDifference).map(this);
   }
 
