@@ -24,10 +24,15 @@ import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyD
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.malformedNonCancelledJourney;
 import static org.opentripplanner.ext.carpooling.CarpoolEstimatedVehicleJourneyData.minimalCompleteJourney;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.CarpoolingParametersTestData;
@@ -42,6 +47,16 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 class SiriETCarpoolingUpdaterTest {
 
   private static final String FEED_ID = "EN";
+
+  /** A SIRI-ET delivery without journeys that claims more data follows. */
+  private static final String PAGE_WITH_MORE_DATA = """
+  <Siri xmlns="http://www.siri.org.uk/siri" version="2.1">
+    <ServiceDelivery>
+      <ResponseTimestamp>%s</ResponseTimestamp>
+      <MoreData>true</MoreData>
+    </ServiceDelivery>
+  </Siri>
+  """;
 
   private DefaultCarpoolingRepository repository;
   private SiriETCarpoolingUpdater updater;
@@ -61,7 +76,7 @@ class SiriETCarpoolingUpdaterTest {
       RoutableCarpoolTripTestData.withDummyVertices(invocation.getArgument(0))
     );
     updater = new SiriETCarpoolingUpdater(
-      params(),
+      params("http://localhost/never-fetched", Duration.ofMinutes(1)),
       repository,
       resolver,
       CarpoolingParameters.DEFAULT
@@ -353,7 +368,7 @@ class SiriETCarpoolingUpdaterTest {
 
   private SiriETCarpoolingUpdater updaterHoldingAtMost(int maxTrips) {
     return new SiriETCarpoolingUpdater(
-      params(),
+      params("http://localhost/never-fetched", Duration.ofMinutes(1)),
       repository,
       resolver,
       CarpoolingParametersTestData.withMaxTrips(maxTrips)
@@ -371,13 +386,55 @@ class SiriETCarpoolingUpdaterTest {
     return journey;
   }
 
-  private static DefaultSiriETUpdaterParameters params() {
+  @Test
+  void aPollReadsAtMostTheMaximumNumberOfPages(@TempDir Path feed) throws IOException {
+    writeThreePagesWithMoreData(feed);
+
+    updaterReadingAtMostTwoPages(feed, Duration.ofMinutes(1)).runPolling();
+
+    assertEquals(1, unreadPages(feed));
+  }
+
+  @Test
+  void anUpdaterThatPollsOnlyOnceReadsEveryPage(@TempDir Path feed) throws IOException {
+    writeThreePagesWithMoreData(feed);
+
+    updaterReadingAtMostTwoPages(feed, Duration.ZERO).runPolling();
+
+    assertEquals(0, unreadPages(feed));
+  }
+
+  private static void writeThreePagesWithMoreData(Path feed) throws IOException {
+    var page = PAGE_WITH_MORE_DATA.formatted(Instant.now());
+    for (int i = 1; i <= 3; i++) {
+      Files.writeString(feed.resolve("page-" + i + ".xml"), page);
+    }
+  }
+
+  /** A non-positive frequency makes the updater poll only once. */
+  private SiriETCarpoolingUpdater updaterReadingAtMostTwoPages(Path feed, Duration frequency) {
+    return new SiriETCarpoolingUpdater(
+      params(feed.toUri().toString(), frequency),
+      repository,
+      resolver,
+      CarpoolingParametersTestData.withMaxPagesPerPoll(2)
+    );
+  }
+
+  /** The pages not read yet: the file loader renames every page it reads. */
+  private static long unreadPages(Path feed) throws IOException {
+    try (var files = Files.list(feed)) {
+      return files.filter(f -> f.toString().endsWith(".xml")).count();
+    }
+  }
+
+  private static DefaultSiriETUpdaterParameters params(String url, Duration frequency) {
     return new DefaultSiriETUpdaterParameters(
       "carpool-test",
       FEED_ID,
       false,
-      "http://localhost/never-fetched",
-      Duration.ofMinutes(1),
+      url,
+      frequency,
       "test-requestor",
       Duration.ofSeconds(30),
       Duration.ofMinutes(15),
