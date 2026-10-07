@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.ExternalLegEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -17,7 +18,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 /**
  * Flex trips edges are not connected to the graph.
  */
-public class FlexTripEdge extends Edge {
+public class FlexTripEdge extends Edge implements ExternalLegEdge {
 
   private final FeedScopedId fromStopId;
   private final FeedScopedId toStopId;

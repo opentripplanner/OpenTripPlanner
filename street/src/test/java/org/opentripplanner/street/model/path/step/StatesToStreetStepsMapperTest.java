@@ -1,8 +1,8 @@
-package org.opentripplanner.routing.algorithm.mapping;
+package org.opentripplanner.street.model.path.step;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.mapping.StatesToWalkStepsMapper.isOnSameStreet;
+import static org.opentripplanner.street.model.path.step.StatesToStreetStepsMapper.isOnSameStreet;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,16 +11,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.core.model.i18n.I18NString;
-import org.opentripplanner.model.plan.walkstep.WalkStep;
-import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
-import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
-import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
-import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.transit.model.site.Entrance;
 
-class StatesToWalkStepsMapperTest {
+class StatesToStreetStepsMapperTest {
 
   @Test
   void absoluteDirection() {
@@ -28,8 +22,8 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '2.0_2.0_3.0_3.0', distance: 157,177.8}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '2.0_2.0_3.0_3.0', distance: 100.0}"
       )
       .inOrder();
   }
@@ -40,11 +34,11 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '2.0_2.0_3.0_3.0', distance: 157,177.8}",
-        "WalkStep{absoluteDirection: SOUTH, relativeDirection: HARD_RIGHT, directionText: 'ElevatorBoardEdge', distance: 0.0}",
-        "WalkStep{relativeDirection: ELEVATOR, directionText: 'elevator', distance: 0.0, verticalTransportation: 'ElevatorUse'}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: HARD_LEFT, directionText: '3.0_3.0_4.0_4.0', distance: 157,106.0}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '2.0_2.0_3.0_3.0', distance: 157,177.8}",
+        "StreetStep{absoluteDirection: SOUTH, relativeDirection: HARD_RIGHT, directionText: 'ElevatorBoardEdge', distance: 0.0}",
+        "StreetStep{relativeDirection: ELEVATOR, directionText: 'elevator', distance: 0.0, verticalTransportation: 'Elevator'}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: HARD_LEFT, directionText: '3.0_3.0_4.0_4.0', distance: 100.0}"
       )
       .inOrder();
   }
@@ -55,9 +49,9 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '2.0_2.0_3.0_3.0', distance: 30.0, verticalTransportation: 'StairsUse'}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '3.0_3.0_4.0_4.0', distance: 157,106.0}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '2.0_2.0_3.0_3.0', distance: 100.0, verticalTransportation: 'Stairs'}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '3.0_3.0_4.0_4.0', distance: 100.0}"
       )
       .inOrder();
   }
@@ -68,9 +62,9 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'escalator', distance: 30.0, verticalTransportation: 'EscalatorUse'}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '3.0_3.0_4.0_4.0', distance: 157,106.0}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'escalator', distance: 30.0, verticalTransportation: 'Escalator'}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: '3.0_3.0_4.0_4.0', distance: 100.0}"
       )
       .inOrder();
   }
@@ -85,10 +79,10 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'name', distance: 31.0}",
-        "WalkStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 0.0, entranceId: osm:12345}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'osm:node:12345_4.0_4.0', distance: 157,106.0}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'name', distance: 157,010.4}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'name', distance: 31.0}",
+        "StreetStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 0.0, entranceId: osm:12345}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'osm:node:12345_4.0_4.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'name', distance: 157,010.4}"
       )
       .inOrder();
   }
@@ -99,8 +93,8 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: ENTER_STATION, directionText: 'Lichterfelde-Ost', distance: 0.0, entranceId: F:Lichterfelde-Ost}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: ENTER_STATION, directionText: 'Lichterfelde-Ost', distance: 0.0, entranceId: street:Lichterfelde-Ost}"
       )
       .inOrder();
   }
@@ -111,9 +105,9 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'pathway', distance: 0.0}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: EXIT_STATION, directionText: 'Lichterfelde-Ost', distance: 0.0, entranceId: F:Lichterfelde-Ost}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'pathway', distance: 0.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: EXIT_STATION, directionText: 'Lichterfelde-Ost', distance: 0.0, entranceId: street:Lichterfelde-Ost}"
       )
       .inOrder();
   }
@@ -124,8 +118,8 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'name', distance: 31.0}",
-        "WalkStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 0.0, entranceId: osm:12345}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'name', distance: 31.0}",
+        "StreetStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 0.0, entranceId: osm:12345}"
       )
       .inOrder();
   }
@@ -138,9 +132,9 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'name', distance: 1.0}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'escalator', distance: 30.0, verticalTransportation: 'EscalatorUse'}",
-        "WalkStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 0.0, entranceId: osm:12345}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: 'name', distance: 1.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: CONTINUE, directionText: 'escalator', distance: 30.0, verticalTransportation: 'Escalator'}",
+        "StreetStep{relativeDirection: ENTER_OR_EXIT_STATION, directionText: 'station entrance', distance: 0.0, entranceId: osm:12345}"
       )
       .inOrder();
   }
@@ -151,48 +145,42 @@ class StatesToWalkStepsMapperTest {
 
     assertThat(toStrings(states))
       .containsExactly(
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 157,225.7}",
-        "WalkStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'follow signs to platform 1', distance: 100.0}"
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: DEPART, directionText: '1.0_1.0_2.0_2.0', distance: 100.0}",
+        "StreetStep{absoluteDirection: NORTHEAST, relativeDirection: FOLLOW_SIGNS, directionText: 'follow signs to platform 1', distance: 100.0}"
       )
       .inOrder();
   }
 
-  private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
+  private static List<StreetStep> buildWalkSteps(TestStateBuilder builder) {
     var result = builder.build();
     var path = new StreetPath(result);
-    var mapper = new StatesToWalkStepsMapper(
-      path.states(),
-      null,
-      new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
-      id -> Entrance.of(id).withCoordinate(WgsCoordinate.GREENWICH).build(),
-      0
-    );
-    return mapper.generateWalkSteps();
+    var mapper = new StatesToStreetStepsMapper(path.states(), null, 0);
+    return mapper.generateSteps();
   }
 
   private static List<String> toStrings(TestStateBuilder builder) {
-    return buildWalkSteps(builder).stream().map(WalkStep::toString).toList();
+    return buildWalkSteps(builder).stream().map(StreetStep::toString).toList();
   }
 
   @ParameterizedTest
   @MethodSource("createIsOnSameStreetCases")
   void testIsOnSameStreet(List<String> streets, boolean expected, String message) {
-    List<WalkStepBuilder> steps = streets
+    List<StreetStepBuilder> steps = streets
       .stream()
       .map(s ->
         s != null
-          ? WalkStep.builder()
+          ? StreetStep.builder()
               .withCrossing(s.startsWith("crossing over ") || s.equals("derived name"))
               .withNameIsDerived(s.equals("derived name"))
               .withDirectionText(I18NString.of(s))
-          : WalkStep.builder()
+          : StreetStep.builder()
       )
       .toList();
 
     int lastIndex = steps.size() - 1;
-    WalkStepBuilder threeBack = steps.get(lastIndex - 2);
-    WalkStepBuilder twoBack = steps.get(lastIndex - 1);
-    WalkStepBuilder lastStep = steps.get(lastIndex);
+    StreetStepBuilder threeBack = steps.get(lastIndex - 2);
+    StreetStepBuilder twoBack = steps.get(lastIndex - 1);
+    StreetStepBuilder lastStep = steps.get(lastIndex);
 
     assertEquals(expected, isOnSameStreet(lastStep, twoBack, threeBack), message);
   }

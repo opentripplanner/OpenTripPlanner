@@ -8,6 +8,8 @@ import org.opentripplanner.model.plan.walkstep.verticaltransportation.VerticalTr
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
+import org.opentripplanner.street.model.path.step.AbsoluteDirection;
+import org.opentripplanner.street.model.path.step.RelativeDirection;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -32,7 +34,6 @@ public class WalkStepBuilder {
   private VerticalTransportationUse verticalTransportationUse;
 
   private boolean stayOn = false;
-  private boolean crossing;
   /**
    * Distance used for appending elevation profiles
    */
@@ -98,14 +99,14 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public WalkStepBuilder withCrossing(boolean crossing) {
-    this.crossing = crossing;
-    return this;
-  }
-
   public WalkStepBuilder withDirections(double lastAngle, double thisAngle, boolean roundabout) {
     relativeDirection = RelativeDirection.calculate(lastAngle, thisAngle, roundabout);
     withAbsoluteDirection(thisAngle);
+    return this;
+  }
+
+  public WalkStepBuilder withAbsoluteDirection(@Nullable AbsoluteDirection absoluteDirection) {
+    this.absoluteDirection = absoluteDirection;
     return this;
   }
 
@@ -129,59 +130,9 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public ElevationProfile elevationProfile() {
-    return elevationProfile;
-  }
-
-  public double distance() {
-    return distance;
-  }
-
   public WalkStepBuilder addEdge(Edge edge) {
     this.edges.add(edge);
     return this;
-  }
-
-  @Nullable
-  public String directionTextNoParens() {
-    var str = directionText.toString();
-    if (str == null) {
-      // Avoid null reference exceptions with pathways which don't have names
-      return null;
-    }
-    int idx = str.indexOf('(');
-    if (idx > 0) {
-      return str.substring(0, idx - 1);
-    }
-    return str;
-  }
-
-  public boolean hasEntrance() {
-    return entrance != null;
-  }
-
-  @Nullable
-  public VerticalTransportationUse verticalTransportationUse() {
-    return verticalTransportationUse;
-  }
-
-  public I18NString directionText() {
-    return directionText;
-  }
-
-  /**
-   * @see Edge#nameIsDerived()
-   */
-  public boolean nameIsDerived() {
-    return nameIsDerived;
-  }
-
-  public RelativeDirection relativeDirection() {
-    return relativeDirection;
-  }
-
-  public boolean isCrossing() {
-    return crossing;
   }
 
   public WalkStep build() {
