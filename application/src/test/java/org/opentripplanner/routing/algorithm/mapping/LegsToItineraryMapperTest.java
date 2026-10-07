@@ -34,7 +34,7 @@ class LegsToItineraryMapperTest {
   @ParameterizedTest
   @MethodSource("cases")
   void isSearchWindowAware(State state) {
-    var mapper = new StreetPathToLegsMapper(
+    var mapper = new StreetLegMapper(
       new NoopSiteResolver(),
       ZoneIds.UTC,
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),

@@ -10,7 +10,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.algorithm.mapping.LegsToItineraryMapper;
-import org.opentripplanner.routing.algorithm.mapping.StreetPathToLegsMapper;
+import org.opentripplanner.routing.algorithm.mapping.StreetLegMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.linking.LinkingContext;
@@ -64,7 +64,7 @@ public class DirectStreetRouter {
       var paths = gpFinder.find(request, linkingContext);
 
       // Convert the internal StreetPaths to itineraries
-      final StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
+      final StreetLegMapper streetLegMapper = new StreetLegMapper(
         new TransitServiceResolver(transitService),
         transitService.getTimeZone(),
         streetDetailsService,
@@ -72,7 +72,7 @@ public class DirectStreetRouter {
       );
       List<Itinerary> itineraries = new ArrayList<>();
       for (var path : paths) {
-        var legs = streetPathToLegsMapper.map(path, request);
+        var legs = streetLegMapper.map(path, request);
         var itinerary = LegsToItineraryMapper.map(
           legs,
           path.lastState().isRentingVehicleFromStation(),

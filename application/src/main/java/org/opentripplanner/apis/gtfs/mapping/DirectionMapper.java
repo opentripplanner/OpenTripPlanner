@@ -2,8 +2,8 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
-import org.opentripplanner.model.plan.walkstep.AbsoluteDirection;
-import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.street.model.path.step.AbsoluteDirection;
+import org.opentripplanner.street.model.path.step.RelativeDirection;
 
 public final class DirectionMapper {
 
