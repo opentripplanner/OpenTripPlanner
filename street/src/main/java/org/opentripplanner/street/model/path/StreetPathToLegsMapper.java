@@ -10,7 +10,7 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
- * Splits a {@link StreetPath} into {@link PathLeg}s. If the whole path is traversed with a
+ * Splits a {@link StreetPath} into {@link StreetLeg}s. If the whole path is traversed with a
  * singular street mode, this will return a single leg. Each change of street mode within a path
  * generates a new leg. Note, walking a bike does not cause a new leg to be generated.
  */
@@ -50,8 +50,8 @@ class StreetPathToLegsMapper {
   /**
    * The legs are returned in the order they are traversed in the path.
    */
-  List<PathLeg> map(StreetPath path) {
-    List<PathLeg> legs = new ArrayList<>();
+  List<StreetLeg> map(StreetPath path) {
+    List<StreetLeg> legs = new ArrayList<>();
     DefaultStreetLeg previousStreetLeg = null;
     for (var subPath : slicePath(path)) {
       if (subPath.states().get(1).getBackEdge() instanceof ExternalLegEdge externalEdge) {
@@ -128,7 +128,19 @@ class StreetPathToLegsMapper {
     var states = path.states();
     State fromState = states.get(0);
     State toState = states.get(1);
-    int generalizedCost = IntUtils.round(toState.getWeight() - fromState.getWeight());
-    return new ExternalEdgeLeg(edge, fromState.getTime(), toState.getTime(), generalizedCost);
+    var backEdge = toState.getBackEdge();
+    return new ExternalEdgeLeg(
+      edge,
+      toState.getBackMode(),
+      fromState.getTime(),
+      toState.getTime(),
+      StreetLegPlace.of(fromState),
+      StreetLegPlace.of(toState),
+      backEdge.getDistanceMeters(),
+      IntUtils.round(toState.getWeight() - fromState.getWeight()),
+      backEdge.getGeometry(),
+      fromState.isRentingVehicle(),
+      fromState.isRentingVehicle() ? fromState.getVehicleRentalNetwork() : null
+    );
   }
 }
