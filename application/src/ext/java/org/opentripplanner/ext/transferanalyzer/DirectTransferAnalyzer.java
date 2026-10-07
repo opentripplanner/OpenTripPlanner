@@ -93,8 +93,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       Map<RegularStop, NearbyStop> stopsEuclidean = straightLineNearbyStopFinder
         .findNearbyStops(c0, radiusMeters)
         .stream()
-        .filter(nearbyStop -> getRegularStop(nearbyStop.stopId) != null)
-        .collect(Collectors.toMap(nearbyStop -> getRegularStop(nearbyStop.stopId), t -> t));
+        .filter(nearbyStop -> getRegularStop(nearbyStop.stopId()) != null)
+        .collect(Collectors.toMap(nearbyStop -> getRegularStop(nearbyStop.stopId()), t -> t));
 
       Map<RegularStop, NearbyStop> stopsStreets = new HashMap<>();
       try {
@@ -102,9 +102,9 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         streetNearbyStopFinder
           .findNearbyStops(c0, radiusMeters * RADIUS_MULTIPLIER)
           .stream()
-          .filter(nearbyStop -> getRegularStop(nearbyStop.stopId) != null)
+          .filter(nearbyStop -> getRegularStop(nearbyStop.stopId()) != null)
           .forEach(nearbyStop ->
-            stopsStreets.putIfAbsent(getRegularStop(nearbyStop.stopId), nearbyStop)
+            stopsStreets.putIfAbsent(getRegularStop(nearbyStop.stopId()), nearbyStop)
           );
       } catch (Exception ignored) {}
 
@@ -133,8 +133,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         TransferInfo transferInfo = new TransferInfo(
           originStop,
           destStop,
-          euclideanStop.distance,
-          streetStop.distance
+          euclideanStop.distance(),
+          streetStop.distance()
         );
 
         /* Log transfer where the street distance is too long compared to the euclidean distance */
@@ -151,7 +151,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
         /* Log transfers that are found by euclidean search but not by street search */
         directTransfersNotFound.add(
-          new TransferInfo(originStop, destStop, euclideanStop.distance, -1)
+          new TransferInfo(originStop, destStop, euclideanStop.distance(), -1)
         );
       }
     }

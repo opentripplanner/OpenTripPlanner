@@ -231,7 +231,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
   static List<NearbyStop> sort(Collection<NearbyStop> stops) {
     return stops
       .stream()
-      .sorted(Comparator.comparing(x -> x.distance))
+      .sorted(Comparator.comparing(x -> x.distance()))
       .toList();
   }
 
@@ -239,11 +239,11 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
    * Verify that the nearby stop is zero distance and corresponds to the expected vertex
    */
   void assertZeroDistanceStop(TransitStopVertex expected, NearbyStop nearbyStop) {
-    assertEquals(expected.getId(), nearbyStop.stopId);
-    assertEquals(0, nearbyStop.distance);
-    assertEquals(0, nearbyStop.edges.size());
-    assertEquals(expected, nearbyStop.state.getVertex());
-    assertNull(nearbyStop.state.getBackState());
+    assertEquals(expected.getId(), nearbyStop.stopId());
+    assertEquals(0, nearbyStop.distance());
+    assertEquals(0, nearbyStop.edges().size());
+    assertEquals(expected, nearbyStop.state().getVertex());
+    assertNull(nearbyStop.state().getBackState());
   }
 
   /**
@@ -254,17 +254,17 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     double expectedDistance,
     NearbyStop nearbyStop
   ) {
-    assertEquals(expected.getId(), nearbyStop.stopId);
-    assertEquals(expectedDistance, nearbyStop.distance);
-    assertEquals(expected, nearbyStop.state.getVertex());
-    assertFalse(nearbyStop.edges.isEmpty());
-    assertNotNull(nearbyStop.state.getBackState());
+    assertEquals(expected.getId(), nearbyStop.stopId());
+    assertEquals(expectedDistance, nearbyStop.distance());
+    assertEquals(expected, nearbyStop.state().getVertex());
+    assertFalse(nearbyStop.edges().isEmpty());
+    assertNotNull(nearbyStop.state().getBackState());
   }
 
   private List<NearbyStop> simplify(List<NearbyStop> closestStops) {
     return closestStops
       .stream()
-      .map(ns -> new NearbyStop(ns.stopId, ns.distance, null, null))
+      .map(ns -> new NearbyStop(ns.stopId(), ns.distance(), null, null))
       .collect(Collectors.toList());
   }
 }

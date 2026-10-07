@@ -34,7 +34,7 @@ class FlexTripNearbyStopFilter implements NearbyStopFilter {
   ) {
     MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = MinMap.ofNaturalOrder();
     for (var it : nearbyStops) {
-      var stopId = it.stopId;
+      var stopId = it.stopId();
       var flexTrips = transitService.getFlexIndex().getFlexTripsByStopId(stopId);
 
       for (FlexTrip<?, ?> trip : flexTrips) {
