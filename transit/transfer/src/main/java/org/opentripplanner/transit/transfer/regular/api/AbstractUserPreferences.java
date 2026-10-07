@@ -61,7 +61,7 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
       return false;
     }
     AbstractUserPreferences that = (AbstractUserPreferences) o;
-    return speed.equals(that.speed) && reluctance == that.reluctance && stairs == that.stairs;
+    return speed.equals(that.speed) && reluctance.equals(that.reluctance) && stairs == that.stairs;
   }
 
   @Override
