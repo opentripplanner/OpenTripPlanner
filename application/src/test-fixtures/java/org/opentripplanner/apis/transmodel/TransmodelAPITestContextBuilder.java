@@ -7,6 +7,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 
 public class TransmodelAPITestContextBuilder {
 
@@ -66,7 +67,12 @@ public class TransmodelAPITestContextBuilder {
     var vertexLinker = VertexLinkerTestFactory.of(graph);
 
     return new TestTransmodelGraphQLRequestContext(
-      TestServerContext.createRoutingService(graph, transitService, transferRepository),
+      TestServerContext.createRoutingService(
+        graph,
+        transitService,
+        transferRepository,
+        NoRegularTransfers.factory()
+      ),
       transitService,
       null,
       null,

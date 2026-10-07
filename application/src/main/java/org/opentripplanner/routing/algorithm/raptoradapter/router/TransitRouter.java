@@ -17,10 +17,13 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorTransferProfileMapper;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
@@ -48,6 +51,8 @@ import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 
 public class TransitRouter {
 
@@ -60,6 +65,7 @@ public class TransitRouter {
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
+  private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
 
@@ -85,6 +91,7 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -104,6 +111,7 @@ public class TransitRouter {
     this.meterRegistry = meterRegistry;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
+    this.regularTransferServiceFactory = regularTransferServiceFactory;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
@@ -125,6 +133,7 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -145,6 +154,7 @@ public class TransitRouter {
       meterRegistry,
       streetDetailsService,
       transferService,
+      regularTransferServiceFactory,
       flexParameters,
       rideHailingServices,
       dataOverlayParameterBindings,
@@ -276,6 +286,7 @@ public class TransitRouter {
       transitService,
       streetDetailsService,
       raptorTransitData,
+      regularTransferServiceFactory,
       transitSearchTimeZero,
       request
     );
@@ -345,12 +356,20 @@ public class TransitRouter {
   ) {
     return new RaptorRoutingRequestTransitData(
       raptorTransitData,
+      raptorRegularTransferService(),
       transitGroupPriorityService,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       DefaultTransitDataProviderFilter.ofRequest(request),
       request
+    );
+  }
+
+  private RaptorRegularTransferService raptorRegularTransferService() {
+    return regularTransferServiceFactory.create(
+      RaptorTransferProfileMapper.fromRouteRequest(request),
+      RegularTransferPreferencesMapper.fromRouteRequest(request)
     );
   }
 

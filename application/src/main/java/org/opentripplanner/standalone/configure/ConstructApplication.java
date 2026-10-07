@@ -116,14 +116,7 @@ public class ConstructApplication {
     }
     LOG.info("Creating transit layer for Raptor routing.");
     transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(
-        tuningParameters,
-        graph,
-        transitRepository,
-        transferRepository,
-        regularTransferBuildRepository,
-        config.buildConfig().transferProfiles()
-      )
+      RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
     );
     var scheduledRaptorTransitData = new RaptorTransitData(
       transitRepository.getRaptorTransitData()
@@ -219,6 +212,12 @@ public class ConstructApplication {
   private void setupTransitRoutingServer() {
     enableRequestTraceLogging();
     createMetricsLogging();
+
+    // Repositories must be registered before the updaters start writing, not lazily by the first
+    // request - registration is not thread-safe.
+    factory.regularTransferRepositoryHandle();
+    // Build the stop index and street path provider at startup, not in the first request.
+    factory.regularTransferServiceFactoryCreator();
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(

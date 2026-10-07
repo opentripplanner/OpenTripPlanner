@@ -48,6 +48,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.spi.WriteToGraphCallbacks;
@@ -275,7 +276,8 @@ public abstract class GtfsTest {
     routingService = TestServerContext.createRoutingService(
       graph,
       transitService,
-      transferRepository
+      transferRepository,
+      NoRegularTransfers.factory()
     );
   }
 }

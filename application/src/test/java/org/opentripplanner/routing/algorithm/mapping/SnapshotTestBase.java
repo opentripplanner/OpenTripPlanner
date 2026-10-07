@@ -91,14 +91,17 @@ public abstract class SnapshotTestBase {
     if (routingService == null) {
       TestOtpModel model = getGraph();
       transitService = TestServerContext.createTransitService(
-        model.graph(),
         model.transitRepository(),
         model.transferRepository()
       );
       routingService = TestServerContext.createRoutingService(
         model.graph(),
         transitService,
-        model.transferRepository()
+        model.transferRepository(),
+        TestServerContext.createRegularTransferServiceFactory(
+          model.graph(),
+          model.transitRepository()
+        )
       );
     }
   }

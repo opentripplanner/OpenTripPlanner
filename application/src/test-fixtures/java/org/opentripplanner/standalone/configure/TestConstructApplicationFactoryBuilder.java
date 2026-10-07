@@ -6,6 +6,7 @@ import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepo
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.ext.fares.service.gtfs.v1.DefaultFareService;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -18,6 +19,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
@@ -36,10 +38,20 @@ import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFac
  */
 public final class TestConstructApplicationFactoryBuilder {
 
+  private RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
+    RegularTransferFactory.createBuildRepository();
+
   private TestConstructApplicationFactoryBuilder() {}
 
   public static TestConstructApplicationFactoryBuilder of() {
     return new TestConstructApplicationFactoryBuilder();
+  }
+
+  public TestConstructApplicationFactoryBuilder withRegularTransferBuildRepository(
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
+  ) {
+    this.regularTransferBuildRepository = regularTransferBuildRepository;
+    return this;
   }
 
   public ConstructApplicationFactory build() {
@@ -50,7 +62,7 @@ public final class TestConstructApplicationFactoryBuilder {
       .graph(new Graph())
       .transitRepository(transitRepository)
       .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
-      .regularTransferBuildRepository(RegularTransferFactory.createBuildRepository())
+      .regularTransferBuildRepository(regularTransferBuildRepository)
       .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
       .stopConsolidationRepository(null)
       .vehicleParkingRepository(new DefaultVehicleParkingRepository())

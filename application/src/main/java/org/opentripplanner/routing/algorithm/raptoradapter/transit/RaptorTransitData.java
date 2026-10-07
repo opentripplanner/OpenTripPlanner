@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
-import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorTransferProfileMapper;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
@@ -21,8 +17,6 @@ import org.opentripplanner.transfer.regular.index.RaptorTransferIndex;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 
 /**
  * This is a replica of public transportation data already present in TransitRepository, but rearranged
@@ -63,17 +57,6 @@ public class RaptorTransitData {
   private final int[] stopBoardAlightTransferCosts;
 
   /**
-   * Built once per process, like {@code transferCache} above. {@code null} unless raptor-data
-   * wiring (a {@code Graph} + configured transfer profiles) was supplied at mapping time - see
-   * {@code RaptorTransitDataMapper}'s two {@code map(...)} overloads.
-   */
-  @Nullable
-  private final TransferProfilesConfig transferProfilesConfig;
-
-  @Nullable
-  private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
-
-  /**
    * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a shallow
    * copy of the HashMap is made. This is sufficient, as the RealTimeRaptorTransitDataUpdater will replace entire
    * keys and their values in the map.
@@ -87,13 +70,10 @@ public class RaptorTransitData {
       raptorTransitData.transferCache,
       raptorTransitData.constrainedTransfers,
       raptorTransitData.transferIndexGenerator,
-      raptorTransitData.stopBoardAlightTransferCosts,
-      raptorTransitData.transferProfilesConfig,
-      raptorTransitData.regularTransferServiceFactory
+      raptorTransitData.stopBoardAlightTransferCosts
     );
   }
 
-  /** Without raptor-data wiring - {@code getRegularTransferServiceForRequest} always null. */
   public RaptorTransitData(
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
     List<List<PathTransfer>> transfersByStopIndex,
@@ -104,32 +84,6 @@ public class RaptorTransitData {
     TransferIndexGenerator transferIndexGenerator,
     @Nullable int[] stopBoardAlightTransferCosts
   ) {
-    this(
-      tripPatternsRunningOnDate,
-      transfersByStopIndex,
-      transferService,
-      siteRepository,
-      transferCache,
-      constrainedTransfers,
-      transferIndexGenerator,
-      stopBoardAlightTransferCosts,
-      null,
-      null
-    );
-  }
-
-  public RaptorTransitData(
-    Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
-    List<List<PathTransfer>> transfersByStopIndex,
-    ConstrainedTransferService transferService,
-    SiteRepository siteRepository,
-    RaptorRequestTransferCache transferCache,
-    ConstrainedTransfersForPatterns constrainedTransfers,
-    TransferIndexGenerator transferIndexGenerator,
-    @Nullable int[] stopBoardAlightTransferCosts,
-    @Nullable TransferProfilesConfig transferProfilesConfig,
-    @Nullable RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory
-  ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
@@ -138,8 +92,6 @@ public class RaptorTransitData {
     this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
     this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
-    this.transferProfilesConfig = transferProfilesConfig;
-    this.regularTransferServiceFactory = regularTransferServiceFactory;
   }
 
   @Nullable
@@ -200,35 +152,6 @@ public class RaptorTransitData {
 
   public RaptorRequestTransferCache getTransferCache() {
     return transferCache;
-  }
-
-  /**
-   * {@code null} if raptor-data wiring wasn't supplied at mapping time - callers fall back to
-   * {@link #getRaptorTransfersForRequest} in that case.
-   */
-  @Nullable
-  public RaptorRegularTransferService getRegularTransferServiceForRequest(RouteRequest request) {
-    if (regularTransferServiceFactory == null || transferProfilesConfig == null) {
-      return null;
-    }
-    var profileType = RaptorTransferProfileMapper.fromRouteRequest(request);
-    var preferences = RegularTransferPreferencesMapper.fromRouteRequest(request);
-    return regularTransferServiceFactory.create(profileType, preferences);
-  }
-
-  /**
-   * Recover the real street path template for a transfer produced by
-   * {@link #getRegularTransferServiceForRequest} - used by itinerary mapping to build a transfer
-   * leg's geometry/walk-steps. {@code null} if raptor-data wiring wasn't supplied, or no template
-   * is stored for this stop pair under the request's resolved profile.
-   */
-  @Nullable
-  public NearbyStop findRegularTransferPath(RouteRequest request, int fromStop, int toStop) {
-    if (regularTransferServiceFactory == null || transferProfilesConfig == null) {
-      return null;
-    }
-    var profileType = RaptorTransferProfileMapper.fromRouteRequest(request);
-    return regularTransferServiceFactory.findPath(profileType, fromStop, toStop);
   }
 
   @Nullable

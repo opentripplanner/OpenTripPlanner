@@ -6,10 +6,11 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
- * Provides the {@link RaptorRegularTransferService} for a {@code (profileType, preferences)} by
- * re-costing the path templates of a {@link RegularTransferRepositorySnapshot} under the
- * request-time preferences, and recovers the path template of a transfer used in an itinerary.
- * Results are cached in the snapshot, keyed on
+ * The regular transfers of one request, read from the {@link RegularTransferRepositorySnapshot} of
+ * the request. It provides the {@link RaptorRegularTransferService} for a
+ * {@code (profileType, preferences)} by re-costing the snapshot's path templates - generated at
+ * graph build or committed at runtime - under the request-time preferences, and recovers the path
+ * template of a transfer used in an itinerary. Results are cached in the snapshot, keyed on
  * {@code (profileType, preferences)} - normalizing the preferences so equivalent requests share a
  * cache entry is the caller's responsibility, not this factory's.
  *

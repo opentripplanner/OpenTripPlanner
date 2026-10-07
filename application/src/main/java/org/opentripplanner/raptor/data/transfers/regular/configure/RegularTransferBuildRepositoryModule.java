@@ -10,8 +10,8 @@ import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFac
 /**
  * Mirrors {@code TransferRepositoryModule}: an empty singleton, populated in place by
  * {@code RegularTransitTransferGenerator} during graph build (or already populated, if deserialized
- * from a saved graph - see {@code SerializedGraphObject.regularTransferBuildRepository}). At startup
- * it is converted into the initial snapshot of the transactional repository.
+ * from a saved graph - see {@code SerializedGraphObject.regularTransferBuildRepository}). At runtime
+ * it is converted into the repository, see {@code RegularTransferRepositoryModule}.
  */
 @Module
 public class RegularTransferBuildRepositoryModule {

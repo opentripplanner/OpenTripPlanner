@@ -13,30 +13,21 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
-import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.stop.StopIndex;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.transfercache.RaptorRequestTransferCache;
-import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.constrained.raptoradaptor.ConstrainedTransfersForPatterns;
 import org.opentripplanner.transfer.constrained.raptoradaptor.TransferIndexGenerator;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
-import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,56 +49,28 @@ public class RaptorTransitDataMapper {
   private final TransitService transitService;
   private final SiteRepository siteRepository;
   private final TransferRepository transferRepository;
-  private final Graph graph;
-  private final TransitRepository transitRepository;
-  private final RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
-  private final TransferProfilesConfig transferProfilesConfig;
 
   private RaptorTransitDataMapper(
-    Graph graph,
     TransitRepository transitRepository,
-    TransferRepository transferRepository,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
-    TransferProfilesConfig transferProfilesConfig
+    TransferRepository transferRepository
   ) {
     this.transitService = new DefaultTransitService(transitRepository);
     this.siteRepository = transitRepository.getSiteRepository();
     this.transferRepository = transferRepository;
-    this.graph = graph;
-    this.transitRepository = transitRepository;
-    this.regularTransferBuildRepository = regularTransferBuildRepository;
-    this.transferProfilesConfig = transferProfilesConfig;
   }
 
   /**
-   * Without raptor-data wiring - the graph-less entry point. {@code FlexTransferGenerator} no
-   * longer generates regular (non-FLEX) transfers, so {@code transferRepository} has none to fall
-   * back on here: regular transfers will be empty unless the raptor-data pipeline (see the other
-   * {@code map} overload, and {@code RaptorDataTransferGenerator}) is run first.
+   * {@code FlexTransferGenerator} no longer generates regular (non-FLEX) transfers, so the
+   * {@code RaptorTransferIndex} built from {@code transferRepository} holds none. Routing gets
+   * the regular transfers from the request-scoped regular-transfer pipeline instead, see
+   * {@code RaptorRoutingRequestTransitData}.
    */
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
     TransitRepository transitRepository,
     TransferRepository transferRepository
   ) {
-    return map(tuningParameters, null, transitRepository, transferRepository, null, null);
-  }
-
-  public static RaptorTransitData map(
-    TransitTuningParameters tuningParameters,
-    @Nullable Graph graph,
-    TransitRepository transitRepository,
-    TransferRepository transferRepository,
-    @Nullable RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
-    @Nullable TransferProfilesConfig transferProfilesConfig
-  ) {
-    return new RaptorTransitDataMapper(
-      graph,
-      transitRepository,
-      transferRepository,
-      regularTransferBuildRepository,
-      transferProfilesConfig
-    ).map(tuningParameters);
+    return new RaptorTransitDataMapper(transitRepository, transferRepository).map(tuningParameters);
   }
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {
@@ -133,7 +96,6 @@ public class RaptorTransitDataMapper {
     }
 
     var transferCache = new RaptorRequestTransferCache(tuningParameters.transferCacheMaxSize());
-    var regularTransferServiceFactory = createRegularTransferServiceFactory();
 
     LOG.info("Mapping complete.");
 
@@ -145,39 +107,7 @@ public class RaptorTransitDataMapper {
       transferCache,
       constrainedTransfers,
       transferIndexGenerator,
-      createStopBoardAlightTransferCosts(siteRepository, tuningParameters),
-      transferProfilesConfig,
-      regularTransferServiceFactory
-    );
-  }
-
-  /**
-   * Built once per process (like {@code transferCache} above), not per-request - mirrors how
-   * {@code RaptorRequestTransferCache} is used. {@code null} unless raptor-data wiring was
-   * supplied to the mapper (see the two-overload {@code map(...)} above).
-   */
-  @Nullable
-  private RegularTransferServiceFactory<NearbyStop> createRegularTransferServiceFactory() {
-    if (graph == null || regularTransferBuildRepository == null || transferProfilesConfig == null) {
-      return null;
-    }
-    var stopIndex = new StopIndex(
-      siteRepository.stopIndexSize(),
-      siteRepository.listRegularStops(),
-      RegularStop::getIndex,
-      RegularStop::getId
-    );
-    var nearbyStopFinder = StreetTransferPathProvider.createNearbyStopFinder(
-      graph,
-      transitRepository
-    );
-    var pathProvider = new StreetTransferPathProvider(graph, nearbyStopFinder);
-    // Temporary: one snapshot for the process lifetime, until routing reads the snapshot of the
-    // request's transaction scope.
-    return RegularTransferFactory.createServiceFactory(
-      stopIndex,
-      regularTransferBuildRepository.createInitialSnapshot(),
-      pathProvider
+      createStopBoardAlightTransferCosts(siteRepository, tuningParameters)
     );
   }
 

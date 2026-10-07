@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.ext.carpooling.internal.CarpoolItineraryMapper;
@@ -30,6 +31,7 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorTransferProfileMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -54,6 +56,7 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
+import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.utils.collection.ListUtils;
 
 /**
@@ -65,6 +68,8 @@ import org.opentripplanner.utils.collection.ListUtils;
 public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final RaptorTransitData raptorTransitData;
+
+  private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
 
   private final RouteRequest request;
   private final StreetSearchRequest transferStreetRequest;
@@ -80,6 +85,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    *
    * @param raptorTransitData          the currently active transit layer (may have real-time data
    *                              applied)
+   * @param regularTransferServiceFactory the request's regular-transfer pipeline, used to recover
+   *                              the street path of a regular transfer
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
    */
@@ -88,10 +95,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     StreetDetailsService streetDetailsService,
     RaptorTransitData raptorTransitData,
+    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request
   ) {
     this.raptorTransitData = raptorTransitData;
+    this.regularTransferServiceFactory = regularTransferServiceFactory;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
@@ -344,18 +353,23 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
-    // Not a type raptorTransitData's graph-less fallback would produce - must be a transfer from
-    // the raptor-data regular-transfer pipeline. Recover its street path template for the leg's
-    // geometry/walk-steps.
-    var regularTransferPath = raptorTransitData.findRegularTransferPath(
-      request,
-      pathLeg.fromStop(),
-      pathLeg.toStop()
-    );
+    // Not a legacy transfer - must be a transfer from the regular-transfer pipeline. Recover its
+    // street path template for the leg's geometry/walk-steps.
+    var regularTransferPath = findRegularTransferPath(pathLeg.fromStop(), pathLeg.toStop());
     if (regularTransferPath != null) {
       return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
     }
     throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
+  }
+
+  /**
+   * Recover the street path template for a transfer produced by the regular-transfer pipeline.
+   * {@code null} if no template is stored for this stop pair under the request's profile.
+   */
+  @Nullable
+  private NearbyStop findRegularTransferPath(int fromStop, int toStop) {
+    var profileType = RaptorTransferProfileMapper.fromRouteRequest(request);
+    return regularTransferServiceFactory.findPath(profileType, fromStop, toStop);
   }
 
   private List<Leg> mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
@@ -404,7 +418,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   /**
    * Mirrors {@link #mapTransferLeg(PathLeg, PathTransfer, TraverseMode, Place, Place)} for a
    * transfer recovered from the raptor-data regular-transfer pipeline via
-   * {@link RaptorTransitData#findRegularTransferPath}. Uses an empty line string when there are
+   * {@link #findRegularTransferPath}. Uses an empty line string when there are
    * no edges, matching {@link PathTransfer#getGeometry()}'s behavior for the same case.
    */
   private List<Leg> mapTransferLeg(
