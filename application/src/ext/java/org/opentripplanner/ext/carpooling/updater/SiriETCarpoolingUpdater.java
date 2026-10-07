@@ -62,6 +62,8 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
 
   private final int maxTrips;
 
+  private final int maxPagesPerPoll;
+
   private int rejectedThisPoll;
 
   public SiriETCarpoolingUpdater(
@@ -72,6 +74,7 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   ) {
     super(config);
     this.maxTrips = parameters.maxTrips();
+    this.maxPagesPerPoll = parameters.maxPagesPerPoll();
     this.tripExpiry = parameters.tripExpiry();
     this.updateSource = new SiriETHttpTripUpdateSource(config, siriLoader(config));
     this.repository = repository;
@@ -93,10 +96,19 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   @Override
   public void runPolling() {
+    int pages = 0;
     boolean moreData;
     do {
       moreData = fetchAndProcessUpdates();
-    } while (moreData);
+      pages++;
+    } while (moreData && (runOnlyOnce() || pages < maxPagesPerPoll));
+    if (moreData) {
+      LOG.warn(
+        "Read the maximum of {} pages from {} in one poll; the rest follows on the next poll",
+        maxPagesPerPoll,
+        updateSource
+      );
+    }
     removeExpiredTrips();
     if (rejectedThisPoll > 0) {
       LOG.warn(
