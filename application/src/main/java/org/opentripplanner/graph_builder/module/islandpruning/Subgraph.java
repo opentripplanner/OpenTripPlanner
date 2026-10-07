@@ -91,7 +91,6 @@ class Subgraph {
   }
 
   // find minimal distance from a given vertex to vertices of this subgraph
-
   double vertexDistanceFromSubgraph(Vertex v, double searchRadius) {
     double d1 = computeDistance(v, searchRadius, streetVertices);
     double d2 = computeDistance(v, searchRadius, stopVertices);
@@ -148,15 +147,16 @@ class Subgraph {
     }
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
-    // build the lookup set before going parallel
     Set<Vertex> members = materializeVertices();
-    return graph
-      .findVertices(envelope)
-      .parallelStream()
-      .filter(vx -> !members.contains(vx))
-      .mapToDouble(vx -> vertexDistanceFromSubgraph(vx, searchRadius))
-      .min()
-      .orElse(searchRadius);
+    double minDistance = Double.MAX_VALUE;
+    boolean found = false;
+    for (Vertex vx : graph.findVertices(envelope)) {
+      if (!members.contains(vx)) {
+        minDistance = Math.min(minDistance, vertexDistanceFromSubgraph(vx, searchRadius));
+        found = true;
+      }
+    }
+    return found ? minDistance : searchRadius;
   }
 
   /**
