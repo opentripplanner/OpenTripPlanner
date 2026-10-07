@@ -114,7 +114,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
    * call, so only call this for paths which are actually used, like when mapping an itinerary.
    */
   public StreetPath streetPath() {
-    return new StreetPath(finalState);
+    return StreetPath.of(finalState);
   }
 
   @Override

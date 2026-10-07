@@ -321,7 +321,7 @@ public class RefetchItineraryService {
     return search
       .getPathsToTarget()
       .stream()
-      .min(Comparator.comparing(StreetPath::weight))
+      .min(Comparator.comparing(StreetPath::generalizedCost))
       .map(this::streetPathToLegs);
   }
 

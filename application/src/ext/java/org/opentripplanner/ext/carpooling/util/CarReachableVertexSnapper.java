@@ -181,7 +181,7 @@ public final class CarReachableVertexSnapper {
       return null;
     }
 
-    var path = new StreetPath(best);
+    var path = StreetPath.of(best);
     // A zero-duration path means the snap landed on a zero-cost temporary hop — no real walk.
     if (path.duration().isZero()) {
       return new SnapResult(best.getVertex(), null);

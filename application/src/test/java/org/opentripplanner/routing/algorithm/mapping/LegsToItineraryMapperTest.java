@@ -40,7 +40,7 @@ class LegsToItineraryMapperTest {
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       1
     );
-    var path = new StreetPath(state);
+    var path = StreetPath.of(state);
     var legs = mapper.map(path, RouteRequest.defaultValue());
     var itin = LegsToItineraryMapper.map(legs, false, null).get();
     assertFalse(itin.isSearchWindowAware());

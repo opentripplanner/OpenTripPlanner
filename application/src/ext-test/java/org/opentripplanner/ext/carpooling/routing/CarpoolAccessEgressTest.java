@@ -14,6 +14,7 @@ import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
@@ -50,7 +51,9 @@ class CarpoolAccessEgressTest {
 
     int rideSeconds = 60 + DWELL_SECONDS;
     double expectedWeight =
-      walkToPickup.weight() + walkFromDropoff.weight() + rideSeconds * carpoolReluctance;
+      StreetPathUtils.weightOrZero(walkToPickup) +
+      StreetPathUtils.weightOrZero(walkFromDropoff) +
+      rideSeconds * carpoolReluctance;
     assertEquals(RaptorCostConverter.toRaptorCost(expectedWeight), accessEgress.c1());
   }
 

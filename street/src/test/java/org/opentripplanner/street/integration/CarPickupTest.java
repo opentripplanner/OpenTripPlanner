@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -211,8 +211,7 @@ public class CarPickupTest extends GraphRoutingTest {
     var state = tree.getState(arriveBy ? fromVertex : toVertex);
 
     return state != null
-      ? new StreetPath(state)
-          .states()
+      ? StreetPathForTest.states(state)
           .stream()
           .map(s ->
             String.format(

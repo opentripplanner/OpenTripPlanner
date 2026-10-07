@@ -35,7 +35,7 @@ public class EdgeTraverser {
     } catch (CouldNotTraverseException _) {
       return Optional.empty();
     }
-    return Optional.of(new StreetPath(states, edges));
+    return Optional.of(StreetPath.of(states, edges));
   }
 
   /// Traverse a set of edges given a start state. Return the final state, empty if the edges cannot

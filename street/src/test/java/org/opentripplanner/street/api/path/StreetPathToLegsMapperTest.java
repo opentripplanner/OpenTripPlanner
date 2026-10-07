@@ -20,7 +20,7 @@ class StreetPathToLegsMapperTest {
   void singleLeg() {
     var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
 
-    var legs = new StreetPath(state).computeLegs(0);
+    var legs = new DefaultStreetPath(state).computeLegs(0);
 
     assertThat(legs).hasSize(1);
     var leg = legs.getFirst();
@@ -34,7 +34,7 @@ class StreetPathToLegsMapperTest {
   void carRentalPickUp() {
     var state = TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build();
 
-    var legs = new StreetPath(state).computeLegs(0);
+    var legs = new DefaultStreetPath(state).computeLegs(0);
 
     assertThat(legs).hasSize(2);
     var walk = legs.get(0);
@@ -51,7 +51,7 @@ class StreetPathToLegsMapperTest {
     var edge = new ExternalTestEdge(walk.getVertex(), StreetModelFactory.V3);
     var state = edge.traverse(walk)[0];
 
-    var legs = new StreetPath(state).computeLegs(0);
+    var legs = new DefaultStreetPath(state).computeLegs(0);
 
     assertThat(legs).hasSize(2);
     assertThat(legs.get(0)).isInstanceOf(DefaultStreetLeg.class);
@@ -75,7 +75,7 @@ class StreetPathToLegsMapperTest {
   void noLegsForEmptyPath() {
     var state = TestStateBuilder.ofWalking().build();
 
-    assertThat(new StreetPath(state).computeLegs(0)).isEmpty();
+    assertThat(new DefaultStreetPath(state).computeLegs(0)).isEmpty();
   }
 
   /**

@@ -10,19 +10,21 @@ import java.util.List;
 import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Distance;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.search.state.State;
 
-/// This class represents a path within the street network
-public class StreetPath {
+/// A [StreetPath] backed by the states of a street search.
+final class DefaultStreetPath implements StreetPath {
 
   private final List<State> states;
   private final List<Edge> edges;
 
-  public StreetPath(List<State> states, List<Edge> edges) {
+  DefaultStreetPath(List<State> states, List<Edge> edges) {
     validate(states, edges);
     this.states = states;
     this.edges = edges;
@@ -34,7 +36,7 @@ public class StreetPath {
    * search, the chain is reversed first, since the back-state chain otherwise runs the "wrong" way
    * for that search direction.
    */
-  public StreetPath(State finalState) {
+  DefaultStreetPath(State finalState) {
     var state = finalState.getRequest().arriveBy() ? finalState.reverse() : finalState;
 
     List<State> states = new ArrayList<>();
@@ -62,30 +64,50 @@ public class StreetPath {
     }
   }
 
+  @Override
+  public Cost generalizedCost() {
+    return Cost.costOfSeconds(weight());
+  }
+
+  /// The duration is computed from the millisecond precision times of the first and last state
+  /// and rounded up, the same way as [State#getElapsedTimeSeconds()].
+  @Override
+  public Duration duration() {
+    long millis = Math.abs(
+      states.getLast().getTimeMilliseconds() - states.getFirst().getTimeMilliseconds()
+    );
+    return Duration.ofSeconds((millis + 999L) / 1000L);
+  }
+
+  @Override
+  public Distance traversalDistance() {
+    return Distance.ofMeters(distanceMeters());
+  }
+
+  @Override
+  public List<StreetLeg> computeLegs(double ellipsoidToGeoidDifference) {
+    return new StreetPathToLegsMapper(ellipsoidToGeoidDifference).map(this);
+  }
+
   /// The start of the path in seconds
-  public Instant startTime() {
+  Instant startTime() {
     return states.getFirst().getTime();
   }
 
   /// The end of the path in seconds
-  public Instant endTime() {
+  Instant endTime() {
     return states.getLast().getTime();
   }
 
-  public double weight() {
+  double weight() {
     return states.getLast().weight - states.getFirst().weight;
   }
 
-  public double distanceMeters() {
+  double distanceMeters() {
     return edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
   }
 
-  /// The duration of the trip in seconds
-  public Duration duration() {
-    return startTime().until(endTime());
-  }
-
-  public LineString geometry() {
+  LineString geometry() {
     var geometries = edges
       .stream()
       .filter(Edge::includeGeometryInPath)
@@ -95,30 +117,17 @@ public class StreetPath {
     return GeometryUtils.concatenateLineStrings(geometries::iterator);
   }
 
-  /// Split this path into legs. Each change of street mode, like picking up a rental vehicle or
-  /// parking a car, starts a new leg. Walking a bike does not.
-  ///
-  /// The legs are created on demand, and the expensive parts of each leg, like the turn-by-turn
-  /// directions, are computed lazily when accessed.
-  ///
-  /// @param ellipsoidToGeoidDifference The difference between the ellipsoid and the geoid
-  ///                                   elevation of the graph, applied to the elevations of the
-  ///                                   legs if requested.
-  public List<StreetLeg> computeLegs(double ellipsoidToGeoidDifference) {
-    return new StreetPathToLegsMapper(ellipsoidToGeoidDifference).map(this);
-  }
-
   /// Get all the states of this path
-  public List<State> states() {
+  List<State> states() {
     return states;
   }
 
   /// Get the last state in the path
-  public State lastState() {
+  State lastState() {
     return states.getLast();
   }
 
-  public ElevationProfile elevation(boolean geoidElevation, double ellipsoidToGeoidDifference) {
+  ElevationProfile elevation(boolean geoidElevation, double ellipsoidToGeoidDifference) {
     var builder = ElevationProfile.of();
 
     double heightOffset = geoidElevation ? ellipsoidToGeoidDifference : 0;
@@ -137,7 +146,7 @@ public class StreetPath {
   }
 
   /// Calculate the elevationGained and elevationLost
-  public ElevationChange calculateElevations() {
+  ElevationChange calculateElevations() {
     double elevationGained_m = 0.0;
     double elevationLost_m = 0.0;
     for (Edge edge : edges) {
@@ -170,9 +179,9 @@ public class StreetPath {
   ///
   /// @param startIdx the first state index (inclusive)
   /// @param endIdx the end state index (exclusive)
-  StreetPath subPath(int startIdx, int endIdx) {
+  DefaultStreetPath subPath(int startIdx, int endIdx) {
     var subStates = states.subList(startIdx, endIdx);
     var subEdges = edges.subList(startIdx, endIdx - 1);
-    return new StreetPath(subStates, subEdges);
+    return new DefaultStreetPath(subStates, subEdges);
   }
 }

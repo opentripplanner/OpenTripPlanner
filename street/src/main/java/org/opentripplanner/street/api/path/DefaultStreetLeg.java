@@ -18,7 +18,7 @@ import org.opentripplanner.utils.lang.IntUtils;
  */
 final class DefaultStreetLeg implements StreetLeg {
 
-  private final StreetPath path;
+  private final DefaultStreetPath path;
 
   /**
    * The time the leg starts. This is usually the time of the first state of the path, but if the
@@ -48,7 +48,7 @@ final class DefaultStreetLeg implements StreetLeg {
    *                    compute the relative direction of the first step correctly.
    */
   DefaultStreetLeg(
-    StreetPath path,
+    DefaultStreetPath path,
     Instant startTime,
     double extraWeight,
     @Nullable DefaultStreetLeg previous,
@@ -128,6 +128,11 @@ final class DefaultStreetLeg implements StreetLeg {
   }
 
   @Override
+  public ElevationChange elevationChange() {
+    return path.calculateElevations();
+  }
+
+  @Override
   public List<StreetStep> steps() {
     if (steps == null) {
       steps = new StatesToStreetStepsMapper(
@@ -142,6 +147,11 @@ final class DefaultStreetLeg implements StreetLeg {
   @Override
   public boolean rentedVehicle() {
     return path.states().getFirst().isRentingVehicle();
+  }
+
+  @Override
+  public boolean arrivesWithRentedVehicleFromStation() {
+    return path.lastState().isRentingVehicleFromStation();
   }
 
   @Override

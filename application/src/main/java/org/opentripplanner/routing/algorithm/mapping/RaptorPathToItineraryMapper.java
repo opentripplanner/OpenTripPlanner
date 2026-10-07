@@ -476,7 +476,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       }
     }
     State[] states = transferStates.toArray(State[]::new);
-    var graphPath = new StreetPath(states[states.length - 1]);
+    var graphPath = StreetPath.of(states[states.length - 1]);
     return streetLegMapper.map(graphPath, request);
   }
 

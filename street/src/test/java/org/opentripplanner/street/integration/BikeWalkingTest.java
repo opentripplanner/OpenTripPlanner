@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -402,8 +402,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
       return null;
     }
 
-    return new StreetPath(state)
-      .states()
+    return StreetPathForTest.states(state)
       .stream()
       .map(s ->
         String.format(

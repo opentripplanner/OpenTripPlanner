@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
@@ -358,7 +358,7 @@ public class TurnRestrictionModuleTest {
       .withFrom(A)
       .withTo(F)
       .getShortestPathTree();
-    List<State> states = new StreetPath(spt.getState(F)).states();
+    List<State> states = StreetPathForTest.states(spt.getState(F));
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);

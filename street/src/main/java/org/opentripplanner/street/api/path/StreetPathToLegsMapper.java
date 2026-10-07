@@ -51,7 +51,7 @@ class StreetPathToLegsMapper {
   /**
    * The legs are returned in the order they are traversed in the path.
    */
-  List<StreetLeg> map(StreetPath path) {
+  List<StreetLeg> map(DefaultStreetPath path) {
     List<StreetLeg> legs = new ArrayList<>();
     DefaultStreetLeg previousStreetLeg = null;
     for (var slice : slicePath(path)) {
@@ -80,7 +80,7 @@ class StreetPathToLegsMapper {
    * @param streetPath The path to slice of input states
    * @return A list of slices representing the final legs
    */
-  private static List<Slice> slicePath(StreetPath streetPath) {
+  private static List<Slice> slicePath(DefaultStreetPath streetPath) {
     var states = streetPath.states();
     // Trivial case
     if (states.stream().allMatch(state -> state.getBackMode() == null)) {
@@ -142,7 +142,7 @@ class StreetPathToLegsMapper {
     return slices;
   }
 
-  private static ExternalEdgeLeg mapExternalEdgeLeg(StreetPath path, ExternalLegEdge edge) {
+  private static ExternalEdgeLeg mapExternalEdgeLeg(DefaultStreetPath path, ExternalLegEdge edge) {
     var states = path.states();
     State fromState = states.get(0);
     State toState = states.get(1);
@@ -158,6 +158,7 @@ class StreetPathToLegsMapper {
       IntUtils.round(toState.getWeight() - fromState.getWeight()),
       backEdge::getGeometry,
       fromState.isRentingVehicle(),
+      toState.isRentingVehicleFromStation(),
       fromState.isRentingVehicle() ? fromState.getVehicleRentalNetwork() : null
     );
   }
@@ -168,5 +169,5 @@ class StreetPathToLegsMapper {
    * before parking and the extra weight is the cost for parking. Otherwise, the start time is the
    * time of the first state of the sub-path and the extra weight is zero.
    */
-  private record Slice(StreetPath path, Instant startTime, double extraWeight) {}
+  private record Slice(DefaultStreetPath path, Instant startTime, double extraWeight) {}
 }

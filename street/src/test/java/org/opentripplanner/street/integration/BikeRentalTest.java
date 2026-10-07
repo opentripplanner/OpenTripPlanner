@@ -17,7 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.api.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.model.StreetMode;
@@ -690,8 +690,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       return null;
     }
 
-    return new StreetPath(state)
-      .states()
+    return StreetPathForTest.states(state)
       .stream()
       .filter(s -> s.getBackEdge() instanceof StreetEdge || s.getVertex() == toVertex)
       .map(s ->

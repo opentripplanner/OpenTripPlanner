@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.ext.carpooling.routing.RoutedSegment;
 import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 /**
  * Builder for creating StreetPath objects for carpooling tests using real State chains.
+ * This replaces MockGraphPathFactory with OTP's preferred TestStateBuilder pattern.
  */
 public class CarpoolStreetPathBuilder {
 
@@ -38,7 +40,7 @@ public class CarpoolStreetPathBuilder {
 
     builder.streetEdge("segment-0", distanceMeters);
 
-    return new StreetPath(builder.build());
+    return StreetPath.of(builder.build());
   }
 
   /** A driver route segment of the given duration, wrapping {@link #createStreetPath(Duration)}. */

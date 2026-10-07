@@ -121,7 +121,7 @@ public class StreetSearchBuilder {
   public List<StreetPath> getPathsToTarget() {
     return StreamUtils.ofIterable(buildAstar().listFinalStates())
       .sorted(Comparator.comparingLong(State::getElapsedTimeSeconds))
-      .map(StreetPath::new)
+      .map(StreetPath::of)
       .toList();
   }
 

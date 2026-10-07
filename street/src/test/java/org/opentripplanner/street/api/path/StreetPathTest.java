@@ -16,7 +16,7 @@ class StreetPathTest {
   @Test
   void startTime() {
     var state = startState().streetEdge().build();
-    var path = new StreetPath(state);
+    var path = new DefaultStreetPath(state);
     assertEquals(START_TIME, path.startTime());
   }
 
@@ -26,7 +26,7 @@ class StreetPathTest {
       .testEdge(b -> b.withDurationSeconds(10))
       .testEdge(b -> b.withDurationSeconds(10))
       .build();
-    var path = new StreetPath(state);
+    var path = new DefaultStreetPath(state);
 
     assertEquals(START_TIME.plus(Duration.ofSeconds(20)), path.endTime());
   }
@@ -37,7 +37,7 @@ class StreetPathTest {
       .testEdge(b -> b.withWeight(10))
       .testEdge(b -> b.withWeight(10))
       .build();
-    var path = new StreetPath(state);
+    var path = new DefaultStreetPath(state);
 
     assertEquals(20.0, path.weight());
   }
@@ -48,7 +48,7 @@ class StreetPathTest {
       .testEdge(b -> b.withDistanceMeters(10))
       .testEdge(b -> b.withDistanceMeters(10))
       .build();
-    var path = new StreetPath(state);
+    var path = new DefaultStreetPath(state);
     assertEquals(20.0, path.distanceMeters());
   }
 
@@ -60,7 +60,7 @@ class StreetPathTest {
       .testEdge(b -> b.withDurationSeconds(3))
       .testEdge(b -> b.withDurationSeconds(4))
       .build();
-    var path = new StreetPath(state).subPath(1, 4);
+    var path = new DefaultStreetPath(state).subPath(1, 4);
 
     assertEquals(Duration.ofSeconds(5), path.duration());
   }
@@ -71,7 +71,7 @@ class StreetPathTest {
       .testEdge()
       .testEdge(b -> b.withIncludeGeometryInPath(false))
       .build();
-    var path = new StreetPath(state);
+    var path = new DefaultStreetPath(state);
 
     // Make sure we ignore the last leg
     assertEquals("LINESTRING (1 1, 2 2)", path.geometry().toString());
@@ -85,7 +85,7 @@ class StreetPathTest {
       .testEdge(b -> b.withDurationSeconds(10).withWeight(10).withDistanceMeters(10))
       .build();
 
-    var path = new StreetPath(state);
+    var path = new DefaultStreetPath(state);
     var subPath = path.subPath(1, 3);
     assertEquals(START_TIME.plus(Duration.ofSeconds(10)), subPath.startTime());
     assertEquals(START_TIME.plus(Duration.ofSeconds(15)), subPath.endTime());

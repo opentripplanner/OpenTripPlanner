@@ -21,7 +21,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingBoundaryExtension;
-import org.opentripplanner.street.api.path.StreetPath;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.geometry.Polygons;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -211,8 +211,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var state = tree.getState(T_ORIGIN);
     assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = new StreetPath(state)
-      .states()
+    var descriptor = StreetPathForTest.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(s -> formatState(s))
@@ -418,8 +417,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var state = tree.getState(T_ORIGIN);
     assertNotNull(state, "arriveBy should find a path");
 
-    var descriptor = new StreetPath(state)
-      .states()
+    var descriptor = StreetPathForTest.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -599,8 +597,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
     var state = tree.getState(T_ORIGIN);
     assertNotNull(state, "arriveBy should find a path");
 
-    var arriveBy = new StreetPath(state)
-      .states()
+    var arriveBy = StreetPathForTest.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)
@@ -665,8 +662,7 @@ public class ScooterRentalGeofencingTest extends GraphRoutingTest {
       return null;
     }
 
-    return new StreetPath(state)
-      .states()
+    return StreetPathForTest.states(state)
       .stream()
       .filter(s -> s.getBackEdge() != null)
       .map(this::formatState)

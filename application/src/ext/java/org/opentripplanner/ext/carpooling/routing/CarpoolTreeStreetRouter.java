@@ -313,7 +313,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     @Override
     public StreetPath path() {
       if (path == null) {
-        path = new StreetPath(arrival);
+        path = StreetPath.of(arrival);
       }
       return path;
     }

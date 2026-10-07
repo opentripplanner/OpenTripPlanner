@@ -13,6 +13,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
 import org.opentripplanner.routing.cost.CostLimit;
+import org.opentripplanner.street.api.path.StreetPathForTest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
@@ -114,9 +115,9 @@ class DefaultAccessEgressTest {
     var path = new DefaultAccessEgress(STOP, finalState).streetPath();
 
     assertEquals(Duration.ofSeconds(finalState.getElapsedTimeSeconds()), path.duration());
-    assertTrue(path.startTime().isBefore(path.endTime()));
-    var edgeNames = path
-      .states()
+    var states = StreetPathForTest.states(path);
+    assertTrue(states.getFirst().getTime().isBefore(states.getLast().getTime()));
+    var edgeNames = states
       .stream()
       .skip(1)
       .map(s -> s.getBackEdge().getName().toString())
