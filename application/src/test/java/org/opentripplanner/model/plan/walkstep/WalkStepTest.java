@@ -6,7 +6,6 @@ import static org.opentripplanner.street.model.path.step.AbsoluteDirection.NORTH
 import static org.opentripplanner.street.model.path.step.AbsoluteDirection.SOUTHWEST;
 
 import java.util.Optional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -29,7 +28,7 @@ public class WalkStepTest {
 
     builder.withDirections(angle1, angle2, false);
     var step = builder.build();
-    Assertions.assertEquals(RelativeDirection.RIGHT, step.getRelativeDirection());
+    assertEquals(RelativeDirection.RIGHT, step.getRelativeDirection());
     assertEquals(Optional.of(EAST), step.getAbsoluteDirection());
 
     angle1 = degreesToRadians(0);
