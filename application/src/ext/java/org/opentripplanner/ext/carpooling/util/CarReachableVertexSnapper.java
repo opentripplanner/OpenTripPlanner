@@ -82,7 +82,7 @@ public final class CarReachableVertexSnapper {
    * A car-reachable {@code vertex} paired with the {@code walkPath} bridging the gap to the
    * original input, or a {@code null} {@code walkPath} when there is no real walking.
    */
-  public record SnapResult(Vertex vertex, @Nullable GraphPath<State, Edge, Vertex> walkPath) {}
+  public record SnapResult(Vertex vertex, @Nullable GraphPath walkPath) {}
 
   /**
    * Snaps a pickup: forward search from {@code vertexToSnap}; the walk path runs to the snapped
@@ -196,7 +196,7 @@ public final class CarReachableVertexSnapper {
       return null;
     }
 
-    var path = new GraphPath<>(best);
+    var path = new GraphPath(best);
     // A zero-duration path means the snap landed on a zero-cost temporary hop — no real walk.
     if (path.getDuration() == 0) {
       return new SnapResult(best.getVertex(), null);

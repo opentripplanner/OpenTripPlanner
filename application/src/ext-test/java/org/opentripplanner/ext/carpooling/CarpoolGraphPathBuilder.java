@@ -4,9 +4,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 
 /**
@@ -21,7 +18,7 @@ public class CarpoolGraphPathBuilder {
   /**
    * Creates a GraphPath with default 5-minute duration.
    */
-  public static GraphPath<State, Edge, Vertex> createGraphPath() {
+  public static GraphPath createGraphPath() {
     return createGraphPath(Duration.ofMinutes(5));
   }
 
@@ -35,14 +32,14 @@ public class CarpoolGraphPathBuilder {
    * @param duration Total duration for the path
    * @return GraphPath with real State objects and accurate timing
    */
-  public static GraphPath<State, Edge, Vertex> createGraphPath(Duration duration) {
+  public static GraphPath createGraphPath(Duration duration) {
     var builder = TestStateBuilder.ofWalking();
 
     int distanceMeters = (int) (duration.toSeconds() * WALKING_SPEED_MPS);
 
     builder.streetEdge("segment-0", distanceMeters);
 
-    return new GraphPath<>(builder.build());
+    return new GraphPath(builder.build());
   }
 
   /**
@@ -52,7 +49,7 @@ public class CarpoolGraphPathBuilder {
    * @param count Number of paths to create
    * @return List of GraphPaths with incrementing durations
    */
-  public static List<GraphPath<State, Edge, Vertex>> createGraphPaths(int count) {
+  public static List<GraphPath> createGraphPaths(int count) {
     return IntStream.range(0, count)
       .mapToObj(i -> createGraphPath(Duration.ofMinutes(5 + i)))
       .toList();

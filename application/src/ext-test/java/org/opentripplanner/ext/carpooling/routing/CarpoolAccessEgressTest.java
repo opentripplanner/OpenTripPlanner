@@ -18,9 +18,6 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostConverter;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 
 class CarpoolAccessEgressTest {
@@ -228,9 +225,9 @@ class CarpoolAccessEgressTest {
    */
   private static CarpoolAccessEgress newAccessEgress(
     int passengerDepartureTime,
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
+    @Nullable GraphPath walkToPickup,
     Duration sharedSegmentDuration,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
+    @Nullable GraphPath walkFromDropoff,
     double carpoolReluctance
   ) {
     return newAccessEgress(
@@ -246,9 +243,9 @@ class CarpoolAccessEgressTest {
 
   private static CarpoolAccessEgress newAccessEgress(
     int passengerDepartureTime,
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
+    @Nullable GraphPath walkToPickup,
     Duration sharedSegmentDuration,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
+    @Nullable GraphPath walkFromDropoff,
     double carpoolReluctance,
     EndpointLabel startLabel,
     EndpointLabel endLabel

@@ -25,9 +25,7 @@ import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -357,8 +355,8 @@ class CarpoolItineraryMapperTest {
   }
 
   private InsertionCandidate newCandidate(
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
+    @Nullable GraphPath walkToPickup,
+    @Nullable GraphPath walkFromDropoff
   ) {
     return new InsertionCandidate(
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),

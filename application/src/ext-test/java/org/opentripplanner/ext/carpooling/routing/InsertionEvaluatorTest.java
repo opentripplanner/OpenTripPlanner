@@ -29,10 +29,8 @@ import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.collection.Pair;
 
 class InsertionEvaluatorTest {
@@ -266,7 +264,7 @@ class InsertionEvaluatorTest {
     var trip = createTripWithStops(OSLO_SOUTH, List.of(stop), OSLO_NORTH, Duration.ofMinutes(30));
     var tripWithVertices = createTripWithVertices(trip);
 
-    final Map<Pair<WgsCoordinate>, GraphPath<State, Edge, Vertex>> pathsMap = new HashMap<>(
+    final Map<Pair<WgsCoordinate>, GraphPath> pathsMap = new HashMap<>(
       Map.of(
         // Baseline segments
         new Pair<>(OSLO_SOUTH, OSLO_CENTER),
@@ -347,7 +345,7 @@ class InsertionEvaluatorTest {
     // MIDPOINT_NORTH → NORTH
     var segmentDB = createGraphPath(Duration.ofMinutes(4));
 
-    final Map<Pair<WgsCoordinate>, GraphPath<State, Edge, Vertex>> pathsMap = new HashMap<>(
+    final Map<Pair<WgsCoordinate>, GraphPath> pathsMap = new HashMap<>(
       Map.of(
         new Pair<>(OSLO_CENTER, OSLO_NORTH),
         baselinePath,

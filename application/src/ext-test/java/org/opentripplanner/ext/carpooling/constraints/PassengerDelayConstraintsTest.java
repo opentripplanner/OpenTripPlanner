@@ -12,9 +12,6 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 
 class PassengerDelayConstraintsTest {
 
@@ -39,7 +36,7 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 7min - 5min = 2min (within 5min budget)
     // Destination delay: 17min - 15min = 2min (within 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -67,7 +64,7 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 15min - 10min = 5min (exactly at 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -95,7 +92,7 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 16min - 10min = 6min (exceeds 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -124,7 +121,7 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 12min - 10min = 2min (within 20min budget)
     // Destination delay: 27min - 20min = 7min (exceeds 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -159,7 +156,7 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 13min - 10min = 3min ok
     // Stop2 delay: 27min - 20min = 7min exceeds
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -193,7 +190,7 @@ class PassengerDelayConstraintsTest {
       stopWithBudget(FIVE_MINUTES)
     );
 
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -223,7 +220,7 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 13min - 10min = 3min (exceeds 2min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -250,7 +247,7 @@ class PassengerDelayConstraintsTest {
       stopWithBudget(FIVE_MINUTES)
     );
 
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -278,7 +275,7 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 10min + 1s - 10min = 1s (exceeds zero budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -306,7 +303,7 @@ class PassengerDelayConstraintsTest {
 
     // Use the same GraphPaths to derive both original and modified times
     // so there is truly zero delay (avoids rounding from GraphPath construction)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -343,7 +340,7 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 40min - 10min = 30min (within 60min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(35)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -373,7 +370,7 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 12min - 10min = 2min (within 3min budget, ok)
     // Destination delay: 47min - 20min = 27min (within 30min budget, ok)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
@@ -410,7 +407,7 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 13min - 10min = 3min ok
     // Stop2 delay: 24min - 20min = 4min ok
     // Destination delay: 36min - 30min = 6min exceeds 5min budget
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
@@ -442,7 +439,7 @@ class PassengerDelayConstraintsTest {
     );
 
     // Baseline: 2 segments of 10min. With 1-min dwell: cumulative = [0, 10, 21]
-    GraphPath<State, Edge, Vertex>[] baselineSegments = new GraphPath[] {
+    GraphPath[] baselineSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
     };
@@ -450,7 +447,7 @@ class PassengerDelayConstraintsTest {
 
     // Modified (pickup=1, dropoff=3): 4 segments of 6min. With 1-min dwell: cumulative = [0, 6, 13, 20, 27]
     // Destination delay: 27 - 21 = 6min, exceeds 5min budget.
-    GraphPath<State, Edge, Vertex>[] overBudgetSegments = new GraphPath[] {
+    GraphPath[] overBudgetSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
@@ -469,7 +466,7 @@ class PassengerDelayConstraintsTest {
 
     // Shortening one segment to 5min: cumulative = [0, 6, 12, 19, 26]
     // Destination delay: 26 - 21 = 5min, exactly at budget → accepts.
-    GraphPath<State, Edge, Vertex>[] atBudgetSegments = new GraphPath[] {
+    GraphPath[] atBudgetSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
@@ -506,7 +503,7 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 11min - 10min = 1min ok
     // Stop2 delay: 24min - 20min = 4min ok
     // Destination delay: 36min - 30min = 6min exceeds 5min budget
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
+    GraphPath[] modifiedSegments = new GraphPath[] {
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
       CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),

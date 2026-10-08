@@ -7,12 +7,10 @@ import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.path.StreetPathTree;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 import org.opentripplanner.utils.collection.Pair;
 import org.slf4j.Logger;
@@ -42,7 +40,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
   private final Map<Vertex, VertexRegistration> reverseRegistrations = new HashMap<>();
   private final Map<Vertex, StreetPathTree> forwardTrees = new HashMap<>();
   private final Map<Vertex, StreetPathTree> reverseTrees = new HashMap<>();
-  private final Map<Pair<Vertex>, GraphPath<State, Edge, Vertex>> pathCache = new HashMap<>();
+  private final Map<Pair<Vertex>, GraphPath> pathCache = new HashMap<>();
   private boolean routingStarted = false;
 
   public enum Direction {
@@ -181,7 +179,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
    * tree does not reach the other endpoint within its search limit returns {@code null} as well.
    */
   @Override
-  public GraphPath<State, Edge, Vertex> route(Vertex from, Vertex to) {
+  public GraphPath route(Vertex from, Vertex to) {
     routingStarted = true;
 
     var key = new Pair<>(from, to);
@@ -201,7 +199,7 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
     }
 
     var state = isReverse ? tree.getState(from) : tree.getState(to);
-    var path = state == null ? null : new GraphPath<>(state);
+    var path = state == null ? null : new GraphPath(state);
     pathCache.put(key, path);
     return path;
   }

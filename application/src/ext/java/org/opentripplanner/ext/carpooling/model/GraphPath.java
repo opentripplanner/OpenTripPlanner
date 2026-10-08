@@ -2,9 +2,8 @@ package org.opentripplanner.ext.carpooling.model;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.opentripplanner.astar.spi.AStarEdge;
-import org.opentripplanner.astar.spi.AStarState;
-import org.opentripplanner.astar.spi.AStarVertex;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.state.State;
 
 /**
  * A shortest path on the graph.
@@ -15,11 +14,7 @@ import org.opentripplanner.astar.spi.AStarVertex;
  * ordered path. This class only exists for the carpooling sandbox feature; core OTP code must not
  * depend on it.
  */
-public class GraphPath<
-  State extends AStarState<State, Edge, Vertex>,
-  Edge extends AStarEdge<State, Edge, Vertex>,
-  Vertex extends AStarVertex<State, Edge, Vertex>
-> {
+public class GraphPath {
 
   public List<State> states;
 
