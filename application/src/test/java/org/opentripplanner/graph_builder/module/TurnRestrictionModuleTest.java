@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
@@ -24,7 +23,6 @@ import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -352,12 +350,12 @@ public class TurnRestrictionModuleTest {
 
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
 
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+    var spt = StreetSearchBuilder.of()
       .withRequest(request)
       .withFrom(A)
       .withTo(F)
       .getShortestPathTree();
-    List<State> states = new StreetPath(spt.getState(F)).states();
+    List<State> states = new StreetPath(spt.getPath(F)).states();
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);
@@ -431,7 +429,7 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(B)
         .getShortestPathTree()
-        .getState(B)
+        .getPath(B)
     );
     assertNull(
       StreetSearchBuilder.of()
@@ -439,17 +437,17 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(C)
         .getShortestPathTree()
-        .getState(C)
+        .getPath(C)
     );
-    State state = StreetSearchBuilder.of()
+    var path = StreetSearchBuilder.of()
       .withRequest(request)
       .withFrom(A)
       .withTo(E)
       .getShortestPathTree()
-      .getState(E);
-    assertNotNull(state);
+      .getPath(E);
+    assertNotNull(path);
 
-    for (Edge edge : state.listBackEdges()) {
+    for (Edge edge : path.listBackEdges()) {
       assertEquals(StreetTraversalPermission.CAR, ((StreetEdge) edge).getPermission());
     }
   }

@@ -3,9 +3,6 @@ package org.opentripplanner.ext.carpooling.util;
 import java.time.Duration;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 
 public final class GraphPathUtils {
 
@@ -14,7 +11,7 @@ public final class GraphPathUtils {
   /**
    * Returns the duration of the given path, or {@link Duration#ZERO} if the path is {@code null}.
    */
-  public static Duration durationOrZero(@Nullable GraphPath<State, Edge, Vertex> path) {
+  public static Duration durationOrZero(@Nullable GraphPath path) {
     return path == null ? Duration.ZERO : Duration.ofSeconds(path.getDuration());
   }
 
@@ -23,7 +20,7 @@ public final class GraphPathUtils {
    * already accounts for the user's walk preferences (reluctance, safety factor, slope cost,
    * etc.) since it comes from the search that produced the path.
    */
-  public static double weightOrZero(@Nullable GraphPath<State, Edge, Vertex> path) {
+  public static double weightOrZero(@Nullable GraphPath path) {
     return path == null ? 0 : path.getWeight();
   }
 
@@ -35,7 +32,7 @@ public final class GraphPathUtils {
    * @param stopDuration Duration added at each intermediate stop
    */
   public static Duration[] calculateCumulativeDurations(
-    GraphPath<State, Edge, Vertex>[] segments,
+    GraphPath[] segments,
     Duration stopDuration
   ) {
     Duration[] segmentDurations = new Duration[segments.length];

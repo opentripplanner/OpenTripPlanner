@@ -1,10 +1,6 @@
 package org.opentripplanner.ext.flex.flexpathcalculator;
 
-import com.google.common.collect.Iterables;
-import java.util.function.Supplier;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.street.geometry.GeometryUtils;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.LazyStreetPath;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -26,33 +22,15 @@ class StateToFlexPathMapper {
    * Walk the state chain and collect edges in chronological order (origin → destination), summing
    * up the distance along the way.
    */
-  static FlexPath map(State state) {
+  static FlexPath map(LazyStreetPath path) {
     // computing the linestring from the graph path is a surprisingly expensive operation
     // so we delay it until it's actually needed. since most flex paths are never shown to the user
     // this improves performance quite a bit.
-    Supplier<LineString> geometrySupplier = () -> {
-      if (state.getRequest().arriveBy()) {
-        var geometries = Iterables.transform(state.listBackEdges(), Edge::getGeometry);
-        return GeometryUtils.concatenateLineStrings(geometries);
-      } else {
-        var geometries = Iterables.transform(state.listBackEdges(), StateToFlexPathMapper::reverse);
-        return GeometryUtils.concatenateLineStrings(geometries).reverse();
-      }
-    };
 
     return new FlexPath(
-      (int) state.getTraversalDistanceMeters(),
-      (int) state.getElapsedTimeSeconds(),
-      geometrySupplier
+      (int) path.getTraversalDistanceMeters(),
+      (int) path.getElapsedTimeSeconds(),
+      path::getGeometry
     );
-  }
-
-  private static LineString reverse(Edge e) {
-    var geom = e.getGeometry();
-    if (geom == null) {
-      return null;
-    } else {
-      return geom.reverse();
-    }
   }
 }

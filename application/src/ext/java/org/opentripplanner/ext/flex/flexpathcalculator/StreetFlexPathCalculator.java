@@ -3,15 +3,13 @@ package org.opentripplanner.ext.flex.flexpathcalculator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPathTree;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 
 /**
@@ -30,7 +28,7 @@ import org.opentripplanner.street.search.strategy.DominanceFunctions;
  */
 public class StreetFlexPathCalculator implements FlexPathCalculator {
 
-  private final Map<Vertex, ShortestPathTree<State, Edge, Vertex>> cache = new HashMap<>();
+  private final Map<Vertex, StreetPathTree> cache = new HashMap<>();
   private final boolean reverseDirection;
   private final Duration maxFlexTripDuration;
 
@@ -51,7 +49,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     Vertex originVertex = reverseDirection ? tov : fromv;
     Vertex destinationVertex = reverseDirection ? fromv : tov;
 
-    ShortestPathTree<State, Edge, Vertex> shortestPathTree;
+    StreetPathTree shortestPathTree;
     if (cache.containsKey(originVertex)) {
       shortestPathTree = cache.get(originVertex);
     } else {
@@ -59,15 +57,15 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    var state = shortestPathTree.getState(destinationVertex);
-    if (state == null) {
+    var path = shortestPathTree.getPath(destinationVertex);
+    if (path == null) {
       return null;
     }
 
-    return StateToFlexPathMapper.map(state);
+    return StateToFlexPathMapper.map(path);
   }
 
-  private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
+  private StreetPathTree routeToMany(Vertex vertex) {
     // TODO: This is incorrect, the configured defaults are not used.
     var streetRequest = StreetSearchRequest.of()
       .withMode(StreetMode.CAR)

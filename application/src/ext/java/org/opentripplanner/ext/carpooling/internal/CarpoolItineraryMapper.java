@@ -29,7 +29,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -146,7 +145,7 @@ public class CarpoolItineraryMapper {
   }
 
   private static CarpoolLeg buildCarpoolLeg(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments,
+    List<GraphPath> sharedSegments,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     double rideWeight,
@@ -172,7 +171,7 @@ public class CarpoolItineraryMapper {
   }
 
   private static StreetLeg buildWalkLeg(
-    GraphPath<State, Edge, Vertex> walkPath,
+    GraphPath walkPath,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     Place fromPlace,
@@ -237,9 +236,9 @@ public class CarpoolItineraryMapper {
    * via {@link #makePlace(Vertex)}.
    */
   private static Itinerary buildItinerary(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments,
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
+    List<GraphPath> sharedSegments,
+    @Nullable GraphPath walkToPickup,
+    @Nullable GraphPath walkFromDropoff,
     ZonedDateTime carpoolStart,
     ZonedDateTime carpoolEnd,
     double rideWeight,
@@ -349,15 +348,11 @@ public class CarpoolItineraryMapper {
       .build();
   }
 
-  private static WgsCoordinate boardingCoordinate(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments
-  ) {
+  private static WgsCoordinate boardingCoordinate(List<GraphPath> sharedSegments) {
     return sharedSegments.getFirst().states.getFirst().getVertex().toWgsCoordinate();
   }
 
-  private static WgsCoordinate alightingCoordinate(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments
-  ) {
+  private static WgsCoordinate alightingCoordinate(List<GraphPath> sharedSegments) {
     return sharedSegments.getLast().states.getLast().getVertex().toWgsCoordinate();
   }
 

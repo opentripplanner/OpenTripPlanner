@@ -10,8 +10,6 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.cost.CostLimit;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -297,7 +295,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * is needed.
    */
   @Nullable
-  public GraphPath<State, Edge, Vertex> walkToPickup() {
+  public GraphPath walkToPickup() {
     return insertionCandidate.walkToPickup();
   }
 
@@ -306,7 +304,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * intermediate stops the driver makes along the way for other passengers). Never empty for a
    * valid leg.
    */
-  public List<GraphPath<State, Edge, Vertex>> sharedSegments() {
+  public List<GraphPath> sharedSegments() {
     return insertionCandidate.getSharedSegments();
   }
 
@@ -316,7 +314,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * walk is needed.
    */
   @Nullable
-  public GraphPath<State, Edge, Vertex> walkFromDropoff() {
+  public GraphPath walkFromDropoff() {
     return insertionCandidate.walkFromDropoff();
   }
 

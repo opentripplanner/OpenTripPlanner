@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -396,13 +395,14 @@ public class BikeWalkingTest extends GraphRoutingTest {
       .withTo(toVertex)
       .getShortestPathTree();
 
-    var state = tree.getState(arriveBy ? fromVertex : toVertex);
+    var path = tree.getPath(arriveBy ? fromVertex : toVertex);
 
-    if (state == null) {
+    if (path == null) {
       return null;
     }
 
-    return new StreetPath(state)
+    return path
+      .materialize()
       .states()
       .stream()
       .map(s ->

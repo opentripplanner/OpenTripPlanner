@@ -1,7 +1,6 @@
 package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.integration.TurnRestrictionTest.getParentLabelString;
 
 import java.util.List;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
@@ -20,7 +18,6 @@ import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.path.StreetPath;
@@ -197,15 +194,13 @@ public class TurnCostTest {
       .withIntersectionTraversalCalculator(calculator)
       .build();
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
+    var tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
       .withRequest(request)
       .withFrom(from)
       .withTo(to)
       .getShortestPathTree();
-    State state = tree.getState(bottomLeft);
-    assertNotNull(state);
-    StreetPath path = new StreetPath(state);
+    var path = tree.getPath(bottomLeft).materialize();
     List<State> states = path.states();
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.

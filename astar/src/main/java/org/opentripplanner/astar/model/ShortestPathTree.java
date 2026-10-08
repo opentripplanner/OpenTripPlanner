@@ -32,7 +32,7 @@ public class ShortestPathTree<
   Vertex extends AStarVertex<State, Edge, Vertex>
 > {
 
-  public final DominanceFunction<State> dominanceFunction;
+  private final DominanceFunction<State> dominanceFunction;
 
   // Value is either a single State (common case) or List<State> (multi-state vertices)
   private final SegmentedIdentityMap<Vertex, Object> stateSets;
