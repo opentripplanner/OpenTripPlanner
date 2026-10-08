@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.street.api.path.DefaultStreetPath;
 import org.opentripplanner.street.api.path.StreetPath;
 import org.opentripplanner.street.api.request.StreetSearchRequest;
 import org.opentripplanner.street.model.edge.Edge;
@@ -35,7 +36,7 @@ public class EdgeTraverser {
     } catch (CouldNotTraverseException _) {
       return Optional.empty();
     }
-    return Optional.of(StreetPath.of(states, edges));
+    return Optional.of(new DefaultStreetPath(states, edges));
   }
 
   /// Traverse a set of edges given a start state. Return the final state, empty if the edges cannot

@@ -18,12 +18,12 @@ import org.opentripplanner.street.model.elevation.ElevationProfile;
 import org.opentripplanner.street.search.state.State;
 
 /// A [StreetPath] backed by the states of a street search.
-final class DefaultStreetPath implements StreetPath {
+public final class DefaultStreetPath implements StreetPath {
 
   private final List<State> states;
   private final List<Edge> edges;
 
-  DefaultStreetPath(List<State> states, List<Edge> edges) {
+  public DefaultStreetPath(List<State> states, List<Edge> edges) {
     validate(states, edges);
     this.states = states;
     this.edges = edges;
