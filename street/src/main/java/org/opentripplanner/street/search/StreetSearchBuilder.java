@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.AStar;
 import org.opentripplanner.astar.AStarBuilder;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
@@ -16,6 +15,7 @@ import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.path.StreetPath;
+import org.opentripplanner.street.model.path.StreetPathTree;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -109,8 +109,8 @@ public class StreetSearchBuilder {
   }
 
   /// Run the search returning the shortestPathTree
-  public ShortestPathTree<State, Edge, Vertex> getShortestPathTree() {
-    return buildAstar().getShortestPathTree();
+  public StreetPathTree getShortestPathTree() {
+    return new StreetPathTree(buildAstar().getShortestPathTree());
   }
 
   /// Run the street search, returning all paths found

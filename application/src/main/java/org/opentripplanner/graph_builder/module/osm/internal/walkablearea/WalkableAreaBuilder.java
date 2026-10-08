@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.prep.PreparedPolygon;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -527,7 +526,7 @@ public class WalkableAreaBuilder {
     var request = StreetSearchRequest.of().withMode(mode).build();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
-      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+      var spt = StreetSearchBuilder.of()
         .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
         .withSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .withDominanceFunction(new DominanceFunctions.EarliestArrival())

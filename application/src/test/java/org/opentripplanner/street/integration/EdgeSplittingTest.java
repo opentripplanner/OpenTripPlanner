@@ -13,7 +13,6 @@ import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -33,7 +32,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -167,7 +165,7 @@ public class EdgeSplittingTest {
 
     var request = StreetSearchRequest.of().build();
 
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+    var spt = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
       .withRequest(request)
       .withFrom(start)
@@ -210,7 +208,7 @@ public class EdgeSplittingTest {
 
     var request = StreetSearchRequest.of().build();
 
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+    var spt = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
       .withRequest(request)
       .withFrom(start)
@@ -294,7 +292,7 @@ public class EdgeSplittingTest {
       assertFalse(fromVertices.isEmpty());
       var toVertices = linkingContext.findVertices(to);
       assertFalse(toVertices.isEmpty());
-      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+      var spt = StreetSearchBuilder.of()
         .withHeuristic(new EuclideanRemainingWeightHeuristic())
         .withRequest(StreetSearchRequestMapper.map(walking).build())
         .withFrom(fromVertices)

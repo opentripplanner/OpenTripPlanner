@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
@@ -20,7 +19,6 @@ import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.path.StreetPath;
@@ -103,7 +101,7 @@ public class TurnRestrictionTest {
       .withWalk(w -> w.withSpeed(1.0))
       .build();
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
+    var tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
       .withRequest(request)
       .withFrom(topRight)
@@ -133,7 +131,7 @@ public class TurnRestrictionTest {
       .withWalk(w -> w.withSpeed(1.0))
       .build();
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
+    var tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
       .withRequest(request)
       .withFrom(topRight)
@@ -170,7 +168,7 @@ public class TurnRestrictionTest {
   public void testForwardAsCar() {
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
+    var tree = StreetSearchBuilder.of()
       .withHeuristic(new EuclideanRemainingWeightHeuristic())
       .withRequest(request)
       .withFrom(topRight)
