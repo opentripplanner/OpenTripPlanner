@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
 import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
-import static org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder.createGraphPath;
+import static org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder.createStreetPath;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_CENTER;
 import static org.opentripplanner.ext.carpooling.CarpoolTestCoordinates.OSLO_NORTH;
 import static org.opentripplanner.ext.carpooling.CarpoolTripTestData.createSimpleTrip;
@@ -18,16 +18,13 @@ import java.util.EnumSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -75,15 +72,16 @@ class CarpoolItineraryMapperTest {
   private static final double CARPOOL_RELUCTANCE = 1.0;
 
   /**
-   * Every GraphPath produced by {@link org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder}
-   * has a single outgoing street edge named "segment-0", so the FIRST vertex of each path
+   * Every StreetPath produced by
+   * {@link org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder} has a single outgoing
+   * street edge named "segment-0", so the FIRST vertex of each path
    * (which carries that edge as outgoing) resolves to that name via
    * {@link org.opentripplanner.street.model.vertex.StreetVertex#getIntersectionName()}.
    */
   private static final String NAMED_INTERSECTION = "segment-0";
 
   /**
-   * The LAST vertex of each test GraphPath has the segment edge only as <em>incoming</em> — there
+   * The LAST vertex of each test StreetPath has the segment edge only as <em>incoming</em> — there
    * are no outgoing street edges — so {@code getIntersectionName()} falls back to its
    * {@code LocalizedString("unnamedStreet")} branch, which resolves to "unnamed" in English. The
    * point of asserting this value is to prove it's a getIntersectionName() output (not the user's
@@ -190,8 +188,8 @@ class CarpoolItineraryMapperTest {
   @Test
   void outerEndpointsUseUserSuppliedLabels() {
     var candidate = newCandidate(
-      createGraphPath(Duration.ofSeconds(80)),
-      createGraphPath(Duration.ofSeconds(40))
+      createStreetPath(Duration.ofSeconds(80)),
+      createStreetPath(Duration.ofSeconds(40))
     );
 
     var itinerary = mapper.toItinerary(
@@ -213,8 +211,8 @@ class CarpoolItineraryMapperTest {
   @Test
   void outerEndpointsFallBackToLocalizedOriginDestination() {
     var candidate = newCandidate(
-      createGraphPath(Duration.ofSeconds(80)),
-      createGraphPath(Duration.ofSeconds(40))
+      createStreetPath(Duration.ofSeconds(80)),
+      createStreetPath(Duration.ofSeconds(40))
     );
 
     var itinerary = mapper.toItinerary(
@@ -237,8 +235,8 @@ class CarpoolItineraryMapperTest {
   @Test
   void outerEndpointsFallBackWhenLabelIsEmptyString() {
     var candidate = newCandidate(
-      createGraphPath(Duration.ofSeconds(80)),
-      createGraphPath(Duration.ofSeconds(40))
+      createStreetPath(Duration.ofSeconds(80)),
+      createStreetPath(Duration.ofSeconds(40))
     );
 
     var itinerary = mapper.toItinerary(
@@ -263,8 +261,8 @@ class CarpoolItineraryMapperTest {
   @Test
   void carpoolBoundaryUsesIntersectionNameNotUserLabel() {
     var candidate = newCandidate(
-      createGraphPath(Duration.ofSeconds(80)),
-      createGraphPath(Duration.ofSeconds(40))
+      createStreetPath(Duration.ofSeconds(80)),
+      createStreetPath(Duration.ofSeconds(40))
     );
 
     var itinerary = mapper.toItinerary(
@@ -276,12 +274,12 @@ class CarpoolItineraryMapperTest {
 
     var legs = itinerary.legs();
     // Walk-to-pickup's TO == carpool's FROM == pickup vertex.
-    // The pickup vertex is the FIRST vertex of the shared GraphPath and carries the segment edge
+    // The pickup vertex is the FIRST vertex of the shared StreetPath and carries the segment edge
     // as outgoing, so getIntersectionName() returns the edge name "segment-0".
     assertEquals(NAMED_INTERSECTION, legs.getFirst().to().name.toString());
     assertEquals(NAMED_INTERSECTION, legs.get(1).from().name.toString());
     // Carpool's TO == walk-from-dropoff's FROM == dropoff vertex.
-    // The dropoff vertex is the LAST vertex of the shared GraphPath and has no outgoing street
+    // The dropoff vertex is the LAST vertex of the shared StreetPath and has no outgoing street
     // edges, so getIntersectionName() falls back to "unnamed". Crucially, this is NOT the user's
     // "Office" label — that's the property under test.
     assertEquals(UNNAMED_INTERSECTION, legs.get(1).to().name.toString());
@@ -302,7 +300,7 @@ class CarpoolItineraryMapperTest {
     RegularStop stop = testModel.stop("Central Station", 59.91, 10.74).build();
     GenericLocation passengerOrigin = GenericLocation.fromCoordinate(59.92, 10.75, "Home");
     var candidate = newCandidate(
-      createGraphPath(Duration.ofSeconds(80)),
+      createStreetPath(Duration.ofSeconds(80)),
       // Access: the carpool ends at the transit stop, no walk-from-dropoff.
       null
     );
@@ -337,7 +335,7 @@ class CarpoolItineraryMapperTest {
     var candidate = newCandidate(
       // Egress: the carpool starts at the transit stop, no walk-to-pickup.
       null,
-      createGraphPath(Duration.ofSeconds(40))
+      createStreetPath(Duration.ofSeconds(40))
     );
     var accessEgress = new CarpoolAccessEgress(
       0,
@@ -357,14 +355,14 @@ class CarpoolItineraryMapperTest {
   }
 
   private InsertionCandidate newCandidate(
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
+    @Nullable StreetPath walkToPickup,
+    @Nullable StreetPath walkFromDropoff
   ) {
     return new InsertionCandidate(
       createSimpleTrip(OSLO_CENTER, OSLO_NORTH),
       PICKUP_POSITION,
       DROPOFF_POSITION,
-      List.of(createGraphPath(PICKUP_SEGMENT_DURATION), createGraphPath(SHARED_SEGMENT_DURATION)),
+      List.of(createStreetPath(PICKUP_SEGMENT_DURATION), createStreetPath(SHARED_SEGMENT_DURATION)),
       STOP_DURATION,
       null,
       walkToPickup,

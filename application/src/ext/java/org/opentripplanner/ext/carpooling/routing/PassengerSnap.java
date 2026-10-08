@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.carpooling.routing;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 
 /**
  * Both ends of a passenger's carpool leg, already snapped to vertices the driver can stop at.
@@ -19,6 +17,6 @@ import org.opentripplanner.street.search.state.State;
 public record PassengerSnap(
   Vertex pickupVertex,
   Vertex dropoffVertex,
-  @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-  @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
+  @Nullable StreetPath walkToPickup,
+  @Nullable StreetPath walkFromDropoff
 ) {}
