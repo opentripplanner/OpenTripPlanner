@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.search.state.TestStateBuilder.ofDriving;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.street.model.path.LazyStreetPath;
 
 class StateToFlexPathMapperTest {
 
@@ -13,8 +14,8 @@ class StateToFlexPathMapperTest {
 
   @Test
   void departAt() {
-    var state = ofDriving().streetEdge().streetEdge().streetEdge().build();
-    var flexPath = StateToFlexPathMapper.map(state);
+    var path = ofDriving().streetEdge().streetEdge().streetEdge().buildPath();
+    var flexPath = StateToFlexPathMapper.map(path);
     assertEquals(EXPECTED_DISTANCE, flexPath.distanceMeters, EPSILON);
     assertEquals(EXPECTED_DURATION, flexPath.durationSeconds, EPSILON);
     assertEquals("LINESTRING (1 1, 2 2, 3 3, 4 4)", flexPath.getGeometry().toString());
@@ -23,7 +24,7 @@ class StateToFlexPathMapperTest {
   @Test
   void arriveBy() {
     var state = ofDriving().streetEdge().streetEdge().streetEdge().build().reverse();
-    var flexPath = StateToFlexPathMapper.map(state);
+    var flexPath = StateToFlexPathMapper.map(new LazyStreetPath(state));
     assertEquals(EXPECTED_DISTANCE, flexPath.distanceMeters, EPSILON);
     assertEquals(EXPECTED_DURATION, flexPath.durationSeconds, EPSILON);
     assertEquals("LINESTRING (1 1, 2 2, 3 3, 4 4)", flexPath.getGeometry().toString());

@@ -355,7 +355,7 @@ public class TurnRestrictionModuleTest {
       .withFrom(A)
       .withTo(F)
       .getShortestPathTree();
-    List<State> states = new StreetPath(spt.getState(F)).states();
+    List<State> states = new StreetPath(spt.getPath(F)).states();
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);
@@ -429,7 +429,7 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(B)
         .getShortestPathTree()
-        .getState(B)
+        .getPath(B)
     );
     assertNull(
       StreetSearchBuilder.of()
@@ -437,17 +437,17 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(C)
         .getShortestPathTree()
-        .getState(C)
+        .getPath(C)
     );
-    State state = StreetSearchBuilder.of()
+    var path = StreetSearchBuilder.of()
       .withRequest(request)
       .withFrom(A)
       .withTo(E)
       .getShortestPathTree()
-      .getState(E);
-    assertNotNull(state);
+      .getPath(E);
+    assertNotNull(path);
 
-    for (Edge edge : state.listBackEdges()) {
+    for (Edge edge : path.listBackEdges()) {
       assertEquals(StreetTraversalPermission.CAR, ((StreetEdge) edge).getPermission());
     }
   }

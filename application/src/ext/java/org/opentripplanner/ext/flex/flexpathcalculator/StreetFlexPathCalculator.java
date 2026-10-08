@@ -57,12 +57,12 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
       cache.put(originVertex, shortestPathTree);
     }
 
-    var state = shortestPathTree.getState(destinationVertex);
-    if (state == null) {
+    var path = shortestPathTree.getPath(destinationVertex);
+    if (path == null) {
       return null;
     }
 
-    return StateToFlexPathMapper.map(state);
+    return StateToFlexPathMapper.map(path);
   }
 
   private StreetPathTree routeToMany(Vertex vertex) {

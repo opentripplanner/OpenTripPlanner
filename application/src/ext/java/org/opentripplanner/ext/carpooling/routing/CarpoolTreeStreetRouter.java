@@ -198,8 +198,8 @@ public class CarpoolTreeStreetRouter implements CarpoolRouter {
       return null;
     }
 
-    var state = isReverse ? tree.getState(from) : tree.getState(to);
-    var path = state == null ? null : new GraphPath(state);
+    var lazyPath = isReverse ? tree.getPath(from) : tree.getPath(to);
+    var path = lazyPath == null ? null : new GraphPath(lazyPath);
     pathCache.put(key, path);
     return path;
   }

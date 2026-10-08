@@ -27,6 +27,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
+import org.opentripplanner.street.model.path.LazyStreetPath;
 import org.opentripplanner.street.model.vertex.ElevatorHopVertex;
 import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -367,5 +368,9 @@ public class TestStateBuilder {
 
   public State build() {
     return currentState;
+  }
+
+  public LazyStreetPath buildPath() {
+    return new LazyStreetPath(currentState);
   }
 }

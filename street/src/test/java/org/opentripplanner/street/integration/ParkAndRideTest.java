@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
@@ -171,13 +170,14 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
       .withTo(toVertex)
       .getShortestPathTree();
 
-    var state = tree.getState(arriveBy ? fromVertex : toVertex);
+    var path = tree.getPath(arriveBy ? fromVertex : toVertex);
 
-    if (state == null) {
+    if (path == null) {
       return List.of();
     }
 
-    return new StreetPath(state)
+    return path
+      .materialize()
       .states()
       .stream()
       .map(s ->

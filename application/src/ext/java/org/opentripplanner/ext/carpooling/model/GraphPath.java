@@ -3,6 +3,7 @@ package org.opentripplanner.ext.carpooling.model;
 import java.util.LinkedList;
 import java.util.List;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.LazyStreetPath;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -56,6 +57,10 @@ public class GraphPath {
         edges.addFirst(cur.getBackEdge());
       }
     }
+  }
+
+  public GraphPath(LazyStreetPath path) {
+    this(path.getFinalState());
   }
 
   public GraphPath(List<State> states, List<Edge> edges) {

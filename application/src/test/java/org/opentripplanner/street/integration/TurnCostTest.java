@@ -1,7 +1,6 @@
 package org.opentripplanner.street.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.street.integration.TurnRestrictionTest.getParentLabelString;
 
 import java.util.List;
@@ -201,9 +200,7 @@ public class TurnCostTest {
       .withFrom(from)
       .withTo(to)
       .getShortestPathTree();
-    State state = tree.getState(bottomLeft);
-    assertNotNull(state);
-    StreetPath path = new StreetPath(state);
+    var path = tree.getPath(bottomLeft).materialize();
     List<State> states = path.states();
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.

@@ -16,10 +16,14 @@ public class StreetPathTree {
     this.spt = spt;
   }
 
-  /// Returns the 'best' state for the given Vertex, where 'best' depends on the implementation.
+  /// Returns the 'best' path for the given Vertex, where 'best' depends on the implementation.
   @Nullable
-  public State getState(Vertex dest) {
-    return spt.getState(dest);
+  public LazyStreetPath getPath(Vertex dest) {
+    var state = spt.getState(dest);
+    if (state == null) {
+      return null;
+    }
+    return new LazyStreetPath(state);
   }
 
   /// Return every state in this tree.

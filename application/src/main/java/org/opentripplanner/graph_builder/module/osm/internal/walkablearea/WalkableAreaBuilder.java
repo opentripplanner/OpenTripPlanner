@@ -535,9 +535,9 @@ public class WalkableAreaBuilder {
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {
-        State state = spt.getState(endVertex);
-        if (state != null) {
-          for (Edge edge : state.listBackEdges()) {
+        var path = spt.getPath(endVertex);
+        if (path != null) {
+          for (Edge edge : path.listBackEdges()) {
             usedEdges.add(edge);
           }
         }

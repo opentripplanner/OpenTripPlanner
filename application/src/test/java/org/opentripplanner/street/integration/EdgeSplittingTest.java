@@ -172,9 +172,9 @@ public class EdgeSplittingTest {
       .withTo(end)
       .getShortestPathTree();
 
-    State state = spt.getState(end);
-    assertNotNull(state, "There must be a path from start to end");
-    assertEquals(1, size(state.listBackEdges()));
+    var path = spt.getPath(end);
+    assertNotNull(path, "There must be a path from start to end");
+    assertEquals(1, size(path.listBackEdges()));
     connection.disposeEdges();
   }
 
@@ -215,9 +215,9 @@ public class EdgeSplittingTest {
       .withTo(end)
       .getShortestPathTree();
 
-    State state = spt.getState(end);
-    assertNotNull(state, "There must be a path from start to end");
-    assertTrue(size(state.listBackEdges()) > 1);
+    var path = spt.getPath(end);
+    assertNotNull(path, "There must be a path from start to end");
+    assertTrue(size(path.listBackEdges()) > 1);
     connection.disposeEdges();
   }
 
@@ -298,9 +298,9 @@ public class EdgeSplittingTest {
         .withFrom(fromVertices)
         .withTo(toVertices)
         .getShortestPathTree();
-      State state = spt.getState(toVertices.iterator().next());
-      for (State s : state.listBackStates()) {
-        assertNotSame(s.getBackEdge(), top);
+      var path = spt.getPath(toVertices.iterator().next());
+      for (var e : path.listBackEdges()) {
+        assertNotSame(e, top);
       }
     }
   }

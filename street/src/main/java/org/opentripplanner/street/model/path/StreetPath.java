@@ -53,6 +53,11 @@ public class StreetPath {
     this.edges = edges;
   }
 
+  /// Materialize a LazyStreetPath
+  public StreetPath(LazyStreetPath lazyStreetPath) {
+    this(lazyStreetPath.getFinalState());
+  }
+
   private static void validate(List<State> states, List<Edge> edges) {
     if (states.isEmpty()) {
       throw new IllegalArgumentException("A path needs at least one state");

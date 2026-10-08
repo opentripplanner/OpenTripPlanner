@@ -13,7 +13,6 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
 
 /**
@@ -60,11 +59,11 @@ class UnroutableTest {
       .withTo(to)
       .getShortestPathTree();
 
-    State state = spt.getState(to);
+    var path = spt.getPath(to);
     // At the time of writing this test, the router simply doesn't find a path at all when highway=construction
     // is filtered out, thus the null check.
-    if (state != null) {
-      for (Edge edge : state.listBackEdges()) {
+    if (path != null) {
+      for (Edge edge : path.listBackEdges()) {
         assertNotEquals(
           "Path should not use the as-yet unbuilt Tilikum Crossing bridge.",
           "Tilikum Crossing",
