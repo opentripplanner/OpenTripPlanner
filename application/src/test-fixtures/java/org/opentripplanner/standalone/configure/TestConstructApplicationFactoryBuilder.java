@@ -72,8 +72,6 @@ public final class TestConstructApplicationFactoryBuilder {
           public void configure(JsonNode config) {}
         }
       )
-      .scheduledRaptorTransitData(transitRepository.getRaptorTransitData())
-      .scheduledTripCalendars(transitRepository.getTripCalendar())
       .build();
   }
 }
