@@ -36,7 +36,6 @@ import org.opentripplanner.ext.taxi.configure.TaxiServiceModule;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -73,7 +72,6 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
 import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.configure.TransitModule;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -255,12 +253,6 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder fareServiceFactory(FareServiceFactory fareService);
-
-    @BindsInstance
-    Builder scheduledRaptorTransitData(RaptorTransitData scheduledRaptorTransitData);
-
-    @BindsInstance
-    Builder scheduledTripCalendars(TripCalendars tripCalendars);
 
     ConstructApplicationFactory build();
   }

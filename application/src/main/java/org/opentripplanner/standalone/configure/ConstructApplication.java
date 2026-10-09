@@ -17,10 +17,8 @@ import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.util.EllipsoidUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -61,9 +59,11 @@ import org.slf4j.LoggerFactory;
  * using the {@link LoadApplication} - An application is constructed AFTER config and input files
  * are loaded.
  * <p>
- * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The
- * constructor performs the heavy Raptor data mapping before handing results to Dagger; all other
- * wiring is fast (no IO beyond config file reads).
+ * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. The heavy
+ * Raptor data mapping is NOT done in the constructor: for an in-memory {@code --build --serve}
+ * run the transit repository is still empty at construction time and only gets populated
+ * afterwards by the graph builder, so that mapping is deferred to a lazy Dagger provider (see
+ * {@link org.opentripplanner.transit.configure.TransitModule#timetableRepositoryHandle}).
  */
 public class ConstructApplication {
 
@@ -104,24 +104,6 @@ public class ConstructApplication {
     this.graphBuilderDataSources = graphBuilderDataSources;
     this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
 
-    // Compute Raptor data before Dagger construction so it can be injected as instances.
-    // This is intentionally done here rather than in a Dagger provider because the mapping
-    // is heavy and should not run inside the DI container's initialization.
-    var tuningParameters = config.routerConfig().transitTuningConfig();
-    if (!transitRepository.hasTransit() || !transitRepository.isIndexed()) {
-      LOG.warn(
-        "Cannot create Raptor data, that requires the graph to have transit data and be indexed."
-      );
-    }
-    LOG.info("Creating transit layer for Raptor routing.");
-    transitRepository.initRaptorTransitData(
-      RaptorTransitDataMapper.map(tuningParameters, transitRepository, transferRepository)
-    );
-    var scheduledRaptorTransitData = new RaptorTransitData(
-      transitRepository.getRaptorTransitData()
-    );
-    var scheduledTripCalendars = transitRepository.getTripCalendar();
-
     ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
     this.factory = builder
       .configModel(config)
@@ -139,13 +121,21 @@ public class ConstructApplication {
       .streetStreetRepository(streetRepository)
       .schema(config.routerConfig().routingRequestDefaults())
       .fareServiceFactory(fareServiceFactory)
-      .scheduledRaptorTransitData(scheduledRaptorTransitData)
-      .scheduledTripCalendars(scheduledTripCalendars)
       .build();
   }
 
   public ConstructApplicationFactory getFactory() {
     return factory;
+  }
+
+  /**
+   * Trigger the (lazily computed) Raptor transit data mapping. The transit repository must be
+   * fully populated - loaded from disk, or just built by {@link #createGraphBuilder()} - when
+   * this is called, and it must be called before {@link TransitRepository#freeze()}, since that
+   * forbids further writes to the repository.
+   */
+  public void initRaptorTransitData() {
+    factory.timetableRepositoryHandle();
   }
 
   /**
@@ -210,6 +200,12 @@ public class ConstructApplication {
 
   private void setupTransitRoutingServer() {
     enableRequestTraceLogging();
+
+    // Resolving the timetable repository handle triggers the (lazy) Raptor transit data mapping;
+    // do this before createMetricsLogging() so the Raptor transfer-cache metric below sees the
+    // real, graph-built data rather than a not-yet-initialized repository.
+    var timetableRepositoryHandle = factory.timetableRepositoryHandle();
+
     createMetricsLogging();
 
     /* Create updater modules from JSON config. */
@@ -225,7 +221,7 @@ public class ConstructApplication {
       carpoolTripVertexResolver(),
       factory.transitUpdateManager(),
       factory.streetUpdateManager(),
-      factory.timetableRepositoryHandle(),
+      timetableRepositoryHandle,
       factory.transitAlertService(),
       routerConfig().updaterConfig(),
       otpConfig().gbfsNetworks

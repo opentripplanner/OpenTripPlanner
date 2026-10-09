@@ -191,6 +191,11 @@ public class OTPMain {
   }
 
   private static void startOtpWebServer(CommandLineParameters params, ConstructApplication app) {
+    // Map the Raptor transit data now that the transit repository is guaranteed to be fully
+    // populated (either loaded from disk, or just built by the graph builder above), and before
+    // the repository is frozen below.
+    app.initRaptorTransitData();
+
     // Index graph for travel search
     app.transitRepository().freeze();
     app.transferRepository().index();
