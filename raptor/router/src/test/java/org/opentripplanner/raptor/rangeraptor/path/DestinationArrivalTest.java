@@ -56,7 +56,6 @@ public class DestinationArrivalTest {
   private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
     TestAccessEgress.walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
     TRANSIT_ARRIVAL,
-    ACCESS_DEPARTURE_TIME,
     TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
     DESTINATION_C1,
     DESTINATION_C2

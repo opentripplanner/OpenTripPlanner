@@ -102,8 +102,10 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     }
     int minArrivalTime = arrivalTime + h.minTravelDuration();
     int minNumberOfTransfers = round - 1 + h.minNumTransfers();
+    int minTravelDuration = travelDuration + h.minTravelDuration();
     int minCost = cost + h.minCost();
-    return paths.qualify(minArrivalTime, minNumberOfTransfers, minCost, c2);
+    int departureTime = minArrivalTime - minTravelDuration;
+    return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost, c2);
   }
 
   private String rejectErrorMessage(int stop) {
