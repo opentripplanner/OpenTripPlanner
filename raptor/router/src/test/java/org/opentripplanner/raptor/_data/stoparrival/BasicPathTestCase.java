@@ -227,6 +227,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     return new DestinationArrival<>(
       egress.egressPath().egress(),
       egress.previous(),
+      RAPTOR_ITERATION_START_TIME,
       egress.arrivalTime(),
       egress.egressPath().egress().c1(),
       egress.c2()
@@ -273,6 +274,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     return new DestinationArrival<>(
       egress.egressPath().egress(),
       egress.previous(),
+      RAPTOR_ITERATION_START_TIME,
       egress.arrivalTime(),
       egress.egressPath().egress().c1(),
       egress.c2()

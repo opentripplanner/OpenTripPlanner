@@ -63,17 +63,20 @@ public final class PathParetoSetComparators {
 
     return switch (costConfig) {
       case NONE -> switch (timeConfig) {
-        case USE_TIMETABLE -> comparatorTimetable();
+        case USE_TIMETABLE, USE_TIMETABLE_REVERSE -> comparatorTimetable();
         case USE_ARRIVAL_TIME -> comparatorStandardArrivalTime();
         case USE_DEPARTURE_TIME -> comparatorStandardDepartureTime();
       };
       case USE_C1 -> switch (timeConfig) {
-        case USE_TIMETABLE -> comparatorTimetableAndC1();
+        case USE_TIMETABLE, USE_TIMETABLE_REVERSE -> comparatorTimetableAndC1();
         case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndC1();
         case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndC1();
       };
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> switch (timeConfig) {
-        case USE_TIMETABLE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
+        case USE_TIMETABLE, USE_TIMETABLE_REVERSE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(
+          relaxC1,
+          c2Comp
+        );
         case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
         case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
           relaxC1,

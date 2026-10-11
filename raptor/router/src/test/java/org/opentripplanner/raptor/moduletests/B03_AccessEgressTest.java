@@ -104,10 +104,10 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCasesWithoutTimetable() {
     return standardTestCases()
       .withRequest(r -> r.searchParams().timetable(false))
+      // The two higher-cost paths (C₁3_120, C₁3_000) arriving at 0:39 with 0 transfers are
+      // dominated by C₁2_762 on cost and are no longer kept in the DestinationArrival pareto set.
       .add(
         multiCriteria(),
-        "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m Tₙ0 C₁3_120]",
-        "Walk 4m ~ B ~ BUS R1 0:14 0:32 ~ F ~ Walk 7m [0:10 0:39 29m Tₙ0 C₁3_000]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s Tₙ0 C₁2_762]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:36 ~ G ~ Walk 4m [0:09:59 0:40 30m1s Tₙ0 C₁2_642]",
         "Walk 1s ~ A ~ BUS R1 0:10 0:40 ~ H ~ Walk 1s [0:09:59 0:40:01 30m2s Tₙ0 C₁2_404]"
