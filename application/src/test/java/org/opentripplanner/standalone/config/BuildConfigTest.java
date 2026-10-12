@@ -7,7 +7,6 @@ import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFI
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;

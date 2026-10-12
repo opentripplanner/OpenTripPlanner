@@ -1,9 +1,5 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +19,6 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Fetches GBFS endpoints from a GBFS v3 manifest.json file.

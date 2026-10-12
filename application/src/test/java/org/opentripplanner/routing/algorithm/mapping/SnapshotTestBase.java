@@ -114,7 +114,7 @@ public abstract class SnapshotTestBase {
   ) {
     ensureContextInitialized();
 
-    var builder = RouterConfig.DEFAULT.routingRequestDefaults()
+    return RouterConfig.DEFAULT.routingRequestDefaults()
       .copyOf()
       .withDateTime(
         LocalDateTime.of(year, month, day, hour, minute, second)

@@ -1,8 +1,7 @@
 package org.opentripplanner.gbfs.manifest;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import static tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+
 import java.net.URI;
 import java.util.Comparator;
 import java.util.Optional;
@@ -15,6 +14,7 @@ import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Loads a GBFS v3 {@code manifest.json}, which lists the systems a provider publishes and the GBFS
@@ -27,9 +27,9 @@ public class GbfsManifestLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsManifestLoader.class);
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-    .registerModule(new JavaTimeModule())
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder()
+    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+    .build();
 
   /**
    * Loads the manifest from a remote URL or a local {@code file:} path.

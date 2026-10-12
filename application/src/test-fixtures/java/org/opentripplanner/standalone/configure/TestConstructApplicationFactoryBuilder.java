@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.internal.DefaultEmpiricalDelayRepository;
 import org.opentripplanner.ext.fares.model.FareRulesData;
@@ -18,6 +17,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Builds the real production {@link ConstructApplicationFactory} — the same Dagger component
