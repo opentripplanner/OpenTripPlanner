@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.inject.hk2.AbstractBinder;
 import org.glassfish.jersey.internal.inject.Binder;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.json.JacksonJsonProvider;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
 import org.opentripplanner.ext.httpresponsetimemetrics.HttpResponseTimeMetricsFilter;

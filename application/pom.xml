@@ -291,7 +291,7 @@
         <!-- Jackson modules to serialize Jersey response objects to JSON. -->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
+            <artifactId>jersey-media-json-jackson3</artifactId>
             <version>${jersey.version}</version>
         </dependency>
         <dependency>
