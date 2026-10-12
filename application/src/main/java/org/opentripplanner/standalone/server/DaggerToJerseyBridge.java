@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.server;
 import jakarta.inject.Provider;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.inject.hk2.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
