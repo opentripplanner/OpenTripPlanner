@@ -16,7 +16,7 @@ public enum ParetoSetTime {
   /**
    * Like {@link #USE_TIMETABLE} but for reverse (arrive-by) searches. In a reverse search the
    * {@link org.opentripplanner.raptor.rangeraptor.path.DestinationArrival} fields have swapped
-   * semantics: {@code arrivalTimeInclusivePenalty} holds the forward origin-departure time and
+   * semantics: {@code arrivalTime} holds the forward origin-departure time and
    * {@code iterationDepartureTime} holds the forward destination-arrival time. The comparator
    * criteria are correspondingly swapped and their directions inverted.
    */

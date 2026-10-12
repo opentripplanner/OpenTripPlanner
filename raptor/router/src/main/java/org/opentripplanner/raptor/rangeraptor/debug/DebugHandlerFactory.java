@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.debug;
 
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -75,9 +76,19 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   /* path */
 
+  /**
+   * Create a pareto set listener for a set of elements that can be mapped to a path, like
+   * destination arrivals. The path is only created if path debugging is enabled, and the events
+   * are reported to the path debug listener.
+   *
+   * @param toPath maps an element to a path, or to {@code null} if the element should not be
+   *               reported
+   */
   @Nullable
-  public ParetoSetDebugHandlerAdapter<RaptorPath<?>> paretoSetDebugPathListener() {
-    return pathHandler == null ? null : new ParetoSetDebugHandlerAdapter<>(pathHandler);
+  public <E> ParetoSetEventListener<E> paretoSetDebugPathListener(
+    Function<E, RaptorPath<?>> toPath
+  ) {
+    return pathHandler == null ? null : new ParetoSetDebugPathAdapter<>(pathHandler, toPath);
   }
 
   @Nullable

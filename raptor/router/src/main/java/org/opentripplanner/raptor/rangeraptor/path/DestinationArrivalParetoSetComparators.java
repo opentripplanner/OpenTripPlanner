@@ -12,21 +12,25 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * Pareto set comparators for {@link DestinationArrival}.
  * <p>
  * Design mirrors the per-stop arrival pareto sets: the comparators use
- * {@link DestinationArrival#arrivalTimeInclusivePenalty()},
+ * {@link DestinationArrival#arrivalTime()},
  * {@link DestinationArrival#numberOfTransfers()}, and cost.
+ * <p>
+ * The egress time-penalty is already part of {@link DestinationArrival#arrivalTime()}: Raptor
+ * decorates egress paths with the penalty, so it is included in the egress duration. It must not
+ * be added again here. See {@code EgressWithPenalty}.
  * <p>
  * In timetable mode ({@link ParetoSetTime#USE_TIMETABLE}), {@code iterationDepartureTime} is
  * included as the primary criterion so that results from all departure iterations are kept, even
  * when arrival time and cost are equal. This is the normal mode of operation.
  * <p>
  * Without timetable mode, cross-iteration correctness follows naturally: Range Raptor explores
- * iterations latest → earliest, so the first arrival added for a given (arrivalTimeIP, transfers,
+ * iterations latest → earliest, so the first arrival added for a given (arrivalTime, transfers,
  * c1) tuple is always from the latest-departing iteration. Equal-criteria arrivals from subsequent
  * (earlier-departing) iterations are rejected via the {@code NONE} case in the pareto set, exactly
  * as intermediate stop arrivals are handled.
  * <p>
  * In {@link ParetoSetTime#USE_DEPARTURE_TIME} mode (arrive-by / reverse searches),
- * {@code arrivalTimeInclusivePenalty} holds the forward origin-departure time (time flows backward
+ * {@code arrivalTime} holds the forward origin-departure time (time flows backward
  * in the reverse calculator), so the comparison is inverted: larger value = later departure =
  * better.
  */
@@ -76,7 +80,7 @@ public final class DestinationArrivalParetoSetComparators {
   /**
    * Timetable comparator for reverse (arrive-by) searches.
    * <p>
-   * In a reverse search {@code arrivalTimeInclusivePenalty} holds the forward origin-departure
+   * In a reverse search {@code arrivalTime} holds the forward origin-departure
    * time (prefer larger = later departure) and {@code iterationDepartureTime} holds the forward
    * destination-arrival time (prefer smaller = earlier arrival). Both roles and directions are
    * therefore inverted relative to {@link #comparatorTimetable()}.
@@ -202,15 +206,15 @@ public final class DestinationArrivalParetoSetComparators {
   }
 
   private static boolean compareArrivalTime(DestinationArrival<?> l, DestinationArrival<?> r) {
-    return l.arrivalTimeInclusivePenalty() < r.arrivalTimeInclusivePenalty();
+    return l.arrivalTime() < r.arrivalTime();
   }
 
   /**
-   * In a reverse (arrive-by) search, {@code arrivalTimeInclusivePenalty} holds the forward
+   * In a reverse (arrive-by) search, {@code arrivalTime} holds the forward
    * origin-departure time. Larger = later departure = better for an arrive-by search.
    */
   private static boolean compareDepartureTime(DestinationArrival<?> l, DestinationArrival<?> r) {
-    return l.arrivalTimeInclusivePenalty() > r.arrivalTimeInclusivePenalty();
+    return l.arrivalTime() > r.arrivalTime();
   }
 
   private static boolean compareIterationDepartureTime(

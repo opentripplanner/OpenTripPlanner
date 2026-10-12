@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Optional;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -56,7 +57,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   private final ParetoSet<DestinationArrival<T>> arrivals;
 
-  /** Reused by {@link #qualify}; never added to {@link #arrivals}. */
+  /**
+   * Reused by {@link #qualify}; never added to {@link #arrivals}. Not thread-safe, see
+   * {@link #qualify} for how to handle parallel use.
+   */
   private final DestinationArrival<T> probe = DestinationArrival.createProbe();
 
   /**
@@ -92,6 +96,18 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
   }
 
+  /**
+   * The pareto set elements are destination arrivals, but the debug API reports paths. Paths are
+   * only built for debug events. The probe used by {@link #qualify} has no arrival chain, and is
+   * skipped.
+   */
+  private static <T extends RaptorTripSchedule> Function<
+    DestinationArrival<T>,
+    RaptorPath<?>
+  > toPath(PathMapper<T> pathMapper) {
+    return arrival -> arrival.previous() == null ? null : pathMapper.mapToPath(arrival);
+  }
+
   /** Create a {@link DestinationArrivalPaths} for StdRaptor (eager path building). */
   public static <T extends RaptorTripSchedule> DestinationArrivalPaths<T> forStdRaptor(
     ParetoComparator<DestinationArrival<T>> arrivalComparator,
@@ -103,7 +119,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle
   ) {
-    var arrivals = ParetoSet.of(arrivalComparator, null);
+    var arrivals = ParetoSet.of(
+      arrivalComparator,
+      debugHandlerFactory.paretoSetDebugPathListener(toPath(pathMapper))
+    );
     return new DestinationArrivalPaths<>(
       arrivals,
       new IdentityHashMap<>(),
@@ -128,7 +147,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle
   ) {
-    var arrivals = ParetoSet.of(arrivalComparator, null);
+    var arrivals = ParetoSet.of(
+      arrivalComparator,
+      debugHandlerFactory.paretoSetDebugPathListener(toPath(pathMapper))
+    );
     return new DestinationArrivalPaths<>(
       arrivals,
       null,
@@ -197,8 +219,15 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
    * and an object created here is not reliably removed by the JVM's escape analysis (the
    * qualification check is too large to be fully inlined). The result is millions of short-lived
    * objects and a measurable slowdown of the search. Instead, the same primitive signature is
-   * used and the values are written into a single reusable probe. This is safe because the probe
-   * is never stored by the pareto set, and the search is single-threaded.
+   * used and the values are written into a single reusable probe. The probe is never stored by
+   * the pareto set.
+   * <p>
+   * <b>Thread-safety:</b> This method is NOT thread-safe, because the probe is shared by all
+   * callers of this instance. This is fine as long as each instance is used by one thread only,
+   * which is the case today. If a search is ever changed to call this method from several threads
+   * (OTP has optimizations that run searches in parallel), create one probe per thread (for
+   * example using a {@link ThreadLocal}, or one probe per worker) instead of sharing it. Do not
+   * fall back to allocating a probe per call.
    */
   public boolean qualify(int arrivalTime, int numberOfTransfers, int cost, int c2) {
     probe.setProbeValues(iterationDepartureTime, arrivalTime, numberOfTransfers, cost, c2);

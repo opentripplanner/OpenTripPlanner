@@ -33,12 +33,16 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   private final RaptorAccessEgress egress;
   private int iterationDepartureTime;
   private int arrivalTime;
-  private int arrivalTimeInclusivePenalty;
 
   private int numberOfTransfers;
   private int c1;
   private int c2;
 
+  /**
+   * @param arrivalTime The destination arrival time. If the egress has a time-penalty, the time
+   *                    already includes it, since Raptor decorates the egress and adds the
+   *                    penalty to the egress duration. It is the time used for comparison.
+   */
   public DestinationArrival(
     RaptorAccessEgress egress,
     ArrivalView<T> previous,
@@ -51,9 +55,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     this.egress = egress;
     this.iterationDepartureTime = iterationDepartureTime;
     this.arrivalTime = arrivalTime;
-    this.arrivalTimeInclusivePenalty = egress.hasTimePenalty()
-      ? arrivalTime + egress.timePenalty()
-      : arrivalTime;
     // transit-only transfers; egress rides are added dynamically via round()
     this.numberOfTransfers = previous.round() - 1;
     this.c1 = previous.c1() + additionalC1;
@@ -65,6 +66,9 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
    * ({@link #previous()} returns {@code null}) and must never be used for path building or be
    * added to a pareto set. Create ONE probe and reuse it with {@link #setProbeValues}; this
    * avoids allocating an object for every qualification check.
+   * <p>
+   * A probe is mutable and NOT thread-safe. Do not share a probe between threads; create one
+   * probe per thread if qualification checks are run in parallel.
    */
   static <T extends RaptorTripSchedule> DestinationArrival<T> createProbe() {
     return new DestinationArrival<>();
@@ -78,7 +82,8 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   /**
    * Set the criteria values of a probe created with {@link #createProbe()}. Real arrivals are
-   * immutable in practice, so this is only allowed on a probe.
+   * immutable in practice, so this is only allowed on a probe. Not thread-safe, see
+   * {@link #createProbe()}.
    */
   void setProbeValues(
     int iterationDepartureTime,
@@ -92,7 +97,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     }
     this.iterationDepartureTime = iterationDepartureTime;
     this.arrivalTime = arrivalTime;
-    this.arrivalTimeInclusivePenalty = arrivalTime;
     this.numberOfTransfers = numberOfTransfers;
     this.c1 = c1;
     this.c2 = c2;
@@ -100,10 +104,6 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   public int iterationDepartureTime() {
     return iterationDepartureTime;
-  }
-
-  public int arrivalTimeInclusivePenalty() {
-    return arrivalTimeInclusivePenalty;
   }
 
   @Override
