@@ -179,11 +179,6 @@ public class DefaultTransitService implements TransitService {
   }
 
   @Override
-  public Optional<Agency> findAgency(FeedScopedId id) {
-    return this.transitRepository.findAgencyById(id);
-  }
-
-  @Override
   public FeedInfo getFeedInfo(String feedId) {
     return this.transitRepository.getFeedInfo(feedId);
   }
