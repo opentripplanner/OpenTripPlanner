@@ -2,10 +2,6 @@ package org.opentripplanner.graph_builder.module.boardinglocations.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.OSM;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
@@ -19,7 +15,6 @@ import org.opentripplanner.graph_builder.module.boardinglocations.LinkedGraph;
 import org.opentripplanner.osm.TestOsmProvider;
 import org.opentripplanner.osm.model.OsmWayBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -43,15 +38,8 @@ class PlatformAreaTest {
     var eastStop = test.stop("east", SOUTH_WEST.moveNorthMeters(4).moveEastMeters(30));
 
     var result = test.build();
-    var west = result.boardingLocation(westStop);
-    var east = result.boardingLocation(eastStop);
-
-    assertNotSame(west, east, "each stop should get its own boarding location");
-    assertEquals(0, result.distanceFromStop(westStop), 0.1);
-    assertEquals(0, result.distanceFromStop(eastStop), 0.1);
 
     // Both are registered as visibility vertices of the platform, so they see each other directly.
-    assertTrue(west.isConnected(east), "the two stops should be connected across the platform");
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
       .containsExactly(
@@ -76,6 +64,11 @@ class PlatformAreaTest {
         "(53.550036,10.000454) → (53.550036,10.000151) PEDESTRIAN ♿✅",
         "(53.550036,10.000151)[F:west] linked to (53.550036,10.000151)"
       );
+    // The summary only shows coordinates: the vertex the stop is linked to must be the one that
+    // carries the visibility edges, not a co-located one.
+    assertWithMessage("the two stops should be connected across the platform")
+      .that(result.boardingLocation(westStop).isConnected(result.boardingLocation(eastStop)))
+      .isTrue();
     assertThat(result.issueTypes()).isEmpty();
   }
 
@@ -91,11 +84,30 @@ class PlatformAreaTest {
 
     var result = test.build();
 
-    assertEquals(
-      result.boardingLocation(westStop),
-      result.boardingLocation(eastStop),
-      "both stops should share the platform centroid"
-    );
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.550036,10.000303) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550036,10.000303) linked to (53.550036,10.000454)[F:east]",
+        "(53.550036,10.000303) linked to (53.550036,10.000151)[F:west]",
+        "(53.55,10) → (53.550036,10.000303) PEDESTRIAN ♿✅",
+        "(53.550036,10.000454)[F:east] linked to (53.550036,10.000303)",
+        "(53.550036,10.000151)[F:west] linked to (53.550036,10.000303)",
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.550072,10.000606) PEDESTRIAN ♿✅"
+      );
+    // A second, co-located centroid would print the same coordinates.
+    assertWithMessage("both stops should share the platform centroid")
+      .that(result.boardingLocation(westStop))
+      .isSameInstanceAs(result.boardingLocation(eastStop));
   }
 
   /**
@@ -112,22 +124,7 @@ class PlatformAreaTest {
 
     var result = test.build();
 
-    assertEquals(0, result.distanceFromStop(outsideStop), 0.1, "the stop must not be moved");
-
-    var connectors = result.connectors(outsideStop);
-    assertEquals(1, connectors.size(), "one edge onto the platform");
-    assertTrue(
-      connectors.getFirst().getDistanceMeters() < 1,
-      "a 5 cm discrepancy should cost a centimetre-scale walk, but was " +
-        connectors.getFirst().getDistanceMeters()
-    );
-
-    var accessPoint = connectors.getFirst().getToVertex();
-    assertEquals(
-      result.areaEdgeCount(result.boardingLocation(insideStop)),
-      result.areaEdgeCount(accessPoint),
-      "the access point should be as well connected as a stop inside the platform"
-    );
+    // The access point is as well connected as the boarding location placed inside.
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
       .containsExactly(
@@ -154,6 +151,16 @@ class PlatformAreaTest {
         "(53.55,10.000454) → (53.550002,10.000454) PEDESTRIAN ♿✅",
         "(53.550002,10.000454) → (53.55,10.000454) PEDESTRIAN ♿✅"
       );
+    // The length is not part of the edge summary above.
+    var connector = result.connectors(outsideStop).getFirst();
+    // The summary only shows coordinates: the connector must lead to the vertex the area edges
+    // start from, not to a co-located one.
+    assertWithMessage("the access point should be as well connected as a stop inside the platform")
+      .that(result.areaEdgeCount(connector.getToVertex()))
+      .isEqualTo(result.areaEdgeCount(result.boardingLocation(insideStop)));
+    assertWithMessage("a 5 cm discrepancy should cost a centimetre-scale walk")
+      .that(connector.getDistanceMeters())
+      .isLessThan(1.0);
     assertThat(result.issueTypes()).isEmpty();
   }
 
@@ -168,13 +175,31 @@ class PlatformAreaTest {
 
     var result = test.build();
 
-    assertEquals(0, result.distanceFromStop(farStop), 0.1, "the stop must not be moved");
-    assertEquals(
-      30,
-      result.connectors(farStop).getFirst().getDistanceMeters(),
-      1,
-      "the walk onto the platform should be the real distance"
-    );
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.54973,10.000303)[F:far] linked to (53.54973,10.000303)",
+        "(53.54973,10.000303) linked to (53.54973,10.000303)[F:far]",
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550002,10.000303) PEDESTRIAN ♿✅",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550002,10.000303) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000606) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.55,10.000606) PEDESTRIAN ♿✅",
+        "(53.550072,10.000606) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.550072,10.000606) PEDESTRIAN ♿✅",
+        "(53.54973,10.000303) → (53.550002,10.000303) PEDESTRIAN ♿✅",
+        "(53.550002,10.000303) → (53.54973,10.000303) PEDESTRIAN ♿✅"
+      );
+    // The length is not part of the edge summary above.
+    assertWithMessage("the walk onto the platform should be the real distance")
+      .that(result.connectors(farStop).getFirst().getDistanceMeters())
+      .isWithin(1)
+      .of(30);
     assertThat(result.issueTypes()).contains("StopFarFromBoardingLocation");
   }
 
@@ -191,12 +216,33 @@ class PlatformAreaTest {
 
     var result = test.build();
 
-    assertEquals(
-      2.2,
-      result.connectors(besideStop).getFirst().getDistanceMeters(),
-      0.3,
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.54982,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.003027) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.550002,10.000151) PEDESTRIAN ♿✅",
+        "(53.54982,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.003027) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.550002,10.000151) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.003027) → (53.550072,10.003027) PEDESTRIAN ♿✅",
+        "(53.550072,10.003027) → (53.55,10.003027) PEDESTRIAN ♿✅",
+        "(53.549982,10.000151) → (53.550002,10.000151) PEDESTRIAN ♿✅",
+        "(53.549982,10.000151) linked to (53.549982,10.000151)[F:beside]",
+        "(53.550002,10.000151) → (53.549982,10.000151) PEDESTRIAN ♿✅",
+        "(53.549982,10.000151)[F:beside] linked to (53.549982,10.000151)",
+        "(53.550072,10.003027) → (53.550072,10) PEDESTRIAN ♿✅",
+        "(53.550072,10) → (53.550072,10.003027) PEDESTRIAN ♿✅"
+      );
+    // The length is not part of the edge summary above.
+    assertWithMessage(
       "the access point should sit next to the stop, not where an oblique line crosses the boundary"
-    );
+    )
+      .that(result.connectors(besideStop).getFirst().getDistanceMeters())
+      .isWithin(0.3)
+      .of(2.2);
   }
 
   /**
@@ -219,16 +265,8 @@ class PlatformAreaTest {
     var outsideStop = test.stop("outside", SOUTH_WEST.moveSouthMeters(3).moveEastMeters(20));
 
     var result = test.build();
-    var connector = result.connectors(outsideStop).getFirst();
 
-    assertFalse(
-      connector.isWheelchairAccessible(),
-      "a platform tagged wheelchair=no must not produce an accessible connector"
-    );
-    assertFalse(
-      connector.getPermission().allows(StreetTraversalPermission.BICYCLE),
-      "a platform tagged bicycle=no must not produce a cyclable connector"
-    );
+    // The connector to the access point is pedestrian-only and not wheelchair accessible.
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
       .containsExactly(
@@ -250,11 +288,9 @@ class PlatformAreaTest {
         "(53.550002,10.000303) → (53.549973,10.000303) PEDESTRIAN ♿❌"
       );
     // The safety factor is not part of the edge summary above.
-    assertEquals(
-      areaEdgeOf(result, outsideStop).getWalkSafetyFactor(),
-      connector.getWalkSafetyFactor(),
-      "the connector should inherit the platform's walk safety factor"
-    );
+    assertWithMessage("the connector should inherit the platform's walk safety factor")
+      .that(result.connectors(outsideStop).getFirst().getWalkSafetyFactor())
+      .isEqualTo(areaEdgeOf(result, outsideStop).getWalkSafetyFactor());
   }
 
   /** One of the area's own edges, to compare the connector's inherited properties against. */

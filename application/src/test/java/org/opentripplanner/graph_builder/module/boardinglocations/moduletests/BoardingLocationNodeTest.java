@@ -2,8 +2,6 @@ package org.opentripplanner.graph_builder.module.boardinglocations.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.OSM;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
 
@@ -32,17 +30,6 @@ class BoardingLocationNodeTest {
 
     var result = test.build();
 
-    assertEquals(0, result.distanceFromStop(stop), 0.1, "the stop must not be moved to the node");
-
-    var connectors = result.connectors(stop);
-    assertEquals(1, connectors.size(), "one edge to the node");
-    assertEquals(
-      20,
-      connectors.getFirst().getDistanceMeters(),
-      0.5,
-      "the 20 m offset must cost its real distance"
-    );
-
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
       .containsExactly(
@@ -55,14 +42,17 @@ class BoardingLocationNodeTest {
         "(53.55018,10)[F:node-stop] linked to (53.55018,10)",
         "(53.55018,10) linked to (53.55018,10)[F:node-stop]"
       );
-
-    var osmNode = connectors.getFirst().getToVertex();
-    assertEquals(NODE.asJtsCoordinate(), osmNode.getCoordinate(), "the OSM node must not be moved");
-    assertInstanceOf(
-      OsmBoardingLocationVertex.class,
-      osmNode,
-      "the stop should reach the tagged node, but reached a " + osmNode.getClass().getSimpleName()
-    );
+    // The length is the point of TRANSIT mode and is not part of the edge summary above.
+    assertWithMessage("the 20 m offset must cost its real distance")
+      .that(result.connectors(stop).getFirst().getDistanceMeters())
+      .isWithin(0.5)
+      .of(20);
+    // The summary only shows coordinates: make sure the vertex at the node is the node itself.
+    var osmNode = result.connectors(stop).getFirst().getToVertex();
+    assertThat(osmNode).isInstanceOf(OsmBoardingLocationVertex.class);
+    assertWithMessage("the OSM node must not be moved")
+      .that(osmNode.getCoordinate())
+      .isEqualTo(NODE.asJtsCoordinate());
     assertThat(result.issueTypes()).contains("StopFarFromBoardingLocation");
   }
 
@@ -73,15 +63,20 @@ class BoardingLocationNodeTest {
   @Test
   void osmModeLinksTheStopStraightToTheNode() {
     var test = BoardingLocationsEnvironment.of(OSM, footwayWithNode("node-stop"));
-    var stop = test.stop("node-stop", NODE.moveNorthMeters(20));
+    test.stop("node-stop", NODE.moveNorthMeters(20));
 
     var result = test.build();
 
-    assertEquals(
-      NODE.asJtsCoordinate(),
-      result.boardingLocation(stop).getCoordinate(),
-      "the stop should be linked at the node"
-    );
+    assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
+      .that(result.summarizeEdges())
+      .containsExactly(
+        "(53.55,10) → (53.55,9.999546) PEDESTRIAN ♿✅",
+        "(53.55,10) → (53.55,10.000454) PEDESTRIAN ♿✅",
+        "(53.55,10) linked to (53.55018,10)[F:node-stop]",
+        "(53.55,9.999546) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55,10.000454) → (53.55,10) PEDESTRIAN ♿✅",
+        "(53.55018,10)[F:node-stop] linked to (53.55,10)"
+      );
   }
 
   /**

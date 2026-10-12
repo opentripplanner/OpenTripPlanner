@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.edge.Edge;
@@ -57,14 +56,6 @@ public record LinkedGraph(Graph rawGraph, DefaultDataImportIssueStore issueStore
   /** How many visibility edges a boarding location has into its platform area. */
   public long areaEdgeCount(Vertex vertex) {
     return GraphSummarizer.outgoingAreaEdges(vertex).size();
-  }
-
-  /** How far the boarding location ended up from the stop's own coordinate. */
-  public double distanceFromStop(RegularStop stop) {
-    return SphericalDistanceLibrary.distance(
-      boardingLocation(stop).getCoordinate(),
-      stop.getCoordinate().asJtsCoordinate()
-    );
   }
 
   /** Every edge in the graph as a readable string, to assert the shape of the linking against. */

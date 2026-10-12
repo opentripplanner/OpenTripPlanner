@@ -2,9 +2,6 @@ package org.opentripplanner.graph_builder.module.boardinglocations.moduletests;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.OSM;
 import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinateSource.TRANSIT;
 import static org.opentripplanner.osm.model.NodeBuilder.node;
@@ -33,8 +30,6 @@ class PlatformWayTest {
 
     var result = test.build();
 
-    assertEquals(0, result.distanceFromStop(stop), 0.1, "the stop must not be moved");
-
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
       .containsExactly(
@@ -50,13 +45,16 @@ class PlatformWayTest {
         "(53.550108,10.002271)[F:off-the-way] linked to (53.550108,10.002271)"
       );
 
-    // One connector per traversal direction of the way, each carrying the real offset. The length
-    // is the point of TRANSIT mode and is not part of the edge summary above.
-    var connectors = result.connectors(stop);
-    assertEquals(2, connectors.size(), "one connector per traversal direction");
-    connectors.forEach(c ->
-      assertEquals(12, c.getDistanceMeters(), 0.5, "the offset onto the platform costs its length")
-    );
+    // Each connector carries the real offset. The length is the point of TRANSIT mode and is not
+    // part of the edge summary above.
+    result
+      .connectors(stop)
+      .forEach(c ->
+        assertWithMessage("the offset onto the platform costs its length")
+          .that(c.getDistanceMeters())
+          .isWithin(0.5)
+          .of(12)
+      );
     assertThat(result.issueTypes()).contains("StopFarFromBoardingLocation");
   }
 
@@ -149,11 +147,10 @@ class PlatformWayTest {
 
     var test = BoardingLocationsEnvironment.of(TRANSIT, provider);
     // The stop sits exactly on the platform way's western end, which an unrelated footway shares.
-    var stop = test.stop("on-the-end", WEST_END);
+    test.stop("on-the-end", WEST_END);
 
     var result = test.build();
 
-    assertFalse(result.linkedVertices(stop).isEmpty(), "the stop should be linked");
     // No split vertex: the platform way and the footway are still one edge pair each.
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
@@ -200,18 +197,11 @@ class PlatformWayTest {
       .build();
 
     var test = BoardingLocationsEnvironment.of(TRANSIT, provider);
-    var stop = test.stop("both-ways", WEST_END.moveNorthMeters(4).moveEastMeters(20));
+    test.stop("both-ways", WEST_END.moveNorthMeters(4).moveEastMeters(20));
 
     var result = test.build();
 
-    assertFalse(
-      result.linkedVertices(stop).isEmpty(),
-      "the stop should fall back to the area platform, not be left unlinked by the way path"
-    );
-    assertTrue(
-      result.areaEdgeCount(result.boardingLocation(stop)) > 0,
-      "the stop should be linked into the platform area"
-    );
+    // The stop is linked into the platform area, not left unlinked by the car-only way.
     assertWithMessage("Unexpected edges. Check graph at %s", result.geoJsonUrl())
       .that(result.summarizeEdges())
       .containsExactly(
