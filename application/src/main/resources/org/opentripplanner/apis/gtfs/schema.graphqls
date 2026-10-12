@@ -243,6 +243,12 @@ type ArrivalDepartureTime {
   arrival: OffsetDateTime
   "Departure time as an ISO-8601-formatted datetime."
   departure: OffsetDateTime
+  """
+  If set to `true`, indicates that arrival and departure times for a stop are strictly adhered to by the vehicle.
+    
+  If set to `false` then times are approximated.
+  """
+  timePoint: Boolean!
 }
 
 "Bike park represents a location where bicycles can be parked."
