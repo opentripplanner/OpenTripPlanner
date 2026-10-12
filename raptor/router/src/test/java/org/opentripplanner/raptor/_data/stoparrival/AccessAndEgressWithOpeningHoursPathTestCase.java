@@ -318,7 +318,6 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     return new DestinationArrival<>(
       egressPath,
       prevArrival,
-      RaptorConstants.ZERO,
       arrivalTime,
       additionalCost,
       RaptorConstants.NOT_SET
@@ -364,7 +363,6 @@ public class AccessAndEgressWithOpeningHoursPathTestCase implements RaptorTestCo
     return new DestinationArrival<>(
       accessPath,
       prevArrival,
-      RaptorConstants.ZERO,
       arrivalTime,
       additionalCost,
       RaptorConstants.NOT_SET

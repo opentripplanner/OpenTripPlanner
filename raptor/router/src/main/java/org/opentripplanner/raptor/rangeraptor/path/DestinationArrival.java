@@ -31,79 +31,24 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   private final ArrivalView<T> previous;
   private final RaptorAccessEgress egress;
-  private int iterationDepartureTime;
-  private int arrivalTime;
+  private final int arrivalTime;
+  private final int numberOfTransfers;
+  private final int c1;
+  private final int c2;
 
-  private int numberOfTransfers;
-  private int c1;
-  private int c2;
-
-  /**
-   * @param arrivalTime The destination arrival time. If the egress has a time-penalty, the time
-   *                    already includes it, since Raptor decorates the egress and adds the
-   *                    penalty to the egress duration. It is the time used for comparison.
-   */
   public DestinationArrival(
     RaptorAccessEgress egress,
     ArrivalView<T> previous,
-    int iterationDepartureTime,
     int arrivalTime,
     int additionalC1,
     int c2
   ) {
     this.previous = previous;
     this.egress = egress;
-    this.iterationDepartureTime = iterationDepartureTime;
     this.arrivalTime = arrivalTime;
-    // transit-only transfers; egress rides are added dynamically via round()
     this.numberOfTransfers = previous.round() - 1;
     this.c1 = previous.c1() + additionalC1;
     this.c2 = c2;
-  }
-
-  /**
-   * Create a mutable probe for pareto qualification checks only. The probe has no arrival chain
-   * ({@link #previous()} returns {@code null}) and must never be used for path building or be
-   * added to a pareto set. Create ONE probe and reuse it with {@link #setProbeValues}; this
-   * avoids allocating an object for every qualification check.
-   * <p>
-   * A probe is mutable and NOT thread-safe. Do not share a probe between threads; create one
-   * probe per thread if qualification checks are run in parallel.
-   */
-  static <T extends RaptorTripSchedule> DestinationArrival<T> createProbe() {
-    return new DestinationArrival<>();
-  }
-
-  /** Used by {@link #createProbe()} only. */
-  private DestinationArrival() {
-    this.previous = null;
-    this.egress = null;
-  }
-
-  /**
-   * Set the criteria values of a probe created with {@link #createProbe()}. Real arrivals are
-   * immutable in practice, so this is only allowed on a probe. Not thread-safe, see
-   * {@link #createProbe()}.
-   */
-  void setProbeValues(
-    int iterationDepartureTime,
-    int arrivalTime,
-    int numberOfTransfers,
-    int c1,
-    int c2
-  ) {
-    if (previous != null || egress != null) {
-      throw new IllegalStateException("Only a probe may be modified.");
-    }
-    this.iterationDepartureTime = iterationDepartureTime;
-    this.arrivalTime = arrivalTime;
-    this.numberOfTransfers = numberOfTransfers;
-    this.c1 = c1;
-    this.c2 = c2;
-  }
-
-  public int iterationDepartureTime() {
-    return iterationDepartureTime;
   }
 
   @Override
@@ -113,12 +58,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   @Override
   public int round() {
-    return 1 + numberOfTransfers + (egress != null ? egress.numberOfRides() : 0);
-  }
-
-  @Override
-  public int numberOfTransfers() {
-    return round() - 1;
+    return 1 + numberOfTransfers + egress.numberOfRides();
   }
 
   @Override

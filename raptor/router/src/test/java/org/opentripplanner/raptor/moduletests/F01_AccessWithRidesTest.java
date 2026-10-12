@@ -75,11 +75,12 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
       .add(TC_STANDARD_ONE, expWalkAccess)
       .add(
         multiCriteria(),
-        // The DestinationArrival pareto set uses (arrivalTimeIP, transfers, c1) without duration.
-        // "Flex 3m" (Tₙ2, C₁1_500) is dominated by "Flex+Walk 2m" (Tₙ2, C₁1_499) on cost.
-        // "Flex+Walk 7m" (Tₙ1, C₁1_500) is dominated by "Walk 10m" (Tₙ0, C₁1_500) on transfers.
-        // Lowest cost among Tₙ2
+        // Latest departure time
+        "Flex 3m Rₙ2 ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m Tₙ2 C₁1_500]",
+        // Lowest cost
         "Flex+Walk 2m Rₙ2 ~ C ~ BUS R1 0:12 0:20 ~ F ~ Walk 1m [0:09 0:21 12m Tₙ2 C₁1_499]",
+        // Lowest num-of-transfers + time
+        "Flex+Walk 7m Rₙ1 ~ E ~ BUS R1 0:16 0:20 ~ F ~ Walk 1m [0:08 0:21 13m Tₙ1 C₁1_500]",
         // Lowest num-of-transfers
         "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m Tₙ0 C₁1_500]"
       )

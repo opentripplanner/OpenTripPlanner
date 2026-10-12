@@ -104,14 +104,14 @@ public class PathParetoSetComparatorsTest {
   ) {
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, NORMAL, ANY, ANY, LARGE, ANY),
-        new TestRaptorPath(ANY, SMALL, ANY, ANY, ANY, ANY)
+        new TestRaptorPath(ANY, NORMAL, ANY, ANY, ANY, LARGE, ANY),
+        new TestRaptorPath(ANY, SMALL, ANY, ANY, ANY, ANY, ANY)
       )
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, NORMAL, ANY, ANY, LARGE, ANY),
-        new TestRaptorPath(ANY, LARGE, ANY, ANY, ANY, ANY)
+        new TestRaptorPath(ANY, NORMAL, ANY, ANY, ANY, LARGE, ANY),
+        new TestRaptorPath(ANY, LARGE, ANY, ANY, ANY, ANY, ANY)
       )
     );
   }
@@ -125,14 +125,14 @@ public class PathParetoSetComparatorsTest {
     // Verify that bigger rangeRaptorIterationDepartureTime always wins
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(NORMAL, ANY, ANY, ANY, LARGE, ANY),
-        new TestRaptorPath(SMALL, ANY, ANY, ANY, ANY, ANY)
+        new TestRaptorPath(NORMAL, ANY, ANY, ANY, ANY, LARGE, ANY),
+        new TestRaptorPath(SMALL, ANY, ANY, ANY, ANY, ANY, ANY)
       )
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new TestRaptorPath(NORMAL, ANY, ANY, ANY, LARGE, ANY),
-        new TestRaptorPath(LARGE, ANY, ANY, ANY, ANY, ANY)
+        new TestRaptorPath(NORMAL, ANY, ANY, ANY, ANY, LARGE, ANY),
+        new TestRaptorPath(LARGE, ANY, ANY, ANY, ANY, ANY, ANY)
       )
     );
   }
@@ -146,14 +146,14 @@ public class PathParetoSetComparatorsTest {
     //  Verify that lower endTime always wins
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, NORMAL, ANY, LARGE, ANY),
-        new TestRaptorPath(ANY, ANY, LARGE, ANY, SMALL, ANY)
+        new TestRaptorPath(ANY, ANY, NORMAL, ANY, ANY, LARGE, ANY),
+        new TestRaptorPath(ANY, ANY, LARGE, ANY, ANY, SMALL, ANY)
       )
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, NORMAL, ANY, LARGE, ANY),
-        new TestRaptorPath(ANY, ANY, SMALL, ANY, SMALL, ANY)
+        new TestRaptorPath(ANY, ANY, NORMAL, ANY, ANY, LARGE, ANY),
+        new TestRaptorPath(ANY, ANY, SMALL, ANY, ANY, SMALL, ANY)
       )
     );
   }
@@ -166,14 +166,14 @@ public class PathParetoSetComparatorsTest {
   ) {
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, NORMAL, LARGE, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, LARGE, SMALL, ANY)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, LARGE, ANY),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, LARGE, SMALL, ANY)
       )
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, NORMAL, LARGE, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, SMALL, SMALL, ANY)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, LARGE, ANY),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, SMALL, SMALL, ANY)
       )
     );
   }
@@ -184,14 +184,14 @@ public class PathParetoSetComparatorsTest {
   private void verifyC1Comparator(ParetoComparator<RaptorPath<RaptorTripSchedule>> comparator) {
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, LARGE, ANY)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, ANY),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, LARGE, ANY)
       )
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, SMALL, ANY)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, ANY),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, SMALL, ANY)
       )
     );
   }
@@ -204,38 +204,38 @@ public class PathParetoSetComparatorsTest {
   ) {
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, SMALL, NORMAL),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, NORMAL)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, SMALL, NORMAL),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, NORMAL)
       ),
       "c1 is optimal, c2 is not => path is optimal"
     );
     assertTrue(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, RELAXED, SMALL),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, NORMAL)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, RELAXED, SMALL),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, NORMAL)
       ),
       "c2 is optimal, c1 is within relaxed limit => path is optimal"
     );
     assertFalse(
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, RELAXED, ANY),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, ANY)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, RELAXED, ANY),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, ANY)
       ),
       "c2 is not optimal, c1 is within relaxed limit => path is NOT optimal"
     );
     assertFalse(
       // c2 is optimal, but c1 is not within relaxed limit
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, LARGE, SMALL),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, NORMAL)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, LARGE, SMALL),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, NORMAL)
       ),
       "c2 is optimal, c1 is not within relaxed limit => path is NOT optimal"
     );
     assertFalse(
       // c1 and c2 is not optimal (they are equal)
       comparator.leftDominanceExist(
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, NORMAL),
-        new TestRaptorPath(ANY, ANY, ANY, ANY, NORMAL, NORMAL)
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, NORMAL),
+        new TestRaptorPath(ANY, ANY, ANY, ANY, ANY, NORMAL, NORMAL)
       ),
       "c1 and c2 is not optimal"
     );

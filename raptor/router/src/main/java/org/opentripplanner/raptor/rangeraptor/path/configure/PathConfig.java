@@ -7,8 +7,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalParetoSetComparators;
+import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.PathMapper;
@@ -29,53 +28,32 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
+public class PathConfig<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> ctx;
 
-  public DestinationArrivalConfig(SearchContext<T> context) {
+  public PathConfig(SearchContext<T> context) {
     this.ctx = context;
   }
 
   public DestinationArrivalPaths<T> createDestArrivalPathsStdSearch() {
-    ParetoComparator<DestinationArrival<T>> comparator =
-      DestinationArrivalParetoSetComparators.paretoComparator(
-        paretoSetTimeConfig(),
-        ParetoSetCost.NONE,
-        null,
-        null
-      );
-    return DestinationArrivalPaths.forStdRaptor(
-      comparator,
-      ctx.calculator(),
-      null,
-      ctx.slackProvider(),
-      createPathMapper(false),
-      ctx.debugFactory(),
-      ctx.stopNameResolver(),
-      ctx.lifeCycle()
+    return createDestArrivalPaths(
+      ParetoSetCost.NONE,
+      createPathParetoComparator(ParetoSetCost.NONE, DominanceFunction.noop())
     );
   }
 
   /**
-   * Create a {@link DestinationArrivalPaths} for McRaptor (lazy path building).
-   *
+   * Create a new {@link DestinationArrivalPaths}.
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param c2Comp     Dominance function for c2; {@code null} means c2 is not used.
+   * @param c2Comp c2 comparator function to be used in the pareto set criteria. If c2 comparator is null
+   *               then no c2 comparison will be used.
    */
-  public DestinationArrivalPaths<T> createMcDestArrivalPaths(
+  public DestinationArrivalPaths<T> createDestArrivalPaths(
     ParetoSetCost costConfig,
-    DominanceFunction c2Comp
+    ParetoComparator<RaptorPath<T>> comparator
   ) {
-    var relaxC1 = ctx.multiCriteria().relaxC1();
-    ParetoComparator<DestinationArrival<T>> comparator =
-      DestinationArrivalParetoSetComparators.paretoComparator(
-        paretoSetTimeConfig(),
-        costConfig,
-        relaxC1,
-        c2Comp
-      );
-    return DestinationArrivalPaths.forMcRaptor(
+    return new DestinationArrivalPaths<>(
       comparator,
       ctx.calculator(),
       costConfig.useC1() ? ctx.costCalculator() : null,
@@ -101,14 +79,12 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
     boolean preferLatestDeparture =
       ctx.searchParams().preferLateArrival() != ctx.searchDirection().isInReverse();
 
-    if (ctx.searchParams().timetable()) {
-      return ctx.searchDirection().isInReverse()
-        ? ParetoSetTime.USE_TIMETABLE_REVERSE
-        : ParetoSetTime.USE_TIMETABLE;
-    }
-    return preferLatestDeparture
-      ? ParetoSetTime.USE_DEPARTURE_TIME
-      : ParetoSetTime.USE_ARRIVAL_TIME;
+    ParetoSetTime timeConfig = ctx.searchParams().timetable()
+      ? ParetoSetTime.USE_TIMETABLE
+      : preferLatestDeparture
+        ? ParetoSetTime.USE_DEPARTURE_TIME
+        : ParetoSetTime.USE_ARRIVAL_TIME;
+    return timeConfig;
   }
 
   private PathMapper<T> createPathMapper(boolean includeCost) {
@@ -117,7 +93,8 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
       ctx.raptorSlackProvider(),
       includeCost ? ctx.costCalculator() : null,
       ctx.stopNameResolver(),
-      ctx.transitData().transferConstraintsSearch()
+      ctx.transitData().transferConstraintsSearch(),
+      ctx.lifeCycle()
     );
   }
 
@@ -126,14 +103,16 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider,
     RaptorCostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
-    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch
+    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
+    WorkerLifeCycle lifeCycle
   ) {
     return searchDirection.isForward()
       ? new ForwardPathMapper<>(
           slackProvider,
           costCalculator,
           stopNameResolver,
-          txConstraintsSearch
+          txConstraintsSearch,
+          lifeCycle
         )
       : new ReversePathMapper<>(
           slackProvider,

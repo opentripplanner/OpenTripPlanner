@@ -21,6 +21,7 @@ public record TestRaptorPath(
   int rangeRaptorIterationDepartureTime,
   int startTimeInclusivePenalty,
   int endTimeInclusivePenalty,
+  int durationInclusivePenaltyInSeconds,
   int numberOfTransfers,
   int c1,
   int c2
