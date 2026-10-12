@@ -16,16 +16,16 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * Enriches scheduled itineraries with real-time data to reflect changes to previously planned journeys.
+ * This helps users understand why a journey may no longer be feasible or optimal compared to when it was originally searched
+ */
 public class RealtimeResolver {
 
   private final RefetchItineraryService refetchItineraryService;
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
 
-  /**
-   * Enriches scheduled itineraries with real-time data to reflect changes to previously planned journeys.
-   * This helps users understand why a journey may no longer be feasible or optimal compared to when it was originally searched
-   */
   public RealtimeResolver(
     RefetchItineraryService refetchItineraryService,
     TransitService transitService,
