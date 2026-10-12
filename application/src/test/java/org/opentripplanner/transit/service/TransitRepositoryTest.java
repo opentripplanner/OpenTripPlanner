@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
@@ -8,7 +9,9 @@ import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.r
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.stopPattern;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.tripPattern;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -22,6 +25,7 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -121,6 +125,38 @@ class TransitRepositoryTest {
     var stop = TransitRepositoryForTest.of().stop("stop-1").build();
     repo.addScheduledStopPointMapping(Map.of(sspId, stop));
     assertEquals(stop, repo.findStopByScheduledStopPoint(sspId).get());
+  }
+
+  @Test
+  void findAgencyById() {
+    var repo = new TransitRepository();
+    var agency = TransitRepositoryForTest.AGENCY;
+    repo.addAgency(agency);
+    repo.index();
+
+    assertEquals(Optional.of(agency), repo.findAgencyById(agency.getId()));
+    assertEquals(Optional.empty(), repo.findAgencyById(id("unknown-agency")));
+  }
+
+  @Test
+  void getOperator() {
+    var repo = new TransitRepository();
+    var operator = Operator.of(id("operator-1")).withName("Operator 1").build();
+    repo.index();
+    // Adding operators invalidates the index, so they are found after re-indexing
+    repo.addOperators(List.of(operator));
+    repo.index();
+
+    assertEquals(operator, repo.getOperator(operator.getId()));
+    assertNull(repo.getOperator(id("unknown-operator")));
+  }
+
+  @Test
+  void lookupsRequireIndex() {
+    var repo = new TransitRepository();
+
+    assertThrows(IllegalStateException.class, () -> repo.findAgencyById(id("agency")));
+    assertThrows(IllegalStateException.class, () -> repo.getOperator(id("operator")));
   }
 
   @Test

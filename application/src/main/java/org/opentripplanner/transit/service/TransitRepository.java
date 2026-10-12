@@ -300,8 +300,18 @@ public class TransitRepository implements Serializable {
     return Collections.unmodifiableCollection(operators);
   }
 
+  /**
+   * Return the operator for the given id, or {@code null} if there is none. Requires the
+   * repository to be indexed, see {@link #index()}.
+   */
+  @Nullable
+  public Operator getOperator(FeedScopedId id) {
+    return requireIndex().getOperatorForId(id);
+  }
+
   public void addOperators(Collection<Operator> operators) {
     assertModificationsAllowed();
+    invalidateIndex();
     this.operators.addAll(operators);
   }
 
@@ -455,11 +465,12 @@ public class TransitRepository implements Serializable {
     return !tripCalendars.isEmpty();
   }
 
+  /**
+   * Return the agency for the given id. Requires the repository to be indexed, see
+   * {@link #index()}.
+   */
   public Optional<Agency> findAgencyById(FeedScopedId id) {
-    return agencies
-      .stream()
-      .filter(a -> a.getId().equals(id))
-      .findAny();
+    return Optional.ofNullable(requireIndex().getAgencyForId(id));
   }
 
   /**
@@ -570,6 +581,13 @@ public class TransitRepository implements Serializable {
         .toList()
     );
     return stopLocations;
+  }
+
+  private TransitRepositoryIndex requireIndex() {
+    if (index == null) {
+      throw new IllegalStateException("The transit repository is not indexed, call index() first.");
+    }
+    return index;
   }
 
   private void invalidateIndex() {
