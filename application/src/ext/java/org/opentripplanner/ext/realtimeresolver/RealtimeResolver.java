@@ -22,6 +22,10 @@ public class RealtimeResolver {
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
 
+  /**
+   * Enriches scheduled itineraries with real-time data to reflect changes to previously planned journeys.
+   * This helps users understand why a journey may no longer be feasible or optimal compared to when it was originally searched
+   */
   public RealtimeResolver(
     RefetchItineraryService refetchItineraryService,
     TransitService transitService,
@@ -74,7 +78,7 @@ public class RealtimeResolver {
 
     boolean hasItineraryStopsChanged = hasItineraryStopsChanged(itinerary);
 
-    //We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
+    // We only call refetchItineraryService if any change has been made of stop places, due to performance reasons since refetch can be heavy.
     if (hasItineraryStopsChanged) {
       return refetchItineraryService.refetchItinerary(
         fromLocation,
