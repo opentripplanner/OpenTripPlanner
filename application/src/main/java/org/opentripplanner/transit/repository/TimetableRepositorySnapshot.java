@@ -197,65 +197,6 @@ public interface TimetableRepositorySnapshot {
   boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 
   /**
-   * Return the route created by a realtime update for the given id, or null if no route was added
-   * with this id.
-   */
-  @Nullable
-  Route getRealtimeAddedRoute(FeedScopedId id);
-
-  /**
-   * List all routes created by realtime updates, that is routes which are not present in the
-   * scheduled data.
-   */
-  Collection<Route> listRealTimeAddedRoutes();
-
-  /**
-   * Return the trip created by a realtime update for the given id, or null if no trip was added
-   * with this id.
-   */
-  @Nullable
-  Trip getRealTimeAddedTrip(FeedScopedId id);
-
-  /**
-   * List all trips created by realtime updates, that is trips which are not present in the
-   * scheduled data.
-   */
-  Collection<Trip> listRealTimeAddedTrips();
-
-  /**
-   * Return the pattern created by a realtime update for the given realtime-added trip, or null if
-   * the trip is not realtime-added.
-   */
-  @Nullable
-  TripPattern getRealTimeAddedPatternForTrip(Trip trip);
-
-  /**
-   * Return the patterns created by realtime updates for the given route.
-   */
-  Collection<TripPattern> getRealTimeAddedPatternForRoute(Route route);
-
-  /**
-   * Return the trip-on-service-date created by a realtime update for the given id, or null if no
-   * trip-on-service-date was added with this id.
-   */
-  @Nullable
-  TripOnServiceDate getRealTimeAddedTripOnServiceDateById(FeedScopedId id);
-
-  /**
-   * Return the trip-on-service-date created by a realtime update for the given trip and service
-   * date, or null if the trip is not realtime-added on that date.
-   */
-  @Nullable
-  TripOnServiceDate getRealTimeAddedTripOnServiceDateForTripAndDay(
-    TripIdAndServiceDate tripIdAndServiceDate
-  );
-
-  /**
-   * List all trips-on-service-date created by realtime updates.
-   */
-  Collection<? extends TripOnServiceDate> listRealTimeAddedTripOnServiceDate();
-
-  /**
    * Return the raptor transit data that includes the realtime updates of this snapshot. This is
    * the transit data used for routing with this snapshot.
    */
