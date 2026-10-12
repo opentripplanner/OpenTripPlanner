@@ -4,14 +4,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.model.CarpoolTrip;
-import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.cost.CostLimit;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.search.state.State;
 
 /**
@@ -95,14 +93,14 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
 
     var walkToPickup = insertionCandidate.walkToPickup();
     var walkFromDropoff = insertionCandidate.walkFromDropoff();
-    int walkSeconds = (int) (GraphPathUtils.durationOrZero(walkToPickup).getSeconds() +
-      GraphPathUtils.durationOrZero(walkFromDropoff).getSeconds());
+    int walkSeconds = (int) (StreetPathUtils.durationOrZero(walkToPickup).getSeconds() +
+      StreetPathUtils.durationOrZero(walkFromDropoff).getSeconds());
     int rideSeconds = (int) insertionCandidate.getPassengerRideDuration().getSeconds();
     this.durationInSeconds = walkSeconds + rideSeconds;
     this.passengerArrivalTime = passengerDepartureTime + this.durationInSeconds;
 
     double walkWeight =
-      GraphPathUtils.weightOrZero(walkToPickup) + GraphPathUtils.weightOrZero(walkFromDropoff);
+      StreetPathUtils.weightOrZero(walkToPickup) + StreetPathUtils.weightOrZero(walkFromDropoff);
     double totalWeight = walkWeight + insertionCandidate.getPassengerRideWeight(carpoolReluctance);
     this.c1 = CostLimit.toRaptorCost(totalWeight) + penalty.cost().toCentiSeconds();
   }
@@ -273,10 +271,10 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
   public State getFinalState() {
     if (startLabel.stop() != null) {
       var firstSegment = walkToPickup() != null ? walkToPickup() : sharedSegments().getFirst();
-      return firstSegment.states.getFirst();
+      return firstSegment.states().getFirst();
     }
     var lastSegment = walkFromDropoff() != null ? walkFromDropoff() : sharedSegments().getLast();
-    return lastSegment.states.getLast();
+    return lastSegment.lastState();
   }
 
   /** Always {@code false}: a carpool leg, by definition, contains a vehicle ride. */
@@ -297,7 +295,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * is needed.
    */
   @Nullable
-  public GraphPath<State, Edge, Vertex> walkToPickup() {
+  public StreetPath walkToPickup() {
     return insertionCandidate.walkToPickup();
   }
 
@@ -306,7 +304,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * intermediate stops the driver makes along the way for other passengers). Never empty for a
    * valid leg.
    */
-  public List<GraphPath<State, Edge, Vertex>> sharedSegments() {
+  public List<StreetPath> sharedSegments() {
     return insertionCandidate.getSharedSegments();
   }
 
@@ -316,7 +314,7 @@ public class CarpoolAccessEgress implements RoutingAccessEgress {
    * walk is needed.
    */
   @Nullable
-  public GraphPath<State, Edge, Vertex> walkFromDropoff() {
+  public StreetPath walkFromDropoff() {
     return insertionCandidate.walkFromDropoff();
   }
 
