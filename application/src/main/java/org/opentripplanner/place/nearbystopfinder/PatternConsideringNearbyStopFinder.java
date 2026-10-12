@@ -3,15 +3,19 @@ package org.opentripplanner.place.nearbystopfinder;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.SiteRepository;
 
 /**
  * A {@link NearbyStopFinder} that filters nearby stops based on trip patterns and flex trips.
@@ -20,7 +24,7 @@ import org.opentripplanner.transit.service.TransitService;
  * them to include only stops that:
  * <ul>
  *   <li>Are served by trip patterns where boarding/alighting is possible, OR</li>
- *   <li>Are served by flex trips (if FlexRouting is enabled), OR</li>
+ *   <li>Are served by flex trips (if a flex index is given), OR</li>
  *   <li>Are sometimes used by real-time trips (if IncludeStopsUsedRealTimeInTransfers is enabled)</li>
  * </ul>
  * <p>
@@ -34,17 +38,26 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
 
   private final NearbyStopFinder delegateNearbyStopFinder;
 
-  private final TransitService transitService;
+  private final SiteRepository siteRepository;
 
+  /**
+   * @param patternsForStop the scheduled trip patterns visiting a stop
+   * @param flexIndex the flex trips to consider, or {@code null} to ignore flex trips (when flex
+   *                  routing is disabled)
+   */
   public PatternConsideringNearbyStopFinder(
-    TransitService transitService,
+    SiteRepository siteRepository,
+    Function<StopLocation, Collection<TripPattern>> patternsForStop,
+    @Nullable FlexIndex flexIndex,
     NearbyStopFinder delegateNearbyStopFinder
   ) {
-    this.transitService = transitService;
-    var builder = CompositeNearbyStopFilter.of().add(new PatternNearbyStopFilter(transitService));
+    this.siteRepository = siteRepository;
+    var builder = CompositeNearbyStopFilter.of().add(
+      new PatternNearbyStopFilter(siteRepository, patternsForStop)
+    );
 
-    if (OTPFeature.FlexRouting.isOn()) {
-      builder.add(new FlexTripNearbyStopFilter(transitService));
+    if (flexIndex != null) {
+      builder.add(new FlexTripNearbyStopFilter(flexIndex));
     }
     this.filter = builder.build();
     this.delegateNearbyStopFinder = delegateNearbyStopFinder;
@@ -99,7 +112,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   private Collection<NearbyStop> removeTransferNotAllowedStops(Collection<NearbyStop> nearbyStops) {
     return nearbyStops
       .stream()
-      .filter(s -> !transitService.getStopLocation(s.stopId()).transfersNotAllowed())
+      .filter(s -> !siteRepository.getStopLocation(s.stopId()).transfersNotAllowed())
       .toList();
   }
 }
