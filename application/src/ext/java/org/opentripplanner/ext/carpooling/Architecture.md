@@ -29,6 +29,7 @@ org.opentripplanner.ext.carpooling/
 │   ├── TripPreFilters       # Composite of pre-filters (AND)
 │   ├── ItineraryPostFilters # Composite of post-filters (AND)
 │   ├── TimeTripFilter       # Pre-filter: loose time-window check
+│   ├── CapacityTripFilter   # Pre-filter: a free seat on some leg
 │   ├── CorridorTripFilter   # Pre-filter: the trip's corridor reaches the passenger
 │   └── TimeItineraryFilter  # Post-filter: tight time-window enforcement
 ├── constraints/              # Post-routing constraints
@@ -52,6 +53,7 @@ Fast pre-screening, once the passenger is snapped to the street network, to elim
 trips using necessary conditions only (loose bounds); tight enforcement is deferred to the
 post-filter once actual times are known:
 - **TimeTripFilter**: the trip's time span overlaps the passenger's time window
+- **CapacityTripFilter**: the car has a free seat on some leg
 - **CorridorTripFilter**: the trip's corridor can reach the snapped passenger
   (`CarpoolCorridor.mayServe`)
 
