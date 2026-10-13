@@ -35,6 +35,7 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │  1. Filter Phase (TripPreFilters)         │
 │     (after snapping the passenger)         │
 │     - Time window check                    │
+│     - Free seat check                      │
 │     - Corridor reach check                 │
 │                                            │
 │  2. Insertion Phase                        │
@@ -81,6 +82,7 @@ org.opentripplanner.ext.carpooling/
 │   ├── ItineraryPostFilters.java   # Post-filter composite (AND, short-circuit)
 │   ├── SnappedPassenger.java       # The passenger's snapped pickup and dropoff
 │   ├── TimeTripFilter.java   # Pre-filter: depart-after & arrive-by time checks
+│   ├── CapacityTripFilter.java # Pre-filter: a free seat on some leg
 │   ├── CorridorTripFilter.java # Pre-filter: the trip's corridor reaches the passenger
 │   └── TimeItineraryFilter.java # Post-filter: depart-after & arrive-by enforcement
 │
@@ -120,7 +122,8 @@ org.opentripplanner.ext.carpooling/
 Once the passenger is snapped to the street network, filters eliminate obviously incompatible trips **without any further street routing**. They are necessary conditions only: they never reject a trip that could serve the passenger inside the passenger's window.
 
 1. **TimeTripFilter**: Can the trip be at the passenger's pickup or dropoff inside the passenger's window (depart-after or arrive-by)? The trip's span is taken as the insertion evaluation times it: from its start to its routed arrival at the destination plus the destination's deviation budget.
-2. **CorridorTripFilter** (`CarpoolCorridor.mayServe`): Can the trip's corridor reach the snapped passenger at all? A leg can only serve a point whose beeline detour, driven at the graph's maximum car speed, fits the leg's limit; direct requests check both the pickup and the dropoff.
+2. **CapacityTripFilter**: Does the car have a free seat on some leg? A car that is full all the way cannot take the passenger.
+3. **CorridorTripFilter** (`CarpoolCorridor.mayServe`): Can the trip's corridor reach the snapped passenger at all? A leg can only serve a point whose beeline detour, driven at the graph's maximum car speed, fits the leg's limit; direct requests check both the pickup and the dropoff.
 
 **Performance**: O(n) where n = number of active trips.
 
