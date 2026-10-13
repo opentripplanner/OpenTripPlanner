@@ -45,17 +45,6 @@ public class DefaultTransitRealTimeUpdateContext implements TransitRealTimeUpdat
     this.realtimeVehicleRepository = realtimeVehicleRepository;
   }
 
-  /**
-   * Constructor for unit tests only.
-   */
-  public DefaultTransitRealTimeUpdateContext(TransitRepository transitRepository) {
-    this(transitRepository, null, () -> {
-      throw new UnsupportedOperationException(
-        "The realtime-vehicle repository is not available in this test context"
-      );
-    });
-  }
-
   @Override
   public TimetableRepository timetableRepository() {
     return timetableRepository;

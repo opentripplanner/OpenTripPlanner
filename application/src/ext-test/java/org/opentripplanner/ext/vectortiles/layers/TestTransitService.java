@@ -5,13 +5,18 @@ import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class TestTransitService extends DefaultTransitService {
 
   public TestTransitService(TransitRepository transitRepository) {
-    super(transitRepository);
+    super(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(ScheduledTimetableData.empty())
+    );
   }
 
   @Override

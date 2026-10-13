@@ -31,8 +31,10 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.StopConditionsHelper;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultTransitRealTimeUpdateContext;
@@ -86,9 +88,25 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   public void setUp() throws Exception {
     super.setUp();
 
-    realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(transitRepository);
+    realTimeUpdateContext = new DefaultTransitRealTimeUpdateContext(
+      transitRepository,
+      new DefaultTimetableRepository(
+        RaptorTransitDataTestFactory.empty(),
+        timetableBuildRepository.toScheduledTimetableData()
+      ),
+      () -> {
+        throw new UnsupportedOperationException(
+          "The realtime-vehicle repository is not available in this test context"
+        );
+      }
+    );
     if (transitService == null) {
-      transitService = new DefaultTransitService(transitRepository);
+      transitService = new DefaultTransitService(
+        transitRepository,
+        DefaultTimetableRepository.scheduledOnly(
+          timetableBuildRepository.toScheduledTimetableData()
+        )
+      );
     } else {
       transitAlertService.getAllAlerts().clear();
     }

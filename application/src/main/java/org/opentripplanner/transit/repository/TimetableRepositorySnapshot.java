@@ -3,10 +3,13 @@ package org.opentripplanner.transit.repository;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -50,6 +53,148 @@ public interface TimetableRepositorySnapshot {
    * Return true if any trip has been assigned to a new trip pattern by a realtime update.
    */
   boolean hasNewTripPatternsForModifiedTrips();
+
+  /**
+   * Return a route for a given id, including routes created by real-time updates, falling back to
+   * the scheduled route if there is no real-time-added route with this id.
+   */
+  @Nullable
+  Route getRoute(FeedScopedId id);
+
+  /**
+   * Return all routes, including those created by real-time updates.
+   */
+  Collection<Route> listRoutes();
+
+  /**
+   * Return the trip for the given id, including trips created by real-time updates, falling back
+   * to the scheduled trip if there is no real-time-added trip with this id.
+   */
+  @Nullable
+  Trip getTrip(FeedScopedId id);
+
+  /**
+   * Return the trip for the given id, not including trips created by real-time updates.
+   */
+  @Nullable
+  Trip getScheduledTrip(FeedScopedId id);
+
+  /**
+   * Return all trips, including those created by real-time updates.
+   */
+  Collection<Trip> listTrips();
+
+  /**
+   * Return true if a trip with the given id exists, either in the scheduled data or among the
+   * trips created by real-time updates.
+   */
+  boolean containsTrip(FeedScopedId id);
+
+  /**
+   * Return the scheduled trip pattern for a given trip, or, if the trip was added by a real-time
+   * update (extra journey), the pattern it was created with.
+   */
+  TripPattern findPattern(Trip trip);
+
+  /**
+   * Return the trip pattern for a given trip on a service date. The real-time updated version is
+   * returned if it exists, otherwise the scheduled (or real-time-added) trip pattern is returned.
+   */
+  TripPattern findPattern(Trip trip, @Nullable LocalDate serviceDate);
+
+  /**
+   * Return all the trip patterns used in the given route, including those added by real-time
+   * updates.
+   */
+  Collection<TripPattern> findPatterns(Route route);
+
+  /**
+   * Return the trip-on-service-date for a given id, including those created by real-time updates,
+   * falling back to the scheduled trip-on-service-date if there is none real-time-added with this
+   * id.
+   */
+  @Nullable
+  TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
+
+  /**
+   * Return the trip-on-service-date for a given trip and service date, including those created by
+   * real-time updates, falling back to the scheduled trip-on-service-date if there is none
+   * real-time-added for this trip and date.
+   */
+  @Nullable
+  TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate);
+
+  /**
+   * Return all trips-on-service-date, including those created by real-time updates.
+   */
+  Collection<TripOnServiceDate> listTripsOnServiceDate();
+
+  /**
+   * Return the trips-on-service-date that replace the given trip-on-service-date: those in the
+   * scheduled data, followed by those added by real-time updates.
+   */
+  List<TripOnServiceDate> findReplacedBy(FeedScopedId id);
+
+  /**
+   * Return the scheduled trip pattern with the given id. Trip patterns created by real-time updates
+   * are not included.
+   */
+  @Nullable
+  TripPattern getTripPattern(FeedScopedId id);
+
+  /**
+   * Return all scheduled trip patterns. Trip patterns created by real-time updates are not
+   * included.
+   */
+  Collection<TripPattern> listTripPatterns();
+
+  /**
+   * Return the scheduled trip patterns visiting the given stop. Trip patterns created by real-time
+   * updates are not included, see {@link #findPatterns(StopLocation, boolean)}.
+   */
+  Collection<TripPattern> findPatterns(StopLocation stop);
+
+  /**
+   * Return the trip patterns visiting the given stop. If {@code includeRealtimeUpdates} is set, the
+   * trip patterns created by real-time updates are included.
+   */
+  Collection<TripPattern> findPatterns(StopLocation stop, boolean includeRealtimeUpdates);
+
+  /**
+   * Return the routes of the scheduled trip patterns and of the flex trips visiting the given
+   * stop. Routes created by real-time updates are not included.
+   */
+  Set<Route> findRoutes(StopLocation stop);
+
+  /**
+   * Return all groups of routes. Groups of routes are only part of the scheduled data.
+   */
+  Collection<GroupOfRoutes> listGroupsOfRoutes();
+
+  /**
+   * Return the scheduled routes in the given group of routes.
+   */
+  Collection<Route> findRoutes(GroupOfRoutes groupOfRoutes);
+
+  /**
+   * Return the group of routes with the given id. Groups of routes are only part of the scheduled
+   * data.
+   */
+  @Nullable
+  GroupOfRoutes getGroupOfRoutes(FeedScopedId id);
+
+  /**
+   * Return the flex index, or {@code null} if flex routing is disabled. Flex trips are only part of
+   * the scheduled data.
+   */
+  @Nullable
+  FlexIndex getFlexIndex();
+
+  /**
+   * Checks if the last scheduled service date for the stop is on or after the given date. This
+   * does not include real-time updates.
+   */
+  boolean hasScheduledServicesAfter(LocalDate date, StopLocation stop);
 
   /**
    * Return the route created by a realtime update for the given id, or null if no route was added
@@ -109,17 +254,6 @@ public interface TimetableRepositorySnapshot {
    * List all trips-on-service-date created by realtime updates.
    */
   Collection<? extends TripOnServiceDate> listRealTimeAddedTripOnServiceDate();
-
-  /**
-   * Return the trips-on-service-date that replace the given trip-on-service-date according to
-   * realtime updates.
-   */
-  Collection<TripOnServiceDate> getRealTimeReplacedByTripOnServiceDate(FeedScopedId id);
-
-  /**
-   * Return the patterns created by realtime updates which visit the given stop.
-   */
-  Collection<TripPattern> getPatternsForStop(StopLocation stop);
 
   /**
    * Return the raptor transit data that includes the realtime updates of this snapshot. This is

@@ -35,6 +35,7 @@ import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -59,6 +60,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
   private final TransitRepository transitRepository;
+  private final TimetableBuildRepository timetableBuildRepository;
   private final TransferRepository transferRepository;
   private final DataImportIssueStore issueStore;
 
@@ -70,6 +72,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
@@ -77,6 +80,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
@@ -87,12 +91,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     RegularTransferParameters parameters
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = parameters.maxDuration();
     this.transferRequests = parameters.requests();
@@ -111,9 +117,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(patternsForStop);
 
     Set<StopLocation> carsAllowedStops =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
+      timetableBuildRepository.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =
-      transitRepository.getStopLocationsUsedForBikesAllowedTrips();
+      timetableBuildRepository.getStopLocationsUsedForBikesAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -254,7 +260,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    */
   private Multimap<StopLocation, TripPattern> patternsForStop() {
     Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
-    for (TripPattern pattern : transitRepository.getAllTripPatterns()) {
+    for (TripPattern pattern : timetableBuildRepository.getAllTripPatterns()) {
       for (StopLocation stop : pattern.getStops()) {
         patternsForStop.put(stop, pattern);
       }
@@ -284,7 +290,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       var flexIndex = OTPFeature.FlexRouting.isOn()
-        ? new FlexIndex(transitRepository.getAllFlexTrips(), transitRepository.getTripCalendar())
+        ? new FlexIndex(
+            timetableBuildRepository.getAllFlexTrips(),
+            timetableBuildRepository.getTripCalendars()
+          )
         : null;
       return new PatternConsideringNearbyStopFinder(
         siteRepository,

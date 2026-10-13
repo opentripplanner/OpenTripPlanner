@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.gtfs.GtfsRtTestHelper;
@@ -105,10 +106,14 @@ class CancellationDeletionTest implements RealtimeTestConstants {
 
     var snapshot = env.timetableSnapshot();
     // Get the trip pattern of the added trip which goes through stopA
-    var patternsAtA = snapshot.getPatternsForStop(STOP_A);
+    var patternsAtA = snapshot.findPatterns(STOP_A, true);
 
     assertNotNull(patternsAtA, "Added trip pattern should be found");
-    var tripPattern = patternsAtA.stream().findFirst().get();
+    var tripPattern = patternsAtA
+      .stream()
+      .filter(TripPattern::isRealTimeTripPattern)
+      .findFirst()
+      .get();
 
     var forToday = snapshot.resolve(tripPattern, env.defaultServiceDate());
     var schedule = snapshot.resolve(tripPattern, null);

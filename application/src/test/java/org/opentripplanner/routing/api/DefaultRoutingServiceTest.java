@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -34,7 +35,10 @@ public class DefaultRoutingServiceTest extends GtfsTest {
   @Override
   public void setUp() throws Exception {
     super.setUp();
-    transitService = new DefaultTransitService(transitRepository);
+    transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+    );
   }
 
   @Override

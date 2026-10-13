@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 
 class StopConsolidationModuleTest {
 
@@ -21,12 +22,18 @@ class StopConsolidationModuleTest {
     var groups = List.of(new ConsolidatedStopGroup(STOP_D.getId(), List.of(STOP_B.getId())));
 
     var transitRepository = TestStopConsolidationModel.buildTransitRepository();
-    transitRepository.addTripPattern(PATTERN.getId(), PATTERN);
+    var timetableBuildRepository = new TimetableBuildRepository();
+    timetableBuildRepository.addTripPattern(PATTERN.getId(), PATTERN);
     var repo = new DefaultStopConsolidationRepository();
-    var module = new StopConsolidationModule(transitRepository, repo, groups);
+    var module = new StopConsolidationModule(
+      transitRepository,
+      timetableBuildRepository,
+      repo,
+      groups
+    );
     module.buildGraph();
 
-    var modifiedPattern = transitRepository.getTripPatternForId(PATTERN.getId());
+    var modifiedPattern = timetableBuildRepository.getTripPatternForId(PATTERN.getId());
     assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
     assertFalse(modifiedPattern.sameAs(PATTERN));
 
@@ -37,7 +44,7 @@ class StopConsolidationModuleTest {
       .getStop(1);
     assertEquals(modifiedStop, STOP_D);
 
-    var patterns = List.copyOf(transitRepository.getAllTripPatterns());
+    var patterns = List.copyOf(timetableBuildRepository.getAllTripPatterns());
 
     var stops = patterns.stream().map(TripPattern::getStops).toList();
     assertEquals(List.of(List.of(STOP_A, STOP_D, STOP_C)), stops);

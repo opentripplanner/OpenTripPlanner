@@ -8,21 +8,31 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TransitDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class AddTransitEntitiesToTimetable {
 
   private final TransitDataImport dataImport;
+  private final TimetableBuildRepository timetableBuildRepository;
 
-  private AddTransitEntitiesToTimetable(TransitDataImport dataImport) {
+  private AddTransitEntitiesToTimetable(
+    TransitDataImport dataImport,
+    TimetableBuildRepository timetableBuildRepository
+  ) {
     this.dataImport = dataImport;
+    this.timetableBuildRepository = timetableBuildRepository;
   }
 
   public static void addToTimetable(
     TransitDataImport dataImport,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository
   ) {
-    new AddTransitEntitiesToTimetable(dataImport).applyToTransitRepository(transitRepository);
+    new AddTransitEntitiesToTimetable(
+      dataImport,
+      timetableBuildRepository
+    ).applyToTransitRepository(transitRepository);
   }
 
   private void applyToTransitRepository(TransitRepository transitRepository) {
@@ -30,7 +40,7 @@ public class AddTransitEntitiesToTimetable {
 
     // Netex specific entities
     for (var tripOnServiceDate : dataImport.getTripOnServiceDates()) {
-      transitRepository.addTripOnServiceDate(tripOnServiceDate);
+      timetableBuildRepository.addTripOnServiceDate(tripOnServiceDate);
     }
     transitRepository.addOperators(dataImport.getAllOperators());
     transitRepository.addNoticeAssignments(dataImport.getNoticeAssignments());
@@ -38,14 +48,14 @@ public class AddTransitEntitiesToTimetable {
 
     addFeedInfo(transitRepository);
     addAgencies(transitRepository);
-    addServices(transitRepository);
-    addTripPatterns(transitRepository);
+    addServices();
+    addTripPatterns();
 
     /* Interpret the transfers explicitly defined in transfers.txt. */
     addTransfers(transitRepository);
 
     if (OTPFeature.FlexRouting.isOn()) {
-      addFlexTrips(transitRepository);
+      addFlexTrips();
     }
   }
 
@@ -65,29 +75,34 @@ public class AddTransitEntitiesToTimetable {
     transitRepository.getConstrainedTransferService().addAll(dataImport.getAllTransfers());
   }
 
-  private void addServices(TransitRepository transitRepository) {
+  private void addServices() {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
     for (FeedScopedId serviceId : dataImport.getAllServiceIds()) {
-      transitRepository.putServiceCode(serviceId, transitRepository.getServiceCodes().size());
+      timetableBuildRepository.putServiceCode(
+        serviceId,
+        timetableBuildRepository.getServiceCodes().size()
+      );
     }
   }
 
-  private void addTripPatterns(TransitRepository transitRepository) {
+  private void addTripPatterns() {
     Collection<TripPattern> tripPatterns = dataImport.getTripPatterns();
 
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {
       // TODO this could be more elegant
-      tripPattern.getScheduledTimetable().setServiceCodes(transitRepository.getServiceCodes());
+      tripPattern
+        .getScheduledTimetable()
+        .setServiceCodes(timetableBuildRepository.getServiceCodes());
 
-      // Store the tripPattern in the timetable repository so it will be serialized and usable in routing.
-      transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      // Store the tripPattern in the scheduled timetable data so it will be serialized and usable in routing.
+      timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
   }
 
-  private void addFlexTrips(TransitRepository transitRepository) {
+  private void addFlexTrips() {
     for (FlexTrip<?, ?> flexTrip : dataImport.getAllFlexTrips()) {
-      transitRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }
 }

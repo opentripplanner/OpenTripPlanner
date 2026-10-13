@@ -41,6 +41,7 @@ class SetupHelper {
     return new LoadModel(
       graph,
       transitRepository,
+      serializedGraphObject.timetableBuildRepository,
       transferRepository,
       serializedGraphObject.buildConfig
     );

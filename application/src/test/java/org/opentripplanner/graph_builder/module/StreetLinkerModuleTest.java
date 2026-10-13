@@ -40,6 +40,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -193,6 +194,7 @@ class StreetLinkerModuleTest {
     private final StreetLinkerModule module;
     private final RegularStop stop;
     private final TransitRepository transitRepository;
+    private final TimetableBuildRepository timetableBuildRepository;
     private final Graph graph;
 
     public TestModel() {
@@ -219,6 +221,7 @@ class StreetLinkerModuleTest {
       builder.withRegularStop(stop);
 
       transitRepository = new TransitRepository(builder.build());
+      timetableBuildRepository = new TimetableBuildRepository();
 
       stopVertex = TransitStopVertex.of()
         .withId(stop.getId())
@@ -233,6 +236,7 @@ class StreetLinkerModuleTest {
         new VertexLinker(graph, GeofencingZoneService.EMPTY, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         transitRepository,
+        timetableBuildRepository,
         DataImportIssueStore.NOOP
       );
 
@@ -258,7 +262,7 @@ class StreetLinkerModuleTest {
     }
 
     public void withFlexTrip(UnscheduledTrip flexTrip) {
-      transitRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
     }
 
     public void withCarsAllowedTrip(Trip trip, StopLocation... stops) {
@@ -283,7 +287,7 @@ class StreetLinkerModuleTest {
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();
 
-      transitRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     /**

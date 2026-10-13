@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -126,7 +127,10 @@ class StreetNearbyPlaceFinderTest extends GraphRoutingTest {
       }
     );
 
-    transitService = new DefaultTransitService(otpModel.transitRepository());
+    transitService = new DefaultTransitService(
+      otpModel.transitRepository(),
+      DefaultTimetableRepository.scheduledOnly(otpModel.scheduledTimetableData())
+    );
     var vertexLinker = VertexLinkerTestFactory.of(otpModel.graph());
     var linkingContextFactory = new LinkingContextFactory(
       otpModel.graph(),

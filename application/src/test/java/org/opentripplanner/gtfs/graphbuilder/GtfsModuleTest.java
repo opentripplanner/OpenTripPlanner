@@ -15,6 +15,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -28,13 +29,14 @@ class GtfsModuleTest {
     var module = GtfsModuleTestFactory.forTest(
       List.of(bundle),
       model.transitRepository,
+      model.timetableBuildRepository,
       model.graph,
       LocalDateRange.ofUnbounded()
     );
 
     module.buildGraph();
 
-    var frequencyTripPattern = model.transitRepository
+    var frequencyTripPattern = model.timetableBuildRepository
       .getAllTripPatterns()
       .stream()
       .filter(p -> !p.getScheduledTimetable().getFrequencyEntries().isEmpty())
@@ -46,7 +48,7 @@ class GtfsModuleTest {
     assertNotNull(tripPattern.getGeometry());
     assertNotNull(tripPattern.getHopGeometry(0));
 
-    var pattern = model.transitRepository.getTripPatternForId(tripPattern.getId());
+    var pattern = model.timetableBuildRepository.getTripPatternForId(tripPattern.getId());
     assertNotNull(pattern.getGeometry());
     assertNotNull(pattern.getHopGeometry(0));
   }
@@ -59,6 +61,7 @@ class GtfsModuleTest {
     var module = GtfsModuleTestFactory.forTest(
       bundles,
       model.transitRepository,
+      model.timetableBuildRepository,
       model.graph,
       LocalDateRange.ofUnbounded()
     );
@@ -69,10 +72,15 @@ class GtfsModuleTest {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
-    return new TestModels(graph, transitRepository);
+    var timetableBuildRepository = new TimetableBuildRepository();
+    return new TestModels(graph, transitRepository, timetableBuildRepository);
   }
 
-  record TestModels(Graph graph, TransitRepository transitRepository) {}
+  record TestModels(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository
+  ) {}
 
   static GtfsBundle bundle(String feedId) {
     return GtfsBundleTestFactory.forTest(
@@ -107,6 +115,7 @@ class GtfsModuleTest {
       var module = GtfsModuleTestFactory.forTest(
         bundles,
         model.transitRepository,
+        model.timetableBuildRepository,
         model.graph,
         LocalDateRange.ofUnbounded()
       );

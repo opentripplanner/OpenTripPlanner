@@ -10,7 +10,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 
 @Module
 public class EmissionGraphBuilderModule {
@@ -22,7 +22,7 @@ public class EmissionGraphBuilderModule {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmissionRepository emissionRepository,
-    TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     DataImportIssueStore issueStore
   ) {
     if (OTPFeature.Emission.isOff() || emissionRepository == null) {
@@ -34,7 +34,7 @@ public class EmissionGraphBuilderModule {
       dataSources.getEmissionConfiguredDataSource(),
       config.emission,
       emissionRepository,
-      transitRepository,
+      timetableBuildRepository,
       issueStore
     );
   }

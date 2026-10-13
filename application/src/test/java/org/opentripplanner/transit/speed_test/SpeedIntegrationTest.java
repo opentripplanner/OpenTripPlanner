@@ -98,6 +98,7 @@ public class SpeedIntegrationTest {
       routerConfig,
       model.graph(),
       model.transitRepository(),
+      model.timetableBuildRepository(),
       model.transferRepository()
     );
 

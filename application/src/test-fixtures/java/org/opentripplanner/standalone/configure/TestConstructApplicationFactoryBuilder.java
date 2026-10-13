@@ -42,12 +42,14 @@ public final class TestConstructApplicationFactoryBuilder {
   }
 
   public ConstructApplicationFactory build() {
-    var transitRepository = TransitTestEnvironment.of().build().transitRepository();
+    var env = TransitTestEnvironment.of().build();
+    var transitRepository = env.transitRepository();
 
     return DaggerConstructApplicationFactory.builder()
       .configModel(new ConfigModel(OtpConfigLoader.fromString("{}")))
       .graph(new Graph())
       .transitRepository(transitRepository)
+      .scheduledTimetableData(env.scheduledTimetableData())
       .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
       .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
       .stopConsolidationRepository(null)
@@ -73,7 +75,6 @@ public final class TestConstructApplicationFactoryBuilder {
         }
       )
       .scheduledRaptorTransitData(transitRepository.getRaptorTransitData())
-      .scheduledTripCalendars(transitRepository.getTripCalendar())
       .build();
   }
 }

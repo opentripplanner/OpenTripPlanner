@@ -31,6 +31,7 @@ import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRe
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final FareServiceFactory fareServiceFactory;
 
   private final TransitRepository transitRepository;
+  private final TimetableBuildRepository timetableBuildRepository;
   private final StreetDetailsRepository streetDetailsRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
@@ -58,6 +60,7 @@ public class GtfsModule implements GraphBuilderModule {
   public GtfsModule(
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     Graph graph,
     DeduplicatorService deduplicator,
@@ -69,6 +72,7 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     this.gtfsBundles = bundles;
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.graph = graph;
     this.deduplicator = deduplicator;
@@ -85,12 +89,14 @@ public class GtfsModule implements GraphBuilderModule {
   public static GtfsModule forTest(
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     Graph graph,
     LocalDateRange transitPeriodLimit
   ) {
     return new GtfsModule(
       bundles,
       transitRepository,
+      timetableBuildRepository,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
@@ -184,7 +190,7 @@ public class GtfsModule implements GraphBuilderModule {
       throw new RuntimeException(e);
     }
 
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
     TransitWithFutureDateValidator.validate(
       calendarServiceData,
       issueStore,
@@ -270,7 +276,11 @@ public class GtfsModule implements GraphBuilderModule {
     StreetDetailsRepository streetDetailsRepository,
     TransitDataImport dataImport
   ) {
-    AddTransitEntitiesToTimetable.addToTimetable(dataImport, transitRepository);
+    AddTransitEntitiesToTimetable.addToTimetable(
+      dataImport,
+      transitRepository,
+      timetableBuildRepository
+    );
     AddTransitEntitiesToGraph.addToGraph(
       dataImport,
       subwayAccessTime_s,

@@ -45,6 +45,7 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -64,6 +65,7 @@ public abstract class GtfsTest {
 
   public Graph graph;
   public TransitRepository transitRepository;
+  public TimetableBuildRepository timetableBuildRepository;
 
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
@@ -189,6 +191,7 @@ public abstract class GtfsTest {
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     graph = new Graph();
     transitRepository = new TransitRepository(new SiteRepository());
+    timetableBuildRepository = new TimetableBuildRepository();
     transitRepository.initUpdaterManager(
       new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
@@ -197,6 +200,7 @@ public abstract class GtfsTest {
     GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
       transitRepository,
+      timetableBuildRepository,
       graph,
       LocalDateRange.ofUnbounded()
     );
@@ -206,16 +210,19 @@ public abstract class GtfsTest {
     graph.index();
 
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
+    // Converted once, as on server startup, and shared by the Raptor mapping and the services
+    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new org.opentripplanner.transit.repository.DefaultTimetableRepository(
       new RaptorTransitData(scheduledRaptorData),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     var timetableHandle = registry.registerRepositorySnapshot(
       timetableSnapshot,

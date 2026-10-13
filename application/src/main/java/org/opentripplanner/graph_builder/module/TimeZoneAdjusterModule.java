@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -16,18 +17,23 @@ import org.opentripplanner.transit.service.TransitRepository;
 public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
   private final TransitRepository transitRepository;
+  private final TimetableBuildRepository timetableBuildRepository;
 
   @Inject
-  public TimeZoneAdjusterModule(TransitRepository transitRepository) {
+  public TimeZoneAdjusterModule(
+    TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository
+  ) {
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
   }
 
   @Override
   public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
-    final Instant serviceStart = transitRepository
-      .getTripCalendar()
+    final Instant serviceStart = timetableBuildRepository
+      .getTripCalendars()
       .transitServiceStarts(transitRepository.getTimeZone());
     var graphOffset = Duration.ofSeconds(
       transitRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
@@ -35,7 +41,7 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
     Map<ZoneId, Duration> agencyShift = new HashMap<>();
 
-    transitRepository.getAllTripPatterns().forEach(pattern -> {
+    timetableBuildRepository.getAllTripPatterns().forEach(pattern -> {
       var timeShift = agencyShift.computeIfAbsent(
         pattern.getRoute().getAgency().getTimezone(),
         zoneId ->
@@ -51,7 +57,7 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
         .withScheduledTimeTableBuilder(builder -> builder.withAdjustedTimes(timeShift))
         .build();
       // replace the original pattern with the updated pattern in the transit model
-      transitRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
+      timetableBuildRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
     });
     transitRepository.index();
   }

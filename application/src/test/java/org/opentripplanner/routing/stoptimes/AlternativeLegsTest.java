@@ -16,6 +16,7 @@ import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 
 /**
@@ -36,7 +37,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testPreviousLegs() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "1.2"),
@@ -69,7 +73,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testNextLegs() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "2.2"),
@@ -102,7 +109,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testCircularRoutes() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),
@@ -129,7 +139,10 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Test
   void testComplexCircularRoutes() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),

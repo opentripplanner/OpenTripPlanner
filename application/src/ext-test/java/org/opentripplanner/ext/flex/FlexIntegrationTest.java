@@ -36,6 +36,7 @@ import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -59,6 +60,8 @@ public class FlexIntegrationTest {
 
   static TransitRepository transitRepository;
 
+  static TimetableBuildRepository timetableBuildRepository;
+
   static TransferRepository transferRepository;
 
   static RoutingService service;
@@ -69,10 +72,12 @@ public class FlexIntegrationTest {
     TestOtpModel model = FlexIntegrationTestData.cobbOsm();
     graph = model.graph();
     transitRepository = model.transitRepository();
+    timetableBuildRepository = model.timetableBuildRepository();
     transferRepository = model.transferRepository();
     addGtfsToGraph(
       graph,
       transitRepository,
+      timetableBuildRepository,
       transferRepository,
       List.of(
         FlexIntegrationTestData.COBB_BUS_30_GTFS,
@@ -82,6 +87,7 @@ public class FlexIntegrationTest {
     );
     var transitService = TestServerContext.createTransitService(
       transitRepository,
+      timetableBuildRepository,
       transferRepository
     );
     service = TestServerContext.createRoutingService(graph, transitService, transferRepository);
@@ -89,7 +95,7 @@ public class FlexIntegrationTest {
 
   @Test
   void addFlexTripsAndPatternsToGraph() {
-    assertFalse(transitRepository.getAllTripPatterns().isEmpty());
+    assertFalse(timetableBuildRepository.getAllTripPatterns().isEmpty());
   }
 
   @Test
@@ -195,6 +201,7 @@ public class FlexIntegrationTest {
   private static void addGtfsToGraph(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository,
     List<File> gtfsFiles
   ) {
@@ -203,13 +210,14 @@ public class FlexIntegrationTest {
     GtfsModule gtfsModule = GtfsModuleTestFactory.forTest(
       gtfsBundles,
       transitRepository,
+      timetableBuildRepository,
       graph,
       LocalDateRange.ofUnbounded()
     );
     gtfsModule.buildGraph();
 
     // link stations to streets
-    TestStreetLinkerModule.link(graph, transitRepository);
+    TestStreetLinkerModule.link(graph, transitRepository, timetableBuildRepository);
 
     // link flex locations to streets
     new AreaStopsToVerticesMapper(graph, transitRepository).buildGraph();
@@ -221,6 +229,7 @@ public class FlexIntegrationTest {
     new DirectTransferGenerator(
       graph,
       transitRepository,
+      timetableBuildRepository,
       transferRepository,
       DataImportIssueStore.NOOP,
       Duration.ofMinutes(10),
