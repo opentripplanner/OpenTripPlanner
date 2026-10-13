@@ -16,6 +16,7 @@ import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
@@ -33,6 +34,7 @@ import org.opentripplanner.transit.service.TransitRepository;
  * This class is responsible for wiring up various metrics to micrometer, which we use for
  * performance logging, through the Actuator API.
  */
+@Singleton
 public class MetricsLogging {
 
   @Inject
