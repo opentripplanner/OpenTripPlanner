@@ -133,7 +133,8 @@ Where the driving times come from:
   (`CarpoolTreeStreetRouter`) and reads everything else from the candidate trips' corridors.
 
 In both modes, at most the 30 trips passing closest to the passenger are evaluated
-(`ClosestCandidateTrips`).
+(`ClosestCandidateTrips`); for access and egress, those without a stop the passenger can use are
+then left out.
 
 ## Usage Examples
 
