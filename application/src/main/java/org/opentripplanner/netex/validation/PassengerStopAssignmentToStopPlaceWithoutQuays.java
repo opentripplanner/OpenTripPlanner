@@ -35,7 +35,7 @@ class PassengerStopAssignmentToStopPlaceWithoutQuays
   @Override
   public DataImportIssue logMessage(String stopPointRef, String stopPlaceRef) {
     return Issue.issue(
-      "InvalidPassengerStopAssignment",
+      "PassengerStopAssignmentToQuaylessStopPlace",
       "ScheduledStopPoint %s is assigned to StopPlace %s, which contains no quays.",
       stopPointRef,
       stopPlaceRef
