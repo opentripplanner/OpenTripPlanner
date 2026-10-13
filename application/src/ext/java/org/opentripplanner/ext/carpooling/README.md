@@ -8,7 +8,7 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 
 **Why it exists**: Provides flexible, demand-responsive carpooling as a complement to fixed-route transit.
 
-**How it works**: Pre-filters the driver trips, evaluates the best insertion of the passenger into each from street driving times (searched per request for direct trips; for access and egress, the trip's legs and stops are precomputed when the trip arrives and the drives to and from the passenger are searched per request), and validates the result against the passenger's time window.
+**How it works**: Pre-filters the driver trips, evaluates the best insertion of the passenger into each from street driving times (the trip's legs, and for access and egress its stops, precomputed when the trip arrives; the drives to and from the passenger searched per request), and validates the result against the passenger's time window.
 
 ## Key Features
 
@@ -40,8 +40,8 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │                                            │
 │  2. Insertion Phase (InsertionEvaluator)   │
 │     - Driving times per leg and point      │
-│       (street searches, and for            │
-│       access/egress the trip's corridor)   │
+│       (the trip's corridor, and street     │
+│       searches for the passenger's ends)   │
 │     - Every pickup/dropoff pair of legs    │
 │       checked against budgets + capacity   │
 │     - Select minimum additional time       │
@@ -133,7 +133,8 @@ in an itinerary.
 
 Where the driving times come from:
 
-- **Direct**: goal-directed street searches (`CarpoolStreetRouter`). A leg whose beeline detour
+- **Direct**: goal-directed street searches (`CarpoolStreetRouter`) between the passenger and the
+  trip's waypoints; the baseline legs come from the trip's corridor. A leg whose beeline detour
   already exceeds the smallest budget of the stops after it is not searched.
 - **Access/egress**: when a trip arrives, `CorridorBuilder` computes its `CarpoolCorridor`: the
   routed baseline legs and, per leg, every transit stop inside the leg's feasibility ellipse with

@@ -287,6 +287,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var insertionEvaluator = new InsertionEvaluator(
         router,
+        router,
         stopDuration,
         streetLimitationParametersService.maxCarSpeed()
       );
@@ -502,7 +503,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
 
       var stopDuration = request.preferences().car().pickupTime();
 
-      var insertionEvaluator = new InsertionEvaluator(corridorRouter, stopDuration, maxCarSpeed);
+      var insertionEvaluator = new InsertionEvaluator(
+        corridorRouter,
+        pathRouter,
+        stopDuration,
+        maxCarSpeed
+      );
 
       // TODO carpooling currently reuses the car-mode reluctance; revisit whether it should have
       //   its own preference.

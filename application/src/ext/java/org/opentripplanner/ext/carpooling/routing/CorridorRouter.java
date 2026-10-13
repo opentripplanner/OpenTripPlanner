@@ -87,7 +87,7 @@ public class CorridorRouter implements CarpoolRouter {
    * segment of a leg Raptor keeps does not keep the router, and with it the passenger's trees,
    * reachable.
    */
-  private static final class CorridorSegment implements RoutedSegment {
+  static final class CorridorSegment implements RoutedSegment {
 
     /**
      * Room for durations measured by a reverse search, which can differ from the forward search

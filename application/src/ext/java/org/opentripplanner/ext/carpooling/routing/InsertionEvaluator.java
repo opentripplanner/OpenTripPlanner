@@ -15,8 +15,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.collection.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Finds, for a passenger's pickup and dropoff points, the best place to insert them into a
@@ -31,10 +29,11 @@ import org.slf4j.LoggerFactory;
  * stop is delayed by the pickup's detour, and by the dropoff's
  * too once past the dropoff, so the delay constraint reduces to comparing each detour with the
  * smallest budget among the stops it delays. Per trip the budget range minima and the capacity per
- * pair of legs are computed once; per point the two driving times of a leg are routed the first
- * time a pair needs them. A pair is then a few additions and comparisons, so the number of stops
- * on the trip no longer matters, and only the winner's route is assembled. The passenger's own
- * ride, pickup to dropoff, is routed once per request.
+ * pair of legs are computed once, and the legs' driving times are the trip's corridor's; per point
+ * the two driving times of a leg are routed the first time a pair needs them. A pair is then a few
+ * additions and comparisons, so the number of stops on the trip no longer matters, and only the
+ * winner's route is assembled. The passenger's own ride, pickup to dropoff, is routed once per
+ * request.
  * <p>
  * A leg is not routed at all when the beeline detour through it, at the fastest speed in the
  * graph, already exceeds the smallest budget of the stops after it. With a goal-directed router
@@ -46,20 +45,21 @@ import org.slf4j.LoggerFactory;
  */
 public class InsertionEvaluator {
 
-  private static final Logger LOG = LoggerFactory.getLogger(InsertionEvaluator.class);
-
   private final CarpoolRouter carpoolRouter;
+  private final CarpoolStreetRouter pathRouter;
   private final Duration stopDuration;
   private final double maxCarSpeed;
   private final Map<Pair<Vertex>, Optional<RoutedSegment>> rides = new HashMap<>();
 
   /**
-   * @param carpoolRouter routes a street segment between two vertices of the candidate route
+   * @param carpoolRouter routes the segments with the passenger at one end
+   * @param pathRouter finds the path of a leg the passenger rides through
    * @param stopDuration dwell added at each intermediate stop, the passenger's included
    * @param maxCarSpeed the fastest speed in the graph in m/s, for the beeline pre-check
    */
   public InsertionEvaluator(
     CarpoolRouter carpoolRouter,
+    CarpoolStreetRouter pathRouter,
     Duration stopDuration,
     double maxCarSpeed
   ) {
@@ -67,6 +67,7 @@ public class InsertionEvaluator {
       throw new IllegalArgumentException("maxCarSpeed must be positive, got " + maxCarSpeed);
     }
     this.carpoolRouter = carpoolRouter;
+    this.pathRouter = pathRouter;
     this.stopDuration = stopDuration;
     this.maxCarSpeed = maxCarSpeed;
   }
@@ -84,9 +85,6 @@ public class InsertionEvaluator {
       return List.of();
     }
     var plan = plan(tripWithViableAccessEgress.routableTrip());
-    if (plan == null) {
-      return List.of();
-    }
     var candidates = new ArrayList<InsertionCandidate>();
     for (var viable : viableStops) {
       var candidate = plan.best(toPassengerSnap(viable), viable.transitStop());
@@ -109,20 +107,21 @@ public class InsertionEvaluator {
     RoutableCarpoolTrip routableTrip,
     PassengerSnap snap
   ) {
-    var plan = plan(routableTrip);
-    return plan == null ? null : plan.best(snap, null);
+    return plan(routableTrip).best(snap, null);
   }
 
-  @Nullable
+  /** The baseline legs come from the trip's corridor; their paths are found when needed. */
   private TripInsertionPlan plan(RoutableCarpoolTrip routableTrip) {
     var waypoints = routableTrip.vertices();
-    var baseline = new RoutedSegment[waypoints.size() - 1];
+    var legDurations = routableTrip.corridor().legDurations();
+    var baseline = new RoutedSegment[legDurations.size()];
     for (int leg = 0; leg < baseline.length; leg++) {
-      baseline[leg] = carpoolRouter.route(waypoints.get(leg), waypoints.get(leg + 1));
-      if (baseline[leg] == null) {
-        LOG.info("Could not route leg {} of carpool trip {}", leg, routableTrip.trip().getId());
-        return null;
-      }
+      baseline[leg] = new CorridorRouter.CorridorSegment(
+        waypoints.get(leg),
+        waypoints.get(leg + 1),
+        (int) legDurations.get(leg).toSeconds(),
+        pathRouter
+      );
     }
     return new TripInsertionPlan(routableTrip, baseline);
   }
