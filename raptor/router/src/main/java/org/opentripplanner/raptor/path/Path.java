@@ -19,15 +19,7 @@ import org.opentripplanner.raptor.spi.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The result of a Raptor search is a path describing the one possible journey. The path is the
- * main DTO part of the Raptor result, but it is also used internally in Raptor. Hence, it is a bit
- * more complex, and it has more responsiblilities than it should.
- * <p>
- * To improve the design, Raptor should not use the path internally. Instead, there should
- * be a special destination arrival that could take over the Raptor responsibilities. The
- * path would still need to be constructed at the time of arrival and then become a part of the
- * destination arrival. The reason for this is that the data necessary to create a path is not
- * kept in the Raptor state between rounds.
+ * The result path of a Raptor search, describing one possible journey.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -43,27 +35,6 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   private final int c2;
   private final AccessPathLeg<T> accessLeg;
   private final EgressPathLeg<T> egressLeg;
-
-  /** @see #dummyPath(int, int, int, int, int, int) */
-  private Path(
-    int iterationDepartureTime,
-    int startTime,
-    int endTime,
-    int numberOfTransfers,
-    int c1,
-    int c2
-  ) {
-    this.iterationDepartureTime = iterationDepartureTime;
-    this.startTime = startTime;
-    this.startTimeInclusivePenalty = startTime;
-    this.endTime = endTime;
-    this.endTimeInclusivePenalty = endTime;
-    this.numberOfTransfers = numberOfTransfers;
-    this.c1 = c1;
-    this.accessLeg = null;
-    this.egressLeg = null;
-    this.c2 = c2;
-  }
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int c1, int c2) {
     this.iterationDepartureTime = iterationDepartureTime;
@@ -86,21 +57,6 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int c1) {
     this(iterationDepartureTime, accessLeg, c1, RaptorConstants.NOT_SET);
-  }
-
-  /**
-   * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
-   * creating the whole path.
-   */
-  public static <T extends RaptorTripSchedule> RaptorPath<T> dummyPath(
-    int iteration,
-    int startTime,
-    int endTime,
-    int numberOfTransfers,
-    int cost,
-    int c2
-  ) {
-    return new Path<>(iteration, startTime, endTime, numberOfTransfers, cost, c2);
   }
 
   @Override

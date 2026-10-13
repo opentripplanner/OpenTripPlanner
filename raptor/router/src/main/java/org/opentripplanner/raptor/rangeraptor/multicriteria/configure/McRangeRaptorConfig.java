@@ -31,7 +31,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.TransitGroupPriorityRideFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
+import org.opentripplanner.raptor.rangeraptor.path.configure.DestinationArrivalConfig;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
@@ -45,7 +45,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContextViaSegments<T> contextSegment;
-  private final PathConfig<T> pathConfig;
+  private final DestinationArrivalConfig<T> destinationArrivalConfig;
   private DestinationArrivalPaths<T> paths;
   private ParetoComparator<RaptorPath<T>> comparator;
   private McRangeRaptorWorkerState<T> state;
@@ -56,7 +56,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   public McRangeRaptorConfig(SearchContextViaSegments<T> contextSegment) {
     this.contextSegment = Objects.requireNonNull(contextSegment);
-    this.pathConfig = new PathConfig<>(this.contextSegment.parent());
+    this.destinationArrivalConfig = new DestinationArrivalConfig<>(this.contextSegment.parent());
   }
 
   /**
@@ -123,7 +123,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   public ParetoComparator<RaptorPath<T>> createPathParetoComparator() {
     if (comparator == null) {
       var c2Comp = isTransitPriority() ? dominanceFunctionC2() : null;
-      comparator = pathConfig.createPathParetoComparator(resolveCostConfig(), c2Comp);
+      comparator = destinationArrivalConfig.createPathParetoComparator(resolveCostConfig(), c2Comp);
     }
     return comparator;
   }
@@ -211,7 +211,10 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private DestinationArrivalPaths<T> createDestinationArrivalPaths() {
     if (paths == null) {
-      paths = pathConfig.createDestArrivalPaths(resolveCostConfig(), createPathParetoComparator());
+      paths = destinationArrivalConfig.createMcDestArrivalPaths(
+        resolveCostConfig(),
+        dominanceFunctionC2()
+      );
     }
     return paths;
   }
