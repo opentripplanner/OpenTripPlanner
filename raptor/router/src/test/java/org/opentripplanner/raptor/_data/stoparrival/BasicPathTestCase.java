@@ -314,6 +314,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
+      STOP_C,
       TX_END,
       transfer.c1(),
       transfer,
