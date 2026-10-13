@@ -76,8 +76,8 @@ import org.slf4j.LoggerFactory;
  * The service executes routing requests in four phases:
  * <ol>
  *   <li><strong>Pre-filtering ({@link TripPreFilters}):</strong> Once the passenger is snapped to the
- *       street network, quickly eliminates trips that cannot serve the passenger in time or whose
- *       corridor cannot reach the passenger.</li>
+ *       street network, quickly eliminates trips that cannot serve the passenger in time, have no free
+ *       seat, or whose corridor cannot reach the passenger.</li>
  *   <li><strong>Position Finding ({@link InsertionPositionFinder}):</strong> For trips that pass
  *       filtering, identifies viable pickup/dropoff position pairs using fast heuristics (capacity,
  *       beeline delay estimates). No routing is performed in this phase.</li>
@@ -184,9 +184,9 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * This method executes the full four-phase carpooling algorithm:
    * <ol>
    *   <li><strong>Pre-filtering:</strong> Once the passenger is snapped to the street network, all
-   *       trips from the repository are filtered by time window and by whether their corridor can reach
-   *       both the snapped pickup and the snapped dropoff, to quickly eliminate incompatible
-   *       matches.</li>
+   *       trips from the repository are filtered by time window, by free seats and by whether their
+   *       corridor can reach both the snapped pickup and the snapped dropoff, to quickly eliminate
+   *       incompatible matches.</li>
    *   <li><strong>Position finding:</strong> For each surviving trip, viable pickup/dropoff insertion
    *       positions are identified using beeline heuristics (no routing).</li>
    *   <li><strong>Insertion evaluation:</strong> Viable positions are evaluated with the driving
@@ -364,8 +364,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    * <p>
    * The method proceeds as follows:
    * <ol>
-   *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time window
-   *       and by whether their corridor can reach the passenger.</li>
+   *   <li>Once the passenger is snapped to the street network, pre-filters the trips by time window,
+   *       by free seats and by whether their corridor can reach the passenger.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping those
    *       the passenger can walk to or from within the walk budget.</li>
    *   <li>For each candidate trip and corridor stop combination, identifies viable insertion
