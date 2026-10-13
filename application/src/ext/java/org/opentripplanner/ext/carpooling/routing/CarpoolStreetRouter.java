@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *   <li><strong>Mode:</strong> CAR mode for both origin and destination</li>
  *   <li><strong>Algorithm:</strong> A* with Euclidean heuristic</li>
  *   <li><strong>Dominance:</strong> Minimum weight</li>
- *   <li><strong>Search Bound:</strong> the maximum trip duration</li>
+ *   <li><strong>Search Bound:</strong> the maximum trip duration, or the caller's smaller limit</li>
  *   <li><strong>Error Handling:</strong> Returns null on routing failure (logged as warning); a
  *       cancelled request propagates, see {@link CarpoolRouter#route}</li>
  * </ul>
@@ -58,8 +58,17 @@ public class CarpoolStreetRouter implements CarpoolRouter {
 
   @Override
   public RoutedSegment route(Vertex from, Vertex to) {
+    return route(from, to, maxTripDuration);
+  }
+
+  @Override
+  public RoutedSegment route(Vertex from, Vertex to, Duration limit) {
     try {
-      var path = carpoolRouting(from, to);
+      var path = carpoolRouting(
+        from,
+        to,
+        limit.compareTo(maxTripDuration) < 0 ? limit : maxTripDuration
+      );
       return path == null ? null : RoutedSegment.of(path);
     } catch (OTPRequestTimeoutException e) {
       // Rethrown ahead of the catch-all below, which would turn a cancellation into a null return.
@@ -81,12 +90,13 @@ public class CarpoolStreetRouter implements CarpoolRouter {
    *   <li><strong>Dominance:</strong> Minimum weight</li>
    * </ul>
    *
-   * @param fromVertex the origin vertex
-   * @param toVertex   the destination vertex
+   * @param fromVertex  the origin vertex
+   * @param toVertex    the destination vertex
+   * @param searchLimit the duration the search stops at
    * @return the first (best) path found, or null if no path reaches the destination within the
-   *         maximum trip duration
+   *         search limit
    */
-  private StreetPath carpoolRouting(Vertex fromVertex, Vertex toVertex) {
+  private StreetPath carpoolRouting(Vertex fromVertex, Vertex toVertex, Duration searchLimit) {
     var request = StreetSearchRequest.of().withMode(StreetMode.CAR).build();
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
@@ -94,7 +104,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
       .withSkipEdgeStrategy(
         new ComposingSkipEdgeStrategy<>(
           TraversalScope.withOwnLinkingOf(fromVertex, toVertex),
-          new DurationSkipEdgeStrategy<>(maxTripDuration)
+          new DurationSkipEdgeStrategy<>(searchLimit)
         )
       )
       .withDominanceFunction(new DominanceFunctions.MinimumWeight())

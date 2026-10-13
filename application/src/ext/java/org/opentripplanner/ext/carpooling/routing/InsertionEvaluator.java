@@ -37,9 +37,10 @@ import org.opentripplanner.utils.collection.Pair;
  * request.
  * <p>
  * A leg is not routed at all when the beeline detour through it, at the fastest speed in the
- * graph, already exceeds the smallest budget of the stops after it. With a goal-directed router
- * (direct mode) this avoids the searches that fail only after exploring everything within the
- * trip's time bound.
+ * graph, already exceeds the smallest budget of the stops after it, and a segment into or out of a
+ * leg is searched no further than the leg's limit: a longer one cannot be part of an insertion
+ * within the budgets. With a goal-directed router (direct mode) this avoids the searches that fail
+ * only after exploring everything within the trip's time bound.
  * <p>
  * One evaluator serves one request on one thread. Everything works on segment durations; no
  * street path is built here, see {@link RoutedSegment}.
@@ -348,7 +349,7 @@ public class InsertionEvaluator {
         if (!inRouted[leg]) {
           inRouted[leg] = true;
           if (withinReach(leg)) {
-            in[leg] = carpoolRouter.route(routableTrip.vertices().get(leg), point);
+            in[leg] = carpoolRouter.route(routableTrip.vertices().get(leg), point, limit(leg));
           }
         }
         return in[leg];
@@ -359,10 +360,14 @@ public class InsertionEvaluator {
         if (!outRouted[leg]) {
           outRouted[leg] = true;
           if (withinReach(leg)) {
-            out[leg] = carpoolRouter.route(point, routableTrip.vertices().get(leg + 1));
+            out[leg] = carpoolRouter.route(point, routableTrip.vertices().get(leg + 1), limit(leg));
           }
         }
         return out[leg];
+      }
+
+      private Duration limit(int leg) {
+        return routableTrip.corridor().legLimits().get(leg);
       }
 
       /**
