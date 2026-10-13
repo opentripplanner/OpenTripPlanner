@@ -336,7 +336,8 @@ public class DefaultCarpoolingService implements CarpoolingService {
    *       {@link CarpoolingParameters#maxCandidateTripsPerRequest()}, those passing closest to the
    *       passenger, are evaluated.</li>
    *   <li>Takes the transit stops each trip can serve from its {@link CarpoolCorridor}, keeping those
-   *       the passenger can walk to or from within the walk budget.</li>
+   *       the passenger can walk to or from within the walk budget; a trip without such a stop is left
+   *       out.</li>
    *   <li>Evaluates the insertion positions with the driving times of the corridor and the
    *       passenger's two street trees, via {@link CorridorRouter}.</li>
    *   <li>Converts the best insertions into {@link CarpoolAccessEgress} objects with timing
@@ -451,14 +452,26 @@ public class DefaultCarpoolingService implements CarpoolingService {
         parameters.maxCandidateTripsPerRequest()
       );
 
-      if (candidateTrips.isEmpty()) {
+      // Only a trip with a stop the passenger can walk to (access) or from (egress) can serve the
+      // request, and only those trips size the passenger's trees.
+      boolean access = accessOrEgress.isAccess();
+      var stopSnaps = new HashMap<FeedScopedId, SnapResult>();
+      var servingTrips = new ArrayList<TripStops>();
+      for (var trip : candidateTrips) {
+        var stops = usableStops(trip, access, stopSnaps, streetSearchRequest, maxWalkToCarpool);
+        if (!stops.isEmpty()) {
+          servingTrips.add(new TripStops(trip, stops));
+        }
+      }
+      if (servingTrips.isEmpty()) {
         return List.of();
       }
+      var trips = servingTrips.stream().map(TripStops::trip).toList();
 
       var passengerRouter = PassengerTrees.router(
         passengerVertex,
-        candidateTrips,
-        accessOrEgress.isAccess(),
+        trips,
+        access,
         maxCarSpeed,
         parameters.maxTripDuration(),
         Duration.ofSeconds(maxLegSeconds)
@@ -482,14 +495,12 @@ public class DefaultCarpoolingService implements CarpoolingService {
       //   its own preference.
       var carpoolReluctance = request.preferences().car().reluctance();
 
-      boolean access = accessOrEgress.isAccess();
-      var stopSnaps = new HashMap<FeedScopedId, SnapResult>();
       var accessEgresses = new ArrayList<CarpoolAccessEgress>();
-      for (var trip : candidateTrips) {
-        var stops = usableStops(trip, access, stopSnaps, streetSearchRequest, maxWalkToCarpool);
-        registerCorridor(trip, stops, access, corridorRouter);
+      for (var tripStops : servingTrips) {
+        var trip = tripStops.trip();
+        registerCorridor(trip, tripStops.stops(), access, corridorRouter);
         var viableStops = viableAccessEgress(
-          stops,
+          tripStops.stops(),
           accessOrEgress,
           passengerSnap,
           transitServiceResolver
@@ -513,11 +524,14 @@ public class DefaultCarpoolingService implements CarpoolingService {
         "{} carpool {} candidates from {} trips",
         accessEgresses.size(),
         accessOrEgress,
-        candidateTrips.size()
+        servingTrips.size()
       );
       return accessEgresses;
     }
   }
+
+  /** A trip with the corridor stops the passenger can use, each with its snap. */
+  private record TripStops(RoutableCarpoolTrip trip, List<UsableStop> stops) {}
 
   private record UsableStop(CarpoolCorridor.CorridorStop stop, SnapResult snap) {}
 
