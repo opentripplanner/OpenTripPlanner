@@ -85,7 +85,6 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   OpenTripPlanner.
 - **Iceland (nationwide)** – [Strætó](https://www.straeto.is/en) has used OTP from 2015.
 
-
 ## Independent Production
 
 The following OTP-based services are presented as production-quality deployments, but are not backed
