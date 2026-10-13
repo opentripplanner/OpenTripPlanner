@@ -1,16 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.street.geometry.GeometryUtils.getGeometryFactory;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import java.time.ZoneId;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -20,6 +10,16 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.LogInfo;
+
+import javax.annotation.Nullable;
+import java.time.ZoneId;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.street.geometry.GeometryUtils.getGeometryFactory;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -47,7 +47,6 @@ public class Station
 
   private GeometryCollection geometry;
 
-  @JsonCreator
   Station(StationBuilder builder) {
     super(builder.getId());
     // Required fields
