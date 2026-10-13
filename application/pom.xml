@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.18.6</version>
+            <version>1.18.7</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
