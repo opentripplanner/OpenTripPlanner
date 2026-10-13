@@ -613,6 +613,18 @@
             </dependency>
 
             <dependency>
+                <!--
+                  Some dependencies still use Jackson 2. Keep it managed so it does not fall back to
+                  an older version. Remove when no dependency needs Jackson 2 anymore.
+                -->
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>2.22.3</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
