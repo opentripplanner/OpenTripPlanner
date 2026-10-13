@@ -26,6 +26,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove core astar GraphPath, use StreetPath and state-chain iteration instead [#8031](https://github.com/opentripplanner/OpenTripPlanner/pull/8031)
 - TransferPathLeg exposes the wrong toStop in reverse searches [#8062](https://github.com/opentripplanner/OpenTripPlanner/pull/8062)
 - TransferPathLeg exposes the wrong toStop in reverse searches [#8062](https://github.com/opentripplanner/OpenTripPlanner/pull/8062)
+- Limit the number of issues per type in the data import report [#8063](https://github.com/opentripplanner/OpenTripPlanner/pull/8063)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
