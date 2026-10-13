@@ -96,3 +96,5 @@ of several popular multi-city mobile trip planning applications.
 - [Aubin](https://aubin.app/) is a country-wide journey planner in Great Britain, with a mobile
   application which focuses on personalized, need-based travel planning using the capability offered
   by OpenTripPlanner.
+- [dataHabibi](https://datahabibi.ae/) Dubai property data site; runs OTP for building commute times
+  by car, transit, walking and cycling.
