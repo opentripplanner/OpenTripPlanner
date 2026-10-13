@@ -30,6 +30,7 @@ Sections follow that describe particular settings in more depth.
 | includeInclinedEdgeLevelInfo                                                                |       `boolean`      | Whether level info for inclined edges should be stored in the graph for use during runtime.                                                                    | *Optional* | `false`                           |  2.9  |
 | maxAreaNodes                                                                                |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                                   |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
+| [maxDataImportIssuesPerType](#maxDataImportIssuesPerType)                                   |       `integer`      | The maximum number of issues of each type written to the import report.                                                                                        | *Optional* | `1000`                            |  2.11 |
 | maxElevationPropagationMeters                                                               |       `integer`      | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                                   |       `double`       | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
 | maxTransferDuration                                                                         |      `duration`      | Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph.                                               | *Optional* | `"PT30M"`                         |  2.1  |
@@ -497,8 +498,21 @@ all of the elevation values in the street edges.
 
 When to split the import report.
 
-  If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
+  If the number of issues is larger than `maxDataImportIssuesPerFile`, then the files will
   be split in multiple files. Since browsers have problems opening large HTML files.
+
+
+<h3 id="maxDataImportIssuesPerType">maxDataImportIssuesPerType</h3>
+
+**Since version:** `2.11` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`   
+**Path:** / 
+
+The maximum number of issues of each type written to the import report.
+
+  When an issue type has more issues than `maxDataImportIssuesPerType`, only the issues
+  with the highest priority are written to the HTML and GeoJSON report. The others are left
+  out of the report, but they are still counted in the issue summary logged at the end of
+  the graph build. Set the value to `-1` to write all issues.
 
 
 <h3 id="maxStopToShapeSnapDistance">maxStopToShapeSnapDistance</h3>

@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
@@ -118,6 +119,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final boolean dataImportReport;
 
   public final int maxDataImportIssuesPerFile;
+
+  public final int maxDataImportIssuesPerType;
 
   public final double subwayAccessTime;
 
@@ -284,8 +287,22 @@ public class BuildConfig implements OtpDataStoreConfig {
       .summary("When to split the import report.")
       .description(
         """
-          If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
+          If the number of issues is larger than `maxDataImportIssuesPerFile`, then the files will
           be split in multiple files. Since browsers have problems opening large HTML files.
+        """
+      )
+      .asInt(1000);
+
+    this.maxDataImportIssuesPerType = root
+      .of("maxDataImportIssuesPerType")
+      .since(V2_11)
+      .summary("The maximum number of issues of each type written to the import report.")
+      .description(
+        """
+          When an issue type has more issues than `maxDataImportIssuesPerType`, only the issues
+          with the highest priority are written to the HTML and GeoJSON report. The others are left
+          out of the report, but they are still counted in the issue summary logged at the end of
+          the graph build. Set the value to `-1` to write all issues.
         """
       )
       .asInt(1000);

@@ -310,6 +310,7 @@ public class GraphBuilderModules {
     return new DataImportIssueReporter(
       issueStore,
       dataSources.getBuildReportDir(),
+      config.maxDataImportIssuesPerType,
       config.maxDataImportIssuesPerFile
     );
   }
