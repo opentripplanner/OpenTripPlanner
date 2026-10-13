@@ -5,6 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.Notice;
+import org.entur.netex2.model.NoticeAssignment;
+import org.entur.netex2.model.NoticeRefStructure;
+import org.entur.netex2.model.PointInJourneyPatternRefStructure;
+import org.entur.netex2.model.PublicCodeStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTimes_RelStructure;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -16,16 +26,6 @@ import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Notice;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.NoticeRefStructure;
-import org.rutebanken.netex.model.PointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.PublicCodeStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 public class NoticeAssignmentMapperTest {
 
@@ -35,7 +35,7 @@ public class NoticeAssignmentMapperTest {
   private static final String TIMETABLED_PASSING_TIME1 = "RUT:TimetabledPassingTime:1";
   private static final String TIMETABLED_PASSING_TIME2 = "RUT:TimetabledPassingTime:2";
 
-  private static final Notice NOTICE = new org.rutebanken.netex.model.Notice()
+  private static final Notice NOTICE = new org.entur.netex2.model.Notice()
     .withId(NOTICE_ID)
     .withPublicCode(new PublicCodeStructure().withValue("Notice Code"))
     .withText(new MultilingualString().withContent("Notice text"));

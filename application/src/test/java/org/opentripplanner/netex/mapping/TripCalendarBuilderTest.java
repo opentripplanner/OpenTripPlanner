@@ -10,13 +10,19 @@ import static org.opentripplanner.netex.NetexTestDataSupport.jaxbElement;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.JourneyRefStructure;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingDayRefStructure;
+import org.entur.netex2.model.OperatingPeriod_VersionStructure;
+import org.entur.netex2.model.ServiceJourney;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -25,14 +31,6 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.JourneyRefStructure;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.ServiceJourney;
 
 public class TripCalendarBuilderTest {
 
@@ -40,8 +38,6 @@ public class TripCalendarBuilderTest {
 
   private static final LocalDate D2020_11_01 = LocalDate.of(2020, 11, 1);
   private static final LocalDate D2020_11_02 = LocalDate.of(2020, 11, 2);
-
-  private static final LocalTime ANY_TIME = LocalTime.of(12, 0);
 
   private static final String DAY_TYPE_1 = "DT-1";
 
@@ -129,9 +125,7 @@ public class TripCalendarBuilderTest {
 
   private static HierarchicalMapById<OperatingDay> operatingDays_2020_11_02() {
     HierarchicalMapById<OperatingDay> opDays = new HierarchicalMapById<>();
-    opDays.add(
-      new OperatingDay().withId(OD_1).withCalendarDate(LocalDateTime.of(D2020_11_02, ANY_TIME))
-    );
+    opDays.add(new OperatingDay().withId(OD_1).withCalendarDate(D2020_11_02));
     return opDays;
   }
 

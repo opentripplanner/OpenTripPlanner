@@ -4,12 +4,12 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.entur.netex2.model.DestinationDisplay;
+import org.entur.netex2.model.MultilingualString;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.MultilingualString;
 
 class HeadsignMapperTest {
 

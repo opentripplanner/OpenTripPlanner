@@ -3,17 +3,27 @@ package org.opentripplanner.netex.mapping;
 import static com.google.common.truth.Truth.assertThat;
 import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
+import static org.entur.netex2.model.AllPublicTransportModesEnumeration.TRAM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
-import static org.rutebanken.netex.model.AllPublicTransportModesEnumeration.TRAM;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.AccessibilityAssessment;
+import org.entur.netex2.model.AccessibilityLimitation;
+import org.entur.netex2.model.AccessibilityLimitations_RelStructure;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.LimitationStatusEnumeration;
+import org.entur.netex2.model.LimitedUseTypeEnumeration;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Quays_RelStructure;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -25,16 +35,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.AccessibilityAssessment;
-import org.rutebanken.netex.model.AccessibilityLimitation;
-import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.LimitationStatusEnumeration;
-import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.StopPlace;
 
 class StopAndStationMapperTest {
 

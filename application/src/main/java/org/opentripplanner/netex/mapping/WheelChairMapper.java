@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Optional;
+import org.entur.netex2.model.AccessibilityAssessment;
+import org.entur.netex2.model.AccessibilityLimitation;
+import org.entur.netex2.model.AccessibilityLimitations_RelStructure;
+import org.entur.netex2.model.LimitationStatusEnumeration;
 import org.opentripplanner.core.model.accessibility.Accessibility;
-import org.rutebanken.netex.model.AccessibilityAssessment;
-import org.rutebanken.netex.model.AccessibilityLimitation;
-import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
-import org.rutebanken.netex.model.LimitationStatusEnumeration;
 
 public class WheelChairMapper {
 

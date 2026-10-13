@@ -2,10 +2,10 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.Notice;
+import org.entur.netex2.model.PublicCodeStructure;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Notice;
-import org.rutebanken.netex.model.PublicCodeStructure;
 
 public class NoticeMapperTest {
 
