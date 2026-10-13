@@ -133,7 +133,8 @@ in an itinerary.
 
 Where the driving times come from:
 
-- **Direct**: goal-directed street searches (`CarpoolStreetRouter`). A leg whose beeline detour
+- **Direct**: goal-directed street searches (`CarpoolStreetRouter`) between the passenger and the
+  trip's waypoints; the baseline legs come from the trip's corridor. A leg whose beeline detour
   already exceeds the smallest budget of the stops after it is not searched.
 - **Access/egress**: when a trip arrives, `CorridorBuilder` computes its `CarpoolCorridor`: the
   routed baseline legs and, per leg, every transit stop inside the leg's feasibility ellipse with

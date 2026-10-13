@@ -74,7 +74,7 @@ public class CorridorRouter implements CarpoolRouter {
   }
 
   /** A duration known from the corridor; the path is found when first asked for. */
-  private static final class CorridorSegment implements RoutedSegment {
+  static final class CorridorSegment implements RoutedSegment {
 
     private final Vertex from;
     private final Vertex to;

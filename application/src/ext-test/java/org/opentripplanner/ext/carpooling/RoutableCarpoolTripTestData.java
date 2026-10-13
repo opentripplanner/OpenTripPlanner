@@ -30,7 +30,15 @@ public final class RoutableCarpoolTripTestData {
    * to take no longer than that.
    */
   public static RoutableCarpoolTrip withRoutedLegs(CarpoolTrip trip, Duration... legDurations) {
-    var vertices = withDummyVertices(trip).vertices();
+    return withRoutedLegs(trip, withDummyVertices(trip).vertices(), legDurations);
+  }
+
+  /** Like {@link #withRoutedLegs(CarpoolTrip, Duration...)}, on the given vertices. */
+  public static RoutableCarpoolTrip withRoutedLegs(
+    CarpoolTrip trip,
+    List<Vertex> vertices,
+    Duration... legDurations
+  ) {
     var durations = List.of(legDurations);
     return new RoutableCarpoolTrip(
       trip,
