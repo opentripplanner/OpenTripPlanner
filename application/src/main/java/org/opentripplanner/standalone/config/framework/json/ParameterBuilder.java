@@ -43,6 +43,7 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.LocalDateUtils;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.exc.JsonNodeException;
 
 /**
  * TODO RT_AB: add Javadoc to clarify whether this is building a declarative representation of the
@@ -120,7 +121,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public Boolean asBoolean() {
-    return ofRequired(BOOLEAN).asBoolean();
+    return ofRequired(BOOLEAN, JsonNode::asBoolean);
   }
 
   public Boolean asBoolean(boolean defaultValue) {
@@ -129,7 +130,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public double asDouble() {
-    return ofRequired(DOUBLE).asDouble();
+    return ofRequired(DOUBLE, JsonNode::asDouble);
   }
 
   public double asDouble(double defaultValue) {
@@ -146,7 +147,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public int asInt() {
-    return ofRequired(INTEGER).asInt();
+    return ofRequired(INTEGER, JsonNode::asInt);
   }
 
   public int asInt(int defaultValue) {
@@ -163,7 +164,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public String asString() {
-    return ofRequired(STRING).asString();
+    return ofRequired(STRING, JsonNode::asString);
   }
 
   public String asString(String defaultValue) {
@@ -221,7 +222,7 @@ public class ParameterBuilder {
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
     info.withRequired().withEnum(enumType);
     // throws exception if enum value is missing
-    return parseRequiredEnum(build().asString(), enumType);
+    return parseRequiredEnum(convert(build(), JsonNode::asString), enumType);
   }
 
   /** Get optional enum value. Parser is not case sensitive. */
@@ -235,9 +236,10 @@ public class ParameterBuilder {
     if (node.isMissingNode()) {
       return defaultValue;
     }
-    return parseOptionalEnum(node.asString(), (Class<T>) defaultValue.getClass()).orElse(
-      defaultValue
-    );
+    return parseOptionalEnum(
+      convert(node, JsonNode::asString),
+      (Class<T>) defaultValue.getClass()
+    ).orElse(defaultValue);
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
@@ -443,7 +445,9 @@ public class ParameterBuilder {
   /* Custom OTP types */
 
   public FeedScopedId asFeedScopedId(FeedScopedId defaultValue) {
-    return exist() ? FeedScopedId.parseStrict(ofType(FEED_SCOPED_ID).asString()) : defaultValue;
+    return exist()
+      ? FeedScopedId.parseStrict(ofType(FEED_SCOPED_ID, JsonNode::asString))
+      : defaultValue;
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
@@ -472,19 +476,9 @@ public class ParameterBuilder {
     return target.exist(paramName());
   }
 
-  private JsonNode ofType(ConfigType type) {
-    info.withType(type);
-    return build();
-  }
-
   private <T> T ofType(ConfigType type, Function<JsonNode, T> body) {
     info.withType(type);
-    return body.apply(build());
-  }
-
-  private JsonNode ofRequired(ConfigType type) {
-    info.withRequired();
-    return ofType(type);
+    return convert(build(), body);
   }
 
   private <T> T ofRequired(ConfigType type, Function<JsonNode, T> body) {
@@ -502,7 +496,7 @@ public class ParameterBuilder {
     info.withType(type);
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
-    return exist() ? body.apply(node) : defaultValue;
+    return exist() ? convert(node, body) : defaultValue;
   }
 
   private <T> T ofOptional(ConfigType type, T defaultValue, Function<JsonNode, T> body) {
@@ -519,7 +513,7 @@ public class ParameterBuilder {
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
     return exist()
-      ? mapper.apply(node.asString())
+      ? mapper.apply(convert(node, JsonNode::asString))
       : defaultValueAsString == null
         ? null
         : mapper.apply(defaultValueAsString);
@@ -548,7 +542,7 @@ public class ParameterBuilder {
     Iterator<String> names = mapNode.parameterNames();
     while (names.hasNext()) {
       var parameterName = names.next();
-      result.put(parameterName, mapper.apply(mapNode.rawNode(parameterName)));
+      result.put(parameterName, convert(mapNode.rawNode(parameterName), mapper));
     }
     return result;
   }
@@ -581,7 +575,7 @@ public class ParameterBuilder {
     }
     List<T> values = new ArrayList<>();
     for (JsonNode node : array) {
-      values.add(mapper.apply(node));
+      values.add(convert(node, mapper));
     }
     return values;
   }
@@ -636,6 +630,19 @@ public class ParameterBuilder {
   }
 
   /* parse/map from string to a specific type, handle parse error */
+
+  /**
+   * Apply the given {@code body} to the node. Jackson throws a {@link JsonNodeException} if the
+   * node can not be converted to the requested type, for example if {@code asInt()} is called
+   * on a text node. This is mapped to an {@link OtpAppException} with a user-friendly message.
+   */
+  private <T> T convert(JsonNode node, Function<JsonNode, T> body) {
+    try {
+      return body.apply(node);
+    } catch (JsonNodeException e) {
+      throw error("The parameter value '%s' has the wrong type.".formatted(node), e);
+    }
+  }
 
   private <T> T parseConfigType(ConfigType elementType, JsonNode child) {
     try {
