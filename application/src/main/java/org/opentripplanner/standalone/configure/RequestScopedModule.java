@@ -19,10 +19,12 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.taxi.TaxiService;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -30,6 +32,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -93,6 +96,41 @@ public class RequestScopedModule {
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
     return new DefaultTransitService(transitRepository, timetableSnapshot);
+  }
+
+  @Provides
+  @Nullable
+  @HttpRequestScoped
+  RealtimeResolver realTimeResolver(
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
+  ) {
+    return OTPFeature.RealtimeResolver.isOn()
+      ? new RealtimeResolver(refetchItineraryService, transitService, transitAlertService)
+      : null;
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static RefetchItineraryService refetchItineraryService(
+    Graph graph,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
+  ) {
+    return new RefetchItineraryService(
+      graph,
+      transitService,
+      transitAlertService,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
+    );
   }
 
   @Provides
@@ -167,7 +205,8 @@ public class RequestScopedModule {
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
-    TransitRoutingConfig transitRoutingConfig
+    TransitRoutingConfig transitRoutingConfig,
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     return new DefaultRoutingService(
       transitService,
@@ -191,7 +230,8 @@ public class RequestScopedModule {
       linkingContextFactory,
       // transitRoutingConfig implements 2 roles; hence the repetition below
       transitRoutingConfig,
-      transitRoutingConfig
+      transitRoutingConfig,
+      realtimeResolver
     );
   }
 
