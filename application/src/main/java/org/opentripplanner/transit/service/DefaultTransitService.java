@@ -722,12 +722,12 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public Instant getTransitServiceEnds() {
-    return transitRepository.getTransitServiceEnds();
+    return getTripCalendars().transitServiceEnds(getTimeZone());
   }
 
   @Override
   public Instant getTransitServiceStarts() {
-    return transitRepository.getTransitServiceStarts();
+    return getTripCalendars().transitServiceStarts(getTimeZone());
   }
 
   @Override
@@ -792,7 +792,7 @@ public class DefaultTransitService implements TransitService {
 
   @Override
   public boolean transitFeedCovers(Instant dateTime) {
-    return transitRepository.transitFeedCovers(dateTime);
+    return getTripCalendars().transitServiceCovers(dateTime, getTimeZone());
   }
 
   @Override

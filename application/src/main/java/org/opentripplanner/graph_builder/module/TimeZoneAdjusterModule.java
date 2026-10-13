@@ -26,7 +26,9 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
   public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
-    final Instant serviceStart = transitRepository.getTransitServiceStarts();
+    final Instant serviceStart = transitRepository
+      .getTripCalendar()
+      .transitServiceStarts(transitRepository.getTimeZone());
     var graphOffset = Duration.ofSeconds(
       transitRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
     );

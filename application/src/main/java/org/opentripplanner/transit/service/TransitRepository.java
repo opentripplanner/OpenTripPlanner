@@ -9,7 +9,6 @@ import com.google.common.collect.Multimap;
 import gnu.trove.set.TIntSet;
 import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.logging.PowerOfTwoThrottle;
-import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,13 +166,6 @@ public class TransitRepository implements Serializable {
 
   public ConstrainedTransferService getConstrainedTransferService() {
     return constrainedTransferService;
-  }
-
-  /**
-   * Returns true if this repository contains any transit data at the given instant.
-   */
-  public boolean transitFeedCovers(Instant time) {
-    return !time.isBefore(getTransitServiceStarts()) && time.isBefore(getTransitServiceEnds());
   }
 
   /**
@@ -313,28 +304,6 @@ public class TransitRepository implements Serializable {
     assertModificationsAllowed();
     invalidateIndex();
     this.operators.addAll(operators);
-  }
-
-  /**
-   * The time when the transit service start. Will return EPOCH if there is no transit.
-   */
-  public Instant getTransitServiceStarts() {
-    return tripCalendars
-      .startDate()
-      .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, getTimeZone()).toInstant())
-      .orElse(Instant.EPOCH);
-  }
-
-  /**
-   * The time when the transit service ends. Will return EPOCH if there is no transit.
-   */
-  public Instant getTransitServiceEnds() {
-    return tripCalendars
-      .endDate()
-      .map(serviceDate ->
-        ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), getTimeZone()).toInstant()
-      )
-      .orElse(Instant.EPOCH);
   }
 
   /**
