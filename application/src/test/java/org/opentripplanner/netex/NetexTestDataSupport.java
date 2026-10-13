@@ -9,30 +9,30 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayOfWeekEnumeration;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.JourneyRefStructure;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.OperatingPeriod;
-import org.rutebanken.netex.model.OperatingPeriodRefStructure;
-import org.rutebanken.netex.model.PropertiesOfDay_RelStructure;
-import org.rutebanken.netex.model.PropertyOfDay;
-import org.rutebanken.netex.model.PublicCodeStructure;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.UicOperatingPeriod;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.DayOfWeekEnumeration;
+import org.entur.netex2.model.DayType;
+import org.entur.netex2.model.DayTypeAssignment;
+import org.entur.netex2.model.DayTypeRefStructure;
+import org.entur.netex2.model.DayTypeRefs_RelStructure;
+import org.entur.netex2.model.JourneyRefStructure;
+import org.entur.netex2.model.LocationStructure;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.OperatingDayRefStructure;
+import org.entur.netex2.model.OperatingPeriod;
+import org.entur.netex2.model.OperatingPeriodRefStructure;
+import org.entur.netex2.model.PropertiesOfDay_RelStructure;
+import org.entur.netex2.model.PropertyOfDay;
+import org.entur.netex2.model.PublicCodeStructure;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.Quays_RelStructure;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
+import org.entur.netex2.model.SimplePoint_VersionStructure;
+import org.entur.netex2.model.StopPlace;
+import org.entur.netex2.model.UicOperatingPeriod;
 
 public final class NetexTestDataSupport {
 
@@ -72,7 +72,7 @@ public final class NetexTestDataSupport {
   /* NETEX TYPES */
 
   public static OperatingDay createOperatingDay(String id, LocalDate day) {
-    return new OperatingDay().withId(id).withCalendarDate(createLocalDateTime(day));
+    return new OperatingDay().withId(id).withCalendarDate(day);
   }
 
   public static DayType createDayType(String id, DayOfWeekEnumeration... daysOfWeek) {
@@ -115,7 +115,7 @@ public final class NetexTestDataSupport {
     LocalDate date,
     Boolean isAvailable
   ) {
-    return createDayTypeAssignment(dayTypeId, isAvailable).withDate(createLocalDateTime(date));
+    return createDayTypeAssignment(dayTypeId, isAvailable).withDate(date);
   }
 
   public static DayTypeAssignment createDayTypeAssignmentWithPeriod(

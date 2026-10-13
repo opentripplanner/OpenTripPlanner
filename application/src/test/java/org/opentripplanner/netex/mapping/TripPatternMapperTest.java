@@ -9,6 +9,12 @@ import com.google.common.collect.ArrayListMultimap;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import java.util.Optional;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.OperatingDay;
+import org.entur.netex2.model.ReplacedJourneys_RelStructure;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
+import org.entur.netex2.model.VehicleJourneyRefStructure;
+import org.entur.netex2.model.VehicleTypeRefStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
@@ -21,12 +27,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.ReplacedJourneys_RelStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
-import org.rutebanken.netex.model.VehicleTypeRefStructure;
 
 class TripPatternMapperTest {
 

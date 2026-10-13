@@ -8,21 +8,21 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.BookingArrangementsStructure;
+import org.entur.netex2.model.BookingMethodEnumeration;
+import org.entur.netex2.model.ContactStructure;
+import org.entur.netex2.model.EntityStructure;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.FlexibleServiceProperties;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.PurchaseWhenEnumeration;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
 import org.opentripplanner.transit.model.timetable.booking.BookingTime;
-import org.rutebanken.netex.model.BookingArrangementsStructure;
-import org.rutebanken.netex.model.BookingMethodEnumeration;
-import org.rutebanken.netex.model.ContactStructure;
-import org.rutebanken.netex.model.EntityStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleServiceProperties;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PurchaseWhenEnumeration;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
 
 /**
  * Maps booking info from NeTEx BookingArrangements, FlexibleServiceProperties, and FlexibleLine

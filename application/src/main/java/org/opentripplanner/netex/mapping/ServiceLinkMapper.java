@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.opengis.gml._3.LineStringType;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.LinkInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.LinkSequenceProjection_VersionStructure;
+import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -20,11 +25,6 @@ import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinkInJourneyPattern_VersionedChildStructure;
 
 /**
  * Maps NeTEx ServiceLinks to arrays of LineStrings.

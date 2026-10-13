@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.FlexibleArea;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.KeyListStructure;
+import org.entur.netex2.model.KeyValueStructure;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -16,10 +20,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.KeyListStructure;
-import org.rutebanken.netex.model.KeyValueStructure;
 
 class FlexStopsMapper {
 

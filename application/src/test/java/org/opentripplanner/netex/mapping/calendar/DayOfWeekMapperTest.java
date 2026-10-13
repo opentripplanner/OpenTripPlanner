@@ -1,18 +1,18 @@
 package org.opentripplanner.netex.mapping.calendar;
 
+import static org.entur.netex2.model.DayOfWeekEnumeration.EVERYDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.FRIDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.MONDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.NONE;
+import static org.entur.netex2.model.DayOfWeekEnumeration.SATURDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.SUNDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.THURSDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.TUESDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.WEDNESDAY;
+import static org.entur.netex2.model.DayOfWeekEnumeration.WEEKDAYS;
+import static org.entur.netex2.model.DayOfWeekEnumeration.WEEKEND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.mapping.calendar.DayOfWeekMapper.mapDayOfWeek;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.FRIDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.MONDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.NONE;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.SATURDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.SUNDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.THURSDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.TUESDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEDNESDAY;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
-import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKEND;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;

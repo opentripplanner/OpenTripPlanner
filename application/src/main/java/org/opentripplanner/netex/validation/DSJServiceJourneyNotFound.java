@@ -2,10 +2,10 @@ package org.opentripplanner.netex.validation;
 
 import jakarta.xml.bind.JAXBElement;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.DatedServiceJourney;
+import org.entur.netex2.model.JourneyRefStructure;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.netex.issues.ObjectNotFound;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.JourneyRefStructure;
 
 class DSJServiceJourneyNotFound extends AbstractHMapValidationRule<String, DatedServiceJourney> {
 

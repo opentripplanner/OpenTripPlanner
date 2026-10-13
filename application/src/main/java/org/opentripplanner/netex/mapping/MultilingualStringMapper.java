@@ -3,8 +3,8 @@ package org.opentripplanner.netex.mapping;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.MultilingualString;
 import org.opentripplanner.utils.lang.StringUtils;
-import org.rutebanken.netex.model.MultilingualString;
 
 public class MultilingualStringMapper {
 

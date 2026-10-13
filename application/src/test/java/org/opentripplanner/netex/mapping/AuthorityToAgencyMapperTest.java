@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
+import org.entur.netex2.model.Authority;
+import org.entur.netex2.model.ContactStructure;
+import org.entur.netex2.model.MultilingualString;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.ContactStructure;
-import org.rutebanken.netex.model.MultilingualString;
 
 public class AuthorityToAgencyMapperTest {
 

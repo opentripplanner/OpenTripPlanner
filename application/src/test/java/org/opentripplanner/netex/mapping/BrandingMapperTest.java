@@ -2,9 +2,9 @@ package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.entur.netex2.model.Branding;
+import org.entur.netex2.model.MultilingualString;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.Branding;
-import org.rutebanken.netex.model.MultilingualString;
 
 public class BrandingMapperTest {
 

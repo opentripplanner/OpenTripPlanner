@@ -6,13 +6,13 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
 import java.util.Collection;
 import java.util.Set;
+import org.entur.netex2.model.ObjectFactory;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.SiteFrame;
+import org.entur.netex2.model.StopPlace;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.index.NetexEntityIndex;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.SiteFrame;
-import org.rutebanken.netex.model.StopPlace;
 
 class SiteFrameParserTest {
 

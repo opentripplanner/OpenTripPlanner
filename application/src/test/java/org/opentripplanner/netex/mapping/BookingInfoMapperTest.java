@@ -5,17 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import org.entur.netex2.model.BookingArrangementsStructure;
+import org.entur.netex2.model.ContactStructure;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.FlexibleServiceProperties;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.PurchaseWhenEnumeration;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
-import org.rutebanken.netex.model.BookingArrangementsStructure;
-import org.rutebanken.netex.model.ContactStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.FlexibleServiceProperties;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PurchaseWhenEnumeration;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
 
 class BookingInfoMapperTest {
 

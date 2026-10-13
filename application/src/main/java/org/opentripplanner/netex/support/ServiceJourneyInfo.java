@@ -4,13 +4,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.entur.netex2.model.EntityStructure;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.TimetabledPassingTime;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.support.stoptime.StopTimeAdaptor;
-import org.rutebanken.netex.model.EntityStructure;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
  * Wrapper around {@link ServiceJourney} that provides a simpler interface for using
