@@ -11,6 +11,16 @@ import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.Authority;
+import org.entur.netex2.model.BrandingRefStructure;
+import org.entur.netex2.model.GroupOfLinesRefStructure;
+import org.entur.netex2.model.Line;
+import org.entur.netex2.model.MultilingualString;
+import org.entur.netex2.model.Network;
+import org.entur.netex2.model.PresentationStructure;
+import org.entur.netex2.model.PublicCodeStructure;
+import org.entur.netex2.model.TransportOrganisationRefStructure;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
@@ -23,16 +33,6 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.service.SiteRepository;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.Authority;
-import org.rutebanken.netex.model.BrandingRefStructure;
-import org.rutebanken.netex.model.GroupOfLinesRefStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.PresentationStructure;
-import org.rutebanken.netex.model.PublicCodeStructure;
-import org.rutebanken.netex.model.TransportOrganisationRefStructure;
 
 class RouteMapperTest {
 

@@ -23,7 +23,7 @@ class NoticeMapper {
     this.idFactory = idFactory;
   }
 
-  Notice map(org.rutebanken.netex.model.Notice netexNotice) {
+  Notice map(org.entur.netex2.model.Notice netexNotice) {
     FeedScopedId id = idFactory.createId(netexNotice.getId());
     Notice otpNotice = cache.get(id);
 

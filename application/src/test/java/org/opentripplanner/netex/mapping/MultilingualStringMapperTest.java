@@ -3,8 +3,8 @@ package org.opentripplanner.netex.mapping;
 import static com.google.common.truth.Truth.assertThat;
 
 import jakarta.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import org.entur.netex2.model.MultilingualString;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.MultilingualString;
 
 class MultilingualStringMapperTest {
 

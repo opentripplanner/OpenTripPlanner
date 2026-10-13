@@ -1,6 +1,6 @@
-package org.rutebanken.netex.model;
+package org.entur.netex2.model;
 
-import static org.rutebanken.netex.model.StopUseEnumeration.ACCESS;
+import static org.entur.netex2.model.StopUseEnumeration.ACCESS;
 
 import java.math.BigInteger;
 import java.util.Arrays;

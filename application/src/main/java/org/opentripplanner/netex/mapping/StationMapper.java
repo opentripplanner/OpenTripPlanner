@@ -8,6 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.entur.netex2.model.LimitedUseTypeEnumeration;
+import org.entur.netex2.model.LocaleStructure;
+import org.entur.netex2.model.NameTypeEnumeration;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.StopPlace;
+import org.entur.netex2.model.Zone_VersionStructure;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
@@ -18,12 +24,6 @@ import org.opentripplanner.netex.support.JAXBUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
-import org.rutebanken.netex.model.LocaleStructure;
-import org.rutebanken.netex.model.NameTypeEnumeration;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.Zone_VersionStructure;
 
 class StationMapper {
 

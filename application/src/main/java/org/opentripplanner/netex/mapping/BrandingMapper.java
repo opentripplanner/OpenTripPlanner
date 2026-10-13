@@ -20,7 +20,7 @@ public class BrandingMapper {
    * @param branding NeTEx branding entity
    * @return OTP Branding model
    */
-  public Branding mapBranding(org.rutebanken.netex.model.Branding branding) {
+  public Branding mapBranding(org.entur.netex2.model.Branding branding) {
     var builder = Branding.of(idFactory.createId(branding.getId()));
 
     if (branding.getShortName() != null) {

@@ -5,6 +5,14 @@ import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BrandingRefStructure;
+import org.entur.netex2.model.FlexibleLine_VersionStructure;
+import org.entur.netex2.model.GroupOfLinesRefStructure;
+import org.entur.netex2.model.Line_VersionStructure;
+import org.entur.netex2.model.Network;
+import org.entur.netex2.model.OperatorRefStructure;
+import org.entur.netex2.model.PresentationStructure;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -20,14 +28,6 @@ import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.BrandingRefStructure;
-import org.rutebanken.netex.model.FlexibleLine_VersionStructure;
-import org.rutebanken.netex.model.GroupOfLinesRefStructure;
-import org.rutebanken.netex.model.Line_VersionStructure;
-import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OperatorRefStructure;
-import org.rutebanken.netex.model.PresentationStructure;
 
 /**
  * Maps NeTEx line to OTP Route.

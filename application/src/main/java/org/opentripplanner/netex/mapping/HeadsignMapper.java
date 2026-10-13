@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Optional;
+import org.entur.netex2.model.DestinationDisplay;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.config.SwissProfile;
-import org.rutebanken.netex.model.DestinationDisplay;
 
 /**
  * Maps Netex DestinationDisplay to I18NString.

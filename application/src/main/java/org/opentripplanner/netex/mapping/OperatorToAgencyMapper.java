@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
+import org.entur.netex2.model.ContactStructure;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.organization.OperatorBuilder;
 import org.opentripplanner.utils.lang.StringUtils;
-import org.rutebanken.netex.model.ContactStructure;
 
 /**
  * Maps a Netex operator to OTP Operator.
@@ -20,7 +20,7 @@ class OperatorToAgencyMapper {
     this.idFactory = idFactory;
   }
 
-  Operator mapOperator(org.rutebanken.netex.model.Operator source) {
+  Operator mapOperator(org.entur.netex2.model.Operator source) {
     final String name;
     String sourceName = MultilingualStringMapper.getStringValue(source.getName());
     if (source.getName() == null || StringUtils.hasNoValue(sourceName)) {

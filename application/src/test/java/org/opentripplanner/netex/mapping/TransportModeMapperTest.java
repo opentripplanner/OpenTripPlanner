@@ -1,6 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import static java.util.Map.entry;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.POST_BOAT;
+import static org.entur.netex2.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -8,15 +13,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.transit.model.network.CarAccess.ALLOWED;
 import static org.opentripplanner.transit.model.network.CarAccess.NOT_ALLOWED;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.POST_BOAT;
-import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import org.entur.netex2.model.AirSubmodeEnumeration;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BusSubmodeEnumeration;
+import org.entur.netex2.model.CoachSubmodeEnumeration;
+import org.entur.netex2.model.FunicularSubmodeEnumeration;
+import org.entur.netex2.model.MetroSubmodeEnumeration;
+import org.entur.netex2.model.RailSubmodeEnumeration;
+import org.entur.netex2.model.SnowAndIceSubmodeEnumeration;
+import org.entur.netex2.model.TaxiSubmodeEnumeration;
+import org.entur.netex2.model.TelecabinSubmodeEnumeration;
+import org.entur.netex2.model.TramSubmodeEnumeration;
+import org.entur.netex2.model.TransportSubmodeStructure;
+import org.entur.netex2.model.WaterSubmodeEnumeration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,19 +37,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.netex.mapping.TransportModeMapper.UnsupportedModeException;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.rutebanken.netex.model.AirSubmodeEnumeration;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.CoachSubmodeEnumeration;
-import org.rutebanken.netex.model.FunicularSubmodeEnumeration;
-import org.rutebanken.netex.model.MetroSubmodeEnumeration;
-import org.rutebanken.netex.model.RailSubmodeEnumeration;
-import org.rutebanken.netex.model.SnowAndIceSubmodeEnumeration;
-import org.rutebanken.netex.model.TaxiSubmodeEnumeration;
-import org.rutebanken.netex.model.TelecabinSubmodeEnumeration;
-import org.rutebanken.netex.model.TramSubmodeEnumeration;
-import org.rutebanken.netex.model.TransportSubmodeStructure;
-import org.rutebanken.netex.model.WaterSubmodeEnumeration;
 
 class TransportModeMapperTest {
 

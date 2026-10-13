@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
+import org.entur.netex2.model.StopPlace;
 import org.jspecify.annotations.Nullable;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -9,7 +10,6 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.MultiModalStationBuilder;
 import org.opentripplanner.transit.model.site.Station;
-import org.rutebanken.netex.model.StopPlace;
 
 class MultiModalStationMapper {
 

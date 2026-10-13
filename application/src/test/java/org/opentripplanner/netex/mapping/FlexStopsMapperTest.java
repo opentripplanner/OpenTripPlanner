@@ -13,6 +13,13 @@ import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.FlexibleArea;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.FlexibleStopPlace_VersionStructure;
+import org.entur.netex2.model.KeyListStructure;
+import org.entur.netex2.model.KeyValueStructure;
+import org.entur.netex2.model.MultilingualString;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -23,13 +30,6 @@ import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
-import org.rutebanken.netex.model.KeyListStructure;
-import org.rutebanken.netex.model.KeyValueStructure;
-import org.rutebanken.netex.model.MultilingualString;
 
 class FlexStopsMapperTest {
 
