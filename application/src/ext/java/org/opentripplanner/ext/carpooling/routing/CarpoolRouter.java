@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.carpooling.routing;
 
+import java.time.Duration;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -22,4 +23,14 @@ public interface CarpoolRouter {
    */
   @Nullable
   RoutedSegment route(Vertex from, Vertex to);
+
+  /**
+   * Like {@link #route(Vertex, Vertex)}, for a caller that has no use for a segment longer than
+   * {@code limit}: the search may stop there and return {@code null}. By default it searches as far
+   * as {@link #route(Vertex, Vertex)} does.
+   */
+  @Nullable
+  default RoutedSegment route(Vertex from, Vertex to, Duration limit) {
+    return route(from, to);
+  }
 }

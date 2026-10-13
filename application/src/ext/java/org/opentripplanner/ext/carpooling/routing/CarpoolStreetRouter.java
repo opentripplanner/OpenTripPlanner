@@ -63,10 +63,7 @@ public class CarpoolStreetRouter implements CarpoolRouter {
     return route(from, to, maxTripDuration);
   }
 
-  /**
-   * Like {@link #route(Vertex, Vertex)}, for a caller that has no use for a segment longer than
-   * {@code limit}: the search stops there and returns {@code null}.
-   */
+  @Override
   public RoutedSegment route(Vertex from, Vertex to, Duration limit) {
     try {
       var path = carpoolRouting(
