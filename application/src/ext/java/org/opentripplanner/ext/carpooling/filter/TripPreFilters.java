@@ -14,6 +14,7 @@ import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTrip;
  * <ol>
  *   <li>{@link TimeTripFilter} — a sum over the trip's legs and two time comparisons, for both
  *       depart-after and arrive-by</li>
+ *   <li>{@link CapacityTripFilter} — a seat check per leg</li>
  *   <li>{@link CorridorTripFilter} — a beeline check per leg of the trip's corridor</li>
  * </ol>
  */
@@ -31,7 +32,9 @@ public class TripPreFilters implements CarpoolTripFilter {
    * @param maxCarSpeed the fastest car speed in the street graph, in metres per second
    */
   public static TripPreFilters defaults(double maxCarSpeed) {
-    return new TripPreFilters(List.of(new TimeTripFilter(), new CorridorTripFilter(maxCarSpeed)));
+    return new TripPreFilters(
+      List.of(new TimeTripFilter(), new CapacityTripFilter(), new CorridorTripFilter(maxCarSpeed))
+    );
   }
 
   @Override

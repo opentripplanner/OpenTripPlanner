@@ -36,6 +36,7 @@ The carpooling extension enables OpenTripPlanner to find carpool trip options by
 │     (after snapping the passenger)         │
 │     - Time window check                    │
 │     - Corridor reach check                 │
+│     - Free seat check                      │
 │                                            │
 │  2. Insertion Phase                        │
 │     2a. Position Pre-screening             │
@@ -82,6 +83,7 @@ org.opentripplanner.ext.carpooling/
 │   ├── ItineraryPostFilters.java   # Post-filter composite (AND, short-circuit)
 │   ├── TimeTripFilter.java   # Pre-filter: depart-after & arrive-by time checks
 │   ├── CorridorTripFilter.java # Pre-filter: the trip's corridor reaches the passenger
+│   ├── CapacityTripFilter.java # Pre-filter: a free seat on some leg
 │   └── TimeItineraryFilter.java # Post-filter: depart-after & arrive-by enforcement
 │
 ├── routing/                         # Insertion optimization
@@ -121,6 +123,7 @@ Once the passenger is snapped to the street network, filters eliminate obviously
 
 1. **TimeTripFilter**: Can the trip be at the passenger's pickup or dropoff inside the passenger's window (depart-after or arrive-by)? The trip's span is taken as the insertion evaluation times it: from its start to its routed arrival at the destination plus the destination's deviation budget.
 2. **CorridorTripFilter** (`CarpoolCorridor.mayServe`): Can the trip's corridor reach the snapped passenger at all? A leg can only serve a point whose beeline detour, driven at the graph's maximum car speed, fits the leg's limit; direct requests check both the pickup and the dropoff.
+3. **CapacityTripFilter**: Does the car have a free seat on some leg? A car that is full all the way cannot take the passenger.
 
 **Performance**: O(n) where n = number of active trips.
 

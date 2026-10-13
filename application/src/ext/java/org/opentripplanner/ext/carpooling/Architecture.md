@@ -26,6 +26,7 @@ org.opentripplanner.ext.carpooling/
 │   ├── ItineraryPostFilters # Composite of post-filters (AND)
 │   ├── TimeTripFilter       # Pre-filter: loose time-window check
 │   ├── CorridorTripFilter   # Pre-filter: the trip's corridor reaches the passenger
+│   ├── CapacityTripFilter   # Pre-filter: a free seat on some leg
 │   └── TimeItineraryFilter  # Post-filter: tight time-window enforcement
 ├── constraints/              # Post-routing constraints
 │   └── PassengerDelayConstraints # Protects existing passengers
@@ -51,6 +52,7 @@ post-filter once actual times are known:
   depart-after or arrive-by window, timed as the insertion evaluation times it
 - **CorridorTripFilter**: the trip's corridor can reach the snapped passenger
   (`CarpoolCorridor.mayServe`)
+- **CapacityTripFilter**: the car has a free seat on some leg
 
 ### 2. Routing Phase
 Optimal insertion point calculation:
