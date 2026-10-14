@@ -12,7 +12,7 @@ import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.QuayRefStructure;
 import org.rutebanken.netex.model.StopPlace;
 
-class PassengerStopAssignmentToStopPlaceWithoutQuaysTest {
+class PassengerStopAssignmentToQuaylessStopPlaceTest {
 
   private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
   private static final String STOP_PLACE_ID = NetexTestDataSupport.STOP_PLACE_ID;
@@ -70,7 +70,7 @@ class PassengerStopAssignmentToStopPlaceWithoutQuaysTest {
 
   @Test
   void stopPlaceNotFound() {
-    var rule = new PassengerStopAssignmentToStopPlaceWithoutQuays();
+    var rule = new PassengerStopAssignmentToQuaylessStopPlace();
     rule.setup(new NetexEntityIndex().readOnlyView());
 
     assertEquals(DISCARD, rule.validate(STOP_PLACE_ID));
@@ -79,7 +79,7 @@ class PassengerStopAssignmentToStopPlaceWithoutQuaysTest {
   private static Status validate(StopPlace stopPlace) {
     var index = new NetexEntityIndex();
     index.stopPlaceById.add(stopPlace);
-    var rule = new PassengerStopAssignmentToStopPlaceWithoutQuays();
+    var rule = new PassengerStopAssignmentToQuaylessStopPlace();
     rule.setup(index.readOnlyView());
     return rule.validate(STOP_PLACE_ID);
   }

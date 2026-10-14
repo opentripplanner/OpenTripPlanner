@@ -12,7 +12,7 @@ import org.rutebanken.netex.model.StopPlace;
 /**
  * Ensure stop place exists for PassengerStopAssignment.
  */
-class PassengerStopAssignmentToStopPlaceWithoutQuays
+class PassengerStopAssignmentToQuaylessStopPlace
   extends AbstractHMapValidationRule<String, String>
 {
 
