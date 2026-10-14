@@ -2,6 +2,7 @@ package org.opentripplanner.netex.loader.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.xml.bind.JAXBElement;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,6 +99,30 @@ class ServiceFrameParserTest {
 
     assertNull(netexEntityIndex.quayIdByStopPointRef.lookup(STOP_POINT_REF_1));
     assertNull(netexEntityIndex.stopPlaceIdByStopPointRef.lookup(STOP_POINT_REF_1));
+  }
+
+  @Test
+  void testPassengerStopAssignmentWithoutScheduledStopPointRefIsIgnored() {
+    addPassengerStopAssignment(new PassengerStopAssignment().withQuayRef(createQuayRef(QUAY_REF)));
+
+    serviceFrameParser.parse(serviceFrame);
+    serviceFrameParser.setResultOnIndex(netexEntityIndex);
+
+    assertTrue(netexEntityIndex.quayIdByStopPointRef.localKeys().isEmpty());
+    assertTrue(netexEntityIndex.stopPlaceIdByStopPointRef.localKeys().isEmpty());
+  }
+
+  @Test
+  void testPassengerStopAssignmentWithoutScheduledStopPointRefButWithStopPlaceRefIsIgnored() {
+    addPassengerStopAssignment(
+      new PassengerStopAssignment().withStopPlaceRef(createStopPlaceRef(STOP_PLACE_REF))
+    );
+
+    serviceFrameParser.parse(serviceFrame);
+    serviceFrameParser.setResultOnIndex(netexEntityIndex);
+
+    assertTrue(netexEntityIndex.quayIdByStopPointRef.localKeys().isEmpty());
+    assertTrue(netexEntityIndex.stopPlaceIdByStopPointRef.localKeys().isEmpty());
   }
 
   private void addPassengerStopAssignment(PassengerStopAssignment assignment) {
