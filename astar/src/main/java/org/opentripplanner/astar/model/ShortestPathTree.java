@@ -2,10 +2,8 @@ package org.opentripplanner.astar.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
@@ -37,15 +35,15 @@ public class ShortestPathTree<
   public final DominanceFunction<State> dominanceFunction;
 
   // Value is either a single State (common case) or List<State> (multi-state vertices)
+  private final SegmentedIdentityMap<Vertex, Object> vertexStates;
   private final SegmentedIdentityMap<Edge, Object> edgeStates;
-  private final Map<Vertex, List<State>> initialStates;
   private final boolean isReverse;
 
   public ShortestPathTree(DominanceFunction<State> dominanceFunction, boolean isReverse) {
     this.dominanceFunction = dominanceFunction;
     // Initialized with a reasonable size, see #4445
+    vertexStates = new SegmentedIdentityMap<>(25_000);
     edgeStates = new SegmentedIdentityMap<>(25_000);
-    initialStates = new HashMap<>(10);
     this.isReverse = isReverse;
   }
 
@@ -56,6 +54,25 @@ public class ShortestPathTree<
       return null;
     } else {
       return new GraphPath<>(s);
+    }
+  }
+
+  private void addEdge(State newState) {
+    Edge backEdge = newState.getBackEdge();
+    Object edgeExisting = edgeStates.get(backEdge);
+
+    if (edgeExisting == null) {
+      edgeStates.put(backEdge, newState);
+    } else {
+      if (!(edgeExisting instanceof List)) {
+        List list = new ArrayList(2);
+        list.add(edgeExisting);
+        list.add(newState);
+        edgeStates.put(backEdge, list);
+      } else {
+        List list = (List) edgeExisting;
+        list.add(newState);
+      }
     }
   }
 
@@ -71,31 +88,61 @@ public class ShortestPathTree<
    */
   @SuppressWarnings("unchecked")
   public boolean add(State newState) {
+    Vertex vertex = newState.getVertex();
     Edge backEdge = newState.getBackEdge();
-    if (backEdge == null) {
-      Vertex vertex = newState.getVertex();
-      initialStates.computeIfAbsent(vertex, k -> new ArrayList<>()).add(newState);
-      return true;
-    }
+    Object edgeExisting = edgeStates.get(backEdge);
+    Object vertexExisting = vertexStates.get(vertex);
 
-    Object existing = edgeStates.get(backEdge);
+    if (edgeExisting == null) {
+      if (vertexExisting == null) {
+        vertexStates.put(vertex, newState);
+        return true;
+      }
 
-    // if the vertex has no states, store directly (no list wrapper)
-    if (existing == null) {
-      edgeStates.put(backEdge, newState);
+      if (vertexExisting instanceof Boolean) {
+        addEdge(newState);
+        return true;
+      }
+
+      State oldState = (State) vertexExisting;
+      if (dominanceFunction.comparable(oldState, newState)) {
+        if (backEdge != null && oldState.getBackEdge() == newState.getBackEdge()) {
+          if (dominanceFunction.betterOrEqual(oldState, newState)) {
+            return false;
+          }
+          if (dominanceFunction.betterOrEqual(newState, oldState)) {
+            vertexStates.put(vertex, newState);
+            return true;
+          }
+        } else {
+          if (dominanceFunction.significantlyBetter(oldState, newState)) {
+            return false;
+          }
+          if (dominanceFunction.significantlyBetter(newState, oldState)) {
+            vertexStates.put(vertex, newState);
+            return true;
+          }
+        }
+      }
+
+      addEdge(oldState);
+      addEdge(newState);
+      vertexStates.put(vertex, Boolean.FALSE);
       return true;
     }
 
     // Single-state fast path (99% of vertices)
-    if (!(existing instanceof List)) {
-      State oldState = (State) existing;
-      // order is important, because in the case of a tie we want to reject the new state
-      if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
-        return false;
-      }
-      if (dominanceFunction.betterOrEqualAndComparable(newState, oldState)) {
-        edgeStates.put(backEdge, newState);
-        return true;
+    if (!(edgeExisting instanceof List)) {
+      State oldState = (State) edgeExisting;
+      if (dominanceFunction.comparable(oldState, newState)) {
+        // order is important, because in the case of a tie we want to reject the new state
+        if (dominanceFunction.betterOrEqual(oldState, newState)) {
+          return false;
+        }
+        if (dominanceFunction.betterOrEqual(newState, oldState)) {
+          edgeStates.put(backEdge, newState);
+          return true;
+        }
       }
       // Co-dominant: promote to list
       List<State> list = new ArrayList<>(2);
@@ -106,16 +153,18 @@ public class ShortestPathTree<
     }
 
     // Multi-state path: existing iterator-based dominance logic
-    List<State> states = (List<State>) existing;
+    List<State> states = (List<State>) edgeExisting;
     Iterator<State> it = states.iterator();
     while (it.hasNext()) {
       State oldState = it.next();
-      // order is important, because in the case of a tie we want to reject the new state
-      if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
-        return false;
-      }
-      if (dominanceFunction.betterOrEqualAndComparable(newState, oldState)) {
-        it.remove();
+      if (dominanceFunction.comparable(oldState, newState)) {
+        // order is important, because in the case of a tie we want to reject the new state
+        if (dominanceFunction.betterOrEqual(oldState, newState)) {
+          return false;
+        }
+        if (dominanceFunction.betterOrEqual(newState, oldState)) {
+          it.remove();
+        }
       }
     }
     states.add(newState);
@@ -135,10 +184,21 @@ public class ShortestPathTree<
     // initial state, so putting the test for initialStates last in case best is still null will
     // not work correctly. But also initial states can all be non-final, in which case we have
     // to fall through.
-    var best = getBestState(initialStates.get(dest));
-    if (best != null) {
-      return best;
+    var vertexExisting = vertexStates.get(dest);
+    if (vertexExisting != null && !(vertexExisting instanceof Boolean)) {
+      if (vertexExisting instanceof List) {
+        var best = getBestState((List<State>) vertexExisting);
+        if (best != null) {
+          return best;
+        }
+      } else {
+        var state = (State) vertexExisting;
+        if (state.isFinal()) {
+          return state;
+        }
+      }
     }
+    State best = null;
     var edges = isReverse ? dest.getOutgoing() : dest.getIncoming();
     for (Edge edge : edges) {
       State candidate = getState(edge);
@@ -203,10 +263,16 @@ public class ShortestPathTree<
    */
   @SuppressWarnings("unchecked")
   public boolean visit(State state) {
-    Edge backEdge = state.getBackEdge();
-    if (backEdge == null) {
-      Vertex vertex = state.getVertex();
-      return initialStates.containsKey(vertex) && initialStates.get(vertex).contains(state);
+    Object vertexExisting = vertexStates.get(state.getVertex());
+    if (vertexExisting != null && !(vertexExisting instanceof Boolean)) {
+      if (!(vertexExisting instanceof List)) {
+        return vertexExisting == state;
+      }
+      for (State s : (List<State>) vertexExisting) {
+        if (s == state) {
+          return true;
+        }
+      }
     }
 
     Object existing = edgeStates.get(state.getBackEdge());
@@ -224,7 +290,14 @@ public class ShortestPathTree<
   /** @return every state in this tree */
   @SuppressWarnings("unchecked")
   public Collection<State> getAllStates() {
-    ArrayList<State> allStates = new ArrayList<>(edgeStates.size());
+    ArrayList<State> allStates = new ArrayList<>(vertexStates.size() + edgeStates.size());
+    vertexStates.forEachValue(value -> {
+      if (value instanceof List) {
+        allStates.addAll((List<State>) value);
+      } else if (!(value instanceof Boolean)) {
+        allStates.add((State) value);
+      }
+    });
     edgeStates.forEachValue(value -> {
       if (value instanceof List) {
         allStates.addAll((List<State>) value);
@@ -232,14 +305,11 @@ public class ShortestPathTree<
         allStates.add((State) value);
       }
     });
-    for (List<State> states : initialStates.values()) {
-      allStates.addAll(states);
-    }
     return allStates;
   }
 
   public String toString() {
-    int size = edgeStates.size() + initialStates.size();
+    int size = edgeStates.size() + vertexStates.size();
     return "ShortestPathTree(" + size + " vertices)";
   }
 }

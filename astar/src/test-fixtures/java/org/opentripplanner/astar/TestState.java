@@ -30,6 +30,10 @@ public class TestState implements AStarState<TestState, TestEdge, TestVertex> {
     this.elapsedTimeSeconds = elapsedTimeSeconds;
   }
 
+  public String toString() {
+    return "TestState(" + vertex + ", " + edge + ")";
+  }
+
   @Override
   public boolean isFinal() {
     return true;

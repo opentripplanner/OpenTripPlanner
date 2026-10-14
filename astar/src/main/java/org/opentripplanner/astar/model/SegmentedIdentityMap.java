@@ -27,6 +27,7 @@ class SegmentedIdentityMap<K, V> {
   private int segmentMask;
   private int size;
   private int threshold;
+  private Object nullValue;
 
   SegmentedIdentityMap(int expectedSize) {
     initSegments(tableSizeFor(expectedSize));
@@ -34,6 +35,9 @@ class SegmentedIdentityMap<K, V> {
 
   @SuppressWarnings("unchecked")
   V get(K key) {
+    if (key == null) {
+      return (V) nullValue;
+    }
     int hash = System.identityHashCode(key);
     int slot = hash & slotMask;
     Object[] seg = segments[(hash >>> slotBits) & segmentMask];
@@ -52,6 +56,11 @@ class SegmentedIdentityMap<K, V> {
 
   @SuppressWarnings("unchecked")
   V put(K key, V value) {
+    if (key == null) {
+      V old = (V) nullValue;
+      nullValue = value;
+      return old;
+    }
     int hash = System.identityHashCode(key);
     int slot = hash & slotMask;
     Object[] seg = segments[(hash >>> slotBits) & segmentMask];
@@ -93,6 +102,9 @@ class SegmentedIdentityMap<K, V> {
 
   @SuppressWarnings("unchecked")
   void forEachValue(Consumer<V> action) {
+    if (nullValue != null) {
+      action.accept((V) nullValue);
+    }
     for (Object[] seg : segments) {
       for (int i = 0; i < seg.length; i += 2) {
         if (seg[i] != null) {
@@ -137,6 +149,7 @@ class SegmentedIdentityMap<K, V> {
     for (int i = 0; i < segmentCount; i++) {
       segments[i] = new Object[slotsPerSegment * 2];
     }
+    this.nullValue = null;
   }
 
   /**

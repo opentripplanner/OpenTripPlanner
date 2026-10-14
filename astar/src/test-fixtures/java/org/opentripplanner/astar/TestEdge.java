@@ -16,6 +16,10 @@ public class TestEdge implements AStarEdge<TestState, TestEdge, TestVertex> {
     from.getOutgoing().add(this);
   }
 
+  public String toString() {
+    return "TestEdge(" + from.name() + "->" + to.name() + ")";
+  }
+
   @Override
   public TestVertex getFromVertex() {
     return from;
@@ -28,6 +32,6 @@ public class TestEdge implements AStarEdge<TestState, TestEdge, TestVertex> {
 
   @Override
   public TestState[] traverse(TestState s0) {
-    return new TestState[] { new TestState(to, s0.getWeight() + weight) };
+    return new TestState[] { new TestState(to, s0.getWeight() + weight, this) };
   }
 }
