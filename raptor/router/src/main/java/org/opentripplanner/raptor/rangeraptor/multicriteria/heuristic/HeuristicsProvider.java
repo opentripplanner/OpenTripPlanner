@@ -94,6 +94,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
    * no heuristic calculation for the C2 value. Destination pruning can only be used if this
    * is ok.
    */
+  // TODO R - The "travelDuration" looks unused?
   private boolean qualify(int stop, int arrivalTime, int travelDuration, int cost, int c2) {
     HeuristicAtStop h = get(stop);
 
@@ -102,10 +103,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     }
     int minArrivalTime = arrivalTime + h.minTravelDuration();
     int minNumberOfTransfers = round - 1 + h.minNumTransfers();
-    int minTravelDuration = travelDuration + h.minTravelDuration();
     int minCost = cost + h.minCost();
-    int departureTime = minArrivalTime - minTravelDuration;
-    return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost, c2);
+    return paths.qualify(minArrivalTime, minNumberOfTransfers, minCost, c2);
   }
 
   private String rejectErrorMessage(int stop) {
