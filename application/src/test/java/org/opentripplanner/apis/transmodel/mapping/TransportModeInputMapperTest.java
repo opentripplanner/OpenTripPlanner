@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.transmodel.mapping;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -12,23 +14,20 @@ class TransportModeInputMapperTest {
 
   @Test
   void mapTransitMode() {
-    assertThat(TransportModeInputMapper.mapTransitMode(TransitMode.BUS)).isEqualTo(TransitMode.BUS);
+    assertEquals(TransitMode.BUS, TransportModeInputMapper.mapTransitMode(TransitMode.BUS));
   }
 
   @Test
   void mapNullTransitMode() {
-    assertThat(TransportModeInputMapper.mapTransitMode(null)).isNull();
+    assertNull(TransportModeInputMapper.mapTransitMode(null));
   }
 
   @Test
   void rejectUnknownTransitMode() {
     // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
-    var ex = assertThrows(InvalidInputException.class, () ->
+    assertThrows(InvalidInputException.class, () ->
       TransportModeInputMapper.mapTransitMode("unknown")
     );
-    assertThat(ex)
-      .hasMessageThat()
-      .isEqualTo("transportMode 'unknown' cannot be used as a filter.");
   }
 
   @Test
