@@ -32,14 +32,14 @@ public class TransportModeInputMapper {
   }
 
   /**
-   * Map a list of {@code TransportMode} input values. A {@code null} list is returned as is.
+   * Map a list of {@code TransportMode} input values. A {@code null} list is mapped to an empty
+   * list.
    *
    * @throws InvalidInputException if a value is not a {@link TransitMode}, e.g. {@code unknown}
    */
-  @Nullable
   public static List<TransitMode> mapTransitModes(@Nullable List<?> values) {
     if (values == null) {
-      return null;
+      return List.of();
     }
     return values.stream().map(TransportModeInputMapper::mapTransitMode).toList();
   }

@@ -39,7 +39,7 @@ class TransportModeInputMapperTest {
 
   @Test
   void mapNullTransitModes() {
-    assertThat(TransportModeInputMapper.mapTransitModes(null)).isNull();
+    assertThat(TransportModeInputMapper.mapTransitModes(null)).isEmpty();
   }
 
   @Test
