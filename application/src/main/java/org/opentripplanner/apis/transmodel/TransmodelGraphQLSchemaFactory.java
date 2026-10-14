@@ -823,11 +823,12 @@ public class TransmodelGraphQLSchemaFactory {
                 .filter(
                   stopAtDistance ->
                     environment.getArgument("authority") == null ||
-                    stopAtDistance.stopId
+                    stopAtDistance
+                      .stopId()
                       .getFeedId()
                       .equalsIgnoreCase(environment.getArgument("authority"))
                 )
-                .sorted(Comparator.comparing(s -> s.distance))
+                .sorted(Comparator.comparing(s -> s.distance()))
                 .collect(Collectors.toList());
             } catch (RoutingValidationException e) {
               LOG.warn(

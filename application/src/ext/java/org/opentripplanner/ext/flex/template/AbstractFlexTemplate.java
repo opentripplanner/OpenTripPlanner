@@ -91,7 +91,7 @@ abstract class AbstractFlexTemplate {
   }
 
   FeedScopedId getAccessEgressStopId() {
-    return accessEgress.stopId;
+    return accessEgress.stopId();
   }
 
   /**
@@ -109,7 +109,7 @@ abstract class AbstractFlexTemplate {
     else {
       double maxDistanceMeters =
         flexParameters.maxTransferDuration().getSeconds() *
-        accessEgress.state.getRequest().walk().speed();
+        accessEgress.state().getRequest().walk().speed();
 
       return getTransfersFromTransferStop(callback)
         .stream()
@@ -194,7 +194,7 @@ abstract class AbstractFlexTemplate {
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice, leading to a noticeable slowdown.
-    final var afterFlexState = flexEdge.traverse(accessEgress.state);
+    final var afterFlexState = flexEdge.traverse(accessEgress.state());
     if (State.isEmpty(afterFlexState)) {
       return null;
     }

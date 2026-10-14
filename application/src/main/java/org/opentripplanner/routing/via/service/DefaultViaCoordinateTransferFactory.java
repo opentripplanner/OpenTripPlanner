@@ -56,12 +56,12 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
         transfers.add(
           new ViaCoordinateTransfer(
             coordinate,
-            transitService.getStopLocation(from.stopId).getIndex(),
-            transitService.getStopLocation(to.stopId).getIndex(),
-            from.edges,
-            to.edges,
-            (int) (from.state.getElapsedTimeSeconds() + to.state.getElapsedTimeSeconds()),
-            from.state.getWeight() + to.state.getWeight()
+            transitService.getStopLocation(from.stopId()).getIndex(),
+            transitService.getStopLocation(to.stopId()).getIndex(),
+            from.edges(),
+            to.edges(),
+            (int) (from.state().getElapsedTimeSeconds() + to.state().getElapsedTimeSeconds()),
+            from.state().getWeight() + to.state().getWeight()
           )
         );
       }
@@ -101,7 +101,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     );
     return r
       .stream()
-      .filter(it -> !transitService.getStopLocation(it.stopId).transfersNotAllowed())
+      .filter(it -> !transitService.getStopLocation(it.stopId()).transfersNotAllowed())
       .toList();
   }
 }

@@ -38,11 +38,11 @@ public class AccessEgressMapper {
   }
 
   private RoutingAccessEgress mapNearbyStop(NearbyStop nearbyStop) {
-    var stop = resolver.getStopLocation(nearbyStop.stopId);
+    var stop = resolver.getStopLocation(nearbyStop.stopId());
     if (!(stop instanceof RegularStop)) {
       return null;
     }
 
-    return new DefaultAccessEgress(stop.getIndex(), nearbyStop.state);
+    return new DefaultAccessEgress(stop.getIndex(), nearbyStop.state());
   }
 }

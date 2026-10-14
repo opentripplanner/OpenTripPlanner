@@ -225,14 +225,14 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   }
 
   private String nearbyStopDescription(NearbyStop nearbyStop) {
-    if (nearbyStop.edges.isEmpty()) {
+    if (nearbyStop.edges().isEmpty()) {
       return (
         "direct[" +
-        transitRepository.getSiteRepository().getStopLocation(nearbyStop.stopId).getName() +
+        transitRepository.getSiteRepository().getStopLocation(nearbyStop.stopId()).getName() +
         "]"
       );
     } else {
-      return "street[" + stateDescription(nearbyStop.state) + "]";
+      return "street[" + stateDescription(nearbyStop.state()) + "]";
     }
   }
 
