@@ -20,6 +20,10 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * The departure time is used to calculate the journey duration, which is a pareto criterion in
  * the destination pareto-set for searches that are not timetable searches. See
  * {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
+ * <p>
+ * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/8095">
+ *     This class duplicates logic found in Raptor and the path builder
+ * </a>.
  */
 public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
 

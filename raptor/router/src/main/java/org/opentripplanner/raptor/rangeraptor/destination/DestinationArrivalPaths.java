@@ -52,7 +52,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private final DebugHandler<ArrivalView<?>> debugHandler;
   private final RaptorStopNameResolver stopNameResolver;
   private boolean reachedCurrentRound = false;
-  private int iterationDepartureTime = -1;
+  private int iterationDepartureTime = RaptorConstants.TIME_NOT_SET;
 
   private final ParetoSet<DestinationArrival<T>> arrivals;
 
@@ -209,13 +209,12 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   /**
    * Check whether the given arrival could produce a pareto-optimal result. Called by McRaptor's
-   * heuristic pruning only — never called by StdRaptor.
+   * heuristic pruning only - never called by StdRaptor.
    * <p>
-   * <b>Do NOT replace this method with one creating a new {@link DestinationArrival} (or a
-   * {@link RaptorPath}) per call.</b> It is called for every stop arrival in every round, so it is
-   * one of the hottest code paths in McRaptor. The pareto set needs an element to compare with,
-   * and an object created here is not reliably removed by the JVM's escape analysis (the
-   * qualification check is too large to be fully inlined). The result is millions of short-lived
+   * <b>Do NOT replace this method with one creating a new {@link DestinationArrival} per call.</b>
+   * It is called for every stop arrival in every round, so it is one of the hottest code paths in
+   * McRaptor. The pareto-set needs an element to compare with, and an object created here is
+   * not reliably removed by the JVM's escape analysis. The result is millions of short-lived
    * objects and a measurable slowdown of the search. Instead, the same primitive signature is
    * used and the values are written into a single reusable probe. The probe is never stored by
    * the pareto set.

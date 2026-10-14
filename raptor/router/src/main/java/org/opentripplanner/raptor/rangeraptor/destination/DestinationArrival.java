@@ -24,6 +24,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   private final ArrivalView<T> previous;
   private final RaptorAccessEgress egress;
 
+  // The fields below are not final only to let a single probe be reused for qualification checks, see setProbeValues().
   private int iterationDepartureTime;
   private int departureTime;
   private int arrivalTime;
@@ -54,8 +55,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     this.iterationDepartureTime = iterationDepartureTime;
     this.departureTime = departureTime;
     this.arrivalTime = arrivalTime;
-    // transit-only transfers; egress rides are added dynamically via round()
-    this.numberOfTransfers = previous.round() - 1;
+    this.numberOfTransfers = previous.round() - 1 + egress.numberOfRides();
     this.c1 = previous.c1() + additionalC1;
     this.c2 = c2;
   }
@@ -131,7 +131,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   @Override
   public int numberOfTransfers() {
-    return numberOfTransfers + (egress != null ? egress.numberOfRides() : 0);
+    return numberOfTransfers;
   }
 
   @Override
