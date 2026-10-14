@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
 import gnu.trove.list.array.TIntArrayList;
+import java.util.PrimitiveIterator;
 
 /**
  * Undirected vertex adjacency of the street graph, keyed on {@link VertexIndex} ids and stored in
@@ -45,15 +46,21 @@ class Adjacency {
     return offsets[v] != offsets[v + 1];
   }
 
-  int firstNeighbour(int v) {
-    return offsets[v];
-  }
+  /** The ids of the vertices adjacent to vertex {@code v}. */
+  PrimitiveIterator.OfInt neighbours(int v) {
+    return new PrimitiveIterator.OfInt() {
+      private int i = offsets[v];
+      private final int end = offsets[v + 1];
 
-  int endNeighbour(int v) {
-    return offsets[v + 1];
-  }
+      @Override
+      public boolean hasNext() {
+        return i < end;
+      }
 
-  int neighbour(int i) {
-    return targets[i];
+      @Override
+      public int nextInt() {
+        return targets[i++];
+      }
+    };
   }
 }

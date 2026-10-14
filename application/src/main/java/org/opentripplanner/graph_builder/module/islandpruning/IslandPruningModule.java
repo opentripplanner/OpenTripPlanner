@@ -281,7 +281,6 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
-    // only the graph vertices, not those added to the index while collecting
     for (int from = 0; from < vertexIndex.size(); from++) {
       if (!vertexIndex.isStreetVertex(from)) {
         continue;

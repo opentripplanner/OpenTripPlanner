@@ -97,8 +97,8 @@ class SubgraphSearch {
     queue[tail++] = startVertex;
     while (head < tail) {
       int vertex = queue[head++];
-      for (int i = neighbours.firstNeighbour(vertex); i < neighbours.endNeighbour(vertex); i++) {
-        int neighbour = neighbours.neighbour(i);
+      for (var it = neighbours.neighbours(vertex); it.hasNext(); ) {
+        int neighbour = it.nextInt();
         if (visitedBy[neighbour] == visited || alreadyMapped[neighbour] != NO_SUBGRAPH) {
           continue;
         }

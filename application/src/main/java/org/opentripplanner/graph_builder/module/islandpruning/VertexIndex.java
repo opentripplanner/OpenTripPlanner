@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -15,8 +16,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
  * has millions of vertices and hash map lookups keyed on {@link Vertex} dominate the run time,
  * array access is much cheaper.
  * <p>
- * Ids follow the iteration order of the collection given to the constructor. Vertices not in that
- * collection are given a new id the first time they are looked up.
+ * Ids follow the iteration order of the collection given to the constructor. The index is
+ * immutable: looking up a vertex that is not in that collection is an error.
  */
 class VertexIndex {
 
@@ -24,14 +25,14 @@ class VertexIndex {
 
   private final TObjectIntMap<Vertex> ids;
   private final List<Vertex> vertices;
-  private final boolean[] streetVertex;
-  private final boolean[] stopVertex;
+  private final BitSet streetVertex;
+  private final BitSet stopVertex;
 
   VertexIndex(Collection<Vertex> graphVertices) {
     this.ids = new TObjectIntHashMap<>(graphVertices.size(), 0.5f, NO_ID);
     this.vertices = new ArrayList<>(graphVertices.size());
-    this.streetVertex = new boolean[graphVertices.size()];
-    this.stopVertex = new boolean[graphVertices.size()];
+    this.streetVertex = new BitSet(graphVertices.size());
+    this.stopVertex = new BitSet(graphVertices.size());
     for (Vertex v : graphVertices) {
       addVertex(v);
     }
@@ -39,11 +40,10 @@ class VertexIndex {
 
   int idOf(Vertex v) {
     int id = ids.get(v);
-    if (id != NO_ID) {
-      return id;
-    } else {
-      throw new RuntimeException("Cannot find index for vertex %s".formatted(v));
+    if (id == NO_ID) {
+      throw new IllegalArgumentException("Vertex %s is not in the index".formatted(v));
     }
+    return id;
   }
 
   Vertex vertex(int id) {
@@ -55,24 +55,18 @@ class VertexIndex {
   }
 
   boolean isStreetVertex(int id) {
-    return streetVertex[id];
+    return streetVertex.get(id);
   }
 
   boolean isStopVertex(int id) {
-    return stopVertex[id];
+    return stopVertex.get(id);
   }
 
-  /** Returns the id of the given vertex, assigning a new one if it does not have one yet. */
-  private int addVertex(Vertex v) {
-    int id = ids.get(v);
-    if (id != NO_ID) {
-      return id;
-    }
-    id = vertices.size();
+  private void addVertex(Vertex v) {
+    int id = vertices.size();
     ids.put(v, id);
     vertices.add(v);
-    streetVertex[id] = v instanceof StreetVertex;
-    stopVertex[id] = v instanceof TransitStopVertex;
-    return id;
+    streetVertex.set(id, v instanceof StreetVertex);
+    stopVertex.set(id, v instanceof TransitStopVertex);
   }
 }
