@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.59.1</version>
+            <version>1.60.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.20</version>
+            <version>7.18.1</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
