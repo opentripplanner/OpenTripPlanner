@@ -1,7 +1,5 @@
 package org.opentripplanner.gbfs.manifest;
 
-import static tools.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-
 import java.net.URI;
 import java.util.Comparator;
 import java.util.Optional;
@@ -27,9 +25,7 @@ public class GbfsManifestLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsManifestLoader.class);
 
-  private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder()
-    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-    .build();
+  private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder().build();
 
   /**
    * Loads the manifest from a remote URL or a local {@code file:} path.
