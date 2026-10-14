@@ -20,6 +20,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
@@ -683,13 +684,14 @@ public class BikeRentalTest extends GraphRoutingTest {
       .withTo(toVertex)
       .getShortestPathTree();
 
-    var path = tree.getPath(arriveBy ? fromVertex : toVertex);
+    var state = tree.getState(arriveBy ? fromVertex : toVertex);
 
-    if (path == null) {
+    if (state == null) {
       return null;
     }
 
-    return path.states
+    return new StreetPath(state)
+      .states()
       .stream()
       .filter(s -> s.getBackEdge() instanceof StreetEdge || s.getVertex() == toVertex)
       .map(s ->

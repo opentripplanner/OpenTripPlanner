@@ -1,11 +1,11 @@
 package org.opentripplanner.apis.vectortiles.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Represents a style specification for Maplibre/Mapbox vector tile layers.

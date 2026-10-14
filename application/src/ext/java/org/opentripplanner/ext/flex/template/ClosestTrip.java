@@ -83,7 +83,7 @@ record ClosestTrip(
   ) {
     var map = new HashMap<FlexTrip<?, ?>, ClosestTrip>();
     for (NearbyStop nearbyStop : nearbyStops) {
-      var stopId = nearbyStop.stopId;
+      var stopId = nearbyStop.stopId();
       for (var trip : callbackService.getFlexTripsByStopId(stopId)) {
         int stopPos = pickup ? trip.findBoardIndex(stopId) : trip.findAlightIndex(stopId);
         if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND && matcher.match(trip.getTrip())) {

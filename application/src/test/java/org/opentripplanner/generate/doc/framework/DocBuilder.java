@@ -2,11 +2,11 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.utils.text.MarkdownFormatter.NEW_LINE;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.utils.text.MarkdownFormatter;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Builder for creating a new document

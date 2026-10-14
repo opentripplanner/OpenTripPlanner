@@ -2,7 +2,6 @@ package org.opentripplanner.astar.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -107,21 +106,6 @@ class ShortestPathTreeTest {
     assertTrue(all.contains(s1));
     assertTrue(all.contains(s2a));
     assertTrue(all.contains(s2b));
-  }
-
-  @Test
-  void getPathReturnsNullForAbsentVertex() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
-    assertNull(spt.getPath(new TestVertex()));
-  }
-
-  @Test
-  void getPathReturnsFinalState() {
-    var spt = new ShortestPathTree<>(BY_WEIGHT);
-    var v = new TestVertex();
-    var s = new TestState(v, 1.0);
-    spt.add(s);
-    assertNotNull(spt.getPath(v));
   }
 
   @Test

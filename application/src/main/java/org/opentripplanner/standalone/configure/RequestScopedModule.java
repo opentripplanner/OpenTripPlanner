@@ -9,19 +9,22 @@ import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
 import org.opentripplanner.apis.transmodel.TransmodelAPIParameters;
 import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
+import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.core.model.transaction.TransactionScope;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.framework.transaction.RepositoryRegistry;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.api.TransactionScope;
-import org.opentripplanner.framework.transaction.configure.TransitDomain;
+import org.opentripplanner.ext.taxi.TaxiService;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -96,6 +99,41 @@ public class RequestScopedModule {
   }
 
   @Provides
+  @Nullable
+  @HttpRequestScoped
+  RealtimeResolver realTimeResolver(
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
+  ) {
+    return OTPFeature.RealtimeResolver.isOn()
+      ? new RealtimeResolver(refetchItineraryService, transitService, transitAlertService)
+      : null;
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static RefetchItineraryService refetchItineraryService(
+    Graph graph,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
+  ) {
+    return new RefetchItineraryService(
+      graph,
+      transitService,
+      transitAlertService,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
+    );
+  }
+
+  @Provides
   @HttpRequestScoped
   static RouteRequest defaultRouteRequest(
     RouterConfig routerConfig,
@@ -163,10 +201,12 @@ public class RequestScopedModule {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiService taxiService,
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
-    TransitRoutingConfig transitRoutingConfig
+    TransitRoutingConfig transitRoutingConfig,
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     return new DefaultRoutingService(
       transitService,
@@ -184,12 +224,14 @@ public class RequestScopedModule {
       sorlandsbanenService,
       viaTransferResolver,
       carpoolingService,
+      taxiService,
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,
       // transitRoutingConfig implements 2 roles; hence the repetition below
       transitRoutingConfig,
-      transitRoutingConfig
+      transitRoutingConfig,
+      realtimeResolver
     );
   }
 
@@ -229,33 +271,5 @@ public class RequestScopedModule {
   @HttpRequestScoped
   static GtfsGraphQLRequestContext graphQLRequestContext(RequestScopedFactory factory) {
     return new DaggerGtfsGraphQLRequestContext(factory);
-  }
-
-  /**
-   * Shared by both the GTFS and Transmodel GraphQL APIs' single-id itinerary refetch queries
-   * (#7878). Assembled from the same request-scoped {@link TransitService}, alerts, transfer
-   * service, and linking context as {@link #routingService}, so refetching uses the request's
-   * consistent realtime view rather than an independently constructed transit snapshot.
-   */
-  @Provides
-  @HttpRequestScoped
-  static RefetchItineraryService refetchItineraryService(
-    Graph graph,
-    TransitService transitService,
-    TransitAlertService transitAlertService,
-    RegularTransferService transferService,
-    StreetDetailsService streetDetailsService,
-    LinkingContextFactory linkingContextFactory,
-    StreetLimitationParametersService streetLimitationParametersService
-  ) {
-    return new RefetchItineraryService(
-      graph,
-      transitService,
-      transitAlertService,
-      transferService,
-      streetDetailsService,
-      linkingContextFactory,
-      streetLimitationParametersService
-    );
   }
 }

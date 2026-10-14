@@ -158,7 +158,7 @@ public class AlternativeLegs {
 
       var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
-      for (TripTimes tripTimes : timetable.getTripTimes()) {
+      for (TripTimes<?> tripTimes : timetable.getTripTimes()) {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {
           continue;
         }
@@ -213,7 +213,7 @@ public class AlternativeLegs {
     TransitService transitService
   ) {
     LocalDate serviceDay = tripTimeOnDate.getServiceDay();
-    TripTimes tripTimes = tripTimeOnDate.getTripTimes();
+    var tripTimes = tripTimeOnDate.getTripTimes();
 
     ZonedDateTime boardingTime = ServiceDateUtils.toZonedDateTime(
       serviceDay,

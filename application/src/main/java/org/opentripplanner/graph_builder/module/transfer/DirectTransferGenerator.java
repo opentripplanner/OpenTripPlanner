@@ -276,13 +276,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     Map<TransferKey, PathTransfer> distinctTransfers,
     StreetMode mode
   ) {
-    TransferKey transferKey = new TransferKey(from, to, sd.edges);
+    TransferKey transferKey = new TransferKey(from, to, sd.edges());
     PathTransfer pathTransfer = distinctTransfers.get(transferKey);
     if (pathTransfer == null) {
       // If the PathTransfer can't be found, it is created.
       distinctTransfers.put(
         transferKey,
-        new PathTransfer(from, to, sd.distance, sd.edges, EnumSet.of(mode))
+        new PathTransfer(from, to, sd.distance(), sd.edges(), EnumSet.of(mode))
       );
     } else {
       // If the PathTransfer is found, a new PathTransfer with the added mode is created.
@@ -404,7 +404,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       var repository = transitRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        var nearbyStop = repository.getStopLocation(sd.stopId);
+        var nearbyStop = repository.getStopLocation(sd.stopId());
         if (nearbyStop.equals(stop)) {
           continue;
         }
@@ -440,7 +440,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       var repository = transitRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        var nearbyStop = repository.getStopLocation(sd.stopId);
+        var nearbyStop = repository.getStopLocation(sd.stopId());
         if (nearbyStop.equals(stop)) {
           continue;
         }
@@ -526,7 +526,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     );
     var repository = transitRepository.getSiteRepository();
     for (NearbyStop sd : nearbyStops) {
-      var nearbyStop = repository.getStopLocation(sd.stopId);
+      var nearbyStop = repository.getStopLocation(sd.stopId());
       // Skip the origin stop, loop transfers are not needed.
       if (nearbyStop.equals(stop)) {
         continue;

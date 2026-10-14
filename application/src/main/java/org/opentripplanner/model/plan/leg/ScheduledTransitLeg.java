@@ -55,7 +55,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private static final Comparator<FareOffer> FARE_OFFER_COMPARATOR = Comparator.comparing(
     (FareOffer o) -> o.fareProduct().id().getId()
   ).thenComparing(FareOffer::uniqueId);
-  private final TripTimes tripTimes;
+  private final TripTimes<?> tripTimes;
   private final TripPattern tripPattern;
 
   private final ZonedDateTime startTime;
@@ -139,7 +139,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     return zoneId;
   }
 
-  public TripTimes tripTimes() {
+  public TripTimes<?> tripTimes() {
     return tripTimes;
   }
 

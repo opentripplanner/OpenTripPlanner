@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 public final class RealTimeTripUpdate {
 
   private final TripPattern pattern;
-  private final TripTimes updatedTripTimes;
+  private final TripTimes<?> updatedTripTimes;
   private final LocalDate serviceDate;
 
   @Nullable
@@ -61,7 +61,11 @@ public final class RealTimeTripUpdate {
    * @param serviceDate      the service date for which this update applies (updates are valid
    *                         only for one service date).
    */
-  public static Builder of(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
+  public static Builder of(
+    TripPattern pattern,
+    TripTimes<?> updatedTripTimes,
+    LocalDate serviceDate
+  ) {
     return new Builder(pattern, updatedTripTimes, serviceDate);
   }
 
@@ -69,7 +73,7 @@ public final class RealTimeTripUpdate {
     return pattern;
   }
 
-  public TripTimes updatedTripTimes() {
+  public TripTimes<?> updatedTripTimes() {
     return updatedTripTimes;
   }
 
@@ -107,7 +111,7 @@ public final class RealTimeTripUpdate {
   public static class Builder {
 
     private final TripPattern pattern;
-    private final TripTimes updatedTripTimes;
+    private final TripTimes<?> updatedTripTimes;
     private final LocalDate serviceDate;
     private TripOnServiceDate addedTripOnServiceDate = null;
     private boolean tripCreation = false;
@@ -116,7 +120,7 @@ public final class RealTimeTripUpdate {
     private boolean revertPreviousRealTimeUpdates = false;
     private TripPattern hideTripInScheduledPattern = null;
 
-    private Builder(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
+    private Builder(TripPattern pattern, TripTimes<?> updatedTripTimes, LocalDate serviceDate) {
       this.pattern = pattern;
       this.updatedTripTimes = updatedTripTimes;
       this.serviceDate = serviceDate;

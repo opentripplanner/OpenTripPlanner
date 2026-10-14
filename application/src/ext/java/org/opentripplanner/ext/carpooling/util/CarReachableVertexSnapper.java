@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.spi.SearchTerminationStrategy;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
@@ -15,6 +14,7 @@ import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
@@ -82,7 +82,7 @@ public final class CarReachableVertexSnapper {
    * A car-reachable {@code vertex} paired with the {@code walkPath} bridging the gap to the
    * original input, or a {@code null} {@code walkPath} when there is no real walking.
    */
-  public record SnapResult(Vertex vertex, @Nullable GraphPath<State, Edge, Vertex> walkPath) {}
+  public record SnapResult(Vertex vertex, @Nullable StreetPath walkPath) {}
 
   /**
    * Snaps a pickup: forward search from {@code vertexToSnap}; the walk path runs to the snapped
@@ -196,9 +196,9 @@ public final class CarReachableVertexSnapper {
       return null;
     }
 
-    var path = new GraphPath<>(best);
+    var path = new StreetPath(best);
     // A zero-duration path means the snap landed on a zero-cost temporary hop — no real walk.
-    if (path.getDuration() == 0) {
+    if (path.duration().isZero()) {
       return new SnapResult(best.getVertex(), null);
     }
     return new SnapResult(best.getVertex(), path);

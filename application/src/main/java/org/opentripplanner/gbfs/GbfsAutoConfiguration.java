@@ -1,9 +1,5 @@
 package org.opentripplanner.gbfs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -16,6 +12,10 @@ import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.json.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.cfg.EnumFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * The GBFS auto-configuration file (gbfs.json) of a GBFS system, together with the url it was
@@ -27,10 +27,9 @@ public class GbfsAutoConfiguration {
 
   // Unknown enum values (e.g. feed names added in newer GBFS versions) must map to null so that
   // the corresponding feeds can be skipped instead of failing the whole file.
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().configure(
-    DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL,
-    true
-  );
+  private static final JsonMapper OBJECT_MAPPER = JsonMapper.builder()
+    .configure(EnumFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+    .build();
 
   private final String url;
   private final JsonNode json;
@@ -102,7 +101,7 @@ public class GbfsAutoConfiguration {
   public <T> T mapTo(Class<T> clazz) {
     try {
       return OBJECT_MAPPER.treeToValue(json, clazz);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       LOG.warn(
         "Error parsing GBFS auto-configuration file from {}. Details: {}.",
         url,

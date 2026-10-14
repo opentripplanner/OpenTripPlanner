@@ -33,7 +33,7 @@ import org.opentripplanner.ext.carpooling.routing.TripWithViableAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.ViableAccessEgress;
 import org.opentripplanner.ext.carpooling.util.BeelineEstimator;
 import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
-import org.opentripplanner.ext.carpooling.util.GraphPathUtils;
+import org.opentripplanner.ext.carpooling.util.StreetPathUtils;
 import org.opentripplanner.ext.carpooling.util.StreetVertexUtils;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
@@ -477,22 +477,22 @@ public class DefaultCarpoolingService implements CarpoolingService {
       // not a real stop or platform a carpool driver could drop the passenger at, so skip them.
       var byStopId = new LinkedHashMap<FeedScopedId, NearbyStop>();
       for (var stop : foundStops) {
-        if (transitServiceResolver.getStopLocation(stop.stopId) instanceof AreaStop) {
+        if (transitServiceResolver.getStopLocation(stop.stopId()) instanceof AreaStop) {
           continue;
         }
-        byStopId.putIfAbsent(stop.stopId, stop);
+        byStopId.putIfAbsent(stop.stopId(), stop);
       }
       var stopSnaps = new HashMap<NearbyStop, CarReachableVertexSnapper.SnapResult>();
       for (var stop : byStopId.values()) {
         var snap = accessOrEgress.isAccess()
           ? carReachableVertexSnapper.snapDropoff(
               streetSearchRequest,
-              stop.state.getVertex(),
+              stop.state().getVertex(),
               maxWalkToCarpool
             )
           : carReachableVertexSnapper.snapPickup(
               streetSearchRequest,
-              stop.state.getVertex(),
+              stop.state().getVertex(),
               maxWalkToCarpool
             );
         if (snap != null) {
@@ -711,7 +711,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
         );
         return null;
       }
-      durations[leg] = GraphPathUtils.durationOrZero(path);
+      durations[leg] = path.duration();
     }
     return durations;
   }
@@ -752,7 +752,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
       .startTime()
       .plus(insertionCandidate.getDurationUntilPickupArrival());
     var passengerStartTime = carpoolPickupTime.minus(
-      GraphPathUtils.durationOrZero(insertionCandidate.walkToPickup())
+      StreetPathUtils.durationOrZero(insertionCandidate.walkToPickup())
     );
 
     var passengerDepartureTime = TimeUtils.toTransitTimeSeconds(
@@ -761,7 +761,7 @@ public class DefaultCarpoolingService implements CarpoolingService {
     );
 
     StopLocation transitStopLocation = transitServiceResolver.getStopLocation(
-      insertionCandidate.transitStop().stopId
+      insertionCandidate.transitStop().stopId()
     );
     EndpointLabel stopLabel = EndpointLabel.forStop(transitStopLocation);
     EndpointLabel passengerLabel = EndpointLabel.forLocation(passengerLocation);

@@ -87,6 +87,6 @@ public class BeelineEstimator {
     for (int i = 0; i < segmentDurations.length; i++) {
       segmentDurations[i] = estimateDuration(points.get(i), points.get(i + 1));
     }
-    return GraphPathUtils.calculateCumulativeDurations(segmentDurations, stopDuration);
+    return StreetPathUtils.calculateCumulativeDurations(segmentDurations, stopDuration);
   }
 }

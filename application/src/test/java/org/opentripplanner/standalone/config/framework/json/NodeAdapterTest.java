@@ -73,6 +73,20 @@ public class NodeAdapterTest {
   }
 
   @Test
+  void wrongType() {
+    NodeAdapter subject = newNodeAdapterForTest(
+      "{ text : 'abc', bool : 'yes', obj : { a : 1 }, array : [1] }"
+    );
+    var ex = assertThrows(OtpAppException.class, () -> subject.of("text").asInt(0));
+    assertTrue(ex.getMessage().contains("Parameter: text."), ex.getMessage());
+    assertThrows(OtpAppException.class, () -> subject.of("text").asInt());
+    assertThrows(OtpAppException.class, () -> subject.of("text").asDouble(0.0));
+    assertThrows(OtpAppException.class, () -> subject.of("bool").asBoolean(false));
+    assertThrows(OtpAppException.class, () -> subject.of("obj").asString("x"));
+    assertThrows(OtpAppException.class, () -> subject.of("array").asString());
+  }
+
+  @Test
   void docInfo() {
     NodeAdapter subject = newNodeAdapterForTest("{ bool: false }");
     subject.of("bool").since(V2_0).summary("B Summary").description("Ddd").asBoolean();
