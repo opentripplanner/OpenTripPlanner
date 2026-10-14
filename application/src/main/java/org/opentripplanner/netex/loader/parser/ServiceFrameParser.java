@@ -181,7 +181,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
       return;
     }
 
-    for (JAXBElement<?> element : routes.getRoute_Dummy()) {
+    for (JAXBElement<?> element : routes.getRoute()) {
       if (element.getValue() instanceof Route route) {
         this.routes.add(route);
       }
@@ -232,7 +232,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
       return;
     }
 
-    for (JAXBElement<?> element : lines.getLine_Dummy()) {
+    for (JAXBElement<?> element : lines.getLine()) {
       if (element.getValue() instanceof Line) {
         this.lines.add((Line) element.getValue());
       } else if (element.getValue() instanceof FlexibleLine) {
@@ -248,7 +248,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
       return;
     }
 
-    for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern_Dummy()) {
+    for (JAXBElement<?> pattern : journeyPatterns.getJourneyPattern()) {
       if (pattern.getValue() instanceof JourneyPattern_VersionStructure journeyPattern) {
         this.journeyPatterns.add(journeyPattern);
       } else {
