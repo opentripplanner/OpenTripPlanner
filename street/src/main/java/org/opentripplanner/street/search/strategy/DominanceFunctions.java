@@ -23,14 +23,8 @@ import org.opentripplanner.street.search.state.State;
  */
 public abstract class DominanceFunctions implements Serializable, DominanceFunction<State> {
 
-  /**
-   * For bike rental, parking, and approaching turn-restricted intersections states are
-   * incomparable: they exist on separate planes. The core state dominance logic is wrapped in this
-   * public function and only applied when the two states have all these variables in common (are on
-   * the same plane).
-   */
   @Override
-  public boolean betterOrEqualAndComparable(State a, State b) {
+  public boolean comparable(State a, State b) {
     // Does one state represent riding a rented bike and the other represent walking before/after rental?
     if (!a.isCompatibleVehicleRentalState(b)) {
       return false;
@@ -101,18 +95,20 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       return false;
     }
 
-    // These two states are comparable (they are on the same "plane" or "copy" of the graph).
-    return betterOrEqual(a, b);
+    return true;
   }
 
   /**
-   * Return true if the first state "defeats" the second state or at least ties with it in terms of
-   * suitability. In the case that they are tied, we still want to return true so that an existing
-   * state will kick out a new one. Provide this custom logic in subclasses. You would think this
-   * could be static, but in Java for some reason calling a static function will call the one on the
-   * declared type, not the runtime instance type.
+   * For bike rental, parking, and approaching turn-restricted intersections states are
+   * incomparable: they exist on separate planes. The core state dominance logic is wrapped in this
+   * public function and only applied when the two states have all these variables in common (are on
+   * the same plane).
    */
-  protected abstract boolean betterOrEqual(State a, State b);
+  @Override
+  public boolean betterOrEqualAndComparable(State a, State b) {
+    // These two states are comparable (they are on the same "plane" or "copy" of the graph).
+    return comparable(a, b) && betterOrEqual(a, b);
+  }
 
   public static class MinimumWeight extends DominanceFunctions {
 
@@ -120,6 +116,11 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
     @Override
     public boolean betterOrEqual(State a, State b) {
       return a.weight <= b.weight;
+    }
+
+    @Override
+    public boolean significantlyBetter(State a, State b) {
+      return a.weight < b.weight - 60;
     }
   }
 
@@ -134,6 +135,11 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
     @Override
     public boolean betterOrEqual(State a, State b) {
       return a.getElapsedTimeMilliseconds() <= b.getElapsedTimeMilliseconds();
+    }
+
+    @Override
+    public boolean significantlyBetter(State a, State b) {
+      return a.getElapsedTimeMilliseconds() < b.getElapsedTimeMilliseconds() - 60_000;
     }
   }
 
@@ -159,6 +165,11 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
         length++;
       }
     }
+
+    @Override
+    public boolean significantlyBetter(State a, State b) {
+      return a.getElapsedTimeMilliseconds() < b.getElapsedTimeMilliseconds() - 60_000;
+    }
   }
 
   /**
@@ -167,8 +178,13 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
   public static class ShortestDistance extends DominanceFunctions {
 
     @Override
-    protected boolean betterOrEqual(State a, State b) {
+    public boolean betterOrEqual(State a, State b) {
       return a.getTraversalDistanceMeters() <= b.getTraversalDistanceMeters();
+    }
+
+    @Override
+    public boolean significantlyBetter(State a, State b) {
+      return betterOrEqual(a, b);
     }
   }
 
@@ -189,6 +205,14 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       return (
         a.getElapsedTimeSeconds() <= b.getElapsedTimeSeconds() + EPSILON &&
         a.getWeight() <= b.getWeight() + EPSILON
+      );
+    }
+
+    @Override
+    public boolean significantlyBetter(State a, State b) {
+      return (
+        a.getElapsedTimeMilliseconds() < b.getElapsedTimeMilliseconds() - 60_000 &&
+        a.getWeight() < b.getWeight() - 60
       );
     }
   }

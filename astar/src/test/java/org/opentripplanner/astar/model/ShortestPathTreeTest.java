@@ -56,7 +56,7 @@ class ShortestPathTreeTest {
     var v = new TestVertex();
     var e = new TestEdge(v0, v, 1.0);
     var better = new TestState(v, 1.0, e);
-    var worse = new TestState(v, 10.0, e);
+    var worse = new TestState(v, 100.0, e);
 
     assertTrue(spt.add(better));
     assertFalse(spt.add(worse));
@@ -65,9 +65,11 @@ class ShortestPathTreeTest {
   @Test
   void coDominantStates() {
     var spt = new ShortestPathTree<>(NONE, false);
+    var v0 = new TestVertex();
     var v = new TestVertex();
-    var s1 = new TestState(v, 1.0);
-    var s2 = new TestState(v, 2.0);
+    var e = new TestEdge(v0, v, 1.0);
+    var s1 = new TestState(v, 1.0, e);
+    var s2 = new TestState(v, 2.0, e);
 
     assertTrue(spt.add(s1));
     assertTrue(spt.add(s2));

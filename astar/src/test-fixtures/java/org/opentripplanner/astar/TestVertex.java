@@ -22,6 +22,10 @@ public class TestVertex implements AStarVertex<TestState, TestEdge, TestVertex> 
     return name;
   }
 
+  public String toString() {
+    return "TestVertex(" + name + ")";
+  }
+
   @Override
   public Collection<TestEdge> getOutgoing() {
     return outgoing;
