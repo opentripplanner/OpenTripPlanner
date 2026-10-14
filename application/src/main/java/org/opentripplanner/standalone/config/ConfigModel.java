@@ -1,11 +1,11 @@
 package org.opentripplanner.standalone.config;
 
-import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * This class is responsible for keeping a single instance of the OTP configuration in memory.
