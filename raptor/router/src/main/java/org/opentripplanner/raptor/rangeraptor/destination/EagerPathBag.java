@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import java.util.IdentityHashMap;
 import java.util.List;

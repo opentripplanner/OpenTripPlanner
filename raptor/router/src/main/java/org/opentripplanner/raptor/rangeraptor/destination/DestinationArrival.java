@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.opentripplanner.raptor.api.view.PathLegType.EGRESS;
 

@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;

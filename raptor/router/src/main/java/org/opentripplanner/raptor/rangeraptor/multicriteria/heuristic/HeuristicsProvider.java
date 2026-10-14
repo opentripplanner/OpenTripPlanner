@@ -3,11 +3,11 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic;
 import java.util.Objects;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**

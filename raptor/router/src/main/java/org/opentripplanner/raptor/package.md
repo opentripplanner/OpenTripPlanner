@@ -114,7 +114,7 @@ because the existing element `[5,6]` is better than the new element for both cri
 ### Destination pareto-set
 
 _The code for this is found in `DestinationArrivalParetoSetComparators` in the
-`org.opentripplanner.raptor.rangeraptor.path` package._
+`org.opentripplanner.raptor.rangeraptor.destination` package._
 
 The pareto-set at the destination is different from the pareto-sets at the stops: it is the source
 of the result paths. Raptor does not build a path for each arrival at the destination. The set holds

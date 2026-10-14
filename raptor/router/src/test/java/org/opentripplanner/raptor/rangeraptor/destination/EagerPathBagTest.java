@@ -1,10 +1,10 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators.paretoComparator;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.NONE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
-import static org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalParetoSetComparators.paretoComparator;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

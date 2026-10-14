@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path.configure;
+package org.opentripplanner.raptor.rangeraptor.destination.configure;
 
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
@@ -6,15 +6,15 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrival;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
+import org.opentripplanner.raptor.rangeraptor.destination.ForwardPathMapper;
+import org.opentripplanner.raptor.rangeraptor.destination.PathMapper;
+import org.opentripplanner.raptor.rangeraptor.destination.ReversePathMapper;
+import org.opentripplanner.raptor.rangeraptor.destination.TimeShiftedDepartureTime;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalParetoSetComparators;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
-import org.opentripplanner.raptor.rangeraptor.path.PathMapper;
-import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
-import org.opentripplanner.raptor.rangeraptor.path.TimeShiftedDepartureTime;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;

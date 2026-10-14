@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import java.util.Objects;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
