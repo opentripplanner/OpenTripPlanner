@@ -1,10 +1,11 @@
 package org.opentripplanner.netex.validation;
 
-import java.util.List;
+import jakarta.xml.bind.JAXBElement;
 import java.util.Optional;
-import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -18,18 +19,11 @@ class PassengerStopAssignmentToStopPlaceWithoutQuays
   @Override
   public Status validate(String stopPlaceRef) {
     var stopPlace = index.getStopPlaceById().lookupLastVersionById(stopPlaceRef);
-    if (hasAtLeastOneQuay(stopPlace)) {
+    if (hasAtLeastOneUsableQuay(stopPlace)) {
       return Status.OK;
     } else {
       return Status.DISCARD;
     }
-  }
-
-  private static boolean hasAtLeastOneQuay(StopPlace stopPlace) {
-    return Optional.ofNullable(stopPlace.getQuays())
-      .map(Quays_RelStructure::getQuayRefOrQuay)
-      .filter(Predicate.not(List::isEmpty))
-      .isPresent();
   }
 
   @Override
@@ -40,5 +34,24 @@ class PassengerStopAssignmentToStopPlaceWithoutQuays
       stopPointRef,
       stopPlaceRef
     );
+  }
+
+  private static boolean hasAtLeastOneUsableQuay(@Nullable StopPlace stopPlace) {
+    return Optional.ofNullable(stopPlace)
+      .map(sp -> sp.getQuays())
+      .map(Quays_RelStructure::getQuayRefOrQuay)
+      .filter(quays -> quays.stream().anyMatch(q -> isUsable(q)))
+      .isPresent();
+  }
+
+  private static boolean isUsable(JAXBElement<?> element) {
+    if (element.getValue() instanceof Quay q) {
+      // we could use the WgsCoordinateMapper to check for more invalid data
+      return Optional.ofNullable(q.getCentroid())
+        .map(c -> c.getLocation())
+        .isPresent();
+    }
+    // could be a QuayRef which we don't support (yet)
+    return false;
   }
 }
