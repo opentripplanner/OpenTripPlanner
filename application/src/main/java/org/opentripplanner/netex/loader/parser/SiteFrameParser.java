@@ -66,7 +66,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     }
 
     if (!ignoredFeatures.contains(PARKING) && frame.getParkings() != null) {
-      parseParkings(frame.getParkings().getParking_Dummy());
+      parseParkings(frame.getParkings().getParking());
     }
     // Keep list sorted alphabetically
     warnOnMissingMapping(LOG, frame.getAccesses());
