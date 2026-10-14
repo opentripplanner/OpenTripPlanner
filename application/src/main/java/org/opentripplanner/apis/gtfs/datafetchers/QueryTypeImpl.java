@@ -85,8 +85,12 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
+
+  private static final Logger LOG = LoggerFactory.getLogger(QueryTypeImpl.class);
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
@@ -388,8 +392,9 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public DataFetcher<Itinerary> itinerary() {
-    return environment -> {
+    DataFetcher<?> fetcher = environment -> {
       GtfsGraphQLRequestContext context = environment.<GtfsGraphQLRequestContext>getContext();
       var args = new GraphQLTypes.GraphQLQueryTypeItineraryArgs(environment.getArguments());
       var reference = ItineraryReference.decode(args.getGraphQLId());
@@ -401,7 +406,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           reference,
           context.defaultRouteRequest()
         );
-        return context
+        var itinerary = context
           .refetchItineraryService()
           .refetchItinerary(
             reference.from(),
@@ -409,10 +414,21 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             reference.legReferences(),
             routeRequest
           );
-      } catch (RefetchItineraryException | IllegalArgumentException e) {
+        return DataFetcherResult.<Itinerary>newResult()
+          .data(itinerary)
+          .localContext(Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest))
+          .build();
+      } catch (
+        RefetchItineraryException
+        | RoutingValidationException
+        | IllegalArgumentException
+        | NullPointerException e
+      ) {
+        LOG.debug("Could not refetch itinerary for id {}", args.getGraphQLId(), e);
         return null;
       }
     };
+    return (DataFetcher<Itinerary>) fetcher;
   }
 
   @Override

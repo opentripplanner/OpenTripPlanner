@@ -20,6 +20,12 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * {@code transferSlack} (the existing refetch implementation does not use it).
  * {@code from}/{@code to} on-board {@link org.opentripplanner.routing.api.request.TripLocation}s
  * are not currently supported.
+ * <p>
+ * Only walk preferences are encoded. A refetch of an itinerary with a non-walk access or egress
+ * mode therefore rebuilds those legs with the default bike, car or scooter preferences, which may
+ * produce different access/egress legs. Encoding the preferences of the remaining modes requires
+ * covering their nested parking, rental and optimisation preferences too, and is left to a
+ * follow-up.
  */
 public record ItineraryReference(
   List<LegReference> legReferences,

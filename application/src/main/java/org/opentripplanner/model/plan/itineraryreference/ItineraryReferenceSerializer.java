@@ -26,7 +26,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Each leg reference is encoded with the existing {@link LegReferenceSerializer} and the
  * resulting tokens are joined with {@link #LEG_REFERENCE_DELIMITER}, a character not present in
- * the URL-safe Base64 alphabet {@link LegReferenceSerializer} produces.
+ * the URL-safe Base64 alphabet {@link LegReferenceSerializer} produces. Those tokens are already
+ * Base64, so the surrounding token encodes them a second time and is roughly a third larger than
+ * strictly necessary. Reusing {@link LegReferenceSerializer} is preferred over duplicating its
+ * versioned leg format here, which would have to be kept in sync by hand.
  * <p>
  * {@code StreetMode} fields are deliberately encoded as explicit {@code STRING}s (via
  * {@code name()}/{@code valueOf()}), not {@code addEnum()} - see the token framework's own

@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.refetch;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.time.Duration;
@@ -86,9 +84,9 @@ class ItineraryReferenceMapperTest {
     var reference = ItineraryReferenceMapper.toItineraryReference(originalItinerary, routeRequest);
 
     var encoded = ItineraryReferenceSerializer.encode(reference);
-    assertNotNull(encoded);
+    assertThat(encoded).isNotNull();
     var decodedReference = ItineraryReferenceSerializer.decode(encoded);
-    assertNotNull(decodedReference);
+    assertThat(decodedReference).isNotNull();
 
     var refetchRouteRequest = ItineraryReferenceMapper.toRouteRequest(
       decodedReference,
@@ -101,8 +99,8 @@ class ItineraryReferenceMapperTest {
       refetchRouteRequest
     );
 
-    assertEquals(originalItinerary.toStr(), refetchedItinerary.toStr());
-    assertEquals("A ~ BUS tripX 10:00 11:00 ~ B []", refetchedItinerary.toStr());
+    assertThat(refetchedItinerary.toStr()).isEqualTo(originalItinerary.toStr());
+    assertThat(refetchedItinerary.toStr()).isEqualTo("A ~ BUS tripX 10:00 11:00 ~ B []");
   }
 
   @Test
@@ -131,11 +129,11 @@ class ItineraryReferenceMapperTest {
       .build();
 
     var expectedLegReference = itinerary.legs().get(1).legReference();
-    assertNotNull(expectedLegReference);
+    assertThat(expectedLegReference).isNotNull();
 
     var reference = ItineraryReferenceMapper.toItineraryReference(itinerary, routeRequest());
 
-    assertEquals(List.of(expectedLegReference), reference.legReferences());
+    assertThat(reference.legReferences()).containsExactly(expectedLegReference);
   }
 
   @Test
@@ -175,22 +173,23 @@ class ItineraryReferenceMapperTest {
 
     var reference = ItineraryReferenceMapper.toItineraryReference(itinerary, customRouteRequest);
 
-    assertEquals(GenericLocation.fromStopId(STOP_A.getId()), reference.from());
-    assertEquals(GenericLocation.fromStopId(STOP_B.getId()), reference.to());
-    assertEquals(StreetMode.BIKE, reference.accessMode());
-    assertEquals(StreetMode.CAR, reference.egressMode());
-    assertEquals(StreetMode.WALK, reference.transferMode());
-    assertTrue(reference.wheelchair());
-    assertEquals(Duration.ofSeconds(60), reference.boardSlack().defaultValue());
-    assertEquals(Duration.ofSeconds(90), reference.boardSlack().valueOf(TransitMode.BUS));
-    assertEquals(Duration.ofSeconds(30), reference.alightSlack().defaultValue());
-    assertEquals(Duration.ofSeconds(45), reference.alightSlack().valueOf(TransitMode.RAIL));
-    assertEquals(2.5, reference.walkSpeed());
-    assertEquals(3.0, reference.walkReluctance());
-    assertEquals(Duration.ofMinutes(20), reference.maxAccessEgressDuration().defaultValue());
-    assertEquals(
-      Duration.ofMinutes(15),
-      reference.maxAccessEgressDuration().valueOf(StreetMode.BIKE)
+    assertThat(reference.from()).isEqualTo(GenericLocation.fromStopId(STOP_A.getId()));
+    assertThat(reference.to()).isEqualTo(GenericLocation.fromStopId(STOP_B.getId()));
+    assertThat(reference.accessMode()).isEqualTo(StreetMode.BIKE);
+    assertThat(reference.egressMode()).isEqualTo(StreetMode.CAR);
+    assertThat(reference.transferMode()).isEqualTo(StreetMode.WALK);
+    assertThat(reference.wheelchair()).isTrue();
+    assertThat(reference.boardSlack().defaultValue()).isEqualTo(Duration.ofSeconds(60));
+    assertThat(reference.boardSlack().valueOf(TransitMode.BUS)).isEqualTo(Duration.ofSeconds(90));
+    assertThat(reference.alightSlack().defaultValue()).isEqualTo(Duration.ofSeconds(30));
+    assertThat(reference.alightSlack().valueOf(TransitMode.RAIL)).isEqualTo(Duration.ofSeconds(45));
+    assertThat(reference.walkSpeed()).isEqualTo(2.5);
+    assertThat(reference.walkReluctance()).isEqualTo(3.0);
+    assertThat(reference.maxAccessEgressDuration().defaultValue()).isEqualTo(
+      Duration.ofMinutes(20)
+    );
+    assertThat(reference.maxAccessEgressDuration().valueOf(StreetMode.BIKE)).isEqualTo(
+      Duration.ofMinutes(15)
     );
   }
 
@@ -226,7 +225,7 @@ class ItineraryReferenceMapperTest {
         routeRequest
       )
     );
-    assertEquals("Could not calculate access", e.getMessage());
+    assertThat(e.getMessage()).isEqualTo("Could not calculate access");
   }
 
   private ScheduledTransitLegReference legRef() {
@@ -278,5 +277,94 @@ class ItineraryReferenceMapperTest {
       .withFrom(GenericLocation.fromStopId(STOP_A.getId()))
       .withTo(GenericLocation.fromStopId(STOP_B.getId()))
       .buildRequest();
+  }
+
+  /**
+   * In production the "default" request is the router-config default, which has no from/to at all
+   * ({@link RouteRequest#defaultValue()}). {@code toRouteRequest} must therefore supply them from
+   * the reference, otherwise {@code RouteRequest.validate()} rejects the rebuilt request with
+   * {@code LOCATION_NOT_FOUND} and the refetch query fails for every real call.
+   */
+  @Test
+  void toRouteRequestWorksWithARealDefaultRequest() {
+    var reference = ItineraryReferenceMapper.toItineraryReference(
+      createRefetchService().refetchItinerary(null, null, List.of(legRef()), routeRequest()),
+      routeRequest()
+    );
+
+    var routeRequest = ItineraryReferenceMapper.toRouteRequest(
+      reference,
+      RouteRequest.defaultValue()
+    );
+
+    assertThat(routeRequest.from()).isEqualTo(reference.from());
+    assertThat(routeRequest.to()).isEqualTo(reference.to());
+  }
+
+  /**
+   * A reference may carry no from/to (they are optional). The rebuilt request still has to be
+   * valid, so the board/alight stops of the transit spine are used as a fallback.
+   */
+  @Test
+  void toRouteRequestFallsBackToTheTransitSpineStops() {
+    var reference = new ItineraryReference(
+      List.of(legRef()),
+      null,
+      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      DurationForEnum.of(TransitMode.class).build(),
+      DurationForEnum.of(TransitMode.class).build(),
+      1.3,
+      2.0,
+      DurationForEnum.of(StreetMode.class).build(),
+      false
+    );
+
+    var routeRequest = ItineraryReferenceMapper.toRouteRequest(
+      reference,
+      RouteRequest.defaultValue()
+    );
+
+    assertThat(routeRequest.from()).isEqualTo(GenericLocation.fromStopId(STOP_A.getId()));
+    assertThat(routeRequest.to()).isEqualTo(GenericLocation.fromStopId(STOP_B.getId()));
+  }
+
+  /**
+   * Legs without a {@link org.opentripplanner.model.plan.legreference.LegReference} that are not
+   * street legs (flex, carpool) must make the itinerary unsupported rather than being silently
+   * dropped from the transit spine - a partially-encoded id would refetch a different trip.
+   */
+  /**
+   * A {@link org.opentripplanner.model.plan.leg.FrequencyTransitLeg} is a
+   * {@code ScheduledTransitLeg} and so passes the supported-leg-reference check, but frequency
+   * trips are not in the timetable's trip-times index, so the leg could never be looked up again
+   * on refetch. Such an itinerary must not get an id at all.
+   */
+  @Test
+  void frequencyLegIsUnsupported() {
+    var itinerary = newItinerary(Place.forStop(STOP_A), 0)
+      .frequencyBus(1, 200, 300, Place.forStop(STOP_B))
+      .build();
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(itinerary, routeRequest())
+    );
+  }
+
+  @Test
+  void nonStreetLegWithoutAReferenceIsUnsupported() {
+    var boardPlace = Place.forStop(STOP_A);
+    var alightPlace = Place.forStop(STOP_B);
+
+    var itinerary = newItinerary(boardPlace, 0)
+      .bus(1, 200, 300, alightPlace)
+      .flex(400, 500, alightPlace)
+      .build();
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toItineraryReference(itinerary, routeRequest())
+    );
   }
 }

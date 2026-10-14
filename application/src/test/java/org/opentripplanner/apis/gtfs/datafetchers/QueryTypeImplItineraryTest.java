@@ -1,9 +1,9 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.executionContext;
 
+import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.LocalDate;
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
@@ -66,6 +67,7 @@ class QueryTypeImplItineraryTest {
   }
 
   private static final QueryTypeImpl SUBJECT = new QueryTypeImpl();
+  private static final ItineraryImpl IMPL_FOR_ID = new ItineraryImpl();
 
   @Test
   void refetchesItineraryByEncodedId() throws Exception {
@@ -79,9 +81,47 @@ class QueryTypeImplItineraryTest {
     );
     var id = ItineraryReferenceSerializer.encode(reference);
 
-    var itinerary = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
+    Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
 
-    assertEquals("A ~ BUS tripX 10:00 11:00 ~ B []", itinerary.toStr());
+    assertThat(itineraryOf(result).toStr()).isEqualTo("A ~ BUS tripX 10:00 11:00 ~ B []");
+  }
+
+  /**
+   * The refetched itinerary must expose an {@code id} of its own, so a client can refresh the same
+   * trip again. {@code ItineraryImpl#id} reads the route request from the local context, which
+   * this query - unlike {@code planConnection} - has to put there itself.
+   */
+  @Test
+  @SuppressWarnings("unchecked")
+  void refetchedItineraryCarriesTheRouteRequestForItsOwnId() throws Exception {
+    var refetchService = refetchItineraryService();
+    var routeRequest = routeRequest();
+
+    var reference = ItineraryReferenceMapper.toItineraryReference(
+      refetchService.refetchItinerary(null, null, List.of(legRef()), routeRequest),
+      routeRequest
+    );
+    var id = ItineraryReferenceSerializer.encode(reference);
+
+    Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
+
+    Map<String, ?> localContext = (Map<String, ?>) (
+      (DataFetcherResult<?>) result
+    ).getLocalContext();
+    assertThat(localContext).containsKey(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY);
+
+    var secondId = IMPL_FOR_ID.id().get(
+      DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext())
+        .source(itineraryOf(result))
+        .localContext(localContext)
+        .build()
+    );
+    assertThat(secondId).isEqualTo(id);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Itinerary itineraryOf(Object dataFetcherResult) {
+    return ((DataFetcherResult<Itinerary>) dataFetcherResult).getData();
   }
 
   @Test
@@ -90,7 +130,7 @@ class QueryTypeImplItineraryTest {
       environment("this-is-not-a-valid-id", refetchItineraryService(), routeRequest())
     );
 
-    assertNull(itinerary);
+    assertThat(itinerary).isNull();
   }
 
   @Test
@@ -115,7 +155,7 @@ class QueryTypeImplItineraryTest {
       environment(id, refetchItineraryService(), routeRequest())
     );
 
-    assertNull(itinerary);
+    assertThat(itinerary).isNull();
   }
 
   private ScheduledTransitLegReference legRef() {

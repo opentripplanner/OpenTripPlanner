@@ -1,8 +1,6 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.executionContext;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
@@ -46,24 +44,26 @@ class ItineraryImplTest {
 
     var id = IMPL.id().get(env);
 
-    assertNotNull(id);
+    assertThat(id).isNotNull();
     var decoded = ItineraryReferenceSerializer.decode(id);
-    assertNotNull(decoded);
-    assertEquals(itinerary.legs().getFirst().legReference(), decoded.legReferences().getFirst());
+    assertThat(decoded).isNotNull();
+    assertThat(decoded.legReferences().getFirst()).isEqualTo(
+      itinerary.legs().getFirst().legReference()
+    );
   }
 
   @Test
   void idIsNullWithoutLocalContext() throws Exception {
     var env = environment(simpleBusItinerary(), null);
 
-    assertNull(IMPL.id().get(env));
+    assertThat(IMPL.id().get(env)).isNull();
   }
 
   @Test
   void idIsNullWithoutRouteRequestInLocalContext() throws Exception {
     var env = environment(simpleBusItinerary(), Map.of("locale", "en"));
 
-    assertNull(IMPL.id().get(env));
+    assertThat(IMPL.id().get(env)).isNull();
   }
 
   @Test
@@ -76,7 +76,7 @@ class ItineraryImplTest {
       Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest())
     );
 
-    assertNull(IMPL.id().get(env));
+    assertThat(IMPL.id().get(env)).isNull();
   }
 
   private static Itinerary simpleBusItinerary() {
