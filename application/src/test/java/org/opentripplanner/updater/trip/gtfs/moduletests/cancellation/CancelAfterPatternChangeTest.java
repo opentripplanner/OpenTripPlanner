@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.gtfs.moduletests.cancellation;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -85,5 +86,7 @@ class CancelAfterPatternChangeTest implements RealtimeTestConstants {
       "C U | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
       tripData.showTimetable()
     );
+
+    assertThat(env.raptorData().summarizePatterns()).containsExactly("F:Pattern1[C U]");
   }
 }
