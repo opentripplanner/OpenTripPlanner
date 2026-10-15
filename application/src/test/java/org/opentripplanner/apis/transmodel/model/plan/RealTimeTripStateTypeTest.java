@@ -17,10 +17,10 @@ import org.opentripplanner.apis.transmodel.model.timetable.TransmodelRealTimeTri
 class RealTimeTripStateTypeTest {
 
   private static final TransmodelRealTimeTripStateModel ALL_FALSE =
-    new TransmodelRealTimeTripStateModel(false, false, false, false, false);
+    new TransmodelRealTimeTripStateModel(false, false, false, false, false, false);
 
   private static final TransmodelRealTimeTripStateModel ALL_TRUE =
-    new TransmodelRealTimeTripStateModel(true, true, true, true, true);
+    new TransmodelRealTimeTripStateModel(true, true, true, true, true, true);
 
   // Execute a GraphQL query that selects all six fields from a RealTimeTripState source object.
   private static final GraphQL GRAPHQL = buildGraphQL();
@@ -33,6 +33,7 @@ class RealTimeTripStateTypeTest {
     assertFalse(flag(result, "timesModified"));
     assertFalse(flag(result, "journeyPatternModified"));
     assertFalse(flag(result, "updated"));
+    assertFalse(flag(result, "monitored"));
   }
 
   @Test
@@ -43,6 +44,7 @@ class RealTimeTripStateTypeTest {
     assertTrue(flag(result, "timesModified"));
     assertTrue(flag(result, "journeyPatternModified"));
     assertTrue(flag(result, "updated"));
+    assertTrue(flag(result, "monitored"));
   }
 
   // Individual flag tests guard against copy-paste errors in the six nearly-identical
@@ -50,18 +52,19 @@ class RealTimeTripStateTypeTest {
 
   @Test
   void extraJourneyFlagIsIsolated() {
-    var model = new TransmodelRealTimeTripStateModel(true, false, false, false, false);
+    var model = new TransmodelRealTimeTripStateModel(true, false, false, false, false, false);
     var result = execute(model);
     assertTrue(flag(result, "extraJourney"));
     assertFalse(flag(result, "cancellation"));
     assertFalse(flag(result, "timesModified"));
     assertFalse(flag(result, "journeyPatternModified"));
     assertFalse(flag(result, "updated"));
+    assertFalse(flag(result, "monitored"));
   }
 
   @Test
   void cancellationFlagIsIsolated() {
-    var model = new TransmodelRealTimeTripStateModel(false, true, false, false, false);
+    var model = new TransmodelRealTimeTripStateModel(false, true, false, false, false, false);
     var result = execute(model);
     assertFalse(flag(result, "extraJourney"));
     assertTrue(flag(result, "cancellation"));
@@ -69,7 +72,7 @@ class RealTimeTripStateTypeTest {
 
   @Test
   void timesModifiedFlagIsIsolated() {
-    var model = new TransmodelRealTimeTripStateModel(false, false, true, false, false);
+    var model = new TransmodelRealTimeTripStateModel(false, false, true, false, false, false);
     var result = execute(model);
     assertTrue(flag(result, "timesModified"));
     assertFalse(flag(result, "journeyPatternModified"));
@@ -77,7 +80,7 @@ class RealTimeTripStateTypeTest {
 
   @Test
   void journeyPatternModifiedFlagIsIsolated() {
-    var model = new TransmodelRealTimeTripStateModel(false, false, false, true, false);
+    var model = new TransmodelRealTimeTripStateModel(false, false, false, true, false, false);
     var result = execute(model);
     assertFalse(flag(result, "timesModified"));
     assertTrue(flag(result, "journeyPatternModified"));
@@ -86,10 +89,18 @@ class RealTimeTripStateTypeTest {
 
   @Test
   void updatedFlagIsIsolated() {
-    var model = new TransmodelRealTimeTripStateModel(false, false, false, false, true);
+    var model = new TransmodelRealTimeTripStateModel(false, false, false, false, true, false);
     var result = execute(model);
     assertFalse(flag(result, "journeyPatternModified"));
     assertTrue(flag(result, "updated"));
+  }
+
+  @Test
+  void monitoredFlagIsIsolated() {
+    var model = new TransmodelRealTimeTripStateModel(false, false, false, false, false, true);
+    var result = execute(model);
+    assertFalse(flag(result, "journeyPatternModified"));
+    assertTrue(flag(result, "monitored"));
   }
 
   // ---------------------------------------------------------------------------
@@ -105,7 +116,7 @@ class RealTimeTripStateTypeTest {
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
         .query(
-          "{ state { extraJourney cancellation timesModified journeyPatternModified updated } }"
+          "{ state { extraJourney cancellation timesModified journeyPatternModified updated monitored } }"
         )
         .root(model)
         .build()

@@ -28,26 +28,6 @@ class EstimatedVehicleJourneyWrapperTest {
   /* Construction and validation */
 
   @Test
-  void rejectUnmonitoredJourney() {
-    var journey = builder().withMonitored(false).buildEstimatedVehicleJourney();
-
-    assertFailure(UpdateErrorType.NOT_MONITORED, () -> EstimatedVehicleJourneyWrapper.of(journey));
-  }
-
-  @Test
-  void acceptUnmonitoredCancellation() {
-    var journey = builder()
-      .withMonitored(false)
-      .withCancellation(true)
-      .buildEstimatedVehicleJourney();
-
-    var wrapper = EstimatedVehicleJourneyWrapper.of(journey);
-
-    assertFalse(wrapper.isMonitored());
-    assertTrue(wrapper.isCancellation());
-  }
-
-  @Test
   void propagateInvalidCallFailure() {
     var journey = builder()
       .withEstimatedCalls(calls -> calls.call("STOP_A").clearOrder())
@@ -107,11 +87,14 @@ class EstimatedVehicleJourneyWrapperTest {
 
   @Test
   void journeyStatusFlagsDefaultToFalse() {
-    var wrapper = EstimatedVehicleJourneyWrapper.of(builder().buildEstimatedVehicleJourney());
+    var wrapper = EstimatedVehicleJourneyWrapper.of(
+      builder().withMonitored(false).buildEstimatedVehicleJourney()
+    );
 
     assertFalse(wrapper.isCancellation());
     assertFalse(wrapper.isExtraJourney());
     assertFalse(wrapper.isPredictionInaccurate());
+    assertFalse(wrapper.isMonitored());
   }
 
   /* Trip identification */
