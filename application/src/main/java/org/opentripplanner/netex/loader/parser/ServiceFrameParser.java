@@ -146,6 +146,9 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
       if (stopAssignment.getValue() instanceof PassengerStopAssignment assignment) {
+        if (assignment.getScheduledStopPointRef() == null) {
+          continue;
+        }
         var stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
         if (assignment.getQuayRef() != null) {
           String quayRef = assignment.getQuayRef().getValue().getRef();
