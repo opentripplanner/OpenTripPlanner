@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
@@ -392,10 +393,7 @@ class StopTimesMapper {
       // least one quay
       var station = stationsById.get(idFactory.createId(stopPlaceId));
       stopLocation =
-        station
-          .getChildStops()
-          .stream()
-          .min(TransitEntity.idComparator())
+        pickAnyChildStop(station)
           // if you see this exception then the validation didn't filter out the passenger stop assignment
           .orElseThrow(() ->
             new RuntimeException(
@@ -422,6 +420,15 @@ class StopTimesMapper {
     }
 
     return stopLocation;
+  }
+
+  /**
+   * Pick a child stop of the station for the assignment. Sorts by stop ID and picks the first
+   * so that this method is deterministic even though there is no guarantee that any specific stop is
+   * picked.
+   */
+  private static Optional<StopLocation> pickAnyChildStop(Station station) {
+    return station.getChildStops().stream().min(TransitEntity.idComparator());
   }
 
   private FlexibleLine lookUpFlexibleLine(
