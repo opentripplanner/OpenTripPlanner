@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.model.StreetEdgePair;
 import org.opentripplanner.graph_builder.module.osm.storage.OsmDatabase;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.street.model.edge.NameType;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
@@ -155,11 +156,11 @@ class PortlandCustomNamer implements EdgeNamer {
         if (name == null) {
           continue;
         }
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name), NameType.REAL);
         return name;
       } else {
         String name = out.getDefaultName();
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name), NameType.REAL);
         return name;
       }
     }
@@ -176,11 +177,11 @@ class PortlandCustomNamer implements EdgeNamer {
         if (name == null) {
           continue;
         }
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name), NameType.REAL);
         return name;
       } else {
         String name = in.getDefaultName();
-        e.setName(new NonLocalizedString(name));
+        e.overrideName(new NonLocalizedString(name), NameType.REAL);
         return name;
       }
     }

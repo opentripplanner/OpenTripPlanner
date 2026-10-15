@@ -445,7 +445,7 @@ public class StreetEdgeTest {
   }
 
   @Test
-  void setName() {
+  void overrideName() {
     var path = I18NString.of("path");
     var edge = new StreetEdgeBuilder<>()
       .withFromVertex(v0)
@@ -460,7 +460,7 @@ public class StreetEdgeTest {
     assertTrue(edge.nameIsDerived());
 
     var mainStreet = I18NString.of("Main Street");
-    edge.setName(mainStreet);
+    edge.overrideName(mainStreet, NameType.REAL);
     assertEquals(mainStreet, edge.getName());
     assertFalse(edge.nameIsDerived());
   }

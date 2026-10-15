@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.CONTINUE;
 import static org.opentripplanner.model.plan.walkstep.RelativeDirection.ENTER_STATION;
 import static org.opentripplanner.model.plan.walkstep.RelativeDirection.EXIT_STATION;
 import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_SIGNS;
@@ -97,18 +98,6 @@ public class StatesToWalkStepsMapper {
     );
   }
 
-  public static String getNormalizedName(String streetName) {
-    if (streetName == null) {
-      // Avoid null reference exceptions with pathways which don't have names
-      return null;
-    }
-    int idx = streetName.indexOf('(');
-    if (idx > 0) {
-      return streetName.substring(0, idx - 1);
-    }
-    return streetName;
-  }
-
   public List<WalkStep> generateWalkSteps() {
     for (int i = 0; i < states.size() - 1; i++) {
       processState(states.get(i), states.get(i + 1));
@@ -122,6 +111,18 @@ public class StatesToWalkStepsMapper {
     }
 
     return steps.stream().map(WalkStepBuilder::build).toList();
+  }
+
+  private static String getNormalizedName(String streetName) {
+    if (streetName == null) {
+      // Avoid null reference exceptions with pathways which don't have names
+      return null;
+    }
+    int idx = streetName.indexOf('(');
+    if (idx > 0) {
+      return streetName.substring(0, idx - 1);
+    }
+    return streetName;
   }
 
   /**
@@ -248,19 +249,26 @@ public class StatesToWalkStepsMapper {
         roundaboutExit = 0;
       }
 
-      // start a new step
-      current = createWalkStep(forwardState, backState);
-      createdNewStep = true;
-      steps.add(current);
-
-      // indicate that we are now on a roundabout and use one-based exit numbering
-      if (edge.isRoundabout()) {
-        roundaboutExit = 1;
-        roundaboutPreviousStreet = getNormalizedName(backState.getBackEdge().getName().toString());
-      }
-
       double thisAngle = DirectionUtils.getFirstAngle(geom);
-      current.withDirections(lastAngle, thisAngle, edge.isRoundabout());
+      var direction = RelativeDirection.calculate(lastAngle, thisAngle, edge.isRoundabout());
+
+      if (!isShortContinueOnDerivedName(forwardState, direction)) {
+        // start a new step
+        current = createWalkStep(forwardState, backState);
+        createdNewStep = true;
+        steps.add(current);
+
+        // indicate that we are now on a roundabout and use one-based exit numbering
+        if (edge.isRoundabout()) {
+          roundaboutExit = 1;
+          roundaboutPreviousStreet = getNormalizedName(
+            backState.getBackEdge().getName().toString()
+          );
+        }
+
+        current.withDirection(direction);
+        current.withAbsoluteDirection(thisAngle);
+      }
       // new step, set distance to length of first edge
       distance = edge.getDistanceMeters();
     } else {
@@ -300,9 +308,9 @@ public class StatesToWalkStepsMapper {
       // check last three steps for zag
       int lastIndex = steps.size() - 1;
       if (lastIndex >= 2) {
-        WalkStepBuilder threeBack = steps.get(lastIndex - 2);
-        WalkStepBuilder twoBack = steps.get(lastIndex - 1);
-        WalkStepBuilder lastStep = steps.get(lastIndex);
+        var threeBack = steps.get(lastIndex - 2);
+        var twoBack = steps.get(lastIndex - 1);
+        var lastStep = steps.get(lastIndex);
         boolean isOnSameStreet = isOnSameStreet(lastStep, twoBack, threeBack);
         if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && canZagBeRemoved(twoBack)) {
           if (isUTurn(twoBack, lastStep)) {
@@ -330,11 +338,20 @@ public class StatesToWalkStepsMapper {
     current.addEdge(edge);
   }
 
+  private static boolean isShortContinueOnDerivedName(
+    State forwardState,
+    RelativeDirection direction
+  ) {
+    return direction == CONTINUE && forwardState.backEdge.getDistanceMeters() < 30;
+  }
+
   /**
    * Determines whether a set of three consecutive instances of {@link WalkStepBuilder} refer to the
    * same street. The purposes of this check are (i) to give a separate instruction when crossing to
-   * the other side of the same street, if a crosswalk namer is iin use (an instruction can be given
-   * to cross at a particular location because others may not be accessible, practical, etc.), and
+   * the other
+   * side of the same street, if a crosswalk namer is in use (an instruction can be given
+   * to cross
+   * at a particular location because others may not be accessible, practical, etc.), and
    * (ii) to remove trivial turns when a given street briefly merges with another.
    *
    * @return true if the walk steps refer to the same street, false otherwise.
@@ -500,7 +517,7 @@ public class StatesToWalkStepsMapper {
 
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
     return !(
-      current.directionText().toString() != null &&
+      current.directionText() != null &&
       !Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
       (!current.nameIsDerived() || !edge.nameIsDerived())
     );

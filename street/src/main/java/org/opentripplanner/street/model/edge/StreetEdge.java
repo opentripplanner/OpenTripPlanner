@@ -374,9 +374,10 @@ public class StreetEdge
    *
    * @see Edge#nameIsDerived()
    */
-  public void setName(I18NString name) {
+  public void overrideName(I18NString name, NameType nt) {
     this.name = name;
-    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
+    var isDerived = nt == NameType.DERIVED;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, isDerived);
   }
 
   @Override

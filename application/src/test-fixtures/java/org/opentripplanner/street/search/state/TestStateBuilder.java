@@ -129,6 +129,24 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder unnamedStreetEdge(int distance) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var edge = StreetModelForTest.streetEdgeBuilder(
+      from,
+      to,
+      distance,
+      StreetTraversalPermission.PEDESTRIAN
+    )
+      .withName("path")
+      .withNameIsDerived(true)
+      .buildAndConnect();
+
+    currentState = requireSingleState(edge.traverse(currentState));
+    return this;
+  }
+
   /**
    * Traverse a very plain street edge with stairs with no special characteristics.
    */
