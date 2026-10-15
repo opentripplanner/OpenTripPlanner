@@ -406,6 +406,7 @@ public class StatesToWalkStepsMapper {
   private boolean canZagBeRemoved(WalkStepBuilder walkStepBuilder) {
     return (
       !walkStepBuilder.hasEntrance() &&
+      walkStepBuilder.relativeDirection() != FOLLOW_SIGNS &&
       !(walkStepBuilder.verticalTransportationUse() instanceof ElevatorUse) &&
       !(walkStepBuilder.verticalTransportationUse() instanceof EscalatorUse) &&
       !(walkStepBuilder.verticalTransportationUse() instanceof StairsUse)
