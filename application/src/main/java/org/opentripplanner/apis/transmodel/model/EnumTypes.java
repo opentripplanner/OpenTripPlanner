@@ -516,8 +516,9 @@ public class EnumTypes {
         .value("unknown")
         .description("Unknown transport mode. No trip, line or stop has this mode.")
         .deprecationReason(
-          "Matches nothing. Ignored in `whiteListedModes` and `filterByModes`, " +
-            "rejected as invalid input in all other filters and in board/alight slack lists."
+          "Matches nothing. Accepted in `whiteListedModes` and `filterByModes`, where it " +
+            "selects nothing, and rejected as invalid input in all other filters and in " +
+            "board/alight slack lists."
         )
         .build()
     )
