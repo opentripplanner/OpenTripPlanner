@@ -36,7 +36,7 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
     e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR);
 
   private final Set<Vertex> originVertices;
-  private final Set<Vertex> ignoreVertices;
+  private final Set<FeedScopedId> ignoreStops;
   private final boolean reverseDirection;
 
   private final List<NearbyStop> transitStopsFound = new ArrayList<>();
@@ -46,11 +46,11 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
 
   NearbyStopFinderVisitor(
     Set<Vertex> originVertices,
-    Set<Vertex> ignoreVertices,
+    Set<FeedScopedId> ignoreStops,
     boolean reverseDirection
   ) {
     this.originVertices = requireNonNull(originVertices);
-    this.ignoreVertices = requireNonNull(ignoreVertices);
+    this.ignoreStops = requireNonNull(ignoreStops);
     this.reverseDirection = reverseDirection;
   }
 
@@ -58,21 +58,22 @@ class NearbyStopFinderVisitor implements TraverseVisitor<State, Edge> {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
 
-    if (originVertices.contains(vertex) || ignoreVertices.contains(vertex)) {
+    if (originVertices.contains(vertex)) {
       return;
     }
 
     if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
-      transitStopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getId()));
-    }
-
-    if (
+      var stopId = tsv.getId();
+      if (!ignoreStops.contains(stopId)) {
+        transitStopsFound.add(NearbyStop.nearbyStopForState(state, stopId));
+      }
+    } else if (
       OTPFeature.FlexRouting.isOn() &&
       vertex instanceof StreetVertex streetVertex &&
       !streetVertex.areaStops().isEmpty()
     ) {
       for (FeedScopedId id : streetVertex.areaStops()) {
-        if (canBoardFlex(state)) {
+        if (canBoardFlex(state) && !ignoreStops.contains(id)) {
           statesForAreaStopIds.putMin(id, state);
         }
       }
