@@ -28,9 +28,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -48,11 +49,14 @@ import uk.org.siri.siri21.Siri;
  * If there are no retained messages, the updater is primed immediately. Live messages (messages
  * without a retained flag) are always processed, even if the updater is not yet primed.
  * <p>
- * If the MQTT broker is unavailable at startup, the updater waits up to
- * {@code connectionStartupTimeout} for a connection. If no connection is established within that
- * time, the updater marks itself as primed immediately so OTP can start routing without real-time
- * data. The MQTT client continues retrying in the background; once the broker becomes available
- * live messages will be processed normally.
+ * Readiness is decoupled from the connection lifecycle: a watcher marks the updater primed
+ * {@code connectionStartupTimeout} after startup regardless of the connection state. This
+ * guarantees OTP eventually becomes ready even if the broker is never reachable, or if the
+ * connection repeatedly fails during the MQTT handshake (e.g. the server closes the connection
+ * without ever sending a CONNACK, so {@link #onConnect()} never fires) and HiveMQ keeps retrying
+ * in a connect/disconnect loop. The MQTT client continues retrying in the background; once the
+ * broker becomes available live messages are processed normally, even after the updater has been
+ * marked primed.
  */
 public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSource {
 
@@ -68,9 +72,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   private final BlockingQueue<byte[]> primingMessageQueue = new LinkedBlockingQueue<>();
   private final ExecutorService primingExecutor;
   private final ExecutorService liveExecutor;
+  private final ScheduledExecutorService readinessWatcher;
 
   private volatile boolean primed = false;
-  private final CompletableFuture<Void> connectionFuture = new CompletableFuture<>();
+
+  /**
+   * Guards the one-time transition from startup into the priming phase, which is triggered by the
+   * first successful connection (see {@link #onConnect()}).
+   */
+  private final AtomicBoolean primingStarted = new AtomicBoolean(false);
 
   private Instant connectedAt;
   private final AtomicLong liveMessageCounter = new AtomicLong();
@@ -94,6 +104,11 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     ThreadFactory liveThreadFactory = Thread.ofPlatform().name("liveSiriMqttUpdater-", 0).factory();
     this.liveExecutor = Executors.newSingleThreadExecutor(liveThreadFactory);
 
+    ThreadFactory watcherThreadFactory = Thread.ofPlatform()
+      .name("readinessSiriMqttUpdater-", 0)
+      .factory();
+    this.readinessWatcher = Executors.newSingleThreadScheduledExecutor(watcherThreadFactory);
+
     registerMetrics();
   }
 
@@ -101,67 +116,74 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   public void start(Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer) {
     this.serviceDeliveryConsumer = serviceDeliveryConsumer;
 
+    // Fallback readiness for when no connection is ever established: if the broker is never
+    // reachable, or the connection keeps failing during the MQTT handshake (connect/disconnect
+    // loop, so onConnect never fires and priming never starts), this watcher guarantees OTP
+    // eventually becomes ready. Once a connection is established and priming has started, readiness
+    // is governed by priming completion instead (see onConnect -> beginPriming), so a slow but
+    // progressing backlog is not cut short by this timeout.
+    readinessWatcher.schedule(
+      this::markPrimedOnStartupTimeout,
+      parameters.connectionStartupTimeout().toMillis(),
+      TimeUnit.MILLISECONDS
+    );
+
     client = buildAndConnectClient();
+  }
 
-    // Wait up to connectionStartupTimeout for the broker to connect.
-    waitToConnectWithTimeout();
-
-    if (!connectionFuture.isDone()) {
-      // Broker was not reachable within the startup timeout. Allow OTP to route without
-      // real-time data. The HiveMQ client continues reconnecting in the background; live
-      // messages will flow once the broker becomes available (via onConnect -> subscribe).
+  private void markPrimedOnStartupTimeout() {
+    if (primingStarted.get()) {
+      // A connection was established and priming is underway; let it finish and mark readiness on
+      // completion rather than forcing it here.
+      return;
+    }
+    if (!primed) {
       LOG.warn(
-        "MQTT broker at {} was not reachable within {}. " +
+        "MQTT broker at {} did not connect within {}. " +
           "OTP will start routing without real-time data. " +
           "The MQTT client will keep retrying in the background.",
         parameters.url(),
         parameters.connectionStartupTimeout()
       );
-      liveExecutor.submit(new LiveRunner());
       primed = true;
+    }
+  }
+
+  /**
+   * Start the priming workers that drain the retained-message backlog. Triggered by the first
+   * successful connection and guarded so it runs at most once, even across reconnects. When all
+   * workers have idled out and their graph updates are applied, the live runner is started and the
+   * updater is marked primed (this may happen before the readiness watcher fires).
+   * <p>
+   * Live (non-retained) messages that arrive during priming are buffered in the live queue and only
+   * applied once the retained backlog has been fully processed. This guarantees priming-first
+   * ordering: an older retained update can never overwrite a newer live update in the graph.
+   */
+  private void beginPriming() {
+    if (!primingStarted.compareAndSet(false, true)) {
       return;
     }
 
-    // Normal priming path: broker was available, retained messages may have arrived.
     List<CompletableFuture<Void>> primingFutures = new ArrayList<>();
-
     for (int i = 0; i < parameters.numberOfPrimingWorkers(); i++) {
       CompletableFuture<Void> f = CompletableFuture.runAsync(new RetainRunner(i), primingExecutor);
       primingFutures.add(f);
     }
     LOG.info("Started {} priming workers", parameters.numberOfPrimingWorkers());
 
-    // Wait for priming workers to finish
-    CompletableFuture<Void> allPriming = CompletableFuture.allOf(
-      primingFutures.toArray(new CompletableFuture[0])
-    );
-
-    // when all are done, switch to live
-    allPriming
+    CompletableFuture.allOf(primingFutures.toArray(new CompletableFuture[0]))
       .thenRunAsync(() -> {
         waitForGraphUpdates();
         logPrimingSummary();
         primingExecutor.shutdown();
+        // Only now start consuming live messages, so the retained backlog is fully applied first.
+        liveExecutor.submit(new LiveRunner());
         primed = true;
       })
       .exceptionally(ex -> {
         LOG.error("Priming failed", ex);
         return null;
       });
-
-    liveExecutor.submit(new LiveRunner());
-  }
-
-  private void waitToConnectWithTimeout() {
-    try {
-      connectionFuture.get(parameters.connectionStartupTimeout().toMillis(), TimeUnit.MILLISECONDS);
-    } catch (TimeoutException e) {
-      // Broker was not reachable within the startup timeout
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } catch (ExecutionException e) {
-      LOG.warn("Unexpected error while waiting for MQTT connection", e);
-    }
   }
 
   private void waitForGraphUpdates() {
@@ -243,7 +265,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private void onConnect() {
     connectedAt = Instant.now();
-    connectionFuture.complete(null);
     LOG.info(
       "Connected client to MQTT broker: {} with qos: {}",
       parameters.url(),
@@ -258,6 +279,9 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       .qos(Optional.ofNullable(MqttQos.fromCode(parameters.qos())).orElse(MqttQos.AT_MOST_ONCE))
       .callback(this::onMessage)
       .send();
+
+    // Start draining the retained-message backlog on the first successful connection.
+    beginPriming();
   }
 
   @Override
@@ -267,6 +291,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   @Override
   public void teardown() {
+    readinessWatcher.shutdownNow();
     liveExecutor.shutdownNow();
     primingExecutor.shutdownNow();
     if (client != null) {
