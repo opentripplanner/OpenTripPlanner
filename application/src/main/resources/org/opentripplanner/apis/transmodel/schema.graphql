@@ -2111,7 +2111,7 @@ enum TransportMode {
   tram
   trolleybus
   "Unknown transport mode. No trip, line or stop has this mode."
-  unknown @deprecated(reason : "Matches nothing. Ignored in `whiteListedModes` and `filterByModes`, rejected as invalid input in other filters. Will be removed.")
+  unknown @deprecated(reason : "Matches nothing. Ignored in `whiteListedModes` and `filterByModes`, rejected as invalid input in all other filters and in board/alight slack lists.")
   water
 }
 

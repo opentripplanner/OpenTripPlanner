@@ -6,8 +6,8 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
- * Maps values of the GraphQL {@code TransportMode} enum, used as filter input, to
- * {@link TransitMode}.
+ * Maps values of the GraphQL {@code TransportMode} enum, used as filter input or in board/alight
+ * slack lists, to {@link TransitMode}.
  * <p>
  * The enum value {@code unknown} has no {@link TransitMode} counterpart and is mapped to a
  * String. No trip, line or stop has an unknown mode, so it cannot be used as a filter and is

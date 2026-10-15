@@ -1,12 +1,14 @@
 package org.opentripplanner.apis.transmodel.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -71,5 +73,18 @@ public class TransportModeSlackTest {
     assertEquals(D10_m, result.valueOf(TransitMode.CABLE_CAR));
     assertEquals(D30_m, result.valueOf(TransitMode.RAIL));
     assertEquals(D60_m, result.valueOf(TransitMode.AIRPLANE));
+  }
+
+  @Test
+  public void rejectUnknownModeInMapToDomain() {
+    // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
+    List<Object> apiSlackInput = List.of(
+      Map.of("slack", D10_m_SECONDS, "modes", List.of(TransitMode.BUS, "unknown"))
+    );
+    var builder = DurationForEnum.of(TransitMode.class);
+
+    assertThrows(InvalidInputException.class, () ->
+      TransportModeSlack.mapIntoDomain(builder, apiSlackInput)
+    );
   }
 }
