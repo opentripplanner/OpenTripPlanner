@@ -185,14 +185,6 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    */
   @Nullable
   private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
-    var existing = repository.getCarpoolTrip(trip.getId());
-    boolean sameRoutePoints =
-      existing != null && existing.trip().routePoints().equals(trip.routePoints());
-    // The corridor also depends on the stops' deviation budgets: keep it while those are unchanged
-    // too, otherwise recompute it on the stored vertices.
-    if (sameRoutePoints && sameDeviationBudgets(existing.trip(), trip)) {
-      return new RoutableCarpoolTrip(trip, existing.vertices(), existing.corridor());
-    }
     var failed = failedResolutions.get(trip.getId());
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {
       LOG.debug(
@@ -200,6 +192,17 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
         trip.getId()
       );
       return null;
+    }
+    var existing = repository.getCarpoolTrip(trip.getId());
+    boolean sameRoutePoints =
+      existing != null && existing.trip().routePoints().equals(trip.routePoints());
+    // The corridor also depends on the stops' deviation budgets.
+    if (sameRoutePoints && sameDeviationBudgets(existing.trip(), trip)) {
+      return new RoutableCarpoolTrip(trip, existing.vertices(), existing.corridor());
+    }
+    var tripOnSameRoute = storedTripOnTheSameRoute(trip);
+    if (tripOnSameRoute != null) {
+      return new RoutableCarpoolTrip(trip, tripOnSameRoute.vertices(), tripOnSameRoute.corridor());
     }
     RoutableCarpoolTrip resolved;
     try {
@@ -224,6 +227,23 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       failedResolutions.put(trip.getId(), trip);
     }
     return resolved;
+  }
+
+  /**
+   * A stored trip, of any feed, with the same route points and deviation budgets; {@code null} if
+   * there is none.
+   */
+  @Nullable
+  private RoutableCarpoolTrip storedTripOnTheSameRoute(CarpoolTrip trip) {
+    for (var stored : repository.getCarpoolTrips()) {
+      if (
+        stored.trip().routePoints().equals(trip.routePoints()) &&
+        sameDeviationBudgets(stored.trip(), trip)
+      ) {
+        return stored;
+      }
+    }
+    return null;
   }
 
   private static boolean sameDeviationBudgets(CarpoolTrip a, CarpoolTrip b) {

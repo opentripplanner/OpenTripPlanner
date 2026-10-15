@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,9 +30,11 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.carpooling.CarpoolingParameters;
 import org.opentripplanner.ext.carpooling.RoutableCarpoolTripTestData;
 import org.opentripplanner.ext.carpooling.internal.DefaultCarpoolingRepository;
+import org.opentripplanner.ext.carpooling.routing.CarpoolCorridor;
 import org.opentripplanner.ext.carpooling.routing.RoutableCarpoolTripResolver;
 import org.opentripplanner.framework.io.HttpHeaders;
 import org.opentripplanner.updater.trip.siri.updater.DefaultSiriETUpdaterParameters;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 class SiriETCarpoolingUpdaterTest {
 
@@ -204,6 +207,44 @@ class SiriETCarpoolingUpdaterTest {
   }
 
   @Test
+  void processEstimatedVehicleJourney_otherTripOnSameRoute_reusesItsCorridor() {
+    var trip = minimalCompleteJourney();
+    updater.processEstimatedVehicleJourney(trip);
+    var otherTrip = minimalCompleteJourney();
+    otherTrip.setEstimatedVehicleJourneyCode("other");
+
+    updater.processEstimatedVehicleJourney(otherTrip);
+
+    verify(resolver, times(1)).resolve(any());
+    verify(resolver, never()).resolve(any(), any());
+    assertSame(corridorOf(trip), corridorOf(otherTrip));
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_otherTripOnSameRouteWithOtherBudgets_getsItsOwnCorridor() {
+    var trip = journeyWithLatestExpectedArrivalTime(0, 10);
+    updater.processEstimatedVehicleJourney(trip);
+    var otherTrip = journeyWithLatestExpectedArrivalTime(0, 20);
+    otherTrip.setEstimatedVehicleJourneyCode("other");
+
+    updater.processEstimatedVehicleJourney(otherTrip);
+
+    assertNotSame(corridorOf(trip), corridorOf(otherTrip));
+  }
+
+  @Test
+  void processEstimatedVehicleJourney_otherTripOnOtherRoutePoints_getsItsOwnCorridor() {
+    var trip = minimalCompleteJourney();
+    updater.processEstimatedVehicleJourney(trip);
+    var otherTrip = journeyWithMovedDestination();
+    otherTrip.setEstimatedVehicleJourneyCode("other");
+
+    updater.processEstimatedVehicleJourney(otherTrip);
+
+    assertNotSame(corridorOf(trip), corridorOf(otherTrip));
+  }
+
+  @Test
   void processEstimatedVehicleJourney_unchangedGeometry_reusesStoredVerticesAndCorridor() {
     var journey = minimalCompleteJourney();
     updater.processEstimatedVehicleJourney(journey);
@@ -240,6 +281,10 @@ class SiriETCarpoolingUpdaterTest {
     var tripId = mapper.tripId(journey);
     assertTrue(tripIsInRepository(tripId));
     return tripId;
+  }
+
+  private CarpoolCorridor corridorOf(EstimatedVehicleJourney journey) {
+    return repository.getCarpoolTrip(mapper.tripId(journey)).corridor();
   }
 
   private boolean tripIsInRepository(FeedScopedId id) {
