@@ -81,6 +81,13 @@ class StopTimesMapper {
 
   private List<String> currentHeadSignVias;
 
+  /**
+   * @param stopPlaceIdByStopPointRef Generally speaking, scheduled stop points can only refer to quays.
+   *                                  However, some profiles - like EPIP - allow you also use stop places.
+   *                                  If you activate this feature (stopPlaceAsPassengerStopAssignment)
+   *                                  then this collection is non-empty. In such a case a child stop
+   *                                  is used as a fallback.
+   */
   StopTimesMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
