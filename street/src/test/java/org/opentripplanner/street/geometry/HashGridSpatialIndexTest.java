@@ -1,12 +1,14 @@
 package org.opentripplanner.street.geometry;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -63,7 +65,7 @@ public class HashGridSpatialIndexTest {
         }
       }
       boolean equals = hashGridObjs2.equals(strtreeObjs2);
-      Assertions.assertTrue(equals);
+      assertTrue(equals);
     }
   }
 
@@ -98,8 +100,8 @@ public class HashGridSpatialIndexTest {
       List<DummyObject> visited = new ArrayList<>();
       Consumer<DummyObject> consumer = visited::add;
       hashGrid.forEachCandidate(searchEnv, consumer);
-      Assertions.assertEquals(new HashSet<>(hashGrid.query(searchEnv)), new HashSet<>(visited));
-      Assertions.assertTrue(visited.size() >= new HashSet<>(visited).size());
+      assertEquals(new HashSet<>(hashGrid.query(searchEnv)), new HashSet<>(visited));
+      assertTrue(visited.size() >= new HashSet<>(visited).size());
     }
   }
 
@@ -112,13 +114,13 @@ public class HashGridSpatialIndexTest {
 
     List<String> visited = new ArrayList<>();
     hashGrid.forEachCandidate(new Envelope(0.1, 0.2, 0.0, 0.0), visited::add);
-    Assertions.assertEquals(List.of("spanning", "single"), visited);
+    assertEquals(List.of("spanning", "single"), visited);
 
     visited.clear();
     hashGrid.forEachCandidate(new Envelope(0.1, 0.8, 0.0, 0.0), visited::add);
-    Assertions.assertEquals(2, visited.stream().filter("spanning"::equals).count());
-    Assertions.assertEquals(1, visited.stream().filter("single"::equals).count());
-    Assertions.assertEquals(2, hashGrid.query(new Envelope(0.1, 0.8, 0.0, 0.0)).size());
+    assertEquals(2, visited.stream().filter("spanning"::equals).count());
+    assertEquals(1, visited.stream().filter("single"::equals).count());
+    assertEquals(2, hashGrid.query(new Envelope(0.1, 0.8, 0.0, 0.0)).size());
   }
 
   private static class DummyObject {
