@@ -2,17 +2,19 @@ package org.opentripplanner.netex.mapping;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.i18n.TranslatedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.JAXBUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
@@ -24,7 +26,6 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.Zone_VersionStructure;
 
 class StationMapper {
 
@@ -56,6 +57,14 @@ class StationMapper {
     this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
+  /**
+   * Map a NeTEx StopPlace to a Station.
+   *
+   * @return {@code null} if the StopPlace cannot be mapped because it has no valid coordinates,
+   *         neither on the StopPlace itself nor on any of its quays. A data import issue is
+   *         reported in that case.
+   */
+  @Nullable
   Station map(StopPlace stopPlace) {
     var id = idFactory.createId(stopPlace.getId());
     return siteRepositoryBuilder.computeStationIfAbsent(id, it ->
@@ -63,10 +72,16 @@ class StationMapper {
     );
   }
 
+  @Nullable
   Station mapStopPlaceToStation(FeedScopedId id, StopPlace stopPlace) {
+    WgsCoordinate coordinate = mapCoordinate(stopPlace);
+    if (coordinate == null) {
+      return null;
+    }
+
     var builder = Station.of(id)
       .withName(resolveName(stopPlace))
-      .withCoordinate(mapCoordinate(stopPlace))
+      .withCoordinate(coordinate)
       .withShouldRouteToCentroid(shouldRouteToCentroid(id))
       .withDescription(
         NonLocalizedString.ofNullable(stopPlace.getDescription(), MultilingualString::getValue)
@@ -129,32 +144,77 @@ class StationMapper {
   }
 
   /**
-   * Map the centroid to coordinate, if not present the mean coordinate for the child quays is
-   * returned. If the station do not have any quays an exception is thrown.
+   * Map the centroid to a coordinate. If the centroid is missing or invalid, the mean coordinate
+   * of the quays with valid coordinates is returned instead.
+   *
+   * @return {@code null} if no coordinate can be derived at all.
    */
+  @Nullable
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
-    if (stopPlace.getCentroid() != null) {
-      return WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
-    } else {
+    WgsCoordinate coordinate = mapCentroid(stopPlace);
+    if (coordinate != null) {
+      return coordinate;
+    }
+    List<WgsCoordinate> quayCoordinates = mapQuayCoordinates(stopPlace);
+    if (quayCoordinates.isEmpty()) {
       issueStore.add(
-        "StationWithoutCoordinates",
-        "Station %s does not contain any coordinates.",
-        stopPlace.getId() + " " + stopPlace.getName()
+        "StationWithoutValidCoordinates",
+        "Station %s has no valid coordinates, neither on the StopPlace nor on any of its quays. " +
+          "The StopPlace and its quays are skipped.",
+        stopPlace.getId()
       );
-      List<WgsCoordinate> coordinates = JAXBUtils.streamJAXBElementValue(
-        Quay.class,
-        stopPlace.getQuays().getQuayRefOrQuay()
-      )
-        .map(Zone_VersionStructure::getCentroid)
-        .filter(Objects::nonNull)
-        .map(WgsCoordinateMapper::mapToDomain)
-        .toList();
-      if (coordinates.isEmpty()) {
-        throw new IllegalArgumentException(
-          "Station w/quays without coordinates. Station id: " + stopPlace.getId()
+      return null;
+    }
+    return WgsCoordinate.mean(quayCoordinates);
+  }
+
+  @Nullable
+  private WgsCoordinate mapCentroid(StopPlace stopPlace) {
+    try {
+      WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
+      if (coordinate == null) {
+        issueStore.add(
+          "StationWithoutCoordinates",
+          "Station %s %s does not contain any coordinates.",
+          stopPlace.getId(),
+          stopPlace.getName()
         );
       }
-      return WgsCoordinate.mean(coordinates);
+      return coordinate;
+    } catch (InvalidCoordinateException e) {
+      issueStore.add(
+        "StationInvalidCoordinates",
+        "Station %s has invalid coordinates. %s",
+        stopPlace.getId(),
+        e.getMessage()
+      );
+      return null;
     }
+  }
+
+  /**
+   * Return the coordinates of the quays which have a valid coordinate. Quays with missing or
+   * invalid coordinates are reported when the quays themselves are mapped.
+   */
+  private static List<WgsCoordinate> mapQuayCoordinates(StopPlace stopPlace) {
+    if (stopPlace.getQuays() == null) {
+      return List.of();
+    }
+    List<WgsCoordinate> coordinates = new ArrayList<>();
+    var quays = JAXBUtils.streamJAXBElementValue(
+      Quay.class,
+      stopPlace.getQuays().getQuayRefOrQuay()
+    ).toList();
+    for (Quay quay : quays) {
+      try {
+        WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
+        if (coordinate != null) {
+          coordinates.add(coordinate);
+        }
+      } catch (InvalidCoordinateException ignore) {
+        // Skip the quay, the issue is reported by the QuayMapper
+      }
+    }
+    return coordinates;
   }
 }
