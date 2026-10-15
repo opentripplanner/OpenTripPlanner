@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.edgenaming;
 
+import static org.opentripplanner.street.model.edge.NameType.DERIVED;
+import static org.opentripplanner.street.model.edge.NameType.REAL;
+
 import gnu.trove.list.TLongList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,18 +99,19 @@ class CrosswalkNamer implements EdgeNamer {
     if (crossStreetOpt.isPresent()) {
       OsmWay crossStreet = crossStreetOpt.get();
       if (crossStreet.isNamed()) {
-        crosswalk.setName(
-          new LocalizedString("name.crosswalk_over_street", crossStreet.getAssumedName())
+        crosswalk.overrideName(
+          new LocalizedString("name.crosswalk_over_street", crossStreet.getAssumedName()),
+          DERIVED
         );
       } else if (crossStreet.isServiceRoad()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_service_road"));
+        crosswalk.overrideName(new LocalizedString("name.crosswalk_over_service_road"), DERIVED);
       } else if (crossStreet.isMotorwayRamp()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_motorway_ramp"));
+        crosswalk.overrideName(new LocalizedString("name.crosswalk_over_motorway_ramp"), DERIVED);
       } else if (crossStreet.isTurnLane()) {
-        crosswalk.setName(new LocalizedString("name.crosswalk_over_turn_lane"));
+        crosswalk.overrideName(new LocalizedString("name.crosswalk_over_turn_lane"), DERIVED);
       } else {
         // Default on using the OSM way ID, which should not happen.
-        crosswalk.setName(I18NString.of(String.format("crosswalk %s", way.getId())));
+        crosswalk.overrideName(I18NString.of(String.format("crosswalk %s", way.getId())), DERIVED);
       }
 
       var adjacentSidewalks = sidewalkIndex
@@ -142,7 +146,7 @@ class CrosswalkNamer implements EdgeNamer {
       .filter(e -> e.way().getNodeRefs().contains(nodeId))
       .toList();
     if (sidewalks.size() == 1) {
-      sidewalks.getFirst().edge().setName(crosswalkName);
+      sidewalks.getFirst().edge().overrideName(crosswalkName, REAL);
     }
   }
 
