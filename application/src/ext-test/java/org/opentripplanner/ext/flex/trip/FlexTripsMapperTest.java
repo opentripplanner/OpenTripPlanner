@@ -43,4 +43,21 @@ class FlexTripsMapperTest {
       issueStore.listIssues().toString()
     );
   }
+
+  @Test
+  void fixedStopWithMultipleFlexWindows() {
+    var builder = new TransitDataImportBuilder(SiteRepository.of().build(), NOOP);
+    builder
+      .getStopTimesSortedByTrip()
+      .addAll(
+        List.of(
+          org.opentripplanner.model.FlexStopTimesFactory.regularStop("10:00"),
+          org.opentripplanner.model.FlexStopTimesFactory.regularStopWithWindow("10:15", "11:00"),
+          org.opentripplanner.model.FlexStopTimesFactory.regularStopWithWindow("10:15", "11:00")
+        )
+      );
+    var trips = FlexTripsMapper.createFlexTrips(builder, NOOP);
+    assertEquals(1, trips.size());
+    assertInstanceOf(UnscheduledTrip.class, trips.getFirst());
+  }
 }
