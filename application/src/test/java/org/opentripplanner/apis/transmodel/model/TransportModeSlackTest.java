@@ -12,7 +12,7 @@ import org.opentripplanner.apis.support.InvalidInputException;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public class TransportModeSlackTest {
+class TransportModeSlackTest {
 
   private static final Duration D10_m = Duration.ofMinutes(10);
   private static final Duration D30_m = Duration.ofMinutes(30);
@@ -23,7 +23,7 @@ public class TransportModeSlackTest {
   private static final int D60_m_SECONDS = (int) D60_m.toSeconds();
 
   @Test
-  public void mapToApiList() {
+  void mapToApiList() {
     // Given
     DurationForEnum<TransitMode> domain = DurationForEnum.of(TransitMode.class)
       .with(TransitMode.FUNICULAR, D10_m)
@@ -47,7 +47,7 @@ public class TransportModeSlackTest {
   }
 
   @Test
-  public void mapToDomain() {
+  void mapToDomain() {
     // Given
     List<Object> apiSlackInput = List.of(
       Map.of(
@@ -76,7 +76,7 @@ public class TransportModeSlackTest {
   }
 
   @Test
-  public void rejectUnknownModeInMapToDomain() {
+  void rejectUnknownModeInMapToDomain() {
     // The GraphQL TransportMode enum maps "unknown" to a String, not to a TransitMode
     List<Object> apiSlackInput = List.of(
       Map.of("slack", D10_m_SECONDS, "modes", List.of(TransitMode.BUS, "unknown"))
