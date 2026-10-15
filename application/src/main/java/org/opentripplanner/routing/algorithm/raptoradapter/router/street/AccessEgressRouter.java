@@ -88,7 +88,7 @@ public class AccessEgressRouter {
       ? linkingContext.fromStopVertices()
       : linkingContext.toStopVertices();
 
-    return NearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
+    return NearbyStopFactory.nearbyStopsForTransitStopVertices(
       transitStopVertices,
       accessOrEgress.isEgress(),
       routeRequest,

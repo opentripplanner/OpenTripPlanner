@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
@@ -154,15 +155,12 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = NearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
-      originVertices,
+    var stopsFound = NearbyStopFactory.nearbyStopsForTransitStopVertices(
+      getFilteredTransitStopVertices(originVertices),
       reverseDirection,
       request,
       streetMode
-    )
-      .stream()
-      .filter(nearbyStop -> !ignoreStops.contains(nearbyStop.stopId()))
-      .toList();
+    );
 
     // Return only the origin vertices if there are no valid street modes
     if (
@@ -237,6 +235,15 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     } else {
       return false;
     }
+  }
+
+  private Set<TransitStopVertex> getFilteredTransitStopVertices(Set<Vertex> vertices) {
+    return vertices
+      .stream()
+      .filter(v -> v instanceof TransitStopVertex)
+      .map(v -> (TransitStopVertex) v)
+      .filter(v -> !ignoreStops.contains(v.getId()))
+      .collect(Collectors.toSet());
   }
 
   public static class Builder {
