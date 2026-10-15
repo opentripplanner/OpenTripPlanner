@@ -33,7 +33,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  */
 class ModifiedTripBuilder {
 
-  private final TripTimes existingTripTimes;
+  private final TripTimes<?> existingTripTimes;
   private final TripPattern pattern;
   private final LocalDate serviceDate;
   private final ZoneId zoneId;
@@ -50,7 +50,7 @@ class ModifiedTripBuilder {
   private final String vehicleRef;
 
   public ModifiedTripBuilder(
-    TripTimes existingTripTimes,
+    TripTimes<?> existingTripTimes,
     TripPattern pattern,
     EstimatedVehicleJourneyWrapper journey,
     LocalDate serviceDate,
@@ -76,7 +76,7 @@ class ModifiedTripBuilder {
    * Constructor for tests
    */
   public ModifiedTripBuilder(
-    TripTimes existingTripTimes,
+    TripTimes<?> existingTripTimes,
     TripPattern pattern,
     LocalDate serviceDate,
     ZoneId zoneId,

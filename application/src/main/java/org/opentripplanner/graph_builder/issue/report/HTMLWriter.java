@@ -2,8 +2,8 @@ package org.opentripplanner.graph_builder.issue.report;
 
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
@@ -13,33 +13,70 @@ import org.slf4j.LoggerFactory;
 class HTMLWriter {
 
   private static final Logger LOG = LoggerFactory.getLogger(HTMLWriter.class);
+  private static final String INDEX_FILENAME = "index";
+
   private final DataSource target;
-  private final Collection<DataImportIssue> issues;
+  private final Bucket bucket;
+  private final List<Bucket> indexBuckets;
   private final BucketKey bucketKey;
   private final boolean addGeoJSONLink;
   private final List<BucketKey> keys;
 
-  HTMLWriter(
+  private HTMLWriter(
+    DataSource target,
+    BucketKey bucketKey,
+    List<BucketKey> keys,
+    Bucket bucket,
+    List<Bucket> indexBuckets,
+    boolean addGeoJSONLink
+  ) {
+    this.target = target;
+    this.bucketKey = bucketKey;
+    this.keys = keys;
+    this.bucket = bucket;
+    this.indexBuckets = indexBuckets;
+    this.addGeoJSONLink = addGeoJSONLink;
+  }
+
+  /**
+   * Create a writer for the report page listing the issues in the given bucket.
+   */
+  static HTMLWriter forIssueType(
     CompositeDataSource reportDirectory,
     Bucket bucket,
     List<BucketKey> keys,
     boolean addGeoJSONLink
   ) {
-    LOG.debug("Creating file: {}", bucket.key().key());
-    this.bucketKey = bucket.key();
-    this.addGeoJSONLink = addGeoJSONLink;
-    this.target = reportDirectory.entry(bucketKey.key() + ".html");
-    this.keys = keys;
-    this.issues = bucket.issues();
+    BucketKey bucketKey = bucket.key();
+    LOG.debug("Creating file: {}", bucketKey.key());
+    return new HTMLWriter(
+      reportDirectory.entry(bucketKey.key() + ".html"),
+      bucketKey,
+      keys,
+      bucket,
+      null,
+      addGeoJSONLink
+    );
   }
 
-  HTMLWriter(CompositeDataSource reportDirectory, String filename, List<BucketKey> keys) {
-    LOG.debug("Creating index file: {}", filename);
-    this.target = reportDirectory.entry(filename + ".html");
-    this.keys = keys;
-    this.issues = null;
-    this.bucketKey = new BucketKey(filename, null);
-    this.addGeoJSONLink = false;
+  /**
+   * Create a writer for the index page, linking to all issue pages and summarizing the number of
+   * issues of each type.
+   */
+  static HTMLWriter forIndex(
+    CompositeDataSource reportDirectory,
+    List<BucketKey> keys,
+    List<Bucket> buckets
+  ) {
+    LOG.debug("Creating index file: {}", INDEX_FILENAME);
+    return new HTMLWriter(
+      reportDirectory.entry(INDEX_FILENAME + ".html"),
+      new BucketKey(INDEX_FILENAME, null),
+      keys,
+      null,
+      buckets,
+      false
+    );
   }
 
   void writeFile() {
@@ -52,7 +89,11 @@ class HTMLWriter {
 
       printCategoryLinks(out);
 
-      if (issues != null) {
+      if (indexBuckets != null) {
+        writeIssueCounts(out);
+      }
+
+      if (bucket != null) {
         if (addGeoJSONLink) {
           out.printf(
             "<a class=\"pure-button\" href=\"./%s.geojson\">Open issues in a GeoJSON file</a>",
@@ -60,6 +101,16 @@ class HTMLWriter {
           );
         }
 
+        if (bucket.isTruncated()) {
+          out.printf(
+            "<p><strong>Showing the %s issues with the highest priority out of %s %s issues." +
+              " The others are left out of the report, see maxDataImportIssuesPerType in the" +
+              " build configuration.</strong></p>%n",
+            format(bucket.reportedIssuesOfType()),
+            format(bucket.totalIssuesOfType()),
+            bucket.key().issueType()
+          );
+        }
         writeIssues(out);
       }
 
@@ -113,14 +164,43 @@ class HTMLWriter {
   }
 
   /**
+   * Writes a table with the number of issues of each type, and how many of them are written to the
+   * report.
+   */
+  private void writeIssueCounts(PrintWriter out) {
+    out.println("<table class=\"pure-table pure-table-striped\">");
+    out.println(
+      "<thead><tr><th>Issue type</th><th>Issues</th><th>Written to report</th></tr></thead>"
+    );
+    out.println("<tbody>");
+    indexBuckets
+      .stream()
+      .filter(b -> b.key().index() == null || b.key().index() == 1)
+      .sorted()
+      .forEach(b ->
+        out.printf(
+          "<tr><td>%s</td><td>%s</td><td>%s</td></tr>%n",
+          b.key().issueType(),
+          format(b.totalIssuesOfType()),
+          format(b.reportedIssuesOfType())
+        )
+      );
+    out.println("</tbody></table>");
+  }
+
+  /**
    * Writes issues as LI html elements
    */
   private void writeIssues(PrintWriter out) {
     out.println("<ul id=\"log\">");
-    for (DataImportIssue it : issues) {
+    for (DataImportIssue it : bucket.issues()) {
       out.printf("<li>%s</li>%n", it.getHTMLMessage());
     }
     out.println("</ul>");
+  }
+
+  private static String format(int number) {
+    return String.format(Locale.ROOT, "%,d", number);
   }
 
   private static void printPostamble(PrintWriter out) {

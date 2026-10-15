@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config.framework.json;
 import static org.opentripplanner.standalone.config.framework.json.NodeInfo.SOURCETYPE_QUALIFIER;
 import static org.opentripplanner.standalone.config.framework.json.NodeInfo.TYPE_QUALIFIER;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +12,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.application.OtpAppException;
+import tools.jackson.databind.JsonNode;
 
 /**
  * This class wrap a {@link JsonNode} and decorate it with type-safe parsing of types used in OTP
@@ -125,19 +125,19 @@ public class NodeAdapter {
    * use it to provide custom parsing.
    */
   public String asText() {
-    return json.asText();
+    return json.asString();
   }
 
   /** List all present parameters by name */
   public Iterator<String> parameterNames() {
-    return json.fieldNames();
+    return json.propertyNames().iterator();
   }
 
   /**
    * List all children present in the JSON document.
    */
   public Iterator<String> listExistingChildNodes() {
-    return json.fieldNames();
+    return json.propertyNames().iterator();
   }
 
   /**
@@ -152,12 +152,12 @@ public class NodeAdapter {
    */
   public String typeQualifier() {
     assertRequiredFieldExist(TYPE_QUALIFIER);
-    return json.path(TYPE_QUALIFIER).asText();
+    return json.path(TYPE_QUALIFIER).asString();
   }
 
   public String sourceTypeQualifier() {
     assertRequiredFieldExist(SOURCETYPE_QUALIFIER);
-    return json.path(SOURCETYPE_QUALIFIER).asText();
+    return json.path(SOURCETYPE_QUALIFIER).asString();
   }
 
   /**
@@ -242,7 +242,7 @@ public class NodeAdapter {
     }
 
     List<String> unusedParams = new ArrayList<>();
-    Iterator<String> it = json.fieldNames();
+    Iterator<String> it = json.propertyNames().iterator();
     Set<String> parameterNames = parameters.keySet();
 
     while (it.hasNext()) {

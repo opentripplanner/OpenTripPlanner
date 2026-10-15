@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedAugmentedUrl;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.bookingUrlTemplate;
+import static org.opentripplanner.ext.carpooling.CarpoolBookingUrlTestData.expectedExpandedUrl;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -257,7 +258,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
   }
 
   /**
-   * Verifies that {@code from_coordinate} / {@code to_coordinate} on the booking URL reference the
+   * Verifies that the {@code {from}} / {@code {to}} placeholders on the booking URL expand to the
    * carpool boarding/alighting vertices (B and C — where the passenger actually gets in and out
    * of the car) and NOT the passenger's walking endpoints (P and Q). This is the case the user's
    * spec explicitly called out: the coordinates must not be where the passenger starts/finishes
@@ -273,7 +274,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
     );
     var trip = new CarpoolTripBuilder(baseTrip)
       .withPublicContactInformation(
-        ContactInfo.of().withBookingUrl("https://book.example.com").build()
+        ContactInfo.of().withBookingUrl(bookingUrlTemplate("https://book.example.com")).build()
       )
       .build();
     context.upsertTrip(trip);
@@ -286,7 +287,7 @@ class DefaultCarpoolingServiceWalkLegsTest extends GraphRoutingTest {
     assertNotNull(bookingInfo);
 
     assertEquals(
-      expectedAugmentedUrl("https://book.example.com", B_COORD, C_COORD),
+      expectedExpandedUrl("https://book.example.com", B_COORD, C_COORD),
       bookingInfo.getContactInfo().getBookingUrl()
     );
   }

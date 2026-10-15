@@ -26,7 +26,7 @@ public interface TransitDataProviderFilter {
    * object.
    */
   @Nullable
-  Predicate<TripTimes> createTripFilter(TripPattern tripPattern);
+  Predicate<TripTimes<?>> createTripFilter(TripPattern tripPattern);
 
   /**
    * Check if boarding/alighting is possible at each stop. If the values differ from the default

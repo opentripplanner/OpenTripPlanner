@@ -33,6 +33,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +105,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // The linker will use streets if they are available, or straight-line distance otherwise.
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
-    List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
     Set<StopLocation> carsAllowedStops =
       transitRepository.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =
@@ -124,7 +124,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track(
       "Create transfer edges for stops",
       1000,
-      stops.size()
+      transitRepository.getSiteRepository().listRegularStops().size()
     );
 
     AtomicInteger nTransfersTotal = new AtomicInteger();
@@ -155,8 +155,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
      */
     bikesAllowedStops.addAll(emptyStops);
 
-    stops
-      .stream()
+    var stops = graph.findVertices(TransitStopVertex.class);
+    StreamUtils.ofIterable(stops)
       .parallel()
       .forEach(ts0 -> {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
@@ -276,13 +276,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     Map<TransferKey, PathTransfer> distinctTransfers,
     StreetMode mode
   ) {
-    TransferKey transferKey = new TransferKey(from, to, sd.edges);
+    TransferKey transferKey = new TransferKey(from, to, sd.edges());
     PathTransfer pathTransfer = distinctTransfers.get(transferKey);
     if (pathTransfer == null) {
       // If the PathTransfer can't be found, it is created.
       distinctTransfers.put(
         transferKey,
-        new PathTransfer(from, to, sd.distance, sd.edges, EnumSet.of(mode))
+        new PathTransfer(from, to, sd.distance(), sd.edges(), EnumSet.of(mode))
       );
     } else {
       // If the PathTransfer is found, a new PathTransfer with the added mode is created.
@@ -404,7 +404,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       var repository = transitRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        var nearbyStop = repository.getStopLocation(sd.stopId);
+        var nearbyStop = repository.getStopLocation(sd.stopId());
         if (nearbyStop.equals(stop)) {
           continue;
         }
@@ -440,7 +440,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       var repository = transitRepository.getSiteRepository();
       for (NearbyStop sd : nearbyStops) {
         // Skip the origin stop, loop transfers are not needed.
-        var nearbyStop = repository.getStopLocation(sd.stopId);
+        var nearbyStop = repository.getStopLocation(sd.stopId());
         if (nearbyStop.equals(stop)) {
           continue;
         }
@@ -526,7 +526,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     );
     var repository = transitRepository.getSiteRepository();
     for (NearbyStop sd : nearbyStops) {
-      var nearbyStop = repository.getStopLocation(sd.stopId);
+      var nearbyStop = repository.getStopLocation(sd.stopId());
       // Skip the origin stop, loop transfers are not needed.
       if (nearbyStop.equals(stop)) {
         continue;

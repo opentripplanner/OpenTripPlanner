@@ -19,13 +19,15 @@ import java.util.Objects;
  * <p>Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
  * stop pattern will always also have {@code timesModified == true}.
  */
-final class RealTimeTripState {
+public final class RealTimeTripState {
 
   private final boolean timesModified;
   private final boolean canceled;
   private final boolean added;
   private final boolean tripPatternModified;
   private final boolean deleted;
+
+  static final RealTimeTripState SCHEDULED = of().build();
 
   private RealTimeTripState(Builder builder) {
     this.timesModified = builder.timesModified;
@@ -39,28 +41,28 @@ final class RealTimeTripState {
     return new Builder();
   }
 
-  boolean timesModified() {
+  public boolean timesModified() {
     return timesModified;
   }
 
-  boolean canceled() {
+  public boolean canceled() {
     return canceled;
   }
 
-  boolean added() {
+  public boolean added() {
     return added;
   }
 
-  boolean tripPatternModified() {
+  public boolean tripPatternModified() {
     return tripPatternModified;
   }
 
-  boolean deleted() {
+  public boolean deleted() {
     return deleted;
   }
 
   /** Returns {@code true} if any real-time information is present for this trip. */
-  boolean hasAnyUpdates() {
+  public boolean hasAnyUpdates() {
     return timesModified || canceled || added || tripPatternModified || deleted;
   }
 

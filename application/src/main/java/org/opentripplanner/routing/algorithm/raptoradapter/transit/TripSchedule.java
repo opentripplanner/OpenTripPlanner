@@ -15,7 +15,7 @@ public interface TripSchedule extends DefaultTripSchedule {
   /**
    * TODO OTP2 - Add JavaDoc
    */
-  TripTimes getOriginalTripTimes();
+  TripTimes<?> getOriginalTripTimes();
 
   /**
    * TODO OTP2 - Add JavaDoc

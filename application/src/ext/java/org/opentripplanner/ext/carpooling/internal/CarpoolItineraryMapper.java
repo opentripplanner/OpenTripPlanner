@@ -1,16 +1,11 @@
 package org.opentripplanner.ext.carpooling.internal;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
@@ -19,6 +14,7 @@ import org.opentripplanner.ext.carpooling.model.CarpoolLeg;
 import org.opentripplanner.ext.carpooling.routing.CarpoolAccessEgress;
 import org.opentripplanner.ext.carpooling.routing.EndpointLabel;
 import org.opentripplanner.ext.carpooling.routing.InsertionCandidate;
+import org.opentripplanner.ext.carpooling.util.BookingUrlTemplate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -26,20 +22,17 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
 import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 import org.opentripplanner.utils.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maps carpooling insertion candidates to OTP itineraries for API responses.
@@ -98,7 +91,6 @@ import org.slf4j.LoggerFactory;
  */
 public class CarpoolItineraryMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CarpoolItineraryMapper.class);
   private static final I18NString ORIGIN_DEFAULT_NAME = new LocalizedString("origin");
   private static final I18NString DESTINATION_DEFAULT_NAME = new LocalizedString("destination");
 
@@ -151,7 +143,7 @@ public class CarpoolItineraryMapper {
   }
 
   private static CarpoolLeg buildCarpoolLeg(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments,
+    List<StreetPath> sharedSegments,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     double rideWeight,
@@ -159,42 +151,34 @@ public class CarpoolItineraryMapper {
     Place toPlace,
     @Nullable BookingInfo bookingInfo
   ) {
-    var allEdges = sharedSegments
-      .stream()
-      .flatMap(seg -> seg.edges.stream())
-      .toList();
-
     return CarpoolLeg.of()
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(GeometryUtils.concatenateLineStrings(allEdges, Edge::getGeometry))
-      .withDistanceMeters(allEdges.stream().mapToDouble(Edge::getDistanceMeters).sum())
+      .withGeometry(GeometryUtils.concatenateLineStrings(sharedSegments, StreetPath::geometry))
+      .withDistanceMeters(sharedSegments.stream().mapToDouble(StreetPath::distanceMeters).sum())
       .withGeneralizedCost((int) rideWeight)
       .withPickupBookingInfo(bookingInfo)
       .build();
   }
 
   private static StreetLeg buildWalkLeg(
-    GraphPath<State, Edge, Vertex> walkPath,
+    StreetPath walkPath,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     Place fromPlace,
     Place toPlace
   ) {
-    LineString geometry = GeometryUtils.concatenateLineStrings(walkPath.edges, Edge::getGeometry);
-    double distance = walkPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-
     return StreetLeg.of()
       .withMode(TraverseMode.WALK)
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(geometry)
-      .withDistanceMeters(distance)
-      .withGeneralizedCost((int) walkPath.getWeight())
+      .withGeometry(walkPath.geometry())
+      .withDistanceMeters(walkPath.distanceMeters())
+      .withGeneralizedCost((int) walkPath.weight())
       .build();
   }
 
@@ -242,9 +226,9 @@ public class CarpoolItineraryMapper {
    * via {@link #makePlace(Vertex)}.
    */
   private static Itinerary buildItinerary(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments,
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
+    List<StreetPath> sharedSegments,
+    @Nullable StreetPath walkToPickup,
+    @Nullable StreetPath walkFromDropoff,
     ZonedDateTime carpoolStart,
     ZonedDateTime carpoolEnd,
     double rideWeight,
@@ -252,15 +236,15 @@ public class CarpoolItineraryMapper {
     EndpointLabel endLabel,
     @Nullable BookingInfo bookingInfo
   ) {
-    Vertex pickupVertex = sharedSegments.getFirst().states.getFirst().getVertex();
-    Vertex dropoffVertex = sharedSegments.getLast().states.getLast().getVertex();
+    Vertex pickupVertex = sharedSegments.getFirst().states().getFirst().getVertex();
+    Vertex dropoffVertex = sharedSegments.getLast().lastState().getVertex();
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
     Vertex startBoundaryVertex =
-      walkToPickup != null ? walkToPickup.states.getFirst().getVertex() : pickupVertex;
+      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
     Vertex endBoundaryVertex =
-      walkFromDropoff != null ? walkFromDropoff.states.getLast().getVertex() : dropoffVertex;
+      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
 
     Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
     Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
@@ -270,7 +254,7 @@ public class CarpoolItineraryMapper {
 
     List<Leg> legs = new ArrayList<>(3);
     if (walkToPickup != null) {
-      var walkStart = carpoolStart.minusSeconds(walkToPickup.getDuration());
+      var walkStart = carpoolStart.minus(walkToPickup.duration());
       legs.add(buildWalkLeg(walkToPickup, walkStart, carpoolStart, itineraryStart, pickupPlace));
     }
     legs.add(
@@ -285,7 +269,7 @@ public class CarpoolItineraryMapper {
       )
     );
     if (walkFromDropoff != null) {
-      var walkEnd = carpoolEnd.plusSeconds(walkFromDropoff.getDuration());
+      var walkEnd = carpoolEnd.plus(walkFromDropoff.duration());
       legs.add(buildWalkLeg(walkFromDropoff, carpoolEnd, walkEnd, dropoffPlace, itineraryEnd));
     }
 
@@ -296,18 +280,9 @@ public class CarpoolItineraryMapper {
   /**
    * Builds the carpool leg's {@code pickupBookingInfo} from the trip's public-contact details.
    * <p>
-   * The contact's {@code bookingUrl} (if present) is augmented with {@code from_coordinate} and
-   * {@code to_coordinate} query parameters reflecting the passenger's carpool boarding and
-   * alighting vertices — i.e. where the passenger gets in/out of the driver's car. These are
-   * distinct from the passenger's walking endpoints (handled by the surrounding walk legs) and
-   * from the driver's trip origin/destination.
-   * <p>
-   * If the contact's booking URL cannot be parsed as a valid {@link URI}, the URL is dropped from
-   * the returned {@code BookingInfo} (a malformed URL is logged and treated as if the trip
-   * published no booking URL at all) and {@link BookingMethod#ONLINE} is omitted from
-   * the booking methods. This keeps the "non-null return ⇒ at least one usable booking method"
-   * contract honest: a {@code BookingInfo} is never returned advertising {@code ONLINE} without
-   * a URL the user can actually open.
+   * The contact's {@code bookingUrl} (if present) is a {@link BookingUrlTemplate}: its
+   * {@code {from}} and {@code {to}} placeholders are expanded with the passenger's carpool
+   * boarding and alighting vertices — i.e. where the passenger gets in/out of the driver's car.
    * <p>
    * {@code latestBookingTime} is a temporary placeholder: how a real booking deadline should be
    * sourced for carpool trips is yet to be decided, so it is approximated by the trip's
@@ -322,16 +297,15 @@ public class CarpoolItineraryMapper {
    * @param contact the trip's public-contact details, or {@code null} if the trip publishes none.
    * @param tripStartTime the driver's trip start time; only the time-of-day is used, as the
    *        placeholder source for {@code latestBookingTime}.
-   * @param pickup the carpool boarding coordinate (where the passenger gets into the car), used to
-   *        augment the booking URL with {@code from_coordinate}.
+   * @param pickup the carpool boarding coordinate (where the passenger gets into the car),
+   *        expanded into the booking URL's {@code {from}} placeholder.
    * @param dropoff the carpool alighting coordinate (where the passenger gets out of the car),
-   *        used to augment the booking URL with {@code to_coordinate}.
+   *        expanded into the booking URL's {@code {to}} placeholder.
    * @return a booking info populated with the contact details and derived booking methods
-   *         (CALL_OFFICE if phone is set, ONLINE if URL is set and parses), or {@code null} when
+   *         (CALL_OFFICE if phone is set, ONLINE if a booking URL is set), or {@code null} when
    *         no actionable booking method can be derived — i.e. {@code contact} is {@code null},
-   *         the contact carries neither a phone number nor a booking URL, or the only booking
-   *         channel was a malformed URL. Consumers may therefore treat a non-null return as
-   *         "this leg has at least one booking method."
+   *         or it carries neither a phone number nor a booking URL. Consumers may therefore
+   *         treat a non-null return as "this leg has at least one booking method."
    */
   @Nullable
   static BookingInfo toBookingInfo(
@@ -347,19 +321,15 @@ public class CarpoolItineraryMapper {
     if (contact.getPhoneNumber() != null) {
       bookingMethods.add(BookingMethod.CALL_OFFICE);
     }
-    String effectiveUrl =
-      contact.getBookingUrl() == null
-        ? null
-        : appendPassengerCoordinates(contact.getBookingUrl(), pickup, dropoff);
-    if (effectiveUrl != null) {
+    String bookingUrl = contact.getBookingUrl();
+    String expandedUrl =
+      bookingUrl == null ? null : BookingUrlTemplate.expand(bookingUrl, pickup, dropoff);
+    if (expandedUrl != null) {
       bookingMethods.add(BookingMethod.ONLINE);
     }
-    if (bookingMethods.isEmpty()) {
-      return null;
-    }
-    ContactInfo effectiveContact = Objects.equals(effectiveUrl, contact.getBookingUrl())
+    ContactInfo effectiveContact = Objects.equals(expandedUrl, bookingUrl)
       ? contact
-      : contact.copy().withBookingUrl(effectiveUrl).build();
+      : contact.copy().withBookingUrl(expandedUrl).build();
 
     return BookingInfo.of()
       .withContactInfo(effectiveContact)
@@ -368,63 +338,12 @@ public class CarpoolItineraryMapper {
       .build();
   }
 
-  private static WgsCoordinate boardingCoordinate(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments
-  ) {
-    return sharedSegments.getFirst().states.getFirst().getVertex().toWgsCoordinate();
+  private static WgsCoordinate boardingCoordinate(List<StreetPath> sharedSegments) {
+    return sharedSegments.getFirst().states().getFirst().getVertex().toWgsCoordinate();
   }
 
-  private static WgsCoordinate alightingCoordinate(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments
-  ) {
-    return sharedSegments.getLast().states.getLast().getVertex().toWgsCoordinate();
-  }
-
-  /**
-   * Appends {@code from_coordinate} and {@code to_coordinate} query parameters to the booking URL
-   * so the carpool provider's booking page can pre-fill the passenger's pickup and dropoff.
-   * <p>
-   * The URL is parsed via {@link URI} so that any existing query string is merged with {@code &}
-   * (rather than a second {@code ?}) and any fragment ends up after the appended parameters
-   * rather than swallowing them.
-   *
-   * @return the augmented URL, or {@code null} if the input is not a parseable URI — in which
-   *         case the failure is logged and the caller should drop the URL (and the
-   *         {@link BookingMethod#ONLINE} booking method along with it).
-   */
-  @Nullable
-  private static String appendPassengerCoordinates(
-    String url,
-    WgsCoordinate pickup,
-    WgsCoordinate dropoff
-  ) {
-    String addedQuery = String.format(
-      Locale.ROOT,
-      "from_coordinate=%.6f,%.6f&to_coordinate=%.6f,%.6f",
-      pickup.latitude(),
-      pickup.longitude(),
-      dropoff.latitude(),
-      dropoff.longitude()
-    );
-    try {
-      URI uri = new URI(url);
-      String existingQuery = uri.getQuery();
-      String mergedQuery = existingQuery == null ? addedQuery : existingQuery + "&" + addedQuery;
-      return new URI(
-        uri.getScheme(),
-        uri.getAuthority(),
-        uri.getPath(),
-        mergedQuery,
-        uri.getFragment()
-      ).toString();
-    } catch (URISyntaxException e) {
-      LOG.info(
-        "Failed to parse carpool booking URL '{}'; dropping URL from booking info: {}",
-        url,
-        e.getMessage()
-      );
-      return null;
-    }
+  private static WgsCoordinate alightingCoordinate(List<StreetPath> sharedSegments) {
+    return sharedSegments.getLast().lastState().getVertex().toWgsCoordinate();
   }
 
   /**

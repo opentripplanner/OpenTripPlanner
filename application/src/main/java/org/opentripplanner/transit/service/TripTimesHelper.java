@@ -14,7 +14,7 @@ public class TripTimesHelper {
    * Always returns {@code true} if the trip times is deleted.
    */
   public static boolean skipByTripCancellationOrDeletion(
-    TripTimes tripTimes,
+    TripTimes<?> tripTimes,
     boolean includeCancellations
   ) {
     if (tripTimes.isDeleted()) {

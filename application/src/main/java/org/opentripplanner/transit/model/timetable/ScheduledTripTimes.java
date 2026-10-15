@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.accessibility.Accessibility;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.error.OtpError;
@@ -199,6 +199,11 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   @Override
   public BookingInfo getPickupBookingInfo(int stopPos) {
     return pickupBookingInfos.get(stopPos);
+  }
+
+  @Override
+  public RealTimeTripState realtimeTripState() {
+    return RealTimeTripState.SCHEDULED;
   }
 
   @Override

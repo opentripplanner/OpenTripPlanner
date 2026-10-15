@@ -5,13 +5,13 @@ import static org.opentripplanner.framework.application.OtpFileNames.DEBUG_UI_CO
 import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import javax.annotation.Nullable;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Generic config file loader. This is used to load all configuration files.

@@ -1,8 +1,6 @@
 package org.opentripplanner.street.graph.summary;
 
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -13,24 +11,21 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.collection.ListUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Helper class for generating URLs to geojson.io.
  */
 public class GeoJsonIo {
 
-  private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(
-    new JtsModule(GeometryUtils.getGeometryFactory())
-  );
+  private static final JsonMapper MAPPER = JsonMapper.builder()
+    .addModule(new JtsModule(GeometryUtils.getGeometryFactory()))
+    .build();
 
   public static String toUrl(Geometry geometry) {
-    try {
-      var geoJson = MAPPER.writeValueAsString(geometry);
-      var encoded = URLEncoder.encode(geoJson, StandardCharsets.UTF_8);
-      return "http://geojson.io/#data=data:application/json,%s".formatted(encoded);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    var geoJson = MAPPER.writeValueAsString(geometry);
+    var encoded = URLEncoder.encode(geoJson, StandardCharsets.UTF_8);
+    return "http://geojson.io/#data=data:application/json,%s".formatted(encoded);
   }
 
   public static String toUrl(Collection<Edge> edges, Collection<Vertex> vertices) {

@@ -13,9 +13,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
@@ -92,6 +94,9 @@ public class RoutingWorker {
   private final RaptorTuningParameters raptorTuningParameters;
 
   @Nullable
+  private final RealtimeResolver realtimeResolver;
+
+  @Nullable
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
 
   @Nullable
@@ -99,6 +104,9 @@ public class RoutingWorker {
 
   @Nullable
   private final CarpoolingService carpoolingService;
+
+  @Nullable
+  private final TaxiService taxiService;
 
   @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
@@ -132,12 +140,14 @@ public class RoutingWorker {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiService taxiService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
     RaptorTuningParameters raptorTuningParameters,
-    RoutingWorkerRequest workerRequest
+    RoutingWorkerRequest workerRequest,
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     this.request = workerRequest.request();
     this.transitSearchTimeZero = workerRequest.transitSearchTimeZero();
@@ -157,10 +167,12 @@ public class RoutingWorker {
     this.sorlandsbanenService = sorlandsbanenService;
     this.viaTransferResolver = viaTransferResolver;
     this.carpoolingService = carpoolingService;
+    this.taxiService = taxiService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
     this.raptorTuningParameters = raptorTuningParameters;
+    this.realtimeResolver = realtimeResolver;
     this.transitTuningParameters = transitTuningParameters;
     this.debugTimingAggregator = new DebugTimingAggregator(
       meterRegistry,
@@ -189,8 +201,9 @@ public class RoutingWorker {
           var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex());
           var r3 = CompletableFuture.supplyAsync(() -> routeTransit());
           var r4 = CompletableFuture.supplyAsync(() -> routeDirectCarpooling());
+          var r5 = CompletableFuture.supplyAsync(() -> routeDirectTaxi());
 
-          result.merge(r1.join(), r2.join(), r3.join(), r4.join());
+          result.merge(r1.join(), r2.join(), r3.join(), r4.join(), r5.join());
         } catch (CompletionException e) {
           RoutingValidationException.unwrapAndRethrowCompletionException(e);
         }
@@ -199,7 +212,8 @@ public class RoutingWorker {
           routeDirectStreet(),
           routeDirectFlex(),
           routeTransit(),
-          routeDirectCarpooling()
+          routeDirectCarpooling(),
+          routeDirectTaxi()
         );
       }
     } catch (RoutingValidationException e) {
@@ -255,15 +269,13 @@ public class RoutingWorker {
     // is off (too few or too many results found).
 
     var pagingService = createPagingService(result.itineraries());
-
     return RoutingResponseMapper.map(
       request,
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,
-      transitService,
-      transitAlertService,
-      pagingService
+      pagingService,
+      realtimeResolver
     );
   }
 
@@ -305,6 +317,10 @@ public class RoutingWorker {
     //       would be nice to also support via as a feature in the direct-street
     //       search.
     if (request.isViaSearch()) {
+      return RoutingResult.empty();
+    }
+    // Direct taxi routing is handled separately in routeDirectTaxi().
+    if (request.journey().direct().mode() == StreetMode.TAXI) {
       return RoutingResult.empty();
     }
 
@@ -393,7 +409,44 @@ public class RoutingWorker {
     }
   }
 
+  private RoutingResult routeDirectTaxi() {
+    // Start-on-board trip locations don't have street vertices, so direct routing is not applicable
+    if (request.isStartOnBoardAccessRequest()) {
+      return RoutingResult.empty();
+    }
+    // See the equivalent TODO in routeDirectStreet() for why via search is not supported here.
+    if (request.isViaSearch()) {
+      return RoutingResult.empty();
+    }
+    if (request.journey().direct().mode() != StreetMode.TAXI) {
+      return RoutingResult.ok(List.of());
+    }
+    // TODO: The default TAXI routing strategy should use, for example flex routing, which has not
+    //       yet been implemented. Until then, return no direct itinerary for TAXI unless the
+    //       TaxiRouting sandbox feature is enabled and a taxi route provider is configured.
+    if (taxiService == null) {
+      return RoutingResult.empty();
+    }
+    debugTimingAggregator.startedDirectTaxiRouter();
+    try {
+      var itineraries = taxiService.routeDirect(transitService, request, linkingContext());
+      return RoutingResult.ok(itineraries);
+    } catch (RoutingValidationException e) {
+      return RoutingResult.failed(e.getRoutingErrors());
+    } finally {
+      debugTimingAggregator.finishedDirectTaxiRouter();
+    }
+  }
+
   private RoutingResult routeTransit() {
+    // TODO: The default TAXI routing strategy should use, for example flex routing, which has not
+    //       yet been implemented. Until then, return no transit itinerary when access or egress is
+    //       TAXI unless the TaxiRouting sandbox feature is enabled and a taxi route provider is
+    //       configured.
+    if (request.journey().modes().hasAccessOrEgressMode(StreetMode.TAXI) && taxiService == null) {
+      return RoutingResult.empty();
+    }
+
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
@@ -414,7 +467,8 @@ public class RoutingWorker {
         additionalSearchDays,
         debugTimingAggregator,
         linkingContext(),
-        carpoolingService
+        carpoolingService,
+        taxiService
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       var itineraries = transitResults.getItineraries();

@@ -383,7 +383,7 @@ public class TransitDataImportBuilder {
 
     for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
       TripPattern ptn = e.getValue();
-      Set<TripTimes> tripTimesToBeRemoved = ptn
+      Set<TripTimes<?>> tripTimesToBeRemoved = ptn
         .getScheduledTimetable()
         .getTripTimes()
         .stream()

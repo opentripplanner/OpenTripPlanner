@@ -10,14 +10,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
@@ -237,7 +236,7 @@ public class SiriRealTimeUpdateHandler {
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-    TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
+    var existingTripTimes = currentTimetable.getTripTimes(trip);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);
@@ -292,7 +291,7 @@ public class SiriRealTimeUpdateHandler {
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-    TripTimes existingTripTimes = currentTimetable.getTripTimes(trip);
+    var existingTripTimes = currentTimetable.getTripTimes(trip);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", trip.getId());
       throw UpdateException.of(trip.getId(), TRIP_NOT_FOUND_IN_PATTERN);

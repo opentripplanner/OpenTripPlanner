@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
@@ -190,9 +190,14 @@ public class GraphBuilderModules {
   @Singleton
   static StopConnectivityModule provideStopConnectivityModule(
     Graph graph,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
-    return new StopConnectivityModule(graph, issueStore);
+    return new StopConnectivityModule(
+      graph,
+      () -> transitRepository.getSiteRepository().listRegularStops().size(),
+      issueStore
+    );
   }
 
   @Provides
@@ -311,6 +316,7 @@ public class GraphBuilderModules {
     return new DataImportIssueReporter(
       issueStore,
       dataSources.getBuildReportDir(),
+      config.maxDataImportIssuesPerType,
       config.maxDataImportIssuesPerFile
     );
   }
