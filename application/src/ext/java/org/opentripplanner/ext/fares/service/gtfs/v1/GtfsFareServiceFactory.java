@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares.service.gtfs.v1;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.time.LocalDate;
@@ -24,6 +23,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.transit.model.network.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Implements the default GTFS fare rules as described in http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b

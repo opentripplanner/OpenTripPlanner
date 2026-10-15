@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
-import org.opentripplanner.framework.transaction.api.RepositoryHandle;
-import org.opentripplanner.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -187,6 +187,7 @@ public class SpeedTest {
       transitRepository,
       timetableHandle.repositorySnapshot(transactionScope)
     );
+
     this.routingService = new DefaultRoutingService(
       this.transitService,
       graph,
@@ -205,9 +206,11 @@ public class SpeedTest {
       null,
       null,
       null,
+      null,
       TestServerContext.createLinkingContextFactory(graph, vertexLinker, this.transitService),
       routerConfig.transitTuningConfig(),
-      routerConfig.transitTuningConfig()
+      routerConfig.transitTuningConfig(),
+      null
     );
 
     initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);

@@ -55,9 +55,9 @@ public class OjpService {
     } else if (coordinate.isPresent()) {
       callsAtStop = callAtStopService.findCallsAtStop(coordinate.get(), params);
     }
-    var optional = StopEventParamsMapper.mapOptionalFeatures(ser.getParams());
+
     var mapper = new StopEventResponseMapper(
-      optional,
+      params.optionalFeatures(),
       zoneId,
       idMapper,
       callAtStopService::resolveLanguage

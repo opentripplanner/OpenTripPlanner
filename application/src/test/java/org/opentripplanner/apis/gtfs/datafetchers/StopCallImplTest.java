@@ -67,7 +67,7 @@ class StopCallImplTest {
     );
 
     var schedule = impl.schedule().get(env);
-    assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON)), schedule);
+    assertEquals(new CallSchedule(new ArrivalDepartureTime(NOON, NOON, false)), schedule);
   }
 
   @Test

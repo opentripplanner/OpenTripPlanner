@@ -102,7 +102,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     graph.index();
     int successes = 0;
 
-    for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
+    for (TransitStopVertex ts : graph.findVertices(TransitStopVertex.class)) {
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
         var stop = stopResolver.getStop(ts.getId());

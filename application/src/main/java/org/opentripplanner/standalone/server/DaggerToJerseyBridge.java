@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.server;
 import jakarta.inject.Provider;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.innate.inject.BlindBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLRequestContext;
@@ -40,7 +40,7 @@ import org.opentripplanner.transit.service.TransitService;
  * More on custom injection in Jersey 2:
  * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
  */
-final class DaggerToJerseyBridge extends AbstractBinder {
+final class DaggerToJerseyBridge extends BlindBinder {
 
   private final Supplier<RequestScopedFactory> factorySupplier;
 

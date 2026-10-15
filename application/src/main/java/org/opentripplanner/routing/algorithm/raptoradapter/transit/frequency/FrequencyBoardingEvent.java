@@ -12,7 +12,7 @@ final class FrequencyBoardingEvent<T extends DefaultTripSchedule> extends Freque
 
   public FrequencyBoardingEvent(
     TripPatternForDates raptorTripPattern,
-    TripTimes tripTimes,
+    TripTimes<?> tripTimes,
     int stopPositionInPattern,
     int earliestDepartureTime,
     int departureTime,

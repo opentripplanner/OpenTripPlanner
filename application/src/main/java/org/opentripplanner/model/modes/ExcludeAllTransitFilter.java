@@ -24,7 +24,7 @@ public final class ExcludeAllTransitFilter implements Serializable, TransitFilte
   }
 
   @Override
-  public boolean matchTripTimes(TripTimes trip) {
+  public boolean matchTripTimes(TripTimes<?> trip) {
     return false;
   }
 

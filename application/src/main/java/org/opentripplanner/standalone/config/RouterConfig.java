@@ -4,8 +4,6 @@ import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONF
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.routerequest.RouteRequestConfig.mapDefaultRouteRequest;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -31,6 +29,8 @@ import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.warmup.api.WarmupParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * This class is an object representation of the 'router-config.json'.

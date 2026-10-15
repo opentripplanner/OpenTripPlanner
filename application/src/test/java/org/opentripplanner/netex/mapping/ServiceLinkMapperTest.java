@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
@@ -16,6 +17,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
@@ -59,6 +61,8 @@ class ServiceLinkMapperTest {
   private StopPattern.StopPatternBuilder stopPatternBuilder;
   private ServiceLinkMapper serviceLinkMapper;
   private DataImportIssueStore issueStore;
+  private HierarchicalMap<String, String> quayIdByStopPointRef;
+  private EntityById<RegularStop> stopsById;
 
   @BeforeEach
   void setUpTestData() {
@@ -84,10 +88,49 @@ class ServiceLinkMapperTest {
         SERVICE_LINKS_COORDINATES[5],
       }
     );
+    ServiceLink serviceLink3 = createServiceLinkWithDirectLineString(
+      "RUT:ServiceLink:3",
+      "RUT:StopPoint:1",
+      "RUT:StopPoint:2",
+      new Double[] {
+        SERVICE_LINKS_COORDINATES[0],
+        SERVICE_LINKS_COORDINATES[1],
+        SERVICE_LINKS_COORDINATES[2],
+        SERVICE_LINKS_COORDINATES[3],
+      }
+    );
+
+    // links to a quay that is not part of the stops
+    ServiceLink serviceLinkToUnknownQuay = createServiceLink(
+      "RUT:ServiceLink:4",
+      "RUT:StopPoint:1",
+      "RUT:StopPoint:4",
+      new Double[] {
+        SERVICE_LINKS_COORDINATES[0],
+        SERVICE_LINKS_COORDINATES[1],
+        SERVICE_LINKS_COORDINATES[2],
+        SERVICE_LINKS_COORDINATES[3],
+      }
+    );
+    // skips the second stop, so its to-point does not match the journey pattern when used first
+    ServiceLink serviceLinkSkippingStop = createServiceLink(
+      "RUT:ServiceLink:5",
+      "RUT:StopPoint:1",
+      "RUT:StopPoint:3",
+      new Double[] {
+        SERVICE_LINKS_COORDINATES[0],
+        SERVICE_LINKS_COORDINATES[1],
+        SERVICE_LINKS_COORDINATES[4],
+        SERVICE_LINKS_COORDINATES[5],
+      }
+    );
 
     HierarchicalMapById<ServiceLink> serviceLinksById = new HierarchicalMapById<>();
+    serviceLinksById.add(serviceLinkToUnknownQuay);
+    serviceLinksById.add(serviceLinkSkippingStop);
     serviceLinksById.add(serviceLink1);
     serviceLinksById.add(serviceLink2);
+    serviceLinksById.add(serviceLink3);
 
     Quay quay1 = new Quay()
       .withId("NSR:Quay:1")
@@ -101,12 +144,13 @@ class ServiceLinkMapperTest {
 
     List<Quay> quaysById = List.of(quay1, quay2, quay3);
 
-    HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
+    quayIdByStopPointRef = new HierarchicalMap<>();
     quayIdByStopPointRef.add("RUT:StopPoint:1", "NSR:Quay:1");
     quayIdByStopPointRef.add("RUT:StopPoint:2", "NSR:Quay:2");
     quayIdByStopPointRef.add("RUT:StopPoint:3", "NSR:Quay:3");
+    quayIdByStopPointRef.add("RUT:StopPoint:4", "NSR:Quay:4");
 
-    EntityById<RegularStop> stopsById = new DefaultEntityById<>();
+    stopsById = new DefaultEntityById<>();
     issueStore = new DefaultDataImportIssueStore();
 
     QuayMapper quayMapper = new QuayMapper(
@@ -261,6 +305,178 @@ class ServiceLinkMapperTest {
     assertEquals(QUAY3_COORDINATES[1], coordinates[1].getX(), FLOATING_POINT_COMPARISON_PRECISION);
   }
 
+  @Test
+  void testMapServiceLinkWithDirectLineString() {
+    JourneyPattern journeyPattern = new JourneyPattern().withId("RUT:JourneyPattern:1300");
+    journeyPattern.setLinksInSequence(
+      new LinksInJourneyPattern_RelStructure()
+        .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:3")
+          )
+        )
+        .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
+          new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+            new ServiceLinkRefStructure().withRef("RUT:ServiceLink:2")
+          )
+        )
+    );
+
+    List<LineString> shape = serviceLinkMapper.getGeometriesByJourneyPattern(
+      journeyPattern,
+      stopPatternBuilder.build()
+    );
+
+    assertEquals(0, issueStore.listIssues().size());
+
+    Coordinate[] coordinates = shape.get(0).getCoordinates();
+
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[0],
+      coordinates[0].getY(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[1],
+      coordinates[0].getX(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[2],
+      coordinates[1].getY(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+    assertEquals(
+      SERVICE_LINKS_COORDINATES[3],
+      coordinates[1].getX(),
+      FLOATING_POINT_COMPARISON_PRECISION
+    );
+  }
+
+  @Test
+  void testServiceLinkWithUnknownQuayFallsBackToStraightLine() {
+    var shape = serviceLinkMapper.getGeometriesByJourneyPattern(
+      journeyPatternOf("RUT:ServiceLink:4", "RUT:ServiceLink:2"),
+      stopPatternBuilder.build()
+    );
+
+    assertThat(issueTypes()).containsExactly("ServiceLinkWithoutQuay");
+    assertStraightLine(shape.get(0), QUAY1_COORDINATES, QUAY2_COORDINATES);
+  }
+
+  @Test
+  void testServiceLinkWithUnmappedStopPointFallsBackToStraightLine() {
+    var unmapped = createServiceLink(
+      "RUT:ServiceLink:6",
+      "RUT:StopPoint:1",
+      "RUT:StopPoint:UNMAPPED",
+      SERVICE_LINKS_COORDINATES
+    );
+    var links = new HierarchicalMapById<ServiceLink>();
+    links.add(unmapped);
+    var mapper = new ServiceLinkMapper(
+      ID_FACTORY,
+      links,
+      quayIdByStopPointRef,
+      stopsById,
+      issueStore,
+      150
+    );
+
+    var shape = mapper.getGeometriesByJourneyPattern(
+      journeyPatternOf("RUT:ServiceLink:6", "RUT:ServiceLink:6"),
+      stopPatternBuilder.build()
+    );
+
+    assertThat(issueTypes()).contains("ServiceLinkWithoutQuay");
+    assertStraightLine(shape.get(0), QUAY1_COORDINATES, QUAY2_COORDINATES);
+  }
+
+  @Test
+  void testServiceLinkWithFromPointMismatchFallsBackToStraightLine() {
+    // link 1 goes from quay 1 to quay 2, but at index 1 the journey pattern expects quay 2 -> 3
+    var shape = serviceLinkMapper.getGeometriesByJourneyPattern(
+      journeyPatternOf("RUT:ServiceLink:1", "RUT:ServiceLink:1"),
+      stopPatternBuilder.build()
+    );
+
+    assertThat(issueTypes()).containsExactly("ServiceLinkQuayMismatch");
+    assertStraightLine(shape.get(1), QUAY2_COORDINATES, QUAY3_COORDINATES);
+  }
+
+  @Test
+  void testServiceLinkWithToPointMismatchFallsBackToStraightLine() {
+    // link 5 goes from quay 1 to quay 3, but at index 0 the journey pattern expects quay 1 -> 2
+    var shape = serviceLinkMapper.getGeometriesByJourneyPattern(
+      journeyPatternOf("RUT:ServiceLink:5", "RUT:ServiceLink:2"),
+      stopPatternBuilder.build()
+    );
+
+    assertThat(issueTypes()).containsExactly("ServiceLinkQuayMismatch");
+    assertStraightLine(shape.get(0), QUAY1_COORDINATES, QUAY2_COORDINATES);
+  }
+
+  @Test
+  void testDirectLineStringFromToValidation() {
+    // point refs (quay 1 -> quay 3) do not match the journey pattern (quay 1 -> quay 2), but the
+    // refs are not validated when the line string is directly on the service link
+    var link = createServiceLinkWithDirectLineString(
+      "RUT:ServiceLink:7",
+      "RUT:StopPoint:1",
+      "RUT:StopPoint:3",
+      new Double[] {
+        SERVICE_LINKS_COORDINATES[0],
+        SERVICE_LINKS_COORDINATES[1],
+        SERVICE_LINKS_COORDINATES[2],
+        SERVICE_LINKS_COORDINATES[3],
+      }
+    );
+    var links = new HierarchicalMapById<ServiceLink>();
+    links.add(link);
+    var mapper = new ServiceLinkMapper(
+      ID_FACTORY,
+      links,
+      quayIdByStopPointRef,
+      stopsById,
+      issueStore,
+      150
+    );
+
+    var shape = mapper.getGeometriesByJourneyPattern(
+      journeyPatternOf("RUT:ServiceLink:7", "RUT:ServiceLink:7"),
+      stopPatternBuilder.build()
+    );
+
+    assertThat(issueTypes()).contains("ServiceLinkQuayMismatch");
+
+    assertStraightLine(shape.get(0), QUAY1_COORDINATES, QUAY2_COORDINATES);
+  }
+
+  private static JourneyPattern journeyPatternOf(String... serviceLinkRefs) {
+    var links = new LinksInJourneyPattern_RelStructure();
+    for (String ref : serviceLinkRefs) {
+      links.withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
+        new ServiceLinkInJourneyPattern_VersionedChildStructure().withServiceLinkRef(
+          new ServiceLinkRefStructure().withRef(ref)
+        )
+      );
+    }
+    return new JourneyPattern().withId("RUT:JourneyPattern:1300").withLinksInSequence(links);
+  }
+
+  private List<String> issueTypes() {
+    return issueStore.listIssues().stream().map(DataImportIssue::getType).toList();
+  }
+
+  private static void assertStraightLine(LineString line, Double[] from, Double[] to) {
+    Coordinate[] c = line.getCoordinates();
+    assertEquals(2, c.length);
+    assertEquals(from[0], c[0].getY(), FLOATING_POINT_COMPARISON_PRECISION);
+    assertEquals(from[1], c[0].getX(), FLOATING_POINT_COMPARISON_PRECISION);
+    assertEquals(to[0], c[1].getY(), FLOATING_POINT_COMPARISON_PRECISION);
+    assertEquals(to[1], c[1].getX(), FLOATING_POINT_COMPARISON_PRECISION);
+  }
+
   private SimplePoint_VersionStructure getLocation(double latitude, double longitude) {
     return new SimplePoint_VersionStructure().withLocation(
       new LocationStructure()
@@ -314,5 +530,26 @@ class ServiceLinkMapperTest {
       .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
       .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
       .withProjections(projections_relStructure);
+  }
+
+  /**
+   * Some NeTEx producers put the {@link LineStringType} directly on the {@link ServiceLink}
+   * instead of wrapping it in a {@code Projections_RelStructure}.
+   */
+  private ServiceLink createServiceLinkWithDirectLineString(
+    String id,
+    String from,
+    String to,
+    Double[] coordinates
+  ) {
+    DirectPositionListType directPositionListType = new DirectPositionListType().withValue(
+      coordinates
+    );
+
+    return new ServiceLink()
+      .withId(id)
+      .withFromPointRef(new ScheduledStopPointRefStructure().withRef(from))
+      .withToPointRef(new ScheduledStopPointRefStructure().withRef(to))
+      .withLineString(new LineStringType().withPosList(directPositionListType));
   }
 }

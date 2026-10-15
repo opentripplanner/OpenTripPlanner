@@ -43,16 +43,6 @@ public class ShortestPathTree<
     stateSets = new SegmentedIdentityMap<>(25_000);
   }
 
-  /** @return a single optimal, optionally back-optimized path to the given vertex. */
-  public GraphPath<State, Edge, Vertex> getPath(Vertex dest) {
-    State s = getState(dest);
-    if (s == null) {
-      return null;
-    } else {
-      return new GraphPath<>(s);
-    }
-  }
-
   /**
    * The add method checks a new State to see if it is non-dominated and thus worth visiting later.
    * If so, the method returns 'true' indicating that the state is deemed useful and should be

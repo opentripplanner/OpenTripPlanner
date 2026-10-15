@@ -31,7 +31,7 @@ public class TestTripSchedule implements TripSchedule {
   private final int transitReluctanceIndex;
   private final Accessibility wheelchairBoarding;
   private final TripPattern originalPattern;
-  private final TripTimes tripTimes;
+  private final TripTimes<?> tripTimes;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
@@ -40,7 +40,7 @@ public class TestTripSchedule implements TripSchedule {
     int transitReluctanceIndex,
     Accessibility wheelchairBoarding,
     TripPattern originalPattern,
-    TripTimes tripTimes
+    TripTimes<?> tripTimes
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -124,7 +124,7 @@ public class TestTripSchedule implements TripSchedule {
   }
 
   @Override
-  public TripTimes getOriginalTripTimes() {
+  public TripTimes<?> getOriginalTripTimes() {
     return tripTimes;
   }
 
@@ -148,7 +148,7 @@ public class TestTripSchedule implements TripSchedule {
     private int transitReluctanceIndex = 0;
     private Accessibility wheelchairBoarding = NO_INFORMATION;
     private TripPattern originalPattern;
-    private TripTimes tripTimes;
+    private TripTimes<?> tripTimes;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -160,7 +160,7 @@ public class TestTripSchedule implements TripSchedule {
       return this;
     }
 
-    public TestTripSchedule.Builder withTripTimes(TripTimes tripTimes) {
+    public TestTripSchedule.Builder withTripTimes(TripTimes<?> tripTimes) {
       this.tripTimes = tripTimes;
       return this;
     }

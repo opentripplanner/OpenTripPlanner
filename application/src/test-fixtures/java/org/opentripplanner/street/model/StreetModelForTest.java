@@ -134,6 +134,27 @@ public class StreetModelForTest {
       .buildAndConnect();
   }
 
+  public static void areaEdge(
+    IntersectionVertex from,
+    IntersectionVertex to,
+    AreaGroup area,
+    boolean back
+  ) {
+    var geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
+      from.getCoordinate(),
+      to.getCoordinate(),
+    });
+    new AreaEdgeBuilder()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(geometry)
+      .withName("area boundary")
+      .withPermission(StreetTraversalPermission.PEDESTRIAN)
+      .withBack(back)
+      .withArea(area)
+      .buildAndConnect();
+  }
+
   public static StreetEdge streetEdge(
     StreetVertex from,
     StreetVertex to,

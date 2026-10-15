@@ -14,6 +14,8 @@ import org.opentripplanner.ext.empiricaldelay.configure.EmpiricalDelayRepository
 import org.opentripplanner.ext.fares.configure.FareModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationRepositoryModule;
+import org.opentripplanner.ext.taxi.TaxiRepository;
+import org.opentripplanner.ext.taxi.configure.TaxiRepositoryModule;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -49,6 +51,7 @@ import org.opentripplanner.transit.service.TransitRepository;
     StreetDetailsRepositoryModule.class,
     WorldEnvelopeRepositoryModule.class,
     EmissionRepositoryModule.class,
+    TaxiRepositoryModule.class,
     EmpiricalDelayRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
     StreetRepositoryModule.class,
@@ -86,6 +89,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   EmissionRepository emptyEmissionsDataModel();
+
+  @Singleton
+  TaxiRepository emptyTaxiRepository();
 
   @Singleton
   @Nullable

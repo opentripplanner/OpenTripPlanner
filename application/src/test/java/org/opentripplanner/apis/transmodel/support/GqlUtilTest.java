@@ -7,6 +7,7 @@ import graphql.ExecutionInput;
 import graphql.execution.ExecutionContext;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -18,6 +19,7 @@ public class GqlUtilTest {
 
   static final ExecutionContext EXECUTION_CONTEXT;
   private static final String TEST_ARGUMENT = "testArgument";
+  private static final Instant DEFAULT_INSTANT = Instant.parse("2024-05-07T08:00:00Z");
 
   static {
     ExecutionInput executionInput = ExecutionInput.newExecutionInput()
@@ -64,7 +66,51 @@ public class GqlUtilTest {
     );
   }
 
-  private static DataFetchingEnvironment buildEnvWithTestValue(Integer value) {
+  @Test
+  void testGetNonNullDoubleArgumentWithValue() {
+    var env = buildEnvWithTestValue(59.9);
+    assertEquals(59.9, GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT));
+  }
+
+  @Test
+  void testGetNonNullDoubleArgumentWithNullValue() {
+    var env = buildEnvWithTestValue(null);
+    assertThrows(InvalidInputException.class, () ->
+      GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT)
+    );
+  }
+
+  @Test
+  void testGetNonNullDoubleArgumentWithoutValue() {
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT).build();
+    assertThrows(InvalidInputException.class, () ->
+      GqlUtil.getNonNullDoubleArgument(env, TEST_ARGUMENT)
+    );
+  }
+
+  @Test
+  void testGetInstantOrElseWithValue() {
+    long instantAsEpochMilli = 1_700_000_000_000L;
+    var env = buildEnvWithTestValue(instantAsEpochMilli);
+    assertEquals(
+      Instant.ofEpochMilli(instantAsEpochMilli),
+      GqlUtil.getInstantOrElse(env, TEST_ARGUMENT, DEFAULT_INSTANT)
+    );
+  }
+
+  @Test
+  void testGetInstantOrElseWithNullValue() {
+    var env = buildEnvWithTestValue(null);
+    assertEquals(DEFAULT_INSTANT, GqlUtil.getInstantOrElse(env, TEST_ARGUMENT, DEFAULT_INSTANT));
+  }
+
+  @Test
+  void testGetInstantOrElseWithoutValue() {
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT).build();
+    assertEquals(DEFAULT_INSTANT, GqlUtil.getInstantOrElse(env, TEST_ARGUMENT, DEFAULT_INSTANT));
+  }
+
+  private static DataFetchingEnvironment buildEnvWithTestValue(Object value) {
     Map<String, Object> argsMap = new HashMap<>();
     argsMap.put(TEST_ARGUMENT, value);
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(EXECUTION_CONTEXT)

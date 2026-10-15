@@ -156,6 +156,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLArrivalDepartureTime {
     public DataFetcher<java.time.OffsetDateTime> arrival();
     public DataFetcher<java.time.OffsetDateTime> departure();
+    public DataFetcher<Boolean> timePoint();
   }
 
   /** Bike park represents a location where bicycles can be parked. */

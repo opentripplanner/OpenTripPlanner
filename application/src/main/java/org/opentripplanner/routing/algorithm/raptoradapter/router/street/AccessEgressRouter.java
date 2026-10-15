@@ -50,7 +50,7 @@ public class AccessEgressRouter {
     // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
     var ignoreVertices = zeroDistanceAccessEgress
       .stream()
-      .map(nearbyStop -> nearbyStop.state.getVertex())
+      .map(nearbyStop -> nearbyStop.state().getVertex())
       .collect(Collectors.toSet());
 
     var originVertices = accessOrEgress.isAccess()

@@ -6,9 +6,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.taxi.TaxiService;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.Itinerary;
@@ -64,6 +66,9 @@ public class DefaultRoutingService implements RoutingService {
   private final TransitTuningParameters transitTuningParameters;
   private final RaptorTuningParameters raptorTuningParameters;
 
+  @Nullable
+  private final RealtimeResolver realtimeResolver;
+
   //private final TransitRoutingConfig transitRoutingConfig;
 
   @Nullable
@@ -74,6 +79,9 @@ public class DefaultRoutingService implements RoutingService {
 
   @Nullable
   private final CarpoolingService carpoolingService;
+
+  @Nullable
+  private final TaxiService taxiService;
 
   @Nullable
   private final ItineraryDecorator emissionItineraryDecorator;
@@ -99,11 +107,13 @@ public class DefaultRoutingService implements RoutingService {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable CarpoolingService carpoolingService,
+    @Nullable TaxiService taxiService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
-    RaptorTuningParameters raptorTuningParameters
+    RaptorTuningParameters raptorTuningParameters,
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     this.transitService = transitService;
     this.transitAlertService = transitAlertService;
@@ -120,11 +130,13 @@ public class DefaultRoutingService implements RoutingService {
     this.sorlandsbanenService = sorlandsbanenService;
     this.viaTransferResolver = viaTransferResolver;
     this.carpoolingService = carpoolingService;
+    this.taxiService = taxiService;
     this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
     this.transitTuningParameters = transitTuningParameters;
     this.raptorTuningParameters = raptorTuningParameters;
+    this.realtimeResolver = realtimeResolver;
 
     var timeZone = ZoneIdFallback.zoneId(transitService.getTimeZone());
 
@@ -174,12 +186,14 @@ public class DefaultRoutingService implements RoutingService {
       sorlandsbanenService,
       viaTransferResolver,
       carpoolingService,
+      taxiService,
       emissionItineraryDecorator,
       stopConsolidationService,
       linkingContextFactory,
       transitTuningParameters,
       raptorTuningParameters,
-      workerRequest
+      workerRequest,
+      realtimeResolver
     );
   }
 
