@@ -240,8 +240,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   private Set<TransitStopVertex> getFilteredTransitStopVertices(Set<Vertex> vertices) {
     return vertices
       .stream()
-      .filter(v -> v instanceof TransitStopVertex)
-      .map(v -> (TransitStopVertex) v)
+      .filter(TransitStopVertex.class::isInstance)
+      .map(TransitStopVertex.class::cast)
       .filter(v -> !ignoreStops.contains(v.getId()))
       .collect(Collectors.toSet());
   }
@@ -270,7 +270,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
 
     /**
-     * Specify a set of stop vertices to ignore and not return NearbyStops for.
+     * Specify a set of stop ids to ignore and not return NearbyStops for.
      */
     public Builder withIgnoreStops(Set<FeedScopedId> ignoreStops) {
       this.ignoreStops = ignoreStops;
