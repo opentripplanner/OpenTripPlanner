@@ -184,6 +184,18 @@ class SiriETCarpoolingUpdaterTest {
   }
 
   @Test
+  void processEstimatedVehicleJourney_anotherTripOnTheSameRoute_reusesItsCorridor() {
+    updater.processEstimatedVehicleJourney(minimalCompleteJourney());
+    var otherTrip = minimalCompleteJourney();
+    otherTrip.setEstimatedVehicleJourneyCode("other");
+
+    updater.processEstimatedVehicleJourney(otherTrip);
+
+    verify(resolver, times(1)).resolve(any());
+    assertEquals(2, repository.getCarpoolTrips().size());
+  }
+
+  @Test
   void processEstimatedVehicleJourney_unchangedGeometry_reusesStoredVertices() {
     var journey = minimalCompleteJourney();
     updater.processEstimatedVehicleJourney(journey);

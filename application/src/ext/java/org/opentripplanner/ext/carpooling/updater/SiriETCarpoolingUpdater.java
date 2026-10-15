@@ -202,8 +202,9 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * Resolves the trip's route points to permanent vertices and computes its corridor, or
    * {@code null} if a point cannot be resolved or the baseline cannot be routed. Both outcomes are
    * memoized on the route-point geometry: an unchanged geometry reuses the stored vertices or skips
-   * a known failure without re-resolving. A first failure is logged; a resolution that throws is
-   * memoized as failed too, with its stack trace.
+   * a known failure without re-resolving. A trip on the same route as another stored trip, with the
+   * same deviation budgets, reuses that trip's vertices and corridor. A first failure is logged; a
+   * resolution that throws is memoized as failed too, with its stack trace.
    */
   @Nullable
   private RoutableCarpoolTrip resolveTrip(CarpoolTrip trip) {
@@ -214,6 +215,11 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     // too, otherwise recompute it on the stored vertices.
     if (sameRoutePoints && sameDeviationBudgets(existing.trip(), trip)) {
       return new RoutableCarpoolTrip(trip, existing.vertices(), existing.corridor());
+    }
+    // Often the same commute on another day.
+    var sameRoute = storedTripOnTheSameRoute(trip);
+    if (sameRoute != null) {
+      return new RoutableCarpoolTrip(trip, sameRoute.vertices(), sameRoute.corridor());
     }
     var failed = failedResolutions.get(trip.getId());
     if (failed != null && failed.routePoints().equals(trip.routePoints())) {
@@ -246,6 +252,23 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       failedResolutions.put(trip.getId(), trip);
     }
     return resolved;
+  }
+
+  /**
+   * A stored trip, of any feed, with the same route points and deviation budgets as the trip, and
+   * so with the same vertices and corridor; {@code null} if there is none.
+   */
+  @Nullable
+  private RoutableCarpoolTrip storedTripOnTheSameRoute(CarpoolTrip trip) {
+    for (var stored : repository.getCarpoolTrips()) {
+      if (
+        stored.trip().routePoints().equals(trip.routePoints()) &&
+        sameDeviationBudgets(stored.trip(), trip)
+      ) {
+        return stored;
+      }
+    }
+    return null;
   }
 
   @Override
