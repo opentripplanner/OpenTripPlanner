@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import jakarta.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import org.entur.netex2.model.MultilingualString;
@@ -16,18 +17,18 @@ class MultilingualStringMapperTest {
 
   @Test
   void getStringValue() {
-    assertThat(MultilingualStringMapper.getStringValue(null)).isNull();
-    assertThat(MultilingualStringMapper.getStringValue(EMPTY)).isEmpty();
-    assertThat(MultilingualStringMapper.getStringValue(BLANK)).isEqualTo("  ");
-    assertThat(MultilingualStringMapper.getStringValue(TEXT)).isEqualTo("Line 1   Line 2 ");
+    assertNull(MultilingualStringMapper.getStringValue(null));
+    assertEquals("", MultilingualStringMapper.getStringValue(EMPTY));
+    assertEquals("  ", MultilingualStringMapper.getStringValue(BLANK));
+    assertEquals("Line 1   Line 2 ", MultilingualStringMapper.getStringValue(TEXT));
   }
 
   @Test
   void nullableValueOf() {
-    assertThat(MultilingualStringMapper.nullableValueOf(null)).isNull();
-    assertThat(MultilingualStringMapper.nullableValueOf(EMPTY)).isNull();
-    assertThat(MultilingualStringMapper.nullableValueOf(BLANK)).isNull();
-    assertThat(MultilingualStringMapper.nullableValueOf(TEXT)).isEqualTo("Line 1   Line 2 ");
+    assertNull(MultilingualStringMapper.nullableValueOf(null));
+    assertNull(MultilingualStringMapper.nullableValueOf(EMPTY));
+    assertNull(MultilingualStringMapper.nullableValueOf(BLANK));
+    assertEquals("Line 1   Line 2 ", MultilingualStringMapper.nullableValueOf(TEXT));
   }
 
   /**
@@ -37,8 +38,9 @@ class MultilingualStringMapperTest {
   @Test
   void sameWhitespaceNormalizationAsNetexModelBeforeVersion2() {
     var raw = " a\tb\r\nc\n  d\u00a0e\n";
-    assertThat(
+    assertEquals(
+      new NormalizedStringAdapter().unmarshal(raw),
       MultilingualStringMapper.getStringValue(new MultilingualString().withContent(raw))
-    ).isEqualTo(new NormalizedStringAdapter().unmarshal(raw));
+    );
   }
 }

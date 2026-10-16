@@ -34,13 +34,13 @@ class TransportModeMapper {
     TransportSubmodeStructure submode
   ) throws UnsupportedModeException {
     if (submode == null) {
-      return new NetexMainAndSubMode(mapAllVehicleModesOfTransport(netexMode));
+      return new NetexMainAndSubMode(mapAllPublicTransportModes(netexMode));
     } else {
       return getSubmodeAsString(submode);
     }
   }
 
-  public TransitMode mapAllVehicleModesOfTransport(AllPublicTransportModesEnumeration mode)
+  public TransitMode mapAllPublicTransportModes(AllPublicTransportModesEnumeration mode)
     throws UnsupportedModeException {
     if (mode == null) {
       throw new UnsupportedModeException(null);
