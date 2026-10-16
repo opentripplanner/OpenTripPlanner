@@ -18,7 +18,6 @@ import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;
-import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
 import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
@@ -29,15 +28,10 @@ import org.slf4j.LoggerFactory;
  * using a pareto set of {@link DestinationArrival}s. The comparator is passed in as an argument to
  * the constructor, making it possible to collect different sets in different scenarios.
  * <p/>
- * Two modes are supported, selected via the static factory methods:
- * <ul>
- *   <li><b>StdRaptor mode</b> ({@link #forStdRaptor}): paths are built eagerly when an arrival is
- *       accepted. Necessary because StdRaptor's stop-arrival state is mutable and is overwritten
- *       between iterations.
- *   <li><b>McRaptor mode</b> ({@link #forMcRaptor}): {@link DestinationArrival} objects are
- *       stored in the pareto set and paths are built lazily when {@link #listPaths()} is called.
- *       Safe because McRaptor's per-stop pareto sets keep all accepted arrivals indefinitely.
- * </ul>
+ * The {@link DestinationArrival}s are stored in the pareto set, and the paths are built lazily when
+ * {@link #listPaths()} is called. This is safe because the arrival chain of a destination arrival
+ * is not changed by the search: McRaptor's per-stop pareto sets keep all accepted arrivals
+ * indefinitely, and StdRaptor copies the values of the mutable stop-arrival state into the chain.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
@@ -59,14 +53,6 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   /** Reused by {@link #qualify}; never added to {@link #arrivals}. Not thread-safe. */
   private final DestinationArrival<T> probe = DestinationArrival.createProbe();
 
-  /**
-   * Non-null for StdRaptor since later iteration may overwrite the back-pointers.
-   * Not used for McRaptor (null). McRaptor has back-pointers and paths can be created
-   * when needed.
-   */
-  @Nullable
-  private final EagerPathBag<T> eagerPaths;
-
   @Nullable
   private final RaptorCostCalculator<T> costCalculator;
 
@@ -77,9 +63,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   @Nullable
   private final TimeShiftedDepartureTime<T> departureTimeCalculator;
 
-  private DestinationArrivalPaths(
-    ParetoSet<DestinationArrival<T>> arrivals,
-    @Nullable EagerPathBag<T> eagerPaths,
+  public DestinationArrivalPaths(
+    ParetoComparator<DestinationArrival<T>> arrivalComparator,
     RaptorTransitCalculator<T> transitCalculator,
     @Nullable RaptorCostCalculator<T> costCalculator,
     @Nullable TimeShiftedDepartureTime<T> departureTimeCalculator,
@@ -89,9 +74,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle
   ) {
-    this.arrivals = arrivals;
+    this.arrivals = ParetoSet.of(
+      arrivalComparator,
+      debugHandlerFactory.paretoSetDestinationArrivalListener()
+    );
     this.departureTimeCalculator = departureTimeCalculator;
-    this.eagerPaths = eagerPaths;
     this.transitCalculator = transitCalculator;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;
@@ -100,70 +87,6 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     this.stopNameResolver = stopNameResolver;
     lifeCycle.onPrepareForNextRound(_ -> clearReachedCurrentRoundFlag());
     lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
-  }
-
-  /** Create a {@link DestinationArrivalPaths} for StdRaptor (eager path building). */
-  public static <T extends RaptorTripSchedule> DestinationArrivalPaths<T> forStdRaptor(
-    ParetoComparator<DestinationArrival<T>> arrivalComparator,
-    RaptorTransitCalculator<T> transitCalculator,
-    @Nullable RaptorCostCalculator<T> costCalculator,
-    @Nullable TimeShiftedDepartureTime<T> departureTimeCalculator,
-    SlackProvider slackProvider,
-    PathMapper<T> pathMapper,
-    DebugHandlerFactory<T> debugHandlerFactory,
-    RaptorStopNameResolver stopNameResolver,
-    WorkerLifeCycle lifeCycle
-  ) {
-    var eagerPaths = new EagerPathBag<>(pathMapper, stopNameResolver);
-    var arrivals = ParetoSet.of(
-      arrivalComparator,
-      ParetoSetEventListenerComposite.of(
-        eagerPaths,
-        debugHandlerFactory.paretoSetDestinationArrivalListener()
-      )
-    );
-    return new DestinationArrivalPaths<>(
-      arrivals,
-      eagerPaths,
-      transitCalculator,
-      costCalculator,
-      departureTimeCalculator,
-      slackProvider,
-      pathMapper,
-      debugHandlerFactory,
-      stopNameResolver,
-      lifeCycle
-    );
-  }
-
-  /** Create a {@link DestinationArrivalPaths} for McRaptor (lazy path building). */
-  public static <T extends RaptorTripSchedule> DestinationArrivalPaths<T> forMcRaptor(
-    ParetoComparator<DestinationArrival<T>> arrivalComparator,
-    RaptorTransitCalculator<T> transitCalculator,
-    @Nullable RaptorCostCalculator<T> costCalculator,
-    @Nullable TimeShiftedDepartureTime<T> departureTimeCalculator,
-    SlackProvider slackProvider,
-    PathMapper<T> pathMapper,
-    DebugHandlerFactory<T> debugHandlerFactory,
-    RaptorStopNameResolver stopNameResolver,
-    WorkerLifeCycle lifeCycle
-  ) {
-    var arrivals = ParetoSet.of(
-      arrivalComparator,
-      debugHandlerFactory.paretoSetDestinationArrivalListener()
-    );
-    return new DestinationArrivalPaths<>(
-      arrivals,
-      null,
-      transitCalculator,
-      costCalculator,
-      departureTimeCalculator,
-      slackProvider,
-      pathMapper,
-      debugHandlerFactory,
-      stopNameResolver,
-      lifeCycle
-    );
   }
 
   public void add(ArrivalView<T> stopArrival, RaptorAccessEgress egressPath) {
@@ -185,8 +108,6 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   }
 
   private void addDestinationArrivalToPaths(DestinationArrival<T> destArrival) {
-    // In StdRaptor mode the path is built (and kept) by the eager path bag, when the arrival is
-    // accepted, since the stop-arrival state is mutable between iterations.
     if (arrivals.add(destArrival)) {
       reachedCurrentRound = true;
     }
@@ -241,11 +162,6 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   }
 
   public Collection<RaptorPath<T>> listPaths() {
-    if (eagerPaths != null) {
-      // StdRaptor: paths were built eagerly, and are kept in sync with the pareto-set
-      return eagerPaths.toList();
-    }
-    // McRaptor: build paths lazily from stored arrivals
     return arrivals.stream().map(this::buildAndValidatePath).toList();
   }
 
