@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -228,6 +229,28 @@ public class TripCalendars implements Serializable {
     }
     Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
     updated.put(serviceId, code);
+    return new TripCalendars(
+      serviceDatesByServiceId,
+      serviceIdsByDate,
+      serviceCodesRunningForDate,
+      Collections.unmodifiableMap(updated)
+    );
+  }
+
+  /**
+   * Assign each of the given service ids the next free service code, in iteration order: the code
+   * is the number of service codes registered before it. Used during graph build only.
+   * <p>
+   * Registering many ids through {@link #withServiceCode} copies the whole service code map once
+   * per id, which is quadratic, so bulk registration should use this method instead.
+   *
+   * @return a new instance with the service codes registered.
+   */
+  public TripCalendars withNextServiceCodes(Collection<FeedScopedId> serviceIds) {
+    Map<FeedScopedId, Integer> updated = new HashMap<>(serviceCodes);
+    for (FeedScopedId serviceId : serviceIds) {
+      updated.put(serviceId, updated.size());
+    }
     return new TripCalendars(
       serviceDatesByServiceId,
       serviceIdsByDate,
