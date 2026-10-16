@@ -10,8 +10,9 @@ import org.opentripplanner.transit.model.site.RegularStop;
  * surveying discrepancy: one of the two is misplaced, or the OSM feature carries a reference it
  * should not.
  * <p>
- * The stop is still linked, keeping its own coordinate and connected by an edge of this length, so
- * the gap is reported rather than silently added to every itinerary.
+ * Only reported with the {@code TRANSIT} coordinate source: the stop is still linked, keeping its
+ * own coordinate and connected by an edge of this length, so the gap is reported rather than
+ * silently added to every itinerary.
  *
  * @param boardingLocation what the stop was linked to, for looking the feature up in OSM
  */
@@ -26,6 +27,12 @@ public record StopFarFromBoardingLocation(
   @Override
   public String getMessage() {
     return String.format(FMT, stop.getId(), distanceMeters, boardingLocation);
+  }
+
+  /** The largest gaps are the most likely to be real errors, so they are listed first. */
+  @Override
+  public int getPriority() {
+    return (int) distanceMeters;
   }
 
   @Override

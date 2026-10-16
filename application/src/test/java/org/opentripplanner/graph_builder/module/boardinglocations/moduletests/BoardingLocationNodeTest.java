@@ -58,7 +58,7 @@ class BoardingLocationNodeTest {
 
   /**
    * In {@code OSM} mode the stop takes the node's coordinate as its position on the street network,
-   * as it always has.
+   * as it always has, and the gap to it is not reported.
    */
   @Test
   void osmModeLinksTheStopStraightToTheNode() {
@@ -77,6 +77,8 @@ class BoardingLocationNodeTest {
         "(53.55,10.000454) → (53.55,10) PEDESTRIAN ♿✅",
         "(53.55018,10)[F:node-stop] linked to (53.55,10)"
       );
+    // The 20 m gap is swallowed by moving the stop, so it is not reported as one the stop walks.
+    assertThat(result.issueTypes()).doesNotContain("StopFarFromBoardingLocation");
   }
 
   /**

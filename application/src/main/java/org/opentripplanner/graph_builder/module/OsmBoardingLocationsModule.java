@@ -161,7 +161,10 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /**
    * Connect a transit stop vertex into a boarding location area in the index.
    * <p>
-   * A centroid vertex is generated and connected to the visibility vertices on the area edge.
+   * In {@code OSM} mode a vertex at the platform centroid, shared by all stops on the platform, is
+   * connected to the area's visibility vertices. In {@code TRANSIT} mode the stop gets its own vertex
+   * at its own coordinate, connected to the area directly when it lies inside, or else through an
+   * access point just inside the area (see {@link #linkIntoPlatformArea}).
    *
    * @return if the vertex has been connected
    */
@@ -184,11 +187,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           var platform = platOpt.get();
           if (matchesReference(stop, platform.references())) {
             var boardingLocation = makeBoardingLocationForPlatform(stop, platform, area.getName());
-            // An area group with no visibility vertices cannot be linked into -> another nearby
-            // area may carry the same reference and be linkable.
-            if (!linkIntoPlatformArea(boardingLocation, areaGroup, area, platform, stop)) {
-              continue;
-            }
+            linkIntoPlatformArea(boardingLocation, areaGroup, area, platform, stop);
             linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
             return true;
           }
@@ -201,7 +200,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /**
    * Connect a transit stop vertex to a boarding location way in the index.
    * <p>
-   * The vertex is connected to the center of the way if one is found, splitting it if needed.
+   * In {@code OSM} mode the stop is attached where the way passes closest to the platform centroid,
+   * splitting the way if needed. In {@code TRANSIT} mode it is attached where the way passes closest
+   * to the stop's own coordinate, over an edge of the true length (see {@link #linkToPlatformWay}).
    *
    * @return if the vertex has been connected
    */
@@ -332,7 +333,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           stop.getCoordinate().asJtsCoordinate(),
           boardingLocation.getCoordinate()
         );
-        reportIfFarAway(stop, "OSM node %s".formatted(boardingLocation.getLabel()), distanceToNode);
         linkToNode(ts, stop, boardingLocation, distanceToNode);
         return true;
       }
@@ -359,6 +359,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       linkBoardingLocationToStop(ts, stop.getCode(), node);
       return;
     }
+    reportIfFarAway(stop, "OSM node %s".formatted(node.getLabel()), distanceToNode);
     var stopPoint = makeBoardingLocation(
       "node-transit/%s".formatted(stop.getId().toString()),
       stop.getCoordinate().asJtsCoordinate(),
@@ -410,9 +411,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    * one edge of the true length.
    *
    * @param area the matched platform sub-area, whose properties the edge to the access point carries
-   * @return whether the boarding location was connected to the area
    */
-  private boolean linkIntoPlatformArea(
+  private void linkIntoPlatformArea(
     OsmBoardingLocationVertex boardingLocation,
     AreaGroup areaGroup,
     Area area,
@@ -420,7 +420,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     RegularStop stop
   ) {
     if (coordinateSource != BoardingLocationCoordinateSource.TRANSIT) {
-      return linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+      linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+      return;
     }
     var insideCoordinate = ensureInsideArea(
       boardingLocation.getCoordinate(),
@@ -428,16 +429,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       platform.geometry().getCoordinate()
     );
     if (insideCoordinate.equals2D(boardingLocation.getCoordinate())) {
-      return linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+      linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+      return;
     }
     var accessPoint = vertexFactory.intersection(
       "platform-access/%s".formatted(stop.getId().toString()),
       insideCoordinate.x,
       insideCoordinate.y
     );
-    if (!linker.addPermanentAreaVertex(accessPoint, areaGroup)) {
-      return false;
-    }
+    linker.addPermanentAreaVertex(accessPoint, areaGroup);
     reportIfFarAway(
       stop,
       "OSM platform area",
@@ -446,7 +446,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     var properties = ConnectorProperties.of(area);
     connectBoardingLocation(boardingLocation, accessPoint, properties);
     connectBoardingLocation(accessPoint, boardingLocation, properties);
-    return true;
   }
 
   /**
