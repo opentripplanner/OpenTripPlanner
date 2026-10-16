@@ -66,4 +66,28 @@ class BuildConfigTest {
     var conf = new BuildConfig(node, "Test", false);
     assertInstanceOf(JsonNode.class, conf.fareConfig);
   }
+
+  @Test
+  public void transitShapeSimplificationToleranceMetersDefaultsToDisabled() {
+    var node = jsonNodeForTest("{ }");
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(0.0, subject.transitShapeSimplificationToleranceMeters());
+  }
+
+  @Test
+  public void transitShapeSimplificationToleranceMeters() {
+    var node = jsonNodeForTest("{ 'transitShapeSimplificationToleranceMeters' : 5.0 }");
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(5.0, subject.transitShapeSimplificationToleranceMeters());
+  }
+
+  @Test
+  public void transitShapeSimplificationToleranceMetersClampsNegativeValueToZero() {
+    var node = jsonNodeForTest("{ 'transitShapeSimplificationToleranceMeters' : -5.0 }");
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(0.0, subject.transitShapeSimplificationToleranceMeters());
+  }
 }

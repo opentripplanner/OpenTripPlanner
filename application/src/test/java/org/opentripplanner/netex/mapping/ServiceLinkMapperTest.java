@@ -183,7 +183,8 @@ class ServiceLinkMapperTest {
       quayIdByStopPointRef,
       stopsById,
       issueStore,
-      150
+      150,
+      0.0
     );
   }
 
@@ -380,7 +381,8 @@ class ServiceLinkMapperTest {
       quayIdByStopPointRef,
       stopsById,
       issueStore,
-      150
+      150,
+      0.0
     );
 
     var shape = mapper.getGeometriesByJourneyPattern(
@@ -439,7 +441,8 @@ class ServiceLinkMapperTest {
       quayIdByStopPointRef,
       stopsById,
       issueStore,
-      150
+      150,
+      0.0
     );
 
     var shape = mapper.getGeometriesByJourneyPattern(
