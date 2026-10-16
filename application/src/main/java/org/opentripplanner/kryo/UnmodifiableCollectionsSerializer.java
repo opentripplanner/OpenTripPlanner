@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,17 +134,6 @@ public class UnmodifiableCollectionsSerializer extends Serializer<Object> {
       @Override
       public Object fromKryoSerializedObject(Object serializedObject) {
         return Collections.unmodifiableList(new ArrayList<>((Collection<?>) serializedObject));
-      }
-    },
-    LIST(Collections.unmodifiableList(new LinkedList<Void>()).getClass()) {
-      @Override
-      Object toKryoSerializedObject(Object source) {
-        return new ArrayList<>((Collection<?>) source);
-      }
-
-      @Override
-      public Object fromKryoSerializedObject(Object serializedObject) {
-        return Collections.unmodifiableList(new LinkedList<>((Collection<?>) serializedObject));
       }
     },
     SET(Collections.unmodifiableSet(new HashSet<Void>()).getClass()) {

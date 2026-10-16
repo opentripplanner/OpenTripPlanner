@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -334,7 +333,7 @@ public class GeometryProcessor {
       // for the next stop, the discontinuity is joined together. This is avoid a simple edge case
       // of a bus first passing within 150 m of a stop, exit the 150 m radius to a turning circle,
       // then call at the stop at the opposite side of the road.
-      List<List<IndexedLineSegment>> continuousSegments = new LinkedList<>();
+      List<List<IndexedLineSegment>> continuousSegments = new ArrayList<>();
       for (IndexedLineSegment segment : possibleSegmentsForStop.get(stopPositionInPattern)) {
         //can't go backwards along line
         if (prevSegment == null || segment.index >= prevSegment.index) {
@@ -364,7 +363,7 @@ public class GeometryProcessor {
           }
           if (shouldStartNewSegment) {
             // start a new continuous segment
-            continuousSegments.add(new LinkedList<>());
+            continuousSegments.add(new ArrayList<>());
           }
           continuousSegments.getLast().add(segment);
         }
