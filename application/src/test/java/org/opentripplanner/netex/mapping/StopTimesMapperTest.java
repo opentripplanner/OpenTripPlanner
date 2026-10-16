@@ -19,6 +19,8 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
@@ -49,7 +51,9 @@ public class StopTimesMapperTest {
       sample.getStopsById(),
       new DefaultEntityById<>(),
       new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       sample.getDestinationDisplayById(),
+      new HierarchicalMap<>(),
       sample.getQuayIdByStopPointRef(),
       new HierarchicalMap<>(),
       new HierarchicalMapById<>(),
@@ -78,6 +82,72 @@ public class StopTimesMapperTest {
     assertEquals(stopTimes.get(1), map.get("TTPT-2"));
     assertEquals(stopTimes.get(2), map.get("TTPT-3"));
     assertEquals(stopTimes.get(3), map.get("TTPT-4"));
+  }
+
+  /**
+   * If a PassengerStopAssignment refers to a StopPlace instead of a Quay, the stop should be
+   * resolved to one of the StopPlace's (Station's) child stops - the one with the smallest id,
+   * see {@link StopTimesMapper}.
+   */
+  @Test
+  public void testMapStopTimesWithPassengerStopAssignmentToStopPlace() {
+    NetexTestDataSample sample = new NetexTestDataSample();
+    var testModel = TransitRepositoryForTest.of();
+
+    Station station = testModel.station("NSR:StopPlace:1").build();
+    RegularStop expectedChildStop = testModel
+      .stop("NSR:Quay:98")
+      .withParentStation(station)
+      .build();
+    testModel.stop("NSR:Quay:99").withParentStation(station).build();
+
+    DefaultEntityById<Station> stationsById = new DefaultEntityById<>();
+    stationsById.add(station);
+
+    HierarchicalMap<String, String> stopPlaceIdByStopPointRef = new HierarchicalMap<>();
+    sample
+      .getJourneyPattern()
+      .getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      .stream()
+      .map(StopPointInJourneyPattern.class::cast)
+      .forEach(stopPoint ->
+        stopPlaceIdByStopPointRef.add(
+          stopPoint.getScheduledStopPointRef().getValue().getRef(),
+          station.getId().getId()
+        )
+      );
+
+    StopTimesMapper stopTimesMapper = new StopTimesMapper(
+      DataImportIssueStore.NOOP,
+      MappingSupport.ID_FACTORY,
+      sample.getStopsById(),
+      stationsById,
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      sample.getDestinationDisplayById(),
+      stopPlaceIdByStopPointRef,
+      new HierarchicalMap<>(),
+      new HierarchicalMap<>(),
+      new HierarchicalMapById<>(),
+      new HierarchicalMap<>()
+    );
+
+    StopTimesMapperResult result = stopTimesMapper.mapToStopTimes(
+      sample.getJourneyPattern(),
+      TRIP,
+      sample.getTimetabledPassingTimes(),
+      null
+    );
+
+    assertNotNull(result, "result must not be null");
+
+    List<StopTime> stopTimes = result.stopTimes;
+    assertEquals(4, stopTimes.size());
+
+    for (StopTime stopTime : stopTimes) {
+      assertEquals(expectedChildStop, stopTime.getStop());
+    }
   }
 
   /**
@@ -139,7 +209,9 @@ public class StopTimesMapperTest {
       netexSample.getStopsById(),
       new DefaultEntityById<>(),
       new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       netexSample.getDestinationDisplayById(),
+      new HierarchicalMap<>(),
       netexSample.getQuayIdByStopPointRef(),
       new HierarchicalMap<>(),
       new HierarchicalMapById<>(),
