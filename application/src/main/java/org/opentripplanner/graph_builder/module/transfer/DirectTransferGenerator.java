@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -67,6 +69,13 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private static final int NO_STOP_COUNT_LIMIT = 0;
 
   /**
+   * The scheduled trip patterns visiting each stop, by stop id. Built on first access, see {@link
+   * #patternsForStop()}.
+   */
+  @Nullable
+  private Multimap<FeedScopedId, TripPattern> patternsForStop;
+
+  /**
    * Constructor used in tests. This initializes transferParametersForMode as an empty map.
    */
   public DirectTransferGenerator(
@@ -111,10 +120,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Initialize transit model index which is needed by the nearby stop finder.
     transitRepository.index();
 
-    var patternsForStop = patternsForStop();
-
     // The linker will use streets if they are available, or straight-line distance otherwise.
-    NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(patternsForStop);
+    NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
     Set<StopLocation> carsAllowedStops =
       timetableBuildRepository.getStopLocationsUsedForCarsAllowedTrips();
@@ -153,7 +160,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .getSiteRepository()
       .listStopLocations()
       .stream()
-      .filter(stop -> patternsForStop.get(stop).isEmpty())
+      .filter(stop -> patternsForStop().get(stop.getId()).isEmpty())
       .toList();
 
     /*
@@ -255,15 +262,21 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
-   * The scheduled trip patterns visiting each stop. The graph build adds all scheduled patterns
-   * before this module runs.
+   * The scheduled trip patterns visiting each stop, by stop id. The index is built on the first
+   * access and then cached; the graph build adds all scheduled patterns before this module runs.
+   * <p>
+   * Not thread-safe: only call it from the thread running {@link #buildGraph()}. The parallel
+   * transfer search gets the built index, which it only reads.
    */
-  private Multimap<StopLocation, TripPattern> patternsForStop() {
-    Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
-    for (TripPattern pattern : timetableBuildRepository.getAllTripPatterns()) {
-      for (StopLocation stop : pattern.getStops()) {
-        patternsForStop.put(stop, pattern);
+  private Multimap<FeedScopedId, TripPattern> patternsForStop() {
+    if (patternsForStop == null) {
+      Multimap<FeedScopedId, TripPattern> index = ArrayListMultimap.create();
+      for (TripPattern pattern : timetableBuildRepository.getAllTripPatterns()) {
+        for (StopLocation stop : pattern.getStops()) {
+          index.put(stop.getId(), pattern);
+        }
       }
+      patternsForStop = index;
     }
     return patternsForStop;
   }
@@ -273,9 +286,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * whether the graph has a street network and if ConsiderPatternsForDirectTransfers feature is
    * enabled.
    */
-  private NearbyStopFinder createNearbyStopFinder(
-    Multimap<StopLocation, TripPattern> patternsForStop
-  ) {
+  private NearbyStopFinder createNearbyStopFinder() {
     var siteRepository = transitRepository.getSiteRepository();
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
@@ -297,7 +308,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         : null;
       return new PatternConsideringNearbyStopFinder(
         siteRepository,
-        patternsForStop::get,
+        patternsForStop()::get,
         flexIndex,
         finder
       );

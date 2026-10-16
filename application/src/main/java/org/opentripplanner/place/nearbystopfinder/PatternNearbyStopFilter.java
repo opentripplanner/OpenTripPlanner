@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
@@ -27,15 +26,12 @@ import org.opentripplanner.utils.collection.MinMap;
 class PatternNearbyStopFilter implements NearbyStopFilter {
 
   private final SiteRepository siteRepository;
-  private final Function<StopLocation, Collection<TripPattern>> patternsForStop;
+  private final TripPatternsForStop patternsForStop;
 
   /**
    * @param patternsForStop the scheduled trip patterns visiting a stop
    */
-  PatternNearbyStopFilter(
-    SiteRepository siteRepository,
-    Function<StopLocation, Collection<TripPattern>> patternsForStop
-  ) {
+  PatternNearbyStopFilter(SiteRepository siteRepository, TripPatternsForStop patternsForStop) {
     this.siteRepository = siteRepository;
     this.patternsForStop = patternsForStop;
   }
@@ -84,7 +80,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
    */
   private List<FeedScopedId> findPatternsForStop(RegularStop stop, boolean reverseDirection) {
     return patternsForStop
-      .apply(stop)
+      .findPatterns(stop.getId())
       .stream()
       .filter(reverseDirection ? p -> p.alightingExist(stop) : p -> p.boardingExist(stop))
       .map(TripPattern::getId)

@@ -3,7 +3,6 @@ package org.opentripplanner.place.nearbystopfinder;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -13,8 +12,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepository;
 
 /**
@@ -47,7 +44,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
    */
   public PatternConsideringNearbyStopFinder(
     SiteRepository siteRepository,
-    Function<StopLocation, Collection<TripPattern>> patternsForStop,
+    TripPatternsForStop patternsForStop,
     @Nullable FlexIndex flexIndex,
     NearbyStopFinder delegateNearbyStopFinder
   ) {
