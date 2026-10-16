@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
@@ -84,7 +85,9 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    * The URL responds to HTTP GET and returns all initial data in xml-format. It will be
    * called once to initialize real-time-data.
    * All subsequent updates will be received from Google Cloud Pubsub.
+   * If null, no initial data is fetched.
    */
+  @Nullable
   private final URI dataInitializationUrl;
 
   /**
@@ -110,15 +113,15 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private volatile boolean primed;
 
   public GooglePubsubEstimatedTimetableSource(
-    String dataInitializationUrl,
+    @Nullable String dataInitializationUrl,
     Duration reconnectPeriod,
     Duration initialGetDataTimeout,
     String subscriptionProjectName,
     String topicProjectName,
     String topicName
   ) {
-    //
-    this.dataInitializationUrl = URI.create(dataInitializationUrl);
+    this.dataInitializationUrl =
+      dataInitializationUrl == null ? null : URI.create(dataInitializationUrl);
     this.reconnectPeriod = reconnectPeriod;
     this.initialGetDataTimeout = initialGetDataTimeout;
 

@@ -48,6 +48,7 @@ public class NetexBundle implements Closeable {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final Collection<FeedScopedId> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final boolean noTransfersOnIsolatedStops;
   private final Set<IgnorableFeature> ignoredFeatures;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
@@ -66,6 +67,7 @@ public class NetexBundle implements Closeable {
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     boolean noTransfersOnIsolatedStops,
     Set<IgnorableFeature> ignorableFeatures
   ) {
@@ -76,6 +78,7 @@ public class NetexBundle implements Closeable {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.routeToCentroidStopPlaceIds = Set.copyOf(routeToCentroidStopPlaceIds);
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.ignoredFeatures = Set.copyOf(ignorableFeatures);
   }
@@ -99,6 +102,7 @@ public class NetexBundle implements Closeable {
       ferryIdsNotAllowedForBicycle,
       routeToCentroidStopPlaceIds,
       maxStopToShapeSnapDistance,
+      transitShapeSimplificationToleranceMeters,
       noTransfersOnIsolatedStops
     );
 

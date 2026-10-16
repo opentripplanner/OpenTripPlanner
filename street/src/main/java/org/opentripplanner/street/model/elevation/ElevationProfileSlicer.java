@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.elevation;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
@@ -37,7 +37,7 @@ public final class ElevationProfileSlicer {
 
     boolean started = false;
     Coordinate lastCoord = null;
-    List<Coordinate> coordList = new LinkedList<>();
+    List<Coordinate> coordList = new ArrayList<>();
     for (Coordinate coord : coordinateArray) {
       if (coord.x >= start && !started) {
         started = true;

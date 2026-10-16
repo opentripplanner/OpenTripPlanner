@@ -146,6 +146,7 @@ public class GraphBuilderModules {
       config.getTransitServicePeriod(),
       fareServiceFactory,
       config.maxStopToShapeSnapDistance,
+      config.transitShapeSimplificationToleranceMeters(),
       config.getSubwayAccessTimeSeconds()
     );
   }
@@ -189,9 +190,14 @@ public class GraphBuilderModules {
   @Singleton
   static StopConnectivityModule provideStopConnectivityModule(
     Graph graph,
+    TransitRepository transitRepository,
     DataImportIssueStore issueStore
   ) {
-    return new StopConnectivityModule(graph, issueStore);
+    return new StopConnectivityModule(
+      graph,
+      () -> transitRepository.getSiteRepository().listRegularStops().size(),
+      issueStore
+    );
   }
 
   @Provides
