@@ -1,7 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.entur.netex2.model.MultilingualString;
 import org.opentripplanner.utils.lang.StringUtils;
@@ -40,12 +39,8 @@ public class MultilingualStringMapper {
     if (multilingualString == null) {
       return null;
     }
-    List<Serializable> content = multilingualString.getContent();
-    if (content == null) {
-      return "";
-    }
     StringBuilder sb = new StringBuilder();
-    for (Serializable item : content) {
+    for (Serializable item : multilingualString.getContent()) {
       if (item instanceof String s) {
         sb.append(s);
       }
