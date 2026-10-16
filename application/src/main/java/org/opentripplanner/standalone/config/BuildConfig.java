@@ -5,13 +5,12 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -60,6 +59,8 @@ import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * This class is an object representation of the 'build-config.json'.
@@ -120,6 +121,8 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final int maxDataImportIssuesPerFile;
 
+  public final int maxDataImportIssuesPerType;
+
   public final double subwayAccessTime;
 
   public final boolean embedRouterConfig;
@@ -174,6 +177,13 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
+
+  /**
+   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code 0}
+   * (the default when not set) disables simplification.
+   */
+  private final double transitShapeSimplificationToleranceMeters;
+
   public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
   public final DemExtractParametersList dem;
@@ -287,8 +297,22 @@ public class BuildConfig implements OtpDataStoreConfig {
       .summary("When to split the import report.")
       .description(
         """
-          If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
+          If the number of issues is larger than `maxDataImportIssuesPerFile`, then the files will
           be split in multiple files. Since browsers have problems opening large HTML files.
+        """
+      )
+      .asInt(1000);
+
+    this.maxDataImportIssuesPerType = root
+      .of("maxDataImportIssuesPerType")
+      .since(V2_11)
+      .summary("The maximum number of issues of each type written to the import report.")
+      .description(
+        """
+          When an issue type has more issues than `maxDataImportIssuesPerType`, only the issues
+          with the highest priority are written to the HTML and GeoJSON report. The others are left
+          out of the report, but they are still counted in the issue summary logged at the end of
+          the graph build. Set the value to `-1` to write all issues.
         """
       )
       .asInt(1000);
@@ -307,6 +331,22 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(150);
+    this.transitShapeSimplificationToleranceMeters = root
+      .of("transitShapeSimplificationToleranceMeters")
+      .since(V2_11)
+      .summary("Douglas-Peucker simplification tolerance for transit route shapes, in meters.")
+      .description(
+        """
+        Simplifies each trip pattern's shape geometry once, at graph-build time, using the Douglas-Peucker algorithm
+        with this distance tolerance as the epsilon parameter of the algorithm. A larger tolerance removes more
+        points (and any shape detail smaller than it); points are never removed from an individual hop's endpoints,
+        so stop locations are unaffected.
+
+        This is opt-in - leave it unset to keep the raw, unsimplified shapes. 0.5 or 3.0 meters may save a significant
+        amount of memory - if some of the feeds contains shapes with a lot of detail.
+        """
+      )
+      .asDouble(0.0);
     this.multiThreadElevationCalculations = root
       .of("multiThreadElevationCalculations")
       .since(V2_0)
@@ -776,5 +816,13 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public boolean hasUnknownParameters() {
     return root.hasUnknownParameters();
+  }
+
+  public double transitShapeSimplificationToleranceMeters() {
+    if (transitShapeSimplificationToleranceMeters < 0.0) {
+      LOG.warn("Build config transitShapeSimplificationToleranceMeters must not be negative.");
+      return 0.0;
+    }
+    return transitShapeSimplificationToleranceMeters;
   }
 }

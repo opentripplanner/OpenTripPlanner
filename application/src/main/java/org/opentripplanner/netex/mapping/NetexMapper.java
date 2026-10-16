@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -68,6 +68,7 @@ public class NetexMapper {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final Set<FeedScopedId> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final boolean noTransfersOnIsolatedStops;
 
   /** Map entries that cross reference entities within a group/operator, for example Interchanges. */
@@ -96,6 +97,7 @@ public class NetexMapper {
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     boolean noTransfersOnIsolatedStops
   ) {
     this.transitBuilder = transitBuilder;
@@ -106,6 +108,7 @@ public class NetexMapper {
     this.routeToCentroidStopPlaceIds = Set.copyOf(routeToCentroidStopPlaceIds);
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.calendarServiceBuilder = new CalendarServiceBuilder(idFactory);
     this.tripCalendarBuilder = new TripCalendarBuilder(this.calendarServiceBuilder, issueStore);
   }
@@ -463,7 +466,8 @@ public class NetexMapper {
       currentMapperIndexes.getDatedServiceJourneysBySjId(),
       serviceIds,
       deduplicator,
-      maxStopToShapeSnapDistance
+      maxStopToShapeSnapDistance,
+      transitShapeSimplificationToleranceMeters
     );
 
     for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex

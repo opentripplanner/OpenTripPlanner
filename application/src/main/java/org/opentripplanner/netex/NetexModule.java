@@ -1,9 +1,9 @@
 package org.opentripplanner.netex;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
-import org.opentripplanner.core.framework.deduplicator.DeduplicatorService;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -72,7 +72,7 @@ public class NetexModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
     this.transitPeriodLimit = transitPeriodLimit;
-    this.netexBundles = new LinkedList<>(netexBundles);
+    this.netexBundles = new ArrayDeque<>(netexBundles);
   }
 
   @Override

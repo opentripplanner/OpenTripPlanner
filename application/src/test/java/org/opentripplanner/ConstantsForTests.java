@@ -335,6 +335,7 @@ public class ConstantsForTests {
       LocalDateRange.ofUnbounded(),
       fareServiceFactory,
       150.0,
+      0.0,
       DurationUtils.durationInSeconds("2m")
     );
 

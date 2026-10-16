@@ -8,12 +8,12 @@ import static org.opentripplanner.graph_builder.module.BoardingLocationCoordinat
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import tools.jackson.databind.JsonNode;
 
 class BuildConfigTest {
 
@@ -75,5 +75,29 @@ class BuildConfigTest {
     var node = jsonNodeForTest("{ 'fares' : \"highestFareInFreeTransferWindow\" }");
     var conf = new BuildConfig(node, "Test", false);
     assertInstanceOf(JsonNode.class, conf.fareConfig);
+  }
+
+  @Test
+  public void transitShapeSimplificationToleranceMetersDefaultsToDisabled() {
+    var node = jsonNodeForTest("{ }");
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(0.0, subject.transitShapeSimplificationToleranceMeters());
+  }
+
+  @Test
+  public void transitShapeSimplificationToleranceMeters() {
+    var node = jsonNodeForTest("{ 'transitShapeSimplificationToleranceMeters' : 5.0 }");
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(5.0, subject.transitShapeSimplificationToleranceMeters());
+  }
+
+  @Test
+  public void transitShapeSimplificationToleranceMetersClampsNegativeValueToZero() {
+    var node = jsonNodeForTest("{ 'transitShapeSimplificationToleranceMeters' : -5.0 }");
+    var subject = new BuildConfig(node, "Test", false);
+
+    assertEquals(0.0, subject.transitShapeSimplificationToleranceMeters());
   }
 }

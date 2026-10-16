@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -28,6 +27,8 @@ import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * This integration test makes sure that Apache HTTP client still works with important hosts and
@@ -214,7 +215,7 @@ class OtpHttpClientTest {
   @Test
   void shouldWorkWithGetAndMapAsJsonObject() {
     URI uri = URI.create("http://localhost:" + port + "/json");
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new JsonMapper();
 
     // This uses the helper method which internally uses ResponseMapper
     var result = client.getAndMapAsJsonObject(uri, HttpHeaders.empty(), mapper, Map.class);

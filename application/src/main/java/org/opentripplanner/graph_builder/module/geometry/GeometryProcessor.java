@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +25,7 @@ import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -53,16 +53,19 @@ public class GeometryProcessor {
   // this is a thread-safe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
     TransitDataImportBuilder builder,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     DataImportIssueStore issueStore
   ) {
     this.builder = builder;
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.issueStore = issueStore;
   }
 
@@ -84,10 +87,16 @@ public class GeometryProcessor {
       trip.getShapeId().getId() == null ||
       trip.getShapeId().getId().isEmpty()
     ) {
+      // a straight line between two stops has no interior points to simplify away
       return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
+    LineString[] geometry = createGeometry(trip.getShapeId(), stopTimes);
 
-    return Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
+    return transitShapeSimplificationToleranceMeters <= 0
+      ? Arrays.asList(geometry)
+      : Arrays.stream(geometry)
+          .map(l -> DouglasPeuckerAlgorithm.of(l, transitShapeSimplificationToleranceMeters))
+          .toList();
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
@@ -334,7 +343,7 @@ public class GeometryProcessor {
       // for the next stop, the discontinuity is joined together. This is avoid a simple edge case
       // of a bus first passing within 150 m of a stop, exit the 150 m radius to a turning circle,
       // then call at the stop at the opposite side of the road.
-      List<List<IndexedLineSegment>> continuousSegments = new LinkedList<>();
+      List<List<IndexedLineSegment>> continuousSegments = new ArrayList<>();
       for (IndexedLineSegment segment : possibleSegmentsForStop.get(stopPositionInPattern)) {
         //can't go backwards along line
         if (prevSegment == null || segment.index >= prevSegment.index) {
@@ -364,7 +373,7 @@ public class GeometryProcessor {
           }
           if (shouldStartNewSegment) {
             // start a new continuous segment
-            continuousSegments.add(new LinkedList<>());
+            continuousSegments.add(new ArrayList<>());
           }
           continuousSegments.getLast().add(segment);
         }

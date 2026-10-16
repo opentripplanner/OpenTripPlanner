@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.LocalizedString;
@@ -24,12 +22,11 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -146,7 +143,7 @@ public class CarpoolItineraryMapper {
   }
 
   private static CarpoolLeg buildCarpoolLeg(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments,
+    List<StreetPath> sharedSegments,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     double rideWeight,
@@ -154,42 +151,34 @@ public class CarpoolItineraryMapper {
     Place toPlace,
     @Nullable BookingInfo bookingInfo
   ) {
-    var allEdges = sharedSegments
-      .stream()
-      .flatMap(seg -> seg.edges.stream())
-      .toList();
-
     return CarpoolLeg.of()
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(GeometryUtils.concatenateLineStrings(allEdges, Edge::getGeometry))
-      .withDistanceMeters(allEdges.stream().mapToDouble(Edge::getDistanceMeters).sum())
+      .withGeometry(GeometryUtils.concatenateLineStrings(sharedSegments, StreetPath::geometry))
+      .withDistanceMeters(sharedSegments.stream().mapToDouble(StreetPath::distanceMeters).sum())
       .withGeneralizedCost((int) rideWeight)
       .withPickupBookingInfo(bookingInfo)
       .build();
   }
 
   private static StreetLeg buildWalkLeg(
-    GraphPath<State, Edge, Vertex> walkPath,
+    StreetPath walkPath,
     ZonedDateTime startTime,
     ZonedDateTime endTime,
     Place fromPlace,
     Place toPlace
   ) {
-    LineString geometry = GeometryUtils.concatenateLineStrings(walkPath.edges, Edge::getGeometry);
-    double distance = walkPath.edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-
     return StreetLeg.of()
       .withMode(TraverseMode.WALK)
       .withStartTime(startTime)
       .withEndTime(endTime)
       .withFrom(fromPlace)
       .withTo(toPlace)
-      .withGeometry(geometry)
-      .withDistanceMeters(distance)
-      .withGeneralizedCost((int) walkPath.getWeight())
+      .withGeometry(walkPath.geometry())
+      .withDistanceMeters(walkPath.distanceMeters())
+      .withGeneralizedCost((int) walkPath.weight())
       .build();
   }
 
@@ -237,9 +226,9 @@ public class CarpoolItineraryMapper {
    * via {@link #makePlace(Vertex)}.
    */
   private static Itinerary buildItinerary(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments,
-    @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-    @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff,
+    List<StreetPath> sharedSegments,
+    @Nullable StreetPath walkToPickup,
+    @Nullable StreetPath walkFromDropoff,
     ZonedDateTime carpoolStart,
     ZonedDateTime carpoolEnd,
     double rideWeight,
@@ -247,15 +236,15 @@ public class CarpoolItineraryMapper {
     EndpointLabel endLabel,
     @Nullable BookingInfo bookingInfo
   ) {
-    Vertex pickupVertex = sharedSegments.getFirst().states.getFirst().getVertex();
-    Vertex dropoffVertex = sharedSegments.getLast().states.getLast().getVertex();
+    Vertex pickupVertex = sharedSegments.getFirst().states().getFirst().getVertex();
+    Vertex dropoffVertex = sharedSegments.getLast().lastState().getVertex();
     Place pickupPlace = makePlace(pickupVertex);
     Place dropoffPlace = makePlace(dropoffVertex);
 
     Vertex startBoundaryVertex =
-      walkToPickup != null ? walkToPickup.states.getFirst().getVertex() : pickupVertex;
+      walkToPickup != null ? walkToPickup.states().getFirst().getVertex() : pickupVertex;
     Vertex endBoundaryVertex =
-      walkFromDropoff != null ? walkFromDropoff.states.getLast().getVertex() : dropoffVertex;
+      walkFromDropoff != null ? walkFromDropoff.lastState().getVertex() : dropoffVertex;
 
     Place itineraryStart = boundaryPlace(startLabel, ORIGIN_DEFAULT_NAME, startBoundaryVertex);
     Place itineraryEnd = boundaryPlace(endLabel, DESTINATION_DEFAULT_NAME, endBoundaryVertex);
@@ -265,7 +254,7 @@ public class CarpoolItineraryMapper {
 
     List<Leg> legs = new ArrayList<>(3);
     if (walkToPickup != null) {
-      var walkStart = carpoolStart.minusSeconds(walkToPickup.getDuration());
+      var walkStart = carpoolStart.minus(walkToPickup.duration());
       legs.add(buildWalkLeg(walkToPickup, walkStart, carpoolStart, itineraryStart, pickupPlace));
     }
     legs.add(
@@ -280,7 +269,7 @@ public class CarpoolItineraryMapper {
       )
     );
     if (walkFromDropoff != null) {
-      var walkEnd = carpoolEnd.plusSeconds(walkFromDropoff.getDuration());
+      var walkEnd = carpoolEnd.plus(walkFromDropoff.duration());
       legs.add(buildWalkLeg(walkFromDropoff, carpoolEnd, walkEnd, dropoffPlace, itineraryEnd));
     }
 
@@ -349,16 +338,12 @@ public class CarpoolItineraryMapper {
       .build();
   }
 
-  private static WgsCoordinate boardingCoordinate(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments
-  ) {
-    return sharedSegments.getFirst().states.getFirst().getVertex().toWgsCoordinate();
+  private static WgsCoordinate boardingCoordinate(List<StreetPath> sharedSegments) {
+    return sharedSegments.getFirst().states().getFirst().getVertex().toWgsCoordinate();
   }
 
-  private static WgsCoordinate alightingCoordinate(
-    List<GraphPath<State, Edge, Vertex>> sharedSegments
-  ) {
-    return sharedSegments.getLast().states.getLast().getVertex().toWgsCoordinate();
+  private static WgsCoordinate alightingCoordinate(List<StreetPath> sharedSegments) {
+    return sharedSegments.getLast().lastState().getVertex().toWgsCoordinate();
   }
 
   /**

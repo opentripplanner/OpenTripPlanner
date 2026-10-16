@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -24,6 +23,7 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
@@ -110,14 +110,14 @@ public class TurnRestrictionTest {
       .withTo(bottomLeft)
       .getShortestPathTree();
 
-    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
-    assertNotNull(path);
+    State state = tree.getState(bottomLeft);
+    assertNotNull(state);
 
     // Since there are no turn restrictions applied to the default modes (walking + transit)
     // the shortest path is 1st to Main, Main to 2nd, 2nd to Broad and Broad until the
     // corner of Broad and 3rd.
 
-    List<State> states = path.states;
+    List<State> states = new StreetPath(state).states();
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
@@ -140,14 +140,14 @@ public class TurnRestrictionTest {
       .withTo(bottomLeft)
       .getShortestPathTree();
 
-    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
-    assertNotNull(path);
+    State state = tree.getState(bottomLeft);
+    assertNotNull(state);
 
     // Since there are no turn restrictions applied to the default modes (walking + transit)
     // the shortest path is 1st to Main, Main to 2nd, 2nd to Broad and Broad until the
     // corner of Broad and 3rd.
 
-    List<State> states = path.states;
+    List<State> states = new StreetPath(state).states();
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
@@ -177,15 +177,15 @@ public class TurnRestrictionTest {
       .withTo(bottomLeft)
       .getShortestPathTree();
 
-    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
-    assertNotNull(path);
+    State state = tree.getState(bottomLeft);
+    assertNotNull(state);
 
     // If not for turn restrictions, the shortest path would be to take 1st to Main,
     // Main to 2nd, 2nd to Broad and Broad until the corner of Broad and 3rd.
     // However, most of these turns are not allowed. Instead, the shortest allowed
     // path is 1st to Broad, Broad to 3rd.
 
-    List<State> states = path.states;
+    List<State> states = new StreetPath(state).states();
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));

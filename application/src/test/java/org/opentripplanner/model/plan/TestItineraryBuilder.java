@@ -44,7 +44,6 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -550,7 +549,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     stopTimes.add(toStopTime);
 
     StopPattern stopPattern = new StopPattern(stopTimes);
-    final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    final var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     TripPattern tripPattern = TripPattern.of(route.getId())
       .withRoute(route)
       .withStopPattern(stopPattern)

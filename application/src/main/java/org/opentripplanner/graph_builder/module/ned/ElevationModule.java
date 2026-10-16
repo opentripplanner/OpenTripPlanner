@@ -4,8 +4,8 @@ import static org.opentripplanner.routing.util.EllipsoidUtils.computeEllipsoidTo
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -175,7 +175,7 @@ public class ElevationModule implements GraphBuilderModule {
     cachedElevations = cacheManager.load(CacheTask.ELEVATION);
     LOG.info("Setting street elevation profiles from digital elevation model...");
 
-    List<StreetEdge> streetsWithElevationEdges = new LinkedList<>();
+    List<StreetEdge> streetsWithElevationEdges = new ArrayList<>();
 
     for (Vertex gv : graph.getVertices()) {
       for (Edge ee : gv.getOutgoing()) {
@@ -244,7 +244,7 @@ public class ElevationModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
 
     // Iterate again to find edges that had elevation calculated.
-    LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
+    List<StreetEdge> edgesWithCalculatedElevations = new ArrayList<>();
     for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
       if (edgeWithElevation.hasElevationExtension() && !edgeWithElevation.isElevationFlattened()) {
         edgesWithCalculatedElevations.add(edgeWithElevation);
@@ -412,7 +412,7 @@ public class ElevationModule implements GraphBuilderModule {
     try {
       Coordinate[] coords = edgeGeometry.getCoordinates();
 
-      List<Coordinate> coordList = new LinkedList<>();
+      List<Coordinate> coordList = new ArrayList<>();
 
       // initial sample (x = 0)
       coordList.add(new Coordinate(0, getElevation(coverage, coords[0])));

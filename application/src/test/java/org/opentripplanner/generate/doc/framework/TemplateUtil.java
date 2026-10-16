@@ -1,8 +1,8 @@
 package org.opentripplanner.generate.doc.framework;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Replace a text in a file wrapped using HTML comments

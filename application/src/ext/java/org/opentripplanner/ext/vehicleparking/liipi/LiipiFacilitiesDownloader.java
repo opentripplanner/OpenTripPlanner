@@ -1,8 +1,5 @@
 package org.opentripplanner.ext.vehicleparking.liipi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -19,11 +16,15 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class LiipiFacilitiesDownloader {
 
   private static final Logger LOG = LoggerFactory.getLogger(LiipiFacilitiesDownloader.class);
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER = new JsonMapper();
 
   private final String jsonParsePath;
   private final BiFunction<
@@ -60,7 +61,7 @@ public class LiipiFacilitiesDownloader {
           return parseJSON(response.body(), hubForPark);
         } catch (IllegalArgumentException e) {
           LOG.warn("Error parsing facilities from {}", url, e);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
           LOG.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
         } catch (IOException e) {
           LOG.warn("Error reading facilities from {}", url, e);

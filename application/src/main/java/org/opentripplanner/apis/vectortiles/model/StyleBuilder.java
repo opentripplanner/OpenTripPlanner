@@ -2,8 +2,6 @@ package org.opentripplanner.apis.vectortiles.model;
 
 import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +17,8 @@ import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.collection.ListUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Builds a Maplibre/Mapbox <a href="https://maplibre.org/maplibre-style-spec/layers/">vector tile

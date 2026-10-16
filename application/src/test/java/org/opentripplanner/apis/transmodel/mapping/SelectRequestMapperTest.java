@@ -9,10 +9,10 @@ import static org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmo
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.transit.DefaultFeedIdMapper;
+import tools.jackson.core.JacksonException;
 
 class SelectRequestMapperTest {
 
@@ -21,7 +21,7 @@ class SelectRequestMapperTest {
   );
 
   @Test
-  void mapFullSelectRequest() throws JsonProcessingException {
+  void mapFullSelectRequest() throws JacksonException {
     var result = MAPPER.mapSelectRequest(
       map(
         entry("lines", list("F:Line:1", "F:Line:2")),
@@ -46,7 +46,7 @@ class SelectRequestMapperTest {
   }
 
   @Test
-  void mapEmptySelectRequest() throws JsonProcessingException {
+  void mapEmptySelectRequest() throws JacksonException {
     var result = MAPPER.mapSelectRequest(map());
     assertEquals("(transportModes: EMPTY)", result.toString());
   }

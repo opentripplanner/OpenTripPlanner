@@ -1,8 +1,8 @@
 package org.opentripplanner.apis.vectortiles.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.List;
 import org.opentripplanner.utils.lang.StringUtils;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Represent a data source where Maplibre can fetch data for rendering directly in the browser.

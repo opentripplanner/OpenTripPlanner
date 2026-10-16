@@ -371,9 +371,7 @@ public class StopPlaceType {
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
 
-            Instant startTime = environment.containsArgument("startTime")
-              ? Instant.ofEpochMilli(environment.getArgument("startTime"))
-              : Instant.now();
+            Instant startTime = GqlUtil.getInstantOrNow(environment, "startTime");
 
             List<Map<String, ?>> filtersInput = environment.getArgument("filters");
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment, idMapper);

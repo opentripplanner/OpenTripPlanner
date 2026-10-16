@@ -63,7 +63,7 @@ public class DirectStreetRouter {
       );
       var paths = gpFinder.find(request, linkingContext);
 
-      // Convert the internal GraphPaths to itineraries
+      // Convert the internal StreetPaths to itineraries
       final StreetPathToLegsMapper streetPathToLegsMapper = new StreetPathToLegsMapper(
         new TransitServiceResolver(transitService),
         transitService.getTimeZone(),

@@ -2264,6 +2264,7 @@ public class GraphQLTypes {
     CAR_RENTAL,
     FLEX,
     SCOOTER_RENTAL,
+    TAXI,
     WALK,
   }
 
@@ -2335,6 +2336,7 @@ public class GraphQLTypes {
     CAR_RENTAL,
     FLEX,
     SCOOTER_RENTAL,
+    TAXI,
     WALK,
   }
 
@@ -2347,6 +2349,7 @@ public class GraphQLTypes {
     CAR_RENTAL,
     FLEX,
     SCOOTER_RENTAL,
+    TAXI,
     WALK,
   }
 

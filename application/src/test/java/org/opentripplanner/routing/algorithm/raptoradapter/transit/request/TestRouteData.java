@@ -36,7 +36,7 @@ public class TestRouteData {
   private final Route route;
   private final List<Trip> trips;
   private final Map<Trip, List<StopTime>> stopTimesByTrip = new HashMap<>();
-  private final Map<Trip, TripTimes> tripTimesByTrip = new HashMap<>();
+  private final Map<Trip, TripTimes<?>> tripTimesByTrip = new HashMap<>();
   private final Map<Trip, TripSchedule> tripSchedulesByTrip = new HashMap<>();
   private final RaptorTimeTable<TripSchedule> timetable;
   private final TripPattern tripPattern;
@@ -52,7 +52,7 @@ public class TestRouteData {
 
     List<StopTime> stopTimesFistTrip = firstTrip().getStopTimes();
     // Get TripTimes in same order as the trips
-    List<TripTimes> tripTimes = trips
+    List<TripTimes<?>> tripTimes = trips
       .stream()
       .map(tripTimesByTrip::get)
       .collect(Collectors.toList());

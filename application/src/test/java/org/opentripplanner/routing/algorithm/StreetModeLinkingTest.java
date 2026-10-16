@@ -10,6 +10,7 @@ import static org.opentripplanner.street.model.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.street.model.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.street.model.StreetMode.FLEXIBLE;
 import static org.opentripplanner.street.model.StreetMode.SCOOTER_RENTAL;
+import static org.opentripplanner.street.model.StreetMode.TAXI;
 import static org.opentripplanner.street.model.StreetMode.WALK;
 
 import java.util.ArrayList;
@@ -151,6 +152,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       SCOOTER_RENTAL,
       FLEXIBLE,
       CAR_PICKUP,
+      TAXI,
       CAR_RENTAL
     );
 

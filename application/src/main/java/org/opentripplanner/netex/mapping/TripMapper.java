@@ -16,6 +16,7 @@ import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LineRefStructure;
@@ -107,6 +108,12 @@ class TripMapper {
 
     builder.withShortName(serviceJourney.getPublicCode());
     builder.withOperator(findOperator(serviceJourney));
+    builder.withVehicleAssignment(
+      VehicleAssignment.ofNullable(
+        null,
+        VehicleTypeRefMapper.mapVehicleTypeRef(serviceJourney.getVehicleTypeRef())
+      )
+    );
 
     if (serviceJourney.getTransportMode() != null) {
       NetexMainAndSubMode transitMode = null;

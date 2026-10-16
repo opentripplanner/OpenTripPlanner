@@ -42,6 +42,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 class OsmBoardingLocationsModuleTest {
 
@@ -134,10 +136,12 @@ class OsmBoardingLocationsModuleTest {
       BoardingLocationCoordinateSource.OSM
     );
 
-    var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
+    var boardingLocations = ListUtils.ofIterable(
+      graph.findVertices(OsmBoardingLocationVertex.class)
+    );
     // 3 nodes connected to the street network, plus one "floating" and one area centroid created by
     // the module
-    assertEquals(5, boardingLocations.size());
+    assertThat(boardingLocations).hasSize(5);
 
     assertEquals(1, platformVertex.getIncoming().size());
     assertEquals(1, platformVertex.getOutgoing().size());
@@ -346,9 +350,7 @@ class OsmBoardingLocationsModuleTest {
 
     // The vertex that only carried the centroid into the linker is not left behind in the graph.
     assertThat(
-      graph
-        .getVerticesOfType(OsmBoardingLocationVertex.class)
-        .stream()
+      StreamUtils.ofIterable(graph.findVertices(OsmBoardingLocationVertex.class))
         .filter(v -> v.getDegreeIn() == 0 && v.getDegreeOut() == 0)
         .toList()
     ).isEmpty();

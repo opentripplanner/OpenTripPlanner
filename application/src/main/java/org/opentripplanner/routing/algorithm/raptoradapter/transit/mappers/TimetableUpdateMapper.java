@@ -153,7 +153,7 @@ public class TimetableUpdateMapper {
           );
         }
 
-        for (TripTimes triptimes : timetable.getTripTimes()) {
+        for (TripTimes<?> triptimes : timetable.getTripTimes()) {
           var id = new TripIdAndServiceDate(
             triptimes.getTrip().getId(),
             timetable.getServiceDate()
