@@ -1,17 +1,14 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators.paretoComparator;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.NONE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
-import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME_REVERSE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
-import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME_REVERSE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
-import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE_REVERSE;
-import static org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalParetoSetComparators.paretoComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +24,7 @@ import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
@@ -68,36 +66,47 @@ class DestinationArrivalParetoSetComparatorsTest {
    * iteration departure time and the arrival time, while the others compare the arrival (or
    * departure) time, and the duration if cost is used.
    */
-  private record Mode(ParetoSetTime time, List<Criterion> noCost, List<Criterion> withCost) {}
+  private record Mode(
+    ParetoSetTime time,
+    SearchDirection direction,
+    List<Criterion> noCost,
+    List<Criterion> withCost
+  ) {}
 
   private static final List<Mode> MODES = List.of(
     new Mode(
       USE_TIMETABLE,
+      SearchDirection.FORWARD,
       List.of(Criterion.ITERATION_LATER, Criterion.ARRIVAL_EARLIER),
       List.of(Criterion.ITERATION_LATER, Criterion.ARRIVAL_EARLIER)
     ),
     new Mode(
-      USE_TIMETABLE_REVERSE,
+      USE_TIMETABLE,
+      SearchDirection.REVERSE,
       List.of(Criterion.ARRIVAL_LATER, Criterion.ITERATION_EARLIER),
       List.of(Criterion.ARRIVAL_LATER, Criterion.ITERATION_EARLIER)
     ),
     new Mode(
       USE_ARRIVAL_TIME,
+      SearchDirection.FORWARD,
       List.of(Criterion.ARRIVAL_EARLIER),
       List.of(Criterion.ARRIVAL_EARLIER, Criterion.SHORTER_DURATION)
     ),
     new Mode(
-      USE_ARRIVAL_TIME_REVERSE,
+      USE_ARRIVAL_TIME,
+      SearchDirection.REVERSE,
       List.of(Criterion.DEPARTURE_EARLIER),
       List.of(Criterion.DEPARTURE_EARLIER, Criterion.SHORTER_DURATION)
     ),
     new Mode(
       USE_DEPARTURE_TIME,
+      SearchDirection.FORWARD,
       List.of(Criterion.DEPARTURE_LATER),
       List.of(Criterion.DEPARTURE_LATER, Criterion.SHORTER_DURATION)
     ),
     new Mode(
-      USE_DEPARTURE_TIME_REVERSE,
+      USE_DEPARTURE_TIME,
+      SearchDirection.REVERSE,
       List.of(Criterion.ARRIVAL_LATER),
       List.of(Criterion.ARRIVAL_LATER, Criterion.SHORTER_DURATION)
     )
@@ -112,9 +121,9 @@ class DestinationArrivalParetoSetComparatorsTest {
   @ParameterizedTest
   @MethodSource("allModes")
   void comparatorMatchesTheCriteriaOfTheMode(Mode mode, ParetoSetCost cost) {
-    var subject = comparator(mode.time(), cost);
+    var subject = comparator(mode.time(), mode.direction(), cost);
     var criteria = cost == NONE ? mode.noCost() : mode.withCost();
-    var arrivals = grid(isReverse(mode.time()));
+    var arrivals = grid(mode.direction().isInReverse());
 
     for (var l : arrivals) {
       for (var r : arrivals) {
@@ -129,7 +138,7 @@ class DestinationArrivalParetoSetComparatorsTest {
 
   @Test
   void durationIsNotACriterionForTimetableSearches() {
-    var subject = comparator(USE_TIMETABLE, USE_C1);
+    var subject = comparator(USE_TIMETABLE, SearchDirection.FORWARD, USE_C1);
     // Same iteration and arrival, but a shorter duration: the departure time is not used
     var base = arrival(10, 1, 20, 0, 5, 0);
     var shorter = arrival(10, 9, 20, 0, 5, 0);
@@ -147,18 +156,18 @@ class DestinationArrivalParetoSetComparatorsTest {
     var first = arrival(10, 10, 20, 0, 5, 0);
     var shifted = arrival(11, 11, 21, 0, 5, 0);
 
-    var timetable = comparator(USE_TIMETABLE, USE_C1);
+    var timetable = comparator(USE_TIMETABLE, SearchDirection.FORWARD, USE_C1);
     assertEquals(true, timetable.leftDominanceExist(shifted, first));
     assertEquals(true, timetable.leftDominanceExist(first, shifted));
 
-    var arrivalTimeSearch = comparator(USE_ARRIVAL_TIME, USE_C1);
+    var arrivalTimeSearch = comparator(USE_ARRIVAL_TIME, SearchDirection.FORWARD, USE_C1);
     assertEquals(true, arrivalTimeSearch.leftDominanceExist(first, shifted));
     assertEquals(false, arrivalTimeSearch.leftDominanceExist(shifted, first));
   }
 
   @Test
   void durationIsNotUsedWithoutCost() {
-    var subject = comparator(USE_ARRIVAL_TIME, NONE);
+    var subject = comparator(USE_ARRIVAL_TIME, SearchDirection.FORWARD, NONE);
     var longer = arrival(10, 1, 20, 0, 5, 0);
     var shorter = arrival(10, 9, 20, 0, 5, 0);
 
@@ -168,21 +177,14 @@ class DestinationArrivalParetoSetComparatorsTest {
   @Test
   void timeAndCostConfigAreRequired() {
     assertThrows(NullPointerException.class, () ->
-      paretoComparator(null, NONE, RelaxFunction.NORMAL, null)
+      paretoComparator(null, SearchDirection.FORWARD, NONE, RelaxFunction.NORMAL, null)
     );
     assertThrows(NullPointerException.class, () ->
-      paretoComparator(USE_ARRIVAL_TIME, null, RelaxFunction.NORMAL, null)
+      paretoComparator(USE_ARRIVAL_TIME, SearchDirection.FORWARD, null, RelaxFunction.NORMAL, null)
     );
   }
 
   /* Test helpers */
-
-  private static boolean isReverse(ParetoSetTime time) {
-    return switch (time) {
-      case USE_TIMETABLE_REVERSE, USE_ARRIVAL_TIME_REVERSE, USE_DEPARTURE_TIME_REVERSE -> true;
-      default -> false;
-    };
-  }
 
   private static boolean fewerTransfers(DestinationArrival<?> l, DestinationArrival<?> r) {
     return Criterion.FEWER_TRANSFERS.better.test(l, r);
@@ -204,11 +206,13 @@ class DestinationArrivalParetoSetComparatorsTest {
 
   private static ParetoComparator<DestinationArrival<RaptorTripSchedule>> comparator(
     ParetoSetTime time,
+    SearchDirection direction,
     ParetoSetCost cost
   ) {
     boolean relaxed = cost == USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
     return paretoComparator(
       time,
+      direction,
       cost,
       relaxed ? RELAX_FN : RelaxFunction.NORMAL,
       relaxed ? C2_COMP : null

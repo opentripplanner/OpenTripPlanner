@@ -10,6 +10,8 @@ import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculat
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaSegments;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
+import org.opentripplanner.raptor.rangeraptor.destination.configure.DestinationArrivalConfig;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -30,8 +32,6 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.TransitGroupPriorityRideFactory;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.path.configure.DestinationArrivalConfig;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.raptor.util.paretoset.ParetoSet;

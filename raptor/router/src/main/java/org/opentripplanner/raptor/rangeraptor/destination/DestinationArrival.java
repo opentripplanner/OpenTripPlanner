@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.opentripplanner.raptor.api.view.PathLegType.EGRESS;
 
@@ -9,25 +9,12 @@ import org.opentripplanner.raptor.api.view.PathLegType;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
- * The purpose of this class is to hold information about a destination arrival, and to compute the
- * values for arrival time and cost. It is the element of the destination pareto-set, see
- * {@link DestinationArrivalParetoSetComparators}. The result paths are created from the arrivals
- * in the set, not during the search.
- * <p/>
- * Compared with the ParetoSet of each stop we need extra criteria:
- * <ul>
- * <li>Number of transfers. The McRangeRaptor works in rounds, so
- * there is no need to include rounds in the intermediate stop pareto sets.
- * But to avoid that a later iteration delete an earlier result with less
- * transfers, transfers need to be added as a criterion to the final destination.
- *
- * <li>Departure time/travel duration - Range Raptor works in iterations. So when a
- * later iteration makes it into the destination set - it should not erase
- * an earlier result unless it is faster. There is no check on total travel
- * duration for each stop, because it does not need to. A timetable search uses the
- * {@link #iterationDepartureTime()} instead, and keeps results departing later, even if they are
- * slower.
- * </ul>
+ * A light-weight journey arrival at the destination, made of the last stop arrival and the egress. It holds the values
+ * of the journey needed to compare it with other journeys: departure time, arrival time, number of transfers and cost.
+ * The arrival chain is reachable through {@link #previous()}, so a path can be built from it when needed.
+ * <p>
+ * In addition to the criteria of the stop arrivals, the destination also needs a number of transfers and a time
+ * criterion, because the arrivals come from different Range Raptor iterations.
  * See {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -36,10 +23,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   private final ArrivalView<T> previous;
   private final RaptorAccessEgress egress;
+
+  // The fields below are not final only to let a single probe be reused for qualification checks, see setProbeValues().
   private int iterationDepartureTime;
   private int departureTime;
   private int arrivalTime;
-
   private int numberOfTransfers;
   private int c1;
   private int c2;
@@ -67,8 +55,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     this.iterationDepartureTime = iterationDepartureTime;
     this.departureTime = departureTime;
     this.arrivalTime = arrivalTime;
-    // transit-only transfers; egress rides are added dynamically via round()
-    this.numberOfTransfers = previous.round() - 1;
+    this.numberOfTransfers = previous.round() - 1 + egress.numberOfRides();
     this.c1 = previous.c1() + additionalC1;
     this.c2 = c2;
   }
@@ -117,23 +104,16 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   }
 
   /**
-   * The departure time of the Range Raptor iteration this arrival was found in. A path found in
-   * the first iteration can be time-shifted far beyond the iteration time, while the time-shift
-   * in the other iterations is less than one iteration step. The time is not time-shifted and
-   * does not include the time-penalty, see {@link #departureTime()}.
+   * The departure time of the Range Raptor iteration this arrival was found in, see the
+   * "Destination pareto-set" section of {@code org/opentripplanner/raptor/package.md}.
    */
   public int iterationDepartureTime() {
     return iterationDepartureTime;
   }
 
   /**
-   * The departure time of the journey in the search direction, as late as possible for a forward
-   * search (the access is time-shifted), including the access time-penalty. For a reverse search
-   * the iteration departure time is used.
-   * <p>
-   * This is used to calculate the duration of the journey, a criterion in the pareto-set for
-   * searches that are not timetable searches. If a time-shifted departure is not needed by the
-   * pareto comparator, the {@link #iterationDepartureTime()} is used.
+   * The departure time of the journey in the search direction, with the access time-shifted, see
+   * {@link TimeShiftedDepartureTime}. It is the journey arrival time in a reverse search.
    */
   public int departureTime() {
     return departureTime;
@@ -146,12 +126,12 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   @Override
   public int round() {
-    return 1 + numberOfTransfers + (egress != null ? egress.numberOfRides() : 0);
+    return 1 + numberOfTransfers();
   }
 
   @Override
   public int numberOfTransfers() {
-    return round() - 1;
+    return numberOfTransfers;
   }
 
   @Override

@@ -1,15 +1,14 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators.paretoComparator;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.NONE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
-import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME_REVERSE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
-import static org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalParetoSetComparators.paretoComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
 
 class DestinationArrivalPathsTest {
 
@@ -97,32 +97,8 @@ class DestinationArrivalPathsTest {
   }
 
   @Test
-  void stdRaptorBuildsPathsEagerlyAndOnlyForAcceptedArrivals() {
-    var subject = createStd(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
-
-    subject.add(stopArrival(ALIGHT_TIME), egress());
-    assertEquals(1, mappedArrivals.size());
-
-    // Dominated by the first arrival: rejected, no path is built
-    subject.add(stopArrival(ALIGHT_TIME + 100), egress());
-    assertEquals(1, mappedArrivals.size());
-
-    // Dominates the first arrival: accepted, and the first path is dropped from the result
-    subject.add(stopArrival(ALIGHT_TIME - 100), egress());
-    assertEquals(2, mappedArrivals.size());
-
-    var paths = subject.listPaths();
-    assertEquals(1, paths.size());
-    assertEquals(2, mappedArrivals.size(), "listPaths() must not build paths for StdRaptor");
-    assertEquals(
-      ALIGHT_TIME - 100 + EGRESS_DURATION,
-      paths.iterator().next().endTimeInclusivePenalty()
-    );
-  }
-
-  @Test
-  void mcRaptorBuildsPathsLazilyForTheArrivalsInTheResult() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+  void pathsAreBuiltLazilyForTheArrivalsInTheResult() {
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
 
     subject.add(stopArrival(ALIGHT_TIME), egress());
     subject.add(stopArrival(ALIGHT_TIME + 100), egress());
@@ -140,7 +116,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void arrivalsExceedingTheTimeLimitAreRejected() {
-    var subject = createStd(USE_ARRIVAL_TIME, ALIGHT_TIME + EGRESS_DURATION);
+    var subject = create(USE_ARRIVAL_TIME, ALIGHT_TIME + EGRESS_DURATION);
 
     subject.add(stopArrival(ALIGHT_TIME + 1), egress());
     assertTrue(subject.isEmpty());
@@ -152,7 +128,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void reachedCurrentRoundIsSetOnAcceptedArrivalAndClearedInTheNextRound() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
     assertFalse(subject.isReachedCurrentRound());
 
     subject.add(stopArrival(ALIGHT_TIME), egress());
@@ -168,7 +144,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void qualifyOnEmptySetIsTrueAndDoesNotAddToTheSet() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
 
     assertTrue(subject.qualify(ANY, 0, ANY, ANY));
     assertTrue(subject.isEmpty());
@@ -176,7 +152,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void consecutiveQualifyCallsDoNotInterfere() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
     int arrivalTime = ALIGHT_TIME + EGRESS_DURATION;
     subject.add(stopArrival(ALIGHT_TIME), egress());
 
@@ -194,7 +170,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void qualifyUsesTheCurrentIterationDepartureTime() {
-    var subject = createMc(USE_TIMETABLE, NO_TIME_LIMIT);
+    var subject = create(USE_TIMETABLE, NO_TIME_LIMIT);
     int arrivalTime = ALIGHT_TIME + EGRESS_DURATION;
 
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME);
@@ -212,7 +188,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void pathsAreBuiltFromTheArrivalAndNotFromTheCurrentIteration() {
-    var subject = createMc(USE_TIMETABLE, NO_TIME_LIMIT);
+    var subject = create(USE_TIMETABLE, NO_TIME_LIMIT);
 
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME);
     subject.add(stopArrival(ALIGHT_TIME), egress());
@@ -232,7 +208,7 @@ class DestinationArrivalPathsTest {
    */
   @Test
   void forwardEgressTimePenaltyIsCountedOnce() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
 
     subject.add(stopArrival(ALIGHT_TIME), penalisedEgress(EGRESS_DURATION, TIME_PENALTY));
     subject.listPaths();
@@ -245,7 +221,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void forwardPenalisedEgressWinsWhenFasterThanPlainEgressIncludingThePenalty() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
     int arrivalWithPenalty = EGRESS_DURATION + TIME_PENALTY;
 
     // The plain egress is slower than the penalised egress including the penalty
@@ -260,10 +236,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void reversePenalisedEgressLosesWhenSlowerThanPlainEgressIncludingThePenalty() {
-    var subject = createMc(
-      USE_DEPARTURE_TIME_REVERSE,
-      RaptorTransitCalculator.testDummyCalculator(false)
-    );
+    var subject = create(USE_DEPARTURE_TIME, RaptorTransitCalculator.testDummyCalculator(false));
     int durationWithPenalty = EGRESS_DURATION + TIME_PENALTY;
 
     // In a reverse search the egress is the forward access. A shorter total duration is better.
@@ -290,7 +263,7 @@ class DestinationArrivalPathsTest {
       .times(boardTime, boardTime + 600)
       .build();
     var slack = new TestSlack(boardSlack);
-    var subject = createMc(
+    var subject = create(
       USE_ARRIVAL_TIME,
       USE_C1,
       calculator(NO_TIME_LIMIT),
@@ -317,7 +290,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void forwardDepartureTimeModePrefersTheLaterIterationEvenIfItArrivesLater() {
-    var subject = createMc(USE_DEPARTURE_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_DEPARTURE_TIME, NO_TIME_LIMIT);
 
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME);
     subject.add(stopArrival(ALIGHT_TIME + 600), egress());
@@ -334,7 +307,7 @@ class DestinationArrivalPathsTest {
   void forwardArrivalTimeModeWithCostDropsALaterJourneyWithTheSameDuration() {
     // Without a time-shifted departure calculator the iteration departure time is used as
     // departure time. The second journey departs and arrives one minute later: same duration
-    var subject = createMc(USE_ARRIVAL_TIME, USE_C1, calculator(NO_TIME_LIMIT));
+    var subject = create(USE_ARRIVAL_TIME, USE_C1, calculator(NO_TIME_LIMIT));
 
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME);
     subject.add(stopArrival(ALIGHT_TIME + 60), egress());
@@ -348,7 +321,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void timetableKeepsALaterJourneyWithTheSameDuration() {
-    var subject = createMc(USE_TIMETABLE, USE_C1, calculator(NO_TIME_LIMIT));
+    var subject = create(USE_TIMETABLE, USE_C1, calculator(NO_TIME_LIMIT));
 
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME);
     subject.add(stopArrival(ALIGHT_TIME + 60), egress());
@@ -360,7 +333,7 @@ class DestinationArrivalPathsTest {
 
   @Test
   void forwardArrivalTimeModeWithoutCostIgnoresTheDepartureTime() {
-    var subject = createMc(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
 
     lifeCycle.setupIteration(ITERATION_DEPARTURE_TIME);
     subject.add(stopArrival(ALIGHT_TIME + 600), egress());
@@ -380,56 +353,43 @@ class DestinationArrivalPathsTest {
     );
   }
 
-  private DestinationArrivalPaths<RaptorTripSchedule> createStd(
+  private DestinationArrivalPaths<RaptorTripSchedule> create(
     ParetoSetTime time,
     int latestArrivalTime
   ) {
-    return init(
-      DestinationArrivalPaths.forStdRaptor(
-        paretoComparator(time, NONE, RelaxFunction.NORMAL, null),
-        calculator(latestArrivalTime),
-        null,
-        null,
-        NO_SLACK,
-        this::mapToPath,
-        debugHandlerFactory(),
-        RaptorTestConstants::stopIndexToName,
-        subscriptions
-      )
-    );
+    return create(time, calculator(latestArrivalTime));
   }
 
-  private DestinationArrivalPaths<RaptorTripSchedule> createMc(
-    ParetoSetTime time,
-    int latestArrivalTime
-  ) {
-    return createMc(time, calculator(latestArrivalTime));
-  }
-
-  private DestinationArrivalPaths<RaptorTripSchedule> createMc(
+  private DestinationArrivalPaths<RaptorTripSchedule> create(
     ParetoSetTime time,
     RaptorTransitCalculator<RaptorTripSchedule> calculator
   ) {
-    return createMc(time, NONE, calculator);
+    return create(time, NONE, calculator);
   }
 
-  private DestinationArrivalPaths<RaptorTripSchedule> createMc(
+  private DestinationArrivalPaths<RaptorTripSchedule> create(
     ParetoSetTime time,
     ParetoSetCost cost,
     RaptorTransitCalculator<RaptorTripSchedule> calculator
   ) {
-    return createMc(time, cost, calculator, null);
+    return create(time, cost, calculator, null);
   }
 
-  private DestinationArrivalPaths<RaptorTripSchedule> createMc(
+  private DestinationArrivalPaths<RaptorTripSchedule> create(
     ParetoSetTime time,
     ParetoSetCost cost,
     RaptorTransitCalculator<RaptorTripSchedule> calculator,
     TimeShiftedDepartureTime<RaptorTripSchedule> departureTimeCalculator
   ) {
     return init(
-      DestinationArrivalPaths.forMcRaptor(
-        paretoComparator(time, cost, RelaxFunction.NORMAL, null),
+      new DestinationArrivalPaths<>(
+        paretoComparator(
+          time,
+          calculator.searchForward() ? SearchDirection.FORWARD : SearchDirection.REVERSE,
+          cost,
+          RelaxFunction.NORMAL,
+          null
+        ),
         calculator,
         null,
         departureTimeCalculator,

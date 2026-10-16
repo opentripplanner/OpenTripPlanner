@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
@@ -68,29 +69,19 @@ public final class PathParetoSetComparators {
 
     return switch (costConfig) {
       case NONE -> switch (timeConfig) {
-        case USE_TIMETABLE, USE_TIMETABLE_REVERSE -> comparatorTimetable();
-        case USE_ARRIVAL_TIME, USE_ARRIVAL_TIME_REVERSE -> comparatorStandardArrivalTime();
-        case USE_DEPARTURE_TIME, USE_DEPARTURE_TIME_REVERSE -> comparatorStandardDepartureTime();
+        case USE_TIMETABLE -> comparatorTimetable();
+        case USE_ARRIVAL_TIME -> comparatorStandardArrivalTime();
+        case USE_DEPARTURE_TIME -> comparatorStandardDepartureTime();
       };
       case USE_C1 -> switch (timeConfig) {
-        case USE_TIMETABLE, USE_TIMETABLE_REVERSE -> comparatorTimetableAndC1();
-        case USE_ARRIVAL_TIME, USE_ARRIVAL_TIME_REVERSE -> comparatorArrivalTimeAndC1();
-        case USE_DEPARTURE_TIME, USE_DEPARTURE_TIME_REVERSE -> comparatorDepartureTimeAndC1();
+        case USE_TIMETABLE -> comparatorTimetableAndC1();
+        case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndC1();
+        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndC1();
       };
       case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> switch (timeConfig) {
-        case USE_TIMETABLE, USE_TIMETABLE_REVERSE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(
-          relaxC1,
-          c2Comp
-        );
-        case
-          USE_ARRIVAL_TIME,
-          USE_ARRIVAL_TIME_REVERSE -> comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(
-          relaxC1,
-          c2Comp
-        );
-        case
-          USE_DEPARTURE_TIME,
-          USE_DEPARTURE_TIME_REVERSE -> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
+        case USE_TIMETABLE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
+        case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
+        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
           relaxC1,
           c2Comp
         );

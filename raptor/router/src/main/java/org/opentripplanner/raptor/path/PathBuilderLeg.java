@@ -416,7 +416,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
     var transfer = asTransferLeg().transfer;
     int cost = cost(costCalculator, transfer);
-    return new TransferPathLeg<>(fromStop(), fromTime, toTime, cost, transfer, nextLeg);
+    return new TransferPathLeg<>(fromStop(), fromTime, toStop(), toTime, cost, transfer, nextLeg);
   }
 
   /* private methods */

@@ -2,19 +2,16 @@ package org.opentripplanner.ext.carpooling.constraints;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.ext.carpooling.util.GraphPathUtils.calculateCumulativeDurations;
+import static org.opentripplanner.ext.carpooling.util.StreetPathUtils.calculateCumulativeDurations;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.ext.carpooling.CarpoolGraphPathBuilder;
+import org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder;
 import org.opentripplanner.ext.carpooling.model.CarpoolStop;
-import org.opentripplanner.ext.carpooling.model.GraphPath;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.model.path.StreetPath;
 
 class PassengerDelayConstraintsTest {
 
@@ -39,11 +36,11 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 7min - 5min = 2min (within 5min budget)
     // Destination delay: 17min - 15min = 2min (within 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(3)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(4)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -67,11 +64,11 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 15min - 10min = 5min (exactly at 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(10)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -95,11 +92,11 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 16min - 10min = 6min (exceeds 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(11)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -124,11 +121,11 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 12min - 10min = 2min (within 20min budget)
     // Destination delay: 27min - 20min = 7min (exceeds 5min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(7)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(10)),
     };
 
     assertFalse(
@@ -159,12 +156,12 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 13min - 10min = 3min ok
     // Stop2 delay: 27min - 20min = 7min exceeds
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(9)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(8)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(9)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -193,12 +190,12 @@ class PassengerDelayConstraintsTest {
       stopWithBudget(FIVE_MINUTES)
     );
 
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(7)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(7)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(10)),
     };
 
     assertTrue(
@@ -223,11 +220,11 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 13min - 10min = 3min (exceeds 2min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(8)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -250,11 +247,11 @@ class PassengerDelayConstraintsTest {
       stopWithBudget(FIVE_MINUTES)
     );
 
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(4)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -278,11 +275,11 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 10min + 1s - 10min = 1s (exceeds zero budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5).plusSeconds(1)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5).plusSeconds(1)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertFalse(
@@ -304,13 +301,13 @@ class PassengerDelayConstraintsTest {
       stopWithBudget(Duration.ZERO)
     );
 
-    // Use the same GraphPaths to derive both original and modified times
-    // so there is truly zero delay (avoids rounding from GraphPath construction)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(4)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    // Use the same StreetPaths to derive both original and modified times
+    // so there is truly zero delay (avoids rounding from StreetPath construction)
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(4)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
     Duration[] cumulativeDurations = calculateCumulativeDurations(modifiedSegments, Duration.ZERO);
 
@@ -343,11 +340,11 @@ class PassengerDelayConstraintsTest {
     );
 
     // Stop1 delay: 40min - 10min = 30min (within 60min budget)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(35)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(35)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
     };
 
     assertTrue(
@@ -373,11 +370,11 @@ class PassengerDelayConstraintsTest {
 
     // Stop1 delay: 12min - 10min = 2min (within 3min budget, ok)
     // Destination delay: 47min - 20min = 27min (within 30min budget, ok)
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(30)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(7)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(30)),
     };
 
     assertTrue(
@@ -410,12 +407,12 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 13min - 10min = 3min ok
     // Stop2 delay: 24min - 20min = 4min ok
     // Destination delay: 36min - 30min = 6min exceeds 5min budget
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(2)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(8)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(3)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(2)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(8)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(11)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(12)),
     };
 
     assertFalse(
@@ -442,19 +439,19 @@ class PassengerDelayConstraintsTest {
     );
 
     // Baseline: 2 segments of 10min. With 1-min dwell: cumulative = [0, 10, 21]
-    GraphPath<State, Edge, Vertex>[] baselineSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(10)),
+    StreetPath[] baselineSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(10)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(10)),
     };
     Duration[] originalTimes = calculateCumulativeDurations(baselineSegments, stopDuration);
 
     // Modified (pickup=1, dropoff=3): 4 segments of 6min. With 1-min dwell: cumulative = [0, 6, 13, 20, 27]
     // Destination delay: 27 - 21 = 6min, exceeds 5min budget.
-    GraphPath<State, Edge, Vertex>[] overBudgetSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+    StreetPath[] overBudgetSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
     };
 
     assertFalse(
@@ -469,11 +466,11 @@ class PassengerDelayConstraintsTest {
 
     // Shortening one segment to 5min: cumulative = [0, 6, 12, 19, 26]
     // Destination delay: 26 - 21 = 5min, exactly at budget → accepts.
-    GraphPath<State, Edge, Vertex>[] atBudgetSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(5)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(6)),
+    StreetPath[] atBudgetSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(5)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(6)),
     };
 
     assertTrue(
@@ -506,12 +503,12 @@ class PassengerDelayConstraintsTest {
     // Stop1 delay: 11min - 10min = 1min ok
     // Stop2 delay: 24min - 20min = 4min ok
     // Destination delay: 36min - 30min = 6min exceeds 5min budget
-    GraphPath<State, Edge, Vertex>[] modifiedSegments = new GraphPath[] {
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(11)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(3)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(7)),
-      CarpoolGraphPathBuilder.createGraphPath(Duration.ofMinutes(12)),
+    StreetPath[] modifiedSegments = new StreetPath[] {
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(11)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(3)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(3)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(7)),
+      CarpoolStreetPathBuilder.createStreetPath(Duration.ofMinutes(12)),
     };
 
     assertFalse(

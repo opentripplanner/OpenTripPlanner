@@ -2,12 +2,10 @@ package org.opentripplanner.ext.carpooling.routing;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.carpooling.model.GraphPath;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
-import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.state.State;
 
 /**
  * A transit stop that has been determined viable for carpooling access or egress,
@@ -32,6 +30,6 @@ public record ViableAccessEgress(
   Vertex passengerVertex,
   AccessEgressType accessEgress,
   List<InsertionPosition> insertionPositions,
-  @Nullable GraphPath<State, Edge, Vertex> walkToPickup,
-  @Nullable GraphPath<State, Edge, Vertex> walkFromDropoff
+  @Nullable StreetPath walkToPickup,
+  @Nullable StreetPath walkFromDropoff
 ) {}

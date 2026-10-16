@@ -140,7 +140,8 @@ public class TestServerContext {
       null,
       createLinkingContextFactory(graph, vertexLinker, transitService),
       routerConfig.transitTuningConfig(),
-      routerConfig.transitTuningConfig()
+      routerConfig.transitTuningConfig(),
+      null
     );
   }
 

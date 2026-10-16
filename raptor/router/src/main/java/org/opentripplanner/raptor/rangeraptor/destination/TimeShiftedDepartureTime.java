@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -21,8 +21,9 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * the destination pareto-set for searches that are not timetable searches. See
  * {@code org/opentripplanner/raptor/package.md}, section "Destination pareto-set".
  * <p>
- * Limitation: Time-shifting caused by constrained transfers and optimizations done after the
- * path is built is not included.
+ * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/8095">
+ *     This class duplicates logic found in Raptor and the path builder
+ * </a>.
  */
 public final class TimeShiftedDepartureTime<T extends RaptorTripSchedule> {
 

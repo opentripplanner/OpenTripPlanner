@@ -115,7 +115,7 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
     assertNotNull(result);
     assertEquals(C, result.vertex());
     assertNotNull(result.walkPath());
-    assertTrue(result.walkPath().getDuration() > 0);
+    assertTrue(result.walkPath().duration().isPositive());
   }
 
   @Test
@@ -131,9 +131,9 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
     assertEquals(C, result.vertex());
     assertNotNull(result.walkPath());
     // Walk path must be chronological: starts at C (the car-reachable vertex) and ends at A.
-    assertEquals(C, result.walkPath().states.getFirst().getVertex());
-    assertEquals(A, result.walkPath().states.getLast().getVertex());
-    assertTrue(result.walkPath().getDuration() > 0);
+    assertEquals(C, result.walkPath().states().getFirst().getVertex());
+    assertEquals(A, result.walkPath().lastState().getVertex());
+    assertTrue(result.walkPath().duration().isPositive());
   }
 
   /**
@@ -294,8 +294,8 @@ class CarReachableVertexSnapperTest extends GraphRoutingTest {
     assertNotNull(highResult);
     assertNotNull(lowResult.walkPath());
     assertNotNull(highResult.walkPath());
-    double lowWeight = lowResult.walkPath().getWeight();
-    double highWeight = highResult.walkPath().getWeight();
+    double lowWeight = lowResult.walkPath().weight();
+    double highWeight = highResult.walkPath().weight();
     assertTrue(lowWeight > 1, "Expected non-trivial low-reluctance weight, got " + lowWeight);
     assertTrue(highWeight > 1, "Expected non-trivial high-reluctance weight, got " + highWeight);
     assertTrue(

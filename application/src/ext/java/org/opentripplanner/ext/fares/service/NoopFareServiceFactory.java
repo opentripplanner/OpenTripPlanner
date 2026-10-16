@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.fares.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Create a FareServiceFactory which create a noop fare service. That is a fare service that does

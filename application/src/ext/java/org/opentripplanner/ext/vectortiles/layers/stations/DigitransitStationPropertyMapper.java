@@ -2,8 +2,6 @@ package org.opentripplanner.ext.vectortiles.layers.stations;
 
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +14,8 @@ import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
@@ -78,7 +78,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
           )
         )
       );
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new RuntimeException(e);
     }
   }

@@ -187,6 +187,7 @@ public class SpeedTest {
       transitRepository,
       timetableHandle.repositorySnapshot(transactionScope)
     );
+
     this.routingService = new DefaultRoutingService(
       this.transitService,
       graph,
@@ -208,7 +209,8 @@ public class SpeedTest {
       null,
       TestServerContext.createLinkingContextFactory(graph, vertexLinker, this.transitService),
       routerConfig.transitTuningConfig(),
-      routerConfig.transitTuningConfig()
+      routerConfig.transitTuningConfig(),
+      null
     );
 
     initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);

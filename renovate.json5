@@ -29,9 +29,7 @@
         "commons-cli:commons-cli",
         "org.processing:core",
         "edu.ucar:netcdf4",
-        "org.opentripplanner:ojp-java-model",
-        // not sure why, but this update creates an immortal PR, need to update manually when Entur is ready
-        "org.entur:netex-java-model"
+        "org.opentripplanner:ojp-java-model"
       ],
       "enabled": false
     },
@@ -198,6 +196,9 @@
         "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
+        "tools.jackson:{/,}**",
+        "tools.jackson.core:{/,}**",
+        "tools.jackson.datatype:{/,}**",
         "com.fasterxml.jackson:{/,}**",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
@@ -227,6 +228,8 @@
     {
       "groupName": "Jackson non-patch",
       "matchPackageNames": [
+        "tools.jackson.core:{/,}**",
+        "tools.jackson.datatype:{/,}**",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
       ],
