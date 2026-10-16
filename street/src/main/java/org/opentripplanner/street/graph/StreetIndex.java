@@ -19,6 +19,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +163,7 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, TransitStopVertex> indexStopIds(Graph graph) {
-    var vertices = graph.getVerticesOfType(TransitStopVertex.class);
+    var vertices = graph.findVertices(TransitStopVertex.class);
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
     for (TransitStopVertex it : vertices) {
       map.put(it.getId(), it);
@@ -171,9 +172,9 @@ class StreetIndex {
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
-    return graph
-      .getVerticesOfType(StationCentroidVertex.class)
-      .stream()
-      .collect(Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v));
+    var vertices = graph.findVertices(StationCentroidVertex.class);
+    return StreamUtils.ofIterable(vertices).collect(
+      Collectors.toUnmodifiableMap(StationCentroidVertex::getId, v -> v)
+    );
   }
 }

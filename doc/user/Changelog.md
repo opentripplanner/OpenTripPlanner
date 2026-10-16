@@ -28,6 +28,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - TransferPathLeg exposes the wrong toStop in reverse searches [#8062](https://github.com/opentripplanner/OpenTripPlanner/pull/8062)
 - Limit the number of issues per type in the data import report [#8063](https://github.com/opentripplanner/OpenTripPlanner/pull/8063)
 - Speed up island pruning by using int vertex IDs [#8071](https://github.com/opentripplanner/OpenTripPlanner/pull/8071)
+- Add 'time point' information to stop calls API [#8083](https://github.com/opentripplanner/OpenTripPlanner/pull/8083)
+- Fix replacementsExist reporting replacements for trips that are not replaced [#8091](https://github.com/opentripplanner/OpenTripPlanner/pull/8091)
+- Efficiently iterate over graph vertices [#7993](https://github.com/opentripplanner/OpenTripPlanner/pull/7993)
+- Convert stream to plain for-loop to speed up RAPTOR data building [#8045](https://github.com/opentripplanner/OpenTripPlanner/pull/8045)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
