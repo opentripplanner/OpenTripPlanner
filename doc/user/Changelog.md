@@ -32,6 +32,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix replacementsExist reporting replacements for trips that are not replaced [#8091](https://github.com/opentripplanner/OpenTripPlanner/pull/8091)
 - Efficiently iterate over graph vertices [#7993](https://github.com/opentripplanner/OpenTripPlanner/pull/7993)
 - Convert stream to plain for-loop to speed up RAPTOR data building [#8045](https://github.com/opentripplanner/OpenTripPlanner/pull/8045)
+- Transit shape simplification [#8001](https://github.com/opentripplanner/OpenTripPlanner/pull/8001)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
