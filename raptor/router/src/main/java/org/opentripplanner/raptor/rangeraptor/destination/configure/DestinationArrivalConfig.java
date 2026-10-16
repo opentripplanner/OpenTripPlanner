@@ -1,0 +1,166 @@
+package org.opentripplanner.raptor.rangeraptor.destination.configure;
+
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
+
+import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.DominanceFunction;
+import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrival;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalParetoSetComparators;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
+import org.opentripplanner.raptor.rangeraptor.destination.ForwardPathMapper;
+import org.opentripplanner.raptor.rangeraptor.destination.PathMapper;
+import org.opentripplanner.raptor.rangeraptor.destination.ReversePathMapper;
+import org.opentripplanner.raptor.rangeraptor.destination.TimeShiftedDepartureTime;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
+import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorStopNameResolver;
+import org.opentripplanner.raptor.spi.RaptorTripSchedule;
+import org.opentripplanner.raptor.spi.SearchDirection;
+import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
+
+/**
+ * This class is responsible for creating a a result collector - the set of paths.
+ * <p/>
+ * This class has REQUEST scope, so a new instance should be created for each new request/travel
+ * search.
+ *
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
+ */
+public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
+
+  private final SearchContext<T> ctx;
+
+  public DestinationArrivalConfig(SearchContext<T> context) {
+    this.ctx = context;
+  }
+
+  public DestinationArrivalPaths<T> createDestArrivalPathsStdSearch() {
+    ParetoComparator<DestinationArrival<T>> comparator =
+      DestinationArrivalParetoSetComparators.paretoComparator(
+        paretoSetTimeConfig(),
+        ctx.searchDirection(),
+        ParetoSetCost.NONE,
+        null,
+        null
+      );
+    return new DestinationArrivalPaths<>(
+      comparator,
+      ctx.calculator(),
+      null,
+      createDepartureTimeCalculator(ParetoSetCost.NONE),
+      ctx.slackProvider(),
+      createPathMapper(false),
+      ctx.debugFactory(),
+      ctx.stopNameResolver(),
+      ctx.lifeCycle()
+    );
+  }
+
+  /**
+   * Create a {@link DestinationArrivalPaths} for McRaptor.
+   *
+   * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
+   * @param c2Comp     Dominance function for c2; {@code null} means c2 is not used.
+   */
+  public DestinationArrivalPaths<T> createMcDestArrivalPaths(
+    ParetoSetCost costConfig,
+    DominanceFunction c2Comp
+  ) {
+    var relaxC1 = ctx.multiCriteria().relaxC1();
+    ParetoComparator<DestinationArrival<T>> comparator =
+      DestinationArrivalParetoSetComparators.paretoComparator(
+        paretoSetTimeConfig(),
+        ctx.searchDirection(),
+        costConfig,
+        relaxC1,
+        c2Comp
+      );
+    return new DestinationArrivalPaths<>(
+      comparator,
+      ctx.calculator(),
+      costConfig.useC1() ? ctx.costCalculator() : null,
+      createDepartureTimeCalculator(costConfig),
+      ctx.slackProvider(),
+      createPathMapper(costConfig.useC1()),
+      ctx.debugFactory(),
+      ctx.stopNameResolver(),
+      ctx.lifeCycle()
+    );
+  }
+
+  public ParetoComparator<RaptorPath<T>> createPathParetoComparator(
+    ParetoSetCost costConfig,
+    DominanceFunction c2Comp
+  ) {
+    var relaxC1 = ctx.multiCriteria().relaxC1();
+    return paretoComparator(paretoSetTimeConfig(), costConfig, relaxC1, c2Comp);
+  }
+
+  /* private members */
+
+  private ParetoSetTime paretoSetTimeConfig() {
+    boolean reverse = ctx.searchDirection().isInReverse();
+    boolean preferLatestDeparture = ctx.searchParams().preferLateArrival() != reverse;
+
+    if (ctx.searchParams().timetable()) {
+      return ParetoSetTime.USE_TIMETABLE;
+    }
+    return preferLatestDeparture
+      ? ParetoSetTime.USE_DEPARTURE_TIME
+      : ParetoSetTime.USE_ARRIVAL_TIME;
+  }
+
+  /**
+   * The time-shifted departure is only needed to calculate the duration or when the departure time
+   * is a criterion, and only for forward searches. The calculation is skipped for timetable
+   * searches and searches that only use the arrival time.
+   */
+  @Nullable
+  private TimeShiftedDepartureTime<T> createDepartureTimeCalculator(ParetoSetCost costConfig) {
+    boolean needed =
+      ctx.searchDirection().isForward() &&
+      switch (paretoSetTimeConfig()) {
+        case USE_ARRIVAL_TIME -> costConfig != ParetoSetCost.NONE;
+        case USE_DEPARTURE_TIME -> true;
+        default -> false;
+      };
+    return needed ? new TimeShiftedDepartureTime<>(ctx.raptorSlackProvider()) : null;
+  }
+
+  private PathMapper<T> createPathMapper(boolean includeCost) {
+    return createPathMapper(
+      ctx.searchDirection(),
+      ctx.raptorSlackProvider(),
+      includeCost ? ctx.costCalculator() : null,
+      ctx.stopNameResolver(),
+      ctx.transitData().transferConstraintsSearch()
+    );
+  }
+
+  private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
+    SearchDirection searchDirection,
+    RaptorSlackProvider slackProvider,
+    RaptorCostCalculator<S> costCalculator,
+    RaptorStopNameResolver stopNameResolver,
+    RaptorPathConstrainedTransferSearch<S> txConstraintsSearch
+  ) {
+    return searchDirection.isForward()
+      ? new ForwardPathMapper<>(
+          slackProvider,
+          costCalculator,
+          stopNameResolver,
+          txConstraintsSearch
+        )
+      : new ReversePathMapper<>(
+          slackProvider,
+          costCalculator,
+          stopNameResolver,
+          txConstraintsSearch
+        );
+  }
+}
