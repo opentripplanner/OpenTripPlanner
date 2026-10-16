@@ -71,7 +71,7 @@
         <logback.version>1.6.3</logback.version>
         <lucene.version>10.5.1</lucene.version>
         <micrometer.version>1.17.1</micrometer.version>
-        <netex2-java-model.version>3.0.0-SNAPSHOT</netex2-java-model.version>
+        <netex2-java-model.version>3.0.0</netex2-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.36.2</protobuf.version>
         <siri-java-model.version>2.0.9</siri-java-model.version>
@@ -530,16 +530,6 @@
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
             <url>https://repo.osgeo.org/repository/release/</url>
-        </repository>
-        <repository>
-            <id>maven-snapshots</id>
-            <url>https://central.sonatype.com/repository/maven-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
         </repository>
     </repositories>
 
