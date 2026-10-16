@@ -105,6 +105,7 @@ import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -215,6 +216,7 @@ class GraphQLIntegrationTest {
     var siteRepository = siteRepositoryBuilder.build();
     var transitRepository = new TransitRepository(siteRepository);
 
+    var timetableBuildRepository = new TimetableBuildRepository();
     var cal_id = FeedScopedIdForTestFactory.id("CAL_1");
     var trip = TransitRepositoryForTest.trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
@@ -251,7 +253,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    transitRepository.addTripPattern(id("pattern-1"), pattern);
+    timetableBuildRepository.addTripPattern(id("pattern-1"), pattern);
 
     // A trip whose visit at stop B is canceled (skipped), while it still calls at stops A and D.
     // Stop B is part of the stops query, so its canceledCalls field returns this skipped call.
@@ -276,7 +278,7 @@ class GraphQLIntegrationTest {
       .withStopPattern(TransitRepositoryForTest.stopPattern(A.stop, B.stop, D.stop))
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(canceledTripTimes))
       .build();
-    transitRepository.addTripPattern(id("canceled-pattern"), canceledPattern);
+    timetableBuildRepository.addTripPattern(id("canceled-pattern"), canceledPattern);
 
     var feedInfo = FeedInfoTestFactory.dummyForTest(FEED_ID);
     transitRepository.addFeedInfo(feedInfo);
@@ -298,13 +300,14 @@ class GraphQLIntegrationTest {
       cal_id,
       List.of(firstDate, secondDate, SERVICE_DATE)
     );
-    transitRepository.putServiceCode(cal_id, SERVICE_CODE);
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableBuildRepository.putServiceCode(cal_id, SERVICE_CODE);
+    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
+    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     timetableSnapshot.update(
       RealTimeTripUpdate.of(

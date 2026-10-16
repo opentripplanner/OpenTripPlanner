@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
@@ -29,18 +29,18 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
  */
 class ScheduledTripHandler {
 
-  private final TransitService transitService;
+  private final TransitRepository transitRepository;
   private final TimetableRepository buffer;
   private final TripTimesUpdater tripTimesUpdater;
   private final TripPatternCache tripPatternCache;
 
   ScheduledTripHandler(
-    TransitService transitService,
+    TransitRepository transitRepository,
     TimetableRepository buffer,
     TripTimesUpdater tripTimesUpdater,
     TripPatternCache tripPatternCache
   ) {
-    this.transitService = transitService;
+    this.transitRepository = transitRepository;
     this.buffer = buffer;
     this.tripTimesUpdater = tripTimesUpdater;
     this.tripPatternCache = tripPatternCache;
@@ -61,8 +61,8 @@ class ScheduledTripHandler {
       throw UpdateException.of(tripUpdate.tripId(), NO_UPDATES);
     }
 
-    var serviceId = transitService.getTrip(tripUpdate.tripId()).getServiceId();
-    var serviceDates = transitService.getTripCalendars().listServiceDates(serviceId);
+    var serviceId = buffer.getTrip(tripUpdate.tripId()).getServiceId();
+    var serviceDates = buffer.getTripCalendars().listServiceDates(serviceId);
     if (!serviceDates.contains(tripUpdate.startDate())) {
       throw UpdateException.of(tripUpdate.tripId(), NO_SERVICE_ON_DATE);
     }
@@ -81,9 +81,9 @@ class ScheduledTripHandler {
 
     Map<Integer, StopLocation> newStops = new HashMap<>();
     for (var entry : replacedStopIndices.entrySet()) {
-      var stop = transitService.getRegularStop(
-        new FeedScopedId(tripUpdate.tripId().getFeedId(), entry.getValue())
-      );
+      var stop = transitRepository
+        .getSiteRepository()
+        .getRegularStop(new FeedScopedId(tripUpdate.tripId().getFeedId(), entry.getValue()));
       if (stop != null) {
         newStops.put(entry.getKey(), stop);
       }
@@ -98,7 +98,7 @@ class ScheduledTripHandler {
         .replaceStops(newStops)
         .build();
 
-      final Trip trip = transitService.getTrip(tripUpdate.tripId());
+      final Trip trip = buffer.getTrip(tripUpdate.tripId());
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
         trip,
@@ -123,7 +123,7 @@ class ScheduledTripHandler {
   }
 
   private TripPattern getPatternForTripId(FeedScopedId tripId) {
-    Trip trip = transitService.getTrip(tripId);
-    return transitService.findPattern(trip);
+    Trip trip = buffer.getTrip(tripId);
+    return buffer.findPattern(trip);
   }
 }

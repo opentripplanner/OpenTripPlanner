@@ -10,7 +10,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.utils.collection.MinMap;
 
 /**
@@ -25,15 +25,20 @@ import org.opentripplanner.utils.collection.MinMap;
  */
 class PatternNearbyStopFilter implements NearbyStopFilter {
 
-  private final TransitService transitService;
+  private final SiteRepository siteRepository;
+  private final TripPatternsForStop patternsForStop;
 
-  PatternNearbyStopFilter(TransitService transitService) {
-    this.transitService = transitService;
+  /**
+   * @param patternsForStop the scheduled trip patterns visiting a stop
+   */
+  PatternNearbyStopFilter(SiteRepository siteRepository, TripPatternsForStop patternsForStop) {
+    this.siteRepository = siteRepository;
+    this.patternsForStop = patternsForStop;
   }
 
   @Override
   public boolean includeFromStop(FeedScopedId id, boolean reverseDirection) {
-    var stop = transitService.getRegularStop(id);
+    var stop = siteRepository.getRegularStop(id);
     boolean hasPatterns = !findPatternsForStop(stop, !reverseDirection).isEmpty();
     return hasPatterns || includeStopUsedRealtime(stop);
   }
@@ -50,7 +55,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
     Set<NearbyStop> uniqueStopsResult = new HashSet<>();
 
     for (var it : nearbyStops) {
-      StopLocation stop = transitService.getStopLocation(it.stopId());
+      StopLocation stop = siteRepository.getStopLocation(it.stopId());
 
       if (stop instanceof RegularStop regularStop) {
         var patternsForStop = findPatternsForStop(regularStop, reverseDirection);
@@ -74,8 +79,8 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
    * where we can board(forward direction) or alight(reverse direction) at the given stop.
    */
   private List<FeedScopedId> findPatternsForStop(RegularStop stop, boolean reverseDirection) {
-    return transitService
-      .findPatterns(stop)
+    return patternsForStop
+      .findPatterns(stop.getId())
       .stream()
       .filter(reverseDirection ? p -> p.alightingExist(stop) : p -> p.boardingExist(stop))
       .map(TripPattern::getId)

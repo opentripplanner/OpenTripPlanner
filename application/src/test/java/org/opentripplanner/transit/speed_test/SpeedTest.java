@@ -41,6 +41,7 @@ import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFacto
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -92,6 +93,7 @@ public class SpeedTest {
     RouterConfig routerConfig,
     Graph graph,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository
   ) {
     this.opts = opts;
@@ -111,9 +113,12 @@ public class SpeedTest {
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
     TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
+    // Converted once, as on server startup, and shared by the Raptor mapping and the services
+    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
 
@@ -123,7 +128,7 @@ public class SpeedTest {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle =
       registry.registerRepositorySnapshot(
@@ -159,6 +164,10 @@ public class SpeedTest {
       new DefaultVehicleRentalRepository(),
       new DefaultVehicleParkingRepository(),
       transitRepository,
+      new DefaultTransitService(
+        transitRepository,
+        DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
+      ),
       // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling
       // repository nor a resolver.
       null,
@@ -232,6 +241,7 @@ public class SpeedTest {
       OtpStartupInfo.logInfo("Run Speed Test");
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var transitRepository = model.transitRepository();
+      var timetableBuildRepository = model.timetableBuildRepository();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
@@ -243,6 +253,7 @@ public class SpeedTest {
         routerConfig,
         graph,
         transitRepository,
+        timetableBuildRepository,
         transferRepository
       );
 

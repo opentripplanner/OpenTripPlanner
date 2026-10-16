@@ -80,7 +80,6 @@ public interface TransitService {
   Collection<String> listFeedIds();
 
   Collection<Agency> listAgencies();
-  Optional<Agency> findAgency(FeedScopedId id);
 
   FeedInfo getFeedInfo(String feedId);
 

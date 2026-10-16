@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
@@ -8,7 +9,9 @@ import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.r
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.stopPattern;
 import static org.opentripplanner.transit.model._data.TransitRepositoryForTest.tripPattern;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -18,10 +21,12 @@ import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.CarAccess;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -40,9 +45,11 @@ class TransitRepositoryTest {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
+    var timetableBuildRepository = new TimetableBuildRepository();
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
+      timetableBuildRepository,
       ConstantsForTests.SIMPLE_GTFS,
       new GtfsFareServiceFactory(),
       FAKE_FEED_ID
@@ -52,9 +59,9 @@ class TransitRepositoryTest {
     assertEquals("America/New_York", transitRepository.getTimeZone().getId());
 
     // Then trip times should be same as in input data
-    TransitRepositoryIndex transitRepositoryIndex = transitRepository.getTransitRepositoryIndex();
-    Trip trip = transitRepositoryIndex.getTripForId(SAMPLE_TRIP_ID);
-    Timetable timetable = transitRepositoryIndex.getPatternForTrip(trip).getScheduledTimetable();
+    var scheduledEntities = timetableBuildRepository.toScheduledTimetableData();
+    Trip trip = scheduledEntities.getTripForId(SAMPLE_TRIP_ID);
+    Timetable timetable = scheduledEntities.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
 
     // Should throw on second bundle, with different agency time zone
@@ -64,6 +71,7 @@ class TransitRepositoryTest {
         ConstantsForTests.addGtfsToGraph(
           graph,
           transitRepository,
+          timetableBuildRepository,
           RESOURCE_LOADER.file("kcm_gtfs.zip"),
           new GtfsFareServiceFactory(),
           null
@@ -80,6 +88,7 @@ class TransitRepositoryTest {
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
 
+    var timetableBuildRepository = new TimetableBuildRepository();
     // Whit explicit time zone
     transitRepository.initTimeZone(ZoneIds.CHICAGO);
 
@@ -87,6 +96,7 @@ class TransitRepositoryTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
+      timetableBuildRepository,
       ConstantsForTests.SIMPLE_GTFS,
       new GtfsFareServiceFactory(),
       FAKE_FEED_ID
@@ -96,21 +106,22 @@ class TransitRepositoryTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
+      timetableBuildRepository,
       RESOURCE_LOADER.file("kcm_gtfs.zip"),
       new GtfsFareServiceFactory(),
       null
     );
 
-    new TimeZoneAdjusterModule(transitRepository).buildGraph();
+    new TimeZoneAdjusterModule(transitRepository, timetableBuildRepository).buildGraph();
 
-    TransitRepositoryIndex transitRepositoryIndex = transitRepository.getTransitRepositoryIndex();
+    var scheduledEntities = timetableBuildRepository.toScheduledTimetableData();
 
     // Then time zone should match the one provided in the feed
     assertEquals("America/Chicago", transitRepository.getTimeZone().getId());
 
     // Then trip times should be on hour less than in input data
-    Trip trip = transitRepositoryIndex.getTripForId(SAMPLE_TRIP_ID);
-    Timetable timetable = transitRepositoryIndex.getPatternForTrip(trip).getScheduledTimetable();
+    Trip trip = scheduledEntities.getTripForId(SAMPLE_TRIP_ID);
+    Timetable timetable = scheduledEntities.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60 - 60 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
   }
 
@@ -124,8 +135,40 @@ class TransitRepositoryTest {
   }
 
   @Test
-  void testGetStopLocationsUsedForBikesAllowedTrips() {
+  void findAgencyById() {
     var repo = new TransitRepository();
+    var agency = TransitRepositoryForTest.AGENCY;
+    repo.addAgency(agency);
+    repo.index();
+
+    assertEquals(Optional.of(agency), repo.findAgencyById(agency.getId()));
+    assertEquals(Optional.empty(), repo.findAgencyById(id("unknown-agency")));
+  }
+
+  @Test
+  void getOperator() {
+    var repo = new TransitRepository();
+    var operator = Operator.of(id("operator-1")).withName("Operator 1").build();
+    repo.index();
+    // Adding operators invalidates the index, so they are found after re-indexing
+    repo.addOperators(List.of(operator));
+    repo.index();
+
+    assertEquals(operator, repo.getOperator(operator.getId()));
+    assertNull(repo.getOperator(id("unknown-operator")));
+  }
+
+  @Test
+  void lookupsRequireIndex() {
+    var repo = new TransitRepository();
+
+    assertThrows(IllegalStateException.class, () -> repo.findAgencyById(id("agency")));
+    assertThrows(IllegalStateException.class, () -> repo.getOperator(id("operator")));
+  }
+
+  @Test
+  void testGetStopLocationsUsedForBikesAllowedTrips() {
+    var repoBuildRepository = new TimetableBuildRepository();
     var S11 = TransitRepositoryForTest.of().stop("S11").build();
     var S12 = TransitRepositoryForTest.of().stop("S12").build();
     var S13 = TransitRepositoryForTest.of().stop("S13").build();
@@ -158,14 +201,17 @@ class TransitRepositoryTest {
         )
       )
       .build();
-    repo.addTripPattern(id("TP1"), TP1);
-    repo.addTripPattern(id("TP2"), TP2);
-    assertEquals(Set.of(S21, S22, S23), repo.getStopLocationsUsedForBikesAllowedTrips());
+    repoBuildRepository.addTripPattern(id("TP1"), TP1);
+    repoBuildRepository.addTripPattern(id("TP2"), TP2);
+    assertEquals(
+      Set.of(S21, S22, S23),
+      repoBuildRepository.getStopLocationsUsedForBikesAllowedTrips()
+    );
   }
 
   @Test
   void testGetStopLocationsUsedForCarsAllowedTrips() {
-    var repo = new TransitRepository();
+    var repoBuildRepository = new TimetableBuildRepository();
     var S11 = TransitRepositoryForTest.of().stop("S11").build();
     var S12 = TransitRepositoryForTest.of().stop("S12").build();
     var S13 = TransitRepositoryForTest.of().stop("S13").build();
@@ -198,8 +244,11 @@ class TransitRepositoryTest {
         )
       )
       .build();
-    repo.addTripPattern(id("TP1"), TP1);
-    repo.addTripPattern(id("TP2"), TP2);
-    assertEquals(Set.of(S21, S22, S23), repo.getStopLocationsUsedForCarsAllowedTrips());
+    repoBuildRepository.addTripPattern(id("TP1"), TP1);
+    repoBuildRepository.addTripPattern(id("TP2"), TP2);
+    assertEquals(
+      Set.of(S21, S22, S23),
+      repoBuildRepository.getStopLocationsUsedForCarsAllowedTrips()
+    );
   }
 }

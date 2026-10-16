@@ -17,6 +17,7 @@ import org.opentripplanner.place.api.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -24,6 +25,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -62,6 +64,9 @@ public class PlaceFinderTraverseVisitorTest {
       .build()
   );
 
+  static final TimetableBuildRepository TIMETABLE_REPO_BUILD_REPOSITORY =
+    new TimetableBuildRepository();
+
   static {
     TripPatternBuilder t = tripPattern("trip", R);
     var st1 = new StopTime();
@@ -72,24 +77,29 @@ public class PlaceFinderTraverseVisitorTest {
     st2.setStop(STOP2);
     st2.setArrivalTime(T11_05);
     t.withStopPattern(new StopPattern(List.of(st1, st2)));
-    TIMETABLE_REPO.addTripPattern(id("tp1"), t.build());
+    TIMETABLE_REPO_BUILD_REPOSITORY.addTripPattern(id("tp1"), t.build());
 
     var st3 = new StopTime();
     st3.setStop(STOP3);
     st3.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st3)));
-    TIMETABLE_REPO.addTripPattern(id("tp2"), t.build());
+    TIMETABLE_REPO_BUILD_REPOSITORY.addTripPattern(id("tp2"), t.build());
 
     var st4 = new StopTime();
     st4.setStop(STOP4);
     st4.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st4)));
-    TIMETABLE_REPO.addTripPattern(id("tp3"), t.build());
+    TIMETABLE_REPO_BUILD_REPOSITORY.addTripPattern(id("tp3"), t.build());
 
     TIMETABLE_REPO.index();
   }
 
-  static DefaultTransitService transitService = new DefaultTransitService(TIMETABLE_REPO);
+  static DefaultTransitService transitService = new DefaultTransitService(
+    TIMETABLE_REPO,
+    DefaultTimetableRepository.scheduledOnly(
+      TIMETABLE_REPO_BUILD_REPOSITORY.toScheduledTimetableData()
+    )
+  );
 
   @Test
   void stopsOnly() {

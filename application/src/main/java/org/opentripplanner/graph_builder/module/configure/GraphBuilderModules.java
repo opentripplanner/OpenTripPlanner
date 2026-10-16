@@ -53,6 +53,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -128,6 +129,7 @@ public class GraphBuilderModules {
     Graph graph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     FareServiceFactory fareServiceFactory
@@ -139,6 +141,7 @@ public class GraphBuilderModules {
     return new GtfsModule(
       gtfsBundles,
       transitRepository,
+      timetableBuildRepository,
       streetDetailsRepository,
       graph,
       deduplicator,
@@ -159,6 +162,7 @@ public class GraphBuilderModules {
     Graph graph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore
@@ -166,6 +170,7 @@ public class GraphBuilderModules {
     return new NetexConfigure(config).createNetexModule(
       dataSources.getNetexConfiguredDataSource(),
       transitRepository,
+      timetableBuildRepository,
       parkingRepository,
       streetDetailsRepository,
       graph,
@@ -180,10 +185,18 @@ public class GraphBuilderModules {
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
-    return new StreetLinkerModule(graph, linker, parkingRepository, transitRepository, issueStore);
+    return new StreetLinkerModule(
+      graph,
+      linker,
+      parkingRepository,
+      transitRepository,
+      timetableBuildRepository,
+      issueStore
+    );
   }
 
   @Provides
@@ -207,6 +220,7 @@ public class GraphBuilderModules {
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
@@ -222,7 +236,14 @@ public class GraphBuilderModules {
       graph,
       transitRepository,
       issueStore,
-      new StreetLinkerModule(graph, linker, parkingRepository, transitRepository, issueStore),
+      new StreetLinkerModule(
+        graph,
+        linker,
+        parkingRepository,
+        transitRepository,
+        timetableBuildRepository,
+        issueStore
+      ),
       parameters
     );
   }
@@ -263,12 +284,14 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferGenerator(
       graph,
       transitRepository,
+      timetableBuildRepository,
       transferRepository,
       issueStore,
       config.regularTransferParameters()
@@ -341,12 +364,13 @@ public class GraphBuilderModules {
   @Nullable
   static StopConsolidationModule providesStopConsolidationModule(
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources
   ) {
     return dataSources
       .stopConsolidation()
-      .map(ds -> StopConsolidationModule.of(transitRepository, repo, ds))
+      .map(ds -> StopConsolidationModule.of(transitRepository, timetableBuildRepository, repo, ds))
       .orElse(null);
   }
 

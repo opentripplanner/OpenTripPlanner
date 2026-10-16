@@ -10,7 +10,6 @@ import java.time.Month;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -18,6 +17,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 
 /**
  * Tests for {@link TripUpdateApplier}, covering the three-phase update logic that was
@@ -75,7 +75,7 @@ class TripUpdateApplierTest {
   private static DefaultTimetableRepository createBuffer() {
     return new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
   }
 

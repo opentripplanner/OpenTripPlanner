@@ -39,6 +39,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -70,6 +71,7 @@ public class SerializedGraphObject implements Serializable {
 
   public final StreetDetailsRepository streetDetailsRepository;
   public final TransitRepository transitRepository;
+  public final TimetableBuildRepository timetableBuildRepository;
   public final TransferRepository transferRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
@@ -105,6 +107,7 @@ public class SerializedGraphObject implements Serializable {
     StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
     TransitRepository transitRepository,
+    TimetableBuildRepository timetableBuildRepository,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -123,6 +126,7 @@ public class SerializedGraphObject implements Serializable {
     this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;
     this.transitRepository = transitRepository;
+    this.timetableBuildRepository = timetableBuildRepository;
     this.transferRepository = transferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
@@ -296,7 +300,7 @@ public class SerializedGraphObject implements Serializable {
     var nTransfers = f.formatNumber(
       transitRepository.getConstrainedTransferService().listAll().size()
     );
-    var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
+    var nPatterns = f.formatNumber(timetableBuildRepository.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(edges.size());
 

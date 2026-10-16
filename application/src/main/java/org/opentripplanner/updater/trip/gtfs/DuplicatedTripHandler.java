@@ -11,7 +11,6 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TripUpdateApplier;
@@ -22,16 +21,10 @@ import org.opentripplanner.updater.trip.gtfs.model.TripUpdate;
 /// Creates a copy of a scheduled trip shifted to a new start time (and service date).
 class DuplicatedTripHandler {
 
-  private final TransitService transitService;
   private final TimetableRepository buffer;
   private final DeduplicatorService deduplicator;
 
-  DuplicatedTripHandler(
-    TransitService transitService,
-    TimetableRepository buffer,
-    DeduplicatorService deduplicator
-  ) {
-    this.transitService = transitService;
+  DuplicatedTripHandler(TimetableRepository buffer, DeduplicatorService deduplicator) {
     this.buffer = buffer;
     this.deduplicator = deduplicator;
   }
@@ -47,7 +40,7 @@ class DuplicatedTripHandler {
     }
     tripUpdate.validateDuplicated();
 
-    var originalTrip = transitService.getTrip(tripUpdate.tripId());
+    var originalTrip = buffer.getTrip(tripUpdate.tripId());
     if (originalTrip == null) {
       throw UpdateException.of(tripUpdate.tripId(), TRIP_NOT_FOUND);
     }
@@ -59,7 +52,7 @@ class DuplicatedTripHandler {
 
     // Look up the original trip's pattern and scheduled times
 
-    var originalPattern = transitService.findPattern(originalTrip);
+    var originalPattern = buffer.findPattern(originalTrip);
     var originalScheduledTimes = (ScheduledTripTimes) originalPattern
       .getScheduledTimetable()
       .getTripTimes(tripUpdate.tripId());
@@ -77,7 +70,7 @@ class DuplicatedTripHandler {
       .build();
 
     // Shift all scheduled times and rebind to the new trip
-    int serviceCode = transitService.getTripCalendars().getServiceCode(serviceId);
+    int serviceCode = buffer.getTripCalendars().getServiceCode(serviceId);
     var newScheduledTimes = originalScheduledTimes
       .copyOf(deduplicator)
       .withTrip(newTrip)

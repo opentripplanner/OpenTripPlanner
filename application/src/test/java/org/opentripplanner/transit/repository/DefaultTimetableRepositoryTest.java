@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.repository;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,6 +28,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -56,11 +58,12 @@ public class DefaultTimetableRepositoryTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
+    TimetableBuildRepository timetableBuildRepository = model.timetableBuildRepository();
 
     feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : timetableBuildRepository.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
@@ -79,7 +82,7 @@ public class DefaultTimetableRepositoryTest {
   void testUniqueDirtyTimetablesAfterMultipleUpdates() {
     DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
@@ -136,10 +139,67 @@ public class DefaultTimetableRepositoryTest {
   }
 
   @Test
+  void findPatternsForStop() {
+    var testModel = TransitRepositoryForTest.of();
+    var stopA = testModel.stop("A").build();
+    var stopB = testModel.stop("B").build();
+    var route = TransitRepositoryForTest.route("R").build();
+    var stopPattern = TransitRepositoryForTest.stopPattern(stopA, stopB);
+    var scheduledPattern = TransitRepositoryForTest.tripPattern("SCHEDULED", route)
+      .withStopPattern(stopPattern)
+      .build();
+    var realTimePattern = TransitRepositoryForTest.tripPattern("REAL_TIME", route)
+      .withStopPattern(stopPattern)
+      .withRealTimeAddedTrip()
+      .build();
+    var buildRepository = new TimetableBuildRepository();
+    buildRepository.addTripPattern(scheduledPattern.getId(), scheduledPattern);
+    var subject = new DefaultTimetableRepository(
+      RaptorTransitDataTestFactory.empty(),
+      buildRepository.toScheduledTimetableData()
+    );
+    var tripTimes = ScheduledTripTimes.of()
+      .withTrip(TransitRepositoryForTest.trip("T").withRoute(route).build())
+      .withDepartureTimes(new int[] { 0, 60 })
+      .build();
+    subject.update(RealTimeTripUpdate.of(realTimePattern, tripTimes, SERVICE_DATE).build());
+
+    assertThat(subject.findPatterns(stopA)).containsExactly(scheduledPattern);
+    assertThat(subject.findPatterns(stopA, false)).containsExactly(scheduledPattern);
+    assertThat(subject.findPatterns(stopA, true)).containsExactly(
+      scheduledPattern,
+      realTimePattern
+    );
+  }
+
+  @Test
+  void findReplacedByCombinesScheduledAndRealTimeReplacements() {
+    var trip = TransitRepositoryForTest.trip("REPLACED").build();
+    var replaced = TripOnServiceDate.of(trip.getId())
+      .withTrip(trip)
+      .withServiceDate(SERVICE_DATE)
+      .build();
+    var scheduledReplacement = TripOnServiceDate.of(new FeedScopedId(feedId, "SCHEDULED"))
+      .withTrip(TransitRepositoryForTest.trip("SCHEDULED").build())
+      .withServiceDate(SERVICE_DATE)
+      .withReplacementFor(List.of(replaced))
+      .build();
+    var buildRepository = new TimetableBuildRepository();
+    buildRepository.addTripOnServiceDate(scheduledReplacement);
+    var subject = new DefaultTimetableRepository(
+      RaptorTransitDataTestFactory.empty(),
+      buildRepository.toScheduledTimetableData()
+    );
+
+    assertThat(subject.findReplacedBy(replaced.getId())).containsExactly(scheduledReplacement);
+    assertThat(subject.findReplacedBy(scheduledReplacement.getId())).isEmpty();
+  }
+
+  @Test
   void testClear() {
     DefaultTimetableRepository snapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     Trip trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
@@ -231,7 +291,8 @@ public class DefaultTimetableRepositoryTest {
       TripCalendars.empty(),
       RaptorTransitDataTestFactory.empty(),
       false,
-      new TimetableUpdateMapper()
+      new TimetableUpdateMapper(),
+      ScheduledTimetableData.empty()
     );
     assertFalse(snapshot.isEmpty());
     snapshot.clear(id.getFeedId());
@@ -256,7 +317,7 @@ public class DefaultTimetableRepositoryTest {
   private static DefaultTimetableRepository createCommittedSnapshot() {
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
     return timetableSnapshot.commit(true);
   }

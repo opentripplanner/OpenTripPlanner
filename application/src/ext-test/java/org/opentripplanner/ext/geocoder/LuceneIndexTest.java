@@ -23,6 +23,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -31,6 +32,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -123,8 +125,12 @@ class LuceneIndexTest {
       siteRepository::withStation
     );
     var transitRepository = new TransitRepository(siteRepository.build());
+    var timetableBuildRepository = new TimetableBuildRepository();
     transitRepository.index();
-    var transitService = new DefaultTransitService(transitRepository) {
+    var transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+    ) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
         StopLocation,
         TransitMode

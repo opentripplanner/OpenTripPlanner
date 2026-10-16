@@ -4,7 +4,9 @@ import gnu.trove.TCollections;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -151,6 +153,34 @@ public class TripCalendars implements Serializable {
 
   public Optional<LocalDate> endDate() {
     return Optional.ofNullable(endDate);
+  }
+
+  /**
+   * The time when the transit service starts, in the given time zone. EPOCH if there is no
+   * transit.
+   */
+  public Instant transitServiceStarts(ZoneId timeZone) {
+    return startDate()
+      .map(serviceDate -> ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant())
+      .orElse(Instant.EPOCH);
+  }
+
+  /**
+   * The time when the transit service ends, in the given time zone. EPOCH if there is no transit.
+   */
+  public Instant transitServiceEnds(ZoneId timeZone) {
+    return endDate()
+      .map(serviceDate ->
+        ServiceDateUtils.asStartOfService(serviceDate.plusDays(1), timeZone).toInstant()
+      )
+      .orElse(Instant.EPOCH);
+  }
+
+  /** True if the transit service period covers the given instant. */
+  public boolean transitServiceCovers(Instant time, ZoneId timeZone) {
+    return (
+      !time.isBefore(transitServiceStarts(timeZone)) && time.isBefore(transitServiceEnds(timeZone))
+    );
   }
 
   public boolean isEmpty() {
