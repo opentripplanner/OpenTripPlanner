@@ -26,8 +26,8 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

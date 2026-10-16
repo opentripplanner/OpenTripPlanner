@@ -3,7 +3,7 @@ package org.opentripplanner.transit.configure;
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 
 /**
  * Provides the empty {@link TimetableBuildRepository} populated by the graph build. When a graph

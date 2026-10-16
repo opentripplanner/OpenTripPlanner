@@ -7,8 +7,8 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**

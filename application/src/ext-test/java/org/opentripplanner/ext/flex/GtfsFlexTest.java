@@ -11,7 +11,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**

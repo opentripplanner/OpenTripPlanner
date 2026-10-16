@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -18,7 +19,6 @@ import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.opentripplanner.transit.service.SiteRepository;
 
 public class TransitTestEnvironmentBuilder {

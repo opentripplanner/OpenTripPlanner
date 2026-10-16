@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -65,7 +66,7 @@ public final class ScheduledTimetableData {
    * @param tripCalendars the scheduled trip calendars; the service codes running on each date are
    *                      computed here
    */
-  static ScheduledTimetableData of(
+  public static ScheduledTimetableData of(
     Map<FeedScopedId, TripPattern> tripPatternForId,
     Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById,
     Map<FeedScopedId, FlexTrip<?, ?>> flexTripForId,

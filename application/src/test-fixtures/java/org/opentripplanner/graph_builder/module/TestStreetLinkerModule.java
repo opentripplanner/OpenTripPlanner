@@ -5,7 +5,7 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 public class TestStreetLinkerModule {

@@ -12,8 +12,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
 
 class StopConsolidationModuleTest {
 

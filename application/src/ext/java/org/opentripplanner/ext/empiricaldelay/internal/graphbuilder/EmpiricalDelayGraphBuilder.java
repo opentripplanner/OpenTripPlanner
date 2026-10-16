@@ -15,9 +15,9 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

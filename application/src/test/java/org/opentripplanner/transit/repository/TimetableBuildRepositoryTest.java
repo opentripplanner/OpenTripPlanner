@@ -7,6 +7,7 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;

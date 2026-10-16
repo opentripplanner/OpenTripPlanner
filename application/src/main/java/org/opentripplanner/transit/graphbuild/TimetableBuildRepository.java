@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.repository;
+package org.opentripplanner.transit.graphbuild;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +21,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 
 /**
  * The scheduled timetable data while the graph is being built: trip patterns, trips on service

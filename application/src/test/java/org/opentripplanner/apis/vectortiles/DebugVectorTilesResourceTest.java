@@ -11,7 +11,7 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.service.TransitRepository;
 
 class DebugVectorTilesResourceTest {

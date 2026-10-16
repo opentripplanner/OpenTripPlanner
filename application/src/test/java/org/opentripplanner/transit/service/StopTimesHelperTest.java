@@ -18,9 +18,9 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.CancellationPolicy;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
-import org.opentripplanner.transit.repository.TimetableBuildRepository;
 
 class StopTimesHelperTest {
 
