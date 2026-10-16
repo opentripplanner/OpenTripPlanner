@@ -59,8 +59,7 @@ class StopTimeMapper {
 
     lhs.setTrip(tripMapper.map(rhs.getTrip()));
     var stopLocation = rhs.getStopLocation();
-    Objects.requireNonNull(
-      stopLocation,
+    Objects.requireNonNull(stopLocation, () ->
       "Trip %s contains stop_time with no stop, location or group.".formatted(rhs.getTrip())
     );
     switch (stopLocation) {

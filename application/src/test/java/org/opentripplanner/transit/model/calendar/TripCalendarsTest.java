@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.calendar;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -65,6 +66,19 @@ class TripCalendarsTest {
       throw new AssertionError("onUpdate must not fire again for an already-registered date");
     });
     assertEquals(serviceId, sameServiceId);
+  }
+
+  @Test
+  void withNextServiceCodesAssignsSequentialCodesAfterExistingOnes() {
+    var a = FeedScopedIdForTestFactory.id("A");
+    var b = FeedScopedIdForTestFactory.id("B");
+    var c = FeedScopedIdForTestFactory.id("C");
+    TripCalendars calendar = TripCalendars.empty().withServiceCode(a, 0);
+
+    TripCalendars updated = calendar.withNextServiceCodes(List.of(b, c));
+
+    assertThat(updated.getServiceCodes()).containsExactly(a, 0, b, 1, c, 2);
+    assertThat(calendar.getServiceCodes()).containsExactly(a, 0);
   }
 
   private static TripCalendars calendarWithRange() {

@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.Collection;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.FeedInfo;
@@ -67,9 +66,7 @@ public class AddTransitEntitiesToTimetable {
 
   private void addServices(TransitRepository transitRepository) {
     /* Assign 0-based numeric codes to all GTFS service IDs. */
-    for (FeedScopedId serviceId : dataImport.getAllServiceIds()) {
-      transitRepository.putServiceCode(serviceId, transitRepository.getServiceCodes().size());
-    }
+    transitRepository.addNextServiceCodes(dataImport.getAllServiceIds());
   }
 
   private void addTripPatterns(TransitRepository transitRepository) {
