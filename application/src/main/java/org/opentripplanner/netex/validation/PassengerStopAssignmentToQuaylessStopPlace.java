@@ -5,8 +5,10 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
+import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
 
 /**
@@ -46,12 +48,24 @@ class PassengerStopAssignmentToQuaylessStopPlace
 
   private static boolean isUsable(JAXBElement<?> element) {
     if (element.getValue() instanceof Quay q) {
-      // we could use the WgsCoordinateMapper to check for more invalid data
       return Optional.ofNullable(q.getCentroid())
-        .map(c -> c.getLocation())
+        .map(SimplePoint_VersionStructure::getLocation)
+        .filter(PassengerStopAssignmentToQuaylessStopPlace::hasCoordinate)
         .isPresent();
     }
     // could be a QuayRef which we don't support (yet)
     return false;
+  }
+
+  /**
+   * Mirrors the coordinate rules of the stop mapping (see {@code WgsCoordinateMapper}): a location
+   * is usable if it has both latitude and longitude, or a GML position with 2 or 3 values.
+   */
+  private static boolean hasCoordinate(LocationStructure location) {
+    if (location.getLatitude() != null && location.getLongitude() != null) {
+      return true;
+    }
+    var pos = location.getPos();
+    return pos != null && (pos.getValue().size() == 2 || pos.getValue().size() == 3);
   }
 }

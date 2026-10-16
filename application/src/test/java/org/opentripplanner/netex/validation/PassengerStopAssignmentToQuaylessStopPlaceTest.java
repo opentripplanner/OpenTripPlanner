@@ -4,12 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.DISCARD;
 import static org.opentripplanner.netex.index.api.HMapValidationRule.Status.OK;
 
+import java.math.BigDecimal;
+import net.opengis.gml._3.DirectPositionType;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.api.HMapValidationRule.Status;
+import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.QuayRefStructure;
+import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
 
 class PassengerStopAssignmentToQuaylessStopPlaceTest {
@@ -63,6 +67,39 @@ class PassengerStopAssignmentToQuaylessStopPlaceTest {
   @Test
   void stopPlaceWithOnlyQuayWithoutCoordinates() {
     var quay = NetexTestDataSupport.createQuay().withCentroid(null);
+    var stopPlace = NetexTestDataSupport.createStopPlace(quay);
+
+    assertEquals(DISCARD, validate(stopPlace));
+  }
+
+  @Test
+  void stopPlaceWithOnlyQuayWithCentroidWithoutLatitude() {
+    var centroid = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withLongitude(BigDecimal.valueOf(10.75))
+    );
+    var quay = NetexTestDataSupport.createQuay().withCentroid(centroid);
+    var stopPlace = NetexTestDataSupport.createStopPlace(quay);
+
+    assertEquals(DISCARD, validate(stopPlace));
+  }
+
+  @Test
+  void stopPlaceWithOnlyQuayWithCentroidPos() {
+    var centroid = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withPos(new DirectPositionType().withValue(59.9, 10.75))
+    );
+    var quay = NetexTestDataSupport.createQuay().withCentroid(centroid);
+    var stopPlace = NetexTestDataSupport.createStopPlace(quay);
+
+    assertEquals(OK, validate(stopPlace));
+  }
+
+  @Test
+  void stopPlaceWithOnlyQuayWithCentroidEmptyPos() {
+    var centroid = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withPos(new DirectPositionType())
+    );
+    var quay = NetexTestDataSupport.createQuay().withCentroid(centroid);
     var stopPlace = NetexTestDataSupport.createStopPlace(quay);
 
     assertEquals(DISCARD, validate(stopPlace));
