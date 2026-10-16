@@ -190,9 +190,7 @@ class FlexStopsMapper {
   @Nullable
   private TransitMode mapTransitMode(FlexibleStopPlace flexibleStopPlace) {
     try {
-      return transportModeMapper.mapAllVehicleModesOfTransport(
-        flexibleStopPlace.getTransportMode()
-      );
+      return transportModeMapper.mapAllPublicTransportModes(flexibleStopPlace.getTransportMode());
     } catch (TransportModeMapper.UnsupportedModeException e) {
       return null;
     }

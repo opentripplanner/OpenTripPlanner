@@ -5,7 +5,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.organization.OperatorBuilder;
-import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Maps a Netex operator to OTP Operator.
@@ -21,14 +20,11 @@ class OperatorToAgencyMapper {
   }
 
   Operator mapOperator(org.entur.netex2.model.Operator source) {
-    final String name;
-    String sourceName = MultilingualStringMapper.getStringValue(source.getName());
-    if (source.getName() == null || StringUtils.hasNoValue(sourceName)) {
+    String name = MultilingualStringMapper.nullableValueOf(source.getName());
+    if (name == null) {
       issueStore.add("MissingOperatorName", "Missing name for operator %s", source.getId());
       // fall back to NeTEx id when the operator name is missing
       name = source.getId();
-    } else {
-      name = sourceName;
     }
     var target = Operator.of(idFactory.createId(source.getId())).withName(name);
 
