@@ -9,8 +9,10 @@ import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -65,7 +67,18 @@ class QuayMapper {
     NetexMainAndSubMode transitMode,
     Accessibility wheelchair
   ) {
-    var coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
+    WgsCoordinate coordinate;
+    try {
+      coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
+    } catch (InvalidCoordinateException e) {
+      issueStore.add(
+        "QuayInvalidCoordinates",
+        "Quay %s has invalid coordinates and is skipped. %s",
+        quay.getId(),
+        e.getMessage()
+      );
+      return null;
+    }
 
     if (coordinate == null) {
       issueStore.add(
@@ -99,7 +112,7 @@ class QuayMapper {
       .withDescription(
         NonLocalizedString.ofNullable(quay.getDescription(), MultilingualString::getValue)
       )
-      .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
+      .withCoordinate(coordinate)
       .withWheelchairAccessibility(wheelchair)
       .withVehicleType(transitMode.mainMode())
       .withNetexVehicleSubmode(subMode)

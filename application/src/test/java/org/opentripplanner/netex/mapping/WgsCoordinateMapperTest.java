@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.math.BigDecimal;
 import net.opengis.gml._3.DirectPositionType;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.netex.mapping.WgsCoordinateMapper.InvalidCoordinateException;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
@@ -21,8 +22,12 @@ class WgsCoordinateMapperTest {
   private static final double LATITUDE_VALUE = 11.1;
   private static final BigDecimal LATITUDE = BigDecimal.valueOf(LATITUDE_VALUE);
 
+  /** A latitude which lost its decimal point, as seen in real data. */
+  private static final BigDecimal LATITUDE_OUT_OF_RANGE = BigDecimal.valueOf(56162332.0);
+  private static final BigDecimal LONGITUDE_OUT_OF_RANGE = BigDecimal.valueOf(-180.1);
+
   @Test
-  void handleCoordinatesWithValuesSet() {
+  void handleCoordinatesWithValuesSet() throws InvalidCoordinateException {
     // Given a valid point
     final SimplePoint_VersionStructure point = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withLongitude(LONGITUDE).withLatitude(LATITUDE)
@@ -37,12 +42,12 @@ class WgsCoordinateMapperTest {
   }
 
   @Test
-  void handleCoordinatesWithMissingPoint() {
+  void handleCoordinatesWithMissingPoint() throws InvalidCoordinateException {
     assertNull(WgsCoordinateMapper.mapToDomain(null));
   }
 
   @Test
-  void handleCoordinatesWithMissingLocation() {
+  void handleCoordinatesWithMissingLocation() throws InvalidCoordinateException {
     SimplePoint_VersionStructure p = new SimplePoint_VersionStructure();
     assertNull(WgsCoordinateMapper.mapToDomain(p));
   }
@@ -54,7 +59,7 @@ class WgsCoordinateMapperTest {
       new LocationStructure().withLongitude(LONGITUDE)
     );
 
-    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 
   @Test
@@ -62,11 +67,27 @@ class WgsCoordinateMapperTest {
     var p = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withLatitude(LATITUDE)
     );
-    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 
   @Test
-  void pos2Numbers() {
+  void handleLatitudeOutOfRange() {
+    var p = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withLongitude(LONGITUDE).withLatitude(LATITUDE_OUT_OF_RANGE)
+    );
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+  }
+
+  @Test
+  void handleLongitudeOutOfRange() {
+    var p = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withLongitude(LONGITUDE_OUT_OF_RANGE).withLatitude(LATITUDE)
+    );
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+  }
+
+  @Test
+  void pos2Numbers() throws InvalidCoordinateException {
     var coord = WgsCoordinateMapper.mapToDomain(
       new SimplePoint_VersionStructure().withLocation(
         new LocationStructure().withPos(
@@ -79,7 +100,7 @@ class WgsCoordinateMapperTest {
   }
 
   @Test
-  void pos3Numbers() {
+  void pos3Numbers() throws InvalidCoordinateException {
     SimplePoint_VersionStructure p;
     p = new SimplePoint_VersionStructure().withLocation(
       new LocationStructure().withPos(
@@ -97,6 +118,16 @@ class WgsCoordinateMapperTest {
       new LocationStructure().withPos(new DirectPositionType())
     );
 
-    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
+  }
+
+  @Test
+  void posOutOfRange() {
+    var p = new SimplePoint_VersionStructure().withLocation(
+      new LocationStructure().withPos(
+        new DirectPositionType().withValue(LATITUDE_OUT_OF_RANGE.doubleValue(), LONGITUDE_VALUE)
+      )
+    );
+    assertThrows(InvalidCoordinateException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 }
