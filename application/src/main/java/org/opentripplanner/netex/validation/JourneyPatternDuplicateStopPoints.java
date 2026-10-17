@@ -2,11 +2,11 @@ package org.opentripplanner.netex.validation;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.entur.netex2.model.EntityStructure;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.ServiceJourney;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.Issue;
-import org.rutebanken.netex.model.EntityStructure;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.ServiceJourney;
 
 /**
  * Validates that a JourneyPattern does not contain duplicate StopPointInJourneyPattern IDs.

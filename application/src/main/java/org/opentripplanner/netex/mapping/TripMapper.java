@@ -4,6 +4,11 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.DirectionTypeEnumeration;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.LineRefStructure;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.ServiceJourney;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -17,11 +22,6 @@ import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.VehicleAssignment;
-import org.rutebanken.netex.model.DirectionTypeEnumeration;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,9 @@ class TripMapper {
       builder.withNetexInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
     }
 
-    builder.withShortName(serviceJourney.getPublicCode());
+    builder.withShortName(
+      serviceJourney.getPublicCode() != null ? serviceJourney.getPublicCode().getValue() : null
+    );
     builder.withOperator(findOperator(serviceJourney));
     builder.withVehicleAssignment(
       VehicleAssignment.ofNullable(

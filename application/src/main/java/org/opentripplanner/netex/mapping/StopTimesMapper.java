@@ -12,6 +12,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.DestinationDisplay;
+import org.entur.netex2.model.DestinationDisplay_VersionStructure;
+import org.entur.netex2.model.FlexibleLine;
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.LineRefStructure;
+import org.entur.netex2.model.PointInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.Route;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.TimetabledPassingTime;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
+import org.entur.netex2.model.Via_VersionedChildStructure;
+import org.entur.netex2.model.Vias_RelStructure;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -26,20 +39,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
-import org.rutebanken.netex.model.DestinationDisplay;
-import org.rutebanken.netex.model.DestinationDisplay_VersionStructure;
-import org.rutebanken.netex.model.FlexibleLine;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
-import org.rutebanken.netex.model.Via_VersionedChildStructure;
-import org.rutebanken.netex.model.Vias_RelStructure;
 
 /**
  * This maps a list of TimetabledPassingTimes to a list of StopTimes. It also makes sure the
@@ -333,7 +332,7 @@ class StopTimesMapper {
               .filter(Objects::nonNull)
               .map(DestinationDisplay_VersionStructure::getFrontText)
               .filter(Objects::nonNull)
-              .map(MultilingualString::getValue)
+              .map(MultilingualStringMapper::getStringValue)
               .filter(Objects::nonNull)
               .collect(Collectors.toList());
 

@@ -4,6 +4,8 @@ import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
 
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.BusSubmodeEnumeration;
+import org.entur.netex2.model.Quay;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -15,9 +17,6 @@ import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.Quay;
 
 class QuayMapper {
 
@@ -95,9 +94,11 @@ class QuayMapper {
       .regularStop(id)
       .withParentStation(parentStation)
       .withName(parentStation.getName())
-      .withPlatformCode(quay.getPublicCode())
+      .withPlatformCode(quay.getPublicCode() != null ? quay.getPublicCode().getValue() : null)
       .withDescription(
-        NonLocalizedString.ofNullable(quay.getDescription(), MultilingualString::getValue)
+        NonLocalizedString.ofNullable(
+          MultilingualStringMapper.getStringValue(quay.getDescription())
+        )
       )
       .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
       .withWheelchairAccessibility(wheelchair)

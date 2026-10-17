@@ -2,7 +2,7 @@ package org.opentripplanner.netex.support.stoptime;
 
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.elapsedTimeSinceMidnight;
 
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTime;
 
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface

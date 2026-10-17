@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.FlexibleArea;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.KeyListStructure;
+import org.entur.netex2.model.KeyValueStructure;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
@@ -16,10 +20,6 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.KeyListStructure;
-import org.rutebanken.netex.model.KeyValueStructure;
 
 class FlexStopsMapper {
 
@@ -91,7 +91,7 @@ class FlexStopsMapper {
         AreaStop areaStop = mapFlexArea(
           flexibleArea,
           flexibleAreaGeometry,
-          flexibleStopPlace.getName().getValue()
+          MultilingualStringMapper.getStringValue(flexibleStopPlace.getName())
         );
         if (areaStop != null) {
           stops.add(areaStop);
@@ -106,7 +106,11 @@ class FlexStopsMapper {
       // get the ids for the area and stop place correct
       var builder = siteRepositoryBuilder
         .groupStop(idFactory.createId(flexibleStopPlace.getId()))
-        .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()))
+        .withName(
+          new NonLocalizedString(
+            MultilingualStringMapper.getStringValue(flexibleStopPlace.getName())
+          )
+        )
         .withEncompassingAreaGeometries(areaGeometries);
       stops.forEach(builder::addLocation);
       return builder.build();
@@ -125,7 +129,11 @@ class FlexStopsMapper {
     var areaName = area.getName();
     return siteRepositoryBuilder
       .areaStop(idFactory.createId(area.getId()))
-      .withName(new NonLocalizedString(areaName != null ? areaName.getValue() : backupName))
+      .withName(
+        new NonLocalizedString(
+          areaName != null ? MultilingualStringMapper.getStringValue(areaName) : backupName
+        )
+      )
       .withGeometry(geometry)
       .build();
   }
@@ -182,9 +190,7 @@ class FlexStopsMapper {
   @Nullable
   private TransitMode mapTransitMode(FlexibleStopPlace flexibleStopPlace) {
     try {
-      return transportModeMapper.mapAllVehicleModesOfTransport(
-        flexibleStopPlace.getTransportMode()
-      );
+      return transportModeMapper.mapAllPublicTransportModes(flexibleStopPlace.getTransportMode());
     } catch (TransportModeMapper.UnsupportedModeException e) {
       return null;
     }

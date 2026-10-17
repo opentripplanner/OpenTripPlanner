@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.support;
 
+import org.entur.netex2.model.JourneyPattern_VersionStructure;
+import org.entur.netex2.model.Route;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
-import org.rutebanken.netex.model.Route;
 
 /**
  * Utility class with helpers for the generated NeTEx XML model classes

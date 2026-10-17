@@ -4,6 +4,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.NoticeAssignment;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.TimetabledPassingTime;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
@@ -14,9 +17,6 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.rutebanken.netex.model.NoticeAssignment;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
  * Maps NeTEx NoticeAssignment, which is the connection between a Notice and the object it refers
@@ -33,7 +33,7 @@ class NoticeAssignmentMapper {
   private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId =
     ArrayListMultimap.create();
 
-  private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
+  private final ReadOnlyHierarchicalMap<String, org.entur.netex2.model.Notice> noticesById;
 
   private final EntityById<Route> routesById;
 
@@ -48,7 +48,7 @@ class NoticeAssignmentMapper {
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     Collection<ServiceJourney> serviceJourneys,
-    ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
+    ReadOnlyHierarchicalMap<String, org.entur.netex2.model.Notice> noticesById,
     EntityById<Route> routesById,
     EntityById<Trip> tripsById,
     ReadOnlyHierarchicalMap<String, StopTime> stopTimesByNetexId
@@ -117,7 +117,7 @@ class NoticeAssignmentMapper {
 
   @Nullable
   private Notice getOrMapNotice(NoticeAssignment assignment) {
-    org.rutebanken.netex.model.Notice notice =
+    org.entur.netex2.model.Notice notice =
       assignment.getNotice() != null
         ? assignment.getNotice()
         : noticesById.lookup(assignment.getNoticeRef().getRef());

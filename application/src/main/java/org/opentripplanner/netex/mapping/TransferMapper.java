@@ -3,6 +3,9 @@ package org.opentripplanner.netex.mapping;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.JourneyRefStructure;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
+import org.entur.netex2.model.ServiceJourneyInterchange;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.config.SwissProfile;
@@ -17,9 +20,6 @@ import org.opentripplanner.transfer.constrained.model.TransferPriority;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public class TransferMapper {
 
@@ -86,7 +86,7 @@ public class TransferMapper {
   private TripTransferPoint mapPoint(
     Label label,
     String interchangeId,
-    VehicleJourneyRefStructure sjRef,
+    JourneyRefStructure sjRef,
     ScheduledStopPointRefStructure pointRef
   ) {
     if (isInvalid(sjRef)) {
@@ -198,7 +198,7 @@ public class TransferMapper {
   }
 
   @SwissProfile
-  private static boolean isInvalid(VehicleJourneyRefStructure sjRef) {
+  private static boolean isInvalid(JourneyRefStructure sjRef) {
     return sjRef == null || sjRef.getRef() == null;
   }
 

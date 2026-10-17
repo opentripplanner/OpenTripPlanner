@@ -3,6 +3,9 @@ package org.opentripplanner.netex.mapping;
 import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.entur.netex2.model.GroupOfStopPlaces;
+import org.entur.netex2.model.StopPlaceRefStructure;
+import org.entur.netex2.model.StopPlaceRefs_RelStructure;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.i18n.NonLocalizedString;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -15,9 +18,6 @@ import org.opentripplanner.transit.model.site.GroupOfStationsBuilder;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
-import org.rutebanken.netex.model.GroupOfStopPlaces;
-import org.rutebanken.netex.model.StopPlaceRefStructure;
-import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
 
 class GroupOfStationsMapper {
 
@@ -45,7 +45,9 @@ class GroupOfStationsMapper {
     I18NString name;
 
     if (groupOfStopPlaces.getName() != null) {
-      name = NonLocalizedString.ofNullable(groupOfStopPlaces.getName().getValue());
+      name = NonLocalizedString.ofNullable(
+        MultilingualStringMapper.getStringValue(groupOfStopPlaces.getName())
+      );
     } else {
       issueStore.add(
         "GroupOfStopPlacesWithoutName",

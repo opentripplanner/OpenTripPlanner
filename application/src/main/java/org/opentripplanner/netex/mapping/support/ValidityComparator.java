@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping.support;
 import jakarta.ws.rs.NotSupportedException;
 import java.util.Collection;
 import java.util.Comparator;
-import org.rutebanken.netex.model.ValidBetween;
+import org.entur.netex2.model.ValidBetween;
 
 /**
  * This comparator is used for choosing the StopPlace with the most relevant validity period when

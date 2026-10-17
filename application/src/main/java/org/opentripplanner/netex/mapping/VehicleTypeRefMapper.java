@@ -2,7 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import jakarta.xml.bind.JAXBElement;
 import javax.annotation.Nullable;
-import org.rutebanken.netex.model.VehicleTypeRefStructure;
+import org.entur.netex2.model.VehicleTypeRefStructure;
 
 /**
  * Maps the NeTEx VehicleTypeRef field from the netex representation to a string.

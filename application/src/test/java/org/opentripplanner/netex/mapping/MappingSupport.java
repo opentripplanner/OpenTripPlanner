@@ -2,8 +2,8 @@ package org.opentripplanner.netex.mapping;
 
 import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * Test mapping support utility functions - shared between tests.
