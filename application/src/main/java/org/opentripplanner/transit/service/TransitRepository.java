@@ -204,6 +204,17 @@ public class TransitRepository implements Serializable {
     tripCalendars = tripCalendars.withServiceCode(serviceId, code);
   }
 
+  /**
+   * Assign each of the given service ids the next free service code. Used during graph build only.
+   *
+   * @see TripCalendars#withNextServiceCodes(Collection)
+   */
+  public void addNextServiceCodes(Collection<FeedScopedId> serviceIds) {
+    assertModificationsAllowed();
+    invalidateIndex();
+    tripCalendars = tripCalendars.withNextServiceCodes(serviceIds);
+  }
+
   public Collection<String> getFeedIds() {
     return feedIds;
   }

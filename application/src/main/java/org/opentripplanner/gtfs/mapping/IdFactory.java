@@ -23,7 +23,7 @@ class IdFactory {
    *                   in case of invalid values.
    */
   FeedScopedId createId(AgencyAndId id, String entityName) {
-    Objects.requireNonNull(id, idErrorMessage(entityName));
+    Objects.requireNonNull(id, () -> idErrorMessage(entityName));
     return createId(id.getId(), entityName);
   }
 
