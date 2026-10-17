@@ -259,7 +259,7 @@ public class VertexLinker {
       null,
       edges
         .stream()
-        .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
+        .map(e -> new CandidateEdge(e, squaredDistance(vertex, e, xscale)))
         .toList(),
       xscale
     );
@@ -281,21 +281,12 @@ public class VertexLinker {
     // Expand more in the longitude direction than the latitude direction to account for converging meridians.
     env.expandBy(radiusDeg / xscale, radiusDeg);
 
-    // Perform several transformations at once on the edges returned by the index. Only consider
-    // street edges traversable by at least one of the given modes and are still present in the
-    // graph. Calculate a distance to each of those edges, and keep only the ones within the search
-    // radius.
-    // Distances are squared (see squaredDistance), so compare against the squared radius.
-    final double radiusDegSq = radiusDeg * radiusDeg;
-    var candidateEdges = graph.findEdges(env, scope);
-    List<DistanceTo<StreetEdge>> candidateDistanceToEdges = candidateEdges
-      .stream()
-      .filter(StreetEdge.class::isInstance)
-      .map(StreetEdge.class::cast)
-      .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
-      .map(e -> new DistanceTo<>(e, squaredDistance(vertex, e, xscale)))
-      .filter(ead -> ead.squaredDistanceDegreesLat < radiusDegSq)
-      .toList();
+    // The spatial index returns whole grid cells, so in a dense city centre a small envelope still
+    // yields hundreds or thousands of candidate edges of which only a handful are kept. Visit the
+    // candidates in place and apply the cheap, allocation-free mode and distance tests first; only
+    // the survivors are deduplicated, reachability-checked and materialised as CandidateEdge.
+    var collector = new NearbyStreetEdgeCollector(vertex, traverseModes, radiusDeg, xscale);
+    graph.forEachEdgeCandidate(env, scope, collector);
 
     return linkToCandidateEdges(
       vertex,
@@ -303,7 +294,7 @@ public class VertexLinker {
       direction,
       scope,
       tempEdges,
-      candidateDistanceToEdges,
+      collector.nearbyEdges(),
       xscale
     );
   }
@@ -353,20 +344,17 @@ public class VertexLinker {
     LinkingDirection direction,
     Scope scope,
     @Nullable DisposableEdgeCollection tempEdges,
-    List<DistanceTo<StreetEdge>> candidateEdges,
+    List<CandidateEdge> candidateEdges,
     double xscale
   ) {
     if (candidateEdges.isEmpty()) {
       return Set.of();
     }
-    Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(
-      traverseModes,
-      candidateEdges
-    );
+    Set<CandidateEdge> closestEdges = getClosestEdgesPerMode(traverseModes, candidateEdges);
     HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
     return closestEdges
       .stream()
-      .map(ce -> snapAndLink(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
+      .map(ce -> snapAndLink(vertex, ce.edge(), xscale, scope, direction, tempEdges, linkedAreas))
       .filter(Objects::nonNull)
       .collect(Collectors.toSet());
   }
@@ -376,9 +364,9 @@ public class VertexLinker {
    * by all the specified modes. We use a set here to avoid duplicates in the case that edges are
    * traversable by more than one of the modes specified.
    */
-  private Set<DistanceTo<StreetEdge>> getClosestEdgesPerMode(
+  private Set<CandidateEdge> getClosestEdgesPerMode(
     TraverseModeSet traverseModeSet,
-    List<DistanceTo<StreetEdge>> candidateEdges
+    List<CandidateEdge> candidateEdges
   ) {
     // The following logic has gone through several different versions using different approaches.
     // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
@@ -391,14 +379,14 @@ public class VertexLinker {
     // other half lost. It seems like this was based on some incorrect premises about floating point calculations
     // being non-deterministic.
 
-    Set<DistanceTo<StreetEdge>> closestEdges = new HashSet<>();
+    Set<CandidateEdge> closestEdges = new HashSet<>();
     for (TraverseMode mode : traverseModeSet.getModes()) {
       TraverseModeSet modeSet = new TraverseModeSet(mode);
       // There is at least one appropriate edge within range.
 
       var candidateEdgesForMode = candidateEdges
         .stream()
-        .filter(e -> e.item.canTraverse(modeSet))
+        .filter(e -> e.edge().canTraverse(modeSet))
         .toList();
 
       if (candidateEdgesForMode.isEmpty()) {
@@ -407,7 +395,7 @@ public class VertexLinker {
 
       double closestSquaredDistance = candidateEdgesForMode
         .stream()
-        .mapToDouble(ce -> ce.squaredDistanceDegreesLat)
+        .mapToDouble(ce -> ce.squaredDistanceDegreesLat())
         .min()
         .getAsDouble();
 
@@ -417,12 +405,12 @@ public class VertexLinker {
       double band = Math.sqrt(closestSquaredDistance) + DUPLICATE_WAY_EPSILON_DEGREES;
       double bandSquared = band * band;
 
-      // Because this is a set, each instance of DistanceTo<StreetEdge> will only be added once
+      // Because this is a set, each instance of CandidateEdge will only be added once
       // Note: add only closest edges of each mode
       closestEdges.addAll(
         candidateEdgesForMode
           .stream()
-          .filter(ce -> ce.squaredDistanceDegreesLat <= bandSquared)
+          .filter(ce -> ce.squaredDistanceDegreesLat() <= bandSquared)
           .collect(Collectors.toSet())
       );
     }
@@ -628,34 +616,6 @@ public class VertexLinker {
     }
 
     return v;
-  }
-
-  private static class DistanceTo<T> {
-
-    T item;
-    double squaredDistanceDegreesLat;
-
-    public DistanceTo(T item, double squaredDistanceDegreesLat) {
-      this.item = item;
-      this.squaredDistanceDegreesLat = squaredDistanceDegreesLat;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(item);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      DistanceTo<?> that = (DistanceTo<?>) o;
-      return Objects.equals(item, that.item);
-    }
   }
 
   /**
