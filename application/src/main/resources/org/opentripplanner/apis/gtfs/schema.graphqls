@@ -4752,7 +4752,7 @@ input CarParkingPreferencesInput {
   unpreferredCost: Cost
 }
 
-"Preferences related to traveling on a car (excluding car travel on transit services such as taxi)."
+"Preferences for non-transit car legs. These can affect such legs in both direct and transit itineraries. They do not apply to transit legs, such as flex services."
 input CarPreferencesInput {
   "Cost of boarding a vehicle with a car."
   boardCost: Cost
@@ -5208,10 +5208,7 @@ transit.
 input PlanStreetPreferencesInput {
   "Cycling related preferences."
   bicycle: BicyclePreferencesInput
-  """
-  Car related preferences. These are not used for car travel as part of transit, such as
-  taxi travel.
-  """
+  "Car related preferences."
   car: CarPreferencesInput
   "Scooter (kick or electrical) related preferences."
   scooter: ScooterPreferencesInput
