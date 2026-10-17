@@ -47,7 +47,9 @@ import org.opentripplanner.framework.graphql.SimpleCountedListConnection;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.place.NearbyPlaceFinder;
@@ -62,6 +64,8 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.refetch.ItineraryReferenceMapper;
+import org.opentripplanner.routing.refetch.RefetchItineraryException;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
@@ -81,8 +85,12 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
+
+  private static final Logger LOG = LoggerFactory.getLogger(QueryTypeImpl.class);
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
@@ -381,6 +389,46 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
       return new SimpleListConnection<>(places).get(environment);
     };
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public DataFetcher<Itinerary> itinerary() {
+    DataFetcher<?> fetcher = environment -> {
+      GtfsGraphQLRequestContext context = environment.<GtfsGraphQLRequestContext>getContext();
+      var args = new GraphQLTypes.GraphQLQueryTypeItineraryArgs(environment.getArguments());
+      var reference = ItineraryReference.decode(args.getGraphQLId());
+      if (reference == null) {
+        return null;
+      }
+      try {
+        var routeRequest = ItineraryReferenceMapper.toRouteRequest(
+          reference,
+          context.defaultRouteRequest()
+        );
+        var itinerary = context
+          .refetchItineraryService()
+          .refetchItinerary(
+            reference.from(),
+            reference.to(),
+            reference.legReferences(),
+            routeRequest
+          );
+        return DataFetcherResult.<Itinerary>newResult()
+          .data(itinerary)
+          .localContext(Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest))
+          .build();
+      } catch (
+        RefetchItineraryException
+        | RoutingValidationException
+        | IllegalArgumentException
+        | NullPointerException e
+      ) {
+        LOG.debug("Could not refetch itinerary for id {}", args.getGraphQLId(), e);
+        return null;
+      }
+    };
+    return (DataFetcher<Itinerary>) fetcher;
   }
 
   @Override
@@ -1038,7 +1086,14 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     res.getDebugTimingAggregator().finishedRendering();
     return DataFetcherResult.<RoutingResponse>newResult()
       .data(res)
-      .localContext(Map.of("locale", request.preferences().locale()))
+      .localContext(
+        Map.of(
+          "locale",
+          request.preferences().locale(),
+          ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY,
+          request
+        )
+      )
       .build();
   }
 
