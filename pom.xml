@@ -84,7 +84,7 @@
         -->
         <argLine/>
         <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
-        <plugin.spotless.version>3.10.1</plugin.spotless.version>
+        <plugin.spotless.version>3.10.4</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
         <!-- The npm packages used by the Spotless 'prettier' step. Keep them in sync with each
@@ -392,7 +392,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-test-sources</id>
@@ -495,7 +495,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>14.1.0</version>
+                        <version>14.3.0</version>
                     </dependency>
                 </dependencies>
                 <executions>
