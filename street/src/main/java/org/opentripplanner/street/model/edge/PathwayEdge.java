@@ -113,8 +113,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
           request,
           slope,
           wheelchairAccessible,
-          isStairs(),
-          false
+          isStairs()
         );
       } else {
         weight *= StreetEdgeReluctanceCalculator.computeReluctance(

@@ -189,7 +189,7 @@ class StreetEdgeWheelchairCostTest {
 
   static Stream<Arguments> inaccessibleEndpointCases() {
     return Stream.of(
-      Arguments.of(Accessibility.NOT_POSSIBLE, 150),
+      Arguments.of(Accessibility.NOT_POSSIBLE, 615),
       Arguments.of(Accessibility.POSSIBLE, 15),
       Arguments.of(Accessibility.NO_INFORMATION, 15)
     );
@@ -197,9 +197,8 @@ class StreetEdgeWheelchairCostTest {
 
   /**
    * A {@link BarrierVertex} with {@link Accessibility#NOT_POSSIBLE} wheelchair accessibility
-   * (e.g. created for a {@code barrier=kerb} node with a raised/rolled kerb) should make the
-   * connecting edge(s) expensive for wheelchair users, the same way an edge explicitly flagged
-   * as {@code wheelchairAccessible=false} does.
+   * (e.g. created for a {@code barrier=kerb} node with a raised/rolled kerb) adds a fixed cost
+   * to the edge ending at it, independent of the edge length.
    */
   @ParameterizedTest(
     name = "a barrier vertex endpoint with accessibility {0} should lead to traversal costs of {1}"

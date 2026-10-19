@@ -47,6 +47,13 @@ public class StreetEdge
 
   private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
 
+  /**
+   * Fixed extra weight (about 10 minutes of walking) added once when a wheelchair user crosses a
+   * wheelchair-inaccessible barrier vertex, e.g. a raised kerb. It is a point obstacle, so the
+   * cost does not depend on the length of the adjacent edges.
+   */
+  private static final double WHEELCHAIR_INACCESSIBLE_BARRIER_COST = 600;
+
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
@@ -1040,9 +1047,11 @@ public class StreetEdge
           request,
           getMaxSlope(),
           isWheelchairAccessible(),
-          isStairs(),
-          hasWheelchairInaccessibleEndpoint()
+          isStairs()
         );
+      if (isWheelchairInaccessibleBarrier(tov)) {
+        weight += WHEELCHAIR_INACCESSIBLE_BARRIER_COST;
+      }
     } else {
       if (walkingBike) {
         // take slopes into account when walking bikes
@@ -1068,16 +1077,12 @@ public class StreetEdge
   }
 
   /**
-   * Checks if either endpoint of this edge is a {@link BarrierVertex} that is explicitly
-   * wheelchair-inaccessible, e.g. a {@code barrier=kerb} node without a
-   * {@code kerb=flush/lowered/no} tag. This is distinct from {@link #isWheelchairAccessible()},
-   * which reflects tags on the way itself rather than on the nodes at its ends.
+   * Checks if the vertex is a {@link BarrierVertex} that is wheelchair-inaccessible, e.g. a
+   * {@code barrier=kerb} node without a {@code kerb=flush/lowered/no} tag. Only the edge ending
+   * at the vertex is charged, so that crossing the barrier is penalised once, not once per
+   * adjacent edge.
    */
-  private boolean hasWheelchairInaccessibleEndpoint() {
-    return isVertexWheelchairInaccessible(fromv) || isVertexWheelchairInaccessible(tov);
-  }
-
-  private static boolean isVertexWheelchairInaccessible(Vertex vertex) {
+  private static boolean isWheelchairInaccessibleBarrier(Vertex vertex) {
     return (
       vertex instanceof BarrierVertex bv &&
       bv.wheelchairAccessibility() == Accessibility.NOT_POSSIBLE
