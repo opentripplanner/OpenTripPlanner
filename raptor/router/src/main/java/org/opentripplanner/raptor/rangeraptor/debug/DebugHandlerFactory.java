@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.debug;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.DebugLogger;
-import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
@@ -24,7 +23,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
 public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandler<ArrivalView<?>> stopHandler;
-  private final DebugHandler<RaptorPath<?>> pathHandler;
+  private final DebugHandler<ArrivalView<?>> destinationArrivalHandler;
   private final DebugHandler<PatternRideView<?, ?>> patternRideHandler;
   private final DebugLogger logger;
 
@@ -33,8 +32,8 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
       ? new DebugHandlerStopArrivalAdapter(request, lifeCycle)
       : null;
 
-    this.pathHandler = isDebug(request.pathFilteringListener())
-      ? new DebugHandlerPathAdapter(request, lifeCycle)
+    this.destinationArrivalHandler = isDebug(request.destinationArrivalListener())
+      ? new DebugHandlerDestinationArrivalAdapter(request, lifeCycle)
       : null;
 
     this.patternRideHandler = isDebug(request.patternRideDebugListener())
@@ -73,16 +72,22 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
       : new ParetoSetDebugHandlerAdapter<>(patternRideHandler);
   }
 
-  /* path */
+  /* destination arrival */
 
+  /**
+   * Create a pareto set listener for the destination arrivals pareto-set, or {@code null} if
+   * destination arrival debugging is off.
+   */
   @Nullable
-  public ParetoSetDebugHandlerAdapter<RaptorPath<?>> paretoSetDebugPathListener() {
-    return pathHandler == null ? null : new ParetoSetDebugHandlerAdapter<>(pathHandler);
+  public <E extends ArrivalView<?>> ParetoSetEventListener<E> paretoSetDestinationArrivalListener() {
+    return destinationArrivalHandler == null
+      ? null
+      : new ParetoSetDebugHandlerAdapter<>(destinationArrivalHandler);
   }
 
   @Nullable
-  public DebugHandler<RaptorPath<?>> debugPathArrival() {
-    return pathHandler;
+  public DebugHandler<ArrivalView<?>> debugDestinationArrival() {
+    return destinationArrivalHandler;
   }
 
   /* logger */
