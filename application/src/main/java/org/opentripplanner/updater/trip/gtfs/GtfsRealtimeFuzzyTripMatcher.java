@@ -34,8 +34,8 @@ public class GtfsRealtimeFuzzyTripMatcher {
   );
 
   /**
-   * The repository with the trips to match. During an update this is the mutable buffer, so
-   * in-progress real-time additions not yet committed are found as well.
+   * The repository with the trips to match. Trips added to it by real-time updates are found as
+   * well, whether they are committed or not.
    */
   private final TimetableRepository timetableRepository;
 

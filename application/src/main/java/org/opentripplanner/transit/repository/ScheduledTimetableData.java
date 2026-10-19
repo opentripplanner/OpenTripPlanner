@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -26,10 +25,8 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  * public transportation network, with the lookups (by id, by trip, by route, by stop, ...) over
  * them.
  * <p>
- * Immutable: created once when the server starts, from an immutable copy of the {@link
- * TimetableDataImport}, and then owned by the timetable repository. It is shared, unchanged, by
- * every timetable snapshot. Real-time calendar changes are applied to the timetable repository's
- * own calendars, never to these.
+ * Immutable: it holds immutable copies of the data it is created from and never changes, so it
+ * can be shared freely, for example between threads.
  */
 public final class ScheduledTimetableData {
 
@@ -84,8 +81,7 @@ public final class ScheduledTimetableData {
   }
 
   /**
-   * Scheduled data without any trips or calendars. Used in tests, and when the server starts
-   * before a graph is built.
+   * Scheduled data without any trips or calendars.
    */
   public static ScheduledTimetableData empty() {
     return of(Map.of(), Map.of(), ImmutableListMultimap.of(), Map.of(), TripCalendars.empty());

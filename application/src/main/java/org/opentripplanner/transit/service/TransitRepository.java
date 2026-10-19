@@ -42,9 +42,7 @@ import org.slf4j.LoggerFactory;
  * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
  * only in NeTEx, the NeTEx name is used in the internal model.
  * <p>
- * The scheduled trip patterns, trips and trip calendars are not part of this repository. At
- * runtime the timetable repository owns them as
- * {@link org.opentripplanner.transit.repository.ScheduledTimetableData}.
+ * The scheduled trip patterns, trips and trip calendars are not part of this repository.
  * <p>
  * A TransitRepository instance also includes references to some transient indexes of its contents, to
  * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
@@ -76,15 +74,12 @@ public class TransitRepository implements Serializable {
 
   /**
    * The RaptorTransitData representation (optimized and rearranged for Raptor) of the scheduled
-   * (non-realtime) timetable data, mapped at server startup.
+   * (non-realtime) timetable data.
    * <p>
-   * TODO: This does not belong here. The scheduled timetable data itself is no longer part of this
-   *       repository (see ScheduledTimetableData, owned by the timetable repository), and the
-   *       timetable repository already owns the real-time Raptor data seeded from a copy of this.
-   *       The candidate owner is the timetable repository, exposing the scheduled Raptor data via
-   *       its snapshots. It is not ScheduledTimetableData: the Raptor data is also derived from
-   *       transfers, stops and tuning parameters, contains mutable caches, and is mapped from the
-   *       scheduled data. Left here until the Raptor-data creation at startup is refactored.
+   * TODO: This does not belong here: the scheduled timetable data it is derived from is not part
+   *       of this repository. Move it to the timetable repository. It is not part of
+   *       ScheduledTimetableData, since it is also derived from transfers, stops and tuning
+   *       parameters, and contains mutable caches.
    */
   private transient RaptorTransitData raptorTransitData;
 

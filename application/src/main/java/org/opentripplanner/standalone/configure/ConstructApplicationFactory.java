@@ -220,8 +220,7 @@ public interface ConstructApplicationFactory {
     Builder transitRepository(TransitRepository transitRepository);
 
     /**
-     * The immutable scheduled data, for the timetable repository only (see TransitModule). Other
-     * consumers must reach it through the timetable repository.
+     * The immutable scheduled timetable data.
      */
     @BindsInstance
     Builder scheduledTimetableData(ScheduledTimetableData scheduledTimetableData);

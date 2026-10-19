@@ -184,8 +184,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * lets {@link #getRoute}, {@link #getTrip}, {@link #findPattern}, and friends answer
    * "realtime-first, scheduled-fallback" without any help from the rest of the codebase.
    * <p>
-   * Created from the imported timetable data when the server starts, and owned by this repository
-   * from then on.
+   * Owned by this repository.
    */
   private final ScheduledTimetableData scheduledTimetableData;
 
@@ -210,8 +209,7 @@ public class DefaultTimetableRepository implements TimetableRepository {
   private boolean dirty = false;
 
   /**
-   * A read-only snapshot of the scheduled data only, without any real-time data, for consumers that
-   * must not see real-time updates (e.g. the static transit service, or graph build).
+   * A read-only snapshot of the scheduled data only, without any real-time data.
    */
   public static TimetableRepositorySnapshot scheduledOnly(
     ScheduledTimetableData scheduledTimetableData

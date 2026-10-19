@@ -26,20 +26,19 @@ import org.opentripplanner.transit.repository.ScheduledTimetableData;
 
 /**
  * The scheduled timetable data imported from the GTFS and NeTEx feeds: trip patterns, trips on
- * service date, flex trips and the scheduled trip calendars. This is mutable, used by the data
- * import modules only, and serialized with the graph.
+ * service date, flex trips and the scheduled trip calendars. This is mutable and serialized with
+ * the graph.
  * <p>
- * When the server starts, the content is converted into the immutable {@link
- * ScheduledTimetableData} with {@link #toScheduledTimetableData()}, which is then owned by the
- * timetable repository. The dependency goes from this data-import class to the core, not the
- * other way around.
+ * The content is converted into the immutable {@link ScheduledTimetableData} with {@link
+ * #toScheduledTimetableData()}. The dependency goes from this data-import class to the core, not
+ * the other way around.
  * <p>
  * The replacements of each trip on service date are kept in the order the replacing trips are
  * added, which is the order returned by {@link
  * ScheduledTimetableData#getReplacedByTripOnServiceDate}.
  * <p>
- * Converting the content freezes the data import: later modifications would never reach the
- * scheduled data used at runtime, so they fail.
+ * Converting the content freezes the data import: later modifications would not be reflected in
+ * the converted data, so they fail.
  */
 public class TimetableDataImport {
 
@@ -51,8 +50,8 @@ public class TimetableDataImport {
   private TripCalendars tripCalendars = TripCalendars.empty();
 
   /**
-   * Set when the content is converted. Not serialized: a data import loaded from a graph file can
-   * still be modified by a build.
+   * Set when the content is converted. Not serialized, so a deserialized data import can be
+   * modified.
    */
   private transient boolean frozen = false;
 
@@ -128,7 +127,7 @@ public class TimetableDataImport {
 
   /**
    * The stops used by scheduled trips that allow cars (e.g. car ferries), including the regular
-   * stops of group stops. They need to be connected to the road network.
+   * stops of group stops.
    */
   public Set<StopLocation> getStopLocationsUsedForCarsAllowedTrips() {
     return getStopLocationsUsedByTripTimes(
@@ -147,9 +146,9 @@ public class TimetableDataImport {
   }
 
   /**
-   * Convert the content into the immutable scheduled data used at runtime. The content is copied,
-   * so later modifications would never reach the scheduled data: this freezes the data import,
-   * and any later modification fails.
+   * Convert the content into the immutable scheduled data. The content is copied, so later
+   * modifications would not be reflected in it: this freezes the data import, and any later
+   * modification fails.
    */
   public ScheduledTimetableData toScheduledTimetableData() {
     frozen = true;

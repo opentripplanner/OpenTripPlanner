@@ -148,8 +148,7 @@ public final class TransitTestEnvironment {
 
   /**
    * A new timetable repository (write buffer) with the environment's scheduled data and no
-   * real-time updates, for testing code on the real-time update path. It is not registered with
-   * the environment and never committed.
+   * real-time updates. It is not registered with the environment and never committed.
    */
   public TimetableRepository newTimetableRepository() {
     return new DefaultTimetableRepository(

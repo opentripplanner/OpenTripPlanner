@@ -64,7 +64,6 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.VehicleAssignmentOnServiceDate;
-import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -100,9 +99,7 @@ public class DefaultTransitService implements TransitService {
   private final ReplacementHelper replacementHelper;
 
   /**
-   * @param timetableSnapshot the timetable data to read. For a service without real-time data,
-   *                          for example the app-singleton {@link StaticTransitService}, use
-   *                          {@link DefaultTimetableRepository#scheduledOnly}.
+   * @param timetableSnapshot the timetable data to read, with or without real-time updates
    */
   public DefaultTransitService(
     TransitRepository transitRepository,

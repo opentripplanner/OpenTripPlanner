@@ -5,9 +5,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * Look up the scheduled trip patterns visiting a stop. Used by the {@link
- * PatternConsideringNearbyStopFinder} to keep only the stops where a transfer can reach a trip
- * pattern.
+ * Look up the scheduled trip patterns visiting a stop.
  */
 @FunctionalInterface
 public interface PatternsByStopLookup {

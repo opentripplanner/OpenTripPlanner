@@ -39,8 +39,7 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
 
   /**
    * @param patternsByStopLookup the scheduled trip patterns visiting a stop
-   * @param flexIndex the flex trips to consider, or {@code null} to ignore flex trips (when flex
-   *                  routing is disabled)
+   * @param flexIndex the flex trips to consider, or {@code null} to ignore flex trips
    */
   public PatternConsideringNearbyStopFinder(
     SiteRepository siteRepository,

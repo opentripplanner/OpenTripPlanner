@@ -122,7 +122,7 @@ public class ConstructApplication {
     // This is intentionally done here rather than in a Dagger provider because the mapping
     // is heavy and should not run inside the DI container's initialization.
     var tuningParameters = config.routerConfig().transitTuningConfig();
-    // The immutable scheduled data, handed to the timetable repository which owns it from here on.
+    // The immutable scheduled data.
     // Converting freezes the timetable data import, so when a graph is going to be built it is not
     // converted: it is still empty here and must stay modifiable for the graph build. The server
     // then starts without scheduled data, like it starts without Raptor data, see #7948.

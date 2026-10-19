@@ -263,7 +263,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   /**
    * The scheduled trip patterns visiting each stop, by stop id. The index is built on the first
-   * access and then cached; the graph build adds all scheduled patterns before this module runs.
+   * access and then cached, so it assumes that no scheduled patterns are added afterwards.
    * <p>
    * Not thread-safe: only call it from the thread running {@link #buildGraph()}. The parallel
    * transfer search gets the built index, which it only reads.

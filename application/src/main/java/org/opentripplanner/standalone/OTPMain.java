@@ -182,9 +182,8 @@ public class OTPMain {
 
   /**
    * Load the graph from disk and construct the application from it. The loaded {@link
-   * SerializedGraphObject} is only referenced inside this method, so the parts of it that are only
-   * needed to construct the application (for example the timetable data import, once it is
-   * converted) can be garbage collected while the server runs.
+   * SerializedGraphObject} is only referenced inside this method, so the parts of it that the
+   * application does not keep can be garbage collected while the server runs.
    */
   private static ConstructApplication loadGraph(LoadApplication loadApp, ConfigModel config) {
     SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());

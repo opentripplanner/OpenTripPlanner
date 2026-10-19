@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Indexed access to the agencies and operators of the {@link TransitRepository}. The scheduled
- * routes, trips and patterns are indexed by
- * {@link org.opentripplanner.transit.repository.ScheduledTimetableData}.
+ * Indexed access to the agencies and operators of the {@link TransitRepository}.
  * <p>
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
