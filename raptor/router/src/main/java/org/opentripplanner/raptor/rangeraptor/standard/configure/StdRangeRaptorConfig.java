@@ -8,13 +8,13 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
-import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
-import org.opentripplanner.raptor.rangeraptor.destination.configure.DestinationArrivalConfig;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
+import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
@@ -47,7 +47,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> ctx;
-  private final DestinationArrivalConfig<T> destinationArrivalConfig;
+  private final PathConfig<T> pathConfig;
   private final RoutingStrategy<T> strategy;
   private final Set<Class<?>> oneOfInstanceTypes = new HashSet<>();
 
@@ -60,7 +60,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   public StdRangeRaptorConfig(SearchContext<T> context) {
     new VerifyRequestIsValid(context).verify();
     this.ctx = context;
-    this.destinationArrivalConfig = new DestinationArrivalConfig<>(context);
+    this.pathConfig = new PathConfig<>(context);
     this.strategy = createWorkerStrategy();
   }
 
@@ -178,7 +178,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
-    var destinationArrivalPaths = destinationArrivalConfig.createDestArrivalPathsStdSearch();
+    var destinationArrivalPaths = pathConfig.createDestArrivalPathsStdSearch();
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.

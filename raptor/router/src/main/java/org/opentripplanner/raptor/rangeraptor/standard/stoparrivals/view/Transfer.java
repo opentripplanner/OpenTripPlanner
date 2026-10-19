@@ -12,19 +12,13 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
 
-  private final int arrivalTime;
-  private final RaptorTransfer transfer;
-  private final ArrivalView<T> previous;
+  private final StopArrivalState<T> arrival;
+  private final StopsCursor<T> cursor;
 
-  /**
-   * The values are copied from the mutable state, so the arrival and its chain stay valid after
-   * the state is overwritten by the following iterations.
-   */
   Transfer(int round, int stop, StopArrivalState<T> arrival, StopsCursor<T> cursor) {
     super(round, stop);
-    this.arrivalTime = arrival.time();
-    this.transfer = arrival.transferPath();
-    this.previous = cursor.stop(round(), arrival.transferFromStop(), true);
+    this.arrival = arrival;
+    this.cursor = cursor;
   }
 
   @Override
@@ -39,12 +33,12 @@ final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapte
 
   @Override
   public int arrivalTime() {
-    return arrivalTime;
+    return arrival.time();
   }
 
   @Override
   public ArrivalView<T> previous() {
-    return previous;
+    return cursor.stop(round(), arrival.transferFromStop(), true);
   }
 
   @Override
@@ -54,7 +48,7 @@ final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapte
 
   @Override
   public RaptorTransfer transfer() {
-    return transfer;
+    return arrival.transferPath();
   }
 
   @Override

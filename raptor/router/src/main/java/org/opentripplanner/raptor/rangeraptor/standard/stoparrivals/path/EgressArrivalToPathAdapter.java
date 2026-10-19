@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
 import org.opentripplanner.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
@@ -21,7 +21,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * The responsibility of this class is to listen for egress stop arrivals and forward these as
  * Destination arrivals to the {@link DestinationArrivalPaths}.
  * <p/>
- * Because adding new destination arrivals to the set is expensive, this class optimize this by
+ * Range Raptor requires paths to be collected at the end of each iteration. Following iterations
+ * may overwrite the existing state; Hence invalidate trips explored in previous iterations. Because
+ * adding new destination arrivals to the set of paths is expensive, this class optimize this by
  * only adding new destination arrivals at the end of each round.
  * <p/>
  *

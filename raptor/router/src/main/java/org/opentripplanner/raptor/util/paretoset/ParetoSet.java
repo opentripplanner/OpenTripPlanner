@@ -49,11 +49,10 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
   }
 
   /**
-   * Create a new ParetoSet with a comparator and a drop event listener. To add more than one listener use the
-   * {@link ParetoSetEventListenerComposite}.
+   * Create a new ParetoSet with a comparator and a drop event listener.
    *
    * @param comparator    The comparator to use with this set
-   * @param eventListener The event listener registered to listen for accept, drop and reject events.
+   * @param eventListener At most one listener can be registered to listen for drop events.
    */
   public static <T> ParetoSet<T> of(
     ParetoComparator<T> comparator,

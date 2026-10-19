@@ -29,9 +29,9 @@ import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.path.Path;
-import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
 import org.opentripplanner.raptor.spi.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
@@ -227,8 +227,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
     return new DestinationArrival<>(
       egress.egressPath().egress(),
       egress.previous(),
-      RAPTOR_ITERATION_START_TIME,
-      RAPTOR_ITERATION_START_TIME,
       egress.arrivalTime(),
       egress.egressPath().egress().c1(),
       egress.c2()
@@ -275,8 +273,6 @@ public class BasicPathTestCase implements RaptorTestConstants {
     return new DestinationArrival<>(
       egress.egressPath().egress(),
       egress.previous(),
-      RAPTOR_ITERATION_START_TIME,
-      RAPTOR_ITERATION_START_TIME,
       egress.arrivalTime(),
       egress.egressPath().egress().c1(),
       egress.c2()

@@ -14,6 +14,7 @@ public interface RaptorStartOnBoardAccess extends RaptorAccessEgress {
 
   /**
    * The stop index corresponding to {@link #stopPositionInPattern()}.
+   * {@inheritDoc}
    */
   @Override
   int stop();

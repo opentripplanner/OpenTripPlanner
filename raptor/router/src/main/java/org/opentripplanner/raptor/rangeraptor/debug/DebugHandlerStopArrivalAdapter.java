@@ -18,14 +18,14 @@ final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<A
 
   @Override
   protected Iterable<Integer> stopsVisited(ArrivalView<?> arrival) {
-    return listStops(arrival);
+    return listStopsForDebugging(arrival);
   }
 
   /**
    * List all stops used to arrive at current stop arrival. This method can be SLOW, should only be
    * used in code that does not need to be fast, like debugging.
    */
-  static Iterable<Integer> listStops(ArrivalView<?> it) {
+  private Iterable<Integer> listStopsForDebugging(ArrivalView<?> it) {
     LinkedList<Integer> stops = new LinkedList<>();
 
     // loop until access is done(previous is null)

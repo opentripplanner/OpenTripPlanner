@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.destination;
+package org.opentripplanner.raptor.rangeraptor.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase.flexCaseAForwardSearch;
@@ -17,6 +17,7 @@ import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BAS
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripByForwardSearch;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripByReverseSearch;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.lifeCycle;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -44,7 +45,8 @@ public class PathMapperTest implements RaptorTestConstants {
       SLACK_PROVIDER,
       C1_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
-      null
+      null,
+      lifeCycle()
     );
 
     //When:
@@ -146,7 +148,8 @@ public class PathMapperTest implements RaptorTestConstants {
       FLEX_SLACK_PROVIDER,
       FLEX_COST_CALCULATOR,
       RaptorTestConstants::stopIndexToName,
-      null
+      null,
+      lifeCycle()
     );
     // When:
     RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);

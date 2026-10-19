@@ -17,12 +17,12 @@ abstract sealed class AbstractStopArrivalC2<T extends RaptorTripSchedule>
   /**
    * Transit or transfer.
    *
-   * @param previous    the previous arrival visited for the current trip
-   * @param round       the increment to add to the paretoRound
-   * @param stop        stop index for this arrival
-   * @param arrivalTime the arrival time for this stop index
-   * @param c1          first criteria, the total accumulated generalized-cost-1 criteria
-   * @param c2          second criteria, the total accumulated generalized-cost-2 criteria
+   * @param previous             the previous arrival visited for the current trip
+   * @param paretoRoundIncrement the increment to add to the paretoRound
+   * @param stop                 stop index for this arrival
+   * @param arrivalTime          the arrival time for this stop index
+   * @param c1                   first criteria, the total accumulated generalized-cost-1 criteria
+   * @param c2                   second criteria, the total accumulated generalized-cost-2 criteria
    */
   AbstractStopArrivalC2(
     McStopArrival<T> previous,
