@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType.PropulsionType;
 import org.opentripplanner.service.vehiclerental.street.geofencing.GeofencingInterceptor;
@@ -21,6 +22,7 @@ import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -1038,7 +1040,8 @@ public class StreetEdge
           request,
           getMaxSlope(),
           isWheelchairAccessible(),
-          isStairs()
+          isStairs(),
+          hasWheelchairInaccessibleEndpoint()
         );
     } else {
       if (walkingBike) {
@@ -1062,6 +1065,23 @@ public class StreetEdge
     }
 
     return new TraversalCosts(time, weight);
+  }
+
+  /**
+   * Checks if either endpoint of this edge is a {@link BarrierVertex} that is explicitly
+   * wheelchair-inaccessible, e.g. a {@code barrier=kerb} node without a
+   * {@code kerb=flush/lowered/no} tag. This is distinct from {@link #isWheelchairAccessible()},
+   * which reflects tags on the way itself rather than on the nodes at its ends.
+   */
+  private boolean hasWheelchairInaccessibleEndpoint() {
+    return isVertexWheelchairInaccessible(fromv) || isVertexWheelchairInaccessible(tov);
+  }
+
+  private static boolean isVertexWheelchairInaccessible(Vertex vertex) {
+    return (
+      vertex instanceof BarrierVertex bv &&
+      bv.wheelchairAccessibility() == Accessibility.NOT_POSSIBLE
+    );
   }
 
   /* The no-thru traffic support works by not allowing a transition from a no-thru area out of it.

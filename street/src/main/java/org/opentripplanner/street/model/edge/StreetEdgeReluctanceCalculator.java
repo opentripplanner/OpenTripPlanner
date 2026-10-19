@@ -12,7 +12,7 @@ class StreetEdgeReluctanceCalculator {
 
   /**
    * Compute reluctance for a regular street section. Note! This does not apply if in a wheelchair,
-   * see {@link #computeWheelchairReluctance(StreetSearchRequest, double, boolean, boolean)}.
+   * see {@link #computeWheelchairReluctance(StreetSearchRequest, double, boolean, boolean, boolean)}.
    */
   static double computeReluctance(
     StreetSearchRequest pref,
@@ -48,12 +48,19 @@ class StreetEdgeReluctanceCalculator {
     StreetSearchRequest request,
     double maxSlope,
     boolean edgeWheelchairAccessible,
-    boolean stairs
+    boolean stairs,
+    boolean hasWheelchairInaccessibleEndpoint
   ) {
     var wheelchair = request.wheelchair();
     // Add reluctance if street is not wheelchair accessible
     double reluctance = edgeWheelchairAccessible ? 1.0 : wheelchair.inaccessibleStreetReluctance();
     reluctance *= request.walk().reluctance();
+
+    // Add reluctance if one of the edge's endpoints is a barrier vertex explicitly tagged as
+    // wheelchair-inaccessible, e.g. a barrier=kerb node without kerb=flush/lowered/no.
+    if (hasWheelchairInaccessibleEndpoint) {
+      reluctance *= wheelchair.inaccessibleStreetReluctance();
+    }
 
     // Add reluctance for stairs
     if (stairs) {
