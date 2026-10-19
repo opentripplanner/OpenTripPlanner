@@ -303,10 +303,7 @@ public class OsmEntityTest {
         true
       ),
       // real-world values seen in OSM data (taginfo), beyond the ones documented on the wiki
-      Arguments.of(
-        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "sloped").build(),
-        true
-      ),
+      Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "sloped").build(), true),
       Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "none").build(), true),
       Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "low").build(), true),
       Arguments.of(
