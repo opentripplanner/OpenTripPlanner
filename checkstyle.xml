@@ -6,7 +6,7 @@
 <module name="Checker">
     <!-- Generated GraphQL code for the GTFS API -->
     <module name="BeforeExecutionExclusionFileFilter">
-        <property name="fileNamePattern" value="GraphQL(DataFetchers|Types)\.java$"/>
+        <property name="fileNamePattern" value="[\\/]apis[\\/]gtfs[\\/]generated[\\/]"/>
     </module>
     <module name="TreeWalker">
         <module name="ArrayTypeStyle"/>
