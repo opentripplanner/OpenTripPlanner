@@ -118,9 +118,10 @@ _The code for this is found in `DestinationArrivalParetoSetComparators` in the
 
 The pareto-set at the destination is different from the pareto-sets at the stops: it is the source
 of the result paths. Raptor does not build a path for each arrival at the destination. The set holds
-light-weight `DestinationArrival`s, and the paths are built from the arrivals that survive (McRR
-after the search, RR when an arrival is accepted). A stop arrival can be dropped when it is not
-needed to prune later arrivals, a destination arrival that is dropped is a dropped result.
+light-weight `DestinationArrival`s, and the paths are built from the arrivals that survive, after
+the search. This works for both McRR and RR, since the arrival chain of a destination arrival is not
+changed by later iterations. A stop arrival can be dropped when it is not needed to prune later
+arrivals, a destination arrival that is dropped is a dropped result.
 
 Range Raptor finds journeys for many departure times. Without an extra criterion a journey that
 leaves later _and_ arrives later would be dominated by a journey that arrives earlier. Which of

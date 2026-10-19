@@ -13,10 +13,10 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * Used to create a view to the internal StdRangeRaptor model and to navigate between stop arrivals.
- * Since view objects are only used for path and debugging operations, the view can create temporary
- * objects for each StopArrival. These view objects are temporary objects and when the algorithm
- * progress they might get invalid - so do not keep references to these objects bejond the scope of
- * of a the callers method.
+ * The stop arrival state is mutable and overwritten by the following iterations. Hence, the views
+ * copy the values they need and resolve the arrival chain (the previous arrivals) when they are
+ * created. A view is a snapshot, it stays valid after the state is changed and can be stored, for
+ * example as part of a destination arrival.
  * <p/>
  * The design was originally done to support the FLyweight design pattern.
  *

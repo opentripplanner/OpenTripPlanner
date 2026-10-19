@@ -48,7 +48,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
         null,
         null
       );
-    return DestinationArrivalPaths.forStdRaptor(
+    return new DestinationArrivalPaths<>(
       comparator,
       ctx.calculator(),
       null,
@@ -62,7 +62,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a {@link DestinationArrivalPaths} for McRaptor (lazy path building).
+   * Create a {@link DestinationArrivalPaths} for McRaptor.
    *
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
    * @param c2Comp     Dominance function for c2; {@code null} means c2 is not used.
@@ -80,7 +80,7 @@ public class DestinationArrivalConfig<T extends RaptorTripSchedule> {
         relaxC1,
         c2Comp
       );
-    return DestinationArrivalPaths.forMcRaptor(
+    return new DestinationArrivalPaths<>(
       comparator,
       ctx.calculator(),
       costConfig.useC1() ? ctx.costCalculator() : null,
