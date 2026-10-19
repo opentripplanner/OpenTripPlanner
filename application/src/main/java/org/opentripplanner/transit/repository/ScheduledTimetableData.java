@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.repository;
 
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,11 +26,10 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  * public transportation network, with the lookups (by id, by trip, by route, by stop, ...) over
  * them.
  * <p>
- * Immutable: created once when the server starts, from the scheduled data populated by the graph
- * build, and then owned by the timetable repository. It wraps the maps of the frozen {@link
- * TimetableDataImport} it is converted from instead of copying them. It is shared,
- * unchanged, by every timetable snapshot. Real-time calendar changes are applied to the timetable
- * repository's own calendars, never to these.
+ * Immutable: created once when the server starts, from an immutable copy of the {@link
+ * TimetableDataImport}, and then owned by the timetable repository. It is shared, unchanged, by
+ * every timetable snapshot. Real-time calendar changes are applied to the timetable repository's
+ * own calendars, never to these.
  */
 public final class ScheduledTimetableData {
 
@@ -44,24 +43,26 @@ public final class ScheduledTimetableData {
   private ScheduledTimetableData(
     Map<FeedScopedId, TripPattern> tripPatternForId,
     Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById,
+    ListMultimap<FeedScopedId, TripOnServiceDate> replacedByTripOnServiceDates,
     Map<FeedScopedId, FlexTrip<?, ?>> flexTripForId,
     TripCalendars tripCalendars
   ) {
-    this.tripPatternForId = Collections.unmodifiableMap(tripPatternForId);
-    this.tripOnServiceDateById = Collections.unmodifiableMap(tripOnServiceDateById);
-    this.replacedByTripOnServiceDates = replacedBy(this.tripOnServiceDateById.values());
-    this.flexTripForId = Collections.unmodifiableMap(flexTripForId);
+    this.tripPatternForId = Map.copyOf(tripPatternForId);
+    this.tripOnServiceDateById = Map.copyOf(tripOnServiceDateById);
+    this.replacedByTripOnServiceDates = ImmutableListMultimap.copyOf(replacedByTripOnServiceDates);
+    this.flexTripForId = Map.copyOf(flexTripForId);
     this.tripCalendars = tripCalendars.initializeServiceCodesRunningForDate();
     this.index = new ScheduledTimetableIndex(this, this.tripCalendars);
   }
 
   /**
-   * Create the immutable scheduled data. The given maps are wrapped, not copied: the caller must
-   * not change them afterwards. {@link TimetableDataImport#toScheduledTimetableData()}
-   * ensures this by freezing the timetable data import.
+   * Create the immutable scheduled data. The given maps are copied, so later changes to them are
+   * not reflected.
    *
    * @param tripPatternForId the scheduled trip patterns, by id
    * @param tripOnServiceDateById the scheduled trips on service date, by id
+   * @param replacedByTripOnServiceDates for each trip on service date id, the trips on service
+   *                                     date replacing it, in the order they were added
    * @param flexTripForId the flex trips, by id
    * @param tripCalendars the scheduled trip calendars; the service codes running on each date are
    *                      computed here
@@ -69,28 +70,17 @@ public final class ScheduledTimetableData {
   public static ScheduledTimetableData of(
     Map<FeedScopedId, TripPattern> tripPatternForId,
     Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById,
+    ListMultimap<FeedScopedId, TripOnServiceDate> replacedByTripOnServiceDates,
     Map<FeedScopedId, FlexTrip<?, ?>> flexTripForId,
     TripCalendars tripCalendars
   ) {
     return new ScheduledTimetableData(
       tripPatternForId,
       tripOnServiceDateById,
+      replacedByTripOnServiceDates,
       flexTripForId,
       tripCalendars
     );
-  }
-
-  /** For each trip on service date id, the trips on service date replacing it. */
-  private static ImmutableListMultimap<FeedScopedId, TripOnServiceDate> replacedBy(
-    Collection<TripOnServiceDate> tripsOnServiceDate
-  ) {
-    var builder = ImmutableListMultimap.<FeedScopedId, TripOnServiceDate>builder();
-    for (var tripOnServiceDate : tripsOnServiceDate) {
-      for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
-        builder.put(replacementFor.getId(), tripOnServiceDate);
-      }
-    }
-    return builder.build();
   }
 
   /**
@@ -98,7 +88,7 @@ public final class ScheduledTimetableData {
    * before a graph is built.
    */
   public static ScheduledTimetableData empty() {
-    return of(Map.of(), Map.of(), Map.of(), TripCalendars.empty());
+    return of(Map.of(), Map.of(), ImmutableListMultimap.of(), Map.of(), TripCalendars.empty());
   }
 
   @Nullable

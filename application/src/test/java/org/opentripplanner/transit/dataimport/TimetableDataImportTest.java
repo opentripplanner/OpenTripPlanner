@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
@@ -50,6 +51,22 @@ class TimetableDataImportTest {
   }
 
   @Test
+  void replacementsKeepTheOrderTheyWereAdded() {
+    var replaced = tripOnServiceDate("REPLACED", List.of());
+    // Added in reverse id order, to show the order does not come from the ids
+    var replacementB = tripOnServiceDate("B", List.of(replaced));
+    var replacementA = tripOnServiceDate("A", List.of(replaced));
+    var subject = new TimetableDataImport();
+    subject.addTripOnServiceDate(replaced);
+    subject.addTripOnServiceDate(replacementB);
+    subject.addTripOnServiceDate(replacementA);
+
+    assertThat(subject.toScheduledTimetableData().getReplacedByTripOnServiceDate(replaced.getId()))
+      .containsExactly(replacementB, replacementA)
+      .inOrder();
+  }
+
+  @Test
   void readingAndConvertingAgainWorkAfterConversion() {
     var subject = new TimetableDataImport();
     subject.addTripPattern(PATTERN.getId(), PATTERN);
@@ -57,5 +74,16 @@ class TimetableDataImportTest {
     assertThat(subject.toScheduledTimetableData().getAllTripPatterns()).containsExactly(PATTERN);
     assertThat(subject.getAllTripPatterns()).containsExactly(PATTERN);
     assertThat(subject.toScheduledTimetableData().getAllTripPatterns()).containsExactly(PATTERN);
+  }
+
+  private static TripOnServiceDate tripOnServiceDate(
+    String id,
+    List<TripOnServiceDate> replacementFor
+  ) {
+    return TripOnServiceDate.of(id(id))
+      .withTrip(TransitRepositoryForTest.trip(id).build())
+      .withServiceDate(LocalDate.of(2025, 2, 28))
+      .withReplacementFor(replacementFor)
+      .build();
   }
 }

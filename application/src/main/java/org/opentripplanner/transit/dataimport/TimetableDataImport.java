@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.dataimport;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -33,16 +34,19 @@ import org.opentripplanner.transit.repository.ScheduledTimetableData;
  * timetable repository. The dependency goes from this data-import class to the core, not the
  * other way around.
  * <p>
- * Trips on service date are kept in insertion order, which is the order of the replacements
- * returned by {@link ScheduledTimetableData#getReplacedByTripOnServiceDate}.
+ * The replacements of each trip on service date are kept in the order the replacing trips are
+ * added, which is the order returned by {@link
+ * ScheduledTimetableData#getReplacedByTripOnServiceDate}.
  * <p>
- * Converting the content freezes the data import: the scheduled data wraps its maps, so any later
- * modification fails instead of changing data that must stay immutable.
+ * Converting the content freezes the data import: later modifications would never reach the
+ * scheduled data used at runtime, so they fail.
  */
 public class TimetableDataImport {
 
   private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
-  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new LinkedHashMap<>();
+  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new HashMap<>();
+  private final ListMultimap<FeedScopedId, TripOnServiceDate> replacedByTripOnServiceDates =
+    ArrayListMultimap.create();
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripForId = new HashMap<>();
   private TripCalendars tripCalendars = TripCalendars.empty();
 
@@ -71,6 +75,9 @@ public class TimetableDataImport {
   public void addTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
     assertModificationsAllowed();
     tripOnServiceDateById.put(tripOnServiceDate.getId(), tripOnServiceDate);
+    for (var replacementFor : tripOnServiceDate.getReplacementFor()) {
+      replacedByTripOnServiceDates.put(replacementFor.getId(), tripOnServiceDate);
+    }
   }
 
   public Collection<TripOnServiceDate> getAllTripsOnServiceDate() {
@@ -140,15 +147,16 @@ public class TimetableDataImport {
   }
 
   /**
-   * Convert the content into the immutable scheduled data used at runtime. The scheduled data
-   * wraps the maps of this data import instead of copying them, so this freezes the data import:
-   * the graph build must be complete, and any later modification fails.
+   * Convert the content into the immutable scheduled data used at runtime. The content is copied,
+   * so later modifications would never reach the scheduled data: this freezes the data import,
+   * and any later modification fails.
    */
   public ScheduledTimetableData toScheduledTimetableData() {
     frozen = true;
     return ScheduledTimetableData.of(
       tripPatternForId,
       tripOnServiceDateById,
+      replacedByTripOnServiceDates,
       flexTripForId,
       tripCalendars
     );
