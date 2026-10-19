@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.core.framework.transaction.internal.TransactionFactory;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -45,6 +46,8 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -215,22 +218,18 @@ public abstract class GtfsTest {
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
     var registry = TransactionFactory.createRepositoryRegistry();
-    var timetableSnapshot = new org.opentripplanner.transit.repository.DefaultTimetableRepository(
+    var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(scheduledRaptorData),
       transitRepository.getTripCalendar()
     );
     var timetableHandle = registry.registerRepositorySnapshot(
       timetableSnapshot,
-      new org.opentripplanner.transit.repository.TimetableRepositoryLifecycle(
-        timetableSnapshot,
-        false,
-        LocalDate::now
-      )
+      new TimetableRepositoryLifecycle(timetableSnapshot, false, LocalDate::now)
     );
     var updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
       registry,
-      java.util.concurrent.Executors.defaultThreadFactory()
+      Executors.defaultThreadFactory()
     );
 
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(

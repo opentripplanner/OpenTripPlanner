@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.street.mapping.StreetModeToRentalTraverseModeMapper;
+import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
 
@@ -72,7 +74,7 @@ class DeferredForkHandler {
     var request = s0.getRequest();
     var states = new ArrayList<State>();
 
-    var walking = edge.traverse(s0, org.opentripplanner.street.search.TraverseMode.WALK);
+    var walking = edge.traverse(s0, TraverseMode.WALK);
     if (walking != null) {
       var walkState = walking.makeState();
       if (walkState != null) {
@@ -161,10 +163,7 @@ class DeferredForkHandler {
     return forkNetworks;
   }
 
-  private static boolean isNetworkAllowedByRequest(
-    String network,
-    org.opentripplanner.street.search.request.StreetSearchRequest request
-  ) {
+  private static boolean isNetworkAllowedByRequest(String network, StreetSearchRequest request) {
     return NetworkCommitmentHandler.isNetworkAllowedByRequest(network, request);
   }
 }

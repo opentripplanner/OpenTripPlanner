@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Station;
@@ -15,7 +16,7 @@ import org.opentripplanner.utils.collection.MapUtils;
 class EntranceMapper {
 
   private final IdFactory idFactory;
-  private final Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
+  private final Map<Stop, Entrance> mappedEntrances = new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
@@ -30,20 +31,20 @@ class EntranceMapper {
     this.stationLookUp = stationLookUp;
   }
 
-  Collection<Entrance> map(Collection<org.onebusaway.gtfs.model.Stop> allEntrances) {
+  Collection<Entrance> map(Collection<Stop> allEntrances) {
     return MapUtils.mapToList(allEntrances, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  Entrance map(org.onebusaway.gtfs.model.Stop orginal) {
+  Entrance map(Stop orginal) {
     return orginal == null ? null : mappedEntrances.computeIfAbsent(orginal, this::doMap);
   }
 
-  private Entrance doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
-    if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
+  private Entrance doMap(Stop gtfsStop) {
+    if (gtfsStop.getLocationType() != Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
       throw new IllegalArgumentException(
         "Expected type " +
-          org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT +
+          Stop.LOCATION_TYPE_ENTRANCE_EXIT +
           ", but got " +
           gtfsStop.getLocationType()
       );
@@ -58,17 +59,12 @@ class EntranceMapper {
       .withLevel(base.getLevel());
 
     builder.withName(
-      translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
-        "name",
-        base.getId().getId(),
-        base.getName()
-      )
+      translationHelper.getTranslation(Stop.class, "name", base.getId().getId(), base.getName())
     );
 
     builder = builder.withDescription(
       translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
+        Stop.class,
         "desc",
         base.getId().getId(),
         base.getDescription()

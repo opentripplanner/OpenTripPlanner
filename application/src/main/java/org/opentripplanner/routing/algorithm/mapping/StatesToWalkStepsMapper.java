@@ -501,7 +501,7 @@ public class StatesToWalkStepsMapper {
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
     return !(
       current.directionText().toString() != null &&
-      !java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
+      !Objects.equals(current.directionTextNoParens(), streetNameNoParens) &&
       (!current.nameIsDerived() || !edge.nameIsDerived())
     );
   }
