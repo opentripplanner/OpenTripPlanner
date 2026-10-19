@@ -14,8 +14,8 @@ import org.opentripplanner.gbfs.GbfsFeedDetails;
 import org.opentripplanner.gbfs.GbfsFeedLoaderImpl;
 
 /**
- * Class for managing the state and loading of complete GBFS version 2.2 and 2.3 datasets, and updating them according
- * to individual feed's TTL rules.
+ * Class for managing the state and loading of complete GBFS version 2.2 and 2.3 datasets, and
+ * updating them according to individual feed's TTL rules.
  */
 public class GbfsFeedLoader
   extends GbfsFeedLoaderImpl<GBFSFeedName, GbfsFeedLoader.GBFSFeedV23Details>

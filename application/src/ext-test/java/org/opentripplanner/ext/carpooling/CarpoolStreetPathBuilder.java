@@ -22,11 +22,10 @@ public class CarpoolStreetPathBuilder {
   }
 
   /**
-   * Creates a StreetPath with specified duration using State chain.
-   * Uses a single edge with floor distance to avoid rounding errors: the edge traversal
-   * applies ceiling when converting to milliseconds, and State.getTime() applies ceiling
-   * when converting to seconds, so floor distance ensures the final second-precision
-   * duration matches the requested value.
+   * Creates a StreetPath with specified duration using State chain. Uses a single edge with floor
+   * distance to avoid rounding errors: the edge traversal applies ceiling when converting to
+   * milliseconds, and State.getTime() applies ceiling when converting to seconds, so floor distance
+   * ensures the final second-precision duration matches the requested value.
    *
    * @param duration Total duration for the path
    * @return StreetPath with real State objects and accurate timing
@@ -42,8 +41,8 @@ public class CarpoolStreetPathBuilder {
   }
 
   /**
-   * Creates multiple StreetPaths with varying durations.
-   * Each path has duration = 5 minutes + index minutes.
+   * Creates multiple StreetPaths with varying durations. Each path has duration = 5 minutes + index
+   * minutes.
    *
    * @param count Number of paths to create
    * @return List of StreetPaths with incrementing durations

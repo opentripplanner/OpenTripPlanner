@@ -31,7 +31,9 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   private final RaptorService<TestTripSchedule> raptorService = RaptorTestFactory.raptorService();
 
   /**
+   * <pre>
    * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
+   * </pre>
    * <p>
    * Access(stop 1) and egress(stop 3) is 30s.
    */

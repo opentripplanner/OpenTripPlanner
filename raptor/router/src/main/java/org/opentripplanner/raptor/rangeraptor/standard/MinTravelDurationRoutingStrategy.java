@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
  * duration ignoring wait time(except board-/alight-slack). This class optimize on a single
  * criteria: MINIMUM TRAVEL DURATION.
  * <p>
- * Note! Raptor give us number-of-transfer as a second pareto criteria - which is outside the scope
- * of this class.
+ * Note! Raptor give us number-of-transfer as a second pareto criteria - which is outside the
+ * scope of this class.
  * <p>
  * Note! This strategy should only be used with one Range Raptor iteration (no searchWindow).
  * Multiple iterations are not allowed and would produce the same result in every iteration.

@@ -55,6 +55,7 @@ public class GtfsModule implements GraphBuilderModule {
   private final DeduplicatorService deduplicator;
 
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final int subwayAccessTime_s;
 
   public GtfsModule(
@@ -68,6 +69,7 @@ public class GtfsModule implements GraphBuilderModule {
     LocalDateRange transitPeriodLimit,
     FareServiceFactory fareServiceFactory,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     int subwayAccessTime_s
   ) {
     this.gtfsBundles = bundles;
@@ -80,6 +82,7 @@ public class GtfsModule implements GraphBuilderModule {
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.subwayAccessTime_s = subwayAccessTime_s;
   }
 
@@ -104,6 +107,7 @@ public class GtfsModule implements GraphBuilderModule {
       transitPeriodLimit,
       new GtfsFareServiceFactory(),
       150.0,
+      0.0,
       120
     );
   }
@@ -157,6 +161,7 @@ public class GtfsModule implements GraphBuilderModule {
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
           maxStopToShapeSnapDistance,
+          transitShapeSimplificationToleranceMeters,
           issueStore
         );
 
@@ -202,10 +207,11 @@ public class GtfsModule implements GraphBuilderModule {
    * Verifies that a feed id is not assigned twice.
    * <p>
    * Duplicates can happen in the following cases:
+   * <pre>
    *  - the feed id is configured twice in build-config.json
    *  - two GTFS feeds have the same feed_info.feed_id
    *  - a GTFS feed defines a feed_info.feed_id like '3' that collides with an auto-generated one
-   * <p>
+   * </pre>
    * Debugging these cases is very confusing, so we prevent it from happening.
    */
   private static void verifyUniqueFeedId(

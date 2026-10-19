@@ -17,8 +17,8 @@ import org.opentripplanner.transit.service.SiteRepository;
 /**
  * A {@link NearbyStopFinder} that filters nearby stops based on trip patterns and flex trips.
  * <p>
- * This finder delegates to another NearbyStopFinder to find physically nearby stops, then filters
- * them to include only stops that:
+ * This finder delegates to another NearbyStopFinder to find physically nearby stops, then
+ * filters them to include only stops that:
  * <ul>
  *   <li>Are served by trip patterns where boarding/alighting is possible, OR</li>
  *   <li>Are served by flex trips (if a flex index is given), OR</li>

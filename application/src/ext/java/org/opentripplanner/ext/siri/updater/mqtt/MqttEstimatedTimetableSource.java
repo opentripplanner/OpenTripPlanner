@@ -44,8 +44,8 @@ import uk.org.siri.siri21.Siri;
 
 /**
  * This is a realtime updater for trip updates in Siri ET format via MQTT. The updater is primed
- * (ready for routing requests), when all retained messages in the connected MQTT are processed.
- * If there are no retained messages, the updater is primed immediately. Live messages (messages
+ * (ready for routing requests), when all retained messages in the connected MQTT are processed. If
+ * there are no retained messages, the updater is primed immediately. Live messages (messages
  * without a retained flag) are always processed, even if the updater is not yet primed.
  * <p>
  * If the MQTT broker is unavailable at startup, the updater waits up to
@@ -208,8 +208,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   /**
    * Build the HiveMQ client and initiate a non-blocking connect. The client will automatically
-   * retry the connection (with exponential backoff) if the broker is unavailable. When a
-   * connection is established, {@link #onConnect()} is called which sets up the subscription.
+   * retry the connection (with exponential backoff) if the broker is unavailable. When a connection
+   * is established, {@link #onConnect()} is called which sets up the subscription.
    */
   private Mqtt5AsyncClient buildAndConnectClient() {
     Mqtt5SimpleAuth auth;

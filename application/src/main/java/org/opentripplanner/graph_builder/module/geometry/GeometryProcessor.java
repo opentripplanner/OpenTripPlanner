@@ -25,6 +25,7 @@ import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
+import org.opentripplanner.street.geometry.DouglasPeuckerAlgorithm;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -36,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * This module creates hop geometries from GTFS shapes.
  *
  * <p>
- * THREAD SAFETY The computation runs in parallel so be careful about thread safety when modifying
- * the logic here.
+ * THREAD SAFETY The computation runs in parallel so be careful about thread safety when
+ * modifying the logic here.
  */
 public class GeometryProcessor {
 
@@ -52,25 +53,28 @@ public class GeometryProcessor {
   // this is a thread-safe implementation
   private final Map<FeedScopedId, double[]> distancesByShapeId = new ConcurrentHashMap<>();
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final DataImportIssueStore issueStore;
 
   public GeometryProcessor(
     TransitDataImportBuilder builder,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     DataImportIssueStore issueStore
   ) {
     this.builder = builder;
     this.maxStopToShapeSnapDistance =
       maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.issueStore = issueStore;
   }
 
   /**
-   * Generate the per-hop geometry for the trip. The returned list is never null and always
-   * contains one entry per hop ({@code stopTimes.size() - 1}). When the trip has no usable
-   * shape data, the hops fall back to straight lines between consecutive stops, mirroring the
-   * NeTEx {@link org.opentripplanner.netex.mapping.ServiceLinkMapper} behaviour. Assumes that
-   * there are already vertices in the graph for the stops.
+   * Generate the per-hop geometry for the trip. The returned list is never null and always contains
+   * one entry per hop ({@code stopTimes.size() - 1}). When the trip has no usable shape data, the
+   * hops fall back to straight lines between consecutive stops, mirroring the NeTEx
+   * {@link org.opentripplanner.netex.mapping.ServiceLinkMapper} behaviour. Assumes that there are
+   * already vertices in the graph for the stops.
    * <p>
    * THREAD SAFETY The geometries for the trip patterns are computed in parallel. The collections
    * needed for this are concurrent implementations and therefore threadsafe but the issue store,
@@ -83,10 +87,16 @@ public class GeometryProcessor {
       trip.getShapeId().getId() == null ||
       trip.getShapeId().getId().isEmpty()
     ) {
+      // a straight line between two stops has no interior points to simplify away
       return Arrays.asList(createStraightLineHopGeometries(stopTimes));
     }
+    LineString[] geometry = createGeometry(trip.getShapeId(), stopTimes);
 
-    return Arrays.asList(createGeometry(trip.getShapeId(), stopTimes));
+    return transitShapeSimplificationToleranceMeters <= 0
+      ? Arrays.asList(geometry)
+      : Arrays.stream(geometry)
+          .map(l -> DouglasPeuckerAlgorithm.of(l, transitShapeSimplificationToleranceMeters))
+          .toList();
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {

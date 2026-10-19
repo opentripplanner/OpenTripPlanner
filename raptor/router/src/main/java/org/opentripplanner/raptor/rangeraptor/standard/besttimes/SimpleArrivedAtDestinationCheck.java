@@ -5,9 +5,9 @@ import org.opentripplanner.raptor.rangeraptor.standard.internalapi.ArrivedAtDest
 public class SimpleArrivedAtDestinationCheck implements ArrivedAtDestinationCheck {
 
   /**
-   * The list of egress stops used to terminate the search when a stop is reached by transit.
-   * Egress paths that start by walking can not be used with transfer arrivals, since we
-   * do not allow two walking legs after each other.
+   * The list of egress stops used to terminate the search when a stop is reached by transit. Egress
+   * paths that start by walking can not be used with transfer arrivals, since we do not allow two
+   * walking legs after each other.
    */
   private final int[] walkToDestinationEgressStops;
 

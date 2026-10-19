@@ -10,7 +10,8 @@ import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 
 /**
  * Application-scoped factory for GTFS-RT trip update processing. Holds stable, application-lifetime
- * state and produces a per-task {@link GtfsRealTimeUpdateHandler} via {@link #forUpdate(TimetableRepository)}.
+ * state and produces a per-task {@link GtfsRealTimeUpdateHandler} via
+ * {@link #forUpdate(TimetableRepository)}.
  */
 public class GtfsRealTimeTripUpdateAdapter {
 

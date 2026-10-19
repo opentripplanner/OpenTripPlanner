@@ -22,8 +22,8 @@ class LookupStopIndexCallbackTest {
   );
 
   /**
-   * This mostly verifies that the test is set up correctly, the code tested is the dummy inside
-   * the test.
+   * This mostly verifies that the test is set up correctly, the code tested is the dummy inside the
+   * test.
    */
   void lookupStopLocationIndexesSingleIdInput() {
     assertArrayEquals(new int[] { 1, 7, 13 }, subject.lookupStopLocationIndexes(ID_1).toArray());

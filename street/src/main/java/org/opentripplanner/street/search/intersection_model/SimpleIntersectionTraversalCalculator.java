@@ -109,8 +109,7 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   /**
-   * Returns if this angle represents a safe turn were incoming traffic does not have to be
-   * crossed.
+   * Returns if this angle represents a safe turn were incoming traffic does not have to be crossed.
    * <p>
    * In right hand traffic countries (US, mainland Europe), this is a right turn. In left hand
    * traffic countries (UK, Japan) this is a left turn.
@@ -125,8 +124,8 @@ public class SimpleIntersectionTraversalCalculator
   /**
    * Returns if this angle represents a turn across incoming traffic.
    * <p>
-   * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK) countries
-   * this is a right turn.
+   * In right hand traffic countries (US) this is a left turn. In left hand traffic (UK)
+   * countries this is a right turn.
    */
   protected boolean isTurnAcrossTraffic(int turnAngle) {
     return switch (drivingDirection) {

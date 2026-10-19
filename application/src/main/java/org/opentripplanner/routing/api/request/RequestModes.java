@@ -55,8 +55,8 @@ public class RequestModes {
   }
 
   /**
-   * Return the default set of modes with WALK for all street modes and all transit modes set.
-   * Tip: Use the {@link #of()} to change the defaults.
+   * Return the default set of modes with WALK for all street modes and all transit modes set. Tip:
+   * Use the {@link #of()} to change the defaults.
    */
   public static RequestModes defaultRequestModes() {
     return DEFAULTS;

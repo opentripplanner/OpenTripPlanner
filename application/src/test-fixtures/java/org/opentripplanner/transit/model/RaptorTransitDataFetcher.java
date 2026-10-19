@@ -22,8 +22,8 @@ public class RaptorTransitDataFetcher {
   }
 
   /**
-   * Get the patterns for the given service date, extract their ids, converts to string, sort
-   * them alphabetically and add the real-time states of their trip times.
+   * Get the patterns for the given service date, extract their ids, converts to string, sort them
+   * alphabetically and add the real-time states of their trip times.
    */
   public List<String> summarizePatterns() {
     return list().stream().map(RaptorTransitDataFetcher::summarise).toList();

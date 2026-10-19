@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Logs a nicely formatted summary of the result of a realtime update which is very helpful
- * for debugging.
+ * Logs a nicely formatted summary of the result of a realtime update which is very helpful for
+ * debugging.
  */
 public class ResultLogger {
 

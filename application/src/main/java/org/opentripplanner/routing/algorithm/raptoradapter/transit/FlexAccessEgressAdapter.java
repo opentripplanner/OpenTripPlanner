@@ -6,7 +6,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 
 /**
- * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.
+ * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg
+ * DefaultAccessEgress.
  */
 public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 

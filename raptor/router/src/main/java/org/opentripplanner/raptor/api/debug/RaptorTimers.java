@@ -1,9 +1,8 @@
 package org.opentripplanner.raptor.api.debug;
 
 /**
- * Implement this interface and pass it into Raptor to wrap the most important
- * steps in the algorithm. This make Raptor independent of the frameworks used and the
- * target monitoring system.
+ * Implement this interface and pass it into Raptor to wrap the most important steps in the
+ * algorithm. This make Raptor independent of the frameworks used and the target monitoring system.
  */
 public interface RaptorTimers {
   /**
@@ -32,21 +31,21 @@ public interface RaptorTimers {
   };
 
   /**
-   * This method is called for each Range Raptor routing request. A Raptor search may first
-   * do an arrival-time-criteria routing request, then do a reverse search and then a multi-criteria
+   * This method is called for each Range Raptor routing request. A Raptor search may first do an
+   * arrival-time-criteria routing request, then do a reverse search and then a multi-criteria
    * routing request. In this case this method is called for all three requests.
    */
   void route(Runnable body);
 
   /**
-   * This wrap finding all transit routes and updating the state with all transit-stop-arrivals
-   * for a Range-Raptor round.
+   * This wrap finding all transit routes and updating the state with all transit-stop-arrivals for
+   * a Range-Raptor round.
    */
   void routeTransit(Runnable body);
 
   /**
-   * This wrap finding all transfers and updating the state with all transfer-stop-arrivals
-   * for a Range-Raptor round.
+   * This wrap finding all transfers and updating the state with all transfer-stop-arrivals for a
+   * Range-Raptor round.
    */
   void applyTransfers(Runnable body);
 

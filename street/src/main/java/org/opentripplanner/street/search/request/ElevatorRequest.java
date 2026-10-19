@@ -9,7 +9,7 @@ import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- *  TODO: how long does it /really/ take to  an elevator?
+ * TODO: how long does it /really/ take to an elevator?
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
@@ -52,9 +52,9 @@ public final class ElevatorRequest implements Serializable {
   }
 
   /**
-   * How long does it take to board an elevator, on average (actually, it probably should be a bit *more*
-   * than average, to prevent optimistic trips)? Setting it to "seems like forever," while accurate,
-   * will probably prevent OTP from working correctly.
+   * How long does it take to board an elevator, on average (actually, it probably should be a bit
+   * *more* than average, to prevent optimistic trips)? Setting it to "seems like forever," while
+   * accurate, will probably prevent OTP from working correctly.
    */
   public Duration boardSlack() {
     return boardSlack;

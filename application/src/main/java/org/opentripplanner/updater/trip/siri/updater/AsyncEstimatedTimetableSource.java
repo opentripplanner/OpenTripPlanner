@@ -10,11 +10,10 @@ import uk.org.siri.siri21.ServiceDelivery;
 public interface AsyncEstimatedTimetableSource {
   /**
    * Start reading from the SIRI-ET feed and forward the estimated timetables to a consumer for
-   * further processing.
-   * <br>Starting the source includes all the necessary steps to set up the network
-   * communication with the SIRI-ET feed as well as the (optional) processing of the message
-   * backlog, that is the recent history of SIRI-ET messages produced by this feed and made
-   * available by a message cache.
+   * further processing. <br>
+   * Starting the source includes all the necessary steps to set up the network communication with
+   * the SIRI-ET feed as well as the (optional) processing of the message backlog, that is the
+   * recent history of SIRI-ET messages produced by this feed and made available by a message cache.
    *
    * @param serviceDeliveryConsumer apply asynchronously the updates to the transit model. Return a
    *                                future indicating when the updates are applied.

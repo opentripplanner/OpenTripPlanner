@@ -6,8 +6,8 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 
 /**
- * This is the decorator filter implementation. To add a decorator, you should implement
- * the {@link ItineraryDecorator}.
+ * This is the decorator filter implementation. To add a decorator, you should implement the
+ * {@link ItineraryDecorator}.
  */
 public final class DecorateFilter implements ItineraryListFilter {
 

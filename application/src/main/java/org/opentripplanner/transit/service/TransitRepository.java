@@ -35,12 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The TransitRepository groups together all instances making up OTP's primary internal representation
- * of the public transportation network. Although the names of many entities are derived from
- * GTFS concepts, these are actually independent of the data source from which they are loaded.
- * Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept exists
- * in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that exist
- * only in NeTEx, the NeTEx name is used in the internal model.
+ * The TransitRepository groups together all instances making up OTP's primary internal
+ * representation of the public transportation network. Although the names of many entities are
+ * derived from GTFS concepts, these are actually independent of the data source from which they are
+ * loaded. Both GTFS and NeTEx entities are mapped to these same internal OTP entities. If a concept
+ * exists in both GTFS and NeTEx, the GTFS name is used in the internal model. For concepts that
+ * exist only in NeTEx, the NeTEx name is used in the internal model.
  * <p>
  * The scheduled trip patterns, trips and trip calendars are not part of this repository.
  * <p>
@@ -48,13 +48,14 @@ import org.slf4j.LoggerFactory;
  * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
  * its contents.
  * <p>
- * The TransitRepository stands in opposition to two other aggregates: the Graph (representing the
- * street network) and the RaptorTransitData (representing many of the same things in the TransitRepository
- * but rearranged to be more efficient for Raptor routing).
+ * The TransitRepository stands in opposition to two other aggregates: the Graph (representing
+ * the street network) and the RaptorTransitData (representing many of the same things in the
+ * TransitRepository but rearranged to be more efficient for Raptor routing).
  * <p>
  * At this point the TransitRepository is not often read directly. Many requests will look at the
- * RaptorTransitData rather than the TransitRepository it's derived from. Both are often accessed via the
- * TransitService rather than directly reading the fields of TransitRepository or RaptorTransitData.
+ * RaptorTransitData rather than the TransitRepository it's derived from. Both are often accessed
+ * via the TransitService rather than directly reading the fields of TransitRepository or
+ * RaptorTransitData.
  */
 public class TransitRepository implements Serializable {
 
@@ -94,9 +95,9 @@ public class TransitRepository implements Serializable {
 
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
-  /// Updates are not allowed after the repository is frozen. All realtime updates should be
-  /// applied to the TimetableRepository. The repository is modifiable during graph build then
-  /// frozen when the server is started.
+  /// Updates are not allowed after the repository is frozen. All realtime updates should be applied
+  /// to the TimetableRepository. The repository is modifiable during graph build then frozen when
+  /// the server is started.
   private boolean frozen = false;
 
   @Inject
@@ -124,8 +125,8 @@ public class TransitRepository implements Serializable {
   }
 
   /**
-   * Make the Timetable repository immutable when the otp server is started. After this point,
-   * all modifications should be done to the TimetableRepository.
+   * Make the Timetable repository immutable when the otp server is started. After this point, all
+   * modifications should be done to the TimetableRepository.
    */
   public void freeze() {
     index();
@@ -289,13 +290,14 @@ public class TransitRepository implements Serializable {
    * The scheduled stop point is a "location-independent" stop that schedule systems provide
    * which in turn can be later be resolved to an actual stop.
    * <p>
-   * This way two schedule systems can use their own IDs for scheduled stop points but the stop (the
-   * actual physical infrastructure) is the same.
+   * This way two schedule systems can use their own IDs for scheduled stop points but the stop
+   * (the actual physical infrastructure) is the same.
    * <p>
-   * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's stopPointRef
-   * but the specs are unclear and the reality on the ground very mixed.
+   * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's
+   * stopPointRef but the specs are unclear and the reality on the ground very mixed.
    *
-   * @link <a href="https://public.3.basecamp.com/p/TcEEP5WrNZJPBxrJU9GAjint">NeTEx Basecamp discussion</a>
+   * @link <a href="https://public.3.basecamp.com/p/TcEEP5WrNZJPBxrJU9GAjint">NeTEx Basecamp
+   *       discussion</a>
    */
   public Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint) {
     return Optional.ofNullable(stopsByScheduledStopPointRefs.get(scheduledStopPoint));
@@ -307,8 +309,10 @@ public class TransitRepository implements Serializable {
    * <p>
    * Note: before this method is called an empty {@code transitAlertService} is returned instead.
    * <p>
+   * <pre>
    * TODO: This logic is unfortunate and quite brittle. We would like to improve it in the future.
    *       The UpdateManager should live in a DI context(Dagger), not here.
+   * </pre>
    */
   public void initUpdaterManager(GraphUpdaterManager updaterManager) {
     this.updaterManager = ObjectUtils.requireNotInitialized(
@@ -320,8 +324,8 @@ public class TransitRepository implements Serializable {
 
   /**
    * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
-   * graph updaters defined in the configuration. This is {@code null} if no updaters are
-   * configured or not yet initialized.
+   * graph updaters defined in the configuration. This is {@code null} if no updaters are configured
+   * or not yet initialized.
    *
    * @see UpdaterConfigurator
    */
@@ -373,8 +377,8 @@ public class TransitRepository implements Serializable {
   }
 
   /**
-   * The caller is responsible for calling the {@link #index()} method if it is a
-   * possibility that the index is not initialized (during graph build).
+   * The caller is responsible for calling the {@link #index()} method if it is a possibility that
+   * the index is not initialized (during graph build).
    */
   @Nullable
   TransitRepositoryIndex getTransitRepositoryIndex() {

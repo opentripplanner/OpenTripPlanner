@@ -170,9 +170,9 @@ public class RefetchItineraryServiceTest {
     assertEquals("11:00:10", itinerary.legs().get(1).endTime().toLocalTime().toString());
   }
 
-  /// It should be possible to fetch an itinerary that has a leg that ends after the later one starts.
-  /// This is needed to be able to refetch an itinerary that has a delay on an earlier leg that makes
-  /// a transfer impossible to make.
+  /// It should be possible to fetch an itinerary that has a leg that ends after the later one
+  /// starts. This is needed to be able to refetch an itinerary that has a delay on an earlier leg
+  /// that makes a transfer impossible to make.
   @Test
   void refetchWithImpossibleTransfer() {
     var transitEnv = TRANSIT_ENV.build();

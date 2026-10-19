@@ -5,9 +5,9 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
- * This class is an adapter for the internal {@link SlackProvider} which wrap the api {@link
- * RaptorSlackProvider}. The Adapter is needed to swap board/alight in the reverse search. It also
- * incorporates the transfer slack into the bordSlack, so the algorithm have one thing less to
+ * This class is an adapter for the internal {@link SlackProvider} which wrap the api
+ * {@link RaptorSlackProvider}. The Adapter is needed to swap board/alight in the reverse search. It
+ * also incorporates the transfer slack into the bordSlack, so the algorithm have one thing less to
  * account for.
  * <p>
  * Uses the adapter design pattern.

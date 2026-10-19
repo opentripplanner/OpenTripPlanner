@@ -17,9 +17,9 @@ import org.opentripplanner.street.graph.summary.GraphSummarizer;
 class WalkOnlyConnectedParkAndRideTest {
 
   /// A car parking lot whose boundary shares a node with a footway is connected to the street
-  /// network for pedestrians but not for cars.
-  /// The algorithm must detect the missing car access and add an artificial car-accessible entrance
-  /// at the lot's centroid, just as it does for a fully disconnected lot.
+  /// network for pedestrians but not for cars. The algorithm must detect the missing car access and
+  /// add an artificial car-accessible entrance at the lot's centroid, just as it does for a fully
+  /// disconnected lot.
   @Test
   void walkOnlyConnectedParkingLotGetsArtificialCarEntrance() {
     var n1 = OsmNode.of().withId(1).withLatLon(0.0, 0.0).build();

@@ -69,3 +69,21 @@ Three things to check when migrating:
 
 `geofencingBusinessAreaBorders` is renamed `requireDropOffInsideBusinessArea` and is configurable
 per network rather than hardcoded to `true`. The default is unchanged.
+
+### 2.11: boarding location configuration moved into an object
+
+`boardingLocationTags` in `build-config.json` moved into a new `boardingLocations` object and is
+renamed `refTags`. The new `coordinateSource` parameter lives beside it. See
+[boarding locations](BoardingLocations.md).
+
+```
+before                                   after
+  boardingLocationTags: [...]    ------>   boardingLocations
+                                             refTags: [...]
+                                             coordinateSource: "osm" | "transit"
+```
+
+The default for `refTags` is unchanged (`["ref"]`), so a deployment that never set
+`boardingLocationTags` needs no change. One that did will otherwise fall back to the default and
+silently stop matching stops on its other tags - check the startup log for
+`Unexpected config parameter: 'boardingLocationTags'`.

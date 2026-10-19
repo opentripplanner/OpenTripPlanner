@@ -37,8 +37,8 @@ import org.opentripplanner.transit.service.TransitServiceResolver;
  *   S  (10 meters S of A, transit stop)
  * </pre>
  *
- * One straight road east at 10 meters/second: A to D is 48 km, so the carpool drives the single
- * leg A to D in ~80 min, with a 10-min deviation budget at A and D. The access request has the
+ * One straight road east at 10 meters/second: A to D is 48 km, so the carpool drives the single leg
+ * A to D in ~80 min, with a 10-min deviation budget at A and D. The access request has the
  * passenger at P, dropped at stop S — both 10 meters from A.
  * <p>
  * The leg tree is sized from the routed baseline: 80 + 1 (slack) + 10 (budget) = 91 min, wider

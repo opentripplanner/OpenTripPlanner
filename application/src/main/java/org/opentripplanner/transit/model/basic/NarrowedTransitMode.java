@@ -82,8 +82,8 @@ public class NarrowedTransitMode {
   }
 
   /**
-   * Make sure the String serialization is deterministic by sorting the elements in
-   * alphabetic order.
+   * Make sure the String serialization is deterministic by sorting the elements in alphabetic
+   * order.
    *
    * @see MainAndSubMode#toString(Collection)
    */

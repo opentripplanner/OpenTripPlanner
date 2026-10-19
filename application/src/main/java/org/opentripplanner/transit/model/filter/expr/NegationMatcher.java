@@ -2,7 +2,8 @@ package org.opentripplanner.transit.model.filter.expr;
 
 /**
  * A matcher that validates that a value does NOT match the matcher passed.
- * <p/>
+ * <p>
+ *
  * @param <T> The type of the entity being matched.
  */
 public class NegationMatcher<T> implements Matcher<T> {

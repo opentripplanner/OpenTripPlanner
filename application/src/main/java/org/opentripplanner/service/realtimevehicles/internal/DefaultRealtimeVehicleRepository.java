@@ -11,10 +11,10 @@ import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * Mutable repository for the realtime vehicles. A new instance is created for each transaction
- * that writes vehicles — initialized from the last committed snapshot — and is only accessed on
- * the single writer thread. {@link #createSnapshot()} publishes an immutable snapshot of its
- * state at commit time, safe for concurrent reads from request threads.
+ * Mutable repository for the realtime vehicles. A new instance is created for each transaction that
+ * writes vehicles — initialized from the last committed snapshot — and is only accessed on the
+ * single writer thread. {@link #createSnapshot()} publishes an immutable snapshot of its state at
+ * commit time, safe for concurrent reads from request threads.
  */
 public class DefaultRealtimeVehicleRepository implements RealtimeVehicleRepository {
 
@@ -50,8 +50,8 @@ public class DefaultRealtimeVehicleRepository implements RealtimeVehicleReposito
   }
 
   /**
-   * Produce an immutable copy of the state to be used in the repository life-cycle. Only
-   * the lifecycle should have access to this, hence the package local access.
+   * Produce an immutable copy of the state to be used in the repository life-cycle. Only the
+   * lifecycle should have access to this, hence the package local access.
    */
   RealtimeVehicleRepositorySnapshot freeze() {
     return new DefaultRealtimeVehiclesRepositorySnapshot(ImmutableListMultimap.copyOf(vehicles));

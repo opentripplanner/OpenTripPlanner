@@ -41,8 +41,8 @@ public enum FileType {
   }
 
   /**
-   * Return {@code true} if the file is an OUTPUT data file/directory. This is the graph files
-   * and the build-report file.
+   * Return {@code true} if the file is an OUTPUT data file/directory. This is the graph files and
+   * the build-report file.
    */
   public boolean isOutputDataSource() {
     return EnumSet.of(GRAPH, REPORT).contains(this);

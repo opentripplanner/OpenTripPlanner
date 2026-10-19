@@ -7,8 +7,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * References to the vehicle and vehicle type aimed to operate a trip, as given in the planned
- * data.
+ * References to the vehicle and vehicle type aimed to operate a trip, as given in the planned data.
  */
 public class VehicleAssignment implements Serializable {
 

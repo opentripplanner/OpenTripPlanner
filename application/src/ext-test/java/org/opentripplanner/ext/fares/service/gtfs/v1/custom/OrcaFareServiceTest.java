@@ -85,10 +85,11 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded, it is acceptable
-   * to make direct calls to the Orca fare service with predefined routes. Where the default fare is applied a test
-   * substitute {@link OrcaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash fare
-   * types.
+   * These tests are designed to specifically validate Orca fares. Since these fares are hard-coded,
+   * it is acceptable to make direct calls to the Orca fare service with predefined routes. Where
+   * the default fare is applied a test substitute
+   * {@link OrcaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is used. This will be the same for all cash
+   * fare types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
     var itinerary = Itinerary.ofScheduledTransit(legs).withGeneralizedCost(Cost.ZERO).build();
@@ -263,8 +264,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * WSF do not accept free transfers. This test is to make sure the rider is charged the cash price for WSF as well
-   * as the highest fare where Orca can be used.
+   * WSF do not accept free transfers. This test is to make sure the rider is charged the cash price
+   * for WSF as well as the highest fare where Orca can be used.
    */
   @Test
   void calculateFareWithNoFreeTransfer() {
@@ -304,10 +305,10 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A single (highest)
-   * Orca fare will be charged for these transfers. The fifth transfer is outside of the original two hour window so
-   * a single Orca fare for this leg is applied and the two hour window will start again. The final transfer is within
-   * the new two hour window and will be free.
+   * Total trip time is 2h 30m. The first four transfers are within the permitted two hour window. A
+   * single (highest) Orca fare will be charged for these transfers. The fifth transfer is outside
+   * of the original two hour window so a single Orca fare for this leg is applied and the two hour
+   * window will start again. The final transfer is within the new two hour window and will be free.
    */
   @Test
   void calculateFareThatExceedsTwoHourFreeTransferWindow() {
@@ -330,9 +331,9 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Total trip time is 2h 30m. Calculate fare with two free transfer windows which include agencies which do not permit
-   * free transfers. The free transfers will be applied for Kitsap, but not for WSF nor Skagit. Note: Not a real world
-   * trip!
+   * Total trip time is 2h 30m. Calculate fare with two free transfer windows which include agencies
+   * which do not permit free transfers. The free transfers will be applied for Kitsap, but not for
+   * WSF nor Skagit. Note: Not a real world trip!
    */
   @Test
   void calculateFareThatIncludesNoFreeTransfers() {
@@ -367,7 +368,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Total trip time is 4h 30m. This is equivalent to three transfer windows and therefore three Orca fare charges.
+   * Total trip time is 4h 30m. This is equivalent to three transfer windows and therefore three
+   * Orca fare charges.
    */
   @Test
   void calculateFareThatExceedsTwoHourFreeTransferWindowTwice() {
@@ -393,8 +395,9 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * This trip starts with a cash fare so the free transfer window doesn't start until the second transfer. Therefore,
-   * all subsequent transfers will come under one transfer window and only one Orca discount charge will apply.
+   * This trip starts with a cash fare so the free transfer window doesn't start until the second
+   * transfer. Therefore, all subsequent transfers will come under one transfer window and only one
+   * Orca discount charge will apply.
    */
   @Test
   void calculateFareThatStartsWithACashFare() {
@@ -435,7 +438,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Single trip (Point Defiance - Tahlequah) with WSF transit to confirm correct non Orca fares are applied.
+   * Single trip (Point Defiance - Tahlequah) with WSF transit to confirm correct non Orca fares are
+   * applied.
    */
   @Test
   void calculateFareForWSFPtToTahlequah() {
@@ -506,8 +510,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a few Sound Transit trips but under the contracted agency IDs.
-   * SoundTransit contracts their bus service, so their routes show under the contracted agency's IDs in the GTFS feed.
+   * Create a few Sound Transit trips but under the contracted agency IDs. SoundTransit contracts
+   * their bus service, so their routes show under the contracted agency's IDs in the GTFS feed.
    * Make sure that we get ST's bus fare and not the contracted agency's fare.
    */
   @Test
@@ -611,8 +615,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Test monorail fares with transfers to ensure transfer logic works correctly
-   * with monorail's unique fare structure. Update: monorail doesn't accept transfers anymore
+   * Test monorail fares with transfers to ensure transfer logic works correctly with monorail's
+   * unique fare structure. Update: monorail doesn't accept transfers anymore
    */
   @Test
   void calculateMonorailFaresWithTransfers() {
@@ -819,8 +823,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to determine the
-   * correct ride type.
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to
+   * determine the correct ride type.
    */
   private static Leg createLeg(
     String agencyId,
@@ -845,8 +849,8 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to determine the
-   * correct ride type.
+   * Create a {@link Leg} containing route data that will be used by {@link OrcaFareService} to
+   * determine the correct ride type.
    */
   private static Leg createLeg(
     String agencyId,

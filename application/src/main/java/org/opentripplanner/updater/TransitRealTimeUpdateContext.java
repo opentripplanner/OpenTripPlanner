@@ -43,9 +43,9 @@ public interface TransitRealTimeUpdateContext {
   GtfsRealtimeFuzzyTripMatcher gtfsRealtimeFuzzyTripMatcher();
 
   /**
-   * Return an entity resolver that can look up both scheduled and real-time data.
-   * The entity resolver has access to all real-time updates applied so far,
-   * including those not yet committed in a published snapshot.
+   * Return an entity resolver that can look up both scheduled and real-time data. The entity
+   * resolver has access to all real-time updates applied so far, including those not yet committed
+   * in a published snapshot.
    */
   EntityResolver entityResolver(String feedId);
 }

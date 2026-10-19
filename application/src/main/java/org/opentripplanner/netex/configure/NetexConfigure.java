@@ -20,9 +20,9 @@ import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * Responsible for dependency injection and creating main NeTEx module objects. This decouple the
- * main classes in the netex module, and serve as a single entry-point to create a {@link
- * NetexModule} which simplify the code({@link org.opentripplanner.graph_builder.GraphBuilder})
- * using it.
+ * main classes in the netex module, and serve as a single entry-point to create a
+ * {@link NetexModule} which simplify the
+ * code({@link org.opentripplanner.graph_builder.GraphBuilder}) using it.
  * <p>
  * This class inject the build configuration. This way none of the other classes in the
  * `org.opentripplanner.netex` have dependencies to the {@link BuildConfig}.
@@ -31,10 +31,10 @@ import org.opentripplanner.transit.service.TransitRepository;
  */
 public class NetexConfigure {
 
-  private final BuildConfig buildParams;
+  private final BuildConfig buildConfig;
 
-  public NetexConfigure(BuildConfig builderParams) {
-    this.buildParams = builderParams;
+  public NetexConfigure(BuildConfig buildConfig) {
+    this.buildConfig = buildConfig;
   }
 
   public NetexModule createNetexModule(
@@ -65,8 +65,8 @@ public class NetexConfigure {
       parkingRepository,
       streetDetailsRepository,
       issueStore,
-      buildParams.getSubwayAccessTimeSeconds(),
-      buildParams.getTransitServicePeriod(),
+      buildConfig.getSubwayAccessTimeSeconds(),
+      buildConfig.getTransitServicePeriod(),
       netexBundles
     );
   }
@@ -85,8 +85,9 @@ public class NetexConfigure {
       hierarchy(source, config),
       transitServiceBuilder,
       config.ferryIdsNotAllowedForBicycle(),
-      buildParams.transitRouteToStationCentroid(),
-      buildParams.maxStopToShapeSnapDistance,
+      buildConfig.transitRouteToStationCentroid(),
+      buildConfig.maxStopToShapeSnapDistance,
+      buildConfig.transitShapeSimplificationToleranceMeters(),
       config.noTransfersOnIsolatedStops(),
       config.ignoredFeatures()
     );

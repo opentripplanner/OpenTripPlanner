@@ -1,14 +1,14 @@
 package org.opentripplanner.raptor.api.model;
 
 /**
- * Represents a multi-criteria dominance function for comparing two int values:
- * {@code left} and {@code right}.
+ * Represents a multi-criteria dominance function for comparing two int values: {@code left} and
+ * {@code right}.
  */
 @FunctionalInterface
 public interface DominanceFunction {
   /**
-   * Return a function which never dominates anything. This is the same as
-   * ignoring a criteria in the pareto dominance function.
+   * Return a function which never dominates anything. This is the same as ignoring a criteria in
+   * the pareto dominance function.
    */
   static DominanceFunction noop() {
     return (l, r) -> false;

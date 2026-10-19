@@ -6,8 +6,8 @@ public interface GsParameters {
   /**
    * Host of the Google Cloud Services, including the port.
    * <p>
-   * Optional. May return {@code null}. If the host is not set, the connection to the Google Cloud
-   * Platform is done via the default host {@code https://storage.googleapis.com:4443}.
+   * Optional. May return {@code null}. If the host is not set, the connection to the Google
+   * Cloud Platform is done via the default host {@code https://storage.googleapis.com:4443}.
    *
    */
   @Nullable
@@ -20,8 +20,8 @@ public interface GsParameters {
    * <p>
    * This is a path to a file on the local file system, not an URI.
    * <p>
-   * Optional. May return {@code null}. If the credentials are not set, the connection to the Google
-   * Cloud Platform is done without any authorization.
+   * Optional. May return {@code null}. If the credentials are not set, the connection to the
+   * Google Cloud Platform is done without any authorization.
    */
   @Nullable
   String credentialFile();

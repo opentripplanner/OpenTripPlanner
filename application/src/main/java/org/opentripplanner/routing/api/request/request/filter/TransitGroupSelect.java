@@ -10,10 +10,9 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Select a given set of transit routes base on the list of
- * modes, sub-modes, agencies and routes. A transit entity matches
- * if mode, sub-mode, agencyId or routeId matches - only one
- * "thing" needs to match.
+ * Select a given set of transit routes base on the list of modes, sub-modes, agencies and routes. A
+ * transit entity matches if mode, sub-mode, agencyId or routeId matches - only one "thing" needs to
+ * match.
  * <p>
  * The {@code TransitGroupSelect(modes:[BUS, TRAM], agencyIds:[A1, A3])} matches both:
  * <ul>

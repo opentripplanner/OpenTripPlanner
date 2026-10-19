@@ -7,7 +7,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * NeTEx does not contain this id and also assumes ids are already unique, it is necessary to
  * specify an id to use in the OTP model.
  * <p>
- * This factory is used to set the feed id once and then apply it to elements as they are created.
+ * This factory is used to set the feed id once and then apply it to elements as they are
+ * created.
  * <p>
  * This class should only be used by the Netex import/mapping process.
  */

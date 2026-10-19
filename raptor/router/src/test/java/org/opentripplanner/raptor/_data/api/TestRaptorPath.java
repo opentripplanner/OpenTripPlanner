@@ -14,8 +14,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
  * This can be used to test the comparators and ParetoSet. Please use the real
- * {@link org.opentripplanner.raptor.path.Path} implementation if other
- * functionality is needed.
+ * {@link org.opentripplanner.raptor.path.Path} implementation if other functionality is needed.
  */
 public record TestRaptorPath(
   int rangeRaptorIterationDepartureTime,

@@ -24,8 +24,8 @@ public class IntIterators {
   /* Static factories */
 
   /**
-   * Create an iterator over the given bitset. The iterator will return the index of the set bits
-   * in the bitset, in ascending order.
+   * Create an iterator over the given bitset. The iterator will return the index of the set bits in
+   * the bitset, in ascending order.
    */
   public static IntIterator of(BitSet set) {
     return new BitSetIterator(set);

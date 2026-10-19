@@ -12,21 +12,21 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 /**
  * Information about a configuration parameter.
  *
- * @param name The parameter name in the JSON config file.
- * @param summary Short one sentence description of the parameter used for documentation.
- * @param description Long optional multi-line documentation of a parameter - use markdown.
- * @param type The NodeAdaptor supported type.
- * @param enumType If type is ENUM, ENUM_MAP or ENUM_SET, then this contains the enum type.
- * @param elementType If the type is an ARRAY or a MAP then this is the type of the value.
- * @param since This is the first OTP version this feature existed in.
- * @param defaultValue The default value used if this parameter is not present in the documentation.
- * @param required The config parameter is required. OTP will not start unless this parameter is
- *                 set.
- * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
- *                  node.
- *
- *
+ * <p>
  * TODO DOC - Add Unit tests on this class using the builder
+ *
+ * @param name         The parameter name in the JSON config file.
+ * @param summary      Short one sentence description of the parameter used for documentation.
+ * @param description  Long optional multi-line documentation of a parameter - use markdown.
+ * @param type         The NodeAdaptor supported type.
+ * @param enumType     If type is ENUM, ENUM_MAP or ENUM_SET, then this contains the enum type.
+ * @param elementType  If the type is an ARRAY or a MAP then this is the type of the value.
+ * @param since        This is the first OTP version this feature existed in.
+ * @param defaultValue The default value used if this parameter is not present in the documentation.
+ * @param required     The config parameter is required. OTP will not start unless this parameter is
+ *                     set.
+ * @param skipChild    Skip generating doc for this node - the child(this) is documented in the
+ *                     parent node.
  */
 public record NodeInfo(
   String name,
@@ -58,12 +58,14 @@ public record NodeInfo(
   }
 
   /**
-   * For some complex types like Map, we describe the child elements as part of the node-info of
-   * the parent. Hence, we need to skip the child when generating documentation. So, this factory
-   * method is used to generate a placeholder in these cases.
+   * For some complex types like Map, we describe the child elements as part of the node-info of the
+   * parent. Hence, we need to skip the child when generating documentation. So, this factory method
+   * is used to generate a placeholder in these cases.
    * <p>
+   * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
+   * </pre>
    */
   static NodeInfo ofSkipChild(String name) {
     return of()
@@ -77,12 +79,14 @@ public record NodeInfo(
   }
 
   /**
-   * For array of objects the child elements does not have as part of the node-info of
-   * the parent. Hence, we need to skip the child when generating documentation. So, this factory
-   * method is used to generate a placeholder in these cases.
+   * For array of objects the child elements does not have as part of the node-info of the parent.
+   * Hence, we need to skip the child when generating documentation. So, this factory method is used
+   * to generate a placeholder in these cases.
    * <p>
+   * <pre>
    * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
    *           the child, but that requires a bit of refactoring.
+   * </pre>
    */
   public NodeInfo arraysChild() {
     return of()
@@ -95,9 +99,9 @@ public record NodeInfo(
   }
 
   /**
-   * This method will return {@code true} if there is more information than just the basic
-   * required info. It is used to be able to list a node in a "details" section of a document in
-   * the case where there is more info than the info listed in the summary section.
+   * This method will return {@code true} if there is more information than just the basic required
+   * info. It is used to be able to list a node in a "details" section of a document in the case
+   * where there is more info than the info listed in the summary section.
    */
   public boolean printDetails() {
     return (description != null || enumType != null || elementType != null) && !isTypeQualifier();
@@ -119,9 +123,9 @@ public record NodeInfo(
   }
 
   /**
-   * A type qualifier is a field in an JSON object which determines which type it is.
-   * Usually the mapping is split in two different paths - creating different types.
-   * For example, we have both NETEX and GTFS config types in the same list/JSON array.
+   * A type qualifier is a field in an JSON object which determines which type it is. Usually the
+   * mapping is split in two different paths - creating different types. For example, we have both
+   * NETEX and GTFS config types in the same list/JSON array.
    */
   public boolean isTypeQualifier() {
     return enumType != null && TYPE_QUALIFIER.equalsIgnoreCase(name);

@@ -69,9 +69,9 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * A new instance of this class should be created for each request.
- * This ensures that the same TimetableRepositorySnapshot is used for the
- * duration of the request (which may involve several method calls).
+ * A new instance of this class should be created for each request. This ensures that the same
+ * TimetableRepositorySnapshot is used for the duration of the request (which may involve several
+ * method calls).
  */
 public class DefaultTransitService implements TransitService {
 
@@ -354,8 +354,7 @@ public class DefaultTransitService implements TransitService {
 
   /**
    * Resolves a trip's runtime on its service date according to its schedule. The period starts at
-   * the scheduled departure from the first stop and ends at the scheduled arrival at the last
-   * stop.
+   * the scheduled departure from the first stop and ends at the scheduled arrival at the last stop.
    *
    * @return {@code null} if the schedule of the trip cannot be resolved.
    */
