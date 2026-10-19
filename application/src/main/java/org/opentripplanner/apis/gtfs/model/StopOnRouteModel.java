@@ -9,8 +9,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class StopOnRouteModel {
 
   /**
-   * Stop that should be on the route but technically it's possible that it isn't or that it's
-   * null.
+   * Stop that should be on the route but technically it's possible that it isn't or that it's null.
    */
   private final StopLocation stop;
 

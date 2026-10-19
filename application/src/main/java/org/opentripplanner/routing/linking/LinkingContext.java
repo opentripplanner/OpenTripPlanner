@@ -9,8 +9,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
 /**
  * Holds vertices (mainly temporary) that are meant to be used within the scope of a single route
  * request that can contain access/egress/direct/transfer routing. The temporary vertices will be
- * disposed by {@link org.opentripplanner.street.linking.TemporaryVerticesContainer} after the search
- * is over.
+ * disposed by {@link org.opentripplanner.street.linking.TemporaryVerticesContainer} after the
+ * search is over.
  */
 public class LinkingContext {
 

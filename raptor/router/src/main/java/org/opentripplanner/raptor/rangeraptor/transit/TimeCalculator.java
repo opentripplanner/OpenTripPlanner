@@ -34,8 +34,8 @@ public interface TimeCalculator {
    * Forward search: Return {@code true} if the first argument ({@code subject}) is BEFORE the
    * second argument ({@code candidate}). If both are equal {@code false} is returned.
    * <p>
-   * Reverse search: Return {@code true} if the first argument ({@code subject}) is AFTER the second
-   * argument ({@code candidate}). If both are equal {@code false} is returned.
+   * Reverse search: Return {@code true} if the first argument ({@code subject}) is AFTER the
+   * second argument ({@code candidate}). If both are equal {@code false} is returned.
    *
    * @return true if subject is better than the candidate; if not false.
    */

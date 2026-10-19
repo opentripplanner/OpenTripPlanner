@@ -22,7 +22,8 @@ public interface StdWorkerState<T extends RaptorTripSchedule> extends RaptorWork
   int bestTimePreviousRound(int stop);
 
   /**
-   * See {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#addAccessStopArrival(RaptorAccessEgress, int)}.
+   * See
+   * {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#addAccessStopArrival(RaptorAccessEgress, int)}.
    */
   void setAccessToStop(RaptorAccessEgress accessPath, int departureTime);
 

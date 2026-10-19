@@ -28,8 +28,8 @@ public class FlexServiceDate {
   private final int secondsFromStartOfTime;
 
   /**
-   * The requested booking time as seconds since the start of service for this date.
-   * Calculated relative to this specific service date's start-of-service.
+   * The requested booking time as seconds since the start of service for this date. Calculated
+   * relative to this specific service date's start-of-service.
    */
   private final int requestedBookingTime;
 

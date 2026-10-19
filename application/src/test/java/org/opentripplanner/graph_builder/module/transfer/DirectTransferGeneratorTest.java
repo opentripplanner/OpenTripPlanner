@@ -12,9 +12,9 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 
 /**
- * This test uses the following graph/network for testing the DirectTransfer generation. The
- * focus is on the filtering of the transfers, not on testing that the NearBySearch return the
- * correct set of nearby stops.
+ * This test uses the following graph/network for testing the DirectTransfer generation. The focus
+ * is on the filtering of the transfers, not on testing that the NearBySearch return the correct set
+ * of nearby stops.
  * <p>
  * <img src=DirectTransferGeneratorTest.drawio.png />
  */

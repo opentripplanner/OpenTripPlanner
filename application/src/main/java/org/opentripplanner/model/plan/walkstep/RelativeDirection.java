@@ -22,8 +22,8 @@ public enum RelativeDirection {
   ENTER_STATION,
   EXIT_STATION,
   /**
-   * We don't have a way to reliably tell if we are entering or exiting a station and therefore
-   * use this generic enum value. Please don't expose it in APIs.
+   * We don't have a way to reliably tell if we are entering or exiting a station and therefore use
+   * this generic enum value. Please don't expose it in APIs.
    * <p>
    * If we manage to figure it out in the future, we can remove this.
    */

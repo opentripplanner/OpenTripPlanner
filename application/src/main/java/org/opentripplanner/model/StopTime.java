@@ -69,9 +69,9 @@ public final class StopTime implements Comparable<StopTime> {
    * There is no need to navigate in the opposite direction. The StopTime id is NOT stored in a
    * StopTime field.
    * <p>
-   * New ids should only be created when a travel search result is mapped to an itinerary, so even
-   * if creating new objects are expensive, the few extra objects created during the mapping process
-   * is ok.
+   * New ids should only be created when a travel search result is mapped to an itinerary, so
+   * even if creating new objects are expensive, the few extra objects created during the mapping
+   * process is ok.
    */
   public StopTimeKey getId() {
     return StopTimeKey.of(trip.getId(), stopSequence).build();

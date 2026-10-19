@@ -151,8 +151,8 @@ public class TestStopArivalFactory {
   }
 
   /**
-   * This Test data factory is complex - so we have a test on it to verify that it produces
-   * the exact test data we want.
+   * This Test data factory is complex - so we have a test on it to verify that it produces the
+   * exact test data we want.
    */
   public static class Test {
 

@@ -45,9 +45,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   /**
    * Create a new {@link DestinationArrivalPaths}.
+   *
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param c2Comp c2 comparator function to be used in the pareto set criteria. If c2 comparator is null
-   *               then no c2 comparison will be used.
+   * @param c2Comp     c2 comparator function to be used in the pareto set criteria. If c2
+   *                   comparator is null then no c2 comparison will be used.
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
     ParetoSetCost costConfig,

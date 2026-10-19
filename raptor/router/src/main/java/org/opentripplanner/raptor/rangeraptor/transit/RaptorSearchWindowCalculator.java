@@ -7,8 +7,8 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 /**
  * This is a calculator to dynamically calculate the EDT, LAT, and Raptor-search-window parameters.
  * <p>
- * NOTE ! This calculator is state-full and NOT thread-safe. Create a new one every time you need to
- * calculate theses values.
+ * NOTE ! This calculator is state-full and NOT thread-safe. Create a new one every time you need
+ * to calculate theses values.
  *
  * @see DynamicSearchWindowCoefficients for the rules of operation.
  */

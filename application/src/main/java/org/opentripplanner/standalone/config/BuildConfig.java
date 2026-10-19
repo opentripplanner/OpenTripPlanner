@@ -64,16 +64,16 @@ import tools.jackson.databind.node.MissingNode;
 /**
  * This class is an object representation of the 'build-config.json'.
  * <p>
- * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from the
- * RouterParameters which can be applied to a pre-built graph or on the fly at runtime. Eventually
- * both classes may be initialized from the same config file so make sure there is no overlap in the
- * JSON keys used.
+ * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from
+ * the RouterParameters which can be applied to a pre-built graph or on the fly at runtime.
+ * Eventually both classes may be initialized from the same config file so make sure there is no
+ * overlap in the JSON keys used.
  * <p>
  * These used to be command line parameters, but there were getting to be too many of them and
  * besides, we want to allow different graph build configuration for each Graph.
  * <p>
- * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
- * is the build configuration and the other is the router configuration.
+ * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of
+ * which is the build configuration and the other is the router configuration.
  */
 public class BuildConfig implements OtpDataStoreConfig {
 
@@ -176,8 +176,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final double maxStopToShapeSnapDistance;
 
   /**
-   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code 0}
-   * (the default when not set) disables simplification.
+   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code 0} (the
+   * default when not set) disables simplification.
    */
   private final double transitShapeSimplificationToleranceMeters;
 

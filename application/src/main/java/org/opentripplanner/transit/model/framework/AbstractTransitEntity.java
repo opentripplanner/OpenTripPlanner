@@ -8,15 +8,11 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * All OTP Transit entities should extend this class. The purpose of the class is to enforce a
  * common implementation of the identity:
  * <ol>
- *   <li>
- *     {@code id} - All entities should have an id. The id should be unique within the
- *     context the entity live. For aggregates which live in a global space the id must be unique.
- *     This apply to all entities listed in the index service.
- *   </li>
- *   <li>
- *     The {@code hashCode()/equals()} method is consistent and based on the id (identity). We
- *     frequently use this to index and lookup entities.
- *   </li>
+ *   <li>{@code id} - All entities should have an id. The id should be unique within the context the
+ *       entity live. For aggregates which live in a global space the id must be unique. This apply to all
+ *       entities listed in the index service.</li>
+ *   <li>The {@code hashCode()/equals()} method is consistent and based on the id (identity). We
+ *       frequently use this to index and lookup entities.</li>
  * </ol>
  * This class also enforce a strong type-safe relationship between entity and builder.
  */
@@ -41,7 +37,7 @@ public abstract class AbstractTransitEntity<
   }
 
   /**
-   * Uses the  {@code id} for identity. We could use the {@link Object#equals(Object)} method, but
+   * Uses the {@code id} for identity. We could use the {@link Object#equals(Object)} method, but
    * this causes the equals to fail in cases were the same entity is created twice - for example
    * after reloading a serialized instance.
    */

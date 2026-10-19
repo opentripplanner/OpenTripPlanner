@@ -176,8 +176,8 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   /**
-   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3 legs
-   * are properly mapped in the itinerary.
+   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3
+   * legs are properly mapped in the itinerary.
    */
   @Test
   void createItineraryWithOnBoardFlexAccess() {

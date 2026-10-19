@@ -12,8 +12,8 @@ import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.search.state.State;
 
 /**
- * This factory is responsible for creating {@link VerticalTransportationUse} objects.
- * This applies to inclined edges and elevators.
+ * This factory is responsible for creating {@link VerticalTransportationUse} objects. This applies
+ * to inclined edges and elevators.
  */
 public class VerticalTransportationUseFactory {
 
@@ -120,8 +120,8 @@ public class VerticalTransportationUseFactory {
   }
 
   /**
-   * Find the ElevatorBoardEdge that was used from the backState of an ElevatorAlightEdge.
-   * This function should never return null unless the graph is broken.
+   * Find the ElevatorBoardEdge that was used from the backState of an ElevatorAlightEdge. This
+   * function should never return null unless the graph is broken.
    */
   @Nullable
   private ElevatorBoardEdge findElevatorBoardEdge(State backState) {

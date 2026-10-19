@@ -25,8 +25,8 @@ public final class BoardingArea extends StationElement<BoardingArea, BoardingAre
   }
 
   /**
-   * Center point/location for the boarding area. Returns the coordinate of the parent stop,
-   * if the coordinate is not defined for this boarding area.
+   * Center point/location for the boarding area. Returns the coordinate of the parent stop, if the
+   * coordinate is not defined for this boarding area.
    */
   @Override
   public WgsCoordinate getCoordinate() {

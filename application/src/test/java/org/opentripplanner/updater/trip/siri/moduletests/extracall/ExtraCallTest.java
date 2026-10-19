@@ -98,10 +98,10 @@ class ExtraCallTest implements RealtimeTestConstants {
   }
 
   /**
-   * Add an extra call (A → D(extra) → B), then send a second update with the same extra call
-   * but different times. Unlike {@link #testExtraCallMultipleTimes()} which replays an identical
-   * message, this test verifies that updated times are actually applied while preserving the
-   * extra call and the stop pattern.
+   * Add an extra call (A → D(extra) → B), then send a second update with the same extra call but
+   * different times. Unlike {@link #testExtraCallMultipleTimes()} which replays an identical
+   * message, this test verifies that updated times are actually applied while preserving the extra
+   * call and the stop pattern.
    */
   @Test
   void testExtraCallThenUpdateTimesKeepsExtraCall() {
@@ -149,8 +149,8 @@ class ExtraCallTest implements RealtimeTestConstants {
   }
 
   /**
-   * Add an extra call (A → D(extra) → B), then send a regular update without the extra call
-   * (A → B with updated times). The trip should revert to the scheduled pattern.
+   * Add an extra call (A → D(extra) → B), then send a regular update without the extra call (A → B
+   * with updated times). The trip should revert to the scheduled pattern.
    */
   @Test
   void testExtraCallThenRevertToOriginalStops() {

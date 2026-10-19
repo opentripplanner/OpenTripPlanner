@@ -32,8 +32,8 @@ public sealed interface Condition {
    * Test to what degree the OSM entity matches with this operation when taking the ':left' key
    * suffixes into account.
    * <p>
-   * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane` was
-   * required but `cycleway:left=lane` should match.
+   * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane`
+   * was required but `cycleway:left=lane` should match.
    */
   default boolean isLeftMatch(OsmEntity way) {
     var leftKey = this.key() + ":left";
@@ -48,8 +48,8 @@ public sealed interface Condition {
    * Test to what degree the OSM entity matches with this operation when taking the ':right' key
    * suffixes into account.
    * <p>
-   * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane` was
-   * required but `cycleway:right=lane` should match.
+   * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane`
+   * was required but `cycleway:right=lane` should match.
    */
   default boolean isRightMatch(OsmEntity way) {
     var rightKey = this.key() + ":right";

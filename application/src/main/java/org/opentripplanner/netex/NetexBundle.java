@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  * the OTP internal transit model.
  * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
- * keeping an index of entities to enable linking. The convention is documented here {@link
- * NetexFeedParameters#sharedFilePattern()} and here {@link NetexDataSourceHierarchy}.
+ * keeping an index of entities to enable linking. The convention is documented here
+ * {@link NetexFeedParameters#sharedFilePattern()} and here {@link NetexDataSourceHierarchy}.
  * <p>
  * This class is also responsible for logging progress and exception handling.
  */

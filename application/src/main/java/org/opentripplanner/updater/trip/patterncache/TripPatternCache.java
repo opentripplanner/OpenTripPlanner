@@ -8,9 +8,9 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * Threadsafe mechanism for tracking any TripPatterns added to the graph via realtime messages.
- * This tracks only patterns added by realtime messages, not ones that already existed from the
- * scheduled NeTEx or GTFS. This is a "cache" in the sense that it will keep returning the same TripPattern
+ * Threadsafe mechanism for tracking any TripPatterns added to the graph via realtime messages. This
+ * tracks only patterns added by realtime messages, not ones that already existed from the scheduled
+ * NeTEx or GTFS. This is a "cache" in the sense that it will keep returning the same TripPattern
  * when presented with the same StopPattern, so if realtime messages add many trips passing through
  * the same sequence of stops, they will all end up on this same TripPattern.
  * <p>
@@ -58,7 +58,8 @@ public class TripPatternCache {
    * checked by stop pattern; if no entry exists, a new realtime-modified pattern is created,
    * stored, and returned.
    * <p>
-   * The caller is responsible for resolving {@code originalTripPattern} before calling this method.
+   * The caller is responsible for resolving {@code originalTripPattern} before calling this
+   * method.
    *
    * @param stopPattern         stop pattern to retrieve/create a trip pattern for
    * @param trip                trip whose route, mode, and submode are copied when a new pattern is

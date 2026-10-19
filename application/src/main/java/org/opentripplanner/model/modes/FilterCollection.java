@@ -13,10 +13,9 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 public class FilterCollection implements AllowTransitModeFilter {
 
   /**
-   * Note! We use a list for fast iteration, the performance overhead of using
-   * e.g. a Set here is significant. A test performed on the Norwegian dataset
-   * showed an increase in pattern filtering time from ~25 ms to ~40 ms for
-   * List versus Set.
+   * Note! We use a list for fast iteration, the performance overhead of using e.g. a Set here is
+   * significant. A test performed on the Norwegian dataset showed an increase in pattern filtering
+   * time from ~25 ms to ~40 ms for List versus Set.
    */
   private final List<AllowTransitModeFilter> filters;
 

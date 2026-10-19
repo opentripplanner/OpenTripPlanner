@@ -39,13 +39,13 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
 
   /**
    * If the itinerary has a "from" stop that is the secondary stop of a
-   * {@link org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup}
-   * then we replace its name with the primary name of the agency that is
-   * operating the route, so that the name in the result matches the physical signage on the stop.
+   * {@link org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup} then we replace
+   * its name with the primary name of the agency that is operating the route, so that the name in
+   * the result matches the physical signage on the stop.
    * <p>
-   * If the leg has a "to" stop that is a primary stop, then we don't want to show the stop that's on
-   * the signage but what is shown _inside_ the vehicle. That's why we use the agency-specific (aka
-   * secondary) stop.
+   * If the leg has a "to" stop that is a primary stop, then we don't want to show the stop
+   * that's on the signage but what is shown _inside_ the vehicle. That's why we use the
+   * agency-specific (aka secondary) stop.
    * <p>
    * This follows the somewhat idiosyncratic logic of the consolidated stops feature.
    */
@@ -98,12 +98,13 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   }
 
   /**
-   * Figures out if the from/to stops are part of a consolidated stop group and therefore
-   * some stops need to be replaced.
+   * Figures out if the from/to stops are part of a consolidated stop group and therefore some stops
+   * need to be replaced.
    * <p>
-   * Please consult the Javadoc of {@link DecorateConsolidatedStopNames#replaceConsolidatedStops(Itinerary)}
-   * for details of this idiosyncratic business logic and in particular why the logic is not the same
-   * for the from/to stops.
+   * Please consult the Javadoc of
+   * {@link DecorateConsolidatedStopNames#replaceConsolidatedStops(Itinerary)} for details of this
+   * idiosyncratic business logic and in particular why the logic is not the same for the from/to
+   * stops.
    */
   private boolean needsToRenameStops(ScheduledTransitLeg stl) {
     return service.isSecondaryStop(stl.from().stop) || service.isPrimaryStop(stl.to().stop);

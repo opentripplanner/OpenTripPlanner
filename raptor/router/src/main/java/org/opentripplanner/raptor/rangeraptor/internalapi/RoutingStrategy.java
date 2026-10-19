@@ -18,11 +18,11 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 public interface RoutingStrategy<T extends RaptorTripSchedule> {
   /**
    * Add access path to state. This should be called in the matching round and appropriate place in
-   * the algorithm according to the {@link RaptorAccessEgress#numberOfRides()} and {@link
-   * RaptorAccessEgress#arrivedOnBoard()}.
+   * the algorithm according to the {@link RaptorAccessEgress#numberOfRides()} and
+   * {@link RaptorAccessEgress#arrivedOnBoard()}.
    *
-   * @param departureTime The access departure time. The current iteration departure time or
-   *                      the time-shifted departure time for access with opening hours.
+   * @param departureTime The access departure time. The current iteration departure time or the
+   *                      time-shifted departure time for access with opening hours.
    */
   void addAccessStopArrival(RaptorAccessEgress accessPath, int departureTime);
 
@@ -63,10 +63,9 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   void boardWithRegularTransfer(int stopIndex, int stopPos, int boardSlack);
 
   /**
-   * Board the given trip(event) at the given stop index using constraint transfers
-   * if it exists. If the boarding is not processed by the constrained transfers,
-   * the implementation is also responsible for performing the fallback to board
-   * from regular transfer.
+   * Board the given trip(event) at the given stop index using constraint transfers if it exists. If
+   * the boarding is not processed by the constrained transfers, the implementation is also
+   * responsible for performing the fallback to board from regular transfer.
    */
   void boardWithConstrainedTransfer(
     int stopIndex,
@@ -77,8 +76,8 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
 
   /**
    * @return all on-board trip access arrivals for the given {@code routeIndex}. The arrivals are
-   * removed from state and can only be fetched once. The method returns {@code null} if no
-   * arrivals exist - this should be very efficient to check.
+   *         removed from state and can only be fetched once. The method returns {@code null} if no
+   *         arrivals exist - this should be very efficient to check.
    */
   @Nullable
   default OnTripAccessArrivals<T> consumeStartOnBoardStopArrivalsForRoute(int routeIndex) {
@@ -86,8 +85,8 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Board the given {@code trip} at the given {@code stopPositionInPattern} using an
-   * start-on-board access arrival as the previous state.
+   * Board the given {@code trip} at the given {@code stopPositionInPattern} using an start-on-board
+   * access arrival as the previous state.
    */
   default void boardWithStartOnBoardAccess(
     ArrivalView<T> prevArrival,

@@ -42,9 +42,9 @@ public class OtpConfigLoader {
   }
 
   /**
-   * Create a config loader that load config from the given input json document. Use it with {@link
-   * #loadBuildConfig()} or one of the other load methods to return a configuration for the given
-   * input json string.
+   * Create a config loader that load config from the given input json document. Use it with
+   * {@link #loadBuildConfig()} or one of the other load methods to return a configuration for the
+   * given input json string.
    */
   public static OtpConfigLoader fromString(String json) {
     return new OtpConfigLoader(null, json);
@@ -66,7 +66,7 @@ public class OtpConfigLoader {
 
   /**
    * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
-   * given {@code configDir}  is {@code null} or config file is NOT found.
+   * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
    * <p>
@@ -80,7 +80,7 @@ public class OtpConfigLoader {
 
   /**
    * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
-   * given {@code configDir}  is {@code null} or config file is NOT found.
+   * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
    * <p>
@@ -95,7 +95,7 @@ public class OtpConfigLoader {
 
   /**
    * Load the router configuration file as a JsonNode three. An empty node is returned if the given
-   * {@code configDir}  is {@code null} or config file is NOT found.
+   * {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    */
   public RouterConfig loadRouterConfig() {

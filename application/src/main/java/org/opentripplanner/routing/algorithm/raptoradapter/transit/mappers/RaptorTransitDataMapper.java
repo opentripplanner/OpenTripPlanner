@@ -32,10 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the RaptorTransitData object from the TransitRepository object. The ServiceDay hierarchy is reversed,
- * with service days at the top level, which contains TripPatternForDate objects that contain only
- * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
- * when doing Range Raptor searches.
+ * Maps the RaptorTransitData object from the TransitRepository object. The ServiceDay hierarchy is
+ * reversed, with service days at the top level, which contains TripPatternForDate objects that
+ * contain only TripSchedules running on that particular date. This makes it faster to filter out
+ * TripSchedules when doing Range Raptor searches.
  * <p>
  * CONCURRENCY: This mapper runs part of the mapping in parallel using parallel streams. This
  * improves startup time on the Norwegian network by 20 seconds, by reducing this mapper from 36

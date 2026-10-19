@@ -68,9 +68,9 @@ class LineStringMapper {
   }
 
   /**
-   * NeTEx posList/pos coordinates are ordered (latitude, longitude), but JTS
-   * {@link Coordinate}s are always (x=longitude, y=latitude). Swap each pair in place so the
-   * resulting array can be fed directly into {@link GeometryUtils#makeLineString(double...)}.
+   * NeTEx posList/pos coordinates are ordered (latitude, longitude), but JTS {@link Coordinate}s
+   * are always (x=longitude, y=latitude). Swap each pair in place so the resulting array can be fed
+   * directly into {@link GeometryUtils#makeLineString(double...)}.
    */
   private static double[] swapLatLon(double[] coords) {
     for (int i = 0; i + 1 < coords.length; i += 2) {

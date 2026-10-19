@@ -35,8 +35,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
  * <p>
  * Two concerns are pinned here:
  * <ul>
- *   <li>{@link CarpoolItineraryMapper#toBookingInfo} — the pickup booking-info derivation from
- *       the trip's public contact details.</li>
+ *   <li>{@link CarpoolItineraryMapper#toBookingInfo} — the pickup booking-info derivation from the
+ *       trip's public contact details.</li>
  *   <li>Endpoint-naming precedence for itinerary boundaries, see below.</li>
  * </ul>
  * <p>
@@ -45,8 +45,8 @@ import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
  *   <li>Transit stop (Place#forStop) — when the chain ends at a transit stop</li>
  *   <li>User input location (Place#forGenericLocation) — the request's from/to label, with a
  *       localized "Origin"/"Destination" fallback when the label is null</li>
- *   <li>Vertex intersection name (StreetVertex#getIntersectionName) — for intermediate
- *       boundaries between walk and carpool legs</li>
+ *   <li>Vertex intersection name (StreetVertex#getIntersectionName) — for intermediate boundaries
+ *       between walk and carpool legs</li>
  * </ol>
  */
 class CarpoolItineraryMapperTest {
@@ -75,8 +75,8 @@ class CarpoolItineraryMapperTest {
   /**
    * Every StreetPath produced by
    * {@link org.opentripplanner.ext.carpooling.CarpoolStreetPathBuilder} has a single outgoing
-   * street edge named "segment-0", so the FIRST vertex of each path
-   * (which carries that edge as outgoing) resolves to that name via
+   * street edge named "segment-0", so the FIRST vertex of each path (which carries that edge as
+   * outgoing) resolves to that name via
    * {@link org.opentripplanner.street.model.vertex.StreetVertex#getIntersectionName()}.
    */
   private static final String NAMED_INTERSECTION = "segment-0";
@@ -101,9 +101,9 @@ class CarpoolItineraryMapperTest {
   /**
    * A contact that carries neither a phone number nor a booking URL has no actionable booking
    * method, so {@code toBookingInfo} must return {@code null} rather than a {@code BookingInfo}
-   * with an empty {@code bookingMethods} set — otherwise the non-null return would
-   * misleadingly suggest the leg is bookable. Consumers therefore may treat a non-null return
-   * as "this leg has at least one booking method."
+   * with an empty {@code bookingMethods} set — otherwise the non-null return would misleadingly
+   * suggest the leg is bookable. Consumers therefore may treat a non-null return as "this leg has
+   * at least one booking method."
    */
   @Test
   void contactWithNeitherPhoneNorUrl_returnsNull() {
@@ -163,10 +163,10 @@ class CarpoolItineraryMapperTest {
 
   /**
    * Pins down the placeholder behaviour documented on {@code toBookingInfo}: {@code
-   * latestBookingTime} must be non-null with {@code daysPrior == 0} and the time-of-day taken
-   * from the driver's trip start. This shape is load-bearing for the Transmodel
-   * {@code BookingArrangement.bookWhen} mapping, which collapses to {@code "timeOfTravelOnly"}
-   * if {@code latestBookingTime} is null.
+   * latestBookingTime} must be non-null with {@code daysPrior == 0} and the time-of-day taken from
+   * the driver's trip start. This shape is load-bearing for the Transmodel
+   * {@code BookingArrangement.bookWhen} mapping, which collapses to {@code "timeOfTravelOnly"} if
+   * {@code latestBookingTime} is null.
    */
   @Test
   void latestBookingTime_isTripStartTimeOfDayAtDaysPriorZero() {
@@ -182,9 +182,9 @@ class CarpoolItineraryMapperTest {
   }
 
   /**
-   * Tier 2 — outer endpoints carry the user's from/to label when present. Without a transit
-   * stop in play, the labels passed via {@code fromLocation}/{@code toLocation} reach the first
-   * leg's {@code from} and the last leg's {@code to} directly.
+   * Tier 2 — outer endpoints carry the user's from/to label when present. Without a transit stop in
+   * play, the labels passed via {@code fromLocation}/{@code toLocation} reach the first leg's
+   * {@code from} and the last leg's {@code to} directly.
    */
   @Test
   void outerEndpointsUseUserSuppliedLabels() {
@@ -253,10 +253,9 @@ class CarpoolItineraryMapperTest {
   }
 
   /**
-   * Tier 3 — intermediate boundaries (between a walk leg and the carpool leg) are
-   * vertex-derived via {@link
-   * org.opentripplanner.street.model.vertex.StreetVertex#getIntersectionName()} and must NOT
-   * inherit the user's from/to label. This is what keeps the carpool leg's pickup/dropoff
+   * Tier 3 — intermediate boundaries (between a walk leg and the carpool leg) are vertex-derived
+   * via {@link org.opentripplanner.street.model.vertex.StreetVertex#getIntersectionName()} and must
+   * NOT inherit the user's from/to label. This is what keeps the carpool leg's pickup/dropoff
    * looking like actual street locations rather than the rider's labelled origin/destination.
    */
   @Test
@@ -289,9 +288,9 @@ class CarpoolItineraryMapperTest {
 
   /**
    * Tier 1 — for an access itinerary (passenger origin → walk → carpool → transit stop), the
-   * carpool leg's {@code to} (which is the last leg, since no walk-from-dropoff is needed when
-   * the carpool ends at the stop) carries the transit stop's name. Transit stop wins over both
-   * the intersection name and any user-supplied destination label.
+   * carpool leg's {@code to} (which is the last leg, since no walk-from-dropoff is needed when the
+   * carpool ends at the stop) carries the transit stop's name. Transit stop wins over both the
+   * intersection name and any user-supplied destination label.
    * <p>
    * The first leg's {@code from} simultaneously verifies that the passenger origin label is
    * still applied on the user-side end of an access chain.

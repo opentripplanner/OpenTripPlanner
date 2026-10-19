@@ -29,7 +29,8 @@ public class OrcaFareFactory extends GtfsFareServiceFactory {
   }
 
   /**
-   * There is no configuration code in DefaultFareServiceFactory. We override the super class's method just in case it changes.
+   * There is no configuration code in DefaultFareServiceFactory. We override the super class's
+   * method just in case it changes.
    */
   @Override
   public void configure(JsonNode config) {

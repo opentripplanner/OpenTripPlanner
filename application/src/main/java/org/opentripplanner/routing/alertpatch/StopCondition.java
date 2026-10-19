@@ -18,7 +18,9 @@ public enum StopCondition {
   EXCEPTIONAL_STOP,
   /** when a passenger must request the serving of a stop */
   REQUEST_STOP,
-  /** affects all interactions with the stop (boarding, alighting, arrival, departure, interchanges */
+  /**
+   * affects all interactions with the stop (boarding, alighting, arrival, departure, interchanges
+   */
   STOP;
 
   public static final Set<StopCondition> FIRST_DEPARTURE = Set.of(STOP, START_POINT);

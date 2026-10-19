@@ -23,8 +23,8 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
- * A set of connected vertices. Vertices are kept as {@link VertexIndex} ids, so that building
- * a subgraph does not need to touch the vertex objects themselves - at country scale that is
+ * A set of connected vertices. Vertices are kept as {@link VertexIndex} ids, so that building a
+ * subgraph does not need to touch the vertex objects themselves - at country scale that is
  * dominated by cache misses.
  */
 class Subgraph {
@@ -36,9 +36,8 @@ class Subgraph {
   private final List<TransitStopVertex> stopVertices;
 
   /**
-   * Lookup set for checks, only built on demand: subgraphs are often huge (the main
-   * component of a country graph has millions of vertices) but membership is only queried for
-   * small ones.
+   * Lookup set for checks, only built on demand: subgraphs are often huge (the main component of a
+   * country graph has millions of vertices) but membership is only queried for small ones.
    */
   @Nullable
   private Set<Vertex> allVertices;
@@ -177,8 +176,8 @@ class Subgraph {
   /**
    * Checks whether the subgraph has only transit-stops for ferries
    *
-   * @return true if only ferries stop at the subgraph and false if other or no modes are
-   * stopping at the subgraph
+   * @return true if only ferries stop at the subgraph and false if other or no modes are stopping
+   *         at the subgraph
    */
   boolean hasOnlyFerryStops() {
     for (TransitStopVertex v : stopVertices) {

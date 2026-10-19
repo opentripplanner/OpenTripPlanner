@@ -138,8 +138,8 @@ public class EntityResolver {
    *   <li>the service date given by the journey's FramedVehicleJourneyRef -> DataFrameRef,</li>
    *   <li>the service date of the DatedServiceJourney referenced by the journey's
    *       DatedVehicleJourneyRef or EstimatedVehicleJourneyCode,</li>
-   *   <li>the date of the aimed departure time at the first call, shifted back by the number of
-   *       days the scheduled trip's first departure lies after midnight (for trips running past
+   *   <li>the date of the aimed departure time at the first call, shifted back by the number of days
+   *       the scheduled trip's first departure lies after midnight (for trips running past
    *       midnight).</li>
    * </ol>
    * Return {@code null} if none of these strategies succeed.

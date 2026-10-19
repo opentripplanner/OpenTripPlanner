@@ -20,8 +20,8 @@ import org.opentripplanner.street.model.path.StreetPath;
  * </pre>
  * <p>
  * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
- * pickup and dropoff stops in the modified route (the route after the passenger's stops have
- * been inserted into the carpool trip).
+ * pickup and dropoff stops in the modified route (the route after the passenger's stops have been
+ * inserted into the carpool trip).
  */
 public record InsertionCandidate(
   CarpoolTrip trip,
@@ -38,9 +38,9 @@ public record InsertionCandidate(
    * {@link InsertionPositionFinder} guarantees {@code 1 <= pickupPosition < dropoffPosition}
    * (pickup is never at the driver's origin, and dropoff is always strictly after pickup).
    * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
-   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at
-   * the trip's start. Enforce both invariants here so a regression upstream fails loud at
-   * construction instead of silently producing inconsistent durations.
+   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at the
+   * trip's start. Enforce both invariants here so a regression upstream fails loud at construction
+   * instead of silently producing inconsistent durations.
    */
   public InsertionCandidate {
     if (pickupPosition < 1) {
@@ -60,8 +60,8 @@ public record InsertionCandidate(
   }
 
   /**
-   * Convenience constructor that derives {@code totalTripDuration} from the route segments and
-   * stop duration.
+   * Convenience constructor that derives {@code totalTripDuration} from the route segments and stop
+   * duration.
    */
   public InsertionCandidate(
     CarpoolTrip trip,
@@ -136,7 +136,8 @@ public record InsertionCandidate(
    * <em>excludes</em> the boarding dwell at the pickup itself — that is accounted for in
    * {@link #getPassengerRideDuration()}.
    *
-   * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup segments).
+   * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup
+   *         segments).
    */
   public Duration getDurationUntilPickupArrival() {
     return totalSegmentDuration(getPickupSegments(), stopDuration);

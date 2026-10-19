@@ -257,8 +257,8 @@ class OsmBoardingLocationsModuleTest {
       }
 
       /**
-       * Get a TransitStopVertex for the platform in the graph. It is made and added to the graph
-       * on the first call.
+       * Get a TransitStopVertex for the platform in the graph. It is made and added to the graph on
+       * the first call.
        */
       TransitStopVertex getPlatformVertex() {
         if (platformVertex == null) {

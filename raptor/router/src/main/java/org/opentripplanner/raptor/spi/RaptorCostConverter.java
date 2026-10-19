@@ -3,15 +3,15 @@ package org.opentripplanner.raptor.spi;
 import java.time.Duration;
 
 /// Convert Raptor internal cost to OTP domain model cost, and back. This can also be used to
-/// convert between time/duration in seconds to Raptor cost. Raptor does not require the cost to
-/// be in `transit-centi-seconds`(1/100 seconds), the caller/user may use any resolution for cost.
-/// For time/duration the resolution is 1 second.
+/// convert between time/duration in seconds to Raptor cost. Raptor does not require the cost to be
+/// in `transit-centi-seconds`(1/100 seconds), the caller/user may use any resolution for cost. For
+/// time/duration the resolution is 1 second.
 ///
 /// This is provided by the Raptor module as a utility, but not used in Raptor except in unit-tests.
 ///
-/// Inside Raptor the cost unit is 1/100 of a "transit second" using {@code int} as type. In the
-/// OTP internal domain the unit used for cost is one "transit second" with type {@code double}.
-/// Cost in raptor is calculated using `int`s to speed up the calculations and to save memory.
+/// Inside Raptor the cost unit is 1/100 of a "transit second" using {@code int} as type. In the OTP
+/// internal domain the unit used for cost is one "transit second" with type {@code double}. Cost in
+/// raptor is calculated using `int`s to speed up the calculations and to save memory.
 ///
 /// The reason for using 1/100 of a second resolution is that we want a cost factor of {@code 0.99}
 /// to win over a cost factor of {@code 1.00}.

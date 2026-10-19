@@ -12,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Reads taxi route data from a GTFS Flex feed and stores the routes in the
- * {@link TaxiRepository}.
+ * Reads taxi route data from a GTFS Flex feed and stores the routes in the {@link TaxiRepository}.
  */
 public class TaxiDataReader {
 
@@ -28,8 +27,8 @@ public class TaxiDataReader {
   }
 
   /**
-   * Load taxi routes from the given bundle and add them to the repository.
-   * Uses an isolated {@link SiteRepository} to avoid advancing the main model's stop index counter.
+   * Load taxi routes from the given bundle and add them to the repository. Uses an isolated
+   * {@link SiteRepository} to avoid advancing the main model's stop index counter.
    */
   public void read(GtfsBundle bundle) throws IOException {
     var dao = bundle.loadDao();

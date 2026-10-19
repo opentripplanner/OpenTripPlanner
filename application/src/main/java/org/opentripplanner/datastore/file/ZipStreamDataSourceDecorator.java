@@ -52,8 +52,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
   /**
    * Create a Zip Stream data source decorator around another data source. The given delegate is
-   * responsible for retrieving meta-data and providing an input stream to fetch the zipped
-   * content.
+   * responsible for retrieving meta-data and providing an input stream to fetch the zipped content.
    */
   public ZipStreamDataSourceDecorator(DataSource delegate) {
     this(delegate, DEFAULT_MAX_ZIP_ENTRY_SIZE_IN_MEMORY);
@@ -219,8 +218,8 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   }
 
   /**
-   * Copies at maximum maxLength bytes from inputStream to outputStream
-   * Inlined partially from IOUtils.copyLarge
+   * Copies at maximum maxLength bytes from inputStream to outputStream Inlined partially from
+   * IOUtils.copyLarge
    */
   private long copy(InputStream inputStream, OutputStream outputStream, long maxLength)
     throws IOException {

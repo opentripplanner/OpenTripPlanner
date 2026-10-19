@@ -96,12 +96,12 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * transfers. This cost is not related in any way to the path generalized-cost. It takes only the
    * transfer constraint attributes in consideration.
    * <p>
-   * When comparing paths that ride the same trips, this can be used to find the optimal places to
-   * do the transfers. The cost is created to prioritize the following:
+   * When comparing paths that ride the same trips, this can be used to find the optimal places
+   * to do the transfers. The cost is created to prioritize the following:
    * <ol>
-   *     <li>{@code stay-seated} - cost: 10 points</li>
-   *     <li>{@code guaranteed} - cost: 20 points</li>
-   *     <li>None facilitated  - cost: 30 points</li>
+   *   <li>{@code stay-seated} - cost: 10 points</li>
+   *   <li>{@code guaranteed} - cost: 20 points</li>
+   *   <li>None facilitated - cost: 30 points</li>
    * </ol>
    * In addition, the {@code priority} cost is added. See {@link TransferPriority#cost()}.
    *
@@ -135,8 +135,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
    * A facilitated transfer is allowed even if there might not be enough time to walk or if the
    * alight-slack or board-slack is too tight. We ignore slack for facilitated transfers.
    * <p>
-   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer is
-   * either stay-seated or guaranteed. High priority transfers are not facilitated.
+   * This is an aggregated field, which encapsulates an OTP specific rule. A facilitated transfer
+   * is either stay-seated or guaranteed. High priority transfers are not facilitated.
    */
   public boolean isFacilitated() {
     return staySeated || guaranteed;
@@ -182,12 +182,11 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   }
 
   /**
-   * The min-transfer-time specify lower bound for the transfer time. {@link
-   * ConstrainedBoardingSearch}
-   * uses this to make sure at least the amount of seconds specified is available to do the
-   * transfer. If the path transfer takes more time than specified by the {@code min-transfer-time}
-   * then the path transfer is used. Normal slack parameters are added to the path transfer, but not
-   * to the {@code min-transfer-time}.
+   * The min-transfer-time specify lower bound for the transfer time.
+   * {@link ConstrainedBoardingSearch} uses this to make sure at least the amount of seconds
+   * specified is available to do the transfer. If the path transfer takes more time than specified
+   * by the {@code min-transfer-time} then the path transfer is used. Normal slack parameters are
+   * added to the path transfer, but not to the {@code min-transfer-time}.
    */
   public int getMinTransferTime() {
     return minTransferTime;
@@ -200,8 +199,8 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   /**
    * This method is used to calculate the earliest-board-time in a forward search, and the
    * latest-alight-time in a reverse search for a constrained transfer. If the given transfer
-   * constraint is a regular transfer, we use the given {@code regularTransferEBT} function
-   * to calculate the targetTime.
+   * constraint is a regular transfer, we use the given {@code regularTransferEBT} function to
+   * calculate the targetTime.
    * <p>
    * In a forward search we ADD({@code timeAddOp}) the transfer time to the given
    * {@code sourceTransitArrivalTime} to find the earliest-board-time for the target trip.

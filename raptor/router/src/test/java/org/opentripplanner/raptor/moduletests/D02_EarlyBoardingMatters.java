@@ -18,10 +18,9 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorTestFactory;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
-///
-/// In this test boarding a pattern at stop 1 is the only valid path to the destination via
-/// stop 2. But the pattern can be reached in earlier rounds at later stops. The point is to
-/// show that early round pattern arrivals does not dominate boarding early in the pattern.
+/// In this test boarding a pattern at stop 1 is the only valid path to the destination via stop 2.
+/// But the pattern can be reached in earlier rounds at later stops. The point is to show that early
+/// round pattern arrivals does not dominate boarding early in the pattern.
 ///
 /// **Network**
 /// ```

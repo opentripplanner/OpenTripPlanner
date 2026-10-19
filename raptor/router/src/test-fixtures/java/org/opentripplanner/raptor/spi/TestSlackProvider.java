@@ -1,8 +1,8 @@
 package org.opentripplanner.raptor.spi;
 
 /**
- * A simple default implementation which can be used when board and alight slack is fixed.
- * All field unit are in seconds.
+ * A simple default implementation which can be used when board and alight slack is fixed. All field
+ * unit are in seconds.
  */
 public class TestSlackProvider implements RaptorSlackProvider {
 

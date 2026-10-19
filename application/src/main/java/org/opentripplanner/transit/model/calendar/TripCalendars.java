@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
  * on, and the small integer service codes used by Raptor.
  * <p>
  * There is no builder: every modification (see {@link #merge}, {@link #withServiceCode},
- * {@link #initializeServiceCodesRunningForDate}, {@link #getOrCreateServiceIdForDate}) returns a new instance
- * rather than mutating this one, so callers that hold onto a {@code TripCalendars} keep seeing a
- * stable value even while another reference is evolving. A caller that needs a long-lived,
- * continuously-updated view (e.g. {@code DefaultTimetableRepository}'s write buffer) just holds a
- * plain mutable field and reassigns it as each method returns its result.
+ * {@link #initializeServiceCodesRunningForDate}, {@link #getOrCreateServiceIdForDate}) returns a
+ * new instance rather than mutating this one, so callers that hold onto a {@code TripCalendars}
+ * keep seeing a stable value even while another reference is evolving. A caller that needs a
+ * long-lived, continuously-updated view (e.g. {@code DefaultTimetableRepository}'s write buffer)
+ * just holds a plain mutable field and reassigns it as each method returns its result.
  */
 public class TripCalendars implements Serializable {
 
@@ -108,7 +108,7 @@ public class TripCalendars implements Serializable {
   /**
    * Determine whether the given service id is active on the specified service date.
    *
-   * @param serviceId the target service id
+   * @param serviceId   the target service id
    * @param serviceDate the target service date
    * @return {@code true} if the service id is active on the given service date
    */
@@ -120,9 +120,9 @@ public class TripCalendars implements Serializable {
    * Return the integer service code assigned to the given service id, or {@code null} if the
    * service id is not registered.
    * <p>
-   * Service codes are small integers (0, 1, 2, …) allocated during graph build to enable
-   * compact BitSet-based lookups in the Raptor routing engine instead of object comparisons.
-   * The relationship with service id is 1-to-1.
+   * Service codes are small integers (0, 1, 2, …) allocated during graph build to enable compact
+   * BitSet-based lookups in the Raptor routing engine instead of object comparisons. The
+   * relationship with service id is 1-to-1.
    *
    * @return the integer code, or {@code null} if not found
    */
@@ -190,7 +190,7 @@ public class TripCalendars implements Serializable {
    * Register {@code code} as the service code for {@code serviceId}. Used during graph build only.
    *
    * @return a new instance with the service code registered, or this same instance if the service
-   * id was already registered with this exact code.
+   *         id was already registered with this exact code.
    */
   public TripCalendars withServiceCode(FeedScopedId serviceId, int code) {
     if (Integer.valueOf(code).equals(serviceCodes.get(serviceId))) {
@@ -207,9 +207,9 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Compute {@link #getServiceCodesRunningForDate()} from the currently registered service ids
-   * and service codes. Used once, during graph build, after all scheduled calendar data has been
-   * merged in and all service codes have been registered.
+   * Compute {@link #getServiceCodesRunningForDate()} from the currently registered service ids and
+   * service codes. Used once, during graph build, after all scheduled calendar data has been merged
+   * in and all service codes have been registered.
    *
    * @return a new instance with {@link #getServiceCodesRunningForDate()} computed.
    */
@@ -236,19 +236,20 @@ public class TripCalendars implements Serializable {
   }
 
   /**
-   * Get or create a serviceId for a given date. This method is used when a new trip is added from
-   * a realtime data update. It makes sure the date is in the existing transit service period, i.e.
+   * Get or create a serviceId for a given date. This method is used when a new trip is added from a
+   * realtime data update. It makes sure the date is in the existing transit service period, i.e.
    * within {@link #startDate()} and {@link #endDate()}.
    * <p>
-   * Unlike the other modification methods, this one only produces (and passes to {@code onUpdate})
-   * a new instance if the service id was not already registered — the common case, where the same
-   * date has already been seen by an earlier call, is a pure read with no allocation.
+   * Unlike the other modification methods, this one only produces (and passes to
+   * {@code onUpdate}) a new instance if the service id was not already registered — the common
+   * case, where the same date has already been seen by an earlier call, is a pure read with no
+   * allocation.
    *
    * @param serviceDate service date for the added service id
-   * @param onUpdate callback invoked with the new instance, if and only if a new service id was
-   * registered
+   * @param onUpdate    callback invoked with the new instance, if and only if a new service id was
+   *                    registered
    * @return service-id for date if it exists or is created. If the given service date is outside
-   * the service period {@code null} is returned.
+   *         the service period {@code null} is returned.
    */
   @Nullable
   public FeedScopedId getOrCreateServiceIdForDate(

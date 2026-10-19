@@ -10,9 +10,9 @@ import org.opentripplanner.standalone.configure.RequestScopedFactory;
 /**
  * Qualifies the app-singleton {@link org.opentripplanner.transit.service.TransitService} binding
  * that has no real-time data — for consumers that live outside any HTTP request. Distinguishes it
- * from the unqualified, request-scoped {@code TransitService} binding inside {@link
- * RequestScopedFactory}, since Dagger does not support
- * a subcomponent overriding an ancestor's binding for the same, unqualified type.
+ * from the unqualified, request-scoped {@code TransitService} binding inside
+ * {@link RequestScopedFactory}, since Dagger does not support a subcomponent overriding an
+ * ancestor's binding for the same, unqualified type.
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)

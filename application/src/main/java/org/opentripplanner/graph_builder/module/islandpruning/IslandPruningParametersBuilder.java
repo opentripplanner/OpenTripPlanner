@@ -51,8 +51,8 @@ public class IslandPruningParametersBuilder {
   }
 
   /**
-   * Coefficient for how much larger islands (compared to the threshold values above) get pruned
-   * if they are close enough to the rest of the graph.
+   * Coefficient for how much larger islands (compared to the threshold values above) get pruned if
+   * they are close enough to the rest of the graph.
    */
   public IslandPruningParametersBuilder withAdaptivePruningFactor(double adaptivePruningFactor) {
     this.adaptivePruningFactor = adaptivePruningFactor;

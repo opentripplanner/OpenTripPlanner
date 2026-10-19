@@ -5,8 +5,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 /**
- * Breadth-first search for connected subgraphs over an {@link Adjacency}. Keeps its scratch
- * arrays between searches, so that each search only costs the size of the subgraph found.
+ * Breadth-first search for connected subgraphs over an {@link Adjacency}. Keeps its scratch arrays
+ * between searches, so that each search only costs the size of the subgraph found.
  */
 class SubgraphSearch {
 
@@ -76,10 +76,10 @@ class SubgraphSearch {
   }
 
   /**
-   * Find the subgraph connected to {@code startVertex}, which may not enter a vertex already
-   * mapped in {@code alreadyMapped} or, if {@code anchors} is given, belonging to a different
-   * anchor subgraph than the start vertex. Stop vertices are not marked in {@code alreadyMapped},
-   * so they can be part of several subgraphs.
+   * Find the subgraph connected to {@code startVertex}, which may not enter a vertex already mapped
+   * in {@code alreadyMapped} or, if {@code anchors} is given, belonging to a different anchor
+   * subgraph than the start vertex. Stop vertices are not marked in {@code alreadyMapped}, so they
+   * can be part of several subgraphs.
    */
   private Subgraph computeConnectedSubgraph(
     Adjacency neighbours,

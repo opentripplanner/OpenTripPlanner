@@ -15,8 +15,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
  * Pre-processes a {@link RouteRequest} into a {@link RoutingWorkerRequest} for usage in
- * {@link RoutingWorker}. This includes extending the request with a page cursor and amending
- * its data with additional resolved data, such as additional search days.
+ * {@link RoutingWorker}. This includes extending the request with a page cursor and amending its
+ * data with additional resolved data, such as additional search days.
  */
 public final class RequestPreProcessor {
 
@@ -70,8 +70,8 @@ public final class RequestPreProcessor {
    * This prepares the request for a start-on-board raptor search by setting its dateTime to the
    * resolved boarding time and the search window to the given iteration step duration. The boarding
    * time is resolved based on timetable data from {@link TransitService} (see
-   * {@link TripLocationResolver#resolve}). This produces exactly one Raptor
-   * iteration at the boarding time while keeping a valid search window for the filter chain.
+   * {@link TripLocationResolver#resolve}). This produces exactly one Raptor iteration at the
+   * boarding time while keeping a valid search window for the filter chain.
    */
   private RouteRequest prepareRequestForStartOnBoardAccess(RouteRequest request) {
     var fromLocation = request.from();

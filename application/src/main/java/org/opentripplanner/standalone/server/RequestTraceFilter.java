@@ -15,10 +15,10 @@ import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.utils.lang.StringUtils;
 
 /**
- * This filter manages OTP request trace parameters. A trace parameter can be read from the
- * HTTP headers and written to the HTTP response. If the header is missing or the value is
- * empty a trace parameter value can be generated. The value is made available in the logs
- * as well if they have an associated logKey.
+ * This filter manages OTP request trace parameters. A trace parameter can be read from the HTTP
+ * headers and written to the HTTP response. If the header is missing or the value is empty a trace
+ * parameter value can be generated. The value is made available in the logs as well if they have an
+ * associated logKey.
  * <p>
  * The {@link org.opentripplanner.framework.concurrent.OtpRequestThreadFactory} work together
  * with this filter to propagate the log context to all threads.
@@ -30,18 +30,17 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   private static final long MAX_ID = Long.parseLong(MIN_ID_BASE + "0", Character.MAX_RADIX);
 
   /**
-   * The regular Random is good enough for generating new correlationIds, but we want
-   * to properly seed it. Many otp instances might get started at the same time so using
-   * the current time is not good enough. We do not use UUID because an 32 bit int is
-   * enough and easier to read.
+   * The regular Random is good enough for generating new correlationIds, but we want to properly
+   * seed it. Many otp instances might get started at the same time so using the current time is not
+   * good enough. We do not use UUID because an 32 bit int is enough and easier to read.
    */
   private static final Random ID_GEN = new Random(new SecureRandom().nextLong());
 
   /**
-   * Allow HTTP header values to be inserted into the logs if it matches this pattern.
-   * If this is to strict a PATTERN should be added to the configuration parameters.
-   * The pattern specified accepts all characters except control characters and vertical
-   * space. The length must be between 1 and 512 characters.
+   * Allow HTTP header values to be inserted into the logs if it matches this pattern. If this is to
+   * strict a PATTERN should be added to the configuration parameters. The pattern specified accepts
+   * all characters except control characters and vertical space. The length must be between 1 and
+   * 512 characters.
    */
   static final Pattern HTTP_HEADER_VALUE_CHECK = Pattern.compile("[^\\p{Cntrl}\\v]{1,512}");
 
@@ -60,8 +59,8 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   }
 
   /**
-   * Loop through all trance-parameters and insert key/value into the log context. The value is
-   * read from the http-request header or generated.
+   * Loop through all trance-parameters and insert key/value into the log context. The value is read
+   * from the http-request header or generated.
    */
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {

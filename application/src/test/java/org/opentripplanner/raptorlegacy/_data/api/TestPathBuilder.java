@@ -22,8 +22,8 @@ import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
  * <p>
  * If the {@code costCalculator} is null, paths will not include cost.
  *
- * @deprecated This was an earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was an earlier part of Raptor and should not be used outside the Raptor module.
+ *             Use the OTP model entities instead.
  */
 @Deprecated
 public class TestPathBuilder implements RaptorTestConstants {

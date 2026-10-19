@@ -80,9 +80,9 @@ public class OtpBadgeGenerator {
 
   /**
    *
-   * @param label The label in the
+   * @param label        The label in the
    * @param labelBgColor The background color for the label using a valid SVG color format.
-   * @param body The text for the body. The background color will be in OTP blue.
+   * @param body         The text for the body. The background color will be in OTP blue.
    * @return A string containing the svg xml document.
    */
   public static String generateOtpBadgeSvg(String label, String labelBgColor, String body) {
@@ -107,8 +107,8 @@ public class OtpBadgeGenerator {
   }
 
   /**
-   * This method estimates the width needed for the given {@code text}. It is not accurate,
-   * but the text will be stretched/compressed to match the width.
+   * This method estimates the width needed for the given {@code text}. It is not accurate, but the
+   * text will be stretched/compressed to match the width.
    */
   private static int fontWidth(String text) {
     int length = text.length();

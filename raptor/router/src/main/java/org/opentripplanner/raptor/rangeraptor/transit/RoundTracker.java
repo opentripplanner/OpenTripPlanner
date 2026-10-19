@@ -5,8 +5,8 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 /**
  * Round tracker to keep track of round index and when to stop exploring new rounds.
  * <p>
- * In round zero(0), the access paths with one leg are added. In round one(1) the first transit and
- * transfers is added, ...
+ * In round zero(0), the access paths with one leg are added. In round one(1) the first transit
+ * and transfers is added, ...
  */
 public class RoundTracker {
 

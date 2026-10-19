@@ -19,8 +19,8 @@ public interface DebugHandler<T> {
    * Callback to notify that the given element is accepted into the given collection. For example
    * this happens when a new stop arrival is accepted at a particular stop.
    * <p>
-   * The handler will do the last check to see if this stop is in the request stop list or in debug
-   * request path.
+   * The handler will do the last check to see if this stop is in the request stop list or in
+   * debug request path.
    */
   void accept(T element);
 

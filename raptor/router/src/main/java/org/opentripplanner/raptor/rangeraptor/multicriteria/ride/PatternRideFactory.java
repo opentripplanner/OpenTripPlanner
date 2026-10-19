@@ -18,10 +18,9 @@ public interface PatternRideFactory<
   );
 
   /**
-   * This method is called for each pattern before boarding. It allows the factory
-   * to compute and cache values for each pattern, which can be used when creating
-   * rides. This optimization make sure the pattern is accesses once - before
-   * potentially hundreds of boardings.
+   * This method is called for each pattern before boarding. It allows the factory to compute and
+   * cache values for each pattern, which can be used when creating rides. This optimization make
+   * sure the pattern is accesses once - before potentially hundreds of boardings.
    */
   default void prepareForTransitWith(RaptorTripPattern pattern) {}
 }

@@ -7,22 +7,26 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 
 /**
- * Simplifies a {@link LineString} with the Douglas-Peucker algorithm (also known as Ramer-Douglas-Peucker, or RDP),
- * operating on geographic (WGS84 longitude/latitude, in degrees) coordinates.
+ * Simplifies a {@link LineString} with the Douglas-Peucker algorithm (also known as
+ * Ramer-Douglas-Peucker, or RDP), operating on geographic (WGS84 longitude/latitude, in degrees)
+ * coordinates.
  *
- * <p>Away from the equator, a degree of longitude covers fewer real-world meters than a degree of latitude, so the
- * distance calculation scales longitude by {@code cos(latitude)} to correct for that. This is the standard
- * <a href="https://en.wikipedia.org/wiki/Equirectangular_projection"> equirectangular-projection</a> approximation,
- * which treats the Earth as a sphere; it uses the line's approximate average latitude
- * (see {@link #approximateAverageLatitude}), not the latitude of each individual point being measured. We copute
- * the longitude scale once - this is a perfomance optimization. The scaling is applied only inside the distance
- * calculation, never on the coordinates themselves. That means every retained point, endpoints included, is the exact
- * original {@link Coordinate} instance: there is no scale/unscale round-trip, and so no rounding error that could move
- * a point off its original location.
+ * <p>
+ * Away from the equator, a degree of longitude covers fewer real-world meters than a degree of
+ * latitude, so the distance calculation scales longitude by {@code cos(latitude)} to correct for
+ * that. This is the standard <a href="https://en.wikipedia.org/wiki/Equirectangular_projection">
+ * equirectangular-projection</a> approximation, which treats the Earth as a sphere; it uses the
+ * line's approximate average latitude (see {@link #approximateAverageLatitude}), not the latitude
+ * of each individual point being measured. We copute the longitude scale once - this is a
+ * perfomance optimization. The scaling is applied only inside the distance calculation, never on
+ * the coordinates themselves. That means every retained point, endpoints included, is the exact
+ * original {@link Coordinate} instance: there is no scale/unscale round-trip, and so no rounding
+ * error that could move a point off its original location.
  *
- * <p>JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian) and does not apply
- * the longitude correction above, so it distorts distances when applied directly to WGS84 coordinates. This
- * implementation exists to support those coordinates correctly.
+ * <p>
+ * JTS ships its own Douglas-Peucker simplifier, but it treats coordinates as planar (Cartesian)
+ * and does not apply the longitude correction above, so it distorts distances when applied directly
+ * to WGS84 coordinates. This implementation exists to support those coordinates correctly.
  */
 public class DouglasPeuckerAlgorithm {
 
@@ -85,12 +89,13 @@ public class DouglasPeuckerAlgorithm {
 
   /**
    * Keeps the point in each {@code [start, end]} range furthest from the chord between its
-   * endpoints if it exceeds {@code toleranceDegrees}, then splits into two halves and keeps
-   * going. The result is stored in the {@link #keep} BitSet.
+   * endpoints if it exceeds {@code toleranceDegrees}, then splits into two halves and keeps going.
+   * The result is stored in the {@link #keep} BitSet.
    *
-   * <p>This is iterative, with the pending ranges on an explicit heap-allocated {@code stack},
-   * rather than recursive: a naive recursive version can recurse as deep as the input is long
-   * (e.g. a shape whose furthest point from the chord always lands near one end), which risks a
+   * <p>
+   * This is iterative, with the pending ranges on an explicit heap-allocated {@code stack},
+   * rather than recursive: a naive recursive version can recurse as deep as the input is long (e.g.
+   * a shape whose furthest point from the chord always lands near one end), which risks a
    * {@link StackOverflowError} on the JVM call stack for long, detailed shapes.
    */
   private void douglasPeucker(int start, int end) {
@@ -128,11 +133,12 @@ public class DouglasPeuckerAlgorithm {
   }
 
   /**
-   * Distance from {@code point} to the segment between {@code start} and {@code end}, in degrees, with longitude
-   * scaled by {@link #lonScale}. The method uses the perpendicular distance for all points that have a foot between
-   * the start and end point. If the point overshoots the start (or end), then the distance to the start (or end) is
-   * used. In the "basic" Douglas Peucker algorithm the distance is measured against the infinite line. But, this will
-   * remove points that can be far away from the line segment.
+   * Distance from {@code point} to the segment between {@code start} and {@code end}, in degrees,
+   * with longitude scaled by {@link #lonScale}. The method uses the perpendicular distance for all
+   * points that have a foot between the start and end point. If the point overshoots the start (or
+   * end), then the distance to the start (or end) is used. In the "basic" Douglas Peucker algorithm
+   * the distance is measured against the infinite line. But, this will remove points that can be
+   * far away from the line segment.
    */
   static double calculateDistance(
     Coordinate start,
