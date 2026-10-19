@@ -467,6 +467,9 @@
                     <exclusions>
                         <exclusion>**/package-info-template.java</exclusion>
                         <exclusion>**/test-fixtures/**/*</exclusion>
+                        <!-- Generated GraphQL code for the GTFS API -->
+                        <exclusion>**/GraphQLDataFetchers.java</exclusion>
+                        <exclusion>**/GraphQLTypes.java</exclusion>
                     </exclusions>
                     <sizeThresholdMb>0</sizeThresholdMb>
                     <runPerSubmodule>true</runPerSubmodule>
