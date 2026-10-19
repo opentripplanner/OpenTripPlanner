@@ -1,11 +1,11 @@
 package org.opentripplanner.street.model.elevation;
 
 /**
- * Cycling speed coefficient as a function of slope and altitude, modelled as a quadratic
- * B-spline fitted to data from
- * <a href="http://www.analyticcycling.com/ForcesSpeed_Page.html">analyticcycling.com</a>.
- * The coefficient is a multiplier on flat-ground cycling speed: greater than {@code 1.0} on
- * a downhill, less than {@code 1.0} on an uphill.
+ * Cycling speed coefficient as a function of slope and altitude, modelled as a quadratic B-spline
+ * fitted to data from
+ * <a href="http://www.analyticcycling.com/ForcesSpeed_Page.html">analyticcycling.com</a>. The
+ * coefficient is a multiplier on flat-ground cycling speed: greater than {@code 1.0} on a downhill,
+ * less than {@code 1.0} on an uphill.
  * <p>
  * The spline is defined on a bounded domain given by its knot vectors:
  * <ul>
@@ -86,8 +86,7 @@ public final class BicycleSlopeSpeedFunction {
 
   /**
    * Evaluate the spline at the given slope and altitude. The slope is clamped to
-   * {@code [MIN_SLOPE, MAX_SLOPE]} before evaluation to keep the spline inside its valid
-   * domain.
+   * {@code [MIN_SLOPE, MAX_SLOPE]} before evaluation to keep the spline inside its valid domain.
    *
    * @param slope    {@code rise / run} along the edge (no unit, e.g. {@code 0.05} for 5%)
    * @param altitude metres above sea level at the start of the segment

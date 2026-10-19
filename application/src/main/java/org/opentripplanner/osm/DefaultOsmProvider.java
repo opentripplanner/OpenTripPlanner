@@ -59,8 +59,8 @@ public class DefaultOsmProvider implements OsmProvider {
     this.cacheDataInMem = cacheDataInMem;
   }
 
-  /// Parses the OSM data from the source. Shuts down the executor service and will therefore throw an exception if
-  /// called a second time.
+  /// Parses the OSM data from the source. Shuts down the executor service and will therefore throw
+  /// an exception if called a second time.
   public void readOsm(OsmDatabase osmdb) {
     try {
       OsmParser parser = new OsmParser(osmdb, this);

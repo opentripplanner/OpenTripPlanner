@@ -13,13 +13,13 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 
 /**
- * <p>Encapsulates the part of Transit Service which deals with Route/Trip/TripOnServiceDate
- * replacement logic. Has the same lifecycle as Transit Service, so a new instance of this
- * class is created for each request. This ensures that the same Timetable Snapshot is used
- * for the duration of the request, but new requests get the current Timetable Snapshot.</p>
- *
- * <p>Shared by the GTFS and Transmodel query APIs, which have different names but the same
- * concepts (Route/Line, Trip/ServiceJourney, TripOnServiceDate/DatedServiceJourney).</p>
+ * Encapsulates the part of Transit Service which deals with Route/Trip/TripOnServiceDate
+ * replacement logic. Has the same lifecycle as Transit Service, so a new instance of this class is
+ * created for each request. This ensures that the same Timetable Snapshot is used for the duration
+ * of the request, but new requests get the current Timetable Snapshot.
+ * <p>
+ * Shared by the GTFS and Transmodel query APIs, which have different names but the same concepts
+ * (Route/Line, Trip/ServiceJourney, TripOnServiceDate/DatedServiceJourney).
  */
 public class ReplacementHelper {
 

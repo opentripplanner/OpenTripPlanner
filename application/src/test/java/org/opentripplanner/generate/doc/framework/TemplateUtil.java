@@ -79,7 +79,7 @@ public class TemplateUtil {
   }
 
   /**
-   * Create a JSON example for the node. The given source  from the node
+   * Create a JSON example for the node. The given source from the node
    */
   public static String jsonExample(NodeAdapter nodeAdapter, String source) {
     return jsonExample(nodeAdapter.rawNode(), source);

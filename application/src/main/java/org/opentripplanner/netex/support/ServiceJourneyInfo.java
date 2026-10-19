@@ -13,8 +13,8 @@ import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
- * Wrapper around {@link ServiceJourney} that provides a simpler interface
- * for using {@link TimetabledPassingTime}.
+ * Wrapper around {@link ServiceJourney} that provides a simpler interface for using
+ * {@link TimetabledPassingTime}.
  */
 public class ServiceJourneyInfo {
 
@@ -90,8 +90,7 @@ public class ServiceJourneyInfo {
   }
 
   /**
-   * Return the mapping between stop point id and scheduled stop point id for the journey
-   * pattern.
+   * Return the mapping between stop point id and scheduled stop point id for the journey pattern.
    */
   private Map<String, String> scheduledStopPointIdByStopPointId() {
     return journeyPattern

@@ -24,7 +24,7 @@ class DataSourcesView {
   |  ( ) List 1   |  ( ) List 2   |  ( ) List 3   |
   |  ( ) List 1   |  ( ) List 2   |  ( ) List 3   |
   |-----------------------------------------------|
- */
+  */
 
   private final Box mainPanel = Box.createVerticalBox();
   private final Box listPanel = Box.createHorizontalBox();

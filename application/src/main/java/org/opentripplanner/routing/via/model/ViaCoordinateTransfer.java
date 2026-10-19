@@ -11,11 +11,11 @@ import org.opentripplanner.utils.time.DurationUtils;
 /**
  * This class will act as a {@link RaptorTransfer} during the Raptor routing and carry enough
  * information to create an itinerary after the routing is done.
-
- * When routing through a coordinate, we need to generate transfers for each pair of stops
- * connected to it. In this class we keep a reference to the incoming and outgoing paths, instead
- * of connecting the two paths together into one. This approach reduces memory usage during
- * routing. Connecting paths is left to the itinerary mapping.
+ *
+ * When routing through a coordinate, we need to generate transfers for each pair of stops connected
+ * to it. In this class we keep a reference to the incoming and outgoing paths, instead of
+ * connecting the two paths together into one. This approach reduces memory usage during routing.
+ * Connecting paths is left to the itinerary mapping.
  */
 public class ViaCoordinateTransfer implements RaptorTransfer {
 
@@ -28,17 +28,17 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
   private final int raptorCost;
 
   /**
-   * @param coordinate the coordinate of given via point.
-   * @param fromStopIndex The Raptor stop index to use for the arriving stop.
-   * @param toStopIndex The Raptor stop index to use for the boarding stop.
-   * @param fromEdges the street path FROM the alighting stop to the given via point.
-   * @param toEdges the street path TO the departing stop from the given via point.
-   * @param durationInSeconds How long it takes the traverse the from and to edges, exclusive
-   *                          via `minimum-wait-time`.
+   * @param coordinate               the coordinate of given via point.
+   * @param fromStopIndex            The Raptor stop index to use for the arriving stop.
+   * @param toStopIndex              The Raptor stop index to use for the boarding stop.
+   * @param fromEdges                the street path FROM the alighting stop to the given via point.
+   * @param toEdges                  the street path TO the departing stop from the given via point.
+   * @param durationInSeconds        How long it takes the traverse the from and to edges, exclusive
+   *                                 via `minimum-wait-time`.
    * @param generalizedCostInSeconds The total cost traversing the from and to edges in the OTP
-   *                                 domain generalized-cost. The unit is equivalent to seconds.
-   *                                 The cost will be converted to Raptor units and cached for
-   *                                 optimal performance.
+   *                                 domain generalized-cost. The unit is equivalent to seconds. The
+   *                                 cost will be converted to Raptor units and cached for optimal
+   *                                 performance.
    */
   public ViaCoordinateTransfer(
     WgsCoordinate coordinate,

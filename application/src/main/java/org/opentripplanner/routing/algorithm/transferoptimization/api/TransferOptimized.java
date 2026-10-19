@@ -5,26 +5,25 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
 /**
  * The transfer optimization is performed by calculating "cost" values:
  * <ol>
- *     <li>transfer-priority-cost</li>
- *     <li>wait-time-optimized-cost or generalized-cost</li>
- *     <li>break-tie-cost</li>
+ *   <li>transfer-priority-cost</li>
+ *   <li>wait-time-optimized-cost or generalized-cost</li>
+ *   <li>break-tie-cost</li>
  * </ol>
  * <p>
  * If enabled all of these costs are used to find the optimal transfer-points for a given set of
  * transit legs. The transfer-priority takes precedence over the wait-time-optimized-cost, and the
  * break-tie-cost is only used if the cost is the same using the two other filters. For example for
- * a given path the normal case is that the transfer-priority-cost is {@link #NEUTRAL_COST}. Then
- * we look at the wait-time-optimized-cost or the generalized-cost (from routing) - if this is the
+ * a given path the normal case is that the transfer-priority-cost is {@link #NEUTRAL_COST}. Then we
+ * look at the wait-time-optimized-cost or the generalized-cost (from routing) - if this is the
  * same, then we use the break-tie-cost.
  * <p>
- * The wait-time-optimized-cost is typically the same when we can do a in-station/same-stop transfer
- * at multiple locations. The break-tie-cost just looks at the transit departure-times and try to
- * do the transfers as early as possible in the journey to minimize risk.
+ * The wait-time-optimized-cost is typically the same when we can do a in-station/same-stop
+ * transfer at multiple locations. The break-tie-cost just looks at the transit departure-times and
+ * try to do the transfers as early as possible in the journey to minimize risk.
  * <p>
- * The wait-time-optimized-cost uses the generalized-cost as a baseline and adjust it to
- * optimize the wait-time. The cost of waiting is changed while the rest of the cost parts are
- * kept as is. If the wait-time-optimized-cost is not enabled, the generalized-cost from Raptor is
- * used instead.
+ * The wait-time-optimized-cost uses the generalized-cost as a baseline and adjust it to optimize
+ * the wait-time. The cost of waiting is changed while the rest of the cost parts are kept as is. If
+ * the wait-time-optimized-cost is not enabled, the generalized-cost from Raptor is used instead.
  * <p>
  * This interface does not serve a role or implementation purpose, is is ONLY used to group and
  * describe the different costs for transfer optimizing. Two classes implement this interface.

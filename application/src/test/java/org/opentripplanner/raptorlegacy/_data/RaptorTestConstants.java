@@ -10,8 +10,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TestSlackProv
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * @deprecated This was earlier part of Raptor and should not be used outside the Raptor module. Use
+ *             the OTP model entities instead.
  */
 @Deprecated
 public interface RaptorTestConstants {

@@ -17,8 +17,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Enriches scheduled itineraries with real-time data to reflect changes to previously planned journeys.
- * This helps users understand why a journey may no longer be feasible or optimal compared to when it was originally searched
+ * Enriches scheduled itineraries with real-time data to reflect changes to previously planned
+ * journeys. This helps users understand why a journey may no longer be feasible or optimal compared
+ * to when it was originally searched
  */
 public class RealtimeResolver {
 

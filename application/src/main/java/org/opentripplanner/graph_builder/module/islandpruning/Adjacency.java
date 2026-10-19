@@ -16,8 +16,8 @@ class Adjacency {
 
   /**
    * @param vertexCount the number of vertex ids
-   * @param edgeLists lists of interleaved {@code (from, to)} id pairs; each pair is added in both
-   *                  directions
+   * @param edgeLists   lists of interleaved {@code (from, to)} id pairs; each pair is added in both
+   *                    directions
    */
   Adjacency(int vertexCount, TIntArrayList... edgeLists) {
     offsets = new int[vertexCount + 1];

@@ -9,8 +9,8 @@ import org.opentripplanner.routing.alertpatch.AlertEffect;
 public class AlertEffectMapper {
 
   /**
-   * Returns GraphQL API string counter part for internal {@link AlertEffect} enum. Defaults
-   * to returning UNKNOWN_Effect.
+   * Returns GraphQL API string counter part for internal {@link AlertEffect} enum. Defaults to
+   * returning UNKNOWN_Effect.
    */
   public static GraphQLAlertEffectType getGraphQLEffect(AlertEffect effect) {
     if (effect == null) {

@@ -15,14 +15,15 @@ public interface StdWorkerState<T extends RaptorTripSchedule> extends RaptorWork
   /**
    * Return the best time at the given stop found in the last round. This is used to find the right
    * trip to board in the current round.
-   * <p/>
+   * <p>
    * If you are not trying to find paths or calculate the exact number of transfers it is ok to
    * return the overall best tim to reach the given stop.
    */
   int bestTimePreviousRound(int stop);
 
   /**
-   * See {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#addAccessStopArrival(RaptorAccessEgress, int)}.
+   * See
+   * {@link org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy#addAccessStopArrival(RaptorAccessEgress, int)}.
    */
   void setAccessToStop(RaptorAccessEgress accessPath, int departureTime);
 

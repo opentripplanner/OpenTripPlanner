@@ -32,6 +32,7 @@ public class GraphSummarizer {
 
   /// Converts the input to a string-based label and looks it up in the graph. Remember that there
   /// are other, non-string vertex labels for which this method will not work.
+  ///
   /// @see VertexLabel
   @Nullable
   public Vertex getVertex(String label) {
@@ -84,8 +85,8 @@ public class GraphSummarizer {
   }
 
   /**
-   * A list of textual representations of the links (edges of type {@link TemporaryPartialStreetEdge})
-   * in the graph.
+   * A list of textual representations of the links (edges of type
+   * {@link TemporaryPartialStreetEdge}) in the graph.
    */
   public Collection<String> summarizeTempEdges() {
     return listEdges()

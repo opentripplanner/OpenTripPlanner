@@ -7,9 +7,9 @@ import org.opentripplanner._support.arch.ArchComponent;
 import org.opentripplanner._support.arch.Package;
 
 /**
- * Enforces that the GraphQL API implementations remain isolated from each other.
- * Cross-imports lead to runtime ClassCastExceptions because each API installs its
- * own request-context type into the GraphQL execution context.
+ * Enforces that the GraphQL API implementations remain isolated from each other. Cross-imports lead
+ * to runtime ClassCastExceptions because each API installs its own request-context type into the
+ * GraphQL execution context.
  */
 public class ApisArchitectureTest {
 

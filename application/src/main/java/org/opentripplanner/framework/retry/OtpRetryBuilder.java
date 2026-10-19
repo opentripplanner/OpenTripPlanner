@@ -32,8 +32,8 @@ public class OtpRetryBuilder {
   }
 
   /**
-   * Maximum number of additional attempts after the initial failure.
-   * With maxAttempts=0 no retry is performed after the initial failure.
+   * Maximum number of additional attempts after the initial failure. With maxAttempts=0 no retry is
+   * performed after the initial failure.
    */
   public OtpRetryBuilder withMaxAttempts(int maxAttempts) {
     this.maxAttempts = maxAttempts;
@@ -57,8 +57,7 @@ public class OtpRetryBuilder {
   }
 
   /**
-   * Predicate identifying the exceptions that should be retried.
-   * Other exceptions are re-thrown.
+   * Predicate identifying the exceptions that should be retried. Other exceptions are re-thrown.
    */
   public OtpRetryBuilder withRetryableException(Predicate<Exception> retryableException) {
     this.retryableException = retryableException;

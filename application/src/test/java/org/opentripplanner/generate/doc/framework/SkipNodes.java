@@ -7,20 +7,15 @@ import java.util.Optional;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
 /**
- * When generating the configuration we might want to stop processing the node tree at some
- * point. We do not have reusable types in the config, so instead we might document a node
- * in one place and then link to it if we are reusing the same structure in another. A little
- * duplication is ok(like updaters), but listing all parameters of the routingRequest in several
- * places is not.
+ * When generating the configuration we might want to stop processing the node tree at some point.
+ * We do not have reusable types in the config, so instead we might document a node in one place and
+ * then link to it if we are reusing the same structure in another. A little duplication is ok(like
+ * updaters), but listing all parameters of the routingRequest in several places is not.
  * <ul>
- *   <li>
- *     In the {@link ParameterSummaryTable} we include "skipped" nodes and if provided we add a
- *     link, but children is not listed.
- *   </li>
- *   <li>
- *     In the {@link ParameterDetailsList} we skip "skipped" nodes, but include "skipNestedElements".
- *     For "skipNestedElements", children is skipped.
- *   </li>
+ *   <li>In the {@link ParameterSummaryTable} we include "skipped" nodes and if provided we add a
+ *       link, but children is not listed.</li>
+ *   <li>In the {@link ParameterDetailsList} we skip "skipped" nodes, but include
+ *       "skipNestedElements". For "skipNestedElements", children is skipped.</li>
  * </ul>
  */
 public class SkipNodes {
@@ -38,8 +33,7 @@ public class SkipNodes {
   }
 
   /**
-   * Return {@code link} to use in overview for element skipped in
-   * the detailed section.
+   * Return {@code link} to use in overview for element skipped in the detailed section.
    */
   public Optional<String> linkOverview(NodeInfo node) {
     return Optional.ofNullable(skipMap.get(node.name()));
@@ -60,7 +54,8 @@ public class SkipNodes {
   }
 
   /**
-   * Return {@code true} if the nested children of this element should be skipped in the details section.
+   * Return {@code true} if the nested children of this element should be skipped in the details
+   * section.
    */
   public boolean skipDetailsForNestedElements(NodeInfo node) {
     return skipNestedElements.containsKey(node.name());

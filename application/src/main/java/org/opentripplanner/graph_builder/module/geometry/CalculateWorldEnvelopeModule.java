@@ -21,9 +21,8 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(CalculateWorldEnvelopeModule.class);
 
   /**
-   * On a fast Mac(2020) 10_000_000 coordinates are processed in a second, so
-   * normally spending more tha a second on this will rarely occur. There are
-   * usually not that many stops + vertices.
+   * On a fast Mac(2020) 10_000_000 coordinates are processed in a second, so normally spending more
+   * tha a second on this will rarely occur. There are usually not that many stops + vertices.
    */
   private static final int LOG_EVERY_N_COORDINATE = 1_000_000;
 

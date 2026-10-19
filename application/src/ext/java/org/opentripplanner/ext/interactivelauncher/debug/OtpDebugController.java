@@ -9,8 +9,8 @@ import org.opentripplanner.ext.interactivelauncher.debug.logging.LogView;
 import org.opentripplanner.ext.interactivelauncher.debug.raptor.RaptorDebugView;
 
 /**
- * This controller/UI allows changing the debug loggers and setting the raptor
- * debug parameters for incoming rute requests.
+ * This controller/UI allows changing the debug loggers and setting the raptor debug parameters for
+ * incoming rute requests.
  */
 public class OtpDebugController {
 

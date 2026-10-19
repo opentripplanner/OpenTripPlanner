@@ -53,8 +53,8 @@ class CancelledStopTest implements RealtimeTestConstants {
   }
 
   /**
-   * When a journey has predictionInaccurate=true and a stop has isCancellation=true,
-   * the cancelled flag [C] must not be overwritten by prediction inaccurate [PI].
+   * When a journey has predictionInaccurate=true and a stop has isCancellation=true, the cancelled
+   * flag [C] must not be overwritten by prediction inaccurate [PI].
    */
   @Test
   void testCancelledStopWithPredictionInaccurate() {

@@ -14,16 +14,17 @@ import org.opentripplanner.utils.logging.ProgressTracker;
  * Use this class to read in a CSV file from a {@link DataSource}. You must provide (required):
  * <ul>
  *   <li>the {@code datasource} - the csv file to read</li>
- *   <li>the {@code parserFactory} - the factory to create a CSV parser for mapping into the row type.</li>
- *   <li>the {@code rowHandler} - a handler for each row read. </li>
+ *   <li>the {@code parserFactory} - the factory to create a CSV parser for mapping into the row
+ *       type.</li>
+ *   <li>the {@code rowHandler} - a handler for each row read.</li>
  * </ul>
  * Optional:
  * <ul>
  *   <li>the {@code logger} - the logger to write progress tracking events.</li>
  * </ul>
  *
- * The class is responsible for processing the CSV file and orchestrating the parsing process.
- * A progress tracker is created and will be used to track the reading of the datasource.
+ * The class is responsible for processing the CSV file and orchestrating the parsing process. A
+ * progress tracker is created and will be used to track the reading of the datasource.
  *
  * @param <T> The row type.
  */
@@ -49,8 +50,8 @@ public class OtpCsvReader<T> {
   }
 
   /**
-   * The logger is optional. If present, a {@link ProgressTracker} is created and the
-   * log events is written to the logger.
+   * The logger is optional. If present, a {@link ProgressTracker} is created and the log events is
+   * written to the logger.
    */
   public OtpCsvReader<T> withProgressLogger(Consumer<String> logger) {
     this.progressLogger = logger;

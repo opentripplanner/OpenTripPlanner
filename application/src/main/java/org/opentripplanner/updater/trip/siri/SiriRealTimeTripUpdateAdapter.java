@@ -45,8 +45,8 @@ public class SiriRealTimeTripUpdateAdapter {
 
   /**
    * Create an update-scoped task for applying SIRI-ET estimated timetables. The task holds a
-   * {@link org.opentripplanner.transit.service.TransitService} constructed from the given
-   * buffer, so all pattern and trip lookups within the task see in-progress real-time additions.
+   * {@link org.opentripplanner.transit.service.TransitService} constructed from the given buffer,
+   * so all pattern and trip lookups within the task see in-progress real-time additions.
    */
   public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
     var transitService = new DefaultTransitService(transitRepository, buffer);

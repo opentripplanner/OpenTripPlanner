@@ -31,8 +31,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * A helper class for setting up and interacting with transit data for tests.
  * <p>
- * The builder is used to create a SiteRepository and a TransitRepository that can then be queried
- * by a TransitService.
+ * The builder is used to create a SiteRepository and a TransitRepository that can then be
+ * queried by a TransitService.
  */
 public final class TransitTestEnvironment {
 
@@ -112,9 +112,9 @@ public final class TransitTestEnvironment {
 
   /**
    * Applies a real-time update through the transaction framework, committing it to the timetable
-   * repository backing {@link #transitService()}, so that a subsequent call to that method
-   * returns a snapshot reflecting the update. The method will wait for the update to be applied
-   * before returning.
+   * repository backing {@link #transitService()}, so that a subsequent call to that method returns
+   * a snapshot reflecting the update. The method will wait for the update to be applied before
+   * returning.
    */
   public void applyUpdate(RealTimeTripUpdate update) {
     try {

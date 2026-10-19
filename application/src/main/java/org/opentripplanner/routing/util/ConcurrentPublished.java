@@ -8,9 +8,9 @@ package org.opentripplanner.routing.util;
  * order they occur in the source code, as seen by all statements following a call to get() in
  * thread B.
  * <p>
- * The JMM guarantees reference assignment alone is atomic (no read-tearing), but does not guarantee
- * that the combined process of assigning to fields of X and then assigning a reference to X is
- * atomic.
+ * The JMM guarantees reference assignment alone is atomic (no read-tearing), but does not
+ * guarantee that the combined process of assigning to fields of X and then assigning a reference to
+ * X is atomic.
  * <p>
  * This class encapsulates the simple mechanism giving us the desired effect, revealing its
  * semantics through the type name, and providing an object to lock on (to avoid cluttering compound

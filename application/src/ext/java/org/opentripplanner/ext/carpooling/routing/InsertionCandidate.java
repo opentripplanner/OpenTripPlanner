@@ -12,14 +12,16 @@ import org.opentripplanner.street.model.path.StreetPath;
  * Represents a viable insertion of a passenger into a carpool trip.
  * <p>
  * Contains all information needed to construct an itinerary, including:
+ * <pre>
  * - The original trip
  * - Insertion positions (where pickup and dropoff occur in the modified route)
  * - Route segments (all StreetPaths forming the complete modified route)
  * - Timing information
+ * </pre>
  * <p>
  * {@code pickupPosition} and {@code dropoffPosition} are 0-based indices of the passenger's
- * pickup and dropoff stops in the modified route (the route after the passenger's stops have
- * been inserted into the carpool trip).
+ * pickup and dropoff stops in the modified route (the route after the passenger's stops have been
+ * inserted into the carpool trip).
  */
 public record InsertionCandidate(
   CarpoolTrip trip,
@@ -36,9 +38,9 @@ public record InsertionCandidate(
    * {@link InsertionPositionFinder} guarantees {@code 1 <= pickupPosition < dropoffPosition}
    * (pickup is never at the driver's origin, and dropoff is always strictly after pickup).
    * {@link #getPassengerRideDuration()} relies on the lower bound — it unconditionally adds a
-   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at
-   * the trip's start. Enforce both invariants here so a regression upstream fails loud at
-   * construction instead of silently producing inconsistent durations.
+   * boarding dwell, which only makes sense when the passenger boards mid-trip rather than at the
+   * trip's start. Enforce both invariants here so a regression upstream fails loud at construction
+   * instead of silently producing inconsistent durations.
    */
   public InsertionCandidate {
     if (pickupPosition < 1) {
@@ -58,8 +60,8 @@ public record InsertionCandidate(
   }
 
   /**
-   * Convenience constructor that derives {@code totalTripDuration} from the route segments and
-   * stop duration.
+   * Convenience constructor that derives {@code totalTripDuration} from the route segments and stop
+   * duration.
    */
   public InsertionCandidate(
     CarpoolTrip trip,
@@ -97,7 +99,8 @@ public record InsertionCandidate(
 
   /**
    * Gets the pickup route segment(s) - from boarding to passenger pickup.
-   * Returns all segments before the pickup position.
+   *
+   * @return all segments before the pickup position.
    */
   public List<StreetPath> getPickupSegments() {
     if (pickupPosition == 0) {
@@ -108,7 +111,8 @@ public record InsertionCandidate(
 
   /**
    * Gets the shared route segment(s) - from passenger pickup to dropoff.
-   * Returns all segments between pickup and dropoff positions.
+   *
+   * @return all segments between pickup and dropoff positions.
    */
   public List<StreetPath> getSharedSegments() {
     return routeSegments.subList(pickupPosition, dropoffPosition);
@@ -116,7 +120,8 @@ public record InsertionCandidate(
 
   /**
    * Gets the dropoff route segment(s) - from passenger dropoff to alighting.
-   * Returns all segments after the dropoff position.
+   *
+   * @return all segments after the dropoff position.
    */
   public List<StreetPath> getDropoffSegments() {
     if (dropoffPosition >= routeSegments.size()) {
@@ -130,7 +135,9 @@ public record InsertionCandidate(
    * Includes travel time through pickup segments and intermediate stop delays between them, but
    * <em>excludes</em> the boarding dwell at the pickup itself — that is accounted for in
    * {@link #getPassengerRideDuration()}.
-   * Returns {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup segments).
+   *
+   * @return {@link Duration#ZERO} when the passenger boards at the trip origin (no pickup
+   *         segments).
    */
   public Duration getDurationUntilPickupArrival() {
     return totalSegmentDuration(getPickupSegments(), stopDuration);
