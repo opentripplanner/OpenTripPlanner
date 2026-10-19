@@ -11,7 +11,6 @@ import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
 
 class DefaultTransferGeneratorTest {
@@ -34,15 +33,15 @@ class DefaultTransferGeneratorTest {
   @Test
   void keepsOnlyTheCheapestCandidatePerTargetStop() {
     var provider = new FakeTransferPathProvider();
-    var cheapAB = provider.addNearby(TransferProfileType.WALK, A, B, 100, 60);
-    provider.addNearby(TransferProfileType.WALK, A, B, 200, 90);
+    var cheapAB = provider.addNearby(A, B, 100, 60);
+    provider.addNearby(A, B, 200, 90);
 
     AbstractUserPreferences<?> preferences = withReluctance(1.0);
     // Explicit type witnesses throughout: diamond inference from a wildcard-typed argument
     // triggers capture conversion and produces a fresh, non-matching captured type at each use.
     TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
       AbstractUserPreferences<?>
-    >(TransferProfileType.WALK, preferences, preferences);
+    >(preferences, preferences);
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>
     >of(List.of(profile));
@@ -60,19 +59,19 @@ class DefaultTransferGeneratorTest {
     assertThat(
       buildRepository
         .createInitialSnapshot()
-        .findPath(TransferProfileType.WALK, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
+        .findPath(preferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(cheapAB);
   }
 
   @Test
   void pathsExceedingTheProviderConfiguredDurationLimitAreExcluded() {
     var provider = new FakeTransferPathProvider().withMaxDurationSeconds(120);
-    provider.addNearby(TransferProfileType.WALK, A, B, 100, 600);
+    provider.addNearby(A, B, 100, 600);
 
     AbstractUserPreferences<?> preferences = withReluctance(1.0);
     TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
       AbstractUserPreferences<?>
-    >(TransferProfileType.WALK, preferences, preferences);
+    >(preferences, preferences);
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>
     >of(List.of(profile));
@@ -90,7 +89,7 @@ class DefaultTransferGeneratorTest {
     assertThat(
       buildRepository
         .createInitialSnapshot()
-        .findPath(TransferProfileType.WALK, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
+        .findPath(preferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isNull();
   }
 }

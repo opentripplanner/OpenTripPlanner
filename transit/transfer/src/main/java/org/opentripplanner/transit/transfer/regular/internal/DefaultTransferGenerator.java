@@ -72,11 +72,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     int fromStop = stopIndex.toStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 
-    var nearbyStops = pathProvider.findNearbyStops(
-      fromStopId,
-      profile.profileType(),
-      profile.userPreferences()
-    );
+    var nearbyStops = pathProvider.findNearbyStops(fromStopId, profile.userPreferences());
     for (var candidate : nearbyStops) {
       int toStop = stopIndex.toStopIndex(candidate.toStop());
       var existing = bestCandidatePerTargetStop.get(toStop);
@@ -91,7 +87,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     );
     // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {
-      buildRepository.setPaths(profile.profileType(), fromStop, pathsByToStop);
+      buildRepository.setPaths(profile.userPreferences(), fromStop, pathsByToStop);
     }
   }
 }

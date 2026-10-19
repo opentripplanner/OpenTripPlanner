@@ -2,7 +2,6 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -15,12 +14,15 @@ import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 /**
  * Exercise the lifecycle through the real transaction framework: a write is visible only to
  * requests started after the commit, and a failed write is rolled back.
  */
 class RegularTransferRepositoryLifecycleTest {
+
+  private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
 
   private static final int A = 0;
   private static final int B = 1;

@@ -1,14 +1,17 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
+import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 class DefaultRegularTransferRepositoryTest {
+
+  private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
 
   private static final int A = 0;
   private static final int B = 1;
@@ -39,6 +42,22 @@ class DefaultRegularTransferRepositoryTest {
       new StoredPath<>(A, C, PATH_AC),
       new StoredPath<>(B, C, PATH_BC)
     );
+  }
+
+  @Test
+  void lookupsReadThePathsStoredUnderTheClosestPreferences() {
+    var low = WalkPreferences.of().withReluctance(Reluctance.of(1.0)).build();
+    var high = WalkPreferences.of().withReluctance(Reluctance.of(4.0)).build();
+    var repository = new DefaultRegularTransferRepository<String>();
+    repository.setPath(low, A, B, PATH_AB);
+    repository.setPath(high, A, B, PATH_AB_NEW);
+
+    var snapshot = repository.freeze();
+    var closeToLow = WalkPreferences.of().withReluctance(Reluctance.of(1.5)).build();
+    var closeToHigh = WalkPreferences.of().withReluctance(Reluctance.of(3.5)).build();
+    assertThat(snapshot.findPath(closeToLow, A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.findPath(closeToHigh, A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.pathsFor(closeToHigh)).containsExactly(new StoredPath<>(A, B, PATH_AB_NEW));
   }
 
   @Test

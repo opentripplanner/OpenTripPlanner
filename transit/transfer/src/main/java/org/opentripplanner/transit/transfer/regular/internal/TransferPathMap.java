@@ -3,26 +3,23 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
- * The {@code P} path templates keyed by {@code (profileType, fromStop, toStop)}, shared by the
+ * The {@code P} path templates keyed by {@code (userPreferences, fromStop, toStop)}, shared by the
  * build repository, the runtime repository and its snapshots.
  * <p>
  * <b>Copy-on-write.</b> The map can be large (all stops x nearby stops), so it is never
  * deep-copied. The {@code toStop} maps (the leaves) are never modified once stored - a write
  * replaces the leaf with a modified copy instead. That makes it safe to share them between maps,
- * and {@link #copy()} only copies the two upper levels, the profile and {@code fromStop} maps.
- * <p>
- * Plain {@code HashMap}, not {@code EnumMap}: Kryo can't deserialize an empty {@code EnumMap} (it
- * can't infer the enum key type from zero entries) - a real bug this design hit, since the empty
- * instance (no raptor-data GraphBuilderModule ran) must still round-trip through graph
- * serialization.
+ * and {@link #copy()} only copies the two upper levels, the user preferences and {@code fromStop}
+ * maps.
  * <p>
  * This class is not thread-safe.
  *
@@ -30,25 +27,30 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileTy
  */
 final class TransferPathMap<P> implements Serializable {
 
-  private final Map<TransferProfileType, Map<Integer, Map<Integer, P>>> pathsByProfile;
+  private final Map<
+    AbstractUserPreferences<?>,
+    Map<Integer, Map<Integer, P>>
+  > pathsByUserPreferences;
 
   TransferPathMap() {
     this(new HashMap<>());
   }
 
-  private TransferPathMap(Map<TransferProfileType, Map<Integer, Map<Integer, P>>> pathsByProfile) {
-    this.pathsByProfile = pathsByProfile;
+  private TransferPathMap(
+    Map<AbstractUserPreferences<?>, Map<Integer, Map<Integer, P>>> pathsByUserPreferences
+  ) {
+    this.pathsByUserPreferences = pathsByUserPreferences;
   }
 
   /**
-   * Copy the profile and {@code fromStop} maps. The {@code toStop} maps are never modified, so
-   * they are shared, not copied. A write to the copy never changes this map, and the other way
-   * around.
+   * Copy the user preferences and {@code fromStop} maps. The {@code toStop} maps are never
+   * modified, so they are shared, not copied. A write to the copy never changes this map, and the
+   * other way around.
    */
   TransferPathMap<P> copy() {
-    var copy = new HashMap<TransferProfileType, Map<Integer, Map<Integer, P>>>();
-    pathsByProfile.forEach((profileType, byFromStop) ->
-      copy.put(profileType, new HashMap<>(byFromStop))
+    var copy = new HashMap<AbstractUserPreferences<?>, Map<Integer, Map<Integer, P>>>();
+    pathsByUserPreferences.forEach((userPreferences, byFromStop) ->
+      copy.put(userPreferences, new HashMap<>(byFromStop))
     );
     return new TransferPathMap<>(copy);
   }
@@ -57,11 +59,15 @@ final class TransferPathMap<P> implements Serializable {
    * Store the paths from {@code fromStop}, keyed by {@code toStop}; paths to other stops are kept.
    * The given map is copied, not retained.
    */
-  void setPaths(TransferProfileType profileType, int fromStop, Map<Integer, P> pathsByToStop) {
+  void setPaths(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    Map<Integer, P> pathsByToStop
+  ) {
     if (pathsByToStop.isEmpty()) {
       return;
     }
-    var byFromStop = pathsByProfile.computeIfAbsent(profileType, p -> new HashMap<>());
+    var byFromStop = pathsByUserPreferences.computeIfAbsent(userPreferences, p -> new HashMap<>());
     // Never modify a stored toStop map, it may be shared with another map - replace it.
     var byToStop = new HashMap<>(byFromStop.getOrDefault(fromStop, Map.of()));
     byToStop.putAll(pathsByToStop);
@@ -69,8 +75,8 @@ final class TransferPathMap<P> implements Serializable {
   }
 
   @Nullable
-  P findPath(TransferProfileType profileType, int fromStop, int toStop) {
-    var byFromStop = pathsByProfile.get(profileType);
+  P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
+    var byFromStop = closestPaths(userPreferences);
     if (byFromStop == null) {
       return null;
     }
@@ -78,8 +84,8 @@ final class TransferPathMap<P> implements Serializable {
     return byToStop == null ? null : byToStop.get(toStop);
   }
 
-  List<StoredPath<P>> pathsFor(TransferProfileType profileType) {
-    var byFromStop = pathsByProfile.get(profileType);
+  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
+    var byFromStop = closestPaths(userPreferences);
     if (byFromStop == null) {
       return List.of();
     }
@@ -93,29 +99,47 @@ final class TransferPathMap<P> implements Serializable {
   }
 
   boolean hasTransfersFrom(int fromStop) {
-    return pathsByProfile
+    return pathsByUserPreferences
       .values()
       .stream()
       .anyMatch(byFromStop -> !byFromStop.getOrDefault(fromStop, Map.of()).isEmpty());
   }
 
-  /** The number of stored paths for a profile. */
-  int size(TransferProfileType profileType) {
-    return pathsByProfile
-      .getOrDefault(profileType, Map.of())
+  /** The number of paths stored under exactly the given user preferences. */
+  int size(AbstractUserPreferences<?> userPreferences) {
+    return pathsByUserPreferences
+      .getOrDefault(userPreferences, Map.of())
       .values()
       .stream()
       .mapToInt(Map::size)
       .sum();
   }
 
-  /** The number of stored paths, in all profiles. */
+  /** The number of stored paths, under all user preferences. */
   int size() {
-    return pathsByProfile
+    return pathsByUserPreferences
       .values()
       .stream()
       .flatMap(byFromStop -> byFromStop.values().stream())
       .mapToInt(Map::size)
       .sum();
+  }
+
+  /**
+   * The paths stored under the user preferences closest to the given ones, {@code null} if no
+   * paths are stored.
+   */
+  @Nullable
+  private Map<Integer, Map<Integer, P>> closestPaths(AbstractUserPreferences<?> userPreferences) {
+    var exactMatch = pathsByUserPreferences.get(userPreferences);
+    if (exactMatch != null) {
+      return exactMatch;
+    }
+    return pathsByUserPreferences
+      .entrySet()
+      .stream()
+      .min(Comparator.comparingDouble(e -> userPreferences.normalizedDistance(e.getKey())))
+      .map(Map.Entry::getValue)
+      .orElse(null);
   }
 }

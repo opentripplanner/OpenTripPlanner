@@ -8,7 +8,6 @@ import org.opentripplanner.graph_builder.module.transfer.api.TransferProfileConf
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
  * Parses the new {@code transfers:} build-config block (see
@@ -16,8 +15,8 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileTy
  * separate from {@link RegularTransferConfig}/{@code transferRequests}, which
  * {@code FlexTransferGenerator} keeps reading unchanged for FLEX.
  * <p>
- * Only {@code walk} is supported for now (see {@code TransferProfileType}) - support for other
- * profiles, and for a duration limit, is deliberately deferred until designed further.
+ * Only {@code walk} is supported for now - support for other profiles, and for a duration limit,
+ * is deliberately deferred until designed further.
  */
 public class TransferProfilesConfigMapper {
 
@@ -42,7 +41,7 @@ public class TransferProfilesConfigMapper {
     } else {
       // No `transfers` block (or an empty one) configured - fall back to a single default WALK
       // profile, mirroring the implicit default of the old `transferRequests` config.
-      profiles.add(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT));
+      profiles.add(new TransferProfileConfig(WalkPreferences.DEFAULT));
     }
 
     return new TransferProfilesConfig(profiles);
@@ -56,7 +55,7 @@ public class TransferProfilesConfigMapper {
       .asObject();
     WalkPreferences preferences = mapWalkPreferences(prefs);
 
-    return new TransferProfileConfig(TransferProfileType.WALK, preferences);
+    return new TransferProfileConfig(preferences);
   }
 
   private static WalkPreferences mapWalkPreferences(NodeAdapter p) {

@@ -22,7 +22,6 @@ import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -78,7 +77,6 @@ public class StreetTransferPathProvider
   @Override
   public Collection<TransferPath<NearbyStop>> findNearbyStops(
     FeedScopedId fromStop,
-    TransferProfileType profileType,
     AbstractUserPreferences<?> preferences
   ) {
     TransitStopVertex vertex = graph.getStopVertex(fromStop);
@@ -99,7 +97,7 @@ public class StreetTransferPathProvider
       .filter(nearbyStop -> !nearbyStop.stopId.equals(fromStop))
       .map(StreetTransferPathProvider::stripState)
       .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
-        computePathCriteria(path, profileType, preferences).ifPresent(criteria ->
+        computePathCriteria(path, preferences).ifPresent(criteria ->
           consumer.accept(new TransferPath<>(path.stopId, path, criteria))
         )
       )
@@ -120,7 +118,6 @@ public class StreetTransferPathProvider
   @Override
   public Optional<PathCriteria> computePathCriteria(
     NearbyStop path,
-    TransferProfileType profileType,
     AbstractUserPreferences<?> preferences
   ) {
     RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(preferences);

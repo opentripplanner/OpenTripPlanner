@@ -2,7 +2,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
  * Default {@link RegularTransferRepository}. A new instance is created for each transaction that
@@ -27,17 +27,22 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
   }
 
   @Override
-  public void setPath(TransferProfileType profileType, int fromStop, int toStop, P path) {
-    setPaths(profileType, fromStop, Map.of(toStop, path));
+  public void setPath(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    int toStop,
+    P path
+  ) {
+    setPaths(userPreferences, fromStop, Map.of(toStop, path));
   }
 
   @Override
   public void setPaths(
-    TransferProfileType profileType,
+    AbstractUserPreferences<?> userPreferences,
     int fromStop,
     Map<Integer, P> pathsByToStop
   ) {
-    paths.setPaths(profileType, fromStop, pathsByToStop);
+    paths.setPaths(userPreferences, fromStop, pathsByToStop);
   }
 
   /**

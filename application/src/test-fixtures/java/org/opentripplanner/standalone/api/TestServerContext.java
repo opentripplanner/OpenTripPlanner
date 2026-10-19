@@ -67,7 +67,6 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 public class TestServerContext {
 
@@ -138,7 +137,7 @@ public class TestServerContext {
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
       RegularTransferFactory.createBuildRepository();
     var transferProfilesConfig = new TransferProfilesConfig(
-      List.of(new TransferProfileConfig(TransferProfileType.WALK, WalkPreferences.DEFAULT))
+      List.of(new TransferProfileConfig(WalkPreferences.DEFAULT))
     );
     new RegularTransitTransferGenerator(
       graph,

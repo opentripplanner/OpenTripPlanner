@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.configure;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
@@ -29,6 +29,7 @@ import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFac
  */
 class RequestScopedFactoryIntegrationTest {
 
+  private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
   private static final int AWAIT_COMMIT_TIMEOUT_MS = 5_000;
   private static final int AWAIT_COMMIT_POLL_INTERVAL_MS = 20;
   private static final int FROM_STOP = 0;

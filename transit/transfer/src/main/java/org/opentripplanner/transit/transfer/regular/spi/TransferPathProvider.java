@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
  * The only boundary {@code raptor-data}'s regular-transfer pipeline has into street-search
@@ -18,25 +17,20 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileTy
  */
 public interface TransferPathProvider<P, U> {
   /**
-   * Discover candidate paths from {@code fromStop} under {@code (profileId, preferences)}, each
+   * Discover candidate paths from {@code fromStop} under {@code preferences}, each
    * paired with the {@link PathCriteria} it was found under. Called once per stop per profile at
    * graph-build time.
    */
   Collection<TransferPath<P>> findNearbyStops(
     FeedScopedId fromStop,
-    TransferProfileType profileType,
     AbstractUserPreferences<?> preferences
   );
 
   /**
-   * Re-cost a previously discovered path under a different {@code (profileId, preferences)} than
+   * Re-cost a previously discovered path under different {@code preferences} than
    * the one that found it. Used for {@code deduplicationProfile}/dedup comparisons, to re-cost a
    * deduplicationProfile's path under a dependent profile's preferences. Empty if the path exceeds
    * that profile's duration limit.
    */
-  Optional<PathCriteria> computePathCriteria(
-    P path,
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences
-  );
+  Optional<PathCriteria> computePathCriteria(P path, AbstractUserPreferences<?> preferences);
 }

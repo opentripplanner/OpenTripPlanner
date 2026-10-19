@@ -10,14 +10,13 @@ import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
  * Default {@link RegularTransferServiceFactory}, bound to one snapshot. On a cache miss it builds a
- * {@link RaptorTransferStore} from all paths of the profile, re-costed under the request-time
- * preferences. The result is cached in the snapshot, see
+ * {@link RaptorTransferStore} from the paths stored under the user preferences closest to the
+ * request-time preferences, re-costed under the request-time preferences. The result is cached in the snapshot, see
  * {@link RegularTransferRepositorySnapshot#getOrCreateTransferService}.
  *
  * @param <P> the transfer path/template type
@@ -39,13 +38,8 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
   }
 
   @Override
-  public RaptorRegularTransferService create(
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences
-  ) {
-    return snapshot.getOrCreateTransferService(profileType, preferences, () ->
-      build(profileType, preferences)
-    );
+  public RaptorRegularTransferService create(AbstractUserPreferences<?> userPreferences) {
+    return snapshot.getOrCreateTransferService(userPreferences, () -> build(userPreferences));
   }
 
   /**
@@ -55,20 +49,16 @@ public class DefaultRegularTransferServiceFactory<P> implements RegularTransferS
    */
   @Nullable
   @Override
-  public P findPath(TransferProfileType profileType, int fromStop, int toStop) {
-    return snapshot.findPath(profileType, fromStop, toStop);
+  public P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
+    return snapshot.findPath(userPreferences, fromStop, toStop);
   }
 
-  private RaptorRegularTransferService build(
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences
-  ) {
+  private RaptorRegularTransferService build(AbstractUserPreferences<?> userPreferences) {
     var builder = RaptorTransferStore.of(stopIndex.size());
-    for (var stored : snapshot.pathsFor(profileType)) {
+    for (var stored : snapshot.pathsFor(userPreferences)) {
       Optional<PathCriteria> criteria = pathProvider.computePathCriteria(
         stored.path(),
-        profileType,
-        preferences
+        userPreferences
       );
       if (criteria.isEmpty()) {
         continue;

@@ -86,13 +86,7 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     List<TransferProfile<AbstractUserPreferences<?>>> profileList = config
       .profiles()
       .stream()
-      .map(p ->
-        new TransferProfile<AbstractUserPreferences<?>>(
-          p.profileType(),
-          p.preferences(),
-          p.preferences()
-        )
-      )
+      .map(p -> new TransferProfile<AbstractUserPreferences<?>>(p.preferences(), p.preferences()))
       .toList();
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>
@@ -130,9 +124,9 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     int sum = 0;
     for (var profile : profileList) {
       int size = regularTransferBuildRepository.calculateNumberOfTransferPaths(
-        profile.profileType()
+        profile.userPreferences()
       );
-      LOG.info("Created {} regular transfers for profile {}.", size, profile.profileType());
+      LOG.info("Created {} regular transfers for profile {}.", size, profile.userPreferences());
       sum += size;
     }
     LOG.info(

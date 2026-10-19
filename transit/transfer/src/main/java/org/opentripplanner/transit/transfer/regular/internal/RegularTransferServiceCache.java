@@ -7,13 +7,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
- * Bounded LRU cache of {@link RaptorRegularTransferService}s, keyed on
- * {@code (profileType, preferences)}. Each {@link DefaultRegularTransferRepositorySnapshot} owns
- * one, and a new snapshot starts with an empty cache - a cached service is built from the paths of
- * the snapshot it belongs to.
+ * Bounded LRU cache of {@link RaptorRegularTransferService}s, keyed on the user preferences. Each
+ * {@link DefaultRegularTransferRepositorySnapshot} owns one, and a new snapshot starts with an
+ * empty cache - a cached service is built from the paths of the snapshot it belongs to.
  * <p>
  * The cache is shared by all requests reading the same snapshot, without locking: the entries are
  * an immutable map, replaced atomically when a service is added. A miss builds the service outside
@@ -29,7 +27,8 @@ class RegularTransferServiceCache {
   private static final int DEFAULT_MAX_SIZE = 32;
 
   private final int maxSize;
-  private final AtomicReference<Map<CacheKey, Entry>> entries = new AtomicReference<>(Map.of());
+  private final AtomicReference<Map<AbstractUserPreferences<?>, Entry>> entries =
+    new AtomicReference<>(Map.of());
 
   /** Orders the uses of the entries, to evict the least recently used one. */
   private final AtomicLong useCounter = new AtomicLong();
@@ -43,21 +42,21 @@ class RegularTransferServiceCache {
   }
 
   /**
-   * Return the cached service for {@code (profileType, preferences)}, or create it with
+   * Return the cached service for {@code preferences}, or create it with
    * {@code factory} and cache it.
    */
   RaptorRegularTransferService getOrCreate(
-    TransferProfileType profileType,
     AbstractUserPreferences<?> preferences,
     Supplier<RaptorRegularTransferService> factory
   ) {
-    var key = new CacheKey(profileType, preferences);
-    var cached = entries.get().get(key);
+    var cached = entries.get().get(preferences);
     if (cached != null) {
       return use(cached);
     }
     var built = new Entry(factory.get(), useCounter.incrementAndGet());
-    return use(entries.updateAndGet(current -> withEntry(current, key, built)).get(key));
+    return use(
+      entries.updateAndGet(current -> withEntry(current, preferences, built)).get(preferences)
+    );
   }
 
   private RaptorRegularTransferService use(Entry entry) {
@@ -69,7 +68,11 @@ class RegularTransferServiceCache {
    * Return a new map with the entry added, evicting the least recently used other entry if the map
    * is full. Return the current map unchanged if another request has already added the key.
    */
-  private Map<CacheKey, Entry> withEntry(Map<CacheKey, Entry> current, CacheKey key, Entry entry) {
+  private Map<AbstractUserPreferences<?>, Entry> withEntry(
+    Map<AbstractUserPreferences<?>, Entry> current,
+    AbstractUserPreferences<?> key,
+    Entry entry
+  ) {
     if (current.containsKey(key)) {
       return current;
     }
@@ -96,9 +99,4 @@ class RegularTransferServiceCache {
       this.lastUse = lastUse;
     }
   }
-
-  private record CacheKey(
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences
-  ) {}
 }

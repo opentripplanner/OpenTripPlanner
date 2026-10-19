@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
  * A regular-transfer pipeline without any transfers, for tests that route without regular
@@ -40,16 +39,17 @@ public final class NoRegularTransfers {
   private static final RegularTransferServiceFactory<NearbyStop> FACTORY =
     new RegularTransferServiceFactory<>() {
       @Override
-      public RaptorRegularTransferService create(
-        TransferProfileType profileType,
-        AbstractUserPreferences<?> preferences
-      ) {
+      public RaptorRegularTransferService create(AbstractUserPreferences<?> userPreferences) {
         return SERVICE;
       }
 
       @Nullable
       @Override
-      public NearbyStop findPath(TransferProfileType profileType, int fromStop, int toStop) {
+      public NearbyStop findPath(
+        AbstractUserPreferences<?> userPreferences,
+        int fromStop,
+        int toStop
+      ) {
         return null;
       }
     };

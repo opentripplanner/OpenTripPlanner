@@ -5,7 +5,7 @@ import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
  * Default {@link RegularTransferBuildRepository}.
@@ -29,7 +29,7 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
 
   @Override
   public void setPaths(
-    TransferProfileType profileType,
+    AbstractUserPreferences<?> userPreferences,
     int fromStop,
     Map<Integer, P> pathsByToStop
   ) {
@@ -39,7 +39,7 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
           "repository now."
       );
     }
-    paths.setPaths(profileType, fromStop, pathsByToStop);
+    paths.setPaths(userPreferences, fromStop, pathsByToStop);
   }
 
   @Override
@@ -48,8 +48,8 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   }
 
   @Override
-  public List<StoredPath<P>> pathsFor(TransferProfileType profileType) {
-    return paths.pathsFor(profileType);
+  public List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
+    return paths.pathsFor(userPreferences);
   }
 
   @Override
@@ -58,8 +58,8 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   }
 
   @Override
-  public int calculateNumberOfTransferPaths(TransferProfileType profileType) {
-    return paths.size(profileType);
+  public int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences) {
+    return paths.size(userPreferences);
   }
 
   @Override

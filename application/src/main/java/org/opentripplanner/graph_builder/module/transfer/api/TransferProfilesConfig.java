@@ -8,9 +8,6 @@ import java.util.List;
  * of profiles for the new raptor-data regular-transfer pipeline. Unrelated to, and parsed
  * independently of, the old {@code transferRequests}/{@code RegularTransferParameters} config,
  * which {@code FlexTransferGenerator} keeps reading unchanged for FLEX.
- * <p>
- * Only {@code WALK} is supported for now (see {@code TransferProfileType}) - {@code profiles}
- * stays a list for forward compatibility with additional profiles later.
  *
  * @param profiles in the order declared in config. At least one profile is required.
  */

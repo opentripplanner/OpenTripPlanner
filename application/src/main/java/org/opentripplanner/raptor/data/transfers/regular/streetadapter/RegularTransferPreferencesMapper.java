@@ -12,9 +12,7 @@ import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUs
 /**
  * The mapping glue between {@code application}'s traveler-preference model and the concrete
  * preferences type the {@code transit-transfer} module's regular-transfer pipeline caches and
- * normalizes paths under - {@link AbstractUserPreferences}. Only {@code WALK} is supported today
- * (see {@code TransferProfileType}); this mapper is deliberately minimal until the traveler
- * preferences model is designed further.
+ * normalizes paths under - {@link AbstractUserPreferences}. Only {@code WALK} is supported today.
  * <p>
  * {@link #fromRouteRequest} extracts a live request's walk preferences into the cache-friendly
  * {@link WalkPreferences} value (request time, before a {@link

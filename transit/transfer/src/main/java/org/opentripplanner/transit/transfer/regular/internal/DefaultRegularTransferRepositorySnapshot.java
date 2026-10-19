@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created from the build repository or by
@@ -29,22 +28,21 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
 
   @Nullable
   @Override
-  public P findPath(TransferProfileType profileType, int fromStop, int toStop) {
-    return paths.findPath(profileType, fromStop, toStop);
+  public P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
+    return paths.findPath(userPreferences, fromStop, toStop);
   }
 
   @Override
-  public List<StoredPath<P>> pathsFor(TransferProfileType profileType) {
-    return paths.pathsFor(profileType);
+  public List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
+    return paths.pathsFor(userPreferences);
   }
 
   @Override
   public RaptorRegularTransferService getOrCreateTransferService(
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences,
+    AbstractUserPreferences<?> userPreferences,
     Supplier<RaptorRegularTransferService> factory
   ) {
-    return transferServiceCache.getOrCreate(profileType, preferences, factory);
+    return transferServiceCache.getOrCreate(userPreferences, factory);
   }
 
   /**

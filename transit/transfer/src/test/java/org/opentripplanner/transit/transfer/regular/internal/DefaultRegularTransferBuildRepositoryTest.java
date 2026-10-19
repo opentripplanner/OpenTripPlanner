@@ -2,13 +2,15 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType.WALK;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
+import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 class DefaultRegularTransferBuildRepositoryTest {
+
+  private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
 
   private static final int A = 0;
   private static final int B = 1;

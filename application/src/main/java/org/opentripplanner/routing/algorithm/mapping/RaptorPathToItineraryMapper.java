@@ -32,7 +32,7 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorTransferProfileMapper;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -376,12 +376,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   /**
    * Recover the street path template for a transfer produced by the regular-transfer pipeline.
-   * {@code null} if no template is stored for this stop pair under the request's profile.
+   * {@code null} if no template is stored for this stop pair under the preferences closest to the
+   * request's.
    */
   @Nullable
   private NearbyStop findRegularTransferPath(int fromStop, int toStop) {
-    var profileType = RaptorTransferProfileMapper.fromRouteRequest(request);
-    return regularTransferServiceFactory.findPath(profileType, fromStop, toStop);
+    var userPreferences = RegularTransferPreferencesMapper.fromRouteRequest(request);
+    return regularTransferServiceFactory.findPath(userPreferences, fromStop, toStop);
   }
 
   private List<Leg> mapEgressLeg(EgressPathLeg<T> egressPathLeg) {

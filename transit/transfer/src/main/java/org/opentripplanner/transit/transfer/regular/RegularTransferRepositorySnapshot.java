@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
 
 /**
  * A read-only snapshot of the {@link RegularTransferRepository}. A new snapshot is published each
@@ -21,16 +20,20 @@ public interface RegularTransferRepositorySnapshot<P> {
   /**
    * Recover the real street path template for a resolved transfer - used by itinerary mapping to
    * build a transfer leg's geometry/walk-steps, since the routing-time {@code RaptorTransfers}
-   * lookup only carries {@code (stop, duration, c1)}, not the path itself.
+   * lookup only carries {@code (stop, duration, c1)}, not the path itself. The path is read from
+   * the paths stored under the user preferences closest to {@code userPreferences}.
    */
   @Nullable
-  P findPath(TransferProfileType profileType, int fromStop, int toStop);
-
-  /** Every stored {@code (fromStop, toStop, path)} for a profile. Empty if it has none. */
-  List<StoredPath<P>> pathsFor(TransferProfileType profileType);
+  P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop);
 
   /**
-   * Return the transfer service for {@code (profileType, preferences)} cached in this snapshot, or
+   * Every stored {@code (fromStop, toStop, path)} under the user preferences closest to
+   * {@code userPreferences}. Empty if no paths are stored.
+   */
+  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences);
+
+  /**
+   * Return the transfer service for {@code userPreferences} cached in this snapshot, or
    * create it with {@code factory} and cache it. The {@code factory} must build the service from
    * the paths of this snapshot.
    * <p>
@@ -39,8 +42,7 @@ public interface RegularTransferRepositorySnapshot<P> {
    * with another.
    */
   RaptorRegularTransferService getOrCreateTransferService(
-    TransferProfileType profileType,
-    AbstractUserPreferences<?> preferences,
+    AbstractUserPreferences<?> userPreferences,
     Supplier<RaptorRegularTransferService> factory
   );
 

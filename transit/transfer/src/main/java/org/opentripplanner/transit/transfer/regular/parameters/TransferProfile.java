@@ -15,13 +15,10 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  */
 public final class TransferProfile<R> {
 
-  private final TransferProfileType profileType;
-
   private final R configuredRequestParameters;
   private final AbstractUserPreferences userPreferences;
 
   /**
-   * @param profileType            this profile's identifying key
    * @param configuredRequestParameters    this profile's static, config-derived search parameters (street
    *                             mode, duration limits, ...) - opaque to {@code raptor-data}, only
    *                             the {@link TransferPathProvider} implementation interprets it.
@@ -30,21 +27,9 @@ public final class TransferProfile<R> {
    *                             checking for equivalence
    * @param <R>                  the request parameters type
    */
-  public TransferProfile(
-    TransferProfileType profileType,
-    R configuredRequestParameters,
-    AbstractUserPreferences userPreferences
-  ) {
-    this.profileType = profileType;
+  public TransferProfile(R configuredRequestParameters, AbstractUserPreferences userPreferences) {
     this.configuredRequestParameters = configuredRequestParameters;
     this.userPreferences = userPreferences;
-  }
-
-  /**
-   * this profile's identifying key
-   */
-  public TransferProfileType profileType() {
-    return profileType;
   }
 
   /**
@@ -74,7 +59,6 @@ public final class TransferProfile<R> {
     }
     var that = (TransferProfile) obj;
     return (
-      Objects.equals(this.profileType, that.profileType) &&
       Objects.equals(this.configuredRequestParameters, that.configuredRequestParameters) &&
       Objects.equals(this.userPreferences, that.userPreferences)
     );
@@ -82,16 +66,13 @@ public final class TransferProfile<R> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(profileType, configuredRequestParameters, userPreferences);
+    return Objects.hash(configuredRequestParameters, userPreferences);
   }
 
   @Override
   public String toString() {
     return (
       "RegularTransferParameters[" +
-      "profileId=" +
-      profileType +
-      ", " +
       "requestParameters=" +
       configuredRequestParameters +
       ", " +

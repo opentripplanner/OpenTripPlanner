@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
  * The regular-transfer path templates generated at graph build, keyed by
- * {@code (profileType, fromStop, toStop)}, and serialized with the graph. Written by the
+ * {@code (userPreferences, fromStop, toStop)}, and serialized with the graph. Written by the
  * {@link TransferGenerator}.
  * <p>
  * This repository is only used at graph build, it is not the runtime repository. When the
@@ -34,20 +34,27 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
    *
    * @throws IllegalStateException if the repository is sealed
    */
-  void setPaths(TransferProfileType profileType, int fromStop, Map<Integer, P> pathsByToStop);
+  void setPaths(
+    AbstractUserPreferences<?> userPreferences,
+    int fromStop,
+    Map<Integer, P> pathsByToStop
+  );
 
   /**
-   * Whether {@code fromStop} has at least one outgoing transfer, in any profile. Used at graph
+   * Whether {@code fromStop} has at least one outgoing transfer, under any user preferences. Used at graph
    * build to flag stops that could not be linked to any other stop.
    */
   boolean hasTransfersFrom(int fromStop);
 
-  /** Every stored {@code (fromStop, toStop, path)} for a profile. Empty if it has none. */
-  List<StoredPath<P>> pathsFor(TransferProfileType profileType);
+  /**
+   * Every stored {@code (fromStop, toStop, path)} under the user preferences closest to
+   * {@code userPreferences}. Empty if no paths are stored.
+   */
+  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences);
 
-  /** The number of stored paths, in all profiles. */
+  /** The number of stored paths, under all user preferences. */
   int calculateNumberOfTransferPaths();
 
-  /** The number of stored paths for a profile. Cheaper than {@code pathsFor(profileType).size()}. */
-  int calculateNumberOfTransferPaths(TransferProfileType profileType);
+  /** The number of paths stored under exactly the given user preferences. */
+  int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences);
 }

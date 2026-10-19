@@ -23,7 +23,6 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorTransferProfileMapper;
 import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -380,7 +379,6 @@ public class TransitRouter {
 
   private RaptorRegularTransferService raptorRegularTransferService() {
     return regularTransferServiceFactory.create(
-      RaptorTransferProfileMapper.fromRouteRequest(request),
       RegularTransferPreferencesMapper.fromRouteRequest(request)
     );
   }
