@@ -47,7 +47,7 @@ import org.opentripplanner.street.service.DefaultStreetLimitationParametersServi
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
@@ -67,13 +67,13 @@ public class TestServerContext {
    */
   public static TransitService createTransitService(
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository
   ) {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableHandle = indexAndRegisterTimetableSnapshot(
       transitRepository,
-      timetableBuildRepository.toScheduledTimetableData(),
+      timetableDataImport.toScheduledTimetableData(),
       transferRepository,
       registry
     );

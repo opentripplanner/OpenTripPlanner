@@ -21,7 +21,7 @@ import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -45,11 +45,11 @@ class TransitRepositoryTest {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
-    var timetableBuildRepository = new TimetableBuildRepository();
+    var timetableDataImport = new TimetableDataImport();
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       ConstantsForTests.SIMPLE_GTFS,
       new GtfsFareServiceFactory(),
       FAKE_FEED_ID
@@ -59,7 +59,7 @@ class TransitRepositoryTest {
     assertEquals("America/New_York", transitRepository.getTimeZone().getId());
 
     // Then trip times should be same as in input data
-    var scheduledEntities = timetableBuildRepository.toScheduledTimetableData();
+    var scheduledEntities = timetableDataImport.toScheduledTimetableData();
     Trip trip = scheduledEntities.getTripForId(SAMPLE_TRIP_ID);
     Timetable timetable = scheduledEntities.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
@@ -71,7 +71,7 @@ class TransitRepositoryTest {
         ConstantsForTests.addGtfsToGraph(
           graph,
           transitRepository,
-          timetableBuildRepository,
+          timetableDataImport,
           RESOURCE_LOADER.file("kcm_gtfs.zip"),
           new GtfsFareServiceFactory(),
           null
@@ -88,7 +88,7 @@ class TransitRepositoryTest {
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
 
-    var timetableBuildRepository = new TimetableBuildRepository();
+    var timetableDataImport = new TimetableDataImport();
     // Whit explicit time zone
     transitRepository.initTimeZone(ZoneIds.CHICAGO);
 
@@ -96,7 +96,7 @@ class TransitRepositoryTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       ConstantsForTests.SIMPLE_GTFS,
       new GtfsFareServiceFactory(),
       FAKE_FEED_ID
@@ -106,15 +106,15 @@ class TransitRepositoryTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       RESOURCE_LOADER.file("kcm_gtfs.zip"),
       new GtfsFareServiceFactory(),
       null
     );
 
-    new TimeZoneAdjusterModule(transitRepository, timetableBuildRepository).buildGraph();
+    new TimeZoneAdjusterModule(transitRepository, timetableDataImport).buildGraph();
 
-    var scheduledEntities = timetableBuildRepository.toScheduledTimetableData();
+    var scheduledEntities = timetableDataImport.toScheduledTimetableData();
 
     // Then time zone should match the one provided in the feed
     assertEquals("America/Chicago", transitRepository.getTimeZone().getId());
@@ -168,7 +168,7 @@ class TransitRepositoryTest {
 
   @Test
   void testGetStopLocationsUsedForBikesAllowedTrips() {
-    var repoBuildRepository = new TimetableBuildRepository();
+    var dataImport = new TimetableDataImport();
     var S11 = TransitRepositoryForTest.of().stop("S11").build();
     var S12 = TransitRepositoryForTest.of().stop("S12").build();
     var S13 = TransitRepositoryForTest.of().stop("S13").build();
@@ -201,17 +201,14 @@ class TransitRepositoryTest {
         )
       )
       .build();
-    repoBuildRepository.addTripPattern(id("TP1"), TP1);
-    repoBuildRepository.addTripPattern(id("TP2"), TP2);
-    assertEquals(
-      Set.of(S21, S22, S23),
-      repoBuildRepository.getStopLocationsUsedForBikesAllowedTrips()
-    );
+    dataImport.addTripPattern(id("TP1"), TP1);
+    dataImport.addTripPattern(id("TP2"), TP2);
+    assertEquals(Set.of(S21, S22, S23), dataImport.getStopLocationsUsedForBikesAllowedTrips());
   }
 
   @Test
   void testGetStopLocationsUsedForCarsAllowedTrips() {
-    var repoBuildRepository = new TimetableBuildRepository();
+    var dataImport = new TimetableDataImport();
     var S11 = TransitRepositoryForTest.of().stop("S11").build();
     var S12 = TransitRepositoryForTest.of().stop("S12").build();
     var S13 = TransitRepositoryForTest.of().stop("S13").build();
@@ -244,11 +241,8 @@ class TransitRepositoryTest {
         )
       )
       .build();
-    repoBuildRepository.addTripPattern(id("TP1"), TP1);
-    repoBuildRepository.addTripPattern(id("TP2"), TP2);
-    assertEquals(
-      Set.of(S21, S22, S23),
-      repoBuildRepository.getStopLocationsUsedForCarsAllowedTrips()
-    );
+    dataImport.addTripPattern(id("TP1"), TP1);
+    dataImport.addTripPattern(id("TP2"), TP2);
+    assertEquals(Set.of(S21, S22, S23), dataImport.getStopLocationsUsedForCarsAllowedTrips());
   }
 }

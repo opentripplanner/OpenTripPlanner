@@ -34,7 +34,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -68,12 +68,12 @@ public class TripTimesUpdaterTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
-    TimetableBuildRepository timetableBuildRepository = model.timetableBuildRepository();
+    TimetableDataImport timetableDataImport = model.timetableDataImport();
 
     feedId = transitRepository.getFeedIds().stream().findFirst().get();
     patternIndex = new HashMap<>();
 
-    for (TripPattern pattern : timetableBuildRepository.getAllTripPatterns()) {
+    for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 

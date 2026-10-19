@@ -22,7 +22,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VehicleParkingHelper;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -38,7 +38,7 @@ public class NetexModule implements GraphBuilderModule {
   private final Graph graph;
   private final DeduplicatorService deduplicator;
   private final TransitRepository transitRepository;
-  private final TimetableBuildRepository timetableBuildRepository;
+  private final TimetableDataImport timetableDataImport;
   private final VehicleParkingRepository parkingRepository;
   private final StreetDetailsRepository streetDetailsRepository;
   private final DataImportIssueStore issueStore;
@@ -59,7 +59,7 @@ public class NetexModule implements GraphBuilderModule {
     Graph graph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     VehicleParkingRepository parkingRepository,
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
@@ -70,7 +70,7 @@ public class NetexModule implements GraphBuilderModule {
     this.graph = graph;
     this.deduplicator = deduplicator;
     this.transitRepository = transitRepository;
-    this.timetableBuildRepository = timetableBuildRepository;
+    this.timetableDataImport = timetableDataImport;
     this.parkingRepository = parkingRepository;
     this.streetDetailsRepository = streetDetailsRepository;
     this.issueStore = issueStore;
@@ -106,7 +106,7 @@ public class NetexModule implements GraphBuilderModule {
         AddTransitEntitiesToTimetable.addToTimetable(
           otpService,
           transitRepository,
-          timetableBuildRepository
+          timetableDataImport
         );
         AddTransitEntitiesToGraph.addToGraph(
           otpService,
@@ -121,7 +121,7 @@ public class NetexModule implements GraphBuilderModule {
         lots.forEach(linker::linkVehicleParkingToGraph);
       }
 
-      timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+      timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
       TransitWithFutureDateValidator.validate(
         calendarServiceData,

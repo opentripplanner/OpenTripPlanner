@@ -11,7 +11,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -33,8 +33,7 @@ class StopClusterMapperTest {
   private static final TransitRepository TIMETABLE_REPOSITORY = new TransitRepository(
     SITE_REPOSITORY
   );
-  private static final TimetableBuildRepository TIMETABLE_REPOSITORY_BUILD_REPOSITORY =
-    new TimetableBuildRepository();
+  private static final TimetableDataImport TIMETABLE_DATA_IMPORT = new TimetableDataImport();
   private static final List<StopLocation> LOCATIONS = STOPS.stream()
     .map(StopLocation.class::cast)
     .toList();
@@ -94,9 +93,7 @@ class StopClusterMapperTest {
     return new StopClusterMapper(
       new DefaultTransitService(
         TIMETABLE_REPOSITORY,
-        DefaultTimetableRepository.scheduledOnly(
-          TIMETABLE_REPOSITORY_BUILD_REPOSITORY.toScheduledTimetableData()
-        )
+        DefaultTimetableRepository.scheduledOnly(TIMETABLE_DATA_IMPORT.toScheduledTimetableData())
       ),
       service
     );

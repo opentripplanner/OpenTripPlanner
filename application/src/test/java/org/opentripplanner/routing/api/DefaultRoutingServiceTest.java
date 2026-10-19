@@ -37,7 +37,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     super.setUp();
     transitService = new DefaultTransitService(
       transitRepository,
-      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
   }
 

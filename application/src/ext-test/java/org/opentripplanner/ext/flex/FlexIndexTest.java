@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -27,7 +27,7 @@ class FlexIndexTest {
 
   @Test
   void testFlexTripSpanningMidnight() {
-    TimetableBuildRepository repoBuildRepository = new TimetableBuildRepository();
+    TimetableDataImport dataImport = new TimetableDataImport();
     FeedScopedId serviceId = id("S1");
     Trip trip = trip("T1").withServiceId(serviceId).build();
 
@@ -36,18 +36,15 @@ class FlexIndexTest {
       .withStopTimes(List.of(area("22:00", "26:00"), area("22:00", "26:00")))
       .build();
 
-    repoBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+    dataImport.addFlexTrip(flexTrip.getId(), flexTrip);
 
     LocalDate serviceDate = LocalDate.of(2025, 2, 28);
     LocalDate nextDay = serviceDate.plusDays(1);
     CalendarServiceData calendarData = new CalendarServiceData();
     calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
-    repoBuildRepository.updateCalendarServiceData(calendarData);
+    dataImport.updateCalendarServiceData(calendarData);
 
-    FlexIndex index = new FlexIndex(
-      repoBuildRepository.getAllFlexTrips(),
-      repoBuildRepository.getTripCalendars()
-    );
+    FlexIndex index = new FlexIndex(dataImport.getAllFlexTrips(), dataImport.getTripCalendars());
 
     Collection<FlexTripForDate> tripsOnServiceDate = index.getFlexTripsForRunningDate(serviceDate);
     assertEquals(1, tripsOnServiceDate.size(), "Should have 1 trip on service date");
@@ -72,7 +69,7 @@ class FlexIndexTest {
 
   @Test
   void testFlexTripStartingAfterMidnight() {
-    TimetableBuildRepository repoBuildRepository = new TimetableBuildRepository();
+    TimetableDataImport dataImport = new TimetableDataImport();
     FeedScopedId serviceId = id("S2");
     Trip trip = trip("T2").withServiceId(serviceId).build();
 
@@ -81,17 +78,14 @@ class FlexIndexTest {
       .withStopTimes(List.of(area("25:00", "27:00"), area("25:00", "27:00")))
       .build();
 
-    repoBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+    dataImport.addFlexTrip(flexTrip.getId(), flexTrip);
 
     LocalDate serviceDate = LocalDate.of(2025, 2, 28);
     CalendarServiceData calendarData = new CalendarServiceData();
     calendarData.putServiceDatesForServiceId(serviceId, List.of(serviceDate));
-    repoBuildRepository.updateCalendarServiceData(calendarData);
+    dataImport.updateCalendarServiceData(calendarData);
 
-    FlexIndex index = new FlexIndex(
-      repoBuildRepository.getAllFlexTrips(),
-      repoBuildRepository.getTripCalendars()
-    );
+    FlexIndex index = new FlexIndex(dataImport.getAllFlexTrips(), dataImport.getTripCalendars());
 
     Collection<FlexTripForDate> tripsOnServiceDay = index.getFlexTripsForRunningDate(serviceDate);
     assertEquals(1, tripsOnServiceDay.size(), "Should have 1 trip on service day");
@@ -105,7 +99,7 @@ class FlexIndexTest {
 
   @Test
   void routesAtArea() {
-    var repoBuildRepository = new TimetableBuildRepository();
+    var dataImport = new TimetableDataImport();
     var st1 = area("10:00", "12:00");
     var st2 = area("14:00", "16:00");
 
@@ -114,12 +108,9 @@ class FlexIndexTest {
       .withStopTimes(List.of(st1, st2))
       .build();
 
-    repoBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+    dataImport.addFlexTrip(flexTrip.getId(), flexTrip);
 
-    var index = new FlexIndex(
-      repoBuildRepository.getAllFlexTrips(),
-      repoBuildRepository.getTripCalendars()
-    );
+    var index = new FlexIndex(dataImport.getAllFlexTrips(), dataImport.getTripCalendars());
 
     assertThat(index.findRoutes(st1.getStop())).containsExactly(ROUTE_2);
     assertThat(index.findRoutes(st2.getStop())).containsExactly(ROUTE_2);
@@ -127,7 +118,7 @@ class FlexIndexTest {
 
   @Test
   void routesAtGroup() {
-    var repoBuildRepository = new TimetableBuildRepository();
+    var dataImport = new TimetableDataImport();
     var st1 = groupStop("10:00", "12:00");
     var st2 = groupStop("14:00", "16:00");
 
@@ -136,12 +127,9 @@ class FlexIndexTest {
       .withStopTimes(List.of(st1, st2))
       .build();
 
-    repoBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+    dataImport.addFlexTrip(flexTrip.getId(), flexTrip);
 
-    var index = new FlexIndex(
-      repoBuildRepository.getAllFlexTrips(),
-      repoBuildRepository.getTripCalendars()
-    );
+    var index = new FlexIndex(dataImport.getAllFlexTrips(), dataImport.getTripCalendars());
 
     var groupStop = (GroupStop) st1.getStop();
     assertThat(groupStop.getChildLocations()).isNotEmpty();

@@ -56,7 +56,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.model.StreetModelDetails;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -113,7 +113,7 @@ public class GraphSerializationTest {
       streetDetailsRepository,
       streetRepository,
       model.transitRepository(),
-      model.timetableBuildRepository(),
+      model.timetableDataImport(),
       model.transferRepository(),
       weRepo,
       parkingRepository,
@@ -147,7 +147,7 @@ public class GraphSerializationTest {
       streetDetailsRepository,
       streetRepository,
       model.transitRepository(),
-      model.timetableBuildRepository(),
+      model.timetableDataImport(),
       model.transferRepository(),
       worldEnvelopeRepository,
       parkingRepository,
@@ -215,8 +215,8 @@ public class GraphSerializationTest {
    * and the calendars.
    */
   private static void assertSameScheduledData(
-    TimetableBuildRepository original,
-    TimetableBuildRepository copy
+    TimetableDataImport original,
+    TimetableDataImport copy
   ) {
     assertEquals(
       original.getAllTripPatterns().stream().map(TripPattern::getId).collect(Collectors.toSet()),
@@ -289,7 +289,7 @@ public class GraphSerializationTest {
     StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
     TransitRepository originalTransitRepository,
-    TimetableBuildRepository originalTimetableBuildRepository,
+    TimetableDataImport originalTimetableDataImport,
     TransferRepository originalTransferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
@@ -305,7 +305,7 @@ public class GraphSerializationTest {
       streetDetailsRepository,
       streetRepository,
       originalTransitRepository,
-      originalTimetableBuildRepository,
+      originalTimetableDataImport,
       originalTransferRepository,
       worldEnvelopeRepository,
       vehicleParkingRepository,
@@ -322,10 +322,7 @@ public class GraphSerializationTest {
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
     Graph copiedGraph1 = deserializedGraph.graph;
     TransitRepository copiedTransitRepository1 = deserializedGraph.transitRepository;
-    assertSameScheduledData(
-      originalTimetableBuildRepository,
-      deserializedGraph.timetableBuildRepository
-    );
+    assertSameScheduledData(originalTimetableDataImport, deserializedGraph.timetableDataImport);
     // Index both graph - we do no know if the original is indexed, because it is cached and
     // might be indexed by other tests.
 

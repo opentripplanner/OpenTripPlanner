@@ -41,7 +41,7 @@ import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFacto
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
@@ -93,7 +93,7 @@ public class SpeedTest {
     RouterConfig routerConfig,
     Graph graph,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository
   ) {
     this.opts = opts;
@@ -114,7 +114,7 @@ public class SpeedTest {
 
     TransitTuningParameters tuningParameters = routerConfig.transitTuningConfig();
     // Converted once, as on server startup, and shared by the Raptor mapping and the services
-    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
@@ -241,7 +241,7 @@ public class SpeedTest {
       OtpStartupInfo.logInfo("Run Speed Test");
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var transitRepository = model.transitRepository();
-      var timetableBuildRepository = model.timetableBuildRepository();
+      var timetableDataImport = model.timetableDataImport();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
@@ -253,7 +253,7 @@ public class SpeedTest {
         routerConfig,
         graph,
         transitRepository,
-        timetableBuildRepository,
+        timetableDataImport,
         transferRepository
       );
 

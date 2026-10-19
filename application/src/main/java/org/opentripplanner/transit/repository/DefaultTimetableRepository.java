@@ -184,8 +184,8 @@ public class DefaultTimetableRepository implements TimetableRepository {
    * lets {@link #getRoute}, {@link #getTrip}, {@link #findPattern}, and friends answer
    * "realtime-first, scheduled-fallback" without any help from the rest of the codebase.
    * <p>
-   * Created from the graph build data when the server starts, and owned by this repository from
-   * then on.
+   * Created from the imported timetable data when the server starts, and owned by this repository
+   * from then on.
    */
   private final ScheduledTimetableData scheduledTimetableData;
 

@@ -52,7 +52,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -148,7 +148,7 @@ public class ConstantsForTests {
     try {
       var graph = new Graph();
       var transitRepository = new TransitRepository(new SiteRepository());
-      var timetableBuildRepository = new TimetableBuildRepository();
+      var timetableDataImport = new TimetableDataImport();
       var fareFactory = new GtfsFareServiceFactory();
       // Add street data from OSM
       {
@@ -165,14 +165,14 @@ public class ConstantsForTests {
         addGtfsToGraph(
           graph,
           transitRepository,
-          timetableBuildRepository,
+          timetableDataImport,
           PORTLAND_GTFS,
           fareFactory,
           "prt"
         );
       }
       // Link transit stops to streets
-      TestStreetLinkerModule.link(graph, transitRepository, timetableBuildRepository);
+      TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
       // Add elevation data
       if (withElevation) {
@@ -191,7 +191,7 @@ public class ConstantsForTests {
       new DirectTransferGenerator(
         graph,
         transitRepository,
-        timetableBuildRepository,
+        timetableDataImport,
         transferRepository,
         DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
@@ -203,7 +203,7 @@ public class ConstantsForTests {
       return new TestOtpModel(
         graph,
         transitRepository,
-        timetableBuildRepository,
+        timetableDataImport,
         transferRepository,
         fareFactory
       );
@@ -217,7 +217,7 @@ public class ConstantsForTests {
       var siteRepository = new SiteRepository();
       var graph = new Graph();
       var transitRepository = new TransitRepository(siteRepository);
-      var timetableBuildRepository = new TimetableBuildRepository();
+      var timetableDataImport = new TimetableDataImport();
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -243,12 +243,7 @@ public class ConstantsForTests {
       } else {
         transferRepository = TransferServiceTestFactory.defaultTransferRepository();
       }
-      return new TestOtpModel(
-        graph,
-        transitRepository,
-        timetableBuildRepository,
-        transferRepository
-      );
+      return new TestOtpModel(graph, transitRepository, timetableDataImport, transferRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -260,7 +255,7 @@ public class ConstantsForTests {
     addGtfsToGraph(
       otpModel.graph(),
       otpModel.transitRepository(),
-      otpModel.timetableBuildRepository(),
+      otpModel.timetableDataImport(),
       gtfsPath,
       new GtfsFareServiceFactory(),
       null
@@ -270,7 +265,7 @@ public class ConstantsForTests {
     TestStreetLinkerModule.link(
       otpModel.graph(),
       otpModel.transitRepository(),
-      otpModel.timetableBuildRepository()
+      otpModel.timetableDataImport()
     );
 
     return otpModel;
@@ -284,12 +279,12 @@ public class ConstantsForTests {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
-    var timetableBuildRepository = new TimetableBuildRepository();
+    var timetableDataImport = new TimetableDataImport();
     var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     addGtfsToGraph(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       gtfsFile,
       fareServiceFactory,
       null
@@ -297,7 +292,7 @@ public class ConstantsForTests {
     return new TestOtpModel(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       transferRepository,
       fareServiceFactory
     );
@@ -310,7 +305,7 @@ public class ConstantsForTests {
       var parkingRepository = new DefaultVehicleParkingRepository();
       var graph = new Graph();
       var transitRepository = new TransitRepository(siteRepository);
-      var timetableBuildRepository = new TimetableBuildRepository();
+      var timetableDataImport = new TimetableDataImport();
       var streetDetailsRepository = new DefaultStreetDetailsRepository();
       // Add street data from OSM
       {
@@ -337,7 +332,7 @@ public class ConstantsForTests {
           .createNetexModule(
             sources,
             transitRepository,
-            timetableBuildRepository,
+            timetableDataImport,
             parkingRepository,
             streetDetailsRepository,
             graph,
@@ -347,12 +342,12 @@ public class ConstantsForTests {
           .buildGraph();
       }
       // Link transit stops to streets
-      TestStreetLinkerModule.link(graph, transitRepository, timetableBuildRepository);
+      TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
       return new TestOtpModel(
         graph,
         transitRepository,
-        timetableBuildRepository,
+        timetableDataImport,
         TransferServiceTestFactory.defaultTransferRepository()
       );
     } catch (Exception e) {
@@ -363,7 +358,7 @@ public class ConstantsForTests {
   public static void addGtfsToGraph(
     Graph graph,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     File file,
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
@@ -373,7 +368,7 @@ public class ConstantsForTests {
     var module = new GtfsModule(
       List.of(bundle),
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),

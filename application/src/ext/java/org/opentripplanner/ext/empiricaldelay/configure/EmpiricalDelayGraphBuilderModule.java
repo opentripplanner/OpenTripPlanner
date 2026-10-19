@@ -11,7 +11,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 
 @Module
 public class EmpiricalDelayGraphBuilderModule {
@@ -23,7 +23,7 @@ public class EmpiricalDelayGraphBuilderModule {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     DeduplicatorService deduplicator
   ) {
@@ -37,7 +37,7 @@ public class EmpiricalDelayGraphBuilderModule {
       issueStore,
       config.empiricalDelay,
       empiricalDelayRepository,
-      timetableBuildRepository
+      timetableDataImport
     );
   }
 }

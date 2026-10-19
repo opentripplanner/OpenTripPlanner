@@ -19,7 +19,7 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -67,7 +67,7 @@ public class LoadApplication {
       obj.osmInfoGraphBuildRepository,
       obj.streetDetailsRepository,
       obj.transitRepository,
-      obj.timetableBuildRepository,
+      obj.timetableDataImport,
       obj.transferRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
@@ -88,7 +88,7 @@ public class LoadApplication {
       factory.emptyOsmInfoGraphBuildRepository(),
       factory.emptyStreetDetailsRepository(),
       factory.emptyTransitRepository(),
-      factory.emptyTimetableBuildRepository(),
+      factory.emptyTimetableDataImport(),
       factory.emptyTransferRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
@@ -118,7 +118,7 @@ public class LoadApplication {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -136,7 +136,7 @@ public class LoadApplication {
       osmInfoGraphBuildRepository,
       streetDetailsRepository,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       transferRepository,
       worldEnvelopeRepository,
       config(),

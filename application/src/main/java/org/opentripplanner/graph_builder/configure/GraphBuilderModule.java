@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.cache.GraphBuildCacheManager;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 @Module
@@ -21,7 +21,7 @@ public class GraphBuilderModule {
     Graph baseGraph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     GraphBuilderDataSources closeDataSourcesHandle,
     GraphBuildCacheManager cacheManager
@@ -30,7 +30,7 @@ public class GraphBuilderModule {
       baseGraph,
       deduplicator,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       issueStore,
       closeDataSourcesHandle,
       cacheManager

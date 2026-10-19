@@ -15,7 +15,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
   private final EmissionRepository emissionRepository;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources;
   private final Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionDataSources;
-  private final TimetableBuildRepository timetableBuildRepository;
+  private final TimetableDataImport timetableDataImport;
 
   private final DataImportIssueStore issueStore;
 
@@ -41,14 +41,14 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionDataSources,
     EmissionParameters parameters,
     EmissionRepository emissionRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore
   ) {
     this.gtfsDataSources = gtfsDataSources;
     this.emissionDataSources = emissionDataSources;
     this.parameters = parameters;
     this.emissionRepository = emissionRepository;
-    this.timetableBuildRepository = timetableBuildRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
   }
 
@@ -78,7 +78,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
 
   private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {
     var map = new HashMap<FeedScopedId, List<StopLocation>>();
-    for (TripPattern pattern : timetableBuildRepository.getAllTripPatterns()) {
+    for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
       pattern.scheduledTripsAsStream().forEach(it -> map.put(it.getId(), pattern.getStops()));
     }
     return map;

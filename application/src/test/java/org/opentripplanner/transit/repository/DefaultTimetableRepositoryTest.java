@@ -28,7 +28,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TimetableUpdateMapper;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -58,12 +58,12 @@ public class DefaultTimetableRepositoryTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
-    TimetableBuildRepository timetableBuildRepository = model.timetableBuildRepository();
+    TimetableDataImport timetableDataImport = model.timetableDataImport();
 
     feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : timetableBuildRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : timetableDataImport.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
@@ -152,11 +152,11 @@ public class DefaultTimetableRepositoryTest {
       .withStopPattern(stopPattern)
       .withRealTimeAddedTrip()
       .build();
-    var buildRepository = new TimetableBuildRepository();
-    buildRepository.addTripPattern(scheduledPattern.getId(), scheduledPattern);
+    var dataImport = new TimetableDataImport();
+    dataImport.addTripPattern(scheduledPattern.getId(), scheduledPattern);
     var subject = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      buildRepository.toScheduledTimetableData()
+      dataImport.toScheduledTimetableData()
     );
     var tripTimes = ScheduledTripTimes.of()
       .withTrip(TransitRepositoryForTest.trip("T").withRoute(route).build())
@@ -184,11 +184,11 @@ public class DefaultTimetableRepositoryTest {
       .withServiceDate(SERVICE_DATE)
       .withReplacementFor(List.of(replaced))
       .build();
-    var buildRepository = new TimetableBuildRepository();
-    buildRepository.addTripOnServiceDate(scheduledReplacement);
+    var dataImport = new TimetableDataImport();
+    dataImport.addTripOnServiceDate(scheduledReplacement);
     var subject = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      buildRepository.toScheduledTimetableData()
+      dataImport.toScheduledTimetableData()
     );
 
     assertThat(subject.findReplacedBy(replaced.getId())).containsExactly(scheduledReplacement);

@@ -54,7 +54,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.streetadapter.VertexFactory;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -75,11 +75,11 @@ public abstract class GraphRoutingTest {
     builder.build();
     Graph graph = builder.graph();
     TransitRepository transitRepository = builder.transitRepository();
-    TimetableBuildRepository timetableBuildRepository = builder.timetableBuildRepository();
+    TimetableDataImport timetableDataImport = builder.timetableDataImport();
     return new TestOtpModel(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       TransferServiceTestFactory.defaultTransferRepository()
     ).index();
   }
@@ -88,14 +88,14 @@ public abstract class GraphRoutingTest {
 
     private final Graph graph;
     private final TransitRepository transitRepository;
-    private final TimetableBuildRepository timetableBuildRepository;
+    private final TimetableDataImport timetableDataImport;
     private final VertexFactory vertexFactory;
     private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
       graph = new Graph();
       transitRepository = new TransitRepository(new SiteRepository());
-      timetableBuildRepository = new TimetableBuildRepository();
+      timetableDataImport = new TimetableDataImport();
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -110,8 +110,8 @@ public abstract class GraphRoutingTest {
       return transitRepository;
     }
 
-    public TimetableBuildRepository timetableBuildRepository() {
-      return timetableBuildRepository;
+    public TimetableDataImport timetableDataImport() {
+      return timetableDataImport;
     }
 
     // -- Street network
@@ -498,7 +498,7 @@ public abstract class GraphRoutingTest {
 
     // Transit
     public void tripPattern(TripPattern tripPattern) {
-      timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     public StopTime st(TransitStopVertex s1) {

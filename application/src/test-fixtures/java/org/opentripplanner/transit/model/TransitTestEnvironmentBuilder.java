@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -28,8 +28,7 @@ public class TransitTestEnvironmentBuilder {
 
   private final LocalDate defaultServiceDate;
 
-  private final List<Consumer<TimetableBuildRepository>> timetableBuildCustomizers =
-    new ArrayList<>();
+  private final List<Consumer<TimetableDataImport>> timetableBuildCustomizers = new ArrayList<>();
 
   TransitTestEnvironmentBuilder(ZoneId timeZone, LocalDate defaultServiceDate) {
     this.defaultServiceDate = defaultServiceDate;
@@ -40,12 +39,12 @@ public class TransitTestEnvironmentBuilder {
 
   public TransitTestEnvironment build() {
     var siteRepository = site.build();
-    var timetableBuildRepository = new TimetableBuildRepository();
-    var transitRepository = timetable.build(siteRepository, timetableBuildRepository);
-    timetableBuildCustomizers.forEach(it -> it.accept(timetableBuildRepository));
+    var timetableDataImport = new TimetableDataImport();
+    var transitRepository = timetable.build(siteRepository, timetableDataImport);
+    timetableBuildCustomizers.forEach(it -> it.accept(timetableDataImport));
     return new TransitTestEnvironment(
       transitRepository,
-      timetableBuildRepository.toScheduledTimetableData(),
+      timetableDataImport.toScheduledTimetableData(),
       TransferServiceTestFactory.defaultTransferRepository(),
       defaultServiceDate
     );
@@ -55,8 +54,8 @@ public class TransitTestEnvironmentBuilder {
    * Add scheduled timetable data directly, after the trips added with this builder and before the
    * data is converted into the environment's immutable scheduled data.
    */
-  public TransitTestEnvironmentBuilder withTimetableBuildRepository(
-    Consumer<TimetableBuildRepository> customizer
+  public TransitTestEnvironmentBuilder withTimetableDataImport(
+    Consumer<TimetableDataImport> customizer
   ) {
     timetableBuildCustomizers.add(customizer);
     return this;

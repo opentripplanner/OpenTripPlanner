@@ -140,7 +140,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     TestStreetLinkerModule.link(
       graph,
       otpModel.transitRepository(),
-      otpModel.timetableBuildRepository()
+      otpModel.timetableDataImport()
     );
     String label = stop.getLabelString();
     this.stopLocation = GenericLocation.fromStopId(stop.getId(), label);

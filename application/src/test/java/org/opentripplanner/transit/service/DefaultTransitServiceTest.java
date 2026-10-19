@@ -30,7 +30,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -165,13 +165,13 @@ class DefaultTransitServiceTest {
 
     var deduplicator = new Deduplicator();
     var transitRepository = new TransitRepository(siteRepository);
-    var timetableBuildRepository = new TimetableBuildRepository();
+    var timetableDataImport = new TimetableDataImport();
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
     var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
       .createRealTimeFromScheduledTimes()
       .withCanceled()
       .build();
-    timetableBuildRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    timetableDataImport.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -188,19 +188,19 @@ class DefaultTransitServiceTest {
       List.of(firstDate, secondDate)
     );
 
-    timetableBuildRepository.putServiceCode(SERVICE_ID, SERVICE_CODE);
-    timetableBuildRepository.putServiceCode(CALENDAR_ID, SERVICE_CODE);
-    timetableBuildRepository.putServiceCode(CALENDAR_ID_TWO, 1);
+    timetableDataImport.putServiceCode(SERVICE_ID, SERVICE_CODE);
+    timetableDataImport.putServiceCode(CALENDAR_ID, SERVICE_CODE);
+    timetableDataImport.putServiceCode(CALENDAR_ID_TWO, 1);
 
-    timetableBuildRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
-    timetableBuildRepository.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
-    timetableBuildRepository.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
+    timetableDataImport.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    timetableDataImport.addTripPattern(BUS_PATTERN.getId(), BUS_PATTERN);
+    timetableDataImport.addTripPattern(BUS_PATTERN_TODAY.getId(), BUS_PATTERN_TODAY);
 
-    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
     transitRepository.index();
 
-    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       scheduledTimetableData

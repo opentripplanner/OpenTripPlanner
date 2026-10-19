@@ -16,7 +16,7 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -72,13 +72,13 @@ class ScheduledTransitLegReferenceTest {
       .withRegularStop(stop3b)
       .build();
     TransitRepository transitRepository = new TransitRepository(siteRepository);
-    TimetableBuildRepository timetableBuildRepository = new TimetableBuildRepository();
+    TimetableDataImport timetableDataImport = new TimetableDataImport();
     transitRepository.initUpdaterManager(
       new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
     // build transit data
     CalendarServiceData calendarServiceData = new CalendarServiceData();
-    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
     for (var item : Map.of(
       SIMPLE_TRIP_ID,
       TransitRepositoryForTest.stopPattern(stop1, stop2, stop3a),
@@ -100,10 +100,10 @@ class ScheduledTransitLegReferenceTest {
         .withStopPattern(item.getValue())
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();
-      timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
-      timetableBuildRepository.putServiceCode(tripPattern.getId(), SERVICE_CODE);
+      timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableDataImport.putServiceCode(tripPattern.getId(), SERVICE_CODE);
       FeedScopedId tripOnServiceDateId = id("TRIP_ON_SERVICE_DATE" + item.getKey().getId());
-      timetableBuildRepository.addTripOnServiceDate(
+      timetableDataImport.addTripOnServiceDate(
         TripOnServiceDate.of(tripOnServiceDateId)
           .withTrip(trip)
           .withServiceDate(SERVICE_DATE)
@@ -115,14 +115,14 @@ class ScheduledTransitLegReferenceTest {
       calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
     }
 
-    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
     transitRepository.index();
 
     // build transit service
     transitService = new DefaultTransitService(
       transitRepository,
-      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
   }
 

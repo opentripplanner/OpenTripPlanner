@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.repository;
+package org.opentripplanner.transit.dataimport;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,12 +7,11 @@ import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
-class TimetableBuildRepositoryTest {
+class TimetableDataImportTest {
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
   private static final TripPattern PATTERN = TransitRepositoryForTest.tripPattern(
@@ -29,7 +28,7 @@ class TimetableBuildRepositoryTest {
 
   @Test
   void modificationsFailAfterConversion() {
-    var subject = new TimetableBuildRepository();
+    var subject = new TimetableDataImport();
     subject.toScheduledTimetableData();
 
     assertThrows(IllegalStateException.class, () ->
@@ -52,7 +51,7 @@ class TimetableBuildRepositoryTest {
 
   @Test
   void readingAndConvertingAgainWorkAfterConversion() {
-    var subject = new TimetableBuildRepository();
+    var subject = new TimetableDataImport();
     subject.addTripPattern(PATTERN.getId(), PATTERN);
 
     assertThat(subject.toScheduledTimetableData().getAllTripPatterns()).containsExactly(PATTERN);

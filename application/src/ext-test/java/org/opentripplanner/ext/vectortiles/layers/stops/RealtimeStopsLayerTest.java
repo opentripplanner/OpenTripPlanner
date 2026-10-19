@@ -19,7 +19,7 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -54,14 +54,12 @@ public class RealtimeStopsLayerTest {
   @Test
   void realtimeStopLayer() {
     var timetableRepository = new TransitRepository(new SiteRepository());
-    var timetableRepositoryBuildRepository = new TimetableBuildRepository();
+    var timetableDataImport = new TimetableDataImport();
     timetableRepository.initTimeZone(ZoneIds.HELSINKI);
     timetableRepository.index();
     var transitService = new DefaultTransitService(
       timetableRepository,
-      DefaultTimetableRepository.scheduledOnly(
-        timetableRepositoryBuildRepository.toScheduledTimetableData()
-      )
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
     var transitAlertService = new TransitAlertServiceImpl();
 

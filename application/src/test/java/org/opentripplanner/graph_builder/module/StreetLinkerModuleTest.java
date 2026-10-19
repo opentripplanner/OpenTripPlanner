@@ -31,7 +31,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.network.Route;
@@ -194,7 +194,7 @@ class StreetLinkerModuleTest {
     private final StreetLinkerModule module;
     private final RegularStop stop;
     private final TransitRepository transitRepository;
-    private final TimetableBuildRepository timetableBuildRepository;
+    private final TimetableDataImport timetableDataImport;
     private final Graph graph;
 
     public TestModel() {
@@ -221,7 +221,7 @@ class StreetLinkerModuleTest {
       builder.withRegularStop(stop);
 
       transitRepository = new TransitRepository(builder.build());
-      timetableBuildRepository = new TimetableBuildRepository();
+      timetableDataImport = new TimetableDataImport();
 
       stopVertex = TransitStopVertex.of()
         .withId(stop.getId())
@@ -236,7 +236,7 @@ class StreetLinkerModuleTest {
         new VertexLinker(graph, GeofencingZoneService.EMPTY, TRAVERSE_AREA_EDGES, 0, false),
         new DefaultVehicleParkingRepository(),
         transitRepository,
-        timetableBuildRepository,
+        timetableDataImport,
         DataImportIssueStore.NOOP
       );
 
@@ -262,7 +262,7 @@ class StreetLinkerModuleTest {
     }
 
     public void withFlexTrip(UnscheduledTrip flexTrip) {
-      timetableBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableDataImport.addFlexTrip(flexTrip.getId(), flexTrip);
     }
 
     public void withCarsAllowedTrip(Trip trip, StopLocation... stops) {
@@ -287,7 +287,7 @@ class StreetLinkerModuleTest {
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();
 
-      timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     /**

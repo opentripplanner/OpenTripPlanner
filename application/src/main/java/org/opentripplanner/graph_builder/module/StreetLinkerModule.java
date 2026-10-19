@@ -30,7 +30,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -54,7 +54,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final TransitRepository transitRepository;
-  private final TimetableBuildRepository timetableBuildRepository;
+  private final TimetableDataImport timetableDataImport;
   private final DataImportIssueStore issueStore;
   private final VertexLinker vertexLinker;
 
@@ -63,13 +63,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
     VertexLinker linker,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.parkingRepository = parkingRepository;
     this.transitRepository = transitRepository;
-    this.timetableBuildRepository = timetableBuildRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.vertexLinker = linker;
   }
@@ -105,7 +105,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
 
     Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
-      timetableBuildRepository.getStopLocationsUsedForCarsAllowedTrips();
+      timetableDataImport.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex stopVertex : vertices) {
       var stop = Objects.requireNonNull(
@@ -377,7 +377,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private Set<StopLocation> getStopLocationsUsedForFlexTrips() {
-    Set<StopLocation> stopLocations = timetableBuildRepository
+    Set<StopLocation> stopLocations = timetableDataImport
       .getAllFlexTrips()
       .stream()
       .flatMap(t -> t.getStops().stream())

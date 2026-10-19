@@ -92,7 +92,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       transitRepository,
       new DefaultTimetableRepository(
         RaptorTransitDataTestFactory.empty(),
-        timetableBuildRepository.toScheduledTimetableData()
+        timetableDataImport.toScheduledTimetableData()
       ),
       () -> {
         throw new UnsupportedOperationException(
@@ -103,9 +103,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     if (transitService == null) {
       transitService = new DefaultTransitService(
         transitRepository,
-        DefaultTimetableRepository.scheduledOnly(
-          timetableBuildRepository.toScheduledTimetableData()
-        )
+        DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
       );
     } else {
       transitAlertService.getAllAlerts().clear();

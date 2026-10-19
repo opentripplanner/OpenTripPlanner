@@ -29,7 +29,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -167,7 +167,7 @@ class TaxiRouterDirectRoutingTest implements PlanTestConstants {
 
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
-      new TimetableBuildRepository(),
+      new TimetableDataImport(),
       TransferServiceTestFactory.defaultTransferRepository()
     );
 

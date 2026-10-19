@@ -34,7 +34,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -62,7 +62,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
   private final TransitRepository transitRepository;
-  private final TimetableBuildRepository timetableBuildRepository;
+  private final TimetableDataImport timetableDataImport;
   private final TransferRepository transferRepository;
   private final DataImportIssueStore issueStore;
 
@@ -81,7 +81,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
@@ -89,7 +89,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
-    this.timetableBuildRepository = timetableBuildRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
@@ -100,14 +100,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     RegularTransferParameters parameters
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
-    this.timetableBuildRepository = timetableBuildRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = parameters.maxDuration();
     this.transferRequests = parameters.requests();
@@ -124,9 +124,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
     Set<StopLocation> carsAllowedStops =
-      timetableBuildRepository.getStopLocationsUsedForCarsAllowedTrips();
+      timetableDataImport.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =
-      timetableBuildRepository.getStopLocationsUsedForBikesAllowedTrips();
+      timetableDataImport.getStopLocationsUsedForBikesAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -271,7 +271,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private Multimap<FeedScopedId, TripPattern> patternsForStop() {
     if (patternsForStop == null) {
       Multimap<FeedScopedId, TripPattern> index = ArrayListMultimap.create();
-      for (TripPattern pattern : timetableBuildRepository.getAllTripPatterns()) {
+      for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
         for (StopLocation stop : pattern.getStops()) {
           index.put(stop.getId(), pattern);
         }
@@ -302,8 +302,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       var flexIndex = OTPFeature.FlexRouting.isOn()
         ? new FlexIndex(
-            timetableBuildRepository.getAllFlexTrips(),
-            timetableBuildRepository.getTripCalendars()
+            timetableDataImport.getAllFlexTrips(),
+            timetableDataImport.getTripCalendars()
           )
         : null;
       return new PatternConsideringNearbyStopFinder(

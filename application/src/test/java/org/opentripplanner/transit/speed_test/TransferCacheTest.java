@@ -28,7 +28,7 @@ public class TransferCacheTest {
       SetupHelper.loadOtpFeatures(opts);
       var model = SetupHelper.loadGraph(opts.rootDir(), config.graph());
       var transitRepository = model.transitRepository();
-      var timetableBuildRepository = model.timetableBuildRepository();
+      var timetableDataImport = model.timetableDataImport();
       var transferRepository = model.transferRepository();
       var buildConfig = model.buildConfig();
 
@@ -42,7 +42,7 @@ public class TransferCacheTest {
         RaptorTransitDataMapper.map(
           tuningParameters,
           transitRepository,
-          timetableBuildRepository.toScheduledTimetableData(),
+          timetableDataImport.toScheduledTimetableData(),
           transferRepository
         )
       );

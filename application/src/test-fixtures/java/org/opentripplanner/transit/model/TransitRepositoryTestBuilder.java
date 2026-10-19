@@ -15,7 +15,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
@@ -66,11 +66,11 @@ public class TransitRepositoryTestBuilder {
 
   /**
    * Build the transit repository, and add the scheduled timetable entities to
-   * {@code timetableBuildRepository}.
+   * {@code timetableDataImport}.
    */
   public TransitRepository build(
     SiteRepository siteRepository,
-    TimetableBuildRepository timetableBuildRepository
+    TimetableDataImport timetableDataImport
   ) {
     var transitRepository = new TransitRepository(siteRepository);
     transitRepository.initTimeZone(timeZone);
@@ -82,30 +82,30 @@ public class TransitRepositoryTestBuilder {
     transitRepository.addOperators(operators);
 
     for (TripPattern tripPattern : tripPatterns.values()) {
-      timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
+      timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
     }
 
     for (var flexTrip : flexTrips) {
-      timetableBuildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+      timetableDataImport.addFlexTrip(flexTrip.getId(), flexTrip);
     }
 
     for (TripOnServiceDate tripOnServiceDate : tripOnServiceDates) {
-      timetableBuildRepository.addTripOnServiceDate(tripOnServiceDate);
+      timetableDataImport.addTripOnServiceDate(tripOnServiceDate);
     }
 
     var calendarServiceData = new CalendarServiceData();
     int serviceCodeCounter = 0;
     for (var serviceCode : serviceCodes.values()) {
       calendarServiceData.putServiceDatesForServiceId(serviceCode.id(), serviceCode.serviceDates());
-      timetableBuildRepository.putServiceCode(serviceCode.id(), serviceCodeCounter);
+      timetableDataImport.putServiceCode(serviceCode.id(), serviceCodeCounter);
       serviceCodeCounter += 1;
     }
-    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
-    timetableBuildRepository
+    timetableDataImport
       .getAllTripPatterns()
       .forEach(pattern ->
-        pattern.getScheduledTimetable().setServiceCodes(timetableBuildRepository.getServiceCodes())
+        pattern.getScheduledTimetable().setServiceCodes(timetableDataImport.getServiceCodes())
       );
 
     transitRepository.addScheduledStopPointMapping(scheduledStopPointMapping);

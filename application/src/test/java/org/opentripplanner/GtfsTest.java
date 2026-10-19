@@ -42,7 +42,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -65,7 +65,7 @@ public abstract class GtfsTest {
 
   public Graph graph;
   public TransitRepository transitRepository;
-  public TimetableBuildRepository timetableBuildRepository;
+  public TimetableDataImport timetableDataImport;
 
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
@@ -191,7 +191,7 @@ public abstract class GtfsTest {
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     graph = new Graph();
     transitRepository = new TransitRepository(new SiteRepository());
-    timetableBuildRepository = new TimetableBuildRepository();
+    timetableDataImport = new TimetableDataImport();
     transitRepository.initUpdaterManager(
       new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
@@ -200,7 +200,7 @@ public abstract class GtfsTest {
     GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       graph,
       LocalDateRange.ofUnbounded()
     );
@@ -211,7 +211,7 @@ public abstract class GtfsTest {
 
     TransitTuningParameters tuningParameters = RouterConfig.DEFAULT.transitTuningConfig();
     // Converted once, as on server startup, and shared by the Raptor mapping and the services
-    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,

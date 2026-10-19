@@ -58,7 +58,7 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -316,16 +316,14 @@ public class RaptorPathToItineraryMapperTest {
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
     TransitRepository transitRepository = new TransitRepository();
-    TimetableBuildRepository timetableBuildRepository = new TimetableBuildRepository();
+    TimetableDataImport timetableDataImport = new TimetableDataImport();
     transitRepository.initTimeZone(ZoneIds.CET);
     transitRepository.index();
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
       new DefaultTransitService(
         transitRepository,
-        DefaultTimetableRepository.scheduledOnly(
-          timetableBuildRepository.toScheduledTimetableData()
-        )
+        DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
       ),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),

@@ -15,7 +15,7 @@ import org.opentripplanner.ext.empiricaldelay.parameters.EmpiricalDelayParameter
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
   private final EmpiricalDelayParameters parameters;
   private final EmpiricalDelayRepository repository;
-  private final TimetableBuildRepository timetableBuildRepository;
+  private final TimetableDataImport timetableDataImport;
 
   public EmpiricalDelayGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<EmpiricalDelayFeedParameters>> dataSources,
@@ -41,14 +41,14 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
     DataImportIssueStore issueStore,
     EmpiricalDelayParameters parameters,
     EmpiricalDelayRepository repository,
-    TimetableBuildRepository timetableBuildRepository
+    TimetableDataImport timetableDataImport
   ) {
     this.dataSources = Objects.requireNonNull(dataSources);
     this.deduplicator = Objects.requireNonNull(deduplicator);
     this.issueStore = Objects.requireNonNull(issueStore);
     this.parameters = Objects.requireNonNull(parameters);
     this.repository = Objects.requireNonNull(repository);
-    this.timetableBuildRepository = Objects.requireNonNull(timetableBuildRepository);
+    this.timetableDataImport = Objects.requireNonNull(timetableDataImport);
   }
 
   public void buildGraph() {
@@ -58,7 +58,7 @@ public class EmpiricalDelayGraphBuilder implements GraphBuilderModule {
       return;
     }
     var mapper = new TripDelaysMapper(
-      createStopIdsByTripIdMap(timetableBuildRepository.getAllTripPatterns()),
+      createStopIdsByTripIdMap(timetableDataImport.getAllTripPatterns()),
       issueStore,
       deduplicator
     );

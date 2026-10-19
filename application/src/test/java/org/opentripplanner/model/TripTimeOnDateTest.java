@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -178,7 +178,7 @@ class TripTimeOnDateTest {
     var trip = TransitRepositoryForTest.trip("123").build();
     var siteRepository = testModel.siteRepositoryBuilder().build();
     var transitRepository = new TransitRepository(siteRepository);
-    var timetableBuildRepository = new TimetableBuildRepository();
+    var timetableDataImport = new TimetableDataImport();
     var tripTimes = ScheduledTripTimes.of()
       .withTrip(trip)
       .withDepartureTimes(new int[] { 0, 1 })
@@ -187,7 +187,7 @@ class TripTimeOnDateTest {
       .pattern(TransitMode.BUS)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
-    timetableBuildRepository.addTripPattern(tripPattern.getId(), tripPattern);
+    timetableDataImport.addTripPattern(tripPattern.getId(), tripPattern);
     transitRepository.index();
     var timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),

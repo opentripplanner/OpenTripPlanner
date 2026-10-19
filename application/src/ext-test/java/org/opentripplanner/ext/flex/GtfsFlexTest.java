@@ -11,7 +11,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -25,18 +25,18 @@ import org.opentripplanner.transit.service.TransitRepository;
 class GtfsFlexTest {
 
   private static TransitRepository transitRepository;
-  private static TimetableBuildRepository timetableBuildRepository;
+  private static TimetableDataImport timetableDataImport;
 
   @BeforeAll
   static void setup() {
     TestOtpModel model = FlexIntegrationTestData.aspenGtfs();
     transitRepository = model.transitRepository();
-    timetableBuildRepository = model.timetableBuildRepository();
+    timetableDataImport = model.timetableDataImport();
   }
 
   @Test
   void parseAspenTaxiAsUnscheduledTrip() {
-    var flexTrips = timetableBuildRepository.getAllFlexTrips();
+    var flexTrips = timetableDataImport.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(
       Set.of("t_1289262_b_29084_tn_0", "t_1289257_b_28352_tn_0"),
@@ -51,6 +51,6 @@ class GtfsFlexTest {
 
   @Test
   void shouldGeneratePatternForFlexTripWithSingleStop() {
-    assertFalse(timetableBuildRepository.getAllTripPatterns().isEmpty());
+    assertFalse(timetableDataImport.getAllTripPatterns().isEmpty());
   }
 }

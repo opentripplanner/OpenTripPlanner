@@ -98,19 +98,19 @@ public class TripRequestMapperTest implements PlanTestConstants {
     TRANSFER_REPOSITORY = TransferServiceTestFactory.defaultTransferRepository();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     TRANSIT_ENV = TransitTestEnvironment.of(LocalDate.of(2024, 5, 7), ZoneIds.STOCKHOLM)
-      .withTimetableBuildRepository(timetableBuildRepository -> {
+      .withTimetableDataImport(timetableDataImport -> {
         var calendarServiceData = new CalendarServiceData();
         patterns.forEach(pattern -> {
-          timetableBuildRepository.addTripPattern(pattern.getId(), pattern);
+          timetableDataImport.addTripPattern(pattern.getId(), pattern);
           final int serviceCode = pattern
             .getScheduledTimetable()
             .getTripTimes()
             .getFirst()
             .getServiceCode();
-          timetableBuildRepository.putServiceCode(pattern.getId(), serviceCode);
+          timetableDataImport.putServiceCode(pattern.getId(), serviceCode);
           calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
         });
-        timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+        timetableDataImport.updateCalendarServiceData(calendarServiceData);
       })
       .build();
     TRANSIT_REPOSITORY = TRANSIT_ENV.transitRepository();

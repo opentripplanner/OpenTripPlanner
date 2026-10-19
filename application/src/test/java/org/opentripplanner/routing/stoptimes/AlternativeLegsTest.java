@@ -39,7 +39,7 @@ class AlternativeLegsTest extends GtfsTest {
   void testPreviousLegs() {
     var transitService = new DefaultTransitService(
       transitRepository,
-      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
 
     var originalLeg = new ScheduledTransitLegReference(
@@ -75,7 +75,7 @@ class AlternativeLegsTest extends GtfsTest {
   void testNextLegs() {
     var transitService = new DefaultTransitService(
       transitRepository,
-      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
 
     var originalLeg = new ScheduledTransitLegReference(
@@ -111,7 +111,7 @@ class AlternativeLegsTest extends GtfsTest {
   void testCircularRoutes() {
     var transitService = new DefaultTransitService(
       transitRepository,
-      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
 
     var originalLeg = new ScheduledTransitLegReference(
@@ -141,7 +141,7 @@ class AlternativeLegsTest extends GtfsTest {
   void testComplexCircularRoutes() {
     var transitService = new DefaultTransitService(
       transitRepository,
-      DefaultTimetableRepository.scheduledOnly(timetableBuildRepository.toScheduledTimetableData())
+      DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
 
     var originalLeg = new ScheduledTransitLegReference(

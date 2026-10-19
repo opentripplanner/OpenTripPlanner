@@ -53,7 +53,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -129,7 +129,7 @@ public class GraphBuilderModules {
     Graph graph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     FareServiceFactory fareServiceFactory
@@ -141,7 +141,7 @@ public class GraphBuilderModules {
     return new GtfsModule(
       gtfsBundles,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       streetDetailsRepository,
       graph,
       deduplicator,
@@ -161,7 +161,7 @@ public class GraphBuilderModules {
     Graph graph,
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     StreetDetailsRepository streetDetailsRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore
@@ -169,7 +169,7 @@ public class GraphBuilderModules {
     return new NetexConfigure(config).createNetexModule(
       dataSources.getNetexConfiguredDataSource(),
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       parkingRepository,
       streetDetailsRepository,
       graph,
@@ -184,7 +184,7 @@ public class GraphBuilderModules {
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
@@ -193,7 +193,7 @@ public class GraphBuilderModules {
       linker,
       parkingRepository,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       issueStore
     );
   }
@@ -219,7 +219,7 @@ public class GraphBuilderModules {
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore,
     VertexLinker linker
   ) {
@@ -240,7 +240,7 @@ public class GraphBuilderModules {
         linker,
         parkingRepository,
         transitRepository,
-        timetableBuildRepository,
+        timetableDataImport,
         issueStore
       ),
       parameters
@@ -283,14 +283,14 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferGenerator(
       graph,
       transitRepository,
-      timetableBuildRepository,
+      timetableDataImport,
       transferRepository,
       issueStore,
       config.regularTransferParameters()
@@ -363,13 +363,13 @@ public class GraphBuilderModules {
   @Nullable
   static StopConsolidationModule providesStopConsolidationModule(
     TransitRepository transitRepository,
-    TimetableBuildRepository timetableBuildRepository,
+    TimetableDataImport timetableDataImport,
     @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources
   ) {
     return dataSources
       .stopConsolidation()
-      .map(ds -> StopConsolidationModule.of(transitRepository, timetableBuildRepository, repo, ds))
+      .map(ds -> StopConsolidationModule.of(transitRepository, timetableDataImport, repo, ds))
       .orElse(null);
   }
 

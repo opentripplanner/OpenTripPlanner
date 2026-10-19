@@ -56,7 +56,7 @@ import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.regular.TransferRepository;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 @Singleton
@@ -135,7 +135,7 @@ public interface GraphBuilderFactory {
     Builder transitRepository(TransitRepository transitRepository);
 
     @BindsInstance
-    Builder timetableBuildRepository(TimetableBuildRepository timetableBuildRepository);
+    Builder timetableDataImport(TimetableDataImport timetableDataImport);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);

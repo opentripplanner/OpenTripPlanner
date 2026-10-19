@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.LocalTimeParser;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -123,8 +123,8 @@ class EntityResolverTest {
   }
 
   private static EntityResolver newResolver(TransitRepository transitRepository) {
-    var timetableBuildRepository = new TimetableBuildRepository();
-    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
+    var timetableDataImport = new TimetableDataImport();
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     var timetableRepository = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
       scheduledTimetableData

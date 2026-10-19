@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.graphbuild;
+package org.opentripplanner.transit.dataimport;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,22 +24,22 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 
 /**
- * The scheduled timetable data while the graph is being built: trip patterns, trips on service
- * date, flex trips and the scheduled trip calendars. This is mutable, used by the graph build
- * modules only, and serialized with the graph.
+ * The scheduled timetable data imported from the GTFS and NeTEx feeds: trip patterns, trips on
+ * service date, flex trips and the scheduled trip calendars. This is mutable, used by the data
+ * import modules only, and serialized with the graph.
  * <p>
  * When the server starts, the content is converted into the immutable {@link
  * ScheduledTimetableData} with {@link #toScheduledTimetableData()}, which is then owned by the
- * timetable repository. The dependency goes from this graph-build class to the core, not the
+ * timetable repository. The dependency goes from this data-import class to the core, not the
  * other way around.
  * <p>
  * Trips on service date are kept in insertion order, which is the order of the replacements
  * returned by {@link ScheduledTimetableData#getReplacedByTripOnServiceDate}.
  * <p>
- * Converting the content freezes the repository: the scheduled data wraps the maps of this
- * repository, so any later modification fails instead of changing data that must stay immutable.
+ * Converting the content freezes the data import: the scheduled data wraps its maps, so any later
+ * modification fails instead of changing data that must stay immutable.
  */
-public class TimetableBuildRepository {
+public class TimetableDataImport {
 
   private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new LinkedHashMap<>();
@@ -47,12 +47,12 @@ public class TimetableBuildRepository {
   private TripCalendars tripCalendars = TripCalendars.empty();
 
   /**
-   * Set when the content is converted. Not serialized: a repository loaded from a graph file can
+   * Set when the content is converted. Not serialized: a data import loaded from a graph file can
    * still be modified by a build.
    */
   private transient boolean frozen = false;
 
-  public TimetableBuildRepository() {}
+  public TimetableDataImport() {}
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
     assertModificationsAllowed();
@@ -141,7 +141,7 @@ public class TimetableBuildRepository {
 
   /**
    * Convert the content into the immutable scheduled data used at runtime. The scheduled data
-   * wraps the maps of this repository instead of copying them, so this freezes the repository:
+   * wraps the maps of this data import instead of copying them, so this freezes the data import:
    * the graph build must be complete, and any later modification fails.
    */
   public ScheduledTimetableData toScheduledTimetableData() {
@@ -157,7 +157,7 @@ public class TimetableBuildRepository {
   private void assertModificationsAllowed() {
     if (frozen) {
       throw new IllegalStateException(
-        "The timetable build repository is frozen, it has already been converted into the " +
+        "The timetable data import is frozen, it has already been converted into the " +
           "scheduled timetable data."
       );
     }

@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
  * <p>
  * Immutable: created once when the server starts, from the scheduled data populated by the graph
  * build, and then owned by the timetable repository. It wraps the maps of the frozen {@link
- * TimetableBuildRepository} it is converted from instead of copying them. It is shared,
+ * TimetableDataImport} it is converted from instead of copying them. It is shared,
  * unchanged, by every timetable snapshot. Real-time calendar changes are applied to the timetable
  * repository's own calendars, never to these.
  */
@@ -57,8 +57,8 @@ public final class ScheduledTimetableData {
 
   /**
    * Create the immutable scheduled data. The given maps are wrapped, not copied: the caller must
-   * not change them afterwards. {@link TimetableBuildRepository#toScheduledTimetableData()}
-   * ensures this by freezing the build repository.
+   * not change them afterwards. {@link TimetableDataImport#toScheduledTimetableData()}
+   * ensures this by freezing the timetable data import.
    *
    * @param tripPatternForId the scheduled trip patterns, by id
    * @param tripOnServiceDateById the scheduled trips on service date, by id

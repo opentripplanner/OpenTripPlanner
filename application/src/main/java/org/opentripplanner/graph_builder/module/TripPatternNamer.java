@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -19,17 +19,17 @@ import org.slf4j.LoggerFactory;
 public class TripPatternNamer implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternNamer.class);
-  private final TimetableBuildRepository timetableBuildRepository;
+  private final TimetableDataImport timetableDataImport;
 
   @Inject
-  public TripPatternNamer(TimetableBuildRepository timetableBuildRepository) {
-    this.timetableBuildRepository = timetableBuildRepository;
+  public TripPatternNamer(TimetableDataImport timetableDataImport) {
+    this.timetableDataImport = timetableDataImport;
   }
 
   @Override
   public void buildGraph() {
     /* Generate unique human-readable names for all the TableTripPatterns. */
-    generateUniqueNames(timetableBuildRepository.getAllTripPatterns());
+    generateUniqueNames(timetableDataImport.getAllTripPatterns());
   }
 
   /**

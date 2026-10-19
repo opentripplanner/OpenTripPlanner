@@ -18,7 +18,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -124,14 +124,14 @@ class ModifiedTripBuilderTest {
     .withRegularStop(STOP_D)
     .build();
   private final TransitRepository transitRepository = new TransitRepository(siteRepository);
-  private final TimetableBuildRepository timetableBuildRepository = new TimetableBuildRepository();
+  private final TimetableDataImport timetableDataImport = new TimetableDataImport();
   private EntityResolver entityResolver;
 
   @BeforeEach
   void setUp() {
     // Add entities to transit model for the entity resolver
     transitRepository.addAgency(AGENCY);
-    timetableBuildRepository.addTripPattern(PATTERN.getId(), PATTERN);
+    timetableDataImport.addTripPattern(PATTERN.getId(), PATTERN);
 
     // Crate a scheduled calendar, to have the SERVICE_DATE be within the transit feed coverage
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -139,14 +139,14 @@ class ModifiedTripBuilderTest {
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
-    timetableBuildRepository.putServiceCode(SERVICE_ID, 0);
-    timetableBuildRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.putServiceCode(SERVICE_ID, 0);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
 
     // Create transit model index
     transitRepository.index();
 
     // Create the entity resolver only after the model has been indexed
-    var scheduledTimetableData = timetableBuildRepository.toScheduledTimetableData();
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     var timetableRepository = new DefaultTimetableRepository(null, scheduledTimetableData);
     entityResolver = new EntityResolver(
       timetableRepository,

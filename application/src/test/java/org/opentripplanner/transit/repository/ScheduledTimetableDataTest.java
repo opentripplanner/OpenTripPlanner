@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -37,15 +37,15 @@ class ScheduledTimetableDataTest {
 
   @Test
   void lookupsOverTheBuildData() {
-    var buildRepository = new TimetableBuildRepository();
+    var dataImport = new TimetableDataImport();
     var trip1 = trip("T1");
     var trip2 = trip("T2");
     var pattern1 = pattern("P1", trip1);
     var pattern2 = pattern("P2", trip2);
-    buildRepository.addTripPattern(pattern1.getId(), pattern1);
-    buildRepository.addTripPattern(pattern2.getId(), pattern2);
+    dataImport.addTripPattern(pattern1.getId(), pattern1);
+    dataImport.addTripPattern(pattern2.getId(), pattern2);
 
-    var subject = buildRepository.toScheduledTimetableData();
+    var subject = dataImport.toScheduledTimetableData();
 
     assertThat(subject.getAllTrips()).containsExactly(trip1, trip2);
     assertThat(subject.getTripForId(trip2.getId())).isEqualTo(trip2);
@@ -59,13 +59,13 @@ class ScheduledTimetableDataTest {
 
   @Test
   void calendars() {
-    var buildRepository = new TimetableBuildRepository();
+    var dataImport = new TimetableDataImport();
     var pattern = pattern("P1", trip("T1"));
-    buildRepository.addTripPattern(pattern.getId(), pattern);
-    buildRepository.updateCalendarServiceData(calendarData());
-    buildRepository.putServiceCode(id("SID"), 7);
+    dataImport.addTripPattern(pattern.getId(), pattern);
+    dataImport.updateCalendarServiceData(calendarData());
+    dataImport.putServiceCode(id("SID"), 7);
 
-    var subject = buildRepository.toScheduledTimetableData();
+    var subject = dataImport.toScheduledTimetableData();
 
     var codes = subject.getTripCalendars().getServiceCodesRunningForDate().get(SERVICE_DATE);
     assertThat(codes.toArray()).asList().containsExactly(7);
@@ -78,18 +78,18 @@ class ScheduledTimetableDataTest {
     var flexTrip = TEST_MODEL.unscheduledTrip("FT1", STOP_1, STOP_2);
     var flexTripId = flexTrip.getId();
     var flexRouteId = flexTrip.getTrip().getRoute().getId();
-    var buildRepository = new TimetableBuildRepository();
-    buildRepository.addFlexTrip(flexTrip.getId(), flexTrip);
+    var dataImport = new TimetableDataImport();
+    dataImport.addFlexTrip(flexTrip.getId(), flexTrip);
 
     OTPFeature.FlexRouting.testOn(() -> {
-      var subject = buildRepository.toScheduledTimetableData();
+      var subject = dataImport.toScheduledTimetableData();
       assertThat(subject.getFlexIndex()).isNotNull();
       assertTrue(subject.containsTrip(flexTripId));
       assertThat(subject.getRouteForId(flexRouteId)).isNotNull();
     });
 
     OTPFeature.FlexRouting.testOff(() -> {
-      var subject = buildRepository.toScheduledTimetableData();
+      var subject = dataImport.toScheduledTimetableData();
       assertNull(subject.getFlexIndex());
       assertFalse(subject.containsTrip(flexTripId));
       assertNull(subject.getRouteForId(flexRouteId));

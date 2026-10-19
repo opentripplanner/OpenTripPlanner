@@ -12,7 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
-import org.opentripplanner.transit.graphbuild.TimetableBuildRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 class StopConsolidationModuleTest {
@@ -22,18 +22,13 @@ class StopConsolidationModuleTest {
     var groups = List.of(new ConsolidatedStopGroup(STOP_D.getId(), List.of(STOP_B.getId())));
 
     var transitRepository = TestStopConsolidationModel.buildTransitRepository();
-    var timetableBuildRepository = new TimetableBuildRepository();
-    timetableBuildRepository.addTripPattern(PATTERN.getId(), PATTERN);
+    var timetableDataImport = new TimetableDataImport();
+    timetableDataImport.addTripPattern(PATTERN.getId(), PATTERN);
     var repo = new DefaultStopConsolidationRepository();
-    var module = new StopConsolidationModule(
-      transitRepository,
-      timetableBuildRepository,
-      repo,
-      groups
-    );
+    var module = new StopConsolidationModule(transitRepository, timetableDataImport, repo, groups);
     module.buildGraph();
 
-    var modifiedPattern = timetableBuildRepository.getTripPatternForId(PATTERN.getId());
+    var modifiedPattern = timetableDataImport.getTripPatternForId(PATTERN.getId());
     assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
     assertFalse(modifiedPattern.sameAs(PATTERN));
 
@@ -44,7 +39,7 @@ class StopConsolidationModuleTest {
       .getStop(1);
     assertEquals(modifiedStop, STOP_D);
 
-    var patterns = List.copyOf(timetableBuildRepository.getAllTripPatterns());
+    var patterns = List.copyOf(timetableDataImport.getAllTripPatterns());
 
     var stops = patterns.stream().map(TripPattern::getStops).toList();
     assertEquals(List.of(List.of(STOP_A, STOP_D, STOP_C)), stops);
