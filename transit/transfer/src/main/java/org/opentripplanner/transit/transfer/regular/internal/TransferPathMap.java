@@ -76,19 +76,11 @@ final class TransferPathMap<P> implements Serializable {
 
   @Nullable
   P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
-    var byFromStop = closestPaths(userPreferences);
-    if (byFromStop == null) {
-      return null;
-    }
-    var byToStop = byFromStop.get(fromStop);
-    return byToStop == null ? null : byToStop.get(toStop);
+    return closestPaths(userPreferences).getOrDefault(fromStop, Map.of()).get(toStop);
   }
 
   List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
     var byFromStop = closestPaths(userPreferences);
-    if (byFromStop == null) {
-      return List.of();
-    }
     List<StoredPath<P>> result = new ArrayList<>();
     for (var fromEntry : byFromStop.entrySet()) {
       for (var toEntry : fromEntry.getValue().entrySet()) {
@@ -126,20 +118,18 @@ final class TransferPathMap<P> implements Serializable {
   }
 
   /**
-   * The paths stored under the user preferences closest to the given ones, {@code null} if no
-   * paths are stored.
+   * The paths stored under the user preferences closest to the given ones. Empty if no paths are
+   * stored.
    */
-  @Nullable
   private Map<Integer, Map<Integer, P>> closestPaths(AbstractUserPreferences<?> userPreferences) {
-    var exactMatch = pathsByUserPreferences.get(userPreferences);
-    if (exactMatch != null) {
-      return exactMatch;
+    if (pathsByUserPreferences.containsKey(userPreferences)) {
+      return pathsByUserPreferences.get(userPreferences);
     }
     return pathsByUserPreferences
       .entrySet()
       .stream()
       .min(Comparator.comparingDouble(e -> userPreferences.normalizedDistance(e.getKey())))
       .map(Map.Entry::getValue)
-      .orElse(null);
+      .orElse(Map.of());
   }
 }
