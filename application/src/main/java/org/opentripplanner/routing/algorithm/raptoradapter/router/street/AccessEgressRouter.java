@@ -48,16 +48,16 @@ public class AccessEgressRouter {
     );
 
     // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
-    var ignoreVertices = zeroDistanceAccessEgress
+    var ignoreStops = zeroDistanceAccessEgress
       .stream()
-      .map(nearbyStop -> nearbyStop.state().getVertex())
+      .map(NearbyStop::stopId)
       .collect(Collectors.toSet());
 
     var originVertices = accessOrEgress.isAccess()
       ? linkingContext.findVertices(request.from())
       : linkingContext.findVertices(request.to());
     var streetAccessEgress = StreetNearbyStopFinder.of(null)
-      .withIgnoreVertices(ignoreVertices)
+      .withIgnoreStops(ignoreStops)
       .withExtensionRequestContexts(extensionRequestContexts)
       .build()
       .findNearbyStops(
@@ -88,7 +88,7 @@ public class AccessEgressRouter {
       ? linkingContext.fromStopVertices()
       : linkingContext.toStopVertices();
 
-    return NearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
+    return NearbyStopFactory.nearbyStopsForTransitStopVertices(
       transitStopVertices,
       accessOrEgress.isEgress(),
       routeRequest,

@@ -2,18 +2,19 @@ package org.opentripplanner.place.nearbystopfinder;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.MaxCountTerminationStrategy;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.GenericLocation;
@@ -39,23 +40,23 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
 
   private final LinkingContextFactory linkingContextFactory;
   private final Collection<ExtensionRequestContext> extensionRequestContexts;
-  private final Set<Vertex> ignoreVertices;
+  private final Set<FeedScopedId> ignoreStops;
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
-   * @param ignoreVertices   A set of stop vertices to ignore and not return NearbyStops for.
+   * @param ignoreStops   A set of stop ids to ignore and not return NearbyStops for.
    */
   private StreetNearbyStopFinder(
     @Nullable LinkingContextFactory linkingContextFactory,
     Collection<ExtensionRequestContext> extensionRequestContexts,
-    Set<Vertex> ignoreVertices
+    Set<FeedScopedId> ignoreStops
   ) {
     // This is temporarily nullable as we don't need it when we don't link coordinates, but soon
     // setting this everywhere will be easier once construction is moved to dagger
     this.linkingContextFactory = linkingContextFactory;
     this.extensionRequestContexts = requireNonNull(extensionRequestContexts);
-    this.ignoreVertices = requireNonNull(ignoreVertices);
+    this.ignoreStops = requireNonNull(ignoreStops);
   }
 
   public static Builder of(LinkingContextFactory linkingContextFactory) {
@@ -154,8 +155,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
-    List<NearbyStop> stopsFound = NearbyStopFactory.nearbyStopsForTransitStopVerticesFiltered(
-      Sets.difference(originVertices, ignoreVertices),
+    var stopsFound = NearbyStopFactory.nearbyStopsForTransitStopVertices(
+      getFilteredTransitStopVertices(originVertices),
       reverseDirection,
       request,
       streetMode
@@ -169,7 +170,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
     stopsFound = new ArrayList<>(stopsFound);
 
-    var visitor = new NearbyStopFinderVisitor(originVertices, ignoreVertices, reverseDirection);
+    var visitor = new NearbyStopFinderVisitor(originVertices, ignoreStops, reverseDirection);
 
     var streetSearch = StreetSearchBuilder.of()
       .withPreStartHook(OTPRequestTimeoutException::checkForTimeout)
@@ -229,16 +230,27 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
    */
   private boolean hasReachedStop(State state) {
     var vertex = state.getVertex();
-    return (
-      vertex instanceof TransitStopVertex && state.isFinal() && !ignoreVertices.contains(vertex)
-    );
+    if (vertex instanceof TransitStopVertex tsv && state.isFinal()) {
+      return !ignoreStops.contains(tsv.getId());
+    } else {
+      return false;
+    }
+  }
+
+  private Set<TransitStopVertex> getFilteredTransitStopVertices(Set<Vertex> vertices) {
+    return vertices
+      .stream()
+      .filter(TransitStopVertex.class::isInstance)
+      .map(TransitStopVertex.class::cast)
+      .filter(v -> !ignoreStops.contains(v.getId()))
+      .collect(Collectors.toSet());
   }
 
   public static class Builder {
 
     private final LinkingContextFactory linkingContextFactory;
     private Collection<ExtensionRequestContext> extensionRequestContexts = List.of();
-    private Set<Vertex> ignoreVertices = Set.of();
+    private Set<FeedScopedId> ignoreStops = Set.of();
 
     public Builder(LinkingContextFactory linkingContextFactory) {
       this.linkingContextFactory = linkingContextFactory;
@@ -258,10 +270,10 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
 
     /**
-     * Specify a set of stop vertices to ignore and not return NearbyStops for.
+     * Specify a set of stop ids to ignore and not return NearbyStops for.
      */
-    public Builder withIgnoreVertices(Set<Vertex> ignoreVertices) {
-      this.ignoreVertices = ignoreVertices;
+    public Builder withIgnoreStops(Set<FeedScopedId> ignoreStops) {
+      this.ignoreStops = ignoreStops;
       return this;
     }
 
@@ -269,7 +281,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
       return new StreetNearbyStopFinder(
         linkingContextFactory,
         extensionRequestContexts,
-        ignoreVertices
+        ignoreStops
       );
     }
   }
