@@ -26,14 +26,17 @@ import org.opentripplanner.utils.collection.MinMap;
 class PatternNearbyStopFilter implements NearbyStopFilter {
 
   private final SiteRepository siteRepository;
-  private final TripPatternsForStop patternsForStop;
+  private final PatternsByStopLookup patternsByStopLookup;
 
   /**
-   * @param patternsForStop the scheduled trip patterns visiting a stop
+   * @param patternsByStopLookup the scheduled trip patterns visiting a stop
    */
-  PatternNearbyStopFilter(SiteRepository siteRepository, TripPatternsForStop patternsForStop) {
+  PatternNearbyStopFilter(
+    SiteRepository siteRepository,
+    PatternsByStopLookup patternsByStopLookup
+  ) {
     this.siteRepository = siteRepository;
-    this.patternsForStop = patternsForStop;
+    this.patternsByStopLookup = patternsByStopLookup;
   }
 
   @Override
@@ -79,7 +82,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
    * where we can board(forward direction) or alight(reverse direction) at the given stop.
    */
   private List<FeedScopedId> findPatternsForStop(RegularStop stop, boolean reverseDirection) {
-    return patternsForStop
+    return patternsByStopLookup
       .findPatterns(stop.getId())
       .stream()
       .filter(reverseDirection ? p -> p.alightingExist(stop) : p -> p.boardingExist(stop))

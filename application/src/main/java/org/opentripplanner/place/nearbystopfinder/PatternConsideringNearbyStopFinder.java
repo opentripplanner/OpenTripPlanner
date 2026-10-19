@@ -38,19 +38,19 @@ public class PatternConsideringNearbyStopFinder implements NearbyStopFinder {
   private final SiteRepository siteRepository;
 
   /**
-   * @param patternsForStop the scheduled trip patterns visiting a stop
+   * @param patternsByStopLookup the scheduled trip patterns visiting a stop
    * @param flexIndex the flex trips to consider, or {@code null} to ignore flex trips (when flex
    *                  routing is disabled)
    */
   public PatternConsideringNearbyStopFinder(
     SiteRepository siteRepository,
-    TripPatternsForStop patternsForStop,
+    PatternsByStopLookup patternsByStopLookup,
     @Nullable FlexIndex flexIndex,
     NearbyStopFinder delegateNearbyStopFinder
   ) {
     this.siteRepository = siteRepository;
     var builder = CompositeNearbyStopFilter.of().add(
-      new PatternNearbyStopFilter(siteRepository, patternsForStop)
+      new PatternNearbyStopFilter(siteRepository, patternsByStopLookup)
     );
 
     if (flexIndex != null) {
