@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.rangeraptor.path;
+package org.opentripplanner.raptor.rangeraptor.destination;
 
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -18,9 +18,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  * path must be built when the arrival is accepted. McRaptor does not need this, it builds the paths
  * after the search from the arrivals in the set.
  * <p>
- * The only way to access the paths is {@link #toList()}. The bag can be chained with other
- * listeners, like the debug listener, using the
- * {@link org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite}.
+ * The only way to access the paths is {@link #toList()}.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

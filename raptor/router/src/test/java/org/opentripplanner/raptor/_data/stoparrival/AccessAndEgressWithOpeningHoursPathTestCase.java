@@ -18,7 +18,7 @@ import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrival;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
