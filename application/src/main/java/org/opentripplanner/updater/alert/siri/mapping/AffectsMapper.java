@@ -15,7 +15,8 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -49,19 +50,20 @@ public class AffectsMapper {
 
   private final String feedId;
   private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
-  private final TransitService transitService;
+  private final TransitRepository transitRepository;
 
   private final EntityResolver entityResolver;
 
   public AffectsMapper(
     String feedId,
     SiriFuzzyTripMatcher siriFuzzyTripMatcher,
-    TransitService transitService
+    TimetableRepository timetableRepository,
+    TransitRepository transitRepository
   ) {
     this.feedId = feedId;
     this.siriFuzzyTripMatcher = siriFuzzyTripMatcher;
-    this.transitService = transitService;
-    this.entityResolver = new EntityResolver(transitService, feedId);
+    this.transitRepository = transitRepository;
+    this.entityResolver = new EntityResolver(timetableRepository, transitRepository, feedId);
   }
 
   public List<EntitySelector> mapAffects(AffectsScopeStructure affectsStructure) {
@@ -203,7 +205,7 @@ public class AffectsMapper {
           FeedScopedId stop = getStop(
             affectedStop.getStopPointRef().getValue(),
             feedId,
-            transitService
+            transitRepository
           );
           if (stop == null) {
             stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -268,7 +270,7 @@ public class AffectsMapper {
               FeedScopedId stop = getStop(
                 affectedStop.getStopPointRef().getValue(),
                 feedId,
-                transitService
+                transitRepository
               );
               if (stop == null) {
                 stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -336,7 +338,7 @@ public class AffectsMapper {
         continue;
       }
 
-      FeedScopedId stopId = getStop(stopPointRef.getValue(), feedId, transitService);
+      FeedScopedId stopId = getStop(stopPointRef.getValue(), feedId, transitRepository);
 
       if (stopId == null) {
         stopId = new FeedScopedId(feedId, stopPointRef.getValue());
@@ -365,7 +367,7 @@ public class AffectsMapper {
         continue;
       }
 
-      FeedScopedId stopId = getStop(stopPlaceRef.getValue(), feedId, transitService);
+      FeedScopedId stopId = getStop(stopPlaceRef.getValue(), feedId, transitRepository);
 
       if (stopId == null) {
         stopId = new FeedScopedId(feedId, stopPlaceRef.getValue());
@@ -430,12 +432,12 @@ public class AffectsMapper {
   private static FeedScopedId getStop(
     String siriStopId,
     String feedId,
-    TransitService transitService
+    TransitRepository transitRepository
   ) {
     FeedScopedId id = new FeedScopedId(feedId, siriStopId);
-    if (transitService.getRegularStop(id) != null) {
+    if (transitRepository.getSiteRepository().getRegularStop(id) != null) {
       return id;
-    } else if (transitService.getStation(id) != null) {
+    } else if (transitRepository.getSiteRepository().getStationById(id) != null) {
       return id;
     }
 

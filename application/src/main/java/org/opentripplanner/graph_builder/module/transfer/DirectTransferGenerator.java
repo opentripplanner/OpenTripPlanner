@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.transfer;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -11,6 +13,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -29,9 +34,10 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -55,10 +61,18 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Map<StreetMode, TransferParametersForMode> transferParametersForMode;
   private final Graph graph;
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
   private final TransferRepository transferRepository;
   private final DataImportIssueStore issueStore;
 
   private static final int NO_STOP_COUNT_LIMIT = 0;
+
+  /**
+   * The scheduled trip patterns visiting each stop, by stop id. Built on first access, see {@link
+   * #patternsForStop()}.
+   */
+  @Nullable
+  private Multimap<FeedScopedId, TripPattern> patternsForStop;
 
   /**
    * Constructor used in tests. This initializes transferParametersForMode as an empty map.
@@ -66,6 +80,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     Duration defaultMaxTransferDuration,
@@ -73,6 +88,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
@@ -83,12 +99,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public DirectTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     DataImportIssueStore issueStore,
     RegularTransferParameters parameters
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = parameters.maxDuration();
     this.transferRequests = parameters.requests();
@@ -105,9 +123,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder();
 
     Set<StopLocation> carsAllowedStops =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
+      timetableDataImport.getStopLocationsUsedForCarsAllowedTrips();
     Set<StopLocation> bikesAllowedStops =
-      transitRepository.getStopLocationsUsedForBikesAllowedTrips();
+      timetableDataImport.getStopLocationsUsedForBikesAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -137,12 +155,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     // Parse the transfer configuration from the parameters given in the build config.
     TransferConfiguration transferConfiguration = parseTransferParameters();
 
-    var transitService = new DefaultTransitService(transitRepository);
     var emptyStops = transitRepository
       .getSiteRepository()
       .listStopLocations()
       .stream()
-      .filter(stop -> transitService.findPatterns(stop).isEmpty())
+      .filter(stop -> patternsForStop().get(stop.getId()).isEmpty())
       .toList();
 
     /*
@@ -244,25 +261,56 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   }
 
   /**
+   * The scheduled trip patterns visiting each stop, by stop id. The index is built on the first
+   * access and then cached, so it assumes that no scheduled patterns are added afterwards.
+   * <p>
+   * Not thread-safe: only call it from the thread running {@link #buildGraph()}. The parallel
+   * transfer search gets the built index, which it only reads.
+   */
+  private Multimap<FeedScopedId, TripPattern> patternsForStop() {
+    if (patternsForStop == null) {
+      Multimap<FeedScopedId, TripPattern> index = ArrayListMultimap.create();
+      for (TripPattern pattern : timetableDataImport.getAllTripPatterns()) {
+        for (StopLocation stop : pattern.getStops()) {
+          index.put(stop.getId(), pattern);
+        }
+      }
+      patternsForStop = index;
+    }
+    return patternsForStop;
+  }
+
+  /**
    * Factory method for creating a NearbyStopFinder. Will create different finders depending on
    * whether the graph has a street network and if ConsiderPatternsForDirectTransfers feature is
    * enabled.
    */
   private NearbyStopFinder createNearbyStopFinder() {
-    var transitService = new DefaultTransitService(transitRepository);
+    var siteRepository = transitRepository.getSiteRepository();
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(
         "Creating direct transfer edges between stops using straight line distance (not streets)..."
       );
-      finder = new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
+      finder = new StraightLineNearbyStopFinder(siteRepository::findRegularStops);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
       finder = StreetNearbyStopFinder.of(null).build();
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
-      return new PatternConsideringNearbyStopFinder(transitService, finder);
+      var flexIndex = OTPFeature.FlexRouting.isOn()
+        ? new FlexIndex(
+            timetableDataImport.getAllFlexTrips(),
+            timetableDataImport.getTripCalendars()
+          )
+        : null;
+      return new PatternConsideringNearbyStopFinder(
+        siteRepository,
+        patternsForStop()::get,
+        flexIndex,
+        finder
+      );
     } else {
       return finder;
     }

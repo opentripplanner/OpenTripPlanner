@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.gtfs;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner._support.time.ZoneIds.BERLIN;
@@ -17,6 +18,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -37,6 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
@@ -105,6 +108,7 @@ import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -125,8 +129,21 @@ import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.utils.collection.ListUtils;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 class GraphQLIntegrationTest {
+
+  private static final JsonMapper JSON_MAPPER = new JsonMapper();
+
+  /**
+   * Arrays in the responses whose order the API does not define, by query file and JSON pointer.
+   * Their elements are compared without their order; the rest of the response is compared exactly.
+   */
+  private static final Map<String, List<String>> UNORDERED_ARRAYS = Map.of(
+    "patterns.graphql",
+    List.of("/data/patterns")
+  );
 
   private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
 
@@ -215,6 +232,7 @@ class GraphQLIntegrationTest {
     var siteRepository = siteRepositoryBuilder.build();
     var transitRepository = new TransitRepository(siteRepository);
 
+    var timetableDataImport = new TimetableDataImport();
     var cal_id = FeedScopedIdForTestFactory.id("CAL_1");
     var trip = TransitRepositoryForTest.trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
@@ -251,7 +269,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    transitRepository.addTripPattern(id("pattern-1"), pattern);
+    timetableDataImport.addTripPattern(id("pattern-1"), pattern);
 
     // A trip whose visit at stop B is canceled (skipped), while it still calls at stops A and D.
     // Stop B is part of the stops query, so its canceledCalls field returns this skipped call.
@@ -276,7 +294,7 @@ class GraphQLIntegrationTest {
       .withStopPattern(TransitRepositoryForTest.stopPattern(A.stop, B.stop, D.stop))
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(canceledTripTimes))
       .build();
-    transitRepository.addTripPattern(id("canceled-pattern"), canceledPattern);
+    timetableDataImport.addTripPattern(id("canceled-pattern"), canceledPattern);
 
     var feedInfo = FeedInfoTestFactory.dummyForTest(FEED_ID);
     transitRepository.addFeedInfo(feedInfo);
@@ -298,13 +316,14 @@ class GraphQLIntegrationTest {
       cal_id,
       List.of(firstDate, secondDate, SERVICE_DATE)
     );
-    transitRepository.putServiceCode(cal_id, SERVICE_CODE);
-    transitRepository.updateCalendarServiceData(calendarServiceData);
+    timetableDataImport.putServiceCode(cal_id, SERVICE_CODE);
+    timetableDataImport.updateCalendarServiceData(calendarServiceData);
     transitRepository.index();
 
+    var scheduledTimetableData = timetableDataImport.toScheduledTimetableData();
     DefaultTimetableRepository timetableSnapshot = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     timetableSnapshot.update(
       RealTimeTripUpdate.of(
@@ -646,7 +665,22 @@ class GraphQLIntegrationTest {
     }
 
     var expectedJson = Files.readString(expectationFile);
-    assertEqualJson(expectedJson, actualJson);
+    var unorderedArrays = UNORDERED_ARRAYS.getOrDefault(path.getFileName().toString(), List.of());
+    if (unorderedArrays.isEmpty()) {
+      assertEqualJson(expectedJson, actualJson);
+      return;
+    }
+    var expected = JSON_MAPPER.readTree(expectedJson);
+    var actual = JSON_MAPPER.readTree(actualJson);
+    for (var pointer : unorderedArrays) {
+      assertThat(ImmutableList.copyOf(actual.at(pointer))).containsExactlyElementsIn(
+        ImmutableList.copyOf(expected.at(pointer))
+      );
+      // The elements are checked above; compare the rest of the response exactly
+      ((ArrayNode) actual.at(pointer)).removeAll();
+      ((ArrayNode) expected.at(pointer)).removeAll();
+    }
+    assertEqualJson(expected.toString(), actual.toString());
   }
 
   private static List<TransitAlert> getTransitAlert(EntitySelector.Stop entitySelector) {

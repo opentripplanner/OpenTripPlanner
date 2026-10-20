@@ -24,6 +24,8 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -52,9 +54,13 @@ public class RaptorTransitDataMapper {
 
   private RaptorTransitDataMapper(
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository
   ) {
-    this.transitService = new DefaultTransitService(transitRepository);
+    this.transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
+    );
     this.siteRepository = transitRepository.getSiteRepository();
     this.transferRepository = transferRepository;
   }
@@ -62,9 +68,14 @@ public class RaptorTransitDataMapper {
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository
   ) {
-    return new RaptorTransitDataMapper(transitRepository, transferRepository).map(tuningParameters);
+    return new RaptorTransitDataMapper(
+      transitRepository,
+      scheduledTimetableData,
+      transferRepository
+    ).map(tuningParameters);
   }
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {

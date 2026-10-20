@@ -24,12 +24,13 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.model.timetable.Timetable;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.gtfs.interpolation.BackwardsDelayPropagationType;
@@ -52,11 +53,12 @@ public class LegacyTimetableRepositoryIntegrationTest {
   public static void setUp() throws Exception {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitRepository transitRepository = model.transitRepository();
+    TimetableDataImport timetableDataImport = model.timetableDataImport();
 
     feedId = transitRepository.getFeedIds().iterator().next();
 
     patternIndex = new HashMap<>();
-    for (TripPattern tripPattern : transitRepository.getAllTripPatterns()) {
+    for (TripPattern tripPattern : timetableDataImport.getAllTripPatterns()) {
       tripPattern
         .scheduledTripsAsStream()
         .forEach(trip -> patternIndex.put(trip.getId(), tripPattern));
@@ -71,7 +73,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
 
     Timetable scheduled = resolver.resolve(pattern, today);
@@ -122,7 +124,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
     DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
     Timetable origNow = resolver.resolve(pattern, today);
 
@@ -176,7 +178,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
       DefaultTimetableRepository resolver = new DefaultTimetableRepository(
         RaptorTransitDataTestFactory.empty(),
-        TripCalendars.empty()
+        ScheduledTimetableData.empty()
       );
 
       // only return a new snapshot if there are changes
@@ -256,7 +258,7 @@ public class LegacyTimetableRepositoryIntegrationTest {
 
     DefaultTimetableRepository resolver = new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
-      TripCalendars.empty()
+      ScheduledTimetableData.empty()
     );
     updateSnapshot(resolver, pattern, tripUpdate, today);
     updateSnapshot(resolver, pattern, tripUpdate, yesterday);
