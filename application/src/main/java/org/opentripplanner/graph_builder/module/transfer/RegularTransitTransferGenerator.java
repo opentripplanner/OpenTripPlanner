@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.transfer;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -9,8 +11,9 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
@@ -45,6 +48,7 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
 
   private final Graph graph;
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
   private final TransferProfilesConfig config;
   private final RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
   private final DataImportIssueStore issueStore;
@@ -52,12 +56,14 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   public RegularTransitTransferGenerator(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferProfilesConfig config,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.config = config;
     this.regularTransferBuildRepository = regularTransferBuildRepository;
     this.issueStore = issueStore;
@@ -66,7 +72,6 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     transitRepository.index();
-    var transitService = new DefaultTransitService(transitRepository);
     var siteRepository = transitRepository.getSiteRepository();
     var regularStops = siteRepository.listRegularStops();
 
@@ -77,9 +82,10 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
       RegularStop::getId
     );
 
+    var stopsVisitedByPatterns = stopsVisitedByPatterns();
     List<FeedScopedId> stopsWithTrips = regularStops
       .stream()
-      .filter(stop -> !transitService.findPatterns(stop).isEmpty())
+      .filter(stopsVisitedByPatterns::contains)
       .map(RegularStop::getId)
       .toList();
 
@@ -137,5 +143,14 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
       profileList.size(),
       stopsWithTrips.size()
     );
+  }
+
+  /** The stops visited by at least one scheduled trip pattern. */
+  private Set<StopLocation> stopsVisitedByPatterns() {
+    return timetableDataImport
+      .getAllTripPatterns()
+      .stream()
+      .flatMap(pattern -> pattern.getStops().stream())
+      .collect(Collectors.toSet());
   }
 }

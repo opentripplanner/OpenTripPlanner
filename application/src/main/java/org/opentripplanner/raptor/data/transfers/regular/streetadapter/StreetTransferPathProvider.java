@@ -19,7 +19,6 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
@@ -68,8 +67,9 @@ public class StreetTransferPathProvider
     TransitRepository transitRepository
   ) {
     if (!graph.hasStreets) {
-      var transitService = new DefaultTransitService(transitRepository);
-      return new StraightLineNearbyStopFinder(transitService::findRegularStopsByBoundingBox);
+      return new StraightLineNearbyStopFinder(
+        transitRepository.getSiteRepository()::findRegularStops
+      );
     }
     return StreetNearbyStopFinder.of(null).build();
   }
@@ -94,11 +94,11 @@ public class StreetTransferPathProvider
     );
     return nearbyStops
       .stream()
-      .filter(nearbyStop -> !nearbyStop.stopId.equals(fromStop))
+      .filter(nearbyStop -> !nearbyStop.stopId().equals(fromStop))
       .map(StreetTransferPathProvider::stripState)
       .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
         computePathCriteria(path, userPreferences).ifPresent(criteria ->
-          consumer.accept(new TransferPath<>(path.stopId, path, criteria))
+          consumer.accept(new TransferPath<>(path.stopId(), path, criteria))
         )
       )
       .toList();
@@ -112,7 +112,7 @@ public class StreetTransferPathProvider
    * get serialized into the graph.
    */
   private static NearbyStop stripState(NearbyStop nearbyStop) {
-    return new NearbyStop(nearbyStop.stopId, nearbyStop.distance, nearbyStop.edges, null);
+    return new NearbyStop(nearbyStop.stopId(), nearbyStop.distance(), nearbyStop.edges(), null);
   }
 
   @Override
@@ -123,15 +123,15 @@ public class StreetTransferPathProvider
     RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(userPreferences);
     StreetSearchRequest request = streetSearchRequest(routeRequest);
 
-    if (path.edges == null || path.edges.isEmpty()) {
-      double durationSeconds = path.distance / request.walk().speed();
+    if (path.edges() == null || path.edges().isEmpty()) {
+      double durationSeconds = path.distance() / request.walk().speed();
       int c1 = CostLimit.toRaptorCostWholeSeconds(durationSeconds * request.walk().reluctance());
       return Optional.of(new PathCriteria(c1, (int) Math.ceil(durationSeconds)));
     }
 
-    StateEditor stateEditor = new StateEditor(path.edges.get(0).getFromVertex(), request);
+    StateEditor stateEditor = new StateEditor(path.edges().get(0).getFromVertex(), request);
     stateEditor.setTimeSeconds(0);
-    return EdgeTraverser.traverseEdges(stateEditor.makeState(), path.edges).map(state ->
+    return EdgeTraverser.traverseEdges(stateEditor.makeState(), path.edges()).map(state ->
       new PathCriteria(
         CostLimit.toRaptorCostWholeSeconds(state.getWeight()),
         (int) state.getElapsedTimeSeconds()

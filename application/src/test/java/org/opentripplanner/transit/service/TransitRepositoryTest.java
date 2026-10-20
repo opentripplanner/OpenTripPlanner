@@ -165,7 +165,6 @@ class TransitRepositoryTest {
     assertThrows(IllegalStateException.class, () -> repo.getOperator(id("operator")));
   }
 
-
   @Test
   void testGetStopLocationsUsedForCarsAllowedTrips() {
     var dataImport = new TimetableDataImport();

@@ -447,7 +447,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Place from,
     Place to
   ) {
-    List<Edge> edges = transfer.edges;
+    List<Edge> edges = transfer.edges();
     if (edges == null || edges.isEmpty()) {
       return List.of(
         StreetLeg.of()
@@ -456,7 +456,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .withEndTime(createZonedDateTime(pathLeg.toTime()))
           .withFrom(from)
           .withTo(to)
-          .withDistanceMeters(transfer.distance)
+          .withDistanceMeters(transfer.distance())
           .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
           .withGeometry(GeometryUtils.getGeometryFactory().createLineString())
           .withWalkSteps(List.of())

@@ -99,7 +99,8 @@ public abstract class SnapshotTestBase {
         model.transferRepository(),
         TestServerContext.createRegularTransferServiceFactory(
           model.graph(),
-          model.transitRepository()
+          model.transitRepository(),
+          model.timetableDataImport()
         )
       );
     }

@@ -327,12 +327,14 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     DataImportIssueStore issueStore
   ) {
     return new RegularTransitTransferGenerator(
       graph,
       transitRepository,
+      timetableDataImport,
       config.transferProfiles(),
       regularTransferBuildRepository,
       issueStore

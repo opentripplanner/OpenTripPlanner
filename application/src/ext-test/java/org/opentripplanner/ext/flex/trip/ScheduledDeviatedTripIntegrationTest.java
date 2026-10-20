@@ -247,7 +247,11 @@ class ScheduledDeviatedTripIntegrationTest {
         Metrics.globalRegistry,
         TestServerContext.createStreetDetailsService(),
         TransferServiceTestFactory.transferService(transferRepository),
-        TestServerContext.createRegularTransferServiceFactory(graph, transitRepository),
+        TestServerContext.createRegularTransferServiceFactory(
+          graph,
+          transitRepository,
+          timetableDataImport
+        ),
         RouterConfig.DEFAULT.flexParameters(),
         List.of(),
         null,

@@ -132,7 +132,8 @@ public class TestServerContext {
    */
   public static RegularTransferServiceFactory<NearbyStop> createRegularTransferServiceFactory(
     Graph graph,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport
   ) {
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
       RegularTransferFactory.createBuildRepository();
@@ -142,6 +143,7 @@ public class TestServerContext {
     new RegularTransitTransferGenerator(
       graph,
       transitRepository,
+      timetableDataImport,
       transferProfilesConfig,
       regularTransferBuildRepository,
       DataImportIssueStore.NOOP
