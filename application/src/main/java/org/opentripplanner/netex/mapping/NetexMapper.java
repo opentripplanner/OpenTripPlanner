@@ -39,6 +39,7 @@ import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LineRefs_RelStructure;
 import org.rutebanken.netex.model.NoticeAssignment;
+import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
@@ -283,9 +284,7 @@ public class NetexMapper {
 
   private void mapOperators() {
     OperatorToAgencyMapper mapper = new OperatorToAgencyMapper(issueStore, idFactory);
-    for (org.rutebanken.netex.model.Operator operator : currentNetexIndex
-      .getOperatorsById()
-      .localValues()) {
+    for (Operator operator : currentNetexIndex.getOperatorsById().localValues()) {
       transitBuilder.getOperatorsById().add(mapper.mapOperator(operator));
     }
   }

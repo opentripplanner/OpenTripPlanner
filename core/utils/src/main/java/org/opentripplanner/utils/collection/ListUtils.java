@@ -154,7 +154,7 @@ public class ListUtils {
     for (int i = 0; i < input.size() - 1; i++) {
       T first = input.get(i);
       T second = input.get(i + 1);
-      output.add(new org.opentripplanner.utils.collection.Pair<>(first, second));
+      output.add(new Pair<>(first, second));
     }
     return output;
   }

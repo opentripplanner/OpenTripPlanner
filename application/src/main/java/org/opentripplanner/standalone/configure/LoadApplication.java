@@ -42,9 +42,7 @@ public class LoadApplication {
    */
   public LoadApplication(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
-    this.factory = org.opentripplanner.standalone.configure.DaggerLoadApplicationFactory.builder()
-      .commandLineParameters(cli)
-      .build();
+    this.factory = DaggerLoadApplicationFactory.builder().commandLineParameters(cli).build();
   }
 
   public void validateConfigAndDataSources() {

@@ -2,6 +2,7 @@ package org.opentripplanner.updater.trip.siri;
 
 import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
 
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -84,8 +85,8 @@ public interface CallWrapper {
    */
   private static int validateCall(
     StopPointRefStructure stopPointRef,
-    java.math.BigInteger order,
-    java.math.BigInteger visitNumber
+    BigInteger order,
+    BigInteger visitNumber
   ) throws UpdateException {
     var ref = stopPointRef != null ? stopPointRef.getValue() : null;
     if (StringUtils.hasNoValueOrNullAsString(ref)) {

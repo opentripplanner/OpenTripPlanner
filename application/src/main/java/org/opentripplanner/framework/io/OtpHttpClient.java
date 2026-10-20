@@ -31,6 +31,7 @@ import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.Timeout;
@@ -390,7 +391,7 @@ public class OtpHttpClient {
    * Returns true if the HTTP status code is not in the range [200,300[, except for the code 304
    * NOT_MODIFIED which is not a failed request.
    */
-  private static boolean isFailedRequest(org.apache.hc.core5.http.HttpResponse response) {
+  private static boolean isFailedRequest(HttpResponse response) {
     return (
       (response.getCode() < SC_OK || response.getCode() >= SC_REDIRECTION) &&
       response.getCode() != SC_NOT_MODIFIED

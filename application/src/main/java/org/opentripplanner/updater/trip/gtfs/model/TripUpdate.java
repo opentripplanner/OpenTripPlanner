@@ -27,7 +27,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 public final class TripUpdate {
 
   private final String feedId;
-  private final com.google.transit.realtime.GtfsRealtime.TripUpdate tripUpdate;
+  private final GtfsRealtime.TripUpdate tripUpdate;
   private final TripDescriptor tripDescriptor;
   private final Supplier<LocalDate> localDateNow;
   private LocalDate startDate;

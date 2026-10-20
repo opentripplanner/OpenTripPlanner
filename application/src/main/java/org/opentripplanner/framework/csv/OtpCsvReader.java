@@ -60,7 +60,7 @@ public class OtpCsvReader<T> {
 
   /** Set the parser factory for converting CSV rows to objects. */
   public OtpCsvReader<T> withParserFactory(
-    Function<com.csvreader.CsvReader, AbstractCsvParser<T>> parserFactory
+    Function<CsvReader, AbstractCsvParser<T>> parserFactory
   ) {
     this.parserFactory = parserFactory;
     return this;

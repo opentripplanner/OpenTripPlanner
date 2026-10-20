@@ -37,6 +37,7 @@ import org.opentripplanner.street.search.request.RentalPeriod;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 
 class VehicleRentalEdgeTest {
 
@@ -274,7 +275,7 @@ class VehicleRentalEdgeTest {
     initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
 
     var arriveByReq = StreetSearchRequest.copyOf(request).withArriveBy(true).build();
-    var editor = new org.opentripplanner.street.search.state.StateEditor(vertex, arriveByReq);
+    var editor = new StateEditor(vertex, arriveByReq);
     editor.dropFloatingVehicle(SCOOTER, ELECTRIC, null, true);
     editor.addCommittedNetwork(vertex.getStation().network());
     var genericState = editor.makeState();
@@ -294,7 +295,7 @@ class VehicleRentalEdgeTest {
     initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
 
     var arriveByReq = StreetSearchRequest.copyOf(request).withArriveBy(true).build();
-    var editor = new org.opentripplanner.street.search.state.StateEditor(vertex, arriveByReq);
+    var editor = new StateEditor(vertex, arriveByReq);
     editor.dropFloatingVehicle(SCOOTER, ELECTRIC, null, true);
     editor.addCommittedNetwork("some-other-network");
     var genericState = editor.makeState();
