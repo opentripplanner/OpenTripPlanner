@@ -19,7 +19,9 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.transaction.TimetableSnapshotParameters;
 import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferServiceFactoryCreator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -60,7 +62,8 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 
 /**
@@ -96,7 +99,8 @@ public class SpeedTest {
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
-    TransferRepository transferRepository
+    TransferRepository transferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
     this.opts = opts;
     this.config = config;
@@ -144,6 +148,11 @@ public class SpeedTest {
     var realtimeVehicleHandle = registry.registerRepository(
       new DefaultRealtimeVehicleRepository(),
       new RealtimeVehicleRepositoryLifecycle()
+    );
+    // Registered before the updaters start, registration is not thread-safe
+    var regularTransferHandle = RegularTransferFactory.registerRepository(
+      registry,
+      regularTransferBuildRepository
     );
     var threadFactory = Executors.defaultThreadFactory();
     var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
@@ -208,7 +217,9 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
-      NoRegularTransfers.factory(),
+      RegularTransferServiceFactoryCreator.of(graph, transitRepository).create(
+        regularTransferHandle.repositorySnapshot(transactionScope)
+      ),
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),
@@ -257,7 +268,8 @@ public class SpeedTest {
         graph,
         transitRepository,
         timetableDataImport,
-        transferRepository
+        transferRepository,
+        model.regularTransferBuildRepository()
       );
 
       assertTestDateHasData(transitRepository, config, buildConfig);

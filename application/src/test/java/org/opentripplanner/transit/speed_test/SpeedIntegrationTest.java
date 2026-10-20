@@ -17,12 +17,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.transit.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOptsBuilder;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 /**
  * This test runs the SpeedTest on the Portland dataset. It tests all SpeedTest profiles. This is
@@ -37,6 +40,7 @@ public class SpeedIntegrationTest {
   private static final File BASE_DIR = Path.of("src", "test", "resources", "speedtest").toFile();
 
   private static TestOtpModel model;
+  private static RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository;
 
   @BeforeAll
   static void setup() {
@@ -46,6 +50,11 @@ public class SpeedIntegrationTest {
     }
     model = buildNewPortlandGraph(false);
     model.index();
+    regularTransferBuildRepository = TestServerContext.createRegularTransferBuildRepository(
+      model.graph(),
+      model.transitRepository(),
+      model.timetableDataImport()
+    );
   }
 
   @Test
@@ -99,7 +108,8 @@ public class SpeedIntegrationTest {
       model.graph(),
       model.transitRepository(),
       model.timetableDataImport(),
-      model.transferRepository()
+      model.transferRepository(),
+      regularTransferBuildRepository
     );
 
     // We want to validate the Raptor paths without changes done by the OptimizeTransfers

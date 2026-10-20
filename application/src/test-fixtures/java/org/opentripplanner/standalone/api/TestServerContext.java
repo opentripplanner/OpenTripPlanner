@@ -135,6 +135,24 @@ public class TestServerContext {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport
   ) {
+    var snapshot = createRegularTransferBuildRepository(
+      graph,
+      transitRepository,
+      timetableDataImport
+    ).createInitialSnapshot();
+    return RegularTransferServiceFactoryCreator.of(graph, transitRepository).create(snapshot);
+  }
+
+  /**
+   * Generate the regular transfers of a single default walk profile through the raptor-data
+   * pipeline, mirroring production graph builds. The transit repository must be indexed first, see
+   * {@link #createTransitService}.
+   */
+  public static RegularTransferBuildRepository<NearbyStop> createRegularTransferBuildRepository(
+    Graph graph,
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport
+  ) {
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
       RegularTransferFactory.createBuildRepository();
     var transferProfilesConfig = new TransferProfilesConfig(
@@ -148,8 +166,7 @@ public class TestServerContext {
       regularTransferBuildRepository,
       DataImportIssueStore.NOOP
     ).buildGraph();
-    var snapshot = regularTransferBuildRepository.createInitialSnapshot();
-    return RegularTransferServiceFactoryCreator.of(graph, transitRepository).create(snapshot);
+    return regularTransferBuildRepository;
   }
 
   /**
