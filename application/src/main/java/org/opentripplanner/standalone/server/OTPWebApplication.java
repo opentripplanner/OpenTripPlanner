@@ -71,6 +71,7 @@ public class OTPWebApplication extends Application {
     Set<Class<?>> classes = new HashSet<>(APIEndpoints.listAPIEndpoints());
 
     classes.addAll(resolveFilterClasses());
+    classes.add(ClientDisconnectInterceptor.class);
 
     return classes;
   }
