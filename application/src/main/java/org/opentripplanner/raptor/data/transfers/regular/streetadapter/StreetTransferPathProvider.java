@@ -77,13 +77,13 @@ public class StreetTransferPathProvider
   @Override
   public Collection<TransferPath<NearbyStop>> findNearbyStops(
     FeedScopedId fromStop,
-    AbstractUserPreferences<?> preferences
+    AbstractUserPreferences<?> userPreferences
   ) {
     TransitStopVertex vertex = graph.getStopVertex(fromStop);
     if (vertex == null) {
       return List.of();
     }
-    RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(preferences);
+    RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(userPreferences);
     var nearbyStops = nearbyStopFinder.findNearbyStops(
       vertex,
       routeRequest,
@@ -97,7 +97,7 @@ public class StreetTransferPathProvider
       .filter(nearbyStop -> !nearbyStop.stopId.equals(fromStop))
       .map(StreetTransferPathProvider::stripState)
       .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
-        computePathCriteria(path, preferences).ifPresent(criteria ->
+        computePathCriteria(path, userPreferences).ifPresent(criteria ->
           consumer.accept(new TransferPath<>(path.stopId, path, criteria))
         )
       )
@@ -118,9 +118,9 @@ public class StreetTransferPathProvider
   @Override
   public Optional<PathCriteria> computePathCriteria(
     NearbyStop path,
-    AbstractUserPreferences<?> preferences
+    AbstractUserPreferences<?> userPreferences
   ) {
-    RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(preferences);
+    RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(userPreferences);
     StreetSearchRequest request = streetSearchRequest(routeRequest);
 
     if (path.edges == null || path.edges.isEmpty()) {

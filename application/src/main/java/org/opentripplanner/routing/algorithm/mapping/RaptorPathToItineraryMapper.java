@@ -381,8 +381,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    */
   @Nullable
   private NearbyStop findRegularTransferPath(int fromStop, int toStop) {
-    var userPreferences = RegularTransferPreferencesMapper.fromRouteRequest(request);
-    return regularTransferServiceFactory.findPath(userPreferences, fromStop, toStop);
+    var walkPreferences = RegularTransferPreferencesMapper.fromRouteRequest(request);
+    return regularTransferServiceFactory.findPath(walkPreferences, fromStop, toStop);
   }
 
   private List<Leg> mapEgressLeg(EgressPathLeg<T> egressPathLeg) {

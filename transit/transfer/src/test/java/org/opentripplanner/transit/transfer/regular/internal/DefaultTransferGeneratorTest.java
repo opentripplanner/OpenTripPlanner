@@ -36,12 +36,12 @@ class DefaultTransferGeneratorTest {
     var cheapAB = provider.addNearby(A, B, 100, 60);
     provider.addNearby(A, B, 200, 90);
 
-    AbstractUserPreferences<?> preferences = withReluctance(1.0);
+    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
     // Explicit type witnesses throughout: diamond inference from a wildcard-typed argument
     // triggers capture conversion and produces a fresh, non-matching captured type at each use.
     TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
       AbstractUserPreferences<?>
-    >(preferences, preferences);
+    >(userPreferences, userPreferences);
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>
     >of(List.of(profile));
@@ -59,7 +59,7 @@ class DefaultTransferGeneratorTest {
     assertThat(
       buildRepository
         .createInitialSnapshot()
-        .findPath(preferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
+        .findPath(userPreferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(cheapAB);
   }
 
@@ -68,10 +68,10 @@ class DefaultTransferGeneratorTest {
     var provider = new FakeTransferPathProvider().withMaxDurationSeconds(120);
     provider.addNearby(A, B, 100, 600);
 
-    AbstractUserPreferences<?> preferences = withReluctance(1.0);
+    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
     TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
       AbstractUserPreferences<?>
-    >(preferences, preferences);
+    >(userPreferences, userPreferences);
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>
     >of(List.of(profile));
@@ -89,7 +89,7 @@ class DefaultTransferGeneratorTest {
     assertThat(
       buildRepository
         .createInitialSnapshot()
-        .findPath(preferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
+        .findPath(userPreferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isNull();
   }
 }

@@ -86,7 +86,9 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     List<TransferProfile<AbstractUserPreferences<?>>> profileList = config
       .profiles()
       .stream()
-      .map(p -> new TransferProfile<AbstractUserPreferences<?>>(p.preferences(), p.preferences()))
+      .map(p ->
+        new TransferProfile<AbstractUserPreferences<?>>(p.userPreferences(), p.userPreferences())
+      )
       .toList();
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>

@@ -17,20 +17,20 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  */
 public interface TransferPathProvider<P, U> {
   /**
-   * Discover candidate paths from {@code fromStop} under {@code preferences}, each
+   * Discover candidate paths from {@code fromStop} under {@code userPreferences}, each
    * paired with the {@link PathCriteria} it was found under. Called once per stop per profile at
    * graph-build time.
    */
   Collection<TransferPath<P>> findNearbyStops(
     FeedScopedId fromStop,
-    AbstractUserPreferences<?> preferences
+    AbstractUserPreferences<?> userPreferences
   );
 
   /**
-   * Re-cost a previously discovered path under different {@code preferences} than
+   * Re-cost a previously discovered path under different {@code userPreferences} than
    * the one that found it. Used for {@code deduplicationProfile}/dedup comparisons, to re-cost a
    * deduplicationProfile's path under a dependent profile's preferences. Empty if the path exceeds
    * that profile's duration limit.
    */
-  Optional<PathCriteria> computePathCriteria(P path, AbstractUserPreferences<?> preferences);
+  Optional<PathCriteria> computePathCriteria(P path, AbstractUserPreferences<?> userPreferences);
 }

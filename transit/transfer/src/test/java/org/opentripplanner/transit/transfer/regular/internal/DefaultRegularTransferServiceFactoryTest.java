@@ -42,14 +42,14 @@ class DefaultRegularTransferServiceFactoryTest {
   ) {
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    AbstractUserPreferences<?> preferences = withReluctance(buildTimeReluctance);
+    AbstractUserPreferences<?> userPreferences = withReluctance(buildTimeReluctance);
     // configuredRequestParameters (R) is unread by DefaultTransferGenerator today - reuse the
     // preferences instance as a type-compatible placeholder. Explicit type witnesses throughout,
     // since diamond inference from a wildcard-typed argument triggers capture conversion and
     // produces a fresh, non-matching captured type at each use.
     TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
       AbstractUserPreferences<?>
-    >(preferences, preferences);
+    >(userPreferences, userPreferences);
     TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
       AbstractUserPreferences<?>
     >of(List.of(profile));
@@ -134,18 +134,18 @@ class DefaultRegularTransferServiceFactoryTest {
     var stopIndex = stopIndex();
     var fromA = stopIndex.toStopIndex(A);
     var original = generate(stopIndex, provider, 1.0);
-    var prefs = withReluctance(1.0);
+    var walkPreferences = withReluctance(1.0);
     var originalService = new DefaultRegularTransferServiceFactory<>(
       stopIndex,
       original,
       provider
-    ).create(prefs);
+    ).create(walkPreferences);
 
     // Commit a new path A -> C
     var lifecycle = new RegularTransferRepositoryLifecycle<FakeTransferPathProvider.FakePath>();
     var repository = lifecycle.copyOnWrite(original);
     repository.setPath(
-      prefs,
+      walkPreferences,
       fromA,
       stopIndex.toStopIndex(C),
       new FakeTransferPathProvider.FakePath(A, C, 200, 90)
@@ -155,7 +155,7 @@ class DefaultRegularTransferServiceFactoryTest {
       stopIndex,
       updated,
       provider
-    ).create(prefs);
+    ).create(walkPreferences);
 
     assertThat(updatedService).isNotSameInstanceAs(originalService);
     assertThat(collectC1(updatedService.getTransfersFromStop(fromA))).containsExactly(100, 200);

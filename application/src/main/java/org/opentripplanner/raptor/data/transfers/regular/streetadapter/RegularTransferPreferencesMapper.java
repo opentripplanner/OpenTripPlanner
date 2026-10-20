@@ -33,14 +33,14 @@ public final class RegularTransferPreferencesMapper {
       .build();
   }
 
-  public static RouteRequest toRouteRequest(AbstractUserPreferences<?> preferences) {
+  public static RouteRequest toRouteRequest(AbstractUserPreferences<?> userPreferences) {
     var builder = RouteRequest.defaultValue().copyOf();
     builder.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.WALK)));
     builder.withPreferences(routingPrefs ->
       routingPrefs.withWalk(w -> {
-        w.withSpeed(preferences.speed().toMetersPerSecond());
-        w.withReluctance(preferences.reluctance().value());
-        w.withStairsReluctance(stairsReluctance(preferences.stairs(), w.stairsReluctance()));
+        w.withSpeed(userPreferences.speed().toMetersPerSecond());
+        w.withReluctance(userPreferences.reluctance().value());
+        w.withStairsReluctance(stairsReluctance(userPreferences.stairs(), w.stairsReluctance()));
       })
     );
     return builder.buildDefault();

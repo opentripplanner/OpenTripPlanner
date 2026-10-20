@@ -42,20 +42,22 @@ class RegularTransferServiceCache {
   }
 
   /**
-   * Return the cached service for {@code preferences}, or create it with
+   * Return the cached service for {@code userPreferences}, or create it with
    * {@code factory} and cache it.
    */
   RaptorRegularTransferService getOrCreate(
-    AbstractUserPreferences<?> preferences,
+    AbstractUserPreferences<?> userPreferences,
     Supplier<RaptorRegularTransferService> factory
   ) {
-    var cached = entries.get().get(preferences);
+    var cached = entries.get().get(userPreferences);
     if (cached != null) {
       return use(cached);
     }
     var built = new Entry(factory.get(), useCounter.incrementAndGet());
     return use(
-      entries.updateAndGet(current -> withEntry(current, preferences, built)).get(preferences)
+      entries
+        .updateAndGet(current -> withEntry(current, userPreferences, built))
+        .get(userPreferences)
     );
   }
 

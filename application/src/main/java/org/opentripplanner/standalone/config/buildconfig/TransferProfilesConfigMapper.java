@@ -53,9 +53,9 @@ public class TransferProfilesConfigMapper {
       .since(V2_10)
       .summary("Street-search preferences used to discover and cost this profile's paths.")
       .asObject();
-    WalkPreferences preferences = mapWalkPreferences(prefs);
+    WalkPreferences walkPreferences = mapWalkPreferences(prefs);
 
-    return new TransferProfileConfig(preferences);
+    return new TransferProfileConfig(walkPreferences);
   }
 
   private static WalkPreferences mapWalkPreferences(NodeAdapter p) {

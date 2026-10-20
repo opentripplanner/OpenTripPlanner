@@ -45,13 +45,13 @@ public class FakeTransferPathProvider
   @Override
   public Collection<TransferPath<FakePath>> findNearbyStops(
     FeedScopedId fromStop,
-    AbstractUserPreferences<?> preferences
+    AbstractUserPreferences<?> userPreferences
   ) {
     return byStop
       .getOrDefault(fromStop, List.of())
       .stream()
       .<TransferPath<FakePath>>mapMulti((p, consumer) ->
-        computePathCriteria(p, preferences).ifPresent(criteria ->
+        computePathCriteria(p, userPreferences).ifPresent(criteria ->
           consumer.accept(new TransferPath<>(p.to(), p, criteria))
         )
       )
@@ -61,12 +61,12 @@ public class FakeTransferPathProvider
   @Override
   public Optional<PathCriteria> computePathCriteria(
     FakePath path,
-    AbstractUserPreferences<?> preferences
+    AbstractUserPreferences<?> userPreferences
   ) {
     if (path.baseDurationSeconds() > maxDurationSeconds) {
       return Optional.empty();
     }
-    int cost = (int) Math.round(path.baseCost() * preferences.reluctance().value());
+    int cost = (int) Math.round(path.baseCost() * userPreferences.reluctance().value());
     return Optional.of(new PathCriteria(cost, path.baseDurationSeconds()));
   }
 
