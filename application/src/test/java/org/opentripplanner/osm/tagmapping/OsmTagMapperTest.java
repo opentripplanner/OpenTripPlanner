@@ -484,7 +484,7 @@ class OsmTagMapperTest {
   @Test
   void embeddedRailsWithBikeLane() {
     var way = WayTestData.embeddedRails().copy().withTag("cycleway", "lane").build();
-    assertEquals(0.87, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
+    assertEquals(0.64, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
   }
 
   /**
@@ -503,28 +503,28 @@ class OsmTagMapperTest {
     textBlock = """
       tags                                                              | safety
       highway=primary                                                   | 2.06
-      highway=primary;cycleway=shared_lane                              | 1.59
-      highway=primary;cycleway=lane                                     | 1.79
-      highway=primary;cycleway=track                                    | 1.55
-      highway=primary_link;cycleway=lane                                | 1.79
+      highway=primary;cycleway=shared_lane                              | 1.73
+      highway=primary;cycleway=lane                                     | 1.32
+      highway=primary;cycleway=track                                    | 1.05
+      highway=primary_link;cycleway=lane                                | 1.32
       highway=secondary                                                 | 1.50
-      highway=secondary;cycleway=shared_lane                            | 1.16
-      highway=secondary;cycleway=lane                                   | 1.31
-      highway=secondary;cycleway:both=lane                              | 1.31
-      highway=secondary;cycleway=lane;lcn=yes                           | 0.91
-      highway=secondary;cycleway=track                                  | 1.13
-      highway=secondary_link;cycleway=lane                              | 1.31
+      highway=secondary;cycleway=shared_lane                            | 1.26
+      highway=secondary;cycleway=lane                                   | 0.96
+      highway=secondary;cycleway:both=lane                              | 0.96
+      highway=secondary;cycleway=lane;lcn=yes                           | 0.67
+      highway=secondary;cycleway=track                                  | 0.77
+      highway=secondary_link;cycleway=lane                              | 0.96
       not_highway=to_see_default                                        | 1.00
       highway=tertiary                                                  | 1.00
-      highway=tertiary;cycleway=shared_lane                             | 0.77
-      highway=tertiary;cycleway=lane                                    | 0.87
-      highway=tertiary;cycleway=track                                   | 0.75
+      highway=tertiary;cycleway=shared_lane                             | 0.84
+      highway=tertiary;cycleway=lane                                    | 0.64
+      highway=tertiary;cycleway=track                                   | 0.51
       highway=residential                                               | 0.98
       highway=residential;lcn=yes                                       | 0.69
-      highway=residential;cycleway=shared_lane                          | 0.75
-      highway=residential;cycleway=shared_lane;lcn=yes                  | 0.53
-      highway=residential;cycleway=lane                                 | 0.85
-      highway=residential;cycleway=track                                | 0.74
+      highway=residential;cycleway=shared_lane                          | 0.82
+      highway=residential;cycleway=shared_lane;lcn=yes                  | 0.58
+      highway=residential;cycleway=lane                                 | 0.63
+      highway=residential;cycleway=track                                | 0.50
     """
   )
   void cyclewayBicycleSafety(String tags, double safety) {
@@ -543,9 +543,9 @@ class OsmTagMapperTest {
     useHeadersInDisplayName = true,
     textBlock = """
       tags                                                              | forward | backward
-      highway=secondary;cycleway:left=lane                              | 1.50    | 1.31
-      highway=secondary;cycleway:right=lane                             | 1.31    | 1.50
-      highway=secondary;cycleway:right=track;cycleway:left=shared_lane  | 1.13    | 1.16
+      highway=secondary;cycleway:left=lane                              | 1.50    | 0.96
+      highway=secondary;cycleway:right=lane                             | 0.96    | 1.50
+      highway=secondary;cycleway:right=track;cycleway:left=shared_lane  | 0.77    | 1.26
     """
   )
   void cyclewayPerSideBicycleSafety(String tags, double forward, double backward) {
@@ -570,6 +570,18 @@ class OsmTagMapperTest {
   void trackIsSaferThanLane(String highway) {
     assertThat(bicycleSafety("highway=%s;cycleway=track".formatted(highway))).isLessThan(
       bicycleSafety("highway=%s;cycleway=lane".formatted(highway))
+    );
+  }
+
+  /**
+   * A painted lane gives cyclists their own space, while a shared lane (sharrows) only marks the
+   * general traffic lane, so on a busy road the painted lane is the safer of the two.
+   */
+  @ParameterizedTest
+  @ValueSource(strings = { "tertiary", "secondary", "primary" })
+  void paintedLaneIsSaferThanSharedLaneOnArterials(String highway) {
+    assertThat(bicycleSafety("highway=%s;cycleway=lane".formatted(highway))).isLessThan(
+      bicycleSafety("highway=%s;cycleway=shared_lane".formatted(highway))
     );
   }
 
