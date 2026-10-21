@@ -30,6 +30,14 @@ public final class RaptorTransferStore implements RaptorRegularTransferService, 
   }
 
   /**
+   * Start a patch of this store: replace the transfers from some stops, keeping all others. The
+   * patched store shares all unchanged rows with this one, and this store is not changed.
+   */
+  public RaptorTransferStorePatch patch() {
+    return new RaptorTransferStorePatch(fromStops, toStops);
+  }
+
+  /**
    * @see org.opentripplanner.raptor.spi.RaptorTransferDataProvider#getTransfersFromStop(int)
    */
   @Override
@@ -43,6 +51,11 @@ public final class RaptorTransferStore implements RaptorRegularTransferService, 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop) {
     return this.toStops.getTransfers(toStop);
+  }
+
+  /** The transfers by fromStop, for tests in this package. */
+  RaptorTransfers fromStops() {
+    return fromStops;
   }
 
   @Override
