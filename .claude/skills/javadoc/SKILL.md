@@ -39,7 +39,8 @@ mechanics. If the doc only restates the name or signature, delete it or rewrite 
    instead, when one exists. Avoid using `{@link}` if the target is not imported.
 6. **Use `<p>` between paragraphs** and `<ul>` for lists. Keep the doc short; two or three paragraphs is a ceiling for
    most elements.
-7. **Wrap at 100 characters**, matching the code. Prettier does not reflow JavaDoc, so wrap by hand.
+7. **Wrap at 100 characters**, matching the code. Fill each line up to the limit; do not break a
+   line early when the next word still fits. Prettier does not reflow JavaDoc, so wrap by hand.
 8. **Plain, present-tense, active voice.** No filler ("This method is used to"), no marketing words,
    no emojis.
 9. **Define each concept once, at the highest level it belongs to (DRY).** The code has a natural
@@ -68,7 +69,7 @@ mechanics. If the doc only restates the name or signature, delete it or rewrite 
 3. Locate the owning type or interface of each concept in the target and check whether its
    definition already exists above it. Move or remove duplicated definitions toward the top.
 4. Write or revise the JavaDoc following the rules above.
-5. Check line width: no JavaDoc line over 100 characters.
+5. Check every JavaDoc line you wrote against Rule 7.
 6. Report briefly: which elements were documented, which duplicates were removed or replaced by a
    link, and any where you were unsure of the intent.
 
