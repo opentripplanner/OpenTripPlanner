@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
+import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 class RegularTransferServiceCacheTest {

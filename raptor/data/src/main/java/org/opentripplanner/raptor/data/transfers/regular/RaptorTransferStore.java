@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
  * <p>
  * This class is immutable and thread-safe.
  */
-public final class RaptorTransferStore implements Serializable {
+public final class RaptorTransferStore implements RaptorRegularTransferService, Serializable {
 
   private final RaptorTransfers fromStops;
   private final RaptorTransfers toStops;
@@ -32,6 +32,7 @@ public final class RaptorTransferStore implements Serializable {
   /**
    * @see org.opentripplanner.raptor.spi.RaptorTransferDataProvider#getTransfersFromStop(int)
    */
+  @Override
   public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
     return this.fromStops.getTransfers(fromStop);
   }
@@ -39,6 +40,7 @@ public final class RaptorTransferStore implements Serializable {
   /**
    * @see org.opentripplanner.raptor.spi.RaptorTransferDataProvider#getTransfersToStop(int)
    */
+  @Override
   public Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop) {
     return this.toStops.getTransfers(toStop);
   }

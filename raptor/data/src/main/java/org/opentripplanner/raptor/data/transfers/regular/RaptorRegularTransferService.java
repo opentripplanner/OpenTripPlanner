@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular;
+package org.opentripplanner.raptor.data.transfers.regular;
 
 import java.util.Iterator;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
@@ -6,7 +6,8 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
 /**
  * TODO TX - This interface should be replaced by the Raptor SPI
  *           {@link org.opentripplanner.raptor.spi.RaptorTransferDataProvider}. But, we need to move constrained
- *           transfers into this module first. This needs to be analyzed - not necessarily the right thing.
+ *           transfers into the transit-transfer module first. This needs to be analyzed - not necessarily
+ *           the right thing.
  *
  * @see org.opentripplanner.raptor.spi.RaptorTransferDataProvider
  */

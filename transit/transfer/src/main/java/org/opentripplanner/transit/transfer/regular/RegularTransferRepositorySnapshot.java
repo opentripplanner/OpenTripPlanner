@@ -2,6 +2,7 @@ package org.opentripplanner.transit.transfer.regular;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**

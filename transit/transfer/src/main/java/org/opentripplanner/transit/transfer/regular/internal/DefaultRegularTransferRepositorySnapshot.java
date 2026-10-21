@@ -1,13 +1,11 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
-import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
@@ -90,25 +88,6 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
         criteria.get().c1()
       );
     }
-    return asRegularTransferService(builder.build());
-  }
-
-  /**
-   * {@link RaptorTransferStore} lives in {@code raptor-data}, which this module depends on - it
-   * cannot itself implement {@link RaptorRegularTransferService}, defined here. Both expose the
-   * same two methods, so this just delegates.
-   */
-  private static RaptorRegularTransferService asRegularTransferService(RaptorTransferStore store) {
-    return new RaptorRegularTransferService() {
-      @Override
-      public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
-        return store.getTransfersFromStop(fromStop);
-      }
-
-      @Override
-      public Iterator<? extends RaptorTransfer> getTransfersToStop(int toStop) {
-        return store.getTransfersToStop(toStop);
-      }
-    };
+    return builder.build();
   }
 }
