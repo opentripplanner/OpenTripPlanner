@@ -32,7 +32,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
 /**
  * A Dagger subcomponent scoped to the lifetime of one HTTP request. Every binding here is derived
@@ -69,7 +69,7 @@ public interface RequestScopedFactory {
 
   RegularTransferService transferService();
 
-  RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory();
+  RegularTransferRepositorySnapshot<NearbyStop> regularTransfers();
 
   VectorTileConfig vectorTileConfig();
 

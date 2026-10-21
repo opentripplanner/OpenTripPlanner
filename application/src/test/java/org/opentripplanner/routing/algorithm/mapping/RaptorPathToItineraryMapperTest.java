@@ -328,7 +328,7 @@ public class RaptorPathToItineraryMapperTest {
       ),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
-      NoRegularTransfers.factory(),
+      NoRegularTransfers.snapshot(),
       dateTime.atZone(ZoneIds.CET),
       RouteRequest.defaultValue(),
       null

@@ -45,11 +45,10 @@ class RegularTransferRepositoryLifecycleTest {
     buildRepository = new DefaultRegularTransferBuildRepository<>();
     buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB));
 
-    var lifecycle = new RegularTransferRepositoryLifecycle<String>();
     registry = TransactionFactory.createRepositoryRegistry();
-    handle = registry.registerRepositorySnapshot(
-      buildRepository.createInitialSnapshot(),
-      lifecycle
+    handle = registry.registerRepository(
+      buildRepository.createRuntimeRepository(),
+      TestLifecycles.<String>pathsOnly()
     );
     updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",

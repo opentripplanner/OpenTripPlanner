@@ -38,7 +38,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.utils.tostring.MultiLineToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class DefaultRoutingService implements RoutingService {
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
-  private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
+  private final RegularTransferRepositorySnapshot<NearbyStop> regularTransfers;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
@@ -103,7 +103,7 @@ public class DefaultRoutingService implements RoutingService {
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers,
     TransitAlertService transitAlertService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
@@ -128,7 +128,7 @@ public class DefaultRoutingService implements RoutingService {
     this.vehicleRentalService = vehicleRentalService;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
-    this.regularTransferServiceFactory = regularTransferServiceFactory;
+    this.regularTransfers = regularTransfers;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
@@ -185,7 +185,7 @@ public class DefaultRoutingService implements RoutingService {
       vehicleRentalService,
       streetDetailsService,
       transferService,
-      regularTransferServiceFactory,
+      regularTransfers,
       flexParameters,
       rideHailingServices,
       dataOverlayParameterBindings,

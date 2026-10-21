@@ -7,8 +7,10 @@ import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferServiceFactoryCreator;
+import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -16,22 +18,20 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySna
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
- * Wires the regular-transfer pipeline for routing. The runtime repository is created from the build
- * repository and registered on the transit domain's transaction framework; requests read its
- * snapshot through the returned handle, updaters write through it. The request-scoped factory is
- * provided by {@code RequestScopedModule}.
- * <p>
- * Both bindings are resolved eagerly at startup by {@code ConstructApplication}.
+ * Wires the regular-transfer repository for routing. The runtime repository is created from the
+ * build repository and registered on the transit domain's transaction framework; requests read
+ * its snapshot through the returned handle, updaters write through it.
  */
 @Module
 public class RegularTransferRepositoryModule {
 
   /**
-   * Converts the build repository into the initial snapshot of the runtime repository, and seals it. From now on
-   * regular transfers are only updated through the handle.
+   * Converts the build repository into the runtime repository, and seals it. From now on regular
+   * transfers are only updated through the handle. The snapshots derive the Raptor transfers from
+   * their paths with a stop index and a street-search-backed path provider, both created here.
    * <p>
-   * Registration is not thread-safe, so the handle must be created at startup, before the updaters start - not lazily
-   * by the first request. {@code ConstructApplication} does this.
+   * Registration is not thread-safe, so the handle must be created at startup, before the updaters
+   * start - not lazily by the first request. The transit repository must be indexed.
    */
   @Provides
   @Singleton
@@ -40,17 +40,26 @@ public class RegularTransferRepositoryModule {
     RegularTransferRepository<NearbyStop>
   > regularTransferRepositoryHandle(
     @TransitDomain RepositoryRegistry repositoryRegistry,
-    RegularTransferBuildRepository<NearbyStop> buildRepository
-  ) {
-    return RegularTransferFactory.registerRepository(repositoryRegistry, buildRepository);
-  }
-
-  @Provides
-  @Singleton
-  public static RegularTransferServiceFactoryCreator regularTransferServiceFactoryCreator(
+    RegularTransferBuildRepository<NearbyStop> buildRepository,
     Graph graph,
     TransitRepository transitRepository
   ) {
-    return RegularTransferServiceFactoryCreator.of(graph, transitRepository);
+    var siteRepository = transitRepository.getSiteRepository();
+    var stopIndex = new StopIndex(
+      siteRepository.stopIndexSize(),
+      siteRepository.listRegularStops(),
+      RegularStop::getIndex,
+      RegularStop::getId
+    );
+    var pathProvider = new StreetTransferPathProvider(
+      graph,
+      StreetTransferPathProvider.createNearbyStopFinder(graph, transitRepository)
+    );
+    return RegularTransferFactory.registerRepository(
+      repositoryRegistry,
+      buildRepository,
+      stopIndex,
+      pathProvider
+    );
   }
 }

@@ -57,7 +57,7 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.utils.collection.ListUtils;
 
 /**
@@ -70,7 +70,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final RaptorTransitData raptorTransitData;
 
-  private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
+  private final RegularTransferRepositorySnapshot<NearbyStop> regularTransfers;
 
   private final RouteRequest request;
   private final StreetSearchRequest transferStreetRequest;
@@ -89,8 +89,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    *
    * @param raptorTransitData     the currently active transit layer (may have real-time data
    *                              applied)
-   * @param regularTransferServiceFactory the request's regular-transfer pipeline, used to recover
-   *                              the street path of a regular transfer
+   * @param regularTransfers      the request's regular-transfer snapshot, used to recover the
+   *                              street path of a regular transfer
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
    */
@@ -99,13 +99,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     StreetDetailsService streetDetailsService,
     RaptorTransitData raptorTransitData,
-    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request,
     @Nullable TaxiService taxiService
   ) {
     this.raptorTransitData = raptorTransitData;
-    this.regularTransferServiceFactory = regularTransferServiceFactory;
+    this.regularTransfers = regularTransfers;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
@@ -382,7 +382,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   @Nullable
   private NearbyStop findRegularTransferPath(int fromStop, int toStop) {
     var walkPreferences = RegularTransferPreferencesMapper.fromRouteRequest(request);
-    return regularTransferServiceFactory.findPath(walkPreferences, fromStop, toStop);
+    return regularTransfers.findPath(walkPreferences, fromStop, toStop);
   }
 
   private List<Leg> mapEgressLeg(EgressPathLeg<T> egressPathLeg) {

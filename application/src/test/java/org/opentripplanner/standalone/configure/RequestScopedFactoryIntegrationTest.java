@@ -47,9 +47,7 @@ class RequestScopedFactoryIntegrationTest {
 
     var requestOne = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isSameInstanceAs(requestOne.transitService());
-    assertThat(requestOne.regularTransferServiceFactory()).isSameInstanceAs(
-      requestOne.regularTransferServiceFactory()
-    );
+    assertThat(requestOne.regularTransfers()).isSameInstanceAs(requestOne.regularTransfers());
     assertThat(requestOne.transactionScope()).isSameInstanceAs(requestOne.transactionScope());
     assertThat(requestOne.gtfsRequestContext()).isSameInstanceAs(requestOne.gtfsRequestContext());
     assertThat(requestOne.gtfsRequestContext().transitService()).isSameInstanceAs(
@@ -58,9 +56,8 @@ class RequestScopedFactoryIntegrationTest {
 
     var requestTwo = factory.requestScopedFactoryBuilder().build();
     assertThat(requestOne.transitService()).isNotSameInstanceAs(requestTwo.transitService());
-    assertThat(requestOne.regularTransferServiceFactory()).isNotSameInstanceAs(
-      requestTwo.regularTransferServiceFactory()
-    );
+    // Without a commit in between, both requests read the same snapshot and share its cache
+    assertThat(requestOne.regularTransfers()).isSameInstanceAs(requestTwo.regularTransfers());
     assertThat(requestOne.gtfsRequestContext()).isNotSameInstanceAs(
       requestTwo.gtfsRequestContext()
     );
@@ -98,7 +95,7 @@ class RequestScopedFactoryIntegrationTest {
    * is committed. Requests started after the commit see the update.
    */
   @Test
-  void regularTransferServiceFactoryReadsTheSnapshotOfItsRequest() throws Exception {
+  void requestsReadTheRegularTransfersOfTheirSnapshot() throws Exception {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
     var handle = factory.regularTransferRepositoryHandle();
     var updateManager = factory.transitUpdateManager();
@@ -120,7 +117,7 @@ class RequestScopedFactoryIntegrationTest {
 
   @Nullable
   private static NearbyStop findPath(RequestScopedFactory request) {
-    return request.regularTransferServiceFactory().findPath(WALK, FROM_STOP, TO_STOP);
+    return request.regularTransfers().findPath(WALK, FROM_STOP, TO_STOP);
   }
 
   /** The transit domain commits periodically, so poll until a new request sees the update. */

@@ -93,11 +93,7 @@ public class FlexIntegrationTest {
       graph,
       transitService,
       transferRepository,
-      TestServerContext.createRegularTransferServiceFactory(
-        graph,
-        transitRepository,
-        timetableDataImport
-      )
+      TestServerContext.createRegularTransfers(graph, transitRepository, timetableDataImport)
     );
   }
 

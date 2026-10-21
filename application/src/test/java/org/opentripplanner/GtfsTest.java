@@ -285,7 +285,7 @@ public abstract class GtfsTest {
       graph,
       transitService,
       transferRepository,
-      NoRegularTransfers.factory()
+      NoRegularTransfers.snapshot()
     );
   }
 }

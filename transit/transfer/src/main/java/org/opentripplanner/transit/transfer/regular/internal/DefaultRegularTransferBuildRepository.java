@@ -3,7 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
@@ -22,7 +22,7 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   private final TemplatePathsByUserProfile<P> paths = new TemplatePathsByUserProfile<>();
 
   /**
-   * Set when this repository is converted into the initial runtime snapshot. Not serialized, a
+   * Set when this repository is converted into the runtime repository. Not serialized, a
    * loaded graph can be extended by a new graph build.
    */
   private transient boolean sealed = false;
@@ -63,8 +63,8 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   }
 
   @Override
-  public RegularTransferRepositorySnapshot<P> createInitialSnapshot() {
+  public RegularTransferRepository<P> createRuntimeRepository() {
     sealed = true;
-    return new DefaultRegularTransferRepositorySnapshot<>(paths.copy());
+    return new DefaultRegularTransferRepository<>(paths);
   }
 }

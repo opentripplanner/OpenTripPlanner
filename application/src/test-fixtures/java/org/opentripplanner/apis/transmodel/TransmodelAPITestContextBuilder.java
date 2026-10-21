@@ -71,7 +71,7 @@ public class TransmodelAPITestContextBuilder {
         graph,
         transitService,
         transferRepository,
-        NoRegularTransfers.factory()
+        NoRegularTransfers.snapshot()
       ),
       transitService,
       null,

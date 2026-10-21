@@ -9,7 +9,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * <p>
  * The repository is part of the transaction framework and only exists at runtime: write access is
  * only available through a {@code WriteContext} on the writer thread, requests read the immutable
- * {@link RegularTransferRepositorySnapshot} published on each commit. The initial snapshot is
+ * {@link RegularTransferRepositorySnapshot} published on each commit. The repository is first
  * created from the {@link RegularTransferBuildRepository}.
  *
  * @param <P> the transfer path/template type

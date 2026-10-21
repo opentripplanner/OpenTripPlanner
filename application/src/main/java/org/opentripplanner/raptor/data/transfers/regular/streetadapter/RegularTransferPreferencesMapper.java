@@ -15,8 +15,7 @@ import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUs
  * normalizes paths under - {@link AbstractUserPreferences}. Only {@code WALK} is supported today.
  * <p>
  * {@link #fromRouteRequest} extracts a live request's walk preferences into the cache-friendly
- * {@link WalkPreferences} value (request time, before a {@link
- * org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory} lookup). {@link
+ * {@link WalkPreferences} value, the key of the Raptor transfers cached per preferences. {@link
  * #toRouteRequest} reconstructs a minimal {@link RouteRequest} from a stored {@link
  * AbstractUserPreferences} - the only place {@link StreetTransferPathProvider} needs a real
  * {@code RouteRequest}/{@code StreetSearchRequest} to actually traverse streets.

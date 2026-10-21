@@ -17,7 +17,7 @@ import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
 
-class DefaultRegularTransferServiceFactoryTest {
+class DefaultRegularTransferRepositorySnapshotTest {
 
   private static final FeedScopedId A = FeedScopedId.of("F", "A");
   private static final FeedScopedId B = FeedScopedId.of("F", "B");
@@ -60,7 +60,9 @@ class DefaultRegularTransferServiceFactoryTest {
       profiles,
       buildRepository
     ).generateTransfersForAllStops();
-    return buildRepository.createInitialSnapshot();
+    return new RegularTransferRepositoryLifecycle<>(stopIndex, provider).freeze(
+      buildRepository.createRuntimeRepository()
+    );
   }
 
   /**
@@ -77,52 +79,31 @@ class DefaultRegularTransferServiceFactoryTest {
   }
 
   @Test
-  void buildsAllStoredCandidatesRecostedUnderRequestPreferences() {
+  void raptorTransfersAreRecostedUnderTheRequestPreferences() {
     var provider = new FakeTransferPathProvider();
     provider.addNearby(A, B, 100, 60);
     provider.addNearby(A, C, 200, 90);
-
     var stopIndex = stopIndex();
-    var repository = generate(stopIndex, provider, 1.0);
+    var snapshot = generate(stopIndex, provider, 1.0);
 
-    var factory = new DefaultRegularTransferServiceFactory<>(stopIndex, repository, provider);
-    var service = factory.create(withReluctance(2.0));
+    var transfers = snapshot.raptorTransfers(withReluctance(2.0));
 
     // Cost was re-costed under the request's own reluctance (2.0), not the build-time one.
-    assertThat(collectC1(service.getTransfersFromStop(stopIndex.toStopIndex(A)))).containsExactly(
+    assertThat(collectC1(transfers.getTransfersFromStop(stopIndex.toStopIndex(A)))).containsExactly(
       200,
       400
     );
   }
 
   @Test
-  void cachesByModeAndPreferences() {
+  void raptorTransfersAreCachedByPreferences() {
     var provider = new FakeTransferPathProvider();
     provider.addNearby(A, B, 100, 60);
-    var stopIndex = stopIndex();
-    var repository = generate(stopIndex, provider, 1.0);
-    var factory = new DefaultRegularTransferServiceFactory<>(stopIndex, repository, provider);
+    var snapshot = generate(stopIndex(), provider, 1.0);
 
     // Two equal, but separately created preferences - one is mapped for each request
-    var first = factory.create(withReluctance(1.0));
-    var second = factory.create(withReluctance(1.0));
-
-    assertThat(first).isSameInstanceAs(second);
-  }
-
-  @Test
-  void factoriesOfTheSameSnapshotShareItsCache() {
-    var provider = new FakeTransferPathProvider();
-    provider.addNearby(A, B, 100, 60);
-    var stopIndex = stopIndex();
-    var snapshot = generate(stopIndex, provider, 1.0);
-
-    var first = new DefaultRegularTransferServiceFactory<>(stopIndex, snapshot, provider).create(
-      withReluctance(1.0)
-    );
-    var second = new DefaultRegularTransferServiceFactory<>(stopIndex, snapshot, provider).create(
-      withReluctance(1.0)
-    );
+    var first = snapshot.raptorTransfers(withReluctance(1.0));
+    var second = snapshot.raptorTransfers(withReluctance(1.0));
 
     assertThat(second).isSameInstanceAs(first);
   }
@@ -135,14 +116,10 @@ class DefaultRegularTransferServiceFactoryTest {
     var fromA = stopIndex.toStopIndex(A);
     var original = generate(stopIndex, provider, 1.0);
     var walkPreferences = withReluctance(1.0);
-    var originalService = new DefaultRegularTransferServiceFactory<>(
-      stopIndex,
-      original,
-      provider
-    ).create(walkPreferences);
+    var originalTransfers = original.raptorTransfers(walkPreferences);
 
     // Commit a new path A -> C
-    var lifecycle = new RegularTransferRepositoryLifecycle<FakeTransferPathProvider.FakePath>();
+    var lifecycle = new RegularTransferRepositoryLifecycle<>(stopIndex, provider);
     var repository = lifecycle.copyOnWrite(original);
     repository.setPath(
       walkPreferences,
@@ -151,14 +128,10 @@ class DefaultRegularTransferServiceFactoryTest {
       new FakeTransferPathProvider.FakePath(A, C, 200, 90)
     );
     var updated = lifecycle.freeze(repository);
-    var updatedService = new DefaultRegularTransferServiceFactory<>(
-      stopIndex,
-      updated,
-      provider
-    ).create(walkPreferences);
+    var updatedTransfers = updated.raptorTransfers(walkPreferences);
 
-    assertThat(updatedService).isNotSameInstanceAs(originalService);
-    assertThat(collectC1(updatedService.getTransfersFromStop(fromA))).containsExactly(100, 200);
-    assertThat(collectC1(originalService.getTransfersFromStop(fromA))).containsExactly(100);
+    assertThat(updatedTransfers).isNotSameInstanceAs(originalTransfers);
+    assertThat(collectC1(updatedTransfers.getTransfersFromStop(fromA))).containsExactly(100, 200);
+    assertThat(collectC1(originalTransfers.getTransfersFromStop(fromA))).containsExactly(100);
   }
 }

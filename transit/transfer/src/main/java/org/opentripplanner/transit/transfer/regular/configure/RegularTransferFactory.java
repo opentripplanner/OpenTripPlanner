@@ -8,11 +8,9 @@ import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferServiceFactory;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
@@ -50,28 +48,22 @@ public final class RegularTransferFactory {
   }
 
   /**
-   * Register the runtime repository on the transaction framework, starting from the initial
-   * snapshot of the build repository. This seals the build repository.
+   * Register the runtime repository on the transaction framework, created from the paths of the
+   * build repository. This seals the build repository. The snapshots use the {@code stopIndex} and
+   * the {@code pathProvider} to derive the Raptor transfers from their paths.
    */
   public static <P> RepositoryHandle<
     RegularTransferRepositorySnapshot<P>,
     RegularTransferRepository<P>
   > registerRepository(
     RepositoryRegistry repositoryRegistry,
-    RegularTransferBuildRepository<P> buildRepository
-  ) {
-    return repositoryRegistry.registerRepositorySnapshot(
-      buildRepository.createInitialSnapshot(),
-      new RegularTransferRepositoryLifecycle<>()
-    );
-  }
-
-  /** Create the request-scoped service factory, reading the given snapshot. */
-  public static <P> RegularTransferServiceFactory<P> createServiceFactory(
+    RegularTransferBuildRepository<P> buildRepository,
     StopIndex stopIndex,
-    RegularTransferRepositorySnapshot<P> snapshot,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
   ) {
-    return new DefaultRegularTransferServiceFactory<>(stopIndex, snapshot, pathProvider);
+    return repositoryRegistry.registerRepository(
+      buildRepository.createRuntimeRepository(),
+      new RegularTransferRepositoryLifecycle<>(stopIndex, pathProvider)
+    );
   }
 }

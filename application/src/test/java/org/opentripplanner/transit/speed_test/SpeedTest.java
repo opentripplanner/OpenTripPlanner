@@ -21,7 +21,7 @@ import org.opentripplanner.gbfs.network.GbfsNetworkOverrides;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RegularTransferServiceFactoryCreator;
+import org.opentripplanner.raptor.data.transfers.regular.configure.RegularTransferRepositoryModule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -63,7 +63,6 @@ import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 
 /**
@@ -150,9 +149,11 @@ public class SpeedTest {
       new RealtimeVehicleRepositoryLifecycle()
     );
     // Registered before the updaters start, registration is not thread-safe
-    var regularTransferHandle = RegularTransferFactory.registerRepository(
+    var regularTransferHandle = RegularTransferRepositoryModule.regularTransferRepositoryHandle(
       registry,
-      regularTransferBuildRepository
+      regularTransferBuildRepository,
+      graph,
+      transitRepository
     );
     var threadFactory = Executors.defaultThreadFactory();
     var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(
@@ -217,9 +218,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository),
-      RegularTransferServiceFactoryCreator.of(graph, transitRepository).create(
-        regularTransferHandle.repositorySnapshot(transactionScope)
-      ),
+      regularTransferHandle.repositorySnapshot(transactionScope),
       new DelegatingTransitAlertServiceImpl(),
       routerConfig.flexParameters(),
       List.of(),

@@ -2,22 +2,23 @@ package org.opentripplanner.transit.transfer.regular;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
- * A regular-transfer pipeline without any transfers, for tests that route without regular
- * transfers. Use {@code TestServerContext.createRegularTransferServiceFactory} to route with the
- * transfers generated from the test graph.
+ * A regular-transfer snapshot without any transfers, for tests that route without regular
+ * transfers. Use {@code TestServerContext.createRegularTransfers} to route with the transfers
+ * generated from the test graph.
  */
 public final class NoRegularTransfers {
 
   private NoRegularTransfers() {}
 
-  public static RegularTransferServiceFactory<NearbyStop> factory() {
-    return FACTORY;
+  public static RegularTransferRepositorySnapshot<NearbyStop> snapshot() {
+    return SNAPSHOT;
   }
 
   public static RaptorRegularTransferService service() {
@@ -36,10 +37,12 @@ public final class NoRegularTransfers {
     }
   };
 
-  private static final RegularTransferServiceFactory<NearbyStop> FACTORY =
-    new RegularTransferServiceFactory<>() {
+  private static final RegularTransferRepositorySnapshot<NearbyStop> SNAPSHOT =
+    new RegularTransferRepositorySnapshot<>() {
       @Override
-      public RaptorRegularTransferService create(AbstractUserPreferences<?> userPreferences) {
+      public RaptorRegularTransferService raptorTransfers(
+        AbstractUserPreferences<?> userPreferences
+      ) {
         return SERVICE;
       }
 
@@ -51,6 +54,11 @@ public final class NoRegularTransfers {
         int toStop
       ) {
         return null;
+      }
+
+      @Override
+      public List<StoredPath<NearbyStop>> pathsFor(AbstractUserPreferences<?> userPreferences) {
+        return List.of();
       }
     };
 }

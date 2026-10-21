@@ -245,8 +245,6 @@ public class ConstructApplication {
     // Repositories must be registered before the updaters start writing, not lazily by the first
     // request - registration is not thread-safe.
     factory.regularTransferRepositoryHandle();
-    // Build the stop index and street path provider at startup, not in the first request.
-    factory.regularTransferServiceFactoryCreator();
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(

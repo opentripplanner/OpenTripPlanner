@@ -57,8 +57,8 @@ class DefaultTransferGeneratorTest {
     generator.generateTransfersForAllStops();
 
     assertThat(
-      buildRepository
-        .createInitialSnapshot()
+      TestLifecycles.<FakeTransferPathProvider.FakePath>pathsOnly()
+        .freeze(buildRepository.createRuntimeRepository())
         .findPath(userPreferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(cheapAB);
   }
@@ -87,8 +87,8 @@ class DefaultTransferGeneratorTest {
     generator.generateTransfersForAllStops();
 
     assertThat(
-      buildRepository
-        .createInitialSnapshot()
+      TestLifecycles.<FakeTransferPathProvider.FakePath>pathsOnly()
+        .freeze(buildRepository.createRuntimeRepository())
         .findPath(userPreferences, stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isNull();
   }

@@ -33,9 +33,7 @@ import org.slf4j.LoggerFactory;
  * Runs unconditionally, alongside {@link FlexTransferGenerator}: that module now only
  * generates the FLEX-relevant transfers (walking connectors between {@code RegularStop}s and
  * flex {@code AreaStop}/{@code GroupStop}s) - regular transfers between {@code RegularStop}s are
- * exclusively this pipeline's responsibility. Routing reads them through the request-scoped
- * {@code RegularTransferServiceFactory}, so a test that routes with regular transfers must run this
- * generator, see {@code TestServerContext.createRegularTransferServiceFactory}.
+ * exclusively this pipeline's responsibility.
  * <p>
  * {@code regularTransferBuildRepository} is injected empty (mirroring {@code TransferRepository})
  * and populated in place here, so the same instance can be threaded through

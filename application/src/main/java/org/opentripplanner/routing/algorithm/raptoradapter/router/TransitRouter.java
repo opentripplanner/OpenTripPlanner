@@ -52,7 +52,7 @@ import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPrior
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RaptorRegularTransferService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferServiceFactory;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
 public class TransitRouter {
 
@@ -65,7 +65,7 @@ public class TransitRouter {
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
-  private final RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory;
+  private final RegularTransferRepositorySnapshot<NearbyStop> regularTransfers;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
 
@@ -96,7 +96,7 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -117,7 +117,7 @@ public class TransitRouter {
     this.meterRegistry = meterRegistry;
     this.streetDetailsService = streetDetailsService;
     this.transferService = transferService;
-    this.regularTransferServiceFactory = regularTransferServiceFactory;
+    this.regularTransfers = regularTransfers;
     this.flexParameters = flexParameters;
     this.rideHailingServices = rideHailingServices;
     this.dataOverlayParameterBindings = dataOverlayParameterBindings;
@@ -140,7 +140,7 @@ public class TransitRouter {
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    RegularTransferServiceFactory<NearbyStop> regularTransferServiceFactory,
+    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,
@@ -162,7 +162,7 @@ public class TransitRouter {
       meterRegistry,
       streetDetailsService,
       transferService,
-      regularTransferServiceFactory,
+      regularTransfers,
       flexParameters,
       rideHailingServices,
       dataOverlayParameterBindings,
@@ -296,7 +296,7 @@ public class TransitRouter {
       transitService,
       streetDetailsService,
       raptorTransitData,
-      regularTransferServiceFactory,
+      regularTransfers,
       transitSearchTimeZero,
       request,
       taxiService
@@ -378,7 +378,7 @@ public class TransitRouter {
   }
 
   private RaptorRegularTransferService raptorRegularTransferService() {
-    return regularTransferServiceFactory.create(
+    return regularTransfers.raptorTransfers(
       RegularTransferPreferencesMapper.fromRouteRequest(request)
     );
   }
