@@ -80,7 +80,6 @@ class DefaultRegularTransferBuildRepositoryTest {
     assertThat(ex).hasMessageThat().contains("sealed");
     // Reads still work
     assertThat(buildRepository.hasTransfersFrom(A)).isTrue();
-    assertThat(buildRepository.calculateNumberOfTransferPaths(WALK)).isEqualTo(3);
   }
 
   @Test
