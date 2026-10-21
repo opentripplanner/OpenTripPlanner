@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
@@ -18,12 +21,28 @@ final class TestLifecycles {
 
   private TestLifecycles() {}
 
-  /** A lifecycle whose snapshots cannot derive Raptor transfers. */
-  static <P> RegularTransferRepositoryLifecycle<P> pathsOnly() {
+  /**
+   * A lifecycle for the given runtime repository, whose snapshots cannot derive Raptor transfers.
+   */
+  static <P> RegularTransferRepositoryLifecycle<P> pathsOnly(
+    RegularTransferRepository<P> repository
+  ) {
     return new RegularTransferRepositoryLifecycle<>(
+      repository,
       new StopIndex(0, List.<FeedScopedId>of(), id -> 0, id -> id),
       new UnsupportedPathProvider<>()
     );
+  }
+
+  /**
+   * Create the runtime repository from the build repository, and return its initial snapshot,
+   * which cannot derive Raptor transfers.
+   */
+  static <P> RegularTransferRepositorySnapshot<P> initialSnapshot(
+    RegularTransferBuildRepository<P> buildRepository
+  ) {
+    var repository = buildRepository.createRuntimeRepository();
+    return pathsOnly(repository).freeze(repository);
   }
 
   private static final class UnsupportedPathProvider<P> implements

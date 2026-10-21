@@ -1,54 +1,47 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
-import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created by
  * {@link RegularTransferRepositoryLifecycle#freeze}. The snapshot owns its
- * {@link TemplatePathsByUserProfile}, which is never written to after creation. Hence, the paths
- * are effectively immutable and safe to read from any number of request threads. The cache of the
+ * {@link OverlaidTemplatePaths}, which is never written to after creation. Hence, the paths are
+ * effectively immutable and safe to read from any number of request threads. The cache of the
  * Raptor transfers derived from them is the only mutable state, and it is thread-safe.
  *
  * @param <P> the transfer path/template type
  */
 class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepositorySnapshot<P> {
 
-  private final TemplatePathsByUserProfile<P> paths;
-  private final StopIndex stopIndex;
-  private final TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider;
-  private final RegularTransferServiceCache transferServiceCache =
-    new RegularTransferServiceCache();
+  private final OverlaidTemplatePaths<P> paths;
+  private final RegularTransferServiceCache<RaptorTransferStore> cache;
+  private final CacheFactory cacheFactory;
 
   DefaultRegularTransferRepositorySnapshot(
-    TemplatePathsByUserProfile<P> paths,
-    StopIndex stopIndex,
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
+    OverlaidTemplatePaths<P> paths,
+    RegularTransferServiceCache<RaptorTransferStore> cache,
+    RaptorTransfersFactory<P> raptorTransfersFactory
   ) {
     this.paths = paths;
-    this.stopIndex = stopIndex;
-    this.pathProvider = pathProvider;
+    this.cache = cache;
+    this.cacheFactory = new CacheFactory(raptorTransfersFactory);
   }
 
   @Override
   public RaptorRegularTransferService raptorTransfers(AbstractUserPreferences<?> userPreferences) {
-    return transferServiceCache.getOrCreate(userPreferences, () ->
-      createRaptorTransfers(userPreferences)
-    );
+    return cache.get(userPreferences, cacheFactory);
   }
 
   @Nullable
   @Override
   public P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
-    return paths.findPath(userPreferences, fromStop, toStop);
+    return paths.findPath(cache.profileFor(userPreferences, cacheFactory), fromStop, toStop);
   }
 
   @Override
@@ -56,38 +49,50 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
     return paths.pathsFor(userPreferences);
   }
 
-  /**
-   * Create a new mutable repository initialized with the state of this snapshot. Only the
-   * lifecycle should have access to this, hence the package local access.
-   */
-  DefaultRegularTransferRepository<P> copyOnWrite() {
-    return new DefaultRegularTransferRepository<>(paths);
+  /** The paths of this snapshot, for the lifecycle. */
+  OverlaidTemplatePaths<P> paths() {
+    return paths;
   }
 
-  /**
-   * Build a {@link RaptorTransferStore} from the paths stored under the user preferences closest
-   * to {@code userPreferences}, re-costed under {@code userPreferences}. Paths exceeding the
-   * duration limit of the preferences are left out.
-   */
-  private RaptorRegularTransferService createRaptorTransfers(
-    AbstractUserPreferences<?> userPreferences
-  ) {
-    var builder = RaptorTransferStore.of(stopIndex.size());
-    for (var stored : paths.pathsFor(userPreferences)) {
-      Optional<PathCriteria> criteria = pathProvider.computePathCriteria(
-        stored.path(),
-        userPreferences
-      );
-      if (criteria.isEmpty()) {
-        continue;
-      }
-      builder.addTransfer(
-        stored.fromStop(),
-        stored.toStop(),
-        criteria.get().durationInSeconds(),
-        criteria.get().c1()
+  /** Creates and patches the cached Raptor transfers from the paths of this snapshot. */
+  private final class CacheFactory
+    implements RegularTransferServiceCache.Factory<RaptorTransferStore>
+  {
+
+    private final RaptorTransfersFactory<P> raptorTransfersFactory;
+
+    private CacheFactory(RaptorTransfersFactory<P> raptorTransfersFactory) {
+      this.raptorTransfersFactory = raptorTransfersFactory;
+    }
+
+    @Nullable
+    @Override
+    public AbstractUserPreferences<?> profileFor(AbstractUserPreferences<?> userPreferences) {
+      return paths.closestProfile(userPreferences);
+    }
+
+    @Override
+    public RaptorTransferStore create(
+      AbstractUserPreferences<?> userPreferences,
+      @Nullable AbstractUserPreferences<?> profile
+    ) {
+      return raptorTransfersFactory.create(paths, userPreferences, profile);
+    }
+
+    @Override
+    public RaptorTransferStore patch(
+      AbstractUserPreferences<?> userPreferences,
+      @Nullable AbstractUserPreferences<?> profile,
+      RaptorTransferStore previous,
+      Set<Integer> changedFromStops
+    ) {
+      return raptorTransfersFactory.patch(
+        paths,
+        userPreferences,
+        profile,
+        previous,
+        changedFromStops
       );
     }
-    return builder.build();
   }
 }

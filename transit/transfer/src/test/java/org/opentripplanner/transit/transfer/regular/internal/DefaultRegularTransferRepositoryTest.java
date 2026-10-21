@@ -1,47 +1,57 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
+/**
+ * The write side of the runtime repository: replacing and resetting the transfers from a stop,
+ * on top of the paths generated at graph build, and tracking the changed stops.
+ */
 class DefaultRegularTransferRepositoryTest {
 
-  private static final RegularTransferRepositoryLifecycle<String> LIFECYCLE =
-    TestLifecycles.pathsOnly();
-
   private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
+  private static final WalkPreferences UNKNOWN = withReluctance(7.0);
 
   private static final int A = 0;
   private static final int B = 1;
   private static final int C = 2;
+  private static final int D = 3;
 
   private static final String PATH_AB = "A-B";
   private static final String PATH_AC = "A-C";
   private static final String PATH_BC = "B-C";
   private static final String PATH_AB_NEW = "A-B (new)";
+  private static final String PATH_AD = "A-D";
   private static final String PATH_CA = "C-A";
 
-  @Test
-  void emptyRepository() {
-    var snapshot = LIFECYCLE.freeze(new DefaultRegularTransferRepository<>());
+  private DefaultRegularTransferBuildRepository<String> buildRepository;
+  private DefaultRegularTransferRepository<String> repository;
+  private RegularTransferRepositoryLifecycle<String> lifecycle;
 
-    assertThat(snapshot.findPath(WALK, A, B)).isNull();
-    assertThat(snapshot.pathsFor(WALK)).isEmpty();
+  /** Graph build: A -> B, A -> C, B -> C */
+  @BeforeEach
+  void setUp() {
+    buildRepository = new DefaultRegularTransferBuildRepository<>();
+    buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB, C, PATH_AC));
+    buildRepository.setPaths(WALK, B, Map.of(C, PATH_BC));
+    repository =
+      (DefaultRegularTransferRepository<String>) buildRepository.createRuntimeRepository();
+    lifecycle = TestLifecycles.pathsOnly(repository);
   }
 
   @Test
-  void freezePublishesTheWrittenPaths() {
-    var snapshot = createSnapshot();
-
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(WALK, B, A)).isNull();
-    assertThat(snapshot.pathsFor(WALK)).containsExactly(
+  void withoutWritesTheSnapshotHasTheGraphBuildPaths() {
+    assertThat(freeze().pathsFor(WALK)).containsExactly(
       new StoredPath<>(A, B, PATH_AB),
       new StoredPath<>(A, C, PATH_AC),
       new StoredPath<>(B, C, PATH_BC)
@@ -49,139 +59,181 @@ class DefaultRegularTransferRepositoryTest {
   }
 
   @Test
-  void lookupsReadThePathsStoredUnderTheClosestPreferences() {
-    var low = WalkPreferences.of().withReluctance(Reluctance.of(1.0)).build();
-    var high = WalkPreferences.of().withReluctance(Reluctance.of(4.0)).build();
-    var repository = new DefaultRegularTransferRepository<String>();
-    repository.setPath(low, A, B, PATH_AB);
-    repository.setPath(high, A, B, PATH_AB_NEW);
+  void replaceHidesAllGraphBuildPathsFromTheStop() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW, D, PATH_AD));
 
-    var snapshot = LIFECYCLE.freeze(repository);
-    var closeToLow = WalkPreferences.of().withReluctance(Reluctance.of(1.5)).build();
-    var closeToHigh = WalkPreferences.of().withReluctance(Reluctance.of(3.5)).build();
-    assertThat(snapshot.findPath(closeToLow, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(closeToHigh, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(snapshot.pathsFor(closeToHigh)).containsExactly(new StoredPath<>(A, B, PATH_AB_NEW));
-  }
-
-  @Test
-  void setPathsKeepsThePathsToOtherStops() {
-    var repository = LIFECYCLE.copyOnWrite(createSnapshot());
-
-    repository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW));
-
-    var snapshot = LIFECYCLE.freeze(repository);
+    var snapshot = freeze();
     assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.findPath(WALK, A, D)).isEqualTo(PATH_AD);
+    // A -> C is not in the new paths, so it is gone - replace does not merge
+    assertThat(snapshot.findPath(WALK, A, C)).isNull();
+    // Other stops keep their graph-build paths
+    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
-  void setPathsOnACopyOnWriteRepositoryDoesNotChangeTheSnapshot() {
-    var original = createSnapshot();
-    var repository = LIFECYCLE.copyOnWrite(original);
+  void replaceWithNoPathsRemovesAllTransfersFromTheStop() {
+    repository.replaceTransfersFrom(WALK, A, Map.of());
 
-    repository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW));
-    repository.setPaths(WALK, C, Map.of(A, PATH_CA));
-
-    assertThat(original.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(original.findPath(WALK, C, A)).isNull();
+    assertThat(freeze().pathsFor(WALK)).containsExactly(new StoredPath<>(B, C, PATH_BC));
   }
 
   @Test
-  void setPathsWithNoPathsStoresNothing() {
-    var repository = new DefaultRegularTransferRepository<String>();
+  void replaceAddsTransfersFromAStopWithoutGraphBuildPaths() {
+    repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
 
-    repository.setPaths(WALK, A, Map.of());
-
-    assertThat(LIFECYCLE.freeze(repository).pathsFor(WALK)).isEmpty();
+    assertThat(freeze().findPath(WALK, C, A)).isEqualTo(PATH_CA);
   }
 
   @Test
-  void setPathsDoesNotRetainTheGivenMap() {
-    var repository = new DefaultRegularTransferRepository<String>();
+  void theLastReplaceWins() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
+
+    var snapshot = freeze();
+    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.findPath(WALK, A, D)).isNull();
+  }
+
+  @Test
+  void replaceDoesNotRetainTheGivenMap() {
     var paths = new HashMap<Integer, String>();
-    paths.put(B, PATH_AB);
+    paths.put(B, PATH_AB_NEW);
 
-    repository.setPaths(WALK, A, paths);
-    paths.put(C, PATH_AC);
+    repository.replaceTransfersFrom(WALK, A, paths);
+    paths.put(D, PATH_AD);
 
-    assertThat(LIFECYCLE.freeze(repository).findPath(WALK, A, C)).isNull();
+    assertThat(freeze().findPath(WALK, A, D)).isNull();
   }
 
   @Test
-  void writesToACopyOnWriteRepositoryDoNotChangeTheSnapshot() {
-    var original = createSnapshot();
-    var repository = LIFECYCLE.copyOnWrite(original);
+  void resetRestoresTheGraphBuildPaths() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    freeze();
 
-    // Replace a path for an existing fromStop, and add a path for a new fromStop
-    repository.setPath(WALK, A, B, PATH_AB_NEW);
-    repository.setPath(WALK, C, A, PATH_CA);
-    var updated = LIFECYCLE.freeze(repository);
+    repository.resetTransfersFrom(WALK, A);
 
-    assertThat(original.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(original.findPath(WALK, C, A)).isNull();
-    assertThat(original.pathsFor(WALK)).hasSize(3);
-
-    assertThat(updated.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(updated.findPath(WALK, C, A)).isEqualTo(PATH_CA);
-    // Untouched paths are carried over
-    assertThat(updated.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(updated.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    var snapshot = freeze();
+    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.findPath(WALK, A, D)).isNull();
   }
 
   @Test
-  void writesForAProfileMissingInTheSnapshotDoNotChangeTheSnapshot() {
-    var original = LIFECYCLE.freeze(new DefaultRegularTransferRepository<>());
-    var repository = LIFECYCLE.copyOnWrite(original);
+  void resetOfAStopWithoutGraphBuildPathsRemovesItsTransfers() {
+    repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
+    repository.resetTransfersFrom(WALK, C);
 
-    repository.setPath(WALK, A, B, PATH_AB);
+    assertThat(freeze().findPath(WALK, C, A)).isNull();
+  }
 
-    assertThat(original.pathsFor(WALK)).isEmpty();
-    assertThat(LIFECYCLE.freeze(repository).findPath(WALK, A, B)).isEqualTo(PATH_AB);
+  @Test
+  void writesToAnUnknownProfileAreRejected() {
+    assertThrows(IllegalArgumentException.class, () ->
+      repository.replaceTransfersFrom(UNKNOWN, A, Map.of(B, PATH_AB_NEW))
+    );
+    assertThrows(IllegalArgumentException.class, () -> repository.resetTransfersFrom(UNKNOWN, A));
+    assertThat(repository.hasChanges()).isFalse();
+  }
+
+  @Test
+  void theChangedStopsAreTrackedByProfileUntilFreeze() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    repository.replaceTransfersFrom(WALK, C, Map.of());
+    repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
+
+    assertThat(repository.hasChanges()).isTrue();
+    assertThat(repository.freeze().changedFromStops()).containsExactly(WALK, Set.of(A, C));
+
+    // A freeze starts the tracking anew
+    assertThat(repository.hasChanges()).isFalse();
+    assertThat(repository.freeze().changedFromStops()).isEmpty();
+  }
+
+  @Test
+  void aResetIsAChangeOnlyIfTheStopWasReplaced() {
+    repository.resetTransfersFrom(WALK, A);
+    assertThat(repository.hasChanges()).isFalse();
+
+    repository.replaceTransfersFrom(WALK, A, Map.of());
+    repository.freeze();
+    repository.resetTransfersFrom(WALK, A);
+    assertThat(repository.freeze().changedFromStops()).containsExactly(WALK, Set.of(A));
   }
 
   @Test
   void writesAfterFreezeDoNotChangeThePublishedSnapshot() {
-    var repository = new DefaultRegularTransferRepository<String>();
-    repository.setPath(WALK, A, B, PATH_AB);
-    var first = LIFECYCLE.freeze(repository);
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    var first = freeze();
 
-    repository.setPath(WALK, A, B, PATH_AB_NEW);
-    repository.setPath(WALK, A, C, PATH_AC);
-    var second = LIFECYCLE.freeze(repository);
+    repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
+    repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
+    var second = freeze();
 
-    assertThat(first.pathsFor(WALK)).containsExactly(new StoredPath<>(A, B, PATH_AB));
-    assertThat(second.pathsFor(WALK)).containsExactly(
-      new StoredPath<>(A, B, PATH_AB_NEW),
-      new StoredPath<>(A, C, PATH_AC)
+    assertThat(first.findPath(WALK, A, D)).isEqualTo(PATH_AD);
+    assertThat(first.findPath(WALK, A, B)).isNull();
+    assertThat(first.findPath(WALK, C, A)).isNull();
+    assertThat(second.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(second.findPath(WALK, C, A)).isEqualTo(PATH_CA);
+  }
+
+  @Test
+  void writesDoNotChangeTheBuildRepository() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    repository.replaceTransfersFrom(WALK, B, Map.of());
+
+    assertThat(buildRepository.pathsFor(WALK)).containsExactly(
+      new StoredPath<>(A, B, PATH_AB),
+      new StoredPath<>(A, C, PATH_AC),
+      new StoredPath<>(B, C, PATH_BC)
     );
   }
 
   @Test
-  void successiveCopyOnWriteRepositoriesAreIndependent() {
-    var original = createSnapshot();
+  void discardChangesContinuesFromTheCommittedPaths() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    var committed = (DefaultRegularTransferRepositorySnapshot<String>) freeze();
 
-    var first = LIFECYCLE.copyOnWrite(original);
-    first.setPath(WALK, A, B, PATH_AB_NEW);
-    var firstSnapshot = LIFECYCLE.freeze(first);
+    repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
+    repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
+    repository.discardChanges(committed.paths());
 
-    var second = LIFECYCLE.copyOnWrite(firstSnapshot);
-    second.setPath(WALK, A, C, PATH_CA);
-    var secondSnapshot = LIFECYCLE.freeze(second);
-
-    assertThat(original.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(original.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(firstSnapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(firstSnapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(secondSnapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(secondSnapshot.findPath(WALK, A, C)).isEqualTo(PATH_CA);
+    assertThat(repository.hasChanges()).isFalse();
+    var snapshot = freeze();
+    assertThat(snapshot.findPath(WALK, A, D)).isEqualTo(PATH_AD);
+    assertThat(snapshot.findPath(WALK, A, B)).isNull();
+    assertThat(snapshot.findPath(WALK, C, A)).isNull();
   }
 
-  private static RegularTransferRepositorySnapshot<String> createSnapshot() {
-    var repository = new DefaultRegularTransferRepository<String>();
-    repository.setPath(WALK, A, B, PATH_AB);
-    repository.setPath(WALK, A, C, PATH_AC);
-    repository.setPath(WALK, B, C, PATH_BC);
-    return LIFECYCLE.freeze(repository);
+  @Test
+  void writesAreMadeToTheExactProfileAndReadUnderTheClosestOne() {
+    var low = withReluctance(1.0);
+    var high = withReluctance(4.0);
+    var build = new DefaultRegularTransferBuildRepository<String>();
+    build.setPaths(low, A, Map.of(B, PATH_AB));
+    build.setPaths(high, A, Map.of(B, PATH_AB));
+    var repository = build.createRuntimeRepository();
+    var lifecycle = TestLifecycles.pathsOnly(repository);
+
+    repository.replaceTransfersFrom(high, A, Map.of(B, PATH_AB_NEW));
+
+    var snapshot = lifecycle.freeze(repository);
+    assertThat(snapshot.findPath(withReluctance(1.5), A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.findPath(withReluctance(3.5), A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.pathsFor(withReluctance(3.5))).containsExactly(
+      new StoredPath<>(A, B, PATH_AB_NEW)
+    );
+    // Close is not exact: a write must name the profile itself
+    assertThrows(IllegalArgumentException.class, () ->
+      repository.replaceTransfersFrom(withReluctance(3.5), A, Map.of())
+    );
+  }
+
+  private RegularTransferRepositorySnapshot<String> freeze() {
+    return lifecycle.freeze(repository);
+  }
+
+  private static WalkPreferences withReluctance(double reluctance) {
+    return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
   }
 }

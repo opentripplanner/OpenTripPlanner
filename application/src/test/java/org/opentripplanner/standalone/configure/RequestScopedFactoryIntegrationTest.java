@@ -96,7 +96,13 @@ class RequestScopedFactoryIntegrationTest {
    */
   @Test
   void requestsReadTheRegularTransfersOfTheirSnapshot() throws Exception {
-    var factory = TestConstructApplicationFactoryBuilder.of().build();
+    // A path in the opposite direction, so the profile exists
+    RegularTransferBuildRepository<NearbyStop> buildRepository =
+      RegularTransferFactory.createBuildRepository();
+    buildRepository.setPaths(WALK, TO_STOP, Map.of(FROM_STOP, PATH));
+    var factory = TestConstructApplicationFactoryBuilder.of()
+      .withRegularTransferBuildRepository(buildRepository)
+      .build();
     var handle = factory.regularTransferRepositoryHandle();
     var updateManager = factory.transitUpdateManager();
     try {
@@ -104,7 +110,9 @@ class RequestScopedFactoryIntegrationTest {
       assertThat(findPath(before)).isNull();
 
       updateManager
-        .submit(ctx -> ctx.repository(handle).setPath(WALK, FROM_STOP, TO_STOP, PATH))
+        .submit(ctx ->
+          ctx.repository(handle).replaceTransfersFrom(WALK, FROM_STOP, Map.of(TO_STOP, PATH))
+        )
         .get();
       var after = awaitRequestSeeing(factory, PATH);
 

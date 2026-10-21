@@ -21,8 +21,6 @@ class DefaultRegularTransferBuildRepositoryTest {
   private static final String PATH_BC = "B-C";
   private static final String PATH_AB_NEW = "A-B (new)";
 
-  private final RegularTransferRepositoryLifecycle<String> lifecycle = TestLifecycles.pathsOnly();
-
   @Test
   void hasTransfersFromIsFalseForAStopWithNoStoredPaths() {
     var buildRepository = new DefaultRegularTransferBuildRepository<String>();
@@ -63,7 +61,7 @@ class DefaultRegularTransferBuildRepositoryTest {
 
   @Test
   void runtimeRepositoryContainsTheGeneratedPaths() {
-    var snapshot = lifecycle.freeze(createBuildRepository().createRuntimeRepository());
+    var snapshot = TestLifecycles.initialSnapshot(createBuildRepository());
 
     assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.pathsFor(WALK)).hasSize(3);
@@ -88,10 +86,11 @@ class DefaultRegularTransferBuildRepositoryTest {
   void runtimeWritesDoNotChangeTheBuildRepository() {
     var buildRepository = createBuildRepository();
     var runtimeRepository = buildRepository.createRuntimeRepository();
+    var lifecycle = TestLifecycles.pathsOnly(runtimeRepository);
 
-    // Replaces the toStop map of stop A, shared with the build repository, in the runtime
-    // repository only
-    runtimeRepository.setPath(WALK, A, B, PATH_AB_NEW);
+    // The paths of the build repository are the base of the runtime repository, a write
+    // replaces the paths from stop A in the runtime repository only
+    runtimeRepository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
 
     assertThat(buildRepository.pathsFor(WALK)).contains(new StoredPath<>(A, B, PATH_AB));
     assertThat(lifecycle.freeze(runtimeRepository).findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);

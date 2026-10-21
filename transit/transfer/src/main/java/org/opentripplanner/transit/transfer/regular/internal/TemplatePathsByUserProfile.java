@@ -7,21 +7,21 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
- * The {@code P} path templates keyed by {@code (userPreferences, fromStop, toStop)}, shared by the
- * build repository, the runtime repository and its snapshots.
+ * The {@code P} path templates generated at graph build, keyed by
+ * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile.
  * <p>
- * <b>Copy-on-write.</b> The map can be large (all stops x nearby stops), so it is never
- * deep-copied. The {@code toStop} maps (the leaves) are never modified once stored - a write
- * replaces the leaf with a modified copy instead. That makes it safe to share them between maps,
- * and {@link #copy()} only copies the two upper levels, the user preferences and {@code fromStop}
- * maps.
+ * Written only at graph build, by the build repository. Once the build repository is sealed, this
+ * map is never modified again: it is the immutable base the runtime repository and all its
+ * snapshots share, see {@link OverlaidTemplatePaths}. The map can be large (all stops x nearby
+ * stops), so it is never copied.
  * <p>
- * This class is not thread-safe.
+ * This class is not thread-safe while it is written to.
  *
  * @param <P> the transfer path/template type
  */
@@ -43,19 +43,6 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
   }
 
   /**
-   * Copy the user preferences and {@code fromStop} maps. The {@code toStop} maps are never
-   * modified, so they are shared, not copied. A write to the copy never changes this map, and the
-   * other way around.
-   */
-  TemplatePathsByUserProfile<P> copy() {
-    var copy = new HashMap<AbstractUserPreferences<?>, Map<Integer, Map<Integer, P>>>();
-    pathsByUserPreferences.forEach((userPreferences, byFromStop) ->
-      copy.put(userPreferences, new HashMap<>(byFromStop))
-    );
-    return new TemplatePathsByUserProfile<>(copy);
-  }
-
-  /**
    * Store the paths from {@code fromStop}, keyed by {@code toStop}; paths to other stops are kept.
    * The given map is copied, not retained.
    */
@@ -74,20 +61,31 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     byFromStop.put(fromStop, byToStop);
   }
 
-  @Nullable
-  P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
-    return closestPaths(userPreferences).getOrDefault(fromStop, Map.of()).get(toStop);
-  }
-
   List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
-    var byFromStop = closestPaths(userPreferences);
+    var profile = closestProfile(userPreferences);
+    if (profile == null) {
+      return List.of();
+    }
     List<StoredPath<P>> result = new ArrayList<>();
-    for (var fromEntry : byFromStop.entrySet()) {
+    for (var fromEntry : pathsByUserPreferences.get(profile).entrySet()) {
       for (var toEntry : fromEntry.getValue().entrySet()) {
         result.add(new StoredPath<>(fromEntry.getKey(), toEntry.getKey(), toEntry.getValue()));
       }
     }
     return Collections.unmodifiableList(result);
+  }
+
+  /** The user preferences paths are stored under, the profiles. */
+  Set<AbstractUserPreferences<?>> profiles() {
+    return Collections.unmodifiableSet(pathsByUserPreferences.keySet());
+  }
+
+  /**
+   * The paths stored under exactly the given profile, by {@code fromStop} and {@code toStop}.
+   * Empty if the profile is unknown. The returned map must not be modified.
+   */
+  Map<Integer, Map<Integer, P>> pathsByFromStop(AbstractUserPreferences<?> profile) {
+    return pathsByUserPreferences.getOrDefault(profile, Map.of());
   }
 
   boolean hasTransfersFrom(int fromStop) {
@@ -118,18 +116,19 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
   }
 
   /**
-   * The paths stored under the user preferences closest to the given ones. Empty if no paths are
-   * stored.
+   * The profile closest to the given user preferences: the preferences themselves if paths are
+   * stored under them, otherwise the profile with the smallest
+   * {@link AbstractUserPreferences#normalizedDistance}. {@code null} if no paths are stored.
    */
-  private Map<Integer, Map<Integer, P>> closestPaths(AbstractUserPreferences<?> userPreferences) {
+  @Nullable
+  AbstractUserPreferences<?> closestProfile(AbstractUserPreferences<?> userPreferences) {
     if (pathsByUserPreferences.containsKey(userPreferences)) {
-      return pathsByUserPreferences.get(userPreferences);
+      return userPreferences;
     }
     return pathsByUserPreferences
-      .entrySet()
+      .keySet()
       .stream()
-      .min(Comparator.comparingDouble(e -> userPreferences.normalizedDistance(e.getKey())))
-      .map(Map.Entry::getValue)
-      .orElse(Map.of());
+      .min(Comparator.comparingDouble(userPreferences::normalizedDistance))
+      .orElse(null);
   }
 }

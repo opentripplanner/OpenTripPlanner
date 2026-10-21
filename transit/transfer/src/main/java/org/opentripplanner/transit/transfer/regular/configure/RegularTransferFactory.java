@@ -61,9 +61,10 @@ public final class RegularTransferFactory {
     StopIndex stopIndex,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
   ) {
+    var repository = buildRepository.createRuntimeRepository();
     return repositoryRegistry.registerRepository(
-      buildRepository.createRuntimeRepository(),
-      new RegularTransferRepositoryLifecycle<>(stopIndex, pathProvider)
+      repository,
+      new RegularTransferRepositoryLifecycle<>(repository, stopIndex, pathProvider)
     );
   }
 }
