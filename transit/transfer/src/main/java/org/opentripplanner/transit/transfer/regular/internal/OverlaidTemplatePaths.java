@@ -95,13 +95,13 @@ final class OverlaidTemplatePaths<P> {
     if (replaced != null) {
       return replaced;
     }
-    return base.pathsByFromStop(profile).getOrDefault(fromStop, Map.of());
+    return base.pathsFrom(profile, fromStop);
   }
 
   /** Call {@code consumer} for every path stored under {@code profile}. */
   void forEachPath(AbstractUserPreferences<?> profile, PathConsumer<P> consumer) {
     var replaced = overlay.getOrDefault(profile, Map.of());
-    base.pathsByFromStop(profile).forEach((fromStop, byToStop) -> {
+    base.forEachFromStop(profile, (fromStop, byToStop) -> {
       if (!replaced.containsKey(fromStop)) {
         byToStop.forEach((toStop, path) -> consumer.accept(fromStop, toStop, path));
       }

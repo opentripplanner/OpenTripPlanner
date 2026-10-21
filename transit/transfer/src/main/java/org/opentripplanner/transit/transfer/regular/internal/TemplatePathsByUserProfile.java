@@ -6,12 +6,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
  * The {@code P} path templates generated at graph build, keyed by
- * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile.
+ * {@code (userPreferences, fromStop, toStop)}. Each user preferences key is a transfer profile,
+ * its paths are held by a {@link TemplatePathsByStop}.
  * <p>
  * Written only at graph build, by the build repository. Once the build repository is sealed, this
  * map is never modified again: it is the immutable base the runtime repository and all its
@@ -24,20 +26,8 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  */
 final class TemplatePathsByUserProfile<P> implements Serializable {
 
-  private final Map<
-    AbstractUserPreferences<?>,
-    Map<Integer, Map<Integer, P>>
-  > pathsByUserPreferences;
-
-  TemplatePathsByUserProfile() {
-    this(new HashMap<>());
-  }
-
-  private TemplatePathsByUserProfile(
-    Map<AbstractUserPreferences<?>, Map<Integer, Map<Integer, P>>> pathsByUserPreferences
-  ) {
-    this.pathsByUserPreferences = pathsByUserPreferences;
-  }
+  private final Map<AbstractUserPreferences<?>, TemplatePathsByStop<P>> pathsByUserPreferences =
+    new HashMap<>();
 
   /**
    * Store the paths from {@code fromStop}, keyed by {@code toStop}; paths to other stops are kept.
@@ -51,11 +41,9 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     if (pathsByToStop.isEmpty()) {
       return;
     }
-    var byFromStop = pathsByUserPreferences.computeIfAbsent(userPreferences, p -> new HashMap<>());
-    // Never modify a stored toStop map, it may be shared with another map - replace it.
-    var byToStop = new HashMap<>(byFromStop.getOrDefault(fromStop, Map.of()));
-    byToStop.putAll(pathsByToStop);
-    byFromStop.put(fromStop, byToStop);
+    pathsByUserPreferences
+      .computeIfAbsent(userPreferences, p -> new TemplatePathsByStop<>())
+      .setPaths(fromStop, pathsByToStop);
   }
 
   /** The user preferences paths are stored under, the profiles. */
@@ -64,28 +52,39 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
   }
 
   /**
-   * The paths stored under exactly the given profile, by {@code fromStop} and {@code toStop}.
-   * Empty if the profile is unknown. The returned map must not be modified.
+   * The paths from {@code fromStop} stored under exactly the given profile, by {@code toStop}.
+   * Empty if the profile or the stop is unknown. The returned map must not be modified.
    */
-  Map<Integer, Map<Integer, P>> pathsByFromStop(AbstractUserPreferences<?> profile) {
-    return pathsByUserPreferences.getOrDefault(profile, Map.of());
+  Map<Integer, P> pathsFrom(AbstractUserPreferences<?> profile, int fromStop) {
+    var paths = pathsByUserPreferences.get(profile);
+    return paths == null ? Map.of() : paths.pathsFrom(fromStop);
+  }
+
+  /**
+   * Call {@code consumer} with the paths of every {@code fromStop} stored under exactly the given
+   * profile, by {@code toStop}. The maps must not be modified.
+   */
+  void forEachFromStop(
+    AbstractUserPreferences<?> profile,
+    BiConsumer<Integer, Map<Integer, P>> consumer
+  ) {
+    var paths = pathsByUserPreferences.get(profile);
+    if (paths != null) {
+      paths.forEachFromStop(consumer);
+    }
   }
 
   boolean hasTransfersFrom(int fromStop) {
     return pathsByUserPreferences
       .values()
       .stream()
-      .anyMatch(byFromStop -> !byFromStop.getOrDefault(fromStop, Map.of()).isEmpty());
+      .anyMatch(p -> p.hasTransfersFrom(fromStop));
   }
 
   /** The number of paths stored under exactly the given user preferences. */
   int size(AbstractUserPreferences<?> userPreferences) {
-    return pathsByUserPreferences
-      .getOrDefault(userPreferences, Map.of())
-      .values()
-      .stream()
-      .mapToInt(Map::size)
-      .sum();
+    var paths = pathsByUserPreferences.get(userPreferences);
+    return paths == null ? 0 : paths.size();
   }
 
   /**
