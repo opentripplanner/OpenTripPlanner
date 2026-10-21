@@ -146,7 +146,6 @@ public sealed class ParetoSet<T> extends AbstractCollection<T> permits ParetoSet
 
     // Quick shortcut, one element probably dominate most of the new elements
     if (goodElement != null && leftVectorDominatesRightVector(goodElement, newValue)) {
-      notifyElementRejected(newValue, goodElement);
       return false;
     }
 
