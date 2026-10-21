@@ -19,7 +19,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  */
 public class DefaultRegularTransferBuildRepository<P> implements RegularTransferBuildRepository<P> {
 
-  private final TransferPathMap<P> paths = new TransferPathMap<>();
+  private final TemplatePathsByUserProfile<P> paths = new TemplatePathsByUserProfile<>();
 
   /**
    * Set when this repository is converted into the initial runtime snapshot. Not serialized, a

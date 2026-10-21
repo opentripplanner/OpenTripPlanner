@@ -9,7 +9,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created from the build repository or by
- * {@link DefaultRegularTransferRepository#freeze()}. The snapshot owns its {@link TransferPathMap},
+ * {@link DefaultRegularTransferRepository#freeze()}. The snapshot owns its {@link TemplatePathsByUserProfile},
  * which is never written to after creation. Hence, the paths are effectively immutable and safe to
  * read from any number of request threads. The transfer-service cache is the only mutable state,
  * and it is thread-safe.
@@ -18,11 +18,11 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  */
 class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepositorySnapshot<P> {
 
-  private final TransferPathMap<P> paths;
+  private final TemplatePathsByUserProfile<P> paths;
   private final RegularTransferServiceCache transferServiceCache =
     new RegularTransferServiceCache();
 
-  DefaultRegularTransferRepositorySnapshot(TransferPathMap<P> paths) {
+  DefaultRegularTransferRepositorySnapshot(TemplatePathsByUserProfile<P> paths) {
     this.paths = paths;
   }
 

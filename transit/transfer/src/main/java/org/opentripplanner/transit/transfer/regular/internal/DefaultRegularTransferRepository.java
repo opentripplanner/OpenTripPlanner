@@ -8,21 +8,21 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * Default {@link RegularTransferRepository}. A new instance is created for each transaction that
  * writes transfers - initialized from the last committed snapshot - and is only accessed on the
  * single writer thread. Neither creating it nor {@link #freeze()} copies the whole path map, see
- * {@link TransferPathMap}.
+ * {@link TemplatePathsByUserProfile}.
  *
  * @param <P> the transfer path/template type
  */
 class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P> {
 
-  private final TransferPathMap<P> paths;
+  private final TemplatePathsByUserProfile<P> paths;
 
   /** Create an empty repository. */
   DefaultRegularTransferRepository() {
-    this(new TransferPathMap<>());
+    this(new TemplatePathsByUserProfile<>());
   }
 
   /** Create a repository initialized with the paths of a snapshot. */
-  DefaultRegularTransferRepository(TransferPathMap<P> paths) {
+  DefaultRegularTransferRepository(TemplatePathsByUserProfile<P> paths) {
     this.paths = paths.copy();
   }
 

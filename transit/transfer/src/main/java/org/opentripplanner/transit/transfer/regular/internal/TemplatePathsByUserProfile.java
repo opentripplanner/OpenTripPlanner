@@ -25,18 +25,18 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  *
  * @param <P> the transfer path/template type
  */
-final class TransferPathMap<P> implements Serializable {
+final class TemplatePathsByUserProfile<P> implements Serializable {
 
   private final Map<
     AbstractUserPreferences<?>,
     Map<Integer, Map<Integer, P>>
   > pathsByUserPreferences;
 
-  TransferPathMap() {
+  TemplatePathsByUserProfile() {
     this(new HashMap<>());
   }
 
-  private TransferPathMap(
+  private TemplatePathsByUserProfile(
     Map<AbstractUserPreferences<?>, Map<Integer, Map<Integer, P>>> pathsByUserPreferences
   ) {
     this.pathsByUserPreferences = pathsByUserPreferences;
@@ -47,12 +47,12 @@ final class TransferPathMap<P> implements Serializable {
    * modified, so they are shared, not copied. A write to the copy never changes this map, and the
    * other way around.
    */
-  TransferPathMap<P> copy() {
+  TemplatePathsByUserProfile<P> copy() {
     var copy = new HashMap<AbstractUserPreferences<?>, Map<Integer, Map<Integer, P>>>();
     pathsByUserPreferences.forEach((userPreferences, byFromStop) ->
       copy.put(userPreferences, new HashMap<>(byFromStop))
     );
-    return new TransferPathMap<>(copy);
+    return new TemplatePathsByUserProfile<>(copy);
   }
 
   /**

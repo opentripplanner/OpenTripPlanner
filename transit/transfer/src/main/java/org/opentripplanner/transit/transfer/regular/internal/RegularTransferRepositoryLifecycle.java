@@ -11,7 +11,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySna
  * a new immutable snapshot is published when the transaction commits. Edits made to a repository
  * that is never frozen are simply discarded, so a failed transaction rolls back cleanly.
  * <p>
- * Neither direction copies the whole path map, see {@link TransferPathMap}. The initial snapshot is
+ * Neither direction copies the whole path map, see {@link TemplatePathsByUserProfile}. The initial snapshot is
  * created from the build repository, see {@link RegularTransferBuildRepository#createInitialSnapshot}.
  *
  * @param <P> the transfer path/template type
