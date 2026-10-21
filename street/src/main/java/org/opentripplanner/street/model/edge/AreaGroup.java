@@ -52,8 +52,8 @@ public class AreaGroup implements Serializable {
 
   /**
    * Append a vertex discovered during permanent transit-stop linking. This is the only
-   * post-construction mutation allowed on AreaGroup; it ensures future linking operations
-   * can reach this vertex without re-linking the entire area.
+   * post-construction mutation allowed on AreaGroup; it ensures future linking operations can reach
+   * this vertex without re-linking the entire area.
    */
   public void addVisibilityVertex(IntersectionVertex vertex) {
     visibilityVertices.add(vertex);

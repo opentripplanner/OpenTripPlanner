@@ -9,9 +9,9 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * Filter itineraries based on generalizedCost, compared with an on-street-all-the-way itinerary
- * (if it exists). If an itinerary cost exceeds the limit computed from the best
- * all-the-way-on-street itinerary, then the transit itinerary is removed.
+ * Filter itineraries based on generalizedCost, compared with an on-street-all-the-way itinerary (if
+ * it exists). If an itinerary cost exceeds the limit computed from the best all-the-way-on-street
+ * itinerary, then the transit itinerary is removed.
  */
 public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
@@ -24,7 +24,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
 
   /**
    * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
-   * @param costLimitFunction the cost limit function to use with the filter
+   *
+   * @param costLimitFunction       the cost limit function to use with the filter
    * @param generalizedCostMaxLimit this limit is not null when paging is used
    */
   public RemoveTransitIfStreetOnlyIsBetter(
@@ -36,8 +37,9 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   }
 
   /**
-   * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
-   * to know which filters removed
+   * Required for
+   * {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain}, to know
+   * which filters removed
    */
   public static final String TAG = "transit-vs-street-filter";
 

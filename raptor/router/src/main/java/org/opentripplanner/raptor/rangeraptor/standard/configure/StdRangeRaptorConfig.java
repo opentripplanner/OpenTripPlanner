@@ -124,7 +124,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   *  Cache best times; request scope
+   * Cache best times; request scope
    */
   private BestTimes resolveBestTimes() {
     if (bestTimes == null) {

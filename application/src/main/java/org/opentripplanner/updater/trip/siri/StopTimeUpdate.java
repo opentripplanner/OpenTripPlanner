@@ -4,15 +4,15 @@ import javax.annotation.Nullable;
 
 /**
  * Represents a real-time SIRI update for a single stop within a trip, encapsulating both scheduled
- * and real-time arrival and departure times. This class provides the means to calculate arrival
- * and departure delays based on the difference between scheduled and real-time times.
+ * and real-time arrival and departure times. This class provides the means to calculate arrival and
+ * departure delays based on the difference between scheduled and real-time times.
  *
- * A value of {@code null} is used to indicate that a real-time time is missing or unavailable.
- * When real-time data is absent, the scheduled time is used as a fallback. For the first stop
- * in a trip, if the real-time arrival time is missing, the real-time departure time is used
- * as a fallback before resorting to the scheduled arrival time. Similarly, for the last stop,
- * if the real-time departure time is missing, the real-time arrival time is used before
- * falling back to the scheduled departure time.
+ * A value of {@code null} is used to indicate that a real-time time is missing or unavailable. When
+ * real-time data is absent, the scheduled time is used as a fallback. For the first stop in a trip,
+ * if the real-time arrival time is missing, the real-time departure time is used as a fallback
+ * before resorting to the scheduled arrival time. Similarly, for the last stop, if the real-time
+ * departure time is missing, the real-time arrival time is used before falling back to the
+ * scheduled departure time.
  */
 class StopTimeUpdate {
 

@@ -31,8 +31,8 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * minSlack is 10 min and maxSlack is 45 minutes.
  * <p>
- * Search from C to B at 13:15 (first arrival + minSlack) gives 3 results s2i1, s2i2 and s2i3. s2i1
- * departures at 13:15, s2i2 departures at 13:45 and s2i3 departures at 14:30
+ * Search from C to B at 13:15 (first arrival + minSlack) gives 3 results s2i1, s2i2 and s2i3.
+ * s2i1 departures at 13:15, s2i2 departures at 13:45 and s2i3 departures at 14:30
  * <p>
  * s1i1 should be combined with s2i1 and s2i2. Not s2i3 because maxSlack gives that it shold not
  * match departures after 13:45 (first arrival + maxSlack).

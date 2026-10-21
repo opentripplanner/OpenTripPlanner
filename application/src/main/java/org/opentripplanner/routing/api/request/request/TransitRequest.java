@@ -12,10 +12,9 @@ import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Represents a transit request with various configuration options such as
- * banned trips, preferred/unpreferred agencies, and routes, as well as
- * filters and debugging capabilities. This class is designed to allow for
- * customization of transit-related searches.
+ * Represents a transit request with various configuration options such as banned trips,
+ * preferred/unpreferred agencies, and routes, as well as filters and debugging capabilities. This
+ * class is designed to allow for customization of transit-related searches.
  */
 public class TransitRequest implements Serializable {
 
@@ -75,9 +74,9 @@ public class TransitRequest implements Serializable {
   }
 
   /**
-   * A unique group-id is assigned to all patterns grouped by matching select and agency.
-   * In other words, two patterns matching the same select and with the same agency-id
-   * will get the same group-id.
+   * A unique group-id is assigned to all patterns grouped by matching select and agency. In other
+   * words, two patterns matching the same select and with the same agency-id will get the same
+   * group-id.
    * <p>
    * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
    */

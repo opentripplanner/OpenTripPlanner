@@ -52,6 +52,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -147,6 +148,7 @@ public class ConstantsForTests {
     try {
       var graph = new Graph();
       var transitRepository = new TransitRepository(new SiteRepository());
+      var timetableDataImport = new TimetableDataImport();
       var fareFactory = new GtfsFareServiceFactory();
       // Add street data from OSM
       {
@@ -160,10 +162,17 @@ public class ConstantsForTests {
       }
       // Add transit data from GTFS
       {
-        addGtfsToGraph(graph, transitRepository, PORTLAND_GTFS, fareFactory, "prt");
+        addGtfsToGraph(
+          graph,
+          transitRepository,
+          timetableDataImport,
+          PORTLAND_GTFS,
+          fareFactory,
+          "prt"
+        );
       }
       // Link transit stops to streets
-      TestStreetLinkerModule.link(graph, transitRepository);
+      TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
       // Add elevation data
       if (withElevation) {
@@ -182,6 +191,7 @@ public class ConstantsForTests {
       new DirectTransferGenerator(
         graph,
         transitRepository,
+        timetableDataImport,
         transferRepository,
         DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
@@ -190,7 +200,13 @@ public class ConstantsForTests {
 
       graph.index();
 
-      return new TestOtpModel(graph, transitRepository, transferRepository, fareFactory);
+      return new TestOtpModel(
+        graph,
+        transitRepository,
+        timetableDataImport,
+        transferRepository,
+        fareFactory
+      );
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -201,6 +217,7 @@ public class ConstantsForTests {
       var siteRepository = new SiteRepository();
       var graph = new Graph();
       var transitRepository = new TransitRepository(siteRepository);
+      var timetableDataImport = new TimetableDataImport();
       // Add street data from OSM
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
@@ -226,7 +243,7 @@ public class ConstantsForTests {
       } else {
         transferRepository = TransferServiceTestFactory.defaultTransferRepository();
       }
-      return new TestOtpModel(graph, transitRepository, transferRepository);
+      return new TestOtpModel(graph, transitRepository, timetableDataImport, transferRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -238,13 +255,18 @@ public class ConstantsForTests {
     addGtfsToGraph(
       otpModel.graph(),
       otpModel.transitRepository(),
+      otpModel.timetableDataImport(),
       gtfsPath,
       new GtfsFareServiceFactory(),
       null
     );
 
     // Link transit stops to streets
-    TestStreetLinkerModule.link(otpModel.graph(), otpModel.transitRepository());
+    TestStreetLinkerModule.link(
+      otpModel.graph(),
+      otpModel.transitRepository(),
+      otpModel.timetableDataImport()
+    );
 
     return otpModel;
   }
@@ -257,9 +279,23 @@ public class ConstantsForTests {
     var siteRepository = new SiteRepository();
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
+    var timetableDataImport = new TimetableDataImport();
     var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
-    addGtfsToGraph(graph, transitRepository, gtfsFile, fareServiceFactory, null);
-    return new TestOtpModel(graph, transitRepository, transferRepository, fareServiceFactory);
+    addGtfsToGraph(
+      graph,
+      transitRepository,
+      timetableDataImport,
+      gtfsFile,
+      fareServiceFactory,
+      null
+    );
+    return new TestOtpModel(
+      graph,
+      transitRepository,
+      timetableDataImport,
+      transferRepository,
+      fareServiceFactory
+    );
   }
 
   public static TestOtpModel buildNewMinimalNetexGraph() {
@@ -269,6 +305,7 @@ public class ConstantsForTests {
       var parkingRepository = new DefaultVehicleParkingRepository();
       var graph = new Graph();
       var transitRepository = new TransitRepository(siteRepository);
+      var timetableDataImport = new TimetableDataImport();
       var streetDetailsRepository = new DefaultStreetDetailsRepository();
       // Add street data from OSM
       {
@@ -295,6 +332,7 @@ public class ConstantsForTests {
           .createNetexModule(
             sources,
             transitRepository,
+            timetableDataImport,
             parkingRepository,
             streetDetailsRepository,
             graph,
@@ -304,11 +342,12 @@ public class ConstantsForTests {
           .buildGraph();
       }
       // Link transit stops to streets
-      TestStreetLinkerModule.link(graph, transitRepository);
+      TestStreetLinkerModule.link(graph, transitRepository, timetableDataImport);
 
       return new TestOtpModel(
         graph,
         transitRepository,
+        timetableDataImport,
         TransferServiceTestFactory.defaultTransferRepository()
       );
     } catch (Exception e) {
@@ -319,6 +358,7 @@ public class ConstantsForTests {
   public static void addGtfsToGraph(
     Graph graph,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     File file,
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
@@ -328,6 +368,7 @@ public class ConstantsForTests {
     var module = new GtfsModule(
       List.of(bundle),
       transitRepository,
+      timetableDataImport,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),

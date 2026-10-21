@@ -29,9 +29,10 @@ public class TripLocationResolver {
 
   /**
    * Resolve a {@link LocationInTripPatternReference} from timetable data.
+   *
    * @param tripAndServiceDate The trip and service date for this location.
-   * @param stopOrStationId The stop or station id. The stop can be a regular stop or station,
-   *                        but not a multimodal stop or a group of stops.
+   * @param stopOrStationId    The stop or station id. The stop can be a regular stop or station,
+   *                           but not a multimodal stop or a group of stops.
    * @param aimedDepartureTime An optional departure time used to disambiguate for trip's that pass
    *                           by the same stop multiple times - forming a ring line. When provided,
    *                           it must match the actual departure time of the stop exactly.
@@ -122,8 +123,8 @@ public class TripLocationResolver {
   }
 
   /**
-   * If targetSeconds is non-null, only stops with a matching scheduled departure time are
-   * returned, otherwise all stops matching the stop or station id are returned.
+   * If targetSeconds is non-null, only stops with a matching scheduled departure time are returned,
+   * otherwise all stops matching the stop or station id are returned.
    */
   private List<LocationInTripPatternReference> matchingLocations(
     TripPattern tripPattern,

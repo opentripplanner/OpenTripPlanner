@@ -19,8 +19,8 @@ public record TestCaseDefinition(
   GenericLocation toPlace,
   @Nullable VisitViaLocation viaLocation,
   /**
-   * A test case can be grouped into a category used to group similar cases, like "Flex" or
-   * "Long Distance".
+   * A test case can be grouped into a category used to group similar cases, like "Flex" or "Long
+   * Distance".
    */
   String category,
   QualifiedModeSet modes
@@ -50,8 +50,8 @@ public record TestCaseDefinition(
   }
 
   /**
-   * Return a short unique descriptive text for this test-case definition. The returned string is
-   * a combination of {@code id} and {@code description}.
+   * Return a short unique descriptive text for this test-case definition. The returned string is a
+   * combination of {@code id} and {@code description}.
    */
   public String idAndDescription() {
     return id + " " + description;

@@ -65,11 +65,10 @@ class DouglasPeuckerAlgorithmTest {
     assertEquals(route.getEndPoint().getCoordinate(), simplified.getEndPoint().getCoordinate());
   }
 
-  /// At 60 degrees latitude a degree of longitude covers about half as many meters as a degree
-  /// of latitude. A naive lat-only meters-to-degrees conversion would treat this east-west
-  /// zigzag (deliberately deviating in longitude only) as almost twice as far from the line as
-  /// it really is, and fail to simplify it despite the real-world deviation being well within
-  /// tolerance.
+  /// At 60 degrees latitude a degree of longitude covers about half as many meters as a degree of
+  /// latitude. A naive lat-only meters-to-degrees conversion would treat this east-west zigzag
+  /// (deliberately deviating in longitude only) as almost twice as far from the line as it really
+  /// is, and fail to simplify it despite the real-world deviation being well within tolerance.
   @Test
   void simplifyAccountsForLongitudeDegreesShrinkingAwayFromEquator() {
     var start = new Coordinate(60.0, 60.0);
@@ -94,12 +93,12 @@ class DouglasPeuckerAlgorithmTest {
       .containsExactly(start, end);
   }
 
-  /// A spike that overshoots past `end` while staying on (near) the same bearing as the
-  /// start-end chord is the classic Douglas-Peucker failure mode: measured against the
-  /// *infinite line* through start/end, the spike looks colinear (~0 distance) no matter how
-  /// far out it goes, so a naive implementation erases it at any tolerance. Measuring against
-  /// the *segment* instead - clamping the projection to [start, end] - fixes this: the spike's
-  /// distance becomes the real distance to the nearest endpoint, so it survives.
+  /// A spike that overshoots past `end` while staying on (near) the same bearing as the start-end
+  /// chord is the classic Douglas-Peucker failure mode: measured against the *infinite line* through
+  /// start/end, the spike looks colinear (~0 distance) no matter how far out it goes, so a naive
+  /// implementation erases it at any tolerance. Measuring against the *segment* instead - clamping
+  /// the projection to [start, end] - fixes this: the spike's distance becomes the real distance to
+  /// the nearest endpoint, so it survives.
   @Test
   void simplifyKeepsASpikeThatOvershootsPastTheChordEndpoint() {
     var start = new WgsCoordinate(60.0, 10.0);

@@ -135,8 +135,8 @@ public class DurationUtils {
 
   /**
    * This is used to parse a string which may be a number {@code NNNN}(number of seconds) or a
-   * duration with format {@code NhNmNs}, where {@code N} is a decimal number and
-   * {@code h} is hours, {@code m} minutes and {@code s} seconds.
+   * duration with format {@code NhNmNs}, where {@code N} is a decimal number and {@code h} is
+   * hours, {@code m} minutes and {@code s} seconds.
    * <p>
    * This method
    */
@@ -273,8 +273,8 @@ public class DurationUtils {
    * <p>
    * Background: There are multiple ways to express -1.5 hours: "PT-1H-30M" and "-PT1H30M".
    * <p>
-   * The first version is what you get when calling toString() but it's quite confusing. Therefore,
-   * this method makes sure that you get the second form "-PT1H30M".
+   * The first version is what you get when calling toString() but it's quite confusing.
+   * Therefore, this method makes sure that you get the second form "-PT1H30M".
    */
   public static String formatDurationWithLeadingMinus(Duration duration) {
     if (duration.isNegative()) {

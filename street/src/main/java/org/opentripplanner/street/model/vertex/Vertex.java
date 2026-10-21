@@ -162,9 +162,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
-   *  Every vertex has a label which is globally unique.
+   * Every vertex has a label which is globally unique.
    * <p>
-   *  The name "label" is taken from graph theory: https://en.wikipedia.org/wiki/Graph_labeling
+   * The name "label" is taken from graph theory: https://en.wikipedia.org/wiki/Graph_labeling
    */
   public abstract VertexLabel getLabel();
 
@@ -188,14 +188,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
-   * If applying turn restrictions to a graph has generated multiple instances of a vertex,
-   * one of them is the parent, and the others are subsidiary vertices. Calling getParent()
-   * on any of these will always return the same parent, which is used for example for
-   * Edge.isReverseOf(Edge), so that it does not have to operate on geographical coordinates
-   * and trust them for equality.
+   * If applying turn restrictions to a graph has generated multiple instances of a vertex, one of
+   * them is the parent, and the others are subsidiary vertices. Calling getParent() on any of these
+   * will always return the same parent, which is used for example for Edge.isReverseOf(Edge), so
+   * that it does not have to operate on geographical coordinates and trust them for equality.
    *
-   * @return The representative parent Vertex of a group of vertices that are same for
-   *         most purposes.
+   * @return The representative parent Vertex of a group of vertices that are same for most
+   *         purposes.
    */
   public Vertex getParent() {
     return this;
@@ -254,6 +253,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   /**
    * Compare two vertices and return {@code true} if they are close together - have the same
    * location.
+   *
    * @see WgsCoordinate#sameLocation(WgsCoordinate)
    **/
   public boolean sameLocation(Vertex other) {
@@ -317,8 +317,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
-   * A helper method to avoid repeated code for outgoing and incoming lists. Synchronization
-   * must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
+   * A helper method to avoid repeated code for outgoing and incoming lists. Synchronization must be
+   * handled by the caller, to avoid passing edge array pointers that may be invalidated.
    */
   private Edge[] removeEdge(Edge[] existing, Edge e) {
     int nfound = 0;

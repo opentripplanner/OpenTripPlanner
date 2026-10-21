@@ -7,7 +7,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.configure.StaticTransitService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This module builds the Lucene geocoder based on whether the feature flag is on or off.
@@ -19,11 +20,11 @@ public class GeocoderModule {
   @Singleton
   @Nullable
   LuceneIndex luceneIndex(
-    TransitRepository transitRepository,
+    @StaticTransitService TransitService transitService,
     @Nullable StopConsolidationService stopConsolidationService
   ) {
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
-      return new LuceneIndex(transitRepository, stopConsolidationService);
+      return new LuceneIndex(transitService, stopConsolidationService);
     } else {
       return null;
     }

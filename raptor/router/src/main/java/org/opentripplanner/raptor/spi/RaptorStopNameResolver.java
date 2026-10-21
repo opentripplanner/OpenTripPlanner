@@ -16,7 +16,7 @@ public interface RaptorStopNameResolver {
    * Translate the raptor stop index to a string representation for the stop. The returned string
    * should be human-readable and contain enough information to identify the stop in most cases.
    * <p>
-   * Example: {@code "Waterloo Station(22334)"}  (name and raptor index)
+   * Example: {@code "Waterloo Station(22334)"} (name and raptor index)
    * <p>
    * The text is used for logging and debugging, and is not called during normal operation.
    */

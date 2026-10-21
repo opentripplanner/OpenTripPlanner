@@ -19,8 +19,8 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListenerComposite
 /// - updating next via connection event
 /// - updating destination path collection using egress paths.
 ///
-/// If the debugger is not done first, then the logging will be strange -> events
-/// arriving at the destination, before arriving at the egress stop.
+/// If the debugger is not done first, then the logging will be strange -> events arriving at the
+/// destination, before arriving at the egress stop.
 public class McArrivalsEventListenerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandlerFactory<T> debugHandlerFactory;

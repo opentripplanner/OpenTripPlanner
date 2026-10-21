@@ -41,6 +41,7 @@ import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferPara
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
+import org.opentripplanner.standalone.config.buildconfig.BoardingLocationsConfig;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
@@ -64,16 +65,16 @@ import tools.jackson.databind.node.MissingNode;
 /**
  * This class is an object representation of the 'build-config.json'.
  * <p>
- * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from the
- * RouterParameters which can be applied to a pre-built graph or on the fly at runtime. Eventually
- * both classes may be initialized from the same config file so make sure there is no overlap in the
- * JSON keys used.
+ * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from
+ * the RouterParameters which can be applied to a pre-built graph or on the fly at runtime.
+ * Eventually both classes may be initialized from the same config file so make sure there is no
+ * overlap in the JSON keys used.
  * <p>
  * These used to be command line parameters, but there were getting to be too many of them and
  * besides, we want to allow different graph build configuration for each Graph.
  * <p>
- * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
- * is the build configuration and the other is the router configuration.
+ * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of
+ * which is the build configuration and the other is the router configuration.
  */
 public class BuildConfig implements OtpDataStoreConfig {
 
@@ -128,6 +129,8 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean areaVisibility;
 
+  public final BoardingLocationsConfig boardingLocations;
+
   public final boolean platformEntriesLinking;
 
   /** See {@link S3BucketConfig}. */
@@ -176,12 +179,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final double maxStopToShapeSnapDistance;
 
   /**
-   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code 0}
-   * (the default when not set) disables simplification.
+   * Douglas-Peucker simplification tolerance for transit route shapes, in meters. {@code 0} (the
+   * default when not set) disables simplification.
    */
   private final double transitShapeSimplificationToleranceMeters;
 
-  public final Set<String> boardingLocationTags;
   public final List<CompoundRefTagGroup> elevatorRefTags;
   private final GraphBuildCacheConfig cache;
   public final DemExtractParametersList dem;
@@ -235,6 +237,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asBoolean(false);
+    this.boardingLocations = BoardingLocationsConfig.fromConfig(root);
     this.cache = GraphBuildCacheConfig.fromConfig(root);
     this.configVersion = root
       .of("configVersion")
@@ -535,14 +538,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       .since(V1_5)
       .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
       .asInt(2000);
-    this.boardingLocationTags = root
-      .of("boardingLocationTags")
-      .since(V2_2)
-      .summary(
-        "What OSM tags should be looked on for the source of matching stops to platforms and stops."
-      )
-      .description("[Detailed documentation](BoardingLocations.md)")
-      .asStringSet(List.copyOf(Set.of("ref")));
     elevatorRefTags = root
       .of("elevatorRefTags")
       .since(V2_10)

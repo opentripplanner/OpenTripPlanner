@@ -88,11 +88,10 @@ public class TripTimeOnDate {
 
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
-   * StopPatterns.
-   * <br>
+   * StopPatterns. <br>
    * If the timetable does not contain the trip, scheduledTimetable is used instead.
    *
-   * @param table the timetable for the service day
+   * @param table       the timetable for the service day
    * @param serviceDate service day to set
    */
   public static List<TripTimeOnDate> fromTripTimesWithScheduleFallback(
@@ -115,11 +114,10 @@ public class TripTimeOnDate {
 
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
-   * StopPatterns.
-   * <br>
+   * StopPatterns. <br>
    * The timetable given must correspond to the service day so that it must contain the trip.
    *
-   * @param table the timetable for the service day
+   * @param table       the timetable for the service day
    * @param serviceDate service day to set
    */
   public static List<TripTimeOnDate> fromTripTimes(
@@ -171,7 +169,8 @@ public class TripTimeOnDate {
   }
 
   /**
-   * A comparator that uses real time departure if it is available, otherwise the scheduled departure.
+   * A comparator that uses real time departure if it is available, otherwise the scheduled
+   * departure.
    */
   public static Comparator<TripTimeOnDate> compareByDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
@@ -222,8 +221,8 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns true if there is either a scheduled arrival or a scheduled departure time.
-   * If neither is the case, this indicates that it's a flexible time window instead.
+   * Returns true if there is either a scheduled arrival or a scheduled departure time. If neither
+   * is the case, this indicates that it's a flexible time window instead.
    */
   public boolean hasScheduledTimes() {
     return (
@@ -457,8 +456,8 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the previous {@code count} stop times in the trip. If it's the first stop in the trip, it returns an
-   * empty list.
+   * Returns the previous {@code count} stop times in the trip. If it's the first stop in the trip,
+   * it returns an empty list.
    */
   public List<TripTimeOnDate> previousTimes(int count) {
     count = Math.min(count, stopPosition);
@@ -469,14 +468,16 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the next stop times in the trip. If it's the last stop in the trip it returns an empty list.
+   * Returns the next stop times in the trip. If it's the last stop in the trip it returns an empty
+   * list.
    */
   public List<TripTimeOnDate> nextTimes() {
     return nextTimes(tripTimes.getNumStops() - stopPosition - 1);
   }
 
   /**
-   * Returns the next {@code count} stop times in the trip. If it's the last stop in the trip it returns an empty list.
+   * Returns the next {@code count} stop times in the trip. If it's the last stop in the trip it
+   * returns an empty list.
    */
   public List<TripTimeOnDate> nextTimes(int count) {
     count = Math.min(count, tripTimes.getNumStops() - stopPosition - 1);

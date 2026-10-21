@@ -18,7 +18,8 @@ public class ClientCredentialsRequest {
 
   /**
    * Converts this object to application/x-www-form-urlencoded format ("name1=value1&name2=value2").
-   * (There should be no need to url-encode as there are no special characters in the values passed.)
+   * (There should be no need to url-encode as there are no special characters in the values
+   * passed.)
    */
   public String toRequestParamString() {
     return String.format(

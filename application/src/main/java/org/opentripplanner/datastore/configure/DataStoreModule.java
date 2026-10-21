@@ -21,12 +21,12 @@ import org.opentripplanner.datastore.https.HttpsDataSourceRepository;
  * This is the global access point to create a data store and create datasource objects(tests). It
  * uses a build pattern to configure the data store before creating it.
  * <p>
- * Note that opening a data store should not download or open any data sources, only fetch meta-data
- * to figure out what data is available. A data source is accessed (lazy) using streams.
+ * Note that opening a data store should not download or open any data sources, only fetch
+ * meta-data to figure out what data is available. A data source is accessed (lazy) using streams.
  * <p>
- * The only available data store is using the local file system to fetch data, but it is designed so
- * individual forks of OTP can provide their own implementation to fetch data from the cloud, mixed
- * with file access.
+ * The only available data store is using the local file system to fetch data, but it is designed
+ * so individual forks of OTP can provide their own implementation to fetch data from the cloud,
+ * mixed with file access.
  * <p>
  * Implementation details. This class should contain minimal amount of business logic, delegating
  * all tasks to the underlying implementations.

@@ -305,7 +305,7 @@ public final class VehicleRentalStation implements VehicleRentalPlace {
 
   /**
    * @return Counts of available vehicle spaces by type as well as the total number of available
-   * vehicle spaces.
+   *         vehicle spaces.
    */
   public RentalVehicleEntityCounts vehicleSpaceCounts() {
     return new RentalVehicleEntityCounts(

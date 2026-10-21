@@ -6,8 +6,8 @@ import org.opentripplanner.street.search.state.State;
 
 /**
  * Intercepts rental edge traversals to enforce geofencing zone restrictions. Called from
- * {@code StreetEdge.traverse()} — returns {@code State[]} to override the normal traversal,
- * or {@code null} to let it proceed.
+ * {@code StreetEdge.traverse()} — returns {@code State[]} to override the normal traversal, or
+ * {@code null} to let it proceed.
  */
 public class GeofencingInterceptor {
 

@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
  * copy the values they need and resolve the arrival chain (the previous arrivals) when they are
  * created. A view is a snapshot, it stays valid after the state is changed and can be stored, for
  * example as part of a destination arrival.
- * <p/>
+ * <p>
  * The design was originally done to support the FLyweight design pattern.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.

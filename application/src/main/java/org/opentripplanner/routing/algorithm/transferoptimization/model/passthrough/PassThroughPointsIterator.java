@@ -5,8 +5,8 @@ import java.util.List;
 import org.opentripplanner.raptor.api.request.via.RaptorViaLocation;
 
 /**
- * Iterate over the pass-through points. Note! This implementation iterates backwards starting at the last
- * pass-through point.
+ * Iterate over the pass-through points. Note! This implementation iterates backwards starting at
+ * the last pass-through point.
  */
 class PassThroughPointsIterator {
 

@@ -4,8 +4,8 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
 /**
- * A trip in a taxi provider feed did not satisfy the data requirements for taxi trips
- * and was therefore skipped.
+ * A trip in a taxi provider feed did not satisfy the data requirements for taxi trips and was
+ * therefore skipped.
  */
 public record TaxiTripSkipped(FeedScopedId tripId, String reason) implements DataImportIssue {
   private static final String REQUIREMENTS_URL =

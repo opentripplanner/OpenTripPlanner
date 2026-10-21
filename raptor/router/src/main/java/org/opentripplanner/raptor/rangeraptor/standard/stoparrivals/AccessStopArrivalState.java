@@ -6,9 +6,9 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * This class is responsible for adding access functionality, which the {@link
- * DefaultStopArrivalState} ignore. It is injected into the state matrix when new accesses come into
- * play (right round for flex and right iteration for time-restricted access, yet to be
+ * This class is responsible for adding access functionality, which the
+ * {@link DefaultStopArrivalState} ignore. It is injected into the state matrix when new accesses
+ * come into play (right round for flex and right iteration for time-restricted access, yet to be
  * implemented). We do this to keep the default state simple and small. This way we use less memory.
  * We use a delegate pattern and not inheritance, because this allows to decorate an egress state as
  * well as the default state. There are relatively few access states, so the memory and performance

@@ -378,7 +378,8 @@ public class EstimatedCallType {
     );
   }
 
-  /// Determines the RealTimeState for the specific stop, if NO_DATA on Stop its RealTimeState is regarded as "Scheduled"
+  /// Determines the RealTimeState for the specific stop, if NO_DATA on Stop its RealTimeState is
+  /// regarded as "Scheduled"
   private static TransmodelRealTimeState getRealtimeStateOnStop(DataFetchingEnvironment env) {
     TripTimeOnDate tripTimeOnDate = env.getSource();
     return tripTimeOnDate.isNoDataStop()
@@ -386,8 +387,8 @@ public class EstimatedCallType {
       : RealtimeStateMapper.map(tripTimeOnDate.getTripTimes());
   }
 
-  /// Same as [#calcTime(TripTimeOnDate, ToIntFunction)]. If the offset is `-1`, this
-  /// method returns `null`.
+  /// Same as [#calcTime(TripTimeOnDate, ToIntFunction)]. If the offset is `-1`, this method
+  /// returns `null`.
   @Nullable
   private static Long calcTimeOptional(
     DataFetchingEnvironment env,

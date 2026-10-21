@@ -25,6 +25,7 @@ import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.ReplacedJourneys_RelStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.rutebanken.netex.model.VehicleTypeRefStructure;
 
 class TripPatternMapperTest {
@@ -133,12 +134,7 @@ class TripPatternMapperTest {
     ReplacedJourneys_RelStructure replacedJourneys = new ReplacedJourneys_RelStructure();
     replacedJourneys
       .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
-      .add(
-        MappingSupport.createWrappedRef(
-          dsjReplaced.getId(),
-          org.rutebanken.netex.model.VehicleJourneyRefStructure.class
-        )
-      );
+      .add(MappingSupport.createWrappedRef(dsjReplaced.getId(), VehicleJourneyRefStructure.class));
     dsjReplacing.withReplacedJourneys(replacedJourneys);
     Optional<TripPatternMapperResult> res = mapTripPattern(sample);
 

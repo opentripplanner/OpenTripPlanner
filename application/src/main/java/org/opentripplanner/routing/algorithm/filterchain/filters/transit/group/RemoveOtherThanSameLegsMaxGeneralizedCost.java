@@ -13,8 +13,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This filter removes itineraries, which use the same trips for most of their legs, but where some
- * itineraries have a much higher cost for the other legs. This is similar to {@link
- * org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
+ * itineraries have a much higher cost for the other legs. This is similar to
+ * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
  * but is used together with {@link GroupByFilter} to filter within the groups.
  *
  * <h3>Example</h3>
@@ -27,10 +27,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * </pre>
  *
  * <ul>
- * <li>Min cost common legs: a=$42</li>
- * <li>Min cost all itineraries: b=$79</li>
- * <li>maxLimit = a + (b - a) * f = 42 + 37 * 1.05 = 81</li>
- * <li><b>Result:</b> Keep itinerary A, and drop B ($83 > limit $81)</li>
+ *   <li>Min cost common legs: a=$42</li>
+ *   <li>Min cost all itineraries: b=$79</li>
+ *   <li>maxLimit = a + (b - a) * f = 42 + 37 * 1.05 = 81</li>
+ *   <li><b>Result:</b> Keep itinerary A, and drop B ($83 > limit $81)</li>
  * </ul>
  */
 public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItineraryFlagger {

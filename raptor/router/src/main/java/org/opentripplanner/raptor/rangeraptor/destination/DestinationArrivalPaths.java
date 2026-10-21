@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * The responsibility of this class is to collect result paths for destination arrivals. It does so
  * using a pareto set of {@link DestinationArrival}s. The comparator is passed in as an argument to
  * the constructor, making it possible to collect different sets in different scenarios.
- * <p/>
+ * <p>
  * The {@link DestinationArrival}s are stored in the pareto set, and the paths are built lazily when
  * {@link #listPaths()} is called. This is safe because the arrival chain of a destination arrival
  * is not changed by the search: McRaptor's per-stop pareto sets keep all accepted arrivals

@@ -31,6 +31,7 @@ import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.VehicleTypeRefStructure;
@@ -157,11 +158,11 @@ class TripMapperTest {
       MappingSupport.createWrappedRef(JOURNEY_PATTERN_ID, JourneyPatternRefStructure.class)
     );
 
-    org.rutebanken.netex.model.Route netexRoute = new org.rutebanken.netex.model.Route();
+    Route netexRoute = new Route();
     netexRoute.setLineRef(LINE_REF);
     netexRoute.setId(ROUTE_ID);
 
-    HierarchicalMapById<org.rutebanken.netex.model.Route> routeById = new HierarchicalMapById<>();
+    HierarchicalMapById<Route> routeById = new HierarchicalMapById<>();
     routeById.add(netexRoute);
     HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById =
       new HierarchicalMapById<>();

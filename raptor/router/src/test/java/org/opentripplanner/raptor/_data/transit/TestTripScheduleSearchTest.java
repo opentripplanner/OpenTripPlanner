@@ -16,8 +16,8 @@ import org.opentripplanner.raptor.spi.SearchDirection;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * This tests another test class - we do it to make sure the
- * {@link TestTripScheduleSearch} is following the Raptor SPI contract.
+ * This tests another test class - we do it to make sure the {@link TestTripScheduleSearch} is
+ * following the Raptor SPI contract.
  */
 class TestTripScheduleSearchTest implements RaptorTestConstants {
 

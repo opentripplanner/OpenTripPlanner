@@ -12,9 +12,9 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Assigns a dense int id to every vertex, so that {@link IslandPruningModule} can keep its
- * per-vertex state (adjacency, subgraph membership) in plain arrays. At country scale the graph
- * has millions of vertices and hash map lookups keyed on {@link Vertex} dominate the run time,
- * array access is much cheaper.
+ * per-vertex state (adjacency, subgraph membership) in plain arrays. At country scale the graph has
+ * millions of vertices and hash map lookups keyed on {@link Vertex} dominate the run time, array
+ * access is much cheaper.
  * <p>
  * Ids follow the iteration order of the collection given to the constructor. The index is
  * immutable: looking up a vertex that is not in that collection is an error.

@@ -25,14 +25,14 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.repository.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateException;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class ExtraCallTripBuilder {
 
-  private final TransitService transitService;
+  private final TransitRepository transitRepository;
   private final TimetableRepository buffer;
   private final ZoneId timeZone;
   private final Function<Trip, FeedScopedId> generateTripPatternId;
@@ -52,7 +52,7 @@ class ExtraCallTripBuilder {
 
   ExtraCallTripBuilder(
     EstimatedVehicleJourneyWrapper journey,
-    TransitService transitService,
+    TransitRepository transitRepository,
     TimetableRepository buffer,
     DeduplicatorService deduplicator,
     EntityResolver entityResolver,
@@ -76,15 +76,15 @@ class ExtraCallTripBuilder {
 
     this.calls = journey.calls();
 
-    this.transitService = transitService;
+    this.transitRepository = transitRepository;
     this.generateTripPatternId = generateTripPatternId;
-    timeZone = transitService.getTimeZone();
+    timeZone = transitRepository.getTimeZone();
 
     stopTimesMapper = new StopTimesMapper(entityResolver);
   }
 
   TripUpdate build() throws UpdateException {
-    TripPattern originalPattern = transitService.findPattern(trip);
+    TripPattern originalPattern = buffer.findPattern(trip);
     long numExtraCalls = calls.stream().filter(CallWrapper::isExtraCall).count();
     if (calls.size() - numExtraCalls != originalPattern.numberOfStops()) {
       // A trip update with extra calls is expected to have the same number of non-extra calls as
@@ -148,7 +148,7 @@ class ExtraCallTripBuilder {
     StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, aimedStopTimes, deduplicator).withServiceCode(
-      transitService.getTripCalendars().getServiceCode(trip.getServiceId())
+      buffer.getTripCalendars().getServiceCode(trip.getServiceId())
     );
     // validate the scheduled trip times
     // they are in general superseded by real-time trip times

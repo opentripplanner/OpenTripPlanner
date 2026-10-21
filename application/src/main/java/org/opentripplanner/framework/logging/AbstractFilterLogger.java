@@ -6,24 +6,25 @@ import org.slf4j.Marker;
 /**
  * This class can be used to filter logging events with level:
  * <ul>
- *     <li>INFO</li>
- *     <li>WARNING</li>
- *     <li>ERROR</li>
+ *   <li>INFO</li>
+ *   <li>WARNING</li>
+ *   <li>ERROR</li>
  * </ul>
  * DEBUG and TRACE events are not filtered.
  * <p>
- * The primary use-case for this class is to prevent a spamming the log with the same kind
- * of events. There are two concrete implementations:
+ * The primary use-case for this class is to prevent a spamming the log with the same kind of
+ * events. There are two concrete implementations:
  * <ul>
- *     <li>{@link MaxCountLogger} - Log N events, then mute. This is suitable for data import.</li>
+ *   <li>{@link MaxCountLogger} - Log N events, then mute. This is suitable for data import.</li>
  * </ul>
  *
  * <p>
- * This class wrap the original logger and forward some log events, based on the
- * implementation of the {@link #mute()} method.
+ * This class wrap the original logger and forward some log events, based on the implementation
+ * of the {@link #mute()} method.
  * <p>
+ *
  * @deprecated This hide the actual logger in the log, the AbstractFilterLogger becomes thelogger -
-               this make it difficult to find the log statement in the code when  investigating.
+ *             this make it difficult to find the log statement in the code when investigating.
  */
 @Deprecated
 public abstract class AbstractFilterLogger implements Logger {

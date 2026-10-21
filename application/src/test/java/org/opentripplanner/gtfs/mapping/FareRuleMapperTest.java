@@ -19,8 +19,7 @@ public class FareRuleMapperTest {
   private static final String FEED_ID = "FEED";
   private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
 
-  private static final org.onebusaway.gtfs.model.FareRule FARE_RULE =
-    new org.onebusaway.gtfs.model.FareRule();
+  private static final FareRule FARE_RULE = new FareRule();
 
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 

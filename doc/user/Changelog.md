@@ -34,6 +34,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Convert stream to plain for-loop to speed up RAPTOR data building [#8045](https://github.com/opentripplanner/OpenTripPlanner/pull/8045)
 - Transit shape simplification [#8001](https://github.com/opentripplanner/OpenTripPlanner/pull/8001)
 - Transit shape simplification [#8001](https://github.com/opentripplanner/OpenTripPlanner/pull/8001)
+- Use transit coordinates in boarding location linking [#8015](https://github.com/opentripplanner/OpenTripPlanner/pull/8015)
+- Encapsulate Scheduled Timetable Data and move Ownership to TimetableRepository [#8074](https://github.com/opentripplanner/OpenTripPlanner/pull/8074)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)

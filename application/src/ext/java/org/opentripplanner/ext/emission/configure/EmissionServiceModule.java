@@ -11,8 +11,8 @@ import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
 /**
- * The service is used during application serve phase, not loading, so we need to provide
- * a module for the service without the repository, which is injected from the loading phase.
+ * The service is used during application serve phase, not loading, so we need to provide a module
+ * for the service without the repository, which is injected from the loading phase.
  */
 @Module
 public class EmissionServiceModule {

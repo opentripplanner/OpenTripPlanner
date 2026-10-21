@@ -27,8 +27,8 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   int startTime();
 
   /**
-   * This is the start-time used by Raptor in the pareto-comparison. The time includes the
-   * access time-penalty. This should be used when paths are compared for pareto-optimality.
+   * This is the start-time used by Raptor in the pareto-comparison. The time includes the access
+   * time-penalty. This should be used when paths are compared for pareto-optimality.
    */
   int startTimeInclusivePenalty();
 
@@ -38,8 +38,8 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   int endTime();
 
   /**
-   * This is the end-time used by Raptor in the pareto-comparison. The time includes the
-   * egress time-penalty. This should be used when paths are compared for pareto-optimality.
+   * This is the end-time used by Raptor in the pareto-comparison. The time includes the egress
+   * time-penalty. This should be used when paths are compared for pareto-optimality.
    */
   int endTimeInclusivePenalty();
 
@@ -129,11 +129,10 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   String toStringDetailed(RaptorStopNameResolver stopNameResolver);
 
   /**
-   * Return a text describing the path using the given stop name resolver. The
-   * text returned should focus on being human-readable. Avoid ids, use names
-   * instead. It does not need to identify path 100%, but given a context it
-   * should contain the most important information. It is used in logging and
-   * massively in unit-testing.
+   * Return a text describing the path using the given stop name resolver. The text returned should
+   * focus on being human-readable. Avoid ids, use names instead. It does not need to identify path
+   * 100%, but given a context it should contain the most important information. It is used in
+   * logging and massively in unit-testing.
    */
   String toString(RaptorStopNameResolver stopNameTranslator);
 
