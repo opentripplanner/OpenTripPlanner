@@ -35,7 +35,7 @@ public class TripLocationResolver {
    *                           but not a multimodal stop or a group of stops.
    * @param aimedDepartureTime An optional departure time used to disambiguate for trip's that pass
    *                           by the same stop multiple times - forming a ring line. When provided,
-   *                           it must match the actual departure time of the stop exactly.
+   *                           it must match the scheduled departure time of the stop exactly.
    */
   public LocationInTripPatternReference resolve(
     TripAndServiceDate tripAndServiceDate,
@@ -124,7 +124,8 @@ public class TripLocationResolver {
 
   /**
    * If targetSeconds is non-null, only stops with a matching scheduled departure time are returned,
-   * otherwise all stops matching the stop or station id are returned.
+   * otherwise all stops matching the stop or station id are returned. The boarding time of each
+   * returned location is the departure time including real-time updates.
    */
   private List<LocationInTripPatternReference> matchingLocations(
     TripPattern tripPattern,
@@ -138,11 +139,18 @@ public class TripLocationResolver {
       if (
         stop.getId().equals(stopOrStationId) || stop.getStationOrStopId().equals(stopOrStationId)
       ) {
-        int departureTime = tripTimes.getScheduledDepartureTime(stopPos);
-        if (targetSeconds != null && departureTime != targetSeconds) {
+        if (
+          targetSeconds != null && tripTimes.getScheduledDepartureTime(stopPos) != targetSeconds
+        ) {
           continue;
         }
-        locations.add(new LocationInTripPatternReference(stop.getIndex(), stopPos, departureTime));
+        locations.add(
+          new LocationInTripPatternReference(
+            stop.getIndex(),
+            stopPos,
+            tripTimes.getDepartureTime(stopPos)
+          )
+        );
       }
     }
     return locations;
