@@ -10,6 +10,7 @@
     </module>
     <module name="TreeWalker">
         <module name="ArrayTypeStyle"/>
+        <module name="AvoidModuleImport"/>
         <module name="AvoidStarImport"/>
         <module name="ConstantName">
             <!--Exceptions: underscore followed by lowercase SI unit and a number followed by lowercase x.-->
@@ -37,8 +38,13 @@
         </module>
         <module name="UnusedLocalVariable"/>
         <module name="UnnecessaryFullyQualifiedType"/>
+        <module name="NestedTryDepth">
+            <property name="max" value="1"/>
+        </module>
+        <module name="PatternVariableAssignment"/>
         <module name="PackageDeclaration">
             <property name="matchDirectoryStructure" value="true"/>
         </module>
     </module>
+    <module name="UniqueProperties"/>
 </module>
