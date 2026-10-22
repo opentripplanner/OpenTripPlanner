@@ -1,12 +1,8 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
@@ -119,19 +115,6 @@ final class OverlaidTemplatePaths<P> {
   @Nullable
   P findPath(@Nullable AbstractUserPreferences<?> profile, int fromStop, int toStop) {
     return profile == null ? null : pathsFrom(profile, fromStop).get(toStop);
-  }
-
-  /** Every stored path under the profile closest to {@code userPreferences}. */
-  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
-    var profile = closestProfile(userPreferences);
-    if (profile == null) {
-      return List.of();
-    }
-    List<StoredPath<P>> result = new ArrayList<>();
-    forEachPath(profile, (fromStop, toStop, path) ->
-      result.add(new StoredPath<>(fromStop, toStop, path))
-    );
-    return Collections.unmodifiableList(result);
   }
 
   private void assertProfileExists(AbstractUserPreferences<?> profile) {

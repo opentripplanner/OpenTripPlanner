@@ -1,9 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
@@ -45,12 +43,6 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
    * build to flag stops that could not be linked to any other stop.
    */
   boolean hasTransfersFrom(int fromStop);
-
-  /**
-   * Every stored {@code (fromStop, toStop, path)} under the user preferences closest to
-   * {@code userPreferences}. Empty if no paths are stored.
-   */
-  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences);
 
   /** The number of stored paths, under all user preferences. */
   int calculateNumberOfTransferPaths();

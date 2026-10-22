@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 /**
@@ -51,11 +50,10 @@ class DefaultRegularTransferRepositoryTest {
 
   @Test
   void withoutWritesTheSnapshotHasTheGraphBuildPaths() {
-    assertThat(freeze().pathsFor(WALK)).containsExactly(
-      new StoredPath<>(A, B, PATH_AB),
-      new StoredPath<>(A, C, PATH_AC),
-      new StoredPath<>(B, C, PATH_BC)
-    );
+    var snapshot = freeze();
+    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -75,7 +73,10 @@ class DefaultRegularTransferRepositoryTest {
   void replaceWithNoPathsRemovesAllTransfersFromTheStop() {
     repository.replaceTransfersFrom(WALK, A, Map.of());
 
-    assertThat(freeze().pathsFor(WALK)).containsExactly(new StoredPath<>(B, C, PATH_BC));
+    var snapshot = freeze();
+    assertThat(snapshot.findPath(WALK, A, B)).isNull();
+    assertThat(snapshot.findPath(WALK, A, C)).isNull();
+    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -182,11 +183,12 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
     repository.replaceTransfersFrom(WALK, B, Map.of());
 
-    assertThat(buildRepository.pathsFor(WALK)).containsExactly(
-      new StoredPath<>(A, B, PATH_AB),
-      new StoredPath<>(A, C, PATH_AC),
-      new StoredPath<>(B, C, PATH_BC)
-    );
+    // A new runtime repository starts from the unchanged paths of the build repository
+    var snapshot = TestLifecycles.initialSnapshot(buildRepository);
+    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.findPath(WALK, A, D)).isNull();
+    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -220,9 +222,6 @@ class DefaultRegularTransferRepositoryTest {
     var snapshot = lifecycle.freeze(repository);
     assertThat(snapshot.findPath(withReluctance(1.5), A, B)).isEqualTo(PATH_AB);
     assertThat(snapshot.findPath(withReluctance(3.5), A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(snapshot.pathsFor(withReluctance(3.5))).containsExactly(
-      new StoredPath<>(A, B, PATH_AB_NEW)
-    );
     // Close is not exact: a write must name the profile itself
     assertThrows(IllegalArgumentException.class, () ->
       repository.replaceTransfersFrom(withReluctance(3.5), A, Map.of())

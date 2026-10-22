@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.transfer.regular;
 
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
@@ -36,12 +35,4 @@ public interface RegularTransferRepositorySnapshot<P> {
    */
   @Nullable
   P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop);
-
-  /**
-   * Every stored {@code (fromStop, toStop, path)} under the user preferences closest to
-   * {@code userPreferences}. Empty if no paths are stored.
-   */
-  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences);
-
-  record StoredPath<P>(int fromStop, int toStop, P path) {}
 }

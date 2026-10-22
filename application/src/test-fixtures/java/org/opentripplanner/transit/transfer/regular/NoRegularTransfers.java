@@ -2,7 +2,6 @@ package org.opentripplanner.transit.transfer.regular;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
@@ -55,11 +54,6 @@ public final class NoRegularTransfers {
         int toStop
       ) {
         return null;
-      }
-
-      @Override
-      public List<StoredPath<NearbyStop>> pathsFor(AbstractUserPreferences<?> userPreferences) {
-        return List.of();
       }
     };
 }

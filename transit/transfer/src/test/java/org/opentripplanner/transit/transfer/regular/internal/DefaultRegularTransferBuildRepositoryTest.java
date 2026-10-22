@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 class DefaultRegularTransferBuildRepositoryTest {
@@ -43,7 +42,6 @@ class DefaultRegularTransferBuildRepositoryTest {
 
     assertThat(buildRepository.calculateNumberOfTransferPaths()).isEqualTo(3);
     assertThat(buildRepository.calculateNumberOfTransferPaths(WALK)).isEqualTo(3);
-    assertThat(buildRepository.pathsFor(WALK)).hasSize(3);
   }
 
   @Test
@@ -52,11 +50,10 @@ class DefaultRegularTransferBuildRepositoryTest {
 
     buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW));
 
-    assertThat(buildRepository.pathsFor(WALK)).containsExactly(
-      new StoredPath<>(A, B, PATH_AB_NEW),
-      new StoredPath<>(A, C, PATH_AC),
-      new StoredPath<>(B, C, PATH_BC)
-    );
+    var snapshot = TestLifecycles.initialSnapshot(buildRepository);
+    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -64,7 +61,8 @@ class DefaultRegularTransferBuildRepositoryTest {
     var snapshot = TestLifecycles.initialSnapshot(createBuildRepository());
 
     assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.pathsFor(WALK)).hasSize(3);
+    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -92,8 +90,11 @@ class DefaultRegularTransferBuildRepositoryTest {
     // replaces the paths from stop A in the runtime repository only
     runtimeRepository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
 
-    assertThat(buildRepository.pathsFor(WALK)).contains(new StoredPath<>(A, B, PATH_AB));
     assertThat(lifecycle.freeze(runtimeRepository).findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
+    // A new runtime repository starts from the unchanged paths of the build repository
+    assertThat(TestLifecycles.initialSnapshot(buildRepository).findPath(WALK, A, B)).isEqualTo(
+      PATH_AB
+    );
   }
 
   private static DefaultRegularTransferBuildRepository<String> createBuildRepository() {

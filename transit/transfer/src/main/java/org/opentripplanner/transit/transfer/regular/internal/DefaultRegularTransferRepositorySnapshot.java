@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
@@ -42,11 +41,6 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
   @Override
   public P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
     return paths.findPath(paths.closestProfile(userPreferences), fromStop, toStop);
-  }
-
-  @Override
-  public List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
-    return paths.pathsFor(userPreferences);
   }
 
   /** The paths of this snapshot, for the lifecycle. */

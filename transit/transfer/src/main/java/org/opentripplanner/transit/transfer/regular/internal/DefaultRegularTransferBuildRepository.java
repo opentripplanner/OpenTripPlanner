@@ -1,10 +1,8 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.List;
 import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
@@ -45,11 +43,6 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   @Override
   public boolean hasTransfersFrom(int fromStop) {
     return paths.hasTransfersFrom(fromStop);
-  }
-
-  @Override
-  public List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
-    return paths.pathsFor(userPreferences);
   }
 
   @Override

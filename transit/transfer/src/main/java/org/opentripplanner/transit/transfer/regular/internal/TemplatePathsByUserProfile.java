@@ -1,15 +1,12 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot.StoredPath;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
@@ -59,20 +56,6 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     var byToStop = new HashMap<>(byFromStop.getOrDefault(fromStop, Map.of()));
     byToStop.putAll(pathsByToStop);
     byFromStop.put(fromStop, byToStop);
-  }
-
-  List<StoredPath<P>> pathsFor(AbstractUserPreferences<?> userPreferences) {
-    var profile = closestProfile(userPreferences);
-    if (profile == null) {
-      return List.of();
-    }
-    List<StoredPath<P>> result = new ArrayList<>();
-    for (var fromEntry : pathsByUserPreferences.get(profile).entrySet()) {
-      for (var toEntry : fromEntry.getValue().entrySet()) {
-        result.add(new StoredPath<>(fromEntry.getKey(), toEntry.getKey(), toEntry.getValue()));
-      }
-    }
-    return Collections.unmodifiableList(result);
   }
 
   /** The user preferences paths are stored under, the profiles. */

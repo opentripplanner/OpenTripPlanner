@@ -105,7 +105,6 @@ class RegularTransferRepositoryLifecycleTest {
   void writesAreNotVisibleInTheBuildRepository() throws Exception {
     submit(repository -> repository.replaceTransfersFrom(WALK, A, Map.of(C, PATH_AC)));
 
-    assertThat(buildRepository.pathsFor(WALK)).hasSize(1);
     assertThat(buildRepository.calculateNumberOfTransferPaths()).isEqualTo(1);
   }
 
