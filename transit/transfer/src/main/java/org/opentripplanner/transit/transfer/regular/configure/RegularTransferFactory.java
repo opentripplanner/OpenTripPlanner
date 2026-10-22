@@ -9,7 +9,6 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
@@ -30,12 +29,17 @@ public final class RegularTransferFactory {
     return new DefaultRegularTransferBuildRepository<>();
   }
 
-  /** Create the graph-build generator, writing the transfers of all stops into the repository. */
-  public static <P, U> TransferGenerator createTransferGenerator(
+  /**
+   * Create the graph-build generator, writing the transfers of all stops into the repository.
+   *
+   * @param <P> the street path type
+   * @param <R> the routing request type
+   */
+  public static <P, R> TransferGenerator createTransferGenerator(
     RaptorStopIndex stopIndex,
     Collection<FeedScopedId> stopsWithTrips,
-    TransferPathProvider<P, U> pathProvider,
-    TransferProfiles<U> profiles,
+    TransferPathProvider<P> pathProvider,
+    TransferProfiles<R> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
     return new DefaultTransferGenerator<>(
@@ -63,7 +67,7 @@ public final class RegularTransferFactory {
   > registerRepository(
     RepositoryRegistry repositoryRegistry,
     RegularTransferBuildRepository<P> buildRepository,
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
+    TransferPathProvider<P> pathProvider,
     int numberOfStops
   ) {
     return repositoryRegistry.registerRepository(

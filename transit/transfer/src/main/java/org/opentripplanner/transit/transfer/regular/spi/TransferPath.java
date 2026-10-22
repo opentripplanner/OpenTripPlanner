@@ -7,10 +7,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 /**
  * A path {@code P} found by {@link TransferPathProvider#findNearbyStops} together with the stop
  * it arrives at and the {@link PathCriteria} it was found under. {@code P} itself stays fully
- * opaque to {@code raptor-data} - {@code toStop} and {@code criteria} are the pieces of identity
- * the generator needs out of it directly, to compare candidates and store the transfer, without a
- * separate {@link TransferPathProvider#computePathCriteria} round trip for the profile that found
- * the path.
+ * opaque to the regular-transfer module - {@code toStop} and {@code criteria} are the pieces of
+ * identity the generator needs out of it directly, to compare candidates and store the transfer,
+ * without a separate {@link TransferPathProvider#computePathCriteria} round trip for the profile
+ * that found the path.
  */
 public final class TransferPath<P> implements Serializable {
 

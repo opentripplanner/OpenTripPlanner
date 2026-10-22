@@ -13,7 +13,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * populated in place by the graph-builder module, and survive graph serialization the same way
  * {@code TransferRepository} does.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 public class DefaultRegularTransferBuildRepository<P> implements RegularTransferBuildRepository<P> {
 

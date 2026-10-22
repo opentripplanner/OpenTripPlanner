@@ -13,7 +13,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * The paths are immutable. The only mutable state is a cache of the Raptor transfers derived from
  * them, see {@link #raptorTransfers}.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 public interface RegularTransferRepositorySnapshot<P> {
   /**

@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
  * <p>
  * This class is not thread-safe while it is written to.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 final class TemplatePathsByStop<P> implements Serializable {
 

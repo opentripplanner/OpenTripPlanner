@@ -19,7 +19,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  * <p>
  * This class is stateless and thread-safe.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 final class RaptorTransfersFactory<P> {
 
@@ -27,12 +27,9 @@ final class RaptorTransfersFactory<P> {
   static final double MAX_PATCHED_STOPS_SHARE = 0.05;
 
   private final int nStops;
-  private final TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider;
+  private final TransferPathProvider<P> pathProvider;
 
-  RaptorTransfersFactory(
-    int nStops,
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
-  ) {
+  RaptorTransfersFactory(int nStops, TransferPathProvider<P> pathProvider) {
     this.nStops = nStops;
     this.pathProvider = pathProvider;
   }

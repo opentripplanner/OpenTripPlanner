@@ -15,7 +15,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * conversion seals this repository: writing to it afterward throws an
  * {@link IllegalStateException}.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 public interface RegularTransferBuildRepository<P> extends Serializable {
   /**

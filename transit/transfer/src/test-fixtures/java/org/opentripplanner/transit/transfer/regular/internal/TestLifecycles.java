@@ -33,8 +33,7 @@ final class TestLifecycles {
     return TestLifecycles.<P>pathsOnly().freeze(buildRepository.createRuntimeRepository());
   }
 
-  private static final class UnsupportedPathProvider<P> implements
-    TransferPathProvider<P, AbstractUserPreferences<?>> {
+  private static final class UnsupportedPathProvider<P> implements TransferPathProvider<P> {
 
     @Override
     public Collection<TransferPath<P>> findNearbyStops(

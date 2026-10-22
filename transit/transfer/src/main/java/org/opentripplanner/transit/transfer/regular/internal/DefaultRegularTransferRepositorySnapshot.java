@@ -14,7 +14,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * effectively immutable and safe to read from any number of request threads. The cache of the
  * Raptor transfers derived from them is the only mutable state, and it is thread-safe.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepositorySnapshot<P> {
 

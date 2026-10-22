@@ -6,16 +6,14 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
 /**
- * The only boundary {@code raptor-data}'s regular-transfer pipeline has into street-search
- * territory. {@code P} (the path/template type) and {@code U} (the preferences type) stay fully
- * opaque here - {@code raptor-data} never sees {@code Edge}/{@code State}/{@code RouteRequest}.
- * The real implementation (backed by a street search) lives in {@code application} and is
- * injected in.
+ * The only boundary the regular-transfer pipeline has into street-search territory. The street
+ * path type {@code P} stays fully opaque to this module - it never sees
+ * {@code Edge}/{@code State}/{@code RouteRequest}. The real implementation (backed by a street
+ * search) lives in {@code application} and is injected in.
  *
- * @param <P> the transfer path/template type
- * @param <U> the user preferences type
+ * @param <P> the street path type
  */
-public interface TransferPathProvider<P, U> {
+public interface TransferPathProvider<P> {
   /**
    * Discover candidate paths from {@code fromStop} under {@code userPreferences}, each
    * paired with the {@link PathCriteria} it was found under. Called once per stop per profile at

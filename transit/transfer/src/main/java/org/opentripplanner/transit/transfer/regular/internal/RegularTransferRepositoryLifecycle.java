@@ -28,7 +28,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  * <p>
  * This class is stateless and only accessed on the writer thread.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 public class RegularTransferRepositoryLifecycle<P> implements
   RepositoryLifecycle<RegularTransferRepositorySnapshot<P>, RegularTransferRepository<P>> {
@@ -36,7 +36,7 @@ public class RegularTransferRepositoryLifecycle<P> implements
   private final RaptorTransfersFactory<P> raptorTransfersFactory;
 
   public RegularTransferRepositoryLifecycle(
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
+    TransferPathProvider<P> pathProvider,
     int numberOfStops
   ) {
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(

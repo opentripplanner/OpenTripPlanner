@@ -16,7 +16,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
@@ -82,16 +81,12 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
       .map(RegularStop::getId)
       .toList();
 
-    List<TransferProfile<AbstractUserPreferences<?>>> profileList = config
+    var profileList = config
       .profiles()
       .stream()
-      .map(p ->
-        new TransferProfile<AbstractUserPreferences<?>>(p.userPreferences(), p.userPreferences())
-      )
+      .map(p -> new TransferProfile<>("NOT IN USE", p.userPreferences()))
       .toList();
-    TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
-      AbstractUserPreferences<?>
-    >of(profileList);
+    TransferProfiles<?> profiles = TransferProfiles.of(profileList);
 
     var nearbyStopFinder = StreetTransferPathProvider.createNearbyStopFinder(
       graph,
@@ -119,7 +114,7 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   }
 
   private void logSummary(
-    List<TransferProfile<AbstractUserPreferences<?>>> profileList,
+    List<? extends TransferProfile<?>> profileList,
     List<FeedScopedId> stopsWithTrips
   ) {
     int sum = 0;

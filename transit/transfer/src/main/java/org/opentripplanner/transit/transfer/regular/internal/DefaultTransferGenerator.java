@@ -20,16 +20,16 @@ import org.slf4j.LoggerFactory;
  * Graph-build-time implementation of {@link TransferGenerator} - see that interface's doc. There
  * is no {@code TransferRealtimeUpdater} implementation yet.
  *
- * @param <P> the transfer path/template type
- * @param <U> the user preferences type
+ * @param <P> the street path type
+ * @param <R> the routing request type
  */
-public class DefaultTransferGenerator<P, U> implements TransferGenerator {
+public class DefaultTransferGenerator<P, R> implements TransferGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
   private final RaptorStopIndex stopIndex;
   private final Collection<FeedScopedId> stopsWithTrips;
-  private final TransferPathProvider<P, U> pathProvider;
-  private final TransferProfiles<U> orderedProfiles;
+  private final TransferPathProvider<P> pathProvider;
+  private final TransferProfiles<R> orderedProfiles;
   private final RegularTransferBuildRepository<P> buildRepository;
 
   /**
@@ -39,8 +39,8 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
   public DefaultTransferGenerator(
     RaptorStopIndex stopIndex,
     Collection<FeedScopedId> stopsWithTrips,
-    TransferPathProvider<P, U> pathProvider,
-    TransferProfiles<U> profiles,
+    TransferPathProvider<P> pathProvider,
+    TransferProfiles<R> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
     this.stopIndex = stopIndex;
@@ -69,7 +69,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
    * best time and generalized-cost is small. The {@link TransferPathProvider} may return multiple candidates for the
    * same target stop.
    */
-  private void generateForStop(TransferProfile<U> profile, FeedScopedId fromStopId) {
+  private void generateForStop(TransferProfile<R> profile, FeedScopedId fromStopId) {
     int fromStop = requireStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 

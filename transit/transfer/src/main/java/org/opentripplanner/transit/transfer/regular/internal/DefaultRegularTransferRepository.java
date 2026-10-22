@@ -22,7 +22,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * a frozen repository cannot be written to again. A repository that is never frozen, because its
  * transaction failed, is discarded with its changes.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P> {
 

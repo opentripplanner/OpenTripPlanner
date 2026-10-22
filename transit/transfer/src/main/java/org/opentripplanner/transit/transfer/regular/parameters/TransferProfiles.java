@@ -14,6 +14,8 @@ import java.util.List;
  * <p>
  * Simple, not efficient - a fixed-point iteration over the (well under 20) profiles this ever
  * holds, not a proper topological sort.
+ *
+ * @param <R> the routing request type
  */
 public final class TransferProfiles<R> implements Iterable<TransferProfile<R>> {
 

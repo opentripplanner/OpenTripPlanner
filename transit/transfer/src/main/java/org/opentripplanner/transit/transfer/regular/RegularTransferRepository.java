@@ -18,7 +18,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * track why a stop's transfers were replaced. A profile is the exact user preferences the paths
  * were generated under at graph build.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 public interface RegularTransferRepository<P> {
   /**

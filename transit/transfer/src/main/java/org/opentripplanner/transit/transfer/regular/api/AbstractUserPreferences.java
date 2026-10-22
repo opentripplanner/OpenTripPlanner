@@ -10,10 +10,9 @@ import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUs
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * The traveler preferences a regular transfer path is computed and cached under - the concrete
- * {@code U} in {@link org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider}. The
- * values are normalized(rounded) by the individual preference classes so this class can be used
- * as a cache key.
+ * The traveler preferences a regular transfer path is computed and cached under. The values are
+ * normalized(rounded) by the individual preference classes so this class can be used as a cache
+ * key.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */

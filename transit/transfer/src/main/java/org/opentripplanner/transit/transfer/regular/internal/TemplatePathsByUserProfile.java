@@ -22,7 +22,7 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * <p>
  * This class is not thread-safe while it is written to.
  *
- * @param <P> the transfer path/template type
+ * @param <P> the street path type
  */
 final class TemplatePathsByUserProfile<P> implements Serializable {
 

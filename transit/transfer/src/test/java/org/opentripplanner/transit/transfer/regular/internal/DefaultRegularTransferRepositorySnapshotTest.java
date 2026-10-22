@@ -257,9 +257,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
   private record Tx(int stop, int c1) {}
 
   /** Counts the re-costed paths. */
-  private static final class CountingPathProvider
-    implements TransferPathProvider<FakePath, AbstractUserPreferences<?>>
-  {
+  private static final class CountingPathProvider implements TransferPathProvider<FakePath> {
 
     private final FakeTransferPathProvider delegate = new FakeTransferPathProvider();
     private int recosted = 0;

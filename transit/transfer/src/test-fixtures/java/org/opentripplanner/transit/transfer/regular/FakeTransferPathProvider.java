@@ -20,7 +20,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  * resolving internally).
  */
 public class FakeTransferPathProvider
-  implements TransferPathProvider<FakeTransferPathProvider.FakePath, AbstractUserPreferences<?>>
+  implements TransferPathProvider<FakeTransferPathProvider.FakePath>
 {
 
   private final Map<FeedScopedId, List<FakePath>> byStop = new HashMap<>();

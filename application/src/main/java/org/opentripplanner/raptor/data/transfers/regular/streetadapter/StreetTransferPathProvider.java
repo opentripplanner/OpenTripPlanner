@@ -42,9 +42,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  *           (restricted-vs-unrestricted rules, per-target-stop mode restrictions, ...) needs more
  *           thought; {@link #SEARCH_RADIUS} is a fixed placeholder until that's designed.
  */
-public class StreetTransferPathProvider
-  implements TransferPathProvider<NearbyStop, AbstractUserPreferences<?>>
-{
+public class StreetTransferPathProvider implements TransferPathProvider<NearbyStop> {
 
   private static final int NO_STOP_COUNT_LIMIT = 0;
   private static final Duration SEARCH_RADIUS = Duration.ofMinutes(30);

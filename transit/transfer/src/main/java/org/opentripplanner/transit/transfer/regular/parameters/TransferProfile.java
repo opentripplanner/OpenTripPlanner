@@ -5,47 +5,54 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
- * A configured transfer discovery profile.
+ * A configured transfer discovery profile: the routing request the street search is configured
+ * with, and the user preferences the transfer paths are generated and stored under.
  * <p>
  * Duration limits (including any per-target-stop {@code allowedModes} override) and any other
  * search-shaping detail are entirely the {@link TransferPathProvider} implementation's
- * responsibility - {@code raptor-data} never sees stop-classification data, only the opaque
- * {@code requestParameters}/{@code userPreferences} types.
+ * responsibility - the regular-transfer module never sees stop-classification data, and the
+ * routing request type is opaque to it.
  *
+ * @param <R> the routing request type
  */
 public final class TransferProfile<R> {
 
   private final R configuredRequestParameters;
-  private final AbstractUserPreferences userPreferences;
+  private final AbstractUserPreferences<?> userPreferences;
 
   /**
-   * @param configuredRequestParameters    this profile's static, config-derived search parameters (street
-   *                             mode, duration limits, ...) - opaque to {@code raptor-data}, only
-   *                             the {@link TransferPathProvider} implementation interprets it.
-   * @param userPreferences      the traveler preferences, used both for this profile's own discovery
-   *                             search and to re-cost a {@code deduplicationProfile}'s path when
-   *                             checking for equivalence
-   * @param <R>                  the request parameters type
+   * @param configuredRequestParameters this profile's static, config-derived routing request
+   *                                    (street mode, duration limits, ...) - opaque to this
+   *                                    module, only the {@link TransferPathProvider}
+   *                                    implementation interprets it.
+   * @param userPreferences             the traveler preferences, used both for this profile's own
+   *                                    discovery search and to re-cost a
+   *                                    {@code deduplicationProfile}'s path when checking for
+   *                                    equivalence
    */
-  public TransferProfile(R configuredRequestParameters, AbstractUserPreferences userPreferences) {
+  public TransferProfile(
+    R configuredRequestParameters,
+    AbstractUserPreferences<?> userPreferences
+  ) {
     this.configuredRequestParameters = configuredRequestParameters;
     this.userPreferences = userPreferences;
   }
 
-  /**
-   * The configured request parameters, this profile's static, config-derived search parameters (street
-   * mode, duration limits, ...) - opaque to {@code raptor-data}, only
-   * the {@link TransferPathProvider} implementation interprets it.
-   */
-  public R configuredRequestParameters() {
-    return configuredRequestParameters;
-  }
+  // /**
+  //  * This profile's static, config-derived routing request (street mode, duration limits, ...) -
+  //  * opaque to this module, only the {@link TransferPathProvider} implementation interprets it.
+  //  */
+  // TODO: Use the request to shape the street search, and/or to re-cost a deduplicationProfile's
+  //       path when checking for equivalence
+  // public R configuredRequestParameters() {
+  //    return configuredRequestParameters;
+  // }
 
   /**
    * The traveler preferences, used both for this profile's own discovery search and to re-cost a
    * {@code deduplicationProfile}'s path when checking for equivalence
    */
-  public AbstractUserPreferences userPreferences() {
+  public AbstractUserPreferences<?> userPreferences() {
     return userPreferences;
   }
 
