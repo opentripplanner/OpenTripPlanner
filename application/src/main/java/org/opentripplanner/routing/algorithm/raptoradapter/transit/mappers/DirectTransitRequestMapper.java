@@ -51,6 +51,7 @@ public class DirectTransitRequestMapper {
       .addEgressPaths(egress)
       .searchWindowInSeconds(searchParamsUsed.searchWindowInSeconds())
       .earliestDepartureTime(searchParamsUsed.earliestDepartureTime())
+      .latestArrivalTime(searchParamsUsed.latestArrivalTime())
       .withRelaxC1(RaptorRequestMapper.mapRelaxCost(rel.costRelaxFunction()))
       .build();
     return Optional.of(directRequest);

@@ -16,6 +16,7 @@ import org.opentripplanner.raptor.api.request.SearchParams;
 public class RaptorDirectTransitRequestBuilder {
 
   private int earliestDepartureTime;
+  private int latestArrivalTime;
   private int searchWindowInSeconds;
   private RelaxFunction relaxC1;
   private final Collection<RaptorAccessEgress> accessPaths = new ArrayList<>();
@@ -23,6 +24,7 @@ public class RaptorDirectTransitRequestBuilder {
 
   public RaptorDirectTransitRequestBuilder(RaptorDirectTransitRequest defaults) {
     this.earliestDepartureTime = defaults.earliestDepartureTime();
+    this.latestArrivalTime = defaults.latestArrivalTime();
     this.searchWindowInSeconds = defaults.searchWindowInSeconds();
     this.relaxC1 = defaults.relaxC1();
     this.accessPaths.addAll(defaults.accessPaths());
@@ -31,6 +33,11 @@ public class RaptorDirectTransitRequestBuilder {
 
   public RaptorDirectTransitRequestBuilder earliestDepartureTime(int earliestDepartureTime) {
     this.earliestDepartureTime = earliestDepartureTime;
+    return this;
+  }
+
+  public RaptorDirectTransitRequestBuilder latestArrivalTime(int latestArrivalTime) {
+    this.latestArrivalTime = latestArrivalTime;
     return this;
   }
 
@@ -69,6 +76,7 @@ public class RaptorDirectTransitRequestBuilder {
   public RaptorDirectTransitRequest build() {
     return new RaptorDirectTransitRequest(
       earliestDepartureTime,
+      latestArrivalTime,
       searchWindowInSeconds,
       relaxC1,
       accessPaths,

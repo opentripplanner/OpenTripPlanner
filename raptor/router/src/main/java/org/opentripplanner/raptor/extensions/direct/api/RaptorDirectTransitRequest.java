@@ -13,6 +13,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public final class RaptorDirectTransitRequest {
 
   private final int earliestDepartureTime;
+  private final int latestArrivalTime;
   private final int searchWindowInSeconds;
   private final RelaxFunction relaxC1;
   private final Collection<RaptorAccessEgress> accessPaths;
@@ -20,6 +21,7 @@ public final class RaptorDirectTransitRequest {
 
   private RaptorDirectTransitRequest() {
     this.earliestDepartureTime = RaptorConstants.TIME_NOT_SET;
+    this.latestArrivalTime = RaptorConstants.TIME_NOT_SET;
     this.searchWindowInSeconds = RaptorConstants.NOT_SET;
     this.relaxC1 = GeneralizedCostRelaxFunction.NORMAL;
     this.accessPaths = List.of();
@@ -28,12 +30,14 @@ public final class RaptorDirectTransitRequest {
 
   public RaptorDirectTransitRequest(
     int earliestDepartureTime,
+    int latestArrivalTime,
     int searchWindowInSeconds,
     RelaxFunction relaxC1,
     Collection<RaptorAccessEgress> accessPaths,
     Collection<RaptorAccessEgress> egressPaths
   ) {
     this.earliestDepartureTime = earliestDepartureTime;
+    this.latestArrivalTime = latestArrivalTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
     this.relaxC1 = Objects.requireNonNull(relaxC1);
     this.accessPaths = Objects.requireNonNull(accessPaths);
@@ -60,6 +64,18 @@ public final class RaptorDirectTransitRequest {
 
   public boolean isEarliestDepartureTimeSet() {
     return earliestDepartureTime != RaptorConstants.TIME_NOT_SET;
+  }
+
+  /// The latest a journey can arrive at the destination. The unit is seconds since midnight.
+  /// Inclusive.
+  ///
+  /// Optional. Paths arriving after this time are not included in the result.
+  public int latestArrivalTime() {
+    return latestArrivalTime;
+  }
+
+  public boolean isLatestArrivalTimeSet() {
+    return latestArrivalTime != RaptorConstants.TIME_NOT_SET;
   }
 
   /// The time window used to search. The unit is seconds.
@@ -107,6 +123,7 @@ public final class RaptorDirectTransitRequest {
   public int hashCode() {
     return Objects.hash(
       earliestDepartureTime,
+      latestArrivalTime,
       searchWindowInSeconds,
       relaxC1,
       accessPaths,
@@ -122,6 +139,7 @@ public final class RaptorDirectTransitRequest {
     if (o instanceof RaptorDirectTransitRequest that) {
       return (
         earliestDepartureTime == that.earliestDepartureTime &&
+        latestArrivalTime == that.latestArrivalTime &&
         searchWindowInSeconds == that.searchWindowInSeconds &&
         relaxC1.equals(that.relaxC1) &&
         accessPaths.equals(that.accessPaths) &&
@@ -136,6 +154,7 @@ public final class RaptorDirectTransitRequest {
     var dft = defaults();
     return ToStringBuilder.of(RaptorDirectTransitRequest.class)
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, dft.earliestDepartureTime)
+      .addServiceTime("latestArrivalTime", latestArrivalTime, dft.latestArrivalTime)
       .addDurationSec("searchWindow", searchWindowInSeconds, dft.searchWindowInSeconds)
       .addObj("relaxC1", relaxC1, dft.relaxC1)
       .addCollection("accessPaths", accessPaths, 5, RaptorAccessEgress::defaultToString)
