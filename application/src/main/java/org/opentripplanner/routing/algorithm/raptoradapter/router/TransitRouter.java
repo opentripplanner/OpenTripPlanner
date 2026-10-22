@@ -23,6 +23,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.extensions.extrasearch.ExtraMcRouterSearch;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DirectTransitRequestMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DirectTransitSearchTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -251,7 +253,7 @@ public class TransitRouter {
       debugTimingAggregator.startedDirectTransitSearch();
       var directPaths = raptorService.findAllDirectTransit(
         directRequest.get(),
-        requestTransitDataProvider
+        createDirectTransitDataProvider(requestTransitDataProvider)
       );
       paths = new ArrayList<>(paths);
       paths.addAll(directPaths);
@@ -364,6 +366,20 @@ public class TransitRouter {
       DefaultTransitDataProviderFilter.ofRequest(request),
       request
     );
+  }
+
+  /**
+   * The direct transit search may be limited to a subset of the transit modes used in the main
+   * search.
+   */
+  private RaptorTransitDataProvider<TripSchedule> createDirectTransitDataProvider(
+    RaptorRoutingRequestTransitData requestTransitDataProvider
+  ) {
+    var preferences = request.preferences().transit().directTransit().orElseThrow();
+    if (!preferences.isModesRestricted()) {
+      return requestTransitDataProvider;
+    }
+    return new DirectTransitSearchTransitData(requestTransitDataProvider, preferences.modes());
   }
 
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {
