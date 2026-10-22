@@ -41,7 +41,7 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
   @Nullable
   @Override
   public P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
-    return paths.findPath(cache.profileFor(userPreferences, cacheFactory), fromStop, toStop);
+    return paths.findPath(paths.closestProfile(userPreferences), fromStop, toStop);
   }
 
   @Override
@@ -65,31 +65,25 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
       this.raptorTransfersFactory = raptorTransfersFactory;
     }
 
-    @Nullable
     @Override
-    public AbstractUserPreferences<?> profileFor(AbstractUserPreferences<?> userPreferences) {
-      return paths.closestProfile(userPreferences);
-    }
-
-    @Override
-    public RaptorTransferStore create(
-      AbstractUserPreferences<?> userPreferences,
-      @Nullable AbstractUserPreferences<?> profile
-    ) {
-      return raptorTransfersFactory.create(paths, userPreferences, profile);
+    public RaptorTransferStore create(AbstractUserPreferences<?> userPreferences) {
+      return raptorTransfersFactory.create(
+        paths,
+        userPreferences,
+        paths.closestProfile(userPreferences)
+      );
     }
 
     @Override
     public RaptorTransferStore patch(
       AbstractUserPreferences<?> userPreferences,
-      @Nullable AbstractUserPreferences<?> profile,
       RaptorTransferStore previous,
       Set<Integer> changedFromStops
     ) {
       return raptorTransfersFactory.patch(
         paths,
         userPreferences,
-        profile,
+        paths.closestProfile(userPreferences),
         previous,
         changedFromStops
       );

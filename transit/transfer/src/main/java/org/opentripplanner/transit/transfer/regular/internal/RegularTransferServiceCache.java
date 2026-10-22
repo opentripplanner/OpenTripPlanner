@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 
@@ -26,9 +26,8 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * first request for a stale key patches the old value instead of creating it from scratch, see
  * {@link Factory#patch}. A stale entry keeps the old value alive until it is patched or evicted.
  * <p>
- * Each entry holds the profile its value is derived from, resolved once when the entry is
- * created. Normalizing the preferences, so that equivalent requests share an entry, is the
- * caller's responsibility, not this cache's.
+ * Normalizing the preferences, so that equivalent requests share an entry, is the caller's
+ * responsibility, not this cache's.
  * <p>
  * This class is thread-safe.
  *
@@ -65,7 +64,7 @@ class RegularTransferServiceCache<V> {
   V get(AbstractUserPreferences<?> userPreferences, Factory<V> factory) {
     var entry = entries.get(userPreferences);
     if (entry == null) {
-      var created = Entry.<V>missing(factory.profileFor(userPreferences));
+      var created = Entry.<V>missing();
       entry = entries.putIfAbsent(userPreferences, created);
       if (entry == null) {
         entry = created;
@@ -80,28 +79,16 @@ class RegularTransferServiceCache<V> {
   }
 
   /**
-   * The profile the value for {@code userPreferences} is derived from: the one of the cached
-   * entry, or resolved with {@code factory} if there is none. Does not create an entry.
-   */
-  @Nullable
-  AbstractUserPreferences<?> profileFor(
-    AbstractUserPreferences<?> userPreferences,
-    Factory<V> factory
-  ) {
-    var entry = entries.get(userPreferences);
-    return entry != null ? entry.profile : factory.profileFor(userPreferences);
-  }
-
-  /**
    * Create the cache of the next snapshot. Each created value is kept, and marked stale if the
-   * transfers from some stops changed under its profile. A stale value that was never patched
+   * transfers from some stops it is derived from changed. A stale value that was never patched
    * stays stale, with the changed stops added. A value that is still being created, or failed, is
    * dropped - the next snapshot creates it from scratch.
    *
-   * @param changedFromStops the stops whose transfers changed, by profile
+   * @param changedFromStops the stops whose transfers changed, for the user preferences of an
+   *                         entry; empty if none changed
    */
   RegularTransferServiceCache<V> carryForward(
-    Map<AbstractUserPreferences<?>, Set<Integer>> changedFromStops
+    Function<AbstractUserPreferences<?>, Set<Integer>> changedFromStops
   ) {
     var next = new RegularTransferServiceCache<V>(maxSize, useCounter.get());
     entries.forEach((userPreferences, entry) -> {
@@ -117,15 +104,13 @@ class RegularTransferServiceCache<V> {
         previous = entry.previous;
         stale = entry.changedFromStops;
       }
-      var changed = entry.profile == null ? null : changedFromStops.get(entry.profile);
-      if (changed != null && !changed.isEmpty()) {
+      var changed = changedFromStops.apply(userPreferences);
+      if (!changed.isEmpty()) {
         var union = new HashSet<>(stale);
         union.addAll(changed);
         stale = union;
       }
-      var carried = stale.isEmpty()
-        ? Entry.created(entry.profile, previous)
-        : Entry.stale(entry.profile, previous, stale);
+      var carried = stale.isEmpty() ? Entry.created(previous) : Entry.stale(previous, stale);
       carried.lastUse = entry.lastUse;
       next.entries.put(userPreferences, carried);
     });
@@ -136,8 +121,8 @@ class RegularTransferServiceCache<V> {
     try {
       var value =
         entry.previous == null
-          ? f.create(userPreferences, entry.profile)
-          : f.patch(userPreferences, entry.profile, entry.previous, entry.changedFromStops);
+          ? f.create(userPreferences)
+          : f.patch(userPreferences, entry.previous, entry.changedFromStops);
       entry.value.complete(value);
     } catch (RuntimeException | Error e) {
       entries.remove(userPreferences, entry);
@@ -177,29 +162,14 @@ class RegularTransferServiceCache<V> {
 
   /** Creates the cached values. */
   interface Factory<V> {
-    /**
-     * The profile whose paths the value for {@code userPreferences} is derived from. {@code null}
-     * if there are no paths.
-     */
-    @Nullable
-    AbstractUserPreferences<?> profileFor(AbstractUserPreferences<?> userPreferences);
-
     /** Create the value for {@code userPreferences} from scratch. */
-    V create(
-      AbstractUserPreferences<?> userPreferences,
-      @Nullable AbstractUserPreferences<?> profile
-    );
+    V create(AbstractUserPreferences<?> userPreferences);
 
     /**
      * Create the value for {@code userPreferences} from {@code previous}, the value of an earlier
      * snapshot, by updating the transfers from {@code changedFromStops}.
      */
-    V patch(
-      AbstractUserPreferences<?> userPreferences,
-      @Nullable AbstractUserPreferences<?> profile,
-      V previous,
-      Set<Integer> changedFromStops
-    );
+    V patch(AbstractUserPreferences<?> userPreferences, V previous, Set<Integer> changedFromStops);
   }
 
   /**
@@ -207,9 +177,6 @@ class RegularTransferServiceCache<V> {
    * all other requests wait for {@link #value}.
    */
   private static final class Entry<V> {
-
-    @Nullable
-    private final AbstractUserPreferences<?> profile;
 
     /** The value to patch, {@code null} to create the value from scratch. */
     @Nullable
@@ -220,30 +187,21 @@ class RegularTransferServiceCache<V> {
     private final AtomicBoolean claimed = new AtomicBoolean();
     private volatile long lastUse;
 
-    private Entry(
-      @Nullable AbstractUserPreferences<?> profile,
-      @Nullable V previous,
-      Set<Integer> changedFromStops
-    ) {
-      this.profile = profile;
+    private Entry(@Nullable V previous, Set<Integer> changedFromStops) {
       this.previous = previous;
       this.changedFromStops = changedFromStops;
     }
 
-    static <V> Entry<V> missing(@Nullable AbstractUserPreferences<?> profile) {
-      return new Entry<>(profile, null, Set.of());
+    static <V> Entry<V> missing() {
+      return new Entry<>(null, Set.of());
     }
 
-    static <V> Entry<V> stale(
-      @Nullable AbstractUserPreferences<?> profile,
-      V previous,
-      Set<Integer> changedFromStops
-    ) {
-      return new Entry<>(profile, previous, Set.copyOf(changedFromStops));
+    static <V> Entry<V> stale(V previous, Set<Integer> changedFromStops) {
+      return new Entry<>(previous, Set.copyOf(changedFromStops));
     }
 
-    static <V> Entry<V> created(@Nullable AbstractUserPreferences<?> profile, V value) {
-      var entry = new Entry<V>(profile, null, Set.of());
+    static <V> Entry<V> created(V value) {
+      var entry = new Entry<V>(null, Set.of());
       entry.claimed.set(true);
       entry.value.complete(value);
       return entry;

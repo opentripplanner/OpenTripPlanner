@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.stop.StopIndex;
@@ -77,12 +78,27 @@ public class RegularTransferRepositoryLifecycle<P> implements
     var cache =
       publishedCache == null
         ? new RegularTransferServiceCache<RaptorTransferStore>()
-        : publishedCache.carryForward(frozen.changedFromStops());
+        : publishedCache.carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
     publishedCache = cache;
     return new DefaultRegularTransferRepositorySnapshot<>(
       frozen.paths(),
       cache,
       raptorTransfersFactory
     );
+  }
+
+  /**
+   * The stops whose transfers changed under the profile the Raptor transfers for
+   * {@code userPreferences} are derived from.
+   */
+  private static Set<Integer> changedFromStops(
+    DefaultRegularTransferRepository.Frozen<?> frozen,
+    AbstractUserPreferences<?> userPreferences
+  ) {
+    var profile = frozen.paths().closestProfile(userPreferences);
+    if (profile == null) {
+      return Set.of();
+    }
+    return frozen.changedFromStops().getOrDefault(profile, Set.of());
   }
 }

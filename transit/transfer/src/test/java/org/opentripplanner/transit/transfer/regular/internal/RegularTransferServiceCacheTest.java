@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
@@ -29,6 +27,9 @@ class RegularTransferServiceCacheTest {
   private static final WalkPreferences PREFS_2 = withReluctance(2.0);
   private static final WalkPreferences PREFS_3 = withReluctance(3.0);
   private static final WalkPreferences PREFS_4 = withReluctance(4.0);
+
+  private static final Function<AbstractUserPreferences<?>, Set<Integer>> NOTHING_CHANGED = p ->
+    Set.of();
 
   @Test
   void createsOnceAndReturnsTheCachedValue() {
@@ -48,22 +49,6 @@ class RegularTransferServiceCacheTest {
     var factory = new TestFactory();
 
     assertThat(cache.get(PREFS_1, factory)).isNotEqualTo(cache.get(PREFS_2, factory));
-  }
-
-  @Test
-  void theProfileIsResolvedOncePerEntry() {
-    var cache = new RegularTransferServiceCache<String>();
-    var factory = new TestFactory();
-
-    cache.get(PREFS_1, factory);
-    cache.get(PREFS_1, factory);
-    var profile = cache.profileFor(PREFS_1, factory);
-
-    assertThat(profile).isEqualTo(PROFILE_1);
-    assertThat(factory.profileLookups.get()).isEqualTo(1);
-    // Without an entry, the profile is resolved without creating one
-    assertThat(cache.profileFor(PREFS_4, factory)).isEqualTo(PROFILE_2);
-    assertThat(factory.created).hasSize(1);
   }
 
   @Test
@@ -158,7 +143,7 @@ class RegularTransferServiceCacheTest {
     var factory = new TestFactory();
     var value = cache.get(PREFS_1, factory);
 
-    var next = cache.carryForward(Map.of(PROFILE_2, Set.of(7)));
+    var next = cache.carryForward(changed(PROFILE_2, 7));
 
     assertThat(next.get(PREFS_1, factory)).isSameInstanceAs(value);
     assertThat(factory.created).hasSize(1);
@@ -171,7 +156,7 @@ class RegularTransferServiceCacheTest {
     var value1 = cache.get(PREFS_1, factory);
     var value4 = cache.get(PREFS_4, factory);
 
-    var next = cache.carryForward(Map.of(PROFILE_1, Set.of(7)));
+    var next = cache.carryForward(changed(PROFILE_1, 7));
     factory.created.clear();
 
     assertThat(next.get(PREFS_4, factory)).isSameInstanceAs(value4);
@@ -188,9 +173,9 @@ class RegularTransferServiceCacheTest {
     cache.get(PREFS_1, factory);
 
     var next = cache
-      .carryForward(Map.of(PROFILE_1, Set.of(7)))
-      .carryForward(Map.of())
-      .carryForward(Map.of(PROFILE_1, Set.of(8)));
+      .carryForward(changed(PROFILE_1, 7))
+      .carryForward(NOTHING_CHANGED)
+      .carryForward(changed(PROFILE_1, 8));
     factory.created.clear();
 
     next.get(PREFS_1, factory);
@@ -212,7 +197,7 @@ class RegularTransferServiceCacheTest {
       var slowCreation = executor.submit(() -> cache.get(PREFS_1, slow));
       awaitOrFail(creationStarted);
 
-      var next = cache.carryForward(Map.of());
+      var next = cache.carryForward(NOTHING_CHANGED);
       releaseCreation.countDown();
       slowCreation.get(5, TimeUnit.SECONDS);
 
@@ -236,21 +221,32 @@ class RegularTransferServiceCacheTest {
     }
   }
 
+  /** The stops changed under {@code profile}, by the user preferences of a cache entry. */
+  private static Function<AbstractUserPreferences<?>, Set<Integer>> changed(
+    WalkPreferences profile,
+    int stop
+  ) {
+    return userPreferences -> profileOf(userPreferences).equals(profile) ? Set.of(stop) : Set.of();
+  }
+
+  /** {@link #PROFILE_1} for a reluctance below 3, else {@link #PROFILE_2}. */
+  private static WalkPreferences profileOf(AbstractUserPreferences<?> userPreferences) {
+    return userPreferences.reluctance().value() < 3 ? PROFILE_1 : PROFILE_2;
+  }
+
   private static WalkPreferences withReluctance(double reluctance) {
     return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
   }
 
   /**
    * Creates the value {@code "create <preferences>"}, or {@code "patch <preferences> <stops>"},
-   * and records it. The profile is {@link #PROFILE_1} for a reluctance below 3, else
-   * {@link #PROFILE_2}.
+   * and records it.
    */
   private static final class TestFactory implements RegularTransferServiceCache.Factory<String> {
 
     private final Runnable onCreate;
     private final List<String> created = new ArrayList<>();
     private final List<Set<Integer>> patched = new ArrayList<>();
-    private final AtomicInteger profileLookups = new AtomicInteger();
 
     TestFactory() {
       this(() -> {});
@@ -261,23 +257,13 @@ class RegularTransferServiceCacheTest {
     }
 
     @Override
-    public AbstractUserPreferences<?> profileFor(AbstractUserPreferences<?> userPreferences) {
-      profileLookups.incrementAndGet();
-      return userPreferences.reluctance().value() < 3 ? PROFILE_1 : PROFILE_2;
-    }
-
-    @Override
-    public String create(
-      AbstractUserPreferences<?> userPreferences,
-      @Nullable AbstractUserPreferences<?> profile
-    ) {
+    public String create(AbstractUserPreferences<?> userPreferences) {
       return record(() -> "create " + userPreferences);
     }
 
     @Override
     public String patch(
       AbstractUserPreferences<?> userPreferences,
-      @Nullable AbstractUserPreferences<?> profile,
       String previous,
       Set<Integer> changedFromStops
     ) {
