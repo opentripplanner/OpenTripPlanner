@@ -21,8 +21,9 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
   /**
    * Create the runtime {@link RegularTransferRepository} from the paths generated at graph build,
    * and seal the build repository: from now on regular transfers can only be updated through the
-   * runtime repository. Writes to the build repository after this throw - and even without the
-   * seal they could not change the runtime repository, which owns a copy of the paths.
+   * runtime repository. The runtime repository shares the paths of the build repository instead
+   * of copying them; the seal keeps them unchanged, writes to the build repository after this
+   * throw.
    */
   RegularTransferRepository<P> createRuntimeRepository();
 
@@ -38,14 +39,8 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
     Map<Integer, P> pathsByToStop
   );
 
-  /**
-   * Whether {@code fromStop} has at least one outgoing transfer, under any user preferences. Used at graph
-   * build to flag stops that could not be linked to any other stop.
-   */
+  /** Whether {@code fromStop} has at least one outgoing transfer, under any user preferences. */
   boolean hasTransfersFrom(int fromStop);
-
-  /** The number of stored paths, under all user preferences. */
-  int calculateNumberOfTransferPaths();
 
   /** The number of paths stored under exactly the given user preferences. */
   int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences);

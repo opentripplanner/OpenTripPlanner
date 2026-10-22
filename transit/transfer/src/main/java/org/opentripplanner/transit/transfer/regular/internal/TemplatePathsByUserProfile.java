@@ -88,16 +88,6 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
       .sum();
   }
 
-  /** The number of stored paths, under all user preferences. */
-  int size() {
-    return pathsByUserPreferences
-      .values()
-      .stream()
-      .flatMap(byFromStop -> byFromStop.values().stream())
-      .mapToInt(Map::size)
-      .sum();
-  }
-
   /**
    * The profile closest to the given user preferences: the preferences themselves if paths are
    * stored under them, otherwise the profile with the smallest

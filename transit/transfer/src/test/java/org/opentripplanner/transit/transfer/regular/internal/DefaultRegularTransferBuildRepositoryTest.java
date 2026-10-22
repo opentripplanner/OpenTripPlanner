@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 class DefaultRegularTransferBuildRepositoryTest {
@@ -37,11 +38,13 @@ class DefaultRegularTransferBuildRepositoryTest {
   }
 
   @Test
-  void calculateNumberOfTransferPathsCountsAllStoredPaths() {
+  void calculateNumberOfTransferPathsCountsThePathsOfTheGivenPreferencesOnly() {
     var buildRepository = createBuildRepository();
+    var other = WalkPreferences.of().withReluctance(Reluctance.of(4.0)).build();
+    buildRepository.setPaths(other, A, Map.of(B, PATH_AB));
 
-    assertThat(buildRepository.calculateNumberOfTransferPaths()).isEqualTo(3);
     assertThat(buildRepository.calculateNumberOfTransferPaths(WALK)).isEqualTo(3);
+    assertThat(buildRepository.calculateNumberOfTransferPaths(other)).isEqualTo(1);
   }
 
   @Test
@@ -77,7 +80,7 @@ class DefaultRegularTransferBuildRepositoryTest {
     assertThat(ex).hasMessageThat().contains("sealed");
     // Reads still work
     assertThat(buildRepository.hasTransfersFrom(A)).isTrue();
-    assertThat(buildRepository.calculateNumberOfTransferPaths()).isEqualTo(3);
+    assertThat(buildRepository.calculateNumberOfTransferPaths(WALK)).isEqualTo(3);
   }
 
   @Test

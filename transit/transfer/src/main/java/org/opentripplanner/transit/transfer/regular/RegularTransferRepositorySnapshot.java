@@ -21,9 +21,11 @@ public interface RegularTransferRepositorySnapshot<P> {
    * closest to {@code userPreferences}, re-costed under {@code userPreferences}.
    * <p>
    * The result is cached in this snapshot, in a bounded (LRU) and thread-safe cache keyed on
-   * {@code userPreferences}. A new snapshot starts with an empty cache, so transfers derived from
-   * the paths of one snapshot are never used with another. Normalizing the preferences, so that
-   * equivalent requests share a cache entry, is the caller's responsibility.
+   * {@code userPreferences}. The cached transfers are always derived from the paths of this
+   * snapshot: a value cached by the previous snapshot is reused if the paths it was derived from
+   * did not change, and updated for the stops whose transfers changed otherwise. Normalizing the
+   * preferences, so that equivalent requests share a cache entry, is the caller's
+   * responsibility.
    */
   RaptorRegularTransferService raptorTransfers(AbstractUserPreferences<?> userPreferences);
 

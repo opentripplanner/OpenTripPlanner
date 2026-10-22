@@ -46,11 +46,6 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   }
 
   @Override
-  public int calculateNumberOfTransferPaths() {
-    return paths.size();
-  }
-
-  @Override
   public int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences) {
     return paths.size(userPreferences);
   }
