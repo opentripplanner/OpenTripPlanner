@@ -7,10 +7,8 @@ import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -44,13 +42,7 @@ public class RegularTransferRepositoryModule {
     Graph graph,
     TransitRepository transitRepository
   ) {
-    var siteRepository = transitRepository.getSiteRepository();
-    var stopIndex = new StopIndex(
-      siteRepository.stopIndexSize(),
-      siteRepository.listRegularStops(),
-      RegularStop::getIndex,
-      RegularStop::getId
-    );
+    int stopIndexSize = transitRepository.getSiteRepository().stopIndexSize();
     var pathProvider = new StreetTransferPathProvider(
       graph,
       StreetTransferPathProvider.createNearbyStopFinder(graph, transitRepository)
@@ -58,8 +50,8 @@ public class RegularTransferRepositoryModule {
     return RegularTransferFactory.registerRepository(
       repositoryRegistry,
       buildRepository,
-      stopIndex,
-      pathProvider
+      pathProvider,
+      stopIndexSize
     );
   }
 }

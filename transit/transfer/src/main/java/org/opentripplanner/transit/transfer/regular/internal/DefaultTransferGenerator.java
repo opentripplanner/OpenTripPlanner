@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
+import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultTransferGenerator<P, U> implements TransferGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
-  private final StopIndex stopIndex;
+  private final RaptorStopIndex stopIndex;
   private final Collection<FeedScopedId> stopsWithTrips;
   private final TransferPathProvider<P, U> pathProvider;
   private final TransferProfiles<U> orderedProfiles;
@@ -36,7 +37,7 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
    *                         progress without this class taking on a logging dependency itself.
    */
   public DefaultTransferGenerator(
-    StopIndex stopIndex,
+    RaptorStopIndex stopIndex,
     Collection<FeedScopedId> stopsWithTrips,
     TransferPathProvider<P, U> pathProvider,
     TransferProfiles<U> profiles,
@@ -69,12 +70,16 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
    * same target stop.
    */
   private void generateForStop(TransferProfile<U> profile, FeedScopedId fromStopId) {
-    int fromStop = stopIndex.toStopIndex(fromStopId);
+    int fromStop = requireStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 
     var nearbyStops = pathProvider.findNearbyStops(fromStopId, profile.userPreferences());
     for (var candidate : nearbyStops) {
       int toStop = stopIndex.toStopIndex(candidate.toStop());
+      if (toStop == RaptorConstants.NOT_FOUND) {
+        // The nearby stops may include flex stops, they can not be a target of a regular transfer
+        continue;
+      }
       var existing = bestCandidatePerTargetStop.get(toStop);
       if (existing == null || candidate.criteria().c1() < existing.criteria().c1()) {
         bestCandidatePerTargetStop.put(toStop, candidate);
@@ -89,5 +94,13 @@ public class DefaultTransferGenerator<P, U> implements TransferGenerator {
     synchronized (this) {
       buildRepository.setPaths(profile.userPreferences(), fromStop, pathsByToStop);
     }
+  }
+
+  private int requireStopIndex(FeedScopedId stopId) {
+    int index = stopIndex.toStopIndex(stopId);
+    if (index == RaptorConstants.NOT_FOUND) {
+      throw new IllegalStateException("The stop is not in the stop index: " + stopId);
+    }
+    return index;
   }
 }

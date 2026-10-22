@@ -1,10 +1,8 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
@@ -22,10 +20,7 @@ final class TestLifecycles {
 
   /** A lifecycle whose snapshots cannot derive Raptor transfers. */
   static <P> RegularTransferRepositoryLifecycle<P> pathsOnly() {
-    return new RegularTransferRepositoryLifecycle<>(
-      new StopIndex(0, List.<FeedScopedId>of(), id -> 0, id -> id),
-      new UnsupportedPathProvider<>()
-    );
+    return new RegularTransferRepositoryLifecycle<>(new UnsupportedPathProvider<>(), 0);
   }
 
   /**

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
@@ -56,7 +56,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
     buildRepository.setPaths(PROFILE, B, Map.of(C, path(B, C, 300)));
     repository =
       (DefaultRegularTransferRepository<FakePath>) buildRepository.createRuntimeRepository();
-    lifecycle = new RegularTransferRepositoryLifecycle<>(stopIndex(), provider);
+    lifecycle = new RegularTransferRepositoryLifecycle<>(provider, stopIndex().size());
     initial = freeze();
   }
 
@@ -217,11 +217,12 @@ class DefaultRegularTransferRepositorySnapshotTest {
     }
   }
 
-  private static StopIndex stopIndex() {
-    var stops = IntStream.range(0, N_STOPS)
-      .mapToObj(i -> new TestStop(FeedScopedId.of("F", "S" + i), i))
-      .toList();
-    return new StopIndex(N_STOPS, stops, TestStop::index, TestStop::id);
+  private static RaptorStopIndex stopIndex() {
+    return TestStopIndex.of(
+      IntStream.range(0, N_STOPS)
+        .mapToObj(i -> FeedScopedId.of("F", "S" + i))
+        .toList()
+    );
   }
 
   private static FakePath path(int from, int to, int cost) {
@@ -252,8 +253,6 @@ class DefaultRegularTransferRepositorySnapshotTest {
     }
     return result;
   }
-
-  private record TestStop(FeedScopedId id, int index) {}
 
   private record Tx(int stop, int c1) {}
 

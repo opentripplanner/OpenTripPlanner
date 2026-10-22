@@ -3,7 +3,6 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
-import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
@@ -37,11 +36,11 @@ public class RegularTransferRepositoryLifecycle<P> implements
   private final RaptorTransfersFactory<P> raptorTransfersFactory;
 
   public RegularTransferRepositoryLifecycle(
-    StopIndex stopIndex,
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
+    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
+    int numberOfStops
   ) {
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
-      stopIndex.size(),
+      numberOfStops,
       Objects.requireNonNull(pathProvider)
     );
   }

@@ -4,7 +4,7 @@ import java.util.Collection;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
-import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
@@ -32,7 +32,7 @@ public final class RegularTransferFactory {
 
   /** Create the graph-build generator, writing the transfers of all stops into the repository. */
   public static <P, U> TransferGenerator createTransferGenerator(
-    StopIndex stopIndex,
+    RaptorStopIndex stopIndex,
     Collection<FeedScopedId> stopsWithTrips,
     TransferPathProvider<P, U> pathProvider,
     TransferProfiles<U> profiles,
@@ -49,8 +49,13 @@ public final class RegularTransferFactory {
 
   /**
    * Register the runtime repository on the transaction framework, created from the paths of the
-   * build repository. This seals the build repository. The snapshots use the {@code stopIndex} and
-   * the {@code pathProvider} to derive the Raptor transfers from their paths.
+   * build repository. This seals the build repository. The snapshots use the {@code pathProvider}
+   * to derive the Raptor transfers from their paths.
+   *
+   * @param numberOfStops the size of the stop index space ({@code RaptorStopIndex.size()}), not the
+   *                      number of regular stops. The index space is shared with the flex stops,
+   *                      which do not take part in Raptor, so the Raptor transfer data is larger
+   *                      than needed. This goes away when the stop index moves into Raptor.
    */
   public static <P> RepositoryHandle<
     RegularTransferRepositorySnapshot<P>,
@@ -58,12 +63,12 @@ public final class RegularTransferFactory {
   > registerRepository(
     RepositoryRegistry repositoryRegistry,
     RegularTransferBuildRepository<P> buildRepository,
-    StopIndex stopIndex,
-    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
+    TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider,
+    int numberOfStops
   ) {
     return repositoryRegistry.registerRepository(
       buildRepository.createRuntimeRepository(),
-      new RegularTransferRepositoryLifecycle<>(stopIndex, pathProvider)
+      new RegularTransferRepositoryLifecycle<>(pathProvider, numberOfStops)
     );
   }
 }

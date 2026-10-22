@@ -8,7 +8,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.stop.StopIndex;
+import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorStopIndexAdaptor;
 import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -73,12 +73,7 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     var siteRepository = transitRepository.getSiteRepository();
     var regularStops = siteRepository.listRegularStops();
 
-    var stopIndex = new StopIndex(
-      siteRepository.stopIndexSize(),
-      regularStops,
-      RegularStop::getIndex,
-      RegularStop::getId
-    );
+    var stopIndex = new RaptorStopIndexAdaptor(siteRepository);
 
     var stopsVisitedByPatterns = stopsVisitedByPatterns();
     List<FeedScopedId> stopsWithTrips = regularStops
