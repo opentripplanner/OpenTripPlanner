@@ -20,7 +20,7 @@ import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 /**
  * Exercise the lifecycle through the real transaction framework: a write is visible only to
- * requests started after the commit, all transactions write to the same buffer, and a failed
+ * requests started after the commit, each transaction writes to a new repository, and a failed
  * write is rolled back.
  */
 class RegularTransferRepositoryLifecycleTest {
@@ -49,8 +49,10 @@ class RegularTransferRepositoryLifecycleTest {
     buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB));
 
     registry = TransactionFactory.createRepositoryRegistry();
-    var repository = buildRepository.createRuntimeRepository();
-    handle = registry.registerRepository(repository, TestLifecycles.pathsOnly(repository));
+    handle = registry.registerRepository(
+      buildRepository.createRuntimeRepository(),
+      TestLifecycles.pathsOnly()
+    );
     updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
       registry,
@@ -82,7 +84,7 @@ class RegularTransferRepositoryLifecycleTest {
   }
 
   @Test
-  void allTransactionsWriteToTheSameBuffer() throws Exception {
+  void eachTransactionWritesToANewRepository() throws Exception {
     var first = new AtomicReference<RegularTransferRepository<String>>();
     var second = new AtomicReference<RegularTransferRepository<String>>();
 
@@ -95,7 +97,7 @@ class RegularTransferRepositoryLifecycleTest {
       repository.replaceTransfersFrom(WALK, B, Map.of(C, PATH_BC));
     });
 
-    assertThat(second.get()).isSameInstanceAs(first.get());
+    assertThat(second.get()).isNotSameInstanceAs(first.get());
     var snapshot = snapshot();
     assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
     assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
@@ -126,20 +128,6 @@ class RegularTransferRepositoryLifecycleTest {
     assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
     assertThat(snapshot.findPath(WALK, A, B)).isNull();
     assertThat(snapshot.findPath(WALK, B, C)).isNull();
-  }
-
-  @Test
-  void onlyTheBufferOfTheLifecycleCanBeFrozen() {
-    var other = new DefaultRegularTransferBuildRepository<String>().createRuntimeRepository();
-    var lifecycle = TestLifecycles.pathsOnly(buildRepositoryWithPaths().createRuntimeRepository());
-
-    assertThrows(IllegalArgumentException.class, () -> lifecycle.freeze(other));
-  }
-
-  private static DefaultRegularTransferBuildRepository<String> buildRepositoryWithPaths() {
-    var buildRepository = new DefaultRegularTransferBuildRepository<String>();
-    buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB));
-    return buildRepository;
   }
 
   private void submit(Consumer<RegularTransferRepository<String>> write) throws Exception {

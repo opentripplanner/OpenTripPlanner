@@ -48,6 +48,11 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
     return paths;
   }
 
+  /** The cache of the Raptor transfers of this snapshot, for the lifecycle. */
+  RegularTransferServiceCache<RaptorTransferStore> cache() {
+    return cache;
+  }
+
   /** Creates and patches the cached Raptor transfers from the paths of this snapshot. */
   private final class CacheFactory
     implements RegularTransferServiceCache.Factory<RaptorTransferStore>

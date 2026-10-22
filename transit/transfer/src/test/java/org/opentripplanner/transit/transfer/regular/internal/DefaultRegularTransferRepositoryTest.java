@@ -45,7 +45,7 @@ class DefaultRegularTransferRepositoryTest {
     buildRepository.setPaths(WALK, B, Map.of(C, PATH_BC));
     repository =
       (DefaultRegularTransferRepository<String>) buildRepository.createRuntimeRepository();
-    lifecycle = TestLifecycles.pathsOnly(repository);
+    lifecycle = TestLifecycles.pathsOnly();
   }
 
   @Test
@@ -134,36 +134,49 @@ class DefaultRegularTransferRepositoryTest {
       repository.replaceTransfersFrom(UNKNOWN, A, Map.of(B, PATH_AB_NEW))
     );
     assertThrows(IllegalArgumentException.class, () -> repository.resetTransfersFrom(UNKNOWN, A));
-    assertThat(repository.hasChanges()).isFalse();
+    assertThat(repository.freeze().changedFromStops()).isEmpty();
   }
 
   @Test
-  void theChangedStopsAreTrackedByProfileUntilFreeze() {
+  void theChangedStopsAreTrackedByProfile() {
     repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
     repository.replaceTransfersFrom(WALK, C, Map.of());
     repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
 
-    assertThat(repository.hasChanges()).isTrue();
     assertThat(repository.freeze().changedFromStops()).containsExactly(WALK, Set.of(A, C));
+  }
 
-    // A freeze starts the tracking anew
-    assertThat(repository.hasChanges()).isFalse();
+  @Test
+  void aRepositoryContinuingFromASnapshotStartsWithoutChanges() {
+    repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
+    freeze();
+
     assertThat(repository.freeze().changedFromStops()).isEmpty();
   }
 
   @Test
   void aResetIsAChangeOnlyIfTheStopWasReplaced() {
-    repository.resetTransfersFrom(WALK, A);
-    assertThat(repository.hasChanges()).isFalse();
-
+    repository.resetTransfersFrom(WALK, B);
     repository.replaceTransfersFrom(WALK, A, Map.of());
-    repository.freeze();
+    freeze();
+
     repository.resetTransfersFrom(WALK, A);
+    repository.resetTransfersFrom(WALK, B);
     assertThat(repository.freeze().changedFromStops()).containsExactly(WALK, Set.of(A));
   }
 
   @Test
-  void writesAfterFreezeDoNotChangeThePublishedSnapshot() {
+  void aFrozenRepositoryCannotBeWrittenToOrFrozenAgain() {
+    var frozen = repository;
+    lifecycle.freeze(frozen);
+
+    assertThrows(IllegalStateException.class, () -> frozen.replaceTransfersFrom(WALK, A, Map.of()));
+    assertThrows(IllegalStateException.class, () -> frozen.resetTransfersFrom(WALK, A));
+    assertThrows(IllegalStateException.class, () -> lifecycle.freeze(frozen));
+  }
+
+  @Test
+  void aLaterTransactionDoesNotChangeThePublishedSnapshot() {
     repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
     var first = freeze();
 
@@ -192,15 +205,15 @@ class DefaultRegularTransferRepositoryTest {
   }
 
   @Test
-  void discardChangesContinuesFromTheCommittedPaths() {
+  void aRepositoryThatIsNotPublishedIsDiscarded() {
     repository.replaceTransfersFrom(WALK, A, Map.of(D, PATH_AD));
-    var committed = (DefaultRegularTransferRepositorySnapshot<String>) freeze();
+    var committed = freeze();
 
+    // A failed transaction: its repository is not published
     repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
     repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
-    repository.discardChanges(committed.paths());
+    repository = (DefaultRegularTransferRepository<String>) lifecycle.copyOnWrite(committed);
 
-    assertThat(repository.hasChanges()).isFalse();
     var snapshot = freeze();
     assertThat(snapshot.findPath(WALK, A, D)).isEqualTo(PATH_AD);
     assertThat(snapshot.findPath(WALK, A, B)).isNull();
@@ -215,21 +228,26 @@ class DefaultRegularTransferRepositoryTest {
     build.setPaths(low, A, Map.of(B, PATH_AB));
     build.setPaths(high, A, Map.of(B, PATH_AB));
     var repository = build.createRuntimeRepository();
-    var lifecycle = TestLifecycles.pathsOnly(repository);
 
     repository.replaceTransfersFrom(high, A, Map.of(B, PATH_AB_NEW));
-
-    var snapshot = lifecycle.freeze(repository);
-    assertThat(snapshot.findPath(withReluctance(1.5), A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(withReluctance(3.5), A, B)).isEqualTo(PATH_AB_NEW);
     // Close is not exact: a write must name the profile itself
     assertThrows(IllegalArgumentException.class, () ->
       repository.replaceTransfersFrom(withReluctance(3.5), A, Map.of())
     );
+
+    var snapshot = lifecycle.freeze(repository);
+    assertThat(snapshot.findPath(withReluctance(1.5), A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.findPath(withReluctance(3.5), A, B)).isEqualTo(PATH_AB_NEW);
   }
 
+  /**
+   * Publish the paths of the repository, and continue with the repository of the next
+   * transaction, as the framework does.
+   */
   private RegularTransferRepositorySnapshot<String> freeze() {
-    return lifecycle.freeze(repository);
+    var snapshot = lifecycle.freeze(repository);
+    repository = (DefaultRegularTransferRepository<String>) lifecycle.copyOnWrite(snapshot);
+    return snapshot;
   }
 
   private static WalkPreferences withReluctance(double reluctance) {

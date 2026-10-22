@@ -87,7 +87,7 @@ class DefaultRegularTransferBuildRepositoryTest {
   void runtimeWritesDoNotChangeTheBuildRepository() {
     var buildRepository = createBuildRepository();
     var runtimeRepository = buildRepository.createRuntimeRepository();
-    var lifecycle = TestLifecycles.pathsOnly(runtimeRepository);
+    var lifecycle = TestLifecycles.<String>pathsOnly();
 
     // The paths of the build repository are the base of the runtime repository, a write
     // replaces the paths from stop A in the runtime repository only

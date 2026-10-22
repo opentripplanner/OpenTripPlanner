@@ -56,8 +56,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
     buildRepository.setPaths(PROFILE, B, Map.of(C, path(B, C, 300)));
     repository =
       (DefaultRegularTransferRepository<FakePath>) buildRepository.createRuntimeRepository();
-    lifecycle = new RegularTransferRepositoryLifecycle<>(repository, stopIndex(), provider);
-    initial = lifecycle.freeze(repository);
+    lifecycle = new RegularTransferRepositoryLifecycle<>(stopIndex(), provider);
+    initial = freeze();
   }
 
   @Test
@@ -83,7 +83,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
   void aSnapshotWithoutChangesKeepsTheCachedTransfers() {
     var transfers = initial.raptorTransfers(REQUEST);
 
-    var next = lifecycle.freeze(repository);
+    var next = freeze();
 
     assertThat(next.raptorTransfers(REQUEST)).isSameInstanceAs(transfers);
   }
@@ -94,7 +94,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
     provider.recosted = 0;
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of(C, path(A, C, 250), D, path(A, D, 50)));
-    var next = lifecycle.freeze(repository);
+    var next = freeze();
     var transfers = next.raptorTransfers(REQUEST);
 
     // Only the two new paths from A are re-costed
@@ -114,11 +114,11 @@ class DefaultRegularTransferRepositorySnapshotTest {
     initial.raptorTransfers(REQUEST);
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
-    lifecycle.freeze(repository);
+    freeze();
     repository.replaceTransfersFrom(PROFILE, C, Map.of(A, path(C, A, 10)));
-    lifecycle.freeze(repository);
+    freeze();
     repository.resetTransfersFrom(PROFILE, A);
-    var last = lifecycle.freeze(repository);
+    var last = freeze();
     provider.recosted = 0;
     var transfers = last.raptorTransfers(REQUEST);
 
@@ -132,7 +132,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
   @Test
   void transfersFirstUsedAfterAChangeAreCreatedFromScratch() {
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
-    var next = lifecycle.freeze(repository);
+    var next = freeze();
 
     var transfers = next.raptorTransfers(REQUEST);
 
@@ -145,12 +145,35 @@ class DefaultRegularTransferRepositorySnapshotTest {
     var transfers = initial.raptorTransfers(REQUEST);
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
-    // Rollback: the framework does not freeze, and passes the last snapshot to the next write
-    lifecycle.copyOnWrite(initial);
-    var next = lifecycle.freeze(repository);
+    // Rollback: the repository is not frozen, the next write continues from the last snapshot
+    repository = continueFrom(initial);
+    var next = freeze();
 
     assertThat(next.raptorTransfers(REQUEST)).isSameInstanceAs(transfers);
     assertThat(from(next.raptorTransfers(REQUEST), A)).containsExactly(tx(B, 200), tx(C, 400));
+  }
+
+  @Test
+  void aChangeWhoseCommitFailedAfterItWasFrozenIsRolledBack() {
+    initial.raptorTransfers(REQUEST);
+
+    repository.replaceTransfersFrom(PROFILE, A, Map.of());
+    // The commit fails after this freeze, so the frozen snapshot is never published
+    lifecycle.freeze(repository);
+
+    // The framework passes the last published snapshot to the next write
+    repository = continueFrom(initial);
+    repository.replaceTransfersFrom(PROFILE, B, Map.of(D, path(B, D, 10)));
+    var next = freeze();
+    provider.recosted = 0;
+    var transfers = next.raptorTransfers(REQUEST);
+
+    assertThat(next.findPath(REQUEST, A, B)).isEqualTo(path(A, B, 100));
+    assertThat(from(transfers, A)).containsExactly(tx(B, 200), tx(C, 400));
+    assertThat(from(transfers, B)).containsExactly(tx(D, 20));
+    // Patched from the transfers of the published snapshot, for the change of B only
+    assertThat(provider.recosted).isEqualTo(1);
+    assertSameAsCreatedFromScratch(next, transfers);
   }
 
   @Test
@@ -158,11 +181,27 @@ class DefaultRegularTransferRepositorySnapshotTest {
     var newPath = path(A, D, 50);
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of(D, newPath));
-    var next = lifecycle.freeze(repository);
+    var next = freeze();
 
     assertThat(next.findPath(REQUEST, A, D)).isSameInstanceAs(newPath);
     assertThat(next.findPath(REQUEST, A, B)).isNull();
     assertThat(initial.findPath(REQUEST, A, B)).isEqualTo(path(A, B, 100));
+  }
+
+  /**
+   * Publish the paths of the repository, and continue with the repository of the next
+   * transaction, as the framework does.
+   */
+  private RegularTransferRepositorySnapshot<FakePath> freeze() {
+    var snapshot = lifecycle.freeze(repository);
+    repository = continueFrom(snapshot);
+    return snapshot;
+  }
+
+  private DefaultRegularTransferRepository<FakePath> continueFrom(
+    RegularTransferRepositorySnapshot<FakePath> snapshot
+  ) {
+    return (DefaultRegularTransferRepository<FakePath>) lifecycle.copyOnWrite(snapshot);
   }
 
   /** Compare patched transfers with transfers created from scratch from the same paths. */

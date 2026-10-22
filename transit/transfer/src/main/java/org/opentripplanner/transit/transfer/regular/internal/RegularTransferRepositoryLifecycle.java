@@ -2,7 +2,6 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.stop.StopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
@@ -12,48 +11,35 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 
 /**
- * Copy-on-write / freeze lifecycle for the regular-transfer repository. The repository is a single
- * long-lived buffer shared by all transactions: {@link #copyOnWrite} hands out the same buffer
- * instance, and {@link #freeze} publishes an immutable snapshot of it. Every snapshot is created
- * by {@link #freeze}, including the initial one.
+ * Copy-on-write / freeze lifecycle for the regular-transfer repository. Each transaction that
+ * writes transfers gets a new repository continuing from the last published snapshot, see
+ * {@link #copyOnWrite}, and {@link #freeze} publishes its paths in a new immutable snapshot. Every
+ * snapshot is created by {@link #freeze}, including the initial one, from the repository created
+ * by the build repository.
  * <p>
- * Publishing a snapshot copies only the transfers replaced at runtime, never the paths generated
- * at graph build, see {@link OverlaidTemplatePaths}. The cache of the Raptor transfers derived
- * from the paths is carried forward from snapshot to snapshot: a cached value is only updated for
- * the stops whose transfers changed, see {@link RegularTransferServiceCache#carryForward}.
+ * Neither direction copies the paths generated at graph build, only the transfers replaced at
+ * runtime, see {@link OverlaidTemplatePaths}. The cache of the Raptor transfers derived from the
+ * paths is carried forward from the snapshot a repository continues from: a cached value is only
+ * updated for the stops whose transfers changed, see
+ * {@link RegularTransferServiceCache#carryForward}.
  * <p>
- * <b>Rollback.</b> A failed transaction is not frozen; the framework passes the last published
- * snapshot to the next {@link #copyOnWrite}. If the buffer has changes at that point, they belong
- * to the failed transaction, and are discarded.
+ * <b>Rollback.</b> A repository that is not published is discarded with its changes, whether its
+ * transaction failed before or after it was frozen. The next transaction gets a new repository
+ * continuing from the last published snapshot.
  * <p>
- * This class is only accessed on the writer thread.
+ * This class is stateless and only accessed on the writer thread.
  *
  * @param <P> the transfer path/template type
  */
 public class RegularTransferRepositoryLifecycle<P> implements
   RepositoryLifecycle<RegularTransferRepositorySnapshot<P>, RegularTransferRepository<P>> {
 
-  private final DefaultRegularTransferRepository<P> buffer;
   private final RaptorTransfersFactory<P> raptorTransfersFactory;
 
-  /**
-   * The cache of the last published snapshot, the snapshot all requests started after the last
-   * commit read. The cache of the next snapshot is carried forward from it.
-   */
-  @Nullable
-  private RegularTransferServiceCache<RaptorTransferStore> publishedCache;
-
-  /**
-   * @param repository the buffer, created by
-   *                   {@link org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository#createRuntimeRepository()}
-   */
   public RegularTransferRepositoryLifecycle(
-    RegularTransferRepository<P> repository,
     StopIndex stopIndex,
     TransferPathProvider<P, AbstractUserPreferences<?>> pathProvider
   ) {
-    // the cast is safe: the build repository creates the only repository implementation
-    this.buffer = (DefaultRegularTransferRepository<P>) Objects.requireNonNull(repository);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       stopIndex.size(),
       Objects.requireNonNull(pathProvider)
@@ -62,24 +48,23 @@ public class RegularTransferRepositoryLifecycle<P> implements
 
   @Override
   public RegularTransferRepository<P> copyOnWrite(RegularTransferRepositorySnapshot<P> snapshot) {
-    if (buffer.hasChanges()) {
-      // the cast is safe: all snapshots are created by freeze() below
-      buffer.discardChanges(((DefaultRegularTransferRepositorySnapshot<P>) snapshot).paths());
-    }
-    return buffer;
+    // the cast is safe: all snapshots are created by freeze() below
+    return DefaultRegularTransferRepository.continueFrom(
+      (DefaultRegularTransferRepositorySnapshot<P>) Objects.requireNonNull(snapshot)
+    );
   }
 
   @Override
   public RegularTransferRepositorySnapshot<P> freeze(RegularTransferRepository<P> repository) {
-    if (repository != buffer) {
-      throw new IllegalArgumentException("Only the buffer of this lifecycle can be frozen.");
-    }
-    var frozen = buffer.freeze();
+    // the cast is safe: all repositories are created by the build repository or copyOnWrite()
+    var frozen = ((DefaultRegularTransferRepository<P>) repository).freeze();
     var cache =
-      publishedCache == null
+      frozen.base() == null
         ? new RegularTransferServiceCache<RaptorTransferStore>()
-        : publishedCache.carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
-    publishedCache = cache;
+        : frozen
+            .base()
+            .cache()
+            .carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
     return new DefaultRegularTransferRepositorySnapshot<>(
       frozen.paths(),
       cache,
