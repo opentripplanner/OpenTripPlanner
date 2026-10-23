@@ -19,44 +19,80 @@ import java.util.function.BiConsumer;
  * <p>
  * Keys and values can not be {@code null}. Iteration order is unspecified.
  */
-public final class TrieMap<K, V> extends AbstractMap<K, V> {
+public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> {
 
-  private static final TrieMap<?, ?> EMPTY = new TrieMap<>(TrieNode.empty(), 0);
+  private static final ImmutableTrieMap<?, ?> EMPTY = new ImmutableTrieMap<>(TrieNode.empty(), 0);
 
   private final TrieNode<K, V> root;
   private final int size;
   private Set<Map.Entry<K, V>> entrySet;
 
-  private TrieMap(TrieNode<K, V> root, int size) {
+  private ImmutableTrieMap(TrieNode<K, V> root, int size) {
     this.root = root;
     this.size = size;
   }
 
   @SuppressWarnings("unchecked")
-  public static <K, V> TrieMap<K, V> empty() {
-    return (TrieMap<K, V>) EMPTY;
+  public static <K, V> ImmutableTrieMap<K, V> empty() {
+    return (ImmutableTrieMap<K, V>) EMPTY;
+  }
+
+  /**
+   * Return a map with the same mappings as the given map. If the given map is an
+   * {@link ImmutableTrieMap}, it is returned as is.
+   * <p>
+   * Takes time linear in the size of the map. Adding the same mappings one by one with
+   * {@link #with(Object, Object)} copies part of the map for every mapping, which is much slower
+   * for a large map.
+   *
+   * @throws IllegalArgumentException if two keys of the given map are equal, which is possible for
+   *         a map that does not compare keys with {@code equals}, such as
+   *         {@link java.util.IdentityHashMap}
+   */
+  @SuppressWarnings("unchecked")
+  public static <K, V> ImmutableTrieMap<K, V> of(Map<? extends K, ? extends V> map) {
+    if (map instanceof ImmutableTrieMap<?, ?> trieMap) {
+      return (ImmutableTrieMap<K, V>) trieMap;
+    }
+    if (map.isEmpty()) {
+      return empty();
+    }
+    TrieNode<K, V> root = TrieNode.empty();
+    var addedLeaf = new TrieNode.AddedLeaf();
+    for (var e : map.entrySet()) {
+      K key = Objects.requireNonNull(e.getKey());
+      V value = Objects.requireNonNull(e.getValue());
+      addedLeaf.val = false;
+      root = TrieNode.insertInPlace(root, key, TrieNode.hash(key), value, addedLeaf);
+      if (!addedLeaf.val) {
+        throw new IllegalArgumentException("Duplicate key: " + key);
+      }
+    }
+    return new ImmutableTrieMap<>(root, map.size());
   }
 
   /**
    * Return a map with the given mapping added, replacing any existing mapping for the key. If the
    * key already maps to the same value instance, this map is returned.
    */
-  public TrieMap<K, V> with(K key, V value) {
+  public ImmutableTrieMap<K, V> with(K key, V value) {
     Objects.requireNonNull(key);
     Objects.requireNonNull(value);
-    var change = new TrieNode.Change();
-    var newRoot = TrieNode.insert(root, key, TrieNode.hash(key), 0, value, change);
-    return newRoot == root ? this : new TrieMap<>(newRoot, change.added ? size + 1 : size);
+    var addedLeaf = new TrieNode.AddedLeaf();
+    var newRoot = TrieNode.insert(root, key, TrieNode.hash(key), 0, value, addedLeaf);
+    return newRoot == root
+      ? this
+      : new ImmutableTrieMap<>(newRoot, addedLeaf.val ? size + 1 : size);
   }
 
   /**
    * Return a map without the mapping for the given key. If the key is not in this map, this map
    * is returned.
    */
-  public TrieMap<K, V> without(Object key) {
+  public ImmutableTrieMap<K, V> without(Object key) {
     Objects.requireNonNull(key);
     var newRoot = TrieNode.remove(root, key, TrieNode.hash(key), 0);
-    return newRoot == root ? this : new TrieMap<>(newRoot, size - 1);
+    return newRoot == root ? this : new ImmutableTrieMap<>(newRoot, size - 1);
   }
 
   @Override

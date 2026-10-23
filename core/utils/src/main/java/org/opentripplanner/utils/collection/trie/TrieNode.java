@@ -13,11 +13,11 @@ import java.util.function.BiConsumer;
  * 32-bit hash collision).
  * <p>
  * Many versions of a map share nodes and leaves, so a node, its {@code slots} array and a leaf
- * must never change after they are created. A change instead copies the nodes on the path from the
- * root to the changed slot. Each copy gets a new {@code slots} array where only the changed slot
- * differs; every other slot points to the same child as in the original. The new root reaches the
- * new content, the old root still reaches the old content, and both share every subtree off the
- * path. The mutation methods return the new node, or the original node if nothing changed.
+ * must never change once an {@link ImmutableTrieMap} holds them. A change instead copies the nodes
+ * on the path from the root to the changed slot. Each copy gets a new {@code slots} array where
+ * only the changed slot differs; every other slot points to the same child as in the original. The
+ * new root reaches the new content, the old root still reaches the old content, and both share
+ * every subtree off the path.
  */
 final class TrieNode<K, V> {
 
@@ -29,18 +29,21 @@ final class TrieNode<K, V> {
 
   private static final TrieNode<?, ?> EMPTY = new TrieNode<>(0, new Object[0]);
 
-  final int bitmap;
-  final Object[] slots;
+  int bitmap;
+  Object[] slots;
 
   private TrieNode(int bitmap, Object[] slots) {
     this.bitmap = bitmap;
     this.slots = slots;
   }
 
-  /** Tells the caller of {@link #insert} whether a new key was added or a value replaced. */
-  static final class Change {
+  /**
+   * Tells the caller of {@link #insert} or {@link #insertInPlace} whether a new key was added or a
+   * value replaced. This is similar to {@code addedLeaf} from Clojure's {@code PersistentHashMap}.
+   */
+  static final class AddedLeaf {
 
-    boolean added;
+    boolean val;
   }
 
   @SuppressWarnings("unchecked")
@@ -80,7 +83,10 @@ final class TrieNode<K, V> {
     }
   }
 
-  /** Returns the new node. Sets {@code change.added} if {@code key} was not present before. */
+  /**
+   * Returns the new node, or the given node if {@code key} already maps to {@code value}. Sets
+   * {@code addedLeaf.val} if {@code key} was not present before.
+   */
   @SuppressWarnings("unchecked")
   static <K, V> TrieNode<K, V> insert(
     TrieNode<K, V> node,
@@ -88,13 +94,13 @@ final class TrieNode<K, V> {
     int hash,
     int shift,
     V value,
-    Change change
+    AddedLeaf addedLeaf
   ) {
     int bit = bit(hash, shift);
     int pos = node.index(bit);
 
     if ((node.bitmap & bit) == 0) {
-      change.added = true;
+      addedLeaf.val = true;
       return new TrieNode<>(
         node.bitmap | bit,
         arrayInsert(node.slots, pos, new TrieLeaf<>(key, value, null))
@@ -105,7 +111,7 @@ final class TrieNode<K, V> {
     Object newSlot;
     if (existing instanceof TrieNode<?, ?>) {
       var child = (TrieNode<K, V>) existing;
-      var newChild = insert(child, key, hash, shift + BITS_PER_LEVEL, value, change);
+      var newChild = insert(child, key, hash, shift + BITS_PER_LEVEL, value, addedLeaf);
       if (newChild == child) {
         return node;
       }
@@ -119,7 +125,7 @@ final class TrieNode<K, V> {
         newSlot = replaceInChain(leaf, key, value);
       } else if (shift + BITS_PER_LEVEL >= Integer.SIZE) {
         // All 32 hash bits are exhausted: this is a genuine hash collision, chain it.
-        change.added = true;
+        addedLeaf.val = true;
         newSlot = new TrieLeaf<>(key, value, leaf);
       } else {
         // A different key landed in the same slot: split it into a child node one level deeper.
@@ -129,12 +135,65 @@ final class TrieNode<K, V> {
         TrieNode<K, V> sub = new TrieNode<>(bit(hash(leaf.getKey()), nextShift), new Object[] {
           leaf,
         });
-        newSlot = insert(sub, key, hash, nextShift, value, change);
+        newSlot = insert(sub, key, hash, nextShift, value, addedLeaf);
       }
     }
     Object[] newSlots = node.slots.clone();
     newSlots[pos] = newSlot;
     return new TrieNode<>(node.bitmap, newSlots);
+  }
+
+  /**
+   * Add the mapping by changing the nodes in place, instead of copying them, replacing any existing
+   * mapping for the key. Returns the root, which is a new node if the given root is the shared
+   * empty node. Sets {@code addedLeaf.val} if {@code key} was not present before.
+   */
+  @SuppressWarnings("unchecked")
+  static <K, V> TrieNode<K, V> insertInPlace(
+    TrieNode<K, V> root,
+    K key,
+    int hash,
+    V value,
+    AddedLeaf addedLeaf
+  ) {
+    if (root == EMPTY) {
+      root = new TrieNode<>(0, new Object[0]);
+    }
+    TrieNode<K, V> node = root;
+    int shift = 0;
+    while (true) {
+      int bit = bit(hash, shift);
+      int pos = node.index(bit);
+      if ((node.bitmap & bit) == 0) {
+        node.bitmap |= bit;
+        node.slots = arrayInsert(node.slots, pos, new TrieLeaf<>(key, value, null));
+        addedLeaf.val = true;
+        return root;
+      }
+      Object existing = node.slots[pos];
+      if (existing instanceof TrieNode<?, ?>) {
+        node = (TrieNode<K, V>) existing;
+        shift += BITS_PER_LEVEL;
+        continue;
+      }
+      TrieLeaf<K, V> leaf = (TrieLeaf<K, V>) existing;
+      if (leaf.find(key) != null) {
+        node.slots[pos] = replaceInChain(leaf, key, value);
+        return root;
+      }
+      if (shift + BITS_PER_LEVEL >= Integer.SIZE) {
+        // All 32 hash bits are exhausted: this is a genuine hash collision, chain it.
+        node.slots[pos] = new TrieLeaf<>(key, value, leaf);
+        addedLeaf.val = true;
+        return root;
+      }
+      // A different key landed in the same slot: move it into a child node one level deeper, and
+      // continue the insert there.
+      shift += BITS_PER_LEVEL;
+      var child = new TrieNode<K, V>(bit(hash(leaf.getKey()), shift), new Object[] { leaf });
+      node.slots[pos] = child;
+      node = child;
+    }
   }
 
   /** Returns the new node, or the given node if {@code key} is not present. */

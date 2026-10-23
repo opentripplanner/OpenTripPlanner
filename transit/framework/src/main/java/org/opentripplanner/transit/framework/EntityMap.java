@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.framework;
 
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.utils.collection.trie.TrieMap;
+import org.opentripplanner.utils.collection.trie.ImmutableTrieMap;
 
 /**
  * A mutable set of transit entities of one type, looked up by their id. The id of an entity is
@@ -12,10 +12,10 @@ import org.opentripplanner.utils.collection.trie.TrieMap;
 public final class EntityMap<E extends TransitEntity> extends ImmutableEntityMap<E> {
 
   public EntityMap() {
-    this(TrieMap.empty());
+    this(ImmutableTrieMap.empty());
   }
 
-  EntityMap(TrieMap<FeedScopedId, E> map) {
+  EntityMap(ImmutableTrieMap<FeedScopedId, E> map) {
     super(map);
   }
 

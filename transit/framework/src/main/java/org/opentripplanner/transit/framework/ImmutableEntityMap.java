@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.utils.collection.trie.TrieMap;
+import org.opentripplanner.utils.collection.trie.ImmutableTrieMap;
 
 /**
  * Read access to a set of transit entities, looked up by their id.
@@ -25,12 +25,14 @@ public sealed class ImmutableEntityMap<E extends TransitEntity>
   permits EntityMap
 {
 
-  private static final ImmutableEntityMap<?> EMPTY = new ImmutableEntityMap<>(TrieMap.empty());
+  private static final ImmutableEntityMap<?> EMPTY = new ImmutableEntityMap<>(
+    ImmutableTrieMap.empty()
+  );
 
   /** Only {@link EntityMap} changes this field. */
-  TrieMap<FeedScopedId, E> map;
+  ImmutableTrieMap<FeedScopedId, E> map;
 
-  ImmutableEntityMap(TrieMap<FeedScopedId, E> map) {
+  ImmutableEntityMap(ImmutableTrieMap<FeedScopedId, E> map) {
     this.map = map;
   }
 
