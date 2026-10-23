@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -236,6 +241,39 @@ class ImmutableTrieMapTest {
     }
     assertEquals(expected, subject);
     assertEquals(expected.size(), subject.size());
+  }
+
+  @Test
+  void serialization() throws Exception {
+    var expected = new HashMap<String, Integer>();
+    for (int i = 0; i < 1_000; ++i) {
+      expected.put("K" + i, i);
+    }
+    var subject = roundTrip(ImmutableTrieMap.of(expected));
+
+    assertEquals(expected, subject);
+    assertEquals(expected.size(), subject.size());
+
+    var changed = subject.with("K1", -1).without("K2");
+    expected.put("K1", -1);
+    expected.remove("K2");
+    assertEquals(expected, changed);
+  }
+
+  @Test
+  void serializationOfTheEmptyMapReturnsTheEmptyMap() throws Exception {
+    assertSame(ImmutableTrieMap.empty(), roundTrip(ImmutableTrieMap.empty()));
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> T roundTrip(T object) throws IOException, ClassNotFoundException {
+    var bytes = new ByteArrayOutputStream();
+    try (var out = new ObjectOutputStream(bytes)) {
+      out.writeObject(object);
+    }
+    try (var in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
+      return (T) in.readObject();
+    }
   }
 
   /** A key where every instance has the same hash code. */

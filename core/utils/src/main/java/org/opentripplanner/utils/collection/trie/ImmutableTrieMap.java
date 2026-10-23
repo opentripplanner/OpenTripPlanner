@@ -1,7 +1,12 @@
 package org.opentripplanner.utils.collection.trie;
 
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -19,13 +24,13 @@ import java.util.function.BiConsumer;
  * <p>
  * Keys and values can not be {@code null}. Iteration order is unspecified.
  */
-public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> {
+public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements Serializable {
 
   private static final ImmutableTrieMap<?, ?> EMPTY = new ImmutableTrieMap<>(TrieNode.empty(), 0);
 
   private final TrieNode<K, V> root;
   private final int size;
-  private Set<Map.Entry<K, V>> entrySet;
+  private transient Set<Map.Entry<K, V>> entrySet;
 
   private ImmutableTrieMap(TrieNode<K, V> root, int size) {
     this.root = root;
@@ -54,12 +59,19 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> {
     if (map instanceof ImmutableTrieMap<?, ?> trieMap) {
       return (ImmutableTrieMap<K, V>) trieMap;
     }
-    if (map.isEmpty()) {
+    return build(map.entrySet());
+  }
+
+  /** Build a map from entries with distinct keys, changing the trie in place while building it. */
+  private static <K, V> ImmutableTrieMap<K, V> build(
+    Collection<? extends Map.Entry<? extends K, ? extends V>> entries
+  ) {
+    if (entries.isEmpty()) {
       return empty();
     }
     TrieNode<K, V> root = TrieNode.empty();
     var addedLeaf = new TrieNode.AddedLeaf();
-    for (var e : map.entrySet()) {
+    for (var e : entries) {
       K key = Objects.requireNonNull(e.getKey());
       V value = Objects.requireNonNull(e.getValue());
       addedLeaf.val = false;
@@ -68,7 +80,7 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> {
         throw new IllegalArgumentException("Duplicate key: " + key);
       }
     }
-    return new ImmutableTrieMap<>(root, map.size());
+    return new ImmutableTrieMap<>(root, entries.size());
   }
 
   /**
@@ -137,5 +149,35 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> {
       };
     }
     return entrySet;
+  }
+
+  private Object writeReplace() {
+    return new SerializedForm(this);
+  }
+
+  private void readObject(ObjectInputStream in) throws InvalidObjectException {
+    throw new InvalidObjectException("Deserialized through SerializedForm");
+  }
+
+  /**
+   * The serialized form of a map is its entries; the trie is rebuilt when the map is read. The
+   * layout of a trie depends on the {@code hashCode} of its keys, which is not guaranteed to be
+   * the same in another JVM.
+   */
+  private static final class SerializedForm implements Serializable {
+
+    private final Map.Entry<?, ?>[] entries;
+
+    private SerializedForm(ImmutableTrieMap<?, ?> map) {
+      entries = map
+        .entrySet()
+        .stream()
+        .map(AbstractMap.SimpleImmutableEntry::new)
+        .toArray(Map.Entry[]::new);
+    }
+
+    private Object readResolve() {
+      return build(Arrays.asList(entries));
+    }
   }
 }
