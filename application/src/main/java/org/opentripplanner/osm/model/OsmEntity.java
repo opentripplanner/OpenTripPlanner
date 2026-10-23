@@ -10,6 +10,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -125,7 +126,18 @@ public abstract class OsmEntity {
     "tyres"
   );
 
-  private static final Set<String> WHEELCHAIR_ACCESSIBLE_KERBS = Set.of("flush", "lowered", "no");
+  // https://wiki.openstreetmap.org/wiki/Key:kerb documents flush/lowered/no as accessible, but
+  // real-world data (e.g. taginfo) also shows widely-used synonyms/compounds like "sloped",
+  // "none", "low", "lowered_and_sloped", "flush_and_lowered"; these are matched by splitting on
+  // "_" as well as the standard ";" alternatives, see #isWheelchairAccessible.
+  private static final Set<String> WHEELCHAIR_ACCESSIBLE_KERBS = Set.of(
+    "flush",
+    "lowered",
+    "no",
+    "none",
+    "sloped",
+    "low"
+  );
 
   private static final Consumer<String> NO_OP = i -> {};
 
@@ -908,7 +920,14 @@ public abstract class OsmEntity {
       return false;
     }
     if (isTag("barrier", "kerb")) {
-      return isOneOfTags("kerb", WHEELCHAIR_ACCESSIBLE_KERBS);
+      // kerb can have semicolon-separated alternative values, e.g. kerb=lowered;no, and
+      // underscore-joined compound values for the same point, e.g. kerb=lowered_and_sloped
+      // or kerb=flush_and_lowered; treat the node as accessible if any of the individual
+      // words indicates an accessible kerb.
+      return getMultiTagValues(Set.of("kerb"))
+        .stream()
+        .flatMap(value -> Arrays.stream(value.split("_")))
+        .anyMatch(WHEELCHAIR_ACCESSIBLE_KERBS::contains);
     }
     return true;
   }

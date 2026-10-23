@@ -287,7 +287,49 @@ public class OsmEntityTest {
         OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "rolled").build(),
         false
       ),
-      Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "yes").build(), false)
+      Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "yes").build(), false),
+      // kerb can have semicolon-separated alternative values, e.g. on a crossing that is
+      // partially dropped; it should be considered accessible if any value is accessible.
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "lowered;no").build(),
+        true
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "raised;rolled").build(),
+        false
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "raised;flush").build(),
+        true
+      ),
+      // real-world values seen in OSM data (taginfo), beyond the ones documented on the wiki
+      Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "sloped").build(), true),
+      Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "none").build(), true),
+      Arguments.of(OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "low").build(), true),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "lowered_and_sloped").build(),
+        true
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "sloped_and_lowered").build(),
+        true
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "flush_and_lowered").build(),
+        true
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "lowered_sloped").build(),
+        true
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "regular").build(),
+        false
+      ),
+      Arguments.of(
+        OsmNode.of().withTag("barrier", "kerb").withTag("kerb", "rounded").build(),
+        false
+      )
     );
   }
 

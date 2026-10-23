@@ -156,7 +156,11 @@ public class VertexGenerator {
         );
       }
 
-      if (iv == null && node.isBarrier()) {
+      // A node is relevant as a barrier either because it restricts the mode permission
+      // (node.isBarrier()) or because it is wheelchair-inaccessible without affecting other
+      // modes, e.g. barrier=kerb with a raised/rolled kerb value, which isn't in
+      // BARRIER_PERMISSIONS and therefore doesn't make node.isBarrier() true on its own.
+      if (iv == null && (node.isBarrier() || !node.isWheelchairAccessible())) {
         iv = vertexFactory.barrier(nid, coordinate, node.explicitWheelchairAccessibility());
       }
 
