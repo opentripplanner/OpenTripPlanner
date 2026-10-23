@@ -2,9 +2,9 @@ package org.opentripplanner.place.nearbystopfinder;
 
 import java.util.Collection;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.collection.MinMap;
 
 /**
@@ -16,15 +16,15 @@ import org.opentripplanner.utils.collection.MinMap;
  */
 class FlexTripNearbyStopFilter implements NearbyStopFilter {
 
-  private final TransitService transitService;
+  private final FlexIndex flexIndex;
 
-  FlexTripNearbyStopFilter(TransitService transitService) {
-    this.transitService = transitService;
+  FlexTripNearbyStopFilter(FlexIndex flexIndex) {
+    this.flexIndex = flexIndex;
   }
 
   @Override
   public boolean includeFromStop(FeedScopedId id, boolean reverseDirection) {
-    return !transitService.getFlexIndex().getFlexTripsByStopId(id).isEmpty();
+    return !flexIndex.getFlexTripsByStopId(id).isEmpty();
   }
 
   @Override
@@ -35,7 +35,7 @@ class FlexTripNearbyStopFilter implements NearbyStopFilter {
     MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = MinMap.ofNaturalOrder();
     for (var it : nearbyStops) {
       var stopId = it.stopId();
-      var flexTrips = transitService.getFlexIndex().getFlexTripsByStopId(stopId);
+      var flexTrips = flexIndex.getFlexTripsByStopId(stopId);
 
       for (FlexTrip<?, ?> trip : flexTrips) {
         if (reverseDirection ? trip.isAlightingPossible(stopId) : trip.isBoardingPossible(stopId)) {

@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 /**
- * This class is used to store a {@link Duration} value for each of the enum type values.
- * If an enum value does not exist, it falls back to the default value.
+ * This class is used to store a {@link Duration} value for each of the enum type values. If an enum
+ * value does not exist, it falls back to the default value.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
@@ -154,10 +154,10 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
     }
 
     /**
-     * Build a copy of the current values, excluding the defaultValue from the map. This
-     * ensures equality and makes a defensive copy of the builder values. Hence, the builder
-     * can be used to generate new values if desired.
-     * */
+     * Build a copy of the current values, excluding the defaultValue from the map. This ensures
+     * equality and makes a defensive copy of the builder values. Hence, the builder can be used to
+     * generate new values if desired.
+     */
     Map<E, Duration> copyValueForEnum() {
       if (valueForEnum == null) {
         // The valueForEnum is protected and should never be mutated, so we can reuse it

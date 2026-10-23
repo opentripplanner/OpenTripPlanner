@@ -28,13 +28,13 @@ public interface ReadOnlyHierarchicalMap<K, V> {
 
   /**
    * @return a collection of all values hold in the local map, all values added to one of the
-   * parents are excluded from the collection.
+   *         parents are excluded from the collection.
    */
   Collection<K> localKeys();
 
   /**
    * @return a collection of all values hold in the local map, all values added to one of the
-   * parents are excluded from the collection.
+   *         parents are excluded from the collection.
    */
   Collection<V> localValues();
 

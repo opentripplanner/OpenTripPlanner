@@ -16,23 +16,23 @@ import org.opentripplanner.raptorlegacy._data.api.PathUtils;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 
 /**
- *  This test focus on the PASS-THROUGH functionality with three transit legs and two transfer in
- *  the path.
- *  <p>
- *  FEATURE UNDER TEST
- *  <p>
- *  We want the path with the lowest generalized-cost that visit the pass-through points in the
- *  correct order.
- *  <p>
- *  TEST SETUP
- *  <p>
- *  We will use 3 trips with a fixed set of transfers for each test. Each trip has 5 stops and
- *  plenty of slack to do the transfers for all possible stops combinations. There is two
- *  transfers to choose from between trip 1 and trip 2, and between trip 2 and trip 3. We will set
- *  the transfer durations to get different generalized-costs for each possible path. We will set
- *  the cost so the transfers which do not contain any transfer-points have the lowest cost - is
- *  optimal on generalized-cost. We do this to make sure the subject-under-test is using the
- *  pass-through-points, and not the generalized cost to choose the correct path.
+ * This test focus on the PASS-THROUGH functionality with three transit legs and two transfer in the
+ * path.
+ * <p>
+ * FEATURE UNDER TEST
+ * <p>
+ * We want the path with the lowest generalized-cost that visit the pass-through points in the
+ * correct order.
+ * <p>
+ * TEST SETUP
+ * <p>
+ * We will use 3 trips with a fixed set of transfers for each test. Each trip has 5 stops and
+ * plenty of slack to do the transfers for all possible stops combinations. There is two transfers
+ * to choose from between trip 1 and trip 2, and between trip 2 and trip 3. We will set the transfer
+ * durations to get different generalized-costs for each possible path. We will set the cost so the
+ * transfers which do not contain any transfer-points have the lowest cost - is optimal on
+ * generalized-cost. We do this to make sure the subject-under-test is using the
+ * pass-through-points, and not the generalized cost to choose the correct path.
  */
 @SuppressWarnings("SameParameterValue")
 public class PassThroughTwoTransfersTest implements RaptorTestConstants {
@@ -167,12 +167,12 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
    * The point in this test is to give the path with transfer C-G & H-K an advantage
    * (generalized-cost), but at the same time miss out on possible transfer-points (D,E,I,J).
    * <p>
-   * If stop G or K is part of a pass-through-point, then we would like to make an exception to the
-   * generalized-cost by increasing the cost for transfer K -> H-K and G -> C-G to 20s - making
+   * If stop G or K is part of a pass-through-point, then we would like to make an exception to
+   * the generalized-cost by increasing the cost for transfer K -> H-K and G -> C-G to 20s - making
    * these transfers less favorable on generalized-cost.
    * <p>
-   * We will variate this test with zero, one and two pass-through point and by making unreachable
-   * stops(A,F) part of the pass-through-points.
+   * We will variate this test with zero, one and two pass-through point and by making
+   * unreachable stops(A,F) part of the pass-through-points.
    */
   @ParameterizedTest
   @MethodSource("tripWithTwoTransferTestCases")

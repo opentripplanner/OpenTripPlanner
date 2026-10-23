@@ -226,8 +226,9 @@ public class AddTransitEntitiesToGraph {
 
   /**
    * Create elevator edges from pathways. As pathway based elevators are not vertices, but edges in
-   * the pathway model, we have to model each possible movement as an ElevatorHopVertex-StationElementVertex pair,
-   * instead of having only one set of vertices per level and edges between them.
+   * the pathway model, we have to model each possible movement as an
+   * ElevatorHopVertex-StationElementVertex pair, instead of having only one set of vertices per
+   * level and edges between them.
    */
   private void createElevatorEdgesAndAddThemToGraph(
     Pathway pathway,
@@ -326,8 +327,8 @@ public class AddTransitEntitiesToGraph {
   }
 
   /**
-   * Try to find a stop level. If one can not be found, return null.
-   * If a name is not present, default to the index as the name.
+   * Try to find a stop level. If one can not be found, return null. If a name is not present,
+   * default to the index as the name.
    *
    * @return null or StopLevel without any null fields
    */

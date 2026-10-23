@@ -11,8 +11,9 @@ import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
  * OSM way properties for the Houston, Texas, USA area.
  * <p>
  * The differences compared to the default property set are:
- * <p>
+ * <pre>
  * 1. In Houston we want to disallow usage of downtown pedestrian tunnel system.
+ * </pre>
  */
 
 class HoustonMapper extends OsmTagMapper {

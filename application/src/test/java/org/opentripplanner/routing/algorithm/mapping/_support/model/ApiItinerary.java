@@ -88,18 +88,18 @@ public class ApiItinerary {
   public boolean tooSloped = false;
 
   /**
-   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
-   * is set than it is possible to end a trip without dropping off the rented bicycle.
+   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination} is set than it is possible to
+   * end a trip without dropping off the rented bicycle.
    */
   public boolean arrivedAtDestinationWithRentedBicycle = false;
 
   /**
-   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates
-   * how accessible the itinerary is as a whole. This is not a very scientific method but just
-   * a rough guidance that expresses certainty or uncertainty about the accessibility.
+   * A sandbox feature for calculating a numeric score between 0 and 1 which indicates how
+   * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
+   * guidance that expresses certainty or uncertainty about the accessibility.
    *
-   * The intended audience for this score are frontend developers wanting to show a simple UI
-   * rather than having to iterate over all the stops and trips.
+   * The intended audience for this score are frontend developers wanting to show a simple UI rather
+   * than having to iterate over all the stops and trips.
    *
    * Note: the information to calculate this score are all available to the frontend, however
    * calculating them on the backend makes life a little easier and changes are automatically

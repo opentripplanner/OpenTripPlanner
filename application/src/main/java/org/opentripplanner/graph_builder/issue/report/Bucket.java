@@ -8,8 +8,9 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
  *
  * @param reportedIssuesOfType the number of issues of this type written to the report, across all
  *                             the buckets of the type.
- * @param totalIssuesOfType the number of issues of this type found during the graph build. This is
- *                          larger than {@code reportedIssuesOfType} if the report is truncated.
+ * @param totalIssuesOfType    the number of issues of this type found during the graph build. This
+ *                             is larger than {@code reportedIssuesOfType} if the report is
+ *                             truncated.
  */
 record Bucket(
   BucketKey key,

@@ -14,6 +14,7 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 /**
  * Run two Raptor routers and join the result. The two searches are run concurrently if an
  * {@link ExecutorService} is provided.
+ *
  * @see CompositeResult for joining results.
  */
 public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule> implements

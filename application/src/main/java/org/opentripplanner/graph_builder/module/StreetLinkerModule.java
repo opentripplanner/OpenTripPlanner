@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -39,11 +40,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link GraphBuilderModule} plugin that links various
- * objects in the graph to the street network. It should be run after both the transit network and
- * street network are loaded. It links four things: transit stops, transit entrances, bike rental
- * stations, and bike parks. Therefore, it should be run even when there's no GTFS data present to
- * make bike rental services and bike parks usable.
+ * {@link GraphBuilderModule} plugin that links various objects in the graph to the street network.
+ * It should be run after both the transit network and street network are loaded. It links four
+ * things: transit stops, transit entrances, bike rental stations, and bike parks. Therefore, it
+ * should be run even when there's no GTFS data present to make bike rental services and bike parks
+ * usable.
  */
 public class StreetLinkerModule implements GraphBuilderModule {
 
@@ -53,6 +54,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private final Graph graph;
   private final VehicleParkingRepository parkingRepository;
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
   private final DataImportIssueStore issueStore;
   private final VertexLinker vertexLinker;
 
@@ -61,11 +63,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
     VertexLinker linker,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.parkingRepository = parkingRepository;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.issueStore = issueStore;
     this.vertexLinker = linker;
   }
@@ -87,17 +91,21 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   public void linkTransitStops(Graph graph, TransitRepository transitRepository) {
-    List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
-    var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
+    var vertices = graph.findVertices(TransitStopVertex.class);
+    var progress = ProgressTracker.track(
+      "Linking transit stops to graph",
+      5000,
+      transitRepository.getSiteRepository().listRegularStops().size()
+    );
     LOG.info(progress.startMessage());
 
     Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
     if (OTPFeature.FlexRouting.isOn()) {
-      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(transitRepository);
+      stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips();
     }
 
     Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
-      transitRepository.getStopLocationsUsedForCarsAllowedTrips();
+      timetableDataImport.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex stopVertex : vertices) {
       var stop = Objects.requireNonNull(
@@ -136,7 +144,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * the {@link OsmBoardingLocationsModule}, which runs before this one, often links stops to
    * walkable edges only.
    *
-   * @param stopVertex The transit stop vertex to be checked.
+   * @param stopVertex                    The transit stop vertex to be checked.
    * @param stopLocationsUsedForFlexTrips A set of stop locations that are used for flexible trips.
    */
   private static boolean isAlreadyLinked(
@@ -155,8 +163,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
    * Link a stop to the nearest "relevant" edges.
    * <p>
    * These are mostly walk edges but if a stop is used by a flex pattern it also needs to be
-   * car-accessible. Therefore, flex stops are ensured to be connected to the car-accessible
-   * edge. This may lead to several links being created.
+   * car-accessible. Therefore, flex stops are ensured to be connected to the car-accessible edge.
+   * This may lead to several links being created.
    */
   private void linkStopToStreetNetwork(TransitStopVertex tStop, StopLinkType linkType) {
     vertexLinker.linkVertexPermanently(
@@ -245,7 +253,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
-    for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
+    for (TransitEntranceVertex tEntrance : graph.findVertices(TransitEntranceVertex.class)) {
       vertexLinker.linkVertexPermanently(
         tEntrance,
         new TraverseModeSet(TraverseMode.WALK),
@@ -281,7 +289,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         )
       );
 
-    for (StationCentroidVertex station : graph.getVerticesOfType(StationCentroidVertex.class)) {
+    for (StationCentroidVertex station : graph.findVertices(StationCentroidVertex.class)) {
       vertexLinker.linkVertexPermanently(
         station,
         new TraverseModeSet(TraverseMode.WALK),
@@ -294,7 +302,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkVehicleParks(Graph graph, DataImportIssueStore issueStore) {
     LOG.info("Linking vehicle parks to graph...");
     List<VehicleParking> vehicleParkingToRemove = new ArrayList<>();
-    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
+    for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.findVertices(
       VehicleParkingEntranceVertex.class
     )) {
       if (vehicleParkingEntranceVertex.isLinkedToGraph()) {
@@ -368,8 +376,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
   }
 
-  private Set<StopLocation> getStopLocationsUsedForFlexTrips(TransitRepository transitRepository) {
-    Set<StopLocation> stopLocations = transitRepository
+  private Set<StopLocation> getStopLocationsUsedForFlexTrips() {
+    Set<StopLocation> stopLocations = timetableDataImport
       .getAllFlexTrips()
       .stream()
       .flatMap(t -> t.getStops().stream())
@@ -388,13 +396,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private enum StopLinkType {
     /**
-     * Only ensure that the link leads to a walkable edge.
-     * (The same edge may also be drivable but this is not guaranteed.)
+     * Only ensure that the link leads to a walkable edge. (The same edge may also be drivable but
+     * this is not guaranteed.)
      */
     WALK_ONLY,
     /**
-     * Make sure that the stop is linked to an edge each that is walkable and drivable.
-     * This may lead to several links being created.
+     * Make sure that the stop is linked to an edge each that is walkable and drivable. This may
+     * lead to several links being created.
      */
     WALK_AND_CAR,
   }

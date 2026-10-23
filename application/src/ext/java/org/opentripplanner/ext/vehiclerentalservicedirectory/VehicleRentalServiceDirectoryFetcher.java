@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetches GBFS endpoints from a GBFS v3 manifest.json file.
- * The manifest can be loaded from a remote URL or a local file.
+ * Fetches GBFS endpoints from a GBFS v3 manifest.json file. The manifest can be loaded from a
+ * remote URL or a local file.
  */
 public class VehicleRentalServiceDirectoryFetcher {
 

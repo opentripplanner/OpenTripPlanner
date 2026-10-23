@@ -90,6 +90,7 @@ public abstract class SnapshotTestBase {
       TestOtpModel model = getGraph();
       transitService = TestServerContext.createTransitService(
         model.transitRepository(),
+        model.timetableDataImport(),
         model.transferRepository()
       );
       routingService = TestServerContext.createRoutingService(
@@ -378,8 +379,8 @@ public abstract class SnapshotTestBase {
   }
 
   /**
-   * To exclude {@link ApiLeg#getDuration()} from being deserialized because the returned number
-   * is non-constant making it impossible to assert.
+   * To exclude {@link ApiLeg#getDuration()} from being deserialized because the returned number is
+   * non-constant making it impossible to assert.
    */
   private abstract static class ApiLegMixin {
 

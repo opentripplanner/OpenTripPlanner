@@ -20,9 +20,9 @@ public class RaptorEnvironmentFactory {
       }
 
       /**
-       * OTP web server will interrupt all request threads in case of a timeout. In OTP
-       * such events should be mapped to {@link OTPRequestTimeoutException}, which will
-       * later be mapped to the right API response.
+       * OTP web server will interrupt all request threads in case of a timeout. In OTP such events
+       * should be mapped to {@link OTPRequestTimeoutException}, which will later be mapped to the
+       * right API response.
        */
       @Override
       public RuntimeException mapInterruptedException(InterruptedException e) {

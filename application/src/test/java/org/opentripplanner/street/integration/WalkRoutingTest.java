@@ -20,6 +20,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 class WalkRoutingTest {
@@ -40,8 +41,7 @@ class WalkRoutingTest {
   /**
    * Both https://www.openstreetmap.org/way/146988098 and
    * https://www.openstreetmap.org/way/146988099 are routable for pedestrians, the routing engine
-   * should return a path from any point of the first way to any point of the second.
-   * <br>
+   * should return a path from any point of the first way to any point of the second. <br>
    * See also <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/5706">issue
    * #5706</a>
    */
@@ -73,6 +73,7 @@ class WalkRoutingTest {
       var linkingContext = linkingContextFactory.create(temporaryVerticesContainer, linkingRequest);
       var transitService = TestServerContext.createTransitService(
         new TransitRepository(),
+        new TimetableDataImport(),
         TransferServiceTestFactory.defaultTransferRepository()
       );
       return DirectStreetRouter.route(

@@ -22,19 +22,19 @@ import org.opentripplanner.standalone.server.GrizzlyQueueWaitProbe;
 /**
  * A Jersey filter that records HTTP request response times with client identification.
  * <p>
- * The client is identified by a configurable HTTP header. Only monitored clients
- * (configured via {@code server.httpResponseTimeMetrics.monitoredClients}) are tracked individually;
- * unknown or missing client names are grouped under the "other" tag to prevent cardinality explosion.
+ * The client is identified by a configurable HTTP header. Only monitored clients (configured via
+ * {@code server.httpResponseTimeMetrics.monitoredClients}) are tracked individually; unknown or
+ * missing client names are grouped under the "other" tag to prevent cardinality explosion.
  * <p>
  * The metric {@code http.client.requests} is recorded as a Timer with percentile histograms,
  * allowing analysis of response time distribution per client.
  * <p>
- * A second set of timers records the total client-perceived time, including any time spent waiting
- * in the Grizzly thread pool queue before a worker thread picked up the request. The queue wait
- * time is captured via {@link GrizzlyQueueWaitProbe}.
+ * A second set of timers records the total client-perceived time, including any time spent
+ * waiting in the Grizzly thread pool queue before a worker thread picked up the request. The queue
+ * wait time is captured via {@link GrizzlyQueueWaitProbe}.
  * <p>
- * All timers are pre-created at startup for each combination of monitored client and endpoint
- * to ensure predictable metric cardinality.
+ * All timers are pre-created at startup for each combination of monitored client and endpoint to
+ * ensure predictable metric cardinality.
  */
 public class HttpResponseTimeMetricsFilter
   implements ContainerRequestFilter, ContainerResponseFilter
@@ -59,13 +59,13 @@ public class HttpResponseTimeMetricsFilter
   /**
    * Creates a filter for recording HTTP response time metrics.
    *
-   * @param clientHeader the HTTP header name used to identify the client
-   * @param monitoredClients the set of client names to track individually (case-insensitive)
-   * @param monitoredEndpoints the set of endpoint paths to monitor (matched by suffix)
-   * @param metricName the name of the metric to record
+   * @param clientHeader            the HTTP header name used to identify the client
+   * @param monitoredClients        the set of client names to track individually (case-insensitive)
+   * @param monitoredEndpoints      the set of endpoint paths to monitor (matched by suffix)
+   * @param metricName              the name of the metric to record
    * @param minExpectedResponseTime minimum expected response time for histogram buckets
    * @param maxExpectedResponseTime maximum expected response time for histogram buckets
-   * @param registry the meter registry to record metrics to
+   * @param registry                the meter registry to record metrics to
    */
   public HttpResponseTimeMetricsFilter(
     String clientHeader,
@@ -101,10 +101,10 @@ public class HttpResponseTimeMetricsFilter
   /**
    * Creates a filter using the global meter registry.
    *
-   * @param clientHeader the HTTP header name used to identify the client
-   * @param monitoredClients the set of client names to track individually
-   * @param monitoredEndpoints the set of endpoint paths to monitor
-   * @param metricName the name of the metric to record
+   * @param clientHeader            the HTTP header name used to identify the client
+   * @param monitoredClients        the set of client names to track individually
+   * @param monitoredEndpoints      the set of endpoint paths to monitor
+   * @param metricName              the name of the metric to record
    * @param minExpectedResponseTime minimum expected response time for histogram buckets
    * @param maxExpectedResponseTime maximum expected response time for histogram buckets
    */

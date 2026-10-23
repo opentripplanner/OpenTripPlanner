@@ -20,6 +20,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -31,12 +32,13 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 /**
  * A helper class for setting up and interacting with transit data for tests.
  * <p>
- * The builder is used to create a SiteRepository and a TransitRepository that can then be queried
- * by a TransitService.
+ * The builder is used to create a SiteRepository and a TransitRepository that can then be
+ * queried by a TransitService.
  */
 public final class TransitTestEnvironment {
 
   private final TransitRepository transitRepository;
+  private final ScheduledTimetableData scheduledTimetableData;
   private final RepositoryRegistry repositoryRegistry;
   private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
   private final UpdateManager updateManager;
@@ -56,16 +58,19 @@ public final class TransitTestEnvironment {
 
   TransitTestEnvironment(
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository,
     LocalDate defaultServiceDate
   ) {
     this.transitRepository = transitRepository;
+    this.scheduledTimetableData = scheduledTimetableData;
     this.defaultServiceDate = defaultServiceDate;
 
     this.transitRepository.index();
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       new TestTransitTuningParameters(),
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
     this.transitRepository.initRaptorTransitData(scheduledRaptorData);
@@ -73,7 +78,7 @@ public final class TransitTestEnvironment {
     this.repositoryRegistry = TransactionFactory.createRepositoryRegistry();
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     this.timetableHandle = repositoryRegistry.registerRepositorySnapshot(
       timetableSnapshot,
@@ -112,9 +117,9 @@ public final class TransitTestEnvironment {
 
   /**
    * Applies a real-time update through the transaction framework, committing it to the timetable
-   * repository backing {@link #transitService()}, so that a subsequent call to that method
-   * returns a snapshot reflecting the update. The method will wait for the update to be applied
-   * before returning.
+   * repository backing {@link #transitService()}, so that a subsequent call to that method returns
+   * a snapshot reflecting the update. The method will wait for the update to be applied before
+   * returning.
    */
   public void applyUpdate(RealTimeTripUpdate update) {
     try {
@@ -135,6 +140,21 @@ public final class TransitTestEnvironment {
 
   public TransitRepository transitRepository() {
     return transitRepository;
+  }
+
+  public ScheduledTimetableData scheduledTimetableData() {
+    return scheduledTimetableData;
+  }
+
+  /**
+   * A new timetable repository (write buffer) with the environment's scheduled data and no
+   * real-time updates. It is not registered with the environment and never committed.
+   */
+  public TimetableRepository newTimetableRepository() {
+    return new DefaultTimetableRepository(
+      new RaptorTransitData(transitRepository.getRaptorTransitData()),
+      scheduledTimetableData
+    );
   }
 
   public RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle() {

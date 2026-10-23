@@ -4,7 +4,6 @@ package org.opentripplanner.apis.gtfs.generated;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.core.model.basic.Cost;
 
 public class GraphQLTypes {
 
@@ -326,8 +325,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Enum for limiting the returned calls depending on pickup/drop off status on a stop
-   * based on the original schedules.
+   * Enum for limiting the returned calls depending on pickup/drop off status on a stop based on the
+   * original schedules.
    */
   public enum GraphQLArrivalDeparture {
     ARRIVALS,
@@ -339,7 +338,7 @@ public class GraphQLTypes {
 
     private List<GraphQLParkingFilterInput> filters;
     private List<GraphQLParkingFilterInput> preferred;
-    private Cost unpreferredCost;
+    private org.opentripplanner.core.model.basic.Cost unpreferredCost;
 
     public GraphQLBicycleParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
@@ -355,7 +354,9 @@ public class GraphQLTypes {
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
-        this.unpreferredCost = (Cost) args.get("unpreferredCost");
+        this.unpreferredCost = (org.opentripplanner.core.model.basic.Cost) args.get(
+          "unpreferredCost"
+        );
       }
     }
 
@@ -367,7 +368,7 @@ public class GraphQLTypes {
       return this.preferred;
     }
 
-    public Cost getGraphQLUnpreferredCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLUnpreferredCost() {
       return this.unpreferredCost;
     }
 
@@ -379,14 +380,16 @@ public class GraphQLTypes {
       this.preferred = preferred;
     }
 
-    public void setGraphQLUnpreferredCost(Cost unpreferredCost) {
+    public void setGraphQLUnpreferredCost(
+      org.opentripplanner.core.model.basic.Cost unpreferredCost
+    ) {
       this.unpreferredCost = unpreferredCost;
     }
   }
 
   public static class GraphQLBicyclePreferencesInput {
 
-    private Cost boardCost;
+    private org.opentripplanner.core.model.basic.Cost boardCost;
     private GraphQLCyclingOptimizationInput optimization;
     private GraphQLBicycleParkingPreferencesInput parking;
     private Double reluctance;
@@ -396,7 +399,7 @@ public class GraphQLTypes {
 
     public GraphQLBicyclePreferencesInput(Map<String, Object> args) {
       if (args != null) {
-        this.boardCost = (Cost) args.get("boardCost");
+        this.boardCost = (org.opentripplanner.core.model.basic.Cost) args.get("boardCost");
         this.optimization = new GraphQLCyclingOptimizationInput(
           (Map<String, Object>) args.get("optimization")
         );
@@ -412,7 +415,7 @@ public class GraphQLTypes {
       }
     }
 
-    public Cost getGraphQLBoardCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLBoardCost() {
       return this.boardCost;
     }
 
@@ -440,7 +443,7 @@ public class GraphQLTypes {
       return this.walk;
     }
 
-    public void setGraphQLBoardCost(Cost boardCost) {
+    public void setGraphQLBoardCost(org.opentripplanner.core.model.basic.Cost boardCost) {
       this.boardCost = boardCost;
     }
 
@@ -514,17 +517,19 @@ public class GraphQLTypes {
 
   public static class GraphQLBicycleWalkPreferencesCostInput {
 
-    private Cost mountDismountCost;
+    private org.opentripplanner.core.model.basic.Cost mountDismountCost;
     private Double reluctance;
 
     public GraphQLBicycleWalkPreferencesCostInput(Map<String, Object> args) {
       if (args != null) {
-        this.mountDismountCost = (Cost) args.get("mountDismountCost");
+        this.mountDismountCost = (org.opentripplanner.core.model.basic.Cost) args.get(
+          "mountDismountCost"
+        );
         this.reluctance = (Double) args.get("reluctance");
       }
     }
 
-    public Cost getGraphQLMountDismountCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLMountDismountCost() {
       return this.mountDismountCost;
     }
 
@@ -532,7 +537,9 @@ public class GraphQLTypes {
       return this.reluctance;
     }
 
-    public void setGraphQLMountDismountCost(Cost mountDismountCost) {
+    public void setGraphQLMountDismountCost(
+      org.opentripplanner.core.model.basic.Cost mountDismountCost
+    ) {
       this.mountDismountCost = mountDismountCost;
     }
 
@@ -855,7 +862,7 @@ public class GraphQLTypes {
 
     private List<GraphQLParkingFilterInput> filters;
     private List<GraphQLParkingFilterInput> preferred;
-    private Cost unpreferredCost;
+    private org.opentripplanner.core.model.basic.Cost unpreferredCost;
 
     public GraphQLCarParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
@@ -871,7 +878,9 @@ public class GraphQLTypes {
             .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
             .collect(Collectors.toList());
         }
-        this.unpreferredCost = (Cost) args.get("unpreferredCost");
+        this.unpreferredCost = (org.opentripplanner.core.model.basic.Cost) args.get(
+          "unpreferredCost"
+        );
       }
     }
 
@@ -883,7 +892,7 @@ public class GraphQLTypes {
       return this.preferred;
     }
 
-    public Cost getGraphQLUnpreferredCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLUnpreferredCost() {
       return this.unpreferredCost;
     }
 
@@ -895,21 +904,23 @@ public class GraphQLTypes {
       this.preferred = preferred;
     }
 
-    public void setGraphQLUnpreferredCost(Cost unpreferredCost) {
+    public void setGraphQLUnpreferredCost(
+      org.opentripplanner.core.model.basic.Cost unpreferredCost
+    ) {
       this.unpreferredCost = unpreferredCost;
     }
   }
 
   public static class GraphQLCarPreferencesInput {
 
-    private Cost boardCost;
+    private org.opentripplanner.core.model.basic.Cost boardCost;
     private GraphQLCarParkingPreferencesInput parking;
     private Double reluctance;
     private GraphQLCarRentalPreferencesInput rental;
 
     public GraphQLCarPreferencesInput(Map<String, Object> args) {
       if (args != null) {
-        this.boardCost = (Cost) args.get("boardCost");
+        this.boardCost = (org.opentripplanner.core.model.basic.Cost) args.get("boardCost");
         this.parking = new GraphQLCarParkingPreferencesInput(
           (Map<String, Object>) args.get("parking")
         );
@@ -920,7 +931,7 @@ public class GraphQLTypes {
       }
     }
 
-    public Cost getGraphQLBoardCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLBoardCost() {
       return this.boardCost;
     }
 
@@ -936,7 +947,7 @@ public class GraphQLTypes {
       return this.rental;
     }
 
-    public void setGraphQLBoardCost(Cost boardCost) {
+    public void setGraphQLBoardCost(org.opentripplanner.core.model.basic.Cost boardCost) {
       this.boardCost = boardCost;
     }
 
@@ -1034,8 +1045,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Predefined optimization alternatives for bicycling routing. For more customization,
-   * one can use the triangle factors.
+   * Predefined optimization alternatives for bicycling routing. For more customization, one can use
+   * the triangle factors.
    */
   public enum GraphQLCyclingOptimizationType {
     FLAT_STREETS,
@@ -1132,8 +1143,8 @@ public class GraphQLTypes {
    *
    * This enum allows filtering of the dependencies.
    *
-   * Since it is recognised that this is not covered well in the specification, it is discussed here:
-   * https://github.com/google/transit/pull/423
+   * Since it is recognised that this is not covered well in the specification, it is discussed
+   * here: https://github.com/google/transit/pull/423
    */
   public enum GraphQLDependentFareProductFilter {
     ALL,
@@ -1143,12 +1154,12 @@ public class GraphQLTypes {
   public static class GraphQLDestinationBicyclePolicyInput {
 
     private Boolean allowKeeping;
-    private Cost keepingCost;
+    private org.opentripplanner.core.model.basic.Cost keepingCost;
 
     public GraphQLDestinationBicyclePolicyInput(Map<String, Object> args) {
       if (args != null) {
         this.allowKeeping = (Boolean) args.get("allowKeeping");
-        this.keepingCost = (Cost) args.get("keepingCost");
+        this.keepingCost = (org.opentripplanner.core.model.basic.Cost) args.get("keepingCost");
       }
     }
 
@@ -1156,7 +1167,7 @@ public class GraphQLTypes {
       return this.allowKeeping;
     }
 
-    public Cost getGraphQLKeepingCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLKeepingCost() {
       return this.keepingCost;
     }
 
@@ -1164,7 +1175,7 @@ public class GraphQLTypes {
       this.allowKeeping = allowKeeping;
     }
 
-    public void setGraphQLKeepingCost(Cost keepingCost) {
+    public void setGraphQLKeepingCost(org.opentripplanner.core.model.basic.Cost keepingCost) {
       this.keepingCost = keepingCost;
     }
   }
@@ -1172,12 +1183,12 @@ public class GraphQLTypes {
   public static class GraphQLDestinationScooterPolicyInput {
 
     private Boolean allowKeeping;
-    private Cost keepingCost;
+    private org.opentripplanner.core.model.basic.Cost keepingCost;
 
     public GraphQLDestinationScooterPolicyInput(Map<String, Object> args) {
       if (args != null) {
         this.allowKeeping = (Boolean) args.get("allowKeeping");
-        this.keepingCost = (Cost) args.get("keepingCost");
+        this.keepingCost = (org.opentripplanner.core.model.basic.Cost) args.get("keepingCost");
       }
     }
 
@@ -1185,7 +1196,7 @@ public class GraphQLTypes {
       return this.allowKeeping;
     }
 
-    public Cost getGraphQLKeepingCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLKeepingCost() {
       return this.keepingCost;
     }
 
@@ -1193,7 +1204,7 @@ public class GraphQLTypes {
       this.allowKeeping = allowKeeping;
     }
 
-    public void setGraphQLKeepingCost(Cost keepingCost) {
+    public void setGraphQLKeepingCost(org.opentripplanner.core.model.basic.Cost keepingCost) {
       this.keepingCost = keepingCost;
     }
   }
@@ -1902,12 +1913,12 @@ public class GraphQLTypes {
   public static class GraphQLLinearCostFunctionInput {
 
     private Double coefficient;
-    private Cost constant;
+    private org.opentripplanner.core.model.basic.Cost constant;
 
     public GraphQLLinearCostFunctionInput(Map<String, Object> args) {
       if (args != null) {
         this.coefficient = (Double) args.get("coefficient");
-        this.constant = (Cost) args.get("constant");
+        this.constant = (org.opentripplanner.core.model.basic.Cost) args.get("constant");
       }
     }
 
@@ -1915,7 +1926,7 @@ public class GraphQLTypes {
       return this.coefficient;
     }
 
-    public Cost getGraphQLConstant() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLConstant() {
       return this.constant;
     }
 
@@ -1923,7 +1934,7 @@ public class GraphQLTypes {
       this.coefficient = coefficient;
     }
 
-    public void setGraphQLConstant(Cost constant) {
+    public void setGraphQLConstant(org.opentripplanner.core.model.basic.Cost constant) {
       this.constant = constant;
     }
   }
@@ -2903,8 +2914,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Additional qualifier for a transport mode.
-   * Note that qualifiers can only be used with certain transport modes.
+   * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain
+   * transport modes.
    */
   public enum GraphQLQualifier {
     ACCESS,
@@ -5126,9 +5137,9 @@ public class GraphQLTypes {
   }
 
   /**
-   * A direction that is not absolute but rather fuzzy and context-dependent.
-   * It provides the passenger with information what they should do in this step depending on where they
-   * were in the previous one.
+   * A direction that is not absolute but rather fuzzy and context-dependent. It provides the
+   * passenger with information what they should do in this step depending on where they were in the
+   * previous one.
    */
   public enum GraphQLRelativeDirection {
     CIRCLE_CLOCKWISE,
@@ -5308,8 +5319,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Predefined optimization alternatives for scooter routing. For more customization,
-   * one can use the triangle factors.
+   * Predefined optimization alternatives for scooter routing. For more customization, one can use
+   * the triangle factors.
    */
   public enum GraphQLScooterOptimizationType {
     FLAT_STREETS,
@@ -5898,21 +5909,21 @@ public class GraphQLTypes {
 
   public static class GraphQLTransferPreferencesInput {
 
-    private Cost cost;
+    private org.opentripplanner.core.model.basic.Cost cost;
     private Integer maximumAdditionalTransfers;
     private Integer maximumTransfers;
     private java.time.Duration slack;
 
     public GraphQLTransferPreferencesInput(Map<String, Object> args) {
       if (args != null) {
-        this.cost = (Cost) args.get("cost");
+        this.cost = (org.opentripplanner.core.model.basic.Cost) args.get("cost");
         this.maximumAdditionalTransfers = (Integer) args.get("maximumAdditionalTransfers");
         this.maximumTransfers = (Integer) args.get("maximumTransfers");
         this.slack = (java.time.Duration) args.get("slack");
       }
     }
 
-    public Cost getGraphQLCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLCost() {
       return this.cost;
     }
 
@@ -5928,7 +5939,7 @@ public class GraphQLTypes {
       return this.slack;
     }
 
-    public void setGraphQLCost(Cost cost) {
+    public void setGraphQLCost(org.opentripplanner.core.model.basic.Cost cost) {
       this.cost = cost;
     }
 
@@ -6014,9 +6025,9 @@ public class GraphQLTypes {
   }
 
   /**
-   * Transit modes include modes that are used within organized transportation networks
-   * run by public transportation authorities, taxi companies etc.
-   * Equivalent to GTFS route_type or to NeTEx TransportMode.
+   * Transit modes include modes that are used within organized transportation networks run by
+   * public transportation authorities, taxi companies etc. Equivalent to GTFS route_type or to
+   * NeTEx TransportMode.
    */
   public enum GraphQLTransitMode {
     AIRPLANE,
@@ -6474,8 +6485,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they
-   * may be represented differently to the user.
+   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
+   * they may be represented differently to the user.
    */
   public enum GraphQLVehicleParkingState {
     CLOSED,
@@ -6513,21 +6524,21 @@ public class GraphQLTypes {
 
   public static class GraphQLWalkPreferencesInput {
 
-    private Cost boardCost;
+    private org.opentripplanner.core.model.basic.Cost boardCost;
     private Double reluctance;
     private Double safetyFactor;
     private Double speed;
 
     public GraphQLWalkPreferencesInput(Map<String, Object> args) {
       if (args != null) {
-        this.boardCost = (Cost) args.get("boardCost");
+        this.boardCost = (org.opentripplanner.core.model.basic.Cost) args.get("boardCost");
         this.reluctance = (Double) args.get("reluctance");
         this.safetyFactor = (Double) args.get("safetyFactor");
         this.speed = (Double) args.get("speed");
       }
     }
 
-    public Cost getGraphQLBoardCost() {
+    public org.opentripplanner.core.model.basic.Cost getGraphQLBoardCost() {
       return this.boardCost;
     }
 
@@ -6543,7 +6554,7 @@ public class GraphQLTypes {
       return this.speed;
     }
 
-    public void setGraphQLBoardCost(Cost boardCost) {
+    public void setGraphQLBoardCost(org.opentripplanner.core.model.basic.Cost boardCost) {
       this.boardCost = boardCost;
     }
 

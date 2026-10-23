@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.trip.siri.updater.google;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.TransitRealTimeUpdateContext;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -14,8 +15,9 @@ import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
 
 /**
  * Graph updater that processes a SIRI-ET feed based on a Google Pubsub subscription. This class
- * configures a {@link GooglePubsubEstimatedTimetableSource} and an {@link EstimatedTimetableHandler}
- * and delegates the update process to {@link AsyncEstimatedTimetableProcessor}
+ * configures a {@link GooglePubsubEstimatedTimetableSource} and an
+ * {@link EstimatedTimetableHandler} and delegates the update process to
+ * {@link AsyncEstimatedTimetableProcessor}
  */
 public class SiriETGooglePubsubUpdater implements GraphUpdater<TransitRealTimeUpdateContext> {
 
@@ -30,6 +32,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater<TransitRealTimeUp
     SiriRealTimeTripUpdateAdapter adapter
   ) {
     configRef = config.configRef();
+    var feedId = Objects.requireNonNull(config.feedId(), "feedId must not be null");
 
     asyncEstimatedTimetableSource = new GooglePubsubEstimatedTimetableSource(
       config.dataInitializationUrl(),
@@ -40,7 +43,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater<TransitRealTimeUp
       config.topicName()
     );
 
-    estimatedTimetableHandler = new EstimatedTimetableHandler(adapter, config.feedId());
+    estimatedTimetableHandler = new EstimatedTimetableHandler(adapter, feedId);
 
     updateResultConsumer = TripUpdateMetrics.streaming(config);
   }

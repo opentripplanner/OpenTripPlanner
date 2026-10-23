@@ -48,8 +48,11 @@ public class CalendarServiceData implements Serializable {
   }
 
   /**
-   * TODO OTP2 - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
-   *           - this when doing the issue #3030.
+   * TODO OTP2
+   * <pre>
+   * - This is NOT THREAD-SAFE and is used in the real-time updaters, we need to fix
+   * - this when doing the issue #3030.
+   * </pre>
    */
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     FeedScopedId serviceId = new FeedScopedId(

@@ -88,8 +88,8 @@ public class TileJson implements Serializable {
   }
 
   /**
-   * Creates a vector source layer URL from a configured base path plus information from the incoming
-   * HTTP request.
+   * Creates a vector source layer URL from a configured base path plus information from the
+   * incoming HTTP request.
    */
   public static String urlFromOverriddenBasePath(
     UriInfo uri,
