@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,6 @@ import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
-import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -82,23 +82,65 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routeFromVertexWithForwardTree() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path, "Should find path from A to C using forward tree");
+    assertNotNull(segment, "Should find path from A to C using forward tree");
+  }
+
+  @Test
+  void ellipseBoundsKeepTheLegAndDropTheRest() {
+    var unbounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, null, null);
+    long legSeconds = unbounded.getState(vertexC).getElapsedTimeSeconds();
+    // The bound admits the leg A -> C with 5 s to spare; D lies beyond C and can never lead back to
+    // it within that, while everything on the way to C stays.
+    var bounds = new EllipseBounds(vertexC.getCoordinate(), legSeconds + 5, 40.0);
+    var bounded = CarpoolTreeStreetRouter.carTree(vertexA, false, SEARCH_LIMIT, bounds, null);
+
+    assertEquals(legSeconds, bounded.getState(vertexC).getElapsedTimeSeconds());
+    assertNotNull(bounded.getState(vertexB));
+    assertNull(bounded.getState(vertexD));
+  }
+
+  @Test
+  void aTreeWithTargetsStopsOnceTheyAreReached() {
+    var tree = CarpoolTreeStreetRouter.carTree(
+      vertexA,
+      false,
+      SEARCH_LIMIT,
+      null,
+      Map.of(vertexB, SEARCH_LIMIT)
+    );
+
+    assertNotNull(tree.getState(vertexB));
+    assertNull(tree.getState(vertexD), "nothing later than B is expanded");
+  }
+
+  @Test
+  void aTargetThatIsNeverReachedKeepsItsWholeReach() {
+    var tree = CarpoolTreeStreetRouter.carTree(
+      vertexA,
+      false,
+      SEARCH_LIMIT,
+      null,
+      Map.of(vertexB, SEARCH_LIMIT, vertexDisconnected, SEARCH_LIMIT)
+    );
+
+    assertNotNull(tree.getState(vertexD), "Z might still be reached within the limit");
   }
 
   @Test
   void routeToVertexWithReverseTree() {
     router.addVertex(vertexC, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path, "Should find path from A to C using reverse tree");
+    assertNotNull(segment, "Should find path from A to C using reverse tree");
   }
 
   @Test
-  void routeWithBothDirectionTree() {
-    router.addVertex(vertexB, CarpoolTreeStreetRouter.Direction.BOTH, SEARCH_LIMIT);
+  void routeWithBothTreesOfOneVertex() {
+    router.addVertex(vertexB, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexB, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
 
     var fromB = router.route(vertexB, vertexC);
     var toB = router.route(vertexA, vertexB);
@@ -109,9 +151,9 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
 
   @Test
   void routeReturnsNullWhenNoTreeExists() {
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNull(path, "Should return null when no tree exists for either vertex");
+    assertNull(segment, "Should return null when no tree exists for either vertex");
   }
 
   @Test
@@ -130,9 +172,9 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
     router.addVertex(vertexC, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path, "Should find path when both trees are available");
+    assertNotNull(segment, "Should find path when both trees are available");
   }
 
   @Test
@@ -180,8 +222,8 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
       "No reverse tree should be created for FROM direction"
     );
 
-    var path = router.route(vertexA, vertexC);
-    assertNotNull(path, "Should still work after adding same vertex twice");
+    var segment = router.route(vertexA, vertexC);
+    assertNotNull(segment, "Should still work after adding same vertex twice");
   }
 
   @Test
@@ -197,8 +239,8 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routeReturnsNullForUnreachableVertex() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexDisconnected);
-    assertNull(path, "Should return null for unreachable vertex in the same graph");
+    var segment = router.route(vertexA, vertexDisconnected);
+    assertNull(segment, "Should return null for unreachable vertex in the same graph");
   }
 
   /**
@@ -242,11 +284,26 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
   void routePathIsNonEmpty() {
     router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
 
-    var path = router.route(vertexA, vertexC);
+    var segment = router.route(vertexA, vertexC);
 
-    assertNotNull(path);
+    assertNotNull(segment);
+    var path = segment.path();
     assertFalse(path.states().isEmpty(), "Path states should not be empty");
     assertTrue(path.states().size() > 1, "Path should have at least one edge");
+  }
+
+  @Test
+  void durationMatchesThePathInBothTreeDirections() {
+    router.addVertex(vertexA, CarpoolTreeStreetRouter.Direction.FROM, SEARCH_LIMIT);
+    router.addVertex(vertexD, CarpoolTreeStreetRouter.Direction.TO, SEARCH_LIMIT);
+
+    var forward = router.route(vertexA, vertexC);
+    var reverse = router.route(vertexB, vertexD);
+
+    assertNotNull(forward);
+    assertNotNull(reverse);
+    assertEquals(forward.path().duration().toSeconds(), forward.durationSeconds());
+    assertEquals(reverse.path().duration().toSeconds(), reverse.durationSeconds());
   }
 
   @Test
@@ -318,9 +375,9 @@ class CarpoolTreeStreetRouterTest extends GraphRoutingTest {
     assertGeometryRunsFromAToD(router.route(vertexA, vertexD));
   }
 
-  private void assertGeometryRunsFromAToD(StreetPath path) {
-    assertThat(path).isNotNull();
-    assertThat(List.of(path.geometry().getCoordinates()))
+  private void assertGeometryRunsFromAToD(RoutedSegment segment) {
+    assertThat(segment).isNotNull();
+    assertThat(List.of(segment.path().geometry().getCoordinates()))
       .containsExactly(
         vertexA.getCoordinate(),
         vertexB.getCoordinate(),

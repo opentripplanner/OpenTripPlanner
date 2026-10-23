@@ -15,18 +15,24 @@ org.opentripplanner.ext.carpooling/
 ├── routing/                  # Routing and insertion algorithms
 │   ├── InsertionEvaluator   # Finds optimal passenger insertion
 │   ├── InsertionCandidate   # Represents a viable insertion
-│   └── CarpoolStreetRouter  # Street routing for carpooling
+│   ├── CarpoolCorridor      # Per-trip stops and driving times
+│   ├── CorridorBuilder      # Computes a trip's corridor
+│   ├── CarpoolStopIndex     # Transit stops with their car-reachable snaps
+│   ├── CarpoolStreetRouter  # Goal-directed street routing
+│   ├── CorridorRouter       # Access/egress driving times: corridors and passenger trees
+│   └── PassengerTrees       # The passenger's two car trees of a request
 ├── filter/                   # Pre- and post-screening
 │   ├── CarpoolingRequest    # Passenger-side request abstraction
-│   ├── CarpoolTripFilter    # Pre-filter interface (raw trips)
+│   ├── CarpoolTripFilter    # Pre-filter interface (trips vs. the snapped passenger)
+│   ├── SnappedPassenger     # The passenger's snapped pickup and dropoff
 │   ├── CarpoolItineraryFilter # Post-filter interface (routed itineraries)
 │   ├── TripPreFilters       # Composite of pre-filters (AND)
+│   ├── ClosestCandidateTrips # The trips passing closest to the passenger
 │   ├── ItineraryPostFilters # Composite of post-filters (AND)
 │   ├── TimeTripFilter       # Pre-filter: loose time-window check
-│   ├── TimeItineraryFilter  # Post-filter: tight time-window enforcement
-│   └── DistanceTripFilter   # Pre-filter: geographic proximity
-├── constraints/              # Post-routing constraints
-│   └── PassengerDelayConstraints # Protects existing passengers
+│   ├── CapacityTripFilter   # Pre-filter: a free seat on some leg
+│   ├── CorridorTripFilter   # Pre-filter: the trip's corridor reaches the passenger
+│   └── TimeItineraryFilter  # Post-filter: tight time-window enforcement
 ├── util/                     # Utilities
 │   └── BeelineEstimator     # Fast travel time estimates
 ├── updater/                  # Real-time updates
@@ -42,29 +48,25 @@ org.opentripplanner.ext.carpooling/
 The carpooling service uses a multi-phase algorithm to match passengers with compatible carpool trips:
 
 ### 1. Pre-Filter Phase
-Fast pre-screening to eliminate incompatible trips using necessary conditions only (loose bounds);
-tight enforcement is deferred to the post-filter once actual times are known:
-- **Capacity Filter**: Checks if any seats are available
-- **TimeTripFilter**: Trip start/end is loosely compatible with the passenger's depart-after or
-  arrive-by window
-- **DistanceTripFilter**: Validates pickup/dropoff are within 50km of driver's route
+Fast pre-screening, once the passenger is snapped to the street network, to eliminate incompatible
+trips using necessary conditions only (loose bounds); tight enforcement is deferred to the
+post-filter once actual times are known:
+- **TimeTripFilter**: the trip's time span overlaps the passenger's time window
+- **CapacityTripFilter**: the car has a free seat on some leg
+- **CorridorTripFilter**: the trip's corridor can reach the snapped passenger
+  (`CarpoolCorridor.mayServe`)
 
 ### 2. Routing Phase
 Optimal insertion point calculation:
 - Uses beeline estimates for early rejection
-- Routes baseline segments once and caches results
-- Evaluates all viable insertion positions
-- Selects position with minimum additional travel time
+- Every pair of pickup and dropoff legs is evaluated in constant time from the driving times
+- Selects the pair with minimum additional travel time that keeps a free seat on every leg the
+  passenger rides and fits the deviation budget of every stop it delays
 
 ### 3. Post-Filter Phase
 Applied to fully-routed itineraries with actual computed times:
 - **TimeItineraryFilter**: Tight enforcement of the passenger's depart-after / arrive-by window
   against the itinerary's real start/end times
-
-### 4. Constraint Validation
-- **Capacity constraints**: Ensures vehicle capacity is not exceeded
-- **Passenger delay constraints**: Protects existing passengers (max 5 minutes additional delay)
-- **Deviation budget**: Respects driver's maximum acceptable detour time
 
 ## Multi-Stop Support
 
@@ -72,7 +74,7 @@ The system handles trips with multiple existing passengers:
 - Each stop tracks passenger count changes (pickups and dropoffs)
 - Capacity validation ensures vehicle is never over capacity
 - Route optimization considers all existing stops when inserting new passengers
-- Passenger delay constraints protect all existing passengers from excessive delays
+- The stops' deviation budgets protect all existing passengers from excessive delays
 
 ## Integration Points
 

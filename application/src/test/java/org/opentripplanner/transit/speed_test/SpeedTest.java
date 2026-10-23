@@ -169,8 +169,8 @@ public class SpeedTest {
         transitRepository,
         DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
       ),
-      // The speed test does not enable the CarPooling feature, so it supplies neither a carpooling
-      // repository nor a resolver.
+      // The speed test does not enable the CarPooling feature.
+      null,
       null,
       null,
       transitUpdateManager,
