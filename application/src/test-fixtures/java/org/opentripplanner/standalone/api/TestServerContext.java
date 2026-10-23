@@ -170,7 +170,7 @@ public class TestServerContext {
       stopsVisitedByPatterns
     );
     new RegularTransitTransferGenerator(
-      transferGenerator,
+      () -> transferGenerator,
       graph,
       transitRepository,
       stopsVisitedByPatterns,

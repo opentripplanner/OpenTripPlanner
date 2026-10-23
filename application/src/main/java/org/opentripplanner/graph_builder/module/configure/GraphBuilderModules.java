@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -352,7 +353,7 @@ public class GraphBuilderModules {
   @Provides
   @Singleton
   static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
-    TransferGenerator transferGenerator,
+    Provider<TransferGenerator> transferGenerator,
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,

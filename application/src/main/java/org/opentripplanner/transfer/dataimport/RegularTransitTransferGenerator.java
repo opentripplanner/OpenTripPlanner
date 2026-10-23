@@ -1,5 +1,6 @@
 package org.opentripplanner.transfer.dataimport;
 
+import jakarta.inject.Provider;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -37,14 +38,18 @@ import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
  */
 public class RegularTransitTransferGenerator implements GraphBuilderModule {
 
-  private final TransferGenerator transferGenerator;
+  /**
+   * The generator is only created when this module runs, after the transit data is imported: it
+   * holds the site repository, which the import replaces.
+   */
+  private final Provider<TransferGenerator> transferGenerator;
   private final Graph graph;
   private final TransitRepository transitRepository;
   private final StopsVisitedByPatterns stopsVisitedByPatterns;
   private final DataImportIssueStore issueStore;
 
   public RegularTransitTransferGenerator(
-    TransferGenerator transferGenerator,
+    Provider<TransferGenerator> transferGenerator,
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
@@ -60,15 +65,16 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     transitRepository.index();
-    transferGenerator.generateTransfersForAllStops();
-    reportStopsWithoutTransfers();
+    var generator = transferGenerator.get();
+    generator.generateTransfersForAllStops();
+    reportStopsWithoutTransfers(generator);
   }
 
-  private void reportStopsWithoutTransfers() {
+  private void reportStopsWithoutTransfers(TransferGenerator generator) {
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
       return;
     }
-    Set<FeedScopedId> stopsWithTransfers = transferGenerator.listAllStopsUsedInTransfers();
+    Set<FeedScopedId> stopsWithTransfers = generator.listAllStopsUsedInTransfers();
     for (RegularStop stop : transitRepository.getSiteRepository().listRegularStops()) {
       var stopId = stop.getId();
       if (stopsVisitedByPatterns.contains(stopId) && !stopsWithTransfers.contains(stopId)) {
