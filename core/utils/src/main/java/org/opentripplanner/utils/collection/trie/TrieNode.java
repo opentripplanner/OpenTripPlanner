@@ -198,7 +198,7 @@ final class TrieNode<K, V> {
 
   /** Returns the new node, or the given node if {@code key} is not present. */
   @SuppressWarnings("unchecked")
-  static <K, V> TrieNode<K, V> remove(TrieNode<K, V> node, Object key, int hash, int shift) {
+  static <K, V> TrieNode<K, V> remove(TrieNode<K, V> node, K key, int hash, int shift) {
     int bit = bit(hash, shift);
     if ((node.bitmap & bit) == 0) {
       return node;
@@ -262,7 +262,7 @@ final class TrieNode<K, V> {
     return new TrieLeaf<>(leaf.getKey(), leaf.getValue(), replaceInChain(leaf.next, key, value));
   }
 
-  private static <K, V> TrieLeaf<K, V> removeFromChain(TrieLeaf<K, V> leaf, Object key) {
+  private static <K, V> TrieLeaf<K, V> removeFromChain(TrieLeaf<K, V> leaf, K key) {
     if (leaf == null) {
       return null;
     }

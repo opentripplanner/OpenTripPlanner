@@ -101,7 +101,7 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
    * Return a map without the mapping for the given key. If the key is not in this map, this map
    * is returned.
    */
-  public ImmutableTrieMap<K, V> without(Object key) {
+  public ImmutableTrieMap<K, V> without(K key) {
     Objects.requireNonNull(key);
     var newRoot = TrieNode.remove(root, key, TrieNode.hash(key), 0);
     return newRoot == root ? this : new ImmutableTrieMap<>(newRoot, size - 1);
