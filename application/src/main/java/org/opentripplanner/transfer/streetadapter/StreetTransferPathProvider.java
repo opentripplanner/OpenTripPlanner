@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
@@ -49,10 +50,26 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
 
   private final Graph graph;
   private final NearbyStopFinder nearbyStopFinder;
+  private final Predicate<FeedScopedId> isTransferSource;
 
+  /** Find transfers from all stops. */
   public StreetTransferPathProvider(Graph graph, NearbyStopFinder nearbyStopFinder) {
+    this(graph, nearbyStopFinder, stopId -> true);
+  }
+
+  /**
+   * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
+   *                         paths are found for the others. Used to skip the stops that are not
+   *                         visited by any trip.
+   */
+  public StreetTransferPathProvider(
+    Graph graph,
+    NearbyStopFinder nearbyStopFinder,
+    Predicate<FeedScopedId> isTransferSource
+  ) {
     this.graph = graph;
     this.nearbyStopFinder = nearbyStopFinder;
+    this.isTransferSource = isTransferSource;
   }
 
   /**
@@ -77,6 +94,9 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
     FeedScopedId fromStop,
     AbstractUserPreferences<?> userPreferences
   ) {
+    if (!isTransferSource.test(fromStop)) {
+      return List.of();
+    }
     TransitStopVertex vertex = graph.getStopVertex(fromStop);
     if (vertex == null) {
       return List.of();

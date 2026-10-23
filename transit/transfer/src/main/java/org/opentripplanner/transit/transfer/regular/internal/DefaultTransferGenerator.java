@@ -1,8 +1,12 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
@@ -27,24 +31,18 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
   private final RaptorStopIndex stopIndex;
-  private final Collection<FeedScopedId> stopsWithTrips;
   private final TransferPathProvider<P> pathProvider;
   private final TransferProfiles<R> orderedProfiles;
   private final RegularTransferBuildRepository<P> buildRepository;
+  private final Set<Integer> stopsUsedInTransfers = ConcurrentHashMap.newKeySet();
 
-  /**
-   * @param progressCallback invoked once per (profile, stop) generated - lets the caller report
-   *                         progress without this class taking on a logging dependency itself.
-   */
   public DefaultTransferGenerator(
     RaptorStopIndex stopIndex,
-    Collection<FeedScopedId> stopsWithTrips,
     TransferPathProvider<P> pathProvider,
     TransferProfiles<R> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
     this.stopIndex = stopIndex;
-    this.stopsWithTrips = stopsWithTrips;
     this.pathProvider = pathProvider;
     this.orderedProfiles = profiles;
     this.buildRepository = buildRepository;
@@ -52,14 +50,48 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
 
   @Override
   public void generateTransfersForAllStops() {
-    var progress = ProgressTracker.track("Generate regular transfers", 1000, stopsWithTrips.size());
-    stopsWithTrips.parallelStream().forEach(stop -> {
+    var stops = listAllStops();
+    var progress = ProgressTracker.track("Generate regular transfers", 1000, stops.size());
+    stops.parallelStream().forEach(stop -> {
       for (var profile : orderedProfiles) {
         generateForStop(profile, stop);
       }
       progress.step(m -> LOG.info(m));
     });
     LOG.info(progress.completeMessage());
+    logSummary(stops.size());
+  }
+
+  @Override
+  public Set<FeedScopedId> listAllStopsUsedInTransfers() {
+    return stopsUsedInTransfers.stream().map(stopIndex::toStopId).collect(Collectors.toSet());
+  }
+
+  /** All stops in the stop index. The path provider decides which of them have transfers. */
+  private List<FeedScopedId> listAllStops() {
+    var stops = new ArrayList<FeedScopedId>();
+    for (int i = 0; i < stopIndex.size(); ++i) {
+      var stopId = stopIndex.toStopId(i);
+      if (stopId != null) {
+        stops.add(stopId);
+      }
+    }
+    return stops;
+  }
+
+  private void logSummary(int numberOfStops) {
+    int sum = 0;
+    for (var profile : orderedProfiles) {
+      int size = buildRepository.calculateNumberOfTransferPaths(profile.userPreferences());
+      LOG.info("Created {} regular transfers for profile {}.", size, profile.userPreferences());
+      sum += size;
+    }
+    LOG.info(
+      "Done generating regular transfers. paths: {}, profiles: {} stops: {}",
+      sum,
+      orderedProfiles.size(),
+      numberOfStops
+    );
   }
 
   /**
@@ -90,6 +122,10 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
     bestCandidatePerTargetStop.forEach((toStop, candidate) ->
       pathsByToStop.put(toStop, candidate.path())
     );
+    if (!pathsByToStop.isEmpty()) {
+      stopsUsedInTransfers.add(fromStop);
+      stopsUsedInTransfers.addAll(pathsByToStop.keySet());
+    }
     // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {
       buildRepository.setPaths(profile.userPreferences(), fromStop, pathsByToStop);

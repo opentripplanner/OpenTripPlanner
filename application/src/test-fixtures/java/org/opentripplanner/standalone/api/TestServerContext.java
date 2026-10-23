@@ -49,6 +49,7 @@ import org.opentripplanner.street.service.DefaultStreetLimitationParametersServi
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.configure.RegularTransferRepositoryModule;
 import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
+import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
 import org.opentripplanner.transfer.dataimport.api.TransferProfileConfig;
 import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
 import org.opentripplanner.transfer.regular.TransferRepository;
@@ -160,12 +161,19 @@ public class TestServerContext {
     var transferProfilesConfig = new TransferProfilesConfig(
       List.of(new TransferProfileConfig(WalkPreferences.DEFAULT))
     );
-    new RegularTransitTransferGenerator(
+    var stopsVisitedByPatterns = new StopsVisitedByPatterns(timetableDataImport);
+    var transferGenerator = RegularTransitTransferGenerator.create(
       graph,
       transitRepository,
-      timetableDataImport,
       transferProfilesConfig,
       regularTransferBuildRepository,
+      stopsVisitedByPatterns
+    );
+    new RegularTransitTransferGenerator(
+      transferGenerator,
+      graph,
+      transitRepository,
+      stopsVisitedByPatterns,
       DataImportIssueStore.NOOP
     ).buildGraph();
     return regularTransferBuildRepository;

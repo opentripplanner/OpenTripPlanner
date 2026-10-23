@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.transfer.regular.configure;
 
-import java.util.Collection;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
@@ -37,18 +35,11 @@ public final class RegularTransferFactory {
    */
   public static <P, R> TransferGenerator createTransferGenerator(
     RaptorStopIndex stopIndex,
-    Collection<FeedScopedId> stopsWithTrips,
     TransferPathProvider<P> pathProvider,
     TransferProfiles<R> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
-    return new DefaultTransferGenerator<>(
-      stopIndex,
-      stopsWithTrips,
-      pathProvider,
-      profiles,
-      buildRepository
-    );
+    return new DefaultTransferGenerator<>(stopIndex, pathProvider, profiles, buildRepository);
   }
 
   /**

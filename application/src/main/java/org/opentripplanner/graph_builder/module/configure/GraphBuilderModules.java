@@ -56,11 +56,13 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.transfer.dataimport.FlexTransferGenerator;
 import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
+import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 
 /**
  * Configure all modules that are not simple enough to be injected.
@@ -323,20 +325,44 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
+  static TransferGenerator provideRegularTransferGenerator(
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
-    TimetableDataImport timetableDataImport,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
+    StopsVisitedByPatterns stopsVisitedByPatterns,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
+  ) {
+    return RegularTransitTransferGenerator.create(
+      graph,
+      transitRepository,
+      config.transferProfiles(),
+      regularTransferBuildRepository,
+      stopsVisitedByPatterns
+    );
+  }
+
+  @Provides
+  @Singleton
+  static StopsVisitedByPatterns provideStopsVisitedByPatterns(
+    TimetableDataImport timetableDataImport
+  ) {
+    return new StopsVisitedByPatterns(timetableDataImport);
+  }
+
+  @Provides
+  @Singleton
+  static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
+    TransferGenerator transferGenerator,
+    Graph graph,
+    TransitRepository transitRepository,
+    StopsVisitedByPatterns stopsVisitedByPatterns,
     DataImportIssueStore issueStore
   ) {
     return new RegularTransitTransferGenerator(
+      transferGenerator,
       graph,
       transitRepository,
-      timetableDataImport,
-      config.transferProfiles(),
-      regularTransferBuildRepository,
+      stopsVisitedByPatterns,
       issueStore
     );
   }

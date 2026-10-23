@@ -29,6 +29,10 @@ public final class TransferProfiles<R> implements Iterable<TransferProfile<R>> {
     return new TransferProfiles<>(profiles);
   }
 
+  public int size() {
+    return profiles.size();
+  }
+
   @Override
   public Iterator<TransferProfile<R>> iterator() {
     return profiles.iterator();

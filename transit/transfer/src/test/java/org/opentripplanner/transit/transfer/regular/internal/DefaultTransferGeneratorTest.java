@@ -49,7 +49,7 @@ class DefaultTransferGeneratorTest {
     var generator = new DefaultTransferGenerator<
       FakeTransferPathProvider.FakePath,
       AbstractUserPreferences<?>
-    >(stopIndex, List.of(A), provider, profiles, buildRepository);
+    >(stopIndex, provider, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
@@ -81,7 +81,7 @@ class DefaultTransferGeneratorTest {
     var generator = new DefaultTransferGenerator<
       FakeTransferPathProvider.FakePath,
       AbstractUserPreferences<?>
-    >(stopIndex, List.of(A), provider, profiles, buildRepository);
+    >(stopIndex, provider, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
@@ -114,7 +114,7 @@ class DefaultTransferGeneratorTest {
     var generator = new DefaultTransferGenerator<
       FakeTransferPathProvider.FakePath,
       AbstractUserPreferences<?>
-    >(stopIndex(), List.of(A), provider, profiles, buildRepository);
+    >(stopIndex(), provider, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
@@ -122,5 +122,30 @@ class DefaultTransferGeneratorTest {
     assertThat(
       TestLifecycles.initialSnapshot(buildRepository).findPath(userPreferences, 0, 1)
     ).isEqualTo(pathAB);
+  }
+
+  @Test
+  void listsTheStopsAtBothEndsOfTransfers() {
+    var provider = new FakeTransferPathProvider();
+    provider.addNearby(A, B, 100, 60);
+
+    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
+    TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
+      AbstractUserPreferences<?>
+    >(userPreferences, userPreferences);
+    TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
+      AbstractUserPreferences<?>
+    >of(List.of(profile));
+
+    var buildRepository =
+      new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
+    var generator = new DefaultTransferGenerator<
+      FakeTransferPathProvider.FakePath,
+      AbstractUserPreferences<?>
+    >(stopIndex(), provider, profiles, buildRepository);
+
+    generator.generateTransfersForAllStops();
+
+    assertThat(generator.listAllStopsUsedInTransfers()).containsExactly(A, B);
   }
 }
