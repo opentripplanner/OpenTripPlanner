@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.transfer.api;
+package org.opentripplanner.transfer.dataimport.api;
 
 import java.time.Duration;
 import java.util.List;

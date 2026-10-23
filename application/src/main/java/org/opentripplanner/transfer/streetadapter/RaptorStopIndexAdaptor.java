@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.data.transfers.regular.streetadapter;
+package org.opentripplanner.transfer.streetadapter;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;

@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.transfer.api;
+package org.opentripplanner.transfer.dataimport.api;
 
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 

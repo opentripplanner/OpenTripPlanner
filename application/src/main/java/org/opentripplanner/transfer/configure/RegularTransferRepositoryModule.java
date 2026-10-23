@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.data.transfers.regular.configure;
+package org.opentripplanner.transfer.configure;
 
 import dagger.Module;
 import dagger.Provides;
@@ -7,8 +7,8 @@ import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;

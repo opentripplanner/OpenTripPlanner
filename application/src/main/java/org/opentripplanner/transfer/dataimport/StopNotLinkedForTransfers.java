@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.transfer;
+package org.opentripplanner.transfer.dataimport;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;

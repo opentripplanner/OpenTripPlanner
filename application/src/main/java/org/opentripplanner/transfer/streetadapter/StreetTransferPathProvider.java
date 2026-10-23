@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.data.transfers.regular.streetadapter;
+package org.opentripplanner.transfer.streetadapter;
 
 import java.time.Duration;
 import java.time.Instant;

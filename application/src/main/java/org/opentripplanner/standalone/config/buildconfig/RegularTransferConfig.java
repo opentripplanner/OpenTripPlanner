@@ -3,11 +3,11 @@ package org.opentripplanner.standalone.config.buildconfig;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import java.util.List;
-import org.opentripplanner.graph_builder.module.transfer.api.RegularTransferParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
+import org.opentripplanner.transfer.dataimport.api.RegularTransferParameters;
 
 public class RegularTransferConfig {
 

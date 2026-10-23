@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.data.transfers.regular.configure;
+package org.opentripplanner.transfer.configure;
 
 import dagger.Module;
 import dagger.Provides;

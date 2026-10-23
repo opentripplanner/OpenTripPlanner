@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.transfer;
+package org.opentripplanner.transfer.dataimport;
 
 import java.util.List;
 import java.util.Set;
@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.place.api.NearbyStop;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.RaptorStopIndexAdaptor;
-import org.opentripplanner.raptor.data.transfers.regular.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
+import org.opentripplanner.transfer.streetadapter.RaptorStopIndexAdaptor;
+import org.opentripplanner.transfer.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;

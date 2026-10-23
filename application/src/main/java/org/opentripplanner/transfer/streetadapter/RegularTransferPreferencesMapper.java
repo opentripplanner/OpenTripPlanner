@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.data.transfers.regular.streetadapter;
+package org.opentripplanner.transfer.streetadapter;
 
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;

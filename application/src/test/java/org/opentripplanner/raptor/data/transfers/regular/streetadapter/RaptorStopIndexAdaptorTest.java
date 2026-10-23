@@ -8,6 +8,7 @@ import org.opentripplanner.core.model.id.FeedScopedIdForTestFactory;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
+import org.opentripplanner.transfer.streetadapter.RaptorStopIndexAdaptor;
 import org.opentripplanner.transit.service.SiteRepository;
 
 class RaptorStopIndexAdaptorTest {

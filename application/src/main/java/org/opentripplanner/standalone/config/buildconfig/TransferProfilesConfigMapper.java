@@ -4,9 +4,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferProfileConfig;
-import org.opentripplanner.graph_builder.module.transfer.api.TransferProfilesConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.transfer.dataimport.api.TransferProfileConfig;
+import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 
 /**
