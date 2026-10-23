@@ -2,6 +2,7 @@ package org.opentripplanner.ext.carpooling.updater;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,18 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * skips re-linking, re-probing, and re-logging. Swept on the same expiry as stored trips.
    */
   private final Map<FeedScopedId, CarpoolTrip> failedResolutions = new HashMap<>();
+
+  /**
+   * When the source recorded the version that removed each trip no longer in the repository
+   * (cancelled, or left with fewer than two calls), keyed by trip id. A removed trip leaves nothing
+   * to compare a later version against, and the source may still deliver an older, active version
+   * of it afterwards — a proxy with several instances delivers in whatever order its instances were
+   * polled — so the removal's {@code RecordedAtTime} is kept as a tombstone until the trip would
+   * have expired anyway. Only removals that carry a {@code RecordedAtTime} leave one: without it
+   * there is nothing to order against. An unresolvable version needs no tombstone, since it stays
+   * in {@link #failedResolutions} with its own {@code RecordedAtTime}.
+   */
+  private final Map<FeedScopedId, ZonedDateTime> removedTrips = new HashMap<>();
 
   private final int maxTrips;
 
@@ -118,15 +131,21 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
 
   /**
    * Purges trips that ended more than the trip expiry ago, so completed trips are removed even when
-   * the source stops updating them. Cached resolution failures are swept on the same expiry.
+   * the source stops updating them. Cached resolution failures and removal tombstones are swept on
+   * the same expiry, a tombstone by the time its removal was recorded, which is the latest the trip
+   * could still have been active.
    */
   private void removeExpiredTrips() {
-    var now = Instant.now();
+    removeExpiredTrips(Instant.now());
+  }
+
+  void removeExpiredTrips(Instant now) {
     repository.removeExpiredTrips(now, tripExpiry);
     var cutoff = now.minus(tripExpiry);
     failedResolutions
       .values()
       .removeIf(failed -> failed.latestEndTime().toInstant().isBefore(cutoff));
+    removedTrips.values().removeIf(recordedAt -> recordedAt.toInstant().isBefore(cutoff));
   }
 
   /**
@@ -146,13 +165,14 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
-   * Processes a list of estimated timetable deliveries.
+   * Processes a list of estimated timetable deliveries. A journey that carries no
+   * {@code RecordedAtTime} of its own is stamped with its frame's before processing: SIRI requires
+   * the frame's and makes the journey's optional, to be given only when it differs from the
+   * frame's, so the frame's is the journey's when the journey has none.
    *
    * @param deliveries the list of estimated timetable deliveries, may be null
    */
-  private void processEstimatedTimetableDeliveries(
-    List<EstimatedTimetableDeliveryStructure> deliveries
-  ) {
+  void processEstimatedTimetableDeliveries(List<EstimatedTimetableDeliveryStructure> deliveries) {
     if (deliveries == null || deliveries.isEmpty()) {
       return;
     }
@@ -167,7 +187,13 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
           continue;
         }
 
-        estimatedVehicleJourneys.forEach(this::processEstimatedVehicleJourney);
+        var frameRecordedAt = frame.getRecordedAtTime();
+        for (var journey : estimatedVehicleJourneys) {
+          if (journey.getRecordedAtTime() == null) {
+            journey.setRecordedAtTime(frameRecordedAt);
+          }
+          processEstimatedVehicleJourney(journey);
+        }
       }
     }
   }
@@ -177,17 +203,34 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
    * the trip instead when the journey is cancelled, has fewer than 2 non-cancelled calls, or fails
    * to resolve. A delivery that repeats the trip's last one is skipped, and a new trip is dropped
    * when the feed already has as many live trips as it may.
+   * <p>
+   * A journey recorded by the source before the version already applied — stored, failed to
+   * resolve, or removed and remembered as a tombstone — is ignored before any of that work: it is
+   * an older version arriving late, and applying it would briefly revert the trip. Versions
+   * recorded at the same time, and journeys or applied versions without a {@code RecordedAtTime},
+   * are applied as before, so a source that does not stamp its journeys, or stamps them without
+   * advancing the stamp on every change, is never silenced by this check. Timestamps are compared
+   * only with each other, never with the local clock.
    */
   void processEstimatedVehicleJourney(EstimatedVehicleJourney estimatedVehicleJourney) {
     try {
       FeedScopedId tripId = mapper.tripId(estimatedVehicleJourney);
+      var recordedAt = estimatedVehicleJourney.getRecordedAtTime();
+      if (isOlderThanApplied(tripId, recordedAt)) {
+        LOG.debug(
+          "Ignoring carpool trip {} recorded at {}: a newer version has already been applied",
+          tripId,
+          recordedAt
+        );
+        return;
+      }
       if (Boolean.TRUE.equals(estimatedVehicleJourney.isCancellation())) {
-        remove(tripId);
+        remove(tripId, recordedAt);
         return;
       }
       var carpoolTrip = mapper.mapSiriToCarpoolTrip(estimatedVehicleJourney);
       if (carpoolTrip == null) {
-        remove(tripId);
+        remove(tripId, recordedAt);
         return;
       }
       if (isUnchanged(tripId, carpoolTrip)) {
@@ -202,10 +245,12 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
       if (routableTrip == null) {
         failedResolutions.put(tripId, carpoolTrip);
         repository.removeCarpoolTrip(tripId);
+        removedTrips.remove(tripId);
         return;
       }
       failedResolutions.remove(tripId);
       repository.upsertCarpoolTrip(routableTrip);
+      removedTrips.remove(tripId);
     } catch (Exception e) {
       LOG.info(
         "Failed to process EstimatedVehicleJourney {}",
@@ -222,6 +267,20 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
   }
 
   /**
+   * Whether the source recorded this version before the one already applied for the trip: its last
+   * delivery's {@code RecordedAtTime}, or the tombstone's if the trip was removed. Unknown on
+   * either side means not older.
+   */
+  private boolean isOlderThanApplied(FeedScopedId tripId, @Nullable ZonedDateTime recordedAt) {
+    if (recordedAt == null) {
+      return false;
+    }
+    var last = lastDelivery(tripId);
+    var applied = last != null ? last.recordedAt() : removedTrips.get(tripId);
+    return applied != null && recordedAt.isBefore(applied);
+  }
+
+  /**
    * The trip's last delivery, from the repository or, if it could not be resolved, from the failed
    * resolutions; {@code null} if the feed does not have the trip.
    */
@@ -231,9 +290,16 @@ public class SiriETCarpoolingUpdater extends PollingGraphUpdater<TransitRealTime
     return stored != null ? stored.trip() : failedResolutions.get(tripId);
   }
 
-  private void remove(FeedScopedId tripId) {
+  /**
+   * Removes the trip and, when the removing version carries a {@code RecordedAtTime}, leaves a
+   * tombstone so an older active version delivered later does not resurrect it.
+   */
+  private void remove(FeedScopedId tripId, @Nullable ZonedDateTime recordedAt) {
     failedResolutions.remove(tripId);
     repository.removeCarpoolTrip(tripId);
+    if (recordedAt != null) {
+      removedTrips.put(tripId, recordedAt);
+    }
   }
 
   /**
