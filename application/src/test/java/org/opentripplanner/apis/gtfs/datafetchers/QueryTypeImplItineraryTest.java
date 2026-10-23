@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.executionContext;
 
 import graphql.execution.DataFetcherResult;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -229,7 +230,7 @@ class QueryTypeImplItineraryTest {
       .buildRequest();
   }
 
-  private static graphql.schema.DataFetchingEnvironment environment(
+  private static DataFetchingEnvironment environment(
     String id,
     RefetchItineraryService refetchItineraryService,
     RouteRequest defaultRouteRequest
