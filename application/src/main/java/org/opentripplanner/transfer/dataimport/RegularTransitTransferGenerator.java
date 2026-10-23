@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.dataimport;
 
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.place.api.NearbyStop;
@@ -64,6 +65,9 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
   }
 
   private void reportStopsWithoutTransfers() {
+    if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
+      return;
+    }
     Set<FeedScopedId> stopsWithTransfers = transferGenerator.listAllStopsUsedInTransfers();
     for (RegularStop stop : transitRepository.getSiteRepository().listRegularStops()) {
       var stopId = stop.getId();
