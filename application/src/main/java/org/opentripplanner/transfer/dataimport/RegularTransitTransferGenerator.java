@@ -106,13 +106,12 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
     var profileList = config
       .profiles()
       .stream()
-      .map(p -> new TransferProfile<>("NOT IN USE", p.userPreferences()))
+      .map(p -> new TransferProfile<>(p.userPreferences(), pathProvider))
       .toList();
-    TransferProfiles<?> profiles = TransferProfiles.of(profileList);
+    var profiles = TransferProfiles.of(profileList);
 
     return RegularTransferFactory.createTransferGenerator(
       new RaptorStopIndexAdaptor(transitRepository.getSiteRepository()),
-      pathProvider,
       profiles,
       buildRepository
     );

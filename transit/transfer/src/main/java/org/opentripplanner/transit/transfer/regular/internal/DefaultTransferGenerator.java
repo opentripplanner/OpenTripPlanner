@@ -15,7 +15,7 @@ import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
-import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,25 +25,21 @@ import org.slf4j.LoggerFactory;
  * is no {@code TransferRealtimeUpdater} implementation yet.
  *
  * @param <P> the street path type
- * @param <R> the routing request type
  */
-public class DefaultTransferGenerator<P, R> implements TransferGenerator {
+public class DefaultTransferGenerator<P> implements TransferGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
   private final RaptorStopIndex stopIndex;
-  private final TransferPathProvider<P> pathProvider;
-  private final TransferProfiles<R> orderedProfiles;
+  private final TransferProfiles<P> orderedProfiles;
   private final RegularTransferBuildRepository<P> buildRepository;
   private final Set<Integer> stopsUsedInTransfers = ConcurrentHashMap.newKeySet();
 
   public DefaultTransferGenerator(
     RaptorStopIndex stopIndex,
-    TransferPathProvider<P> pathProvider,
-    TransferProfiles<R> profiles,
+    TransferProfiles<P> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
     this.stopIndex = stopIndex;
-    this.pathProvider = pathProvider;
     this.orderedProfiles = profiles;
     this.buildRepository = buildRepository;
   }
@@ -97,15 +93,15 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
   /**
    * Run the profile's own discovery search and keep only the cheapest candidate per target stop.
    * <p>
-   * Only the cheapest(generalized-cost) candidate per target stop is kept. We assume that the diffrence between the
-   * best time and generalized-cost is small. The {@link TransferPathProvider} may return multiple candidates for the
-   * same target stop.
+   * Only the cheapest (generalized-cost) candidate per target stop is kept. We assume that the
+   * difference between the best time and generalized-cost is small. The {@link TransferSearch} may
+   * return multiple candidates for the same target stop.
    */
-  private void generateForStop(TransferProfile<R> profile, FeedScopedId fromStopId) {
+  private void generateForStop(TransferProfile<P> profile, FeedScopedId fromStopId) {
     int fromStop = requireStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 
-    var nearbyStops = pathProvider.findNearbyStops(fromStopId, profile.userPreferences());
+    var nearbyStops = profile.search().findNearbyStops(fromStopId);
     for (var candidate : nearbyStops) {
       int toStop = stopIndex.toStopIndex(candidate.toStop());
       if (toStop == RaptorConstants.NOT_FOUND) {

@@ -25,19 +25,17 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
- * The application-side, street-search-backed implementation of {@link TransferPathProvider} that
- * raptor-data's regular-transfer generator and factory are built against - the one place this
- * pipeline crosses out of the raptor SPI into the street/application modules.
+ * A {@link TransferPathProvider} backed by a street search, with {@code P = NearbyStop}.
  * <p>
- * {@code P = NearbyStop}. Traveler preferences are the concrete {@link AbstractUserPreferences} -
- * {@link RegularTransferPreferencesMapper#toRouteRequest} reconstructs the minimal {@code
- * RouteRequest}/{@code StreetSearchRequest} a street search needs. Only {@code WALK} is supported
- * today, so the street mode is always {@link StreetMode#WALK}. Re-traversal logic (a fresh {@link
- * StateEditor} + {@link EdgeTraverser#traverseEdges}, or a distance/speed estimate when there are
- * no edges) mirrors {@code PathTransfer.asRaptorTransfer}, the equivalent step in today's transfer
- * pipeline.
+ * Traveler preferences are the concrete {@link AbstractUserPreferences} - {@link #searchFor}
+ * reconstructs the minimal {@code RouteRequest}/{@code StreetSearchRequest} a street search
+ * needs, once per preferences. Only {@code WALK} is supported today, so the street mode is always
+ * {@link StreetMode#WALK}. Re-costing a path traverses its edges with a fresh {@link StateEditor}
+ * and {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when
+ * it has no edges, like {@code PathTransfer.asRaptorTransfer}.
  * <p>
  * TODO TX - There is no configurable per-profile duration limit yet - the design for it
  *           (restricted-vs-unrestricted rules, per-target-stop mode restrictions, ...) needs more
@@ -59,8 +57,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
 
   /**
    * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
-   *                         paths are found for the others. Used to skip the stops that are not
-   *                         visited by any trip.
+   *                         paths are found for the others.
    */
   public StreetTransferPathProvider(
     Graph graph,
@@ -73,9 +70,9 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
   }
 
   /**
-   * Shared by the graph-build (generator) and request-time (factory) call sites, so both build
-   * this collaborator the same way: streets if the graph has them, straight-line distance
-   * otherwise (mirrors {@code FlexTransferGenerator.createNearbyStopFinder}).
+   * Create the nearby-stop finder for {@code graph}: it searches the streets if the graph has
+   * them, and uses the straight-line distance otherwise, like
+   * {@code FlexTransferGenerator.createNearbyStopFinder}.
    */
   public static NearbyStopFinder createNearbyStopFinder(
     Graph graph,
@@ -90,76 +87,17 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
   }
 
   @Override
-  public Collection<TransferPath<NearbyStop>> findNearbyStops(
-    FeedScopedId fromStop,
-    AbstractUserPreferences<?> userPreferences
-  ) {
-    if (!isTransferSource.test(fromStop)) {
-      return List.of();
-    }
-    TransitStopVertex vertex = graph.getStopVertex(fromStop);
-    if (vertex == null) {
-      return List.of();
-    }
-    RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(userPreferences);
-    var nearbyStops = nearbyStopFinder.findNearbyStops(
-      vertex,
-      routeRequest,
-      StreetMode.WALK,
-      false,
-      SEARCH_RADIUS,
-      NO_STOP_COUNT_LIMIT
-    );
-    return nearbyStops
-      .stream()
-      .filter(nearbyStop -> !nearbyStop.stopId().equals(fromStop))
-      .map(StreetTransferPathProvider::stripState)
-      .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
-        computePathCriteria(path, userPreferences).ifPresent(criteria ->
-          consumer.accept(new TransferPath<>(path.stopId(), path, criteria))
-        )
-      )
-      .toList();
+  public TransferSearch<NearbyStop> searchFor(AbstractUserPreferences<?> userPreferences) {
+    return new Search(RegularTransferPreferencesMapper.toRouteRequest(userPreferences));
   }
 
   /**
-   * {@link NearbyStop#state} is a live street-search {@link org.opentripplanner.street.search.state.State}
-   * - not {@link java.io.Serializable}, and not needed by anything downstream ({@link
-   * #computePathCriteria} and itinerary mapping both re-derive it from {@code edges}/{@code
-   * distance}). Strip it before a path is handed to the generator/repository, since stored paths
-   * get serialized into the graph.
+   * Drop the live street-search {@link org.opentripplanner.street.search.state.State} of a path,
+   * {@link NearbyStop#state}: it is not {@link java.io.Serializable}, and a path can be re-costed
+   * from its {@code edges} and {@code distance} without it.
    */
   private static NearbyStop stripState(NearbyStop nearbyStop) {
     return new NearbyStop(nearbyStop.stopId(), nearbyStop.distance(), nearbyStop.edges(), null);
-  }
-
-  @Override
-  public Optional<PathCriteria> computePathCriteria(
-    NearbyStop path,
-    AbstractUserPreferences<?> userPreferences
-  ) {
-    // TODO: Build the request once per preferences, not once per path - it only depends on the
-    //  preferences. Building it costs as much as traversing the edges: re-costing all paths of the
-    //  Hamburg graph (33,905 stops, 1,049,172 paths, 41.7 edges per path) took 7.6 s on one
-    //  thread, 3.6 s of it building the requests and 3.0 s traversing the edges. Building the
-    //  request once would save about 4.6 s per Raptor transfer cache miss.
-    RouteRequest routeRequest = RegularTransferPreferencesMapper.toRouteRequest(userPreferences);
-    StreetSearchRequest request = streetSearchRequest(routeRequest);
-
-    if (path.edges() == null || path.edges().isEmpty()) {
-      double durationSeconds = path.distance() / request.walk().speed();
-      int c1 = CostLimit.toRaptorCostWholeSeconds(durationSeconds * request.walk().reluctance());
-      return Optional.of(new PathCriteria(c1, (int) Math.ceil(durationSeconds)));
-    }
-
-    StateEditor stateEditor = new StateEditor(path.edges().get(0).getFromVertex(), request);
-    stateEditor.setTimeSeconds(0);
-    return EdgeTraverser.traverseEdges(stateEditor.makeState(), path.edges()).map(state ->
-      new PathCriteria(
-        CostLimit.toRaptorCostWholeSeconds(state.getWeight()),
-        (int) state.getElapsedTimeSeconds()
-      )
-    );
   }
 
   private static StreetSearchRequest streetSearchRequest(RouteRequest preferences) {
@@ -170,5 +108,70 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
       .withStartTime(Instant.EPOCH)
       .withMode(StreetMode.WALK)
       .build();
+  }
+
+  /**
+   * The search under one set of user preferences: the {@link RouteRequest} the nearby-stop search
+   * is configured with, and the {@link StreetSearchRequest} the edges of a path are traversed with
+   * when it is re-costed. Both are created once, and are immutable.
+   */
+  private final class Search implements TransferSearch<NearbyStop> {
+
+    private final RouteRequest routeRequest;
+    private final StreetSearchRequest streetSearchRequest;
+
+    private Search(RouteRequest routeRequest) {
+      this.routeRequest = routeRequest;
+      this.streetSearchRequest = streetSearchRequest(routeRequest);
+    }
+
+    @Override
+    public Collection<TransferPath<NearbyStop>> findNearbyStops(FeedScopedId fromStop) {
+      if (!isTransferSource.test(fromStop)) {
+        return List.of();
+      }
+      TransitStopVertex vertex = graph.getStopVertex(fromStop);
+      if (vertex == null) {
+        return List.of();
+      }
+      var nearbyStops = nearbyStopFinder.findNearbyStops(
+        vertex,
+        routeRequest,
+        StreetMode.WALK,
+        false,
+        SEARCH_RADIUS,
+        NO_STOP_COUNT_LIMIT
+      );
+      return nearbyStops
+        .stream()
+        .filter(nearbyStop -> !nearbyStop.stopId().equals(fromStop))
+        .map(StreetTransferPathProvider::stripState)
+        .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
+          computePathCriteria(path).ifPresent(criteria ->
+            consumer.accept(new TransferPath<>(path.stopId(), path, criteria))
+          )
+        )
+        .toList();
+    }
+
+    @Override
+    public Optional<PathCriteria> computePathCriteria(NearbyStop path) {
+      if (path.edges() == null || path.edges().isEmpty()) {
+        double durationSeconds = path.distance() / streetSearchRequest.walk().speed();
+        int c1 = CostLimit.toRaptorCostWholeSeconds(
+          durationSeconds * streetSearchRequest.walk().reluctance()
+        );
+        return Optional.of(new PathCriteria(c1, (int) Math.ceil(durationSeconds)));
+      }
+
+      var stateEditor = new StateEditor(path.edges().get(0).getFromVertex(), streetSearchRequest);
+      stateEditor.setTimeSeconds(0);
+      return EdgeTraverser.traverseEdges(stateEditor.makeState(), path.edges()).map(state ->
+        new PathCriteria(
+          CostLimit.toRaptorCostWholeSeconds(state.getWeight()),
+          (int) state.getElapsedTimeSeconds()
+        )
+      );
+    }
   }
 }

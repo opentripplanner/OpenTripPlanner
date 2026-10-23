@@ -42,9 +42,10 @@ final class RaptorTransfersFactory<P> {
   ) {
     var builder = RaptorTransferStore.of(nStops);
     if (profile != null) {
+      var search = pathProvider.searchFor(userPreferences);
       paths.forEachPath(profile, (fromStop, toStop, path) ->
-        pathProvider
-          .computePathCriteria(path, userPreferences)
+        search
+          .computePathCriteria(path)
           .ifPresent(criteria ->
             builder.addTransfer(fromStop, toStop, criteria.durationInSeconds(), criteria.c1())
           )
@@ -68,14 +69,15 @@ final class RaptorTransfersFactory<P> {
     if (profile == null || changedFromStops.size() > MAX_PATCHED_STOPS_SHARE * nStops) {
       return create(paths, userPreferences, profile);
     }
+    var search = pathProvider.searchFor(userPreferences);
     var patch = previous.patch();
     for (int fromStop : changedFromStops) {
       patch.replaceTransfersFrom(fromStop);
       paths
         .pathsFrom(profile, fromStop)
         .forEach((toStop, path) ->
-          pathProvider
-            .computePathCriteria(path, userPreferences)
+          search
+            .computePathCriteria(path)
             .ifPresent(criteria ->
               patch.addTransfer(fromStop, toStop, criteria.durationInSeconds(), criteria.c1())
             )

@@ -31,15 +31,13 @@ public final class RegularTransferFactory {
    * Create the graph-build generator, writing the transfers of all stops into the repository.
    *
    * @param <P> the street path type
-   * @param <R> the routing request type
    */
-  public static <P, R> TransferGenerator createTransferGenerator(
+  public static <P> TransferGenerator createTransferGenerator(
     RaptorStopIndex stopIndex,
-    TransferPathProvider<P> pathProvider,
-    TransferProfiles<R> profiles,
+    TransferProfiles<P> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
-    return new DefaultTransferGenerator<>(stopIndex, pathProvider, profiles, buildRepository);
+    return new DefaultTransferGenerator<>(stopIndex, profiles, buildRepository);
   }
 
   /**

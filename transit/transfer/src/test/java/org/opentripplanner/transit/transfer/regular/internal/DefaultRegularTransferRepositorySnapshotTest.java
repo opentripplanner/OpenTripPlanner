@@ -24,6 +24,7 @@ import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
  * The Raptor transfers of a snapshot: derived from its paths under the request-time preferences,
@@ -68,6 +69,20 @@ class DefaultRegularTransferRepositorySnapshotTest {
     assertThat(from(transfers, A)).containsExactly(tx(B, 200), tx(C, 400));
     assertThat(from(transfers, B)).containsExactly(tx(C, 600));
     assertThat(to(transfers, C)).containsExactly(tx(A, 400), tx(B, 600));
+  }
+
+  @Test
+  void theSearchIsCreatedOncePerCreateAndPerPatch() {
+    initial.raptorTransfers(REQUEST);
+
+    assertThat(provider.searches).isEqualTo(1);
+    assertThat(provider.recosted).isEqualTo(3);
+
+    repository.replaceTransfersFrom(PROFILE, A, Map.of(C, path(A, C, 250), D, path(A, D, 50)));
+    freeze().raptorTransfers(REQUEST);
+
+    assertThat(provider.searches).isEqualTo(2);
+    assertThat(provider.recosted).isEqualTo(5);
   }
 
   @Test
@@ -256,27 +271,29 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   private record Tx(int stop, int c1) {}
 
-  /** Counts the re-costed paths. */
+  /** Counts the created searches and the re-costed paths. */
   private static final class CountingPathProvider implements TransferPathProvider<FakePath> {
 
     private final FakeTransferPathProvider delegate = new FakeTransferPathProvider();
+    private int searches = 0;
     private int recosted = 0;
 
     @Override
-    public Collection<TransferPath<FakePath>> findNearbyStops(
-      FeedScopedId fromStop,
-      AbstractUserPreferences<?> userPreferences
-    ) {
-      return delegate.findNearbyStops(fromStop, userPreferences);
-    }
+    public TransferSearch<FakePath> searchFor(AbstractUserPreferences<?> userPreferences) {
+      ++searches;
+      var search = delegate.searchFor(userPreferences);
+      return new TransferSearch<>() {
+        @Override
+        public Collection<TransferPath<FakePath>> findNearbyStops(FeedScopedId fromStop) {
+          return search.findNearbyStops(fromStop);
+        }
 
-    @Override
-    public Optional<PathCriteria> computePathCriteria(
-      FakePath path,
-      AbstractUserPreferences<?> userPreferences
-    ) {
-      ++recosted;
-      return delegate.computePathCriteria(path, userPreferences);
+        @Override
+        public Optional<PathCriteria> computePathCriteria(FakePath path) {
+          ++recosted;
+          return search.computePathCriteria(path);
+        }
+      };
     }
   }
 }

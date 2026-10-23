@@ -15,17 +15,17 @@ import java.util.List;
  * Simple, not efficient - a fixed-point iteration over the (well under 20) profiles this ever
  * holds, not a proper topological sort.
  *
- * @param <R> the routing request type
+ * @param <P> the street path type
  */
-public final class TransferProfiles<R> implements Iterable<TransferProfile<R>> {
+public final class TransferProfiles<P> implements Iterable<TransferProfile<P>> {
 
-  private final List<TransferProfile<R>> profiles;
+  private final List<TransferProfile<P>> profiles;
 
-  private TransferProfiles(Collection<TransferProfile<R>> profiles) {
+  private TransferProfiles(Collection<TransferProfile<P>> profiles) {
     this.profiles = List.copyOf(profiles);
   }
 
-  public static <R> TransferProfiles<R> of(Collection<TransferProfile<R>> profiles) {
+  public static <P> TransferProfiles<P> of(Collection<TransferProfile<P>> profiles) {
     return new TransferProfiles<>(profiles);
   }
 
@@ -34,7 +34,7 @@ public final class TransferProfiles<R> implements Iterable<TransferProfile<R>> {
   }
 
   @Override
-  public Iterator<TransferProfile<R>> iterator() {
+  public Iterator<TransferProfile<P>> iterator() {
     return profiles.iterator();
   }
 }

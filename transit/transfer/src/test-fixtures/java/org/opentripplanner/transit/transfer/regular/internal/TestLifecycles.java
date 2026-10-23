@@ -1,14 +1,10 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
-import java.util.Collection;
-import java.util.Optional;
-import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
-import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
  * Lifecycles for tests that only read and write the stored paths, not the Raptor transfers
@@ -36,18 +32,7 @@ final class TestLifecycles {
   private static final class UnsupportedPathProvider<P> implements TransferPathProvider<P> {
 
     @Override
-    public Collection<TransferPath<P>> findNearbyStops(
-      FeedScopedId fromStop,
-      AbstractUserPreferences<?> userPreferences
-    ) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<PathCriteria> computePathCriteria(
-      P path,
-      AbstractUserPreferences<?> userPreferences
-    ) {
+    public TransferSearch<P> searchFor(AbstractUserPreferences<?> userPreferences) {
       throw new UnsupportedOperationException();
     }
   }

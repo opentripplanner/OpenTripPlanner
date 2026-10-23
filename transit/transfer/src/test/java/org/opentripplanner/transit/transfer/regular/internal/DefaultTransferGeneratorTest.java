@@ -34,22 +34,12 @@ class DefaultTransferGeneratorTest {
     provider.addNearby(A, B, 200, 90);
 
     AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    // Explicit type witnesses throughout: diamond inference from a wildcard-typed argument
-    // triggers capture conversion and produces a fresh, non-matching captured type at each use.
-    TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
-      AbstractUserPreferences<?>
-    >(userPreferences, userPreferences);
-    TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
-      AbstractUserPreferences<?>
-    >of(List.of(profile));
+    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
 
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<
-      FakeTransferPathProvider.FakePath,
-      AbstractUserPreferences<?>
-    >(stopIndex, provider, profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(stopIndex, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
@@ -68,20 +58,12 @@ class DefaultTransferGeneratorTest {
     provider.addNearby(A, B, 100, 600);
 
     AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
-      AbstractUserPreferences<?>
-    >(userPreferences, userPreferences);
-    TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
-      AbstractUserPreferences<?>
-    >of(List.of(profile));
+    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
 
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<
-      FakeTransferPathProvider.FakePath,
-      AbstractUserPreferences<?>
-    >(stopIndex, provider, profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(stopIndex, profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
@@ -102,19 +84,11 @@ class DefaultTransferGeneratorTest {
     provider.addNearby(A, flexStop, 50, 30);
 
     AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
-      AbstractUserPreferences<?>
-    >(userPreferences, userPreferences);
-    TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
-      AbstractUserPreferences<?>
-    >of(List.of(profile));
+    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
 
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<
-      FakeTransferPathProvider.FakePath,
-      AbstractUserPreferences<?>
-    >(stopIndex(), provider, profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(stopIndex(), profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
@@ -130,19 +104,11 @@ class DefaultTransferGeneratorTest {
     provider.addNearby(A, B, 100, 60);
 
     AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    TransferProfile<AbstractUserPreferences<?>> profile = new TransferProfile<
-      AbstractUserPreferences<?>
-    >(userPreferences, userPreferences);
-    TransferProfiles<AbstractUserPreferences<?>> profiles = TransferProfiles.<
-      AbstractUserPreferences<?>
-    >of(List.of(profile));
+    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
 
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<
-      FakeTransferPathProvider.FakePath,
-      AbstractUserPreferences<?>
-    >(stopIndex(), provider, profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(stopIndex(), profiles, buildRepository);
 
     generator.generateTransfersForAllStops();
 
