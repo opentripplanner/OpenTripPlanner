@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
-import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 class ItineraryReferenceSerializerTest {
 
@@ -57,11 +56,10 @@ class ItineraryReferenceSerializerTest {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.WALK,
-      DurationForEnum.of(TransitMode.class).build(),
-      DurationForEnum.of(TransitMode.class).build(),
+      Duration.ZERO,
+      Duration.ZERO,
       1.3,
       2.0,
-      DurationForEnum.of(StreetMode.class).build(),
       false
     );
   }
@@ -93,11 +91,10 @@ class ItineraryReferenceSerializerTest {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.BIKE,
-      DurationForEnum.of(TransitMode.class).build(),
-      DurationForEnum.of(TransitMode.class).build(),
+      Duration.ZERO,
+      Duration.ZERO,
       1.3,
       2.0,
-      DurationForEnum.of(StreetMode.class).build(),
       true
     );
 
@@ -115,21 +112,10 @@ class ItineraryReferenceSerializerTest {
       StreetMode.BIKE,
       StreetMode.CAR,
       StreetMode.WALK,
-      DurationForEnum.of(TransitMode.class)
-        .withDefaultSec(60)
-        .with(TransitMode.BUS, Duration.ofSeconds(90))
-        .with(TransitMode.RAIL, Duration.ofSeconds(120))
-        .build(),
-      DurationForEnum.of(TransitMode.class)
-        .withDefaultSec(30)
-        .with(TransitMode.FERRY, Duration.ofSeconds(180))
-        .build(),
+      Duration.ofSeconds(60),
+      Duration.ofSeconds(30),
       2.5,
       3.25,
-      DurationForEnum.of(StreetMode.class)
-        .withDefault(Duration.ofMinutes(20))
-        .with(StreetMode.BIKE, Duration.ofMinutes(15))
-        .build(),
       true
     );
 
@@ -159,11 +145,10 @@ class ItineraryReferenceSerializerTest {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.WALK,
-      DurationForEnum.of(TransitMode.class).build(),
-      DurationForEnum.of(TransitMode.class).build(),
+      Duration.ZERO,
+      Duration.ZERO,
       1.3,
       2.0,
-      DurationForEnum.of(StreetMode.class).build(),
       false
     );
 
@@ -261,6 +246,92 @@ class ItineraryReferenceSerializerTest {
   }
 
   /**
+   * A board/alight slack above what the GTFS API would ever let a client set
+   * ({@code requireNonNegativeMax2hours} in {@code TransitPreferencesMapper}) is only possible in
+   * a hand-crafted token, and must not reach {@code RouteRequest.buildRequest()} unvalidated - see
+   * {@link ItineraryReference}'s class doc.
+   */
+  @Test
+  void boardSlackAboveTwoHoursDecodesToNull() {
+    var ref = new ItineraryReference(
+      List.of(LEG_A_TO_B),
+      null,
+      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      Duration.ofHours(2).plusSeconds(1),
+      Duration.ZERO,
+      1.3,
+      2.0,
+      false
+    );
+
+    assertThat(
+      ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref))
+    ).isNull();
+  }
+
+  @Test
+  void alightSlackAboveTwoHoursDecodesToNull() {
+    var ref = new ItineraryReference(
+      List.of(LEG_A_TO_B),
+      null,
+      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      Duration.ZERO,
+      Duration.ofHours(2).plusSeconds(1),
+      1.3,
+      2.0,
+      false
+    );
+
+    assertThat(
+      ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref))
+    ).isNull();
+  }
+
+  @Test
+  void negativeBoardSlackDecodesToNull() {
+    var ref = new ItineraryReference(
+      List.of(LEG_A_TO_B),
+      null,
+      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      Duration.ofSeconds(-1),
+      Duration.ZERO,
+      1.3,
+      2.0,
+      false
+    );
+
+    assertThat(
+      ItineraryReferenceSerializer.decode(ItineraryReferenceSerializer.encode(ref))
+    ).isNull();
+  }
+
+  /**
+   * A single {@code itinerary(id:)} call does a lookup, and possibly a transfer street search,
+   * per leg reference - an id with an unbounded number of them lets a client make one call do an
+   * unbounded amount of work. The cap is one leg more than
+   * {@link org.opentripplanner.routing.api.request.preference.TransferPreferences}'s own hard
+   * ceiling on transfers, so a token with more legs than that can only be hand-crafted.
+   */
+  @Test
+  void tooManyLegReferencesDecodesToNull() {
+    String validLegToken = LegReferenceSerializer.encode(LEG_A_TO_B);
+    String joinedTooManyLegs = String.join("~", Collections.nCopies(32, validLegToken));
+
+    String craftedToken = craftedToken(joinedTooManyLegs, null, null, "1.3");
+
+    assertThat(ItineraryReferenceSerializer.decode(craftedToken)).isNull();
+  }
+
+  /**
    * Builds a token with otherwise-valid values for every field production uses, and no
    * {@code toStopId}/{@code toLat}/{@code toLng} location - so a test only needs to pass in the
    * one or two fields it wants to make malformed. Field names/order must match
@@ -285,14 +356,10 @@ class ItineraryReferenceSerializerTest {
       .addString("accessMode")
       .addString("egressMode")
       .addString("transferMode")
-      .addDuration("boardSlackDefault")
-      .addString("boardSlackOverrides")
-      .addDuration("alightSlackDefault")
-      .addString("alightSlackOverrides")
+      .addDuration("boardSlack")
+      .addDuration("alightSlack")
       .addString("walkSpeed")
       .addString("walkReluctance")
-      .addDuration("maxAccessEgressDurationDefault")
-      .addString("maxAccessEgressDurationOverrides")
       .addBoolean("wheelchair")
       .build();
 
@@ -308,14 +375,10 @@ class ItineraryReferenceSerializerTest {
       .withString("accessMode", StreetMode.WALK.name())
       .withString("egressMode", StreetMode.WALK.name())
       .withString("transferMode", StreetMode.WALK.name())
-      .withDuration("boardSlackDefault", Duration.ZERO)
-      .withString("boardSlackOverrides", "")
-      .withDuration("alightSlackDefault", Duration.ZERO)
-      .withString("alightSlackOverrides", "")
+      .withDuration("boardSlack", Duration.ZERO)
+      .withDuration("alightSlack", Duration.ZERO)
       .withString("walkSpeed", walkSpeed)
       .withString("walkReluctance", "2.0")
-      .withDuration("maxAccessEgressDurationDefault", Duration.ZERO)
-      .withString("maxAccessEgressDurationOverrides", "")
       .withBoolean("wheelchair", false)
       .build();
   }

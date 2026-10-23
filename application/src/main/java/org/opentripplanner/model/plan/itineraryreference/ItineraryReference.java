@@ -1,13 +1,12 @@
 package org.opentripplanner.model.plan.itineraryreference;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.LegReference;
-import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * A stable reference containing the information required to refetch an itinerary using
@@ -26,6 +25,17 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * produce different access/egress legs. Encoding the preferences of the remaining modes requires
  * covering their nested parking, rental and optimisation preferences too, and is left to a
  * follow-up.
+ * <p>
+ * Only the client-settable default is encoded for {@code boardSlack}/{@code alightSlack} and
+ * {@code maxAccessEgressDuration} is not encoded at all; no supported API lets a client set
+ * per-mode overrides or {@code maxAccessEgressDuration}, so those are always read from the
+ * current {@code defaultRouteRequest}/router config at refetch time instead. This follows the
+ * same rule throughout: a client's choice goes into the token, server-only configuration is read
+ * fresh every time - so an id always reflects the operator's current settings, not whatever they
+ * were when the itinerary was planned, and there is nothing a client-controlled value could
+ * inject into a server-only setting. {@code boardSlack}/{@code alightSlack} are validated at
+ * decode time ({@link ItineraryReferenceSerializer#decode}) against the same bound the GTFS API
+ * enforces on client input.
  */
 public record ItineraryReference(
   List<LegReference> legReferences,
@@ -34,11 +44,10 @@ public record ItineraryReference(
   StreetMode accessMode,
   StreetMode egressMode,
   StreetMode transferMode,
-  DurationForEnum<TransitMode> boardSlack,
-  DurationForEnum<TransitMode> alightSlack,
+  Duration boardSlack,
+  Duration alightSlack,
   double walkSpeed,
   double walkReluctance,
-  DurationForEnum<StreetMode> maxAccessEgressDuration,
   boolean wheelchair
 ) {
   public ItineraryReference {
@@ -48,7 +57,6 @@ public record ItineraryReference(
     Objects.requireNonNull(transferMode);
     Objects.requireNonNull(boardSlack);
     Objects.requireNonNull(alightSlack);
-    Objects.requireNonNull(maxAccessEgressDuration);
     // List.copyOf() also rejects null elements and guards against a caller mutating the list
     // after construction.
     legReferences = List.copyOf(legReferences);

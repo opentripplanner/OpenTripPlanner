@@ -5,8 +5,10 @@ import static org.opentripplanner.apis.support.graphql.DataFetchingSupport.execu
 
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.gtfs.TestGtfsGraphQLRequestContext;
@@ -16,7 +18,6 @@ import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
@@ -33,7 +34,6 @@ import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
@@ -124,6 +124,35 @@ class QueryTypeImplItineraryTest {
     return ((DataFetcherResult<Itinerary>) dataFetcherResult).getData();
   }
 
+  /**
+   * The original {@code planConnection}/{@code plan} resolver puts {@code locale} into the local
+   * context ({@code QueryTypeImpl#getPlanResult}), which {@code GraphQLUtils} reads before falling
+   * back to {@code Accept-Language}. {@code itinerary(id:)} must do the same, or a trip planned
+   * with a non-default locale comes back with names in a different language on refetch.
+   */
+  @Test
+  @SuppressWarnings("unchecked")
+  void refetchedItineraryPreservesLocale() throws Exception {
+    var refetchService = refetchItineraryService();
+    var routeRequest = routeRequest()
+      .copyOf()
+      .withPreferences(p -> p.withLocale(Locale.GERMAN))
+      .buildRequest();
+
+    var reference = ItineraryReferenceMapper.toItineraryReference(
+      refetchService.refetchItinerary(null, null, List.of(legRef()), routeRequest),
+      routeRequest
+    );
+    var id = ItineraryReferenceSerializer.encode(reference);
+
+    Object result = SUBJECT.itinerary().get(environment(id, refetchService, routeRequest));
+
+    Map<String, ?> localContext = (Map<String, ?>) (
+      (DataFetcherResult<?>) result
+    ).getLocalContext();
+    assertThat(localContext).containsEntry("locale", Locale.GERMAN);
+  }
+
   @Test
   void invalidIdReturnsNull() throws Exception {
     var itinerary = SUBJECT.itinerary().get(
@@ -142,11 +171,10 @@ class QueryTypeImplItineraryTest {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.WALK,
-      DurationForEnum.of(TransitMode.class).build(),
-      DurationForEnum.of(TransitMode.class).build(),
+      Duration.ofSeconds(0),
+      Duration.ofSeconds(0),
       -1,
       2.0,
-      DurationForEnum.of(StreetMode.class).build(),
       false
     );
     var id = ItineraryReferenceSerializer.encode(reference);

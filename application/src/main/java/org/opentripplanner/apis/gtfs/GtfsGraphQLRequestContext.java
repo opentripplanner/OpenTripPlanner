@@ -53,5 +53,6 @@ public interface GtfsGraphQLRequestContext {
    */
   RouteRequest defaultRouteRequest();
 
+  /** Shared by every data fetcher that refetches an itinerary from a client-supplied id. */
   RefetchItineraryService refetchItineraryService();
 }

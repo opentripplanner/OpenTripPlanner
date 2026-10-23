@@ -416,14 +416,16 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           );
         return DataFetcherResult.<Itinerary>newResult()
           .data(itinerary)
-          .localContext(Map.of(ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY, routeRequest))
+          .localContext(
+            Map.of(
+              "locale",
+              routeRequest.preferences().locale(),
+              ItineraryImpl.ROUTE_REQUEST_CONTEXT_KEY,
+              routeRequest
+            )
+          )
           .build();
-      } catch (
-        RefetchItineraryException
-        | RoutingValidationException
-        | IllegalArgumentException
-        | NullPointerException e
-      ) {
+      } catch (RefetchItineraryException e) {
         LOG.debug("Could not refetch itinerary for id {}", args.getGraphQLId(), e);
         return null;
       }

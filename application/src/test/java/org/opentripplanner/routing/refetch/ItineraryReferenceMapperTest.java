@@ -12,9 +12,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReference;
 import org.opentripplanner.model.plan.itineraryreference.ItineraryReferenceSerializer;
+import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -161,13 +161,6 @@ class ItineraryReferenceMapperTest {
               )
           )
           .withWalk(walk -> walk.withSpeed(2.5).withReluctance(3.0))
-          .withStreet(street ->
-            street.withAccessEgress(accessEgress ->
-              accessEgress.withMaxDuration(b ->
-                b.withDefault(Duration.ofMinutes(20)).with(StreetMode.BIKE, Duration.ofMinutes(15))
-              )
-            )
-          )
       )
       .buildRequest();
 
@@ -179,17 +172,67 @@ class ItineraryReferenceMapperTest {
     assertThat(reference.egressMode()).isEqualTo(StreetMode.CAR);
     assertThat(reference.transferMode()).isEqualTo(StreetMode.WALK);
     assertThat(reference.wheelchair()).isTrue();
-    assertThat(reference.boardSlack().defaultValue()).isEqualTo(Duration.ofSeconds(60));
-    assertThat(reference.boardSlack().valueOf(TransitMode.BUS)).isEqualTo(Duration.ofSeconds(90));
-    assertThat(reference.alightSlack().defaultValue()).isEqualTo(Duration.ofSeconds(30));
-    assertThat(reference.alightSlack().valueOf(TransitMode.RAIL)).isEqualTo(Duration.ofSeconds(45));
+    assertThat(reference.boardSlack()).isEqualTo(Duration.ofSeconds(60));
+    assertThat(reference.alightSlack()).isEqualTo(Duration.ofSeconds(30));
     assertThat(reference.walkSpeed()).isEqualTo(2.5);
     assertThat(reference.walkReluctance()).isEqualTo(3.0);
-    assertThat(reference.maxAccessEgressDuration().defaultValue()).isEqualTo(
-      Duration.ofMinutes(20)
+  }
+
+  /**
+   * {@code customRouteRequest} above sets per-mode board/alight slack overrides
+   * ({@code TransitMode.BUS}/{@code TransitMode.RAIL}), which no supported API lets a client set.
+   * {@link ItineraryReference#boardSlack()}/{@link ItineraryReference#alightSlack()} are plain
+   * {@link Duration}s, not {@link DurationForEnum}, so they cannot carry a per-mode override at
+   * all - confirming they only capture the client-settable default, per {@link ItineraryReference}'s
+   * class doc.
+   */
+  @Test
+  void toItineraryReferenceDropsServerOnlyPerModeSlackOverrides() {
+    var refetchService = createRefetchService();
+    var itinerary = refetchService.refetchItinerary(null, null, List.of(legRef()), routeRequest());
+
+    var routeRequestWithOverrides = routeRequest()
+      .copyOf()
+      .withPreferences(preferences ->
+        preferences.withTransit(transit ->
+          transit
+            .withBoardSlack(b -> b.withDefaultSec(60).with(TransitMode.BUS, Duration.ofSeconds(90)))
+            .withAlightSlack(b ->
+              b.withDefaultSec(30).with(TransitMode.RAIL, Duration.ofSeconds(45))
+            )
+        )
+      )
+      .buildRequest();
+
+    var reference = ItineraryReferenceMapper.toItineraryReference(
+      itinerary,
+      routeRequestWithOverrides
     );
-    assertThat(reference.maxAccessEgressDuration().valueOf(StreetMode.BIKE)).isEqualTo(
-      Duration.ofMinutes(15)
+
+    // Only the Duration type itself is asserted here - there is no override to read, because
+    // ItineraryReference has no field capable of holding one.
+    assertThat(reference.boardSlack()).isInstanceOf(Duration.class);
+    assertThat(reference.boardSlack()).isEqualTo(Duration.ofSeconds(60));
+    assertThat(reference.alightSlack()).isEqualTo(Duration.ofSeconds(30));
+
+    // Rebuilding with a *different* default request that has its own per-mode overrides proves
+    // those overrides - not the ones from routeRequestWithOverrides above - are what ends up on
+    // the rebuilt request, i.e. overrides are always read fresh from the current server config.
+    var differentDefaultRequest = routeRequest()
+      .copyOf()
+      .withPreferences(preferences ->
+        preferences.withTransit(transit ->
+          transit.withBoardSlack(b ->
+            b.withDefaultSec(60).with(TransitMode.BUS, Duration.ofSeconds(999))
+          )
+        )
+      )
+      .buildRequest();
+
+    var rebuilt = ItineraryReferenceMapper.toRouteRequest(reference, differentDefaultRequest);
+
+    assertThat(rebuilt.preferences().transit().boardSlack().valueOf(TransitMode.BUS)).isEqualTo(
+      Duration.ofSeconds(999)
     );
   }
 
@@ -208,11 +251,10 @@ class ItineraryReferenceMapperTest {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.WALK,
-      DurationForEnum.of(TransitMode.class).build(),
-      DurationForEnum.of(TransitMode.class).build(),
+      Duration.ZERO,
+      Duration.ZERO,
       1.3,
       2.0,
-      DurationForEnum.of(StreetMode.class).build(),
       false
     );
 
@@ -226,6 +268,34 @@ class ItineraryReferenceMapperTest {
       )
     );
     assertThat(e.getMessage()).isEqualTo("Could not calculate access");
+  }
+
+  /**
+   * {@code LegReferenceSerializer} only produces {@link ScheduledTransitLegReference} today, but
+   * {@code toRouteRequest}'s board/alight-stop fallback must not assume that holds for every
+   * possible {@link org.opentripplanner.model.plan.legreference.LegReference} - a mismatch has to
+   * make the {@code itinerary(id:)} query result {@code null}, not cause a
+   * {@link ClassCastException}.
+   */
+  @Test
+  void toRouteRequestRejectsUnsupportedLegReferenceTypeInsteadOfThrowingClassCastException() {
+    var reference = new ItineraryReference(
+      List.of((LegReference) (transitService, transitAlertService) -> null),
+      null,
+      null,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      StreetMode.WALK,
+      Duration.ZERO,
+      Duration.ZERO,
+      1.3,
+      2.0,
+      false
+    );
+
+    assertThrows(UnsupportedItineraryReferenceException.class, () ->
+      ItineraryReferenceMapper.toRouteRequest(reference, routeRequest())
+    );
   }
 
   private ScheduledTransitLegReference legRef() {
@@ -314,11 +384,10 @@ class ItineraryReferenceMapperTest {
       StreetMode.WALK,
       StreetMode.WALK,
       StreetMode.WALK,
-      DurationForEnum.of(TransitMode.class).build(),
-      DurationForEnum.of(TransitMode.class).build(),
+      Duration.ZERO,
+      Duration.ZERO,
       1.3,
       2.0,
-      DurationForEnum.of(StreetMode.class).build(),
       false
     );
 
