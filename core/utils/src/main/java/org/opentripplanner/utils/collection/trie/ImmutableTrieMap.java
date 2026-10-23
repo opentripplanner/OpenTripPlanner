@@ -114,6 +114,12 @@ public final class ImmutableTrieMap<K, V> extends AbstractMap<K, V> implements S
   }
 
   @Override
+  public V getOrDefault(Object key, V defaultValue) {
+    V value = get(key);
+    return value == null ? defaultValue : value;
+  }
+
+  @Override
   public boolean containsKey(Object key) {
     return get(key) != null;
   }

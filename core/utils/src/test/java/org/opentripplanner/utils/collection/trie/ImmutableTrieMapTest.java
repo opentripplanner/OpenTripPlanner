@@ -265,6 +265,24 @@ class ImmutableTrieMapTest {
     assertSame(ImmutableTrieMap.empty(), roundTrip(ImmutableTrieMap.empty()));
   }
 
+  @Test
+  void getOrDefault() {
+    var subject = ImmutableTrieMap.<String, Integer>empty().with("A", 1);
+
+    assertEquals(1, subject.getOrDefault("A", -1));
+    assertEquals(-1, subject.getOrDefault("B", -1));
+  }
+
+  @Test
+  void getOrDefaultLooksUpAMissingKeyOnce() {
+    var subject = ImmutableTrieMap.<CountingKey, Integer>empty().with(new CountingKey("A"), 1);
+    var missing = new CountingKey("B");
+
+    subject.getOrDefault(missing, -1);
+
+    assertEquals(1, missing.hashCodeCalls);
+  }
+
   @SuppressWarnings("unchecked")
   private static <T> T roundTrip(T object) throws IOException, ClassNotFoundException {
     var bytes = new ByteArrayOutputStream();
@@ -273,6 +291,28 @@ class ImmutableTrieMapTest {
     }
     try (var in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
       return (T) in.readObject();
+    }
+  }
+
+  /** A key that counts how often its hash code is computed. */
+  private static final class CountingKey {
+
+    private final String value;
+    private int hashCodeCalls = 0;
+
+    private CountingKey(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public int hashCode() {
+      ++hashCodeCalls;
+      return value.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      return o instanceof CountingKey other && value.equals(other.value);
     }
   }
 
