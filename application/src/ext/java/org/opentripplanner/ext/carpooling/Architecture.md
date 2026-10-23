@@ -83,6 +83,16 @@ Carpooling results are integrated into the standard OTP GraphQL API. Carpool leg
 The `SiriETCarpoolingUpdater` receives real-time updates about carpool trips via SIRI-ET (Estimated Timetable) messages. The `CarpoolSiriMapper` maps SIRI-ET data to the internal domain model:
 - `EstimatedVehicleJourneyCode` → Trip ID
 - `EstimatedCalls` → Stops on the carpooling trip
+- `RecordedAtTime` → when the source recorded this version of the trip (the journey's own, or
+  its frame's when the journey carries none)
+
+Versions of a trip are applied in the order the source recorded them, not the order they arrive.
+A journey recorded before the version already applied — stored, or removed and remembered as a
+tombstone until it would have expired — is ignored, so an older version delivered late (a proxy
+with several instances delivers in whatever order its instances were polled) never reverts a trip
+or resurrects a cancelled one. A version recorded at the same time, or with no `RecordedAtTime` on
+either side, is applied as before: the check orders, it never silences a source that does not
+stamp every change. Timestamps are compared only with each other, never with the local clock.
 
 ## Design Decisions
 
