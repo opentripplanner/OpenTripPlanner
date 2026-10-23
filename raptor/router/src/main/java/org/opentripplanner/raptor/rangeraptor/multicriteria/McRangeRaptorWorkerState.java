@@ -11,6 +11,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.model.RaptorTripScheduleStopPosition;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.rangeraptor.destination.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.internalapi.OnTripAccessArrivals;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorRouterResult;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
@@ -20,7 +21,6 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStop
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.AbstractPatternRide;
-import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;

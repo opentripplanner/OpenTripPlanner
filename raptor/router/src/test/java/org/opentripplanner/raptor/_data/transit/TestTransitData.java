@@ -392,7 +392,7 @@ public class TestTransitData
       debug
         .withStopArrivalListener(logger::stopArrivalLister)
         .withPatternRideDebugListener(logger::patternRideLister)
-        .withPathFilteringListener(logger::pathFilteringListener)
+        .withDestinationArrivalListener(logger::destinationArrivalListener)
         .withLogger(logger);
     } else {
       if (WARNING_COUNTER.getAndIncrement() % 20 == 0) {
