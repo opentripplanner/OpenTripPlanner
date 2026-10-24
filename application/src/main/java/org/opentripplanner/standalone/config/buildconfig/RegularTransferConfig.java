@@ -30,6 +30,32 @@ public class RegularTransferConfig {
         .asDuration(dft.maxDuration())
     );
 
+    builder.withIncludeStops(
+      root
+        .of("stopsWithRegularTransfers")
+        .since(V2_9)
+        .summary(
+          "Stops that should always have regular transfers computed, even without scheduled trips."
+        )
+        .description(
+          """
+          List of stop IDs for which regular transfers are always pre-computed during graph build,
+          even if the stop has no scheduled trips. Remember to include _feedId_ like this
+          `"RB:NSR:Quay:102541"`.
+
+          This is useful for stops that are unused in static transit data, but may be visited by
+          real-time updates (e.g. a platform that a train can be re-routed to at runtime). Without
+          this configuration, stops with no scheduled trips are excluded from transfer pre-computation
+          and become unreachable islands when a real-time update routes a trip to them.
+
+          Note! This parameter should be replaced with an automatic update to regular transfers
+          based on real-time updates.
+          """
+        )
+        .experimentalFeature()
+        .asFeedScopedIds(List.of())
+    );
+
     builder.withParametersForMode(
       root
         .of("transferParametersForMode")
