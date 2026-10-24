@@ -9,7 +9,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DefaultDirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -76,7 +76,8 @@ class WalkRoutingTest {
         new TimetableDataImport(),
         TransferServiceTestFactory.defaultTransferRepository()
       );
-      return DirectStreetRouter.route(
+      var router = new DefaultDirectStreetRouter();
+      return router.route(
         graph,
         transitService,
         TestServerContext.createStreetLimitationParametersService(),
