@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
@@ -124,8 +125,11 @@ class RequestScopedFactoryIntegrationTest {
   }
 
   @Nullable
-  private static NearbyStop findPath(RequestScopedFactory request) {
-    return request.regularTransfers().findPath(WALK, FROM_STOP, TO_STOP);
+  private static NearbyStop findPath(RequestScopedFactory requestFactory) {
+    return requestFactory
+      .regularTransfers()
+      .forRequest(RouteRequest.defaultValue())
+      .findPath(FROM_STOP, TO_STOP);
   }
 
   /** The transit domain commits periodically, so poll until a new request sees the update. */

@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.RoutingService;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
@@ -47,11 +48,9 @@ import org.opentripplanner.street.internal.DefaultStreetRepository;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.configure.RegularTransferRepositoryModule;
+import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
 import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
-import org.opentripplanner.transfer.dataimport.api.TransferProfileConfig;
-import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -66,7 +65,6 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 public class TestServerContext {
@@ -131,15 +129,16 @@ public class TestServerContext {
    * builds, register them on a new transaction registry, and return the current snapshot. The
    * transit repository must be indexed first, see {@link #createTransitService}.
    */
-  public static RegularTransferRepositorySnapshot<NearbyStop> createRegularTransfers(
+  public static RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> createRegularTransfers(
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport
   ) {
     var registry = TransactionFactory.createRepositoryRegistry();
-    var handle = RegularTransferRepositoryModule.regularTransferRepositoryHandle(
+    var handle = StreetTransferFactory.registerRepository(
       registry,
       createRegularTransferBuildRepository(graph, transitRepository, timetableDataImport),
+      StreetTransferFactory.defaultParameters(),
       graph,
       transitRepository
     );
@@ -158,16 +157,13 @@ public class TestServerContext {
   ) {
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository =
       RegularTransferFactory.createBuildRepository();
-    var transferProfilesConfig = new TransferProfilesConfig(
-      List.of(new TransferProfileConfig(WalkPreferences.DEFAULT))
-    );
     var stopsVisitedByPatterns = new StopsVisitedByPatterns(timetableDataImport);
-    var transferGenerator = RegularTransitTransferGenerator.create(
+    var transferGenerator = StreetTransferFactory.createGenerator(
       graph,
       transitRepository,
-      transferProfilesConfig,
+      StreetTransferFactory.defaultParameters(),
       regularTransferBuildRepository,
-      stopsVisitedByPatterns
+      stopsVisitedByPatterns::contains
     );
     new RegularTransitTransferGenerator(
       () -> transferGenerator,
@@ -187,7 +183,7 @@ public class TestServerContext {
     Graph graph,
     TransitService transitService,
     TransferRepository transferRepository,
-    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers
   ) {
     var routerConfig = RouterConfig.DEFAULT;
     var raptorConfig = createRaptorConfig();

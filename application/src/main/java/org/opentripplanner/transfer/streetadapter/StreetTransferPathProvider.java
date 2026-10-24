@@ -21,7 +21,6 @@ import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -30,10 +29,10 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 /**
  * A {@link TransferPathProvider} backed by a street search, with {@code P = NearbyStop}.
  * <p>
- * Traveler preferences are the concrete {@link AbstractUserPreferences} - {@link #searchFor}
- * reconstructs the minimal {@code RouteRequest}/{@code StreetSearchRequest} a street search
- * needs, once per preferences. Only {@code WALK} is supported today, so the street mode is always
- * {@link StreetMode#WALK}. Re-costing a path traverses its edges with a fresh {@link StateEditor}
+ * The request is a {@link RouteRequest} with the user preferences applied, see
+ * {@link RegularTransferPreferencesMapper}. {@link #searchFor} creates the {@code
+ * StreetSearchRequest} a street search needs, once per request. Only {@code WALK} is supported
+ * today, so the street mode is always {@link StreetMode#WALK}. Re-costing a path traverses its edges with a fresh {@link StateEditor}
  * and {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when
  * it has no edges, like {@code PathTransfer.asRaptorTransfer}.
  * <p>
@@ -41,7 +40,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  *           (restricted-vs-unrestricted rules, per-target-stop mode restrictions, ...) needs more
  *           thought; {@link #SEARCH_RADIUS} is a fixed placeholder until that's designed.
  */
-public class StreetTransferPathProvider implements TransferPathProvider<NearbyStop> {
+public class StreetTransferPathProvider implements TransferPathProvider<NearbyStop, RouteRequest> {
 
   private static final int NO_STOP_COUNT_LIMIT = 0;
   private static final Duration SEARCH_RADIUS = Duration.ofMinutes(30);
@@ -87,8 +86,8 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
   }
 
   @Override
-  public TransferSearch<NearbyStop> searchFor(AbstractUserPreferences<?> userPreferences) {
-    return new Search(RegularTransferPreferencesMapper.toRouteRequest(userPreferences));
+  public TransferSearch<NearbyStop> searchFor(RouteRequest request) {
+    return new Search(request);
   }
 
   /**

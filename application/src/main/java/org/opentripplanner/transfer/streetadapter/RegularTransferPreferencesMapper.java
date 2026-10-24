@@ -8,23 +8,23 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
+import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
- * The mapping glue between {@code application}'s traveler-preference model and the concrete
- * preferences type the {@code transit-transfer} module's regular-transfer pipeline caches and
- * normalizes paths under - {@link AbstractUserPreferences}. Only {@code WALK} is supported today.
+ * The mapping glue between {@code application}'s {@link RouteRequest} and the concrete preferences
+ * type the {@code transit-transfer} module's regular-transfer pipeline caches and normalizes paths
+ * under - {@link AbstractUserPreferences}. Only {@code WALK} is supported today.
  * <p>
- * {@link #fromRouteRequest} extracts a live request's walk preferences into the cache-friendly
+ * {@link #toUserPreferences} extracts a live request's walk preferences into the cache-friendly
  * {@link WalkPreferences} value, the key of the Raptor transfers cached per preferences. {@link
- * #toRouteRequest} reconstructs a minimal {@link RouteRequest} from a stored {@link
- * AbstractUserPreferences} - the only place {@link StreetTransferPathProvider} needs a real
- * {@code RouteRequest}/{@code StreetSearchRequest} to actually traverse streets.
+ * #toRequest} applies stored {@link AbstractUserPreferences} on a base request - the only place
+ * {@link StreetTransferPathProvider} gets the real {@code RouteRequest}/{@code
+ * StreetSearchRequest} it needs to actually traverse streets.
  */
-public final class RegularTransferPreferencesMapper {
+public final class RegularTransferPreferencesMapper implements TransferRequestMapper<RouteRequest> {
 
-  private RegularTransferPreferencesMapper() {}
-
-  public static WalkPreferences fromRouteRequest(RouteRequest request) {
+  @Override
+  public WalkPreferences toUserPreferences(RouteRequest request) {
     var appWalk = request.preferences().walk();
     return WalkPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(appWalk.speed()))
@@ -32,8 +32,9 @@ public final class RegularTransferPreferencesMapper {
       .build();
   }
 
-  public static RouteRequest toRouteRequest(AbstractUserPreferences<?> userPreferences) {
-    var builder = RouteRequest.defaultValue().copyOf();
+  @Override
+  public RouteRequest toRequest(AbstractUserPreferences<?> userPreferences, RouteRequest base) {
+    var builder = base.copyOf();
     builder.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.WALK)));
     builder.withPreferences(routingPrefs ->
       routingPrefs.withWalk(w -> {

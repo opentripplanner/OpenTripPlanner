@@ -6,18 +6,10 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
-import org.opentripplanner.transfer.streetadapter.RaptorStopIndexAdaptor;
-import org.opentripplanner.transfer.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
-import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
 
 /**
  * {@link GraphBuilderModule} that generates regular (non-constrained) transfers through the
@@ -84,36 +76,5 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
         }
       }
     }
-  }
-
-  public static TransferGenerator create(
-    Graph graph,
-    TransitRepository transitRepository,
-    TransferProfilesConfig config,
-    RegularTransferBuildRepository<NearbyStop> buildRepository,
-    StopsVisitedByPatterns stopsVisitedByPatterns
-  ) {
-    var nearbyStopFinder = StreetTransferPathProvider.createNearbyStopFinder(
-      graph,
-      transitRepository
-    );
-    var pathProvider = new StreetTransferPathProvider(
-      graph,
-      nearbyStopFinder,
-      stopsVisitedByPatterns::contains
-    );
-
-    var profileList = config
-      .profiles()
-      .stream()
-      .map(p -> new TransferProfile<>(p.userPreferences(), pathProvider))
-      .toList();
-    var profiles = TransferProfiles.of(profileList);
-
-    return RegularTransferFactory.createTransferGenerator(
-      new RaptorStopIndexAdaptor(transitRepository.getSiteRepository()),
-      profiles,
-      buildRepository
-    );
   }
 }

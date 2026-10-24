@@ -88,7 +88,7 @@ public class RoutingWorker {
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
   private final RegularTransferService transferService;
-  private final RegularTransferRepositorySnapshot<NearbyStop> regularTransfers;
+  private final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
   private final ViaCoordinateTransferFactory viaTransferResolver;
@@ -137,7 +137,7 @@ public class RoutingWorker {
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,

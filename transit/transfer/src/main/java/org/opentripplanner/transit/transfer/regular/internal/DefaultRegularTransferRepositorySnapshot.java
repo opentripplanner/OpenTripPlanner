@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Set;
-import javax.annotation.Nullable;
-import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
+import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created by
@@ -15,32 +15,40 @@ import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
  * Raptor transfers derived from them is the only mutable state, and it is thread-safe.
  *
  * @param <P> the street path type
+ * @param <R> the request type
  */
-class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepositorySnapshot<P> {
+class DefaultRegularTransferRepositorySnapshot<
+  P,
+  R
+> implements RegularTransferRepositorySnapshot<P, R> {
 
   private final OverlaidTemplatePaths<P> paths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final CacheFactory cacheFactory;
+  private final TransferRequestMapper<R> mapper;
 
   DefaultRegularTransferRepositorySnapshot(
     OverlaidTemplatePaths<P> paths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
-    RaptorTransfersFactory<P> raptorTransfersFactory
+    RaptorTransfersFactory<P, R> raptorTransfersFactory,
+    TransferRequestMapper<R> mapper
   ) {
     this.paths = paths;
     this.cache = cache;
+    this.mapper = mapper;
     this.cacheFactory = new CacheFactory(raptorTransfersFactory);
   }
 
   @Override
-  public RaptorRegularTransferService raptorTransfers(AbstractUserPreferences<?> userPreferences) {
-    return cache.get(userPreferences, cacheFactory);
-  }
-
-  @Nullable
-  @Override
-  public P findPath(AbstractUserPreferences<?> userPreferences, int fromStop, int toStop) {
-    return paths.findPath(paths.closestProfile(userPreferences), fromStop, toStop);
+  public RegularTransfers<P> forRequest(R request) {
+    var userPreferences = mapper.toUserPreferences(request);
+    return new DefaultRegularTransfers<>(
+      paths,
+      cache,
+      cacheFactory,
+      userPreferences,
+      paths.closestProfile(userPreferences)
+    );
   }
 
   /** The paths of this snapshot, for the lifecycle. */
@@ -58,9 +66,9 @@ class DefaultRegularTransferRepositorySnapshot<P> implements RegularTransferRepo
     implements RegularTransferServiceCache.Factory<RaptorTransferStore>
   {
 
-    private final RaptorTransfersFactory<P> raptorTransfersFactory;
+    private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
 
-    private CacheFactory(RaptorTransfersFactory<P> raptorTransfersFactory) {
+    private CacheFactory(RaptorTransfersFactory<P, R> raptorTransfersFactory) {
       this.raptorTransfersFactory = raptorTransfersFactory;
     }
 

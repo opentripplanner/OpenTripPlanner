@@ -1115,8 +1115,8 @@ The named set of mapping rules applied when parsing OSM tags.
 
 Transfer profiles for the raptor-data regular-transfer pipeline.
 
-Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only the `walk`
-profile is supported for now. If this block is omitted entirely, a single default `walk`
+Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only `walk`
+profiles are supported for now. If this block is omitted entirely, a single default `walk`
 profile is used, mirroring the implicit default of the old `transferRequests` config.
 
 

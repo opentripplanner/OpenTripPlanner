@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -21,7 +21,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * resolving internally).
  */
 public class FakeTransferPathProvider
-  implements TransferPathProvider<FakeTransferPathProvider.FakePath>
+  implements TransferPathProvider<FakeTransferPathProvider.FakePath, WalkPreferences>
 {
 
   private final Map<FeedScopedId, List<FakePath>> byStop = new HashMap<>();
@@ -44,7 +44,7 @@ public class FakeTransferPathProvider
   }
 
   @Override
-  public TransferSearch<FakePath> searchFor(AbstractUserPreferences<?> userPreferences) {
+  public TransferSearch<FakePath> searchFor(WalkPreferences request) {
     return new TransferSearch<>() {
       @Override
       public Collection<TransferPath<FakePath>> findNearbyStops(FeedScopedId fromStop) {
@@ -64,7 +64,7 @@ public class FakeTransferPathProvider
         if (path.baseDurationSeconds() > maxDurationSeconds) {
           return Optional.empty();
         }
-        int cost = (int) Math.round(path.baseCost() * userPreferences.reluctance().value());
+        int cost = (int) Math.round(path.baseCost() * request.reluctance().value());
         return Optional.of(new PathCriteria(cost, path.baseDurationSeconds()));
       }
     };

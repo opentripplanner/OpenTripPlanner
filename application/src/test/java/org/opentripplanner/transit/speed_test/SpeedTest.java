@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.api.RoutingService;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
@@ -41,7 +42,7 @@ import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.configure.RegularTransferRepositoryModule;
+import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -63,6 +64,7 @@ import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 
 /**
@@ -99,6 +101,7 @@ public class SpeedTest {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
+    TransferProfilesParameters<RouteRequest> transferProfiles,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
     this.opts = opts;
@@ -149,9 +152,10 @@ public class SpeedTest {
       new RealtimeVehicleRepositoryLifecycle()
     );
     // Registered before the updaters start, registration is not thread-safe
-    var regularTransferHandle = RegularTransferRepositoryModule.regularTransferRepositoryHandle(
+    var regularTransferHandle = StreetTransferFactory.registerRepository(
       registry,
       regularTransferBuildRepository,
+      transferProfiles,
       graph,
       transitRepository
     );
@@ -268,6 +272,7 @@ public class SpeedTest {
         transitRepository,
         timetableDataImport,
         transferRepository,
+        buildConfig.transferProfiles(),
         model.regularTransferBuildRepository()
       );
 

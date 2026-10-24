@@ -137,7 +137,7 @@ public interface ConstructApplicationFactory {
   RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository();
 
   RepositoryHandle<
-    RegularTransferRepositorySnapshot<NearbyStop>,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
     RegularTransferRepository<NearbyStop>
   > regularTransferRepositoryHandle();
 

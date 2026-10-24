@@ -39,7 +39,7 @@ class RegularTransferRepositoryLifecycleTest {
   private RepositoryRegistry registry;
   private UpdateManager updateManager;
   private RepositoryHandle<
-    RegularTransferRepositorySnapshot<String>,
+    RegularTransferRepositorySnapshot<String, WalkPreferences>,
     RegularTransferRepository<String>
   > handle;
 
@@ -67,7 +67,7 @@ class RegularTransferRepositoryLifecycleTest {
 
   @Test
   void initialSnapshotContainsTheGraphBuildPaths() {
-    assertThat(snapshot().findPath(WALK, A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot().forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
   }
 
   @Test
@@ -77,10 +77,10 @@ class RegularTransferRepositoryLifecycleTest {
     submit(repository -> repository.replaceTransfersFrom(WALK, A, Map.of(C, PATH_AC)));
 
     var after = snapshot();
-    assertThat(before.findPath(WALK, A, C)).isNull();
-    assertThat(before.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(after.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(after.findPath(WALK, A, B)).isNull();
+    assertThat(before.forRequest(WALK).findPath(A, C)).isNull();
+    assertThat(before.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
+    assertThat(after.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(after.forRequest(WALK).findPath(A, B)).isNull();
   }
 
   @Test
@@ -99,8 +99,8 @@ class RegularTransferRepositoryLifecycleTest {
 
     assertThat(second.get()).isNotSameInstanceAs(first.get());
     var snapshot = snapshot();
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -125,16 +125,16 @@ class RegularTransferRepositoryLifecycleTest {
     submit(repository -> repository.replaceTransfersFrom(WALK, C, Map.of()));
 
     var snapshot = snapshot();
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, A, B)).isNull();
-    assertThat(snapshot.findPath(WALK, B, C)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isNull();
   }
 
   private void submit(Consumer<RegularTransferRepository<String>> write) throws Exception {
     updateManager.submit(ctx -> write.accept(ctx.repository(handle))).get();
   }
 
-  private RegularTransferRepositorySnapshot<String> snapshot() {
+  private RegularTransferRepositorySnapshot<String, WalkPreferences> snapshot() {
     return handle.repositorySnapshot(registry.scope());
   }
 }

@@ -29,7 +29,7 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
   private final OverlaidTemplatePaths<P> paths;
 
   @Nullable
-  private final DefaultRegularTransferRepositorySnapshot<P> base;
+  private final DefaultRegularTransferRepositorySnapshot<P, ?> base;
 
   private final Map<AbstractUserPreferences<?>, Set<Integer>> changedFromStops = new HashMap<>();
   private boolean frozen = false;
@@ -41,7 +41,7 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
 
   private DefaultRegularTransferRepository(
     OverlaidTemplatePaths<P> paths,
-    @Nullable DefaultRegularTransferRepositorySnapshot<P> base
+    @Nullable DefaultRegularTransferRepositorySnapshot<P, ?> base
   ) {
     this.paths = paths;
     this.base = base;
@@ -49,7 +49,7 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
 
   /** Create a repository continuing from {@code base}, with a copy of its paths. */
   static <P> DefaultRegularTransferRepository<P> continueFrom(
-    DefaultRegularTransferRepositorySnapshot<P> base
+    DefaultRegularTransferRepositorySnapshot<P, ?> base
   ) {
     return new DefaultRegularTransferRepository<>(base.paths().copy(), base);
   }
@@ -106,7 +106,7 @@ class DefaultRegularTransferRepository<P> implements RegularTransferRepository<P
    */
   record Frozen<P>(
     OverlaidTemplatePaths<P> paths,
-    @Nullable DefaultRegularTransferRepositorySnapshot<P> base,
+    @Nullable DefaultRegularTransferRepositorySnapshot<P, ?> base,
     Map<AbstractUserPreferences<?>, Set<Integer>> changedFromStops
   ) {}
 }

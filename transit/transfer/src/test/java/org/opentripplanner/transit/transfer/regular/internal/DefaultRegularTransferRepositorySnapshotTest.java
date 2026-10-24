@@ -16,14 +16,18 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
+import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
 /**
@@ -46,8 +50,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   private final CountingPathProvider provider = new CountingPathProvider();
   private DefaultRegularTransferRepository<FakePath> repository;
-  private RegularTransferRepositoryLifecycle<FakePath> lifecycle;
-  private RegularTransferRepositorySnapshot<FakePath> initial;
+  private RegularTransferRepositoryLifecycle<FakePath, WalkPreferences> lifecycle;
+  private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> initial;
 
   /** Graph build: A -> B, A -> C, B -> C */
   @BeforeEach
@@ -57,13 +61,18 @@ class DefaultRegularTransferRepositorySnapshotTest {
     buildRepository.setPaths(PROFILE, B, Map.of(C, path(B, C, 300)));
     repository =
       (DefaultRegularTransferRepository<FakePath>) buildRepository.createRuntimeRepository();
-    lifecycle = new RegularTransferRepositoryLifecycle<>(provider, stopIndex().size());
+    lifecycle = new RegularTransferRepositoryLifecycle<>(
+      provider,
+      FakeRequestMapper.INSTANCE,
+      new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(PROFILE, PROFILE))),
+      stopIndex().size()
+    );
     initial = freeze();
   }
 
   @Test
   void raptorTransfersAreRecostedUnderTheRequestPreferences() {
-    var transfers = initial.raptorTransfers(REQUEST);
+    var transfers = initial.forRequest(REQUEST).raptorTransfers();
 
     // Cost was re-costed under the request's own reluctance (2.0), not the build-time one.
     assertThat(from(transfers, A)).containsExactly(tx(B, 200), tx(C, 400));
@@ -73,44 +82,66 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   @Test
   void theSearchIsCreatedOncePerCreateAndPerPatch() {
-    initial.raptorTransfers(REQUEST);
+    initial.forRequest(REQUEST).raptorTransfers();
 
     assertThat(provider.searches).isEqualTo(1);
     assertThat(provider.recosted).isEqualTo(3);
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of(C, path(A, C, 250), D, path(A, D, 50)));
-    freeze().raptorTransfers(REQUEST);
+    freeze().forRequest(REQUEST).raptorTransfers();
 
     assertThat(provider.searches).isEqualTo(2);
     assertThat(provider.recosted).isEqualTo(5);
   }
 
   @Test
+  void theRequestIsMappedOnceForAllTheTransfersOfTheRequest() {
+    var mapper = new CountingRequestMapper();
+    var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
+    buildRepository.setPaths(PROFILE, A, Map.of(B, path(A, B, 100)));
+    var lifecycle = new RegularTransferRepositoryLifecycle<>(
+      provider,
+      mapper,
+      new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(PROFILE, PROFILE))),
+      stopIndex().size()
+    );
+    var snapshot = lifecycle.freeze(buildRepository.createRuntimeRepository());
+
+    var transfers = snapshot.forRequest(REQUEST);
+    transfers.raptorTransfers();
+    transfers.raptorTransfers();
+    assertThat(transfers.findPath(A, B)).isEqualTo(path(A, B, 100));
+    assertThat(transfers.findPath(A, C)).isNull();
+
+    assertThat(mapper.toUserPreferencesCalls).isEqualTo(1);
+  }
+
+  @Test
   void raptorTransfersAreCachedByPreferences() {
     // Two equal, but separately created preferences - one is mapped for each request
-    var first = initial.raptorTransfers(withReluctance(2.0));
-    var second = initial.raptorTransfers(withReluctance(2.0));
+    var first = initial.forRequest(withReluctance(2.0)).raptorTransfers();
+    var second = initial.forRequest(withReluctance(2.0)).raptorTransfers();
 
     assertThat(second).isSameInstanceAs(first);
   }
 
   @Test
   void aSnapshotWithoutChangesKeepsTheCachedTransfers() {
-    var transfers = initial.raptorTransfers(REQUEST);
+    var transfers = initial.forRequest(REQUEST).raptorTransfers();
 
     var next = freeze();
 
-    assertThat(next.raptorTransfers(REQUEST)).isSameInstanceAs(transfers);
+    assertThat(next.forRequest(REQUEST).raptorTransfers()).isSameInstanceAs(transfers);
   }
 
   @Test
   void aSnapshotPatchesTheTransfersOfTheChangedStopsOnly() {
-    var initialTransfers = initial.raptorTransfers(REQUEST);
+    var initialTransfers = initial.forRequest(REQUEST).raptorTransfers();
     provider.recosted = 0;
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of(C, path(A, C, 250), D, path(A, D, 50)));
     var next = freeze();
-    var transfers = next.raptorTransfers(REQUEST);
+    var transfers = next.forRequest(REQUEST).raptorTransfers();
 
     // Only the two new paths from A are re-costed
     assertThat(provider.recosted).isEqualTo(2);
@@ -126,7 +157,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   @Test
   void transfersNotUsedForSeveralSnapshotsArePatchedForAllChanges() {
-    initial.raptorTransfers(REQUEST);
+    initial.forRequest(REQUEST).raptorTransfers();
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
     freeze();
@@ -135,7 +166,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
     repository.resetTransfersFrom(PROFILE, A);
     var last = freeze();
     provider.recosted = 0;
-    var transfers = last.raptorTransfers(REQUEST);
+    var transfers = last.forRequest(REQUEST).raptorTransfers();
 
     // A is back to its two graph-build paths, plus the new path from C
     assertThat(provider.recosted).isEqualTo(3);
@@ -149,7 +180,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
     var next = freeze();
 
-    var transfers = next.raptorTransfers(REQUEST);
+    var transfers = next.forRequest(REQUEST).raptorTransfers();
 
     assertThat(from(transfers, A)).isEmpty();
     assertThat(from(transfers, B)).containsExactly(tx(C, 600));
@@ -157,20 +188,23 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   @Test
   void aRolledBackChangeDoesNotChangeTheCachedTransfers() {
-    var transfers = initial.raptorTransfers(REQUEST);
+    var transfers = initial.forRequest(REQUEST).raptorTransfers();
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
     // Rollback: the repository is not frozen, the next write continues from the last snapshot
     repository = continueFrom(initial);
     var next = freeze();
 
-    assertThat(next.raptorTransfers(REQUEST)).isSameInstanceAs(transfers);
-    assertThat(from(next.raptorTransfers(REQUEST), A)).containsExactly(tx(B, 200), tx(C, 400));
+    assertThat(next.forRequest(REQUEST).raptorTransfers()).isSameInstanceAs(transfers);
+    assertThat(from(next.forRequest(REQUEST).raptorTransfers(), A)).containsExactly(
+      tx(B, 200),
+      tx(C, 400)
+    );
   }
 
   @Test
   void aChangeWhoseCommitFailedAfterItWasFrozenIsRolledBack() {
-    initial.raptorTransfers(REQUEST);
+    initial.forRequest(REQUEST).raptorTransfers();
 
     repository.replaceTransfersFrom(PROFILE, A, Map.of());
     // The commit fails after this freeze, so the frozen snapshot is never published
@@ -181,9 +215,9 @@ class DefaultRegularTransferRepositorySnapshotTest {
     repository.replaceTransfersFrom(PROFILE, B, Map.of(D, path(B, D, 10)));
     var next = freeze();
     provider.recosted = 0;
-    var transfers = next.raptorTransfers(REQUEST);
+    var transfers = next.forRequest(REQUEST).raptorTransfers();
 
-    assertThat(next.findPath(REQUEST, A, B)).isEqualTo(path(A, B, 100));
+    assertThat(next.forRequest(REQUEST).findPath(A, B)).isEqualTo(path(A, B, 100));
     assertThat(from(transfers, A)).containsExactly(tx(B, 200), tx(C, 400));
     assertThat(from(transfers, B)).containsExactly(tx(D, 20));
     // Patched from the transfers of the published snapshot, for the change of B only
@@ -198,34 +232,41 @@ class DefaultRegularTransferRepositorySnapshotTest {
     repository.replaceTransfersFrom(PROFILE, A, Map.of(D, newPath));
     var next = freeze();
 
-    assertThat(next.findPath(REQUEST, A, D)).isSameInstanceAs(newPath);
-    assertThat(next.findPath(REQUEST, A, B)).isNull();
-    assertThat(initial.findPath(REQUEST, A, B)).isEqualTo(path(A, B, 100));
+    assertThat(next.forRequest(REQUEST).findPath(A, D)).isSameInstanceAs(newPath);
+    assertThat(next.forRequest(REQUEST).findPath(A, B)).isNull();
+    assertThat(initial.forRequest(REQUEST).findPath(A, B)).isEqualTo(path(A, B, 100));
   }
 
   /**
    * Publish the paths of the repository, and continue with the repository of the next
    * transaction, as the framework does.
    */
-  private RegularTransferRepositorySnapshot<FakePath> freeze() {
+  private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> freeze() {
     var snapshot = lifecycle.freeze(repository);
     repository = continueFrom(snapshot);
     return snapshot;
   }
 
   private DefaultRegularTransferRepository<FakePath> continueFrom(
-    RegularTransferRepositorySnapshot<FakePath> snapshot
+    RegularTransferRepositorySnapshot<FakePath, WalkPreferences> snapshot
   ) {
     return (DefaultRegularTransferRepository<FakePath>) lifecycle.copyOnWrite(snapshot);
   }
 
   /** Compare patched transfers with transfers created from scratch from the same paths. */
   private void assertSameAsCreatedFromScratch(
-    RegularTransferRepositorySnapshot<FakePath> snapshot,
+    RegularTransferRepositorySnapshot<FakePath, WalkPreferences> snapshot,
     RaptorRegularTransferService transfers
   ) {
-    var paths = ((DefaultRegularTransferRepositorySnapshot<FakePath>) snapshot).paths();
-    var expected = new RaptorTransfersFactory<>(N_STOPS, provider).create(paths, REQUEST, PROFILE);
+    var paths = (
+      (DefaultRegularTransferRepositorySnapshot<FakePath, WalkPreferences>) snapshot
+    ).paths();
+    var expected = new RaptorTransfersFactory<>(
+      N_STOPS,
+      provider,
+      FakeRequestMapper.INSTANCE,
+      Map.<AbstractUserPreferences<?>, WalkPreferences>of(PROFILE, PROFILE)
+    ).create(paths, REQUEST, PROFILE);
     for (int stop = 0; stop < N_STOPS; ++stop) {
       assertThat(from(transfers, stop)).containsExactlyElementsIn(from(expected, stop));
       assertThat(to(transfers, stop)).containsExactlyElementsIn(to(expected, stop));
@@ -271,17 +312,41 @@ class DefaultRegularTransferRepositorySnapshotTest {
 
   private record Tx(int stop, int c1) {}
 
+  /** Counts the mapping of requests to user preferences. */
+  private static final class CountingRequestMapper
+    implements TransferRequestMapper<WalkPreferences>
+  {
+
+    private int toUserPreferencesCalls = 0;
+
+    @Override
+    public WalkPreferences toRequest(
+      AbstractUserPreferences<?> userPreferences,
+      WalkPreferences base
+    ) {
+      return FakeRequestMapper.INSTANCE.toRequest(userPreferences, base);
+    }
+
+    @Override
+    public AbstractUserPreferences<?> toUserPreferences(WalkPreferences request) {
+      ++toUserPreferencesCalls;
+      return FakeRequestMapper.INSTANCE.toUserPreferences(request);
+    }
+  }
+
   /** Counts the created searches and the re-costed paths. */
-  private static final class CountingPathProvider implements TransferPathProvider<FakePath> {
+  private static final class CountingPathProvider
+    implements TransferPathProvider<FakePath, WalkPreferences>
+  {
 
     private final FakeTransferPathProvider delegate = new FakeTransferPathProvider();
     private int searches = 0;
     private int recosted = 0;
 
     @Override
-    public TransferSearch<FakePath> searchFor(AbstractUserPreferences<?> userPreferences) {
+    public TransferSearch<FakePath> searchFor(WalkPreferences request) {
       ++searches;
-      var search = delegate.searchFor(userPreferences);
+      var search = delegate.searchFor(request);
       return new TransferSearch<>() {
         @Override
         public Collection<TransferPath<FakePath>> findNearbyStops(FeedScopedId fromStop) {

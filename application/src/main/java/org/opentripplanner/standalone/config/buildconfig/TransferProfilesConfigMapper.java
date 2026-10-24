@@ -2,67 +2,92 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
-import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.core.model.basic.Reluctance;
+import org.opentripplanner.core.model.basic.Speed;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.transfer.dataimport.api.TransferProfileConfig;
-import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 
 /**
  * Parses the new {@code transfers:} build-config block (see
- * {@code opentripplanner/OpenTripPlanner#7998}) into a {@link TransferProfilesConfig}. Entirely
- * separate from {@link RegularTransferConfig}/{@code transferRequests}, which
- * {@code FlexTransferGenerator} keeps reading unchanged for FLEX.
+ * {@code opentripplanner/OpenTripPlanner#7998}) into the {@link TransferProfilesParameters} of the
+ * regular-transfer module. Entirely separate from {@link RegularTransferConfig}/
+ * {@code transferRequests}, which {@code FlexTransferGenerator} keeps reading unchanged for FLEX.
  * <p>
- * Only {@code walk} is supported for now - support for other profiles, and for a duration limit,
- * is deliberately deferred until designed further.
+ * Only {@code walk} profiles are supported for now - support for other profile types, inheritance
+ * ({@code parent}) and a duration limit is deliberately deferred.
  */
 public class TransferProfilesConfigMapper {
 
-  public static TransferProfilesConfig map(NodeAdapter root) {
-    var c = root
+  public static TransferProfilesParameters<RouteRequest> map(NodeAdapter root) {
+    var transfers = root
       .of("transfers")
       .since(V2_10)
       .summary("Transfer profiles for the raptor-data regular-transfer pipeline.")
       .description(
         """
-        Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only the `walk`
-        profile is supported for now. If this block is omitted entirely, a single default `walk`
+        Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only `walk`
+        profiles are supported for now. If this block is omitted entirely, a single default `walk`
         profile is used, mirroring the implicit default of the old `transferRequests` config.
         """
       )
       .asObject();
 
-    List<TransferProfileConfig> profiles = new ArrayList<>();
-    if (c.exist("walk")) {
-      var p = c.of("walk").since(V2_10).summary("The walk transfer profile.").asObject();
-      profiles.add(mapProfile(p));
-    } else {
-      // No `transfers` block (or an empty one) configured - fall back to a single default WALK
-      // profile, mirroring the implicit default of the old `transferRequests` config.
-      profiles.add(new TransferProfileConfig(WalkPreferences.DEFAULT));
-    }
+    var profiles = transfers
+      .of("profiles")
+      .since(V2_10)
+      .summary("The transfer profiles, by profile type.")
+      .asObject();
 
-    return new TransferProfilesConfig(profiles);
+    var walk = profiles
+      .of("walk")
+      .since(V2_10)
+      .summary("The walk transfer profiles.")
+      .description(
+        "Each profile runs a discovery search of walk transfers with its own preferences. The " +
+          "`userPreferences` of the profiles must be unique."
+      )
+      .asObjects(List.of(defaultWalkProfile()), TransferProfilesConfigMapper::mapWalkProfile);
+
+    return new TransferProfilesParameters<>(walk);
   }
 
-  private static TransferProfileConfig mapProfile(NodeAdapter p) {
-    var prefs = p
-      .of("preferences")
-      .since(V2_10)
-      .summary("Street-search preferences used to discover and cost this profile's paths.")
-      .asObject();
-    WalkPreferences walkPreferences = mapWalkPreferences(prefs);
+  /** The profile used if no profile is configured. */
+  private static WalkProfileParameters<RouteRequest> defaultWalkProfile() {
+    return new WalkProfileParameters<>(WalkPreferences.DEFAULT, RouteRequest.defaultValue());
+  }
 
-    return new TransferProfileConfig(walkPreferences);
+  private static WalkProfileParameters<RouteRequest> mapWalkProfile(NodeAdapter p) {
+    var userPreferences = mapWalkPreferences(
+      p
+        .of("userPreferences")
+        .since(V2_10)
+        .summary("Street-search preferences used to discover and cost this profile's paths.")
+        .asObject()
+    );
+    var routingRequest = RouteRequestConfig.mapRouteRequest(
+      p
+        .of("routingRequest")
+        .since(V2_10)
+        .summary("The routing request parameters the street search of this profile is based on.")
+        .description(
+          "Preferences in `userPreferences` override the equivalent parameters of the request."
+        )
+        .asObject(),
+      RouteRequest.defaultValue()
+    );
+    return new WalkProfileParameters<>(userPreferences, routingRequest);
   }
 
   private static WalkPreferences mapWalkPreferences(NodeAdapter p) {
     var dft = WalkPreferences.of();
     var original = dft.original();
     dft.withSpeed(
-      org.opentripplanner.core.model.basic.Speed.ofMetersPerSecond(
+      Speed.ofMetersPerSecond(
         p
           .of("speed")
           .since(V2_10)
@@ -71,7 +96,7 @@ public class TransferProfilesConfigMapper {
       )
     );
     dft.withReluctance(
-      org.opentripplanner.core.model.basic.Reluctance.of(
+      Reluctance.of(
         p
           .of("reluctance")
           .since(V2_10)

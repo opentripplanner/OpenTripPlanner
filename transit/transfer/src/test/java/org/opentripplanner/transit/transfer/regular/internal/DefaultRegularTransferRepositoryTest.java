@@ -35,7 +35,7 @@ class DefaultRegularTransferRepositoryTest {
 
   private DefaultRegularTransferBuildRepository<String> buildRepository;
   private DefaultRegularTransferRepository<String> repository;
-  private RegularTransferRepositoryLifecycle<String> lifecycle;
+  private RegularTransferRepositoryLifecycle<String, WalkPreferences> lifecycle;
 
   /** Graph build: A -> B, A -> C, B -> C */
   @BeforeEach
@@ -51,9 +51,9 @@ class DefaultRegularTransferRepositoryTest {
   @Test
   void withoutWritesTheSnapshotHasTheGraphBuildPaths() {
     var snapshot = freeze();
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -61,12 +61,12 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW, D, PATH_AD));
 
     var snapshot = freeze();
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(snapshot.findPath(WALK, A, D)).isEqualTo(PATH_AD);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.forRequest(WALK).findPath(A, D)).isEqualTo(PATH_AD);
     // A -> C is not in the new paths, so it is gone - replace does not merge
-    assertThat(snapshot.findPath(WALK, A, C)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isNull();
     // Other stops keep their graph-build paths
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -74,16 +74,16 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, A, Map.of());
 
     var snapshot = freeze();
-    assertThat(snapshot.findPath(WALK, A, B)).isNull();
-    assertThat(snapshot.findPath(WALK, A, C)).isNull();
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
   void replaceAddsTransfersFromAStopWithoutGraphBuildPaths() {
     repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
 
-    assertThat(freeze().findPath(WALK, C, A)).isEqualTo(PATH_CA);
+    assertThat(freeze().forRequest(WALK).findPath(C, A)).isEqualTo(PATH_CA);
   }
 
   @Test
@@ -92,8 +92,8 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
 
     var snapshot = freeze();
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(snapshot.findPath(WALK, A, D)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.forRequest(WALK).findPath(A, D)).isNull();
   }
 
   @Test
@@ -104,7 +104,7 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, A, paths);
     paths.put(D, PATH_AD);
 
-    assertThat(freeze().findPath(WALK, A, D)).isNull();
+    assertThat(freeze().forRequest(WALK).findPath(A, D)).isNull();
   }
 
   @Test
@@ -115,9 +115,9 @@ class DefaultRegularTransferRepositoryTest {
     repository.resetTransfersFrom(WALK, A);
 
     var snapshot = freeze();
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, A, D)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, D)).isNull();
   }
 
   @Test
@@ -125,7 +125,7 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
     repository.resetTransfersFrom(WALK, C);
 
-    assertThat(freeze().findPath(WALK, C, A)).isNull();
+    assertThat(freeze().forRequest(WALK).findPath(C, A)).isNull();
   }
 
   @Test
@@ -184,11 +184,11 @@ class DefaultRegularTransferRepositoryTest {
     repository.replaceTransfersFrom(WALK, C, Map.of(A, PATH_CA));
     var second = freeze();
 
-    assertThat(first.findPath(WALK, A, D)).isEqualTo(PATH_AD);
-    assertThat(first.findPath(WALK, A, B)).isNull();
-    assertThat(first.findPath(WALK, C, A)).isNull();
-    assertThat(second.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(second.findPath(WALK, C, A)).isEqualTo(PATH_CA);
+    assertThat(first.forRequest(WALK).findPath(A, D)).isEqualTo(PATH_AD);
+    assertThat(first.forRequest(WALK).findPath(A, B)).isNull();
+    assertThat(first.forRequest(WALK).findPath(C, A)).isNull();
+    assertThat(second.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(second.forRequest(WALK).findPath(C, A)).isEqualTo(PATH_CA);
   }
 
   @Test
@@ -198,10 +198,10 @@ class DefaultRegularTransferRepositoryTest {
 
     // A new runtime repository starts from the unchanged paths of the build repository
     var snapshot = TestLifecycles.initialSnapshot(buildRepository);
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, A, D)).isNull();
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, D)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -215,9 +215,9 @@ class DefaultRegularTransferRepositoryTest {
     repository = (DefaultRegularTransferRepository<String>) lifecycle.copyOnWrite(committed);
 
     var snapshot = freeze();
-    assertThat(snapshot.findPath(WALK, A, D)).isEqualTo(PATH_AD);
-    assertThat(snapshot.findPath(WALK, A, B)).isNull();
-    assertThat(snapshot.findPath(WALK, C, A)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(A, D)).isEqualTo(PATH_AD);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isNull();
+    assertThat(snapshot.forRequest(WALK).findPath(C, A)).isNull();
   }
 
   @Test
@@ -236,15 +236,15 @@ class DefaultRegularTransferRepositoryTest {
     );
 
     var snapshot = lifecycle.freeze(repository);
-    assertThat(snapshot.findPath(withReluctance(1.5), A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(withReluctance(3.5), A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.forRequest(withReluctance(1.5)).findPath(A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.forRequest(withReluctance(3.5)).findPath(A, B)).isEqualTo(PATH_AB_NEW);
   }
 
   /**
    * Publish the paths of the repository, and continue with the repository of the next
    * transaction, as the framework does.
    */
-  private RegularTransferRepositorySnapshot<String> freeze() {
+  private RegularTransferRepositorySnapshot<String, WalkPreferences> freeze() {
     var snapshot = lifecycle.freeze(repository);
     repository = (DefaultRegularTransferRepository<String>) lifecycle.copyOnWrite(snapshot);
     return snapshot;

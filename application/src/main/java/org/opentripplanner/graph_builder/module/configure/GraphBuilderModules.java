@@ -55,6 +55,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
+import org.opentripplanner.transfer.configure.StreetTransferFactory;
 import org.opentripplanner.transfer.dataimport.FlexTransferGenerator;
 import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
 import org.opentripplanner.transfer.dataimport.StopsVisitedByPatterns;
@@ -333,12 +334,12 @@ public class GraphBuilderModules {
     StopsVisitedByPatterns stopsVisitedByPatterns,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
-    return RegularTransitTransferGenerator.create(
+    return StreetTransferFactory.createGenerator(
       graph,
       transitRepository,
       config.transferProfiles(),
       regularTransferBuildRepository,
-      stopsVisitedByPatterns
+      stopsVisitedByPatterns::contains
     );
   }
 

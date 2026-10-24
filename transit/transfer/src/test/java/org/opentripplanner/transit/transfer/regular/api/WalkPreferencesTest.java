@@ -38,6 +38,39 @@ class WalkPreferencesTest {
     ).isNotEqualTo(subject);
   }
 
+  @Test
+  void distanceToSelfIsZero() {
+    var subject = preferences(1.3, 2.0);
+
+    assertThat(subject.normalizedDistance(subject)).isEqualTo(0f);
+    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0f);
+  }
+
+  @Test
+  void distanceIncreasesWithTheDifferenceInPreferences() {
+    AbstractUserPreferences<?> subject = preferences(1.3, 2.0);
+    AbstractUserPreferences<?> sameSpeed = preferences(1.3, 3.0);
+    AbstractUserPreferences<?> sameReluctance = preferences(1.5, 2.0);
+    AbstractUserPreferences<?> bothDiffer = preferences(1.5, 3.0);
+
+    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(bothDiffer)).isGreaterThan(
+      subject.normalizedDistance(sameSpeed)
+    );
+  }
+
+  @Test
+  void distanceIsTheSameThroughTheWalkPreferencesType() {
+    var subject = preferences(1.3, 2.0);
+    var other = preferences(1.5, 3.0);
+    AbstractUserPreferences<?> abstractSubject = subject;
+
+    assertThat(subject.normalizedDistance(other)).isEqualTo(
+      abstractSubject.normalizedDistance(other)
+    );
+  }
+
   private static WalkPreferences preferences(double speed, double reluctance) {
     return WalkPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(speed))

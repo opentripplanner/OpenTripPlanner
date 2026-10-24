@@ -69,7 +69,7 @@ public interface RequestScopedFactory {
 
   RegularTransferService transferService();
 
-  RegularTransferRepositorySnapshot<NearbyStop> regularTransfers();
+  RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers();
 
   VectorTileConfig vectorTileConfig();
 

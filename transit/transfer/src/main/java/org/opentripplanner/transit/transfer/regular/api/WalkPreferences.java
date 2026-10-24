@@ -57,11 +57,6 @@ public final class WalkPreferences extends AbstractUserPreferences {
     return super.appendToString(ToStringBuilder.of(WalkPreferences.class)).toString();
   }
 
-  @Override
-  public float normalizedDistance(Object other) {
-    return 0;
-  }
-
   public static class Builder extends AbstractUserPreferences.Builder<WalkPreferences, Builder> {
 
     public Builder(WalkPreferences original) {

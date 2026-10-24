@@ -6,7 +6,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
 
 /**
  * A regular-transfer snapshot without any transfers, for tests that route without regular
@@ -17,8 +18,12 @@ public final class NoRegularTransfers {
 
   private NoRegularTransfers() {}
 
-  public static RegularTransferRepositorySnapshot<NearbyStop> snapshot() {
+  public static RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> snapshot() {
     return SNAPSHOT;
+  }
+
+  public static RegularTransfers<NearbyStop> transfers() {
+    return TRANSFERS;
   }
 
   public static RaptorRegularTransferService service() {
@@ -37,23 +42,19 @@ public final class NoRegularTransfers {
     }
   };
 
-  private static final RegularTransferRepositorySnapshot<NearbyStop> SNAPSHOT =
-    new RegularTransferRepositorySnapshot<>() {
-      @Override
-      public RaptorRegularTransferService raptorTransfers(
-        AbstractUserPreferences<?> userPreferences
-      ) {
-        return SERVICE;
-      }
+  private static final RegularTransfers<NearbyStop> TRANSFERS = new RegularTransfers<>() {
+    @Override
+    public RaptorRegularTransferService raptorTransfers() {
+      return SERVICE;
+    }
 
-      @Nullable
-      @Override
-      public NearbyStop findPath(
-        AbstractUserPreferences<?> userPreferences,
-        int fromStop,
-        int toStop
-      ) {
-        return null;
-      }
-    };
+    @Nullable
+    @Override
+    public NearbyStop findPath(int fromStop, int toStop) {
+      return null;
+    }
+  };
+
+  private static final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> SNAPSHOT = _ ->
+    TRANSFERS;
 }

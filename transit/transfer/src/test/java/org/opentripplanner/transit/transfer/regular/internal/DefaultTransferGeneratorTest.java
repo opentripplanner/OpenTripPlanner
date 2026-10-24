@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
+import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
+import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 
 class DefaultTransferGeneratorTest {
 
@@ -21,6 +21,10 @@ class DefaultTransferGeneratorTest {
 
   private static RaptorStopIndex stopIndex() {
     return TestStopIndex.of(A, B, C);
+  }
+
+  private static TransferProfilesParameters<WalkPreferences> parameters(WalkPreferences walk) {
+    return new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(walk, walk)));
   }
 
   private static WalkPreferences withReluctance(double reluctance) {
@@ -33,22 +37,24 @@ class DefaultTransferGeneratorTest {
     var cheapAB = provider.addNearby(A, B, 100, 60);
     provider.addNearby(A, B, 200, 90);
 
-    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
-
+    WalkPreferences userPreferences = withReluctance(1.0);
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(stopIndex, profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(
+      stopIndex,
+      parameters(userPreferences),
+      provider,
+      FakeRequestMapper.INSTANCE,
+      buildRepository
+    );
 
     generator.generateTransfersForAllStops();
 
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository).findPath(
-        userPreferences,
-        stopIndex.toStopIndex(A),
-        stopIndex.toStopIndex(B)
-      )
+      TestLifecycles.initialSnapshot(buildRepository)
+        .forRequest(userPreferences)
+        .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isSameInstanceAs(cheapAB);
   }
 
@@ -57,22 +63,24 @@ class DefaultTransferGeneratorTest {
     var provider = new FakeTransferPathProvider().withMaxDurationSeconds(120);
     provider.addNearby(A, B, 100, 600);
 
-    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
-
+    WalkPreferences userPreferences = withReluctance(1.0);
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(stopIndex, profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(
+      stopIndex,
+      parameters(userPreferences),
+      provider,
+      FakeRequestMapper.INSTANCE,
+      buildRepository
+    );
 
     generator.generateTransfersForAllStops();
 
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository).findPath(
-        userPreferences,
-        stopIndex.toStopIndex(A),
-        stopIndex.toStopIndex(B)
-      )
+      TestLifecycles.initialSnapshot(buildRepository)
+        .forRequest(userPreferences)
+        .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
     ).isNull();
   }
 
@@ -83,18 +91,22 @@ class DefaultTransferGeneratorTest {
     var pathAB = provider.addNearby(A, B, 100, 60);
     provider.addNearby(A, flexStop, 50, 30);
 
-    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
-
+    WalkPreferences userPreferences = withReluctance(1.0);
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(stopIndex(), profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(
+      stopIndex(),
+      parameters(userPreferences),
+      provider,
+      FakeRequestMapper.INSTANCE,
+      buildRepository
+    );
 
     generator.generateTransfersForAllStops();
 
     assertThat(buildRepository.calculateNumberOfTransferPaths(userPreferences)).isEqualTo(1);
     assertThat(
-      TestLifecycles.initialSnapshot(buildRepository).findPath(userPreferences, 0, 1)
+      TestLifecycles.initialSnapshot(buildRepository).forRequest(userPreferences).findPath(0, 1)
     ).isEqualTo(pathAB);
   }
 
@@ -103,12 +115,16 @@ class DefaultTransferGeneratorTest {
     var provider = new FakeTransferPathProvider();
     provider.addNearby(A, B, 100, 60);
 
-    AbstractUserPreferences<?> userPreferences = withReluctance(1.0);
-    var profiles = TransferProfiles.of(List.of(new TransferProfile<>(userPreferences, provider)));
-
+    WalkPreferences userPreferences = withReluctance(1.0);
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(stopIndex(), profiles, buildRepository);
+    var generator = new DefaultTransferGenerator<>(
+      stopIndex(),
+      parameters(userPreferences),
+      provider,
+      FakeRequestMapper.INSTANCE,
+      buildRepository
+    );
 
     generator.generateTransfersForAllStops();
 

@@ -39,6 +39,7 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.osm.model.CompoundRefTagGroup;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.buildconfig.BoardingLocationsConfig;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
@@ -56,7 +57,7 @@ import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transfer.dataimport.api.RegularTransferParameters;
-import org.opentripplanner.transfer.dataimport.api.TransferProfilesConfig;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,7 +174,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParameters osmDefaults;
 
   private final RegularTransferParameters regularTransferParameters;
-  private final TransferProfilesConfig transferProfiles;
+  private final TransferProfilesParameters<RouteRequest> transferProfiles;
 
   public final int maxAreaNodes;
 
@@ -809,7 +810,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Falls back to a single default {@code walk} profile if the new {@code transfers:} block is
    * not present in build-config.json.
    */
-  public TransferProfilesConfig transferProfiles() {
+  public TransferProfilesParameters<RouteRequest> transferProfiles() {
     return transferProfiles;
   }
 

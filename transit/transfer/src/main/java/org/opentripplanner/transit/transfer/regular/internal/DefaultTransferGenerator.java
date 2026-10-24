@@ -12,9 +12,10 @@ import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfile;
-import org.opentripplanner.transit.transfer.regular.parameters.TransferProfiles;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
+import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -25,22 +26,33 @@ import org.slf4j.LoggerFactory;
  * is no {@code TransferRealtimeUpdater} implementation yet.
  *
  * @param <P> the street path type
+ * @param <R> the request type
  */
-public class DefaultTransferGenerator<P> implements TransferGenerator {
+public class DefaultTransferGenerator<P, R> implements TransferGenerator {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
   private final RaptorStopIndex stopIndex;
-  private final TransferProfiles<P> orderedProfiles;
+  private final TransferProfiles<P, R> profiles;
   private final RegularTransferBuildRepository<P> buildRepository;
   private final Set<Integer> stopsUsedInTransfers = ConcurrentHashMap.newKeySet();
 
   public DefaultTransferGenerator(
     RaptorStopIndex stopIndex,
-    TransferProfiles<P> profiles,
+    TransferProfilesParameters<R> parameters,
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    RegularTransferBuildRepository<P> buildRepository
+  ) {
+    this(stopIndex, TransferProfiles.of(parameters, pathProvider, mapper), buildRepository);
+  }
+
+  DefaultTransferGenerator(
+    RaptorStopIndex stopIndex,
+    TransferProfiles<P, R> profiles,
     RegularTransferBuildRepository<P> buildRepository
   ) {
     this.stopIndex = stopIndex;
-    this.orderedProfiles = profiles;
+    this.profiles = profiles;
     this.buildRepository = buildRepository;
   }
 
@@ -49,7 +61,7 @@ public class DefaultTransferGenerator<P> implements TransferGenerator {
     var stops = listAllStops();
     var progress = ProgressTracker.track("Generate regular transfers", 1000, stops.size());
     stops.parallelStream().forEach(stop -> {
-      for (var profile : orderedProfiles) {
+      for (var profile : profiles) {
         generateForStop(profile, stop);
       }
       progress.step(m -> LOG.info(m));
@@ -77,7 +89,7 @@ public class DefaultTransferGenerator<P> implements TransferGenerator {
 
   private void logSummary(int numberOfStops) {
     int sum = 0;
-    for (var profile : orderedProfiles) {
+    for (var profile : profiles) {
       int size = buildRepository.calculateNumberOfTransferPaths(profile.userPreferences());
       LOG.info("Created {} regular transfers for profile {}.", size, profile.userPreferences());
       sum += size;
@@ -85,7 +97,7 @@ public class DefaultTransferGenerator<P> implements TransferGenerator {
     LOG.info(
       "Done generating regular transfers. paths: {}, profiles: {} stops: {}",
       sum,
-      orderedProfiles.size(),
+      profiles.size(),
       numberOfStops
     );
   }
@@ -97,7 +109,7 @@ public class DefaultTransferGenerator<P> implements TransferGenerator {
    * difference between the best time and generalized-cost is small. The {@link TransferSearch} may
    * return multiple candidates for the same target stop.
    */
-  private void generateForStop(TransferProfile<P> profile, FeedScopedId fromStopId) {
+  private void generateForStop(TransferProfile<P, R> profile, FeedScopedId fromStopId) {
     int fromStop = requireStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 

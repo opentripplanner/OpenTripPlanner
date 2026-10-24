@@ -54,18 +54,18 @@ class DefaultRegularTransferBuildRepositoryTest {
     buildRepository.setPaths(WALK, A, Map.of(B, PATH_AB_NEW));
 
     var snapshot = TestLifecycles.initialSnapshot(buildRepository);
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB_NEW);
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
   void runtimeRepositoryContainsTheGeneratedPaths() {
     var snapshot = TestLifecycles.initialSnapshot(createBuildRepository());
 
-    assertThat(snapshot.findPath(WALK, A, B)).isEqualTo(PATH_AB);
-    assertThat(snapshot.findPath(WALK, A, C)).isEqualTo(PATH_AC);
-    assertThat(snapshot.findPath(WALK, B, C)).isEqualTo(PATH_BC);
+    assertThat(snapshot.forRequest(WALK).findPath(A, B)).isEqualTo(PATH_AB);
+    assertThat(snapshot.forRequest(WALK).findPath(A, C)).isEqualTo(PATH_AC);
+    assertThat(snapshot.forRequest(WALK).findPath(B, C)).isEqualTo(PATH_BC);
   }
 
   @Test
@@ -92,11 +92,13 @@ class DefaultRegularTransferBuildRepositoryTest {
     // replaces the paths from stop A in the runtime repository only
     runtimeRepository.replaceTransfersFrom(WALK, A, Map.of(B, PATH_AB_NEW));
 
-    assertThat(lifecycle.freeze(runtimeRepository).findPath(WALK, A, B)).isEqualTo(PATH_AB_NEW);
-    // A new runtime repository starts from the unchanged paths of the build repository
-    assertThat(TestLifecycles.initialSnapshot(buildRepository).findPath(WALK, A, B)).isEqualTo(
-      PATH_AB
+    assertThat(lifecycle.freeze(runtimeRepository).forRequest(WALK).findPath(A, B)).isEqualTo(
+      PATH_AB_NEW
     );
+    // A new runtime repository starts from the unchanged paths of the build repository
+    assertThat(
+      TestLifecycles.initialSnapshot(buildRepository).forRequest(WALK).findPath(A, B)
+    ).isEqualTo(PATH_AB);
   }
 
   private static DefaultRegularTransferBuildRepository<String> createBuildRepository() {

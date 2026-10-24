@@ -107,9 +107,9 @@ public class RequestScopedModule {
    */
   @Provides
   @HttpRequestScoped
-  static RegularTransferRepositorySnapshot<NearbyStop> regularTransfers(
+  static RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers(
     RepositoryHandle<
-      RegularTransferRepositorySnapshot<NearbyStop>,
+      RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
       RegularTransferRepository<NearbyStop>
     > regularTransferRepositoryHandle,
     TransactionScope transactionScope
@@ -214,7 +214,7 @@ public class RequestScopedModule {
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
     RegularTransferService transferService,
-    RegularTransferRepositorySnapshot<NearbyStop> regularTransfers,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable DataOverlayParameterBindings dataOverlayParameterBindings,

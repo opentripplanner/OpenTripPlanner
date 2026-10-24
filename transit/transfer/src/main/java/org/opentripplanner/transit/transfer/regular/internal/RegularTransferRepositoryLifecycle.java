@@ -1,13 +1,17 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
  * Copy-on-write / freeze lifecycle for the regular-transfer repository. Each transaction that
@@ -29,32 +33,71 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
  * This class is stateless and only accessed on the writer thread.
  *
  * @param <P> the street path type
+ * @param <R> the request type
  */
-public class RegularTransferRepositoryLifecycle<P> implements
-  RepositoryLifecycle<RegularTransferRepositorySnapshot<P>, RegularTransferRepository<P>> {
+public class RegularTransferRepositoryLifecycle<
+  P,
+  R
+> implements
+  RepositoryLifecycle<RegularTransferRepositorySnapshot<P, R>, RegularTransferRepository<P>> {
 
-  private final RaptorTransfersFactory<P> raptorTransfersFactory;
+  private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
+  private final TransferRequestMapper<R> mapper;
 
+  /**
+   * @param profiles the configuration of the profiles the paths are stored under, the Raptor
+   *                 transfers are derived with the request of the profile closest to the request
+   */
   public RegularTransferRepositoryLifecycle(
-    TransferPathProvider<P> pathProvider,
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    TransferProfilesParameters<R> profiles,
     int numberOfStops
   ) {
+    this(pathProvider, mapper, requestsByProfile(profiles), numberOfStops);
+  }
+
+  RegularTransferRepositoryLifecycle(
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    Map<AbstractUserPreferences<?>, R> profileRequests,
+    int numberOfStops
+  ) {
+    this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       numberOfStops,
-      Objects.requireNonNull(pathProvider)
+      Objects.requireNonNull(pathProvider),
+      mapper,
+      profileRequests
     );
   }
 
+  private static <R> Map<AbstractUserPreferences<?>, R> requestsByProfile(
+    TransferProfilesParameters<R> parameters
+  ) {
+    return parameters
+      .walk()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          p -> (AbstractUserPreferences<?>) p.userPreferences(),
+          p -> p.routingRequest()
+        )
+      );
+  }
+
   @Override
-  public RegularTransferRepository<P> copyOnWrite(RegularTransferRepositorySnapshot<P> snapshot) {
+  public RegularTransferRepository<P> copyOnWrite(
+    RegularTransferRepositorySnapshot<P, R> snapshot
+  ) {
     // the cast is safe: all snapshots are created by freeze() below
     return DefaultRegularTransferRepository.continueFrom(
-      (DefaultRegularTransferRepositorySnapshot<P>) Objects.requireNonNull(snapshot)
+      (DefaultRegularTransferRepositorySnapshot<P, R>) Objects.requireNonNull(snapshot)
     );
   }
 
   @Override
-  public RegularTransferRepositorySnapshot<P> freeze(RegularTransferRepository<P> repository) {
+  public RegularTransferRepositorySnapshot<P, R> freeze(RegularTransferRepository<P> repository) {
     // the cast is safe: all repositories are created by the build repository or copyOnWrite()
     var frozen = ((DefaultRegularTransferRepository<P>) repository).freeze();
     var cache =
@@ -67,7 +110,8 @@ public class RegularTransferRepositoryLifecycle<P> implements
     return new DefaultRegularTransferRepositorySnapshot<>(
       frozen.paths(),
       cache,
-      raptorTransfersFactory
+      raptorTransfersFactory,
+      mapper
     );
   }
 
