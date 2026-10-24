@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 
@@ -15,6 +16,7 @@ class TransferProfilesTest {
   void ofWrapsTheGivenProfilesPreservingOrder() {
     var walk = new TransferProfile<>(
       new WalkProfileParameters<>(WalkPreferences.DEFAULT, WalkPreferences.DEFAULT),
+      MaxDurationsPreference.DEFAULT,
       new FakeTransferPathProvider(),
       FakeRequestMapper.INSTANCE
     );

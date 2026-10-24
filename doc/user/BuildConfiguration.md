@@ -1117,7 +1117,9 @@ Transfer profiles for the raptor-data regular-transfer pipeline.
 
 Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only `walk`
 profiles are supported for now. If this block is omitted entirely, a single default `walk`
-profile is used, mirroring the implicit default of the old `transferRequests` config.
+profile is used, mirroring the implicit default of the old `transferRequests` config. The
+max duration of the transfers is set with `defaultMaxDuration`, and can be overridden per
+profile type with `maxDurations`. The old `maxTransferDuration` is not used.
 
 
 <h3 id="transitFeeds">transitFeeds</h3>

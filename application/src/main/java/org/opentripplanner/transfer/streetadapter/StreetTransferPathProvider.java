@@ -1,6 +1,5 @@
 package org.opentripplanner.transfer.streetadapter;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -36,14 +36,12 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * and {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when
  * it has no edges, like {@code PathTransfer.asRaptorTransfer}.
  * <p>
- * TODO TX - There is no configurable per-profile duration limit yet - the design for it
- *           (restricted-vs-unrestricted rules, per-target-stop mode restrictions, ...) needs more
- *           thought; {@link #SEARCH_RADIUS} is a fixed placeholder until that's designed.
+ * The max duration of the profile type bounds the street search that discovers the transfers, see
+ * {@link TransferSearch#findNearbyStops}. Re-costing a path is not limited.
  */
 public class StreetTransferPathProvider implements TransferPathProvider<NearbyStop, RouteRequest> {
 
   private static final int NO_STOP_COUNT_LIMIT = 0;
-  private static final Duration SEARCH_RADIUS = Duration.ofMinutes(30);
 
   private final Graph graph;
   private final NearbyStopFinder nearbyStopFinder;
@@ -125,7 +123,10 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
     }
 
     @Override
-    public Collection<TransferPath<NearbyStop>> findNearbyStops(FeedScopedId fromStop) {
+    public Collection<TransferPath<NearbyStop>> findNearbyStops(
+      FeedScopedId fromStop,
+      MaxDurationsPreference maxDurations
+    ) {
       if (!isTransferSource.test(fromStop)) {
         return List.of();
       }
@@ -138,7 +139,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
         routeRequest,
         StreetMode.WALK,
         false,
-        SEARCH_RADIUS,
+        maxDurations.maxDuration(),
         NO_STOP_COUNT_LIMIT
       );
       return nearbyStops

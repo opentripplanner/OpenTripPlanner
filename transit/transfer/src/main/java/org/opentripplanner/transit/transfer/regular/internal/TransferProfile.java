@@ -2,6 +2,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -25,19 +26,23 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 final class TransferProfile<P, R> {
 
   private final AbstractUserPreferences<?> userPreferences;
+  private final MaxDurationsPreference maxDurations;
   private final TransferSearch<P> search;
 
   /**
    * @param parameters   the configuration of the profile
+   * @param maxDurations the max durations of the type of the profile
    * @param pathProvider creates the search of this profile
    * @param mapper       applies the user preferences of the profile on its routing request
    */
   TransferProfile(
     WalkProfileParameters<R> parameters,
+    MaxDurationsPreference maxDurations,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper
   ) {
     this.userPreferences = Objects.requireNonNull(parameters.userPreferences());
+    this.maxDurations = Objects.requireNonNull(maxDurations);
     this.search = pathProvider.searchFor(
       mapper.toRequest(userPreferences, parameters.routingRequest())
     );
@@ -46,6 +51,11 @@ final class TransferProfile<P, R> {
   /** The traveler preferences the paths of this profile are found and stored under. */
   AbstractUserPreferences<?> userPreferences() {
     return userPreferences;
+  }
+
+  /** How far the discovery search of this profile looks, the limit of the type of the profile. */
+  MaxDurationsPreference maxDurations() {
+    return maxDurations;
   }
 
   /** The street search of this profile, for its discovery search and re-costing its paths. */

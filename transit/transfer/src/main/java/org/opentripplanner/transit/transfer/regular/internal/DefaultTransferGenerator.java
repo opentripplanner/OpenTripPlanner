@@ -113,7 +113,7 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
     int fromStop = requireStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 
-    var nearbyStops = profile.search().findNearbyStops(fromStopId);
+    var nearbyStops = profile.search().findNearbyStops(fromStopId, profile.maxDurations());
     for (var candidate : nearbyStops) {
       int toStop = stopIndex.toStopIndex(candidate.toStop());
       if (toStop == RaptorConstants.NOT_FOUND) {
