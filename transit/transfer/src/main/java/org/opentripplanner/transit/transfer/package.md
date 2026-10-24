@@ -43,6 +43,41 @@
 | **Stale entry**                   | An entry whose source paths changed. It is patched instead of rebuilt.                                                          |
 | **Patch vs. create from scratch** | Patching is used when at most `MAX_PATCHED_STOPS_SHARE` (5%) of stops changed. Memory locality is the reason for the threshold. |
 
+### Realtime updates
+
+The regular transfers are generated at graph build time, but the module is designed to change them
+at runtime. There are two reasons to do so:
+
+- **Elevators.** An elevator that is out of order should not be used for wheelchair transfers, see
+  [#6533](https://github.com/opentripplanner/OpenTripPlanner/issues/6533).
+- **Changed trip patterns.** Realtime updates can use stops that have no transfers, for example a
+  new stop in an extra journey. Today this is solved by generating more transfers than necessary at
+  graph build time, see [#7074](https://github.com/opentripplanner/OpenTripPlanner/issues/7074).
+
+The remaining work is tracked in
+[#8061](https://github.com/opentripplanner/OpenTripPlanner/issues/8061).
+
+**What is supported today.** The storage and the cache are prepared for updates, but nothing
+generates them yet:
+
+- The **runtime repository** replaces the transfers of one leaf (all paths from one `fromStop` under
+  one profile) with `replaceTransfersFrom`, and restores the graph-build paths of a leaf with
+  `resetTransfersFrom`. The paths generated at graph build are never copied: they are shared as the
+  base, and the replaced leaves are kept in an overlay.
+- The repository is updated in a transaction on the transaction framework. Each commit publishes a
+  new immutable **snapshot**. A request resolves one snapshot at its start, so the transfers used
+  for routing and the paths used for the itineraries always come from the same snapshot, even if an
+  update is committed while the request runs.
+- The **Routing Transfer Cache** is carried forward from one snapshot to the next. A cached value is
+  reused if the paths it is derived from did not change. If some did, only the transfers from the
+  changed stops are re-costed, as long as at most 5% of the stops changed. Above that, the value is
+  created from scratch.
+
+**What is not implemented yet.** `TransferRealtimeUpdater` defines the use cases: a new stop is
+used, and an elevator or other vertex is opened or closed. It has no implementation, and no updater
+writes to the repository. An implementation is expected to run the same profile search as the graph
+build for the affected stops, and to write the result with `replaceTransfersFrom` in a transaction.
+
 ## Constrained Transfers
 
 TODO: We are moving these here later - currently in the application module.
