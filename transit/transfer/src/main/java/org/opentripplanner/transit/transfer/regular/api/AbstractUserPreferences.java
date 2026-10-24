@@ -2,7 +2,6 @@ package org.opentripplanner.transit.transfer.regular.api;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.function.Consumer;
 import org.opentripplanner.core.model.basic.NormalizedDistance;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
@@ -123,12 +122,6 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     @SuppressWarnings("unchecked")
     public T withStairs(StreetSegmentTypeUsage stairs) {
       this.stairs = stairs;
-      return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T apply(Consumer<T> body) {
-      body.accept((T) this);
       return (T) this;
     }
 

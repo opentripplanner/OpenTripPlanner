@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.transfer.regular.spi;
 
-import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
@@ -10,7 +9,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
  * to the regular-transfer module; the stop and the criteria are available without re-costing the
  * path with {@link TransferSearch#computePathCriteria}.
  */
-public final class TransferPath<P> implements Serializable {
+public final class TransferPath<P> {
 
   private final FeedScopedId toStop;
   private final P path;
