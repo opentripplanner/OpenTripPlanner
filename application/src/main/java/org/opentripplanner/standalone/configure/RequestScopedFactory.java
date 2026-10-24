@@ -30,7 +30,7 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
@@ -67,7 +67,7 @@ public interface RequestScopedFactory {
 
   StreetDetailsService streetDetailsService();
 
-  RegularTransferService transferService();
+  FlexTransferService transferService();
 
   RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers();
 

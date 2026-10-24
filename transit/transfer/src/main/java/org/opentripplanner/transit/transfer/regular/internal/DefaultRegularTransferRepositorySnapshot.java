@@ -4,7 +4,7 @@ import java.util.Set;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
@@ -40,9 +40,9 @@ class DefaultRegularTransferRepositorySnapshot<
   }
 
   @Override
-  public RegularTransfers<P> forRequest(R request) {
+  public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
-    return new DefaultRegularTransfers<>(
+    return new DefaultRegularTransfersService<>(
       paths,
       cache,
       cacheFactory,

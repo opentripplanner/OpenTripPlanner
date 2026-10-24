@@ -37,7 +37,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -125,7 +125,7 @@ class RealtimeResolverTest {
   private static final Graph GRAPH = G.build();
 
   // Setup transfers
-  private static final RegularTransferService TRANSFER_SERVICE = createTransferService(
+  private static final FlexTransferService TRANSFER_SERVICE = createTransferService(
     List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
   );
 

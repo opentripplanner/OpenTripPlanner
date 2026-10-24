@@ -16,7 +16,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -33,7 +33,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   private final VehicleRentalService vehicleRentalService;
   private final VehicleParkingService vehicleParkingService;
   private final Graph graph;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
   private final StreetDetailsService streetDetailsService;
   private final LinkingContextFactory linkingContextFactory;
   private final StreetLimitationParametersService streetLimitationParametersService;
@@ -47,7 +47,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
     VehicleRentalService vehicleRentalService,
     VehicleParkingService vehicleParkingService,
     Graph graph,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
@@ -109,7 +109,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   }
 
   @Override
-  public RegularTransferService transferService() {
+  public FlexTransferService transferService() {
     return transferService;
   }
 

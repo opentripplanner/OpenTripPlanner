@@ -56,7 +56,7 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.utils.collection.ListUtils;
 
 /**
@@ -69,7 +69,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final RaptorTransitData raptorTransitData;
 
-  private final RegularTransfers<NearbyStop> regularTransfers;
+  private final RegularTransfersService<NearbyStop> regularTransfers;
 
   private final RouteRequest request;
   private final StreetSearchRequest transferStreetRequest;
@@ -98,7 +98,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     StreetDetailsService streetDetailsService,
     RaptorTransitData raptorTransitData,
-    RegularTransfers<NearbyStop> regularTransfers,
+    RegularTransfersService<NearbyStop> regularTransfers,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request,
     @Nullable TaxiService taxiService

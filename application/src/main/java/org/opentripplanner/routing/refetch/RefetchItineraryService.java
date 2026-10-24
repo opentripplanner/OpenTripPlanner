@@ -39,7 +39,7 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
@@ -55,7 +55,7 @@ public class RefetchItineraryService {
   private final TransitService transitService;
   private final TransitAlertService transitAlertService;
   private final ConstrainedTransferService constrainedTransferService;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
   private final Graph graph;
   private final LinkingContextFactory linkingContextFactory;
   private final StreetPathToLegsMapper streetPathToLegsMapper;
@@ -65,7 +65,7 @@ public class RefetchItineraryService {
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService

@@ -45,13 +45,13 @@ import org.opentripplanner.routing.linking.LinkingContext;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 
 public class TransitRouter {
 
@@ -63,8 +63,8 @@ public class TransitRouter {
   private final RaptorConfig<TripSchedule> raptorConfig;
   private final MeterRegistry meterRegistry;
   private final StreetDetailsService streetDetailsService;
-  private final RegularTransferService transferService;
-  private final RegularTransfers<NearbyStop> regularTransfers;
+  private final FlexTransferService transferService;
+  private final RegularTransfersService<NearbyStop> regularTransfers;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
 
@@ -94,7 +94,7 @@ public class TransitRouter {
     RaptorConfig<TripSchedule> raptorConfig,
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
@@ -138,7 +138,7 @@ public class TransitRouter {
     RaptorConfig<TripSchedule> raptorConfig,
     MeterRegistry meterRegistry,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,

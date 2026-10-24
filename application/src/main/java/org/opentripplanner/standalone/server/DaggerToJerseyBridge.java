@@ -25,7 +25,7 @@ import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.street.graph.Graph;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -73,7 +73,7 @@ final class DaggerToJerseyBridge extends BlindBinder {
     bridge(factory, RequestScopedFactory::worldEnvelopeService, WorldEnvelopeService.class);
     bridge(factory, RequestScopedFactory::vehicleRentalService, VehicleRentalService.class);
     bridge(factory, RequestScopedFactory::streetDetailsService, StreetDetailsService.class);
-    bridge(factory, RequestScopedFactory::transferService, RegularTransferService.class);
+    bridge(factory, RequestScopedFactory::transferService, FlexTransferService.class);
     bridge(factory, RequestScopedFactory::vectorTileConfig, VectorTileConfig.class);
     bridge(factory, RequestScopedFactory::gtfsApiParameters, GtfsApiParameters.class);
     bridge(factory, RequestScopedFactory::transmodelAPIParameters, TransmodelAPIParameters.class);
