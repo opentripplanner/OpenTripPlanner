@@ -41,11 +41,6 @@ public class DefaultRegularTransferBuildRepository<P> implements RegularTransfer
   }
 
   @Override
-  public boolean hasTransfersFrom(int fromStop) {
-    return paths.hasTransfersFrom(fromStop);
-  }
-
-  @Override
   public int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences) {
     return paths.size(userPreferences);
   }

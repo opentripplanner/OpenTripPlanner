@@ -22,22 +22,6 @@ class DefaultRegularTransferBuildRepositoryTest {
   private static final String PATH_AB_NEW = "A-B (new)";
 
   @Test
-  void hasTransfersFromIsFalseForAStopWithNoStoredPaths() {
-    var buildRepository = new DefaultRegularTransferBuildRepository<String>();
-    assertThat(buildRepository.hasTransfersFrom(0)).isFalse();
-  }
-
-  @Test
-  void hasTransfersFromIsTrueOnceAPathIsStoredForAnyProfile() {
-    var buildRepository = new DefaultRegularTransferBuildRepository<String>();
-    buildRepository.setPaths(WALK, 0, Map.of(1, "A -> B"));
-
-    assertThat(buildRepository.hasTransfersFrom(0)).isTrue();
-    // Only the fromStop that was actually stored to is linked.
-    assertThat(buildRepository.hasTransfersFrom(1)).isFalse();
-  }
-
-  @Test
   void calculateNumberOfTransferPathsCountsThePathsOfTheGivenPreferencesOnly() {
     var buildRepository = createBuildRepository();
     var other = WalkPreferences.of().withReluctance(Reluctance.of(4.0)).build();
@@ -79,7 +63,7 @@ class DefaultRegularTransferBuildRepositoryTest {
     );
     assertThat(ex).hasMessageThat().contains("sealed");
     // Reads still work
-    assertThat(buildRepository.hasTransfersFrom(A)).isTrue();
+    assertThat(buildRepository.calculateNumberOfTransferPaths(WALK)).isEqualTo(3);
   }
 
   @Test

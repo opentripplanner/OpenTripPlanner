@@ -74,13 +74,6 @@ final class TemplatePathsByUserProfile<P> implements Serializable {
     }
   }
 
-  boolean hasTransfersFrom(int fromStop) {
-    return pathsByUserPreferences
-      .values()
-      .stream()
-      .anyMatch(p -> p.hasTransfersFrom(fromStop));
-  }
-
   /** The number of paths stored under exactly the given user preferences. */
   int size(AbstractUserPreferences<?> userPreferences) {
     var paths = pathsByUserPreferences.get(userPreferences);

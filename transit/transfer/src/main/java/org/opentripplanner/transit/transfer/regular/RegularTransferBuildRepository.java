@@ -38,9 +38,6 @@ public interface RegularTransferBuildRepository<P> extends Serializable {
     Map<Integer, P> pathsByToStop
   );
 
-  /** Whether {@code fromStop} has at least one outgoing transfer, under any user preferences. */
-  boolean hasTransfersFrom(int fromStop);
-
   /** The number of paths stored under exactly the given user preferences. */
   int calculateNumberOfTransferPaths(AbstractUserPreferences<?> userPreferences);
 }

@@ -44,10 +44,6 @@ final class TemplatePathsByStop<P> implements Serializable {
     paths.forEach(consumer);
   }
 
-  boolean hasTransfersFrom(int fromStop) {
-    return !pathsFrom(fromStop).isEmpty();
-  }
-
   /** The number of stored paths. */
   int size() {
     return paths.values().stream().mapToInt(Map::size).sum();
