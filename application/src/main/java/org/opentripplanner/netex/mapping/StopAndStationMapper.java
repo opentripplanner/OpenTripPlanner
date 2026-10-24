@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.accessibility.Accessibility;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -99,6 +100,10 @@ class StopAndStationMapper {
     StopPlace selectedStopPlace = first(stopPlaceAllVersions);
 
     Station station = mapStopPlaceAllVersionsToStation(selectedStopPlace);
+    if (station == null) {
+      // The StationMapper has reported the issue, skip the StopPlace and its quays
+      return;
+    }
     Collection<FareZone> fareZones = mapTariffZones(selectedStopPlace);
     var transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
@@ -115,9 +120,12 @@ class StopAndStationMapper {
     return stops.get(0);
   }
 
+  @Nullable
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
-
+    if (station == null) {
+      return null;
+    }
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }

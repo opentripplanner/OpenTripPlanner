@@ -71,6 +71,58 @@ class VehicleParkingMapperTest {
     );
   }
 
+  @Test
+  void dropMissingCoordinates() {
+    var parking = parking(Set.of(CAR));
+    parking.setCentroid(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertNull(vp);
+    assertEquals(
+      List.of("MissingParkingCoordinates"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  @Test
+  void dropInvalidCoordinates() {
+    var parking = parking(Set.of(CAR));
+    parking.getCentroid().getLocation().setLatitude(new BigDecimal(100));
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertNull(vp);
+    assertEquals(
+      List.of("InvalidParkingCoordinates"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  @Test
+  void mapMissingName() {
+    var parking = parking(Set.of(CAR));
+    parking.setName(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertEquals("N/A", vp.getName().toString());
+    assertEquals(
+      List.of("MissingParkingName"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
+  @Test
+  void mapNameWithoutValue() {
+    var parking = parking(Set.of(CAR));
+    parking.getName().setValue(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var vp = mapper(issueStore).map(parking);
+    assertEquals("N/A", vp.getName().toString());
+    assertEquals(
+      List.of("MissingParkingName"),
+      issueStore.listIssues().stream().map(DataImportIssue::getType).toList()
+    );
+  }
+
   private VehicleParkingMapper mapper() {
     return mapper(DataImportIssueStore.NOOP);
   }
