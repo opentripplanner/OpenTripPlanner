@@ -36,9 +36,9 @@ not the `routingDefaults` of `router-config.json`, since the router configuratio
 when the graph is built.
 
 **Warmup.** The transfers for the preferences of a routing request are created the first time a
-request needs them, and cached. A warmup entry lets OTP create them when the server starts, for
-preferences that are common in the requests but are not worth a profile of their own. See
-[Warmup](#warmup).
+request needs them, and cached. OTP creates them for the preferences of every profile when the
+server starts. A warmup entry does the same for other preferences that are common in the requests,
+but are not worth a profile of their own. See [Warmup](#warmup).
 
 **Parent.** A profile can be based on another profile, its `parent`. The profile inherits the
 `routingRequest` and the `userPreferences` of the parent, and only has to set what is different. The
@@ -153,10 +153,10 @@ re-calculating the duration and the cost of the stored transfers of a profile. T
 and it is done by the first request with these preferences. The result is cached, so the following
 requests are fast.
 
-A `warmup` entry creates the transfers for some preferences when the server starts, before the first
-request. Use it for the preferences that are common in the requests, for example the default
-preferences of a client, but that are not different enough from a profile to be worth a profile of
-their own. A warmup entry needs:
+When the server starts, before the first request, OTP creates the transfers for the preferences of
+every profile. A `warmup` entry creates them for some more preferences. Use it for the preferences
+that are common in the requests, for example the default preferences of a client, but that are not
+different enough from a profile to be worth a profile of their own. A warmup entry needs:
 
 - an `id`, unique among all profiles and warmup entries. It is used in the logs.
 - a `parent`, the `id` of a profile. The transfers are created from the stored transfers of the
@@ -168,15 +168,17 @@ No transfers are searched for or stored for a warmup entry, so it adds nothing t
 request with preferences that are closest to a warmup entry uses the stored transfers of the parent
 of the entry, like a request that is closest to the parent.
 
-The server start waits for the transfers to be created. The time of each entry is logged:
+The server start waits for the transfers to be created. The time of each profile and each entry is
+logged:
 
 ```
+Warmed up the Routing Transfer Cache for the profile 'walk' in 150 ms.
 Warmed up the Routing Transfer Cache for 'avoid-walking' from the paths of 'walk' in 170 ms.
 ```
 
-Only the entries in `warmup` are created at start. The transfers for the preferences of a profile
-are created by the first request that uses them, like any other preferences. The cache holds a
-limited number of preference sets, and the least recently used are dropped first.
+The transfers for other preferences are created by the first request that uses them. The cache holds
+a limited number of preference sets, and the least recently used are dropped first, so a large
+number of warmup entries and profiles may drop the first ones.
 
 ### Max durations
 

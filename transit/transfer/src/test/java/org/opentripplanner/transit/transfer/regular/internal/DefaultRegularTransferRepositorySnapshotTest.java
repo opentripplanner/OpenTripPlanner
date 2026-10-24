@@ -158,24 +158,42 @@ class DefaultRegularTransferRepositorySnapshotTest {
   }
 
   @Test
-  void warmUpCreatesTheTransfersOfTheWarmupEntriesBeforeTheFirstRequest() {
+  void warmUpCreatesTheTransfersOfTheProfilesAndTheWarmupEntriesBeforeTheFirstRequest() {
     var snapshot = snapshotWithWarmup(true);
     assertThat(provider.searches).isEqualTo(0);
 
     snapshot.warmUp();
 
-    assertThat(provider.searches).isEqualTo(1);
+    // The profiles 'near' and 'far', and the warmup entry
+    assertThat(provider.searches).isEqualTo(3);
     // The first request with the preferences of the entry does not create the transfers again
     var transfers = snapshot.forRequest(withReluctance(3.0)).raptorTransfers();
-    assertThat(provider.searches).isEqualTo(1);
     assertThat(from(transfers, A)).containsExactly(tx(C, 600));
+    assertThat(provider.searches).isEqualTo(3);
   }
 
   @Test
-  void warmUpDoesNothingWithoutWarmupEntries() {
-    snapshotWithWarmup(false).warmUp();
+  void warmUpCreatesTheTransfersOfTheProfilesEvenWithoutWarmupEntries() {
+    var snapshot = snapshotWithWarmup(false);
 
-    assertThat(provider.searches).isEqualTo(0);
+    snapshot.warmUp();
+
+    assertThat(provider.searches).isEqualTo(2);
+    // A request with the preferences of a profile does not create the transfers again
+    var near = snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+    var far = snapshot.forRequest(withReluctance(10.0)).raptorTransfers();
+    assertThat(provider.searches).isEqualTo(2);
+    assertThat(from(near, A)).containsExactly(tx(B, 100));
+    assertThat(from(far, A)).containsExactly(tx(C, 2000));
+  }
+
+  @Test
+  void withoutWarmUpTheTransfersAreCreatedByTheFirstRequest() {
+    var snapshot = snapshotWithWarmup(true);
+
+    snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+
+    assertThat(provider.searches).isEqualTo(1);
   }
 
   @Test

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
@@ -36,8 +37,17 @@ class DefaultRegularTransferRepositorySnapshot<
   private final ProfileMatcher matcher;
   private final List<WarmupEntry> warmup;
 
-  /** A warmup entry, with the user preferences resolved. */
-  record WarmupEntry(String id, String parent, AbstractUserPreferences<?> userPreferences) {}
+  /**
+   * The user preferences to create the Raptor transfers for when the server starts: the
+   * preferences of a profile, or of a warmup entry.
+   *
+   * @param parent the parent profile of a warmup entry, {@code null} for a profile
+   */
+  record WarmupEntry(
+    String id,
+    @Nullable String parent,
+    AbstractUserPreferences<?> userPreferences
+  ) {}
 
   DefaultRegularTransferRepositorySnapshot(
     OverlaidTemplatePaths<P> paths,
@@ -60,12 +70,21 @@ class DefaultRegularTransferRepositorySnapshot<
     for (var entry : warmup) {
       long start = System.currentTimeMillis();
       cache.get(entry.userPreferences(), cacheFactory);
-      LOG.info(
-        "Warmed up the Routing Transfer Cache for '{}' from the paths of '{}' in {} ms.",
-        entry.id(),
-        entry.parent(),
-        System.currentTimeMillis() - start
-      );
+      var time = System.currentTimeMillis() - start;
+      if (entry.parent() == null) {
+        LOG.info(
+          "Warmed up the Routing Transfer Cache for the profile '{}' in {} ms.",
+          entry.id(),
+          time
+        );
+      } else {
+        LOG.info(
+          "Warmed up the Routing Transfer Cache for '{}' from the paths of '{}' in {} ms.",
+          entry.id(),
+          entry.parent(),
+          time
+        );
+      }
     }
   }
 

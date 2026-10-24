@@ -56,7 +56,9 @@ public final class TestConstructApplicationFactoryBuilder {
   }
 
   public ConstructApplicationFactory build() {
-    var env = TransitTestEnvironment.of().build();
+    // Two stops, so the stop indexes 0 and 1 used by the regular transfers of a test exist. The
+    // Raptor transfers of the profiles are created when the repository is registered.
+    var env = TransitTestEnvironment.of().addStops("A", "B").build();
     var transitRepository = env.transitRepository();
 
     return DaggerConstructApplicationFactory.builder()

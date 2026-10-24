@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class RegularTransferRepositoryLifecycle<
       mapper,
       requestsByProfile(profiles, mapper),
       new ProfileMatcher(ProfileUserPreferences.warmupParents(profiles, mapper)),
-      warmupEntries(profiles),
+      warmupEntries(profiles, mapper),
       numberOfStops
     );
   }
@@ -106,20 +107,30 @@ public class RegularTransferRepositoryLifecycle<
     return result;
   }
 
-  private static List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmupEntries(
-    TransferProfilesParameters<?> parameters
+  /**
+   * The user preferences to create the Raptor transfers for at start: the preferences of every
+   * profile, and then the ones of the warmup entries.
+   */
+  private static <R> List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmupEntries(
+    TransferProfilesParameters<R> parameters,
+    TransferRequestMapper<R> mapper
   ) {
-    return parameters
-      .warmup()
-      .stream()
-      .map(w ->
-        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(
-          w.id(),
-          w.parent(),
-          w.userPreferences()
-        )
+    var result = new ArrayList<DefaultRegularTransferRepositorySnapshot.WarmupEntry>();
+    ProfileUserPreferences.resolveAll(parameters, mapper).forEach((preferences, profile) ->
+      result.add(
+        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(profile.id(), null, preferences)
       )
-      .toList();
+    );
+    for (var warmup : parameters.warmup()) {
+      result.add(
+        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(
+          warmup.id(),
+          warmup.parent(),
+          warmup.userPreferences()
+        )
+      );
+    }
+    return List.copyOf(result);
   }
 
   @Override

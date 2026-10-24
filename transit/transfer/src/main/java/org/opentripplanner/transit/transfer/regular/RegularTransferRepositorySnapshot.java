@@ -24,11 +24,11 @@ public interface RegularTransferRepositorySnapshot<P, R> {
   RegularTransfersService<P> forRequest(R request);
 
   /**
-   * Create the Raptor transfers of the warmup entries of the configuration, and put them in the
-   * cache. Call it when the server starts, before the first request, so the requests with these
-   * preferences do not wait for the transfers to be created. The cache is carried forward to the
-   * next snapshots, so this is only needed for the first snapshot. Does nothing if there are no
-   * warmup entries.
+   * Create the Raptor transfers of the profiles and of the warmup entries of the configuration, and
+   * put them in the cache. Call it when the server starts, before the first request, so the
+   * requests with these preferences do not wait for the transfers to be created. The cache is
+   * carried forward to the next snapshots, so this is only needed for the first snapshot. Does
+   * nothing if the snapshot has no profiles configured.
    */
   void warmUp();
 }
