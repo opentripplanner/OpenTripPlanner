@@ -17,7 +17,6 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
@@ -35,7 +34,7 @@ public final class StreetTransferFactory {
   /** The profiles used if none are configured: a single default walk profile. */
   public static TransferProfilesParameters<RouteRequest> defaultParameters() {
     return new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>(WalkPreferences.DEFAULT, RouteRequest.defaultValue()))
+      List.of(new WalkProfileParameters<>("walk", null, RouteRequest.defaultValue()))
     );
   }
 

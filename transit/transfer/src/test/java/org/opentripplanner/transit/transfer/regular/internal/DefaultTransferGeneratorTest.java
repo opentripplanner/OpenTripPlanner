@@ -27,7 +27,9 @@ class DefaultTransferGeneratorTest {
   }
 
   private static TransferProfilesParameters<WalkPreferences> parameters(WalkPreferences walk) {
-    return new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(walk, walk)));
+    return new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>("walk", walk, walk))
+    );
   }
 
   private static TransferProfilesParameters<WalkPreferences> parameters(
@@ -35,7 +37,7 @@ class DefaultTransferGeneratorTest {
     Duration maxDuration
   ) {
     return new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>(walk, walk)),
+      List.of(new WalkProfileParameters<>("walk", walk, walk)),
       MaxDurationsPreference.of(maxDuration),
       Map.of()
     );

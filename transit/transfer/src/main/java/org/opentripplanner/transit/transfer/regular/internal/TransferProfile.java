@@ -25,6 +25,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  */
 final class TransferProfile<P, R> {
 
+  private final String id;
   private final AbstractUserPreferences<?> userPreferences;
   private final MaxDurationsPreference maxDurations;
   private final TransferSearch<P> search;
@@ -41,11 +42,17 @@ final class TransferProfile<P, R> {
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper
   ) {
-    this.userPreferences = Objects.requireNonNull(parameters.userPreferences());
+    this.id = parameters.id();
+    this.userPreferences = ProfileUserPreferences.resolve(parameters, mapper);
     this.maxDurations = Objects.requireNonNull(maxDurations);
     this.search = pathProvider.searchFor(
       mapper.toRequest(userPreferences, parameters.routingRequest())
     );
+  }
+
+  /** The id of the profile, for the logs and the issues reported. */
+  String id() {
+    return id;
   }
 
   /** The traveler preferences the paths of this profile are found and stored under. */
@@ -82,6 +89,6 @@ final class TransferProfile<P, R> {
 
   @Override
   public String toString() {
-    return "TransferProfile[userPreferences=" + userPreferences + ']';
+    return "TransferProfile[id=" + id + ", userPreferences=" + userPreferences + ']';
   }
 }

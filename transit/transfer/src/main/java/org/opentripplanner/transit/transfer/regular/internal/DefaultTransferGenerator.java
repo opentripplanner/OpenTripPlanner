@@ -91,7 +91,12 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
     int sum = 0;
     for (var profile : profiles) {
       int size = buildRepository.calculateNumberOfTransferPaths(profile.userPreferences());
-      LOG.info("Created {} regular transfers for profile {}.", size, profile.userPreferences());
+      LOG.info(
+        "Created {} regular transfers for profile '{}', {}.",
+        size,
+        profile.id(),
+        profile.userPreferences()
+      );
       sum += size;
     }
     LOG.info(

@@ -18,8 +18,8 @@ class TransferProfilesParametersTest {
 
   @Test
   void keepsTheProfilesInTheDeclaredOrder() {
-    var first = new WalkProfileParameters<>(OTHER_WALK, "first");
-    var second = new WalkProfileParameters<>(WALK, "second");
+    var first = new WalkProfileParameters<>("first", OTHER_WALK, "first");
+    var second = new WalkProfileParameters<>("second", WALK, "second");
 
     var subject = new TransferProfilesParameters<>(List.of(first, second));
 
@@ -34,23 +34,52 @@ class TransferProfilesParametersTest {
   }
 
   @Test
-  void rejectsProfilesWithEqualUserPreferences() {
+  void rejectsProfilesWithTheSameId() {
     var profiles = List.of(
-      new WalkProfileParameters<>(WALK, "first"),
-      new WalkProfileParameters<>(WalkPreferences.of().build(), "second")
+      new WalkProfileParameters<>("walk", WALK, "first"),
+      new WalkProfileParameters<>("walk", OTHER_WALK, "second")
     );
 
-    assertThrows(IllegalArgumentException.class, () -> new TransferProfilesParameters<>(profiles));
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(profiles)
+    );
+    assertThat(ex).hasMessageThat().contains("walk");
+  }
+
+  @Test
+  void aProfileNeedsAnId() {
+    assertThrows(IllegalArgumentException.class, () ->
+      new WalkProfileParameters<>(" ", WALK, "request")
+    );
+    assertThrows(NullPointerException.class, () ->
+      new WalkProfileParameters<>(null, WALK, "request")
+    );
+  }
+
+  @Test
+  void anyNonBlankIdIsAccepted() {
+    var profile = new WalkProfileParameters<>("Walk: 1.3 m/s (åre) #1", WALK, "request");
+
+    assertThat(profile.id()).isEqualTo("Walk: 1.3 m/s (åre) #1");
+  }
+
+  @Test
+  void aProfileMayHaveNoUserPreferences() {
+    var profile = new WalkProfileParameters<>("walk", null, "request");
+
+    assertThat(profile.userPreferences()).isNull();
   }
 
   @Test
   void rejectsAProfileWithoutARoutingRequest() {
-    assertThrows(NullPointerException.class, () -> new WalkProfileParameters<String>(WALK, null));
+    assertThrows(NullPointerException.class, () ->
+      new WalkProfileParameters<String>("walk", WALK, null)
+    );
   }
 
   @Test
   void aTypeWithoutAnOverrideUsesTheDefaultMaxDurations() {
-    var profiles = List.of(new WalkProfileParameters<>(WALK, "walk"));
+    var profiles = List.of(new WalkProfileParameters<>("walk", WALK, "walk"));
 
     var subject = new TransferProfilesParameters<>(
       profiles,
@@ -65,7 +94,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void anOverrideReplacesTheDefaultMaxDurationsOfTheType() {
-    var profiles = List.of(new WalkProfileParameters<>(WALK, "walk"));
+    var profiles = List.of(new WalkProfileParameters<>("walk", WALK, "walk"));
 
     var subject = new TransferProfilesParameters<>(
       profiles,
@@ -80,7 +109,9 @@ class TransferProfilesParametersTest {
 
   @Test
   void theDefaultMaxDurationsAreThirtyMinutes() {
-    var subject = new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(WALK, "w")));
+    var subject = new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>("walk", WALK, "w"))
+    );
 
     assertThat(subject.maxDurations(TransferProfileType.WALK)).isEqualTo(
       MaxDurationsPreference.DEFAULT

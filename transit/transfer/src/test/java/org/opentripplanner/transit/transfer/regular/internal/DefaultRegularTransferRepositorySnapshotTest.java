@@ -65,7 +65,9 @@ class DefaultRegularTransferRepositorySnapshotTest {
     lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       FakeRequestMapper.INSTANCE,
-      new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(PROFILE, PROFILE))),
+      new TransferProfilesParameters<>(
+        List.of(new WalkProfileParameters<>("walk", PROFILE, PROFILE))
+      ),
       stopIndex().size()
     );
     initial = freeze();
@@ -103,7 +105,9 @@ class DefaultRegularTransferRepositorySnapshotTest {
     var lifecycle = new RegularTransferRepositoryLifecycle<>(
       provider,
       mapper,
-      new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(PROFILE, PROFILE))),
+      new TransferProfilesParameters<>(
+        List.of(new WalkProfileParameters<>("walk", PROFILE, PROFILE))
+      ),
       stopIndex().size()
     );
     var snapshot = lifecycle.freeze(buildRepository.createRuntimeRepository());
