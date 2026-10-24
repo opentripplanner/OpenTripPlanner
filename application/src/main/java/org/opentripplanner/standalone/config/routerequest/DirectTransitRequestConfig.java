@@ -1,9 +1,11 @@
 package org.opentripplanner.standalone.config.routerequest;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
 import org.opentripplanner.routing.api.request.preference.DirectTransitPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class DirectTransitRequestConfig {
 
@@ -80,6 +82,19 @@ public class DirectTransitRequestConfig {
             """
           )
           .asDuration(dft.maxAccessEgressDuration().orElse(null))
+      )
+      .withModes(
+        c
+          .of("modes")
+          .since(V2_11)
+          .summary("The transit modes to include in the direct transit search")
+          .description(
+            """
+            Only results where the transit leg uses one of these modes are included. The main search
+            is not affected. If not set, all transit modes are included.
+            """
+          )
+          .asEnumSet(TransitMode.class, dft.modes())
       );
   }
 }

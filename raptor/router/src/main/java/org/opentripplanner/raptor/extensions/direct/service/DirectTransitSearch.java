@@ -27,6 +27,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
   private final int earliestDepartureTime;
   private final int latestDepartureTime;
+  private final int latestArrivalTime;
   private final RelaxFunction relaxC1;
   private final Collection<RaptorAccessEgress> accesses;
   private final Collection<RaptorAccessEgress> egresses;
@@ -38,6 +39,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
 
   public DirectTransitSearch(
     int earliestDepartureTime,
+    int latestArrivalTime,
     int searchWindowInSeconds,
     RelaxFunction relaxC1,
     Collection<RaptorAccessEgress> accesses,
@@ -46,6 +48,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
   ) {
     this.earliestDepartureTime = earliestDepartureTime;
     this.latestDepartureTime = earliestDepartureTime + searchWindowInSeconds;
+    this.latestArrivalTime = latestArrivalTime;
     this.relaxC1 = relaxC1;
     this.accesses = accesses;
     this.egresses = egresses;
@@ -139,7 +142,7 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
       );
     }
 
-    if (path.startTime() < latestDepartureTime) {
+    if (path.startTime() < latestDepartureTime && arrivesInTime(path)) {
       return Optional.of(new PathAndTripIndex<T>(path, boardEvent.tripScheduleIndex()));
     }
     return Optional.empty();
@@ -171,7 +174,9 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
       if (path.startTime() > latestDepartureTime) {
         return results;
       }
-      results.add(path);
+      if (arrivesInTime(path)) {
+        results.add(path);
+      }
     }
     return results;
   }
@@ -203,6 +208,10 @@ public class DirectTransitSearch<T extends RaptorTripSchedule> {
     pathBuilder.transit(schedule, times);
     pathBuilder.egress(egress);
     return pathBuilder.build();
+  }
+
+  private boolean arrivesInTime(RaptorPath<T> path) {
+    return latestArrivalTime == RaptorConstants.TIME_NOT_SET || path.endTime() <= latestArrivalTime;
   }
 
   static int calculateIterationDepartureTime(int accessDuration, int boardTime, int boardSlack) {

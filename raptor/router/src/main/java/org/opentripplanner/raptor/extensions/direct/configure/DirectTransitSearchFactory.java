@@ -13,6 +13,7 @@ public class DirectTransitSearchFactory {
   ) {
     return new DirectTransitSearch<T>(
       request.earliestDepartureTime(),
+      request.latestArrivalTime(),
       request.searchWindowInSeconds(),
       request.relaxC1(),
       request.accessPaths(),

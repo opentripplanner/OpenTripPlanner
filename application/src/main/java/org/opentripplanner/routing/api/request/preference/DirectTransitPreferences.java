@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /// All preferences related to the Direct Transit Search
@@ -22,7 +25,8 @@ public class DirectTransitPreferences {
     false,
     DEFAULT_COST_RELAX_FUNCTION,
     DEFAULT_RELUCTANCE,
-    null
+    null,
+    Set.of()
   );
 
   private final boolean enabled;
@@ -32,16 +36,20 @@ public class DirectTransitPreferences {
   @Nullable
   private final Duration maxAccessEgressDuration;
 
+  private final Set<TransitMode> modes;
+
   private DirectTransitPreferences(
     boolean enabled,
     CostLinearFunction costRelaxFunction,
     double extraAccessEgressReluctance,
-    @Nullable Duration maxAccessEgressDuration
+    @Nullable Duration maxAccessEgressDuration,
+    Set<TransitMode> modes
   ) {
     this.enabled = enabled;
     this.costRelaxFunction = Objects.requireNonNull(costRelaxFunction);
     this.extraAccessEgressReluctance = extraAccessEgressReluctance;
     this.maxAccessEgressDuration = maxAccessEgressDuration;
+    this.modes = Set.copyOf(modes);
   }
 
   public static Builder of() {
@@ -80,6 +88,16 @@ public class DirectTransitPreferences {
     return Optional.ofNullable(maxAccessEgressDuration);
   }
 
+  /// The transit modes to include in the direct transit search. If empty, all modes are included.
+  public Set<TransitMode> modes() {
+    return modes;
+  }
+
+  /// Whether the direct transit search should only include some of the transit modes
+  public boolean isModesRestricted() {
+    return !modes.isEmpty();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) {
@@ -90,7 +108,8 @@ public class DirectTransitPreferences {
       enabled == that.enabled &&
       Double.compare(extraAccessEgressReluctance, that.extraAccessEgressReluctance) == 0 &&
       Objects.equals(maxAccessEgressDuration, that.maxAccessEgressDuration) &&
-      Objects.equals(costRelaxFunction, that.costRelaxFunction)
+      Objects.equals(costRelaxFunction, that.costRelaxFunction) &&
+      modes.equals(that.modes)
     );
   }
 
@@ -100,7 +119,8 @@ public class DirectTransitPreferences {
       enabled,
       costRelaxFunction,
       extraAccessEgressReluctance,
-      maxAccessEgressDuration
+      maxAccessEgressDuration,
+      modes
     );
   }
 
@@ -121,6 +141,7 @@ public class DirectTransitPreferences {
         maxAccessEgressDuration,
         DEFAULT.maxAccessEgressDuration
       )
+      .addCol("modes", modes, DEFAULT.modes)
       .toString();
   }
 
@@ -130,6 +151,7 @@ public class DirectTransitPreferences {
     private CostLinearFunction costRelaxFunction;
     private double extraAccessEgressReluctance;
     private Duration maxAccessEgressDuration;
+    private Set<TransitMode> modes;
     public DirectTransitPreferences original;
 
     public Builder(DirectTransitPreferences original) {
@@ -138,6 +160,7 @@ public class DirectTransitPreferences {
       this.costRelaxFunction = original.costRelaxFunction;
       this.extraAccessEgressReluctance = original.extraAccessEgressReluctance;
       this.maxAccessEgressDuration = original.maxAccessEgressDuration;
+      this.modes = original.modes;
     }
 
     public Builder withEnabled(boolean enabled) {
@@ -160,12 +183,18 @@ public class DirectTransitPreferences {
       return this;
     }
 
+    public Builder withModes(Collection<TransitMode> modes) {
+      this.modes = Set.copyOf(modes);
+      return this;
+    }
+
     public DirectTransitPreferences build() {
       var value = new DirectTransitPreferences(
         enabled,
         costRelaxFunction,
         extraAccessEgressReluctance,
-        maxAccessEgressDuration
+        maxAccessEgressDuration,
+        modes
       );
       return original.equals(value) ? original : value;
     }

@@ -813,7 +813,11 @@ Ordered list of `StreetMode` values used as egress modes. Each entry is paired w
       "enabled" : false,
       "costRelaxFunction" : "15m + 1.5t",
       "maxAccessEgressDuration" : "5m",
-      "extraAccessEgressReluctance" : 2
+      "extraAccessEgressReluctance" : 2,
+      "modes" : [
+        "FERRY",
+        "RAIL"
+      ]
     }
   },
   "flex" : {

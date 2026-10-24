@@ -112,6 +112,7 @@ The RouteRequest is the type for the
 |    enabled                                                                                                   |        `boolean`       | Enable the direct transit search                                                                                                                         | *Optional* | `false`          |  2.9  |
 |    [extraAccessEgressReluctance](#rd_directTransitSearch_extraAccessEgressReluctance)                        |        `double`        | Add an extra cost factor to access/egress legs for these results                                                                                         | *Optional* | `1.0`            |  2.9  |
 |    [maxAccessEgressDuration](#rd_directTransitSearch_maxAccessEgressDuration)                                |       `duration`       | A limit on the duration of access/egress for the direct transit search                                                                                   | *Optional* |                  |  2.9  |
+|    [modes](#rd_directTransitSearch_modes)                                                                    |       `enum set`       | The transit modes to include in the direct transit search                                                                                                | *Optional* |                  |  2.11 |
 | elevator                                                                                                     |        `object`        | Elevator preferences.                                                                                                                                    | *Optional* |                  |  2.9  |
 |    boardCost                                                                                                 |        `integer`       | What is the cost of boarding a elevator?                                                                                                                 | *Optional* | `15`             |  2.9  |
 |    boardSlack                                                                                                |       `duration`       | How long it takes to get on an elevator, on average.                                                                                                     | *Optional* | `"PT1M30S"`      |  2.9  |
@@ -777,6 +778,18 @@ search will have have no effect.
 If set to zero, the search won't include results where access or egress is necessary. In
 this case the direct transit search will only be used when searching to and from a stop
 or station.
+
+
+<h3 id="rd_directTransitSearch_modes">modes</h3>
+
+**Since version:** `2.11` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/directTransitSearch   
+**Enum values:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail` | `carpool` | `taxi` | `snow-and-ice`
+
+The transit modes to include in the direct transit search
+
+Only results where the transit leg uses one of these modes are included. The main search
+is not affected. If not set, all transit modes are included.
 
 
 <h3 id="rd_itineraryFilters">itineraryFilters</h3>
@@ -1466,7 +1479,11 @@ include stairs as a last result.
       "enabled" : false,
       "costRelaxFunction" : "15m + 1.5t",
       "maxAccessEgressDuration" : "5m",
-      "extraAccessEgressReluctance" : 2
+      "extraAccessEgressReluctance" : 2,
+      "modes" : [
+        "FERRY",
+        "RAIL"
+      ]
     }
   }
 }
