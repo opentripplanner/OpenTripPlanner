@@ -21,6 +21,7 @@ import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
@@ -349,8 +350,11 @@ class DefaultRegularTransferRepositorySnapshotTest {
       var search = delegate.searchFor(request);
       return new TransferSearch<>() {
         @Override
-        public Collection<TransferPath<FakePath>> findNearbyStops(FeedScopedId fromStop) {
-          return search.findNearbyStops(fromStop);
+        public Collection<TransferPath<FakePath>> findNearbyStops(
+          FeedScopedId fromStop,
+          MaxDurationsPreference maxDurations
+        ) {
+          return search.findNearbyStops(fromStop, maxDurations);
         }
 
         @Override

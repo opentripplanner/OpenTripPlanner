@@ -2,13 +2,16 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
@@ -25,6 +28,17 @@ class DefaultTransferGeneratorTest {
 
   private static TransferProfilesParameters<WalkPreferences> parameters(WalkPreferences walk) {
     return new TransferProfilesParameters<>(List.of(new WalkProfileParameters<>(walk, walk)));
+  }
+
+  private static TransferProfilesParameters<WalkPreferences> parameters(
+    WalkPreferences walk,
+    Duration maxDuration
+  ) {
+    return new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>(walk, walk)),
+      MaxDurationsPreference.of(maxDuration),
+      Map.of()
+    );
   }
 
   private static WalkPreferences withReluctance(double reluctance) {
@@ -59,8 +73,8 @@ class DefaultTransferGeneratorTest {
   }
 
   @Test
-  void pathsExceedingTheProviderConfiguredDurationLimitAreExcluded() {
-    var provider = new FakeTransferPathProvider().withMaxDurationSeconds(120);
+  void pathsExceedingTheMaxDurationAreExcluded() {
+    var provider = new FakeTransferPathProvider();
     provider.addNearby(A, B, 100, 600);
 
     WalkPreferences userPreferences = withReluctance(1.0);
@@ -69,7 +83,7 @@ class DefaultTransferGeneratorTest {
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
     var generator = new DefaultTransferGenerator<>(
       stopIndex,
-      parameters(userPreferences),
+      parameters(userPreferences, Duration.ofMinutes(2)),
       provider,
       FakeRequestMapper.INSTANCE,
       buildRepository
@@ -108,6 +122,31 @@ class DefaultTransferGeneratorTest {
     assertThat(
       TestLifecycles.initialSnapshot(buildRepository).forRequest(userPreferences).findPath(0, 1)
     ).isEqualTo(pathAB);
+  }
+
+  @Test
+  void pathsWithinTheMaxDurationAreKept() {
+    var provider = new FakeTransferPathProvider();
+    var path = provider.addNearby(A, B, 100, 120);
+    provider.addNearby(A, C, 100, 121);
+
+    WalkPreferences userPreferences = withReluctance(1.0);
+    var stopIndex = stopIndex();
+    var buildRepository =
+      new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
+    new DefaultTransferGenerator<>(
+      stopIndex,
+      parameters(userPreferences, Duration.ofMinutes(2)),
+      provider,
+      FakeRequestMapper.INSTANCE,
+      buildRepository
+    ).generateTransfersForAllStops();
+
+    var transfers = TestLifecycles.initialSnapshot(buildRepository).forRequest(userPreferences);
+    assertThat(
+      transfers.findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B))
+    ).isSameInstanceAs(path);
+    assertThat(transfers.findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(C))).isNull();
   }
 
   @Test

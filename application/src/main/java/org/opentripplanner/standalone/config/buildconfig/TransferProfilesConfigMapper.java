@@ -2,12 +2,18 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
+import java.time.Duration;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
+import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
+import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
@@ -32,7 +38,9 @@ public class TransferProfilesConfigMapper {
         """
         Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only `walk`
         profiles are supported for now. If this block is omitted entirely, a single default `walk`
-        profile is used, mirroring the implicit default of the old `transferRequests` config.
+        profile is used, mirroring the implicit default of the old `transferRequests` config. The
+        max duration of the transfers is set with `defaultMaxDuration`, and can be overridden per
+        profile type with `maxDurations`. The old `maxTransferDuration` is not used.
         """
       )
       .asObject();
@@ -53,7 +61,79 @@ public class TransferProfilesConfigMapper {
       )
       .asObjects(List.of(defaultWalkProfile()), TransferProfilesConfigMapper::mapWalkProfile);
 
-    return new TransferProfilesParameters<>(walk);
+    var defaultMaxDurations = MaxDurationsPreference.of(
+      transfers
+        .of("defaultMaxDuration")
+        .since(V2_10)
+        .summary("The default max duration of the transfers, for all profile types.")
+        .description(
+          """
+          How far from a stop the transfers are searched when the transfers are generated. It is
+          used by all profile types that do not have an entry in `maxDurations`.
+          """
+        )
+        .asDuration(MaxDurationsPreference.DEFAULT.maxDuration())
+    );
+
+    return new TransferProfilesParameters<>(walk, defaultMaxDurations, mapMaxDurations(transfers));
+  }
+
+  /**
+   * One max duration configuration per profile type, it replaces the default for the type. The
+   * type is the name of the {@link TransferProfileType} in lower case.
+   */
+  private static Map<TransferProfileType, MaxDurationsPreference> mapMaxDurations(
+    NodeAdapter transfers
+  ) {
+    var node = transfers
+      .of("maxDurations")
+      .since(V2_10)
+      .summary("The max durations of the transfers, by profile type.")
+      .description(
+        """
+        One configuration per profile type. It is shared by all the profiles of the type, and it
+        replaces `defaultMaxDuration` for the type. Only the type `walk` is supported for now.
+        """
+      )
+      .asObject();
+    var result = new EnumMap<TransferProfileType, MaxDurationsPreference>(
+      TransferProfileType.class
+    );
+    for (var type : TransferProfileType.values()) {
+      var key = type.name().toLowerCase();
+      var entries = node
+        .of(key)
+        .since(V2_10)
+        .summary("The max durations of the " + key + " transfers.")
+        .asObjects(TransferProfilesConfigMapper::mapMaxDuration);
+      if (entries.size() > 1) {
+        throw new OtpAppException(
+          "Only one max duration is supported for the transfer profile type '" +
+            key +
+            "', found " +
+            entries.size() +
+            "."
+        );
+      }
+      if (!entries.isEmpty()) {
+        result.put(type, MaxDurationsPreference.of(entries.getFirst()));
+      }
+    }
+    return result;
+  }
+
+  private static Duration mapMaxDuration(NodeAdapter entry) {
+    if (entry.exist("allowedModes")) {
+      throw new OtpAppException(
+        "'allowedModes' is not supported yet in the transfer 'maxDurations' in " +
+          entry.contextPath()
+      );
+    }
+    return entry
+      .of("maxDuration")
+      .since(V2_10)
+      .summary("The longest transfer, measured with the user preferences of the profile.")
+      .asDuration();
   }
 
   /** The profile used if no profile is configured. */

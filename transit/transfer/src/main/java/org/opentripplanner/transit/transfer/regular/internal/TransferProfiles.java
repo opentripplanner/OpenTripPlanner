@@ -3,6 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -35,7 +36,14 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
       parameters
         .walk()
         .stream()
-        .map(p -> new TransferProfile<>(p, pathProvider, mapper))
+        .map(p ->
+          new TransferProfile<>(
+            p,
+            parameters.maxDurations(TransferProfileType.WALK),
+            pathProvider,
+            mapper
+          )
+        )
         .toList()
     );
   }
