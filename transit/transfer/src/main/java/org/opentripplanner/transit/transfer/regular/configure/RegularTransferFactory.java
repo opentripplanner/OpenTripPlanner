@@ -10,6 +10,7 @@ import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.internal.ProfileUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -22,6 +23,21 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 public final class RegularTransferFactory {
 
   private RegularTransferFactory() {}
+
+  /**
+   * Check the profiles that can not be checked when the parameters are created: the user
+   * preferences of the profiles must be unique, and a profile without preferences gets them from
+   * its request with the {@code mapper}. Call it when the configuration is read, to fail before
+   * the graph build starts.
+   *
+   * @throws IllegalArgumentException if two profiles have equal user preferences
+   */
+  public static <R> void validate(
+    TransferProfilesParameters<R> parameters,
+    TransferRequestMapper<R> mapper
+  ) {
+    ProfileUserPreferences.resolveAll(parameters, mapper);
+  }
 
   /** Create an empty build repository, populated at graph build. */
   public static <P> RegularTransferBuildRepository<P> createBuildRepository() {

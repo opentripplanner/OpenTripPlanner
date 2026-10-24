@@ -6,28 +6,35 @@ import java.time.Duration;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
+import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**
- * Parses the new {@code transfers:} build-config block (see
- * {@code opentripplanner/OpenTripPlanner#7998}) into the {@link TransferProfilesParameters} of the
- * regular-transfer module. Entirely separate from {@link RegularTransferConfig}/
- * {@code transferRequests}, which {@code FlexTransferGenerator} keeps reading unchanged for FLEX.
+ * Parses the {@code transfers:} build-config block, see {@code doc/user/TransferConfiguration.md},
+ * into the {@link TransferProfilesParameters} of the regular-transfer module. Entirely separate
+ * from {@link RegularTransferConfig}/{@code transferRequests}, which {@code FlexTransferGenerator}
+ * keeps reading unchanged for FLEX.
  * <p>
- * Only {@code walk} profiles are supported for now - support for other profile types, inheritance
- * ({@code parent}) and a duration limit is deliberately deferred.
+ * The configuration of a profile type is a block named after the type, for example {@code walk},
+ * with the profiles and the max durations of the type. Only {@code walk} is supported for now -
+ * {@code parent}, {@code warmup}, and the other types are deliberately deferred.
  */
 public class TransferProfilesConfigMapper {
+
+  /** The id of the profile used if no profile is configured. */
+  static final String DEFAULT_WALK_PROFILE_ID = "walk";
 
   public static TransferProfilesParameters<RouteRequest> map(NodeAdapter root) {
     var transfers = root
@@ -36,30 +43,16 @@ public class TransferProfilesConfigMapper {
       .summary("Transfer profiles for the raptor-data regular-transfer pipeline.")
       .description(
         """
-        Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only `walk`
-        profiles are supported for now. If this block is omitted entirely, a single default `walk`
-        profile is used, mirroring the implicit default of the old `transferRequests` config. The
-        max duration of the transfers is set with `defaultMaxDuration`, and can be overridden per
-        profile type with `maxDurations`. The old `maxTransferDuration` is not used.
+        Replaces `transferRequests` for regular (non-FLEX) transfer generation. The configuration of
+        a profile type is
+        a block named after the type, with its `profiles` and `maxDurations`. Only the type `walk`
+        is supported for now. If this block is omitted, a single default `walk` profile is used,
+        mirroring the implicit default of the old `transferRequests` config. The max duration of
+        the transfers is set with `defaultMaxDuration`, and can be overridden for a profile type
+        with `maxDurations`. The old `maxTransferDuration` is not used.
         """
       )
       .asObject();
-
-    var profiles = transfers
-      .of("profiles")
-      .since(V2_10)
-      .summary("The transfer profiles, by profile type.")
-      .asObject();
-
-    var walk = profiles
-      .of("walk")
-      .since(V2_10)
-      .summary("The walk transfer profiles.")
-      .description(
-        "Each profile runs a discovery search of walk transfers with its own preferences. The " +
-          "`userPreferences` of the profiles must be unique."
-      )
-      .asObjects(List.of(defaultWalkProfile()), TransferProfilesConfigMapper::mapWalkProfile);
 
     var defaultMaxDurations = MaxDurationsPreference.of(
       transfers
@@ -69,63 +62,114 @@ public class TransferProfilesConfigMapper {
         .description(
           """
           How far from a stop the transfers are searched when the transfers are generated. It is
-          used by all profile types that do not have an entry in `maxDurations`.
+          used by all profile types that do not have `maxDurations`.
           """
         )
         .asDuration(MaxDurationsPreference.DEFAULT.maxDuration())
     );
 
-    return new TransferProfilesParameters<>(walk, defaultMaxDurations, mapMaxDurations(transfers));
-  }
-
-  /**
-   * One max duration configuration per profile type, it replaces the default for the type. The
-   * type is the name of the {@link TransferProfileType} in lower case.
-   */
-  private static Map<TransferProfileType, MaxDurationsPreference> mapMaxDurations(
-    NodeAdapter transfers
-  ) {
-    var node = transfers
-      .of("maxDurations")
+    var walk = transfers
+      .of("walk")
       .since(V2_10)
-      .summary("The max durations of the transfers, by profile type.")
+      .summary("The configuration of the walk transfers.")
       .description(
         """
-        One configuration per profile type. It is shared by all the profiles of the type, and it
-        replaces `defaultMaxDuration` for the type. Only the type `walk` is supported for now.
+        The `profiles`, each a discovery search of walk transfers with its own preferences, and the
+        `maxDurations`, one configuration shared by all the walk profiles.
         """
       )
       .asObject();
-    var result = new EnumMap<TransferProfileType, MaxDurationsPreference>(
+
+    var profiles = walk
+      .of("profiles")
+      .since(V2_10)
+      .summary("The walk transfer profiles.")
+      .description(
+        """
+        Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
+        profiles must be unique. A profile without `userPreferences` gets them from its
+        `routingRequest`. If no profile is configured, a default profile with the id `walk` is used.
+        """
+      )
+      .asObjects(List.of(), TransferProfilesConfigMapper::mapWalkProfile);
+    if (profiles.isEmpty()) {
+      profiles = List.of(defaultWalkProfile());
+    }
+    if (walk.exist("warmup")) {
+      throw new OtpAppException(
+        "'warmup' is not supported yet in the transfer configuration, in " + walk.contextPath()
+      );
+    }
+
+    var maxDurations = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
-    for (var type : TransferProfileType.values()) {
-      var key = type.name().toLowerCase();
-      var entries = node
-        .of(key)
-        .since(V2_10)
-        .summary("The max durations of the " + key + " transfers.")
-        .asObjects(TransferProfilesConfigMapper::mapMaxDuration);
-      if (entries.size() > 1) {
-        throw new OtpAppException(
-          "Only one max duration is supported for the transfer profile type '" +
-            key +
-            "', found " +
-            entries.size() +
-            "."
-        );
-      }
-      if (!entries.isEmpty()) {
-        result.put(type, MaxDurationsPreference.of(entries.getFirst()));
-      }
+    var walkMaxDurations = mapMaxDurations(walk, TransferProfileType.WALK);
+    if (walkMaxDurations != null) {
+      maxDurations.put(TransferProfileType.WALK, walkMaxDurations);
     }
-    return result;
+
+    return createParameters(profiles, defaultMaxDurations, maxDurations);
+  }
+
+  /**
+   * Create and validate the parameters. A configuration error is reported like the other
+   * configuration errors, when the configuration is read.
+   */
+  private static TransferProfilesParameters<RouteRequest> createParameters(
+    List<WalkProfileParameters<RouteRequest>> profiles,
+    MaxDurationsPreference defaultMaxDurations,
+    Map<TransferProfileType, MaxDurationsPreference> maxDurations
+  ) {
+    try {
+      var parameters = new TransferProfilesParameters<>(
+        profiles,
+        defaultMaxDurations,
+        maxDurations
+      );
+      RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
+      return parameters;
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
+    }
+  }
+
+  /**
+   * The max durations of a profile type: one configuration, it replaces the default for the type.
+   * {@code null} if the type has none.
+   */
+  @Nullable
+  private static MaxDurationsPreference mapMaxDurations(
+    NodeAdapter typeNode,
+    TransferProfileType type
+  ) {
+    var entries = typeNode
+      .of("maxDurations")
+      .since(V2_10)
+      .summary("The max durations of the " + type.name().toLowerCase() + " transfers.")
+      .description(
+        """
+        One configuration for the profile type, shared by all its profiles. It replaces
+        `defaultMaxDuration` for the type.
+        """
+      )
+      .asObjects(TransferProfilesConfigMapper::mapMaxDuration);
+    if (entries.size() > 1) {
+      throw new OtpAppException(
+        "Only one max duration is supported for the transfer profile type '" +
+          type.name().toLowerCase() +
+          "', found " +
+          entries.size() +
+          "."
+      );
+    }
+    return entries.isEmpty() ? null : MaxDurationsPreference.of(entries.getFirst());
   }
 
   private static Duration mapMaxDuration(NodeAdapter entry) {
     if (entry.exist("allowedModes")) {
       throw new OtpAppException(
-        "'allowedModes' is not supported yet in the transfer 'maxDurations' in " +
+        "'allowedModes' is not supported yet in the transfer 'maxDurations', in " +
           entry.contextPath()
       );
     }
@@ -136,19 +180,41 @@ public class TransferProfilesConfigMapper {
       .asDuration();
   }
 
-  /** The profile used if no profile is configured. */
+  /** The profile used if no profile is configured: its preferences are the ones of the request. */
   private static WalkProfileParameters<RouteRequest> defaultWalkProfile() {
-    return new WalkProfileParameters<>(WalkPreferences.DEFAULT, RouteRequest.defaultValue());
+    return new WalkProfileParameters<>(DEFAULT_WALK_PROFILE_ID, null, RouteRequest.defaultValue());
   }
 
   private static WalkProfileParameters<RouteRequest> mapWalkProfile(NodeAdapter p) {
-    var userPreferences = mapWalkPreferences(
-      p
-        .of("userPreferences")
-        .since(V2_10)
-        .summary("Street-search preferences used to discover and cost this profile's paths.")
-        .asObject()
-    );
+    if (p.exist("parent")) {
+      throw new OtpAppException(
+        "'parent' is not supported yet in the transfer profiles, in " + p.contextPath()
+      );
+    }
+    var id = p
+      .of("id")
+      .since(V2_10)
+      .summary("The id of the profile.")
+      .description(
+        """
+        Identifies the profile in the logs and the issues reported. It must be unique among all the
+        profiles. Any string is allowed.
+        """
+      )
+      .asString();
+    WalkPreferences userPreferences = null;
+    if (p.exist("userPreferences")) {
+      userPreferences = mapWalkPreferences(
+        p
+          .of("userPreferences")
+          .since(V2_10)
+          .summary("Street-search preferences used to discover and cost this profile's paths.")
+          .description(
+            "Optional. If it is not set, the preferences of the `routingRequest` are used."
+          )
+          .asObject()
+      );
+    }
     var routingRequest = RouteRequestConfig.mapRouteRequest(
       p
         .of("routingRequest")
@@ -160,7 +226,7 @@ public class TransferProfilesConfigMapper {
         .asObject(),
       RouteRequest.defaultValue()
     );
-    return new WalkProfileParameters<>(userPreferences, routingRequest);
+    return new WalkProfileParameters<>(id, userPreferences, routingRequest);
   }
 
   private static WalkPreferences mapWalkPreferences(NodeAdapter p) {

@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -54,7 +54,7 @@ public class RegularTransferRepositoryLifecycle<
     TransferProfilesParameters<R> profiles,
     int numberOfStops
   ) {
-    this(pathProvider, mapper, requestsByProfile(profiles), numberOfStops);
+    this(pathProvider, mapper, requestsByProfile(profiles, mapper), numberOfStops);
   }
 
   RegularTransferRepositoryLifecycle(
@@ -73,17 +73,14 @@ public class RegularTransferRepositoryLifecycle<
   }
 
   private static <R> Map<AbstractUserPreferences<?>, R> requestsByProfile(
-    TransferProfilesParameters<R> parameters
+    TransferProfilesParameters<R> parameters,
+    TransferRequestMapper<R> mapper
   ) {
-    return parameters
-      .walk()
-      .stream()
-      .collect(
-        Collectors.toMap(
-          p -> (AbstractUserPreferences<?>) p.userPreferences(),
-          p -> p.routingRequest()
-        )
-      );
+    var result = new LinkedHashMap<AbstractUserPreferences<?>, R>();
+    ProfileUserPreferences.resolveAll(parameters, mapper).forEach((preferences, profile) ->
+      result.put(preferences, profile.routingRequest())
+    );
+    return result;
   }
 
   @Override

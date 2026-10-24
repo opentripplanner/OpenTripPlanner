@@ -32,6 +32,8 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper
   ) {
+    // Reject profiles with equal user preferences
+    ProfileUserPreferences.resolveAll(parameters, mapper);
     return of(
       parameters
         .walk()

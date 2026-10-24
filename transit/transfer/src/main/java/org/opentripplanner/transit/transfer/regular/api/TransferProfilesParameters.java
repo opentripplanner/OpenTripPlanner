@@ -11,8 +11,10 @@ import java.util.Objects;
  * max durations of the profile types. Only walk profiles are supported.
  *
  * @param walk                the walk profiles, in the order declared in the configuration. At
- *                            least one is required, and no two may have equal user preferences,
- *                            since the user preferences identify a profile.
+ *                            least one is required, and the ids must be unique. The user
+ *                            preferences of the profiles must be unique too, but that is checked
+ *                            when the profiles are created, since a profile without preferences
+ *                            gets them from its request.
  * @param defaultMaxDurations the max durations of the profile types without an override in
  *                            {@code maxDurations}
  * @param maxDurations        the max durations of a profile type, shared by all profiles of the
@@ -31,12 +33,11 @@ public record TransferProfilesParameters<R>(
     if (walk.isEmpty()) {
       throw new IllegalArgumentException("At least one walk transfer profile is required.");
     }
-    var preferences = new HashSet<WalkPreferences>();
+    var ids = new HashSet<String>();
     for (var profile : walk) {
-      if (!preferences.add(profile.userPreferences())) {
+      if (!ids.add(profile.id())) {
         throw new IllegalArgumentException(
-          "Duplicate walk transfer profile, the user preferences must be unique: " +
-            profile.userPreferences()
+          "Duplicate transfer profile id, the ids must be unique: " + profile.id()
         );
       }
     }

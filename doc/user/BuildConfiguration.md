@@ -103,7 +103,7 @@ Sections follow that describe particular settings in more depth.
 |    [osmTagMapping](#od_osmTagMapping)                                                   |       `enum`       | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                                             |     `time-zone`    | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
 | [transferRequests](RouteRequest.md)                                                     |     `object[]`     | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
-| [transfers](#transfers)                                                                 |      `object`      | Transfer profiles for the raptor-data regular-transfer pipeline.                                                                                               | *Optional* |                                   |  2.10 |
+| [transfers](TransferConfiguration.md)                                                   |      `object`      | Transfer profiles for the raptor-data regular-transfer pipeline.                                                                                               | *Optional* |                                   |  2.10 |
 | [transitFeeds](#transitFeeds)                                                           |     `object[]`     | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
 |    { object }                                                                           |      `object`      | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
 |       type = "gtfs"                                                                     |       `enum`       | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
@@ -1107,20 +1107,6 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `hamburg` | `atlanta` | `houston` | `portland` | `twin-cities` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags.
-
-<h3 id="transfers">transfers</h3>
-
-**Since version:** `2.10` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Transfer profiles for the raptor-data regular-transfer pipeline.
-
-Replaces `transferRequests` for regular (non-FLEX) transfer generation. Only `walk`
-profiles are supported for now. If this block is omitted entirely, a single default `walk`
-profile is used, mirroring the implicit default of the old `transferRequests` config. The
-max duration of the transfers is set with `defaultMaxDuration`, and can be overridden per
-profile type with `maxDurations`. The old `maxTransferDuration` is not used.
-
 
 <h3 id="transitFeeds">transitFeeds</h3>
 
