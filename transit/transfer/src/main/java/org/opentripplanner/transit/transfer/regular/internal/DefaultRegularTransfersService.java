@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 
 /**
- * Default {@link RegularTransfers}, created by
+ * Default {@link RegularTransfersService}, created by
  * {@link DefaultRegularTransferRepositorySnapshot#forRequest}. It holds the user preferences of
  * the request and the profile closest to them, both found once, and reads the paths and the cache
  * of the Raptor transfers of the snapshot it is created from. The paths are immutable and the
@@ -15,7 +15,7 @@ import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
  *
  * @param <P> the street path type
  */
-final class DefaultRegularTransfers<P> implements RegularTransfers<P> {
+final class DefaultRegularTransfersService<P> implements RegularTransfersService<P> {
 
   private final OverlaidTemplatePaths<P> paths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
@@ -30,7 +30,7 @@ final class DefaultRegularTransfers<P> implements RegularTransfers<P> {
    * @param profile         the stored profile closest to {@code userPreferences}, the paths are
    *                        read from it. {@code null} if there are no stored paths.
    */
-  DefaultRegularTransfers(
+  DefaultRegularTransfersService(
     OverlaidTemplatePaths<P> paths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
     RegularTransferServiceCache.Factory<RaptorTransferStore> cacheFactory,

@@ -7,7 +7,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 
 /**
  * A regular-transfer snapshot without any transfers, for tests that route without regular
@@ -22,7 +22,7 @@ public final class NoRegularTransfers {
     return SNAPSHOT;
   }
 
-  public static RegularTransfers<NearbyStop> transfers() {
+  public static RegularTransfersService<NearbyStop> transfers() {
     return TRANSFERS;
   }
 
@@ -42,18 +42,19 @@ public final class NoRegularTransfers {
     }
   };
 
-  private static final RegularTransfers<NearbyStop> TRANSFERS = new RegularTransfers<>() {
-    @Override
-    public RaptorRegularTransferService raptorTransfers() {
-      return SERVICE;
-    }
+  private static final RegularTransfersService<NearbyStop> TRANSFERS =
+    new RegularTransfersService<>() {
+      @Override
+      public RaptorRegularTransferService raptorTransfers() {
+        return SERVICE;
+      }
 
-    @Nullable
-    @Override
-    public NearbyStop findPath(int fromStop, int toStop) {
-      return null;
-    }
-  };
+      @Nullable
+      @Override
+      public NearbyStop findPath(int fromStop, int toStop) {
+        return null;
+      }
+    };
 
   private static final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> SNAPSHOT = _ ->
     TRANSFERS;

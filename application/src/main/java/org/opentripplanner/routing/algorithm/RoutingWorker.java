@@ -59,7 +59,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
@@ -87,7 +87,7 @@ public class RoutingWorker {
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final VehicleRentalService vehicleRentalService;
   private final StreetDetailsService streetDetailsService;
-  private final RegularTransferService transferService;
+  private final FlexTransferService transferService;
   private final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers;
   private final FlexParameters flexParameters;
   private final List<RideHailingService> rideHailingServices;
@@ -136,7 +136,7 @@ public class RoutingWorker {
     StreetLimitationParametersService streetLimitationParametersService,
     VehicleRentalService vehicleRentalService,
     StreetDetailsService streetDetailsService,
-    RegularTransferService transferService,
+    FlexTransferService transferService,
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
