@@ -118,4 +118,54 @@ class TransferProfilesParametersTest {
     );
     assertThat(MaxDurationsPreference.DEFAULT.maxDuration()).isEqualTo(Duration.ofMinutes(30));
   }
+
+  @Test
+  void aParentThatDoesNotExistIsRejectedAndNamed() {
+    var profiles = List.of(
+      new WalkProfileParameters<>("walk", null, WALK, "walk"),
+      new WalkProfileParameters<>("slow", "missing", OTHER_WALK, "slow")
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(profiles)
+    );
+    assertThat(ex).hasMessageThat().contains("'missing'");
+    assertThat(ex).hasMessageThat().contains("'slow'");
+  }
+
+  @Test
+  void aCycleOfParentsIsRejected() {
+    var profiles = List.of(
+      new WalkProfileParameters<>("a", "b", WALK, "a"),
+      new WalkProfileParameters<>("b", "a", OTHER_WALK, "b")
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(profiles)
+    );
+    assertThat(ex).hasMessageThat().contains("cycle");
+  }
+
+  @Test
+  void aProfileCanNotBeItsOwnParent() {
+    var profiles = List.of(new WalkProfileParameters<>("a", "a", WALK, "a"));
+
+    assertThrows(IllegalArgumentException.class, () -> new TransferProfilesParameters<>(profiles));
+  }
+
+  @Test
+  void aBlankParentIsRejected() {
+    assertThrows(IllegalArgumentException.class, () ->
+      new WalkProfileParameters<>("a", " ", WALK, "a")
+    );
+  }
+
+  @Test
+  void theDeduplicationLimitIsTheDefaultIfNotGiven() {
+    var subject = new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>("w", WALK, "w"))
+    );
+
+    assertThat(subject.deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
+  }
 }

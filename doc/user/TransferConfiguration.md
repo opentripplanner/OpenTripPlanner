@@ -7,8 +7,9 @@ Flex transfers are still configured with [`transferRequests`](BuildConfiguration
 
 !!! note
 
-    The `transfers` configuration is new and under development. Only walk transfers can be
-    configured so far. See [What is not supported yet](#what-is-not-supported-yet).
+    The `transfers` configuration is new (since version 2.10) and under development. Only walk
+    transfers can be configured so far. See
+    [What is not supported yet](#what-is-not-supported-yet).
 
 ## Concepts
 
@@ -30,6 +31,15 @@ logs and in the issues it reports, for example `Created 101785 regular transfers
 for and cost the transfers. A profile without `userPreferences` gets them from its `routingRequest`,
 or from the default request if it has none. The user preferences of the profiles must be unique.
 
+**Default request.** The default request is the request with the default values of the code. It is
+not the `routingDefaults` of `router-config.json`, since the router configuration is not available
+when the graph is built.
+
+**Parent.** A profile can be based on another profile, its `parent`. The profile inherits the
+`routingRequest` and the `userPreferences` of the parent, and only has to set what is different. The
+transfers the profile and its parent have in common are stored once, which saves memory. See
+[Parent and deduplication](#parent-and-deduplication).
+
 ## Example
 
 ```json
@@ -37,6 +47,7 @@ or from the default request if it has none. The user preferences of the profiles
 {
   "transfers": {
     "defaultMaxDuration": "30m",
+    "deduplicationLimit": "0.005x + 30s",
     "walk": {
       "profiles": [
         {
@@ -45,6 +56,7 @@ or from the default request if it has none. The user preferences of the profiles
         },
         {
           "id": "slow-walk",
+          "parent": "walk",
           "userPreferences": { "speed": 0.9, "reluctance": 4.0, "stairs": "DISCOURAGED" }
         }
       ],
@@ -59,14 +71,17 @@ request and a max duration of 30 minutes is used.
 
 ## Parameters
 
-| Parameter                              | Type       | Description                                                                     | Default |
-|----------------------------------------|------------|---------------------------------------------------------------------------------|---------|
-| `defaultMaxDuration`                   | `duration` | The max duration of all profile types that do not have `maxDurations`.          | `"30m"` |
-| `walk.profiles`                        | `object[]` | The walk profiles. If none is configured, one with the id `walk` is used.       |         |
-| &nbsp;&nbsp;`id`                       | `string`   | **Required.** The id of the profile, unique among all profiles.                 |         |
-| &nbsp;&nbsp;`userPreferences`          | `object`   | The preferences the profile is searched with. See below.                        |         |
-| &nbsp;&nbsp;`routingRequest`           | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.         |         |
-| `walk.maxDurations`                    | `object[]` | The max duration of the walk transfers. One entry. See below.                   |         |
+| Parameter                     | Type       | Description                                                                         | Default           |
+|-------------------------------|------------|-------------------------------------------------------------------------------------|-------------------|
+| `defaultMaxDuration`          | `duration` | The max duration of all profile types that do not have `maxDurations`.              | `"30m"`           |
+| `deduplicationLimit`          | `string`   | How much more the path of a parent may cost to be used by a child. See below.       | `"0.005x + 30s"`  |
+| `walk.profiles`               | `object[]` | The walk profiles. If none is configured, one with the id `walk` is used.           |                   |
+| &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the profile, unique among all profiles.                     |                   |
+| &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
+| &nbsp;&nbsp;`userPreferences` | `object`   | The preferences the profile is searched with. See below.                            |                   |
+| &nbsp;&nbsp;`routingRequest`  | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.             |                   |
+| `walk.maxDurations`           | `object[]` | The max duration of the walk transfers. One entry. See below.                       |                   |
+| &nbsp;&nbsp;`maxDuration`     | `duration` | **Required** in the entry. How far from a stop the transfers are searched.          |                   |
 
 ### User preferences
 
@@ -82,6 +97,38 @@ request and a max duration of 30 minutes is used.
 the transfer search is made with. It is there so existing behavior can be kept. The values in
 `userPreferences` override the equivalent values of the request. The goal is to move all the
 relevant parameters to `userPreferences`, and drop `routingRequest` in the future.
+
+### Parent and deduplication
+
+A profile can name another profile as its `parent` with the `id` of the parent. The `parent` must be
+a profile of the same configuration, and the parents must not form a cycle. The profiles can be
+declared in any order.
+
+**Inheritance.** The profile inherits the `routingRequest` and the `userPreferences` of the parent.
+Everything that is set on the profile overrides the inherited value, and everything that is not set
+is the value of the parent. A profile with a parent and without `userPreferences` of its own would
+get the same preferences as the parent, and is rejected, since the profiles must be unique.
+
+**Deduplication.** Each profile still searches for its own transfers, but the transfers that are
+the same, or almost the same, as the transfers of the parent are only stored once. For each pair of
+stops, OTP calculates the cost of the path of the parent with the preferences of the profile. If it
+is close enough to the cost of the best path the profile found itself, the profile uses the path of
+the parent. This makes the graph smaller, and the graph file too.
+
+"Close enough" is set with `deduplicationLimit`. It is a linear function of the cost `x` of the
+path of the parent, for example `0.005x + 30s`: a path that costs up to 0.5% and 30 seconds more
+than the best path is used. The terms can be written in either order, and one of them can be left
+out. A limit of `0s` only shares the paths with the same cost. The limit applies to the generalized
+cost only, not to the duration. The graph build logs how many of the paths of each profile are the
+paths of its parent:
+
+```
+Profile 'slow-walk': 84788 of 85142 paths (99.6%) are the paths of the parent 'walk', they are stored once.
+```
+
+Use a parent for profiles that are close to another profile, like a slightly slower walker. A
+profile that is very different from its parent, like one that avoids stairs, shares fewer paths.
+For each transfer of a profile, the graph build re-costs the path of the parent once more.
 
 ### Max durations
 
@@ -106,7 +153,6 @@ re-calculated for a routing request, even if the request walks slower than the p
 
 These parameters are reserved for later. OTP stops with an error if they are used:
 
-- `parent` on a profile, to reuse the stored paths of another profile.
 - `warmup`, to fill the cache of transfers with preferences that are common.
 - `allowedModes` in `maxDurations`, to give stops that car or bicycle can use a longer duration.
 

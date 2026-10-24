@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -14,12 +15,14 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
+import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
+import org.opentripplanner.utils.collection.ParentOrder;
 
 /**
  * Parses the {@code transfers:} build-config block, see {@code doc/user/TransferConfiguration.md},
@@ -29,7 +32,7 @@ import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFac
  * <p>
  * The configuration of a profile type is a block named after the type, for example {@code walk},
  * with the profiles and the max durations of the type. Only {@code walk} is supported for now -
- * {@code parent}, {@code warmup}, and the other types are deliberately deferred.
+ * {@code warmup}, and the other types are deliberately deferred.
  */
 public class TransferProfilesConfigMapper {
 
@@ -68,6 +71,8 @@ public class TransferProfilesConfigMapper {
         .asDuration(MaxDurationsPreference.DEFAULT.maxDuration())
     );
 
+    var deduplicationLimit = mapDeduplicationLimit(transfers);
+
     var walk = transfers
       .of("walk")
       .since(V2_10)
@@ -80,21 +85,7 @@ public class TransferProfilesConfigMapper {
       )
       .asObject();
 
-    var profiles = walk
-      .of("profiles")
-      .since(V2_10)
-      .summary("The walk transfer profiles.")
-      .description(
-        """
-        Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
-        profiles must be unique. A profile without `userPreferences` gets them from its
-        `routingRequest`. If no profile is configured, a default profile with the id `walk` is used.
-        """
-      )
-      .asObjects(List.of(), TransferProfilesConfigMapper::mapWalkProfile);
-    if (profiles.isEmpty()) {
-      profiles = List.of(defaultWalkProfile());
-    }
+    var profiles = mapProfiles(walk);
     if (walk.exist("warmup")) {
       throw new OtpAppException(
         "'warmup' is not supported yet in the transfer configuration, in " + walk.contextPath()
@@ -109,7 +100,7 @@ public class TransferProfilesConfigMapper {
       maxDurations.put(TransferProfileType.WALK, walkMaxDurations);
     }
 
-    return createParameters(profiles, defaultMaxDurations, maxDurations);
+    return createParameters(profiles, defaultMaxDurations, maxDurations, deduplicationLimit);
   }
 
   /**
@@ -119,13 +110,15 @@ public class TransferProfilesConfigMapper {
   private static TransferProfilesParameters<RouteRequest> createParameters(
     List<WalkProfileParameters<RouteRequest>> profiles,
     MaxDurationsPreference defaultMaxDurations,
-    Map<TransferProfileType, MaxDurationsPreference> maxDurations
+    Map<TransferProfileType, MaxDurationsPreference> maxDurations,
+    DeduplicationLimit deduplicationLimit
   ) {
     try {
       var parameters = new TransferProfilesParameters<>(
         profiles,
         defaultMaxDurations,
-        maxDurations
+        maxDurations,
+        deduplicationLimit
       );
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
@@ -185,12 +178,122 @@ public class TransferProfilesConfigMapper {
     return new WalkProfileParameters<>(DEFAULT_WALK_PROFILE_ID, null, RouteRequest.defaultValue());
   }
 
-  private static WalkProfileParameters<RouteRequest> mapWalkProfile(NodeAdapter p) {
-    if (p.exist("parent")) {
-      throw new OtpAppException(
-        "'parent' is not supported yet in the transfer profiles, in " + p.contextPath()
+  private static DeduplicationLimit mapDeduplicationLimit(NodeAdapter transfers) {
+    var text = transfers
+      .of("deduplicationLimit")
+      .since(V2_10)
+      .summary("How much more the path of a parent profile may cost, to be used by its children.")
+      .description(
+        """
+        A profile with a `parent` finds its own paths, but if the path of the parent costs about the
+        same for the profile, it uses the path of the parent instead of storing its own. This saves
+        memory. The paths are equivalent if the difference in generalized cost is within this limit,
+        a linear function of the cost `x` of the path of the parent, for example `0.005x + 30s`. The
+        limit applies to cost only, not to duration. A report is logged when the graph is built.
+        """
+      )
+      .asString(null);
+    if (text == null) {
+      return DeduplicationLimit.DEFAULT;
+    }
+    try {
+      return DeduplicationLimitParser.parse(text);
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
+    }
+  }
+
+  /** A profile as configured: its id and its parent are read first, to order the profiles. */
+  private record ConfiguredProfile(String id, @Nullable String parent, NodeAdapter node) {}
+
+  /** A profile with the values that are inherited by its children. */
+  private record ResolvedProfile(RouteRequest request, WalkPreferences userPreferences) {}
+
+  /**
+   * Map the profiles of the walk type. A profile inherits unset values from its parent, so the
+   * parents are mapped first, whatever order they are declared in.
+   */
+  private static List<WalkProfileParameters<RouteRequest>> mapProfiles(NodeAdapter walk) {
+    var configured = walk
+      .of("profiles")
+      .since(V2_10)
+      .summary("The walk transfer profiles.")
+      .description(
+        """
+        Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
+        profiles must be unique. A profile without `userPreferences` gets them from its
+        `routingRequest`. A profile with a `parent` inherits the `routingRequest` and the
+        `userPreferences` of the parent, and the paths it has in common with the parent are stored
+        once. If no profile is configured, a default profile with the id `walk` is used.
+        """
+      )
+      .asObjects(List.of(), TransferProfilesConfigMapper::readConfiguredProfile);
+    if (configured.isEmpty()) {
+      return List.of(defaultWalkProfile());
+    }
+
+    List<ConfiguredProfile> parentsFirst;
+    try {
+      parentsFirst = ParentOrder.parentsFirst(
+        configured,
+        ConfiguredProfile::id,
+        ConfiguredProfile::parent
+      );
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
+    }
+
+    var mapper = new RegularTransferPreferencesMapper();
+    var resolved = new HashMap<String, ResolvedProfile>();
+    var mapped = new HashMap<String, WalkProfileParameters<RouteRequest>>();
+    for (var profile : parentsFirst) {
+      var parent = profile.parent() == null ? null : resolved.get(profile.parent());
+      var request = RouteRequestConfig.mapRouteRequest(
+        profile
+          .node()
+          .of("routingRequest")
+          .since(V2_10)
+          .summary("The routing request parameters the street search of this profile is based on.")
+          .description(
+            "Preferences in `userPreferences` override the equivalent parameters of the request."
+          )
+          .asObject(),
+        parent == null ? RouteRequest.defaultValue() : parent.request()
+      );
+      WalkPreferences own = null;
+      if (profile.node().exist("userPreferences")) {
+        own = mapWalkPreferences(
+          profile
+            .node()
+            .of("userPreferences")
+            .since(V2_10)
+            .summary("Street-search preferences used to discover and cost this profile's paths.")
+            .description(
+              "Optional. If it is not set, the preferences of the `routingRequest` are used."
+            )
+            .asObject(),
+          parent == null ? WalkPreferences.DEFAULT : parent.userPreferences()
+        );
+      }
+      var effective = own != null ? own : mapper.toUserPreferences(request);
+      // The children inherit the request with the preferences of this profile applied
+      resolved.put(
+        profile.id(),
+        new ResolvedProfile(mapper.toRequest(effective, request), effective)
+      );
+      mapped.put(
+        profile.id(),
+        new WalkProfileParameters<>(profile.id(), profile.parent(), own, request)
       );
     }
+    // Keep the declared order
+    return configured
+      .stream()
+      .map(p -> mapped.get(p.id()))
+      .toList();
+  }
+
+  private static ConfiguredProfile readConfiguredProfile(NodeAdapter p) {
     var id = p
       .of("id")
       .since(V2_10)
@@ -202,35 +305,28 @@ public class TransferProfilesConfigMapper {
         """
       )
       .asString();
-    WalkPreferences userPreferences = null;
-    if (p.exist("userPreferences")) {
-      userPreferences = mapWalkPreferences(
-        p
-          .of("userPreferences")
-          .since(V2_10)
-          .summary("Street-search preferences used to discover and cost this profile's paths.")
-          .description(
-            "Optional. If it is not set, the preferences of the `routingRequest` are used."
-          )
-          .asObject()
-      );
-    }
-    var routingRequest = RouteRequestConfig.mapRouteRequest(
-      p
-        .of("routingRequest")
+    String parent = null;
+    if (p.exist("parent")) {
+      parent = p
+        .of("parent")
         .since(V2_10)
-        .summary("The routing request parameters the street search of this profile is based on.")
+        .summary("The id of the profile this profile is based on.")
         .description(
-          "Preferences in `userPreferences` override the equivalent parameters of the request."
+          """
+          The profile inherits the `routingRequest` and the `userPreferences` of the parent. Values
+          set on the profile override the inherited ones. The parent is generated first, and the
+          paths of the profile that are equivalent to the paths of the parent are stored once, see
+          `deduplicationLimit`. The parents must not form a cycle.
+          """
         )
-        .asObject(),
-      RouteRequest.defaultValue()
-    );
-    return new WalkProfileParameters<>(id, userPreferences, routingRequest);
+        .asString();
+    }
+    return new ConfiguredProfile(id, parent, p);
   }
 
-  private static WalkPreferences mapWalkPreferences(NodeAdapter p) {
-    var dft = WalkPreferences.of();
+  /** Unset values are the values of {@code base}, the preferences of the parent or the default. */
+  private static WalkPreferences mapWalkPreferences(NodeAdapter p, WalkPreferences base) {
+    var dft = base.copyOf();
     var original = dft.original();
     dft.withSpeed(
       Speed.ofMetersPerSecond(

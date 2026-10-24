@@ -30,6 +30,10 @@ public final class WalkPreferences extends AbstractUserPreferences {
     return new Builder(DEFAULT);
   }
 
+  public Builder copyOf() {
+    return new Builder(this);
+  }
+
   @Override
   AbstractUserPreferences defaultInstance() {
     return DEFAULT;

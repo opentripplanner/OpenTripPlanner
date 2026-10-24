@@ -3,6 +3,8 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
@@ -75,5 +77,51 @@ class TransferProfilesTest {
 
     assertThat(walk.id()).isEqualTo("my-walk");
     assertThat(walk.toString()).contains("my-walk");
+  }
+
+  @Test
+  void aParentIsBeforeItsChildrenWhateverTheDeclaredOrder() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new WalkProfileParameters<>("child", "parent", withReluctance(3.0), withReluctance(3.0)),
+        new WalkProfileParameters<>("other", null, withReluctance(4.0), withReluctance(4.0)),
+        new WalkProfileParameters<>("parent", null, withReluctance(2.0), withReluctance(2.0))
+      )
+    );
+
+    var profiles = TransferProfiles.of(
+      parameters,
+      new FakeTransferPathProvider(),
+      FakeRequestMapper.INSTANCE
+    );
+
+    var ids = new ArrayList<String>();
+    profiles.forEach(p -> ids.add(p.id()));
+    assertThat(ids).containsExactly("parent", "child", "other").inOrder();
+  }
+
+  @Test
+  void aChildKnowsItsParent() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(
+        new WalkProfileParameters<>("parent", null, withReluctance(2.0), withReluctance(2.0)),
+        new WalkProfileParameters<>("child", "parent", withReluctance(3.0), withReluctance(3.0))
+      )
+    );
+
+    var profiles = TransferProfiles.of(
+      parameters,
+      new FakeTransferPathProvider(),
+      FakeRequestMapper.INSTANCE
+    );
+
+    var byId = new HashMap<String, TransferProfile<?, ?>>();
+    profiles.forEach(p -> byId.put(p.id(), p));
+    assertThat(byId.get("child").parent()).isSameInstanceAs(byId.get("parent"));
+    assertThat(byId.get("parent").parent()).isNull();
+  }
+
+  private static WalkPreferences withReluctance(double reluctance) {
+    return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
   }
 }

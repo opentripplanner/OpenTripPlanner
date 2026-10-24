@@ -9,6 +9,10 @@ import javax.annotation.Nullable;
  *
  * @param id              identifies the profile in the logs and in the issues reported. It must be
  *                        unique among all the profiles.
+ * @param parent          the id of the profile this profile is based on, {@code null} if there is
+ *                        none. The paths of the profile that are equivalent to the paths of the
+ *                        parent are not stored again, see {@link DeduplicationLimit}. The parent
+ *                        is generated first.
  * @param userPreferences the traveler preferences the paths of the profile are found and stored
  *                        under. They override the equivalent values of the {@code routingRequest}.
  *                        {@code null} if the profile has no preferences of its own: the user
@@ -19,6 +23,7 @@ import javax.annotation.Nullable;
  */
 public record WalkProfileParameters<R>(
   String id,
+  @Nullable String parent,
   @Nullable WalkPreferences userPreferences,
   R routingRequest
 ) {
@@ -28,5 +33,17 @@ public record WalkProfileParameters<R>(
       throw new IllegalArgumentException("A transfer profile needs an id.");
     }
     Objects.requireNonNull(routingRequest);
+    if (parent != null && parent.isBlank()) {
+      throw new IllegalArgumentException("The parent of the profile '" + id + "' is blank.");
+    }
+  }
+
+  /** A profile without a parent. */
+  public WalkProfileParameters(
+    String id,
+    @Nullable WalkPreferences userPreferences,
+    R routingRequest
+  ) {
+    this(id, null, userPreferences, routingRequest);
   }
 }

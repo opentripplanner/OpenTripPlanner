@@ -6,13 +6,16 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.n
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class TransferProfilesConfigMapperTest {
@@ -174,13 +177,169 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void parentIsNotSupportedYet() {
+  void aChildInheritsTheUserPreferencesOfItsParent() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [
+              { id: "walk", userPreferences: { speed: 1.1, reluctance: 3.0 } },
+              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var slow = profile(subject, "slow");
+    assertThat(slow.parent()).isEqualTo("walk");
+    // Set on the child
+    assertThat(slow.userPreferences().reluctance().value()).isEqualTo(5.0);
+    // Not set on the child, so the one of the parent
+    assertThat(slow.userPreferences().speed().toMetersPerSecond()).isWithin(0.001).of(1.1);
+  }
+
+  @Test
+  void aChildInheritsTheResolvedPreferencesOfAParentWithoutOwnPreferences() {
+    // The preferences of the parent are the ones of the default request
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [
+              { id: "walk" },
+              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var slow = profile(subject, "slow");
+    assertThat(slow.userPreferences().speed()).isEqualTo(WalkPreferences.DEFAULT.speed());
+    assertThat(slow.userPreferences().reluctance().value()).isEqualTo(5.0);
+  }
+
+  @Test
+  void aChildInheritsTheRoutingRequestOfItsParentWithTheParentsPreferencesApplied() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [
+              {
+                id: "walk",
+                userPreferences: { speed: 1.1 },
+                routingRequest: { wheelchairAccessibility: { enabled: true } }
+              },
+              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var request = profile(subject, "slow").routingRequest();
+    assertThat(request.journey().wheelchair()).isTrue();
+    assertThat(request.preferences().walk().speed()).isWithin(0.001).of(1.1);
+  }
+
+  @Test
+  void aChildDeclaredBeforeItsParentIsMappedAndTheDeclaredOrderIsKept() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [
+              { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } },
+              { id: "walk", userPreferences: { speed: 1.1, reluctance: 3.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    assertThat(
+      subject
+        .walk()
+        .stream()
+        .map(p -> p.id())
+    )
+      .containsExactly("slow", "walk")
+      .inOrder();
+    assertThat(profile(subject, "slow").userPreferences().speed().toMetersPerSecond())
+      .isWithin(0.001)
+      .of(1.1);
+  }
+
+  @Test
+  void aChildWithoutPreferencesOfItsOwnIsADuplicateOfItsParent() {
     var root = newNodeAdapterForTest(
-      "{ transfers: { walk: { profiles: [{ id: 'a', parent: 'b' }] } } }"
+      """
+      {
+        transfers: {
+          walk: { profiles: [{ id: "walk" }, { id: "copy", parent: "walk" }] }
+        }
+      }
+      """
     );
 
     var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
-    assertThat(ex).hasMessageThat().contains("parent");
+    assertThat(ex).hasMessageThat().contains("'walk'");
+    assertThat(ex).hasMessageThat().contains("'copy'");
+  }
+
+  @Test
+  void aParentThatDoesNotExistIsRejectedAndNamed() {
+    var root = newNodeAdapterForTest(
+      "{ transfers: { walk: { profiles: [{ id: 'a', parent: 'missing' }] } } }"
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("'missing'");
+    assertThat(ex).hasMessageThat().contains("'a'");
+  }
+
+  @Test
+  void aCycleOfParentsIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [
+              { id: "a", parent: "b", userPreferences: { reluctance: 3.0 } },
+              { id: "b", parent: "a", userPreferences: { reluctance: 4.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("cycle");
+  }
+
+  @Test
+  void theDeduplicationLimitIsTheDefaultIfNotConfigured() {
+    assertThat(map("{}").deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
+  }
+
+  @Test
+  void mapsTheDeduplicationLimit() {
+    var subject = map("{ transfers: { deduplicationLimit: '10s + 0.01 x' } }");
+
+    assertThat(subject.deduplicationLimit().constant()).isEqualTo(Cost.costOfSeconds(10));
+    assertThat(subject.deduplicationLimit().coefficient()).isEqualTo(0.01);
   }
 
   @Test
@@ -284,5 +443,17 @@ class TransferProfilesConfigMapperTest {
 
   private static Duration maxDuration(TransferProfilesParameters<RouteRequest> parameters) {
     return parameters.maxDurations(TransferProfileType.WALK).maxDuration();
+  }
+
+  private static WalkProfileParameters<RouteRequest> profile(
+    TransferProfilesParameters<RouteRequest> parameters,
+    String id
+  ) {
+    return parameters
+      .walk()
+      .stream()
+      .filter(p -> p.id().equals(id))
+      .findFirst()
+      .orElseThrow();
   }
 }

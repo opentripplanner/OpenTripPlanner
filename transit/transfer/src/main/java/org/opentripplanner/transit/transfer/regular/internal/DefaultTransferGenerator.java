@@ -3,15 +3,18 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -35,6 +38,9 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
   private final TransferProfiles<P, R> profiles;
   private final RegularTransferBuildRepository<P> buildRepository;
   private final Set<Integer> stopsUsedInTransfers = ConcurrentHashMap.newKeySet();
+
+  /** The number of paths of a profile (by id) that are the paths of its parent. */
+  private final Map<String, LongAdder> sharedPaths = new ConcurrentHashMap<>();
 
   public DefaultTransferGenerator(
     RaptorStopIndex stopIndex,
@@ -61,8 +67,10 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
     var stops = listAllStops();
     var progress = ProgressTracker.track("Generate regular transfers", 1000, stops.size());
     stops.parallelStream().forEach(stop -> {
+      // The paths found for this stop, the parents are generated before their children
+      var pathsOfThisStop = new HashMap<TransferProfile<P, R>, Map<Integer, P>>();
       for (var profile : profiles) {
-        generateForStop(profile, stop);
+        pathsOfThisStop.put(profile, generateForStop(profile, stop, pathsOfThisStop));
       }
       progress.step(m -> LOG.info(m));
     });
@@ -97,6 +105,17 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
         profile.id(),
         profile.userPreferences()
       );
+      if (profile.parent() != null) {
+        long shared = sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum();
+        LOG.info(
+          "Profile '{}': {} of {} paths ({}%) are the paths of the parent '{}', they are stored once.",
+          profile.id(),
+          shared,
+          size,
+          size == 0 ? "0" : String.format(Locale.ROOT, "%.1f", (100.0 * shared) / size),
+          profile.parent().id()
+        );
+      }
       sum += size;
     }
     LOG.info(
@@ -113,8 +132,20 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
    * Only the cheapest (generalized-cost) candidate per target stop is kept. We assume that the
    * difference between the best time and generalized-cost is small. The {@link TransferSearch} may
    * return multiple candidates for the same target stop.
+   * <p>
+   * If the profile has a parent, the path of the parent is used instead of the path found for a
+   * target stop if it is equivalent: re-costed with the preferences of this profile, it costs
+   * about the same, see {@link DeduplicationLimit}. The path is then stored once, for both
+   * profiles.
+   *
+   * @param pathsOfThisStop the paths found for this stop so far, by profile and target stop
+   * @return the paths of the profile from the stop, by target stop
    */
-  private void generateForStop(TransferProfile<P, R> profile, FeedScopedId fromStopId) {
+  private Map<Integer, P> generateForStop(
+    TransferProfile<P, R> profile,
+    FeedScopedId fromStopId,
+    Map<TransferProfile<P, R>, Map<Integer, P>> pathsOfThisStop
+  ) {
     int fromStop = requireStopIndex(fromStopId);
     Map<Integer, TransferPath<P>> bestCandidatePerTargetStop = new HashMap<>();
 
@@ -131,10 +162,20 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
       }
     }
 
+    var parentPaths =
+      profile.parent() == null
+        ? Map.<Integer, P>of()
+        : pathsOfThisStop.getOrDefault(profile.parent(), Map.of());
     Map<Integer, P> pathsByToStop = new HashMap<>();
-    bestCandidatePerTargetStop.forEach((toStop, candidate) ->
-      pathsByToStop.put(toStop, candidate.path())
-    );
+    bestCandidatePerTargetStop.forEach((toStop, candidate) -> {
+      var parentPath = parentPaths.get(toStop);
+      if (parentPath != null && isEquivalent(profile, candidate, parentPath)) {
+        pathsByToStop.put(toStop, parentPath);
+        sharedPaths.computeIfAbsent(profile.id(), id -> new LongAdder()).increment();
+      } else {
+        pathsByToStop.put(toStop, candidate.path());
+      }
+    });
     if (!pathsByToStop.isEmpty()) {
       stopsUsedInTransfers.add(fromStop);
       stopsUsedInTransfers.addAll(pathsByToStop.keySet());
@@ -143,6 +184,21 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
     synchronized (this) {
       buildRepository.setPaths(profile.userPreferences(), fromStop, pathsByToStop);
     }
+    return pathsByToStop;
+  }
+
+  /**
+   * The path of the parent is equivalent to the path found by the profile if its cost for the
+   * profile, is close to the cost of the path the profile found.
+   */
+  private boolean isEquivalent(TransferProfile<P, R> profile, TransferPath<P> own, P parentPath) {
+    return profile
+      .search()
+      .computePathCriteria(parentPath)
+      .map(criteria ->
+        profiles.deduplicationLimit().isEquivalent(criteria.c1(), own.criteria().c1())
+      )
+      .orElse(false);
   }
 
   private int requireStopIndex(FeedScopedId stopId) {

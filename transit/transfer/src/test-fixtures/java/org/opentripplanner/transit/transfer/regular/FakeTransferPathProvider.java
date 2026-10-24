@@ -24,6 +24,16 @@ public class FakeTransferPathProvider
 {
 
   private final Map<FeedScopedId, List<FakePath>> byStop = new HashMap<>();
+  private final Map<CostKey, Integer> costOverrides = new HashMap<>();
+
+  /**
+   * Set the cost of {@code path} under the given {@code reluctance}, instead of the cost scaled by
+   * the reluctance. Used to make profiles find different best paths.
+   */
+  public FakeTransferPathProvider withCost(FakePath path, double reluctance, int cost) {
+    costOverrides.put(new CostKey(path, reluctance), cost);
+    return this;
+  }
 
   public FakePath addNearby(
     FeedScopedId from,
@@ -58,11 +68,17 @@ public class FakeTransferPathProvider
 
       @Override
       public Optional<PathCriteria> computePathCriteria(FakePath path) {
-        int cost = (int) Math.round(path.baseCost() * request.reluctance().value());
+        var override = costOverrides.get(new CostKey(path, request.reluctance().value()));
+        int cost =
+          override != null
+            ? override
+            : (int) Math.round(path.baseCost() * request.reluctance().value());
         return Optional.of(new PathCriteria(cost, path.baseDurationSeconds()));
       }
     };
   }
+
+  private record CostKey(FakePath path, double reluctance) {}
 
   public record FakePath(
     FeedScopedId from,

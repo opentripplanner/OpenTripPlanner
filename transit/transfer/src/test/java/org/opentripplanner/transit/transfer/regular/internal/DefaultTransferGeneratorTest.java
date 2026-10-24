@@ -6,11 +6,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
@@ -170,5 +172,117 @@ class DefaultTransferGeneratorTest {
     generator.generateTransfersForAllStops();
 
     assertThat(generator.listAllStopsUsedInTransfers()).containsExactly(A, B);
+  }
+
+  /**
+   * The parent finds {@code p1}. Under the preferences of the child, {@code p1} costs 210 and
+   * {@code p2} costs 200, so the child finds {@code p2}. The two paths are different instances.
+   */
+  private static final class ParentAndChild {
+
+    final FakeTransferPathProvider provider = new FakeTransferPathProvider();
+    final FakeTransferPathProvider.FakePath p1 = provider.addNearby(A, B, 100, 60);
+    final FakeTransferPathProvider.FakePath p2 = provider.addNearby(A, B, 100, 61);
+    final WalkPreferences parent = withReluctance(1.0);
+    final WalkPreferences child = withReluctance(2.0);
+
+    ParentAndChild() {
+      provider.withCost(p1, 2.0, 210).withCost(p2, 2.0, 200);
+    }
+
+    /** The path from A to B found for the preferences, after the transfers are generated. */
+    FakeTransferPathProvider.FakePath generateAndFindPath(
+      List<WalkProfileParameters<WalkPreferences>> profiles,
+      DeduplicationLimit limit,
+      WalkPreferences forPreferences
+    ) {
+      var stopIndex = stopIndex();
+      var buildRepository =
+        new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
+      new DefaultTransferGenerator<>(
+        stopIndex,
+        new TransferProfilesParameters<>(profiles, MaxDurationsPreference.DEFAULT, Map.of(), limit),
+        provider,
+        FakeRequestMapper.INSTANCE,
+        buildRepository
+      ).generateTransfersForAllStops();
+      return TestLifecycles.initialSnapshot(buildRepository)
+        .forRequest(forPreferences)
+        .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B));
+    }
+
+    WalkProfileParameters<WalkPreferences> parentProfile() {
+      return new WalkProfileParameters<>("parent", null, parent, parent);
+    }
+
+    WalkProfileParameters<WalkPreferences> childProfile(String parentId) {
+      return new WalkProfileParameters<>("child", parentId, child, child);
+    }
+  }
+
+  @Test
+  void aChildUsesThePathOfItsParentIfTheCostIsEquivalent() {
+    var test = new ParentAndChild();
+
+    var path = test.generateAndFindPath(
+      List.of(test.parentProfile(), test.childProfile("parent")),
+      DeduplicationLimit.DEFAULT,
+      test.child
+    );
+
+    assertThat(path).isSameInstanceAs(test.p1);
+  }
+
+  @Test
+  void aChildKeepsItsOwnPathIfTheCostIsNotEquivalent() {
+    var test = new ParentAndChild();
+
+    // p1 costs 10 more for the child, the limit does not accept any difference
+    var path = test.generateAndFindPath(
+      List.of(test.parentProfile(), test.childProfile("parent")),
+      new DeduplicationLimit(Cost.ZERO, 0.0),
+      test.child
+    );
+
+    assertThat(path).isSameInstanceAs(test.p2);
+  }
+
+  @Test
+  void aProfileWithoutAParentKeepsItsOwnPath() {
+    var test = new ParentAndChild();
+
+    var path = test.generateAndFindPath(
+      List.of(test.parentProfile(), test.childProfile(null)),
+      DeduplicationLimit.DEFAULT,
+      test.child
+    );
+
+    assertThat(path).isSameInstanceAs(test.p2);
+  }
+
+  @Test
+  void theParentKeepsItsOwnPath() {
+    var test = new ParentAndChild();
+
+    var path = test.generateAndFindPath(
+      List.of(test.parentProfile(), test.childProfile("parent")),
+      DeduplicationLimit.DEFAULT,
+      test.parent
+    );
+
+    assertThat(path).isSameInstanceAs(test.p1);
+  }
+
+  @Test
+  void aChildDeclaredBeforeItsParentIsStillDeduplicated() {
+    var test = new ParentAndChild();
+
+    var path = test.generateAndFindPath(
+      List.of(test.childProfile("parent"), test.parentProfile()),
+      DeduplicationLimit.DEFAULT,
+      test.child
+    );
+
+    assertThat(path).isSameInstanceAs(test.p1);
   }
 }
