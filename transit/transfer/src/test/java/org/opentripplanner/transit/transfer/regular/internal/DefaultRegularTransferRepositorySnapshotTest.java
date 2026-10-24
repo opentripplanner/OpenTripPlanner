@@ -21,10 +21,12 @@ import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -119,6 +121,91 @@ class DefaultRegularTransferRepositorySnapshotTest {
     assertThat(transfers.findPath(A, C)).isNull();
 
     assertThat(mapper.toUserPreferencesCalls).isEqualTo(1);
+  }
+
+  /**
+   * Two profiles with their own paths: {@code far} (reluctance 10) has the path A -> C, and
+   * {@code near} (reluctance 1) has the path A -> B. The warmup entry, with the reluctance 3 and
+   * {@code far} as its parent, is closer to a request with the reluctance 2.5 than {@code near}.
+   */
+  private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> snapshotWithWarmup(
+    boolean withWarmupEntry
+  ) {
+    var near = withReluctance(1.0);
+    var far = withReluctance(10.0);
+    var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
+    buildRepository.setPaths(near, A, Map.of(B, path(A, B, 100)));
+    buildRepository.setPaths(far, A, Map.of(C, path(A, C, 200)));
+    var warmup = withWarmupEntry
+      ? List.of(new WarmupParameters("warm", "far", withReluctance(3.0)))
+      : List.<WarmupParameters>of();
+    var lifecycle = new RegularTransferRepositoryLifecycle<>(
+      provider,
+      FakeRequestMapper.INSTANCE,
+      new TransferProfilesParameters<>(
+        List.of(
+          new WalkProfileParameters<>("near", near, near),
+          new WalkProfileParameters<>("far", far, far)
+        ),
+        MaxDurationsPreference.DEFAULT,
+        Map.of(),
+        DeduplicationLimit.DEFAULT,
+        warmup
+      ),
+      stopIndex().size()
+    );
+    return lifecycle.freeze(buildRepository.createRuntimeRepository());
+  }
+
+  @Test
+  void warmUpCreatesTheTransfersOfTheWarmupEntriesBeforeTheFirstRequest() {
+    var snapshot = snapshotWithWarmup(true);
+    assertThat(provider.searches).isEqualTo(0);
+
+    snapshot.warmUp();
+
+    assertThat(provider.searches).isEqualTo(1);
+    // The first request with the preferences of the entry does not create the transfers again
+    var transfers = snapshot.forRequest(withReluctance(3.0)).raptorTransfers();
+    assertThat(provider.searches).isEqualTo(1);
+    assertThat(from(transfers, A)).containsExactly(tx(C, 600));
+  }
+
+  @Test
+  void warmUpDoesNothingWithoutWarmupEntries() {
+    snapshotWithWarmup(false).warmUp();
+
+    assertThat(provider.searches).isEqualTo(0);
+  }
+
+  @Test
+  void aRequestCloserToAWarmupEntryThanToAProfileUsesTheParentsPaths() {
+    var snapshot = snapshotWithWarmup(true);
+
+    var transfers = snapshot.forRequest(withReluctance(2.5));
+
+    // The warmup entry (reluctance 3) is closer than the profile 'near' (reluctance 1)
+    assertThat(transfers.findPath(A, C)).isEqualTo(path(A, C, 200));
+    assertThat(transfers.findPath(A, B)).isNull();
+  }
+
+  @Test
+  void withoutTheWarmupEntryTheClosestProfileIsUsed() {
+    var snapshot = snapshotWithWarmup(false);
+
+    var transfers = snapshot.forRequest(withReluctance(2.5));
+
+    assertThat(transfers.findPath(A, B)).isEqualTo(path(A, B, 100));
+    assertThat(transfers.findPath(A, C)).isNull();
+  }
+
+  @Test
+  void aProfileThatMatchesExactlyIsUsedEvenIfAWarmupEntryIsClose() {
+    var snapshot = snapshotWithWarmup(true);
+
+    var transfers = snapshot.forRequest(withReluctance(1.0));
+
+    assertThat(transfers.findPath(A, B)).isEqualTo(path(A, B, 100));
   }
 
   @Test

@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
@@ -33,20 +35,55 @@ public final class ProfileUserPreferences {
     TransferRequestMapper<R> mapper
   ) {
     var result = new LinkedHashMap<AbstractUserPreferences<?>, WalkProfileParameters<R>>();
+    var idsByPreferences = new HashMap<AbstractUserPreferences<?>, String>();
     for (var profile : parameters.walk()) {
       var preferences = resolve(profile, mapper);
-      var other = result.put(preferences, profile);
-      if (other != null) {
-        throw new IllegalArgumentException(
-          "The transfer profiles '" +
-            other.id() +
-            "' and '" +
-            profile.id() +
-            "' have the same user preferences, the user preferences must be unique: " +
-            preferences
-        );
-      }
+      result.put(preferences, profile);
+      assertUnique(idsByPreferences.put(preferences, profile.id()), profile.id(), preferences);
+    }
+    for (var entry : parameters.warmup()) {
+      assertUnique(
+        idsByPreferences.put(entry.userPreferences(), entry.id()),
+        entry.id(),
+        entry.userPreferences()
+      );
     }
     return result;
+  }
+
+  /**
+   * The warmup entries by their user preferences, with the user preferences of the parent profile
+   * of each entry.
+   */
+  static <R> Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> warmupParents(
+    TransferProfilesParameters<R> parameters,
+    TransferRequestMapper<R> mapper
+  ) {
+    var preferencesById = new HashMap<String, AbstractUserPreferences<?>>();
+    for (var profile : parameters.walk()) {
+      preferencesById.put(profile.id(), resolve(profile, mapper));
+    }
+    var result = new LinkedHashMap<AbstractUserPreferences<?>, AbstractUserPreferences<?>>();
+    for (var entry : parameters.warmup()) {
+      result.put(entry.userPreferences(), preferencesById.get(entry.parent()));
+    }
+    return result;
+  }
+
+  private static void assertUnique(
+    @Nullable String otherId,
+    String id,
+    AbstractUserPreferences<?> preferences
+  ) {
+    if (otherId != null) {
+      throw new IllegalArgumentException(
+        "The transfer profiles '" +
+          otherId +
+          "' and '" +
+          id +
+          "' have the same user preferences, the user preferences must be unique: " +
+          preferences
+      );
+    }
   }
 }

@@ -79,6 +79,11 @@ final class OverlaidTemplatePaths<P> {
     return true;
   }
 
+  /** Were transfers generated under {@code profile} at graph build? */
+  boolean hasProfile(AbstractUserPreferences<?> profile) {
+    return base.profiles().contains(profile);
+  }
+
   /** See {@link TemplatePathsByUserProfile#closestProfile}. */
   @Nullable
   AbstractUserPreferences<?> closestProfile(AbstractUserPreferences<?> userPreferences) {

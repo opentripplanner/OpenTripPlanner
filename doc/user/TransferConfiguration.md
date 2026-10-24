@@ -35,6 +35,11 @@ or from the default request if it has none. The user preferences of the profiles
 not the `routingDefaults` of `router-config.json`, since the router configuration is not available
 when the graph is built.
 
+**Warmup.** The transfers for the preferences of a routing request are created the first time a
+request needs them, and cached. A warmup entry lets OTP create them when the server starts, for
+preferences that are common in the requests but are not worth a profile of their own. See
+[Warmup](#warmup).
+
 **Parent.** A profile can be based on another profile, its `parent`. The profile inherits the
 `routingRequest` and the `userPreferences` of the parent, and only has to set what is different. The
 transfers the profile and its parent have in common are stored once, which saves memory. See
@@ -60,7 +65,14 @@ transfers the profile and its parent have in common are stored once, which saves
           "userPreferences": { "speed": 0.9, "reluctance": 4.0, "stairs": "DISCOURAGED" }
         }
       ],
-      "maxDurations": [{ "maxDuration": "40m" }]
+      "maxDurations": [{ "maxDuration": "40m" }],
+      "warmup": [
+        {
+          "id": "avoid-walking",
+          "parent": "walk",
+          "userPreferences": { "speed": 1.15, "reluctance": 10.0 }
+        }
+      ]
     }
   }
 }
@@ -82,6 +94,10 @@ request and a max duration of 30 minutes is used.
 | &nbsp;&nbsp;`routingRequest`  | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.             |                   |
 | `walk.maxDurations`           | `object[]` | The max duration of the walk transfers. One entry. See below.                       |                   |
 | &nbsp;&nbsp;`maxDuration`     | `duration` | **Required** in the entry. How far from a stop the transfers are searched.          |                   |
+| `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
+| &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
+| &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of the profile the transfers are created from.               |                   |
+| &nbsp;&nbsp;`userPreferences` | `object`   | **Required.** The preferences to warm up. Unset values are the ones of the parent.  |                   |
 
 ### User preferences
 
@@ -130,6 +146,38 @@ Use a parent for profiles that are close to another profile, like a slightly slo
 profile that is very different from its parent, like one that avoids stairs, shares fewer paths.
 For each transfer of a profile, the graph build re-costs the path of the parent once more.
 
+### Warmup
+
+When a routing request arrives, OTP creates the transfers for the preferences of the request, by
+re-calculating the duration and the cost of the stored transfers of a profile. This takes a moment,
+and it is done by the first request with these preferences. The result is cached, so the following
+requests are fast.
+
+A `warmup` entry creates the transfers for some preferences when the server starts, before the first
+request. Use it for the preferences that are common in the requests, for example the default
+preferences of a client, but that are not different enough from a profile to be worth a profile of
+their own. A warmup entry needs:
+
+- an `id`, unique among all profiles and warmup entries. It is used in the logs.
+- a `parent`, the `id` of a profile. The transfers are created from the stored transfers of the
+  parent, and the entry inherits the preferences of the parent. A warmup entry can not be a parent.
+- `userPreferences`. They must be different from the preferences of every profile and every other
+  warmup entry.
+
+No transfers are searched for or stored for a warmup entry, so it adds nothing to the graph. A
+request with preferences that are closest to a warmup entry uses the stored transfers of the parent
+of the entry, like a request that is closest to the parent.
+
+The server start waits for the transfers to be created. The time of each entry is logged:
+
+```
+Warmed up the Routing Transfer Cache for 'avoid-walking' from the paths of 'walk' in 170 ms.
+```
+
+Only the entries in `warmup` are created at start. The transfers for the preferences of a profile
+are created by the first request that uses them, like any other preferences. The cache holds a
+limited number of preference sets, and the least recently used are dropped first.
+
 ### Max durations
 
 The max duration is how far from a stop the transfers are searched when the graph is built, measured
@@ -153,7 +201,6 @@ re-calculated for a routing request, even if the request walks slower than the p
 
 These parameters are reserved for later. OTP stops with an error if they are used:
 
-- `warmup`, to fill the cache of transfers with preferences that are common.
 - `allowedModes` in `maxDurations`, to give stops that car or bicycle can use a longer duration.
 
 The profile types `wheelchair`, `bicycle`, `scooter` and `car` are not read yet. They are reported

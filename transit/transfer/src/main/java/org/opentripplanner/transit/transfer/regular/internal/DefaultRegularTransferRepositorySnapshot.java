@@ -1,11 +1,14 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link RegularTransferRepositorySnapshot}, created by
@@ -22,21 +25,48 @@ class DefaultRegularTransferRepositorySnapshot<
   R
 > implements RegularTransferRepositorySnapshot<P, R> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(
+    DefaultRegularTransferRepositorySnapshot.class
+  );
+
   private final OverlaidTemplatePaths<P> paths;
   private final RegularTransferServiceCache<RaptorTransferStore> cache;
   private final CacheFactory cacheFactory;
   private final TransferRequestMapper<R> mapper;
+  private final ProfileMatcher matcher;
+  private final List<WarmupEntry> warmup;
+
+  /** A warmup entry, with the user preferences resolved. */
+  record WarmupEntry(String id, String parent, AbstractUserPreferences<?> userPreferences) {}
 
   DefaultRegularTransferRepositorySnapshot(
     OverlaidTemplatePaths<P> paths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
     RaptorTransfersFactory<P, R> raptorTransfersFactory,
-    TransferRequestMapper<R> mapper
+    TransferRequestMapper<R> mapper,
+    ProfileMatcher matcher,
+    List<WarmupEntry> warmup
   ) {
     this.paths = paths;
     this.cache = cache;
     this.mapper = mapper;
+    this.matcher = matcher;
+    this.warmup = List.copyOf(warmup);
     this.cacheFactory = new CacheFactory(raptorTransfersFactory);
+  }
+
+  @Override
+  public void warmUp() {
+    for (var entry : warmup) {
+      long start = System.currentTimeMillis();
+      cache.get(entry.userPreferences(), cacheFactory);
+      LOG.info(
+        "Warmed up the Routing Transfer Cache for '{}' from the paths of '{}' in {} ms.",
+        entry.id(),
+        entry.parent(),
+        System.currentTimeMillis() - start
+      );
+    }
   }
 
   @Override
@@ -47,7 +77,7 @@ class DefaultRegularTransferRepositorySnapshot<
       cache,
       cacheFactory,
       userPreferences,
-      paths.closestProfile(userPreferences)
+      matcher.closestProfile(paths, userPreferences)
     );
   }
 
@@ -77,7 +107,7 @@ class DefaultRegularTransferRepositorySnapshot<
       return raptorTransfersFactory.create(
         paths,
         userPreferences,
-        paths.closestProfile(userPreferences)
+        matcher.closestProfile(paths, userPreferences)
       );
     }
 
@@ -90,7 +120,7 @@ class DefaultRegularTransferRepositorySnapshot<
       return raptorTransfersFactory.patch(
         paths,
         userPreferences,
-        paths.closestProfile(userPreferences),
+        matcher.closestProfile(paths, userPreferences),
         previous,
         changedFromStops
       );

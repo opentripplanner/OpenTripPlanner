@@ -6,14 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.WarmupParameters;
 
 class TransferProfilesTest {
 
@@ -123,5 +126,40 @@ class TransferProfilesTest {
 
   private static WalkPreferences withReluctance(double reluctance) {
     return WalkPreferences.of().withReluctance(Reluctance.of(reluctance)).build();
+  }
+
+  @Test
+  void aWarmupEntryWithTheUserPreferencesOfAProfileIsRejectedAndNamed() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>("walk", withReluctance(2.0), withReluctance(2.0))),
+      MaxDurationsPreference.DEFAULT,
+      Map.of(),
+      DeduplicationLimit.DEFAULT,
+      List.of(new WarmupParameters("same", "walk", withReluctance(2.0)))
+    );
+
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TransferProfiles.of(parameters, new FakeTransferPathProvider(), FakeRequestMapper.INSTANCE)
+    );
+    assertThat(ex).hasMessageThat().contains("'walk'");
+    assertThat(ex).hasMessageThat().contains("'same'");
+  }
+
+  @Test
+  void warmupEntriesWithTheSameUserPreferencesAreRejected() {
+    var parameters = new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>("walk", withReluctance(2.0), withReluctance(2.0))),
+      MaxDurationsPreference.DEFAULT,
+      Map.of(),
+      DeduplicationLimit.DEFAULT,
+      List.of(
+        new WarmupParameters("a", "walk", withReluctance(5.0)),
+        new WarmupParameters("b", "walk", withReluctance(5.0))
+      )
+    );
+
+    assertThrows(IllegalArgumentException.class, () ->
+      TransferProfiles.of(parameters, new FakeTransferPathProvider(), FakeRequestMapper.INSTANCE)
+    );
   }
 }

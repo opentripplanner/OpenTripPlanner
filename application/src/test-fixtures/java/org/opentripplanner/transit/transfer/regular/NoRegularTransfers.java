@@ -56,6 +56,14 @@ public final class NoRegularTransfers {
       }
     };
 
-  private static final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> SNAPSHOT = _ ->
-    TRANSFERS;
+  private static final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> SNAPSHOT =
+    new RegularTransferRepositorySnapshot<>() {
+      @Override
+      public RegularTransfersService<NearbyStop> forRequest(RouteRequest request) {
+        return TRANSFERS;
+      }
+
+      @Override
+      public void warmUp() {}
+    };
 }

@@ -88,9 +88,12 @@ public final class RegularTransferFactory {
     TransferRequestMapper<R> mapper,
     int numberOfStops
   ) {
-    return repositoryRegistry.registerRepository(
+    var handle = repositoryRegistry.registerRepository(
       buildRepository.createRuntimeRepository(),
       new RegularTransferRepositoryLifecycle<>(pathProvider, mapper, parameters, numberOfStops)
     );
+    // Create the Raptor transfers of the warmup entries before the first request
+    handle.repositorySnapshot(repositoryRegistry.scope()).warmUp();
+    return handle;
   }
 }

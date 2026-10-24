@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
+import org.opentripplanner.core.model.basic.Speed;
 
 class TransferProfilesParametersTest {
 
@@ -167,5 +168,70 @@ class TransferProfilesParametersTest {
     );
 
     assertThat(subject.deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
+  }
+
+  private static TransferProfilesParameters<String> withWarmup(WarmupParameters... warmup) {
+    return new TransferProfilesParameters<>(
+      List.of(new WalkProfileParameters<>("walk", WALK, "walk")),
+      MaxDurationsPreference.DEFAULT,
+      Map.of(),
+      DeduplicationLimit.DEFAULT,
+      List.of(warmup)
+    );
+  }
+
+  @Test
+  void keepsTheWarmupEntries() {
+    var entry = new WarmupParameters("avoid", "walk", OTHER_WALK);
+
+    assertThat(withWarmup(entry).warmup()).containsExactly(entry);
+  }
+
+  @Test
+  void theParentOfAWarmupEntryMustBeAProfile() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(new WarmupParameters("avoid", "missing", OTHER_WALK))
+    );
+    assertThat(ex).hasMessageThat().contains("'missing'");
+    assertThat(ex).hasMessageThat().contains("'avoid'");
+  }
+
+  @Test
+  void aWarmupEntryCanNotBeTheParentOfAnotherWarmupEntry() {
+    assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(
+        new WarmupParameters("a", "walk", OTHER_WALK),
+        new WarmupParameters(
+          "b",
+          "a",
+          WalkPreferences.of().withReluctance(Reluctance.of(7.0)).build()
+        )
+      )
+    );
+  }
+
+  @Test
+  void aWarmupIdMustBeUniqueAmongTheProfilesAndTheWarmupEntries() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(new WarmupParameters("walk", "walk", OTHER_WALK))
+    );
+    assertThat(ex).hasMessageThat().contains("walk");
+    assertThrows(IllegalArgumentException.class, () ->
+      withWarmup(
+        new WarmupParameters("a", "walk", OTHER_WALK),
+        new WarmupParameters(
+          "a",
+          "walk",
+          WalkPreferences.of().withSpeed(Speed.ofMetersPerSecond(1.0)).build()
+        )
+      )
+    );
+  }
+
+  @Test
+  void aWarmupEntryNeedsAnIdAParentAndPreferences() {
+    assertThrows(IllegalArgumentException.class, () -> new WarmupParameters(" ", "walk", WALK));
+    assertThrows(IllegalArgumentException.class, () -> new WarmupParameters("a", " ", WALK));
+    assertThrows(NullPointerException.class, () -> new WarmupParameters("a", "walk", null));
   }
 }

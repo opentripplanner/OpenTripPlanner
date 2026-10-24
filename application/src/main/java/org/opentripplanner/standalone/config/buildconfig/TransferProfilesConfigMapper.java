@@ -21,6 +21,7 @@ import org.opentripplanner.transit.transfer.regular.api.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
 
@@ -85,12 +86,9 @@ public class TransferProfilesConfigMapper {
       )
       .asObject();
 
-    var profiles = mapProfiles(walk);
-    if (walk.exist("warmup")) {
-      throw new OtpAppException(
-        "'warmup' is not supported yet in the transfer configuration, in " + walk.contextPath()
-      );
-    }
+    var mappedProfiles = mapProfiles(walk);
+    var profiles = mappedProfiles.profiles();
+    var warmup = mapWarmup(walk, mappedProfiles.preferencesById());
 
     var maxDurations = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
@@ -100,7 +98,13 @@ public class TransferProfilesConfigMapper {
       maxDurations.put(TransferProfileType.WALK, walkMaxDurations);
     }
 
-    return createParameters(profiles, defaultMaxDurations, maxDurations, deduplicationLimit);
+    return createParameters(
+      profiles,
+      defaultMaxDurations,
+      maxDurations,
+      deduplicationLimit,
+      warmup
+    );
   }
 
   /**
@@ -111,14 +115,16 @@ public class TransferProfilesConfigMapper {
     List<WalkProfileParameters<RouteRequest>> profiles,
     MaxDurationsPreference defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    DeduplicationLimit deduplicationLimit
+    DeduplicationLimit deduplicationLimit,
+    List<WarmupParameters> warmup
   ) {
     try {
       var parameters = new TransferProfilesParameters<>(
         profiles,
         defaultMaxDurations,
         maxDurations,
-        deduplicationLimit
+        deduplicationLimit,
+        warmup
       );
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
@@ -209,11 +215,17 @@ public class TransferProfilesConfigMapper {
   /** A profile with the values that are inherited by its children. */
   private record ResolvedProfile(RouteRequest request, WalkPreferences userPreferences) {}
 
+  /** The mapped profiles, and the user preferences of each profile, by id, after inheritance. */
+  private record MappedProfiles(
+    List<WalkProfileParameters<RouteRequest>> profiles,
+    Map<String, WalkPreferences> preferencesById
+  ) {}
+
   /**
    * Map the profiles of the walk type. A profile inherits unset values from its parent, so the
    * parents are mapped first, whatever order they are declared in.
    */
-  private static List<WalkProfileParameters<RouteRequest>> mapProfiles(NodeAdapter walk) {
+  private static MappedProfiles mapProfiles(NodeAdapter walk) {
     var configured = walk
       .of("profiles")
       .since(V2_10)
@@ -229,7 +241,14 @@ public class TransferProfilesConfigMapper {
       )
       .asObjects(List.of(), TransferProfilesConfigMapper::readConfiguredProfile);
     if (configured.isEmpty()) {
-      return List.of(defaultWalkProfile());
+      var profile = defaultWalkProfile();
+      return new MappedProfiles(
+        List.of(profile),
+        Map.of(
+          profile.id(),
+          new RegularTransferPreferencesMapper().toUserPreferences(profile.routingRequest())
+        )
+      );
     }
 
     List<ConfiguredProfile> parentsFirst;
@@ -287,10 +306,82 @@ public class TransferProfilesConfigMapper {
       );
     }
     // Keep the declared order
-    return configured
-      .stream()
-      .map(p -> mapped.get(p.id()))
-      .toList();
+    var preferencesById = new HashMap<String, WalkPreferences>();
+    resolved.forEach((id, profile) -> preferencesById.put(id, profile.userPreferences()));
+    return new MappedProfiles(
+      configured
+        .stream()
+        .map(p -> mapped.get(p.id()))
+        .toList(),
+      preferencesById
+    );
+  }
+
+  /**
+   * Map the warmup entries. The preferences of an entry inherit the preferences of its parent
+   * profile, so an entry only sets what is different.
+   */
+  private static List<WarmupParameters> mapWarmup(
+    NodeAdapter walk,
+    Map<String, WalkPreferences> preferencesById
+  ) {
+    return walk
+      .of("warmup")
+      .since(V2_10)
+      .summary("The user preferences to create the Raptor transfers for when the server starts.")
+      .description(
+        """
+        Each entry needs an `id`, a `parent` and `userPreferences`. The `id` must be unique among
+        all the profiles and warmup entries, and the `parent` is the `id` of a profile. The
+        Raptor transfers for the `userPreferences` are created from the paths of the parent when the
+        server starts, so the first request with these preferences does not wait for them. No paths
+        are searched for or stored for a warmup entry. Use warmup for preferences that are common in
+        the requests, but are not worth a profile of their own.
+        """
+      )
+      .asObjects(List.of(), entry -> mapWarmupEntry(entry, preferencesById));
+  }
+
+  private static WarmupParameters mapWarmupEntry(
+    NodeAdapter entry,
+    Map<String, WalkPreferences> preferencesById
+  ) {
+    var id = entry
+      .of("id")
+      .since(V2_10)
+      .summary("The id of the warmup entry.")
+      .description("Identifies the entry in the logs. It must be unique among all the profiles.")
+      .asString();
+    var parent = entry
+      .of("parent")
+      .since(V2_10)
+      .summary("The id of the profile the Raptor transfers are created from.")
+      .asString();
+    var parentPreferences = preferencesById.get(parent);
+    if (parentPreferences == null) {
+      throw new OtpAppException(
+        "Invalid transfer configuration: The parent '" +
+          parent +
+          "' of the warmup '" +
+          id +
+          "' is not a profile"
+      );
+    }
+    if (!entry.exist("userPreferences")) {
+      throw new OtpAppException(
+        "Invalid transfer configuration: The warmup '" + id + "' needs 'userPreferences'"
+      );
+    }
+    var userPreferences = mapWalkPreferences(
+      entry
+        .of("userPreferences")
+        .since(V2_10)
+        .summary("The user preferences to warm up.")
+        .description("Unset values are the values of the parent.")
+        .asObject(),
+      parentPreferences
+    );
+    return new WarmupParameters(id, parent, userPreferences);
   }
 
   private static ConfiguredProfile readConfiguredProfile(NodeAdapter p) {

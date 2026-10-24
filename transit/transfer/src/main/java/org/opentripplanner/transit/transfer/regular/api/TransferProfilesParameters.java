@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.opentripplanner.utils.collection.ParentOrder;
 
 /**
@@ -22,16 +23,22 @@ import org.opentripplanner.utils.collection.ParentOrder;
  *                            type. This is one configuration per type, it replaces the default.
  * @param deduplicationLimit  when the path of a parent profile is used instead of a path of the
  *                            profile itself, see {@link DeduplicationLimit}
+ * @param warmup              the preferences to create Raptor transfers for when the server starts,
+ *                            see {@link WarmupParameters}. The ids must be unique among the
+ *                            profiles and the warmup entries, and the parent of an entry must be a
+ *                            profile.
  * @param <R>                 the request type, opaque to the module
  */
 public record TransferProfilesParameters<R>(
   List<WalkProfileParameters<R>> walk,
   MaxDurationsPreference defaultMaxDurations,
   Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-  DeduplicationLimit deduplicationLimit
+  DeduplicationLimit deduplicationLimit,
+  List<WarmupParameters> warmup
 ) {
   public TransferProfilesParameters {
     walk = List.copyOf(walk);
+    warmup = List.copyOf(warmup);
     Objects.requireNonNull(defaultMaxDurations);
     Objects.requireNonNull(deduplicationLimit);
     maxDurations = maxDurations.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(maxDurations));
@@ -48,6 +55,21 @@ public record TransferProfilesParameters<R>(
     }
     // Check that the parents exist, and that they do not form a cycle
     ParentOrder.parentsFirst(walk, WalkProfileParameters::id, WalkProfileParameters::parent);
+    for (var entry : warmup) {
+      if (!ids.add(entry.id())) {
+        throw new IllegalArgumentException(
+          "Duplicate transfer profile id, the ids must be unique: " + entry.id()
+        );
+      }
+    }
+    var profileIds = walk.stream().map(WalkProfileParameters::id).collect(Collectors.toSet());
+    for (var entry : warmup) {
+      if (!profileIds.contains(entry.parent())) {
+        throw new IllegalArgumentException(
+          "The parent '" + entry.parent() + "' of the warmup '" + entry.id() + "' is not a profile"
+        );
+      }
+    }
   }
 
   /** The profiles with the default max durations and deduplication limit. */
@@ -61,7 +83,17 @@ public record TransferProfilesParameters<R>(
     MaxDurationsPreference defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations
   ) {
-    this(walk, defaultMaxDurations, maxDurations, DeduplicationLimit.DEFAULT);
+    this(walk, defaultMaxDurations, maxDurations, DeduplicationLimit.DEFAULT, List.of());
+  }
+
+  /** The profiles without warmup entries. */
+  public TransferProfilesParameters(
+    List<WalkProfileParameters<R>> walk,
+    MaxDurationsPreference defaultMaxDurations,
+    Map<TransferProfileType, MaxDurationsPreference> maxDurations,
+    DeduplicationLimit deduplicationLimit
+  ) {
+    this(walk, defaultMaxDurations, maxDurations, deduplicationLimit, List.of());
   }
 
   /** The max durations of {@code type}: its override, or else the default. */

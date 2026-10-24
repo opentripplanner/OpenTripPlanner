@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -43,6 +44,8 @@ public class RegularTransferRepositoryLifecycle<
 
   private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
   private final TransferRequestMapper<R> mapper;
+  private final ProfileMatcher matcher;
+  private final List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup;
 
   /**
    * @param profiles the configuration of the profiles the paths are stored under, the Raptor
@@ -54,7 +57,14 @@ public class RegularTransferRepositoryLifecycle<
     TransferProfilesParameters<R> profiles,
     int numberOfStops
   ) {
-    this(pathProvider, mapper, requestsByProfile(profiles, mapper), numberOfStops);
+    this(
+      pathProvider,
+      mapper,
+      requestsByProfile(profiles, mapper),
+      new ProfileMatcher(ProfileUserPreferences.warmupParents(profiles, mapper)),
+      warmupEntries(profiles),
+      numberOfStops
+    );
   }
 
   RegularTransferRepositoryLifecycle(
@@ -63,6 +73,19 @@ public class RegularTransferRepositoryLifecycle<
     Map<AbstractUserPreferences<?>, R> profileRequests,
     int numberOfStops
   ) {
+    this(pathProvider, mapper, profileRequests, ProfileMatcher.NO_WARMUP, List.of(), numberOfStops);
+  }
+
+  private RegularTransferRepositoryLifecycle(
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    Map<AbstractUserPreferences<?>, R> profileRequests,
+    ProfileMatcher matcher,
+    List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup,
+    int numberOfStops
+  ) {
+    this.matcher = matcher;
+    this.warmup = warmup;
     this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       numberOfStops,
@@ -81,6 +104,22 @@ public class RegularTransferRepositoryLifecycle<
       result.put(preferences, profile.routingRequest())
     );
     return result;
+  }
+
+  private static List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmupEntries(
+    TransferProfilesParameters<?> parameters
+  ) {
+    return parameters
+      .warmup()
+      .stream()
+      .map(w ->
+        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(
+          w.id(),
+          w.parent(),
+          w.userPreferences()
+        )
+      )
+      .toList();
   }
 
   @Override
@@ -108,7 +147,9 @@ public class RegularTransferRepositoryLifecycle<
       frozen.paths(),
       cache,
       raptorTransfersFactory,
-      mapper
+      mapper,
+      matcher,
+      warmup
     );
   }
 
@@ -116,11 +157,11 @@ public class RegularTransferRepositoryLifecycle<
    * The stops whose transfers changed under the profile the Raptor transfers for
    * {@code userPreferences} are derived from.
    */
-  private static Set<Integer> changedFromStops(
+  private Set<Integer> changedFromStops(
     DefaultRegularTransferRepository.Frozen<?> frozen,
     AbstractUserPreferences<?> userPreferences
   ) {
-    var profile = frozen.paths().closestProfile(userPreferences);
+    var profile = matcher.closestProfile(frozen.paths(), userPreferences);
     if (profile == null) {
       return Set.of();
     }
