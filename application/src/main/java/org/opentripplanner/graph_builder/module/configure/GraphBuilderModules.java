@@ -64,7 +64,7 @@ import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 
 /**
  * Configure all modules that are not simple enough to be injected.
@@ -327,7 +327,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static TransferGenerator provideRegularTransferGenerator(
+  static RegularTransferGenerator provideRegularTransferGenerator(
     BuildConfig config,
     Graph graph,
     TransitRepository transitRepository,
@@ -354,7 +354,7 @@ public class GraphBuilderModules {
   @Provides
   @Singleton
   static RegularTransitTransferGenerator provideRegularTransitTransferGenerator(
-    Provider<TransferGenerator> transferGenerator,
+    Provider<RegularTransferGenerator> transferGenerator,
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,

@@ -4,12 +4,12 @@ import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.ProfileUserPreferences;
 import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -50,14 +50,14 @@ public final class RegularTransferFactory {
    * @param <P> the street path type
    * @param <R> the request type
    */
-  public static <P, R> TransferGenerator createTransferGenerator(
+  public static <P, R> RegularTransferGenerator createTransferGenerator(
     RaptorStopIndex stopIndex,
     TransferProfilesParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     RegularTransferBuildRepository<P> buildRepository
   ) {
-    return new DefaultTransferGenerator<>(
+    return new DefaultRegularTransferGenerator<>(
       stopIndex,
       parameters,
       pathProvider,

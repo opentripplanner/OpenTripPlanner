@@ -18,7 +18,7 @@ import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParamete
 import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 
-class DefaultTransferGeneratorTest {
+class DefaultRegularTransferGeneratorTest {
 
   private static final FeedScopedId A = FeedScopedId.of("F", "A");
   private static final FeedScopedId B = FeedScopedId.of("F", "B");
@@ -59,7 +59,7 @@ class DefaultTransferGeneratorTest {
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(
+    var generator = new DefaultRegularTransferGenerator<>(
       stopIndex,
       parameters(userPreferences),
       provider,
@@ -85,7 +85,7 @@ class DefaultTransferGeneratorTest {
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(
+    var generator = new DefaultRegularTransferGenerator<>(
       stopIndex,
       parameters(userPreferences, Duration.ofMinutes(2)),
       provider,
@@ -112,7 +112,7 @@ class DefaultTransferGeneratorTest {
     WalkPreferences userPreferences = withReluctance(1.0);
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(
+    var generator = new DefaultRegularTransferGenerator<>(
       stopIndex(),
       parameters(userPreferences),
       provider,
@@ -138,7 +138,7 @@ class DefaultTransferGeneratorTest {
     var stopIndex = stopIndex();
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    new DefaultTransferGenerator<>(
+    new DefaultRegularTransferGenerator<>(
       stopIndex,
       parameters(userPreferences, Duration.ofMinutes(2)),
       provider,
@@ -161,7 +161,7 @@ class DefaultTransferGeneratorTest {
     WalkPreferences userPreferences = withReluctance(1.0);
     var buildRepository =
       new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-    var generator = new DefaultTransferGenerator<>(
+    var generator = new DefaultRegularTransferGenerator<>(
       stopIndex(),
       parameters(userPreferences),
       provider,
@@ -199,7 +199,7 @@ class DefaultTransferGeneratorTest {
       var stopIndex = stopIndex();
       var buildRepository =
         new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
-      new DefaultTransferGenerator<>(
+      new DefaultRegularTransferGenerator<>(
         stopIndex,
         new TransferProfilesParameters<>(profiles, MaxDurationsPreference.DEFAULT, Map.of(), limit),
         provider,

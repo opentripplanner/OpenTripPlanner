@@ -13,9 +13,9 @@ import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapp
 import org.opentripplanner.transfer.streetadapter.StreetTransferPathProvider;
 import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
@@ -44,7 +44,7 @@ public final class StreetTransferFactory {
    *
    * @param isTransferSource only the stops accepted by this predicate have transfers from them
    */
-  public static TransferGenerator createGenerator(
+  public static RegularTransferGenerator createGenerator(
     Graph graph,
     TransitRepository transitRepository,
     TransferProfilesParameters<RouteRequest> parameters,

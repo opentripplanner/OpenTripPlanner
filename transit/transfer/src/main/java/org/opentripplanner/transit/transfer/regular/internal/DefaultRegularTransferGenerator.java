@@ -13,7 +13,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
@@ -25,15 +25,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Graph-build-time implementation of {@link TransferGenerator} - see that interface's doc. There
- * is no {@code TransferRealtimeUpdater} implementation yet.
+ * Graph-build-time implementation of {@link RegularTransferGenerator} - see that interface's doc.
+ * There is no {@code RegularTransferRealtimeUpdater} implementation yet.
  *
  * @param <P> the street path type
  * @param <R> the request type
  */
-public class DefaultTransferGenerator<P, R> implements TransferGenerator {
+public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGenerator {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransferGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultRegularTransferGenerator.class);
   private final RaptorStopIndex stopIndex;
   private final TransferProfiles<P, R> profiles;
   private final RegularTransferBuildRepository<P> buildRepository;
@@ -42,7 +42,7 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
   /** The number of paths of a profile (by id) that are the paths of its parent. */
   private final Map<String, LongAdder> sharedPaths = new ConcurrentHashMap<>();
 
-  public DefaultTransferGenerator(
+  public DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
     TransferProfilesParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
@@ -52,7 +52,7 @@ public class DefaultTransferGenerator<P, R> implements TransferGenerator {
     this(stopIndex, TransferProfiles.of(parameters, pathProvider, mapper), buildRepository);
   }
 
-  DefaultTransferGenerator(
+  DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
     TransferProfiles<P, R> profiles,
     RegularTransferBuildRepository<P> buildRepository

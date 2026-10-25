@@ -19,9 +19,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 /// TODO: This is not implemented yet, see the module package.md.
 ///
 /// @param <P> the street path type
-/// @see TransferGenerator for the graph-build-time counterpart
+/// @see RegularTransferGenerator for the graph-build-time counterpart
 ///
-public interface TransferRealtimeUpdater<P> {
+public interface RegularTransferRealtimeUpdater<P> {
   /**
    * Typically done when a new stop is used by a new pattern as part of an extra journey or
    * platform change. Lightweight no-op if the stop already has transfers.

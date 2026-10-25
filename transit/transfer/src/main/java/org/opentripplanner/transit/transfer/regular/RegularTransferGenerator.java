@@ -7,9 +7,9 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 /// Generates a profile's regular transfer path templates for all stops. Typically done at graph
 /// build time and serialized to reduce startup time.
 ///
-/// @see TransferRealtimeUpdater for the incremental, runtime-mutation counterpart.
+/// @see RegularTransferRealtimeUpdater for the incremental, runtime-mutation counterpart.
 ///
-public interface TransferGenerator {
+public interface RegularTransferGenerator {
   /// Generate the transfers of all stops and all profiles. Which stops take part in transfers is
   /// decided by the `TransferPathProvider`, it returns no paths for the stops that do not.
   void generateTransfersForAllStops();

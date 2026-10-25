@@ -75,10 +75,11 @@ generates them yet:
   changed stops are re-costed, as long as at most 5% of the stops changed. Above that, the value is
   created from scratch.
 
-**What is not implemented yet.** `TransferRealtimeUpdater` defines the use cases: a new stop is
-used, and an elevator or other vertex is opened or closed. It has no implementation, and no updater
-writes to the repository. An implementation is expected to run the same profile search as the graph
-build for the affected stops, and to write the result with `replaceTransfersFrom` in a transaction.
+**What is not implemented yet.** `RegularTransferRealtimeUpdater` defines the use cases: a new stop
+is used, and an elevator or other vertex is opened or closed. It has no implementation, and no
+updater writes to the repository. An implementation is expected to run the same profile search as
+the graph build for the affected stops, and to write the result with `replaceTransfersFrom` in a
+transaction.
 
 ## Constrained Transfers
 
