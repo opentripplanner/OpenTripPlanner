@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

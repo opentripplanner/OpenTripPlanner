@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;

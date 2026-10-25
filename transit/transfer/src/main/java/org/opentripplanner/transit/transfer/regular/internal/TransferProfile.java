@@ -2,9 +2,9 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
-import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;

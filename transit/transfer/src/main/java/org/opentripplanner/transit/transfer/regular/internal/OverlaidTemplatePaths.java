@@ -3,7 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * The runtime path templates: the paths generated at graph build (the base), with the transfers

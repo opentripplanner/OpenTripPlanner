@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * The {@code P} path templates generated at graph build, keyed by

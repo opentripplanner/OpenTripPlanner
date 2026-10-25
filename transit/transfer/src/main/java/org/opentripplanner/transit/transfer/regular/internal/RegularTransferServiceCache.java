@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Bounded LRU cache of the Raptor transfers derived from the paths of one snapshot, keyed on the

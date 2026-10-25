@@ -7,7 +7,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.ProfileUserPreferences;

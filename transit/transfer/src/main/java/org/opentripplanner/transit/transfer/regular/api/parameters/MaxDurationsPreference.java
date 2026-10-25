@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.time.Duration;
 import java.util.Objects;

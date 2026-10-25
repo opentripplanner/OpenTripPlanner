@@ -2,7 +2,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Finds the profile whose stored paths the Raptor transfers for some user preferences are created

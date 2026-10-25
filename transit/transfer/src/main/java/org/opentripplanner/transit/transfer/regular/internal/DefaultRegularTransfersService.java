@@ -3,8 +3,8 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Default {@link RegularTransfersService}, created by

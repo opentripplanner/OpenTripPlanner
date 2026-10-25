@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import java.util.regex.Pattern;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**

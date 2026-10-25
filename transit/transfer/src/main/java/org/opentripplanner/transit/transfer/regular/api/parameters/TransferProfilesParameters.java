@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.util.EnumMap;
 import java.util.HashSet;

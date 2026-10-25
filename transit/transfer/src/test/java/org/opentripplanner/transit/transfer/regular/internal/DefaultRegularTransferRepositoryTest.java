@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 /**
  * The write side of the runtime repository: replacing and resetting the transfers from a stop,

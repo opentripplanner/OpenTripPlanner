@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.util.Objects;
 import org.opentripplanner.core.model.basic.Cost;

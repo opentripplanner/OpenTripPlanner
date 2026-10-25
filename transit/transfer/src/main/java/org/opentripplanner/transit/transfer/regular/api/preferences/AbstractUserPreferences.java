@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import java.io.Serializable;
 import java.util.Objects;

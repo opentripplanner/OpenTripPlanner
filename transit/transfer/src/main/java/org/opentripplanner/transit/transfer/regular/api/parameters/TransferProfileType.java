@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 /**
  * The type of a transfer profile. The configuration that is shared by all profiles of a type, like

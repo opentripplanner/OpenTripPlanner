@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
-import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
-import org.opentripplanner.transit.transfer.regular.api.WalkProfileParameters;
-import org.opentripplanner.transit.transfer.regular.api.WarmupParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class TransferProfilesTest {
 

@@ -1,6 +1,7 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.util.Objects;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 /**
  * A warmup entry: user preferences that are common in routing requests, but are not worth a

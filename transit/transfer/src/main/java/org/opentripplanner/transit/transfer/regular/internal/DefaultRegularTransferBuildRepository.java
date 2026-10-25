@@ -3,7 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.Map;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Default {@link RegularTransferBuildRepository}.

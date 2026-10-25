@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.spi;
 
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * Maps between the {@link AbstractUserPreferences user preferences} the regular-transfer module

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;

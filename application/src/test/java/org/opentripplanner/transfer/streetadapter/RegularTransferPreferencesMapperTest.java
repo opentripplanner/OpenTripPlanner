@@ -7,7 +7,7 @@ import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.model.StreetMode;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class RegularTransferPreferencesMapperTest {
 

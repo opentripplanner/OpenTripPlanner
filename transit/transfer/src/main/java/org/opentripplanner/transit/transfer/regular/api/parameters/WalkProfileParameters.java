@@ -1,7 +1,8 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 /**
  * The configuration of one walk transfer profile: a discovery search for the transfer paths of

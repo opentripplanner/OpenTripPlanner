@@ -2,7 +2,7 @@ package org.opentripplanner.transit.transfer.regular;
 
 import java.io.Serializable;
 import java.util.Map;
-import org.opentripplanner.transit.transfer.regular.api.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * The regular-transfer path templates generated at graph build, keyed by

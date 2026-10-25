@@ -11,7 +11,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
-import org.opentripplanner.transit.transfer.regular.api.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 
 /**

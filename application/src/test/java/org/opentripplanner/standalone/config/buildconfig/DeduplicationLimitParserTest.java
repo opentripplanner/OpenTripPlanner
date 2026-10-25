@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
-import org.opentripplanner.transit.transfer.regular.api.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 
 class DeduplicationLimitParserTest {
 
