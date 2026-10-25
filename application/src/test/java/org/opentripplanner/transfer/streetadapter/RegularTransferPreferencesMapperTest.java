@@ -9,8 +9,11 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
+import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class RegularTransferPreferencesMapperTest {
 
@@ -118,10 +121,66 @@ class RegularTransferPreferencesMapperTest {
   void aTransferModeWithoutAProfileTypeIsNotAccepted() {
     var request = RouteRequest.defaultValue()
       .copyOf()
-      .withJourney(j -> j.withTransfer(new StreetRequest(StreetMode.BIKE)))
+      .withJourney(j -> j.withTransfer(new StreetRequest(StreetMode.SCOOTER_RENTAL)))
       .buildDefault();
 
     var ex = assertThrows(IllegalArgumentException.class, () -> SUBJECT.toUserPreferences(request));
-    assertThat(ex.getMessage()).contains("BIKE");
+    assertThat(ex.getMessage()).contains("SCOOTER_RENTAL");
+  }
+
+  @Test
+  void aBikeTransferRequestHasBicyclePreferences() {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(new StreetRequest(StreetMode.BIKE)))
+      .withPreferences(p ->
+        p
+          .withWalk(w -> w.withSpeed(1.0))
+          // The walk preferences must not be used
+          .withBike(b -> b.withSpeed(6.0).withReluctance(3.0))
+      )
+      .buildDefault();
+
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(
+      BicyclePreferences.of()
+        .withSpeed(Speed.ofMetersPerSecond(6.0))
+        .withReluctance(Reluctance.of(3.0))
+        .build()
+    );
+  }
+
+  @Test
+  void bicyclePreferencesMakeABikeRequest() {
+    var preferences = BicyclePreferences.of()
+      .withSpeed(Speed.ofMetersPerSecond(6.0))
+      .withReluctance(Reluctance.of(3.0))
+      .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
+      .build();
+
+    var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
+
+    assertThat(request.journey().transfer().mode()).isEqualTo(StreetMode.BIKE);
+    assertThat(request.journey().wheelchair()).isFalse();
+    assertThat(request.preferences().bike().speed()).isEqualTo(6.0);
+    assertThat(request.preferences().bike().reluctance()).isEqualTo(3.0);
+    assertThat(request.preferences().walk().stairsReluctance()).isEqualTo(1000.0);
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(
+      preferences.copyOf().withStairs(StreetSegmentTypeUsage.ALLOWED).build()
+    );
+  }
+
+  @Test
+  void theUserPreferencesOfAProfileTypeAreTakenFromTheRequestPreferencesOfThatType() {
+    // A profile without preferences of its own is of a type, but its request is a default request
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)).withBike(b -> b.withSpeed(6.0)))
+      .buildDefault();
+
+    var bicycle = SUBJECT.toUserPreferences(TransferProfileType.BICYCLE, request);
+    var walk = SUBJECT.toUserPreferences(TransferProfileType.WALK, request);
+
+    assertThat(bicycle.speed()).isEqualTo(Speed.ofMetersPerSecond(6.0));
+    assertThat(walk.speed()).isEqualTo(Speed.ofMetersPerSecond(1.0));
   }
 }

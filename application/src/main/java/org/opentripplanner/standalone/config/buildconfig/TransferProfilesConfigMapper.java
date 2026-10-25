@@ -23,6 +23,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
@@ -37,8 +38,9 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * keeps reading unchanged for FLEX.
  * <p>
  * The configuration of a profile type is a block named after the type, for example {@code walk},
- * with the profiles, the max durations and the warmup entries of the type. The types {@code walk}
- * and {@code wheelchair} are supported for now, the other types are deliberately deferred.
+ * with the profiles, the max durations and the warmup entries of the type. The types {@code walk},
+ * {@code wheelchair} and {@code bicycle} are supported for now, the other types are deliberately
+ * deferred.
  */
 public class TransferProfilesConfigMapper {
 
@@ -54,9 +56,9 @@ public class TransferProfilesConfigMapper {
         """
         Replaces `transferRequests` for regular (non-FLEX) transfer generation. The configuration of
         a profile type is a block named after the type, with its `profiles`, its `maxDurations` and
-        its `warmup` entries. The types `walk` and `wheelchair` are supported for now. If no profile
-        is configured, a single default `walk` profile is used, mirroring the implicit default of
-        the old `transferRequests` config. The max duration of the transfers is set with
+        its `warmup` entries. The types `walk`, `wheelchair` and `bicycle` are supported for now. If
+        no profile is configured, a single default `walk` profile is used, mirroring the implicit
+        default of the old `transferRequests` config. The max duration of the transfers is set with
         `defaultMaxDuration`, and can be overridden for a profile type with `maxDurations`. The old
         `maxTransferDuration` is not used.
         """
@@ -497,6 +499,7 @@ public class TransferProfilesConfigMapper {
     return switch (type) {
       case WALK -> mapWalkPreferences(p, WalkPreferences.inheritedFrom(parent));
       case WHEELCHAIR -> mapWheelchairPreferences(p, WheelchairPreferences.inheritedFrom(parent));
+      case BICYCLE -> mapBicyclePreferences(p, BicyclePreferences.inheritedFrom(parent));
     };
   }
 
@@ -518,6 +521,16 @@ public class TransferProfilesConfigMapper {
     );
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
+    );
+    builder.withStairs(mapStairs(p, base));
+    return builder.build();
+  }
+
+  private static BicyclePreferences mapBicyclePreferences(NodeAdapter p, BicyclePreferences base) {
+    var builder = base.copyOf();
+    builder.withSpeed(mapSpeed(p, "Bicycle speed, in meters per second.", base));
+    builder.withReluctance(
+      mapReluctance(p, "A multiplier for the cost of riding a bicycle.", base)
     );
     builder.withStairs(mapStairs(p, base));
     return builder.build();

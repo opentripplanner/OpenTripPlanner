@@ -20,7 +20,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public abstract sealed class AbstractUserPreferences<S extends AbstractUserPreferences<S>>
   implements NormalizedDistance<S>, Serializable
-  permits WalkPreferences, WheelchairPreferences
+  permits BicyclePreferences, WalkPreferences, WheelchairPreferences
 {
 
   private final Speed speed;

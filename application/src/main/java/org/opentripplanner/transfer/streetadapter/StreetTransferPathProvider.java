@@ -31,10 +31,10 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * <p>
  * The request is a {@link RouteRequest} with the user preferences applied, see
  * {@link RegularTransferPreferencesMapper}. {@link #searchFor} creates the {@code
- * StreetSearchRequest} a street search needs, once per request. Only {@code WALK} is supported
- * today, so the street mode is always {@link StreetMode#WALK}. Re-costing a path traverses its edges with a fresh {@link StateEditor}
- * and {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when
- * it has no edges, like {@code PathTransfer.asRaptorTransfer}.
+ * StreetSearchRequest} a street search needs, once per request. The street mode is the transfer
+ * mode of the request. Re-costing a path traverses its edges with a fresh {@link StateEditor} and
+ * {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when it
+ * has no edges, like {@code PathTransfer.asRaptorTransfer}.
  * <p>
  * The max duration of the profile type bounds the street search that discovers the transfers, see
  * {@link TransferSearch#findNearbyStops}. Re-costing a path is not limited.
@@ -97,13 +97,17 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
     return new NearbyStop(nearbyStop.stopId(), nearbyStop.distance(), nearbyStop.edges(), null);
   }
 
+  private static StreetMode mode(RouteRequest request) {
+    return request.journey().transfer().mode();
+  }
+
   private static StreetSearchRequest streetSearchRequest(RouteRequest preferences) {
     return StreetSearchRequestMapper.map(preferences)
       .withFromEnvelope(null)
       .withToEnvelope(null)
       .withArriveBy(false)
       .withStartTime(Instant.EPOCH)
-      .withMode(StreetMode.WALK)
+      .withMode(mode(preferences))
       .build();
   }
 
@@ -137,7 +141,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
       var nearbyStops = nearbyStopFinder.findNearbyStops(
         vertex,
         routeRequest,
-        StreetMode.WALK,
+        mode(routeRequest),
         false,
         maxDurations.maxDuration(),
         NO_STOP_COUNT_LIMIT
@@ -154,13 +158,26 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
         .toList();
     }
 
+    /** The speed of the transfer mode, used for a path without edges. */
+    private double speed() {
+      return switch (mode(routeRequest)) {
+        case BIKE -> streetSearchRequest.bike().speed();
+        default -> streetSearchRequest.walk().speed();
+      };
+    }
+
+    private double reluctance() {
+      return switch (mode(routeRequest)) {
+        case BIKE -> streetSearchRequest.bike().reluctance();
+        default -> streetSearchRequest.walk().reluctance();
+      };
+    }
+
     @Override
     public Optional<PathCriteria> computePathCriteria(NearbyStop path) {
       if (path.edges() == null || path.edges().isEmpty()) {
-        double durationSeconds = path.distance() / streetSearchRequest.walk().speed();
-        int c1 = CostLimit.toRaptorCostWholeSeconds(
-          durationSeconds * streetSearchRequest.walk().reluctance()
-        );
+        double durationSeconds = path.distance() / speed();
+        int c1 = CostLimit.toRaptorCostWholeSeconds(durationSeconds * reluctance());
         return Optional.of(new PathCriteria(c1, (int) Math.ceil(durationSeconds)));
       }
 

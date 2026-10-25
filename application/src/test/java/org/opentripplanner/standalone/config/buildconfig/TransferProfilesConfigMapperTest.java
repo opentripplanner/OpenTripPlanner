@@ -15,6 +15,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.Deduplication
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
@@ -698,6 +699,69 @@ class TransferProfilesConfigMapperTest {
 
     assertThat(subject.profiles()).hasSize(1);
     assertThat(subject.profiles().getFirst().type()).isEqualTo(TransferProfileType.WHEELCHAIR);
+  }
+
+  @Test
+  void mapsABicycleProfile() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: { profiles: [{ id: "walk" }] },
+          bicycle: {
+            profiles: [{
+              id: "bicycle",
+              userPreferences: { speed: 6.0, reluctance: 3.0, stairs: "DISCOURAGED" }
+            }],
+            maxDurations: [{ maxDuration: "20m" }]
+          }
+        }
+      }
+      """
+    );
+
+    var bicycle = profile(subject, "bicycle");
+    assertThat(bicycle.type()).isEqualTo(TransferProfileType.BICYCLE);
+    assertThat(bicycle.userPreferences()).isEqualTo(
+      BicyclePreferences.of()
+        .withSpeed(Speed.ofMetersPerSecond(6.0))
+        .withReluctance(Reluctance.of(3.0))
+        .withStairs(StreetSegmentTypeUsage.DISCOURAGED)
+        .build()
+    );
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE).maxDuration()).isEqualTo(
+      Duration.ofMinutes(20)
+    );
+  }
+
+  @Test
+  void aBicycleProfileInheritsTheValuesInCommonFromAWalkParent() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [{
+              id: "walk",
+              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
+            }]
+          },
+          bicycle: {
+            profiles: [{
+              id: "bicycle",
+              parent: "walk",
+              userPreferences: { speed: 5.5 }
+            }]
+          }
+        }
+      }
+      """
+    );
+
+    var bicycle = (BicyclePreferences) profile(subject, "bicycle").userPreferences();
+    assertThat(bicycle.speed()).isEqualTo(Speed.ofMetersPerSecond(5.5));
+    assertThat(bicycle.reluctance()).isEqualTo(Reluctance.of(3.0));
+    assertThat(bicycle.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
   }
 
   private static TransferProfilesParameters<RouteRequest> map(String json) {
