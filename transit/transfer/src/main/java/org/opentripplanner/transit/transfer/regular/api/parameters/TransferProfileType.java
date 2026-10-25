@@ -9,4 +9,5 @@ public enum TransferProfileType {
   WALK,
   WHEELCHAIR,
   BICYCLE,
+  CAR,
 }

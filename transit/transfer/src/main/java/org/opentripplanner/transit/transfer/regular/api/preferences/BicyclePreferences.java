@@ -19,20 +19,23 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class BicyclePreferences
   extends AbstractUserPreferences<BicyclePreferences>
-  implements WithStairs
+  implements WithSpeed, WithStairs
 {
 
   public static final BicyclePreferences DEFAULT = new BicyclePreferences();
 
+  private final Speed speed;
   private final StreetSegmentTypeUsage stairs;
 
   private BicyclePreferences() {
-    super(Speed.ofMetersPerSecond(5.0), Reluctance.of(2.0));
+    super(Reluctance.of(2.0));
+    this.speed = Speed.ofMetersPerSecond(5.0);
     this.stairs = StreetSegmentTypeUsage.ALLOWED;
   }
 
   private BicyclePreferences(Builder builder) {
     super(builder);
+    this.speed = Objects.requireNonNull(builder.speed);
     this.stairs = Objects.requireNonNull(builder.stairs);
   }
 
@@ -65,6 +68,11 @@ public final class BicyclePreferences
   }
 
   @Override
+  public Speed speed() {
+    return speed;
+  }
+
+  @Override
   public StreetSegmentTypeUsage stairs() {
     return stairs;
   }
@@ -78,6 +86,7 @@ public final class BicyclePreferences
   public float normalizedDistance(AbstractUserPreferences other) {
     float distance = super.normalizedDistance(other);
     if (other instanceof BicyclePreferences that) {
+      distance += speed.normalizedDistance(that.speed);
       distance += stairs.normalizedDistance(that.stairs);
     }
     return distance;
@@ -88,29 +97,37 @@ public final class BicyclePreferences
     if (!(obj instanceof BicyclePreferences that)) {
       return false;
     }
-    return super.equals(obj) && stairs == that.stairs;
+    return super.equals(obj) && speed.equals(that.speed) && stairs == that.stairs;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), stairs);
+    return Objects.hash(super.hashCode(), speed, stairs);
   }
 
   @Override
   public String toString() {
     return super
       .appendToString(ToStringBuilder.of(BicyclePreferences.class))
+      .addObj("speed", speed, DEFAULT.speed)
       .addObj("stairs", stairs, DEFAULT.stairs)
       .toString();
   }
 
   public static class Builder extends AbstractUserPreferences.Builder<BicyclePreferences, Builder> {
 
+    private Speed speed;
     private StreetSegmentTypeUsage stairs;
 
     public Builder(BicyclePreferences original) {
       super(original);
+      this.speed = original.speed;
       this.stairs = original.stairs;
+    }
+
+    public Builder withSpeed(Speed speed) {
+      this.speed = speed;
+      return this;
     }
 
     public Builder withStairs(StreetSegmentTypeUsage stairs) {
@@ -121,6 +138,9 @@ public final class BicyclePreferences
     @Override
     public Builder inheritFrom(AbstractUserPreferences<?> parent) {
       super.inheritFrom(parent);
+      if (parent instanceof WithSpeed withSpeed) {
+        this.speed = withSpeed.speed();
+      }
       if (parent instanceof WithStairs withStairs) {
         this.stairs = withStairs.stairs();
       }

@@ -8,7 +8,7 @@ Flex transfers are still configured with [`transferRequests`](BuildConfiguration
 !!! note
 
     The `transfers` configuration is new (since version 2.10) and under development. Only walk,
-    wheelchair and bicycle transfers can be configured so far. See
+    wheelchair, bicycle and car transfers can be configured so far. See
     [What is not supported yet](#what-is-not-supported-yet).
 
 ## Concepts
@@ -19,14 +19,15 @@ When a routing request arrives, OTP picks the profile with the user preferences 
 request, and re-calculates the duration and the cost of the stored transfers with the preferences of
 the request. The result is cached, so the next request with the same preferences is fast.
 
-**Profile type.** Each profile has a type: `walk`, `wheelchair` and `bicycle`, and later `scooter`
-and `car`. The configuration of a type is a block named after the type. Everything that is shared by
+**Profile type.** Each profile has a type: `walk`, `wheelchair`, `bicycle` and `car`, and later
+`scooter`. The configuration of a type is a block named after the type. Everything that is shared by
 the profiles of a type is configured once per type, like the max durations. A routing request is
 matched to a type by its transfer street mode, and for walking by the wheelchair flag: a request
 for a wheelchair accessible trip uses the `wheelchair` profiles, any other walking request uses the
-`walk` profiles, and a request that transfers by bike uses the `bicycle` profiles. A request that
-has no profile of its type is not accepted, so a `wheelchair` profile is needed to route with
-wheelchair accessibility, and a `bicycle` profile to transfer by bike.
+`walk` profiles, a request that transfers by bike uses the `bicycle` profiles, and a request that
+transfers by car uses the `car` profiles. A request that has no profile of its type is not
+accepted, so a `wheelchair` profile is needed to route with wheelchair accessibility, a `bicycle`
+profile to transfer by bike, and a `car` profile to transfer by car.
 
 **Id.** Each profile has an `id`, which must be unique among all the profiles. OTP uses it in the
 logs and in the issues it reports, for example `Created 101785 regular transfers for profile
@@ -104,20 +105,21 @@ request and a max duration of 30 minutes is used.
 | &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of a profile of the same type the transfers are created from.|                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | **Required.** The preferences to warm up. Unset values are the ones of the parent.  |                   |
 
-The `wheelchair` and `bicycle` blocks have the same parameters as the `walk` block, for example
-`wheelchair.profiles`, `bicycle.maxDurations` and `bicycle.warmup`.
+The `wheelchair`, `bicycle` and `car` blocks have the same parameters as the `walk` block, for
+example `wheelchair.profiles`, `bicycle.maxDurations` and `car.warmup`.
 
 ### User preferences
 
 | Parameter     | Type     | Description                                                                         | Default  |
 |---------------|----------|-------------------------------------------------------------------------------------|----------|
-| `speed`       | `double` | The speed in meters per second.                                                     | `1.35`   |
+| `speed`       | `double` | The speed in meters per second. Not for `car`, it drives the speed of the streets.  | `1.35`   |
 | `reluctance`  | `double` | A multiplier for the cost of the transfer. A higher value avoids the transfer.      | `2.0`    |
-| `stairs`      | `enum`   | `ALLOWED`, `DISCOURAGED` or `FORBIDDEN`. A bicycle is pushed on stairs.             | `ALLOWED`|
+| `stairs`      | `enum`   | `ALLOWED`, `DISCOURAGED` or `FORBIDDEN`. Not for `car`. A bicycle is pushed.        | `ALLOWED`|
 
-The preferences are the same for `walk`, `wheelchair` and `bicycle`. The defaults of `walk` and
-`wheelchair` are the same, and the default `speed` of `bicycle` is `5.0`. The street model decides
-which streets and elevators a wheelchair can use, and where a bicycle can go.
+The `walk`, `wheelchair` and `bicycle` types have all three, and the `car` type only has
+`reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
+`bicycle` is `5.0`. The street model decides which streets and elevators a wheelchair can use, and
+where a bicycle or a car can go.
 
 ### Routing request
 
@@ -139,7 +141,8 @@ is the value of the parent. A profile with a parent and without `userPreferences
 get the same preferences as the parent, and is rejected, since the profiles must be unique. If the
 parent is of another type, the profile inherits the preferences the two types have in common, for
 example the speed and the reluctance of a `walk` parent for a `wheelchair` profile. A `bicycle`
-profile with a `walk` parent would get the walking speed unless it sets its own. Check that these
+profile with a `walk` parent would get the walking speed unless it sets its own, and a `car`
+profile only inherits the `reluctance`. Check that these
 are meaningful for the type of the profile, and set them in its `userPreferences` if they are not.
 
 **Deduplication.** Each profile still searches for its own transfers, but the transfers that are
@@ -222,8 +225,7 @@ These parameters are reserved for later. OTP stops with an error if they are use
 
 - `allowedModes` in `maxDurations`, to give stops that car or bicycle can use a longer duration.
 
-The profile types `scooter` and `car` are not read yet. They are reported as unexpected
-parameters.
+The profile type `scooter` is not read yet. It is reported as an unexpected parameter.
 
 ## Compatibility with older versions
 

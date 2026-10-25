@@ -16,6 +16,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
@@ -200,7 +201,9 @@ class TransferProfilesConfigMapperTest {
     // Set on the child
     assertThat(slow.userPreferences().reluctance().value()).isEqualTo(5.0);
     // Not set on the child, so the one of the parent
-    assertThat(slow.userPreferences().speed().toMetersPerSecond()).isWithin(0.001).of(1.1);
+    assertThat(((WalkPreferences) slow.userPreferences()).speed().toMetersPerSecond())
+      .isWithin(0.001)
+      .of(1.1);
   }
 
   @Test
@@ -222,7 +225,9 @@ class TransferProfilesConfigMapperTest {
     );
 
     var slow = profile(subject, "slow");
-    assertThat(slow.userPreferences().speed()).isEqualTo(WalkPreferences.DEFAULT.speed());
+    assertThat(((WalkPreferences) slow.userPreferences()).speed()).isEqualTo(
+      WalkPreferences.DEFAULT.speed()
+    );
     assertThat(slow.userPreferences().reluctance().value()).isEqualTo(5.0);
   }
 
@@ -277,7 +282,9 @@ class TransferProfilesConfigMapperTest {
     )
       .containsExactly("slow", "walk")
       .inOrder();
-    assertThat(profile(subject, "slow").userPreferences().speed().toMetersPerSecond())
+    assertThat(
+      ((WalkPreferences) profile(subject, "slow").userPreferences()).speed().toMetersPerSecond()
+    )
       .isWithin(0.001)
       .of(1.1);
   }
@@ -365,7 +372,9 @@ class TransferProfilesConfigMapperTest {
     assertThat(entry.parent()).isEqualTo("walk");
     assertThat(entry.userPreferences().reluctance().value()).isEqualTo(9.0);
     // Not set on the entry, so the one of the parent
-    assertThat(entry.userPreferences().speed().toMetersPerSecond()).isWithin(0.001).of(1.1);
+    assertThat(((WalkPreferences) entry.userPreferences()).speed().toMetersPerSecond())
+      .isWithin(0.001)
+      .of(1.1);
   }
 
   @Test
@@ -384,7 +393,9 @@ class TransferProfilesConfigMapperTest {
     );
 
     var entry = subject.warmup().getFirst();
-    assertThat(entry.userPreferences().speed()).isEqualTo(WalkPreferences.DEFAULT.speed());
+    assertThat(((WalkPreferences) entry.userPreferences()).speed()).isEqualTo(
+      WalkPreferences.DEFAULT.speed()
+    );
   }
 
   @Test
@@ -762,6 +773,32 @@ class TransferProfilesConfigMapperTest {
     assertThat(bicycle.speed()).isEqualTo(Speed.ofMetersPerSecond(5.5));
     assertThat(bicycle.reluctance()).isEqualTo(Reluctance.of(3.0));
     assertThat(bicycle.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
+  }
+
+  @Test
+  void mapsACarProfileWithoutSpeedAndStairs() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: { profiles: [{ id: "walk" }] },
+          car: {
+            profiles: [{ id: "car", userPreferences: { reluctance: 3.0 } }],
+            maxDurations: [{ maxDuration: "3h" }]
+          }
+        }
+      }
+      """
+    );
+
+    var car = profile(subject, "car");
+    assertThat(car.type()).isEqualTo(TransferProfileType.CAR);
+    assertThat(car.userPreferences()).isEqualTo(
+      CarPreferences.of().withReluctance(Reluctance.of(3.0)).build()
+    );
+    assertThat(subject.maxDurations(TransferProfileType.CAR).maxDuration()).isEqualTo(
+      Duration.ofHours(3)
+    );
   }
 
   private static TransferProfilesParameters<RouteRequest> map(String json) {

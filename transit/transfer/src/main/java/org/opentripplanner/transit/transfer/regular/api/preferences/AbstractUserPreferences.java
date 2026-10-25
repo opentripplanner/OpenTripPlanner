@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.core.model.basic.NormalizedDistance;
 import org.opentripplanner.core.model.basic.Reluctance;
-import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -14,34 +13,28 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * key.
  * <p>
  * Each {@link TransferProfileType} has its own preferences class, with the preferences that are
- * meaningful for the type. The preferences all types share are here: the speed and the reluctance.
+ * meaningful for the type. The only preference all types share is the reluctance, a car has no
+ * speed or stairs of its own, see {@link WithSpeed} and {@link WithStairs}.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public abstract sealed class AbstractUserPreferences<S extends AbstractUserPreferences<S>>
   implements NormalizedDistance<S>, Serializable
-  permits BicyclePreferences, WalkPreferences, WheelchairPreferences
+  permits BicyclePreferences, CarPreferences, WalkPreferences, WheelchairPreferences
 {
 
-  private final Speed speed;
   private final Reluctance reluctance;
 
-  AbstractUserPreferences(Speed speed, Reluctance reluctance) {
-    this.speed = speed;
+  AbstractUserPreferences(Reluctance reluctance) {
     this.reluctance = reluctance;
   }
 
   AbstractUserPreferences(Builder builder) {
-    this.speed = builder.speed;
     this.reluctance = builder.reluctance;
   }
 
   /** The profile type these preferences belong to. */
   public abstract TransferProfileType type();
-
-  public Speed speed() {
-    return speed;
-  }
 
   public Reluctance reluctance() {
     return reluctance;
@@ -58,18 +51,16 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
       return false;
     }
     AbstractUserPreferences that = (AbstractUserPreferences) o;
-    return speed.equals(that.speed) && reluctance.equals(that.reluctance);
+    return reluctance.equals(that.reluctance);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(speed, reluctance);
+    return Objects.hash(reluctance);
   }
 
   ToStringBuilder appendToString(ToStringBuilder builder) {
-    return builder
-      .addObj("speed", speed, defaultInstance().speed())
-      .addObj("reluctance", reluctance, defaultInstance().reluctance());
+    return builder.addObj("reluctance", reluctance, defaultInstance().reluctance());
   }
 
   @Override
@@ -77,7 +68,7 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     if (getClass() != other.getClass()) {
       return 1000f;
     }
-    return speed.normalizedDistance(other.speed) + reluctance.normalizedDistance(other.reluctance);
+    return reluctance.normalizedDistance(other.reluctance);
   }
 
   protected abstract static class Builder<
@@ -86,23 +77,15 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
   > {
 
     private final S original;
-    private Speed speed;
     private Reluctance reluctance;
 
     Builder(S original) {
       this.original = original;
-      this.speed = original.speed();
       this.reluctance = original.reluctance();
     }
 
     public S original() {
       return original;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withSpeed(Speed speed) {
-      this.speed = speed;
-      return (T) this;
     }
 
     @SuppressWarnings("unchecked")
@@ -119,7 +102,6 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
      */
     @SuppressWarnings("unchecked")
     public T inheritFrom(AbstractUserPreferences<?> parent) {
-      this.speed = parent.speed();
       this.reluctance = parent.reluctance();
       return (T) this;
     }
