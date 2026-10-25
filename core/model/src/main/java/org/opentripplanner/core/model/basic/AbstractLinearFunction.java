@@ -1,8 +1,9 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.basic;
 
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Objects;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.Units;
 
 /**
@@ -13,16 +14,14 @@ import org.opentripplanner.utils.lang.Units;
  * <p>
  * The class is a thread-safe, immutable value-object.
  */
-abstract sealed class AbstractLinearFunction<T>
-  implements Serializable
-  permits CostLinearFunction, TimePenalty
-{
+public abstract class AbstractLinearFunction<T> implements Serializable {
 
   private final T constant;
 
   private final double coefficient;
 
   protected AbstractLinearFunction(T constant, double coefficient) {
+    DoubleUtils.requireInRange(coefficient, 0.0, 100.0);
     this.constant = Objects.requireNonNull(constant);
     this.coefficient = Units.normalizedFactor(coefficient, 0.0, 100.0);
   }

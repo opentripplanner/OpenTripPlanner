@@ -9,8 +9,8 @@ import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.core.testfixtures.lang.AssertEqualsAndHashCode;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 class DirectTransitPreferencesTest {
 

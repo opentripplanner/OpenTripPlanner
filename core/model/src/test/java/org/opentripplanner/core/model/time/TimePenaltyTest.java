@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

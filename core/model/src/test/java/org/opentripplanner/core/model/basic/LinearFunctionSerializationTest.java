@@ -1,18 +1,17 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.basic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.utils.time.DurationUtils;
 
 class LinearFunctionSerializationTest {
@@ -21,24 +20,20 @@ class LinearFunctionSerializationTest {
   private static final Duration D1_h = Duration.ofSeconds(3600);
 
   @SuppressWarnings("unused")
-  static Stream<Arguments> parseTestCases() {
-    return TestTableParser.of(
-      """
-      #        INPUT    ||       EXPECTED
-      #                 ||  CONSTANT | COEFFICIENT
-                 0+0t   ||       0s  |   0.0
-           1+0.0111 t   ||       1s  |   0.0
-        120 + 0.111 t   ||       2m  |   0.1
-        120 + 0.111 t   ||       2m  |   0.1
-           12.0 + 0 t   ||      12s  |   0.0
-       2h3m + 1.111 t   ||     2h3m  |   1.1
-       2h3m + 2.111 t   ||     2h3m  |   2.1
-         3h + 5.111 t   ||       3h  |   5.0
-          7m + 10.1 x   ||       7m  |  10.0
-        PT7s + 10.1 x   ||       7s  |  10.0
-        0.1 + 10.1 x   ||       0s  |  10.0
-        0.5 + 10.1 x   ||       1s  |  10.0
-      """
+  static List<Arguments> parseTestCases() {
+    return List.of(
+      Arguments.of("0+0t", "0s", 0.0),
+      Arguments.of("1+0.0111 t", "1s", 0.0),
+      Arguments.of("120 + 0.111 t", "2m", 0.1),
+      Arguments.of("120 + 0.111 t", "2m", 0.1),
+      Arguments.of("12.0 + 0 t", "12s", 0.0),
+      Arguments.of("2h3m + 1.111 t", "2h3m", 1.1),
+      Arguments.of("2h3m + 2.111 t", "2h3m", 2.1),
+      Arguments.of("3h + 5.111 t", "3h", 5.0),
+      Arguments.of("7m + 10.1 x", "7m", 10.0),
+      Arguments.of("PT7s + 10.1 x", "7s", 10.0),
+      Arguments.of("0.1 + 10.1 x", "0s", 10.0),
+      Arguments.of("0.5 + 10.1 x", "1s", 10.0)
     );
   }
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.core.model.basic;
 
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.lang.Units;
