@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -16,7 +17,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public final class WalkPreferences extends AbstractUserPreferences<WalkPreferences> {
+public final class WalkPreferences
+  extends AbstractUserPreferences<WalkPreferences>
+  implements WithStairs
+{
 
   public static final WalkPreferences DEFAULT = new WalkPreferences();
 
@@ -40,12 +44,27 @@ public final class WalkPreferences extends AbstractUserPreferences<WalkPreferenc
     return new Builder(this);
   }
 
+  /**
+   * The preferences a profile starts with: the defaults, with the values the {@code parent} has in
+   * common, see {@link AbstractUserPreferences.Builder#inheritFrom}. The parent itself if it is
+   * walk preferences, the defaults if there is no parent.
+   */
+  public static WalkPreferences inheritedFrom(@Nullable AbstractUserPreferences<?> parent) {
+    if (parent == null) {
+      return DEFAULT;
+    }
+    if (parent instanceof WalkPreferences walk) {
+      return walk;
+    }
+    return of().inheritFrom(parent).build();
+  }
+
   @Override
   public TransferProfileType type() {
     return TransferProfileType.WALK;
   }
 
-  /** Whether stairs are allowed, discouraged or forbidden. */
+  @Override
   public StreetSegmentTypeUsage stairs() {
     return stairs;
   }
@@ -96,6 +115,15 @@ public final class WalkPreferences extends AbstractUserPreferences<WalkPreferenc
 
     public Builder withStairs(StreetSegmentTypeUsage stairs) {
       this.stairs = stairs;
+      return this;
+    }
+
+    @Override
+    public Builder inheritFrom(AbstractUserPreferences<?> parent) {
+      super.inheritFrom(parent);
+      if (parent instanceof WithStairs withStairs) {
+        this.stairs = withStairs.stairs();
+      }
       return this;
     }
 

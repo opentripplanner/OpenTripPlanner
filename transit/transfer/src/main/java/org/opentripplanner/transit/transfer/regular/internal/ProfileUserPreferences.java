@@ -23,7 +23,7 @@ public final class ProfileUserPreferences {
     TransferRequestMapper<R> mapper
   ) {
     var own = profile.userPreferences();
-    return own != null ? own : mapper.toUserPreferences(profile.routingRequest());
+    return own != null ? own : mapper.toUserPreferences(profile.type(), profile.routingRequest());
   }
 
   /**

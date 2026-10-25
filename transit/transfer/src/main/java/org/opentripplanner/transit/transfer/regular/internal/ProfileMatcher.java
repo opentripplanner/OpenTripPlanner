@@ -47,7 +47,9 @@ final class ProfileMatcher {
     double bestDistance =
       profile == null ? Double.MAX_VALUE : userPreferences.normalizedDistance(profile);
     for (var warmup : parentsOfWarmup.entrySet()) {
-      if (!paths.hasProfile(warmup.getValue())) {
+      if (
+        !paths.hasProfile(warmup.getValue()) || warmup.getKey().type() != userPreferences.type()
+      ) {
         continue;
       }
       double distance = userPreferences.normalizedDistance(warmup.getKey());

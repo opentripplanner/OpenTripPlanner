@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular;
 
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -24,6 +25,17 @@ public class FakeRequestMapper implements TransferRequestMapper<WalkPreferences>
 
   @Override
   public AbstractUserPreferences<?> toUserPreferences(WalkPreferences request) {
+    return request;
+  }
+
+  @Override
+  public AbstractUserPreferences<?> toUserPreferences(
+    TransferProfileType type,
+    WalkPreferences request
+  ) {
+    if (type != request.type()) {
+      throw new UnsupportedOperationException("The fake request is of the type walk.");
+    }
     return request;
   }
 }

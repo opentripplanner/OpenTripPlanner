@@ -8,7 +8,7 @@ Flex transfers are still configured with [`transferRequests`](BuildConfiguration
 !!! note
 
     The `transfers` configuration is new (since version 2.10) and under development. Only walk
-    transfers can be configured so far. See
+    and wheelchair transfers can be configured so far. See
     [What is not supported yet](#what-is-not-supported-yet).
 
 ## Concepts
@@ -19,9 +19,13 @@ When a routing request arrives, OTP picks the profile with the user preferences 
 request, and re-calculates the duration and the cost of the stored transfers with the preferences of
 the request. The result is cached, so the next request with the same preferences is fast.
 
-**Profile type.** Each profile has a type: `walk`, and later `wheelchair`, `bicycle`, `scooter`
+**Profile type.** Each profile has a type: `walk` and `wheelchair`, and later `bicycle`, `scooter`
 and `car`. The configuration of a type is a block named after the type. Everything that is shared by
-the profiles of a type is configured once per type, like the max durations.
+the profiles of a type is configured once per type, like the max durations. A routing request is
+matched to a type by its transfer street mode, and for walking by the wheelchair flag: a request
+for a wheelchair accessible trip uses the `wheelchair` profiles, any other walking request uses the
+`walk` profiles. A request that has no profile of its type is not accepted, so a `wheelchair`
+profile is needed to route with wheelchair accessibility.
 
 **Id.** Each profile has an `id`, which must be unique among all the profiles. OTP uses it in the
 logs and in the issues it reports, for example `Created 101785 regular transfers for profile
@@ -96,16 +100,22 @@ request and a max duration of 30 minutes is used.
 | &nbsp;&nbsp;`maxDuration`     | `duration` | **Required** in the entry. How far from a stop the transfers are searched.          |                   |
 | `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
-| &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of the profile the transfers are created from.               |                   |
+| &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of a profile of the same type the transfers are created from.|                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | **Required.** The preferences to warm up. Unset values are the ones of the parent.  |                   |
+
+The `wheelchair` block has the same parameters as the `walk` block: `wheelchair.profiles`,
+`wheelchair.maxDurations` and `wheelchair.warmup`.
 
 ### User preferences
 
 | Parameter     | Type     | Description                                                                         | Default  |
 |---------------|----------|-------------------------------------------------------------------------------------|----------|
-| `speed`       | `double` | The walking speed in meters per second.                                             | `1.35`   |
-| `reluctance`  | `double` | A multiplier for the cost of walking. A higher value avoids walking.                | `2.0`    |
+| `speed`       | `double` | The speed in meters per second.                                                     | `1.35`   |
+| `reluctance`  | `double` | A multiplier for the cost of the transfer. A higher value avoids walking.           | `2.0`    |
 | `stairs`      | `enum`   | `ALLOWED`, `DISCOURAGED` or `FORBIDDEN`.                                            | `ALLOWED`|
+
+The preferences are the same for `walk` and `wheelchair`, and the defaults are the same. The street
+model decides which streets and elevators a wheelchair can use.
 
 ### Routing request
 
@@ -118,12 +128,16 @@ relevant parameters to `userPreferences`, and drop `routingRequest` in the futur
 
 A profile can name another profile as its `parent` with the `id` of the parent. The `parent` must be
 a profile of the same configuration, and the parents must not form a cycle. The profiles can be
-declared in any order.
+declared in any order. A parent can be of another type, for example a `wheelchair` profile with the
+`walk` profile as its parent.
 
 **Inheritance.** The profile inherits the `routingRequest` and the `userPreferences` of the parent.
 Everything that is set on the profile overrides the inherited value, and everything that is not set
 is the value of the parent. A profile with a parent and without `userPreferences` of its own would
-get the same preferences as the parent, and is rejected, since the profiles must be unique.
+get the same preferences as the parent, and is rejected, since the profiles must be unique. If the
+parent is of another type, the profile inherits the preferences the two types have in common, for
+example the speed and the reluctance of a `walk` parent for a `wheelchair` profile. Check that these
+are meaningful for the type of the profile, and set them in its `userPreferences` if they are not.
 
 **Deduplication.** Each profile still searches for its own transfers, but the transfers that are
 the same, or almost the same, as the transfers of the parent are only stored once. For each pair of
@@ -205,8 +219,8 @@ These parameters are reserved for later. OTP stops with an error if they are use
 
 - `allowedModes` in `maxDurations`, to give stops that car or bicycle can use a longer duration.
 
-The profile types `wheelchair`, `bicycle`, `scooter` and `car` are not read yet. They are reported
-as unexpected parameters.
+The profile types `bicycle`, `scooter` and `car` are not read yet. They are reported as unexpected
+parameters.
 
 ## Compatibility with older versions
 

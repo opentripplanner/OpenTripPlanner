@@ -5,43 +5,84 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
  * The mapping glue between {@code application}'s {@link RouteRequest} and the concrete preferences
  * type the {@code transit-transfer} module's regular-transfer pipeline caches and normalizes paths
- * under - {@link AbstractUserPreferences}. Only {@code WALK} is supported today.
+ * under - {@link AbstractUserPreferences}.
  * <p>
- * {@link #toUserPreferences} extracts a live request's walk preferences into the cache-friendly
- * {@link WalkPreferences} value, the key of the Raptor transfers cached per preferences. {@link
- * #toRequest} applies stored {@link AbstractUserPreferences} on a base request - the only place
- * {@link StreetTransferPathProvider} gets the real {@code RouteRequest}/{@code
- * StreetSearchRequest} it needs to actually traverse streets.
+ * The profile type of a request is decided by the transfer street mode of the request, and for
+ * walking by the wheelchair flag: a {@code WALK} request is of the type
+ * {@link TransferProfileType#WHEELCHAIR} if the request is wheelchair accessible, and of the type
+ * {@link TransferProfileType#WALK} otherwise. A request with a transfer street mode without a
+ * profile type is not accepted.
  */
 public final class RegularTransferPreferencesMapper implements TransferRequestMapper<RouteRequest> {
 
   @Override
-  public WalkPreferences toUserPreferences(RouteRequest request) {
+  public AbstractUserPreferences<?> toUserPreferences(RouteRequest request) {
+    return toUserPreferences(profileType(request), request);
+  }
+
+  @Override
+  public AbstractUserPreferences<?> toUserPreferences(
+    TransferProfileType type,
+    RouteRequest request
+  ) {
     var appWalk = request.preferences().walk();
-    return WalkPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(appWalk.speed()))
-      .withReluctance(Reluctance.of(appWalk.reluctance()))
-      .build();
+    var speed = Speed.ofMetersPerSecond(appWalk.speed());
+    var reluctance = Reluctance.of(appWalk.reluctance());
+    return switch (type) {
+      case WALK -> WalkPreferences.of().withSpeed(speed).withReluctance(reluctance).build();
+      case WHEELCHAIR -> WheelchairPreferences.of()
+        .withSpeed(speed)
+        .withReluctance(reluctance)
+        .build();
+    };
+  }
+
+  /**
+   * The profile type of a request.
+   *
+   * @throws IllegalArgumentException if the transfer street mode of the request has no profile type
+   */
+  static TransferProfileType profileType(RouteRequest request) {
+    var mode = request.journey().transfer().mode();
+    if (mode == StreetMode.WALK) {
+      return request.journey().wheelchair()
+        ? TransferProfileType.WHEELCHAIR
+        : TransferProfileType.WALK;
+    }
+    throw new IllegalArgumentException(
+      "The transfer street mode " + mode + " is not supported by the regular transfers."
+    );
   }
 
   @Override
   public RouteRequest toRequest(AbstractUserPreferences<?> userPreferences, RouteRequest base) {
     return switch (userPreferences) {
-      case WalkPreferences walk -> walkRequest(walk, base);
+      case WalkPreferences walk -> walkRequest(walk, base, false);
+      case WheelchairPreferences wheelchair -> walkRequest(wheelchair, base, true);
     };
   }
 
-  private static RouteRequest walkRequest(WalkPreferences userPreferences, RouteRequest base) {
+  /** A walking request, for a traveler in a wheelchair or not. */
+  private static <T extends AbstractUserPreferences<T> & WithStairs> RouteRequest walkRequest(
+    T userPreferences,
+    RouteRequest base,
+    boolean wheelchair
+  ) {
     var builder = base.copyOf();
-    builder.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.WALK)));
+    builder.withJourney(jb ->
+      jb.withTransfer(new StreetRequest(StreetMode.WALK)).withWheelchair(wheelchair)
+    );
     builder.withPreferences(routingPrefs ->
       routingPrefs.withWalk(w -> {
         w.withSpeed(userPreferences.speed().toMetersPerSecond());

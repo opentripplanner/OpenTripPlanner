@@ -7,4 +7,5 @@ package org.opentripplanner.transit.transfer.regular.api.parameters;
  */
 public enum TransferProfileType {
   WALK,
+  WHEELCHAIR,
 }

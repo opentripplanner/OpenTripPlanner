@@ -16,6 +16,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class TransferProfilesConfigMapperTest {
@@ -235,7 +236,7 @@ class TransferProfilesConfigMapperTest {
               {
                 id: "walk",
                 userPreferences: { speed: 1.1 },
-                routingRequest: { wheelchairAccessibility: { enabled: true } }
+                routingRequest: { numItineraries: 7 }
               },
               { id: "slow", parent: "walk", userPreferences: { reluctance: 5.0 } }
             ]
@@ -246,7 +247,7 @@ class TransferProfilesConfigMapperTest {
     );
 
     var request = profile(subject, "slow").routingRequest();
-    assertThat(request.journey().wheelchair()).isTrue();
+    assertThat(request.numItineraries()).isEqualTo(7);
     assertThat(request.preferences().walk().speed()).isWithin(0.001).of(1.1);
   }
 
@@ -580,6 +581,123 @@ class TransferProfilesConfigMapperTest {
 
     var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
     assertThat(ex).hasMessageThat().contains("allowedModes");
+  }
+
+  @Test
+  void mapsAWheelchairProfile() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: { profiles: [{ id: "walk" }] },
+          wheelchair: {
+            profiles: [{
+              id: "wheelchair",
+              userPreferences: { speed: 0.9, reluctance: 4.0, stairs: "FORBIDDEN" }
+            }],
+            maxDurations: [{ maxDuration: "45m" }]
+          }
+        }
+      }
+      """
+    );
+
+    assertThat(subject.profiles()).hasSize(2);
+    var wheelchair = profile(subject, "wheelchair");
+    assertThat(wheelchair.type()).isEqualTo(TransferProfileType.WHEELCHAIR);
+    assertThat(wheelchair.userPreferences()).isEqualTo(
+      WheelchairPreferences.of()
+        .withSpeed(Speed.ofMetersPerSecond(0.9))
+        .withReluctance(Reluctance.of(4.0))
+        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
+        .build()
+    );
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).maxDuration()).isEqualTo(
+      Duration.ofMinutes(45)
+    );
+    assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
+      Duration.ofMinutes(30)
+    );
+  }
+
+  @Test
+  void aWheelchairProfileInheritsTheValuesInCommonFromAWalkParent() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            profiles: [{
+              id: "walk",
+              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
+            }]
+          },
+          wheelchair: {
+            profiles: [{
+              id: "wheelchair",
+              parent: "walk",
+              userPreferences: { reluctance: 5.0 }
+            }]
+          }
+        }
+      }
+      """
+    );
+
+    var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
+    assertThat(wheelchair.speed()).isEqualTo(Speed.ofMetersPerSecond(1.1));
+    assertThat(wheelchair.reluctance()).isEqualTo(Reluctance.of(5.0));
+    assertThat(wheelchair.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
+  }
+
+  @Test
+  void aParentCanBeDeclaredInAnotherTypeBlockAfterTheChild() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: { profiles: [{ id: "walk", parent: "wheelchair" }] },
+          wheelchair: { profiles: [{ id: "wheelchair" }] }
+        }
+      }
+      """
+    );
+
+    assertThat(
+      subject
+        .profiles()
+        .stream()
+        .map(p -> p.id())
+        .toList()
+    ).containsExactly("walk", "wheelchair");
+  }
+
+  @Test
+  void aWarmupParentMustBeOfTheTypeOfTheWarmup() {
+    var ex = assertThrows(OtpAppException.class, () ->
+      map(
+        """
+        {
+          transfers: {
+            walk: { profiles: [{ id: "walk" }] },
+            wheelchair: {
+              profiles: [{ id: "wheelchair" }],
+              warmup: [{ id: "w", parent: "walk", userPreferences: { speed: 1.0 } }]
+            }
+          }
+        }
+        """
+      )
+    );
+    assertThat(ex.getMessage()).contains("is a walk profile");
+  }
+
+  @Test
+  void noDefaultProfileIsAddedIfOnlyAWheelchairProfileIsConfigured() {
+    var subject = map("{ transfers: { wheelchair: { profiles: [{ id: \"wheelchair\" }] } } }");
+
+    assertThat(subject.profiles()).hasSize(1);
+    assertThat(subject.profiles().getFirst().type()).isEqualTo(TransferProfileType.WHEELCHAIR);
   }
 
   private static TransferProfilesParameters<RouteRequest> map(String json) {

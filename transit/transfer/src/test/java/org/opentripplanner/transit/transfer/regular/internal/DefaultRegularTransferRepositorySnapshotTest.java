@@ -443,6 +443,14 @@ class DefaultRegularTransferRepositorySnapshotTest {
       ++toUserPreferencesCalls;
       return FakeRequestMapper.INSTANCE.toUserPreferences(request);
     }
+
+    @Override
+    public AbstractUserPreferences<?> toUserPreferences(
+      TransferProfileType type,
+      WalkPreferences request
+    ) {
+      return FakeRequestMapper.INSTANCE.toUserPreferences(type, request);
+    }
   }
 
   /** Counts the created searches and the re-costed paths. */

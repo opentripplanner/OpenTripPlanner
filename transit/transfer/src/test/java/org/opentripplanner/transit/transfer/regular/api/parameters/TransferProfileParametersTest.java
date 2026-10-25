@@ -29,6 +29,19 @@ class TransferProfileParametersTest {
   }
 
   @Test
+  void thePreferencesMustBeThePreferencesOfTheType() {
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfileParameters<>(
+        "wheelchair",
+        TransferProfileType.WHEELCHAIR,
+        WalkPreferences.DEFAULT,
+        "r"
+      )
+    );
+    assertThat(ex.getMessage()).contains("WHEELCHAIR");
+  }
+
+  @Test
   void anIdIsRequired() {
     assertThrows(IllegalArgumentException.class, () ->
       new TransferProfileParameters<>(" ", TransferProfileType.WALK, null, "r")

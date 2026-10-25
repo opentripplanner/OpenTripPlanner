@@ -24,6 +24,9 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
+import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
 
@@ -34,8 +37,8 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * keeps reading unchanged for FLEX.
  * <p>
  * The configuration of a profile type is a block named after the type, for example {@code walk},
- * with the profiles, the max durations and the warmup entries of the type. Only {@code walk} is
- * supported for now, the other types are deliberately deferred.
+ * with the profiles, the max durations and the warmup entries of the type. The types {@code walk}
+ * and {@code wheelchair} are supported for now, the other types are deliberately deferred.
  */
 public class TransferProfilesConfigMapper {
 
@@ -51,9 +54,9 @@ public class TransferProfilesConfigMapper {
         """
         Replaces `transferRequests` for regular (non-FLEX) transfer generation. The configuration of
         a profile type is a block named after the type, with its `profiles`, its `maxDurations` and
-        its `warmup` entries. Only the type `walk` is supported for now. If no profile is
-        configured, a single default `walk` profile is used, mirroring the implicit default of the
-        old `transferRequests` config. The max duration of the transfers is set with
+        its `warmup` entries. The types `walk` and `wheelchair` are supported for now. If no profile
+        is configured, a single default `walk` profile is used, mirroring the implicit default of
+        the old `transferRequests` config. The max duration of the transfers is set with
         `defaultMaxDuration`, and can be overridden for a profile type with `maxDurations`. The old
         `maxTransferDuration` is not used.
         """
@@ -330,7 +333,7 @@ public class TransferProfilesConfigMapper {
           parent == null ? null : parent.userPreferences()
         );
       }
-      var effective = own != null ? own : mapper.toUserPreferences(request);
+      var effective = own != null ? own : mapper.toUserPreferences(profile.type(), request);
       // The children inherit the request with the preferences of this profile applied
       resolved.put(
         profile.id(),
@@ -483,7 +486,8 @@ public class TransferProfilesConfigMapper {
 
   /**
    * Map the user preferences of a profile type. Unset values are the values of {@code parent}, the
-   * preferences of the parent profile or the warmup, or else the defaults of the type.
+   * preferences of the parent profile or the warmup, or else the defaults of the type. A parent of
+   * another type gives the values the two types have in common.
    */
   private static AbstractUserPreferences<?> mapPreferences(
     TransferProfileType type,
@@ -491,41 +495,57 @@ public class TransferProfilesConfigMapper {
     @Nullable AbstractUserPreferences<?> parent
   ) {
     return switch (type) {
-      case WALK -> mapWalkPreferences(
-        p,
-        parent instanceof WalkPreferences walk ? walk : WalkPreferences.DEFAULT
-      );
+      case WALK -> mapWalkPreferences(p, WalkPreferences.inheritedFrom(parent));
+      case WHEELCHAIR -> mapWheelchairPreferences(p, WheelchairPreferences.inheritedFrom(parent));
     };
   }
 
   private static WalkPreferences mapWalkPreferences(NodeAdapter p, WalkPreferences base) {
-    var dft = base.copyOf();
-    var original = dft.original();
-    dft.withSpeed(
-      Speed.ofMetersPerSecond(
-        p
-          .of("speed")
-          .since(V2_10)
-          .summary("Walking speed, in meters per second.")
-          .asDouble(original.speed().toMetersPerSecond())
-      )
+    var builder = base.copyOf();
+    builder.withSpeed(mapSpeed(p, "Walking speed, in meters per second.", base));
+    builder.withReluctance(mapReluctance(p, "A multiplier for the cost of walking.", base));
+    builder.withStairs(mapStairs(p, base));
+    return builder.build();
+  }
+
+  private static WheelchairPreferences mapWheelchairPreferences(
+    NodeAdapter p,
+    WheelchairPreferences base
+  ) {
+    var builder = base.copyOf();
+    builder.withSpeed(
+      mapSpeed(p, "Speed of a traveler in a wheelchair, in meters per second.", base)
     );
-    dft.withReluctance(
-      Reluctance.of(
-        p
-          .of("reluctance")
-          .since(V2_10)
-          .summary("A multiplier for the cost of walking.")
-          .asDouble(original.reluctance().value())
-      )
+    builder.withReluctance(
+      mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
     );
-    dft.withStairs(
-      p
-        .of("stairs")
-        .since(V2_10)
-        .summary("Whether stairs are allowed, discouraged, or forbidden for this profile.")
-        .asEnum(original.stairs())
+    builder.withStairs(mapStairs(p, base));
+    return builder.build();
+  }
+
+  private static Speed mapSpeed(NodeAdapter p, String summary, AbstractUserPreferences<?> base) {
+    return Speed.ofMetersPerSecond(
+      p.of("speed").since(V2_10).summary(summary).asDouble(base.speed().toMetersPerSecond())
     );
-    return dft.build();
+  }
+
+  private static Reluctance mapReluctance(
+    NodeAdapter p,
+    String summary,
+    AbstractUserPreferences<?> base
+  ) {
+    return Reluctance.of(
+      p.of("reluctance").since(V2_10).summary(summary).asDouble(base.reluctance().value())
+    );
+  }
+
+  private static <
+    T extends AbstractUserPreferences<T> & WithStairs
+  > StreetSegmentTypeUsage mapStairs(NodeAdapter p, T base) {
+    return p
+      .of("stairs")
+      .since(V2_10)
+      .summary("Whether stairs are allowed, discouraged, or forbidden for this profile.")
+      .asEnum(base.stairs());
   }
 }
