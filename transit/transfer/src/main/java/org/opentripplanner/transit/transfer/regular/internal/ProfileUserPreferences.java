@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
@@ -19,7 +19,7 @@ public final class ProfileUserPreferences {
 
   /** The user preferences of the profile: its own, or else the ones of its routing request. */
   static <R> AbstractUserPreferences<?> resolve(
-    WalkProfileParameters<R> profile,
+    TransferProfileParameters<R> profile,
     TransferRequestMapper<R> mapper
   ) {
     var own = profile.userPreferences();
@@ -30,13 +30,13 @@ public final class ProfileUserPreferences {
    * The profiles by their user preferences, in the order they are declared. The user preferences
    * identify a profile in the repository, so two profiles with equal preferences are rejected.
    */
-  public static <R> Map<AbstractUserPreferences<?>, WalkProfileParameters<R>> resolveAll(
+  public static <R> Map<AbstractUserPreferences<?>, TransferProfileParameters<R>> resolveAll(
     TransferProfilesParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
-    var result = new LinkedHashMap<AbstractUserPreferences<?>, WalkProfileParameters<R>>();
+    var result = new LinkedHashMap<AbstractUserPreferences<?>, TransferProfileParameters<R>>();
     var idsByPreferences = new HashMap<AbstractUserPreferences<?>, String>();
-    for (var profile : parameters.walk()) {
+    for (var profile : parameters.profiles()) {
       var preferences = resolve(profile, mapper);
       result.put(preferences, profile);
       assertUnique(idsByPreferences.put(preferences, profile.id()), profile.id(), preferences);
@@ -60,7 +60,7 @@ public final class ProfileUserPreferences {
     TransferRequestMapper<R> mapper
   ) {
     var preferencesById = new HashMap<String, AbstractUserPreferences<?>>();
-    for (var profile : parameters.walk()) {
+    for (var profile : parameters.profiles()) {
       preferencesById.put(profile.id(), resolve(profile, mapper));
     }
     var result = new LinkedHashMap<AbstractUserPreferences<?>, AbstractUserPreferences<?>>();

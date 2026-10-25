@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.transfer.regular.api.parameters;
 
 import java.util.Objects;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 
 /**
  * A warmup entry: user preferences that are common in routing requests, but are not worth a
@@ -19,7 +19,11 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferen
  * @param userPreferences the preferences to warm up. They must be unique among the profiles and
  *                        the warmup entries.
  */
-public record WarmupParameters(String id, String parent, WalkPreferences userPreferences) {
+public record WarmupParameters(
+  String id,
+  String parent,
+  AbstractUserPreferences<?> userPreferences
+) {
   public WarmupParameters {
     Objects.requireNonNull(id);
     Objects.requireNonNull(parent);

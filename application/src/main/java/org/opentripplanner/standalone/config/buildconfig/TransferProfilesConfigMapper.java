@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_10;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +18,11 @@ import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
+import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
@@ -32,8 +34,8 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * keeps reading unchanged for FLEX.
  * <p>
  * The configuration of a profile type is a block named after the type, for example {@code walk},
- * with the profiles and the max durations of the type. Only {@code walk} is supported for now -
- * {@code warmup}, and the other types are deliberately deferred.
+ * with the profiles, the max durations and the warmup entries of the type. Only {@code walk} is
+ * supported for now, the other types are deliberately deferred.
  */
 public class TransferProfilesConfigMapper {
 
@@ -48,12 +50,12 @@ public class TransferProfilesConfigMapper {
       .description(
         """
         Replaces `transferRequests` for regular (non-FLEX) transfer generation. The configuration of
-        a profile type is
-        a block named after the type, with its `profiles` and `maxDurations`. Only the type `walk`
-        is supported for now. If this block is omitted, a single default `walk` profile is used,
-        mirroring the implicit default of the old `transferRequests` config. The max duration of
-        the transfers is set with `defaultMaxDuration`, and can be overridden for a profile type
-        with `maxDurations`. The old `maxTransferDuration` is not used.
+        a profile type is a block named after the type, with its `profiles`, its `maxDurations` and
+        its `warmup` entries. Only the type `walk` is supported for now. If no profile is
+        configured, a single default `walk` profile is used, mirroring the implicit default of the
+        old `transferRequests` config. The max duration of the transfers is set with
+        `defaultMaxDuration`, and can be overridden for a profile type with `maxDurations`. The old
+        `maxTransferDuration` is not used.
         """
       )
       .asObject();
@@ -74,29 +76,22 @@ public class TransferProfilesConfigMapper {
 
     var deduplicationLimit = mapDeduplicationLimit(transfers);
 
-    var walk = transfers
-      .of("walk")
-      .since(V2_10)
-      .summary("The configuration of the walk transfers.")
-      .description(
-        """
-        The `profiles`, each a discovery search of walk transfers with its own preferences, and the
-        `maxDurations`, one configuration shared by all the walk profiles.
-        """
-      )
-      .asObject();
-
-    var mappedProfiles = mapProfiles(walk);
-    var profiles = mappedProfiles.profiles();
-    var warmup = mapWarmup(walk, mappedProfiles.preferencesById());
-
+    var typeBlocks = new EnumMap<TransferProfileType, NodeAdapter>(TransferProfileType.class);
     var maxDurations = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
-    var walkMaxDurations = mapMaxDurations(walk, TransferProfileType.WALK);
-    if (walkMaxDurations != null) {
-      maxDurations.put(TransferProfileType.WALK, walkMaxDurations);
+    for (var type : TransferProfileType.values()) {
+      var block = mapTypeBlock(transfers, type);
+      typeBlocks.put(type, block);
+      var typeMaxDurations = mapMaxDurations(block, type);
+      if (typeMaxDurations != null) {
+        maxDurations.put(type, typeMaxDurations);
+      }
     }
+
+    var mappedProfiles = mapProfiles(typeBlocks);
+    var profiles = mappedProfiles.profiles();
+    var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
 
     return createParameters(
       profiles,
@@ -107,12 +102,33 @@ public class TransferProfilesConfigMapper {
     );
   }
 
+  /** The block of a profile type, for example {@code walk}. An empty block if it is not set. */
+  private static NodeAdapter mapTypeBlock(NodeAdapter transfers, TransferProfileType type) {
+    var name = typeName(type);
+    return transfers
+      .of(name)
+      .since(V2_10)
+      .summary("The configuration of the " + name + " transfers.")
+      .description(
+        """
+        The `profiles`, each a discovery search of transfers with its own preferences, the
+        `maxDurations`, one configuration shared by all the profiles of the type, and the `warmup`
+        entries.
+        """
+      )
+      .asObject();
+  }
+
+  private static String typeName(TransferProfileType type) {
+    return type.name().toLowerCase();
+  }
+
   /**
    * Create and validate the parameters. A configuration error is reported like the other
    * configuration errors, when the configuration is read.
    */
   private static TransferProfilesParameters<RouteRequest> createParameters(
-    List<WalkProfileParameters<RouteRequest>> profiles,
+    List<TransferProfileParameters<RouteRequest>> profiles,
     MaxDurationsPreference defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit,
@@ -180,8 +196,13 @@ public class TransferProfilesConfigMapper {
   }
 
   /** The profile used if no profile is configured: its preferences are the ones of the request. */
-  private static WalkProfileParameters<RouteRequest> defaultWalkProfile() {
-    return new WalkProfileParameters<>(DEFAULT_WALK_PROFILE_ID, null, RouteRequest.defaultValue());
+  private static TransferProfileParameters<RouteRequest> defaultWalkProfile() {
+    return new TransferProfileParameters<>(
+      DEFAULT_WALK_PROFILE_ID,
+      TransferProfileType.WALK,
+      null,
+      RouteRequest.defaultValue()
+    );
   }
 
   private static DeduplicationLimit mapDeduplicationLimit(NodeAdapter transfers) {
@@ -210,36 +231,50 @@ public class TransferProfilesConfigMapper {
   }
 
   /** A profile as configured: its id and its parent are read first, to order the profiles. */
-  private record ConfiguredProfile(String id, @Nullable String parent, NodeAdapter node) {}
+  private record ConfiguredProfile(
+    String id,
+    TransferProfileType type,
+    @Nullable String parent,
+    NodeAdapter node
+  ) {}
 
   /** A profile with the values that are inherited by its children. */
-  private record ResolvedProfile(RouteRequest request, WalkPreferences userPreferences) {}
+  private record ResolvedProfile(
+    RouteRequest request,
+    AbstractUserPreferences<?> userPreferences
+  ) {}
 
   /** The mapped profiles, and the user preferences of each profile, by id, after inheritance. */
   private record MappedProfiles(
-    List<WalkProfileParameters<RouteRequest>> profiles,
-    Map<String, WalkPreferences> preferencesById
+    List<TransferProfileParameters<RouteRequest>> profiles,
+    Map<String, AbstractUserPreferences<?>> preferencesById
   ) {}
 
   /**
-   * Map the profiles of the walk type. A profile inherits unset values from its parent, so the
-   * parents are mapped first, whatever order they are declared in.
+   * Map the profiles of all the types. A profile inherits unset values from its parent, so the
+   * parents are mapped first, whatever order they are declared in, and the parent can be of
+   * another type. If no profile is configured, a default walk profile is used.
    */
-  private static MappedProfiles mapProfiles(NodeAdapter walk) {
-    var configured = walk
-      .of("profiles")
-      .since(V2_10)
-      .summary("The walk transfer profiles.")
-      .description(
-        """
-        Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
-        profiles must be unique. A profile without `userPreferences` gets them from its
-        `routingRequest`. A profile with a `parent` inherits the `routingRequest` and the
-        `userPreferences` of the parent, and the paths it has in common with the parent are stored
-        once. If no profile is configured, a default profile with the id `walk` is used.
-        """
+  private static MappedProfiles mapProfiles(Map<TransferProfileType, NodeAdapter> typeBlocks) {
+    var configured = new ArrayList<ConfiguredProfile>();
+    typeBlocks.forEach((type, block) ->
+      configured.addAll(
+        block
+          .of("profiles")
+          .since(V2_10)
+          .summary("The " + typeName(type) + " transfer profiles.")
+          .description(
+            """
+            Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
+            profiles must be unique. A profile without `userPreferences` gets them from its
+            `routingRequest`. A profile with a `parent` inherits the `routingRequest` and the
+            `userPreferences` of the parent, and the paths it has in common with the parent are
+            stored once.
+            """
+          )
+          .asObjects(List.of(), node -> readConfiguredProfile(node, type))
       )
-      .asObjects(List.of(), TransferProfilesConfigMapper::readConfiguredProfile);
+    );
     if (configured.isEmpty()) {
       var profile = defaultWalkProfile();
       return new MappedProfiles(
@@ -264,7 +299,7 @@ public class TransferProfilesConfigMapper {
 
     var mapper = new RegularTransferPreferencesMapper();
     var resolved = new HashMap<String, ResolvedProfile>();
-    var mapped = new HashMap<String, WalkProfileParameters<RouteRequest>>();
+    var mapped = new HashMap<String, TransferProfileParameters<RouteRequest>>();
     for (var profile : parentsFirst) {
       var parent = profile.parent() == null ? null : resolved.get(profile.parent());
       var request = RouteRequestConfig.mapRouteRequest(
@@ -279,9 +314,10 @@ public class TransferProfilesConfigMapper {
           .asObject(),
         parent == null ? RouteRequest.defaultValue() : parent.request()
       );
-      WalkPreferences own = null;
+      AbstractUserPreferences<?> own = null;
       if (profile.node().exist("userPreferences")) {
-        own = mapWalkPreferences(
+        own = mapPreferences(
+          profile.type(),
           profile
             .node()
             .of("userPreferences")
@@ -291,7 +327,7 @@ public class TransferProfilesConfigMapper {
               "Optional. If it is not set, the preferences of the `routingRequest` are used."
             )
             .asObject(),
-          parent == null ? WalkPreferences.DEFAULT : parent.userPreferences()
+          parent == null ? null : parent.userPreferences()
         );
       }
       var effective = own != null ? own : mapper.toUserPreferences(request);
@@ -302,11 +338,17 @@ public class TransferProfilesConfigMapper {
       );
       mapped.put(
         profile.id(),
-        new WalkProfileParameters<>(profile.id(), profile.parent(), own, request)
+        new TransferProfileParameters<>(
+          profile.id(),
+          profile.type(),
+          profile.parent(),
+          own,
+          request
+        )
       );
     }
     // Keep the declared order
-    var preferencesById = new HashMap<String, WalkPreferences>();
+    var preferencesById = new HashMap<String, AbstractUserPreferences<?>>();
     resolved.forEach((id, profile) -> preferencesById.put(id, profile.userPreferences()));
     return new MappedProfiles(
       configured
@@ -318,33 +360,43 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * Map the warmup entries. The preferences of an entry inherit the preferences of its parent
-   * profile, so an entry only sets what is different.
+   * Map the warmup entries of all the types. The preferences of an entry inherit the preferences
+   * of its parent profile, so an entry only sets what is different.
    */
   private static List<WarmupParameters> mapWarmup(
-    NodeAdapter walk,
-    Map<String, WalkPreferences> preferencesById
+    Map<TransferProfileType, NodeAdapter> typeBlocks,
+    Map<String, AbstractUserPreferences<?>> preferencesById
   ) {
-    return walk
-      .of("warmup")
-      .since(V2_10)
-      .summary("The user preferences to create the Raptor transfers for when the server starts.")
-      .description(
-        """
-        Each entry needs an `id`, a `parent` and `userPreferences`. The `id` must be unique among
-        all the profiles and warmup entries, and the `parent` is the `id` of a profile. The
-        Raptor transfers for the `userPreferences` are created from the paths of the parent when the
-        server starts, so the first request with these preferences does not wait for them. No paths
-        are searched for or stored for a warmup entry. Use warmup for preferences that are common in
-        the requests, but are not worth a profile of their own.
-        """
+    var result = new ArrayList<WarmupParameters>();
+    typeBlocks.forEach((type, block) ->
+      result.addAll(
+        block
+          .of("warmup")
+          .since(V2_10)
+          .summary(
+            "The user preferences to create the Raptor transfers for when the server starts."
+          )
+          .description(
+            """
+            Each entry needs an `id`, a `parent` and `userPreferences`. The `id` must be unique
+            among all the profiles and warmup entries, and the `parent` is the `id` of a profile of
+            the same type. The Raptor transfers for the `userPreferences` are created from the
+            paths of the parent when the server starts, so the first request with these preferences
+            does not wait for them. No paths are searched for or stored for a warmup entry. Use
+            warmup for preferences that are common in the requests, but are not worth a profile of
+            their own.
+            """
+          )
+          .asObjects(List.of(), entry -> mapWarmupEntry(entry, type, preferencesById))
       )
-      .asObjects(List.of(), entry -> mapWarmupEntry(entry, preferencesById));
+    );
+    return result;
   }
 
   private static WarmupParameters mapWarmupEntry(
     NodeAdapter entry,
-    Map<String, WalkPreferences> preferencesById
+    TransferProfileType type,
+    Map<String, AbstractUserPreferences<?>> preferencesById
   ) {
     var id = entry
       .of("id")
@@ -367,12 +419,26 @@ public class TransferProfilesConfigMapper {
           "' is not a profile"
       );
     }
+    if (parentPreferences.type() != type) {
+      throw new OtpAppException(
+        "Invalid transfer configuration: The parent '" +
+          parent +
+          "' of the warmup '" +
+          id +
+          "' is a " +
+          typeName(parentPreferences.type()) +
+          " profile, the warmup is in the " +
+          typeName(type) +
+          " block"
+      );
+    }
     if (!entry.exist("userPreferences")) {
       throw new OtpAppException(
         "Invalid transfer configuration: The warmup '" + id + "' needs 'userPreferences'"
       );
     }
-    var userPreferences = mapWalkPreferences(
+    var userPreferences = mapPreferences(
+      type,
       entry
         .of("userPreferences")
         .since(V2_10)
@@ -384,7 +450,7 @@ public class TransferProfilesConfigMapper {
     return new WarmupParameters(id, parent, userPreferences);
   }
 
-  private static ConfiguredProfile readConfiguredProfile(NodeAdapter p) {
+  private static ConfiguredProfile readConfiguredProfile(NodeAdapter p, TransferProfileType type) {
     var id = p
       .of("id")
       .since(V2_10)
@@ -412,10 +478,26 @@ public class TransferProfilesConfigMapper {
         )
         .asString();
     }
-    return new ConfiguredProfile(id, parent, p);
+    return new ConfiguredProfile(id, type, parent, p);
   }
 
-  /** Unset values are the values of {@code base}, the preferences of the parent or the default. */
+  /**
+   * Map the user preferences of a profile type. Unset values are the values of {@code parent}, the
+   * preferences of the parent profile or the warmup, or else the defaults of the type.
+   */
+  private static AbstractUserPreferences<?> mapPreferences(
+    TransferProfileType type,
+    NodeAdapter p,
+    @Nullable AbstractUserPreferences<?> parent
+  ) {
+    return switch (type) {
+      case WALK -> mapWalkPreferences(
+        p,
+        parent instanceof WalkPreferences walk ? walk : WalkPreferences.DEFAULT
+      );
+    };
+  }
+
   private static WalkPreferences mapWalkPreferences(NodeAdapter p, WalkPreferences base) {
     var dft = base.copyOf();
     var original = dft.original();

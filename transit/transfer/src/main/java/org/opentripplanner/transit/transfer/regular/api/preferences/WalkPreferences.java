@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
+import java.util.Objects;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -14,16 +16,20 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public final class WalkPreferences extends AbstractUserPreferences {
+public final class WalkPreferences extends AbstractUserPreferences<WalkPreferences> {
 
   public static final WalkPreferences DEFAULT = new WalkPreferences();
 
+  private final StreetSegmentTypeUsage stairs;
+
   private WalkPreferences() {
-    super(Speed.ofMetersPerSecond(1.35), Reluctance.of(2.0), StreetSegmentTypeUsage.ALLOWED);
+    super(Speed.ofMetersPerSecond(1.35), Reluctance.of(2.0));
+    this.stairs = StreetSegmentTypeUsage.ALLOWED;
   }
 
   private WalkPreferences(Builder builder) {
     super(builder);
+    this.stairs = Objects.requireNonNull(builder.stairs);
   }
 
   public static Builder of() {
@@ -35,32 +41,62 @@ public final class WalkPreferences extends AbstractUserPreferences {
   }
 
   @Override
-  AbstractUserPreferences defaultInstance() {
+  public TransferProfileType type() {
+    return TransferProfileType.WALK;
+  }
+
+  /** Whether stairs are allowed, discouraged or forbidden. */
+  public StreetSegmentTypeUsage stairs() {
+    return stairs;
+  }
+
+  @Override
+  WalkPreferences defaultInstance() {
     return DEFAULT;
   }
 
   @Override
+  public float normalizedDistance(AbstractUserPreferences other) {
+    float distance = super.normalizedDistance(other);
+    if (other instanceof WalkPreferences that) {
+      distance += stairs.normalizedDistance(that.stairs);
+    }
+    return distance;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof WalkPreferences)) {
+    if (!(obj instanceof WalkPreferences that)) {
       return false;
     }
-    return super.equals(obj);
+    return super.equals(obj) && stairs == that.stairs;
   }
 
   @Override
   public int hashCode() {
-    return super.hashCode();
+    return Objects.hash(super.hashCode(), stairs);
   }
 
   @Override
   public String toString() {
-    return super.appendToString(ToStringBuilder.of(WalkPreferences.class)).toString();
+    return super
+      .appendToString(ToStringBuilder.of(WalkPreferences.class))
+      .addObj("stairs", stairs, DEFAULT.stairs)
+      .toString();
   }
 
   public static class Builder extends AbstractUserPreferences.Builder<WalkPreferences, Builder> {
 
+    private StreetSegmentTypeUsage stairs;
+
     public Builder(WalkPreferences original) {
       super(original);
+      this.stairs = original.stairs;
+    }
+
+    public Builder withStairs(StreetSegmentTypeUsage stairs) {
+      this.stairs = stairs;
+      return this;
     }
 
     @Override

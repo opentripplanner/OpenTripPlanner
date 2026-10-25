@@ -12,7 +12,7 @@ public enum StreetSegmentTypeUsage
   ),
   DISCOURAGED(
     "This value indicates that the user can use this but would prefer other alternatives. " +
-      "A small time penalty and/or a moderate generalized cost are added."
+      "A small time penty and/or a moderate generalized cost are added."
   ),
   FORBIDDEN(
     "This value indicates that the user does not want this at all, unless no other option exists." +

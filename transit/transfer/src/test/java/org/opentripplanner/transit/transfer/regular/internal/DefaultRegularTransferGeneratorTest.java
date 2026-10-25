@@ -14,8 +14,9 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class DefaultRegularTransferGeneratorTest {
@@ -30,7 +31,7 @@ class DefaultRegularTransferGeneratorTest {
 
   private static TransferProfilesParameters<WalkPreferences> parameters(WalkPreferences walk) {
     return new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>("walk", walk, walk))
+      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, walk, walk))
     );
   }
 
@@ -39,7 +40,7 @@ class DefaultRegularTransferGeneratorTest {
     Duration maxDuration
   ) {
     return new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>("walk", walk, walk)),
+      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, walk, walk)),
       MaxDurationsPreference.of(maxDuration),
       Map.of()
     );
@@ -192,7 +193,7 @@ class DefaultRegularTransferGeneratorTest {
 
     /** The path from A to B found for the preferences, after the transfers are generated. */
     FakeTransferPathProvider.FakePath generateAndFindPath(
-      List<WalkProfileParameters<WalkPreferences>> profiles,
+      List<TransferProfileParameters<WalkPreferences>> profiles,
       DeduplicationLimit limit,
       WalkPreferences forPreferences
     ) {
@@ -211,12 +212,24 @@ class DefaultRegularTransferGeneratorTest {
         .findPath(stopIndex.toStopIndex(A), stopIndex.toStopIndex(B));
     }
 
-    WalkProfileParameters<WalkPreferences> parentProfile() {
-      return new WalkProfileParameters<>("parent", null, parent, parent);
+    TransferProfileParameters<WalkPreferences> parentProfile() {
+      return new TransferProfileParameters<>(
+        "parent",
+        TransferProfileType.WALK,
+        null,
+        parent,
+        parent
+      );
     }
 
-    WalkProfileParameters<WalkPreferences> childProfile(String parentId) {
-      return new WalkProfileParameters<>("child", parentId, child, child);
+    TransferProfileParameters<WalkPreferences> childProfile(String parentId) {
+      return new TransferProfileParameters<>(
+        "child",
+        TransferProfileType.WALK,
+        parentId,
+        child,
+        child
+      );
     }
   }
 

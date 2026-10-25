@@ -10,13 +10,13 @@ import org.opentripplanner.utils.collection.ParentOrder;
 
 /**
  * The configuration of the regular transfers: the profiles to generate transfer paths for, and the
- * max durations of the profile types. Only walk profiles are supported.
+ * max durations of the profile types.
  *
- * @param walk                the walk profiles, in the order declared in the configuration. At
- *                            least one is required, and the ids must be unique. The user
- *                            preferences of the profiles must be unique too, but that is checked
- *                            when the profiles are created, since a profile without preferences
- *                            gets them from its request.
+ * @param profiles            the profiles of all types, in the order declared in the
+ *                            configuration. At least one is required, and the ids must be unique.
+ *                            The user preferences of the profiles must be unique too, but that is
+ *                            checked when the profiles are created, since a profile without
+ *                            preferences gets them from its request.
  * @param defaultMaxDurations the max durations of the profile types without an override in
  *                            {@code maxDurations}
  * @param maxDurations        the max durations of a profile type, shared by all profiles of the
@@ -30,23 +30,23 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * @param <R>                 the request type, opaque to the module
  */
 public record TransferProfilesParameters<R>(
-  List<WalkProfileParameters<R>> walk,
+  List<TransferProfileParameters<R>> profiles,
   MaxDurationsPreference defaultMaxDurations,
   Map<TransferProfileType, MaxDurationsPreference> maxDurations,
   DeduplicationLimit deduplicationLimit,
   List<WarmupParameters> warmup
 ) {
   public TransferProfilesParameters {
-    walk = List.copyOf(walk);
+    profiles = List.copyOf(profiles);
     warmup = List.copyOf(warmup);
     Objects.requireNonNull(defaultMaxDurations);
     Objects.requireNonNull(deduplicationLimit);
     maxDurations = maxDurations.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(maxDurations));
-    if (walk.isEmpty()) {
-      throw new IllegalArgumentException("At least one walk transfer profile is required.");
+    if (profiles.isEmpty()) {
+      throw new IllegalArgumentException("At least one transfer profile is required.");
     }
     var ids = new HashSet<String>();
-    for (var profile : walk) {
+    for (var profile : profiles) {
       if (!ids.add(profile.id())) {
         throw new IllegalArgumentException(
           "Duplicate transfer profile id, the ids must be unique: " + profile.id()
@@ -54,7 +54,11 @@ public record TransferProfilesParameters<R>(
       }
     }
     // Check that the parents exist, and that they do not form a cycle
-    ParentOrder.parentsFirst(walk, WalkProfileParameters::id, WalkProfileParameters::parent);
+    ParentOrder.parentsFirst(
+      profiles,
+      TransferProfileParameters::id,
+      TransferProfileParameters::parent
+    );
     for (var entry : warmup) {
       if (!ids.add(entry.id())) {
         throw new IllegalArgumentException(
@@ -62,7 +66,10 @@ public record TransferProfilesParameters<R>(
         );
       }
     }
-    var profileIds = walk.stream().map(WalkProfileParameters::id).collect(Collectors.toSet());
+    var profileIds = profiles
+      .stream()
+      .map(TransferProfileParameters::id)
+      .collect(Collectors.toSet());
     for (var entry : warmup) {
       if (!profileIds.contains(entry.parent())) {
         throw new IllegalArgumentException(
@@ -73,27 +80,27 @@ public record TransferProfilesParameters<R>(
   }
 
   /** The profiles with the default max durations and deduplication limit. */
-  public TransferProfilesParameters(List<WalkProfileParameters<R>> walk) {
-    this(walk, MaxDurationsPreference.DEFAULT, Map.of());
+  public TransferProfilesParameters(List<TransferProfileParameters<R>> profiles) {
+    this(profiles, MaxDurationsPreference.DEFAULT, Map.of());
   }
 
   /** The profiles with the default deduplication limit. */
   public TransferProfilesParameters(
-    List<WalkProfileParameters<R>> walk,
+    List<TransferProfileParameters<R>> profiles,
     MaxDurationsPreference defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations
   ) {
-    this(walk, defaultMaxDurations, maxDurations, DeduplicationLimit.DEFAULT, List.of());
+    this(profiles, defaultMaxDurations, maxDurations, DeduplicationLimit.DEFAULT, List.of());
   }
 
   /** The profiles without warmup entries. */
   public TransferProfilesParameters(
-    List<WalkProfileParameters<R>> walk,
+    List<TransferProfileParameters<R>> profiles,
     MaxDurationsPreference defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit
   ) {
-    this(walk, defaultMaxDurations, maxDurations, deduplicationLimit, List.of());
+    this(profiles, defaultMaxDurations, maxDurations, deduplicationLimit, List.of());
   }
 
   /** The max durations of {@code type}: its override, or else the default. */

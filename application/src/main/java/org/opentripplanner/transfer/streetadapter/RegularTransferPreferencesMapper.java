@@ -34,6 +34,12 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
 
   @Override
   public RouteRequest toRequest(AbstractUserPreferences<?> userPreferences, RouteRequest base) {
+    return switch (userPreferences) {
+      case WalkPreferences walk -> walkRequest(walk, base);
+    };
+  }
+
+  private static RouteRequest walkRequest(WalkPreferences userPreferences, RouteRequest base) {
     var builder = base.copyOf();
     builder.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.WALK)));
     builder.withPreferences(routingPrefs ->

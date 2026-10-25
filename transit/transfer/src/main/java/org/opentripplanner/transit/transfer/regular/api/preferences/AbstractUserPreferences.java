@@ -5,13 +5,16 @@ import java.util.Objects;
 import org.opentripplanner.core.model.basic.NormalizedDistance;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The traveler preferences a regular transfer path is computed and cached under. The values are
  * normalized(rounded) by the individual preference classes so this class can be used as a cache
  * key.
+ * <p>
+ * Each {@link TransferProfileType} has its own preferences class, with the preferences that are
+ * meaningful for the type. The preferences all types share are here: the speed and the reluctance.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
@@ -22,19 +25,19 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
 
   private final Speed speed;
   private final Reluctance reluctance;
-  private final StreetSegmentTypeUsage stairs;
 
-  AbstractUserPreferences(Speed speed, Reluctance reluctance, StreetSegmentTypeUsage stairs) {
+  AbstractUserPreferences(Speed speed, Reluctance reluctance) {
     this.speed = speed;
     this.reluctance = reluctance;
-    this.stairs = stairs;
   }
 
   AbstractUserPreferences(Builder builder) {
     this.speed = builder.speed;
     this.reluctance = builder.reluctance;
-    this.stairs = builder.stairs;
   }
+
+  /** The profile type these preferences belong to. */
+  public abstract TransferProfileType type();
 
   public Speed speed() {
     return speed;
@@ -42,10 +45,6 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
 
   public Reluctance reluctance() {
     return reluctance;
-  }
-
-  public StreetSegmentTypeUsage stairs() {
-    return stairs;
   }
 
   abstract S defaultInstance();
@@ -59,19 +58,18 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
       return false;
     }
     AbstractUserPreferences that = (AbstractUserPreferences) o;
-    return speed.equals(that.speed) && reluctance.equals(that.reluctance) && stairs == that.stairs;
+    return speed.equals(that.speed) && reluctance.equals(that.reluctance);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(speed, reluctance, stairs);
+    return Objects.hash(speed, reluctance);
   }
 
   ToStringBuilder appendToString(ToStringBuilder builder) {
     return builder
       .addObj("speed", speed, defaultInstance().speed())
-      .addObj("reluctance", reluctance, defaultInstance().reluctance())
-      .addObj("stairs", stairs, defaultInstance().stairs());
+      .addObj("reluctance", reluctance, defaultInstance().reluctance());
   }
 
   @Override
@@ -79,11 +77,7 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     if (getClass() != other.getClass()) {
       return 1000f;
     }
-    return (
-      speed.normalizedDistance(other.speed) +
-      reluctance.normalizedDistance(other.reluctance) +
-      stairs.normalizedDistance(other.stairs)
-    );
+    return speed.normalizedDistance(other.speed) + reluctance.normalizedDistance(other.reluctance);
   }
 
   protected abstract static class Builder<
@@ -94,13 +88,11 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     private final S original;
     private Speed speed;
     private Reluctance reluctance;
-    private StreetSegmentTypeUsage stairs;
 
     Builder(S original) {
       this.original = original;
       this.speed = original.speed();
       this.reluctance = original.reluctance();
-      this.stairs = original.stairs();
     }
 
     public S original() {
@@ -116,12 +108,6 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     @SuppressWarnings("unchecked")
     public T withReluctance(Reluctance reluctance) {
       this.reluctance = reluctance;
-      return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public T withStairs(StreetSegmentTypeUsage stairs) {
-      this.stairs = stairs;
       return (T) this;
     }
 

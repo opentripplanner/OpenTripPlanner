@@ -12,9 +12,9 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
@@ -24,8 +24,8 @@ class TransferProfilesConfigMapperTest {
   void aSingleDefaultWalkProfileIsUsedWithoutConfiguration() {
     var subject = map("{}");
 
-    assertThat(subject.walk()).hasSize(1);
-    var walk = subject.walk().getFirst();
+    assertThat(subject.profiles()).hasSize(1);
+    var walk = subject.profiles().getFirst();
     assertThat(walk.id()).isEqualTo("walk");
     assertThat(walk.userPreferences()).isNull();
     assertThat(walk.routingRequest()).isEqualTo(RouteRequest.defaultValue());
@@ -35,8 +35,8 @@ class TransferProfilesConfigMapperTest {
   void aWalkBlockWithoutProfilesUsesTheDefaultProfile() {
     var subject = map("{ transfers: { walk: {} } }");
 
-    assertThat(subject.walk()).hasSize(1);
-    assertThat(subject.walk().getFirst().id()).isEqualTo("walk");
+    assertThat(subject.profiles()).hasSize(1);
+    assertThat(subject.profiles().getFirst().id()).isEqualTo("walk");
   }
 
   @Test
@@ -56,8 +56,8 @@ class TransferProfilesConfigMapperTest {
       """
     );
 
-    assertThat(subject.walk()).hasSize(1);
-    var profile = subject.walk().getFirst();
+    assertThat(subject.profiles()).hasSize(1);
+    var profile = subject.profiles().getFirst();
     assertThat(profile.id()).isEqualTo("slow walk");
     assertThat(profile.userPreferences()).isEqualTo(
       WalkPreferences.of()
@@ -72,7 +72,7 @@ class TransferProfilesConfigMapperTest {
   void aProfileMayHaveNoUserPreferences() {
     var subject = map("{ transfers: { walk: { profiles: [{ id: 'walk' }] } } }");
 
-    assertThat(subject.walk().getFirst().userPreferences()).isNull();
+    assertThat(subject.profiles().getFirst().userPreferences()).isNull();
   }
 
   @Test
@@ -92,7 +92,7 @@ class TransferProfilesConfigMapperTest {
       """
     );
 
-    var request = subject.walk().getFirst().routingRequest();
+    var request = subject.profiles().getFirst().routingRequest();
     assertThat(request.journey().wheelchair()).isTrue();
   }
 
@@ -115,7 +115,7 @@ class TransferProfilesConfigMapperTest {
 
     assertThat(
       subject
-        .walk()
+        .profiles()
         .stream()
         .map(p -> p.id())
     )
@@ -269,7 +269,7 @@ class TransferProfilesConfigMapperTest {
 
     assertThat(
       subject
-        .walk()
+        .profiles()
         .stream()
         .map(p -> p.id())
     )
@@ -398,7 +398,7 @@ class TransferProfilesConfigMapperTest {
     );
 
     assertThat(subject.warmup()).hasSize(1);
-    assertThat(subject.walk().getFirst().id()).isEqualTo("walk");
+    assertThat(subject.profiles().getFirst().id()).isEqualTo("walk");
   }
 
   @Test
@@ -543,7 +543,7 @@ class TransferProfilesConfigMapperTest {
       """
     );
 
-    assertThat(subject.walk()).hasSize(2);
+    assertThat(subject.profiles()).hasSize(2);
     assertThat(maxDuration(subject)).isEqualTo(Duration.ofMinutes(10));
   }
 
@@ -590,12 +590,12 @@ class TransferProfilesConfigMapperTest {
     return parameters.maxDurations(TransferProfileType.WALK).maxDuration();
   }
 
-  private static WalkProfileParameters<RouteRequest> profile(
+  private static TransferProfileParameters<RouteRequest> profile(
     TransferProfilesParameters<RouteRequest> parameters,
     String id
   ) {
     return parameters
-      .walk()
+      .profiles()
       .stream()
       .filter(p -> p.id().equals(id))
       .findFirst()

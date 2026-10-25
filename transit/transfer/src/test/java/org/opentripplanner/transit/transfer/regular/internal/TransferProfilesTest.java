@@ -13,8 +13,9 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.WalkProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
@@ -23,7 +24,12 @@ class TransferProfilesTest {
   @Test
   void ofWrapsTheGivenProfilesPreservingOrder() {
     var walk = new TransferProfile<>(
-      new WalkProfileParameters<>("walk", WalkPreferences.DEFAULT, WalkPreferences.DEFAULT),
+      new TransferProfileParameters<>(
+        "walk",
+        TransferProfileType.WALK,
+        WalkPreferences.DEFAULT,
+        WalkPreferences.DEFAULT
+      ),
       MaxDurationsPreference.DEFAULT,
       new FakeTransferPathProvider(),
       FakeRequestMapper.INSTANCE
@@ -38,7 +44,7 @@ class TransferProfilesTest {
   void aProfileWithoutUserPreferencesGetsThemFromItsRoutingRequest() {
     var request = WalkPreferences.of().withReluctance(Reluctance.of(7.0)).build();
     var parameters = new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>("derived", null, request))
+      List.of(new TransferProfileParameters<>("derived", TransferProfileType.WALK, null, request))
     );
 
     var profiles = TransferProfiles.of(
@@ -56,9 +62,19 @@ class TransferProfilesTest {
   void profilesWithEqualUserPreferencesAreRejectedAndNamed() {
     var parameters = new TransferProfilesParameters<>(
       List.of(
-        new WalkProfileParameters<>("a", WalkPreferences.DEFAULT, WalkPreferences.DEFAULT),
+        new TransferProfileParameters<>(
+          "a",
+          TransferProfileType.WALK,
+          WalkPreferences.DEFAULT,
+          WalkPreferences.DEFAULT
+        ),
         // No preferences of its own: they come from the request, which equals the default
-        new WalkProfileParameters<>("b", null, WalkPreferences.DEFAULT)
+        new TransferProfileParameters<>(
+          "b",
+          TransferProfileType.WALK,
+          null,
+          WalkPreferences.DEFAULT
+        )
       )
     );
 
@@ -72,7 +88,12 @@ class TransferProfilesTest {
   @Test
   void theProfileKeepsItsId() {
     var walk = new TransferProfile<>(
-      new WalkProfileParameters<>("my-walk", WalkPreferences.DEFAULT, WalkPreferences.DEFAULT),
+      new TransferProfileParameters<>(
+        "my-walk",
+        TransferProfileType.WALK,
+        WalkPreferences.DEFAULT,
+        WalkPreferences.DEFAULT
+      ),
       MaxDurationsPreference.DEFAULT,
       new FakeTransferPathProvider(),
       FakeRequestMapper.INSTANCE
@@ -86,9 +107,27 @@ class TransferProfilesTest {
   void aParentIsBeforeItsChildrenWhateverTheDeclaredOrder() {
     var parameters = new TransferProfilesParameters<>(
       List.of(
-        new WalkProfileParameters<>("child", "parent", withReluctance(3.0), withReluctance(3.0)),
-        new WalkProfileParameters<>("other", null, withReluctance(4.0), withReluctance(4.0)),
-        new WalkProfileParameters<>("parent", null, withReluctance(2.0), withReluctance(2.0))
+        new TransferProfileParameters<>(
+          "child",
+          TransferProfileType.WALK,
+          "parent",
+          withReluctance(3.0),
+          withReluctance(3.0)
+        ),
+        new TransferProfileParameters<>(
+          "other",
+          TransferProfileType.WALK,
+          null,
+          withReluctance(4.0),
+          withReluctance(4.0)
+        ),
+        new TransferProfileParameters<>(
+          "parent",
+          TransferProfileType.WALK,
+          null,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        )
       )
     );
 
@@ -107,8 +146,20 @@ class TransferProfilesTest {
   void aChildKnowsItsParent() {
     var parameters = new TransferProfilesParameters<>(
       List.of(
-        new WalkProfileParameters<>("parent", null, withReluctance(2.0), withReluctance(2.0)),
-        new WalkProfileParameters<>("child", "parent", withReluctance(3.0), withReluctance(3.0))
+        new TransferProfileParameters<>(
+          "parent",
+          TransferProfileType.WALK,
+          null,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        ),
+        new TransferProfileParameters<>(
+          "child",
+          TransferProfileType.WALK,
+          "parent",
+          withReluctance(3.0),
+          withReluctance(3.0)
+        )
       )
     );
 
@@ -131,7 +182,14 @@ class TransferProfilesTest {
   @Test
   void aWarmupEntryWithTheUserPreferencesOfAProfileIsRejectedAndNamed() {
     var parameters = new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>("walk", withReluctance(2.0), withReluctance(2.0))),
+      List.of(
+        new TransferProfileParameters<>(
+          "walk",
+          TransferProfileType.WALK,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        )
+      ),
       MaxDurationsPreference.DEFAULT,
       Map.of(),
       DeduplicationLimit.DEFAULT,
@@ -148,7 +206,14 @@ class TransferProfilesTest {
   @Test
   void warmupEntriesWithTheSameUserPreferencesAreRejected() {
     var parameters = new TransferProfilesParameters<>(
-      List.of(new WalkProfileParameters<>("walk", withReluctance(2.0), withReluctance(2.0))),
+      List.of(
+        new TransferProfileParameters<>(
+          "walk",
+          TransferProfileType.WALK,
+          withReluctance(2.0),
+          withReluctance(2.0)
+        )
+      ),
       MaxDurationsPreference.DEFAULT,
       Map.of(),
       DeduplicationLimit.DEFAULT,
