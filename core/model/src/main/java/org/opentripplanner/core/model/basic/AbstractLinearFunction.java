@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Objects;
 import org.opentripplanner.utils.lang.DoubleUtils;
-import org.opentripplanner.utils.lang.Units;
 
 /**
  * This is a data-transfer-object representing a linear function(constant and coefficient) of time.
@@ -16,14 +15,45 @@ import org.opentripplanner.utils.lang.Units;
  */
 public abstract class AbstractLinearFunction<T> implements Serializable {
 
+  private static final double COEFFICIENT_MIN = 0.0;
+  private static final double COEFFICIENT_MAX = 1_000.0;
+
+  /**
+   * The step the coefficient are rounded to, as rows of {@code {upper limit, step}}, see
+   * {@link DoubleUtils#roundToStep(double, double[][])}.
+   */
+  static final double[][] COEFFICIENT_SCALE = {
+    { 0.02, 0.001 },
+    { 0.05, 0.002 },
+    { 0.1, 0.005 },
+    { 0.2, 0.01 },
+    { 0.5, 0.02 },
+    { 1.0, 0.05 },
+    { 2.0, 0.1 },
+    { 5.0, 0.2 },
+    { 10.0, 0.5 },
+    { 20.0, 1.0 },
+    { 50.0, 2.0 },
+    { 100.0, 5.0 },
+    { Double.MAX_VALUE, 10.0 },
+  };
+
   private final T constant;
 
   private final double coefficient;
 
   protected AbstractLinearFunction(T constant, double coefficient) {
-    DoubleUtils.requireInRange(coefficient, 0.0, 100.0);
     this.constant = Objects.requireNonNull(constant);
-    this.coefficient = Units.normalizedFactor(coefficient, 0.0, 100.0);
+    this.coefficient = normalizeCoefficient(coefficient);
+  }
+
+  /**
+   * Check that the coefficient is in the range [{@value #COEFFICIENT_MIN},
+   * {@value #COEFFICIENT_MAX}] and round it to the step of its bucket in the coefficient scale.
+   */
+  static double normalizeCoefficient(double coefficient) {
+    DoubleUtils.requireInRange(coefficient, COEFFICIENT_MIN, COEFFICIENT_MAX);
+    return DoubleUtils.roundToStep(coefficient, COEFFICIENT_SCALE);
   }
 
   /** The constant part of the function in "centi-second" cost. */
@@ -55,7 +85,7 @@ public abstract class AbstractLinearFunction<T> implements Serializable {
   }
 
   public final String serialize() {
-    return LinearFunctionSerialization.serialize(this);
+    return LinearFunctionSerialization.serialize(this, COEFFICIENT_SCALE);
   }
 
   @Override

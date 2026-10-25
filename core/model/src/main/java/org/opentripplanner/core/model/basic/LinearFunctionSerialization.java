@@ -1,5 +1,6 @@
 package org.opentripplanner.core.model.basic;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
@@ -7,9 +8,9 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.StringUtils;
-import org.opentripplanner.utils.lang.Units;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
@@ -47,8 +48,9 @@ public class LinearFunctionSerialization {
   /**
    * Parse a string on the format: {@code 2m30s + 1.2 t }.
    * <p>
-   * The coefficient must be a number between 0.0 and 100.0. and is normalized: if < 2.0 to 2
-   * decimals, if 2.0 < 10.0 to 1 decimal and to whole numbers above 10.0.
+   * The coefficient must be a number in the range of {@link AbstractLinearFunction}, and is rounded
+   * to the step of its bucket in the coefficient scale: finer steps for small values, coarser for
+   * large.
    *
    * @throws NumberFormatException
    * @throws IllegalArgumentException
@@ -63,7 +65,7 @@ public class LinearFunctionSerialization {
       var constantText = m.group(1);
       var coefficientText = m.group(2);
       var coefficient = Double.parseDouble(coefficientText);
-      coefficient = Units.normalizedFactor(coefficient, 0.0, 100.0);
+      coefficient = AbstractLinearFunction.normalizeCoefficient(coefficient);
 
       var constant = parseDecimalSecondsOrDuration(constantText);
 
@@ -73,17 +75,47 @@ public class LinearFunctionSerialization {
     throw new IllegalArgumentException("Unable to parse function: '" + text + "'");
   }
 
-  public static String serialize(AbstractLinearFunction<?> value) {
-    return serialize(value.constantAsDuration(), value.coefficient());
+  /**
+   * Serialize the function. The coefficient is written with the number of decimals of the step of
+   * its bucket in the given {@code scale}, see {@link DoubleUtils#roundToStep(double, double[][])}
+   * for the table format. A coefficient is written with at least one decimal, if the step is less
+   * than 1, so the serialized text can be parsed back to the same function.
+   */
+  public static String serialize(AbstractLinearFunction<?> value, double[][] scale) {
+    return serialize(value.constantAsDuration(), value.coefficient(), scale);
   }
 
+  /** Serialize with the coefficient scale of the linear functions. */
   public static String serialize(Duration constant, double coefficient) {
+    return serialize(constant, coefficient, AbstractLinearFunction.COEFFICIENT_SCALE);
+  }
+
+  static String serialize(Duration constant, double coefficient, double[][] scale) {
     return String.format(
       Locale.ROOT,
       "%s + %s t",
       DurationUtils.durationToStr(constant),
-      Units.factorToString(coefficient)
+      coefficientToString(coefficient, scale)
     );
+  }
+
+  private static String coefficientToString(double coefficient, double[][] scale) {
+    int decimals = 0;
+    for (var row : scale) {
+      if (coefficient < row[0]) {
+        decimals = Math.max(0, BigDecimal.valueOf(row[1]).stripTrailingZeros().scale());
+        break;
+      }
+    }
+    var text = String.format(Locale.ROOT, "%." + decimals + "f", coefficient);
+    if (decimals > 1) {
+      int end = text.length();
+      while (text.charAt(end - 1) == '0' && text.charAt(end - 2) != '.') {
+        --end;
+      }
+      text = text.substring(0, end);
+    }
+    return text;
   }
 
   /**

@@ -49,12 +49,13 @@ class CostLinearFunctionTest {
   }
 
   @Test
-  void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
+  void coefficientMustBeInTheSanityRange() {
     assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of(D2_m, -0.01));
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      CostLinearFunction.of(Duration.ZERO, 100.1)
+      CostLinearFunction.of(Duration.ZERO, 1_000.1)
     );
-    assertEquals("The value is not in range[0.0, 100.0]: 100.1", ex.getMessage());
+    assertEquals("The value is not in range[0.0, 1,000.0]: 1,000.1", ex.getMessage());
+    assertEquals(1_000.0, CostLinearFunction.of(Duration.ZERO, 1_000.0).coefficient());
   }
 
   @Test

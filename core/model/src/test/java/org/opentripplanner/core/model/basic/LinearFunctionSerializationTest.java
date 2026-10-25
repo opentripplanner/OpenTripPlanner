@@ -16,37 +16,54 @@ import org.opentripplanner.utils.time.DurationUtils;
 
 class LinearFunctionSerializationTest {
 
-  private static final Duration D2_h_9_s = Duration.ofSeconds(129);
-  private static final Duration D1_h = Duration.ofSeconds(3600);
-
+  /**
+   * Each case is: input, expected constant, expected normalized coefficient and the expected
+   * serialized coefficient. The rows cover each bucket of the coefficient scale.
+   */
   @SuppressWarnings("unused")
-  static List<Arguments> parseTestCases() {
+  static List<Arguments> normalizeAndSerializeTestCases() {
     return List.of(
-      Arguments.of("0+0t", "0s", 0.0),
-      Arguments.of("1+0.0111 t", "1s", 0.0),
-      Arguments.of("120 + 0.111 t", "2m", 0.1),
-      Arguments.of("120 + 0.111 t", "2m", 0.1),
-      Arguments.of("12.0 + 0 t", "12s", 0.0),
-      Arguments.of("2h3m + 1.111 t", "2h3m", 1.1),
-      Arguments.of("2h3m + 2.111 t", "2h3m", 2.1),
-      Arguments.of("3h + 5.111 t", "3h", 5.0),
-      Arguments.of("7m + 10.1 x", "7m", 10.0),
-      Arguments.of("PT7s + 10.1 x", "7s", 10.0),
-      Arguments.of("0.1 + 10.1 x", "0s", 10.0),
-      Arguments.of("0.5 + 10.1 x", "1s", 10.0)
+      Arguments.of("0+0t", "0s", 0.0, "0s + 0.0 t"),
+      Arguments.of("1+0.0004 t", "1s", 0.0, "1s + 0.0 t"),
+      Arguments.of("1+0.0111 t", "1s", 0.011, "1s + 0.011 t"),
+      Arguments.of("1+0.0116 t", "1s", 0.012, "1s + 0.012 t"),
+      Arguments.of("1+0.0201 t", "1s", 0.02, "1s + 0.02 t"),
+      Arguments.of("1+0.0301 t", "1s", 0.03, "1s + 0.03 t"),
+      Arguments.of("1+0.0731 t", "1s", 0.075, "1s + 0.075 t"),
+      Arguments.of("120 + 0.111 t", "2m", 0.11, "2m + 0.11 t"),
+      Arguments.of("120 + 0.126 t", "2m", 0.13, "2m + 0.13 t"),
+      Arguments.of("1 + 0.3 t", "1s", 0.3, "1s + 0.3 t"),
+      Arguments.of("1 + 0.73 t", "1s", 0.75, "1s + 0.75 t"),
+      Arguments.of("2h3m + 1.111 t", "2h3m", 1.1, "2h3m + 1.1 t"),
+      Arguments.of("2h3m + 2.111 t", "2h3m", 2.2, "2h3m + 2.2 t"),
+      Arguments.of("3h + 5.111 t", "3h", 5.0, "3h + 5.0 t"),
+      Arguments.of("12.0 + 12.4 t", "12s", 12.0, "12s + 12 t"),
+      Arguments.of("7m + 10.1 x", "7m", 10.0, "7m + 10 t"),
+      Arguments.of("PT7s + 10.1 x", "7s", 10.0, "7s + 10 t"),
+      Arguments.of("0.1 + 10.1 x", "0s", 10.0, "0s + 10 t"),
+      Arguments.of("0.5 + 10.1 x", "1s", 10.0, "1s + 10 t"),
+      Arguments.of("1h + 234 x", "1h", 230.0, "1h + 230 t")
     );
   }
 
   @ParameterizedTest
-  @MethodSource("parseTestCases")
-  void parseTest(String input, String expectedConstant, double expectedCoefficient) {
-    Optional<MyTestLinearFunction> result = LinearFunctionSerialization.parse(
-      input,
-      MyTestLinearFunction::new
-    );
-    var f = result.orElseThrow();
+  @MethodSource("normalizeAndSerializeTestCases")
+  void normalizeAndSerialize(
+    String input,
+    String expectedConstant,
+    double expectedCoefficient,
+    String expectedSerialized
+  ) {
+    var f = LinearFunctionSerialization.parse(input, MyTestLinearFunction::new).orElseThrow();
     assertEquals(DurationUtils.duration(expectedConstant), f.constant);
     assertEquals(expectedCoefficient, f.coefficient);
+    assertEquals(expectedSerialized, f.toString());
+
+    // The serialized form is parsed back to the same function
+    assertEquals(
+      f,
+      LinearFunctionSerialization.parse(expectedSerialized, MyTestLinearFunction::new).orElseThrow()
+    );
   }
 
   @Test
@@ -57,12 +74,23 @@ class LinearFunctionSerializationTest {
   }
 
   @Test
-  void serialize() {
-    assertEquals("0s + 0.0 t", LinearFunctionSerialization.serialize(Duration.ZERO, 0));
-    assertEquals("2m9s + 0.0 t", LinearFunctionSerialization.serialize(D2_h_9_s, 0.0111));
-    assertEquals("1h + 0.1 t", LinearFunctionSerialization.serialize(D1_h, 0.111));
-    assertEquals("1h + 1.1 t", LinearFunctionSerialization.serialize(D1_h, 1.111));
-    assertEquals("1h + 2.1 t", LinearFunctionSerialization.serialize(D1_h, 2.111));
+  void serializeUsesTheDecimalsOfTheStepInTheScale() {
+    var scale = new double[][] { { 1.0, 0.25 }, { 10.0, 0.5 }, { 100.0, 5.0 }, { 1000.0, 0.001 } };
+    var d = Duration.ofSeconds(60);
+
+    // Step 0.25 gives 2 decimals, but trailing zeros are removed down to one decimal
+    assertEquals("1m + 0.0 t", LinearFunctionSerialization.serialize(d, 0.0, scale));
+    assertEquals("1m + 0.25 t", LinearFunctionSerialization.serialize(d, 0.25, scale));
+    assertEquals("1m + 0.5 t", LinearFunctionSerialization.serialize(d, 0.5, scale));
+    // Step 0.5 gives 1 decimal
+    assertEquals("1m + 1.0 t", LinearFunctionSerialization.serialize(d, 1.0, scale));
+    assertEquals("1m + 9.5 t", LinearFunctionSerialization.serialize(d, 9.5, scale));
+    // Step 5.0 gives a whole number
+    assertEquals("1m + 10 t", LinearFunctionSerialization.serialize(d, 10.0, scale));
+    assertEquals("1m + 95 t", LinearFunctionSerialization.serialize(d, 95.0, scale));
+    // Step 0.001 gives 3 decimals
+    assertEquals("1m + 100.001 t", LinearFunctionSerialization.serialize(d, 100.001, scale));
+    assertEquals("1m + 100.0 t", LinearFunctionSerialization.serialize(d, 100.0, scale));
   }
 
   @Test
