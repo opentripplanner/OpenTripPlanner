@@ -12,9 +12,11 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
+import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -332,14 +334,20 @@ public class GraphBuilderModules {
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
+    TimetableDataImport timetableDataImport,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
+    // The generator is created when the transfers are generated, after the transit data import
+    var flexIndex = OTPFeature.FlexRouting.isOn()
+      ? new FlexIndex(timetableDataImport.getAllFlexTrips(), timetableDataImport.getTripCalendars())
+      : null;
     return StreetTransferFactory.createGenerator(
       graph,
       transitRepository,
       config.transferProfiles(),
       regularTransferBuildRepository,
-      stopsVisitedByPatterns::contains
+      stopsVisitedByPatterns,
+      flexIndex
     );
   }
 

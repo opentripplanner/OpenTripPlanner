@@ -1,9 +1,14 @@
 package org.opentripplanner.transfer.streetadapter;
 
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.ext.flex.FlexIndex;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.NearbyStopFinder;
 import org.opentripplanner.place.api.NearbyStop;
+import org.opentripplanner.place.nearbystopfinder.PatternConsideringNearbyStopFinder;
+import org.opentripplanner.place.nearbystopfinder.PatternsByStopLookup;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -59,6 +64,33 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
       );
     }
     return StreetNearbyStopFinder.of(null).build();
+  }
+
+  /**
+   * Create the nearby-stop finder for {@code graph}, like
+   * {@link #createNearbyStopFinder(Graph, TransitRepository)}, but if the feature
+   * {@link OTPFeature#ConsiderPatternsForDirectTransfers} is on, only the stops that are useful for
+   * a transfer are found: for each trip pattern only the closest stop. This limits the number of
+   * transfers a lot, so the transfers can be stored and the graph built.
+   *
+   * @param flexIndex the flex trips to consider, or {@code null} to ignore flex trips
+   */
+  public static NearbyStopFinder createNearbyStopFinder(
+    Graph graph,
+    TransitRepository transitRepository,
+    PatternsByStopLookup patternsByStop,
+    @Nullable FlexIndex flexIndex
+  ) {
+    var finder = createNearbyStopFinder(graph, transitRepository);
+    if (!OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
+      return finder;
+    }
+    return new PatternConsideringNearbyStopFinder(
+      transitRepository.getSiteRepository(),
+      patternsByStop,
+      flexIndex,
+      finder
+    );
   }
 
   @Override

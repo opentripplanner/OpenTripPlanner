@@ -163,7 +163,8 @@ public class TestServerContext {
       transitRepository,
       StreetTransferFactory.defaultParameters(),
       regularTransferBuildRepository,
-      stopsVisitedByPatterns::contains
+      stopsVisitedByPatterns,
+      null
     );
     new RegularTransitTransferGenerator(
       () -> transferGenerator,
