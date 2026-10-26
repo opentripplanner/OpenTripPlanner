@@ -46,6 +46,7 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
   private final Graph graph;
   private final NearbyStopFinder nearbyStopFinder;
   private final Predicate<FeedScopedId> isTransferSource;
+  private final Predicate<FeedScopedId> isTransferTarget;
   private final AllowedModesLookup allowedModes;
   private final RouteRequest routeRequest;
   private final StreetSearchRequest streetSearchRequest;
@@ -53,6 +54,8 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
   /**
    * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
    *                         paths are found for the others.
+   * @param isTransferTarget only the stops accepted by this predicate have transfers to them, the
+   *                         paths to the others are dropped.
    * @param allowedModes     the modes the stops are allowed for, used to find the max duration of
    *                         the transfers from a stop and of each transfer, see
    *                         {@link MaxDurationsPreference}
@@ -61,12 +64,14 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
     Graph graph,
     NearbyStopFinder nearbyStopFinder,
     Predicate<FeedScopedId> isTransferSource,
+    Predicate<FeedScopedId> isTransferTarget,
     AllowedModesLookup allowedModes,
     RouteRequest routeRequest
   ) {
     this.graph = graph;
     this.nearbyStopFinder = nearbyStopFinder;
     this.isTransferSource = isTransferSource;
+    this.isTransferTarget = isTransferTarget;
     this.allowedModes = allowedModes;
     this.routeRequest = routeRequest;
     this.streetSearchRequest = streetSearchRequest(routeRequest);
@@ -102,6 +107,7 @@ final class DefaultTransferSearch implements TransferSearch<NearbyStop> {
     return nearbyStops
       .stream()
       .filter(nearbyStop -> !nearbyStop.stopId().equals(fromStop))
+      .filter(nearbyStop -> isTransferTarget.test(nearbyStop.stopId()))
       .map(DefaultTransferSearch::stripState)
       .<TransferPath<NearbyStop>>mapMulti((path, consumer) ->
         computePathCriteria(path)

@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.configure;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -76,7 +77,8 @@ public final class StreetTransferFactory {
           stopPatterns,
           flexIndex
         ),
-        stopPatterns::contains,
+        stopId -> stopPatterns.contains(stopId) && transfersAllowed(transitRepository, stopId),
+        stopId -> transfersAllowed(transitRepository, stopId),
         allowedModes
       ),
       new RegularTransferPreferencesMapper(),
@@ -121,5 +123,14 @@ public final class StreetTransferFactory {
       graph,
       StreetTransferPathProvider.createNearbyStopFinder(graph, transitRepository)
     );
+  }
+
+  /** A stop of a station that does not allow transfers has no transfers from or to it. */
+  private static boolean transfersAllowed(
+    TransitRepository transitRepository,
+    FeedScopedId stopId
+  ) {
+    var stop = transitRepository.getSiteRepository().getStopLocation(stopId);
+    return stop != null && !stop.transfersNotAllowed();
   }
 }

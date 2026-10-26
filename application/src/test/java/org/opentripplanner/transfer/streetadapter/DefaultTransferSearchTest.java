@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.core.model.id.FeedScopedId;
@@ -122,10 +123,47 @@ class DefaultTransferSearchTest {
     assertThat(finder.durationLimit).isEqualTo(Duration.ofMinutes(20));
   }
 
+  @Test
+  void thereIsNoStreetSearchFromAStopThatIsNotATransferSource() {
+    finder.add(PLAIN, minutes(10));
+    var subject = subject(StreetMode.WALK, MODES, FROM, stopId -> false, stopId -> true);
+
+    var result = subject.findNearbyStops(FROM, MaxDurationsPreference.of(Duration.ofMinutes(30)));
+
+    assertThat(result).isEmpty();
+    assertThat(finder.calls).isEqualTo(0);
+  }
+
+  @Test
+  void thePathsToAStopThatIsNotATransferTargetAreDropped() {
+    finder.add(PLAIN, minutes(10)).add(CAR, minutes(10));
+    var subject = subject(
+      StreetMode.WALK,
+      MODES,
+      FROM,
+      stopId -> true,
+      stopId -> !stopId.equals(PLAIN)
+    );
+
+    var result = subject.findNearbyStops(FROM, MaxDurationsPreference.of(Duration.ofMinutes(30)));
+
+    assertThat(stopIds(result)).containsExactly(CAR);
+  }
+
   private DefaultTransferSearch subject(
     StreetMode mode,
     Map<FeedScopedId, Set<AllowedMode>> modes,
     FeedScopedId fromStop
+  ) {
+    return subject(mode, modes, fromStop, stopId -> true, stopId -> true);
+  }
+
+  private DefaultTransferSearch subject(
+    StreetMode mode,
+    Map<FeedScopedId, Set<AllowedMode>> modes,
+    FeedScopedId fromStop,
+    Predicate<FeedScopedId> isSource,
+    Predicate<FeedScopedId> isTarget
   ) {
     var graph = new Graph();
     graph.addVertex(
@@ -141,7 +179,7 @@ class DefaultTransferSearchTest {
       .withJourney(jb -> jb.withTransfer(mode))
       .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)).withBike(b -> b.withSpeed(1.0)))
       .buildDefault();
-    return new DefaultTransferSearch(graph, finder, stopId -> true, lookup, request);
+    return new DefaultTransferSearch(graph, finder, isSource, isTarget, lookup, request);
   }
 
   private static List<FeedScopedId> stopIds(Collection<TransferPath<NearbyStop>> paths) {

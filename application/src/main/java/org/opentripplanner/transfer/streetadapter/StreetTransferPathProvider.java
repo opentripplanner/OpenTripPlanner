@@ -30,6 +30,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
   private final Graph graph;
   private final NearbyStopFinder nearbyStopFinder;
   private final Predicate<FeedScopedId> isTransferSource;
+  private final Predicate<FeedScopedId> isTransferTarget;
   private final AllowedModesLookup allowedModes;
 
   /**
@@ -37,12 +38,14 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
    * transfers, not to search for them.
    */
   public StreetTransferPathProvider(Graph graph, NearbyStopFinder nearbyStopFinder) {
-    this(graph, nearbyStopFinder, stopId -> true, AllowedModesLookup.NONE);
+    this(graph, nearbyStopFinder, stopId -> true, stopId -> true, AllowedModesLookup.NONE);
   }
 
   /**
    * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
    *                         paths are found for the others.
+   * @param isTransferTarget only the stops accepted by this predicate have transfers to them, the
+   *                         paths to the others are dropped.
    * @param allowedModes     the modes the stops are allowed for, to select the max duration of a
    *                         transfer
    */
@@ -50,11 +53,13 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
     Graph graph,
     NearbyStopFinder nearbyStopFinder,
     Predicate<FeedScopedId> isTransferSource,
+    Predicate<FeedScopedId> isTransferTarget,
     AllowedModesLookup allowedModes
   ) {
     this.graph = graph;
     this.nearbyStopFinder = nearbyStopFinder;
     this.isTransferSource = isTransferSource;
+    this.isTransferTarget = isTransferTarget;
     this.allowedModes = allowedModes;
   }
 
@@ -108,6 +113,7 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
       graph,
       nearbyStopFinder,
       isTransferSource,
+      isTransferTarget,
       allowedModes,
       request
     );
