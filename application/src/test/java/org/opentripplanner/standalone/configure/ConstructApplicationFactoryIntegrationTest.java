@@ -20,6 +20,7 @@ import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -98,7 +99,8 @@ class ConstructApplicationFactoryIntegrationTest {
     of(EmpiricalDelayRepository.class),
     of(LuceneIndex.class),
     of(SorlandsbanenNorwayService.class),
-    of(StopConsolidationRepository.class)
+    of(StopConsolidationRepository.class),
+    of(TaxiRepository.class)
   );
 
   /**
@@ -119,12 +121,10 @@ class ConstructApplicationFactoryIntegrationTest {
   @Test
   void everyExposedServiceHasTheExpectedScope() {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
-    DaggerScopeAssertions.assertSingleInstanceScope(
-      ConstructApplicationFactory.class,
-      factory,
-      SINGLETONS,
-      KNOWN_UNSCOPED_BUGS,
-      PROTOTYPE_BY_DESIGN
-    );
+    DaggerScopeAssertions.singleInstanceScope(ConstructApplicationFactory.class, factory)
+      .singletons(SINGLETONS)
+      .knownUnscopedBugs(KNOWN_UNSCOPED_BUGS)
+      .prototypeByDesign(PROTOTYPE_BY_DESIGN)
+      .assertScopes();
   }
 }

@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 /**
  * Shared reflection machinery behind the DI-scope regression tests: reflects over every no-arg
@@ -24,12 +25,116 @@ final class DaggerScopeAssertions {
   private DaggerScopeAssertions() {}
 
   /**
+   * Fluent, named-argument entry point for {@link #assertSingleInstanceScope}, so the three
+   * same-typed classification lists can't be mixed up at the call site.
+   */
+  static SingleInstanceScopeBuilder singleInstanceScope(
+    Class<?> accessorInterface,
+    Object instance
+  ) {
+    return new SingleInstanceScopeBuilder(accessorInterface, instance);
+  }
+
+  /**
+   * Fluent, named-argument entry point for {@link #assertRequestScope}, so the three same-typed
+   * classification lists can't be mixed up at the call site.
+   */
+  static RequestScopeBuilder requestScope(
+    Class<?> accessorInterface,
+    Object requestOne,
+    Object requestTwo
+  ) {
+    return new RequestScopeBuilder(accessorInterface, requestOne, requestTwo);
+  }
+
+  static final class SingleInstanceScopeBuilder {
+
+    private final Class<?> accessorInterface;
+    private final Object instance;
+    private List<DaggerBindingKey> singletons = List.of();
+    private List<DaggerBindingKey> knownUnscopedBugs = List.of();
+    private List<DaggerBindingKey> prototypeByDesign = List.of();
+
+    private SingleInstanceScopeBuilder(Class<?> accessorInterface, Object instance) {
+      this.accessorInterface = accessorInterface;
+      this.instance = instance;
+    }
+
+    SingleInstanceScopeBuilder singletons(List<DaggerBindingKey> keys) {
+      this.singletons = keys;
+      return this;
+    }
+
+    SingleInstanceScopeBuilder knownUnscopedBugs(List<DaggerBindingKey> keys) {
+      this.knownUnscopedBugs = keys;
+      return this;
+    }
+
+    SingleInstanceScopeBuilder prototypeByDesign(List<DaggerBindingKey> keys) {
+      this.prototypeByDesign = keys;
+      return this;
+    }
+
+    void assertScopes() {
+      assertSingleInstanceScope(
+        accessorInterface,
+        instance,
+        singletons,
+        knownUnscopedBugs,
+        prototypeByDesign
+      );
+    }
+  }
+
+  static final class RequestScopeBuilder {
+
+    private final Class<?> accessorInterface;
+    private final Object requestOne;
+    private final Object requestTwo;
+    private List<DaggerBindingKey> applicationSingleton = List.of();
+    private List<DaggerBindingKey> requestScoped = List.of();
+    private List<DaggerBindingKey> knownUnscopedBugs = List.of();
+
+    private RequestScopeBuilder(Class<?> accessorInterface, Object requestOne, Object requestTwo) {
+      this.accessorInterface = accessorInterface;
+      this.requestOne = requestOne;
+      this.requestTwo = requestTwo;
+    }
+
+    RequestScopeBuilder applicationSingleton(List<DaggerBindingKey> keys) {
+      this.applicationSingleton = keys;
+      return this;
+    }
+
+    RequestScopeBuilder requestScoped(List<DaggerBindingKey> keys) {
+      this.requestScoped = keys;
+      return this;
+    }
+
+    RequestScopeBuilder knownUnscopedBugs(List<DaggerBindingKey> keys) {
+      this.knownUnscopedBugs = keys;
+      return this;
+    }
+
+    void assertScopes() {
+      assertRequestScope(
+        accessorInterface,
+        requestOne,
+        requestTwo,
+        applicationSingleton,
+        requestScoped,
+        knownUnscopedBugs
+      );
+    }
+  }
+
+  /**
    * For a single-component factory (e.g. {@code ConstructApplicationFactory}): every accessor is
    * invoked twice on {@code instance} and must be classified as a singleton (same instance both
    * times), a known unscoped bug (different instances — tracked, not yet fixed), or built fresh
    * by design (different instances, expected).
    */
-  static void assertSingleInstanceScope(
+  private static void assertSingleInstanceScope(
     Class<?> accessorInterface,
     Object instance,
     List<DaggerBindingKey> singletons,
@@ -50,6 +155,9 @@ final class DaggerScopeAssertions {
       for (var method : accessors) {
         var key = DaggerBindingKey.ofAccessor(method);
         var first = method.invoke(instance);
+        if (nullIsHandled(method, first, failures)) {
+          continue;
+        }
         var second = method.invoke(instance);
 
         if (singletons.contains(key) && first != second) {
@@ -76,17 +184,15 @@ final class DaggerScopeAssertions {
    * on the independent {@code requestTwo}, and must be classified as an application singleton
    * (stable within and across requests), correctly request-scoped (stable within one request,
    * different across requests), a known unscoped bug (different even within one request —
-   * tracked, not yet fixed), or ignored (not a Dagger binding at all — e.g. hand-memoized on the
-   * wrapper itself — so no scope behavior is asserted; only listed for exhaustiveness).
+   * tracked, not yet fixed).
    */
-  static void assertRequestScope(
+  private static void assertRequestScope(
     Class<?> accessorInterface,
     Object requestOne,
     Object requestTwo,
     List<DaggerBindingKey> applicationSingleton,
     List<DaggerBindingKey> requestScoped,
-    List<DaggerBindingKey> knownUnscopedBugs,
-    List<DaggerBindingKey> ignored
+    List<DaggerBindingKey> knownUnscopedBugs
   ) {
     try {
       var accessors = accessorsOf(accessorInterface);
@@ -95,17 +201,16 @@ final class DaggerScopeAssertions {
         accessors,
         applicationSingleton,
         requestScoped,
-        knownUnscopedBugs,
-        ignored
+        knownUnscopedBugs
       );
 
       var failures = new ArrayList<String>();
       for (var method : accessors) {
         var key = DaggerBindingKey.ofAccessor(method);
-        if (ignored.contains(key)) {
+        var withinRequestFirst = method.invoke(requestOne);
+        if (nullIsHandled(method, withinRequestFirst, failures)) {
           continue;
         }
-        var withinRequestFirst = method.invoke(requestOne);
         var withinRequestSecond = method.invoke(requestOne);
         var acrossRequests = method.invoke(requestTwo);
 
@@ -143,6 +248,23 @@ final class DaggerScopeAssertions {
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * A {@code null} binding (typically a disabled sandbox feature) has no instance to compare, so
+   * its scope cannot be checked and it is skipped. That is only accepted for accessors explicitly
+   * marked {@link Nullable}; any other accessor returning {@code null} is reported as a failure.
+   *
+   * @return true if {@code value} is null, so the caller must skip the scope comparison
+   */
+  private static boolean nullIsHandled(Method accessor, Object value, List<String> failures) {
+    if (value != null) {
+      return false;
+    }
+    if (!accessor.isAnnotationPresent(Nullable.class)) {
+      failures.add(accessor.getName() + "() returned null but is not annotated @Nullable");
+    }
+    return true;
   }
 
   private static List<Method> accessorsOf(Class<?> accessorInterface) {

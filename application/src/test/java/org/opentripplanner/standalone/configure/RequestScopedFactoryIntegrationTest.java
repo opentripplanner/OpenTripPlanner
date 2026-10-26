@@ -98,8 +98,6 @@ class RequestScopedFactoryIntegrationTest {
   );
 
   /** Nothing exposed directly by {@link RequestScopedFactory} is a hand-memoized, non-Dagger value. */
-  private static final List<DaggerBindingKey> IGNORED = List.of();
-
   /**
    * Guards against the #7441 regression: a binding reached through a nested consumer ({@link
    * GtfsGraphQLRequestContext}) must resolve to the same shared instance as the direct accessor
@@ -126,14 +124,10 @@ class RequestScopedFactoryIntegrationTest {
     var factory = TestConstructApplicationFactoryBuilder.of().build();
     var requestOne = factory.requestScopedFactoryBuilder().build();
     var requestTwo = factory.requestScopedFactoryBuilder().build();
-    DaggerScopeAssertions.assertRequestScope(
-      RequestScopedFactory.class,
-      requestOne,
-      requestTwo,
-      APPLICATION_SINGLETON,
-      REQUEST_SCOPED,
-      KNOWN_UNSCOPED_BUGS,
-      IGNORED
-    );
+    DaggerScopeAssertions.requestScope(RequestScopedFactory.class, requestOne, requestTwo)
+      .applicationSingleton(APPLICATION_SINGLETON)
+      .requestScoped(REQUEST_SCOPED)
+      .knownUnscopedBugs(KNOWN_UNSCOPED_BUGS)
+      .assertScopes();
   }
 }
