@@ -17,7 +17,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;

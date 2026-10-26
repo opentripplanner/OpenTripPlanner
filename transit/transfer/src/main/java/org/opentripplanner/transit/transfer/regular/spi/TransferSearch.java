@@ -3,7 +3,7 @@ package org.opentripplanner.transit.transfer.regular.spi;
 import java.util.Collection;
 import java.util.Optional;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 
 /**
  * The street search and re-costing of transfer paths under one set of user preferences, see

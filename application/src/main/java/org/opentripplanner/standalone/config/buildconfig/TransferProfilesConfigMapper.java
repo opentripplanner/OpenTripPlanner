@@ -16,8 +16,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
@@ -136,7 +137,7 @@ public class TransferProfilesConfigMapper {
    */
   private static TransferProfilesParameters<RouteRequest> createParameters(
     List<TransferProfileParameters<RouteRequest>> profiles,
-    MaxDurationsPreference defaultMaxDurations,
+    PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit,
     List<WarmupParameters> warmup
@@ -185,7 +186,7 @@ public class TransferProfilesConfigMapper {
           "."
       );
     }
-    return entries.isEmpty() ? null : MaxDurationsPreference.of(entries.getFirst());
+    return entries.isEmpty() ? null : MaxDurationsPreference.of(type, entries.getFirst());
   }
 
   private static Duration mapMaxDuration(NodeAdapter entry) {

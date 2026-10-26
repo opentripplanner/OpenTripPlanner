@@ -2,7 +2,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.parameters.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;

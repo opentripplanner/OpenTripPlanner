@@ -9,6 +9,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class TransferProfilesParametersTest {
@@ -131,6 +135,62 @@ class TransferProfilesParametersTest {
     assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
       Duration.ofMinutes(45)
     );
+  }
+
+  @Test
+  void theDefaultMaxDurationIsOfTheKindOfTheType() {
+    var subject = new TransferProfilesParameters<>(
+      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "w"))
+    );
+
+    assertThat(subject.maxDurations(TransferProfileType.CAR)).isEqualTo(
+      new CarMaxDuration(Duration.ofMinutes(30))
+    );
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(
+      new BicycleMaxDurations(Duration.ofMinutes(30))
+    );
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR)).isEqualTo(
+      new PlainMaxDuration(Duration.ofMinutes(30))
+    );
+  }
+
+  @Test
+  void theMaxDurationsOfATypeMustBeOfTheKindOfTheType() {
+    var profiles = List.of(
+      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "w")
+    );
+    var plain = MaxDurationsPreference.of(Duration.ofMinutes(20));
+    var bicycle = new BicycleMaxDurations(Duration.ofMinutes(20));
+    var car = new CarMaxDuration(Duration.ofMinutes(20));
+
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(
+        profiles,
+        MaxDurationsPreference.DEFAULT,
+        Map.of(TransferProfileType.CAR, plain)
+      )
+    );
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(
+        profiles,
+        MaxDurationsPreference.DEFAULT,
+        Map.of(TransferProfileType.WALK, bicycle)
+      )
+    );
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferProfilesParameters<>(
+        profiles,
+        MaxDurationsPreference.DEFAULT,
+        Map.of(TransferProfileType.BICYCLE, car)
+      )
+    );
+    var subject = new TransferProfilesParameters<>(
+      profiles,
+      MaxDurationsPreference.DEFAULT,
+      Map.of(TransferProfileType.BICYCLE, bicycle, TransferProfileType.CAR, car)
+    );
+    assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(bicycle);
+    assertThat(subject.maxDurations(TransferProfileType.CAR)).isEqualTo(car);
   }
 
   @Test
