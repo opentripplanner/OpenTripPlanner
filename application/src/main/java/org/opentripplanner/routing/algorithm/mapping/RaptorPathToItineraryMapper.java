@@ -23,6 +23,7 @@ import org.opentripplanner.model.plan.leg.FrequencyTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.leg.UnknownPathLeg;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorStartOnBoardAccess;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
@@ -55,6 +56,7 @@ import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransfers;
 import org.opentripplanner.utils.collection.ListUtils;
 
 /**
@@ -66,6 +68,8 @@ import org.opentripplanner.utils.collection.ListUtils;
 public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final RaptorTransitData raptorTransitData;
+
+  private final RegularTransfers<NearbyStop> regularTransfers;
 
   private final RouteRequest request;
   private final StreetSearchRequest transferStreetRequest;
@@ -84,6 +88,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    *
    * @param raptorTransitData     the currently active transit layer (may have real-time data
    *                              applied)
+   * @param regularTransfers      the request's regular transfers, used to recover the street
+   *                              path of a regular transfer
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
    */
@@ -92,11 +98,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     TransitService transitService,
     StreetDetailsService streetDetailsService,
     RaptorTransitData raptorTransitData,
+    RegularTransfers<NearbyStop> regularTransfers,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request,
     @Nullable TaxiService taxiService
   ) {
     this.raptorTransitData = raptorTransitData;
+    this.regularTransfers = regularTransfers;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
@@ -356,7 +364,23 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
+    // Not a legacy transfer - must be a transfer from the regular-transfer pipeline. Recover its
+    // street path template for the leg's geometry/walk-steps.
+    var regularTransferPath = findRegularTransferPath(pathLeg.fromStop(), pathLeg.toStop());
+    if (regularTransferPath != null) {
+      return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
+    }
     throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
+  }
+
+  /**
+   * Recover the street path template for a transfer produced by the regular-transfer pipeline.
+   * {@code null} if no template is stored for this stop pair under the preferences closest to the
+   * request's.
+   */
+  @Nullable
+  private NearbyStop findRegularTransferPath(int fromStop, int toStop) {
+    return regularTransfers.findPath(fromStop, toStop);
   }
 
   private List<Leg> mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
@@ -400,6 +424,39 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .withDistanceMeters(transfer.getDistanceMeters())
           .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
           .withGeometry(transfer.getGeometry())
+          .withWalkSteps(List.of())
+          .build()
+      );
+    } else {
+      return mapTransferLegWithEdges(pathLeg.fromTime(), edges);
+    }
+  }
+
+  /**
+   * Mirrors {@link #mapTransferLeg(PathLeg, PathTransfer, TraverseMode, Place, Place)} for a
+   * transfer recovered from the raptor-data regular-transfer pipeline via
+   * {@link #findRegularTransferPath}. Uses an empty line string when there are
+   * no edges, matching {@link PathTransfer#getGeometry()}'s behavior for the same case.
+   */
+  private List<Leg> mapTransferLeg(
+    PathLeg<T> pathLeg,
+    NearbyStop transfer,
+    TraverseMode transferMode,
+    Place from,
+    Place to
+  ) {
+    List<Edge> edges = transfer.edges();
+    if (edges == null || edges.isEmpty()) {
+      return List.of(
+        StreetLeg.of()
+          .withMode(transferMode)
+          .withStartTime(createZonedDateTime(pathLeg.fromTime()))
+          .withEndTime(createZonedDateTime(pathLeg.toTime()))
+          .withFrom(from)
+          .withTo(to)
+          .withDistanceMeters(transfer.distance())
+          .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
+          .withGeometry(GeometryUtils.getGeometryFactory().createLineString())
           .withWalkSteps(List.of())
           .build()
       );

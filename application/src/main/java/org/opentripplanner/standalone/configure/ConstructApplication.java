@@ -17,6 +17,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -47,6 +48,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -99,6 +101,7 @@ public class ConstructApplication {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
+    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
@@ -154,6 +157,7 @@ public class ConstructApplication {
       .transitRepository(transitRepository)
       .scheduledTimetableData(scheduledTimetableData)
       .transferRepository(transferRepository)
+      .regularTransferBuildRepository(regularTransferBuildRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
       .emissionRepository(emissionRepository)
@@ -201,6 +205,7 @@ public class ConstructApplication {
       factory.transitRepository(),
       timetableDataImport(),
       factory.transferRepository(),
+      factory.regularTransferBuildRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionRepository(),
@@ -236,6 +241,10 @@ public class ConstructApplication {
   private void setupTransitRoutingServer() {
     enableRequestTraceLogging();
     createMetricsLogging();
+
+    // Repositories must be registered before the updaters start writing, not lazily by the first
+    // request - registration is not thread-safe.
+    factory.regularTransferRepositoryHandle();
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
@@ -319,6 +328,10 @@ public class ConstructApplication {
 
   public TransferRepository transferRepository() {
     return factory.transferRepository();
+  }
+
+  public RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository() {
+    return factory.regularTransferBuildRepository();
   }
 
   @Nullable
