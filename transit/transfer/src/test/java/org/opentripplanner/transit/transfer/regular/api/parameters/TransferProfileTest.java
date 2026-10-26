@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
-class TransferProfileParametersTest {
+class TransferProfileTest {
 
   @Test
   void aProfileWithoutPreferencesHasNoTypeConflict() {
-    var subject = new TransferProfileParameters<>("walk", TransferProfileType.WALK, null, "r");
+    var subject = new TransferProfile<>("walk", TransferProfileType.WALK, null, "r");
 
     assertThat(subject.userPreferences()).isNull();
     assertThat(subject.type()).isEqualTo(TransferProfileType.WALK);
@@ -18,7 +18,7 @@ class TransferProfileParametersTest {
 
   @Test
   void thePreferencesAreThePreferencesOfTheType() {
-    var subject = new TransferProfileParameters<>(
+    var subject = new TransferProfile<>(
       "walk",
       TransferProfileType.WALK,
       WalkPreferences.DEFAULT,
@@ -31,7 +31,7 @@ class TransferProfileParametersTest {
   @Test
   void thePreferencesMustBeThePreferencesOfTheType() {
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfileParameters<>(
+      new TransferProfile<>(
         "wheelchair",
         TransferProfileType.WHEELCHAIR,
         WalkPreferences.DEFAULT,
@@ -44,7 +44,7 @@ class TransferProfileParametersTest {
   @Test
   void anIdIsRequired() {
     assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfileParameters<>(" ", TransferProfileType.WALK, null, "r")
+      new TransferProfile<>(" ", TransferProfileType.WALK, null, "r")
     );
   }
 }

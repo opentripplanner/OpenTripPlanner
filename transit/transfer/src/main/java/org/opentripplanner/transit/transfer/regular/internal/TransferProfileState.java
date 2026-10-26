@@ -3,7 +3,7 @@ package org.opentripplanner.transit.transfer.regular.internal;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -43,7 +43,7 @@ final class TransferProfileState<P, R> {
    * @param mapper       applies the user preferences of the profile on its routing request
    */
   TransferProfileState(
-    TransferProfileParameters<R> parameters,
+    TransferProfile<R> parameters,
     MaxDurationsPreference maxDurations,
     @Nullable TransferProfileState<P, R> parent,
     TransferPathProvider<P, R> pathProvider,
@@ -60,7 +60,7 @@ final class TransferProfileState<P, R> {
 
   /** A profile without a parent. */
   TransferProfileState(
-    TransferProfileParameters<R> parameters,
+    TransferProfile<R> parameters,
     MaxDurationsPreference maxDurations,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper

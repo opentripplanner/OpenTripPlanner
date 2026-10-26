@@ -12,7 +12,7 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
@@ -809,7 +809,7 @@ class TransferProfilesConfigMapperTest {
     return parameters.maxDurations(TransferProfileType.WALK).maxDuration();
   }
 
-  private static TransferProfileParameters<RouteRequest> profile(
+  private static TransferProfile<RouteRequest> profile(
     TransferProfilesParameters<RouteRequest> parameters,
     String id
   ) {

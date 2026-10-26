@@ -19,7 +19,7 @@ import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapp
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
@@ -136,7 +136,7 @@ public class TransferProfilesConfigMapper {
    * configuration errors, when the configuration is read.
    */
   private static TransferProfilesParameters<RouteRequest> createParameters(
-    List<TransferProfileParameters<RouteRequest>> profiles,
+    List<TransferProfile<RouteRequest>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit,
@@ -204,8 +204,8 @@ public class TransferProfilesConfigMapper {
   }
 
   /** The profile used if no profile is configured: its preferences are the ones of the request. */
-  private static TransferProfileParameters<RouteRequest> defaultWalkProfile() {
-    return new TransferProfileParameters<>(
+  private static TransferProfile<RouteRequest> defaultWalkProfile() {
+    return new TransferProfile<>(
       DEFAULT_WALK_PROFILE_ID,
       TransferProfileType.WALK,
       null,
@@ -254,7 +254,7 @@ public class TransferProfilesConfigMapper {
 
   /** The mapped profiles, and the user preferences of each profile, by id, after inheritance. */
   private record MappedProfiles(
-    List<TransferProfileParameters<RouteRequest>> profiles,
+    List<TransferProfile<RouteRequest>> profiles,
     Map<String, AbstractUserPreferences<?>> preferencesById
   ) {}
 
@@ -307,7 +307,7 @@ public class TransferProfilesConfigMapper {
 
     var mapper = new RegularTransferPreferencesMapper();
     var resolved = new HashMap<String, ResolvedProfile>();
-    var mapped = new HashMap<String, TransferProfileParameters<RouteRequest>>();
+    var mapped = new HashMap<String, TransferProfile<RouteRequest>>();
     for (var profile : parentsFirst) {
       var parent = profile.parent() == null ? null : resolved.get(profile.parent());
       var request = RouteRequestConfig.mapRouteRequest(
@@ -346,13 +346,7 @@ public class TransferProfilesConfigMapper {
       );
       mapped.put(
         profile.id(),
-        new TransferProfileParameters<>(
-          profile.id(),
-          profile.type(),
-          profile.parent(),
-          own,
-          request
-        )
+        new TransferProfile<>(profile.id(), profile.type(), profile.parent(), own, request)
       );
     }
     // Keep the declared order

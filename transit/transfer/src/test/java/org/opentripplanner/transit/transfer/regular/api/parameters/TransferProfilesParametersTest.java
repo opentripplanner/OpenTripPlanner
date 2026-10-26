@@ -24,18 +24,8 @@ class TransferProfilesParametersTest {
 
   @Test
   void keepsTheProfilesInTheDeclaredOrder() {
-    var first = new TransferProfileParameters<>(
-      "first",
-      TransferProfileType.WALK,
-      OTHER_WALK,
-      "first"
-    );
-    var second = new TransferProfileParameters<>(
-      "second",
-      TransferProfileType.WALK,
-      WALK,
-      "second"
-    );
+    var first = new TransferProfile<>("first", TransferProfileType.WALK, OTHER_WALK, "first");
+    var second = new TransferProfile<>("second", TransferProfileType.WALK, WALK, "second");
 
     var subject = new TransferProfilesParameters<>(List.of(first, second));
 
@@ -52,8 +42,8 @@ class TransferProfilesParametersTest {
   @Test
   void rejectsProfilesWithTheSameId() {
     var profiles = List.of(
-      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "first"),
-      new TransferProfileParameters<>("walk", TransferProfileType.WALK, OTHER_WALK, "second")
+      new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "first"),
+      new TransferProfile<>("walk", TransferProfileType.WALK, OTHER_WALK, "second")
     );
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -65,16 +55,16 @@ class TransferProfilesParametersTest {
   @Test
   void aProfileNeedsAnId() {
     assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfileParameters<>(" ", TransferProfileType.WALK, WALK, "request")
+      new TransferProfile<>(" ", TransferProfileType.WALK, WALK, "request")
     );
     assertThrows(NullPointerException.class, () ->
-      new TransferProfileParameters<>(null, TransferProfileType.WALK, WALK, "request")
+      new TransferProfile<>(null, TransferProfileType.WALK, WALK, "request")
     );
   }
 
   @Test
   void anyNonBlankIdIsAccepted() {
-    var profile = new TransferProfileParameters<>(
+    var profile = new TransferProfile<>(
       "Walk: 1.3 m/s (åre) #1",
       TransferProfileType.WALK,
       WALK,
@@ -86,12 +76,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void aProfileMayHaveNoUserPreferences() {
-    var profile = new TransferProfileParameters<>(
-      "walk",
-      TransferProfileType.WALK,
-      null,
-      "request"
-    );
+    var profile = new TransferProfile<>("walk", TransferProfileType.WALK, null, "request");
 
     assertThat(profile.userPreferences()).isNull();
   }
@@ -99,15 +84,13 @@ class TransferProfilesParametersTest {
   @Test
   void rejectsAProfileWithoutARoutingRequest() {
     assertThrows(NullPointerException.class, () ->
-      new TransferProfileParameters<String>("walk", TransferProfileType.WALK, WALK, null)
+      new TransferProfile<String>("walk", TransferProfileType.WALK, WALK, null)
     );
   }
 
   @Test
   void aTypeWithoutAnOverrideUsesTheDefaultMaxDurations() {
-    var profiles = List.of(
-      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "walk")
-    );
+    var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
 
     var subject = new TransferProfilesParameters<>(
       profiles,
@@ -122,9 +105,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void anOverrideReplacesTheDefaultMaxDurationsOfTheType() {
-    var profiles = List.of(
-      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "walk")
-    );
+    var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
 
     var subject = new TransferProfilesParameters<>(
       profiles,
@@ -140,7 +121,7 @@ class TransferProfilesParametersTest {
   @Test
   void theDefaultMaxDurationIsOfTheKindOfTheType() {
     var subject = new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "w"))
+      List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"))
     );
 
     assertThat(subject.maxDurations(TransferProfileType.CAR)).isEqualTo(
@@ -156,9 +137,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void theMaxDurationsOfATypeMustBeOfTheKindOfTheType() {
-    var profiles = List.of(
-      new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "w")
-    );
+    var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"));
     var plain = MaxDurationsPreference.of(Duration.ofMinutes(20));
     var bicycle = new BicycleMaxDurations(Duration.ofMinutes(20));
     var car = new CarMaxDuration(Duration.ofMinutes(20));
@@ -196,7 +175,7 @@ class TransferProfilesParametersTest {
   @Test
   void theDefaultMaxDurationsAreThirtyMinutes() {
     var subject = new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "w"))
+      List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"))
     );
 
     assertThat(subject.maxDurations(TransferProfileType.WALK)).isEqualTo(
@@ -208,14 +187,8 @@ class TransferProfilesParametersTest {
   @Test
   void aParentThatDoesNotExistIsRejectedAndNamed() {
     var profiles = List.of(
-      new TransferProfileParameters<>("walk", TransferProfileType.WALK, null, WALK, "walk"),
-      new TransferProfileParameters<>(
-        "slow",
-        TransferProfileType.WALK,
-        "missing",
-        OTHER_WALK,
-        "slow"
-      )
+      new TransferProfile<>("walk", TransferProfileType.WALK, null, WALK, "walk"),
+      new TransferProfile<>("slow", TransferProfileType.WALK, "missing", OTHER_WALK, "slow")
     );
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -228,8 +201,8 @@ class TransferProfilesParametersTest {
   @Test
   void aCycleOfParentsIsRejected() {
     var profiles = List.of(
-      new TransferProfileParameters<>("a", TransferProfileType.WALK, "b", WALK, "a"),
-      new TransferProfileParameters<>("b", TransferProfileType.WALK, "a", OTHER_WALK, "b")
+      new TransferProfile<>("a", TransferProfileType.WALK, "b", WALK, "a"),
+      new TransferProfile<>("b", TransferProfileType.WALK, "a", OTHER_WALK, "b")
     );
 
     var ex = assertThrows(IllegalArgumentException.class, () ->
@@ -240,9 +213,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void aProfileCanNotBeItsOwnParent() {
-    var profiles = List.of(
-      new TransferProfileParameters<>("a", TransferProfileType.WALK, "a", WALK, "a")
-    );
+    var profiles = List.of(new TransferProfile<>("a", TransferProfileType.WALK, "a", WALK, "a"));
 
     assertThrows(IllegalArgumentException.class, () -> new TransferProfilesParameters<>(profiles));
   }
@@ -250,14 +221,14 @@ class TransferProfilesParametersTest {
   @Test
   void aBlankParentIsRejected() {
     assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfileParameters<>("a", TransferProfileType.WALK, " ", WALK, "a")
+      new TransferProfile<>("a", TransferProfileType.WALK, " ", WALK, "a")
     );
   }
 
   @Test
   void theDeduplicationLimitIsTheDefaultIfNotGiven() {
     var subject = new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("w", TransferProfileType.WALK, WALK, "w"))
+      List.of(new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w"))
     );
 
     assertThat(subject.deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
@@ -265,7 +236,7 @@ class TransferProfilesParametersTest {
 
   private static TransferProfilesParameters<String> withWarmup(WarmupParameters... warmup) {
     return new TransferProfilesParameters<>(
-      List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, WALK, "walk")),
+      List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk")),
       MaxDurationsPreference.DEFAULT,
       Map.of(),
       DeduplicationLimit.DEFAULT,

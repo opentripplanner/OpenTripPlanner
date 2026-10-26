@@ -23,7 +23,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class TransferProfilesParameters<R> {
 
-  private final List<TransferProfileParameters<R>> profiles;
+  private final List<TransferProfile<R>> profiles;
   private final PlainMaxDuration defaultMaxDurations;
   private final Map<TransferProfileType, MaxDurationsPreference> maxDurations;
   private final DeduplicationLimit deduplicationLimit;
@@ -50,7 +50,7 @@ public final class TransferProfilesParameters<R> {
    *                            must be a profile.
    */
   public TransferProfilesParameters(
-    List<TransferProfileParameters<R>> profiles,
+    List<TransferProfile<R>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit,
@@ -66,13 +66,13 @@ public final class TransferProfilesParameters<R> {
   }
 
   /** The profiles with the default max durations and deduplication limit. */
-  public TransferProfilesParameters(List<TransferProfileParameters<R>> profiles) {
+  public TransferProfilesParameters(List<TransferProfile<R>> profiles) {
     this(profiles, MaxDurationsPreference.DEFAULT, Map.of());
   }
 
   /** The profiles with the default deduplication limit. */
   public TransferProfilesParameters(
-    List<TransferProfileParameters<R>> profiles,
+    List<TransferProfile<R>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations
   ) {
@@ -81,7 +81,7 @@ public final class TransferProfilesParameters<R> {
 
   /** The profiles without warmup entries. */
   public TransferProfilesParameters(
-    List<TransferProfileParameters<R>> profiles,
+    List<TransferProfile<R>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit
@@ -89,7 +89,7 @@ public final class TransferProfilesParameters<R> {
     this(profiles, defaultMaxDurations, maxDurations, deduplicationLimit, List.of());
   }
 
-  public List<TransferProfileParameters<R>> profiles() {
+  public List<TransferProfile<R>> profiles() {
     return profiles;
   }
 
@@ -137,7 +137,7 @@ public final class TransferProfilesParameters<R> {
   }
 
   private static <R> void validateProfiles(
-    List<TransferProfileParameters<R>> profiles,
+    List<TransferProfile<R>> profiles,
     List<WarmupParameters> warmup
   ) {
     if (profiles.isEmpty()) {
@@ -152,11 +152,7 @@ public final class TransferProfilesParameters<R> {
       }
     }
     // Check that the parents exist, and that they do not form a cycle
-    ParentOrder.parentsFirst(
-      profiles,
-      TransferProfileParameters::id,
-      TransferProfileParameters::parent
-    );
+    ParentOrder.parentsFirst(profiles, TransferProfile::id, TransferProfile::parent);
     for (var entry : warmup) {
       if (!ids.add(entry.id())) {
         throw new IllegalArgumentException(
@@ -164,10 +160,7 @@ public final class TransferProfilesParameters<R> {
         );
       }
     }
-    var profileIds = profiles
-      .stream()
-      .map(TransferProfileParameters::id)
-      .collect(Collectors.toSet());
+    var profileIds = profiles.stream().map(TransferProfile::id).collect(Collectors.toSet());
     for (var entry : warmup) {
       if (!profileIds.contains(entry.parent())) {
         throw new IllegalArgumentException(

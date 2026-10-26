@@ -22,7 +22,7 @@ import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.Fak
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
@@ -69,7 +69,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
       provider,
       FakeRequestMapper.INSTANCE,
       new TransferProfilesParameters<>(
-        List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
+        List.of(new TransferProfile<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
       ),
       stopIndex().size()
     );
@@ -109,7 +109,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
       provider,
       mapper,
       new TransferProfilesParameters<>(
-        List.of(new TransferProfileParameters<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
+        List.of(new TransferProfile<>("walk", TransferProfileType.WALK, PROFILE, PROFILE))
       ),
       stopIndex().size()
     );
@@ -145,8 +145,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
       FakeRequestMapper.INSTANCE,
       new TransferProfilesParameters<>(
         List.of(
-          new TransferProfileParameters<>("near", TransferProfileType.WALK, near, near),
-          new TransferProfileParameters<>("far", TransferProfileType.WALK, far, far)
+          new TransferProfile<>("near", TransferProfileType.WALK, near, near),
+          new TransferProfile<>("far", TransferProfileType.WALK, far, far)
         ),
         MaxDurationsPreference.DEFAULT,
         Map.of(),

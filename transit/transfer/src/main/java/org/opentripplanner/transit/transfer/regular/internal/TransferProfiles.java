@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -51,8 +51,8 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R
     var result = new ArrayList<TransferProfileState<P, R>>();
     for (var p : ParentOrder.parentsFirst(
       parameters.profiles(),
-      TransferProfileParameters::id,
-      TransferProfileParameters::parent
+      TransferProfile::id,
+      TransferProfile::parent
     )) {
       var profile = new TransferProfileState<>(
         p,
