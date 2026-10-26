@@ -1,0 +1,80 @@
+package org.opentripplanner.transit.transfer.regular.configure;
+
+import org.opentripplanner.core.model.transaction.RepositoryHandle;
+import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
+import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.TransferGenerator;
+import org.opentripplanner.transit.transfer.regular.api.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
+import org.opentripplanner.transit.transfer.regular.internal.DefaultTransferGenerator;
+import org.opentripplanner.transit.transfer.regular.internal.RegularTransferRepositoryLifecycle;
+import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
+
+/**
+ * Creates the implementations of the regular-transfer component, so code outside the component
+ * never references its {@code internal} classes. This module has no dependency injection; the
+ * application wires these into its own modules, with the concrete path type.
+ */
+public final class RegularTransferFactory {
+
+  private RegularTransferFactory() {}
+
+  /** Create an empty build repository, populated at graph build. */
+  public static <P> RegularTransferBuildRepository<P> createBuildRepository() {
+    return new DefaultRegularTransferBuildRepository<>();
+  }
+
+  /**
+   * Create the graph-build generator, writing the transfers of all stops into the repository.
+   *
+   * @param <P> the street path type
+   * @param <R> the request type
+   */
+  public static <P, R> TransferGenerator createTransferGenerator(
+    RaptorStopIndex stopIndex,
+    TransferProfilesParameters<R> parameters,
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    RegularTransferBuildRepository<P> buildRepository
+  ) {
+    return new DefaultTransferGenerator<>(
+      stopIndex,
+      parameters,
+      pathProvider,
+      mapper,
+      buildRepository
+    );
+  }
+
+  /**
+   * Register the runtime repository on the transaction framework, created from the paths of the
+   * build repository. This seals the build repository. The snapshots use the {@code pathProvider}
+   * to derive the Raptor transfers from their paths, with the request of the profile the paths are
+   * stored under, and the {@code mapper} to map the routing requests to user preferences.
+   *
+   * @param numberOfStops the size of the stop index space ({@code RaptorStopIndex.size()}), not the
+   *                      number of regular stops. The index space is shared with the flex stops,
+   *                      which do not take part in Raptor, so the Raptor transfer data is larger
+   *                      than needed. This goes away when the stop index moves into Raptor.
+   */
+  public static <P, R> RepositoryHandle<
+    RegularTransferRepositorySnapshot<P, R>,
+    RegularTransferRepository<P>
+  > registerRepository(
+    RepositoryRegistry repositoryRegistry,
+    RegularTransferBuildRepository<P> buildRepository,
+    TransferProfilesParameters<R> parameters,
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    int numberOfStops
+  ) {
+    return repositoryRegistry.registerRepository(
+      buildRepository.createRuntimeRepository(),
+      new RegularTransferRepositoryLifecycle<>(pathProvider, mapper, parameters, numberOfStops)
+    );
+  }
+}
