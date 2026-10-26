@@ -15,6 +15,11 @@ public record PlainMaxDuration(Duration maxDuration) implements MaxDurationsPref
   }
 
   @Override
+  public Duration longestDuration() {
+    return maxDuration;
+  }
+
+  @Override
   public Optional<Duration> searchLimit(Set<AllowedMode> atSource) {
     return Optional.of(maxDuration);
   }

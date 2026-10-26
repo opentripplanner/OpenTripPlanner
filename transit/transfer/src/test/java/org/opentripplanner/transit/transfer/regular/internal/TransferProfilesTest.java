@@ -185,8 +185,7 @@ class TransferProfilesTest {
           withReluctance(2.0)
         )
       ),
-      MaxDurationsPreference.DEFAULT,
-      Map.of(),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
       DeduplicationLimit.DEFAULT,
       List.of(new WarmupParameters("same", "walk", withReluctance(2.0)))
     );
@@ -209,8 +208,7 @@ class TransferProfilesTest {
           withReluctance(2.0)
         )
       ),
-      MaxDurationsPreference.DEFAULT,
-      Map.of(),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
       DeduplicationLimit.DEFAULT,
       List.of(
         new WarmupParameters("a", "walk", withReluctance(5.0)),

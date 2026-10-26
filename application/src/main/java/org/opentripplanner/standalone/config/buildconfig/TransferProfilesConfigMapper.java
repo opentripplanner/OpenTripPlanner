@@ -16,6 +16,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
+import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
@@ -47,12 +48,6 @@ import org.opentripplanner.utils.collection.ParentOrder;
  */
 public class TransferProfilesConfigMapper {
 
-  private static final String CAR_MAX_DURATION_NOTE = """
-
-  A car is only used between stops that allow cars, so there are no car transfers from or to
-  other stops.
-  """;
-
   /** The id of the profile used if no profile is configured. */
   static final String DEFAULT_WALK_PROFILE_ID = "walk";
 
@@ -66,27 +61,13 @@ public class TransferProfilesConfigMapper {
         Replaces `transferRequests` for regular (non-FLEX) transfer generation. The configuration of
         a profile type is a block named after the type, with its `profiles`, its `maxDuration` and
         its `warmup` entries. The types `walk`, `wheelchair`, `bicycle` and `car` are supported for
-        now. If no profile is configured, a single default `walk` profile is used, mirroring the
-        implicit default of the old `transferRequests` config. The max duration of the transfers is
-        set with `defaultMaxDuration`, and can be overridden for a profile type with
-        `maxDuration`. The old `maxTransferDuration` is not used.
+        now. If no profile is configured, a single default `walk` profile with a max duration of 30
+        minutes is used, mirroring the implicit default of the old `transferRequests` config. Each
+        profile type with profiles must set its `maxDuration`. The old `maxTransferDuration` is
+        not used.
         """
       )
       .asObject();
-
-    var defaultMaxDurations = MaxDurationsPreference.of(
-      transfers
-        .of("defaultMaxDuration")
-        .since(V2_10)
-        .summary("The default max duration of the transfers, for all profile types.")
-        .description(
-          """
-          How far from a stop the transfers are searched when the transfers are generated. It is
-          used by all profile types that do not have a `maxDuration`.
-          """
-        )
-        .asDuration(MaxDurationsPreference.DEFAULT.maxDuration())
-    );
 
     var deduplicationLimit = mapDeduplicationLimit(transfers);
 
@@ -97,7 +78,7 @@ public class TransferProfilesConfigMapper {
     for (var type : TransferProfileType.values()) {
       var block = mapTypeBlock(transfers, type);
       typeBlocks.put(type, block);
-      var typeMaxDurations = mapMaxDurations(block, type, defaultMaxDurations);
+      var typeMaxDurations = mapMaxDurations(block, type);
       if (typeMaxDurations != null) {
         maxDurations.put(type, typeMaxDurations);
       }
@@ -106,14 +87,11 @@ public class TransferProfilesConfigMapper {
     var mappedProfiles = mapProfiles(typeBlocks);
     var profiles = mappedProfiles.profiles();
     var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
+    if (mappedProfiles.isDefaultWalkProfile()) {
+      maxDurations.putIfAbsent(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT);
+    }
 
-    return createParameters(
-      profiles,
-      defaultMaxDurations,
-      maxDurations,
-      deduplicationLimit,
-      warmup
-    );
+    return createParameters(profiles, maxDurations, deduplicationLimit, warmup);
   }
 
   /** The block of a profile type, for example {@code walk}. An empty block if it is not set. */
@@ -142,19 +120,12 @@ public class TransferProfilesConfigMapper {
    */
   private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
-    PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
     DeduplicationLimit deduplicationLimit,
     List<WarmupParameters> warmup
   ) {
     try {
-      var parameters = new TransferParameters<>(
-        profiles,
-        defaultMaxDurations,
-        maxDurations,
-        deduplicationLimit,
-        warmup
-      );
+      var parameters = new TransferParameters<>(profiles, maxDurations, deduplicationLimit, warmup);
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
     } catch (IllegalArgumentException e) {
@@ -163,75 +134,90 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * The max durations of a profile type, shared by all its profiles. They replace the default for
-   * the type. {@code null} if the type has none.
+   * The max durations of a profile type, shared by all its profiles. {@code null} if the type has
+   * none, which is an error if the type has profiles.
    */
   @Nullable
   private static MaxDurationsPreference mapMaxDurations(
     NodeAdapter typeNode,
-    TransferProfileType type,
-    PlainMaxDuration defaultMaxDuration
+    TransferProfileType type
   ) {
     var name = typeName(type);
     var maxDuration = typeNode
       .of("maxDuration")
       .since(V2_10)
       .summary("The longest " + name + " transfer, measured with the user preferences.")
-      .description(
-        """
-        How far from a stop the transfers are searched when the transfers are generated. It
-        replaces `defaultMaxDuration` for the type, and is not inherited from another type or a
-        parent profile.
-        """ + (type == TransferProfileType.CAR ? CAR_MAX_DURATION_NOTE : "")
-      )
+      .description(maxDurationDescription(type))
       .asDuration(null);
 
     if (type != TransferProfileType.BICYCLE) {
-      rejectBicycleOnly(typeNode, "maxDurationAllowsBicycle", name);
-      rejectBicycleOnly(typeNode, "maxDurationAllowsBicycleAndCar", name);
-      return maxDuration == null ? null : MaxDurationsPreference.of(type, maxDuration);
+      rejectBicycleOnly(typeNode, "maxDurationAllowAllModes", name);
+      rejectBicycleOnly(typeNode, "maxDurationAllowsCar", name);
+      if (maxDuration == null) {
+        return null;
+      }
+      return type == TransferProfileType.CAR
+        ? new CarMaxDuration(maxDuration)
+        : new PlainMaxDuration(maxDuration);
     }
 
-    var allowsBicycle = typeNode
-      .of("maxDurationAllowsBicycle")
+    var allowAllModes = typeNode
+      .of("maxDurationAllowAllModes")
       .since(V2_10)
-      .summary("The longest bicycle transfer between stops that allow bicycles.")
+      .summary("The longest bicycle transfer between any two stops.")
       .description(
         """
-        Used instead of `maxDuration` for the transfers between two stops that are visited by trips
-        that allow bicycles, for example a ferry. It must be longer than `maxDuration`. If it is
-        not set, the transfers between these stops are limited by `maxDuration`.
+        A bicycle can cover a long distance, so this is usually short. It must be shorter than
+        `maxDuration` and `maxDurationAllowsCar`. If it is not set, there are only transfers
+        between the stops that allow bicycles or cars, as set by `maxDuration` and
+        `maxDurationAllowsCar`.
         """
       )
       .asDuration(null);
-    var allowsBicycleAndCar = typeNode
-      .of("maxDurationAllowsBicycleAndCar")
+    var allowsCar = typeNode
+      .of("maxDurationAllowsCar")
       .since(V2_10)
-      .summary("The longest bicycle transfer between stops that allow both bicycles and cars.")
+      .summary("The longest bicycle transfer between stops that allow cars.")
       .description(
         """
-        Used instead of `maxDurationAllowsBicycle` for the transfers between two stops that are
-        visited by trips that allow both bicycles and cars, not just one of them, for example a car
-        ferry that carries bicycles. It must be longer than `maxDurationAllowsBicycle` and
-        `maxDuration`. If it is not set, the transfers between these stops are limited by
-        `maxDurationAllowsBicycle`, or `maxDuration`.
+        Used for the transfers between two stops that are visited by trips that allow cars, for
+        example a car ferry, which a bicycle can use too. It must be longer than
+        `maxDurationAllowAllModes`.
         """
       )
       .asDuration(null);
-    if (maxDuration == null && allowsBicycle == null && allowsBicycleAndCar == null) {
+    if (maxDuration == null && allowAllModes == null && allowsCar == null) {
       return null;
     }
     try {
-      return new BicycleMaxDurations(
-        maxDuration == null ? defaultMaxDuration.maxDuration() : maxDuration,
-        allowsBicycle,
-        allowsBicycleAndCar
-      );
+      return new BicycleMaxDurations(allowAllModes, maxDuration, allowsCar);
     } catch (IllegalArgumentException e) {
       throw new OtpAppException(
         "Invalid transfer configuration in " + typeNode.contextPath() + ": " + e.getMessage()
       );
     }
+  }
+
+  private static String maxDurationDescription(TransferProfileType type) {
+    var description = """
+    How far from a stop the transfers are searched when the transfers are generated. It is
+    shared by all the profiles of the type, and is not inherited from another type or from a
+    parent profile. Each type with profiles must set it.
+    """;
+    return switch (type) {
+      case WALK, WHEELCHAIR -> description +
+        "\nThere are transfers between all stops within the duration.\n";
+      case BICYCLE -> description +
+        "\nThere are transfers within the duration between the stops that allow bicycles.\n";
+      case CAR -> description +
+        """
+
+        There are transfers within the duration between the stops that allow cars only, and no
+        transfers from or to other stops. A car reaches a lot of stops in a short time, so a car
+        search from all stops does not work, even for small deployments. If there are too many stops
+        that allow cars, fix the data, or let the OTP developers know the use case.
+        """;
+    };
   }
 
   private static void rejectBicycleOnly(NodeAdapter typeNode, String parameter, String typeName) {
@@ -299,7 +285,8 @@ public class TransferProfilesConfigMapper {
   /** The mapped profiles, and the user preferences of each profile, by id, after inheritance. */
   private record MappedProfiles(
     List<TransferProfile<RouteRequest>> profiles,
-    Map<String, AbstractUserPreferences<?>> preferencesById
+    Map<String, AbstractUserPreferences<?>> preferencesById,
+    boolean isDefaultWalkProfile
   ) {}
 
   /**
@@ -334,7 +321,8 @@ public class TransferProfilesConfigMapper {
         Map.of(
           profile.id(),
           new RegularTransferPreferencesMapper().toUserPreferences(profile.routingRequest())
-        )
+        ),
+        true
       );
     }
 
@@ -401,7 +389,8 @@ public class TransferProfilesConfigMapper {
         .stream()
         .map(p -> mapped.get(p.id()))
         .toList(),
-      preferencesById
+      preferencesById,
+      false
     );
   }
 

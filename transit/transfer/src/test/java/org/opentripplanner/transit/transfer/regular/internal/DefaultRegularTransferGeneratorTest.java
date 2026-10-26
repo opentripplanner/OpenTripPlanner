@@ -41,8 +41,7 @@ class DefaultRegularTransferGeneratorTest {
   ) {
     return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, walk, walk)),
-      MaxDurationsPreference.of(maxDuration),
-      Map.of()
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.of(maxDuration))
     );
   }
 
@@ -202,7 +201,11 @@ class DefaultRegularTransferGeneratorTest {
         new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
       new DefaultRegularTransferGenerator<>(
         stopIndex,
-        new TransferParameters<>(profiles, MaxDurationsPreference.DEFAULT, Map.of(), limit),
+        new TransferParameters<>(
+          profiles,
+          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
+          limit
+        ),
         provider,
         FakeRequestMapper.INSTANCE,
         buildRepository

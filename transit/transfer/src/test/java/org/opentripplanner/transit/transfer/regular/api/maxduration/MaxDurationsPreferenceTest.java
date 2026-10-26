@@ -27,11 +27,14 @@ class MaxDurationsPreferenceTest {
   private static final Duration D45 = Duration.ofMinutes(45);
   private static final Duration D60 = Duration.ofMinutes(60);
 
-  private static final BicycleMaxDurations BICYCLE_ALL = new BicycleMaxDurations(D30, D45, D60);
+  private static final Duration D20 = Duration.ofMinutes(20);
+
+  /** All stops 20 min, bicycle stops 45 min, car stops 60 min. */
+  private static final BicycleMaxDurations BICYCLE_ALL = new BicycleMaxDurations(D20, D45, D60);
 
   @Test
   void keepsTheMaxDuration() {
-    assertThat(MaxDurationsPreference.of(Duration.ofMinutes(45)).maxDuration()).isEqualTo(D45);
+    assertThat(MaxDurationsPreference.of(Duration.ofMinutes(45)).longestDuration()).isEqualTo(D45);
   }
 
   @Test
@@ -46,21 +49,23 @@ class MaxDurationsPreferenceTest {
       MaxDurationsPreference.of(Duration.ofMinutes(-1))
     );
     assertThrows(IllegalArgumentException.class, () -> new CarMaxDuration(Duration.ZERO));
-    assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(Duration.ZERO));
+    assertThrows(IllegalArgumentException.class, () ->
+      new BicycleMaxDurations(Duration.ZERO, null, null)
+    );
   }
 
   @Test
-  void theKindDependsOnTheType() {
-    assertThat(MaxDurationsPreference.of(TransferProfileType.WALK, D30)).isEqualTo(
+  void theDefaultIsThirtyMinutesInTheWayOfTheType() {
+    assertThat(MaxDurationsPreference.defaultFor(TransferProfileType.WALK)).isEqualTo(
       new PlainMaxDuration(D30)
     );
-    assertThat(MaxDurationsPreference.of(TransferProfileType.WHEELCHAIR, D30)).isEqualTo(
+    assertThat(MaxDurationsPreference.defaultFor(TransferProfileType.WHEELCHAIR)).isEqualTo(
       new PlainMaxDuration(D30)
     );
-    assertThat(MaxDurationsPreference.of(TransferProfileType.BICYCLE, D30)).isEqualTo(
-      new BicycleMaxDurations(D30)
+    assertThat(MaxDurationsPreference.defaultFor(TransferProfileType.BICYCLE)).isEqualTo(
+      new BicycleMaxDurations(null, D30, null)
     );
-    assertThat(MaxDurationsPreference.of(TransferProfileType.CAR, D30)).isEqualTo(
+    assertThat(MaxDurationsPreference.defaultFor(TransferProfileType.CAR)).isEqualTo(
       new CarMaxDuration(D30)
     );
   }
@@ -96,19 +101,26 @@ class MaxDurationsPreferenceTest {
   }
 
   @Test
-  void bicycleSearchLimitIsTheLongestDurationOfTheModesOfTheStop() {
-    assertThat(BICYCLE_ALL.searchLimit(NONE)).hasValue(D30);
-    assertThat(BICYCLE_ALL.searchLimit(CAR)).hasValue(D30);
+  void bicycleLongestDurationIsTheLongestOfTheLimits() {
+    assertThat(BICYCLE_ALL.longestDuration()).isEqualTo(D60);
+    assertThat(new BicycleMaxDurations(D20, D45, null).longestDuration()).isEqualTo(D45);
+    assertThat(new BicycleMaxDurations(D20, null, null).longestDuration()).isEqualTo(D20);
+  }
+
+  @Test
+  void bicycleSearchLimitIsTheLongestLimitThatAppliesToTheModesOfTheStop() {
+    assertThat(BICYCLE_ALL.searchLimit(NONE)).hasValue(D20);
     assertThat(BICYCLE_ALL.searchLimit(BICYCLE)).hasValue(D45);
+    assertThat(BICYCLE_ALL.searchLimit(CAR)).hasValue(D60);
     assertThat(BICYCLE_ALL.searchLimit(BICYCLE_AND_CAR)).hasValue(D60);
     assertThat(BICYCLE_ALL.hasTransfersFrom(NONE)).isTrue();
   }
 
   @Test
-  void bicycleAcceptsTheMaxDurationBetweenAnyStops() {
-    assertThat(BICYCLE_ALL.accepts(MIN_30, NONE, NONE)).isTrue();
-    assertThat(BICYCLE_ALL.accepts(MIN_30 + 1, NONE, NONE)).isFalse();
-    assertThat(BICYCLE_ALL.accepts(MIN_30 + 1, BICYCLE, NONE)).isFalse();
+  void bicycleAcceptsTheAllStopsLimitBetweenAnyStops() {
+    assertThat(BICYCLE_ALL.accepts(20 * 60, NONE, NONE)).isTrue();
+    assertThat(BICYCLE_ALL.accepts(20 * 60 + 1, NONE, NONE)).isFalse();
+    assertThat(BICYCLE_ALL.accepts(20 * 60 + 1, BICYCLE, NONE)).isFalse();
   }
 
   @Test
@@ -123,52 +135,61 @@ class MaxDurationsPreferenceTest {
   }
 
   @Test
-  void bicycleAcceptsTheLongestTransferBetweenStopsThatAllowBothBicyclesAndCars() {
+  void bicycleAcceptsALongerTransferBetweenStopsThatAllowCars() {
+    assertThat(BICYCLE_ALL.accepts(MIN_60, CAR, CAR)).isTrue();
+    assertThat(BICYCLE_ALL.accepts(MIN_60 + 1, CAR, CAR)).isFalse();
+    assertThat(BICYCLE_ALL.accepts(MIN_60, CAR, NONE)).isFalse();
+    assertThat(BICYCLE_ALL.accepts(MIN_60, NONE, CAR)).isFalse();
+    assertThat(BICYCLE_ALL.accepts(MIN_60, CAR, BICYCLE)).isFalse();
     assertThat(BICYCLE_ALL.accepts(MIN_60, BICYCLE_AND_CAR, BICYCLE_AND_CAR)).isTrue();
-    assertThat(BICYCLE_ALL.accepts(MIN_60 + 1, BICYCLE_AND_CAR, BICYCLE_AND_CAR)).isFalse();
-    // Both stops must allow both modes, not one of them each
-    assertThat(BICYCLE_ALL.accepts(MIN_60, BICYCLE, CAR)).isFalse();
-    assertThat(BICYCLE_ALL.accepts(MIN_60, BICYCLE_AND_CAR, BICYCLE)).isFalse();
-    assertThat(BICYCLE_ALL.accepts(MIN_60, CAR, BICYCLE_AND_CAR)).isFalse();
-    assertThat(BICYCLE_ALL.accepts(MIN_60, CAR, CAR)).isFalse();
   }
 
   @Test
-  void bicycleWithoutTheLongerDurationsHasNoExtensions() {
-    var subject = new BicycleMaxDurations(D30);
-    assertThat(subject.searchLimit(BICYCLE_AND_CAR)).hasValue(D30);
-    assertThat(subject.accepts(MIN_30 + 1, BICYCLE_AND_CAR, BICYCLE_AND_CAR)).isFalse();
+  void theBicycleAndCarLimitsAreIndependent() {
+    var carOnly = new BicycleMaxDurations(D20, null, D60);
+    assertThat(carOnly.accepts(MIN_40, BICYCLE, BICYCLE)).isFalse();
+    assertThat(carOnly.accepts(MIN_40, CAR, CAR)).isTrue();
+    var bicycleOnly = new BicycleMaxDurations(D20, D45, null);
+    assertThat(bicycleOnly.accepts(MIN_40, CAR, CAR)).isFalse();
+    assertThat(bicycleOnly.accepts(MIN_40, BICYCLE, BICYCLE)).isTrue();
   }
 
   @Test
-  void bicycleWithOnlyTheBicycleAndCarDurationUsesItForStopsThatAllowBoth() {
-    var subject = new BicycleMaxDurations(D30, null, D60);
-    assertThat(subject.searchLimit(BICYCLE)).hasValue(D30);
-    assertThat(subject.searchLimit(BICYCLE_AND_CAR)).hasValue(D60);
-    assertThat(subject.accepts(MIN_40, BICYCLE, BICYCLE)).isFalse();
-    assertThat(subject.accepts(MIN_40, BICYCLE_AND_CAR, BICYCLE_AND_CAR)).isTrue();
+  void bicycleWithoutTheAllStopsLimitHasTransfersBetweenAllowedStopsOnly() {
+    var subject = new BicycleMaxDurations(null, D45, D60);
+
+    assertThat(subject.searchLimit(NONE)).isEmpty();
+    assertThat(subject.hasTransfersFrom(NONE)).isFalse();
+    assertThat(subject.searchLimit(BICYCLE)).hasValue(D45);
+    assertThat(subject.searchLimit(CAR)).hasValue(D60);
+    assertThat(subject.accepts(60, NONE, NONE)).isFalse();
+    assertThat(subject.accepts(60, BICYCLE, BICYCLE)).isTrue();
+    assertThat(subject.accepts(60, BICYCLE, NONE)).isFalse();
   }
 
   @Test
-  void bicycleWithOnlyTheBicycleDurationDoesNotUseItForCars() {
-    var subject = new BicycleMaxDurations(D30, D45, null);
-    assertThat(subject.searchLimit(BICYCLE_AND_CAR)).hasValue(D45);
-    assertThat(subject.accepts(MIN_40, BICYCLE_AND_CAR, BICYCLE_AND_CAR)).isTrue();
+  void bicycleNeedsAtLeastOneLimit() {
+    assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(null, null, null));
   }
 
   @Test
-  void bicycleDurationsMustIncrease() {
+  void theLimitsOfTheAllowedStopsMustBeLongerThanTheAllStopsLimit() {
     assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(D30, D30, null));
     assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(D45, D30, null));
     assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(D30, null, D30));
-    assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(D30, D45, D45));
-    assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(D30, D60, D45));
+    assertThrows(IllegalArgumentException.class, () -> new BicycleMaxDurations(D45, null, D30));
+    // The limits of the allowed stops have no relation to each other
+    assertThat(new BicycleMaxDurations(D20, D60, D45).maxDurationAllowsCar()).isEqualTo(D45);
+    assertThat(new BicycleMaxDurations(D20, D45, D60).maxDuration()).isEqualTo(D45);
   }
 
   @Test
-  void bicycleOptionalDurationsMustBePositive() {
+  void bicycleLimitsMustBePositive() {
     assertThrows(IllegalArgumentException.class, () ->
-      new BicycleMaxDurations(D30, Duration.ZERO, null)
+      new BicycleMaxDurations(null, Duration.ZERO, null)
+    );
+    assertThrows(IllegalArgumentException.class, () ->
+      new BicycleMaxDurations(null, null, Duration.ofMinutes(-1))
     );
   }
 }

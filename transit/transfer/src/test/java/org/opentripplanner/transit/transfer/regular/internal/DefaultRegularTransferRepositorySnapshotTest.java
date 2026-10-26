@@ -148,8 +148,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
           new TransferProfile<>("near", TransferProfileType.WALK, near, near),
           new TransferProfile<>("far", TransferProfileType.WALK, far, far)
         ),
-        MaxDurationsPreference.DEFAULT,
-        Map.of(),
+        Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
         DeduplicationLimit.DEFAULT,
         warmup
       ),

@@ -16,7 +16,8 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
  * variants of this interface are:
  * <ul>
  *   <li>{@link PlainMaxDuration}: the same duration between all stops, for walk and wheelchair.</li>
- *   <li>{@link BicycleMaxDurations}: longer durations between stops that allow bicycles.</li>
+ *   <li>{@link BicycleMaxDurations}: a duration between all stops, and longer durations between
+ *       stops that allow bicycles or cars.</li>
  *   <li>{@link CarMaxDuration}: transfers between stops that allow cars only.</li>
  * </ul>
  * <p>
@@ -33,19 +34,20 @@ public sealed interface MaxDurationsPreference
   }
 
   /**
-   * The max durations of a profile type with {@code maxDuration} and no longer durations: the
-   * kind that fits the type.
+   * The 30 minute max duration of a profile type, in the way of the type. It is used for the
+   * implicit configuration of a single walk profile, there is no default for a configured type.
    */
-  static MaxDurationsPreference of(TransferProfileType type, Duration maxDuration) {
+  static MaxDurationsPreference defaultFor(TransferProfileType type) {
+    var thirtyMinutes = DEFAULT.maxDuration();
     return switch (type) {
-      case WALK, WHEELCHAIR -> new PlainMaxDuration(maxDuration);
-      case BICYCLE -> new BicycleMaxDurations(maxDuration);
-      case CAR -> new CarMaxDuration(maxDuration);
+      case WALK, WHEELCHAIR -> DEFAULT;
+      case BICYCLE -> new BicycleMaxDurations(null, thirtyMinutes, null);
+      case CAR -> new CarMaxDuration(thirtyMinutes);
     };
   }
 
-  /** The {@code maxDuration} of the type, the duration of the transfers between any stops. */
-  Duration maxDuration();
+  /** The longest of all the durations. */
+  Duration longestDuration();
 
   /**
    * How far to search from a stop that allows the modes {@code atSource}: the longest duration of

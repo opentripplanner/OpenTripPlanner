@@ -17,6 +17,11 @@ public record CarMaxDuration(Duration maxDuration) implements MaxDurationsPrefer
   }
 
   @Override
+  public Duration longestDuration() {
+    return maxDuration;
+  }
+
+  @Override
   public Optional<Duration> searchLimit(Set<AllowedMode> atSource) {
     return atSource.contains(AllowedMode.CAR) ? Optional.of(maxDuration) : Optional.empty();
   }

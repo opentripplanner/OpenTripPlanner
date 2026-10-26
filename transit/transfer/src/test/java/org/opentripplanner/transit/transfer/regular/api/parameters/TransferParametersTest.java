@@ -12,8 +12,8 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 
 class TransferParametersTest {
 
@@ -85,91 +85,103 @@ class TransferParametersTest {
   }
 
   @Test
-  void aTypeWithoutAnOverrideUsesTheDefaultMaxDurations() {
+  void theMaxDurationsOfATypeAreTheOnesConfigured() {
     var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
 
     var subject = new TransferParameters<>(
       profiles,
-      MaxDurationsPreference.of(Duration.ofMinutes(20)),
-      Map.of()
-    );
-
-    assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
-      Duration.ofMinutes(20)
-    );
-  }
-
-  @Test
-  void anOverrideReplacesTheDefaultMaxDurationsOfTheType() {
-    var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
-
-    var subject = new TransferParameters<>(
-      profiles,
-      MaxDurationsPreference.of(Duration.ofMinutes(20)),
       Map.of(TransferProfileType.WALK, MaxDurationsPreference.of(Duration.ofMinutes(45)))
     );
 
-    assertThat(subject.maxDurations(TransferProfileType.WALK).maxDuration()).isEqualTo(
+    assertThat(subject.maxDurations(TransferProfileType.WALK).longestDuration()).isEqualTo(
       Duration.ofMinutes(45)
     );
   }
 
   @Test
-  void theDefaultMaxDurationIsOfTheKindOfTheType() {
-    var subject = new TransferParameters<>(
-      List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"))
+  void aTypeWithProfilesNeedsMaxDurations() {
+    var profiles = List.of(
+      new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"),
+      new TransferProfile<>(
+        "wheelchair",
+        TransferProfileType.WHEELCHAIR,
+        WheelchairPreferences.DEFAULT,
+        "wheelchair"
+      )
     );
 
-    assertThat(subject.maxDurations(TransferProfileType.CAR)).isEqualTo(
-      new CarMaxDuration(Duration.ofMinutes(30))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new TransferParameters<>(
+        profiles,
+        Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT)
+      )
     );
-    assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(
-      new BicycleMaxDurations(Duration.ofMinutes(30))
+
+    assertThat(ex).hasMessageThat().contains("wheelchair");
+  }
+
+  @Test
+  void theMaxDurationsOfATypeWithoutProfilesAreNotRequired() {
+    var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
+
+    var subject = new TransferParameters<>(
+      profiles,
+      Map.of(
+        TransferProfileType.WALK,
+        MaxDurationsPreference.DEFAULT,
+        TransferProfileType.CAR,
+        new CarMaxDuration(Duration.ofHours(3))
+      )
     );
-    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR)).isEqualTo(
-      new PlainMaxDuration(Duration.ofMinutes(30))
+
+    assertThrows(IllegalArgumentException.class, () ->
+      subject.maxDurations(TransferProfileType.BICYCLE)
     );
   }
 
   @Test
   void theMaxDurationsOfATypeMustBeOfTheKindOfTheType() {
     var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"));
-    var plain = MaxDurationsPreference.of(Duration.ofMinutes(20));
-    var bicycle = new BicycleMaxDurations(Duration.ofMinutes(20));
-    var car = new CarMaxDuration(Duration.ofMinutes(20));
+    MaxDurationsPreference plain = MaxDurationsPreference.of(Duration.ofMinutes(20));
+    MaxDurationsPreference bicycle = new BicycleMaxDurations(null, Duration.ofMinutes(20), null);
+    MaxDurationsPreference car = new CarMaxDuration(Duration.ofMinutes(20));
+    var walk = Map.of(TransferProfileType.WALK, plain);
 
     assertThrows(IllegalArgumentException.class, () ->
       new TransferParameters<>(
         profiles,
-        MaxDurationsPreference.DEFAULT,
-        Map.of(TransferProfileType.CAR, plain)
+        Map.of(TransferProfileType.WALK, plain, TransferProfileType.CAR, plain)
       )
+    );
+    assertThrows(IllegalArgumentException.class, () ->
+      new TransferParameters<>(profiles, Map.of(TransferProfileType.WALK, bicycle))
     );
     assertThrows(IllegalArgumentException.class, () ->
       new TransferParameters<>(
         profiles,
-        MaxDurationsPreference.DEFAULT,
-        Map.of(TransferProfileType.WALK, bicycle)
-      )
-    );
-    assertThrows(IllegalArgumentException.class, () ->
-      new TransferParameters<>(
-        profiles,
-        MaxDurationsPreference.DEFAULT,
-        Map.of(TransferProfileType.BICYCLE, car)
+        Map.of(TransferProfileType.WALK, plain, TransferProfileType.BICYCLE, car)
       )
     );
     var subject = new TransferParameters<>(
       profiles,
-      MaxDurationsPreference.DEFAULT,
-      Map.of(TransferProfileType.BICYCLE, bicycle, TransferProfileType.CAR, car)
+      Map.of(
+        TransferProfileType.WALK,
+        plain,
+        TransferProfileType.BICYCLE,
+        bicycle,
+        TransferProfileType.CAR,
+        car
+      )
     );
     assertThat(subject.maxDurations(TransferProfileType.BICYCLE)).isEqualTo(bicycle);
     assertThat(subject.maxDurations(TransferProfileType.CAR)).isEqualTo(car);
+    assertThat(
+      new TransferParameters<>(profiles, walk).maxDurations(TransferProfileType.WALK)
+    ).isEqualTo(plain);
   }
 
   @Test
-  void theDefaultMaxDurationsAreThirtyMinutes() {
+  void theImplicitConfigurationHasThirtyMinutesForEachTypeOfTheProfiles() {
     var subject = new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"))
     );
@@ -177,7 +189,7 @@ class TransferParametersTest {
     assertThat(subject.maxDurations(TransferProfileType.WALK)).isEqualTo(
       MaxDurationsPreference.DEFAULT
     );
-    assertThat(MaxDurationsPreference.DEFAULT.maxDuration()).isEqualTo(Duration.ofMinutes(30));
+    assertThat(MaxDurationsPreference.DEFAULT.longestDuration()).isEqualTo(Duration.ofMinutes(30));
   }
 
   @Test
@@ -229,8 +241,7 @@ class TransferParametersTest {
   private static TransferParameters<String> withWarmup(WarmupParameters... warmup) {
     return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk")),
-      MaxDurationsPreference.DEFAULT,
-      Map.of(),
+      Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
       DeduplicationLimit.DEFAULT,
       List.of(warmup)
     );
