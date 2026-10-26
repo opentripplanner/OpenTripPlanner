@@ -77,6 +77,27 @@ class BicyclePreferencesTest {
     assertThat(subject.normalizedDistance(walk)).isGreaterThan(100f);
   }
 
+  @Test
+  void thePreferencesForWalkingWithTheBicycleAreAPartOfTheEquality() {
+    var subject = preferences(1.3, 2.0);
+    var slowWalk = subject
+      .copyOf()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(0.9), Reluctance.of(5.0)))
+      .build();
+    var sameWalk = subject.copyOf().withWalk(subject.walk()).build();
+
+    assertThat(slowWalk).isNotEqualTo(subject);
+    assertThat(sameWalk).isEqualTo(subject);
+    assertThat(subject.normalizedDistance(slowWalk)).isGreaterThan(0f);
+  }
+
+  @Test
+  void theDefaultWalkingWithTheBicycleIsTheDefaultOfTheRequest() {
+    assertThat(BicyclePreferences.DEFAULT.walk()).isEqualTo(
+      BicycleWalk.of(Speed.ofMetersPerSecond(1.35), Reluctance.of(5.0))
+    );
+  }
+
   private static BicyclePreferences preferences(double speed, double reluctance) {
     return BicyclePreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(speed))

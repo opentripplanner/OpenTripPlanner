@@ -26,6 +26,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
@@ -568,7 +569,34 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of riding a bicycle.", base)
     );
+    builder.withWalk(mapBicycleWalk(p, base.walk()));
     return builder.build();
+  }
+
+  private static BicycleWalk mapBicycleWalk(NodeAdapter p, BicycleWalk base) {
+    var walk = p
+      .of("walk")
+      .since(V2_10)
+      .summary("The preferences for walking with the bicycle.")
+      .description("Used when the traveler pushes the bicycle, for example on stairs.")
+      .asObject();
+    return BicycleWalk.of(
+      Speed.ofMetersPerSecond(
+        walk
+          .of("speed")
+          .since(V2_10)
+          .summary("The speed of walking with the bicycle, in meters per second.")
+          .asDouble(base.speed().toMetersPerSecond())
+      ),
+      Reluctance.of(
+        walk
+          .of("reluctance")
+          .since(V2_10)
+          .summary("A multiplier for the cost of walking with the bicycle.")
+          .description("A higher value avoids walking with the bicycle.")
+          .asDouble(base.reluctance().value())
+      )
+    );
   }
 
   private static CarPreferences mapCarPreferences(NodeAdapter p, CarPreferences base) {

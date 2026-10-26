@@ -117,7 +117,14 @@ two more parameters, see [Max durations](#max-durations).
 The `walk`, `wheelchair` and `bicycle` types have `speed` and `reluctance`, and the `car` type only
 has `reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
 `bicycle` is `5.0`. The street model decides which streets and elevators a wheelchair can use, and
-where a bicycle or a car can go.
+where a bicycle or a car can go. The `bicycle` type also has the preferences for walking with the
+bicycle, when it is pushed:
+
+| Parameter                | Type     | Description                                                      | Default |
+|--------------------------|----------|------------------------------------------------------------------|---------|
+| `bicycle.walk`           | `object` | The preferences for walking with the bicycle.                    |         |
+| &nbsp;&nbsp;`speed`      | `double` | The speed in meters per second.                                  | `1.35`  |
+| &nbsp;&nbsp;`reluctance` | `double` | A multiplier for the cost of walking with the bicycle.           | `5.0`   |
 
 The stairs reluctance is not a user preference, since no API takes it as an input of a routing
 search. It is a `routingRequest` parameter of the profile, for example `walk.stairsReluctance`,

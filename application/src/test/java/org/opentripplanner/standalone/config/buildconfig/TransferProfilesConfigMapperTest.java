@@ -20,6 +20,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParam
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
@@ -945,6 +946,34 @@ class TransferProfilesConfigMapperTest {
     );
     assertThat(subject.maxDurations(TransferProfileType.CAR).longestDuration()).isEqualTo(
       Duration.ofHours(3)
+    );
+  }
+
+  @Test
+  void theWalkingWithTheBicycleIsSetWithTheWalkSpeedAndReluctance() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [
+              { id: "root", userPreferences: { walk: { speed: 1.0 } } },
+              { id: "child", parent: "root", userPreferences: { walk: { reluctance: 8.0 } } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var root = (BicyclePreferences) profile(subject, "root").userPreferences();
+    var child = (BicyclePreferences) profile(subject, "child").userPreferences();
+    assertThat(root.walk().speed()).isEqualTo(Speed.ofMetersPerSecond(1.0));
+    assertThat(root.walk().reluctance()).isEqualTo(BicyclePreferences.DEFAULT.walk().reluctance());
+    // The child inherits the unset values of the parent of the same type
+    assertThat(child.walk()).isEqualTo(
+      BicycleWalk.of(Speed.ofMetersPerSecond(1.0), Reluctance.of(8.0))
     );
   }
 

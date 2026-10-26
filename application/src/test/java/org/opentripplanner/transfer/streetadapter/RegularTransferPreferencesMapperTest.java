@@ -11,6 +11,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
@@ -205,6 +206,38 @@ class RegularTransferPreferencesMapperTest {
     assertThat(request.journey().transfer().mode()).isEqualTo(StreetMode.CAR);
     assertThat(request.journey().wheelchair()).isFalse();
     assertThat(request.preferences().car().reluctance()).isEqualTo(3.0);
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
+  }
+
+  @Test
+  void theWalkingWithTheBicycleIsTheWalkingOfTheBikePreferences() {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(StreetMode.BIKE))
+      .withPreferences(p ->
+        p
+          .withWalk(w -> w.withSpeed(1.0).withReluctance(9.0))
+          .withBike(b -> b.withWalking(w -> w.withSpeed(0.9).withReluctance(7.0)))
+      )
+      .buildDefault();
+
+    var bicycle = (BicyclePreferences) SUBJECT.toUserPreferences(request);
+
+    assertThat(bicycle.walk()).isEqualTo(
+      BicycleWalk.of(Speed.ofMetersPerSecond(0.9), Reluctance.of(7.0))
+    );
+  }
+
+  @Test
+  void theWalkingWithTheBicycleMakesTheWalkingOfTheBikePreferences() {
+    var preferences = BicyclePreferences.of()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(0.9), Reluctance.of(7.0)))
+      .build();
+
+    var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
+
+    assertThat(request.preferences().bike().walking().speed()).isEqualTo(0.9);
+    assertThat(request.preferences().bike().walking().reluctance()).isEqualTo(7.0);
     assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
   }
 }

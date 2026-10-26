@@ -7,6 +7,7 @@ import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
@@ -52,6 +53,12 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       case BICYCLE -> BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
         .withReluctance(Reluctance.of(appBike.reluctance()))
+        .withWalk(
+          BicycleWalk.of(
+            Speed.ofMetersPerSecond(appBike.walking().speed()),
+            Reluctance.of(appBike.walking().reluctance())
+          )
+        )
         .build();
       case CAR -> CarPreferences.of().withReluctance(Reluctance.of(appCar.reluctance())).build();
     };
@@ -116,6 +123,10 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         rb.withBike(bike -> {
           bike.withSpeed(userPreferences.speed().toMetersPerSecond());
           bike.withReluctance(userPreferences.reluctance().value());
+          bike.withWalking(walking -> {
+            walking.withSpeed(userPreferences.walk().speed().toMetersPerSecond());
+            walking.withReluctance(userPreferences.walk().reluctance().value());
+          });
         })
       )
       .buildDefault();
