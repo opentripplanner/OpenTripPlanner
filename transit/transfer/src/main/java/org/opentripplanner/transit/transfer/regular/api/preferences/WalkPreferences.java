@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -19,24 +18,21 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class WalkPreferences
   extends AbstractUserPreferences<WalkPreferences>
-  implements WithSpeed, WithStairs
+  implements WithSpeed
 {
 
   public static final WalkPreferences DEFAULT = new WalkPreferences();
 
   private final Speed speed;
-  private final StreetSegmentTypeUsage stairs;
 
   private WalkPreferences() {
     super(Reluctance.of(2.0));
     this.speed = Speed.ofMetersPerSecond(1.35);
-    this.stairs = StreetSegmentTypeUsage.ALLOWED;
   }
 
   private WalkPreferences(Builder builder) {
     super(builder);
     this.speed = Objects.requireNonNull(builder.speed);
-    this.stairs = Objects.requireNonNull(builder.stairs);
   }
 
   public static Builder of() {
@@ -73,11 +69,6 @@ public final class WalkPreferences
   }
 
   @Override
-  public StreetSegmentTypeUsage stairs() {
-    return stairs;
-  }
-
-  @Override
   WalkPreferences defaultInstance() {
     return DEFAULT;
   }
@@ -87,7 +78,6 @@ public final class WalkPreferences
     float distance = super.normalizedDistance(other);
     if (other instanceof WalkPreferences that) {
       distance += speed.normalizedDistance(that.speed);
-      distance += stairs.normalizedDistance(that.stairs);
     }
     return distance;
   }
@@ -97,12 +87,12 @@ public final class WalkPreferences
     if (!(obj instanceof WalkPreferences that)) {
       return false;
     }
-    return super.equals(obj) && speed.equals(that.speed) && stairs == that.stairs;
+    return super.equals(obj) && speed.equals(that.speed);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), speed, stairs);
+    return Objects.hash(super.hashCode(), speed);
   }
 
   @Override
@@ -110,28 +100,20 @@ public final class WalkPreferences
     return super
       .appendToString(ToStringBuilder.of(WalkPreferences.class))
       .addObj("speed", speed, DEFAULT.speed)
-      .addObj("stairs", stairs, DEFAULT.stairs)
       .toString();
   }
 
   public static class Builder extends AbstractUserPreferences.Builder<WalkPreferences, Builder> {
 
     private Speed speed;
-    private StreetSegmentTypeUsage stairs;
 
     public Builder(WalkPreferences original) {
       super(original);
       this.speed = original.speed;
-      this.stairs = original.stairs;
     }
 
     public Builder withSpeed(Speed speed) {
       this.speed = speed;
-      return this;
-    }
-
-    public Builder withStairs(StreetSegmentTypeUsage stairs) {
-      this.stairs = stairs;
       return this;
     }
 
@@ -140,9 +122,6 @@ public final class WalkPreferences
       super.inheritFrom(parent);
       if (parent instanceof WithSpeed withSpeed) {
         this.speed = withSpeed.speed();
-      }
-      if (parent instanceof WithStairs withStairs) {
-        this.stairs = withStairs.stairs();
       }
       return this;
     }

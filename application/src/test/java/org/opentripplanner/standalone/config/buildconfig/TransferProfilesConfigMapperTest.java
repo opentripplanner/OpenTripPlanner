@@ -22,7 +22,6 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePrefe
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class TransferProfilesConfigMapperTest {
 
@@ -54,7 +53,7 @@ class TransferProfilesConfigMapperTest {
           walk: { maxDuration: '30m',
             profiles: [{
               id: "slow walk",
-              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "FORBIDDEN" }
+              userPreferences: { speed: 1.1, reluctance: 3.0 }
             }]
           }
         }
@@ -69,7 +68,6 @@ class TransferProfilesConfigMapperTest {
       WalkPreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(1.1))
         .withReluctance(Reluctance.of(3.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
         .build()
     );
   }
@@ -719,7 +717,7 @@ class TransferProfilesConfigMapperTest {
           wheelchair: { maxDuration: '30m',
             profiles: [{
               id: "wheelchair",
-              userPreferences: { speed: 0.9, reluctance: 4.0, stairs: "FORBIDDEN" }
+              userPreferences: { speed: 0.9, reluctance: 4.0 }
             }],
             maxDuration: "45m"
           }
@@ -735,7 +733,6 @@ class TransferProfilesConfigMapperTest {
       WheelchairPreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(0.9))
         .withReluctance(Reluctance.of(4.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
         .build()
     );
     assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
@@ -755,7 +752,7 @@ class TransferProfilesConfigMapperTest {
           walk: { maxDuration: '30m',
             profiles: [{
               id: "walk",
-              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
+              userPreferences: { speed: 1.1, reluctance: 3.0 }
             }]
           },
           wheelchair: { maxDuration: '30m',
@@ -773,7 +770,6 @@ class TransferProfilesConfigMapperTest {
     var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
     assertThat(wheelchair.speed()).isEqualTo(Speed.ofMetersPerSecond(1.1));
     assertThat(wheelchair.reluctance()).isEqualTo(Reluctance.of(5.0));
-    assertThat(wheelchair.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
   }
 
   @Test
@@ -838,7 +834,7 @@ class TransferProfilesConfigMapperTest {
           bicycle: { maxDuration: '30m',
             profiles: [{
               id: "bicycle",
-              userPreferences: { speed: 6.0, reluctance: 3.0, stairs: "DISCOURAGED" }
+              userPreferences: { speed: 6.0, reluctance: 3.0 }
             }],
             maxDuration: "20m"
           }
@@ -853,7 +849,6 @@ class TransferProfilesConfigMapperTest {
       BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(6.0))
         .withReluctance(Reluctance.of(3.0))
-        .withStairs(StreetSegmentTypeUsage.DISCOURAGED)
         .build()
     );
     assertThat(subject.maxDurations(TransferProfileType.BICYCLE).longestDuration()).isEqualTo(
@@ -870,7 +865,7 @@ class TransferProfilesConfigMapperTest {
           walk: { maxDuration: '30m',
             profiles: [{
               id: "walk",
-              userPreferences: { speed: 1.1, reluctance: 3.0, stairs: "DISCOURAGED" }
+              userPreferences: { speed: 1.1, reluctance: 3.0 }
             }]
           },
           bicycle: { maxDuration: '30m',
@@ -888,7 +883,6 @@ class TransferProfilesConfigMapperTest {
     var bicycle = (BicyclePreferences) profile(subject, "bicycle").userPreferences();
     assertThat(bicycle.speed()).isEqualTo(Speed.ofMetersPerSecond(5.5));
     assertThat(bicycle.reluctance()).isEqualTo(Reluctance.of(3.0));
-    assertThat(bicycle.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
   }
 
   @Test

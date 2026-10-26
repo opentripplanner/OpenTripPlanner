@@ -14,7 +14,6 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePrefe
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class RegularTransferPreferencesMapperTest {
 
@@ -155,7 +154,6 @@ class RegularTransferPreferencesMapperTest {
     var preferences = BicyclePreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(6.0))
       .withReluctance(Reluctance.of(3.0))
-      .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
       .build();
 
     var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
@@ -164,10 +162,7 @@ class RegularTransferPreferencesMapperTest {
     assertThat(request.journey().wheelchair()).isFalse();
     assertThat(request.preferences().bike().speed()).isEqualTo(6.0);
     assertThat(request.preferences().bike().reluctance()).isEqualTo(3.0);
-    assertThat(request.preferences().walk().stairsReluctance()).isEqualTo(1000.0);
-    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(
-      preferences.copyOf().withStairs(StreetSegmentTypeUsage.ALLOWED).build()
-    );
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
   }
 
   @Test

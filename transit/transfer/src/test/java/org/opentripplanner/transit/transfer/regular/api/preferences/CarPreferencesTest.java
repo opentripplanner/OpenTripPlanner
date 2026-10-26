@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class CarPreferencesTest {
 
@@ -59,7 +58,6 @@ class CarPreferencesTest {
     var walk = WalkPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(1.1))
       .withReluctance(Reluctance.of(5.0))
-      .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
       .build();
 
     var subject = CarPreferences.inheritedFrom(walk);

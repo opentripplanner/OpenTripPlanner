@@ -5,7 +5,6 @@ import static com.google.common.truth.Truth.assertThat;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 
 class WalkPreferencesTest {
 
@@ -29,13 +28,6 @@ class WalkPreferencesTest {
 
     assertThat(preferences(1.3, 3.0)).isNotEqualTo(subject);
     assertThat(preferences(1.5, 2.0)).isNotEqualTo(subject);
-    assertThat(
-      WalkPreferences.of()
-        .withSpeed(Speed.ofMetersPerSecond(1.3))
-        .withReluctance(Reluctance.of(2.0))
-        .withStairs(StreetSegmentTypeUsage.FORBIDDEN)
-        .build()
-    ).isNotEqualTo(subject);
   }
 
   @Test
@@ -76,14 +68,12 @@ class WalkPreferencesTest {
     var wheelchair = WheelchairPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(0.9))
       .withReluctance(Reluctance.of(4.0))
-      .withStairs(StreetSegmentTypeUsage.DISCOURAGED)
       .build();
 
     var subject = WalkPreferences.inheritedFrom(wheelchair);
 
     assertThat(subject.speed()).isEqualTo(wheelchair.speed());
     assertThat(subject.reluctance()).isEqualTo(wheelchair.reluctance());
-    assertThat(subject.stairs()).isEqualTo(StreetSegmentTypeUsage.DISCOURAGED);
   }
 
   private static WalkPreferences preferences(double speed, double reluctance) {

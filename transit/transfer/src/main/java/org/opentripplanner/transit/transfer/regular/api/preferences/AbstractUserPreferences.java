@@ -14,7 +14,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * <p>
  * Each {@link TransferProfileType} has its own preferences class, with the preferences that are
  * meaningful for the type. The only preference all types share is the reluctance, a car has no
- * speed or stairs of its own, see {@link WithSpeed} and {@link WithStairs}.
+ * speed of its own, see {@link WithSpeed}.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */

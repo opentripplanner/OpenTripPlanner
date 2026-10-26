@@ -11,8 +11,6 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferenc
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**
@@ -89,9 +87,11 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
   }
 
   /** A walking request, for a traveler in a wheelchair or not. */
-  private static <
-    T extends AbstractUserPreferences<T> & WithSpeed & WithStairs
-  > RouteRequest walkRequest(T userPreferences, RouteRequest base, boolean wheelchair) {
+  private static <T extends AbstractUserPreferences<T> & WithSpeed> RouteRequest walkRequest(
+    T userPreferences,
+    RouteRequest base,
+    boolean wheelchair
+  ) {
     return base
       .copyOf()
       .withJourney(jb -> jb.withTransfer(StreetMode.WALK).withWheelchair(wheelchair))
@@ -99,9 +99,6 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         routingPrefs.withWalk(walk -> {
           walk.withSpeed(userPreferences.speed().toMetersPerSecond());
           walk.withReluctance(userPreferences.reluctance().value());
-          walk.withStairsReluctance(
-            stairsReluctance(userPreferences.stairs(), walk.stairsReluctance())
-          );
         })
       )
       .buildDefault();
@@ -116,16 +113,10 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       .copyOf()
       .withJourney(jb -> jb.withTransfer(StreetMode.BIKE))
       .withPreferences(rb ->
-        rb
-          .withWalk(walk ->
-            walk.withStairsReluctance(
-              stairsReluctance(userPreferences.stairs(), walk.stairsReluctance())
-            )
-          )
-          .withBike(bike -> {
-            bike.withSpeed(userPreferences.speed().toMetersPerSecond());
-            bike.withReluctance(userPreferences.reluctance().value());
-          })
+        rb.withBike(bike -> {
+          bike.withSpeed(userPreferences.speed().toMetersPerSecond());
+          bike.withReluctance(userPreferences.reluctance().value());
+        })
       )
       .buildDefault();
   }
@@ -139,14 +130,5 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         pb.withCar(c -> c.withReluctance(userPreferences.reluctance().value()))
       )
       .buildDefault();
-  }
-
-  /** Interim mapping until the traveler-preferences design (stairs as a 3-way enum) is finalized. */
-  private static double stairsReluctance(StreetSegmentTypeUsage stairs, double defaultReluctance) {
-    return switch (stairs) {
-      case ALLOWED -> defaultReluctance;
-      case DISCOURAGED -> 10.0;
-      case FORBIDDEN -> 1000.0;
-    };
   }
 }

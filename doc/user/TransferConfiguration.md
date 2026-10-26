@@ -67,7 +67,7 @@ transfers the profile and its parent have in common are stored once, which saves
         {
           "id": "slow-walk",
           "parent": "walk",
-          "userPreferences": { "speed": 0.9, "reluctance": 4.0, "stairs": "DISCOURAGED" }
+          "userPreferences": { "speed": 0.9, "reluctance": 4.0 }
         }
       ],
       "maxDuration": "40m",
@@ -113,12 +113,17 @@ two more parameters, see [Max durations](#max-durations).
 |---------------|----------|-------------------------------------------------------------------------------------|----------|
 | `speed`       | `double` | The speed in meters per second. Not for `car`, it drives the speed of the streets.  | `1.35`   |
 | `reluctance`  | `double` | A multiplier for the cost of the transfer. A higher value avoids the transfer.      | `2.0`    |
-| `stairs`      | `enum`   | `ALLOWED`, `DISCOURAGED` or `FORBIDDEN`. Not for `car`. A bicycle is pushed.        | `ALLOWED`|
 
-The `walk`, `wheelchair` and `bicycle` types have all three, and the `car` type only has
-`reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
+The `walk`, `wheelchair` and `bicycle` types have `speed` and `reluctance`, and the `car` type only
+has `reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
 `bicycle` is `5.0`. The street model decides which streets and elevators a wheelchair can use, and
 where a bicycle or a car can go.
+
+The stairs reluctance is not a user preference, since no API takes it as an input of a routing
+search. It is a `routingRequest` parameter of the profile, for example `walk.stairsReluctance`,
+`wheelchair.stairsReluctance` or `bicycle.walking.stairsReluctance`. It is the value of the
+configuration of the profile, not the one in `routingDefaults` of the `router-config.json`, so
+copy it to the `routingRequest` of the profiles if it is not the default.
 
 ### Routing request
 

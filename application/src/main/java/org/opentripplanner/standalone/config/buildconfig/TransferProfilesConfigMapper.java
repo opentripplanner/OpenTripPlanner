@@ -30,8 +30,6 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferenc
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
-import org.opentripplanner.transit.transfer.regular.api.preferences.WithStairs;
-import org.opentripplanner.transit.transfer.regular.api.ways.StreetSegmentTypeUsage;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
 
@@ -538,7 +536,6 @@ public class TransferProfilesConfigMapper {
     var builder = base.copyOf();
     builder.withSpeed(mapSpeed(p, "Walking speed, in meters per second.", base));
     builder.withReluctance(mapReluctance(p, "A multiplier for the cost of walking.", base));
-    builder.withStairs(mapStairs(p, base));
     return builder.build();
   }
 
@@ -553,7 +550,6 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
     );
-    builder.withStairs(mapStairs(p, base));
     return builder.build();
   }
 
@@ -563,7 +559,6 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of riding a bicycle.", base)
     );
-    builder.withStairs(mapStairs(p, base));
     return builder.build();
   }
 
@@ -591,15 +586,5 @@ public class TransferProfilesConfigMapper {
     return Reluctance.of(
       p.of("reluctance").since(V2_10).summary(summary).asDouble(base.reluctance().value())
     );
-  }
-
-  private static <
-    T extends AbstractUserPreferences<T> & WithStairs
-  > StreetSegmentTypeUsage mapStairs(NodeAdapter p, T base) {
-    return p
-      .of("stairs")
-      .since(V2_10)
-      .summary("Whether stairs are allowed, discouraged, or forbidden for this profile.")
-      .asEnum(base.stairs());
   }
 }
