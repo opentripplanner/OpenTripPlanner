@@ -30,6 +30,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFactor;
@@ -598,8 +599,62 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of riding a bicycle.", base)
     );
+    builder.withOptimize(mapOptimize(p, base.optimize()));
     builder.withWalk(mapBicycleWalk(p, base.walk()));
     return builder.build();
+  }
+
+  private static TimeSlopeSafetyTrianglePreference mapOptimize(
+    NodeAdapter p,
+    TimeSlopeSafetyTrianglePreference base
+  ) {
+    if (!p.exist("optimize")) {
+      return base;
+    }
+    var optimize = p
+      .of("optimize")
+      .since(V2_10)
+      .summary("How the route of the bicycle is optimized.")
+      .description(
+        """
+        The importance of the `time`, the `slope` and the `safety`. At least one must be set, and
+        the values that are not set are 0.0. The values are relative to each other, for example
+        `time: 0.1` is the same as `time: 1.0`, and they are rounded so they sum to 1.0. A `time` of
+        1.0 is the shortest duration, a `slope` of 1.0 is the flattest streets, and a `safety` of
+        1.0 is the safest streets.
+        """
+      )
+      .asObject();
+    if (!optimize.exist("time") && !optimize.exist("slope") && !optimize.exist("safety")) {
+      throw new OtpAppException(
+        "Invalid transfer configuration in " +
+          optimize.contextPath() +
+          ": at least one of time, slope and safety must be set."
+      );
+    }
+    try {
+      return TimeSlopeSafetyTrianglePreference.of(
+        optimize
+          .of("time")
+          .since(V2_10)
+          .summary("The importance of the time, the shortest duration.")
+          .asDouble(0.0),
+        optimize
+          .of("slope")
+          .since(V2_10)
+          .summary("The importance of the slope, the flattest streets.")
+          .asDouble(0.0),
+        optimize
+          .of("safety")
+          .since(V2_10)
+          .summary("The importance of the safety, the safest streets.")
+          .asDouble(0.0)
+      );
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException(
+        "Invalid transfer configuration in " + optimize.contextPath() + ": " + e.getMessage()
+      );
+    }
   }
 
   private static BicycleWalk mapBicycleWalk(NodeAdapter p, BicycleWalk base) {

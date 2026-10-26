@@ -4,12 +4,15 @@ import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFactor;
@@ -61,6 +64,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
       case BICYCLE -> BicyclePreferences.of()
         .withSpeed(Speed.ofMetersPerSecond(appBike.speed()))
         .withReluctance(Reluctance.of(appBike.reluctance()))
+        .withOptimize(optimize(appBike))
         .withWalk(
           BicycleWalk.of(
             Speed.ofMetersPerSecond(appBike.walking().speed()),
@@ -130,6 +134,13 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         rb.withBike(bike -> {
           bike.withSpeed(userPreferences.speed().toMetersPerSecond());
           bike.withReluctance(userPreferences.reluctance().value());
+          // The triangle is the same as the shortest, flattest or safest type with one value of 1.0
+          bike.withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE);
+          bike.withOptimizeTriangle(triangle -> {
+            triangle.withTime(userPreferences.optimize().time().asDouble());
+            triangle.withSlope(userPreferences.optimize().slope().asDouble());
+            triangle.withSafety(userPreferences.optimize().safety().asDouble());
+          });
           bike.withWalking(walking -> {
             walking.withSpeed(userPreferences.walk().speed().toMetersPerSecond());
             walking.withReluctance(userPreferences.walk().reluctance().value());
@@ -148,5 +159,24 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
         pb.withCar(c -> c.withReluctance(userPreferences.reluctance().value()))
       )
       .buildDefault();
+  }
+
+  /** The optimization of a bike request as a triangle: the other types have one value of 1.0. */
+  private static TimeSlopeSafetyTrianglePreference optimize(BikePreferences bike) {
+    return switch (bike.optimizeType()) {
+      case SHORTEST_DURATION -> TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0);
+      case FLAT_STREETS -> TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0);
+      case SAFE_STREETS -> TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0);
+      case TRIANGLE -> {
+        var triangle = bike.optimizeTriangle();
+        yield triangle.time() + triangle.slope() + triangle.safety() > 0.0
+          ? TimeSlopeSafetyTrianglePreference.of(
+              triangle.time(),
+              triangle.slope(),
+              triangle.safety()
+            )
+          : TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0);
+      }
+    };
   }
 }

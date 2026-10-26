@@ -23,6 +23,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 
@@ -1025,6 +1026,95 @@ class TransferProfilesConfigMapperTest {
 
     var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
     assertThat(ex).hasMessageThat().contains("safetyFactor");
+  }
+
+  @Test
+  void theOptimizationOfABicycleIsSetWithTheTimeTheSlopeAndTheSafety() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [
+              { id: "time", userPreferences: { optimize: { time: 0.1 } } },
+              { id: "mix", userPreferences: { optimize: { time: 2.0, slope: 3.0, safety: 5.0 } } },
+              { id: "child", parent: "mix", userPreferences: { reluctance: 3.0 } },
+              { id: "reset", parent: "mix", userPreferences: { optimize: { slope: 1.0 } } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    assertThat(optimize(subject, "time")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0)
+    );
+    assertThat(optimize(subject, "mix")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.2, 0.3, 0.5)
+    );
+    // Inherited when it is not set, the values that are not set are 0.0 when it is set
+    assertThat(optimize(subject, "child")).isEqualTo(optimize(subject, "mix"));
+    assertThat(optimize(subject, "reset")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0)
+    );
+  }
+
+  @Test
+  void theOptimizationOfARootIsTheOptimizationOfTheRequestIfNotSet() {
+    var subject = map(
+      "{ transfers: { bicycle: { maxDuration: '30m', profiles: [{ id: 'b', userPreferences: { speed: 6.0 } }] } } }"
+    );
+
+    assertThat(optimize(subject, "b")).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0)
+    );
+  }
+
+  @Test
+  void anOptimizationWithoutAnyValueIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [{ id: "b", userPreferences: { optimize: {} } }]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("optimize");
+  }
+
+  @Test
+  void anOptimizationWithANegativeValueIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          bicycle: {
+            maxDuration: '30m',
+            profiles: [{ id: "b", userPreferences: { optimize: { time: -1.0 } } }]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("optimize");
+  }
+
+  private static TimeSlopeSafetyTrianglePreference optimize(
+    TransferParameters<RouteRequest> parameters,
+    String id
+  ) {
+    return ((BicyclePreferences) profile(parameters, id).userPreferences()).optimize();
   }
 
   private static TransferParameters<RouteRequest> map(String json) {

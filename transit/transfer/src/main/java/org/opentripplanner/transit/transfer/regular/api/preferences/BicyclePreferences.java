@@ -8,7 +8,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The preferences of the bicycle transfers: speed and reluctance for a traveler that rides
- * a bicycle, and the preferences for walking with it. The values are normalized(rounded) so the
+ * a bicycle, how the route is optimized, and the preferences for walking with it. The values are normalized(rounded) so the
  * class can used as a cache key.
  * <p>
  * See the configuration for documentation of each field.
@@ -23,17 +23,20 @@ public final class BicyclePreferences
   public static final BicyclePreferences DEFAULT = new BicyclePreferences();
 
   private final Speed speed;
+  private final TimeSlopeSafetyTrianglePreference optimize;
   private final BicycleWalk walk;
 
   private BicyclePreferences() {
     super(Reluctance.of(2.0));
     this.speed = Speed.ofMetersPerSecond(5.0);
+    this.optimize = TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0);
     this.walk = BicycleWalk.of(Speed.ofMetersPerSecond(1.35), Reluctance.of(5.0));
   }
 
   private BicyclePreferences(Builder builder) {
     super(builder);
     this.speed = Objects.requireNonNull(builder.speed);
+    this.optimize = Objects.requireNonNull(builder.optimize);
     this.walk = Objects.requireNonNull(builder.walk);
   }
 
@@ -55,6 +58,11 @@ public final class BicyclePreferences
     return speed;
   }
 
+  /** How the route is optimized: the importance of the time, the slope and the safety. */
+  public TimeSlopeSafetyTrianglePreference optimize() {
+    return optimize;
+  }
+
   /** The preferences for walking with the bicycle. */
   public BicycleWalk walk() {
     return walk;
@@ -70,6 +78,7 @@ public final class BicyclePreferences
     float distance = super.normalizedDistance(other);
     if (other instanceof BicyclePreferences that) {
       distance += speed.normalizedDistance(that.speed);
+      distance += optimize.normalizedDistance(that.optimize);
       distance += walk.normalizedDistance(that.walk);
     }
     return distance;
@@ -80,12 +89,17 @@ public final class BicyclePreferences
     if (!(obj instanceof BicyclePreferences that)) {
       return false;
     }
-    return super.equals(obj) && speed.equals(that.speed) && walk.equals(that.walk);
+    return (
+      super.equals(obj) &&
+      speed.equals(that.speed) &&
+      optimize.equals(that.optimize) &&
+      walk.equals(that.walk)
+    );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), speed, walk);
+    return Objects.hash(super.hashCode(), speed, optimize, walk);
   }
 
   @Override
@@ -93,6 +107,7 @@ public final class BicyclePreferences
     return super
       .appendToString(ToStringBuilder.of(BicyclePreferences.class))
       .addObj("speed", speed, DEFAULT.speed)
+      .addObj("optimize", optimize, DEFAULT.optimize)
       .addObj("walk", walk, DEFAULT.walk)
       .toString();
   }
@@ -100,16 +115,23 @@ public final class BicyclePreferences
   public static class Builder extends AbstractUserPreferences.Builder<BicyclePreferences, Builder> {
 
     private Speed speed;
+    private TimeSlopeSafetyTrianglePreference optimize;
     private BicycleWalk walk;
 
     public Builder(BicyclePreferences original) {
       super(original);
       this.speed = original.speed;
+      this.optimize = original.optimize;
       this.walk = original.walk;
     }
 
     public Builder withSpeed(Speed speed) {
       this.speed = speed;
+      return this;
+    }
+
+    public Builder withOptimize(TimeSlopeSafetyTrianglePreference optimize) {
+      this.optimize = optimize;
       return this;
     }
 

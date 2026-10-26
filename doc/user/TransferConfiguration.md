@@ -119,13 +119,23 @@ The `walk`, `wheelchair` and `bicycle` types have `speed` and `reluctance`, and 
 has `reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
 `bicycle` is `5.0`. The street model decides which streets and elevators a wheelchair can use, and
 where a bicycle or a car can go. The `bicycle` type also has the preferences for walking with the
-bicycle, when it is pushed:
+bicycle, when it is pushed, and how the route is optimized:
 
 | Parameter                | Type     | Description                                                      | Default |
 |--------------------------|----------|------------------------------------------------------------------|---------|
+| `bicycle.optimize`       | `object` | How the route is optimized. At least one value is required.      |         |
+| &nbsp;&nbsp;`time`       | `double` | The importance of the time. `1.0` is the shortest duration.      | `0.0`   |
+| &nbsp;&nbsp;`slope`      | `double` | The importance of the slope. `1.0` is the flattest streets.      | `0.0`   |
+| &nbsp;&nbsp;`safety`     | `double` | The importance of the safety. `1.0` is the safest streets.       | `0.0`   |
 | `bicycle.walk`           | `object` | The preferences for walking with the bicycle.                    |         |
 | &nbsp;&nbsp;`speed`      | `double` | The speed in meters per second.                                  | `1.35`  |
 | &nbsp;&nbsp;`reluctance` | `double` | A multiplier for the cost of walking with the bicycle.           | `5.0`   |
+
+The `optimize` values are relative to each other, for example `time: 0.1` is the same as
+`time: 1.0`. They are rounded so they sum to 1.0. If `optimize` is set, the values that are not set
+are `0.0`, so `optimize: { time: 0.1 }` is `time: 1.0`, `slope: 0.0` and `safety: 0.0`. If it is
+not set in a profile, the profile inherits it from a parent of the same type, and a root gets it
+from the request. The default is the safest streets (`safety: 1.0`).
 
 The stairs reluctance is not a user preference, since no API takes it as an input of a routing
 search. It is a `routingRequest` parameter of the profile, for example `walk.stairsReluctance`,

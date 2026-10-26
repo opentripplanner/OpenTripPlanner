@@ -98,6 +98,27 @@ class BicyclePreferencesTest {
     );
   }
 
+  @Test
+  void theOptimizationIsAPartOfTheEqualityAndTheDistance() {
+    var subject = preferences(1.3, 2.0);
+    var fastest = subject
+      .copyOf()
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(1, 0, 0))
+      .build();
+    var same = subject.copyOf().withOptimize(subject.optimize()).build();
+
+    assertThat(fastest).isNotEqualTo(subject);
+    assertThat(same).isEqualTo(subject);
+    assertThat(subject.normalizedDistance(fastest)).isGreaterThan(0f);
+  }
+
+  @Test
+  void theDefaultOptimizationIsTheSafestStreets() {
+    assertThat(BicyclePreferences.DEFAULT.optimize()).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0)
+    );
+  }
+
   private static BicyclePreferences preferences(double speed, double reluctance) {
     return BicyclePreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(speed))

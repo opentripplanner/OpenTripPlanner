@@ -10,10 +10,12 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
+import org.opentripplanner.street.model.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.TimeSlopeSafetyTrianglePreference;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 
@@ -272,5 +274,63 @@ class RegularTransferPreferencesMapperTest {
     assertThat(wheelchairRequest.preferences().walk().safetyFactor()).isEqualTo(0.6);
     assertThat(SUBJECT.toUserPreferences(walkRequest)).isEqualTo(walk);
     assertThat(SUBJECT.toUserPreferences(wheelchairRequest)).isEqualTo(wheelchair);
+  }
+
+  @Test
+  void theOptimizationTypesOfABikeRequestAreTrianglesWithOneValueOfOne() {
+    assertThat(optimizeOf(VehicleRoutingOptimizeType.SHORTEST_DURATION)).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(1.0, 0.0, 0.0)
+    );
+    assertThat(optimizeOf(VehicleRoutingOptimizeType.FLAT_STREETS)).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 1.0, 0.0)
+    );
+    assertThat(optimizeOf(VehicleRoutingOptimizeType.SAFE_STREETS)).isEqualTo(
+      TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 1.0)
+    );
+  }
+
+  @Test
+  void theTriangleOfABikeRequestIsNormalized() {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(StreetMode.BIKE))
+      .withPreferences(p ->
+        p.withBike(b ->
+          b
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+            .withOptimizeTriangle(t -> t.withTime(2.0).withSlope(3.0).withSafety(5.0))
+        )
+      )
+      .buildDefault();
+
+    var bicycle = (BicyclePreferences) SUBJECT.toUserPreferences(request);
+
+    assertThat(bicycle.optimize()).isEqualTo(TimeSlopeSafetyTrianglePreference.of(0.2, 0.3, 0.5));
+  }
+
+  @Test
+  void theOptimizationMakesATriangleRequestAndIsReadBack() {
+    var preferences = BicyclePreferences.of()
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(0.2, 0.3, 0.5))
+      .build();
+
+    var request = SUBJECT.toRequest(preferences, RouteRequest.defaultValue());
+
+    assertThat(request.preferences().bike().optimizeType()).isEqualTo(
+      VehicleRoutingOptimizeType.TRIANGLE
+    );
+    assertThat(request.preferences().bike().optimizeTriangle().time()).isEqualTo(0.2);
+    assertThat(request.preferences().bike().optimizeTriangle().slope()).isEqualTo(0.3);
+    assertThat(request.preferences().bike().optimizeTriangle().safety()).isEqualTo(0.5);
+    assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
+  }
+
+  private static TimeSlopeSafetyTrianglePreference optimizeOf(VehicleRoutingOptimizeType type) {
+    var request = RouteRequest.defaultValue()
+      .copyOf()
+      .withJourney(j -> j.withTransfer(StreetMode.BIKE))
+      .withPreferences(p -> p.withBike(b -> b.withOptimizeType(type)))
+      .buildDefault();
+    return ((BicyclePreferences) SUBJECT.toUserPreferences(request)).optimize();
   }
 }
