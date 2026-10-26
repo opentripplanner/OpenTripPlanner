@@ -34,12 +34,12 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.refetch.RefetchItineraryException;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
 
-public class TripPatternForLegsQuery {
+public class TripPatternByLegIdsQuery {
 
   private final FeedScopedIdMapper idMapper;
   private final GenericLocationMapper genericLocationMapper;
 
-  public TripPatternForLegsQuery(FeedScopedIdMapper idMapper) {
+  public TripPatternByLegIdsQuery(FeedScopedIdMapper idMapper) {
     this.idMapper = idMapper;
     this.genericLocationMapper = new GenericLocationMapper(idMapper);
   }
@@ -57,13 +57,13 @@ public class TripPatternForLegsQuery {
       tripPatternType
     );
     return createField(routing, outputType, durationPerStreetModeType, locationInputType)
-      .name("tripPatternForLegs")
+      .name("tripPatternByLegIds")
       .description("Get a trip pattern for the given legs, with realtime changes applied.")
       .build();
   }
 
   /**
-   * The predecessor of {@code tripPatternForLegs}, kept so that existing clients keep working.
+   * The predecessor of {@code tripPatternByLegIds}, kept so that existing clients keep working.
    */
   public GraphQLFieldDefinition createRefetchTripPattern(
     DefaultRouteRequestType routing,
@@ -80,7 +80,7 @@ public class TripPatternForLegsQuery {
     return createField(routing, outputType, durationPerStreetModeType, locationInputType)
       .name("refetchTripPattern")
       .description("Get an updated version of a trip pattern with realtime changes applied.")
-      .deprecate("Use tripPatternForLegs instead.")
+      .deprecate("Use tripPatternByLegIds instead.")
       .build();
   }
 
@@ -232,10 +232,10 @@ public class TripPatternForLegsQuery {
           )
           .build()
       )
-      .dataFetcher(this::tripPatternForLegs);
+      .dataFetcher(this::tripPatternByLegIds);
   }
 
-  private DataFetcherResult<TripPatternResult> tripPatternForLegs(
+  private DataFetcherResult<TripPatternResult> tripPatternByLegIds(
     DataFetchingEnvironment environment
   ) {
     TransmodelGraphQLRequestContext ctx = environment.getContext();

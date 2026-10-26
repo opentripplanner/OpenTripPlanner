@@ -843,7 +843,7 @@ type QueryType {
     walkSpeed: Float = 1.35,
     "Whether the trip must be wheelchair accessible. Supported for the street part of the search."
     wheelchairAccessible: Boolean = false
-  ): RefetchTripPatternResult! @deprecated(reason : "Use tripPatternForLegs instead.") @timingData
+  ): RefetchTripPatternResult! @deprecated(reason : "Use tripPatternByLegIds instead.") @timingData
   "Get default routing parameters."
   routingParameters: RoutingParameters @timingData
   "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
@@ -1053,7 +1053,7 @@ type QueryType {
     whiteListed: InputWhiteListed
   ): Trip! @timingData
   "Get a trip pattern for the given legs, with realtime changes applied."
-  tripPatternForLegs(
+  tripPatternByLegIds(
     "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
     alightSlackDefault: Int = 0,
     "List of alightSlack for a given set of modes. Defaults: []"

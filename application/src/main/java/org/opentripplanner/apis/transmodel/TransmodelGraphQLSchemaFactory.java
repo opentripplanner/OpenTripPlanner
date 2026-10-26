@@ -83,7 +83,7 @@ import org.opentripplanner.apis.transmodel.model.plan.LegType;
 import org.opentripplanner.apis.transmodel.model.plan.PathGuidanceType;
 import org.opentripplanner.apis.transmodel.model.plan.PlanPlaceType;
 import org.opentripplanner.apis.transmodel.model.plan.RoutingErrorType;
-import org.opentripplanner.apis.transmodel.model.plan.TripPatternForLegsQuery;
+import org.opentripplanner.apis.transmodel.model.plan.TripPatternByLegIdsQuery;
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternTimePenaltyType;
 import org.opentripplanner.apis.transmodel.model.plan.TripPatternType;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
@@ -171,7 +171,7 @@ public class TransmodelGraphQLSchemaFactory {
   private final ServiceJourneyType serviceJourneyTypeFactory;
   private final DatedServiceJourneyType datedServiceJourneyTypeFactory;
   private final TripQuery tripQueryFactory;
-  private final TripPatternForLegsQuery tripPatternForLegsQueryFactory;
+  private final TripPatternByLegIdsQuery tripPatternByLegIdsQueryFactory;
   private final ViaTripQuery viaTripQueryFactory;
   private final GroupOfLinesType groupOfLinesTypeFactory;
   private final DatedServiceJourneyQuery datedServiceJourneyQueryFactory;
@@ -206,7 +206,7 @@ public class TransmodelGraphQLSchemaFactory {
     this.serviceJourneyTypeFactory = new ServiceJourneyType(idMapper);
     this.datedServiceJourneyTypeFactory = new DatedServiceJourneyType(idMapper);
     this.tripQueryFactory = new TripQuery(idMapper);
-    this.tripPatternForLegsQueryFactory = new TripPatternForLegsQuery(idMapper);
+    this.tripPatternByLegIdsQueryFactory = new TripPatternByLegIdsQuery(idMapper);
     this.viaTripQueryFactory = new ViaTripQuery(idMapper);
     this.groupOfLinesTypeFactory = new GroupOfLinesType(idMapper);
     this.datedServiceJourneyQueryFactory = new DatedServiceJourneyQuery(idMapper);
@@ -452,7 +452,7 @@ public class TransmodelGraphQLSchemaFactory {
       locationInputType
     );
 
-    GraphQLFieldDefinition tripPatternForLegsQuery = tripPatternForLegsQueryFactory.create(
+    GraphQLFieldDefinition tripPatternByLegIdsQuery = tripPatternByLegIdsQueryFactory.create(
       routing,
       tripPatternType,
       durationPerStreetModeInput,
@@ -460,7 +460,7 @@ public class TransmodelGraphQLSchemaFactory {
     );
 
     GraphQLFieldDefinition refetchTripPatternQuery =
-      tripPatternForLegsQueryFactory.createRefetchTripPattern(
+      tripPatternByLegIdsQueryFactory.createRefetchTripPattern(
         routing,
         tripPatternType,
         durationPerStreetModeInput,
@@ -522,7 +522,7 @@ public class TransmodelGraphQLSchemaFactory {
     GraphQLObjectType queryType = GraphQLObjectType.newObject()
       .name("QueryType")
       .field(tripQuery)
-      .field(tripPatternForLegsQuery)
+      .field(tripPatternByLegIdsQuery)
       .field(refetchTripPatternQuery)
       .field(viaTripQuery)
       .field(
