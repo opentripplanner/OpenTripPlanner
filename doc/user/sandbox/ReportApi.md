@@ -28,7 +28,7 @@ This module mounts an endpoint for generating reports under `otp/report`. Availa
   List all transit groups used for transit-group-priority (Competition neutral planning).
 - [/otp/report/regular-transfers/cache.json](http://localhost:8080/otp/report/regular-transfers/cache.json)
   The user preferences the regular transfers are cached for, with the number of requests that used
-  each (kind: profile, warmup or on demand).
+  each (source: profile, warmup or on demand).
 
 ### Configuration
 

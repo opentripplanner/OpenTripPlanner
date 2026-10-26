@@ -27,7 +27,7 @@ import org.opentripplanner.standalone.configure.RequestScopedFactory;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 
 /**
  * Bridges the Dagger-managed {@link RequestScopedFactory} into HK2/Jersey: the component itself,

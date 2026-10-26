@@ -4,12 +4,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry;
-import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry.Kind;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.report.TransferCacheReportEntry;
+import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 
 /**
  * The number of requests that used each key of the cache of the Raptor transfers, for the report
@@ -37,10 +37,13 @@ abstract class RegularTransferCacheStatistics {
   /** No statistics are collected. */
   static final RegularTransferCacheStatistics NONE = new RegularTransferCacheStatistics() {
     @Override
-    void record(AbstractUserPreferences<?> key, Supplier<KeyInfo> info) {}
+    void record(AbstractUserPreferences<?> key) {}
 
     @Override
-    List<TransferCacheReportEntry> entries(Predicate<AbstractUserPreferences<?>> isCached) {
+    List<TransferCacheReportEntry> entries(
+      Predicate<AbstractUserPreferences<?>> isCached,
+      Function<AbstractUserPreferences<?>, KeyInfo> keyInfo
+    ) {
       return List.of();
     }
   };
@@ -56,23 +59,30 @@ abstract class RegularTransferCacheStatistics {
   }
 
   /**
-   * What is known about a key the first time it is used.
+   * What is known about a key, resolved when the report is built.
    *
    * @param id               the id of the profile or the warmup entry, {@code null} if on demand
    * @param closestProfileId the id of the closest profile, {@code null} if there is none
    */
-  record KeyInfo(Kind kind, @Nullable String id, @Nullable String closestProfileId) {}
+  record KeyInfo(
+    UserPreferenceSource source,
+    @Nullable String id,
+    @Nullable String closestProfileId
+  ) {}
+
+  /** Count a request that used {@code key}. */
+  abstract void record(AbstractUserPreferences<?> key);
 
   /**
-   * Count a request that used {@code key}.
+   * The tracked keys, the most used first.
    *
-   * @param info creates the information about the key, it is only called the first time the key
-   *             is used, or if the key was dropped
+   * @param isCached whether the Raptor transfers of a key are in the cache now
+   * @param keyInfo  resolves what is known about a key, it is only called when the report is built
    */
-  abstract void record(AbstractUserPreferences<?> key, Supplier<KeyInfo> info);
-
-  /** The tracked keys, the most used first. */
-  abstract List<TransferCacheReportEntry> entries(Predicate<AbstractUserPreferences<?>> isCached);
+  abstract List<TransferCacheReportEntry> entries(
+    Predicate<AbstractUserPreferences<?>> isCached,
+    Function<AbstractUserPreferences<?>, KeyInfo> keyInfo
+  );
 
   private static final class Bounded extends RegularTransferCacheStatistics {
 
@@ -85,27 +95,30 @@ abstract class RegularTransferCacheStatistics {
     }
 
     @Override
-    void record(AbstractUserPreferences<?> key, Supplier<KeyInfo> info) {
+    void record(AbstractUserPreferences<?> key) {
       var counter = counters.get(key);
       if (counter == null) {
         if (counters.size() >= capacity) {
           makeRoom();
         }
-        counter = counters.computeIfAbsent(key, k -> new Counter(info.get()));
+        counter = counters.computeIfAbsent(key, k -> new Counter());
       }
       counter.hits.increment();
     }
 
     @Override
-    List<TransferCacheReportEntry> entries(Predicate<AbstractUserPreferences<?>> isCached) {
+    List<TransferCacheReportEntry> entries(
+      Predicate<AbstractUserPreferences<?>> isCached,
+      Function<AbstractUserPreferences<?>, KeyInfo> keyInfo
+    ) {
       return counters
         .entrySet()
         .stream()
         .map(e -> {
-          var info = e.getValue().info;
+          var info = keyInfo.apply(e.getKey());
           return new TransferCacheReportEntry(
             e.getKey().type(),
-            info.kind(),
+            info.source(),
             info.id(),
             info.closestProfileId(),
             e.getKey().toString(),
@@ -132,11 +145,6 @@ abstract class RegularTransferCacheStatistics {
 
   private static final class Counter {
 
-    private final KeyInfo info;
     private final LongAdder hits = new LongAdder();
-
-    private Counter(KeyInfo info) {
-      this.info = info;
-    }
   }
 }

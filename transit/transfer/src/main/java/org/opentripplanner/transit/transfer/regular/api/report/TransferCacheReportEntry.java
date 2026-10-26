@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.transfer.regular.api;
+package org.opentripplanner.transit.transfer.regular.api.report;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -8,7 +8,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
  * {@link RegularTransferCacheReport}.
  *
  * @param type              the profile type of the preferences
- * @param kind              how the key came to be, see {@link Kind}
+ * @param source            how the key came to be, see {@link UserPreferenceSource}
  * @param id                the id of the profile or the warmup entry, {@code null} if the key was
  *                          created on demand
  * @param closestProfileId  the id of the profile closest to the key, the paths of the transfers
@@ -19,20 +19,10 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
  */
 public record TransferCacheReportEntry(
   TransferProfileType type,
-  Kind kind,
+  UserPreferenceSource source,
   @Nullable String id,
   @Nullable String closestProfileId,
   String userPreferences,
   long hits,
   boolean cached
-) {
-  /** How a key of the cache came to be. */
-  public enum Kind {
-    /** The preferences of a profile, the Raptor transfers are created when the server starts. */
-    PROFILE,
-    /** The preferences of a warmup entry, created when the server starts. */
-    WARMUP,
-    /** The preferences of a request that is not a profile or a warmup entry. */
-    ON_DEMAND,
-  }
-}
+) {}

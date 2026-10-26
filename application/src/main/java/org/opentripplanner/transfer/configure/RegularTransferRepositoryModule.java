@@ -50,7 +50,6 @@ public class RegularTransferRepositoryModule {
       buildConfig.transferProfiles(),
       graph,
       transitRepository,
-      // The statistics are only collected for the report API
       OTPFeature.ReportApi.isOn()
     );
   }

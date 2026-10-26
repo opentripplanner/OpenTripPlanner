@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.transfer.regular;
 
-import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
 /**

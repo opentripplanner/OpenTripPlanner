@@ -17,8 +17,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.constrained.ConstrainedTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
-import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
+import org.opentripplanner.transit.transfer.regular.api.report.TransferCacheReportEntry;
 
 @Path("/report")
 @Produces(MediaType.TEXT_PLAIN)

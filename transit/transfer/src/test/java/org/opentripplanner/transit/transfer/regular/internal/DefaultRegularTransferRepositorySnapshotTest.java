@@ -20,7 +20,6 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
@@ -29,6 +28,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
+import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 import org.opentripplanner.transit.transfer.regular.spi.PathCriteria;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -510,7 +510,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
       .filter(e -> "near".equals(e.id()))
       .findFirst()
       .orElseThrow();
-    assertThat(near.kind()).isEqualTo(TransferCacheReportEntry.Kind.PROFILE);
+    assertThat(near.source()).isEqualTo(UserPreferenceSource.PROFILE);
     assertThat(near.hits()).isEqualTo(2);
     assertThat(near.cached()).isTrue();
     var warm = report
@@ -518,12 +518,12 @@ class DefaultRegularTransferRepositorySnapshotTest {
       .filter(e -> "warm".equals(e.id()))
       .findFirst()
       .orElseThrow();
-    assertThat(warm.kind()).isEqualTo(TransferCacheReportEntry.Kind.WARMUP);
+    assertThat(warm.source()).isEqualTo(UserPreferenceSource.WARMUP);
     assertThat(warm.closestProfileId()).isEqualTo("far");
     assertThat(warm.hits()).isEqualTo(1);
     var onDemand = report
       .stream()
-      .filter(e -> e.kind() == TransferCacheReportEntry.Kind.ON_DEMAND)
+      .filter(e -> e.source() == UserPreferenceSource.ON_DEMAND)
       .findFirst()
       .orElseThrow();
     assertThat(onDemand.id()).isNull();

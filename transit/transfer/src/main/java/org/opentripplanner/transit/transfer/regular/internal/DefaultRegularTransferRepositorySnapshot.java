@@ -7,10 +7,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
-import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry.Kind;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
+import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +102,7 @@ class DefaultRegularTransferRepositorySnapshot<
   public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
     var profile = matcher.closestProfile(paths, userPreferences);
-    statistics.record(userPreferences, () -> keyInfo(userPreferences, profile));
+    statistics.record(userPreferences);
     return new DefaultRegularTransfersService<>(
       paths,
       cache,
@@ -114,28 +114,42 @@ class DefaultRegularTransferRepositorySnapshot<
 
   @Override
   public RegularTransferCacheReport cacheReport() {
-    return () -> statistics.entries(cache::contains);
+    return () -> statistics.entries(cache::contains, this::keyInfo);
   }
 
-  /** How a key of the cache came to be: a profile, a warmup entry, or on demand. */
+  /**
+   * How a key of the cache came to be: a profile, a warmup entry, or on demand. It is only called
+   * when the report is built.
+   */
   private RegularTransferCacheStatistics.KeyInfo keyInfo(
-    AbstractUserPreferences<?> userPreferences,
-    @Nullable AbstractUserPreferences<?> closestProfile
+    AbstractUserPreferences<?> userPreferences
   ) {
     var entry = entryByPreferences.get(userPreferences);
     if (entry != null) {
       return new RegularTransferCacheStatistics.KeyInfo(
-        entry.parent() == null ? Kind.PROFILE : Kind.WARMUP,
+        entry.parent() == null ? UserPreferenceSource.PROFILE : UserPreferenceSource.WARMUP,
         entry.id(),
         entry.parent() == null ? entry.id() : entry.parent()
       );
     }
+    var closestProfile = closestProfileOrNull(userPreferences);
     var closest = closestProfile == null ? null : entryByPreferences.get(closestProfile);
     return new RegularTransferCacheStatistics.KeyInfo(
-      Kind.ON_DEMAND,
+      UserPreferenceSource.ON_DEMAND,
       null,
       closest == null ? null : closest.id()
     );
+  }
+
+  /** The profile closest to the key in this snapshot, {@code null} if there is none. */
+  @Nullable
+  private AbstractUserPreferences<?> closestProfileOrNull(AbstractUserPreferences<?> key) {
+    try {
+      return matcher.closestProfile(paths, key);
+    } catch (IllegalArgumentException e) {
+      // The paths of the snapshot have no profile of the type of the key
+      return null;
+    }
   }
 
   /** The paths of this snapshot, for the lifecycle. */
