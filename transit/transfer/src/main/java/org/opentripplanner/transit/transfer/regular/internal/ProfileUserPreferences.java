@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
@@ -31,7 +31,7 @@ public final class ProfileUserPreferences {
    * identify a profile in the repository, so two profiles with equal preferences are rejected.
    */
   public static <R> Map<AbstractUserPreferences<?>, TransferProfile<R>> resolveAll(
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
     var result = new LinkedHashMap<AbstractUserPreferences<?>, TransferProfile<R>>();
@@ -56,7 +56,7 @@ public final class ProfileUserPreferences {
    * of each entry.
    */
   static <R> Map<AbstractUserPreferences<?>, AbstractUserPreferences<?>> warmupParents(
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
     var preferencesById = new HashMap<String, AbstractUserPreferences<?>>();

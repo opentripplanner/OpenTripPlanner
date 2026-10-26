@@ -14,9 +14,9 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
 class DefaultRegularTransferGeneratorTest {
@@ -29,17 +29,17 @@ class DefaultRegularTransferGeneratorTest {
     return TestStopIndex.of(A, B, C);
   }
 
-  private static TransferProfilesParameters<WalkPreferences> parameters(WalkPreferences walk) {
-    return new TransferProfilesParameters<>(
+  private static TransferParameters<WalkPreferences> parameters(WalkPreferences walk) {
+    return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, walk, walk))
     );
   }
 
-  private static TransferProfilesParameters<WalkPreferences> parameters(
+  private static TransferParameters<WalkPreferences> parameters(
     WalkPreferences walk,
     Duration maxDuration
   ) {
-    return new TransferProfilesParameters<>(
+    return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, walk, walk)),
       MaxDurationsPreference.of(maxDuration),
       Map.of()
@@ -202,7 +202,7 @@ class DefaultRegularTransferGeneratorTest {
         new DefaultRegularTransferBuildRepository<FakeTransferPathProvider.FakePath>();
       new DefaultRegularTransferGenerator<>(
         stopIndex,
-        new TransferProfilesParameters<>(profiles, MaxDurationsPreference.DEFAULT, Map.of(), limit),
+        new TransferParameters<>(profiles, MaxDurationsPreference.DEFAULT, Map.of(), limit),
         provider,
         FakeRequestMapper.INSTANCE,
         buildRepository

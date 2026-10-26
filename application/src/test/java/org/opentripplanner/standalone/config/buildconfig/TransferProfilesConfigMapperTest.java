@@ -12,9 +12,9 @@ import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
@@ -801,16 +801,16 @@ class TransferProfilesConfigMapperTest {
     );
   }
 
-  private static TransferProfilesParameters<RouteRequest> map(String json) {
+  private static TransferParameters<RouteRequest> map(String json) {
     return TransferProfilesConfigMapper.map(newNodeAdapterForTest(json));
   }
 
-  private static Duration maxDuration(TransferProfilesParameters<RouteRequest> parameters) {
+  private static Duration maxDuration(TransferParameters<RouteRequest> parameters) {
     return parameters.maxDurations(TransferProfileType.WALK).maxDuration();
   }
 
   private static TransferProfile<RouteRequest> profile(
-    TransferProfilesParameters<RouteRequest> parameters,
+    TransferParameters<RouteRequest> parameters,
     String id
   ) {
     return parameters

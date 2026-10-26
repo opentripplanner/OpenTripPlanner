@@ -21,7 +21,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  *
  * @param <R> the request type, opaque to the module
  */
-public final class TransferProfilesParameters<R> {
+public final class TransferParameters<R> {
 
   private final List<TransferProfile<R>> profiles;
   private final PlainMaxDuration defaultMaxDurations;
@@ -49,7 +49,7 @@ public final class TransferProfilesParameters<R> {
    *                            the profiles and the warmup entries, and the parent of an entry
    *                            must be a profile.
    */
-  public TransferProfilesParameters(
+  public TransferParameters(
     List<TransferProfile<R>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
@@ -61,17 +61,17 @@ public final class TransferProfilesParameters<R> {
     this.defaultMaxDurations = Objects.requireNonNull(defaultMaxDurations);
     this.deduplicationLimit = Objects.requireNonNull(deduplicationLimit);
     this.maxDurations = maxDurations.isEmpty() ? Map.of() : Map.copyOf(new EnumMap<>(maxDurations));
-    this.maxDurations.forEach(TransferProfilesParameters::validateMaxDurationsOfType);
+    this.maxDurations.forEach(TransferParameters::validateMaxDurationsOfType);
     validateProfiles(this.profiles, this.warmup);
   }
 
   /** The profiles with the default max durations and deduplication limit. */
-  public TransferProfilesParameters(List<TransferProfile<R>> profiles) {
+  public TransferParameters(List<TransferProfile<R>> profiles) {
     this(profiles, MaxDurationsPreference.DEFAULT, Map.of());
   }
 
   /** The profiles with the default deduplication limit. */
-  public TransferProfilesParameters(
+  public TransferParameters(
     List<TransferProfile<R>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations
@@ -80,7 +80,7 @@ public final class TransferProfilesParameters<R> {
   }
 
   /** The profiles without warmup entries. */
-  public TransferProfilesParameters(
+  public TransferParameters(
     List<TransferProfile<R>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
@@ -178,7 +178,7 @@ public final class TransferProfilesParameters<R> {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    var that = (TransferProfilesParameters<?>) o;
+    var that = (TransferParameters<?>) o;
     return (
       profiles.equals(that.profiles) &&
       defaultMaxDurations.equals(that.defaultMaxDurations) &&
@@ -195,7 +195,7 @@ public final class TransferProfilesParameters<R> {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(TransferProfilesParameters.class)
+    return ToStringBuilder.of(TransferParameters.class)
       .addCol("profiles", profiles)
       .addObj("defaultMaxDurations", defaultMaxDurations)
       .addObj("maxDurations", maxDurations)

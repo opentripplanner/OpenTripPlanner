@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -44,7 +44,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   public DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     RegularTransferBuildRepository<P> buildRepository

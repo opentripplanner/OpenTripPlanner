@@ -7,7 +7,7 @@ import org.opentripplanner.transit.transfer.regular.RegularTransferBuildReposito
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.internal.DefaultRegularTransferGenerator;
 import org.opentripplanner.transit.transfer.regular.internal.ProfileUserPreferences;
@@ -33,7 +33,7 @@ public final class RegularTransferFactory {
    * @throws IllegalArgumentException if two profiles have equal user preferences
    */
   public static <R> void validate(
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
     ProfileUserPreferences.resolveAll(parameters, mapper);
@@ -52,7 +52,7 @@ public final class RegularTransferFactory {
    */
   public static <P, R> RegularTransferGenerator createTransferGenerator(
     RaptorStopIndex stopIndex,
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     RegularTransferBuildRepository<P> buildRepository
@@ -83,7 +83,7 @@ public final class RegularTransferFactory {
   > registerRepository(
     RepositoryRegistry repositoryRegistry,
     RegularTransferBuildRepository<P> buildRepository,
-    TransferProfilesParameters<R> parameters,
+    TransferParameters<R> parameters,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper,
     int numberOfStops

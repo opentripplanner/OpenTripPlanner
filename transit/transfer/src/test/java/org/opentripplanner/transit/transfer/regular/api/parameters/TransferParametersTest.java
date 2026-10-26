@@ -15,7 +15,7 @@ import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurations
 import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
-class TransferProfilesParametersTest {
+class TransferParametersTest {
 
   private static final WalkPreferences WALK = WalkPreferences.DEFAULT;
   private static final WalkPreferences OTHER_WALK = WalkPreferences.of()
@@ -27,16 +27,14 @@ class TransferProfilesParametersTest {
     var first = new TransferProfile<>("first", TransferProfileType.WALK, OTHER_WALK, "first");
     var second = new TransferProfile<>("second", TransferProfileType.WALK, WALK, "second");
 
-    var subject = new TransferProfilesParameters<>(List.of(first, second));
+    var subject = new TransferParameters<>(List.of(first, second));
 
     assertThat(subject.profiles()).containsExactly(first, second).inOrder();
   }
 
   @Test
   void requiresAtLeastOneProfile() {
-    assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<String>(List.of())
-    );
+    assertThrows(IllegalArgumentException.class, () -> new TransferParameters<String>(List.of()));
   }
 
   @Test
@@ -46,9 +44,7 @@ class TransferProfilesParametersTest {
       new TransferProfile<>("walk", TransferProfileType.WALK, OTHER_WALK, "second")
     );
 
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<>(profiles)
-    );
+    var ex = assertThrows(IllegalArgumentException.class, () -> new TransferParameters<>(profiles));
     assertThat(ex).hasMessageThat().contains("walk");
   }
 
@@ -92,7 +88,7 @@ class TransferProfilesParametersTest {
   void aTypeWithoutAnOverrideUsesTheDefaultMaxDurations() {
     var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
 
-    var subject = new TransferProfilesParameters<>(
+    var subject = new TransferParameters<>(
       profiles,
       MaxDurationsPreference.of(Duration.ofMinutes(20)),
       Map.of()
@@ -107,7 +103,7 @@ class TransferProfilesParametersTest {
   void anOverrideReplacesTheDefaultMaxDurationsOfTheType() {
     var profiles = List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk"));
 
-    var subject = new TransferProfilesParameters<>(
+    var subject = new TransferParameters<>(
       profiles,
       MaxDurationsPreference.of(Duration.ofMinutes(20)),
       Map.of(TransferProfileType.WALK, MaxDurationsPreference.of(Duration.ofMinutes(45)))
@@ -120,7 +116,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void theDefaultMaxDurationIsOfTheKindOfTheType() {
-    var subject = new TransferProfilesParameters<>(
+    var subject = new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"))
     );
 
@@ -143,27 +139,27 @@ class TransferProfilesParametersTest {
     var car = new CarMaxDuration(Duration.ofMinutes(20));
 
     assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<>(
+      new TransferParameters<>(
         profiles,
         MaxDurationsPreference.DEFAULT,
         Map.of(TransferProfileType.CAR, plain)
       )
     );
     assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<>(
+      new TransferParameters<>(
         profiles,
         MaxDurationsPreference.DEFAULT,
         Map.of(TransferProfileType.WALK, bicycle)
       )
     );
     assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<>(
+      new TransferParameters<>(
         profiles,
         MaxDurationsPreference.DEFAULT,
         Map.of(TransferProfileType.BICYCLE, car)
       )
     );
-    var subject = new TransferProfilesParameters<>(
+    var subject = new TransferParameters<>(
       profiles,
       MaxDurationsPreference.DEFAULT,
       Map.of(TransferProfileType.BICYCLE, bicycle, TransferProfileType.CAR, car)
@@ -174,7 +170,7 @@ class TransferProfilesParametersTest {
 
   @Test
   void theDefaultMaxDurationsAreThirtyMinutes() {
-    var subject = new TransferProfilesParameters<>(
+    var subject = new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "w"))
     );
 
@@ -191,9 +187,7 @@ class TransferProfilesParametersTest {
       new TransferProfile<>("slow", TransferProfileType.WALK, "missing", OTHER_WALK, "slow")
     );
 
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<>(profiles)
-    );
+    var ex = assertThrows(IllegalArgumentException.class, () -> new TransferParameters<>(profiles));
     assertThat(ex).hasMessageThat().contains("'missing'");
     assertThat(ex).hasMessageThat().contains("'slow'");
   }
@@ -205,9 +199,7 @@ class TransferProfilesParametersTest {
       new TransferProfile<>("b", TransferProfileType.WALK, "a", OTHER_WALK, "b")
     );
 
-    var ex = assertThrows(IllegalArgumentException.class, () ->
-      new TransferProfilesParameters<>(profiles)
-    );
+    var ex = assertThrows(IllegalArgumentException.class, () -> new TransferParameters<>(profiles));
     assertThat(ex).hasMessageThat().contains("cycle");
   }
 
@@ -215,7 +207,7 @@ class TransferProfilesParametersTest {
   void aProfileCanNotBeItsOwnParent() {
     var profiles = List.of(new TransferProfile<>("a", TransferProfileType.WALK, "a", WALK, "a"));
 
-    assertThrows(IllegalArgumentException.class, () -> new TransferProfilesParameters<>(profiles));
+    assertThrows(IllegalArgumentException.class, () -> new TransferParameters<>(profiles));
   }
 
   @Test
@@ -227,15 +219,15 @@ class TransferProfilesParametersTest {
 
   @Test
   void theDeduplicationLimitIsTheDefaultIfNotGiven() {
-    var subject = new TransferProfilesParameters<>(
+    var subject = new TransferParameters<>(
       List.of(new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w"))
     );
 
     assertThat(subject.deduplicationLimit()).isEqualTo(DeduplicationLimit.DEFAULT);
   }
 
-  private static TransferProfilesParameters<String> withWarmup(WarmupParameters... warmup) {
-    return new TransferProfilesParameters<>(
+  private static TransferParameters<String> withWarmup(WarmupParameters... warmup) {
+    return new TransferParameters<>(
       List.of(new TransferProfile<>("walk", TransferProfileType.WALK, WALK, "walk")),
       MaxDurationsPreference.DEFAULT,
       Map.of(),

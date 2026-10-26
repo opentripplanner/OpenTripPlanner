@@ -13,9 +13,9 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 
@@ -43,7 +43,7 @@ class TransferProfilesTest {
   @Test
   void aProfileWithoutUserPreferencesGetsThemFromItsRoutingRequest() {
     var request = WalkPreferences.of().withReluctance(Reluctance.of(7.0)).build();
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(new TransferProfile<>("derived", TransferProfileType.WALK, null, request))
     );
 
@@ -60,7 +60,7 @@ class TransferProfilesTest {
 
   @Test
   void profilesWithEqualUserPreferencesAreRejectedAndNamed() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
         new TransferProfile<>(
           "a",
@@ -100,7 +100,7 @@ class TransferProfilesTest {
 
   @Test
   void aParentIsBeforeItsChildrenWhateverTheDeclaredOrder() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
         new TransferProfile<>(
           "child",
@@ -139,7 +139,7 @@ class TransferProfilesTest {
 
   @Test
   void aChildKnowsItsParent() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
         new TransferProfile<>(
           "parent",
@@ -176,7 +176,7 @@ class TransferProfilesTest {
 
   @Test
   void aWarmupEntryWithTheUserPreferencesOfAProfileIsRejectedAndNamed() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
         new TransferProfile<>(
           "walk",
@@ -200,7 +200,7 @@ class TransferProfilesTest {
 
   @Test
   void warmupEntriesWithTheSameUserPreferencesAreRejected() {
-    var parameters = new TransferProfilesParameters<>(
+    var parameters = new TransferParameters<>(
       List.of(
         new TransferProfile<>(
           "walk",

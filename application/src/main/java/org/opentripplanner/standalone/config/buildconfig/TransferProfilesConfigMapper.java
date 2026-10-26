@@ -19,9 +19,9 @@ import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapp
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.PlainMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.WarmupParameters;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.BicyclePreferences;
@@ -36,7 +36,7 @@ import org.opentripplanner.utils.collection.ParentOrder;
 
 /**
  * Parses the {@code transfers:} build-config block, see {@code doc/user/TransferConfiguration.md},
- * into the {@link TransferProfilesParameters} of the regular-transfer module. Entirely separate
+ * into the {@link TransferParameters} of the regular-transfer module. Entirely separate
  * from {@link RegularTransferConfig}/{@code transferRequests}, which {@code FlexTransferGenerator}
  * keeps reading unchanged for FLEX.
  * <p>
@@ -50,7 +50,7 @@ public class TransferProfilesConfigMapper {
   /** The id of the profile used if no profile is configured. */
   static final String DEFAULT_WALK_PROFILE_ID = "walk";
 
-  public static TransferProfilesParameters<RouteRequest> map(NodeAdapter root) {
+  public static TransferParameters<RouteRequest> map(NodeAdapter root) {
     var transfers = root
       .of("transfers")
       .since(V2_10)
@@ -135,7 +135,7 @@ public class TransferProfilesConfigMapper {
    * Create and validate the parameters. A configuration error is reported like the other
    * configuration errors, when the configuration is read.
    */
-  private static TransferProfilesParameters<RouteRequest> createParameters(
+  private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
     PlainMaxDuration defaultMaxDurations,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
@@ -143,7 +143,7 @@ public class TransferProfilesConfigMapper {
     List<WarmupParameters> warmup
   ) {
     try {
-      var parameters = new TransferProfilesParameters<>(
+      var parameters = new TransferParameters<>(
         profiles,
         defaultMaxDurations,
         maxDurations,

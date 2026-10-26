@@ -57,7 +57,7 @@ import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transfer.dataimport.api.RegularTransferParameters;
-import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfilesParameters;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +174,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final OsmExtractParameters osmDefaults;
 
   private final RegularTransferParameters regularTransferParameters;
-  private final TransferProfilesParameters<RouteRequest> transferProfiles;
+  private final TransferParameters<RouteRequest> transferProfiles;
 
   public final int maxAreaNodes;
 
@@ -810,7 +810,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Falls back to a single default {@code walk} profile if the new {@code transfers:} block is
    * not present in build-config.json.
    */
-  public TransferProfilesParameters<RouteRequest> transferProfiles() {
+  public TransferParameters<RouteRequest> transferProfiles() {
     return transferProfiles;
   }
 
