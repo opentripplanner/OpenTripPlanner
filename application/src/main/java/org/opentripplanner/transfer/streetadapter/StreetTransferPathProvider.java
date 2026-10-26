@@ -14,6 +14,7 @@ import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.spi.AllowedModesLookup;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
 
@@ -29,24 +30,32 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
   private final Graph graph;
   private final NearbyStopFinder nearbyStopFinder;
   private final Predicate<FeedScopedId> isTransferSource;
+  private final AllowedModesLookup allowedModes;
 
-  /** Find transfers from all stops. */
+  /**
+   * Find transfers from all stops, no stop is allowed for any mode. This is used to re-cost
+   * transfers, not to search for them.
+   */
   public StreetTransferPathProvider(Graph graph, NearbyStopFinder nearbyStopFinder) {
-    this(graph, nearbyStopFinder, stopId -> true);
+    this(graph, nearbyStopFinder, stopId -> true, AllowedModesLookup.NONE);
   }
 
   /**
    * @param isTransferSource only the stops accepted by this predicate have transfers from them, no
    *                         paths are found for the others.
+   * @param allowedModes     the modes the stops are allowed for, to select the max duration of a
+   *                         transfer
    */
   public StreetTransferPathProvider(
     Graph graph,
     NearbyStopFinder nearbyStopFinder,
-    Predicate<FeedScopedId> isTransferSource
+    Predicate<FeedScopedId> isTransferSource,
+    AllowedModesLookup allowedModes
   ) {
     this.graph = graph;
     this.nearbyStopFinder = nearbyStopFinder;
     this.isTransferSource = isTransferSource;
+    this.allowedModes = allowedModes;
   }
 
   /**
@@ -95,6 +104,12 @@ public class StreetTransferPathProvider implements TransferPathProvider<NearbySt
 
   @Override
   public TransferSearch<NearbyStop> searchFor(RouteRequest request) {
-    return new DefaultTransferSearch(graph, nearbyStopFinder, isTransferSource, request);
+    return new DefaultTransferSearch(
+      graph,
+      nearbyStopFinder,
+      isTransferSource,
+      allowedModes,
+      request
+    );
   }
 }

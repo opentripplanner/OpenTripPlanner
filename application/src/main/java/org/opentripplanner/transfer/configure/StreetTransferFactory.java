@@ -21,6 +21,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParam
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
+import org.opentripplanner.transit.transfer.regular.spi.AllowedModesLookup;
 
 /**
  * Connects the regular-transfer module to the street graph: creates the module's generator and
@@ -50,6 +51,8 @@ public final class StreetTransferFactory {
    *                     have transfers from them, and with the feature
    *                     {@code ConsiderPatternsForDirectTransfers} only the closest stop of each
    *                     pattern is a transfer to
+   * @param allowedModes the modes the stops are allowed for, to select the max duration of the
+   *                     transfers, see {@code MaxDurationsPreference}
    * @param flexIndex    the flex trips to consider when the transfer stops are found, or
    *                     {@code null} to ignore flex trips
    */
@@ -59,6 +62,7 @@ public final class StreetTransferFactory {
     TransferParameters<RouteRequest> parameters,
     RegularTransferBuildRepository<NearbyStop> buildRepository,
     StopsVisitedByPatterns stopPatterns,
+    AllowedModesLookup allowedModes,
     @Nullable FlexIndex flexIndex
   ) {
     return RegularTransferFactory.createTransferGenerator(
@@ -72,7 +76,8 @@ public final class StreetTransferFactory {
           stopPatterns,
           flexIndex
         ),
-        stopPatterns::contains
+        stopPatterns::contains,
+        allowedModes
       ),
       new RegularTransferPreferencesMapper(),
       buildRepository

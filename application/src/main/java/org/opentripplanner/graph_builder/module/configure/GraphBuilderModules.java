@@ -335,6 +335,7 @@ public class GraphBuilderModules {
     Graph graph,
     TransitRepository transitRepository,
     StopsVisitedByPatterns stopsVisitedByPatterns,
+    StopsAllowedForModes stopsAllowedForModes,
     TimetableDataImport timetableDataImport,
     RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
   ) {
@@ -348,6 +349,7 @@ public class GraphBuilderModules {
       config.transferProfiles(),
       regularTransferBuildRepository,
       stopsVisitedByPatterns,
+      stopsAllowedForModes,
       flexIndex
     );
   }
