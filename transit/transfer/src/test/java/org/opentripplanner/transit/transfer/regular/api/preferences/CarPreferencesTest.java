@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
-import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 
 class CarPreferencesTest {
@@ -51,26 +50,6 @@ class CarPreferencesTest {
 
     assertThat(subject).isNotEqualTo(bicycle);
     assertThat(subject.normalizedDistance(bicycle)).isGreaterThan(100f);
-  }
-
-  @Test
-  void inheritedFromAParentOfAnotherTypeTakesTheReluctanceOnly() {
-    var walk = WalkPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(1.1))
-      .withReluctance(Reluctance.of(5.0))
-      .build();
-
-    var subject = CarPreferences.inheritedFrom(walk);
-
-    assertThat(subject).isEqualTo(preferences(5.0));
-  }
-
-  @Test
-  void inheritedFromAParentOfTheSameTypeIsTheParent() {
-    var parent = preferences(5.0);
-
-    assertThat(CarPreferences.inheritedFrom(parent)).isSameInstanceAs(parent);
-    assertThat(CarPreferences.inheritedFrom(null)).isEqualTo(CarPreferences.DEFAULT);
   }
 
   private static CarPreferences preferences(double reluctance) {

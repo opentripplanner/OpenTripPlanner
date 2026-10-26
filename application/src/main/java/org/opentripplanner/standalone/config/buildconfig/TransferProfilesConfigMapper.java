@@ -339,7 +339,11 @@ public class TransferProfilesConfigMapper {
     var resolved = new HashMap<String, ResolvedProfile>();
     var mapped = new HashMap<String, TransferProfile<RouteRequest>>();
     for (var profile : parentsFirst) {
+      // Only a parent of the same type is inherited from. A parent of another type is only used to
+      // store the paths that are the same once, see the deduplication.
       var parent = profile.parent() == null ? null : resolved.get(profile.parent());
+      var inherited =
+        parent != null && parent.userPreferences().type() == profile.type() ? parent : null;
       var request = RouteRequestConfig.mapRouteRequest(
         profile
           .node()
@@ -350,7 +354,7 @@ public class TransferProfilesConfigMapper {
             "Preferences in `userPreferences` override the equivalent parameters of the request."
           )
           .asObject(),
-        parent == null ? RouteRequest.defaultValue() : parent.request()
+        inherited == null ? RouteRequest.defaultValue() : inherited.request()
       );
       AbstractUserPreferences<?> own = null;
       if (profile.node().exist("userPreferences")) {
@@ -365,7 +369,9 @@ public class TransferProfilesConfigMapper {
               "Optional. If it is not set, the preferences of the `routingRequest` are used."
             )
             .asObject(),
-          parent == null ? null : parent.userPreferences()
+          inherited == null
+            ? mapper.toUserPreferences(profile.type(), request)
+            : inherited.userPreferences()
         );
       }
       var effective = own != null ? own : mapper.toUserPreferences(profile.type(), request);
@@ -503,10 +509,13 @@ public class TransferProfilesConfigMapper {
         .summary("The id of the profile this profile is based on.")
         .description(
           """
-          The profile inherits the `routingRequest` and the `userPreferences` of the parent. Values
-          set on the profile override the inherited ones. The parent is generated first, and the
-          paths of the profile that are equivalent to the paths of the parent are stored once, see
-          `deduplicationLimit`. The parents must not form a cycle.
+          If the parent is a profile of the same type, the profile inherits the `routingRequest` and
+          the `userPreferences` of the parent, and values set on the profile override the inherited
+          ones. The root of a type gets the values that are not set from the request. The parent is
+          generated first, and the paths of the profile that are equivalent to the paths of the
+          parent are stored once, see `deduplicationLimit`. The parent can be of another type, but
+          nothing is inherited from it, it is only used to store the paths once. The parents must
+          not form a cycle.
           """
         )
         .asString();
@@ -515,20 +524,20 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * Map the user preferences of a profile type. Unset values are the values of {@code parent}, the
-   * preferences of the parent profile or the warmup, or else the defaults of the type. A parent of
-   * another type gives the values the two types have in common.
+   * Map the user preferences of a profile type. Unset values are the values of {@code base}, the
+   * preferences of the parent of the same type, or the ones of the request if there is none. The
+   * base is of the type of the profile.
    */
   private static AbstractUserPreferences<?> mapPreferences(
     TransferProfileType type,
     NodeAdapter p,
-    @Nullable AbstractUserPreferences<?> parent
+    AbstractUserPreferences<?> base
   ) {
     return switch (type) {
-      case WALK -> mapWalkPreferences(p, WalkPreferences.inheritedFrom(parent));
-      case WHEELCHAIR -> mapWheelchairPreferences(p, WheelchairPreferences.inheritedFrom(parent));
-      case BICYCLE -> mapBicyclePreferences(p, BicyclePreferences.inheritedFrom(parent));
-      case CAR -> mapCarPreferences(p, CarPreferences.inheritedFrom(parent));
+      case WALK -> mapWalkPreferences(p, (WalkPreferences) base);
+      case WHEELCHAIR -> mapWheelchairPreferences(p, (WheelchairPreferences) base);
+      case BICYCLE -> mapBicyclePreferences(p, (BicyclePreferences) base);
+      case CAR -> mapCarPreferences(p, (CarPreferences) base);
     };
   }
 

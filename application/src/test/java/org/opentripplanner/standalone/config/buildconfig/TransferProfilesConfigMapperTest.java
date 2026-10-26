@@ -12,6 +12,7 @@ import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transfer.streetadapter.RegularTransferPreferencesMapper;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
@@ -744,7 +745,7 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void aWheelchairProfileInheritsTheValuesInCommonFromAWalkParent() {
+  void aWheelchairProfileDoesNotInheritFromAWalkParentButTakesTheValuesOfTheRequest() {
     var subject = map(
       """
       {
@@ -768,7 +769,11 @@ class TransferProfilesConfigMapperTest {
     );
 
     var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
-    assertThat(wheelchair.speed()).isEqualTo(Speed.ofMetersPerSecond(1.1));
+    var request = new RegularTransferPreferencesMapper().toUserPreferences(
+      TransferProfileType.WHEELCHAIR,
+      RouteRequest.defaultValue()
+    );
+    assertThat(wheelchair.speed()).isEqualTo(((WheelchairPreferences) request).speed());
     assertThat(wheelchair.reluctance()).isEqualTo(Reluctance.of(5.0));
   }
 
@@ -857,7 +862,7 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void aBicycleProfileInheritsTheValuesInCommonFromAWalkParent() {
+  void aBicycleProfileDoesNotInheritFromAWalkParentButTakesTheValuesOfTheRequest() {
     var subject = map(
       """
       {
@@ -881,8 +886,40 @@ class TransferProfilesConfigMapperTest {
     );
 
     var bicycle = (BicyclePreferences) profile(subject, "bicycle").userPreferences();
+    var request = new RegularTransferPreferencesMapper().toUserPreferences(
+      TransferProfileType.BICYCLE,
+      RouteRequest.defaultValue()
+    );
     assertThat(bicycle.speed()).isEqualTo(Speed.ofMetersPerSecond(5.5));
-    assertThat(bicycle.reluctance()).isEqualTo(Reluctance.of(3.0));
+    assertThat(bicycle.reluctance()).isEqualTo(request.reluctance());
+  }
+
+  @Test
+  void aProfileInheritsFromAParentOfTheSameTypeAndTheRootTakesTheValuesOfTheRequest() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          bicycle: { maxDuration: '30m',
+            profiles: [
+              { id: "root", userPreferences: { speed: 6.0 } },
+              { id: "child", parent: "root", userPreferences: { reluctance: 7.0 } }
+            ]
+          }
+        }
+      }
+      """
+    );
+
+    var root = (BicyclePreferences) profile(subject, "root").userPreferences();
+    var child = (BicyclePreferences) profile(subject, "child").userPreferences();
+    var request = new RegularTransferPreferencesMapper().toUserPreferences(
+      TransferProfileType.BICYCLE,
+      RouteRequest.defaultValue()
+    );
+    assertThat(root.reluctance()).isEqualTo(request.reluctance());
+    assertThat(child.speed()).isEqualTo(Speed.ofMetersPerSecond(6.0));
+    assertThat(child.reluctance()).isEqualTo(Reluctance.of(7.0));
   }
 
   @Test

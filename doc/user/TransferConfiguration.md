@@ -46,10 +46,10 @@ request needs them, and cached. OTP creates them for the preferences of every pr
 server starts. A warmup entry does the same for other preferences that are common in the requests,
 but are not worth a profile of their own. See [Warmup](#warmup).
 
-**Parent.** A profile can be based on another profile, its `parent`. The profile inherits the
-`routingRequest` and the `userPreferences` of the parent, and only has to set what is different. The
-transfers the profile and its parent have in common are stored once, which saves memory. See
-[Parent and deduplication](#parent-and-deduplication).
+**Parent.** A profile can be based on another profile, its `parent`. If the parent is of the same
+type, the profile inherits the `routingRequest` and the `userPreferences` of the parent, and only
+has to set what is different. The transfers the profile and its parent have in common are stored
+once, which saves memory. See [Parent and deduplication](#parent-and-deduplication).
 
 ## Example
 
@@ -137,17 +137,16 @@ relevant parameters to `userPreferences`, and drop `routingRequest` in the futur
 A profile can name another profile as its `parent` with the `id` of the parent. The `parent` must be
 a profile of the same configuration, and the parents must not form a cycle. The profiles can be
 declared in any order. A parent can be of another type, for example a `wheelchair` profile with the
-`walk` profile as its parent.
+`walk` profile as its parent. The paths are then stored once, but no values are inherited.
 
-**Inheritance.** The profile inherits the `routingRequest` and the `userPreferences` of the parent.
+**Inheritance.** Values are only inherited within a profile type. If the parent is a profile of the
+same type, the profile inherits the `routingRequest` and the `userPreferences` of the parent.
 Everything that is set on the profile overrides the inherited value, and everything that is not set
 is the value of the parent. A profile with a parent and without `userPreferences` of its own would
-get the same preferences as the parent, and is rejected, since the profiles must be unique. If the
-parent is of another type, the profile inherits the preferences the two types have in common, for
-example the speed and the reluctance of a `walk` parent for a `wheelchair` profile. A `bicycle`
-profile with a `walk` parent would get the walking speed unless it sets its own, and a `car`
-profile only inherits the `reluctance`. Check that these
-are meaningful for the type of the profile, and set them in its `userPreferences` if they are not.
+get the same preferences as the parent, and is rejected, since the profiles must be unique. A
+profile without a parent of the same type is the root of its type, and the values it does not set
+are the ones of the request, see [Routing request](#routing-request). A parent of another type is
+not inherited from, it is only used for the deduplication below.
 
 **Deduplication.** Each profile still searches for its own transfers, but the transfers that are
 the same, or almost the same, as the transfers of the parent are only stored once. For each pair of
@@ -184,7 +183,8 @@ different enough from a profile to be worth a profile of their own. A warmup ent
 
 - an `id`, unique among all profiles and warmup entries. It is used in the logs.
 - a `parent`, the `id` of a profile. The transfers are created from the stored transfers of the
-  parent, and the entry inherits the preferences of the parent. A warmup entry can not be a parent.
+  parent of the same type, and the entry inherits the preferences of the parent. A warmup entry can
+  not be a parent.
 - `userPreferences`. They must be different from the preferences of every profile and every other
   warmup entry.
 

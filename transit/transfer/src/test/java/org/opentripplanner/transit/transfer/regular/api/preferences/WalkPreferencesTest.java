@@ -63,19 +63,6 @@ class WalkPreferencesTest {
     );
   }
 
-  @Test
-  void inheritedFromAParentOfAnotherTypeTakesTheValuesTheyHaveInCommon() {
-    var wheelchair = WheelchairPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(0.9))
-      .withReluctance(Reluctance.of(4.0))
-      .build();
-
-    var subject = WalkPreferences.inheritedFrom(wheelchair);
-
-    assertThat(subject.speed()).isEqualTo(wheelchair.speed());
-    assertThat(subject.reluctance()).isEqualTo(wheelchair.reluctance());
-  }
-
   private static WalkPreferences preferences(double speed, double reluctance) {
     return WalkPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(speed))

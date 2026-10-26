@@ -77,27 +77,6 @@ class BicyclePreferencesTest {
     assertThat(subject.normalizedDistance(walk)).isGreaterThan(100f);
   }
 
-  @Test
-  void inheritedFromAParentOfTheSameTypeIsTheParent() {
-    var parent = preferences(1.1, 5.0);
-
-    assertThat(BicyclePreferences.inheritedFrom(parent)).isSameInstanceAs(parent);
-    assertThat(BicyclePreferences.inheritedFrom(null)).isEqualTo(BicyclePreferences.DEFAULT);
-  }
-
-  @Test
-  void inheritedFromAParentOfAnotherTypeTakesTheValuesTheyHaveInCommon() {
-    var walk = WalkPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(1.1))
-      .withReluctance(Reluctance.of(5.0))
-      .build();
-
-    var subject = BicyclePreferences.inheritedFrom(walk);
-
-    assertThat(subject.speed()).isEqualTo(walk.speed());
-    assertThat(subject.reluctance()).isEqualTo(walk.reluctance());
-  }
-
   private static BicyclePreferences preferences(double speed, double reluctance) {
     return BicyclePreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(speed))

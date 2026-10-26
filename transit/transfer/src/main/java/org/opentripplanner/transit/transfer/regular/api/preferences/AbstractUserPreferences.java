@@ -94,18 +94,6 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
       return (T) this;
     }
 
-    /**
-     * Use the values of {@code parent} for the preferences both have, even if the parent is of
-     * another type. A value that only exists for one of the types is not changed. The values of
-     * another type are only a starting point, and should be overridden where they are not
-     * meaningful for this type.
-     */
-    @SuppressWarnings("unchecked")
-    public T inheritFrom(AbstractUserPreferences<?> parent) {
-      this.reluctance = parent.reluctance();
-      return (T) this;
-    }
-
     abstract S doBuild();
 
     public S build() {

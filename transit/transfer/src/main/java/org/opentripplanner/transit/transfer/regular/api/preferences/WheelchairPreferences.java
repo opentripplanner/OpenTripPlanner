@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.api.preferences;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -40,21 +39,6 @@ public final class WheelchairPreferences
 
   public Builder copyOf() {
     return new Builder(this);
-  }
-
-  /**
-   * The preferences a profile starts with: the defaults, with the values the {@code parent} has in
-   * common, see {@link AbstractUserPreferences.Builder#inheritFrom}. The parent itself if it is
-   * wheelchair preferences, the defaults if there is no parent.
-   */
-  public static WheelchairPreferences inheritedFrom(@Nullable AbstractUserPreferences<?> parent) {
-    if (parent == null) {
-      return DEFAULT;
-    }
-    if (parent instanceof WheelchairPreferences wheelchair) {
-      return wheelchair;
-    }
-    return of().inheritFrom(parent).build();
   }
 
   @Override
@@ -115,15 +99,6 @@ public final class WheelchairPreferences
 
     public Builder withSpeed(Speed speed) {
       this.speed = speed;
-      return this;
-    }
-
-    @Override
-    public Builder inheritFrom(AbstractUserPreferences<?> parent) {
-      super.inheritFrom(parent);
-      if (parent instanceof WithSpeed withSpeed) {
-        this.speed = withSpeed.speed();
-      }
       return this;
     }
 

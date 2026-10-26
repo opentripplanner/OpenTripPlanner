@@ -77,27 +77,6 @@ class WheelchairPreferencesTest {
     assertThat(subject.normalizedDistance(walk)).isGreaterThan(100f);
   }
 
-  @Test
-  void inheritedFromAParentOfTheSameTypeIsTheParent() {
-    var parent = preferences(1.1, 5.0);
-
-    assertThat(WheelchairPreferences.inheritedFrom(parent)).isSameInstanceAs(parent);
-    assertThat(WheelchairPreferences.inheritedFrom(null)).isEqualTo(WheelchairPreferences.DEFAULT);
-  }
-
-  @Test
-  void inheritedFromAParentOfAnotherTypeTakesTheValuesTheyHaveInCommon() {
-    var walk = WalkPreferences.of()
-      .withSpeed(Speed.ofMetersPerSecond(1.1))
-      .withReluctance(Reluctance.of(5.0))
-      .build();
-
-    var subject = WheelchairPreferences.inheritedFrom(walk);
-
-    assertThat(subject.speed()).isEqualTo(walk.speed());
-    assertThat(subject.reluctance()).isEqualTo(walk.reluctance());
-  }
-
   private static WheelchairPreferences preferences(double speed, double reluctance) {
     return WheelchairPreferences.of()
       .withSpeed(Speed.ofMetersPerSecond(speed))
