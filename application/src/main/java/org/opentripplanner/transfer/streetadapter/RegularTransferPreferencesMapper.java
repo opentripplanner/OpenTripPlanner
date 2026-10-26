@@ -3,7 +3,6 @@ package org.opentripplanner.transfer.streetadapter;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
@@ -45,6 +44,7 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     var reluctance = Reluctance.of(appWalk.reluctance());
     var appBike = request.preferences().bike();
     var appCar = request.preferences().car();
+
     return switch (type) {
       case WALK -> WalkPreferences.of().withSpeed(speed).withReluctance(reluctance).build();
       case WHEELCHAIR -> WheelchairPreferences.of()
@@ -59,29 +59,6 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     };
   }
 
-  /**
-   * The profile type of a request.
-   *
-   * @throws IllegalArgumentException if the transfer street mode of the request has no profile type
-   */
-  static TransferProfileType profileType(RouteRequest request) {
-    var mode = request.journey().transfer().mode();
-    if (mode == StreetMode.WALK) {
-      return request.journey().wheelchair()
-        ? TransferProfileType.WHEELCHAIR
-        : TransferProfileType.WALK;
-    }
-    if (mode == StreetMode.BIKE) {
-      return TransferProfileType.BICYCLE;
-    }
-    if (mode == StreetMode.CAR) {
-      return TransferProfileType.CAR;
-    }
-    throw new IllegalArgumentException(
-      "The transfer street mode " + mode + " is not supported by the regular transfers."
-    );
-  }
-
   @Override
   public RouteRequest toRequest(AbstractUserPreferences<?> userPreferences, RouteRequest base) {
     return switch (userPreferences) {
@@ -92,22 +69,42 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     };
   }
 
+  /**
+   * The profile type of a request.
+   *
+   * @throws IllegalArgumentException if the transfer street mode of the request has no profile type
+   */
+  private static TransferProfileType profileType(RouteRequest request) {
+    var mode = request.journey().transfer().mode();
+    return switch (mode) {
+      case WALK -> request.journey().wheelchair()
+        ? TransferProfileType.WHEELCHAIR
+        : TransferProfileType.WALK;
+      case BIKE -> TransferProfileType.BICYCLE;
+      case CAR -> TransferProfileType.CAR;
+      default -> throw new IllegalArgumentException(
+        "The transfer street mode " + mode + " is not supported by the regular transfers."
+      );
+    };
+  }
+
   /** A walking request, for a traveler in a wheelchair or not. */
   private static <
     T extends AbstractUserPreferences<T> & WithSpeed & WithStairs
   > RouteRequest walkRequest(T userPreferences, RouteRequest base, boolean wheelchair) {
-    var builder = base.copyOf();
-    builder.withJourney(jb ->
-      jb.withTransfer(new StreetRequest(StreetMode.WALK)).withWheelchair(wheelchair)
-    );
-    builder.withPreferences(routingPrefs ->
-      routingPrefs.withWalk(w -> {
-        w.withSpeed(userPreferences.speed().toMetersPerSecond());
-        w.withReluctance(userPreferences.reluctance().value());
-        w.withStairsReluctance(stairsReluctance(userPreferences.stairs(), w.stairsReluctance()));
-      })
-    );
-    return builder.buildDefault();
+    return base
+      .copyOf()
+      .withJourney(jb -> jb.withTransfer(StreetMode.WALK).withWheelchair(wheelchair))
+      .withPreferences(routingPrefs ->
+        routingPrefs.withWalk(walk -> {
+          walk.withSpeed(userPreferences.speed().toMetersPerSecond());
+          walk.withReluctance(userPreferences.reluctance().value());
+          walk.withStairsReluctance(
+            stairsReluctance(userPreferences.stairs(), walk.stairsReluctance())
+          );
+        })
+      )
+      .buildDefault();
   }
 
   /** A request with a bicycle, that is pushed on stairs. */
@@ -115,33 +112,33 @@ public final class RegularTransferPreferencesMapper implements TransferRequestMa
     BicyclePreferences userPreferences,
     RouteRequest base
   ) {
-    var builder = base.copyOf();
-    builder.withJourney(jb ->
-      jb.withTransfer(new StreetRequest(StreetMode.BIKE)).withWheelchair(false)
-    );
-    builder.withPreferences(routingPrefs ->
-      routingPrefs
-        .withBike(b -> {
-          b.withSpeed(userPreferences.speed().toMetersPerSecond());
-          b.withReluctance(userPreferences.reluctance().value());
-        })
-        .withWalk(w ->
-          w.withStairsReluctance(stairsReluctance(userPreferences.stairs(), w.stairsReluctance()))
-        )
-    );
-    return builder.buildDefault();
+    return base
+      .copyOf()
+      .withJourney(jb -> jb.withTransfer(StreetMode.BIKE))
+      .withPreferences(rb ->
+        rb
+          .withWalk(walk ->
+            walk.withStairsReluctance(
+              stairsReluctance(userPreferences.stairs(), walk.stairsReluctance())
+            )
+          )
+          .withBike(bike -> {
+            bike.withSpeed(userPreferences.speed().toMetersPerSecond());
+            bike.withReluctance(userPreferences.reluctance().value());
+          })
+      )
+      .buildDefault();
   }
 
   /** A request with a car, the speed of the car is the speed of the streets. */
   private static RouteRequest carRequest(CarPreferences userPreferences, RouteRequest base) {
-    var builder = base.copyOf();
-    builder.withJourney(jb ->
-      jb.withTransfer(new StreetRequest(StreetMode.CAR)).withWheelchair(false)
-    );
-    builder.withPreferences(routingPrefs ->
-      routingPrefs.withCar(c -> c.withReluctance(userPreferences.reluctance().value()))
-    );
-    return builder.buildDefault();
+    return base
+      .copyOf()
+      .withJourney(jb -> jb.withTransfer(StreetMode.CAR))
+      .withPreferences(pb ->
+        pb.withCar(c -> c.withReluctance(userPreferences.reluctance().value()))
+      )
+      .buildDefault();
   }
 
   /** Interim mapping until the traveler-preferences design (stairs as a 3-way enum) is finalized. */
