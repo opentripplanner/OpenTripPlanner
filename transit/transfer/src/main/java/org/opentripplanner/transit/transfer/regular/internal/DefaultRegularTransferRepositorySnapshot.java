@@ -9,6 +9,7 @@ import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
 import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.api.report.UserPreferenceSource;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
@@ -103,6 +104,11 @@ class DefaultRegularTransferRepositorySnapshot<
   @Override
   public RegularTransferCacheReport cacheReport() {
     return () -> statistics.entries(cache::contains, this::keyInfo);
+  }
+
+  @Override
+  public RegularTransferCacheMetrics cacheMetrics() {
+    return cache.metrics();
   }
 
   /**

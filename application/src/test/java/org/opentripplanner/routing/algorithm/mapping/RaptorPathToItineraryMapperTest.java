@@ -339,13 +339,11 @@ public class RaptorPathToItineraryMapperTest {
     return new RaptorTransitData(
       new HashMap<>(),
       null,
-      null,
       TEST_MODEL.siteRepositoryBuilder()
         .withRegularStop(S1)
         .withRegularStop(S2)
         .withRegularStop(S3)
         .build(),
-      null,
       null,
       null,
       null

@@ -70,6 +70,8 @@ import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFac
 
 public class TestServerContext {
 
+  private static final int TEST_TRANSFER_CACHE_MAX_SIZE = 25;
+
   private TestServerContext() {}
 
   /**
@@ -79,14 +81,12 @@ public class TestServerContext {
    */
   public static TransitService createTransitService(
     TransitRepository transitRepository,
-    TimetableDataImport timetableDataImport,
-    TransferRepository transferRepository
+    TimetableDataImport timetableDataImport
   ) {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableHandle = indexAndRegisterTimetableSnapshot(
       transitRepository,
       timetableDataImport.toScheduledTimetableData(),
-      transferRepository,
       registry
     );
     return new DefaultTransitService(
@@ -101,7 +101,6 @@ public class TestServerContext {
   > indexAndRegisterTimetableSnapshot(
     TransitRepository transitRepository,
     ScheduledTimetableData scheduledTimetableData,
-    TransferRepository transferRepository,
     RepositoryRegistry registry
   ) {
     transitRepository.index();
@@ -110,8 +109,7 @@ public class TestServerContext {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
-      scheduledTimetableData,
-      transferRepository
+      scheduledTimetableData
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
 
@@ -142,6 +140,7 @@ public class TestServerContext {
       StreetTransferFactory.defaultParameters(),
       graph,
       transitRepository,
+      TEST_TRANSFER_CACHE_MAX_SIZE,
       false
     );
     return handle.repositorySnapshot(registry.scope());

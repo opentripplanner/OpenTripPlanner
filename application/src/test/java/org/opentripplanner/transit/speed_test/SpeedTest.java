@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.lang.ref.WeakReference;
@@ -126,8 +125,7 @@ public class SpeedTest {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
-      scheduledTimetableData,
-      transferRepository
+      scheduledTimetableData
     );
 
     transitRepository.initRaptorTransitData(scheduledRaptorData);
@@ -158,6 +156,7 @@ public class SpeedTest {
       transferProfiles,
       graph,
       transitRepository,
+      tuningParameters.transferCacheMaxSize(),
       false
     );
     var threadFactory = Executors.defaultThreadFactory();
@@ -239,8 +238,6 @@ public class SpeedTest {
       routerConfig.transitTuningConfig(),
       null
     );
-
-    initializeTransferCache(routerConfig.transitTuningConfig(), transitRepository);
 
     timer.setUp(opts.groupResultsByCategory());
   }

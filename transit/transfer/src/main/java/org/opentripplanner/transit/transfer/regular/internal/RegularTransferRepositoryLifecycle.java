@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.core.model.transaction.RepositoryLifecycle;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
@@ -49,11 +50,14 @@ public class RegularTransferRepositoryLifecycle<
   private final ProfileMatcher matcher;
   private final List<WarmupEntry> warmup;
   private final RegularTransferCacheStatistics statistics;
+  private final int cacheMaxSize;
+  private final Set<AbstractUserPreferences<?>> retainedKeys;
+  private final RegularTransferCacheCounters cacheCounters = new RegularTransferCacheCounters();
 
   /**
-   * The statistics of the cache are not collected, see
+   * The statistics of the cache are not collected, and the cache has the default size, see
    * {@link #RegularTransferRepositoryLifecycle(TransferPathProvider, TransferRequestMapper,
-   * TransferParameters, int, boolean)}.
+   * TransferParameters, int, int, boolean)}.
    */
   public RegularTransferRepositoryLifecycle(
     TransferPathProvider<P, R> pathProvider,
@@ -61,13 +65,23 @@ public class RegularTransferRepositoryLifecycle<
     TransferParameters<R> profiles,
     int numberOfStops
   ) {
-    this(pathProvider, mapper, profiles, numberOfStops, false);
+    this(
+      pathProvider,
+      mapper,
+      profiles,
+      numberOfStops,
+      RegularTransferServiceCache.DEFAULT_MAX_SIZE,
+      false
+    );
   }
 
   /**
    * @param profiles               the configuration of the profiles the paths are stored under, the
    *                               Raptor transfers are derived with the request of the profile
    *                               closest to the request
+   * @param cacheMaxSize           the max number of Raptor transfers cached for other preferences
+   *                               than the ones of the profiles and the warmup entries, which are
+   *                               always cached
    * @param collectCacheStatistics whether to count the requests that use each key of the cache,
    *                               for the report of the cache, see
    *                               {@link RegularTransferRepositorySnapshot#cacheReport}
@@ -77,6 +91,7 @@ public class RegularTransferRepositoryLifecycle<
     TransferRequestMapper<R> mapper,
     TransferParameters<R> profiles,
     int numberOfStops,
+    int cacheMaxSize,
     boolean collectCacheStatistics
   ) {
     this(
@@ -86,6 +101,7 @@ public class RegularTransferRepositoryLifecycle<
       new ProfileMatcher(ProfileUserPreferences.warmupParents(profiles, mapper)),
       warmupEntries(profiles, mapper),
       numberOfStops,
+      cacheMaxSize,
       collectCacheStatistics
     );
   }
@@ -103,6 +119,7 @@ public class RegularTransferRepositoryLifecycle<
       ProfileMatcher.NO_WARMUP,
       List.of(),
       numberOfStops,
+      RegularTransferServiceCache.DEFAULT_MAX_SIZE,
       false
     );
   }
@@ -114,12 +131,18 @@ public class RegularTransferRepositoryLifecycle<
     ProfileMatcher matcher,
     List<WarmupEntry> warmup,
     int numberOfStops,
+    int cacheMaxSize,
     boolean collectCacheStatistics
   ) {
     this.matcher = matcher;
     this.warmup = warmup;
+    this.cacheMaxSize = cacheMaxSize;
+    this.retainedKeys = warmup
+      .stream()
+      .map(WarmupEntry::userPreferences)
+      .collect(Collectors.toUnmodifiableSet());
     this.statistics = collectCacheStatistics
-      ? RegularTransferCacheStatistics.of(RegularTransferServiceCache.DEFAULT_MAX_SIZE)
+      ? RegularTransferCacheStatistics.of(cacheMaxSize)
       : RegularTransferCacheStatistics.NONE;
     this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
@@ -175,11 +198,16 @@ public class RegularTransferRepositoryLifecycle<
     var frozen = ((DefaultRegularTransferRepository<P>) repository).freeze();
     var cache =
       frozen.base() == null
-        ? new RegularTransferServiceCache<RaptorTransferStore>()
+        ? new RegularTransferServiceCache<RaptorTransferStore>(
+            cacheMaxSize,
+            retainedKeys,
+            cacheCounters
+          )
         : frozen
             .base()
             .cache()
             .carryForward(userPreferences -> changedFromStops(frozen, userPreferences));
+    cacheCounters.setLatest(cache);
     return new DefaultRegularTransferRepositorySnapshot<>(
       frozen.paths(),
       cache,

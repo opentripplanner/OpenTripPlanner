@@ -160,6 +160,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
         warmup
       ),
       stopIndex().size(),
+      RegularTransferServiceCache.DEFAULT_MAX_SIZE,
       collectCacheStatistics
     );
     return lifecycle.freeze(buildRepository.createRuntimeRepository());
