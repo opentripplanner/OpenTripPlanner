@@ -74,7 +74,7 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithoutIdsOrCoordinates() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, null));
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
@@ -86,7 +86,7 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithAnEmptyListOfIds() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of()));
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
@@ -130,7 +130,7 @@ class TripViaLocationMapperTest {
       FIELD_PASS_THROUGH,
       mapOf(FIELD_STOP_LOCATION_IDS, List.of())
     );
-    var ex = assertThrows(IllegalArgumentException.class, () ->
+    var ex = assertThrows(InvalidInputException.class, () ->
       MAPPER.mapToViaLocations(List.of(input))
     );
     assertEquals(
@@ -229,8 +229,8 @@ class TripViaLocationMapperTest {
   }
 
   /**
-   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}.
-   * The {@link Map#of(Object, Object)} does not support {@code null} values.
+   * Create a new HashMap with the {@code key} and {@code value}, the value may be {@code null}. The
+   * {@link Map#of(Object, Object)} does not support {@code null} values.
    */
   private static Map<String, Object> mapOf(String key, Object value) {
     var map = new HashMap<String, Object>();

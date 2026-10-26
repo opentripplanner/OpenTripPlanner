@@ -258,8 +258,8 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * The list of parking lots contained in the transit data (so far only NeTEx).
-   * Note that parking lots can also be sourced from OSM data as well as realtime updaters.
+   * The list of parking lots contained in the transit data (so far only NeTEx). Note that parking
+   * lots can also be sourced from OSM data as well as realtime updaters.
    */
   public List<VehicleParking> vehicleParkings() {
     return vehicleParkings;
@@ -450,8 +450,7 @@ public class TransitDataImportBuilder {
   }
 
   /**
-   * Return {@code true} if the point is a trip-transfer-point and the trip reference is
-   * missing.
+   * Return {@code true} if the point is a trip-transfer-point and the trip reference is missing.
    */
   private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {
     if (!point.isTripTransferPoint()) {

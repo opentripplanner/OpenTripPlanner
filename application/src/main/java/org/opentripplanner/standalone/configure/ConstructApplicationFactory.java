@@ -31,6 +31,8 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
+import org.opentripplanner.ext.taxi.TaxiRepository;
+import org.opentripplanner.ext.taxi.configure.TaxiServiceModule;
 import org.opentripplanner.framework.transaction.configure.TransactionModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -71,7 +73,7 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferServiceModule;
 import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.configure.TransitModule;
-import org.opentripplanner.transit.model.calendar.TripCalendars;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -91,6 +93,7 @@ import org.opentripplanner.warmup.configure.WarmupModule;
     ConstructApplicationModule.class,
     DataOverlayParameterBindingsModule.class,
     EmissionServiceModule.class,
+    TaxiServiceModule.class,
     EmpiricalDelayServiceModule.class,
     DeduplicatorServiceModule.class,
     GeocoderModule.class,
@@ -123,6 +126,7 @@ public interface ConstructApplicationFactory {
   LinkingContextFactory linkingContextFactory();
   VertexLinker vertexLinker();
   TransitRepository transitRepository();
+
   TransferRepository transferRepository();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
@@ -155,6 +159,9 @@ public interface ConstructApplicationFactory {
 
   @Nullable
   EmissionRepository emissionRepository();
+
+  @Nullable
+  TaxiRepository taxiRepository();
 
   StreetDetailsRepository streetDetailsRepository();
 
@@ -212,6 +219,12 @@ public interface ConstructApplicationFactory {
     @BindsInstance
     Builder transitRepository(TransitRepository transitRepository);
 
+    /**
+     * The immutable scheduled timetable data.
+     */
+    @BindsInstance
+    Builder scheduledTimetableData(ScheduledTimetableData scheduledTimetableData);
+
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
 
@@ -233,6 +246,9 @@ public interface ConstructApplicationFactory {
     Builder emissionRepository(EmissionRepository emissionRepository);
 
     @BindsInstance
+    Builder taxiRepository(@Nullable TaxiRepository taxiRepository);
+
+    @BindsInstance
     Builder streetDetailsRepository(StreetDetailsRepository streetDetailsRepository);
 
     @BindsInstance
@@ -249,9 +265,6 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder scheduledRaptorTransitData(RaptorTransitData scheduledRaptorTransitData);
-
-    @BindsInstance
-    Builder scheduledTripCalendars(TripCalendars tripCalendars);
 
     ConstructApplicationFactory build();
   }

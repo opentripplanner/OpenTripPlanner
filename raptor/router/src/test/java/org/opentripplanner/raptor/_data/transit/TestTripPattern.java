@@ -114,8 +114,8 @@ public class TestTripPattern implements RaptorTripPattern {
     }
 
     /**
-     * Set alight and board restriction using a "coded" string, use space as a separator
-     * between stops.
+     * Set alight and board restriction using a "coded" string, use space as a separator between
+     * stops.
      * <pre>
      * Codes:
      *   b : Board

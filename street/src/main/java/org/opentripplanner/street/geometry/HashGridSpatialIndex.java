@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
  * querying, and it's up to the client to filter them out (with whatever knowledge it has on the
  * location of the object).
  * <p>
- * Note: For performance reasons, write operation are not synchronized, it must be taken care by the
- * client. Read-only operation are multi-thread-safe though.
+ * Note: For performance reasons, write operation are not synchronized, it must be taken care by
+ * the client. Read-only operation are multi-thread-safe though.
  *
  * @param <T> Type of objects to be spatial indexed.
  * @author laurent
@@ -159,11 +159,10 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   }
 
   /**
-   * Query all items near any segment of the given line strings. Collects the unique set of bin
-   * keys touched by every segment, then reads each bin exactly once. Avoids per-segment
-   * {@link Envelope} and lambda allocations, and the re-read of bins shared by consecutive
-   * segments (which is the common case — adjacent segments always share at least one bin via
-   * their shared endpoint).
+   * Query all items near any segment of the given line strings. Collects the unique set of bin keys
+   * touched by every segment, then reads each bin exactly once. Avoids per-segment {@link Envelope}
+   * and lambda allocations, and the re-read of bins shared by consecutive segments (which is the
+   * common case — adjacent segments always share at least one bin via their shared endpoint).
    */
   public Set<T> queryAlongLineStrings(Collection<LineString> lineStrings) {
     Set<T> result = new HashSet<>(1024);
@@ -185,9 +184,9 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
   }
 
   /**
-   * Collect the bin keys touched by a segment's axis-aligned bounding box into {@code out}.
-   * Mirrors the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on
-   * primitive coordinates so the hot query loop has no per-segment object allocations.
+   * Collect the bin keys touched by a segment's axis-aligned bounding box into {@code out}. Mirrors
+   * the bin-key math in {@link #visit(Envelope, boolean, BinVisitor)} but operates on primitive
+   * coordinates so the hot query loop has no per-segment object allocations.
    */
   private void collectBinKeys(double x1, double y1, double x2, double y2, TLongSet out) {
     double minX = clampLon(Math.min(x1, x2));
@@ -207,8 +206,8 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
   /**
    * Pack (xKey, yKey) into a single {@code long} hash key. The xKey halves are swapped so the
-   * default long {@code hashCode} ({@code (int) (v ^ (v >>> 32))}) distributes well — see the
-   * note in {@link #visit(Envelope, boolean, BinVisitor)}.
+   * default long {@code hashCode} ({@code (int) (v ^ (v >>> 32))}) distributes well — see the note
+   * in {@link #visit(Envelope, boolean, BinVisitor)}.
    */
   private static long binKey(long xKey, long yKey) {
     return (yKey << 32) | ((xKey & 0xFFFF) << 16) | ((xKey >> 16) & 0xFFFF);

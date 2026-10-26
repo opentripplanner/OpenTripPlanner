@@ -66,8 +66,8 @@ public class UpdateException extends RuntimeException {
     return new UpdateException(this.tripId, this.errorType, this.stopPosition, tripReference);
   }
 
-  /// The position of the GTFS-RT stop time update or SIRI call in the list of updates, which
-  /// does not necessarily correspond to the stop position in pattern.
+  /// The position of the GTFS-RT stop time update or SIRI call in the list of updates, which does
+  /// not necessarily correspond to the stop position in pattern.
   @Nullable
   public Integer stopPosition() {
     return stopPosition;

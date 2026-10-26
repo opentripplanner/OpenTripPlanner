@@ -13,8 +13,8 @@ import org.opentripplanner.model.plan.TransitLeg;
 /**
  * Matches based on the semantics of the GTFS fares V2 timeframes.
  * <p>
- * Timeframes define time-of-day restrictions for fare rules, with start and end times
- * and associated service IDs.
+ * Timeframes define time-of-day restrictions for fare rules, with start and end times and
+ * associated service IDs.
  */
 class TimeframeMatcher {
 
@@ -24,7 +24,6 @@ class TimeframeMatcher {
     this.serviceDatesForServiceId = ImmutableSetMultimap.copyOf(serviceDatesForServiceId);
   }
 
-  ///
   /// Check if a leg matches the timeframe restrictions of a fare rule.
   ///
   /// A leg matches if:

@@ -20,8 +20,8 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
  * preferable use the exclusive end version unless the inclusivity comes from the input data.
  * {@link #toString()} output mirrors the convention used at construction time.
  * <p>
- * {@code null} is accepted in all factory method parameters and is treated as unbounded (equivalent
- * to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
+ * {@code null} is accepted in all factory method parameters and is treated as unbounded
+ * (equivalent to {@link LocalDate#MIN} / {@link LocalDate#MAX}).
  */
 public final class LocalDateRange {
 
@@ -71,8 +71,7 @@ public final class LocalDateRange {
    * Create a range with an inclusive start and an exclusive end.
    *
    * @param start inclusive start, or {@code null} for unbounded start
-   * @param end   exclusive end (first date outside the range), or {@code null} for unbounded
-   *              end
+   * @param end   exclusive end (first date outside the range), or {@code null} for unbounded end
    */
   public static LocalDateRange ofExclusiveEnd(@Nullable LocalDate start, @Nullable LocalDate end) {
     var startInclusive = start == null ? MIN : start;

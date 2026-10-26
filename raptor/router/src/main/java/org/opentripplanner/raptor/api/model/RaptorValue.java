@@ -2,8 +2,8 @@ package org.opentripplanner.raptor.api.model;
 
 import java.util.Objects;
 
-/// This class is a utility class which can hold a value an the unit. It can be used to parse
-/// a value as printed by the {@link #toString()} method. This is most of all useful in tests.
+/// This class is a utility class which can hold a value an the unit. It can be used to parse a
+/// value as printed by the {@link #toString()} method. This is most of all useful in tests.
 public class RaptorValue {
 
   private final int value;

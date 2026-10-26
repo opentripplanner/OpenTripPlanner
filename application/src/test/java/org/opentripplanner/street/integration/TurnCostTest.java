@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -24,6 +23,7 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.EuclideanRemainingWeightHeuristic;
@@ -114,16 +114,11 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     // Since we traverse 3 intersections, the total cost should be 330.
-    GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
-      StreetMode.WALK,
-      topRight,
-      bottomLeft,
-      330
-    );
+    StreetPath path = checkForwardRouteDuration(StreetMode.WALK, topRight, bottomLeft, 330);
 
     // The intersection traversal cost should be applied to the state *after*
     // the intersection itself.
-    List<State> states = path.states;
+    List<State> states = path.states();
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
@@ -146,14 +141,9 @@ public class TurnCostTest {
   @Test
   public void testForwardCarNoTurnCosts() {
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
-    GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
-      StreetMode.CAR,
-      topRight,
-      bottomLeft,
-      350
-    );
+    StreetPath path = checkForwardRouteDuration(StreetMode.CAR, topRight, bottomLeft, 350);
 
-    List<State> states = path.states;
+    List<State> states = path.states();
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
@@ -169,14 +159,9 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 3x100 + 1x50 = 350.
     // Since there are 3 turns, the total cost should be 380.
-    GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
-      StreetMode.CAR,
-      topRight,
-      bottomLeft,
-      380
-    );
+    StreetPath path = checkForwardRouteDuration(StreetMode.CAR, topRight, bottomLeft, 380);
 
-    List<State> states = path.states;
+    List<State> states = path.states();
     assertEquals(5, states.size());
 
     assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
@@ -196,7 +181,7 @@ public class TurnCostTest {
     assertEquals(380, states.get(4).getElapsedTimeSeconds());
   }
 
-  private GraphPath<State, Edge, Vertex> checkForwardRouteDuration(
+  private StreetPath checkForwardRouteDuration(
     StreetMode streetMode,
     Vertex from,
     Vertex to,
@@ -218,16 +203,18 @@ public class TurnCostTest {
       .withFrom(from)
       .withTo(to)
       .getShortestPathTree();
-    GraphPath<State, Edge, Vertex> path = tree.getPath(bottomLeft);
-    assertNotNull(path);
+    State state = tree.getState(bottomLeft);
+    assertNotNull(state);
+    StreetPath path = new StreetPath(state);
+    List<State> states = path.states();
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
-    assertEquals(expectedDuration, path.getDuration());
+    assertEquals(expectedDuration, states.getLast().getElapsedTimeSeconds());
 
     // Weight == duration when reluctances == 0.
-    assertEquals(expectedDuration, (int) path.getWeight());
+    assertEquals(expectedDuration, (int) states.getLast().getWeight());
 
-    for (State s : path.states) {
+    for (State s : states) {
       assertEquals(s.getElapsedTimeSeconds(), (int) s.getWeight());
     }
 

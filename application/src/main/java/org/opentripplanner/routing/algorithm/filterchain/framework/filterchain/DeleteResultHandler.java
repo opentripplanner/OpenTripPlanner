@@ -8,8 +8,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideS
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 
 /**
- * This class will remove itineraries from the list which are flagged for deletion by the
- * filters.
+ * This class will remove itineraries from the list which are flagged for deletion by the filters.
  */
 public class DeleteResultHandler {
 

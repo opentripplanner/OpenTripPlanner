@@ -5,6 +5,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -18,16 +19,17 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
- * This class is responsible for loading configuration and setting up the OTP data store.
- * This is used to load the graph, and finally this class can create the
- * {@link ConstructApplication} for the next phase.
+ * This class is responsible for loading configuration and setting up the OTP data store. This is
+ * used to load the graph, and finally this class can create the {@link ConstructApplication} for
+ * the next phase.
  * <p>
- * By splitting these two responsibilities into two separate phases we are sure all
- * components (graph and transit model) created in the load phase will be available for
- * creating the application using Dagger dependency injection.
+ * By splitting these two responsibilities into two separate phases we are sure all components
+ * (graph and transit model) created in the load phase will be available for creating the
+ * application using Dagger dependency injection.
  */
 public class LoadApplication {
 
@@ -41,9 +43,7 @@ public class LoadApplication {
    */
   public LoadApplication(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
-    this.factory = org.opentripplanner.standalone.configure.DaggerLoadApplicationFactory.builder()
-      .commandLineParameters(cli)
-      .build();
+    this.factory = DaggerLoadApplicationFactory.builder().commandLineParameters(cli).build();
   }
 
   public void validateConfigAndDataSources() {
@@ -65,11 +65,13 @@ public class LoadApplication {
       obj.osmInfoGraphBuildRepository,
       obj.streetDetailsRepository,
       obj.transitRepository,
+      obj.timetableDataImport,
       obj.transferRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
       obj.emissionRepository,
+      obj.taxiRepository,
       obj.empiricalDelayRepository,
       obj.stopConsolidationRepository,
       obj.streetRepository,
@@ -84,11 +86,13 @@ public class LoadApplication {
       factory.emptyOsmInfoGraphBuildRepository(),
       factory.emptyStreetDetailsRepository(),
       factory.emptyTransitRepository(),
+      factory.emptyTimetableDataImport(),
       factory.emptyTransferRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
+      factory.emptyTaxiRepository(),
       factory.emptyEmpiricalDelayRepository(),
       factory.emptyStopConsolidationRepository(),
       factory.emptyStreetRepository(),
@@ -112,11 +116,13 @@ public class LoadApplication {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     StreetDetailsRepository streetDetailsRepository,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetRepository streetRepository,
@@ -128,12 +134,14 @@ public class LoadApplication {
       osmInfoGraphBuildRepository,
       streetDetailsRepository,
       transitRepository,
+      timetableDataImport,
       transferRepository,
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),
       issueSummary,
       emissionRepository,
+      taxiRepository,
       empiricalDelayRepository,
       parkingRepository,
       stopConsolidationRepository,

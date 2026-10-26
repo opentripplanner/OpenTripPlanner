@@ -21,6 +21,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.VehicleAssignment;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
@@ -30,8 +31,10 @@ import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LineRefStructure;
+import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.VehicleTypeRefStructure;
 
 class TripMapperTest {
 
@@ -39,6 +42,7 @@ class TripMapperTest {
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
   private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
   private static final FeedScopedId SERVICE_ID = FeedScopedIdForTestFactory.id("S001");
+  private static final String VEHICLE_TYPE_REF = "RUT:VehicleType:1";
   private static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
   private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
@@ -106,6 +110,36 @@ class TripMapperTest {
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
 
     assertEquals(trip.getId(), ID_FACTORY.createId(SERVICE_JOURNEY_ID));
+    assertNull(trip.getVehicleAssignment());
+  }
+
+  @Test
+  void mapTripWithVehicleTypeRef() {
+    TransitDataImportBuilder transitBuilder = new TransitDataImportBuilder(
+      new SiteRepository(),
+      ISSUE_STORE
+    );
+    transitBuilder.getRoutes().add(TransitRepositoryForTest.route(ROUTE_ID).build());
+
+    TripMapper tripMapper = new TripMapper(
+      ID_FACTORY,
+      ISSUE_STORE,
+      transitBuilder.getOperatorsById(),
+      transitBuilder.getRoutes(),
+      new HierarchicalMapById<>(),
+      new HierarchicalMap<>(),
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
+    );
+
+    ServiceJourney serviceJourney = createExampleServiceJourney();
+    serviceJourney.setLineRef(LINE_REF);
+    serviceJourney.setVehicleTypeRef(
+      createWrappedRef(VEHICLE_TYPE_REF, VehicleTypeRefStructure.class)
+    );
+
+    Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);
+
+    assertEquals(new VehicleAssignment(null, VEHICLE_TYPE_REF), trip.getVehicleAssignment());
   }
 
   @Test
@@ -124,11 +158,11 @@ class TripMapperTest {
       MappingSupport.createWrappedRef(JOURNEY_PATTERN_ID, JourneyPatternRefStructure.class)
     );
 
-    org.rutebanken.netex.model.Route netexRoute = new org.rutebanken.netex.model.Route();
+    Route netexRoute = new Route();
     netexRoute.setLineRef(LINE_REF);
     netexRoute.setId(ROUTE_ID);
 
-    HierarchicalMapById<org.rutebanken.netex.model.Route> routeById = new HierarchicalMapById<>();
+    HierarchicalMapById<Route> routeById = new HierarchicalMapById<>();
     routeById.add(netexRoute);
     HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById =
       new HierarchicalMapById<>();

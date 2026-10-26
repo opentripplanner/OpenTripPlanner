@@ -1,6 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.debug;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -26,13 +28,14 @@ final class DebugHandlerStopArrivalAdapter extends AbstractDebugHandlerAdapter<A
    * used in code that does not need to be fast, like debugging.
    */
   private Iterable<Integer> listStopsForDebugging(ArrivalView<?> it) {
-    LinkedList<Integer> stops = new LinkedList<>();
+    List<Integer> stops = new ArrayList<>();
 
     // loop until access is done(previous is null)
     while (it != null) {
-      stops.addFirst(it.stop());
+      stops.add(it.stop());
       it = it.previous();
     }
+    Collections.reverse(stops);
     return stops;
   }
 }

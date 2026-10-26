@@ -19,9 +19,10 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc.
  * to edges based on OSM tags.
  * <p>
- * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to ways based on how well
- * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
- * number of exact, partial, and wildcard tag matches. See OSMSpecifier for more details on the matching process.
+ * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to
+ * ways based on how well their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will
+ * win out over all the others based on the number of exact, partial, and wildcard tag matches. See
+ * OSMSpecifier for more details on the matching process.
  */
 public class WayPropertySet {
 

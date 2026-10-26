@@ -11,7 +11,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.repository.TimetableRepository;
+import org.opentripplanner.transit.service.TransitRepository;
 
 /**
  * This class is responsible for resolving references to various entities in the transit model for
@@ -19,12 +20,18 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class EntityResolver {
 
-  private final TransitService transitService;
+  private final TimetableRepository timetableRepository;
+  private final TransitRepository transitRepository;
 
   private final String feedId;
 
-  public EntityResolver(TransitService transitService, String feedId) {
-    this.transitService = transitService;
+  public EntityResolver(
+    TimetableRepository timetableRepository,
+    TransitRepository transitRepository,
+    String feedId
+  ) {
+    this.timetableRepository = timetableRepository;
+    this.transitRepository = transitRepository;
     this.feedId = feedId;
   }
 
@@ -46,7 +53,7 @@ public class EntityResolver {
 
     Optional<TripOnServiceDate> tripOnServiceDate = journey
       .datedVehicleJourneyRef()
-      .map(jf -> transitService.getTripOnServiceDate(resolveId(jf)));
+      .map(jf -> timetableRepository.getTripOnServiceDate(resolveId(jf)));
     if (tripOnServiceDate.isPresent()) {
       return tripOnServiceDate.get().getTrip();
     }
@@ -54,7 +61,7 @@ public class EntityResolver {
     // It is possible that the trip has previously been added, resolve the added trip
     return journey
       .code()
-      .map(c -> transitService.getTrip(resolveId(c.asServiceJourneyId())))
+      .map(c -> timetableRepository.getTrip(resolveId(c.asServiceJourneyId())))
       .orElse(null);
   }
 
@@ -81,13 +88,13 @@ public class EntityResolver {
       return null;
     }
 
-    return transitService.getTripOnServiceDate(
+    return timetableRepository.getTripOnServiceDate(
       new TripIdAndServiceDate(resolveId(serviceJourneyId), serviceDate)
     );
   }
 
   private TripOnServiceDate resolveTripOnServiceDate(FeedScopedId datedServiceJourneyId) {
-    return transitService.getTripOnServiceDate(datedServiceJourneyId);
+    return timetableRepository.getTripOnServiceDate(datedServiceJourneyId);
   }
 
   FeedScopedId resolveDatedServiceJourneyId(EstimatedVehicleJourneyWrapper journey) {
@@ -106,7 +113,7 @@ public class EntityResolver {
   }
 
   public Trip resolveTrip(String serviceJourneyId) {
-    return transitService.getTrip(resolveId(serviceJourneyId));
+    return timetableRepository.getTrip(resolveId(serviceJourneyId));
   }
 
   /**
@@ -116,20 +123,20 @@ public class EntityResolver {
    */
   RegularStop resolveQuay(String stopPointRef) {
     var id = resolveId(stopPointRef);
-    return transitService
+    return transitRepository
       .findStopByScheduledStopPoint(id)
-      .orElseGet(() -> transitService.getRegularStop(id));
+      .orElseGet(() -> transitRepository.getSiteRepository().getRegularStop(id));
   }
 
   /**
    * Resolve a {@link Route} from a line id.
    */
   Route resolveRoute(String lineRef) {
-    return transitService.getRoute(resolveId(lineRef));
+    return timetableRepository.getRoute(resolveId(lineRef));
   }
 
   Operator resolveOperator(String operatorRef) {
-    return transitService.getOperator(resolveId(operatorRef));
+    return transitRepository.getOperator(resolveId(operatorRef));
   }
 
   /**
@@ -138,8 +145,8 @@ public class EntityResolver {
    *   <li>the service date given by the journey's FramedVehicleJourneyRef -> DataFrameRef,</li>
    *   <li>the service date of the DatedServiceJourney referenced by the journey's
    *       DatedVehicleJourneyRef or EstimatedVehicleJourneyCode,</li>
-   *   <li>the date of the aimed departure time at the first call, shifted back by the number of
-   *       days the scheduled trip's first departure lies after midnight (for trips running past
+   *   <li>the date of the aimed departure time at the first call, shifted back by the number of days
+   *       the scheduled trip's first departure lies after midnight (for trips running past
    *       midnight).</li>
    * </ol>
    * Return {@code null} if none of these strategies succeed.
@@ -184,7 +191,7 @@ public class EntityResolver {
     if (trip == null) {
       return 0;
     }
-    var pattern = transitService.findPattern(trip);
+    var pattern = timetableRepository.findPattern(trip);
     if (pattern == null) {
       return 0;
     }

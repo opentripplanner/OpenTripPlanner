@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 /**
  * This class computes the days that should be searched in addition to the search date time.
  * <p>
- * For example, if you want to arrive at 0:15 you also need to take the timetable from the previous
- * day into account as your train could arrive at the destination at 23:59.
+ * For example, if you want to arrive at 0:15 you also need to take the timetable from the
+ * previous day into account as your train could arrive at the destination at 23:59.
  * <p>
  * It's similar when you start at 23:59 where you want to take the next day into account, but not
  * the previous one.

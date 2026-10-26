@@ -9,8 +9,8 @@ import org.opentripplanner.model.plan.TransitLeg;
 
 /**
  * Represents an offer for a transit leg, encapsulating fare information and optional time limits.
- * This interface is used to determine fare products applicable to specific legs of transit,
- * and provide functionality for validating time-limited or transfer-limited offers.
+ * This interface is used to determine fare products applicable to specific legs of transit, and
+ * provide functionality for validating time-limited or transfer-limited offers.
  */
 sealed interface LegOffer {
   /**
@@ -52,7 +52,8 @@ sealed interface LegOffer {
   }
 
   /**
-   * A time-limited implementation of the {@link LegOffer} interface that provides fare offer details.
+   * A time-limited implementation of the {@link LegOffer} interface that provides fare offer
+   * details.
    */
   record TimeLimitedOffer(
     FareOffer offer,

@@ -16,8 +16,8 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 /**
  * Trip planning request with a list of via points.
  *
- * @deprecated We will replace the complex via-search with a simpler version part of the
- *      existing trip search.
+ * @deprecated We will replace the complex via-search with a simpler version part of the existing
+ *             trip search.
  */
 @Deprecated
 public class RouteViaRequest implements Serializable {
@@ -242,8 +242,8 @@ public class RouteViaRequest implements Serializable {
   }
 
   /**
-   * ViaSegments contains the {@link JourneyRequest} to the next {@link ViaLocationDeprecated}. The last
-   * segment has null viaLocation, as `to` is the destination of that segment.
+   * ViaSegments contains the {@link JourneyRequest} to the next {@link ViaLocationDeprecated}. The
+   * last segment has null viaLocation, as `to` is the destination of that segment.
    */
   public record ViaSegment(JourneyRequest journeyRequest, ViaLocationDeprecated viaLocation) {}
 }

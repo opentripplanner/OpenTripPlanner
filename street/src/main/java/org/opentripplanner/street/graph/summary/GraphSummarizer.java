@@ -14,6 +14,8 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.StreamUtils;
 
 /// A class for converting graph entities into human-readable strings, which help writing assertions
 /// in test. It does not create or manipulate any entities - it is purely read-only.
@@ -30,6 +32,7 @@ public class GraphSummarizer {
 
   /// Converts the input to a string-based label and looks it up in the graph. Remember that there
   /// are other, non-string vertex labels for which this method will not work.
+  ///
   /// @see VertexLabel
   @Nullable
   public Vertex getVertex(String label) {
@@ -45,7 +48,7 @@ public class GraphSummarizer {
   }
 
   public List<TransitStopVertex> listStopVertices() {
-    return graph.getVerticesOfType(TransitStopVertex.class);
+    return ListUtils.ofIterable(graph.findVertices(TransitStopVertex.class));
   }
 
   /// Iterates over all vertices in the graph and gets all incoming _and_ outgoing edges. This is a
@@ -68,16 +71,30 @@ public class GraphSummarizer {
     return distinctEdges().filter(cls::isInstance).map(cls::cast).toList();
   }
 
+  /// The vertices reachable from `vertex` in one hop, in edge order. Duplicates are kept, so two
+  /// parallel edges to the same target show up twice.
+  public static List<Vertex> successors(Vertex vertex) {
+    return vertex.getOutgoing().stream().map(Edge::getToVertex).toList();
+  }
+
+  /// The area edges leading out of a single vertex, as opposed to {@link #listAreaEdges()} over the
+  /// whole graph. Useful for asserting how well a vertex is wired into the area around it.
+  public static List<AreaEdge> outgoingAreaEdges(Vertex vertex) {
+    return vertex
+      .getOutgoing()
+      .stream()
+      .filter(AreaEdge.class::isInstance)
+      .map(AreaEdge.class::cast)
+      .toList();
+  }
+
   public String geoJsonUrl() {
     return GeoJsonIo.toUrl(this.listEdges(), graph.getVertices());
   }
 
   public Collection<String> summarizeSplitVertices() {
-    return graph
-      .getVerticesOfType(SplitterVertex.class)
-      .stream()
-      .map(StreetSummarizer::summarizeVertex)
-      .toList();
+    var vertices = graph.findVertices(SplitterVertex.class);
+    return StreamUtils.ofIterable(vertices).map(StreetSummarizer::summarizeVertex).toList();
   }
 
   public Collection<String> summarizeEdges() {
@@ -85,8 +102,8 @@ public class GraphSummarizer {
   }
 
   /**
-   * A list of textual representations of the links (edges of type {@link TemporaryPartialStreetEdge})
-   * in the graph.
+   * A list of textual representations of the links (edges of type
+   * {@link TemporaryPartialStreetEdge}) in the graph.
    */
   public Collection<String> summarizeTempEdges() {
     return listEdges()

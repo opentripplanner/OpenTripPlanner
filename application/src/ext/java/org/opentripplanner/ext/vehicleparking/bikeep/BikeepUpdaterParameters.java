@@ -9,8 +9,8 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
- * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link
- * BikeepUpdater}.
+ * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by
+ * {@link BikeepUpdater}.
  */
 public record BikeepUpdaterParameters(
   String configRef,

@@ -36,9 +36,9 @@ import org.opentripplanner.transit.service.TransitService;
  * Tests the {@code realTimeJourneyState} field on the {@link DatedServiceJourneyType}.
  * <p>
  * The real-time trip-times state is built directly from the scheduled trip times (via
- * {@code createRealTimeFromScheduledTimes()}) and injected into a {@link TimetableRepository}, so the
- * resolver is exercised against a live {@link TransitService} without depending on any feed-source
- * adapter (GTFS-RT/SIRI) to set the flags.
+ * {@code createRealTimeFromScheduledTimes()}) and injected into a {@link TimetableRepository}, so
+ * the resolver is exercised against a live {@link TransitService} without depending on any
+ * feed-source adapter (GTFS-RT/SIRI) to set the flags.
  */
 class DatedServiceJourneyTypeTest {
 
@@ -184,7 +184,8 @@ class DatedServiceJourneyTypeTest {
       ref("Quay"),
       ref("ReplacedBy"),
       ref("ReplacementFor"),
-      realTimeJourneyStateType
+      realTimeJourneyStateType,
+      DatedServiceJourneyVehicleAssignmentType.create(new DefaultFeedIdMapper())
     );
 
     var queryType = GraphQLObjectType.newObject()

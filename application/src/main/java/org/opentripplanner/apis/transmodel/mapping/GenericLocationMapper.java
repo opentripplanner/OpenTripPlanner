@@ -21,8 +21,8 @@ public class GenericLocationMapper {
     this.idMapper = idMapper;
   }
 
-  /// Maps a GraphQL Location input type to a GenericLocation.
-  /// Returns an empty result If the input does not contain a coordinate or an id.
+  /// Maps a GraphQL Location input type to a GenericLocation. Returns an empty result If the input
+  /// does not contain a coordinate or an id.
   public Optional<GenericLocation> toGenericLocation(Map<String, Object> m) {
     Map<String, Object> coordinates = (Map<String, Object>) m.get("coordinates");
     Double lat = null;

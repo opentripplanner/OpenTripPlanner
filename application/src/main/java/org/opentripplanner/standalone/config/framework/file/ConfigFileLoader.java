@@ -3,10 +3,6 @@ package org.opentripplanner.standalone.config.framework.file;
 import static org.opentripplanner.standalone.config.framework.file.IncludeFileDirective.includeFileDirective;
 import static org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,18 +12,28 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * Generic config file loader. This is used to load all configuration files.
  * <p>
- * This class is also provide logging when a config file is loaded. We load and parse config files
- * early to reveal syntax errors without waiting for graph build.
+ * This class is also provide logging when a config file is loaded. We load and parse config
+ * files early to reveal syntax errors without waiting for graph build.
  */
 public class ConfigFileLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigFileLoader.class);
 
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = JsonMapper.builder()
+    // Configure mapper
+    .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+    .enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES)
+    .build();
 
   @Nullable
   private File configDir = null;
@@ -35,11 +41,7 @@ public class ConfigFileLoader {
   @Nullable
   private String jsonFallback = null;
 
-  private ConfigFileLoader() {
-    // Configure mapper
-    mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-    mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-  }
+  private ConfigFileLoader() {}
 
   public static ConfigFileLoader of() {
     return new ConfigFileLoader();
@@ -65,7 +67,7 @@ public class ConfigFileLoader {
 
   /**
    * Load the configuration file as a JsonNode tree. An empty node is returned if the given
-   * {@code configDir}  is {@code null} or config file is NOT found.
+   * {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This is public to allow loading configuration files from tests like the SpeedTest.
    *
@@ -88,8 +90,8 @@ public class ConfigFileLoader {
    * keys are allowed. Returns an empty node if the file does not exist. Throws an exception if the
    * file contains syntax errors or cannot be parsed for some other reason.
    * <p>
-   * We do not require any JSON config files to be present because that would get in the way of the
-   * simplest rapid deployment workflow. Therefore we return an empty JSON node when the file is
+   * We do not require any JSON config files to be present because that would get in the way of
+   * the simplest rapid deployment workflow. Therefore we return an empty JSON node when the file is
    * missing, causing us to fall back on all the default values as if there was a JSON file present
    * with no fields defined.
    */
@@ -125,7 +127,7 @@ public class ConfigFileLoader {
       jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
       return mapper.readTree(jsonAsString);
-    } catch (IOException ie) {
+    } catch (JacksonException ie) {
       LOG.error("Error while parsing config '{}'.", source, ie);
       throw new OtpAppException("Failed to load config: " + source);
     }

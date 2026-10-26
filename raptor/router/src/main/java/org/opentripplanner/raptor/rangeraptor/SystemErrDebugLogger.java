@@ -79,8 +79,9 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   /**
-   * This should be passed into the {@link DebugRequestBuilder#withPatternRideDebugListener(Consumer)}
-   * using a lambda to enable debugging pattern ride events.
+   * This should be passed into the
+   * {@link DebugRequestBuilder#withPatternRideDebugListener(Consumer)} using a lambda to enable
+   * debugging pattern ride events.
    */
   public void patternRideLister(DebugEvent<PatternRideView<?, ?>> e) {
     printIterationHeader(e.iterationStartTime());

@@ -34,7 +34,7 @@ public class NoticeAssignmentMapperTest {
   private static final String TIMETABLED_PASSING_TIME1 = "RUT:TimetabledPassingTime:1";
   private static final String TIMETABLED_PASSING_TIME2 = "RUT:TimetabledPassingTime:2";
 
-  private static final Notice NOTICE = new org.rutebanken.netex.model.Notice()
+  private static final Notice NOTICE = new Notice()
     .withId(NOTICE_ID)
     .withPublicCode("Notice Code")
     .withText(new MultilingualString().withValue("Notice text"));

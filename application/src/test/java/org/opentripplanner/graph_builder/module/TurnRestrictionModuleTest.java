@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.graph.summary.GraphSummarizer;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
@@ -22,6 +22,7 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.path.StreetPath;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -142,9 +143,9 @@ public class TurnRestrictionModuleTest {
       .findFirst()
       .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, newB);
-    var newOutB = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var newOutB = GraphSummarizer.successors(newB);
     assertThat(newOutB).containsExactly(A, C, D);
-    var outB = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var outB = GraphSummarizer.successors(B);
     assertThat(outB).containsExactly(A, C, D, E);
   }
 
@@ -215,13 +216,13 @@ public class TurnRestrictionModuleTest {
       .findFirst()
       .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, F, G, H, newB, newE);
-    var newOutB = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var newOutB = GraphSummarizer.successors(newB);
     assertThat(newOutB).containsExactly(A, C, D);
-    var outB = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var outB = GraphSummarizer.successors(B);
     assertThat(outB).containsExactly(A, C, D, newE);
-    var newOutE = newE.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var newOutE = GraphSummarizer.successors(newE);
     assertThat(newOutE).containsExactly(B, F, G);
-    var outE = E.getOutgoing().stream().map(Edge::getToVertex).toList();
+    var outE = GraphSummarizer.successors(E);
     assertThat(outE).containsExactly(B, F, G, H);
 
     var newInB = newB.getIncoming().stream().map(Edge::getFromVertex).toList();
@@ -357,8 +358,7 @@ public class TurnRestrictionModuleTest {
       .withFrom(A)
       .withTo(F)
       .getShortestPathTree();
-    GraphPath<State, Edge, Vertex> path = spt.getPath(F);
-    List<State> states = path.states;
+    List<State> states = new StreetPath(spt.getState(F)).states();
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);
@@ -432,7 +432,7 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(B)
         .getShortestPathTree()
-        .getPath(B)
+        .getState(B)
     );
     assertNull(
       StreetSearchBuilder.of()
@@ -440,17 +440,17 @@ public class TurnRestrictionModuleTest {
         .withFrom(A)
         .withTo(C)
         .getShortestPathTree()
-        .getPath(C)
+        .getState(C)
     );
-    GraphPath<State, Edge, Vertex> path = StreetSearchBuilder.of()
+    State state = StreetSearchBuilder.of()
       .withRequest(request)
       .withFrom(A)
       .withTo(E)
       .getShortestPathTree()
-      .getPath(E);
-    assertNotNull(path);
+      .getState(E);
+    assertNotNull(state);
 
-    for (Edge edge : path.edges) {
+    for (Edge edge : state.listBackEdges()) {
       assertEquals(StreetTraversalPermission.CAR, ((StreetEdge) edge).getPermission());
     }
   }

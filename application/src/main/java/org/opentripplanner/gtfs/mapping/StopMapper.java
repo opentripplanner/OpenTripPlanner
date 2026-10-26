@@ -20,7 +20,7 @@ import org.opentripplanner.utils.collection.MapUtils;
 class StopMapper {
 
   private final IdFactory idFactory;
-  private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
+  private final Map<Stop, RegularStop> mappedStops = new HashMap<>();
   private final SiteRepositoryBuilder siteRepositoryBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
@@ -37,16 +37,16 @@ class StopMapper {
     this.siteRepositoryBuilder = siteRepositoryBuilder;
   }
 
-  Collection<RegularStop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
+  Collection<RegularStop> map(Collection<Stop> allStops) {
     return MapUtils.mapToList(allStops, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  RegularStop map(org.onebusaway.gtfs.model.Stop original) {
+  RegularStop map(Stop original) {
     return original == null ? null : mappedStops.computeIfAbsent(original, this::doMap);
   }
 
-  private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+  private RegularStop doMap(Stop gtfsStop) {
     TransitMode mode = TransitModeMapper.mapMode(gtfsStop.getVehicleType());
 
     assertLocationTypeIsStop(gtfsStop);
@@ -62,17 +62,12 @@ class StopMapper {
       .withSometimesUsedRealtime(mapSometimesUsedRealtime(mode, gtfsStop));
 
     builder.withName(
-      translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
-        "name",
-        base.getId().getId(),
-        base.getName()
-      )
+      translationHelper.getTranslation(Stop.class, "name", base.getId().getId(), base.getName())
     );
 
     builder.withDescription(
       translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
+        Stop.class,
         "desc",
         base.getId().getId(),
         base.getDescription()
@@ -80,12 +75,7 @@ class StopMapper {
     );
 
     builder.withUrl(
-      translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
-        "url",
-        base.getId().getId(),
-        gtfsStop.getUrl()
-      )
+      translationHelper.getTranslation(Stop.class, "url", base.getId().getId(), gtfsStop.getUrl())
     );
 
     if (gtfsStop.getZoneId() != null) {

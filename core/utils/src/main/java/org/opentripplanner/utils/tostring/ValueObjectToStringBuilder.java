@@ -8,9 +8,10 @@ import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * Use this to-string-builder to build value objects. A [ValueObject](http://wiki.c2.com/?ValueObject)
- * is usually a small object/class with a few fields. We want the {@code toString()} to be small and
- * easy to read. The text should be short and without class and field name prefixes.
+ * Use this to-string-builder to build value objects. A
+ * [ValueObject](http://wiki.c2.com/?ValueObject) is usually a small object/class with a few fields.
+ * We want the {@code toString()} to be small and easy to read. The text should be short and without
+ * class and field name prefixes.
  * <p>
  * Examples:
  * <pre>
@@ -21,7 +22,7 @@ import org.opentripplanner.utils.time.TimeUtils;
  * <p>
  * {@code ClassName{field1:value, field2:value, ..., NOT-SET:[fieldX, ...]}}
  * <p>
- * Use the {@link #of()}  factory method to create a instance of this class.
+ * Use the {@link #of()} factory method to create a instance of this class.
  */
 public class ValueObjectToStringBuilder {
 
@@ -122,7 +123,7 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Add time in seconds since midnight. Format:  HH:mm:ss.
+   * Add time in seconds since midnight. Format: HH:mm:ss.
    */
   public ValueObjectToStringBuilder addServiceTime(int secondsPastMidnight) {
     // Use a NOT_SET value which is unlikely to be used
@@ -130,7 +131,7 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Add time in seconds since midnight. Format:  HH:mm:ss. Ignore if not set.
+   * Add time in seconds since midnight. Format: HH:mm:ss. Ignore if not set.
    */
   public ValueObjectToStringBuilder addServiceTime(int secondsPastMidnight, int notSet) {
     return addIt(TimeUtils.timeToStrCompact(secondsPastMidnight, notSet));
@@ -138,8 +139,8 @@ public class ValueObjectToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
-   * Duration#toString()}, but without the 'PT' prefix.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+   * {@link Duration#toString()}, but without the 'PT' prefix.
    */
   public ValueObjectToStringBuilder addDuration(Duration duration) {
     return addIt(duration, DurationUtils::durationToStr);
@@ -147,8 +148,8 @@ public class ValueObjectToStringBuilder {
 
   /**
    * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
-   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
-   * Duration#toString()}, but without the 'PT' prefix.
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the
+   * {@link Duration#toString()}, but without the 'PT' prefix.
    */
   public ValueObjectToStringBuilder addDurationSec(Integer durationSeconds) {
     return addIt(durationSeconds, DurationUtils::durationToStr);
@@ -166,8 +167,8 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Add a cost in the format $N.NN or $N (if decimals are zero). The cost is interoperated as
-   * a generalized-cost like the cost used by Raptor in "centi-seconds"
+   * Add a cost in the format $N.NN or $N (if decimals are zero). The cost is interoperated as a
+   * generalized-cost like the cost used by Raptor in "centi-seconds"
    */
   public ValueObjectToStringBuilder addCostCenti(Integer costCentiSeconds) {
     return addIt(costCentiSeconds, OtpNumberFormat::formatCostCenti);

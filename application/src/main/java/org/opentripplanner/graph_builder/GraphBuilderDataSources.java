@@ -7,6 +7,7 @@ import static org.opentripplanner.datastore.api.FileType.EMPIRICAL_DATA;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -47,13 +48,13 @@ import org.slf4j.LoggerFactory;
  * This is a wrapper around an {@link OtpDataStore} adding the ability to filter which data source
  * input files should be used and validate the available input files against the command line
  * parameters set.
- * <p/>
- * After this class is validated the {@link #has(FileType)} method can be used to determine if the
- * build process should include a file in the build.
- * <p/>
- * By separating this from the builder, this class can be constructed early, causing a validation of
- * the available data-sources against the configuration - and then if not valid - abort the entire
- * OTP startup early, before spending time on loading any data - like the streetGraph.
+ * <p>
+ * After this class is validated the {@link #has(FileType)} method can be used to determine if
+ * the build process should include a file in the build.
+ * <p>
+ * By separating this from the builder, this class can be constructed early, causing a validation
+ * of the available data-sources against the configuration - and then if not valid - abort the
+ * entire OTP startup early, before spending time on loading any data - like the streetGraph.
  */
 @Singleton
 public class GraphBuilderDataSources implements Closeable {
@@ -64,7 +65,7 @@ public class GraphBuilderDataSources implements Closeable {
   private final OtpDataStore store;
   private final Multimap<FileType, DataSource> inputData = ArrayListMultimap.create();
   private final Multimap<FileType, DataSource> skipData = ArrayListMultimap.create();
-  private final Set<FileType> includeTypes = EnumSet.complementOf(EnumSet.of(FileType.UNKNOWN));
+  private final Set<FileType> includeTypes = EnumSet.complementOf(EnumSet.of(UNKNOWN));
   private final DataSource outputGraph;
   private final BuildConfig buildConfig;
   private final File baseDirectory;
@@ -115,14 +116,25 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public boolean hasGtfs() {
-    return has(GTFS);
+    return hasNonTaxiGtfs();
   }
 
   public boolean hasNetex() {
     return has(NETEX);
   }
 
+  /**
+   * {@code true} if there is transit data that will populate the TransitRepository. This excludes
+   * GTFS feeds that are exclusively used as taxi provider data sources.
+   */
   public boolean hasTransitData() {
+    return hasNonTaxiGtfs() || hasNetex();
+  }
+
+  /**
+   * Unlike {@link #hasTransitData()}, taxi provider data never populates the TransitRepository.
+   */
+  public boolean hasTransitOrTaxiData() {
     return hasOneOf(GTFS, NETEX);
   }
 
@@ -135,7 +147,10 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDataSource() {
-    return ofStream(GTFS).map(this::mapGtfsFeed).toList();
+    return ofStream(GTFS)
+      .map(this::mapGtfsFeed)
+      .filter(ds -> !ds.config().isTaxiData())
+      .toList();
   }
 
   public Iterable<
@@ -146,6 +161,13 @@ public class GraphBuilderDataSources implements Closeable {
 
   public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDataSource() {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
+  }
+
+  public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getTaxiConfiguredDataSource() {
+    return ofStream(GTFS)
+      .map(this::mapGtfsFeed)
+      .filter(ds -> ds.config().isTaxiData())
+      .toList();
   }
 
   public Iterable<
@@ -170,8 +192,8 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   /**
-   * Returns a list of data sources for the graph-build cache manager - one for each
-   * cache task type.
+   * Returns a list of data sources for the graph-build cache manager - one for each cache task
+   * type.
    */
   public Iterable<DataSource> listCachedDataSources() {
     return Arrays.stream(CacheTask.values())
@@ -186,10 +208,10 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   /**
-   * We close all data sources after the entire graph build is complete. We do this
-   * because a data source (GFTS zip file) might be accessed by more than one graph
-   * builder module. This also allows us to cache remote files(downloaded over http), not
-   * downloading the files more than one time.
+   * We close all data sources after the entire graph build is complete. We do this because a data
+   * source (GFTS zip file) might be accessed by more than one graph builder module. This also
+   * allows us to cache remote files(downloaded over http), not downloading the files more than one
+   * time.
    */
   @Override
   public void close() {
@@ -213,7 +235,7 @@ public class GraphBuilderDataSources implements Closeable {
 
   /**
    * @return {@code true} if and only if the data source exist, proper command line parameters is
-   * set and not disabled by the loaded configuration files.
+   *         set and not disabled by the loaded configuration files.
    */
   private boolean has(FileType type) {
     return inputData.containsKey(type);
@@ -226,6 +248,12 @@ public class GraphBuilderDataSources implements Closeable {
       }
     }
     return false;
+  }
+
+  private boolean hasNonTaxiGtfs() {
+    return ofStream(GTFS)
+      .map(this::mapGtfsFeed)
+      .anyMatch(ds -> !ds.config().isTaxiData());
   }
 
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
@@ -298,11 +326,10 @@ public class GraphBuilderDataSources implements Closeable {
   }
 
   /**
-   * Match the URI provided in the configuration with the URI of a datasource,
-   * either by comparing directly the two URIs or by first prepending the OTP base directory
-   * to the URI provided in the configuration.
-   * This covers the case where the source parameter provided in the configuration is relative to
-   * the base directory.
+   * Match the URI provided in the configuration with the URI of a datasource, either by comparing
+   * directly the two URIs or by first prepending the OTP base directory to the URI provided in the
+   * configuration. This covers the case where the source parameter provided in the configuration is
+   * relative to the base directory.
    */
   private boolean uriMatch(URI configURI, URI datasourceURI) {
     return (
@@ -335,11 +362,11 @@ public class GraphBuilderDataSources implements Closeable {
 
   private void validateCliMatchesInputData(CommandLineParameters cli) {
     if (cli.build) {
-      if (!hasOsm() && !hasTransitData()) {
+      if (!hasOsm() && !hasTransitOrTaxiData()) {
         throw new OtpAppException("Unable to build graph, no transit nor OSM data available.");
       }
     } else if (cli.buildStreet) {
-      if (!has(OSM)) {
+      if (!hasOsm()) {
         throw new OtpAppException("Unable to build street graph, no OSM data available.");
       }
     } else if (cli.load) {
@@ -356,7 +383,7 @@ public class GraphBuilderDataSources implements Closeable {
           store.getStreetGraph().path()
         );
       }
-      if (!hasTransitData()) {
+      if (!hasTransitOrTaxiData()) {
         throw new OtpAppException("Unable to build transit graph, no transit data available.");
       }
     }

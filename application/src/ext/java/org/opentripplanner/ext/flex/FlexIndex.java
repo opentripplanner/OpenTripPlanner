@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.transit.model.calendar.TripCalendars;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitRepository;
 
 public class FlexIndex {
 
@@ -28,10 +28,10 @@ public class FlexIndex {
 
   private final Multimap<StopLocation, Route> routeByStop;
 
-  public FlexIndex(TransitRepository transitRepository) {
+  public FlexIndex(Collection<FlexTrip<?, ?>> flexTrips, TripCalendars tripCalendars) {
     var routeByStopBuilder = ImmutableSetMultimap.<StopLocation, Route>builder();
 
-    for (FlexTrip<?, ?> flexTrip : transitRepository.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : flexTrips) {
       var route = flexTrip.getTrip().getRoute();
       routeById.put(route.getId(), route);
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
@@ -47,19 +47,16 @@ public class FlexIndex {
         }
       }
 
-      transitRepository
-        .getTripCalendar()
-        .listServiceDates(flexTrip.getTrip().getServiceId())
-        .forEach(serviceDate -> {
-          LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
-          FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);
+      tripCalendars.listServiceDates(flexTrip.getTrip().getServiceId()).forEach(serviceDate -> {
+        LocalDate maxDate = serviceDate.plusDays(flexTrip.maxSpanDays());
+        FlexTripForDate flexTripForDate = new FlexTripForDate(serviceDate, maxDate, flexTrip);
 
-          serviceDate.datesUntil(maxDate.plusDays(1)).forEach(runningDate -> {
-            flexTripsRunningOnDate
-              .computeIfAbsent(runningDate, d -> new ArrayList<>())
-              .add(flexTripForDate);
-          });
+        serviceDate.datesUntil(maxDate.plusDays(1)).forEach(runningDate -> {
+          flexTripsRunningOnDate
+            .computeIfAbsent(runningDate, d -> new ArrayList<>())
+            .add(flexTripForDate);
         });
+      });
     }
 
     routeByStop = routeByStopBuilder.build();
@@ -86,9 +83,9 @@ public class FlexIndex {
   }
 
   /**
-   * For a given stop location returns the flex routes that visit it, taking care to resolve
-   * members of group stops (which are visited "transitively", ie. not directly but by
-   * them being members of the group stop).
+   * For a given stop location returns the flex routes that visit it, taking care to resolve members
+   * of group stops (which are visited "transitively", ie. not directly but by them being members of
+   * the group stop).
    */
   public Collection<Route> findRoutes(StopLocation stop) {
     return routeByStop.get(stop);

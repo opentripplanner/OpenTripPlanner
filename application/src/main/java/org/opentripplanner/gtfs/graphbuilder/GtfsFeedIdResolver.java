@@ -30,21 +30,19 @@ public class GtfsFeedIdResolver {
    * datasource is read more than once.
    * <p>
    * This will try to fetch the experimental feed_id field from the feed_info.txt file.
-   * </p>
    * <p>
-   * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will be
-   * created.
-   * </p>
+   * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will
+   * be created.
    * <h5>THIS METHOD IS THREAD SAFE!</h5>
    * <p>
    * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does
    * not exist already. The single access point(this method) guarantee thread-safety.
-   * </p>
    *
-   * @param source the input source
+   * @param source       the input source
    * @param dataSourceId Any id which identify the data sorce, for example the URI.
    * @return A GtfsFeedId
-   * @see <a href="http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
+   * @see <a href=
+   *      "http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
    */
   public static String fromGtfsFeed(CsvInputSource source, Object dataSourceId) {
     return FEED_ID_MAP.computeIfAbsent(dataSourceId, ignore -> readFeedIdFromDataSource(source));

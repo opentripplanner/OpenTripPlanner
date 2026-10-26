@@ -10,30 +10,38 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.utils.collection.MinMap;
 
 /**
  * Filters nearby stops based on trip pattern availability.
  * <p>
  * This filter ensures that transfers are only generated between stops that are served by trip
- * patterns. For each trip pattern passing nearby, it keeps only the closest stop where boarding
- * or alighting is possible (depending on direction).
+ * patterns. For each trip pattern passing nearby, it keeps only the closest stop where boarding or
+ * alighting is possible (depending on direction).
  * <p>
  * Stops without patterns may still be included if they are marked as sometimes-used by real-time
  * updates (when the IncludeStopsUsedRealTimeInTransfers feature is enabled).
  */
 class PatternNearbyStopFilter implements NearbyStopFilter {
 
-  private final TransitService transitService;
+  private final SiteRepository siteRepository;
+  private final PatternsByStopLookup patternsByStopLookup;
 
-  PatternNearbyStopFilter(TransitService transitService) {
-    this.transitService = transitService;
+  /**
+   * @param patternsByStopLookup the scheduled trip patterns visiting a stop
+   */
+  PatternNearbyStopFilter(
+    SiteRepository siteRepository,
+    PatternsByStopLookup patternsByStopLookup
+  ) {
+    this.siteRepository = siteRepository;
+    this.patternsByStopLookup = patternsByStopLookup;
   }
 
   @Override
   public boolean includeFromStop(FeedScopedId id, boolean reverseDirection) {
-    var stop = transitService.getRegularStop(id);
+    var stop = siteRepository.getRegularStop(id);
     boolean hasPatterns = !findPatternsForStop(stop, !reverseDirection).isEmpty();
     return hasPatterns || includeStopUsedRealtime(stop);
   }
@@ -50,7 +58,7 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
     Set<NearbyStop> uniqueStopsResult = new HashSet<>();
 
     for (var it : nearbyStops) {
-      StopLocation stop = transitService.getStopLocation(it.stopId);
+      StopLocation stop = siteRepository.getStopLocation(it.stopId());
 
       if (stop instanceof RegularStop regularStop) {
         var patternsForStop = findPatternsForStop(regularStop, reverseDirection);
@@ -70,12 +78,12 @@ class PatternNearbyStopFilter implements NearbyStopFilter {
   }
 
   /**
-   * Find all candidate patterns for the given destination {@code stop}. Only return patterns
-   * where we can board(forward direction) or alight(reverse direction) at the given stop.
+   * Find all candidate patterns for the given destination {@code stop}. Only return patterns where
+   * we can board(forward direction) or alight(reverse direction) at the given stop.
    */
   private List<FeedScopedId> findPatternsForStop(RegularStop stop, boolean reverseDirection) {
-    return transitService
-      .findPatterns(stop)
+    return patternsByStopLookup
+      .findPatterns(stop.getId())
       .stream()
       .filter(reverseDirection ? p -> p.alightingExist(stop) : p -> p.boardingExist(stop))
       .map(TripPattern::getId)

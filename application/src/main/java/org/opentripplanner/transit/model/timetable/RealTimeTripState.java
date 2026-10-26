@@ -5,27 +5,31 @@ import java.util.Objects;
 /**
  * Value object encapsulating the real-time state of a trip.
  *
- * <p>{@code timesModified} is {@code true} if any stop arrival or departure time was updated via
+ * <p>
+ * {@code timesModified} is {@code true} if any stop arrival or departure time was updated via
  * real-time data. The remaining flags represent structural changes:
  * <ul>
  *   <li>{@code canceled} – the trip has been canceled.</li>
- *   <li>{@code added} – the trip was injected entirely via a real-time feed (not in the
- *       planned timetable).</li>
- *   <li>{@code tripPatternModified} – the trip retains its identity but its stop pattern has
- *       been changed by a real-time update.</li>
+ *   <li>{@code added} – the trip was injected entirely via a real-time feed (not in the planned
+ *       timetable).</li>
+ *   <li>{@code tripPatternModified} – the trip retains its identity but its stop pattern has been
+ *       changed by a real-time update.</li>
  *   <li>{@code deleted} – the trip is soft-deleted and must not be visible to end users.</li>
  * </ul>
  *
- * <p>Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
+ * <p>
+ * Multiple flags may be {@code true} simultaneously. For example, a trip that has a modified
  * stop pattern will always also have {@code timesModified == true}.
  */
-final class RealTimeTripState {
+public final class RealTimeTripState {
 
   private final boolean timesModified;
   private final boolean canceled;
   private final boolean added;
   private final boolean tripPatternModified;
   private final boolean deleted;
+
+  static final RealTimeTripState SCHEDULED = of().build();
 
   private RealTimeTripState(Builder builder) {
     this.timesModified = builder.timesModified;
@@ -39,28 +43,28 @@ final class RealTimeTripState {
     return new Builder();
   }
 
-  boolean timesModified() {
+  public boolean timesModified() {
     return timesModified;
   }
 
-  boolean canceled() {
+  public boolean canceled() {
     return canceled;
   }
 
-  boolean added() {
+  public boolean added() {
     return added;
   }
 
-  boolean tripPatternModified() {
+  public boolean tripPatternModified() {
     return tripPatternModified;
   }
 
-  boolean deleted() {
+  public boolean deleted() {
     return deleted;
   }
 
   /** Returns {@code true} if any real-time information is present for this trip. */
-  boolean hasAnyUpdates() {
+  public boolean hasAnyUpdates() {
     return timesModified || canceled || added || tripPatternModified || deleted;
   }
 

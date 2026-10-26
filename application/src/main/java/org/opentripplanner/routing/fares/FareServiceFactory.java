@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.fares;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.model.FareRulesData;
+import tools.jackson.databind.JsonNode;
 
 public interface FareServiceFactory {
   FareService makeFareService();

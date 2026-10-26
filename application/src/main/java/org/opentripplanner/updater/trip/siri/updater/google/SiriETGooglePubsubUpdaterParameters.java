@@ -46,6 +46,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   }
 
   @Override
+  @Nullable
   public String url() {
     return dataInitializationUrl;
   }

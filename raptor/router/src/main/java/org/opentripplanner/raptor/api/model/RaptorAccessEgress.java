@@ -14,16 +14,15 @@ import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * Encapsulate information about an access or egress path. We do not distinguish between
- * the access (origin to first stop) or egress (last stop to destination),
- * to Raptor - all these are the same thing.
+ * Encapsulate information about an access or egress path. We do not distinguish between the access
+ * (origin to first stop) or egress (last stop to destination), to Raptor - all these are the same
+ * thing.
  */
 public interface RaptorAccessEgress {
   /**
    * Raptor may decorate access/egress passed into Raptor. Use this method to get the original
-   * instance of a given {@code type} type passed into Raptor. The first element matching the
-   * given {@code type} in the chain of delegates (see {@link AbstractAccessEgressDecorator}) is
-   * returned.
+   * instance of a given {@code type} type passed into Raptor. The first element matching the given
+   * {@code type} in the chain of delegates (see {@link AbstractAccessEgressDecorator}) is returned.
    * <p>
    * This method is primarily for use outside Raptor to get the base access-egress instant to
    * access the EXTENDED state of the base type - state not part of the Raptor interface. This is
@@ -32,8 +31,8 @@ public interface RaptorAccessEgress {
    * Be careful, calling methods part of the {@link RaptorAccessEgress} interface on the returned
    * value will no longer be decorated - not be the value used by Raptor.
    *
-   * @throws IllegalStateException if the given {@code parentType} does not exist in the chain
-   *  of delegates including the first and last element.
+   * @throws IllegalStateException if the given {@code parentType} does not exist in the chain of
+   *                               delegates including the first and last element.
    */
   default <T extends RaptorAccessEgress> Optional<T> findOriginal(Class<T> type) {
     return AbstractAccessEgressDecorator.findType(this, type);
@@ -41,12 +40,11 @@ public interface RaptorAccessEgress {
 
   /**
    * <ul>
-   *     <li>Access: The first stop in the journey, where the access path just arrived at.
-   *     <li>Egress: Last stop before destination, hence not the arrival point, but the departure
-   *     stop.
+   *   <li>Access: The first stop in the journey, where the access path just arrived at.
+   *   <li>Egress: Last stop before destination, hence not the arrival point, but the departure stop.
    * </ul>
-   * The journey origin, destination and transit path board stop must be part of the context;
-   * hence not a member attribute of this type.
+   * The journey origin, destination and transit path board stop must be part of the context; hence
+   * not a member attribute of this type.
    */
   int stop();
 
@@ -65,8 +63,8 @@ public interface RaptorAccessEgress {
    * The time duration to walk or travel the path in seconds. This is not the entire duration from
    * the journey origin, but just:
    * <ul>
-   *     <li>Access: journey origin to first stop.
-   *     <li>Egress: last stop to journey destination.
+   *   <li>Access: journey origin to first stop.
+   *   <li>Egress: last stop to journey destination.
    * </ul>
    */
   int durationInSeconds();
@@ -78,20 +76,20 @@ public interface RaptorAccessEgress {
    * values. This feature is useful when you want to limit the access/egress and the access/egress
    * is FASTER than the preferred option.
    * <p>
-   * For example, for Park&Ride, driving all the way to the
-   * destination is very often the best option when looking at the time criteria. When an
-   * increasing time-penalty is applied to a car access/egress, then driving become less
-   * favorable. This also improves performance, since we usually add a very high cost to
-   * driving - making all park&ride access legs optimal - forcing Raptor to compute a path for
-   * every option. The short drives are optimal on cost, and the long are optimal on time. In the
-   * case of park&ride the time-penalty enables Raptor to choose one of the shortest access/egress
-   * paths over the longer ones.
+   * For example, for Park&Ride, driving all the way to the destination is very often the best
+   * option when looking at the time criteria. When an increasing time-penalty is applied to a car
+   * access/egress, then driving become less favorable. This also improves performance, since we
+   * usually add a very high cost to driving - making all park&ride access legs optimal - forcing
+   * Raptor to compute a path for every option. The short drives are optimal on cost, and the long
+   * are optimal on time. In the case of park&ride the time-penalty enables Raptor to choose one of
+   * the shortest access/egress paths over the longer ones.
    * <p>
    * Another example is FLEX, where we in many use-cases want regular transit to win if there is
-   * an offer. Only in the case where the FLEX is the only solution we want it to be presented.
-   * To achieve this, we must add an extra duration to the time of the FLEX access/egress - it does
-   * not help to just add extra cost - which makes both FLEX optimal on time and transit optimal on
-   * cost. Keeping a large number of optimal access paths has a negative impact on performance as well.
+   * an offer. Only in the case where the FLEX is the only solution we want it to be presented. To
+   * achieve this, we must add an extra duration to the time of the FLEX access/egress - it does not
+   * help to just add extra cost - which makes both FLEX optimal on time and transit optimal on
+   * cost. Keeping a large number of optimal access paths has a negative impact on performance as
+   * well.
    * <p>
    *
    * The unit is seconds and the default value is {@link RaptorConstants#TIME_NOT_SET}.
@@ -114,27 +112,27 @@ public interface RaptorAccessEgress {
    * when the access path can't start immediately, but have to wait for a vehicle arriving. Also DRT
    * systems or bike shares can have operation time limitations.
    * <p>
-   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
-   * is not possible after the requested departure time.
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible after the requested
+   * departure time.
    */
   int earliestDepartureTime(int requestedDepartureTime);
 
   /**
-   * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
-   * where they can have operation time limitations.
+   * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
+   * they can have operation time limitations.
    * <p>
-   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
-   * is not possible before the requested arrival time.
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer is not possible before the
+   * requested arrival time.
    */
   int latestArrivalTime(int requestedArrivalTime);
 
   /**
-   * In a via-search (both pass-through and visit-via) the access/egress may contain one
-   * or more via-locations. If so, Raptor needs to know how many via-locations are included
-   * so it can skip these.
+   * In a via-search (both pass-through and visit-via) the access/egress may contain one or more
+   * via-locations. If so, Raptor needs to know how many via-locations are included so it can skip
+   * these.
    * <p>
-   * If the access/egress {@code stop} is a via-location then this method should include
-   * it in the count.
+   * If the access/egress {@code stop} is a via-location then this method should include it in
+   * the count.
    * <p>
    * The default is zero via-lcations visited.
    */
@@ -143,9 +141,8 @@ public interface RaptorAccessEgress {
   }
 
   /**
-   * Validate that this access or egress path visits via locations correctly.
-   * The number of via locations visited must not exceed the total number of via locations
-   * defined in the search.
+   * Validate that this access or egress path visits via locations correctly. The number of via
+   * locations visited must not exceed the total number of via locations defined in the search.
    *
    * @param numberOfViaLocations the total number of via locations in the search
    * @throws IllegalArgumentException if the via visits are invalid
@@ -176,10 +173,11 @@ public interface RaptorAccessEgress {
   boolean hasOpeningHours();
 
   /**
-   * Return the opening hours in a short human-readable way for the departure at the origin. Do
-   * not parse this. This should only be used for things like testing, debugging and logging.
+   * Return the opening hours in a short human-readable way for the departure at the origin. Do not
+   * parse this. This should only be used for things like testing, debugging and logging.
    * <p>
-   * This method return {@code null} if there are no opening hours, see {@link #hasOpeningHours()}.
+   * This method return {@code null} if there are no opening hours, see
+   * {@link #hasOpeningHours()}.
    */
   @Nullable
   default String openingHoursToString() {
@@ -202,7 +200,7 @@ public interface RaptorAccessEgress {
 
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS
-
+  
        The methods below should be only overridden when a RaptorAccessEgress contains information
        about public services, which were generated outside the RAPTOR algorithm. Examples of such
        schemes include flexible transit service and TNC. They should not be used for regular
@@ -263,8 +261,9 @@ public interface RaptorAccessEgress {
 
   /**
    * Is this {@link RaptorAccessEgress} is connected to the given {@code stop} directly by
-   * <b>walking</b>(or other street mode)? This should be {@code true} if the access/egress
-   * is NOT reached on-board.
+   * <b>walking</b>(or other street mode)? This should be {@code true} if the access/egress is NOT
+   * reached on-board.
+   *
    * @see #arrivedOnBoard()
    */
   default boolean arrivedOnStreet() {
@@ -272,17 +271,17 @@ public interface RaptorAccessEgress {
   }
 
   /**
-   * Is this access or egress without duration.
-   * This commonly refers to:
-   * An empty access where you board transit directly at the origin
-   * An empty egress where you alight transit directly at the destination
+   * Is this access or egress without duration. This commonly refers to: An empty access where you
+   * board transit directly at the origin An empty egress where you alight transit directly at the
+   * destination
+   *
    * @return true if the duration is 0;
    */
   default boolean isFree() {
     return durationInSeconds() == 0;
   }
 
-  /** Call this from toString or {@link #asString(boolean, boolean, String)}*/
+  /** Call this from toString or {@link #asString(boolean, boolean, String)} */
   default String defaultToString() {
     return asString(true, true, null);
   }

@@ -16,11 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A GraphQL instrumentation that aborts the execution if the number of fetched fields exceeds
- * a configurable limit.
- * The instrumentation also periodically checks the OTP request interruption status while the
- * query is being processed, giving the possibility to control the request runtime complexity
- * both in terms of result size and execution time.
+ * A GraphQL instrumentation that aborts the execution if the number of fetched fields exceeds a
+ * configurable limit. The instrumentation also periodically checks the OTP request interruption
+ * status while the query is being processed, giving the possibility to control the request runtime
+ * complexity both in terms of result size and execution time.
  */
 public class MaxFieldsInResultInstrumentation implements Instrumentation {
 

@@ -23,15 +23,19 @@ import org.opentripplanner.utils.lang.StringUtils;
 /**
  * A Trip represents the movement of a public transport vehicle on a given {@link Route}, using a
  * given {@link TransitMode}, on a given sequence of stops served at given passing times.
- * <p>A scheduled Trip can run at most once per service date,
- * while a frequency-based Trip runs several times on a given service date.
- * <p>A Trip can run on multiple service dates.
- * <p>The service dates on which a trip is running are identified
- * by its service id and can be looked up with
- * {@link org.opentripplanner.model.calendar.CalendarService}.
- * <p>Trips that follow the same sequence of stops are grouped under a {@link org.opentripplanner.transit.model.network.TripPattern}
- * via a {@link Timetable}
- * <p>A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
+ * <p>
+ * A scheduled Trip can run at most once per service date, while a frequency-based Trip runs
+ * several times on a given service date.
+ * <p>
+ * A Trip can run on multiple service dates.
+ * <p>
+ * The service dates on which a trip is running are identified by its service id and can be
+ * looked up with {@link org.opentripplanner.model.calendar.CalendarService}.
+ * <p>
+ * Trips that follow the same sequence of stops are grouped under a
+ * {@link org.opentripplanner.transit.model.network.TripPattern} via a {@link Timetable}
+ * <p>
+ * A Trip is equivalent to the TransModel concept of SERVICE JOURNEY.
  */
 public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
@@ -66,6 +70,9 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   @Nullable
   private final String netexInternalPlanningCode;
 
+  @Nullable
+  private final VehicleAssignment vehicleAssignment;
+
   Trip(TripBuilder builder) {
     super(builder.getId());
     // Required fields
@@ -94,6 +101,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     this.shapeId = builder.getShapeId();
     this.gtfsBlockId = builder.getGtfsBlockId();
     this.netexInternalPlanningCode = builder.getNetexInternalPlanningCode();
+    this.vehicleAssignment = builder.getVehicleAssignment();
   }
 
   public static TripBuilder of(FeedScopedId id) {
@@ -185,6 +193,14 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
+   * The vehicle assigned to operate the trip, as given in the planned data.
+   */
+  @Nullable
+  public VehicleAssignment getVehicleAssignment() {
+    return vehicleAssignment;
+  }
+
+  /**
    * Default alteration for a trip.
    * <p>
    * This is planned, by default (e.g. GTFS and if not set explicit).
@@ -194,8 +210,8 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   /**
-   * Return human friendly name to identify the trip when mode, from/to stop and times are
-   * known. This method is meant for debug/logging, and should not be exposed in any API.
+   * Return human friendly name to identify the trip when mode, from/to stop and times are known.
+   * This method is meant for debug/logging, and should not be exposed in any API.
    */
   public String logName() {
     if (StringUtils.hasValue(shortName)) {
@@ -221,6 +237,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
       Objects.equals(this.netexSubmode, other.netexSubmode) &&
       Objects.equals(this.serviceId, other.serviceId) &&
       Objects.equals(this.netexInternalPlanningCode, other.netexInternalPlanningCode) &&
+      Objects.equals(this.vehicleAssignment, other.vehicleAssignment) &&
       Objects.equals(this.headsign, other.headsign) &&
       Objects.equals(this.gtfsBlockId, other.gtfsBlockId) &&
       Objects.equals(this.shapeId, other.shapeId) &&

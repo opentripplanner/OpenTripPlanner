@@ -2,13 +2,13 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import java.util.List;
 import org.opentripplanner.standalone.config.debuguiconfig.BackgroundTileLayer;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * This class is an object representation of the 'debug-ui-config.json'.

@@ -13,11 +13,11 @@ public class LocalDateUtils {
    * <p>
    * If today is {@code 2022-11-30}, then:
    * <ul>
-   * <li>{@code 2022-01-15 is 2022-01-15} (absolute)</li>
-   * <li>{@code "0d" or "P0d" is 2022-11-30}</li>
-   * <li>{@code "3d" or "P3d" is 2022-12-03}</li>
-   * <li>{@code "-P1Y1D" is 2021-11-29} (minus one year and one day)</li>
-   * <li>{@code "P1Y-1D" is 2023-11-29} (plus one year, minus one day)</li>
+   *   <li>{@code 2022-01-15 is 2022-01-15} (absolute)</li>
+   *   <li>{@code "0d" or "P0d" is 2022-11-30}</li>
+   *   <li>{@code "3d" or "P3d" is 2022-12-03}</li>
+   *   <li>{@code "-P1Y1D" is 2021-11-29} (minus one year and one day)</li>
+   *   <li>{@code "P1Y-1D" is 2023-11-29} (plus one year, minus one day)</li>
    * </ul>
    *
    * The Period is parsed using {@link Period#parse(CharSequence)}.

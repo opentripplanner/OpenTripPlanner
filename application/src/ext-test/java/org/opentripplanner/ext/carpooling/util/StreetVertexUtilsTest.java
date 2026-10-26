@@ -16,6 +16,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.TemporaryVerticesContainer;
 import org.opentripplanner.street.model.StreetModelForTest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -137,9 +138,7 @@ class StreetVertexUtilsTest {
     assertNull(result);
   }
 
-  private static boolean hasCarPermittingStreetEdge(
-    Iterable<? extends org.opentripplanner.street.model.edge.Edge> edges
-  ) {
+  private static boolean hasCarPermittingStreetEdge(Iterable<? extends Edge> edges) {
     for (var e : edges) {
       if (e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR)) {
         return true;

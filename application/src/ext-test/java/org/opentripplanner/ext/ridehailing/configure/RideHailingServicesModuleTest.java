@@ -3,16 +3,16 @@ package org.opentripplanner.ext.ridehailing.configure;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.ridehailing.service.uber.UberService;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.standalone.config.RouterConfig;
+import tools.jackson.core.JacksonException;
 
 class RideHailingServicesModuleTest {
 
   @Test
-  void buildServices() throws JsonProcessingException {
+  void buildServices() throws JacksonException {
     var module = new RideHailingServicesModule();
     var json = """
     {

@@ -1,16 +1,14 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import gnu.trove.list.array.TIntArrayList;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -21,7 +19,6 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -31,6 +28,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.utils.collection.StreamUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,9 +79,11 @@ public class IslandPruningModule implements GraphBuilderModule {
       parameters.adaptivePruningDistance()
     );
 
-    pruneIslands(TraverseMode.BICYCLE);
-    pruneIslands(TraverseMode.WALK);
-    pruneIslands(TraverseMode.CAR);
+    // vertices are only removed at the very end, so the index can be shared by all modes
+    var vertexIndex = new VertexIndex(graph.getVertices());
+    pruneIslands(vertexIndex, TraverseMode.BICYCLE);
+    pruneIslands(vertexIndex, TraverseMode.WALK);
+    pruneIslands(vertexIndex, TraverseMode.CAR);
 
     // reconnect stops that got disconnected
     if (streetLinkerModule != null) {
@@ -95,26 +95,18 @@ public class IslandPruningModule implements GraphBuilderModule {
     // note that visibility vertices must not be removed from the graph
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
-    HashSet<AreaGroup> areas = new HashSet<>();
-    HashSet<Vertex> visibilityVertices = new HashSet<>();
-
-    for (AreaEdge ae : graph.findEdges(AreaEdge.class)) {
-      areas.add(ae.getArea());
-    }
-    for (AreaGroup a : areas) {
-      visibilityVertices.addAll(a.visibilityVertices());
-    }
+    Set<Vertex> visibilityVertices = StreamUtils.ofIterable(graph.findEdges(AreaEdge.class))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .flatMap(area -> area.visibilityVertices().stream())
+      .collect(Collectors.toSet());
 
     int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
-    for (Vertex v : graph.getVerticesOfType(StreetVertex.class)) {
+    for (Vertex v : graph.findVertices(StreetVertex.class)) {
       if (v.getDegreeOut() + v.getDegreeIn() == 0 && !visibilityVertices.contains(v)) {
-        toRemove.add(v);
+        graph.remove(v);
+        removed += 1;
       }
-    }
-    for (Vertex v : toRemove) {
-      graph.remove(v);
-      removed += 1;
     }
     LOG.info("Removed {} edgeless street vertices", removed);
 
@@ -126,6 +118,7 @@ public class IslandPruningModule implements GraphBuilderModule {
 
   /**
    * Island pruning strategy:
+   * <pre>
    * 1. Extract islands without using noThruTraffic edges at all.
    * 2. Then create expanded islands by accepting noThruTraffic edges, but do not jump across
    *    original islands! Note: these expanded islands can overlap.
@@ -134,45 +127,46 @@ public class IslandPruningModule implements GraphBuilderModule {
    * 4. Analyze small expanded islands (from step 2). Convert edges which are reachable only via
    *    noThruTraffic edges to noThruTraffic state. Remove traversal mode specific access from
    *    unreachable edges. Remove unconnected edges.
+   * </pre>
    */
-  private void pruneIslands(TraverseMode traverseMode) {
-    LOG.debug("nothru pruning");
-    Map<Vertex, Subgraph> subgraphs = new HashMap<>();
-    Map<Vertex, Subgraph> extgraphs = new HashMap<>();
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex = new ArrayMultimap<>();
+  private void pruneIslands(VertexIndex vertexIndex, TraverseMode traverseMode) {
     Map<Edge, Boolean> isolated = new HashMap<>();
     ArrayList<Subgraph> islands = new ArrayList<>();
     int count;
 
-    /* establish vertex neighbourhood without currently relevant noThruTrafficEdges */
-    collectNeighbourVertices(neighborsForVertex, traverseMode, false);
+    /* establish vertex neighbourhood, with and without currently relevant noThruTrafficEdges */
+    var thruEdges = new TIntArrayList();
+    var noThruEdges = new TIntArrayList();
+    collectNeighbourVertices(vertexIndex, traverseMode, thruEdges, noThruEdges);
+    int vertexCount = vertexIndex.size();
+    var thruNeighbours = new Adjacency(vertexCount, thruEdges);
+    var allNeighbours = new Adjacency(vertexCount, thruEdges, noThruEdges);
+
+    var search = new SubgraphSearch(vertexIndex);
 
     /* associate each connected vertex with a subgraph */
-    count = collectSubGraphs(neighborsForVertex, subgraphs, null, null);
+    int[] subgraphs = SubgraphSearch.newSubgraphMapping(vertexCount);
+    count = search.collectSubGraphs(thruNeighbours, subgraphs, null, null);
     LOG.info("Islands when {} noThruTraffic is considered: {}", traverseMode, count);
 
-    /* Expand vertex neighbourhood with relevant noThruTrafficEdges
-       Note that we can reuse the original neighbour map here
-       and simply process a smaller set of noThruTrafficEdges */
-    collectNeighbourVertices(neighborsForVertex, traverseMode, true);
-
     /* Next: generate subgraphs without considering access limitations */
-    count = collectSubGraphs(neighborsForVertex, extgraphs, null, islands);
+    int[] extgraphs = SubgraphSearch.newSubgraphMapping(vertexCount);
+    count = search.collectSubGraphs(allNeighbours, extgraphs, null, islands);
     LOG.info("Islands when {} noThruTraffic is ignored: {}", traverseMode, count);
 
     /* collect unreachable edges to a map */
     processIslands(islands, isolated, true, traverseMode);
 
-    extgraphs = new HashMap<>();
+    extgraphs = SubgraphSearch.newSubgraphMapping(vertexCount);
     islands = new ArrayList<>();
 
     /* Recompute expanded subgraphs by accepting noThruTraffic edges in graph expansion.
        However, expansion is not allowed to jump from an original island to another one
      */
-    collectSubGraphs(neighborsForVertex, extgraphs, subgraphs, islands);
+    search.collectSubGraphs(allNeighbours, extgraphs, subgraphs, islands);
 
     /* Next round: generate purely noThruTraffic islands if such ones exist */
-    count = collectSubGraphs(neighborsForVertex, extgraphs, null, islands);
+    count = search.collectSubGraphs(allNeighbours, extgraphs, null, islands);
 
     LOG.info("{} noThruTraffic island count: {}", traverseMode, count);
 
@@ -269,10 +263,16 @@ public class IslandPruningModule implements GraphBuilderModule {
     return stats.modifiedIslands();
   }
 
+  /**
+   * Collect the vertex pairs connected by an edge traversable with the given mode, as interleaved
+   * {@code (from, to)} {@link VertexIndex} ids. Street edges which are noThruTraffic for the mode
+   * go to {@code noThruEdges}, all others to {@code thruEdges}.
+   */
   private void collectNeighbourVertices(
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
+    VertexIndex vertexIndex,
     TraverseMode traverseMode,
-    boolean shouldMatchNoThruType
+    TIntArrayList thruEdges,
+    TIntArrayList noThruEdges
   ) {
     StreetMode streetMode = switch (traverseMode) {
       case WALK -> StreetMode.WALK;
@@ -283,68 +283,52 @@ public class IslandPruningModule implements GraphBuilderModule {
 
     StreetSearchRequest request = StreetSearchRequest.of().withMode(streetMode).build();
 
-    for (Vertex gv : graph.getVertices()) {
-      if (!(gv instanceof StreetVertex)) {
+    for (int from = 0; from < vertexIndex.size(); from++) {
+      if (!vertexIndex.isStreetVertex(from)) {
         continue;
       }
-      State s0 = new State(gv, request);
+      Vertex gv = vertexIndex.vertex(from);
+      State s0 = null;
       for (Edge e : gv.getOutgoing()) {
-        if (
-          e instanceof StreetEdge se && shouldMatchNoThruType != se.isNoThruTraffic(traverseMode)
-        ) {
-          continue;
-        }
-        State[] states = e.traverse(s0);
-        if (State.isEmpty(states)) {
-          continue;
-        }
-        for (State state : states) {
-          Vertex out = state.getVertex();
-          neighborsForVertex.put(gv, out);
-
+        if (e instanceof StreetEdge se) {
+          if (!canTraverse(se, traverseMode)) {
+            continue;
+          }
           // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-          neighborsForVertex.put(out, gv);
+          var edges = se.isNoThruTraffic(traverseMode) ? noThruEdges : thruEdges;
+          edges.add(from);
+          edges.add(vertexIndex.idOf(se.getToVertex()));
+        } else {
+          // Fall back to a real traversal for edge types (eg. escalators, pathways, vehicle
+          // rental/parking edges) that don't behave like a plain permission-gated street edge.
+          if (s0 == null) {
+            s0 = new State(gv, request);
+          }
+          State[] states = e.traverse(s0);
+          if (State.isEmpty(states)) {
+            continue;
+          }
+          for (State state : states) {
+            thruEdges.add(from);
+            thruEdges.add(vertexIndex.idOf(state.getVertex()));
+          }
         }
       }
     }
   }
 
-  private int collectSubGraphs(
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
-    // put new subgraphs here
-    Map<Vertex, Subgraph> newgraphs,
-    // optional isolation map from a previous round
-    Map<Vertex, Subgraph> subgraphs,
-    // final list of islands or null
-    ArrayList<Subgraph> islands
-  ) {
-    int count = 0;
-    for (Vertex gv : graph.getVertices()) {
-      if (!(gv instanceof StreetVertex)) {
-        continue;
-      }
-
-      if (subgraphs != null && !subgraphs.containsKey(gv)) {
-        // do not start new graph generation from non-classified vertex
-        continue;
-      }
-      // already processed
-      if (newgraphs.containsKey(gv)) {
-        continue;
-      }
-      if (!neighborsForVertex.containsKey(gv)) {
-        continue;
-      }
-      Subgraph subgraph = computeConnectedSubgraph(neighborsForVertex, gv, subgraphs, newgraphs);
-      for (var subnode : subgraph.streetVertices()) {
-        newgraphs.put(subnode, subgraph);
-      }
-      if (islands != null) {
-        islands.add(subgraph);
-      }
-      count++;
+  /**
+   * Cheap connectivity-only equivalent of {@link StreetEdge#traverse}, for the plain WALK/
+   * BICYCLE/CAR travel modes this module cares about: a permission (incl. barrier vertex) check,
+   * with the same "walk the bike if it can't be ridden" fallback {@link StreetEdge#traverse}
+   * applies. This avoids allocating a {@link State}/{@code StateEditor} and computing speed/cost,
+   * none of which this module reads - it only needs to know whether the edge can be used at all.
+   */
+  private static boolean canTraverse(StreetEdge edge, TraverseMode traverseMode) {
+    if (traverseMode == TraverseMode.BICYCLE) {
+      return edge.canTraverse(TraverseMode.BICYCLE) || edge.canTraverse(TraverseMode.WALK);
     }
-    return count;
+    return edge.canTraverse(traverseMode);
   }
 
   private boolean restrictOrRemove(
@@ -458,39 +442,5 @@ public class IslandPruningModule implements GraphBuilderModule {
     }
     issueStore.add(new GraphIsland(island, nothru, restricted, removed, traverseMode.name()));
     return true;
-  }
-
-  private Subgraph computeConnectedSubgraph(
-    ArrayMultimap<Vertex, Vertex> neighborsForVertex,
-    Vertex startVertex,
-    Map<Vertex, Subgraph> anchors,
-    Map<Vertex, Subgraph> alreadyMapped
-  ) {
-    Subgraph subgraph = new Subgraph();
-    Queue<Vertex> q = new ArrayDeque<>();
-    Subgraph anchor = null;
-
-    if (anchors != null) {
-      // anchor subgraph expansion to this subgraph
-      anchor = anchors.get(startVertex);
-    }
-    q.add(startVertex);
-    while (!q.isEmpty()) {
-      Vertex vertex = q.poll();
-      for (Vertex neighbor : neighborsForVertex.get(vertex)) {
-        if (!subgraph.contains(neighbor) && !alreadyMapped.containsKey(neighbor)) {
-          if (anchor != null) {
-            Subgraph compare = anchors.get(neighbor);
-            if (compare != null && compare != anchor) {
-              // do not enter a new island
-              continue;
-            }
-          }
-          subgraph.addVertex(neighbor);
-          q.add(neighbor);
-        }
-      }
-    }
-    return subgraph;
   }
 }

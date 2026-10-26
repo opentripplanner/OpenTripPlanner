@@ -6,8 +6,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * A generic key-value cache that supports storing and retrieving serialized data.
- * This class maintains an internal cache and tracks new entries separately.
+ * A generic key-value cache that supports storing and retrieving serialized data. This class
+ * maintains an internal cache and tracks new entries separately.
  *
  * @param <K> the type of the keys, which must be serializable
  * @param <V> the type of the values, which must be serializable

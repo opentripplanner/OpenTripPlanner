@@ -9,6 +9,7 @@ import org.opentripplanner.ext.carpooling.util.CarReachableVertexSnapper;
 import org.opentripplanner.routing.linking.VertexLinkerTestFactory;
 import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.service.TransitServiceResolver;
@@ -50,7 +51,10 @@ record CarpoolingServiceTestContext(
     var vertexCreationService = new VertexCreationService(
       VertexLinkerTestFactory.of(model.graph())
     );
-    TransitService transitService = new DefaultTransitService(model.transitRepository());
+    TransitService transitService = new DefaultTransitService(
+      model.transitRepository(),
+      DefaultTimetableRepository.scheduledOnly(model.scheduledTimetableData())
+    );
     var repository = new DefaultCarpoolingRepository();
     var carReachableVertexSnapper = CarReachableVertexSnapper.createDefault();
     var resolver = new CarpoolTripVertexResolver(vertexCreationService, carReachableVertexSnapper);

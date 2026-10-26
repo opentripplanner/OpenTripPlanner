@@ -23,10 +23,10 @@ import org.opentripplanner.transit.model.timetable.Direction;
  * quickly. For example, no alerts on board stop A, no alerts on route 1 ridden, no alerts on alight
  * stop B, no alerts on route 2 ridden, yes one alert found on alight stop C.
  *
- * The fact that alerts are relatively sparse (at the scale of the entire transportation system)
- * is central to this implementation. Adding a list of alerts to every element in the system would
- * mean storing large amounts of null or empty list references. Instead, alerts are looked up in
- * maps allowing them to be attached to any object with minimal space overhead, but requiring some
+ * The fact that alerts are relatively sparse (at the scale of the entire transportation system) is
+ * central to this implementation. Adding a list of alerts to every element in the system would mean
+ * storing large amounts of null or empty list references. Instead, alerts are looked up in maps
+ * allowing them to be attached to any object with minimal space overhead, but requiring some
  * careful indexing to ensure their presence or absence on each object can be determined quickly.
  */
 public interface TransitAlertService {

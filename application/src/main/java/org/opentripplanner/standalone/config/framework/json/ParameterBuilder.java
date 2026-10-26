@@ -15,7 +15,6 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.ST
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_PENALTY;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_ZONE;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.DateTimeException;
@@ -43,11 +42,13 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.LocalDateUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.exc.JsonNodeException;
 
 /**
  * TODO RT_AB: add Javadoc to clarify whether this is building a declarative representation of the
- *   parameter, or building a concrete key-value pair for a parameter in a config file being read
- *   at server startup, or both.
+ * parameter, or building a concrete key-value pair for a parameter in a config file being read at
+ * server startup, or both.
  */
 public class ParameterBuilder {
 
@@ -61,16 +62,16 @@ public class ParameterBuilder {
   private final NodeInfoBuilder info = NodeInfo.of();
 
   /**
-   * The parameter "under construction" belong to the {@code target} node-adaptor. The parameter
-   * is stored on the target when it is build.
+   * The parameter "under construction" belong to the {@code target} node-adaptor. The parameter is
+   * stored on the target when it is build.
    */
   private final NodeAdapter target;
 
   /**
-   * Sometimes we want to use a different default value in the documentation than in the
-   * returned parameters. This is the case when the default value is derived from other
-   * parameters, and the default value is just a fallback. In these cases we temporarily need to
-   * keep the doc-default-value.
+   * Sometimes we want to use a different default value in the documentation than in the returned
+   * parameters. This is the case when the default value is derived from other parameters, and the
+   * default value is just a fallback. In these cases we temporarily need to keep the
+   * doc-default-value.
    */
   private Object docDefaultValue = UNDEFINED;
 
@@ -120,7 +121,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public Boolean asBoolean() {
-    return ofRequired(BOOLEAN).asBoolean();
+    return ofRequired(BOOLEAN, JsonNode::asBoolean);
   }
 
   public Boolean asBoolean(boolean defaultValue) {
@@ -129,7 +130,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public double asDouble() {
-    return ofRequired(DOUBLE).asDouble();
+    return ofRequired(DOUBLE, JsonNode::asDouble);
   }
 
   public double asDouble(double defaultValue) {
@@ -146,7 +147,7 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public int asInt() {
-    return ofRequired(INTEGER).asInt();
+    return ofRequired(INTEGER, JsonNode::asInt);
   }
 
   public int asInt(int defaultValue) {
@@ -154,7 +155,7 @@ public class ParameterBuilder {
   }
 
   public Gram asGram(Gram defaultValue) {
-    return Gram.of(ofOptional(GRAM, defaultValue.toString(), JsonNode::asText));
+    return Gram.of(ofOptional(GRAM, defaultValue.toString(), JsonNode::asString));
   }
 
   public long asLong(long defaultValue) {
@@ -163,11 +164,11 @@ public class ParameterBuilder {
 
   /** @throws OtpAppException if parameter is missing. */
   public String asString() {
-    return ofRequired(STRING).asText();
+    return ofRequired(STRING, JsonNode::asString);
   }
 
   public String asString(String defaultValue) {
-    return ofOptional(STRING, defaultValue, JsonNode::asText);
+    return ofOptional(STRING, defaultValue, JsonNode::asString);
   }
 
   public Set<String> asStringSet(Collection<String> defaultValue) {
@@ -175,7 +176,7 @@ public class ParameterBuilder {
       defaultValue instanceof List<String>
         ? (List<String>) defaultValue
         : List.copyOf(defaultValue);
-    return Set.copyOf(ofArrayAsList(STRING, dft, JsonNode::asText));
+    return Set.copyOf(ofArrayAsList(STRING, dft, JsonNode::asString));
   }
 
   public List<String> asStringList(Collection<String> defaultValue) {
@@ -183,11 +184,11 @@ public class ParameterBuilder {
       defaultValue instanceof List<String>
         ? (List<String>) defaultValue
         : List.copyOf(defaultValue);
-    return ofArrayAsList(STRING, dft, JsonNode::asText);
+    return ofArrayAsList(STRING, dft, JsonNode::asString);
   }
 
   public Map<String, String> asStringMap() {
-    return ofOptionalMap(STRING, JsonNode::asText);
+    return ofOptionalMap(STRING, JsonNode::asString);
   }
 
   public NodeAdapter asObject() {
@@ -196,8 +197,8 @@ public class ParameterBuilder {
   }
 
   /**
-   * Return a list with objects of type {@code T}. The given {@code mapper} is used to map
-   * the nested child JSON nodes into elements.
+   * Return a list with objects of type {@code T}. The given {@code mapper} is used to map the
+   * nested child JSON nodes into elements.
    * <p>
    * An empty list is returned if there is no elements in the list or the list is not present.
    */
@@ -212,16 +213,15 @@ public class ParameterBuilder {
   }
 
   /**
-   * @deprecated Avoid using required enum types, when adding/removing new Enum values
-   *             you potentially break forward/backward compatibility. If the new enum
-   *             value is used in the config, an earlier version of OTP can not read
-   *             the required value.
+   * @deprecated Avoid using required enum types, when adding/removing new Enum values you
+   *             potentially break forward/backward compatibility. If the new enum value is used in
+   *             the config, an earlier version of OTP can not read the required value.
    */
   @Deprecated
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
     info.withRequired().withEnum(enumType);
     // throws exception if enum value is missing
-    return parseRequiredEnum(build().asText(), enumType);
+    return parseRequiredEnum(convert(build(), JsonNode::asString), enumType);
   }
 
   /** Get optional enum value. Parser is not case sensitive. */
@@ -235,15 +235,16 @@ public class ParameterBuilder {
     if (node.isMissingNode()) {
       return defaultValue;
     }
-    return parseOptionalEnum(node.asText(), (Class<T>) defaultValue.getClass()).orElse(
-      defaultValue
-    );
+    return parseOptionalEnum(
+      convert(node, JsonNode::asString),
+      (Class<T>) defaultValue.getClass()
+    ).orElse(defaultValue);
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     info.withOptional().withEnumSet(enumClass);
     List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
-      parseOptionalEnum(it.asText(), enumClass)
+      parseOptionalEnum(it.asString(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -255,7 +256,7 @@ public class ParameterBuilder {
       defaultValues instanceof List<T> ? (List<T>) defaultValues : List.copyOf(defaultValues);
     info.withOptional(dft.toString()).withEnumSet(enumClass);
     List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
-      parseOptionalEnum(it.asText(), enumClass)
+      parseOptionalEnum(it.asString(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -273,8 +274,8 @@ public class ParameterBuilder {
    * }
    * </pre>
    *
-   * @param <E>  The enum type
-   * @param <T>  The map value type.
+   * @param <E> The enum type
+   * @param <T> The map value type.
    * @return a map of listed enum values as keys with value, or an empty map if not set.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(Class<E> enumType, Class<T> elementJavaType) {
@@ -301,11 +302,11 @@ public class ParameterBuilder {
   }
 
   /**
-   * Add a map of a custom type with an enum as the key. You must provide a mapper for the
-   * custom type.
+   * Add a map of a custom type with an enum as the key. You must provide a mapper for the custom
+   * type.
    *
-   * @param <E>  The enum type
-   * @param <T>  The map value type.
+   * @param <E> The enum type
+   * @param <T> The map value type.
    * @return a map of T by enum values as keys, or an empty map if not set.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(
@@ -360,9 +361,9 @@ public class ParameterBuilder {
 
   /**
    * This method provide support for custom types. If the type is used in one place, then this
-   * method provide an easy way to support it. Be aware that custom types are not documented in
-   * the type section in the configuration documents. Also, providing user-friendly messages
-   * is left to the caller.
+   * method provide an easy way to support it. Be aware that custom types are not documented in the
+   * type section in the configuration documents. Also, providing user-friendly messages is left to
+   * the caller.
    */
   public <T> T asCustomStringType(
     T defaultValue,
@@ -372,7 +373,7 @@ public class ParameterBuilder {
     return ofOptional(
       STRING,
       defaultValue,
-      node -> mapper.apply(node.asText()),
+      node -> mapper.apply(node.asString()),
       it -> defaultValueAsString
     );
   }
@@ -380,31 +381,31 @@ public class ParameterBuilder {
   /* Java util/time types */
 
   /**
-   * Parses the sting using {@link LocalDateUtils#asRelativeLocalDate(String, LocalDate)} and
-   * return a new (relative) LocalDate.
+   * Parses the sting using {@link LocalDateUtils#asRelativeLocalDate(String, LocalDate)} and return
+   * a new (relative) LocalDate.
    */
   public LocalDate asDateOrRelativePeriod(String defaultValue, ZoneId timeZone) {
     return ofOptionalString(DURATION, defaultValue, s -> parseRelativeLocalDate(s, timeZone));
   }
 
   public Duration asDuration(Duration defaultValue) {
-    return ofOptional(DURATION, defaultValue, node -> parseDuration(node.asText()));
+    return ofOptional(DURATION, defaultValue, node -> parseDuration(node.asString()));
   }
 
   public Duration asDuration() {
-    return ofRequired(DURATION, node -> parseDuration(node.asText()));
+    return ofRequired(DURATION, node -> parseDuration(node.asString()));
   }
 
   /**
-   * Accepts both a string-formatted duration or a number of seconds as a number.
-   * In the documentation it will claim that it only accepts durations as the number is only for
-   * backwards compatibility.
+   * Accepts both a string-formatted duration or a number of seconds as a number. In the
+   * documentation it will claim that it only accepts durations as the number is only for backwards
+   * compatibility.
    */
   public Duration asDurationOrSeconds(Duration defaultValue) {
     info.withType(DURATION);
     setInfoOptional(defaultValue.toString());
     var node = build();
-    if (node.isTextual()) {
+    if (node.isString()) {
       return asDuration(defaultValue);
     } else {
       return Duration.ofSeconds((long) asDouble(defaultValue.toSeconds()));
@@ -412,11 +413,11 @@ public class ParameterBuilder {
   }
 
   public List<Duration> asDurations(List<Duration> defaultValues) {
-    return ofArrayAsList(DURATION, defaultValues, node -> parseDuration(node.asText()));
+    return ofArrayAsList(DURATION, defaultValues, node -> parseDuration(node.asString()));
   }
 
   public Locale asLocale(Locale defaultValue) {
-    return ofOptional(LOCALE, defaultValue, jsonNode -> parseLocale(jsonNode.asText()));
+    return ofOptional(LOCALE, defaultValue, jsonNode -> parseLocale(jsonNode.asString()));
   }
 
   public Pattern asPattern(String defaultValue) {
@@ -425,7 +426,7 @@ public class ParameterBuilder {
 
   /** Required URI, OTP support a limited set of URIs. */
   public URI asUri() {
-    return ofRequired(ConfigType.URI, n -> parseUri(n.asText()));
+    return ofRequired(ConfigType.URI, n -> parseUri(n.asString()));
   }
 
   public URI asUri(String defaultValue) {
@@ -433,33 +434,35 @@ public class ParameterBuilder {
   }
 
   public List<URI> asUris() {
-    return ofArrayAsList(ConfigType.URI, List.of(), n -> parseUri(n.asText()));
+    return ofArrayAsList(ConfigType.URI, List.of(), n -> parseUri(n.asString()));
   }
 
   public ZoneId asZoneId(ZoneId defaultValue) {
-    return ofOptional(TIME_ZONE, defaultValue, n -> parseZoneId(n.asText()));
+    return ofOptional(TIME_ZONE, defaultValue, n -> parseZoneId(n.asString()));
   }
 
   /* Custom OTP types */
 
   public FeedScopedId asFeedScopedId(FeedScopedId defaultValue) {
-    return exist() ? FeedScopedId.parseStrict(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
+    return exist()
+      ? FeedScopedId.parseStrict(ofType(FEED_SCOPED_ID, JsonNode::asString))
+      : defaultValue;
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
     return buildAndListSimpleArrayElements(defaultValues, it ->
-      FeedScopedId.parseStrict(it.asText())
+      FeedScopedId.parseStrict(it.asString())
     );
   }
 
   public CostLinearFunction asCostLinearFunction(CostLinearFunction defaultValue) {
-    return ofOptional(COST_LINEAR_FUNCTION, defaultValue, n -> CostLinearFunction.of(n.asText()));
+    return ofOptional(COST_LINEAR_FUNCTION, defaultValue, n -> CostLinearFunction.of(n.asString()));
   }
 
   public TimePenalty asTimePenalty(TimePenalty defaultValue) {
-    return ofOptional(TIME_PENALTY, defaultValue, n -> TimePenalty.of(n.asText()));
+    return ofOptional(TIME_PENALTY, defaultValue, n -> TimePenalty.of(n.asString()));
   }
 
   /* private method */
@@ -472,19 +475,9 @@ public class ParameterBuilder {
     return target.exist(paramName());
   }
 
-  private JsonNode ofType(ConfigType type) {
-    info.withType(type);
-    return build();
-  }
-
   private <T> T ofType(ConfigType type, Function<JsonNode, T> body) {
     info.withType(type);
-    return body.apply(build());
-  }
-
-  private JsonNode ofRequired(ConfigType type) {
-    info.withRequired();
-    return ofType(type);
+    return convert(build(), body);
   }
 
   private <T> T ofRequired(ConfigType type, Function<JsonNode, T> body) {
@@ -502,7 +495,7 @@ public class ParameterBuilder {
     info.withType(type);
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
-    return exist() ? body.apply(node) : defaultValue;
+    return exist() ? convert(node, body) : defaultValue;
   }
 
   private <T> T ofOptional(ConfigType type, T defaultValue, Function<JsonNode, T> body) {
@@ -519,7 +512,7 @@ public class ParameterBuilder {
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
     return exist()
-      ? mapper.apply(node.asText())
+      ? mapper.apply(convert(node, JsonNode::asString))
       : defaultValueAsString == null
         ? null
         : mapper.apply(defaultValueAsString);
@@ -548,7 +541,7 @@ public class ParameterBuilder {
     Iterator<String> names = mapNode.parameterNames();
     while (names.hasNext()) {
       var parameterName = names.next();
-      result.put(parameterName, mapper.apply(mapNode.rawNode(parameterName)));
+      result.put(parameterName, convert(mapNode.rawNode(parameterName), mapper));
     }
     return result;
   }
@@ -581,7 +574,7 @@ public class ParameterBuilder {
     }
     List<T> values = new ArrayList<>();
     for (JsonNode node : array) {
-      values.add(mapper.apply(node));
+      values.add(convert(node, mapper));
     }
     return values;
   }
@@ -637,13 +630,26 @@ public class ParameterBuilder {
 
   /* parse/map from string to a specific type, handle parse error */
 
+  /**
+   * Apply the given {@code body} to the node. Jackson throws a {@link JsonNodeException} if the
+   * node can not be converted to the requested type, for example if {@code asInt()} is called on a
+   * text node. This is mapped to an {@link OtpAppException} with a user-friendly message.
+   */
+  private <T> T convert(JsonNode node, Function<JsonNode, T> body) {
+    try {
+      return body.apply(node);
+    } catch (JsonNodeException e) {
+      throw error("The parameter value '%s' has the wrong type.".formatted(node), e);
+    }
+  }
+
   private <T> T parseConfigType(ConfigType elementType, JsonNode child) {
     try {
       return elementType.valueOf(child);
     } catch (Exception e) {
       throw error(
         "The parameter value '%s' is not of type %s.".formatted(
-          child.asText(),
+          child.asString(),
           elementType.docName()
         ),
         e
@@ -694,8 +700,8 @@ public class ParameterBuilder {
 
   /**
    * Somehow Java do not provide a parse method for parsing Locale on the standard form
-   * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that.
-   * The separator used should be underscore({@code '_'}), space({@code ' '}) or hyphen({@code '-'}).
+   * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that. The
+   * separator used should be underscore({@code '_'}), space({@code ' '}) or hyphen({@code '-'}).
    */
   private Locale parseLocale(String text) {
     String[] parts = text.split("[-_ ]+");

@@ -13,8 +13,8 @@ import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
 /**
- * The given Raptor module-test configuration should result in the given expected path string,
- * when calling Raptor. Se one of the module test on how to use this.
+ * The given Raptor module-test configuration should result in the given expected path string, when
+ * calling Raptor. Se one of the module test on how to use this.
  */
 public record RaptorModuleTestCase(
   Consumer<RaptorRequestBuilder<TestTripSchedule>> requestAdditions,

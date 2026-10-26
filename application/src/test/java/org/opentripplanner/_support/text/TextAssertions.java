@@ -3,8 +3,7 @@ package org.opentripplanner._support.text;
 import org.junit.jupiter.api.Assertions;
 
 /**
- * This class contains test assert methods not supported by the standard JUnit
- * framework.
+ * This class contains test assert methods not supported by the standard JUnit framework.
  */
 public final class TextAssertions {
 
@@ -12,9 +11,9 @@ public final class TextAssertions {
   private static final int END_OF_TEXT = -111;
 
   /**
-
-   * Assert to texts are equals line by line. Empty lines and white-space in the start and end of
-   * a line is ignored.
+   *
+   * Assert to texts are equals line by line. Empty lines and white-space in the start and end of a
+   * line is ignored.
    */
   public static void assertLinesEquals(String expected, String actual) {
     var expLines = expected.split(LINE_DELIMITERS);

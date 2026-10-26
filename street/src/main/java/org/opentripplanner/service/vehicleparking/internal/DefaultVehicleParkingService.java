@@ -16,7 +16,8 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
  * held here are immutable and only updated in atomic operations that replace the existing
  * collection with a new copy.
  *
- * <P>THIS CLASS IS THREAD-SAFE<p>
+ * <P>THIS CLASS IS THREAD-SAFE
+ * <p>
  */
 @Singleton
 public class DefaultVehicleParkingService implements Serializable, VehicleParkingService {

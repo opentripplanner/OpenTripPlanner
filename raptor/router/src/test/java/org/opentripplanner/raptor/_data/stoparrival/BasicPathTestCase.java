@@ -56,8 +56,8 @@ import org.opentripplanner.raptor.spi.RaptorTransfer;
  *   Transfers: 2
  *   Generalized-cost: $8154
  * </pre>
- * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and ends at
- * 12:00, total 2 hours.
+ * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 10:00 and
+ * ends at 12:00, total 2 hours.
  */
 public class BasicPathTestCase implements RaptorTestConstants {
 
@@ -314,6 +314,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
+      STOP_C,
       TX_END,
       transfer.c1(),
       transfer,

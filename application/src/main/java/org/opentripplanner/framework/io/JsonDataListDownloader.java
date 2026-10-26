@@ -1,17 +1,19 @@
 package org.opentripplanner.framework.io;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class JsonDataListDownloader<T> {
 
@@ -56,7 +58,7 @@ public class JsonDataListDownloader<T> {
           return parseJSON(response.body());
         } catch (IllegalArgumentException e) {
           LOG.warn("Error parsing feed from {}", url, e);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
           LOG.warn("Error parsing feed from {} (bad JSON of some sort)", url, e);
         } catch (IOException e) {
           LOG.warn("Error reading feed from {}", url, e);
@@ -69,8 +71,8 @@ public class JsonDataListDownloader<T> {
     }
   }
 
-  private static String convertStreamToString(java.io.InputStream is) {
-    try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
+  private static String convertStreamToString(InputStream is) {
+    try (Scanner scanner = new Scanner(is).useDelimiter("\\A")) {
       return scanner.hasNext() ? scanner.next() : "";
     }
   }
@@ -80,7 +82,7 @@ public class JsonDataListDownloader<T> {
 
     String rentalString = convertStreamToString(dataStream);
 
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new JsonMapper();
     JsonNode rootNode = mapper.readTree(rentalString);
 
     if (!jsonParsePath.isEmpty()) {

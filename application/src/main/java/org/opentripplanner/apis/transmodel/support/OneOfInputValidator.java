@@ -20,8 +20,8 @@ public class OneOfInputValidator {
    * Validate that the {@code parent} {@code map} only has one entry.
    *
    * @param map           The input to validate.
-   * @param inputTypeName The name of the type annotated with @oneOf. The name is used in
-   *                      the error message only, in case the validation fails.
+   * @param inputTypeName The name of the type annotated with @oneOf. The name is used in the error
+   *                      message only, in case the validation fails.
    * @param definedFields The name of the fields the @oneOf directive apply to.
    *
    * @return the field with a value set.

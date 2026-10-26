@@ -101,7 +101,7 @@ class RealTimeTripStateTypeTest {
   }
 
   @SuppressWarnings("unchecked")
-  private static java.util.Map<String, Object> execute(TransmodelRealTimeTripStateModel model) {
+  private static Map<String, Object> execute(TransmodelRealTimeTripStateModel model) {
     var result = GRAPHQL.execute(
       ExecutionInput.newExecutionInput()
         .query(
@@ -111,8 +111,8 @@ class RealTimeTripStateTypeTest {
         .build()
     );
     assert result.getErrors().isEmpty() : "GraphQL errors: " + result.getErrors();
-    java.util.Map<String, Object> data = result.getData();
-    return (java.util.Map<String, Object>) data.get("state");
+    Map<String, Object> data = result.getData();
+    return (Map<String, Object>) data.get("state");
   }
 
   private static GraphQL buildGraphQL() {

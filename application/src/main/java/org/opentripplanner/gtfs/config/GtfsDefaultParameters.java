@@ -5,38 +5,43 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * Default GTFS feed configuration - can be set for all feeds in the
- * build-config. The {@link GtfsFeedParameters} contain the feed specific
- * extensions - the extra info you must specify for each feed.
+ * Default GTFS feed configuration - can be set for all feeds in the build-config. The
+ * {@link GtfsFeedParameters} contain the feed specific extensions - the extra info you must specify
+ * for each feed.
  */
 public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 
   private static final boolean DEFAULT_DISCARD_MIN_TRANSFER_TIMES = false;
   private static final boolean DEFAULT_BLOCK_BASED_INTERLINING = true;
   private static final int DEFAULT_MAX_INTERLINE_DISTANCE = 200;
+  private static final boolean DEFAULT_IS_TAXI_DATA = false;
 
   public static final GtfsDefaultParameters DEFAULT = new GtfsDefaultParameters(
     StopTransferPriority.defaultValue(),
     DEFAULT_DISCARD_MIN_TRANSFER_TIMES,
     DEFAULT_BLOCK_BASED_INTERLINING,
-    DEFAULT_MAX_INTERLINE_DISTANCE
+    DEFAULT_MAX_INTERLINE_DISTANCE,
+    DEFAULT_IS_TAXI_DATA
   );
 
   private final StopTransferPriority stationTransferPreference;
   private final boolean discardMinTransferTimes;
   private final boolean blockBasedInterlining;
   private final int maxInterlineDistance;
+  private final boolean isTaxiData;
 
   protected GtfsDefaultParameters(
     StopTransferPriority stationTransferPreference,
     boolean discardMinTransferTimes,
     boolean blockBasedInterlining,
-    int maxInterlineDistance
+    int maxInterlineDistance,
+    boolean isTaxiData
   ) {
     this.stationTransferPreference = Objects.requireNonNull(stationTransferPreference);
     this.discardMinTransferTimes = discardMinTransferTimes;
     this.blockBasedInterlining = blockBasedInterlining;
     this.maxInterlineDistance = maxInterlineDistance;
+    this.isTaxiData = isTaxiData;
   }
 
   GtfsDefaultParameters(GtfsDefaultParametersBuilder builder) {
@@ -44,7 +49,8 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
       builder.stationTransferPreference(),
       builder.discardMinTransferTimes(),
       builder.blockBasedInterlining(),
-      builder.maxInterlineDistance()
+      builder.maxInterlineDistance(),
+      builder.isTaxiData()
     );
   }
 
@@ -73,6 +79,10 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
 
   public int maxInterlineDistance() {
     return maxInterlineDistance;
+  }
+
+  public boolean isTaxiData() {
+    return isTaxiData;
   }
 
   @Override
@@ -107,6 +117,7 @@ public sealed class GtfsDefaultParameters permits GtfsFeedParameters {
         DEFAULT_DISCARD_MIN_TRANSFER_TIMES
       )
       .addBool("blockBasedInterlining", blockBasedInterlining, DEFAULT_BLOCK_BASED_INTERLINING)
-      .addNum("maxInterlineDistance", maxInterlineDistance, DEFAULT_MAX_INTERLINE_DISTANCE);
+      .addNum("maxInterlineDistance", maxInterlineDistance, DEFAULT_MAX_INTERLINE_DISTANCE)
+      .addBool("isTaxiData", isTaxiData, DEFAULT_IS_TAXI_DATA);
   }
 }

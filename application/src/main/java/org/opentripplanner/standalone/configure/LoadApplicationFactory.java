@@ -14,6 +14,8 @@ import org.opentripplanner.ext.empiricaldelay.configure.EmpiricalDelayRepository
 import org.opentripplanner.ext.fares.configure.FareModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationRepositoryModule;
+import org.opentripplanner.ext.taxi.TaxiRepository;
+import org.opentripplanner.ext.taxi.configure.TaxiRepositoryModule;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -33,6 +35,8 @@ import org.opentripplanner.street.configure.StreetRepositoryModule;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.configure.TransferRepositoryModule;
+import org.opentripplanner.transit.configure.TimetableDataImportModule;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
 
 /**
@@ -49,10 +53,12 @@ import org.opentripplanner.transit.service.TransitRepository;
     StreetDetailsRepositoryModule.class,
     WorldEnvelopeRepositoryModule.class,
     EmissionRepositoryModule.class,
+    TaxiRepositoryModule.class,
     EmpiricalDelayRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
     StreetRepositoryModule.class,
     TransferRepositoryModule.class,
+    TimetableDataImportModule.class,
     VehicleParkingRepositoryModule.class,
     FareModule.class,
     DeduplicatorServiceModule.class,
@@ -76,6 +82,9 @@ public interface LoadApplicationFactory {
   TransitRepository emptyTransitRepository();
 
   @Singleton
+  TimetableDataImport emptyTimetableDataImport();
+
+  @Singleton
   TransferRepository emptyTransferRepository();
 
   @Singleton
@@ -86,6 +95,9 @@ public interface LoadApplicationFactory {
 
   @Singleton
   EmissionRepository emptyEmissionsDataModel();
+
+  @Singleton
+  TaxiRepository emptyTaxiRepository();
 
   @Singleton
   @Nullable

@@ -9,15 +9,18 @@ public sealed interface CallScheduledTime
 {
   record ArrivalDepartureTime(
     @Nullable OffsetDateTime arrival,
-    @Nullable OffsetDateTime departure
+    @Nullable OffsetDateTime departure,
+    boolean timePoint
   ) implements CallScheduledTime {
     public ArrivalDepartureTime(
       @Nullable ZonedDateTime arrival,
-      @Nullable ZonedDateTime departure
+      @Nullable ZonedDateTime departure,
+      boolean timePoint
     ) {
       this(
         arrival == null ? null : arrival.toOffsetDateTime(),
-        departure == null ? null : departure.toOffsetDateTime()
+        departure == null ? null : departure.toOffsetDateTime(),
+        timePoint
       );
     }
   }

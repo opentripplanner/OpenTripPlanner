@@ -8,9 +8,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A filter for using select/not semantics.
  * <p>
- * Select: an item must match at least one select criterion (OR between selects).
- * Not: an item is excluded if it matches any not criterion.
- * A filter with no select and no not is not allowed.
+ * Select: an item must match at least one select criterion (OR between selects). Not: an item is
+ * excluded if it matches any not criterion. A filter with no select and no not is not allowed.
  *
  * @param <T> The selector type
  */

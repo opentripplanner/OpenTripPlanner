@@ -24,6 +24,7 @@ import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.stoparrival.AccessAndEgressWithOpeningHoursPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestCostCalculator;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
@@ -71,6 +72,18 @@ public class PathMapperTest implements RaptorTestConstants {
 
     // Then: verify path - should be the same for reverse and forward mapper
     assertPath(path);
+
+    // The path string alone does not catch a wrong TransferPathLeg#toStop(): it is rendered from the next leg's own
+    // stop, not from the transfer leg itself - assert the leg directly.
+    // See https://github.com/opentripplanner/OpenTripPlanner/issues/8047.
+    var transferLeg = path
+      .legStream()
+      .filter(PathLeg::isTransferLeg)
+      .findFirst()
+      .orElseThrow()
+      .asTransferLeg();
+    assertEquals(STOP_B, transferLeg.fromStop());
+    assertEquals(STOP_C, transferLeg.toStop());
   }
 
   /* FLEX CASES - FORWARD SEARCH */

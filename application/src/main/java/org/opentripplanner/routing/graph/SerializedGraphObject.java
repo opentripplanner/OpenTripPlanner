@@ -20,6 +20,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
@@ -38,6 +39,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transfer.regular.TransferRepository;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -50,13 +52,13 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
  * <p>
- * The Graph object does not contain a collection of edges. The set of edges is generated on demand
- * from the vertices. However, when serializing, we intentionally do not serialize the vertices'
- * edge lists to prevent excessive recursion. So we need to save the edges along with the graph. We
- * used to make two serialization calls, one for the graph and one for the edges. But we need the
- * serializer to know that vertices referenced by the edges are the same vertices stored in the
- * graph itself. The easiest way to do this is to make only one serialization call, serializing a
- * single object that contains both the graph and the edge collection.
+ * The Graph object does not contain a collection of edges. The set of edges is generated on
+ * demand from the vertices. However, when serializing, we intentionally do not serialize the
+ * vertices' edge lists to prevent excessive recursion. So we need to save the edges along with the
+ * graph. We used to make two serialization calls, one for the graph and one for the edges. But we
+ * need the serializer to know that vertices referenced by the edges are the same vertices stored in
+ * the graph itself. The easiest way to do this is to make only one serialization call, serializing
+ * a single object that contains both the graph and the edge collection.
  */
 public class SerializedGraphObject implements Serializable {
 
@@ -69,6 +71,7 @@ public class SerializedGraphObject implements Serializable {
 
   public final StreetDetailsRepository streetDetailsRepository;
   public final TransitRepository transitRepository;
+  public final TimetableDataImport timetableDataImport;
   public final TransferRepository transferRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
@@ -83,8 +86,8 @@ public class SerializedGraphObject implements Serializable {
   public final RouterConfig routerConfig;
 
   /**
-   * All submodes are cached in a static collection inside SubMode,
-   * hence we need to serialize that as well
+   * All submodes are cached in a static collection inside SubMode, hence we need to serialize that
+   * as well
    */
   private final List<SubMode> allTransitSubModes;
 
@@ -92,6 +95,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
   public final @Nullable EmissionRepository emissionRepository;
+  public final @Nullable TaxiRepository taxiRepository;
   public final @Nullable EmpiricalDelayRepository empiricalDelayRepository;
   public final FareServiceFactory fareServiceFactory;
   public final StreetRepository streetRepository;
@@ -103,6 +107,7 @@ public class SerializedGraphObject implements Serializable {
     StreetDetailsRepository streetDetailsRepository,
     StreetRepository streetRepository,
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -110,6 +115,7 @@ public class SerializedGraphObject implements Serializable {
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
+    @Nullable TaxiRepository taxiRepository,
     @Nullable EmpiricalDelayRepository empiricalDelayRepository,
     StopConsolidationRepository stopConsolidationRepository,
     FareServiceFactory fareServiceFactory
@@ -120,6 +126,7 @@ public class SerializedGraphObject implements Serializable {
     this.streetDetailsRepository = streetDetailsRepository;
     this.streetRepository = streetRepository;
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
     this.transferRepository = transferRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;
@@ -127,6 +134,7 @@ public class SerializedGraphObject implements Serializable {
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
     this.emissionRepository = emissionRepository;
+    this.taxiRepository = taxiRepository;
     this.empiricalDelayRepository = empiricalDelayRepository;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
@@ -215,7 +223,7 @@ public class SerializedGraphObject implements Serializable {
       serObj.reconstructEdgeLists();
       serObj.transitRepository.getSiteRepository().reindexAfterDeserialization();
       serObj.transitRepository.index();
-      logSerializationCompleteStatus(serObj.graph, serObj.transitRepository);
+      serObj.logSerializationCompleteStatus();
       return serObj;
     } catch (IOException e) {
       LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -286,18 +294,15 @@ public class SerializedGraphObject implements Serializable {
     // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
   }
 
-  private static void logSerializationCompleteStatus(
-    Graph graph,
-    TransitRepository transitRepository
-  ) {
+  private void logSerializationCompleteStatus() {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitRepository.getSiteRepository().stopIndexSize());
     var nTransfers = f.formatNumber(
       transitRepository.getConstrainedTransferService().listAll().size()
     );
-    var nPatterns = f.formatNumber(transitRepository.getAllTripPatterns().size());
+    var nPatterns = f.formatNumber(timetableDataImport.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
-    var nEdges = f.formatNumber(graph.countEdges());
+    var nEdges = f.formatNumber(edges.size());
 
     LOG.info("Graph loaded.   |V|={} |E|={}", nVertices, nEdges);
     LOG.info(

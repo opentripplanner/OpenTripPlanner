@@ -13,8 +13,6 @@ import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.TripAlteration;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 class TripAndServiceDateResolverTest {
 
@@ -44,17 +42,13 @@ class TripAndServiceDateResolverTest {
   @Test
   void resolvesByTripOnServiceDateId() {
     var env = ENV_BUILDER.addTrip(
-      TripInput.of("T1").addStop(STOP_A, "10:00").addStop(STOP_B, "10:05")
+      TripInput.of("T1")
+        .addStop(STOP_A, "10:00")
+        .addStop(STOP_B, "10:05")
+        .withWithTripOnServiceDate("TOSD-1")
     ).build();
 
     var trip = env.tripData("T1").trip();
-    var tripOnServiceDate = TripOnServiceDate.of(id("TOSD-1"))
-      .withTrip(trip)
-      .withServiceDate(SERVICE_DATE)
-      .withTripAlteration(TripAlteration.PLANNED)
-      .build();
-    env.transitRepository().addTripOnServiceDate(tripOnServiceDate);
-    env.transitRepository().index();
 
     var reference = TripOnDateReference.ofTripOnServiceDateId(id("TOSD-1"));
     var result = new TripAndServiceDateResolver(env.transitService()).resolve(reference);
