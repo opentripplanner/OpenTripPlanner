@@ -47,7 +47,7 @@ public class RegularTransferRepositoryLifecycle<
   private final RaptorTransfersFactory<P, R> raptorTransfersFactory;
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
-  private final List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup;
+  private final List<WarmupEntry> warmup;
   private final RegularTransferCacheStatistics statistics;
 
   /**
@@ -112,7 +112,7 @@ public class RegularTransferRepositoryLifecycle<
     TransferRequestMapper<R> mapper,
     Map<AbstractUserPreferences<?>, R> profileRequests,
     ProfileMatcher matcher,
-    List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup,
+    List<WarmupEntry> warmup,
     int numberOfStops,
     boolean collectCacheStatistics
   ) {
@@ -145,24 +145,16 @@ public class RegularTransferRepositoryLifecycle<
    * The user preferences to create the Raptor transfers for at start: the preferences of every
    * profile, and then the ones of the warmup entries.
    */
-  private static <R> List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmupEntries(
+  private static <R> List<WarmupEntry> warmupEntries(
     TransferParameters<R> parameters,
     TransferRequestMapper<R> mapper
   ) {
-    var result = new ArrayList<DefaultRegularTransferRepositorySnapshot.WarmupEntry>();
+    var result = new ArrayList<WarmupEntry>();
     ProfileUserPreferences.resolveAll(parameters, mapper).forEach((preferences, profile) ->
-      result.add(
-        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(profile.id(), null, preferences)
-      )
+      result.add(new WarmupEntry(profile.id(), null, preferences))
     );
     for (var warmup : parameters.warmup()) {
-      result.add(
-        new DefaultRegularTransferRepositorySnapshot.WarmupEntry(
-          warmup.id(),
-          warmup.parent(),
-          warmup.userPreferences()
-        )
-      );
+      result.add(new WarmupEntry(warmup.id(), warmup.parent(), warmup.userPreferences()));
     }
     return List.copyOf(result);
   }

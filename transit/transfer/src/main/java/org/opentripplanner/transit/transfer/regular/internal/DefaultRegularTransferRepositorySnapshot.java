@@ -43,18 +43,6 @@ class DefaultRegularTransferRepositorySnapshot<
   private final Map<AbstractUserPreferences<?>, WarmupEntry> entryByPreferences;
   private final RegularTransferCacheStatistics statistics;
 
-  /**
-   * The user preferences to create the Raptor transfers for when the server starts: the
-   * preferences of a profile, or of a warmup entry.
-   *
-   * @param parent the parent profile of a warmup entry, {@code null} for a profile
-   */
-  record WarmupEntry(
-    String id,
-    @Nullable String parent,
-    AbstractUserPreferences<?> userPreferences
-  ) {}
-
   DefaultRegularTransferRepositorySnapshot(
     OverlaidTemplatePaths<P> paths,
     RegularTransferServiceCache<RaptorTransferStore> cache,
