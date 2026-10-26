@@ -24,12 +24,12 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * @param <P> the street path type
  * @param <R> the request type
  */
-final class TransferProfile<P, R> {
+final class TransferProfileState<P, R> {
 
   private final String id;
 
   @Nullable
-  private final TransferProfile<P, R> parent;
+  private final TransferProfileState<P, R> parent;
 
   private final AbstractUserPreferences<?> userPreferences;
   private final MaxDurationsPreference maxDurations;
@@ -42,10 +42,10 @@ final class TransferProfile<P, R> {
    * @param pathProvider creates the search of this profile
    * @param mapper       applies the user preferences of the profile on its routing request
    */
-  TransferProfile(
+  TransferProfileState(
     TransferProfileParameters<R> parameters,
     MaxDurationsPreference maxDurations,
-    @Nullable TransferProfile<P, R> parent,
+    @Nullable TransferProfileState<P, R> parent,
     TransferPathProvider<P, R> pathProvider,
     TransferRequestMapper<R> mapper
   ) {
@@ -59,7 +59,7 @@ final class TransferProfile<P, R> {
   }
 
   /** A profile without a parent. */
-  TransferProfile(
+  TransferProfileState(
     TransferProfileParameters<R> parameters,
     MaxDurationsPreference maxDurations,
     TransferPathProvider<P, R> pathProvider,
@@ -74,7 +74,7 @@ final class TransferProfile<P, R> {
    * parent are the paths of the parent.
    */
   @Nullable
-  TransferProfile<P, R> parent() {
+  TransferProfileState<P, R> parent() {
     return parent;
   }
 
@@ -106,7 +106,7 @@ final class TransferProfile<P, R> {
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
-    var that = (TransferProfile<?, ?>) obj;
+    var that = (TransferProfileState<?, ?>) obj;
     return userPreferences.equals(that.userPreferences);
   }
 
@@ -117,6 +117,6 @@ final class TransferProfile<P, R> {
 
   @Override
   public String toString() {
-    return "TransferProfile[id=" + id + ", userPreferences=" + userPreferences + ']';
+    return "TransferProfileState[id=" + id + ", userPreferences=" + userPreferences + ']';
   }
 }

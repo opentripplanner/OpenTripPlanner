@@ -18,13 +18,13 @@ import org.opentripplanner.utils.collection.ParentOrder;
  * @param <P> the street path type
  * @param <R> the request type
  */
-final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
+final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R>> {
 
-  private final List<TransferProfile<P, R>> profiles;
+  private final List<TransferProfileState<P, R>> profiles;
   private final DeduplicationLimit deduplicationLimit;
 
   private TransferProfiles(
-    Collection<TransferProfile<P, R>> profiles,
+    Collection<TransferProfileState<P, R>> profiles,
     DeduplicationLimit deduplicationLimit
   ) {
     this.profiles = List.copyOf(profiles);
@@ -32,7 +32,7 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
   }
 
   /** The profiles in the given order, with the default deduplication limit. */
-  static <P, R> TransferProfiles<P, R> of(Collection<TransferProfile<P, R>> profiles) {
+  static <P, R> TransferProfiles<P, R> of(Collection<TransferProfileState<P, R>> profiles) {
     return new TransferProfiles<>(profiles, DeduplicationLimit.DEFAULT);
   }
 
@@ -47,14 +47,14 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
   ) {
     // Reject profiles with equal user preferences
     ProfileUserPreferences.resolveAll(parameters, mapper);
-    var byId = new HashMap<String, TransferProfile<P, R>>();
-    var result = new ArrayList<TransferProfile<P, R>>();
+    var byId = new HashMap<String, TransferProfileState<P, R>>();
+    var result = new ArrayList<TransferProfileState<P, R>>();
     for (var p : ParentOrder.parentsFirst(
       parameters.profiles(),
       TransferProfileParameters::id,
       TransferProfileParameters::parent
     )) {
-      var profile = new TransferProfile<>(
+      var profile = new TransferProfileState<>(
         p,
         parameters.maxDurations(p.type()),
         p.parent() == null ? null : byId.get(p.parent()),
@@ -77,7 +77,7 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfile<P, R>> {
   }
 
   @Override
-  public Iterator<TransferProfile<P, R>> iterator() {
+  public Iterator<TransferProfileState<P, R>> iterator() {
     return profiles.iterator();
   }
 }

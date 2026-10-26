@@ -23,7 +23,7 @@ class TransferProfilesTest {
 
   @Test
   void ofWrapsTheGivenProfilesPreservingOrder() {
-    var walk = new TransferProfile<>(
+    var walk = new TransferProfileState<>(
       new TransferProfileParameters<>(
         "walk",
         TransferProfileType.WALK,
@@ -87,7 +87,7 @@ class TransferProfilesTest {
 
   @Test
   void theProfileKeepsItsId() {
-    var walk = new TransferProfile<>(
+    var walk = new TransferProfileState<>(
       new TransferProfileParameters<>(
         "my-walk",
         TransferProfileType.WALK,
@@ -169,7 +169,7 @@ class TransferProfilesTest {
       FakeRequestMapper.INSTANCE
     );
 
-    var byId = new HashMap<String, TransferProfile<?, ?>>();
+    var byId = new HashMap<String, TransferProfileState<?, ?>>();
     profiles.forEach(p -> byId.put(p.id(), p));
     assertThat(byId.get("child").parent()).isSameInstanceAs(byId.get("parent"));
     assertThat(byId.get("parent").parent()).isNull();
