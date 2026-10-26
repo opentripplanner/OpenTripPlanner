@@ -21,7 +21,6 @@ import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -157,7 +156,7 @@ class DefaultRegularTransferRepositorySnapshotTest {
           new TransferProfile<>("far", TransferProfileType.WALK, far, far)
         ),
         Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-        DeduplicationLimit.DEFAULT,
+        TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
         warmup
       ),
       stopIndex().size(),

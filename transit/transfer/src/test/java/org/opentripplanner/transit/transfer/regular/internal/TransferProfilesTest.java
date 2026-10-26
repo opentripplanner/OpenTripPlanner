@@ -12,7 +12,6 @@ import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
@@ -186,7 +185,7 @@ class TransferProfilesTest {
         )
       ),
       Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       List.of(new WarmupParameters("same", "walk", withReluctance(2.0)))
     );
 
@@ -209,7 +208,7 @@ class TransferProfilesTest {
         )
       ),
       Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-      DeduplicationLimit.DEFAULT,
+      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       List.of(
         new WarmupParameters("a", "walk", withReluctance(5.0)),
         new WarmupParameters("b", "walk", withReluctance(5.0))

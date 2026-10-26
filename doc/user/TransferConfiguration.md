@@ -57,7 +57,7 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
 // build-config.json
 {
   "transfers": {
-    "deduplicationLimit": "0.005x + 30s",
+    "deduplicationLimit": "30s + 0.005x",
     "walk": {
       "profiles": [
         {
@@ -91,7 +91,7 @@ request and a max duration of 30 minutes is used. Each profile type with profile
 
 | Parameter                     | Type       | Description                                                                         | Default           |
 |-------------------------------|------------|-------------------------------------------------------------------------------------|-------------------|
-| `deduplicationLimit`          | `string`   | How much more the path of a parent may cost to be used by a child. See below.       | `"0.005x + 30s"`  |
+| `deduplicationLimit`          | `string`   | How much more the path of a parent may cost to be used by a child. See below.       | `"30s + 0.005x"`  |
 | `walk.profiles`               | `object[]` | The walk profiles. If none is configured, one with the id `walk` is used.           |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the profile, unique among all profiles.                     |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
@@ -173,10 +173,10 @@ is close enough to the cost of the best path the profile found itself, the profi
 the parent. This makes the graph smaller, and the graph file too.
 
 "Close enough" is set with `deduplicationLimit`. It is a linear function of the cost `x` of the
-path of the parent, for example `0.005x + 30s`: a path that costs up to 0.5% and 30 seconds more
-than the best path is used. The terms can be written in either order, and one of them can be left
-out. A limit of `0s` only shares the paths with the same cost. The limit applies to the generalized
-cost only, not to the duration. The graph build logs how many of the paths of each profile are the
+path of the parent, for example `30s + 0.005x`: a path that costs up to 0.5% and 30 seconds more
+than the best path is used. Both terms are required, the constant first, like the other linear
+functions of the configuration. A limit of `0s + 0x` only shares the paths with the same cost. The
+limit applies to the generalized cost only, not to the duration. The graph build logs how many of the paths of each profile are the
 paths of its parent:
 
 ```

@@ -1,11 +1,13 @@
 package org.opentripplanner.transit.transfer.regular.api.parameters;
 
+import java.time.Duration;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.BicycleMaxDurations;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.CarMaxDuration;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
@@ -23,9 +25,19 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class TransferParameters<R> {
 
+  /**
+   * A path of the parent within 30 seconds, and 0.5% of its cost, of the best path of a profile is
+   * equivalent: the function is the tolerance, in generalized cost, of a path of the parent that
+   * costs {@code x}, see {@code deduplicationLimit}.
+   */
+  public static final CostLinearFunction DEFAULT_DEDUPLICATION_LIMIT = CostLinearFunction.of(
+    Duration.ofSeconds(30),
+    0.005
+  );
+
   private final List<TransferProfile<R>> profiles;
   private final Map<TransferProfileType, MaxDurationsPreference> maxDurations;
-  private final DeduplicationLimit deduplicationLimit;
+  private final CostLinearFunction deduplicationLimit;
   private final List<WarmupParameters> warmup;
 
   /**
@@ -40,7 +52,7 @@ public final class TransferParameters<R> {
    *                           {@link CarMaxDuration} for car, and {@link PlainMaxDuration} for the
    *                           other types.
    * @param deduplicationLimit when the path of a parent profile is used instead of a path of the
-   *                           profile itself, see {@link DeduplicationLimit}
+   *                           profile itself, see {@link #DEFAULT_DEDUPLICATION_LIMIT}
    * @param warmup             the preferences to create Raptor transfers for when the server
    *                           starts, see {@link WarmupParameters}. The ids must be unique among
    *                           the profiles and the warmup entries, and the parent of an entry must
@@ -49,7 +61,7 @@ public final class TransferParameters<R> {
   public TransferParameters(
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    DeduplicationLimit deduplicationLimit,
+    CostLinearFunction deduplicationLimit,
     List<WarmupParameters> warmup
   ) {
     this.profiles = List.copyOf(profiles);
@@ -75,14 +87,14 @@ public final class TransferParameters<R> {
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations
   ) {
-    this(profiles, maxDurations, DeduplicationLimit.DEFAULT);
+    this(profiles, maxDurations, DEFAULT_DEDUPLICATION_LIMIT);
   }
 
   /** The profiles without warmup entries. */
   public TransferParameters(
     List<TransferProfile<R>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    DeduplicationLimit deduplicationLimit
+    CostLinearFunction deduplicationLimit
   ) {
     this(profiles, maxDurations, deduplicationLimit, List.of());
   }
@@ -91,7 +103,7 @@ public final class TransferParameters<R> {
     return profiles;
   }
 
-  public DeduplicationLimit deduplicationLimit() {
+  public CostLinearFunction deduplicationLimit() {
     return deduplicationLimit;
   }
 

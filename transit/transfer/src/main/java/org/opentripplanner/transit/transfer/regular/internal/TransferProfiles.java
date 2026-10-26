@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -21,11 +21,11 @@ import org.opentripplanner.utils.collection.ParentOrder;
 final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R>> {
 
   private final List<TransferProfileState<P, R>> profiles;
-  private final DeduplicationLimit deduplicationLimit;
+  private final CostLinearFunction deduplicationLimit;
 
   private TransferProfiles(
     Collection<TransferProfileState<P, R>> profiles,
-    DeduplicationLimit deduplicationLimit
+    CostLinearFunction deduplicationLimit
   ) {
     this.profiles = List.copyOf(profiles);
     this.deduplicationLimit = deduplicationLimit;
@@ -33,7 +33,7 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R
 
   /** The profiles in the given order, with the default deduplication limit. */
   static <P, R> TransferProfiles<P, R> of(Collection<TransferProfileState<P, R>> profiles) {
-    return new TransferProfiles<>(profiles, DeduplicationLimit.DEFAULT);
+    return new TransferProfiles<>(profiles, TransferParameters.DEFAULT_DEDUPLICATION_LIMIT);
   }
 
   /**
@@ -68,7 +68,7 @@ final class TransferProfiles<P, R> implements Iterable<TransferProfileState<P, R
   }
 
   /** When the path of a parent is used instead of the path of a child. */
-  DeduplicationLimit deduplicationLimit() {
+  CostLinearFunction deduplicationLimit() {
     return deduplicationLimit;
   }
 

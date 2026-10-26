@@ -9,12 +9,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
+import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
-import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -135,7 +135,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
    * <p>
    * If the profile has a parent, the path of the parent is used instead of the path found for a
    * target stop if it is equivalent: re-costed with the preferences of this profile, it costs
-   * about the same, see {@link DeduplicationLimit}. The path is then stored once, for both
+   * about the same, see {@link TransferParameters#DEFAULT_DEDUPLICATION_LIMIT}. The path is then stored once, for both
    * profiles.
    *
    * @param pathsOfThisStop the paths found for this stop so far, by profile and target stop
@@ -199,10 +199,21 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     return profile
       .search()
       .computePathCriteria(parentPath)
-      .map(criteria ->
-        profiles.deduplicationLimit().isEquivalent(criteria.c1(), own.criteria().c1())
-      )
+      .map(criteria -> isWithinLimit(criteria.c1(), own.criteria().c1()))
       .orElse(false);
+  }
+
+  /**
+   * Is the cost of the path of the parent within the tolerance of the cost of the path of the
+   * profile? The tolerance is the deduplication limit of the cost of the path of the parent. Both
+   * costs are in Raptor cost units (centi-seconds).
+   */
+  private boolean isWithinLimit(int parentPathC1, int ownC1) {
+    var tolerance = profiles
+      .deduplicationLimit()
+      .calculate(Cost.costOfCentiSeconds(parentPathC1))
+      .toCentiSeconds();
+    return Math.abs(parentPathC1 - ownC1) <= tolerance;
   }
 
   private int requireStopIndex(FeedScopedId stopId) {
