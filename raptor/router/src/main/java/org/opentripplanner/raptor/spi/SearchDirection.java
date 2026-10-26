@@ -9,11 +9,12 @@ package org.opentripplanner.raptor.spi;
  * origin. This will traverse the transit graph backwards in time. This is used in Raptor to produce
  * heuristics, and is normally not something you would like to do unless you are testing or
  * analyzing. This should not be confused with <em>Range Raptor iterations</em>> which
- * step-backward-in-time (start with the last minute of the search window), but searches {@link
- * #FORWARD}. {@link #REVERSE} search is supported by the current implementation of RangeRaptor.
+ * step-backward-in-time (start with the last minute of the search window), but searches
+ * {@link #FORWARD}. {@link #REVERSE} search is supported by the current implementation of
+ * RangeRaptor.
  * <p>
- * In the Raptor code we will refer to the origin and and destination assuming the search direction
- * is {@link #FORWARD}.
+ * In the Raptor code we will refer to the origin and and destination assuming the search
+ * direction is {@link #FORWARD}.
  */
 public enum SearchDirection {
   /**

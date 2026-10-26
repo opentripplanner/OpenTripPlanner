@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.TransitRepository;
 
@@ -16,24 +17,31 @@ import org.opentripplanner.transit.service.TransitRepository;
 public class TimeZoneAdjusterModule implements GraphBuilderModule {
 
   private final TransitRepository transitRepository;
+  private final TimetableDataImport timetableDataImport;
 
   @Inject
-  public TimeZoneAdjusterModule(TransitRepository transitRepository) {
+  public TimeZoneAdjusterModule(
+    TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport
+  ) {
     this.transitRepository = transitRepository;
+    this.timetableDataImport = timetableDataImport;
   }
 
   @Override
   public void buildGraph() {
     // TODO: We assume that all time zones follow the same DST rules. In reality we need to split up
     //  the services for each DST transition
-    final Instant serviceStart = transitRepository.getTransitServiceStarts();
+    final Instant serviceStart = timetableDataImport
+      .getTripCalendars()
+      .transitServiceStarts(transitRepository.getTimeZone());
     var graphOffset = Duration.ofSeconds(
       transitRepository.getTimeZone().getRules().getOffset(serviceStart).getTotalSeconds()
     );
 
     Map<ZoneId, Duration> agencyShift = new HashMap<>();
 
-    transitRepository.getAllTripPatterns().forEach(pattern -> {
+    timetableDataImport.getAllTripPatterns().forEach(pattern -> {
       var timeShift = agencyShift.computeIfAbsent(
         pattern.getRoute().getAgency().getTimezone(),
         zoneId ->
@@ -49,7 +57,7 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
         .withScheduledTimeTableBuilder(builder -> builder.withAdjustedTimes(timeShift))
         .build();
       // replace the original pattern with the updated pattern in the transit model
-      transitRepository.addTripPattern(updatedPattern.getId(), updatedPattern);
+      timetableDataImport.addTripPattern(updatedPattern.getId(), updatedPattern);
     });
     transitRepository.index();
   }

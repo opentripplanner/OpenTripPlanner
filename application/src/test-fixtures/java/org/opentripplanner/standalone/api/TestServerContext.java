@@ -47,7 +47,9 @@ import org.opentripplanner.street.service.DefaultStreetLimitationParametersServi
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositoryLifecycle;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -60,16 +62,18 @@ public class TestServerContext {
   private TestServerContext() {}
 
   /**
-   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds
-   * raptor transit data, and wraps a pinned timetable snapshot.
+   * Create a {@link TransitService} for unit testing: indexes the transit repository, builds raptor
+   * transit data, and wraps a pinned timetable snapshot.
    */
   public static TransitService createTransitService(
     TransitRepository transitRepository,
+    TimetableDataImport timetableDataImport,
     TransferRepository transferRepository
   ) {
     var registry = TransactionFactory.createRepositoryRegistry();
     var timetableHandle = indexAndRegisterTimetableSnapshot(
       transitRepository,
+      timetableDataImport.toScheduledTimetableData(),
       transferRepository,
       registry
     );
@@ -84,6 +88,7 @@ public class TestServerContext {
     TimetableRepository
   > indexAndRegisterTimetableSnapshot(
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository,
     RepositoryRegistry registry
   ) {
@@ -93,13 +98,14 @@ public class TestServerContext {
     var scheduledRaptorData = RaptorTransitDataMapper.map(
       tuningParameters,
       transitRepository,
+      scheduledTimetableData,
       transferRepository
     );
     transitRepository.initRaptorTransitData(scheduledRaptorData);
 
     var timetableSnapshot = new DefaultTimetableRepository(
       new RaptorTransitData(transitRepository.getRaptorTransitData()),
-      transitRepository.getTripCalendar()
+      scheduledTimetableData
     );
     return registry.registerRepositorySnapshot(
       timetableSnapshot,
@@ -140,7 +146,8 @@ public class TestServerContext {
       null,
       createLinkingContextFactory(graph, vertexLinker, transitService),
       routerConfig.transitTuningConfig(),
-      routerConfig.transitTuningConfig()
+      routerConfig.transitTuningConfig(),
+      null
     );
   }
 

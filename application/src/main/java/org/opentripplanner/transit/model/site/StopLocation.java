@@ -32,11 +32,12 @@ public interface StopLocation extends LogInfo, TransitEntity {
   List<FeedScopedId> getIdAndParentStationId();
 
   /**
-   * This is the OTP internal <em>synthetic key</em>, used to reference a StopLocation inside OTP.  This is used
-   * to optimize routing, we do not access the stop instance only keep the {code index}. The index will not change.
+   * This is the OTP internal <em>synthetic key</em>, used to reference a StopLocation inside OTP.
+   * This is used to optimize routing, we do not access the stop instance only keep the {code
+   * index}. The index will not change.
    * <p>
-   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP instances,
-   * use the {code id} for external references.
+   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different
+   * OTP instances, use the {code id} for external references.
    */
   int getIndex();
 
@@ -100,8 +101,8 @@ public interface StopLocation extends LogInfo, TransitEntity {
 
   /**
    * This was to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
-   * which only permits one zone per stop. It has now spread to several other APIs but can be removed
-   * when there is a suitable replacement.
+   * which only permits one zone per stop. It has now spread to several other APIs but can be
+   * removed when there is a suitable replacement.
    */
   @Nullable
   default String getFirstZoneAsString() {

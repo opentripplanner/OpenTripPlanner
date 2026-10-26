@@ -130,8 +130,7 @@ public abstract class AbstractHierarchicalMap<K, V> implements ReadOnlyHierarchi
   }
 
   /**
-   * Return true if the {@code key} exist in one of the parents (parent, parent´s parent and so
-   * on).
+   * Return true if the {@code key} exist in one of the parents (parent, parent´s parent and so on).
    */
   private boolean parentContainsKey(K key) {
     return parent != null && parent.containsKey(key);

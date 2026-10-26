@@ -24,6 +24,8 @@ import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
+import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -32,10 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the RaptorTransitData object from the TransitRepository object. The ServiceDay hierarchy is reversed,
- * with service days at the top level, which contains TripPatternForDate objects that contain only
- * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
- * when doing Range Raptor searches.
+ * Maps the RaptorTransitData object from the TransitRepository object. The ServiceDay hierarchy is
+ * reversed, with service days at the top level, which contains TripPatternForDate objects that
+ * contain only TripSchedules running on that particular date. This makes it faster to filter out
+ * TripSchedules when doing Range Raptor searches.
  * <p>
  * CONCURRENCY: This mapper runs part of the mapping in parallel using parallel streams. This
  * improves startup time on the Norwegian network by 20 seconds, by reducing this mapper from 36
@@ -52,9 +54,13 @@ public class RaptorTransitDataMapper {
 
   private RaptorTransitDataMapper(
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository
   ) {
-    this.transitService = new DefaultTransitService(transitRepository);
+    this.transitService = new DefaultTransitService(
+      transitRepository,
+      DefaultTimetableRepository.scheduledOnly(scheduledTimetableData)
+    );
     this.siteRepository = transitRepository.getSiteRepository();
     this.transferRepository = transferRepository;
   }
@@ -62,9 +68,14 @@ public class RaptorTransitDataMapper {
   public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
     TransitRepository transitRepository,
+    ScheduledTimetableData scheduledTimetableData,
     TransferRepository transferRepository
   ) {
-    return new RaptorTransitDataMapper(transitRepository, transferRepository).map(tuningParameters);
+    return new RaptorTransitDataMapper(
+      transitRepository,
+      scheduledTimetableData,
+      transferRepository
+    ).map(tuningParameters);
   }
 
   private RaptorTransitData map(TransitTuningParameters tuningParameters) {

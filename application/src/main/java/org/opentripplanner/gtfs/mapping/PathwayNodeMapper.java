@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
@@ -16,7 +17,7 @@ class PathwayNodeMapper {
   static final String DEFAULT_NAME = "Pathway node";
 
   private final IdFactory idFactory;
-  private final Map<org.onebusaway.gtfs.model.Stop, PathwayNode> mappedNodes = new HashMap<>();
+  private final Map<Stop, PathwayNode> mappedNodes = new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
@@ -31,22 +32,19 @@ class PathwayNodeMapper {
     this.stationLookUp = stationLookUp;
   }
 
-  Collection<PathwayNode> map(Collection<org.onebusaway.gtfs.model.Stop> allNodes) {
+  Collection<PathwayNode> map(Collection<Stop> allNodes) {
     return MapUtils.mapToList(allNodes, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  PathwayNode map(org.onebusaway.gtfs.model.Stop orginal) {
+  PathwayNode map(Stop orginal) {
     return orginal == null ? null : mappedNodes.computeIfAbsent(orginal, this::doMap);
   }
 
-  private PathwayNode doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
-    if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
+  private PathwayNode doMap(Stop gtfsStop) {
+    if (gtfsStop.getLocationType() != Stop.LOCATION_TYPE_NODE) {
       throw new IllegalArgumentException(
-        "Expected type " +
-          org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE +
-          ", but got " +
-          gtfsStop.getLocationType()
+        "Expected type " + Stop.LOCATION_TYPE_NODE + ", but got " + gtfsStop.getLocationType()
       );
     }
 
@@ -59,7 +57,7 @@ class PathwayNodeMapper {
 
     builder.withName(
       translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
+        Stop.class,
         "name",
         base.getId().getId(),
         Optional.ofNullable(base.getName()).orElse(DEFAULT_NAME)
@@ -68,7 +66,7 @@ class PathwayNodeMapper {
 
     builder = builder.withDescription(
       translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
+        Stop.class,
         "desc",
         base.getId().getId(),
         base.getDescription()

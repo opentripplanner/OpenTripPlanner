@@ -61,6 +61,7 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
+      0.0,
       false
     );
 
@@ -87,6 +88,7 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
+      0.0,
       false
     );
 
@@ -101,9 +103,9 @@ class NetexMapperTest {
   }
 
   /**
-   * {@link org.opentripplanner.netex.mapping.support.NetexMapperIndexes#getStopTimesByNetexId()}
-   * is documented to be scoped per hierarchy level (shared files, shared-group files, group
-   * files) and thrown away once that level is popped.
+   * {@link org.opentripplanner.netex.mapping.support.NetexMapperIndexes#getStopTimesByNetexId()} is
+   * documented to be scoped per hierarchy level (shared files, shared-group files, group files) and
+   * thrown away once that level is popped.
    */
   @Test
   void noticeAssignmentIsNotResolvedAcrossSiblingFiles() {
@@ -120,6 +122,7 @@ class NetexMapperTest {
       Set.of(),
       Set.of(),
       10,
+      0.0,
       false
     );
 

@@ -19,7 +19,7 @@ public interface RegularTransferService {
   /**
    * @param fromStop {@code StopLocation} that is set as a from-stop
    * @return all walk mode {@code PathTransfer}s with the specified {@code StopLocation} as a
-   * from-stop
+   *         from-stop
    * @throws UnsupportedOperationException if flex routing is not activated
    * @throws IllegalStateException         if the index was not initialized
    */
@@ -28,7 +28,7 @@ public interface RegularTransferService {
   /**
    * @param toStop {@code StopLocation} that is set as a to-stop
    * @return all walk mode {@code PathTransfer}s with the specified {@code StopLocation} as a
-   * to-stop
+   *         to-stop
    * @throws UnsupportedOperationException if flex routing is not activated
    * @throws IllegalStateException         if the index was not initialized
    */

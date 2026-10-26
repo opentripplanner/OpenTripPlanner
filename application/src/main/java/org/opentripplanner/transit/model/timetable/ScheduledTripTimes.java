@@ -22,8 +22,8 @@ import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
- * Regular/planed/scheduled read-only version of {@link TripTimes}. The set of static
- * trip-times are build during graph-build and can not be changed using real-time updates.
+ * Regular/planed/scheduled read-only version of {@link TripTimes}. The set of static trip-times are
+ * build during graph-build and can not be changed using real-time updates.
  *
  * @see RealTimeTripTimes for real-time version
  */
@@ -61,8 +61,8 @@ public final class ScheduledTripTimes implements TripTimes<ScheduledTripTimes> {
   private final I18NString[] headsigns;
 
   /**
-   * A 2D array of String containing zero or more Via messages displayed at each stop in the
-   * stop sequence. This reference be null if no stop in the entire sequence of stops has any via
+   * A 2D array of String containing zero or more Via messages displayed at each stop in the stop
+   * sequence. This reference be null if no stop in the entire sequence of stops has any via
    * strings. Any subarray may also be null or empty if no Via strings are displayed at that
    * particular stop. These nulls are allowed to conserve memory in the common case where there are
    * few or no via messages.

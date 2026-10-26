@@ -5,13 +5,13 @@ import static org.opentripplanner.framework.application.OtpFileNames.DEBUG_UI_CO
 import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import javax.annotation.Nullable;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Generic config file loader. This is used to load all configuration files.
@@ -42,9 +42,9 @@ public class OtpConfigLoader {
   }
 
   /**
-   * Create a config loader that load config from the given input json document. Use it with {@link
-   * #loadBuildConfig()} or one of the other load methods to return a configuration for the given
-   * input json string.
+   * Create a config loader that load config from the given input json document. Use it with
+   * {@link #loadBuildConfig()} or one of the other load methods to return a configuration for the
+   * given input json string.
    */
   public static OtpConfigLoader fromString(String json) {
     return new OtpConfigLoader(null, json);
@@ -66,7 +66,7 @@ public class OtpConfigLoader {
 
   /**
    * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
-   * given {@code configDir}  is {@code null} or config file is NOT found.
+   * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
    * <p>
@@ -80,7 +80,7 @@ public class OtpConfigLoader {
 
   /**
    * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
-   * given {@code configDir}  is {@code null} or config file is NOT found.
+   * given {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    * This method also log all loaded parameters to the console.
    * <p>
@@ -95,7 +95,7 @@ public class OtpConfigLoader {
 
   /**
    * Load the router configuration file as a JsonNode three. An empty node is returned if the given
-   * {@code configDir}  is {@code null} or config file is NOT found.
+   * {@code configDir} is {@code null} or config file is NOT found.
    * <p>
    */
   public RouterConfig loadRouterConfig() {

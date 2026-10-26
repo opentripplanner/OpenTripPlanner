@@ -18,13 +18,14 @@ import org.opentripplanner.transit.model.timetable.Direction;
  * {@link org.opentripplanner.updater.alert.TransitAlertProvider} has its own service, and all need
  * to be queried in order to fetch all alerts.
  *
- * Concretely: every realtime updater receiving GTFS Alerts or SIRI Situation Exchange (SX)
- * messages currently maintains its own private index of alerts separately from all other updaters.
- * To make the set of all alerts from all updaters available in a single operation and associate it
- * with the application as a whole, the various indexes are merged in such a way as to have the same
- * index as each individual index.
+ * Concretely: every realtime updater receiving GTFS Alerts or SIRI Situation Exchange (SX) messages
+ * currently maintains its own private index of alerts separately from all other updaters. To make
+ * the set of all alerts from all updaters available in a single operation and associate it with the
+ * application as a whole, the various indexes are merged in such a way as to have the same index as
+ * each individual index.
  *
- * <p>Instances are registered with {@link #addDelegate(TransitAlertService)} when the updaters are
+ * <p>
+ * Instances are registered with {@link #addDelegate(TransitAlertService)} when the updaters are
  * configured. This class is an application-wide singleton, so registration and reads may happen
  * concurrently; a {@link CopyOnWriteArrayList} is used to keep reads lock-free.
  */

@@ -196,6 +196,9 @@
         "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
+        "tools.jackson:{/,}**",
+        "tools.jackson.core:{/,}**",
+        "tools.jackson.datatype:{/,}**",
         "com.fasterxml.jackson:{/,}**",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
@@ -225,6 +228,8 @@
     {
       "groupName": "Jackson non-patch",
       "matchPackageNames": [
+        "tools.jackson.core:{/,}**",
+        "tools.jackson.datatype:{/,}**",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
       ],

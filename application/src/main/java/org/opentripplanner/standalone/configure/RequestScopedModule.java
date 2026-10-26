@@ -19,10 +19,12 @@ import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ojp.parameters.OjpApiParameters;
 import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.taxi.TaxiService;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -30,6 +32,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
+import org.opentripplanner.routing.refetch.RefetchItineraryService;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -53,21 +56,21 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Provides the bindings that live inside {@link RequestScopedFactory}. A single {@link
- * TransactionScope} is captured once per request, and every other binding here is derived from
- * that same scope, so they all see a consistent, pinned view of real-time data.
+ * Provides the bindings that live inside {@link RequestScopedFactory}. A single
+ * {@link TransactionScope} is captured once per request, and every other binding here is derived
+ * from that same scope, so they all see a consistent, pinned view of real-time data.
  * <p>
  * Every {@code @Provides} method below <b>must</b> also be annotated {@link HttpRequestScoped}
- * (enforced by {@link RequestScopedModuleTest}). Without it, Dagger treats the binding as
- * unscoped and re-invokes the provider — constructing a brand-new instance — every single time
- * something depends on that type, even within the same {@link RequestScopedFactory} instance.
- * That matters because {@link org.opentripplanner.standalone.server.DaggerToJerseyBridge}
- * registers a separate HK2 accessor lambda for every binding here, and different resources
- * handling the same HTTP request pull from those lambdas lazily, at different times. An unscoped
- * binding would let two resources in one request each trigger a fresh call and get two different
- * instances — e.g. two {@link TransitService}s each wrapping a different {@code
- * TimetableRepositorySnapshot} if real-time data changed in between. {@code @HttpRequestScoped}
- * is what turns "derived from the same scope" into an actual guarantee: one instance per request,
+ * (enforced by {@link RequestScopedModuleTest}). Without it, Dagger treats the binding as unscoped
+ * and re-invokes the provider — constructing a brand-new instance — every single time something
+ * depends on that type, even within the same {@link RequestScopedFactory} instance. That matters
+ * because {@link org.opentripplanner.standalone.server.DaggerToJerseyBridge} registers a separate
+ * HK2 accessor lambda for every binding here, and different resources handling the same HTTP
+ * request pull from those lambdas lazily, at different times. An unscoped binding would let two
+ * resources in one request each trigger a fresh call and get two different instances — e.g. two
+ * {@link TransitService}s each wrapping a different {@code
+ * TimetableRepositorySnapshot} if real-time data changed in between. {@code @HttpRequestScoped} is
+ * what turns "derived from the same scope" into an actual guarantee: one instance per request,
  * shared by every consumer, instead of silently rebuilt on each lookup.
  */
 @Module
@@ -93,6 +96,41 @@ public class RequestScopedModule {
   ) {
     var timetableSnapshot = timetableRepositoryHandle.repositorySnapshot(transactionScope);
     return new DefaultTransitService(transitRepository, timetableSnapshot);
+  }
+
+  @Provides
+  @Nullable
+  @HttpRequestScoped
+  RealtimeResolver realTimeResolver(
+    RefetchItineraryService refetchItineraryService,
+    TransitService transitService,
+    TransitAlertService transitAlertService
+  ) {
+    return OTPFeature.RealtimeResolver.isOn()
+      ? new RealtimeResolver(refetchItineraryService, transitService, transitAlertService)
+      : null;
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static RefetchItineraryService refetchItineraryService(
+    Graph graph,
+    TransitService transitService,
+    TransitAlertService transitAlertService,
+    RegularTransferService transferService,
+    StreetDetailsService streetDetailsService,
+    LinkingContextFactory linkingContextFactory,
+    StreetLimitationParametersService streetLimitationParametersService
+  ) {
+    return new RefetchItineraryService(
+      graph,
+      transitService,
+      transitAlertService,
+      transferService,
+      streetDetailsService,
+      linkingContextFactory,
+      streetLimitationParametersService
+    );
   }
 
   @Provides
@@ -167,7 +205,8 @@ public class RequestScopedModule {
     @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable StopConsolidationService stopConsolidationService,
     LinkingContextFactory linkingContextFactory,
-    TransitRoutingConfig transitRoutingConfig
+    TransitRoutingConfig transitRoutingConfig,
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     return new DefaultRoutingService(
       transitService,
@@ -191,7 +230,8 @@ public class RequestScopedModule {
       linkingContextFactory,
       // transitRoutingConfig implements 2 roles; hence the repetition below
       transitRoutingConfig,
-      transitRoutingConfig
+      transitRoutingConfig,
+      realtimeResolver
     );
   }
 
@@ -212,9 +252,9 @@ public class RequestScopedModule {
   }
 
   /**
-   * Request context for the Transmodel API's GraphQL data fetchers. Every accessor delegates to
-   * the enclosing {@link RequestScopedFactory}, so a dependency is only resolved if a data
-   * fetcher actually asks for it.
+   * Request context for the Transmodel API's GraphQL data fetchers. Every accessor delegates to the
+   * enclosing {@link RequestScopedFactory}, so a dependency is only resolved if a data fetcher
+   * actually asks for it.
    */
   @Provides
   @HttpRequestScoped

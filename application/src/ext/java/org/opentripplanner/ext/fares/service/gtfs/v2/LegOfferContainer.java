@@ -24,8 +24,8 @@ class LegOfferContainer {
   private final SetMultimap<Leg, LegOffer> unlimitedTransferOffers = HashMultimap.create();
 
   /**
-   * Offers which are limited by the number of transfers. These need special handling.
-   * See {@link LegOfferContainer#addTransferLimitedOffer(TransitLeg, List, Collection)}.
+   * Offers which are limited by the number of transfers. These need special handling. See
+   * {@link LegOfferContainer#addTransferLimitedOffer(TransitLeg, List, Collection)}.
    */
   private final List<TransferLimitedOffer> transferLimitedOffers = new ArrayList<>();
 
@@ -62,8 +62,8 @@ class LegOfferContainer {
   }
 
   /**
-   * Add an offer for a specific leg. If the given offer has a start time before a currently existing
-   * one, this means that the currently existing one is worse than the proposed new one and
+   * Add an offer for a specific leg. If the given offer has a start time before a currently
+   * existing one, this means that the currently existing one is worse than the proposed new one and
    * is removed.
    */
   private void addToLeg(TransitLeg leg, LegOffer legOffer) {

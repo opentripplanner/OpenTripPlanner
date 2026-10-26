@@ -17,10 +17,10 @@ public class OTPRequestTimeoutException extends RuntimeException {
   }
 
   /**
-   * The Grizzly web server is configured with a transaction timeout and will set the interrupt
-   * flag on the current thread. OTP has few blocking operations which check the interrupted flag,
-   * so instead we need to do the check manually. The check has a small performance overhead, so
-   * try to place the check at the beginning of a significant calculations.
+   * The Grizzly web server is configured with a transaction timeout and will set the interrupt flag
+   * on the current thread. OTP has few blocking operations which check the interrupted flag, so
+   * instead we need to do the check manually. The check has a small performance overhead, so try to
+   * place the check at the beginning of a significant calculations.
    */
   public static void checkForTimeout() {
     // We call yield() to allow monitoring thread to interrupt current thread. If this work or not
@@ -35,9 +35,9 @@ public class OTPRequestTimeoutException extends RuntimeException {
   }
 
   /**
-   * This method can be used to investigate where the execution aborts, this is interesting
-   * when debugging this feature. Breakpoint is no very useful, because they interfere with the
-   * timeout logic. To make the code timeout use the
+   * This method can be used to investigate where the execution aborts, this is interesting when
+   * debugging this feature. Breakpoint is no very useful, because they interfere with the timeout
+   * logic. To make the code timeout use the
    * {@link org.opentripplanner.framework.time.TimeUtils#busyWaitOnce(int)} method.
    */
   private static void logDebug() {

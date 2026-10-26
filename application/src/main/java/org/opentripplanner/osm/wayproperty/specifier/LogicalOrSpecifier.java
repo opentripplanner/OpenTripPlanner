@@ -10,12 +10,12 @@ import org.opentripplanner.osm.model.TraverseDirection;
  * Allows to specify a 'logical or' condition to specify a match. This intended to be used with a
  * safety mixin.
  * <p>
- * For example if you specify ("lcn=yes", "rnc=yes", "ncn=yes") then the specifier will match if one
- * of these tags matches.
+ * For example if you specify ("lcn=yes", "rnc=yes", "ncn=yes") then the specifier will match if
+ * one of these tags matches.
  * <p>
- * Background: If you would add 3 separate matches with a {@link BestMatchSpecifier} that would mean
- * that a way that is matched with all of them would receive too high a safety value leading, as the
- * mixin is applied several times.
+ * Background: If you would add 3 separate matches with a {@link BestMatchSpecifier} that would
+ * mean that a way that is matched with all of them would receive too high a safety value leading,
+ * as the mixin is applied several times.
  * <p>
  * 'Logical or's are only implemented for mixins without wildcards.
  */

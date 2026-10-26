@@ -21,7 +21,8 @@ import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
  * is that most of the highway=trunk roads also allows walking and biking, where as some does not.
- * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
+ * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
+ * http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
  *
  * @author seime
  * @see OsmTagMapper

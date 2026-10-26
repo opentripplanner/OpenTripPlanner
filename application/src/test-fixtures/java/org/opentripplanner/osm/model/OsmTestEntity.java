@@ -3,8 +3,7 @@ package org.opentripplanner.osm.model;
 import java.util.Map;
 
 /**
- * Test version of OsmEntity for use in tests.
- * All tags must be passed into the constructor.
+ * Test version of OsmEntity for use in tests. All tags must be passed into the constructor.
  */
 public class OsmTestEntity extends OsmEntity {
 

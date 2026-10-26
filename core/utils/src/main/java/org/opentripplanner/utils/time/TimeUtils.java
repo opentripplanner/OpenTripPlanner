@@ -117,7 +117,7 @@ public class TimeUtils {
       .toArray();
   }
 
-  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59. */
   public static String timeToStrCompact(int time) {
     return RelativeTime.ofSeconds(time).toCompactStr();
   }
@@ -127,12 +127,12 @@ public class TimeUtils {
     return timeToStrCompact(time, notSetValue, "");
   }
 
-  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59. */
   public static String timeToStrCompact(int time, int notSetValue, String notSetText) {
     return time == notSetValue ? notSetText : RelativeTime.ofSeconds(time).toCompactStr();
   }
 
-  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59. */
   public static String timeToStrCompact(ZonedDateTime time) {
     return time == null ? "" : RelativeTime.from(time).toCompactStr();
   }
@@ -168,9 +168,9 @@ public class TimeUtils {
   /**
    * This method take a date, a time in seconds and a zoneId and create a {@link ZonedDateTime}.
    * <p>
-   * This method follow the GTFS specification for time: "The time is measured from 'noon minus 12h'
-   * of the service day (effectively midnight except for days on which daylight savings time changes
-   * occur." See https://developers.google.com/transit/gtfs/reference#field_types
+   * This method follow the GTFS specification for time: "The time is measured from 'noon minus
+   * 12h' of the service day (effectively midnight except for days on which daylight savings time
+   * changes occur." See https://developers.google.com/transit/gtfs/reference#field_types
    * <p>
    *
    * @param date    the "service" date
@@ -180,8 +180,8 @@ public class TimeUtils {
     return RelativeTime.ofSeconds(seconds).toZonedDateTime(date, zoneId);
   }
 
-  /// Round the given `value` to the closest second value.
-  /// Throws [NullPointerException] if `value` is `null`
+  /// Round the given `value` to the closest second value. Throws [NullPointerException] if `value`
+  /// is `null`
   public static ZonedDateTime normalize(ZonedDateTime value) {
     return value.plusNanos(NANOS_IN_SECOND / 2).truncatedTo(ChronoUnit.SECONDS);
   }
@@ -218,9 +218,9 @@ public class TimeUtils {
   /**
    * Wait (compute) until the given {@code waitMs} is past. The returned long is a very random
    * number. If this method is called twice a grace period of 5 times the wait-time is set. All
-   * calls within the grace period will return immediately. This ensures only ONE wait is applied
-   * to a given client request. Wait a bit, then make another request, and you will enter the
-   * busy-wait again.
+   * calls within the grace period will return immediately. This ensures only ONE wait is applied to
+   * a given client request. Wait a bit, then make another request, and you will enter the busy-wait
+   * again.
    * <p>
    * This method does a "busy" wait - it is not affected by a thread interrupt like
    * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic which uses the interrupt
@@ -267,18 +267,18 @@ public class TimeUtils {
 
   /**
    * Calculate the relative time in seconds with the given {@code transitSearchTimeZero} as the
-   * base. There is no restriction on the returned time, it can be in the past(negative) and
-   * many days ahead of the base. This method can be used to translate an API instance of time
-   * into the OTP internal transit model time, when the search zero-point-in-time is known.
+   * base. There is no restriction on the returned time, it can be in the past(negative) and many
+   * days ahead of the base. This method can be used to translate an API instance of time into the
+   * OTP internal transit model time, when the search zero-point-in-time is known.
    */
   public static int toTransitTimeSeconds(ZonedDateTime transitSearchTimeZero, Instant time) {
     return (int) ChronoUnit.SECONDS.between(transitSearchTimeZero.toInstant(), time);
   }
 
   /**
-
-   * Truncates the time to the nearest second. If the given {@code dateTime} is {@code null},
-   * then {@code null} is returned
+   *
+   * Truncates the time to the nearest second. If the given {@code dateTime} is {@code null}, then
+   * {@code null} is returned
    */
   @Nullable
   public static Instant truncateToSeconds(@Nullable Instant dateTime) {

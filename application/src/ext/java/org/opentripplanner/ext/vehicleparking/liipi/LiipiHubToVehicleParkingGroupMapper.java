@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.liipi;
 
 import com.bedatadriven.jackson.datatype.jts.parsers.GenericGeometryParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +15,8 @@ import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Maps a Liipi Park hub into a {@link VehicleParkingGroup}.
@@ -42,12 +42,15 @@ public class LiipiHubToVehicleParkingGroupMapper {
     try {
       Map<String, String> translations = new HashMap<>();
       JsonNode nameNode = jsonNode.path("name");
-      nameNode.fieldNames().forEachRemaining(lang -> {
-        String name = nameNode.path(lang).asText();
-        if (!name.isEmpty()) {
-          translations.put(lang, nameNode.path(lang).asText());
-        }
-      });
+      nameNode
+        .propertyNames()
+        .iterator()
+        .forEachRemaining(lang -> {
+          String name = nameNode.path(lang).asString();
+          if (!name.isEmpty()) {
+            translations.put(lang, nameNode.path(lang).asString());
+          }
+        });
       I18NString name = translations.isEmpty()
         ? new NonLocalizedString(hubId.getId())
         : TranslatedString.getI18NString(translations, false);
@@ -81,7 +84,7 @@ public class LiipiHubToVehicleParkingGroupMapper {
     }
     var vehicleParkingIds = new ArrayList<FeedScopedId>();
     for (JsonNode jsonNode : facilityIdsNode) {
-      vehicleParkingIds.add(new FeedScopedId(feedId, jsonNode.asText()));
+      vehicleParkingIds.add(new FeedScopedId(feedId, jsonNode.asString()));
     }
     return vehicleParkingIds;
   }

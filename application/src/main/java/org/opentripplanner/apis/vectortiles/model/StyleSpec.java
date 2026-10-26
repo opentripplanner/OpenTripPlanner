@@ -1,11 +1,11 @@
 package org.opentripplanner.apis.vectortiles.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Represents a style specification for Maplibre/Mapbox vector tile layers.
@@ -57,8 +57,8 @@ public final class StyleSpec {
   /**
    * Style-level metadata, which the spec allows to carry arbitrary keys. The debug client uses
    * {@code rentalNetworks} to offer a per-network filter on the vehicle rental layers; the values
-   * cannot be derived from the tiles, since a tile only tells you about the networks present in
-   * the area currently loaded.
+   * cannot be derived from the tiles, since a tile only tells you about the networks present in the
+   * area currently loaded.
    */
   @JsonSerialize
   public Map<String, Object> metadata() {

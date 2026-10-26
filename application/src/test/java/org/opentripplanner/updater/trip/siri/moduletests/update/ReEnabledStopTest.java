@@ -21,9 +21,9 @@ class ReEnabledStopTest implements RealtimeTestConstants {
   private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
 
   /**
-   * A SIRI update with DepartureBoardingActivity=BOARDING should re-enable a stop
-   * that was scheduled with PickDrop.NONE (no boarding). This must produce a PATTERN_MODIFIED
-   * trip (new pattern) because the stop's pickup type changed from NONE to SCHEDULED.
+   * A SIRI update with DepartureBoardingActivity=BOARDING should re-enable a stop that was
+   * scheduled with PickDrop.NONE (no boarding). This must produce a PATTERN_MODIFIED trip (new
+   * pattern) because the stop's pickup type changed from NONE to SCHEDULED.
    */
   @Test
   void boardingActivityReEnablesStopWithPickDropNone() {

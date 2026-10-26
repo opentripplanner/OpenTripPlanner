@@ -31,16 +31,16 @@ public class MarkdownFormatter {
   }
 
   /**
-   * Link to a header in the same document. The "other" element need to be tagged with an
-   * "id" attribute equals to the given anchor.
+   * Link to a header in the same document. The "other" element need to be tagged with an "id"
+   * attribute equals to the given anchor.
    */
   public static String linkToAnchor(String text, String anchor) {
     return "[%s](#%s)".formatted(text, normalizeAnchor(anchor));
   }
 
   /**
-   * Link to a header in the same document. The "other" element need to be tagged with an
-   * "id" attribute equals to the given anchor.
+   * Link to a header in the same document. The "other" element need to be tagged with an "id"
+   * attribute equals to the given anchor.
    */
   public static String linkToDoc(String text, String url) {
     return "[%s](%s)".formatted(text, url);
@@ -60,9 +60,9 @@ public class MarkdownFormatter {
   }
 
   /**
-   * Pipes '|' in the text in a Markdown table cell will cause the table to be rendered wrong, so
-   * we must escape pipes in the cell text. The proper way to do this is to use '\|', but that does
-   * not work with Intellij and become hard to work with, so for now we substitute the '|' with a
+   * Pipes '|' in the text in a Markdown table cell will cause the table to be rendered wrong, so we
+   * must escape pipes in the cell text. The proper way to do this is to use '\|', but that does not
+   * work with Intellij and become hard to work with, so for now we substitute the '|' with a
    * broken-pipe '¦' instead.
    */
   public static String escapeInTable(String text) {
@@ -79,10 +79,11 @@ public class MarkdownFormatter {
   }
 
   /**
-   * Line-breaks in markdown is a bit problematic, we should avoid mixing HTML tags and markdown since not all
-   * Markdown applications support it, the same goes for ending the line with {@code \}. The best alternative
-   * seams to be using two trailing spaces {@code "  "} followed by a line-break, even if this is error-prune.
-   * This method does not add the line-break, just the trailing spaces.
+   * Line-breaks in markdown is a bit problematic, we should avoid mixing HTML tags and markdown
+   * since not all Markdown applications support it, the same goes for ending the line with
+   * {@code \}. The best alternative seams to be using two trailing spaces {@code "  "} followed by
+   * a line-break, even if this is error-prune. This method does not add the line-break, just the
+   * trailing spaces.
    * <p>
    * For more info see https://www.markdownguide.org/basic-syntax/#line-breaks
    */

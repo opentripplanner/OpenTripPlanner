@@ -6,8 +6,8 @@ import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEn
 import org.opentripplanner.street.model.StreetMode;
 
 /**
- * This class is responsible for filtering the list of access and egress before
- * the transit routing is performed.
+ * This class is responsible for filtering the list of access and egress before the transit routing
+ * is performed.
  */
 public class AccessEgressPenaltyDecorator {
 

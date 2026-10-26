@@ -10,7 +10,7 @@ public class OccupancyStatusMapper {
 
   /**
    * @return {@link OccupancyStatus} supported by the Transmodel API that is the closes match to the
-   * original.
+   *         original.
    */
   public static OccupancyStatus mapStatus(OccupancyStatus occupancyStatus) {
     return switch (occupancyStatus) {

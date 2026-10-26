@@ -146,8 +146,8 @@ public class TripTimesOnDateTest {
   }
 
   /**
-   * Mode filter should use the trip's mode, not the route's mode. Trips can override
-   * the mode of their route, e.g. a rail replacement bus on a rail route.
+   * Mode filter should use the trip's mode, not the route's mode. Trips can override the mode of
+   * their route, e.g. a rail replacement bus on a rail route.
    */
   @Test
   void modeFilterRespectsTriplevelModeOverride() {
@@ -208,9 +208,8 @@ public class TripTimesOnDateTest {
   }
 
   /**
-   * Mode filter on a multi-modal route where trips override their mode.
-   * Earlier BUS trips should not prevent later COACH trips from being returned
-   * when filtering for COACH.
+   * Mode filter on a multi-modal route where trips override their mode. Earlier BUS trips should
+   * not prevent later COACH trips from being returned when filtering for COACH.
    */
   @Test
   void modeFilterOnMultiModalRoute() {
@@ -286,9 +285,9 @@ public class TripTimesOnDateTest {
   }
 
   /**
-   * Mode filter with separate single-mode routes. BUS and COACH are on different
-   * routes (and thus different patterns), so filtering for COACH returns the COACH
-   * trips regardless of earlier BUS departures.
+   * Mode filter with separate single-mode routes. BUS and COACH are on different routes (and thus
+   * different patterns), so filtering for COACH returns the COACH trips regardless of earlier BUS
+   * departures.
    */
   @Test
   void modeFilterOnSingleModalRoutes() {
@@ -341,8 +340,7 @@ public class TripTimesOnDateTest {
   }
 
   /**
-   * When querying for multiple stops, numberOfDepartures should be the total limit,
-   * not per-stop.
+   * When querying for multiple stops, numberOfDepartures should be the total limit, not per-stop.
    */
   @Test
   void numberOfDeparturesIsGlobalAcrossStops() {

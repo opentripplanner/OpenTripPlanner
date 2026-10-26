@@ -74,7 +74,7 @@ public class HierarchicalMap<K, V> extends AbstractHierarchicalMap<K, V> {
 
   /**
    * @return a collection of all values hold in the local map, all values added to one of the
-   * parents are excluded from the collection.
+   *         parents are excluded from the collection.
    */
   @Override
   public Collection<V> localValues() {

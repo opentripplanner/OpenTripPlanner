@@ -46,7 +46,10 @@ Sections follow that describe particular settings in more depth.
 | [transitModelTimeZone](#transitModelTimeZone)                                                  |      `time-zone`     | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
 | [transitServiceEnd](#transitServiceEnd)                                                        |      `duration`      | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
 | [transitServiceStart](#transitServiceStart)                                                    |      `duration`      | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
-| [boardingLocationTags](#boardingLocationTags)                                                  |      `string[]`      | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
+| [transitShapeSimplificationToleranceMeters](#transitShapeSimplificationToleranceMeters)     |       `double`       | Douglas-Peucker simplification tolerance for transit route shapes, in meters.                                                                                  | *Optional* | `0.0`                             |  2.11 |
+| [boardingLocations](#boardingLocations)                                                     |       `object`       | How transit stops are matched to OSM boarding locations.                                                                                                       | *Optional* |                                   |  2.11 |
+|    [coordinateSource](#boardingLocations_coordinateSource)                                  |        `enum`        | Which position OTP uses for a stop that matches an OSM platform or boarding location node.                                                                     | *Optional* | `"osm"`                           |  2.11 |
+|    [refTags](#boardingLocations_refTags)                                                  |      `string[]`      | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                                     | *Optional* |                                   |  2.2  |
 | [cache](#cache)                                                                                |       `object`       | Configuration for the graph-build file cache.                                                                                                                  | *Optional* |                                   |  2.10 |
 |    [enabled](#cache_enabled)                                                                   |       `boolean`      | Master switch for the graph-build cache.                                                                                                                       | *Optional* | `false`                           |  2.10 |
 |    [path](#cache_path)                                                                         |         `uri`        | Root directory for cache files.                                                                                                                                | *Optional* |                                   |  2.10 |
@@ -661,10 +664,59 @@ build(BUILD_DAY).
 To get an effectively unbounded value, use a very large period like `"-P100Y"`.
 
 
-<h3 id="boardingLocationTags">boardingLocationTags</h3>
+<h3 id="transitShapeSimplificationToleranceMeters">transitShapeSimplificationToleranceMeters</h3>
+
+**Since version:** `2.11` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`   
+**Path:** / 
+
+Douglas-Peucker simplification tolerance for transit route shapes, in meters.
+
+Simplifies each trip pattern's shape geometry once, at graph-build time, using the Douglas-Peucker algorithm
+with this distance tolerance as the epsilon parameter of the algorithm. A larger tolerance removes more
+points (and any shape detail smaller than it); points are never removed from an individual hop's endpoints,
+so stop locations are unaffected.
+
+This is opt-in - leave it unset to keep the raw, unsimplified shapes. 0.5 or 3.0 meters may save a significant
+amount of memory - if some of the feeds contains shapes with a lot of detail.
+
+
+<h3 id="boardingLocations">boardingLocations</h3>
+
+**Since version:** `2.11` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+How transit stops are matched to OSM boarding locations.
+
+[Detailed documentation](BoardingLocations.md)
+
+<h3 id="boardingLocations_coordinateSource">coordinateSource</h3>
+
+**Since version:** `2.11` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"osm"`   
+**Path:** /boardingLocations   
+**Enum values:** `osm` | `transit`
+
+Which position OTP uses for a stop that matches an OSM platform or boarding location node.
+
+When a stop's reference tag matches an OSM platform (a way or an area) or a tagged node, OTP
+has two candidate positions for where the passenger waits: the one in the OSM data and the
+one in the transit data.
+
+The default `OSM` uses the OSM feature. Every stop matching one platform shares a single
+point at its centre, so walking between them is free however far apart they really are, and
+every walk to or from the platform starts at that centre rather than at the stop — on a long
+platform, up to half its length of detour.
+
+`TRANSIT` keeps each stop where the transit data puts it and connects it to the platform by
+a walk of the real distance, so stops on one platform stay separate. This applies to
+platforms mapped as ways or areas and to stops matching a tagged node alike; the OSM
+features themselves are never moved. A gap too large to be a surveying discrepancy is
+reported as a data import issue.
+
+
+<h3 id="boardingLocations_refTags">refTags</h3>
 
 **Since version:** `2.2` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
-**Path:** / 
+**Path:** /boardingLocations 
 
 What OSM tags should be looked on for the source of matching stops to platforms and stops.
 
@@ -1552,6 +1604,13 @@ network that is also built here applies the zones twice.
   },
   "cache" : {
     "enabled" : true
+  },
+  "boardingLocations" : {
+    "refTags" : [
+      "ref",
+      "ref:IFOPT"
+    ],
+    "coordinateSource" : "transit"
   }
 }
 ```

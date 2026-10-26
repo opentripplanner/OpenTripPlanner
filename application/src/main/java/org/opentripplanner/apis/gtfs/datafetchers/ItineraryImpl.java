@@ -16,8 +16,8 @@ import org.opentripplanner.model.plan.Leg;
 
 public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
-  /// The key used to store the itinerary in the GraphQL context for looking it up during
-  /// the fare resolution in [LegImpl#fareProducts].
+  /// The key used to store the itinerary in the GraphQL context for looking it up during the fare
+  /// resolution in [LegImpl#fareProducts].
   static final String ITINERARY_CONTEXT_KEY = "itinerary";
 
   @Override

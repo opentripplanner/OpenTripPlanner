@@ -19,8 +19,8 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
  * prepared geometries are much faster than plain {@link org.locationtech.jts.geom.Geometry} for
  * repeated contains/intersects checks.
  * <p>
- * TODO: Multi-provider support. Currently only the first matching route is used.
- * In the future all matching providers should be available so users can choose.
+ * TODO: Multi-provider support. Currently only the first matching route is used. In the future
+ * all matching providers should be available so users can choose.
  */
 public class TaxiRouteIndex {
 
@@ -47,8 +47,8 @@ public class TaxiRouteIndex {
   }
 
   /**
-   * Returns the first route whose geometry contains both {@code pickup} and
-   * {@code dropoff}. Returns an empty optional if no route covers both endpoints.
+   * Returns the first route whose geometry contains both {@code pickup} and {@code dropoff}.
+   * Returns an empty optional if no route covers both endpoints.
    */
   @SuppressWarnings("unchecked")
   public Optional<TaxiRoute> findFirstRoute(WgsCoordinate pickup, WgsCoordinate dropoff) {
@@ -67,8 +67,8 @@ public class TaxiRouteIndex {
   }
 
   /**
-   * Returns all routes whose geometry contains the given {@code coordinate}.
-   * Returns an empty list if no route covers the coordinate.
+   * Returns all routes whose geometry contains the given {@code coordinate}. Returns an empty list
+   * if no route covers the coordinate.
    */
   @SuppressWarnings("unchecked")
   public List<TaxiRoute> findAllRoutes(WgsCoordinate coordinate) {

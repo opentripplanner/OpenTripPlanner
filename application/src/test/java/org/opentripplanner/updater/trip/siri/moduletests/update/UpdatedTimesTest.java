@@ -81,8 +81,8 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   }
 
   /**
-   * Update a 3-stop trip with a mix of recorded calls (past stops) and estimated calls
-   * (future stops).
+   * Update a 3-stop trip with a mix of recorded calls (past stops) and estimated calls (future
+   * stops).
    */
   @Test
   void testUpdateJourneyWithRecordedAndEstimatedCalls() {
@@ -119,8 +119,8 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   }
 
   /**
-   * Apply two successive updates to the same trip. The second update should replace the first,
-   * not accumulate delays.
+   * Apply two successive updates to the same trip. The second update should replace the first, not
+   * accumulate delays.
    */
   @Test
   void testUpdateJourneyMultipleTimes() {

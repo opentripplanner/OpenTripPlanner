@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  * the OTP internal transit model.
  * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
- * keeping an index of entities to enable linking. The convention is documented here {@link
- * NetexFeedParameters#sharedFilePattern()} and here {@link NetexDataSourceHierarchy}.
+ * keeping an index of entities to enable linking. The convention is documented here
+ * {@link NetexFeedParameters#sharedFilePattern()} and here {@link NetexDataSourceHierarchy}.
  * <p>
  * This class is also responsible for logging progress and exception handling.
  */
@@ -48,6 +48,7 @@ public class NetexBundle implements Closeable {
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final Collection<FeedScopedId> routeToCentroidStopPlaceIds;
   private final double maxStopToShapeSnapDistance;
+  private final double transitShapeSimplificationToleranceMeters;
   private final boolean noTransfersOnIsolatedStops;
   private final boolean allowStopPlaceAsPassengerStopAssignment;
   private final Set<IgnorableFeature> ignoredFeatures;
@@ -67,6 +68,7 @@ public class NetexBundle implements Closeable {
     Set<String> ferryIdsNotAllowedForBicycle,
     Collection<FeedScopedId> routeToCentroidStopPlaceIds,
     double maxStopToShapeSnapDistance,
+    double transitShapeSimplificationToleranceMeters,
     boolean noTransfersOnIsolatedStops,
     boolean allowStopPlaceAsPassengerStopAssignment,
     Set<IgnorableFeature> ignorableFeatures
@@ -78,6 +80,7 @@ public class NetexBundle implements Closeable {
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.routeToCentroidStopPlaceIds = Set.copyOf(routeToCentroidStopPlaceIds);
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.transitShapeSimplificationToleranceMeters = transitShapeSimplificationToleranceMeters;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
     this.allowStopPlaceAsPassengerStopAssignment = allowStopPlaceAsPassengerStopAssignment;
     this.ignoredFeatures = Set.copyOf(ignorableFeatures);
@@ -102,6 +105,7 @@ public class NetexBundle implements Closeable {
       ferryIdsNotAllowedForBicycle,
       routeToCentroidStopPlaceIds,
       maxStopToShapeSnapDistance,
+      transitShapeSimplificationToleranceMeters,
       noTransfersOnIsolatedStops
     );
 

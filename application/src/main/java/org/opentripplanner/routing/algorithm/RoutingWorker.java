@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.carpooling.CarpoolingService;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.flex.FlexParameters;
+import org.opentripplanner.ext.realtimeresolver.RealtimeResolver;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -93,6 +94,9 @@ public class RoutingWorker {
   private final RaptorTuningParameters raptorTuningParameters;
 
   @Nullable
+  private final RealtimeResolver realtimeResolver;
+
+  @Nullable
   private final DataOverlayParameterBindings dataOverlayParameterBindings;
 
   @Nullable
@@ -142,7 +146,8 @@ public class RoutingWorker {
     LinkingContextFactory linkingContextFactory,
     TransitTuningParameters transitTuningParameters,
     RaptorTuningParameters raptorTuningParameters,
-    RoutingWorkerRequest workerRequest
+    RoutingWorkerRequest workerRequest,
+    @Nullable RealtimeResolver realtimeResolver
   ) {
     this.request = workerRequest.request();
     this.transitSearchTimeZero = workerRequest.transitSearchTimeZero();
@@ -167,6 +172,7 @@ public class RoutingWorker {
     this.stopConsolidationService = stopConsolidationService;
     this.linkingContextFactory = linkingContextFactory;
     this.raptorTuningParameters = raptorTuningParameters;
+    this.realtimeResolver = realtimeResolver;
     this.transitTuningParameters = transitTuningParameters;
     this.debugTimingAggregator = new DebugTimingAggregator(
       meterRegistry,
@@ -263,21 +269,19 @@ public class RoutingWorker {
     // is off (too few or too many results found).
 
     var pagingService = createPagingService(result.itineraries());
-
     return RoutingResponseMapper.map(
       request,
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,
-      transitService,
-      transitAlertService,
-      pagingService
+      pagingService,
+      realtimeResolver
     );
   }
 
   /**
-   * Calculate the earliest-departure-time used in the transit search.
-   * This method returns {@code null} if no transit search is performed.
+   * Calculate the earliest-departure-time used in the transit search. This method returns
+   * {@code null} if no transit search is performed.
    */
   @Nullable
   private Instant earliestDepartureTimeUsed() {
@@ -293,8 +297,8 @@ public class RoutingWorker {
   }
 
   /**
-   * Calculate the search-window earliest-departure-time used in the transit search.
-   * This method returns {@code null} if no transit search is performed.
+   * Calculate the search-window earliest-departure-time used in the transit search. This method
+   * returns {@code null} if no transit search is performed.
    */
   @Nullable
   private Duration searchWindowUsed() {
@@ -511,8 +515,8 @@ public class RoutingWorker {
   }
 
   /**
-   * If this is a direct-only search (no transit) and no itineraries were found, return an error
-   * so the client knows why no results were returned.
+   * If this is a direct-only search (no transit) and no itineraries were found, return an error so
+   * the client knows why no results were returned.
    */
   private Collection<RoutingError> checkForEmptyDirectModeResult(RoutingResult result) {
     if (

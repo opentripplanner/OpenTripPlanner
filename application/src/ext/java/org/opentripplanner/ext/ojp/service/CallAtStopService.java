@@ -66,7 +66,7 @@ public class CallAtStopService {
       .stream()
       .flatMap(nearbyStop -> {
         List<StopLocation> stopLocations = List.of(
-          transitService.getStopLocation(nearbyStop.stopId)
+          transitService.getStopLocation(nearbyStop.stopId())
         );
         var calls1 = findCallsAtStop(stopLocations, params);
         return calls1.stream().map(tt -> tt.withWalkTime(nearbyStop.duration()));

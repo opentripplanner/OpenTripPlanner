@@ -25,9 +25,11 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.model.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.transit.configure.StaticTransitService;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterService;
 import org.opentripplanner.updater.UpdatersParameters;
@@ -63,6 +65,9 @@ public class UpdaterConfigurator {
   private final DeduplicatorService deduplicator;
   private final VertexLinker linker;
   private final TransitRepository transitRepository;
+
+  /** A transit service without real-time data, see {@link StaticTransitService}. */
+  private final TransitService staticTransitService;
   private final UpdatersParameters updatersParameters;
   private final RepositoryHandle<
     RealtimeVehicleRepositorySnapshot,
@@ -102,6 +107,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
+    TransitService staticTransitService,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager transitUpdateManager,
@@ -117,6 +123,7 @@ public class UpdaterConfigurator {
     this.realtimeVehicleRepositoryHandle = realtimeVehicleRepositoryHandle;
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.transitRepository = transitRepository;
+    this.staticTransitService = staticTransitService;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.transitUpdateManager = transitUpdateManager;
@@ -139,6 +146,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TransitRepository transitRepository,
+    TransitService staticTransitService,
     @Nullable CarpoolingRepository carpoolingRepository,
     @Nullable CarpoolTripVertexResolver carpoolTripVertexResolver,
     UpdateManager transitUpdateManager,
@@ -156,6 +164,7 @@ public class UpdaterConfigurator {
       vehicleRentalRepository,
       parkingRepository,
       transitRepository,
+      staticTransitService,
       carpoolingRepository,
       carpoolTripVertexResolver,
       transitUpdateManager,
@@ -359,7 +368,7 @@ public class UpdaterConfigurator {
 
   private SiriFuzzyTripMatcherCache siriFuzzyTripMatcherCache() {
     if (siriFuzzyTripMatcherCache == null) {
-      siriFuzzyTripMatcherCache = SiriFuzzyTripMatcherCache.create(transitRepository);
+      siriFuzzyTripMatcherCache = SiriFuzzyTripMatcherCache.create(staticTransitService);
     }
     return siriFuzzyTripMatcherCache;
   }

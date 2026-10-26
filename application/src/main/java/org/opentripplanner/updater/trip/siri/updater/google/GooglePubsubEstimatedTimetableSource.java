@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
@@ -42,13 +43,12 @@ import uk.org.siri.siri21.Siri;
 /**
  * A source of estimated timetables that reads SIRI-ET messages from a Google PubSub subscription.
  * <p>
- *   This class starts a Google PubSub subscription
+ * This class starts a Google PubSub subscription
  * <p>
  * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
  * "GOOGLE_APPLICATION_CREDENTIALS" as described here:
  * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access
- * to
- * create subscription ("editor")</a>
+ * to create subscription ("editor")</a>
  * <p>
  * <p>
  * <p>
@@ -80,11 +80,11 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private static final int RETRY_BACKOFF = 2;
 
   /**
-   * The URL used to fetch all initial updates.
-   * The URL responds to HTTP GET and returns all initial data in xml-format. It will be
-   * called once to initialize real-time-data.
-   * All subsequent updates will be received from Google Cloud Pubsub.
+   * The URL used to fetch all initial updates. The URL responds to HTTP GET and returns all initial
+   * data in xml-format. It will be called once to initialize real-time-data. All subsequent updates
+   * will be received from Google Cloud Pubsub. If null, no initial data is fetched.
    */
+  @Nullable
   private final URI dataInitializationUrl;
 
   /**
@@ -110,15 +110,15 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private volatile boolean primed;
 
   public GooglePubsubEstimatedTimetableSource(
-    String dataInitializationUrl,
+    @Nullable String dataInitializationUrl,
     Duration reconnectPeriod,
     Duration initialGetDataTimeout,
     String subscriptionProjectName,
     String topicProjectName,
     String topicName
   ) {
-    //
-    this.dataInitializationUrl = URI.create(dataInitializationUrl);
+    this.dataInitializationUrl =
+      dataInitializationUrl == null ? null : URI.create(dataInitializationUrl);
     this.reconnectPeriod = reconnectPeriod;
     this.initialGetDataTimeout = initialGetDataTimeout;
 
@@ -146,8 +146,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   /**
    * Create a PubSub subscription, read the backlog of messages and start listening to the
-   * subscription.
-   * Enter an infinite loop waiting for messages. An interruption sent at server
+   * subscription. Enter an infinite loop waiting for messages. An interruption sent at server
    * shutdown will cause the loop to stop.
    */
   @Override
@@ -184,9 +183,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   }
 
   /**
-   * Build a unique name for the subscription.
-   * This ensures that if the subscription is not properly deleted during shutdown,
-   * a restarted instance will get a fresh subscription.
+   * Build a unique name for the subscription. This ensures that if the subscription is not properly
+   * deleted during shutdown, a restarted instance will get a fresh subscription.
    */
   private static String buildSubscriptionId() {
     String hostname = System.getenv("HOSTNAME");
@@ -262,8 +260,8 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   }
 
   /**
-   * Fetch the backlog of messages and apply the changes to the transit model.
-   * Block until the backlog is applied.
+   * Fetch the backlog of messages and apply the changes to the transit model. Block until the
+   * backlog is applied.
    */
   private void initializeData() {
     if (dataInitializationUrl != null) {

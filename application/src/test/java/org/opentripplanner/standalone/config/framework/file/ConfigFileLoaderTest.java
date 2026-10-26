@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.utils.lang.StringUtils;
+import tools.jackson.databind.JsonNode;
 
 class ConfigFileLoaderTest {
 
@@ -38,7 +38,7 @@ class ConfigFileLoaderTest {
     JsonNode node = ConfigFileLoader.nodeFromString("{key:\"value\"}", "JSON-STRING");
 
     // then:
-    assertEquals("value", node.path("key").asText());
+    assertEquals("value", node.path("key").asString());
   }
 
   @Test
@@ -79,7 +79,7 @@ class ConfigFileLoaderTest {
     JsonNode node = ConfigFileLoader.nodeFromString(json, "test");
 
     // Then: verify that the JSON node have the expected value
-    String actualValue = node.path("key").asText(null);
+    String actualValue = node.path("key").asString(null);
 
     assertEquals(expectedValue, actualValue);
   }

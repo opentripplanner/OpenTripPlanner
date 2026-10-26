@@ -171,9 +171,9 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
      * 12:00  12:20  12:25  12:45
      * </pre>
      * This will create a timetable with for stops(A, B, C, & F) and 3 scheduled trips. The
-     * {@link RaptorTestConstants#stopNameToIndex(String)} is used to resolve the stop index
-     * for each of the named stops A, B, C & F. The first line must contain the stop names(A-Z),
-     * and the each extra line is the trips. Extra white-space and empty lines are ignored.
+     * {@link RaptorTestConstants#stopNameToIndex(String)} is used to resolve the stop index for
+     * each of the named stops A, B, C & F. The first line must contain the stop names(A-Z), and the
+     * each extra line is the trips. Extra white-space and empty lines are ignored.
      */
     public TestRoute timetable(String timetable) {
       timetable = timetable.trim();

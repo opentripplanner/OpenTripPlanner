@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An event listener which keeps the result for each event type. Used in tests in this package
- * only!
+ * An event listener which keeps the result for each event type. Used in tests in this package only!
  */
 class TestParetoSetEventListener<T> implements ParetoSetEventListener<T> {
 

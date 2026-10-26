@@ -25,16 +25,16 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
- * A container for a few pieces of information that can be used to calculate flex accesses, egresses,
- * direct flex itineraries or polylines.
+ * A container for a few pieces of information that can be used to calculate flex accesses,
+ * egresses, direct flex itineraries or polylines.
  * <p>
  * Please also see Flex.svg for an illustration of how the flex concepts relate to each other.
  */
 abstract class AbstractFlexTemplate {
 
   /**
-   * We do not want extremely short flex trips, they will normally be dominated in the
-   * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
+   * We do not want extremely short flex trips, they will normally be dominated in the routing
+   * later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
    */
   private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
 
@@ -91,7 +91,7 @@ abstract class AbstractFlexTemplate {
   }
 
   FeedScopedId getAccessEgressStopId() {
-    return accessEgress.stopId;
+    return accessEgress.stopId();
   }
 
   /**
@@ -109,7 +109,7 @@ abstract class AbstractFlexTemplate {
     else {
       double maxDistanceMeters =
         flexParameters.maxTransferDuration().getSeconds() *
-        accessEgress.state.getRequest().walk().speed();
+        accessEgress.state().getRequest().walk().speed();
 
       return getTransfersFromTransferStop(callback)
         .stream()
@@ -194,7 +194,7 @@ abstract class AbstractFlexTemplate {
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice, leading to a noticeable slowdown.
-    final var afterFlexState = flexEdge.traverse(accessEgress.state);
+    final var afterFlexState = flexEdge.traverse(accessEgress.state());
     if (State.isEmpty(afterFlexState)) {
       return null;
     }

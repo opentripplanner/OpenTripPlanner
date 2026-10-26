@@ -10,8 +10,8 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningParam
 
 /**
  * A disconnected street network is only pruned if its size, measured in street vertices, is
- * strictly below the configured threshold. A disconnected network that meets the threshold is
- * left untouched, even though it has no connection to the rest of the graph.
+ * strictly below the configured threshold. A disconnected network that meets the threshold is left
+ * untouched, even though it has no connection to the rest of the graph.
  */
 class IslandAboveThresholdRetainedTest {
 

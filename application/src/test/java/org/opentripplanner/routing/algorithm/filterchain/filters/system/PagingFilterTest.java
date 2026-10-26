@@ -42,7 +42,7 @@ public class PagingFilterTest implements PlanTestConstants {
   /** [11:04, 11:07, $300, Tx0, transit] */
   private static final Itinerary EARLY = newItinerary(A).bus(1, EARLY_START, EARLY_END, D).build();
 
-  /**  [11:03, 11:10, $636, Tx1, transit] */
+  /** [11:03, 11:10, $636, Tx1, transit] */
   private static final Itinerary MIDDLE = createMiddle(636);
 
   /** [11:00, 11:12, $840, Tx0, transit] */

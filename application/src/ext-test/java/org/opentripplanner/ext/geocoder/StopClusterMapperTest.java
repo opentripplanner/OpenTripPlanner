@@ -11,9 +11,11 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
+import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TransitRepository;
@@ -31,6 +33,7 @@ class StopClusterMapperTest {
   private static final TransitRepository TIMETABLE_REPOSITORY = new TransitRepository(
     SITE_REPOSITORY
   );
+  private static final TimetableDataImport TIMETABLE_DATA_IMPORT = new TimetableDataImport();
   private static final List<StopLocation> LOCATIONS = STOPS.stream()
     .map(StopLocation.class::cast)
     .toList();
@@ -87,6 +90,12 @@ class StopClusterMapperTest {
 
   private static StopClusterMapper buildMapper(DefaultStopConsolidationRepository repo) {
     var service = new DefaultStopConsolidationService(repo, TIMETABLE_REPOSITORY);
-    return new StopClusterMapper(new DefaultTransitService(TIMETABLE_REPOSITORY), service);
+    return new StopClusterMapper(
+      new DefaultTransitService(
+        TIMETABLE_REPOSITORY,
+        DefaultTimetableRepository.scheduledOnly(TIMETABLE_DATA_IMPORT.toScheduledTimetableData())
+      ),
+      service
+    );
   }
 }

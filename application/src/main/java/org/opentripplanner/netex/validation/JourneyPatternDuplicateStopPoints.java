@@ -10,8 +10,8 @@ import org.rutebanken.netex.model.ServiceJourney;
 
 /**
  * Validates that a JourneyPattern does not contain duplicate StopPointInJourneyPattern IDs.
- * Duplicate stop point IDs in a journey pattern indicate invalid NeTEx data and will cause
- * failures when creating lookup maps.
+ * Duplicate stop point IDs in a journey pattern indicate invalid NeTEx data and will cause failures
+ * when creating lookup maps.
  */
 class JourneyPatternDuplicateStopPoints extends AbstractHMapValidationRule<String, ServiceJourney> {
 

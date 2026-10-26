@@ -11,12 +11,13 @@ import org.opentripplanner.street.search.state.State;
 
 /**
  * Handles network commitment for generic (null-network) RENTING_FLOATING states in arrive-by
- * searches. When a generic state crosses a zone boundary, this handler forks committed branches
- * for each new network and continues the generic with updated committedNetworks.
+ * searches. When a generic state crosses a zone boundary, this handler forks committed branches for
+ * each new network and continues the generic with updated committedNetworks.
  *
- * <p>Also handles no-traversal zone network recording: when a generic state enters a
- * no-traversal zone, the zone's network is added to committedNetworks (since a committed
- * branch for that network could never legally traverse this path).
+ * <p>
+ * Also handles no-traversal zone network recording: when a generic state enters a no-traversal
+ * zone, the zone's network is added to committedNetworks (since a committed branch for that network
+ * could never legally traverse this path).
  */
 class NetworkCommitmentHandler {
 
@@ -46,8 +47,8 @@ class NetworkCommitmentHandler {
   }
 
   /**
-   * Collect networks from no-traversal zones that a generic state would enter.
-   * These are recorded in committedNetworks to avoid wasteful forks later.
+   * Collect networks from no-traversal zones that a generic state would enter. These are recorded
+   * in committedNetworks to avoid wasteful forks later.
    */
   private static Set<String> collectNoTraversalNetworks(
     State s0,
@@ -85,12 +86,12 @@ class NetworkCommitmentHandler {
   }
 
   /**
-   * Classify new zone networks into those that need committed forks and those that only need
-   * to be recorded in committedNetworks. Business area networks are commit-only: the committed
-   * renting branch for a BA network is created via the HAVE_RENTED walker path
+   * Classify new zone networks into those that need committed forks and those that only need to be
+   * recorded in committedNetworks. Business area networks are commit-only: the committed renting
+   * branch for a BA network is created via the HAVE_RENTED walker path
    * ({@link BusinessAreaEnforcement} + {@link DeferredForkHandler}), which correctly enforces
-   * boundary drop-off. Forking a committed rider here would create an illegal path that drops
-   * off outside the business area.
+   * boundary drop-off. Forking a committed rider here would create an illegal path that drops off
+   * outside the business area.
    */
   private static void classifyNewZoneNetworks(
     State before,

@@ -46,9 +46,9 @@ record ClosestTrip(
   }
 
   /**
-   * Create a set of the closest trips running on the dates provided. Only the
-   * combination of the closest nearby-stop and trip is kept. For each combination,
-   * the set of dates is checked, and an instance with each active date is returned.
+   * Create a set of the closest trips running on the dates provided. Only the combination of the
+   * closest nearby-stop and trip is kept. For each combination, the set of dates is checked, and an
+   * instance with each active date is returned.
    */
   static Collection<ClosestTrip> of(
     FlexAccessEgressCallbackAdapter callbackService,
@@ -83,7 +83,7 @@ record ClosestTrip(
   ) {
     var map = new HashMap<FlexTrip<?, ?>, ClosestTrip>();
     for (NearbyStop nearbyStop : nearbyStops) {
-      var stopId = nearbyStop.stopId;
+      var stopId = nearbyStop.stopId();
       for (var trip : callbackService.getFlexTripsByStopId(stopId)) {
         int stopPos = pickup ? trip.findBoardIndex(stopId) : trip.findAlightIndex(stopId);
         if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND && matcher.match(trip.getTrip())) {

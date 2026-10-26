@@ -2,11 +2,11 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.utils.text.MarkdownFormatter.NEW_LINE;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.utils.text.MarkdownFormatter;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Builder for creating a new document
@@ -17,8 +17,8 @@ public class DocBuilder {
   private final StringBuilder buffer = new StringBuilder();
 
   /**
-   * Add new line to output document - note this do not break the line in the generated HTML
-   * end result.
+   * Add new line to output document - note this do not break the line in the generated HTML end
+   * result.
    */
   public DocBuilder newLine() {
     buffer.append(NEW_LINE);
