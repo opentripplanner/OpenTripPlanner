@@ -50,6 +50,23 @@ class TimeSlopeSafetyTrianglePreferenceTest {
   }
 
   @Test
+  void noCombinationOfValuesFailsOrBreaksTheSumOfOne() {
+    for (int t = 0; t <= 40; ++t) {
+      for (int sl = 0; sl <= 40; ++sl) {
+        for (int sa = 0; sa <= 40; ++sa) {
+          if (t + sl + sa == 0) {
+            continue;
+          }
+          var subject = TimeSlopeSafetyTrianglePreference.of(t / 40.0, sl / 40.0, sa / 40.0);
+          double sum =
+            subject.time().asDouble() + subject.slope().asDouble() + subject.safety().asDouble();
+          assertThat(sum).isWithin(EPSILON).of(1.0);
+        }
+      }
+    }
+  }
+
+  @Test
   void allValuesZeroIsRejected() {
     assertThrows(IllegalArgumentException.class, () ->
       TimeSlopeSafetyTrianglePreference.of(0.0, 0.0, 0.0)

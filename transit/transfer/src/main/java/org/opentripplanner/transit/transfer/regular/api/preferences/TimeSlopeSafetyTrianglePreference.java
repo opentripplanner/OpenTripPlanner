@@ -22,19 +22,18 @@ public final class TimeSlopeSafetyTrianglePreference
   implements NormalizedDistance<TimeSlopeSafetyTrianglePreference>, Serializable
 {
 
-  /** The number of steps the sum of the values (1.0) is divided into, each step is 5/100. */
-  private static final int STEPS = 20;
-
-  private static final double STEP = 1.0 / STEPS;
-
   private final NormalizedRatio time;
   private final NormalizedRatio slope;
   private final NormalizedRatio safety;
 
-  private TimeSlopeSafetyTrianglePreference(int time, int slope, int safety) {
-    this.time = ratio(time);
-    this.slope = ratio(slope);
-    this.safety = ratio(safety);
+  private TimeSlopeSafetyTrianglePreference(
+    NormalizedRatio time,
+    NormalizedRatio slope,
+    NormalizedRatio safety
+  ) {
+    this.time = time;
+    this.slope = slope;
+    this.safety = safety;
   }
 
   /**
@@ -52,28 +51,11 @@ public final class TimeSlopeSafetyTrianglePreference
     if (!(sum > 0.0)) {
       throw new IllegalArgumentException("At least one of time, slope and safety must be set.");
     }
-    // Share out the steps: each value gets the whole steps of its share, and the steps that are
-    // left go to the values with the biggest remainder.
-    double[] share = { (time / sum) * STEPS, (slope / sum) * STEPS, (safety / sum) * STEPS };
-    int[] steps = new int[3];
-    int used = 0;
-    for (int i = 0; i < 3; ++i) {
-      steps[i] = (int) Math.floor(share[i] + 1e-9);
-      used += steps[i];
-    }
-    for (int left = STEPS - used; left > 0; --left) {
-      int best = 0;
-      double bestRemainder = -1.0;
-      for (int i = 0; i < 3; ++i) {
-        double remainder = share[i] - steps[i];
-        if (remainder > bestRemainder + 1e-9) {
-          best = i;
-          bestRemainder = remainder;
-        }
-      }
-      steps[best]++;
-    }
-    return new TimeSlopeSafetyTrianglePreference(steps[0], steps[1], steps[2]);
+    var timeRatio = Ratio.of(time / sum).normalize();
+    var slopeRatio = Ratio.of(slope / sum).normalize();
+    var safetyRatio = Ratio.of(1.0 - (timeRatio.asDouble() + slopeRatio.asDouble())).normalize();
+
+    return new TimeSlopeSafetyTrianglePreference(timeRatio, slopeRatio, safetyRatio);
   }
 
   /** The importance of the time, a value of 1.0 is the same as the shortest duration. */
@@ -123,9 +105,5 @@ public final class TimeSlopeSafetyTrianglePreference
       .addObj("slope", slope)
       .addObj("safety", safety)
       .toString();
-  }
-
-  private static NormalizedRatio ratio(int steps) {
-    return Ratio.of(steps * STEP).normalize();
   }
 }
