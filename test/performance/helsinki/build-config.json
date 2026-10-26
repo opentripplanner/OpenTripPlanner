@@ -5,23 +5,25 @@
   "includeInclinedEdgeLevelInfo": true,
   "subwayAccessTime": 0,
   "maxAreaNodes": 1000,
-  "maxTransferDuration": "26m",
   "multiThreadElevationCalculations": true,
   "transitServiceStart": "2026-02-01",
   "transitServiceEnd": "2026-02-28",
   "transitModelTimeZone": "Europe/Helsinki",
   "fares": "hsl",
-  "transferRequests": [
-    { "modes": "WALK" },
-    {
-      "modes": "WALK",
-      "wheelchairAccessibility": {
-        "enabled": true,
-        "maxSlope": 0.125
-      }
+  "transfers": {
+    "walk": { "maxDuration": "26m" },
+    "wheelchair": {
+      "maxDuration": "26m",
+      "profiles": [
+        {
+          "id": "wheelchair",
+          "routingRequest": { "wheelchairAccessibility": { "enabled": true, "maxSlope": 0.125 } }
+        }
+      ]
     },
-    { "modes": "BICYCLE" }
-  ],
+    "bicycle": { "maxDuration": "26m" },
+    "via": { "maxDuration": "26m" }
+  },
   "gtfsDefaults": {
     "stationTransferPreference": "recommended"
   },

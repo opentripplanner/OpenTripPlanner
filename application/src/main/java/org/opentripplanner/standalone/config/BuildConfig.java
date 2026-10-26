@@ -12,6 +12,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_9;
 
 import java.net.URI;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -42,21 +43,22 @@ import org.opentripplanner.osm.model.CompoundRefTagGroup;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.buildconfig.BoardingLocationsConfig;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
+import org.opentripplanner.standalone.config.buildconfig.FlexTransferConfig;
 import org.opentripplanner.standalone.config.buildconfig.GraphBuildCacheConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.IslandPruningConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
-import org.opentripplanner.standalone.config.buildconfig.RegularTransferConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransferProfilesConfigMapper;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
+import org.opentripplanner.standalone.config.buildconfig.ViaTransferConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.street.geometry.CompactElevationProfile;
 import org.opentripplanner.street.model.StreetConstants;
-import org.opentripplanner.transfer.dataimport.api.RegularTransferParameters;
+import org.opentripplanner.transfer.dataimport.api.FlexTransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -173,7 +175,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DemExtractParameters demDefaults;
   public final OsmExtractParameters osmDefaults;
 
-  private final RegularTransferParameters regularTransferParameters;
+  private final FlexTransferParameters flexTransferParameters;
+  private final Duration viaTransferMaxDuration;
   private final TransferParameters<RouteRequest> transferProfiles;
 
   public final int maxAreaNodes;
@@ -320,8 +323,10 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asInt(1000);
 
-    this.regularTransferParameters = RegularTransferConfig.map(root);
-    this.transferProfiles = TransferProfilesConfigMapper.map(root);
+    var transfers = TransferProfilesConfigMapper.transfersNode(root);
+    this.transferProfiles = TransferProfilesConfigMapper.mapTransfers(transfers);
+    this.flexTransferParameters = FlexTransferConfig.map(transfers);
+    this.viaTransferMaxDuration = ViaTransferConfig.mapMaxDuration(transfers);
 
     this.maxStopToShapeSnapDistance = root
       .of("maxStopToShapeSnapDistance")
@@ -802,8 +807,12 @@ public class BuildConfig implements OtpDataStoreConfig {
     return transitRouteToStationCentroid;
   }
 
-  public RegularTransferParameters regularTransferParameters() {
-    return regularTransferParameters;
+  public FlexTransferParameters flexTransferParameters() {
+    return flexTransferParameters;
+  }
+
+  public Duration viaTransferMaxDuration() {
+    return viaTransferMaxDuration;
   }
 
   /**

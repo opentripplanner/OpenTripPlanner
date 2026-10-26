@@ -26,7 +26,7 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transfer.dataimport.api.RegularTransferParameters;
+import org.opentripplanner.transfer.dataimport.api.FlexTransferParameters;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -93,7 +93,7 @@ public class FlexTransferGenerator implements GraphBuilderModule {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
-    RegularTransferParameters parameters
+    FlexTransferParameters parameters
   ) {
     this(
       graph,

@@ -83,27 +83,20 @@ Other parameters are:
 By default OTP only pre-calculates transfers between stops for able-bodied walkers. If they have no
 obstacles wheelchair users can use them, too, but there won't be guaranteed to be one.
 
-If you want OTP to also pre-generate wheelchair-accessible transfers use the following configuration
-in `build-config.json`:
+If you want OTP to also pre-generate wheelchair-accessible transfers add a `wheelchair` profile type
+to the `transfers` section in `build-config.json`, see [Transfer configuration](TransferConfiguration.md):
 
 ```json
 {
-  "transferRequests": [
-    {
-      "modes": "WALK"
-    },
-    {
-      "modes": "WALK",
-      "wheelchairAccessibility": {
-        "enabled": true
-      }
-    }
-  ]
+  "transfers": {
+    "walk": { "maxDuration": "30m" },
+    "wheelchair": { "maxDuration": "30m" }
+  }
 }
 ```
 
-This results in OTP calculating an accessible transfer if the default one is found to be
-inaccessible to wheelchair users.
+A routing request for a wheelchair accessible trip then uses the transfers of the `wheelchair`
+profiles.
 
 ## Example
 

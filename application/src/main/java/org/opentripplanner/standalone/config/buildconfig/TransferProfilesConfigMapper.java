@@ -40,9 +40,9 @@ import org.opentripplanner.utils.collection.ParentOrder;
 
 /**
  * Parses the {@code transfers:} build-config block, see {@code doc/user/TransferConfiguration.md},
- * into the {@link TransferParameters} of the regular-transfer module. Entirely separate
- * from {@link RegularTransferConfig}/{@code transferRequests}, which {@code FlexTransferGenerator}
- * keeps reading unchanged for FLEX.
+ * into the {@link TransferParameters} of the regular-transfer module. The {@code flex} and
+ * {@code via} blocks of the same node are parsed by {@link FlexTransferConfig} and
+ * {@link ViaTransferConfig}.
  * <p>
  * The configuration of a profile type is a block named after the type, for example {@code walk},
  * with the profiles, the max durations and the warmup entries of the type. The types {@code walk},
@@ -55,23 +55,30 @@ public class TransferProfilesConfigMapper {
   static final String DEFAULT_WALK_PROFILE_ID = "walk";
 
   public static TransferParameters<RouteRequest> map(NodeAdapter root) {
-    var transfers = root
+    return mapTransfers(transfersNode(root));
+  }
+
+  /** The {@code transfers} node, the parent of the regular, flex and via transfer blocks. */
+  public static NodeAdapter transfersNode(NodeAdapter root) {
+    return root
       .of("transfers")
       .since(V2_10)
       .summary("Transfer profiles for the raptor-data regular-transfer pipeline.")
       .description(
         """
-        Replaces `transferRequests` for regular (non-FLEX) transfer generation. The configuration of
-        a profile type is a block named after the type, with its `profiles`, its `maxDuration` and
-        its `warmup` entries. The types `walk`, `wheelchair`, `bicycle` and `car` are supported for
-        now. If no profile is configured, a single default `walk` profile with a max duration of 30
-        minutes is used, mirroring the implicit default of the old `transferRequests` config. Each
-        profile type with profiles must set its `maxDuration`. The old `maxTransferDuration` is
-        not used.
+        The configuration of a profile type is a block named after the type, with its `profiles`,
+        its `maxDuration` and its `warmup` entries. The types `walk`, `wheelchair`, `bicycle` and
+        `car` are supported for now. If no profile is configured, a single default `walk` profile
+        with a max duration of 30 minutes is used. Each profile type with profiles must set its
+        `maxDuration`. The `flex` and `via` blocks configure the transfers of flex routing and of
+        the via coordinates, they replace the old `transferRequests` and `maxTransferDuration`.
         """
       )
       .asObject();
+  }
 
+  /** Map the regular transfer profiles of the {@code transfers} node. */
+  public static TransferParameters<RouteRequest> mapTransfers(NodeAdapter transfers) {
     var deduplicationLimit = mapDeduplicationLimit(transfers);
 
     var typeBlocks = new EnumMap<TransferProfileType, NodeAdapter>(TransferProfileType.class);

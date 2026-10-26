@@ -33,7 +33,6 @@ Sections follow that describe particular settings in more depth.
 | [maxDataImportIssuesPerType](#maxDataImportIssuesPerType)                               |      `integer`     | The maximum number of issues of each type written to the import report.                                                                                        | *Optional* | `1000`                            |  2.11 |
 | maxElevationPropagationMeters                                                           |      `integer`     | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                               |      `double`      | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
-| maxTransferDuration                                                                     |     `duration`     | Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph.                                               | *Optional* | `"PT30M"`                         |  2.1  |
 | [multiThreadElevationCalculations](#multiThreadElevationCalculations)                   |      `boolean`     | Configuring multi-threading during elevation calculations.                                                                                                     | *Optional* | `false`                           |  2.0  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                                 |      `boolean`     | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
 | [osmNaming](#osmNaming)                                                                 |       `enum`       | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
@@ -102,7 +101,6 @@ Sections follow that describe particular settings in more depth.
 |    includeOsmStationEntrances                                                           |      `boolean`     | Whether to include station entrances from the OSM data.                                                                                                        | *Optional* | `false`                           |  2.10 |
 |    [osmTagMapping](#od_osmTagMapping)                                                   |       `enum`       | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                                             |     `time-zone`    | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
-| [transferRequests](RouteRequest.md)                                                     |     `object[]`     | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
 | [transfers](TransferConfiguration.md)                                                   |      `object`      | Transfer profiles for the raptor-data regular-transfer pipeline.                                                                                               | *Optional* |                                   |  2.10 |
 | [transitFeeds](#transitFeeds)                                                           |     `object[]`     | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
 |    { object }                                                                           |      `object`      | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
@@ -1367,17 +1365,27 @@ network that is also built here applies the zones twice.
       "ignoreFilePattern" : "(temp|tmp)"
     }
   ],
-  "transferRequests" : [
-    {
-      "modes" : "WALK"
+  "transfers" : {
+    "walk" : {
+      "maxDuration" : "30m"
     },
-    {
-      "modes" : "WALK",
-      "wheelchairAccessibility" : {
-        "enabled" : true
-      }
+    "wheelchair" : {
+      "maxDuration" : "30m"
+    },
+    "flex" : {
+      "requests" : [
+        {
+          "modes" : "WALK"
+        },
+        {
+          "modes" : "WALK",
+          "wheelchairAccessibility" : {
+            "enabled" : true
+          }
+        }
+      ]
     }
-  ],
+  },
   "stopConsolidationFile" : "consolidated-stops.csv",
   "cache" : {
     "enabled" : true
