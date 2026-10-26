@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Handles a client that disconnects while the response body is written. This is not a server
- * error, and any client can cause it at will, so it is logged at debug level. Without this,
- * Jersey logs it as an error with a full stack trace.
+ * error, and any client can cause it at will, so it is logged at info level without a stack trace.
+ * Without this, Jersey logs it as an error with a full stack trace.
  * <p>
  * Failures that are not caused by writing to the client are passed on unchanged.
  */
@@ -29,7 +29,10 @@ public class ClientDisconnectInterceptor implements WriterInterceptor {
       if (!clientStream.writeFailed) {
         throw e;
       }
-      LOG.debug("Could not write response, the client probably closed the connection", e);
+      LOG.info(
+        "Could not write response, the client probably closed the connection: {}",
+        e.toString()
+      );
     }
   }
 
