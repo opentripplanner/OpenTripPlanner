@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -239,5 +240,37 @@ class RegularTransferPreferencesMapperTest {
     assertThat(request.preferences().bike().walking().speed()).isEqualTo(0.9);
     assertThat(request.preferences().bike().walking().reluctance()).isEqualTo(7.0);
     assertThat(SUBJECT.toUserPreferences(request)).isEqualTo(preferences);
+  }
+
+  @Test
+  void theSafetyFactorOfAWalkAndAWheelchairRequestIsTheSafetyFactorOfTheWalkPreferences() {
+    var walkRequest = RouteRequest.defaultValue()
+      .copyOf()
+      .withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(0.4)))
+      .buildDefault();
+    var wheelchairRequest = walkRequest
+      .copyOf()
+      .withJourney(j -> j.withWheelchair(true))
+      .buildDefault();
+
+    var walk = (WalkPreferences) SUBJECT.toUserPreferences(walkRequest);
+    var wheelchair = (WheelchairPreferences) SUBJECT.toUserPreferences(wheelchairRequest);
+
+    assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
+    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
+  }
+
+  @Test
+  void theSafetyFactorMakesTheSafetyFactorOfTheWalkPreferencesOfTheRequest() {
+    var walk = WalkPreferences.of().withSafetyFactor(Ratio.of(0.4).normalize()).build();
+    var wheelchair = WheelchairPreferences.of().withSafetyFactor(Ratio.of(0.6).normalize()).build();
+
+    var walkRequest = SUBJECT.toRequest(walk, RouteRequest.defaultValue());
+    var wheelchairRequest = SUBJECT.toRequest(wheelchair, RouteRequest.defaultValue());
+
+    assertThat(walkRequest.preferences().walk().safetyFactor()).isEqualTo(0.4);
+    assertThat(wheelchairRequest.preferences().walk().safetyFactor()).isEqualTo(0.6);
+    assertThat(SUBJECT.toUserPreferences(walkRequest)).isEqualTo(walk);
+    assertThat(SUBJECT.toUserPreferences(wheelchairRequest)).isEqualTo(wheelchair);
   }
 }

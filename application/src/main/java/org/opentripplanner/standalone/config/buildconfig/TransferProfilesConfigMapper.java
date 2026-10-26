@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.NormalizedRatio;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -30,6 +32,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.BicycleWalk;
 import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
+import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFactor;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
@@ -546,6 +549,7 @@ public class TransferProfilesConfigMapper {
     var builder = base.copyOf();
     builder.withSpeed(mapSpeed(p, "Walking speed, in meters per second.", base));
     builder.withReluctance(mapReluctance(p, "A multiplier for the cost of walking.", base));
+    builder.withSafetyFactor(mapSafetyFactor(p, base));
     return builder.build();
   }
 
@@ -560,7 +564,32 @@ public class TransferProfilesConfigMapper {
     builder.withReluctance(
       mapReluctance(p, "A multiplier for the cost of traveling in a wheelchair.", base)
     );
+    builder.withSafetyFactor(mapSafetyFactor(p, base));
     return builder.build();
+  }
+
+  private static <
+    T extends AbstractUserPreferences<T> & WithSafetyFactor
+  > NormalizedRatio mapSafetyFactor(NodeAdapter p, T base) {
+    var value = p
+      .of("safetyFactor")
+      .since(V2_10)
+      .summary("How much the safety of the streets is considered.")
+      .description(
+        """
+        A value between 0.0 and 1.0. If it is 0.0, the safety is ignored. If it is 1.0, the safety
+        factor of the street is applied in whole as a multiplier on the cost, on top of the
+        reluctance.
+        """
+      )
+      .asDouble(base.safetyFactor().asDouble());
+    try {
+      return Ratio.of(value).normalize();
+    } catch (IllegalArgumentException e) {
+      throw new OtpAppException(
+        "Invalid transfer configuration in " + p.contextPath() + ": safetyFactor. " + e.getMessage()
+      );
+    }
   }
 
   private static BicyclePreferences mapBicyclePreferences(NodeAdapter p, BicyclePreferences base) {

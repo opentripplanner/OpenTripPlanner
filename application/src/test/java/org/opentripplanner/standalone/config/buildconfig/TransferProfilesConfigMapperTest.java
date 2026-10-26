@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Cost;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -975,6 +976,55 @@ class TransferProfilesConfigMapperTest {
     assertThat(child.walk()).isEqualTo(
       BicycleWalk.of(Speed.ofMetersPerSecond(1.0), Reluctance.of(8.0))
     );
+  }
+
+  @Test
+  void theSafetyFactorOfAWalkAndAWheelchairProfileIsSet() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: {
+            maxDuration: '30m',
+            profiles: [
+              { id: "walk", userPreferences: { safetyFactor: 0.5 } },
+              { id: "child", parent: "walk", userPreferences: { reluctance: 3.0 } }
+            ]
+          },
+          wheelchair: {
+            maxDuration: '30m',
+            profiles: [{ id: "wheelchair", userPreferences: { safetyFactor: 0.3 } }]
+          }
+        }
+      }
+      """
+    );
+
+    var walk = (WalkPreferences) profile(subject, "walk").userPreferences();
+    var child = (WalkPreferences) profile(subject, "child").userPreferences();
+    var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
+    assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
+    assertThat(child.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
+    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.3).normalize());
+  }
+
+  @Test
+  void aSafetyFactorOutsideTheRangeIsRejected() {
+    var root = newNodeAdapterForTest(
+      """
+      {
+        transfers: {
+          walk: {
+            maxDuration: '30m',
+            profiles: [{ id: "walk", userPreferences: { safetyFactor: 1.5 } }]
+          }
+        }
+      }
+      """
+    );
+
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("safetyFactor");
   }
 
   private static TransferParameters<RouteRequest> map(String json) {

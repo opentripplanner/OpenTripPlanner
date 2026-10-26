@@ -3,6 +3,7 @@ package org.opentripplanner.transit.transfer.regular.api.preferences;
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
 
@@ -61,6 +62,22 @@ class WalkPreferencesTest {
     assertThat(subject.normalizedDistance(other)).isEqualTo(
       abstractSubject.normalizedDistance(other)
     );
+  }
+
+  @Test
+  void theSafetyFactorIsAPartOfTheEqualityAndTheDistance() {
+    var subject = preferences(1.3, 2.0);
+    var lessSafe = subject.copyOf().withSafetyFactor(Ratio.of(0.5).normalize()).build();
+    var same = subject.copyOf().withSafetyFactor(subject.safetyFactor()).build();
+
+    assertThat(lessSafe).isNotEqualTo(subject);
+    assertThat(same).isEqualTo(subject);
+    assertThat(subject.normalizedDistance(lessSafe)).isGreaterThan(0f);
+  }
+
+  @Test
+  void theDefaultSafetyFactorIsOne() {
+    assertThat(WalkPreferences.DEFAULT.safetyFactor().asDouble()).isEqualTo(1.0);
   }
 
   private static WalkPreferences preferences(double speed, double reluctance) {
