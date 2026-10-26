@@ -32,7 +32,8 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
  * transaction failed before or after it was frozen. The next transaction gets a new repository
  * continuing from the last published snapshot.
  * <p>
- * This class is stateless and only accessed on the writer thread.
+ * This class is only accessed on the writer thread, except the statistics of the cache. They are
+ * shared by all snapshots, and are thread-safe.
  *
  * @param <P> the street path type
  * @param <R> the request type
@@ -47,10 +48,12 @@ public class RegularTransferRepositoryLifecycle<
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
   private final List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup;
+  private final RegularTransferCacheStatistics statistics;
 
   /**
-   * @param profiles the configuration of the profiles the paths are stored under, the Raptor
-   *                 transfers are derived with the request of the profile closest to the request
+   * The statistics of the cache are not collected, see
+   * {@link #RegularTransferRepositoryLifecycle(TransferPathProvider, TransferRequestMapper,
+   * TransferParameters, int, boolean)}.
    */
   public RegularTransferRepositoryLifecycle(
     TransferPathProvider<P, R> pathProvider,
@@ -58,13 +61,32 @@ public class RegularTransferRepositoryLifecycle<
     TransferParameters<R> profiles,
     int numberOfStops
   ) {
+    this(pathProvider, mapper, profiles, numberOfStops, false);
+  }
+
+  /**
+   * @param profiles               the configuration of the profiles the paths are stored under, the
+   *                               Raptor transfers are derived with the request of the profile
+   *                               closest to the request
+   * @param collectCacheStatistics whether to count the requests that use each key of the cache,
+   *                               for the report of the cache, see
+   *                               {@link RegularTransferRepositorySnapshot#cacheReport}
+   */
+  public RegularTransferRepositoryLifecycle(
+    TransferPathProvider<P, R> pathProvider,
+    TransferRequestMapper<R> mapper,
+    TransferParameters<R> profiles,
+    int numberOfStops,
+    boolean collectCacheStatistics
+  ) {
     this(
       pathProvider,
       mapper,
       requestsByProfile(profiles, mapper),
       new ProfileMatcher(ProfileUserPreferences.warmupParents(profiles, mapper)),
       warmupEntries(profiles, mapper),
-      numberOfStops
+      numberOfStops,
+      collectCacheStatistics
     );
   }
 
@@ -74,7 +96,15 @@ public class RegularTransferRepositoryLifecycle<
     Map<AbstractUserPreferences<?>, R> profileRequests,
     int numberOfStops
   ) {
-    this(pathProvider, mapper, profileRequests, ProfileMatcher.NO_WARMUP, List.of(), numberOfStops);
+    this(
+      pathProvider,
+      mapper,
+      profileRequests,
+      ProfileMatcher.NO_WARMUP,
+      List.of(),
+      numberOfStops,
+      false
+    );
   }
 
   private RegularTransferRepositoryLifecycle(
@@ -83,10 +113,14 @@ public class RegularTransferRepositoryLifecycle<
     Map<AbstractUserPreferences<?>, R> profileRequests,
     ProfileMatcher matcher,
     List<DefaultRegularTransferRepositorySnapshot.WarmupEntry> warmup,
-    int numberOfStops
+    int numberOfStops,
+    boolean collectCacheStatistics
   ) {
     this.matcher = matcher;
     this.warmup = warmup;
+    this.statistics = collectCacheStatistics
+      ? RegularTransferCacheStatistics.of(RegularTransferServiceCache.DEFAULT_MAX_SIZE)
+      : RegularTransferCacheStatistics.NONE;
     this.mapper = Objects.requireNonNull(mapper);
     this.raptorTransfersFactory = new RaptorTransfersFactory<>(
       numberOfStops,
@@ -160,7 +194,8 @@ public class RegularTransferRepositoryLifecycle<
       raptorTransfersFactory,
       mapper,
       matcher,
-      warmup
+      warmup,
+      statistics
     );
   }
 

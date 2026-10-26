@@ -35,7 +35,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUser
  */
 class RegularTransferServiceCache<V> {
 
-  private static final int DEFAULT_MAX_SIZE = 32;
+  static final int DEFAULT_MAX_SIZE = 32;
 
   private final int maxSize;
   private final ConcurrentHashMap<AbstractUserPreferences<?>, Entry<V>> entries =
@@ -76,6 +76,17 @@ class RegularTransferServiceCache<V> {
       create(userPreferences, entry, factory);
     }
     return await(entry);
+  }
+
+  /** Whether the value of {@code userPreferences} has been created, and is in the cache. */
+  boolean contains(AbstractUserPreferences<?> userPreferences) {
+    var entry = entries.get(userPreferences);
+    return entry != null && entry.value.isDone() && !entry.value.isCompletedExceptionally();
+  }
+
+  /** The max number of keys in the cache. */
+  int maxSize() {
+    return maxSize;
   }
 
   /**

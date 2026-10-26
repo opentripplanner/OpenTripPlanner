@@ -141,7 +141,8 @@ public class TestServerContext {
       createRegularTransferBuildRepository(graph, transitRepository, timetableDataImport),
       StreetTransferFactory.defaultParameters(),
       graph,
-      transitRepository
+      transitRepository,
+      false
     );
     return handle.repositorySnapshot(registry.scope());
   }

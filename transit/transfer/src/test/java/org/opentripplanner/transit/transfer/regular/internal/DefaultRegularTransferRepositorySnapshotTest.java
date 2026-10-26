@@ -20,6 +20,7 @@ import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider.FakePath;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.DeduplicationLimit;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
@@ -132,6 +133,13 @@ class DefaultRegularTransferRepositorySnapshotTest {
   private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> snapshotWithWarmup(
     boolean withWarmupEntry
   ) {
+    return snapshotWithWarmup(withWarmupEntry, false);
+  }
+
+  private RegularTransferRepositorySnapshot<FakePath, WalkPreferences> snapshotWithWarmup(
+    boolean withWarmupEntry,
+    boolean collectCacheStatistics
+  ) {
     var near = withReluctance(1.0);
     var far = withReluctance(10.0);
     var buildRepository = new DefaultRegularTransferBuildRepository<FakePath>();
@@ -152,7 +160,8 @@ class DefaultRegularTransferRepositorySnapshotTest {
         DeduplicationLimit.DEFAULT,
         warmup
       ),
-      stopIndex().size()
+      stopIndex().size(),
+      collectCacheStatistics
     );
     return lifecycle.freeze(buildRepository.createRuntimeRepository());
   }
@@ -481,5 +490,55 @@ class DefaultRegularTransferRepositorySnapshotTest {
         }
       };
     }
+  }
+
+  @Test
+  void theCacheReportHasTheKindAndTheNumberOfRequestsOfEachKey() {
+    var snapshot = snapshotWithWarmup(true, true);
+    snapshot.warmUp();
+
+    snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+    snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+    snapshot.forRequest(withReluctance(3.0)).raptorTransfers();
+    snapshot.forRequest(withReluctance(2.5)).raptorTransfers();
+
+    var report = snapshot.cacheReport().entries();
+
+    assertThat(report).hasSize(3);
+    var near = report
+      .stream()
+      .filter(e -> "near".equals(e.id()))
+      .findFirst()
+      .orElseThrow();
+    assertThat(near.kind()).isEqualTo(TransferCacheReportEntry.Kind.PROFILE);
+    assertThat(near.hits()).isEqualTo(2);
+    assertThat(near.cached()).isTrue();
+    var warm = report
+      .stream()
+      .filter(e -> "warm".equals(e.id()))
+      .findFirst()
+      .orElseThrow();
+    assertThat(warm.kind()).isEqualTo(TransferCacheReportEntry.Kind.WARMUP);
+    assertThat(warm.closestProfileId()).isEqualTo("far");
+    assertThat(warm.hits()).isEqualTo(1);
+    var onDemand = report
+      .stream()
+      .filter(e -> e.kind() == TransferCacheReportEntry.Kind.ON_DEMAND)
+      .findFirst()
+      .orElseThrow();
+    assertThat(onDemand.id()).isNull();
+    assertThat(onDemand.closestProfileId()).isEqualTo("far");
+    assertThat(onDemand.hits()).isEqualTo(1);
+    // The most used key is first
+    assertThat(report.getFirst().id()).isEqualTo("near");
+  }
+
+  @Test
+  void theCacheReportIsEmptyIfTheStatisticsAreNotCollected() {
+    var snapshot = snapshotWithWarmup(true, false);
+
+    snapshot.forRequest(withReluctance(1.0)).raptorTransfers();
+
+    assertThat(snapshot.cacheReport().entries()).isEmpty();
   }
 }

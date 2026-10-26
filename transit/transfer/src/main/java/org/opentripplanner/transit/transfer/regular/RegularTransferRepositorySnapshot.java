@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular;
 
+import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 
@@ -31,4 +32,10 @@ public interface RegularTransferRepositorySnapshot<P, R> {
    * nothing if the snapshot has no profiles configured.
    */
   void warmUp();
+
+  /**
+   * A report of the keys of the cache of the Raptor transfers, and how many requests used each.
+   * The report is empty if the statistics are not enabled.
+   */
+  RegularTransferCacheReport cacheReport();
 }

@@ -6,6 +6,7 @@ import jakarta.inject.Singleton;
 import org.opentripplanner.core.framework.transaction.configure.TransitDomain;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
 import org.opentripplanner.core.model.transaction.RepositoryRegistry;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -48,7 +49,9 @@ public class RegularTransferRepositoryModule {
       buildRepository,
       buildConfig.transferProfiles(),
       graph,
-      transitRepository
+      transitRepository,
+      // The statistics are only collected for the report API
+      OTPFeature.ReportApi.isOn()
     );
   }
 }

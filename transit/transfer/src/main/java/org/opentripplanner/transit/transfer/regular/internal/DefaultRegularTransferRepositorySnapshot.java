@@ -1,11 +1,15 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
+import org.opentripplanner.transit.transfer.regular.api.TransferCacheReportEntry.Kind;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferRequestMapper;
 import org.slf4j.Logger;
@@ -36,6 +40,8 @@ class DefaultRegularTransferRepositorySnapshot<
   private final TransferRequestMapper<R> mapper;
   private final ProfileMatcher matcher;
   private final List<WarmupEntry> warmup;
+  private final Map<AbstractUserPreferences<?>, WarmupEntry> entryByPreferences;
+  private final RegularTransferCacheStatistics statistics;
 
   /**
    * The user preferences to create the Raptor transfers for when the server starts: the
@@ -55,13 +61,17 @@ class DefaultRegularTransferRepositorySnapshot<
     RaptorTransfersFactory<P, R> raptorTransfersFactory,
     TransferRequestMapper<R> mapper,
     ProfileMatcher matcher,
-    List<WarmupEntry> warmup
+    List<WarmupEntry> warmup,
+    RegularTransferCacheStatistics statistics
   ) {
     this.paths = paths;
     this.cache = cache;
     this.mapper = mapper;
     this.matcher = matcher;
     this.warmup = List.copyOf(warmup);
+    this.entryByPreferences = new HashMap<>();
+    warmup.forEach(entry -> entryByPreferences.put(entry.userPreferences(), entry));
+    this.statistics = statistics;
     this.cacheFactory = new CacheFactory(raptorTransfersFactory);
   }
 
@@ -91,12 +101,40 @@ class DefaultRegularTransferRepositorySnapshot<
   @Override
   public RegularTransfersService<P> forRequest(R request) {
     var userPreferences = mapper.toUserPreferences(request);
+    var profile = matcher.closestProfile(paths, userPreferences);
+    statistics.record(userPreferences, () -> keyInfo(userPreferences, profile));
     return new DefaultRegularTransfersService<>(
       paths,
       cache,
       cacheFactory,
       userPreferences,
-      matcher.closestProfile(paths, userPreferences)
+      profile
+    );
+  }
+
+  @Override
+  public RegularTransferCacheReport cacheReport() {
+    return () -> statistics.entries(cache::contains);
+  }
+
+  /** How a key of the cache came to be: a profile, a warmup entry, or on demand. */
+  private RegularTransferCacheStatistics.KeyInfo keyInfo(
+    AbstractUserPreferences<?> userPreferences,
+    @Nullable AbstractUserPreferences<?> closestProfile
+  ) {
+    var entry = entryByPreferences.get(userPreferences);
+    if (entry != null) {
+      return new RegularTransferCacheStatistics.KeyInfo(
+        entry.parent() == null ? Kind.PROFILE : Kind.WARMUP,
+        entry.id(),
+        entry.parent() == null ? entry.id() : entry.parent()
+      );
+    }
+    var closest = closestProfile == null ? null : entryByPreferences.get(closestProfile);
+    return new RegularTransferCacheStatistics.KeyInfo(
+      Kind.ON_DEMAND,
+      null,
+      closest == null ? null : closest.id()
     );
   }
 

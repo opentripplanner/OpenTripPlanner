@@ -157,7 +157,8 @@ public class SpeedTest {
       regularTransferBuildRepository,
       transferProfiles,
       graph,
-      transitRepository
+      transitRepository,
+      false
     );
     var threadFactory = Executors.defaultThreadFactory();
     var transitUpdateManager = TransactionFactory.createUpdateManagerWithPeriodicCommits(

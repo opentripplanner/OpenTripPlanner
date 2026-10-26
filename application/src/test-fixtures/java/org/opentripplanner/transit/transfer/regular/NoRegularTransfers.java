@@ -7,6 +7,7 @@ import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.spi.RaptorTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
 import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 
 /**
@@ -65,5 +66,10 @@ public final class NoRegularTransfers {
 
       @Override
       public void warmUp() {}
+
+      @Override
+      public RegularTransferCacheReport cacheReport() {
+        return RegularTransferCacheReport.DISABLED;
+      }
     };
 }

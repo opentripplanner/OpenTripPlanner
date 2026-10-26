@@ -93,6 +93,9 @@ public final class StreetTransferFactory {
    * <p>
    * Registration is not thread-safe, so the handle must be created at startup, before the updaters
    * start. The transit repository must be indexed.
+   *
+   * @param collectCacheStatistics whether to count the requests that use each key of the cache of
+   *                               the Raptor transfers, for the report of the cache
    */
   public static RepositoryHandle<
     RegularTransferRepositorySnapshot<NearbyStop, RouteRequest>,
@@ -102,7 +105,8 @@ public final class StreetTransferFactory {
     RegularTransferBuildRepository<NearbyStop> buildRepository,
     TransferParameters<RouteRequest> parameters,
     Graph graph,
-    TransitRepository transitRepository
+    TransitRepository transitRepository,
+    boolean collectCacheStatistics
   ) {
     return RegularTransferFactory.registerRepository(
       repositoryRegistry,
@@ -110,7 +114,8 @@ public final class StreetTransferFactory {
       parameters,
       createPathProvider(graph, transitRepository),
       new RegularTransferPreferencesMapper(),
-      transitRepository.getSiteRepository().stopIndexSize()
+      transitRepository.getSiteRepository().stopIndexSize(),
+      collectCacheStatistics
     );
   }
 

@@ -57,6 +57,7 @@ import org.opentripplanner.transit.service.TransitRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.transfer.regular.api.RegularTransferCacheReport;
 
 /**
  * Provides the bindings that live inside {@link RequestScopedFactory}. A single
@@ -115,6 +116,15 @@ public class RequestScopedModule {
     TransactionScope transactionScope
   ) {
     return regularTransferRepositoryHandle.repositorySnapshot(transactionScope);
+  }
+
+  /** The report of the cache of the Raptor transfers, for the report API. */
+  @Provides
+  @HttpRequestScoped
+  static RegularTransferCacheReport regularTransferCacheReport(
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers
+  ) {
+    return regularTransfers.cacheReport();
   }
 
   @Provides
