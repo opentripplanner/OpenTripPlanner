@@ -2,6 +2,8 @@ package org.opentripplanner.ext.taxi;
 
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.place.api.NearbyStop;
@@ -26,6 +28,13 @@ public interface TaxiService {
     AccessEgressType type,
     RouteRequest request
   );
+
+  /**
+   * Resolves the coordinate of a request origin/destination, which may be given as a stop or
+   * station id without coordinates. Returns {@code null} if it cannot be resolved.
+   */
+  @Nullable
+  WgsCoordinate resolveCoordinate(TransitService transitService, GenericLocation location);
 
   /**
    * Decorates the {@link TraverseMode#CAR} leg among an access or egress leg chain with taxi
