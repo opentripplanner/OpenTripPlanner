@@ -146,7 +146,7 @@ public class RequestScopedModule {
     Graph graph,
     TransitService transitService,
     TransitAlertService transitAlertService,
-    FlexTransferService transferService,
+    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
@@ -155,7 +155,7 @@ public class RequestScopedModule {
       graph,
       transitService,
       transitAlertService,
-      transferService,
+      regularTransfers,
       streetDetailsService,
       linkingContextFactory,
       streetLimitationParametersService

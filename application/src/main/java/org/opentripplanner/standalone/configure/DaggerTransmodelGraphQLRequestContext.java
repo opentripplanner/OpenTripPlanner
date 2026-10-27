@@ -5,6 +5,7 @@ import org.opentripplanner.apis.transmodel.TransmodelGraphQLRequestContext;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
+import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
@@ -17,8 +18,8 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
-import org.opentripplanner.transfer.regular.FlexTransferService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
 /**
  * Production {@link TransmodelGraphQLRequestContext}: every accessor delegates to the enclosing
@@ -76,8 +77,8 @@ final class DaggerTransmodelGraphQLRequestContext implements TransmodelGraphQLRe
   }
 
   @Override
-  public FlexTransferService transferService() {
-    return factory.transferService();
+  public RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers() {
+    return factory.regularTransfers();
   }
 
   @Override
