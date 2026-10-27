@@ -33,6 +33,8 @@ mechanics. If the doc only restates the name or signature, delete it or rewrite 
    - performance constraints (Raptor hot paths) the caller must respect
 3. **Do not describe the implementation.** No "loops over", "calls", "uses a map". If the how matters to a caller,
    state it as a guarantee.
+   Do not describe what callers do with the element either ("used by the router to ..."). Say what
+   the element is and guarantees; callers change, and the doc goes stale.
 4. **`@param` / `@return` only when they add information.** Drop tags that restate the
    signature. Do not write `@param x the x`.
 5. **Use `{@link}` and `{@code}`** for related types, methods and literals. Link to the abstraction a reader should use
@@ -57,7 +59,8 @@ mechanics. If the doc only restates the name or signature, delete it or rewrite 
      looking at.
    - This applies to the semantics of a concept as well as to units and slack rules. State a
      module-wide convention (such as "all times are in seconds") once, at module or package level.
-10. **Inline comments are rare.** Keep one only for a non-obvious "why". Delete comments that narrate the code.
+10. **Inline comments are rare.** Keep one only for a non-obvious "why". Delete comments that narrate the code,
+    including section dividers such as `// Public methods` or `// ---- Private ----`.
 11. **Keep docs true.** When code changes, update its JavaDoc in the same edit. Remove stale references to renamed
     or deleted elements.
 
