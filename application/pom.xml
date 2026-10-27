@@ -492,6 +492,7 @@
                         <sourceDirectory>src/ext/java</sourceDirectory>
                         <sourceDirectory>src/ext-test/java</sourceDirectory>
                     </sourceDirectories>
+                    <suppressionsLocation>${basedir}/checkstyle-suppressions.xml</suppressionsLocation>
                 </configuration>
             </plugin>
             <plugin>
