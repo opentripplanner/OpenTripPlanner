@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular.api;
 
+import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
@@ -38,4 +39,12 @@ public interface RegularTransfersService<P> {
    */
   @Nullable
   P findPath(int fromStop, int toStop);
+
+  /**
+   * All paths from {@code fromStop}, one per stop they lead to. The paths are read from the paths
+   * stored under the profile closest to the user preferences of the request, like
+   * {@link #findPath}. The collection is unmodifiable, in no particular order, and empty if there
+   * are no paths from the stop.
+   */
+  Collection<P> findPathsFrom(int fromStop);
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -44,6 +45,16 @@ public final class FixedRegularTransfers {
       @Override
       public NearbyStop findPath(int fromStop, int toStop) {
         return paths.get(new Key(fromStop, toStop));
+      }
+
+      @Override
+      public Collection<NearbyStop> findPathsFrom(int fromStop) {
+        return paths
+          .entrySet()
+          .stream()
+          .filter(e -> e.getKey().fromStop() == fromStop)
+          .map(Map.Entry::getValue)
+          .toList();
       }
     };
     var noTransfers = NoRegularTransfers.snapshot();

@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.transfer.regular.internal;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorRegularTransferService;
 import org.opentripplanner.raptor.data.transfers.regular.RaptorTransferStore;
@@ -53,5 +56,12 @@ final class DefaultRegularTransfersService<P> implements RegularTransfersService
   @Override
   public P findPath(int fromStop, int toStop) {
     return paths.findPath(profile, fromStop, toStop);
+  }
+
+  @Override
+  public Collection<P> findPathsFrom(int fromStop) {
+    return profile == null
+      ? List.of()
+      : Collections.unmodifiableCollection(paths.pathsFrom(profile, fromStop).values());
   }
 }
