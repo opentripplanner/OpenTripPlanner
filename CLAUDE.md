@@ -181,6 +181,7 @@ Highlights below; full guidelines in `DEVELOPMENT_DECISION_RECORDS.md`.
 **Protected branches — NEVER push directly:** `dev-2.x`, `main`, `master`, `main_config`. Always
 work on a feature branch, and **ask which remote to use before pushing**.
 
+- Do not add Claude (or any other coding agent) as co-author to commits.
 - Main development branch: `dev-2.x`; release branch: `master` (fast-forward merges from `dev-2.x`).
 - Reference the issue in the PR with a GitHub keyword, e.g. `related to #123` or `closes #123`.
 
