@@ -3,7 +3,8 @@
 .classpath
 .claude/*
 !.claude/settings.json
-.github/copilot/settings.local.json
+.github/copilot/*
+!.github/copilot/settings.json
 .externalToolBuilders
 .gradle
 .settings
