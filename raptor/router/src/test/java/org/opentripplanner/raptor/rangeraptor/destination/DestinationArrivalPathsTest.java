@@ -30,8 +30,10 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.stop.StopArrivalFactoryC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideC1;
+import org.opentripplanner.raptor.rangeraptor.transit.AccessWithPenalty;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressWithPenalty;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
@@ -48,6 +50,7 @@ class DestinationArrivalPathsTest {
   private static final int ALIGHT_TIME = ITERATION_DEPARTURE_TIME + 600;
   private static final int EGRESS_DURATION = 60;
   private static final int TIME_PENALTY = 300;
+  private static final int ACCESS_DURATION = 300;
   private static final int NO_TIME_LIMIT = RaptorConstants.TIME_NOT_SET;
 
   private static final StopArrivalFactoryC1<RaptorTripSchedule> FACTORY =
@@ -345,7 +348,29 @@ class DestinationArrivalPathsTest {
     assertEquals(ITERATION_DEPARTURE_TIME - 60, mappedArrivals.getFirst().iterationDepartureTime());
   }
 
+  @Test
+  void accessTimePenaltyIsIncludedWhenComparingJourneysWithoutTransit() {
+    var subject = create(USE_ARRIVAL_TIME, NO_TIME_LIMIT);
+
+    // The real arrival time of the flex is earlier, but with the penalty the bus is better
+    subject.add(stopArrival(ALIGHT_TIME), egress());
+    subject.add(accessOnlyArrival(ACCESS_DURATION, TIME_PENALTY), egress());
+
+    assertEquals(1, subject.listPaths().size());
+    assertEquals(ALIGHT_TIME + EGRESS_DURATION, mappedArrivals.getFirst().arrivalTime());
+  }
+
   /* private helpers */
+
+  private static McStopArrival<RaptorTripSchedule> accessOnlyArrival(
+    int duration,
+    int timePenalty
+  ) {
+    return FACTORY.createAccessStopArrival(
+      ITERATION_DEPARTURE_TIME,
+      new AccessWithPenalty(TestAccessEgress.walk(STOP, duration).withTimePenalty(timePenalty))
+    );
+  }
 
   private static RaptorAccessEgress penalisedEgress(int duration, int timePenalty) {
     return new EgressWithPenalty(
