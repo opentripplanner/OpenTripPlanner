@@ -50,8 +50,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.streetadapter.StreetSearchRequestMapper;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
-import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
-import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
@@ -358,14 +356,10 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Place from = Place.forStop(transferFromStop);
     Place to = Place.forStop(transferToStop);
 
-    if (raptorTransfer instanceof DefaultRaptorTransfer dftTx) {
-      return mapTransferLeg(pathLeg, dftTx.transfer(), transferMode, from, to);
-    }
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx);
     }
-    // Not a legacy transfer - must be a transfer from the regular-transfer pipeline. Recover its
-    // street path template for the leg's geometry/walk-steps.
+    // A regular transfer. Recover its street path for the leg's geometry and walk steps.
     var regularTransferPath = findRegularTransferPath(pathLeg.fromStop(), pathLeg.toStop());
     if (regularTransferPath != null) {
       return mapTransferLeg(pathLeg, regularTransferPath, transferMode, from, to);
@@ -405,38 +399,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return legs;
   }
 
-  private List<Leg> mapTransferLeg(
-    PathLeg<T> pathLeg,
-    PathTransfer transfer,
-    TraverseMode transferMode,
-    Place from,
-    Place to
-  ) {
-    List<Edge> edges = transfer.getEdges();
-    if (edges == null || edges.isEmpty()) {
-      return List.of(
-        StreetLeg.of()
-          .withMode(transferMode)
-          .withStartTime(createZonedDateTime(pathLeg.fromTime()))
-          .withEndTime(createZonedDateTime(pathLeg.toTime()))
-          .withFrom(from)
-          .withTo(to)
-          .withDistanceMeters(transfer.getDistanceMeters())
-          .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
-          .withGeometry(transfer.getGeometry())
-          .withWalkSteps(List.of())
-          .build()
-      );
-    } else {
-      return mapTransferLegWithEdges(pathLeg.fromTime(), edges);
-    }
-  }
-
   /**
-   * Mirrors {@link #mapTransferLeg(PathLeg, PathTransfer, TraverseMode, Place, Place)} for a
-   * transfer recovered from the raptor-data regular-transfer pipeline via
-   * {@link #findRegularTransferPath}. Uses an empty line string when there are
-   * no edges, matching {@link PathTransfer#getGeometry()}'s behavior for the same case.
+   * Map a regular transfer to a street leg, using the street path recovered with
+   * {@link #findRegularTransferPath}. A path without edges gets an empty line string.
    */
   private List<Leg> mapTransferLeg(
     PathLeg<T> pathLeg,

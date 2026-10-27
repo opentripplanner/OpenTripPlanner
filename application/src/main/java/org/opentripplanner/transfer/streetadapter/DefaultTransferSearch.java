@@ -31,7 +31,7 @@ import org.opentripplanner.transit.transfer.regular.spi.TransferSearch;
  * <p>
  * Re-costing a path traverses its edges with a fresh {@link StateEditor} and
  * {@link EdgeTraverser#traverseEdges}, or estimates its duration from distance and speed when it
- * has no edges, like {@code PathTransfer.asRaptorTransfer}.
+ * has no edges.
  * <p>
  * The max durations of the profile type bound the street search that discovers the transfers, see
  * {@link TransferSearch#findNearbyStops}: the street search from a stop is limited by the longest
