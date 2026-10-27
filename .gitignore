@@ -1,7 +1,8 @@
 
 # Files
 .classpath
-.claude
+.claude/*
+!.claude/settings.json
 .externalToolBuilders
 .gradle
 .settings
