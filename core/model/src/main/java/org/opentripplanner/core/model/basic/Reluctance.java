@@ -7,7 +7,7 @@ public class Reluctance
   implements Serializable, Comparable<Reluctance>, NormalizedDistance<Reluctance>
 {
 
-  private static final double MIN_VALUE = 0.1;
+  private static final double MIN_VALUE = 0.0;
   private static final double MAX_VALUE = 1_000_000.0;
 
   /**
