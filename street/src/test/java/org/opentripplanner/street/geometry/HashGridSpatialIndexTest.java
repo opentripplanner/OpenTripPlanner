@@ -1,78 +1,55 @@
 package org.opentripplanner.street.geometry;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.index.SpatialIndex;
-import org.locationtech.jts.index.strtree.STRtree;
+import static com.google.common.truth.Truth.assertThat;
 
-public class HashGridSpatialIndexTest {
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Envelope;
+
+class HashGridSpatialIndexTest {
 
   /**
-   * We perform a non-regression random test. We insert many random-envelop objects into both a hash
-   * grid (OTP) and STRtree (JTS) spatial indexes. We check with many random query that the set of
-   * returned objects is the same (after pruning because both could return false positives).
+   * Bins of 1 x 1 centred on integer coordinates (keys are rounded): bin x=0 spans [-0.5, 0.5] and
+   * bin x=1 spans [0.5, 1.5].
    */
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testHashGridRandom() {
-    final double X0 = -0.05;
-    final double Y0 = 44.0;
-    final double DX = 0.1;
-    final double DY = 0.1;
-    final int N_OBJS = 1000;
-    final int N_QUERIES = 1000;
+  private final HashGridSpatialIndex<String> index = new HashGridSpatialIndex<>(1.0, 1.0);
 
-    Random rand = new Random(42);
-    SpatialIndex hashGrid = new HashGridSpatialIndex<>();
-    SpatialIndex strTree = new STRtree();
-
-    for (int i = 0; i < N_OBJS; i++) {
-      Coordinate a = new Coordinate(rand.nextDouble() * DX + X0, rand.nextDouble() * DY + Y0);
-      Coordinate b = new Coordinate(rand.nextDouble() * DX + X0, rand.nextDouble() * DY + Y0);
-      DummyObject obj = new DummyObject();
-      obj.envelope = new Envelope(a, b);
-      hashGrid.insert(obj.envelope, obj);
-      strTree.insert(obj.envelope, obj);
-    }
-
-    for (int i = 0; i < N_QUERIES; i++) {
-      Coordinate a = new Coordinate(rand.nextDouble() * DX + X0, rand.nextDouble() * DY + Y0);
-      Coordinate b = new Coordinate(rand.nextDouble() * DX + X0, rand.nextDouble() * DY + Y0);
-      Envelope searchEnv = new Envelope(a, b);
-      List<DummyObject> hashGridObjs = hashGrid.query(searchEnv);
-      // Need to remove non intersecting
-      Set<DummyObject> hashGridObjs2 = new HashSet<>();
-      for (DummyObject obj : hashGridObjs) {
-        if (obj.envelope.intersects(searchEnv)) {
-          hashGridObjs2.add(obj);
-        }
-      }
-      List<DummyObject> strtreeObjs = strTree.query(searchEnv);
-      // Need to remove non intersecting
-      Set<DummyObject> strtreeObjs2 = new HashSet<>();
-      for (DummyObject obj : strtreeObjs) {
-        if (obj.envelope.intersects(searchEnv)) {
-          strtreeObjs2.add(obj);
-        }
-      }
-      boolean equals = hashGridObjs2.equals(strtreeObjs2);
-      Assertions.assertTrue(equals);
-    }
+  @BeforeEach
+  void setUp() {
+    index.insert(new Envelope(0.1, 0.2, 0.0, 0.0), "single");
+    index.insert(new Envelope(0.2, 0.8, 0.0, 0.0), "spanning");
+    index.insert(new Envelope(5.0, 5.0, 5.0, 5.0), "far");
   }
 
-  private static class DummyObject {
+  @Test
+  void queryReturnsEachItemOfTheTouchedBinsOnce() {
+    assertThat(index.query(new Envelope(0.1, 0.8, 0.0, 0.0))).containsExactly("single", "spanning");
+  }
 
-    Envelope envelope;
+  @Test
+  void queryReturnsWholeBins() {
+    // Neither item intersects the query envelope, but both are stored in the touched bin.
+    assertThat(index.query(new Envelope(-0.4, -0.4, 0.0, 0.0))).containsExactly(
+      "single",
+      "spanning"
+    );
+  }
 
-    @Override
-    public String toString() {
-      return envelope.toString();
-    }
+  @Test
+  void queryAwayFromTheStoredItemsIsEmpty() {
+    assertThat(index.query(new Envelope(3.0, 3.0, 3.0, 3.0))).isEmpty();
+  }
+
+  @Test
+  void forEachCandidateVisitsAnItemOncePerBin() {
+    List<String> visited = new ArrayList<>();
+    index.forEachCandidate(new Envelope(0.1, 0.2, 0.0, 0.0), visited::add);
+    assertThat(visited).containsExactly("single", "spanning").inOrder();
+
+    visited.clear();
+    index.forEachCandidate(new Envelope(0.1, 0.8, 0.0, 0.0), visited::add);
+    assertThat(visited).containsExactly("single", "spanning", "spanning");
   }
 }
