@@ -8,6 +8,7 @@ import static org.opentripplanner.apis.transmodel.mapping.preferences.StreetPref
 import static org.opentripplanner.apis.transmodel.mapping.preferences.TransferPreferencesMapper.mapTransferPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.TransitPreferencesMapper.mapTransitPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.WalkPreferencesMapper.mapWalkPreferences;
+import static org.opentripplanner.apis.transmodel.mapping.preferences.WalkPreferencesMapper.mapWheelchairPreferences;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
@@ -25,6 +26,7 @@ class PreferencesMapper {
       mapStreetPreferences(street, environment, preferences.street())
     );
     preferences.withWalk(walk -> mapWalkPreferences(walk, callWith));
+    preferences.withWheelchair(wheelchair -> mapWheelchairPreferences(wheelchair, callWith));
     preferences.withBike(bike -> mapBikePreferences(bike, callWith));
     preferences.withCar(car -> mapCarPreferences(car, callWith));
     preferences.withScooter(scooter -> mapScooterPreferences(scooter, callWith));

@@ -178,8 +178,11 @@ The RouteRequest is the type for the
 |    enabled                                                                                                   |        `boolean`       | Enable wheelchair accessibility.                                                                                                                         | *Optional* | `false`          |  2.0  |
 |    inaccessibleStreetReluctance                                                                              |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                                           | *Optional* | `25.0`           |  2.2  |
 |    [maxSlope](#rd_wheelchairAccessibility_maxSlope)                                                          |        `double`        | The maximum slope as a fraction of 1.                                                                                                                    | *Optional* | `0.083`          |  2.0  |
+|    reluctance                                                                                                |        `double`        | A multiplier for how bad moving in a wheelchair is, compared to being in transit.                                                                        | *Optional* | `2.0`            |  2.11 |
 |    [slopeExceededReluctance](#rd_wheelchairAccessibility_slopeExceededReluctance)                            |        `double`        | How much streets with high slope should be avoided.                                                                                                      | *Optional* | `1.0`            |  2.2  |
+|    speed                                                                                                     |        `double`        | The walking speed of a wheelchair user, in meters per second.                                                                                            | *Optional* | `1.0`            |  2.11 |
 |    [stairsReluctance](#rd_wheelchairAccessibility_stairsReluctance)                                          |        `double`        | How much stairs should be avoided.                                                                                                                       | *Optional* | `100.0`          |  2.2  |
+|    stairsTimeFactor                                                                                          |        `double`        | How much more time does it take to traverse a flight of stairs compared to a similar horizontal length.                                                  | *Optional* | `5.0`            |  2.11 |
 |    elevator                                                                                                  |        `object`        | Configuration for when to use inaccessible elevators.                                                                                                    | *Optional* |                  |  2.2  |
 |       inaccessibleCost                                                                                       |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                                              | *Optional* | `3600`           |  2.2  |
 |       onlyConsiderAccessible                                                                                 |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                                                     | *Optional* | `false`          |  2.2  |
@@ -1460,7 +1463,10 @@ include stairs as a last result.
       "inaccessibleStreetReluctance" : 25,
       "maxSlope" : 0.083,
       "slopeExceededReluctance" : 1,
-      "stairsReluctance" : 100
+      "stairsReluctance" : 100,
+      "speed" : 1.0,
+      "reluctance" : 3.0,
+      "stairsTimeFactor" : 4.0
     },
     "directTransitSearch" : {
       "enabled" : false,

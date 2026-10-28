@@ -6,6 +6,7 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.ModePreferences
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.ScooterPreferencesMapper.setScooterPreferences;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.TransitPreferencesMapper.setTransitPreferences;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.WalkPreferencesMapper.setWalkPreferences;
+import static org.opentripplanner.apis.gtfs.mapping.routerequest.WalkPreferencesMapper.setWheelchairWalkPreferences;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
@@ -148,6 +149,9 @@ public class RouteRequestMapper {
     preferences.withCar(car -> setCarPreferences(car, args.getGraphQLCar(), environment));
     preferences.withScooter(scooter -> setScooterPreferences(scooter, args.getGraphQLScooter()));
     preferences.withWalk(walk -> setWalkPreferences(walk, args.getGraphQLWalk()));
+    preferences.withWheelchair(wheelchair ->
+      setWheelchairWalkPreferences(wheelchair, args.getGraphQLWalk())
+    );
   }
 
   private static void setRentalAvailabilityPreferences(
