@@ -132,6 +132,55 @@ class OsmTagMapperTest {
   }
 
   @Test
+  void bicycleSafetyOfRoundaboutOnSmallStreet() {
+    assertEquals(1, roundaboutSafetyFactor("residential"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("living_street"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("residential_link"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("unclassified"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("residential", "lanes", "1"), EPSILON);
+  }
+
+  @Test
+  void bicycleSafetyOfRoundaboutOnLargeRoad() {
+    assertEquals(1, roundaboutSafetyFactor("secondary"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("primary"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("trunk"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("secondary", "lanes", "1"), EPSILON);
+  }
+
+  @Test
+  void bicycleSafetyOfMultiLaneRoundabout() {
+    assertEquals(1, roundaboutSafetyFactor("residential", "lanes", "2"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("tertiary", "lanes", "2"), EPSILON);
+  }
+
+  @Test
+  void bicycleSafetyOfSingleLaneRoundaboutOnMiddlingRoad() {
+    assertEquals(1, roundaboutSafetyFactor("tertiary"), EPSILON);
+    assertEquals(1, roundaboutSafetyFactor("service"), EPSILON);
+  }
+
+  @Test
+  void bicycleSafetyOfMultiLaneRoundaboutOnLargeRoad() {
+    assertEquals(1, roundaboutSafetyFactor("secondary", "lanes", "2"), EPSILON);
+  }
+
+  /** Bicycle safety of a roundabout, relative to the same street without the roundabout tag. */
+  private static double roundaboutSafetyFactor(String highway, String... extraTags) {
+    var builder = OsmWay.of().withTag("highway", highway);
+    for (int i = 0; i < extraTags.length; i += 2) {
+      builder = builder.withTag(extraTags[i], extraTags[i + 1]);
+    }
+    var street = builder.build();
+    var roundabout = street.copy().withTag("junction", "roundabout").build();
+    return bicycleSafety(roundabout) / bicycleSafety(street);
+  }
+
+  private static double bicycleSafety(OsmWay way) {
+    return WPS.getDataForWay(way).forward().bicycleSafety();
+  }
+
+  @Test
   void sidewalkDesignatedForBicycleIsNotPenalizedAsSidewalk() {
     var footway = WayTestData.footwaySharedWithBicycle();
     var sidewalk = footway.copy().withTag("footway", "sidewalk").build();
