@@ -36,6 +36,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Transit shape simplification [#8001](https://github.com/opentripplanner/OpenTripPlanner/pull/8001)
 - Use transit coordinates in boarding location linking [#8015](https://github.com/opentripplanner/OpenTripPlanner/pull/8015)
 - Encapsulate Scheduled Timetable Data and move Ownership to TimetableRepository [#8074](https://github.com/opentripplanner/OpenTripPlanner/pull/8074)
+- Improve vertex linking filtering logic [#7994](https://github.com/opentripplanner/OpenTripPlanner/pull/7994)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.10.0 (2026-09-09)
