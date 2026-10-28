@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.vectortiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,26 +29,28 @@ class DebugVectorTilesResourceTest {
     new LayerParams("areaStop", LayerType.AreaStop)
   );
 
-  @Test
-  void tileJson() {
-    var graph = new Graph();
+  private static DebugVectorTilesResource resource(DebugUiConfig config) {
     var transferRepository = TransferServiceTestFactory.defaultTransferRepository();
     var transitService = TestServerContext.createTransitService(
       new TransitRepository(),
       new TimetableDataImport(),
       transferRepository
     );
-    var resource = new DebugVectorTilesResource(
+    return new DebugVectorTilesResource(
       transitService,
-      graph,
-      DebugUiConfig.DEFAULT,
+      new Graph(),
+      config,
       TestServerContext.createWorldEnvelopeService(),
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createStreetDetailsService(),
       TransferServiceTestFactory.transferService(transferRepository)
     );
+  }
+
+  @Test
+  void tileJson() {
     var req = HttpForTest.containerRequest();
-    var tileJson = resource.getTileJson(req.getUriInfo(), req, "l1,l2");
+    var tileJson = resource(DebugUiConfig.DEFAULT).getTileJson(req.getUriInfo(), req, "l1,l2");
     assertEquals(
       "https://localhost:8080/otp/debug/vectortiles/l1,l2/{z}/{x}/{y}.pbf",
       tileJson.tiles[0]
@@ -55,8 +58,36 @@ class DebugVectorTilesResourceTest {
   }
 
   @Test
+  void tileJsonWithBasePath() {
+    var config = new DebugUiConfig(
+      jsonNodeForTest("{ 'vectorTilesBasePath': '/gateway/debug/otp/debug/vectortiles' }"),
+      "TEST",
+      true
+    );
+    var req = HttpForTest.containerRequest();
+    var tileJson = resource(config).getTileJson(req.getUriInfo(), req, "l1,l2");
+    assertEquals(
+      "https://localhost:8080/gateway/debug/otp/debug/vectortiles/l1,l2/{z}/{x}/{y}.pbf",
+      tileJson.tiles[0]
+    );
+  }
+
+  @Test
   void tileJsonUrl() {
-    var url = DebugVectorTilesResource.tileJsonUrl("http://example.com", LAYERS);
+    var url = DebugVectorTilesResource.tileJsonUrl(
+      "http://example.com",
+      DebugUiConfig.DEFAULT.vectorTilesBasePath(),
+      LAYERS
+    );
     assertEquals("http://example.com/otp/debug/vectortiles/edge,areaStop/tilejson.json", url);
+  }
+
+  @Test
+  void tileJsonUrlWithBasePath() {
+    // leading and trailing slashes of the base path are optional
+    for (var basePath : List.of("/gateway/tiles", "gateway/tiles/", "/gateway/tiles/")) {
+      var url = DebugVectorTilesResource.tileJsonUrl("http://example.com", basePath, LAYERS);
+      assertEquals("http://example.com/gateway/tiles/edge,areaStop/tilejson.json", url);
+    }
   }
 }

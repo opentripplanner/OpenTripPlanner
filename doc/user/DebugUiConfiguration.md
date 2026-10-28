@@ -14,13 +14,14 @@ available by placing a file `debug-ui-config.json` into OTP's working directory.
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                          |    Type    | Summary                                                                                                                                                                                      |  Req./Opt. | Default Value         | Since |
-|-----------------------------------------------------------|:----------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------|:-----:|
-| [additionalBackgroundLayers](#additionalBackgroundLayers) | `object[]` | Additional background raster map layers.                                                                                                                                                     | *Optional* |                       |  2.7  |
-|       attribution                                         |  `string`  | Attribution for the map data.                                                                                                                                                                | *Optional* | `"© OpenTripPlanner"` |  2.7  |
-|       name                                                |  `string`  | Name to appear in the layer selector.                                                                                                                                                        | *Required* |                       |  2.7  |
-|       templateUrl                                         |  `string`  | The [Maplibre-compatible template URL](https://maplibre.org/maplibre-native/ios/api/tile-url-templates.html) for the raster layer, for example `https://examples.com/tiles/{z}/{x}/{y}.png`. | *Required* |                       |  2.7  |
-|       tileSize                                            |  `integer` | Size of the tile in pixels.                                                                                                                                                                  | *Optional* | `256`                 |  2.7  |
+| Config Parameter                                          |    Type    | Summary                                                                                                                                                                                      |  Req./Opt. | Default Value               | Since |
+|-----------------------------------------------------------|:----------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------|:-----:|
+| [vectorTilesBasePath](#vectorTilesBasePath)               |  `string`  | The path the debug vector tiles are reachable on from the outside.                                                                                                                           | *Optional* | `"/otp/debug/vectortiles/"` |  2.11 |
+| [additionalBackgroundLayers](#additionalBackgroundLayers) | `object[]` | Additional background raster map layers.                                                                                                                                                     | *Optional* |                             |  2.7  |
+|       attribution                                         |  `string`  | Attribution for the map data.                                                                                                                                                                | *Optional* | `"© OpenTripPlanner"`       |  2.7  |
+|       name                                                |  `string`  | Name to appear in the layer selector.                                                                                                                                                        | *Required* |                             |  2.7  |
+|       templateUrl                                         |  `string`  | The [Maplibre-compatible template URL](https://maplibre.org/maplibre-native/ios/api/tile-url-templates.html) for the raster layer, for example `https://examples.com/tiles/{z}/{x}/{y}.png`. | *Required* |                             |  2.7  |
+|       tileSize                                            |  `integer` | Size of the tile in pixels.                                                                                                                                                                  | *Optional* | `256`                       |  2.7  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -28,6 +29,21 @@ available by placing a file `debug-ui-config.json` into OTP's working directory.
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h3 id="vectorTilesBasePath">vectorTilesBasePath</h3>
+
+**Since version:** `2.11` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"/otp/debug/vectortiles/"`   
+**Path:** / 
+
+The path the debug vector tiles are reachable on from the outside.
+
+The Debug UI gets its map data from vector tiles served by OTP. The tile URLs OTP puts in the
+map style and in the tile metadata consist of the host of the request, plus this path. Change
+it when OTP is exposed under a different path than the one it serves them on, for example when
+a reverse proxy or API gateway adds a prefix.
+
+Only set the path, the host is taken from the `X-Forwarded-Host` or `Host` request header.
+
 
 <h3 id="additionalBackgroundLayers">additionalBackgroundLayers</h3>
 
@@ -52,6 +68,7 @@ Currently only raster tile layers are supported.
 ```JSON
 // debug-ui-config.json
 {
+  "vectorTilesBasePath" : "/otp/debug/vectortiles/",
   "additionalBackgroundLayers" : [
     {
       "name" : "TriMet aerial photos",
