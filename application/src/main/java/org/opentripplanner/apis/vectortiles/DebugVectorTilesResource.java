@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.apis.vectortiles.model.LayerParams;
@@ -81,8 +82,6 @@ public class DebugVectorTilesResource {
     RENTAL,
     TRANSFERS
   );
-  public static final String PATH = "/otp/debug/vectortiles/";
-
   private final TransitService transitService;
   private final Graph graph;
   private final DebugUiConfig debugUiConfig;
@@ -149,7 +148,12 @@ public class DebugVectorTilesResource {
     List<FeedInfo> feedInfos = feedInfos();
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    var url = TileJson.urlFromOverriddenBasePath(uri, headers, PATH, layers);
+    var url = TileJson.urlFromOverriddenBasePath(
+      uri,
+      headers,
+      debugUiConfig.vectorTilesBasePath(),
+      layers
+    );
     return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
 
@@ -158,20 +162,27 @@ public class DebugVectorTilesResource {
   @Produces(MediaType.APPLICATION_JSON)
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
     var base = HttpUtils.getBaseAddress(uri, headers);
+    var basePath = debugUiConfig.vectorTilesBasePath();
 
     // these could also be loaded together but are put into separate sources because
     // the stops are fast and the edges are relatively slow
     var stopsSource = new VectorSource(
       "stops",
-      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
+      tileJsonUrl(base, basePath, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
     );
-    var streetSource = new VectorSource("street", tileJsonUrl(base, List.of(EDGES, VERTICES)));
+    var streetSource = new VectorSource(
+      "street",
+      tileJsonUrl(base, basePath, List.of(EDGES, VERTICES))
+    );
     var geofencingSource = new VectorSource(
       "geofencing",
-      tileJsonUrl(base, List.of(GEOFENCING_ZONES))
+      tileJsonUrl(base, basePath, List.of(GEOFENCING_ZONES))
     );
-    var rentalSource = new VectorSource("rental", tileJsonUrl(base, List.of(RENTAL)));
-    var transferSource = new VectorSource("transfers", tileJsonUrl(base, List.of(TRANSFERS)));
+    var rentalSource = new VectorSource("rental", tileJsonUrl(base, basePath, List.of(RENTAL)));
+    var transferSource = new VectorSource(
+      "transfers",
+      tileJsonUrl(base, basePath, List.of(TRANSFERS))
+    );
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
@@ -187,12 +198,12 @@ public class DebugVectorTilesResource {
     );
   }
 
-  static String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
+  static String tileJsonUrl(String base, String basePath, List<LayerParameters<LayerType>> layers) {
     final String allLayers = layers
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    return "%s%s%s/tilejson.json".formatted(base, PATH, allLayers);
+    return "%s/%s/%s/tilejson.json".formatted(base, StringUtils.strip(basePath, "/"), allLayers);
   }
 
   private List<FeedInfo> feedInfos() {

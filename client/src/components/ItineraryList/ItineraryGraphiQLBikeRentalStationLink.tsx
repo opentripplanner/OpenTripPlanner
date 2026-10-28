@@ -9,6 +9,10 @@ export function ItineraryGraphiQLBikeRentalStationLink({
   stationId: string | undefined;
   legName: Maybe<string> | undefined;
 }) {
+  if (!graphiQLUrl) {
+    return <>{legName}</>;
+  }
+
   const queryID = { id: stationId };
   const formattedQuery = encodeURIComponent(bikeRentalStationQueryAsString);
   const formattedQueryID = encodeURIComponent(JSON.stringify(queryID));
