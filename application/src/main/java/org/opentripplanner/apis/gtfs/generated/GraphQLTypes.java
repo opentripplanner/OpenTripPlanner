@@ -1284,6 +1284,18 @@ public class GraphQLTypes {
     SCOOTER_STANDING,
   }
 
+  /**
+   * The geographical scope of a transit service: how far it travels and which kind of journeys it is
+   * meant for. The scope is derived from the NeTEx submode or the GTFS extended route type. Currently,
+   * it is only derived for the modes `RAIL` and `COACH`. Car transport trains (GTFS 104, NeTEx
+   * `carTransportRailService`) and urban railways (GTFS 400, 403 and 404) have no scope.
+   */
+  public enum GraphQLGeographicalScope {
+    LONG_DISTANCE,
+    REGIONAL,
+    SUBURBAN,
+  }
+
   public static class GraphQLInputBannedInput {
 
     private String agencies;
@@ -2692,6 +2704,8 @@ public class GraphQLTypes {
   public static class GraphQLPlanTransitModePreferenceInput {
 
     private GraphQLTransitModePreferenceCostInput cost;
+    private List<GraphQLGeographicalScope> excludedGeographicalScopes;
+    private GraphQLGeographicalScope geographicalScope;
     private GraphQLTransitMode mode;
     private GraphQLReplacementFilterInput replacement;
 
@@ -2700,6 +2714,24 @@ public class GraphQLTypes {
         this.cost = new GraphQLTransitModePreferenceCostInput(
           (Map<String, Object>) args.get("cost")
         );
+        if (args.get("excludedGeographicalScopes") != null) {
+          this.excludedGeographicalScopes = ((List<Object>) args.get("excludedGeographicalScopes"))
+            .stream()
+            .map(item ->
+              item instanceof GraphQLGeographicalScope
+                ? item
+                : GraphQLGeographicalScope.valueOf((String) item)
+            )
+            .map(GraphQLGeographicalScope.class::cast)
+            .collect(Collectors.toList());
+        }
+        if (args.get("geographicalScope") instanceof GraphQLGeographicalScope) {
+          this.geographicalScope = (GraphQLGeographicalScope) args.get("geographicalScope");
+        } else if (args.get("geographicalScope") != null) {
+          this.geographicalScope = GraphQLGeographicalScope.valueOf(
+            (String) args.get("geographicalScope")
+          );
+        }
         if (args.get("mode") instanceof GraphQLTransitMode) {
           this.mode = (GraphQLTransitMode) args.get("mode");
         } else if (args.get("mode") != null) {
@@ -2715,6 +2747,14 @@ public class GraphQLTypes {
       return this.cost;
     }
 
+    public List<GraphQLGeographicalScope> getGraphQLExcludedGeographicalScopes() {
+      return this.excludedGeographicalScopes;
+    }
+
+    public GraphQLGeographicalScope getGraphQLGeographicalScope() {
+      return this.geographicalScope;
+    }
+
     public GraphQLTransitMode getGraphQLMode() {
       return this.mode;
     }
@@ -2725,6 +2765,16 @@ public class GraphQLTypes {
 
     public void setGraphQLCost(GraphQLTransitModePreferenceCostInput cost) {
       this.cost = cost;
+    }
+
+    public void setGraphQLExcludedGeographicalScopes(
+      List<GraphQLGeographicalScope> excludedGeographicalScopes
+    ) {
+      this.excludedGeographicalScopes = excludedGeographicalScopes;
+    }
+
+    public void setGraphQLGeographicalScope(GraphQLGeographicalScope geographicalScope) {
+      this.geographicalScope = geographicalScope;
     }
 
     public void setGraphQLMode(GraphQLTransitMode mode) {

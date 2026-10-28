@@ -3678,6 +3678,32 @@ enum FormFactor {
   SCOOTER_STANDING
 }
 
+"""
+The geographical scope of a transit service: how far it travels and which kind of journeys it is
+meant for. The scope is derived from the NeTEx submode or the GTFS extended route type. Currently,
+it is only derived for the modes `RAIL` and `COACH`. Car transport trains (GTFS 104, NeTEx
+`carTransportRailService`) and urban railways (GTFS 400, 403 and 404) have no scope.
+"""
+enum GeographicalScope {
+  """
+  National and international services, including high speed rail and night trains. Derived from
+  the GTFS extended route types 101, 102, 105, 114, 201 and 202 and the NeTEx submodes
+  `highSpeedRail`, `longDistance`, `international`, `sleeperRailService`, `nightRail`,
+  `crossCountryRail`, `nationalCoach` and `internationalCoach`.
+  """
+  LONG_DISTANCE
+  """
+  Services connecting the towns and cities of a region. Derived from the GTFS extended route types
+  103, 106 and 204 and the NeTEx submodes `interregionalRail`, `regionalRail` and `regionalCoach`.
+  """
+  REGIONAL
+  """
+  Services connecting a city with its suburbs, e.g. S-Bahn. Derived from the GTFS extended route
+  types 109 and 208 and the NeTEx submodes `suburbanRailway` and `commuterCoach`.
+  """
+  SUBURBAN
+}
+
 enum InputField {
   DATE_TIME
   FROM
@@ -5224,8 +5250,35 @@ input PlanStreetPreferencesInput {
 
 "Transit mode and a reluctance associated with it."
 input PlanTransitModePreferenceInput {
-  "Costs related to using a transit mode."
+  """
+  Costs related to using a transit mode. Costs are defined per transit mode: if a mode is listed
+  more than once, e.g. with different geographical scopes, all entries that define a cost must
+  define the same cost.
+  """
   cost: TransitModePreferenceCostInput
+  """
+  If present and not null, all trips of the mode match except those with one of these geographical
+  scopes. Trips whose scope can't be derived from the data are not excluded. Like
+  `geographicalScope`, this is an additional requirement next to `replacement`.
+    
+  For example, `(mode: RAIL, excludedGeographicalScopes: [LONG_DISTANCE])` matches suburban and
+  regional trains as well as trains without a derivable scope, but no long-distance trains.
+    
+  Only supported for the modes `RAIL` and `COACH`, and can't be combined with `geographicalScope`.
+  An empty list is rejected as invalid input.
+  """
+  excludedGeographicalScopes: [GeographicalScope!]
+  """
+  If present and not null, only trips with this geographical scope match. Trips whose scope can't
+  be derived from the data never match; use `excludedGeographicalScopes` to keep them. Unlike
+  `replacement`, this is an additional requirement: a trip must match both the replacement
+  requirement and the geographical scope.
+    
+  Only supported for the modes `RAIL` and `COACH`, and not together with replacement `REQUIRED`,
+  since replacement services have no geographical scope. Other combinations are rejected as
+  invalid input, as they could never match.
+  """
+  geographicalScope: GeographicalScope
   "Transit mode that could be (but doesn't have to be) used in an itinerary."
   mode: TransitMode!
   """

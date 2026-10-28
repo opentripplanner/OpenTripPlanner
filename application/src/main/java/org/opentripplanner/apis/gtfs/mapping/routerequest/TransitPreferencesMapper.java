@@ -3,8 +3,9 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.ArgumentUtils.getTransitModes;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.support.InvalidInputException;
@@ -12,6 +13,7 @@ import org.opentripplanner.core.model.basic.Cost;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -26,19 +28,7 @@ public class TransitPreferencesMapper {
     var modes = args.getGraphQLModes();
     var transit = getTransitModes(environment);
     if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && !CollectionUtils.isEmpty(transit)) {
-      var reluctanceForMode = transit
-        .stream()
-        .filter(mode -> mode.containsKey("cost"))
-        .collect(
-          Collectors.toMap(
-            mode ->
-              TransitModeMapper.map(
-                GraphQLTypes.GraphQLTransitMode.valueOf((String) mode.get("mode"))
-              ),
-            mode -> (Double) ((Map<String, Object>) mode.get("cost")).get("reluctance")
-          )
-        );
-      transitPreferences.withReluctanceForMode(reluctanceForMode);
+      transitPreferences.withReluctanceForMode(mapReluctanceForMode(transit));
     }
     var transitArgs = args.getGraphQLPreferences().getGraphQLTransit();
     if (transitArgs == null) {
@@ -124,5 +114,33 @@ public class TransitPreferencesMapper {
         transitPreferences.withIncludeRealtimeCancellations(includeRealtimeCancellations);
       }
     }
+  }
+
+  /**
+   * The reluctance is defined per main mode, so a mode listed more than once, e.g. with different
+   * geographical scopes, must have the same reluctance in all entries that set one.
+   */
+  private static Map<TransitMode, Double> mapReluctanceForMode(List<Map<String, Object>> transit) {
+    var reluctanceForMode = new EnumMap<TransitMode, Double>(TransitMode.class);
+    for (var mode : transit) {
+      if (!mode.containsKey("cost")) {
+        continue;
+      }
+      var transitMode = TransitModeMapper.map(
+        GraphQLTypes.GraphQLTransitMode.valueOf((String) mode.get("mode"))
+      );
+      var reluctance = (Double) ((Map<String, Object>) mode.get("cost")).get("reluctance");
+      var previous = reluctanceForMode.putIfAbsent(transitMode, reluctance);
+      if (previous != null && !previous.equals(reluctance)) {
+        throw new InvalidInputException(
+          "Transit mode %s is listed with different reluctances (%s and %s). The reluctance can only be set per transit mode, not per geographical scope or replacement.".formatted(
+            transitMode,
+            previous,
+            reluctance
+          )
+        );
+      }
+    }
+    return reluctanceForMode;
   }
 }
