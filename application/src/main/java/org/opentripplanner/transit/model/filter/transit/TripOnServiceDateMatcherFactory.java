@@ -114,7 +114,7 @@ public class TripOnServiceDateMatcherFactory {
 
     if (!selector.transportModes().includeEverything()) {
       var transportModeFilter = AllowTransitModeFilter.of(
-        selector.transportModes().get().stream().map(NarrowedTransitMode::of).toList()
+        selector.transportModes().get().stream().map(NarrowedTransitMode::ofMainAndSubMode).toList()
       );
       expr.matches(
         new GenericUnaryMatcher<>("transportMode", (TripOnServiceDate tripTime) ->

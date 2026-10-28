@@ -114,11 +114,9 @@ public class ModePreferencesMapper {
 
   private static NarrowedTransitMode map(GraphQLTypes.GraphQLPlanTransitModePreferenceInput input) {
     if (input != null) {
-      return new NarrowedTransitMode(
-        TransitModeMapper.map(input.getGraphQLMode()),
-        null,
-        map(input.getGraphQLReplacement())
-      );
+      return NarrowedTransitMode.of(TransitModeMapper.map(input.getGraphQLMode()))
+        .withReplacement(map(input.getGraphQLReplacement()))
+        .build();
     } else {
       return null;
     }

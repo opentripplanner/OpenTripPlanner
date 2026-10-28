@@ -189,7 +189,10 @@ public class SelectRequest implements Serializable {
     private List<FeedScopedId> routes = new ArrayList<>();
 
     public Builder withTransportModes(List<MainAndSubMode> transportModes) {
-      this.transportModes = transportModes.stream().map(NarrowedTransitMode::of).toList();
+      this.transportModes = transportModes
+        .stream()
+        .map(NarrowedTransitMode::ofMainAndSubMode)
+        .toList();
       return this;
     }
 
@@ -199,7 +202,7 @@ public class SelectRequest implements Serializable {
     }
 
     public Builder addTransportMode(MainAndSubMode transportMode) {
-      this.transportModes.add(NarrowedTransitMode.of(transportMode));
+      this.transportModes.add(NarrowedTransitMode.ofMainAndSubMode(transportMode));
       return this;
     }
 
