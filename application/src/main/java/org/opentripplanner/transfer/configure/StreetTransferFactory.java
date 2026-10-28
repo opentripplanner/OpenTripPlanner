@@ -1,6 +1,5 @@
 package org.opentripplanner.transfer.configure;
 
-import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.core.model.transaction.RepositoryHandle;
@@ -38,12 +37,16 @@ public final class StreetTransferFactory {
 
   private StreetTransferFactory() {}
 
-  /** The profiles used if none are configured: a single default walk profile. */
-  public static TransferParameters<RouteRequest> defaultParameters() {
-    return new TransferParameters<>(
-      List.of(
-        new TransferProfile<>("walk", TransferProfileType.WALK, null, RouteRequest.defaultValue())
-      )
+  /**
+   * The profile used if no profile is configured: a walk profile with id {@code walk}, its
+   * preferences are the ones of the default request.
+   */
+  public static TransferProfile<RouteRequest> defaultWalkProfile() {
+    return new TransferProfile<>(
+      "walk",
+      TransferProfileType.WALK,
+      null,
+      RouteRequest.defaultValue()
     );
   }
 
