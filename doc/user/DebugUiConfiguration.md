@@ -16,7 +16,7 @@ available by placing a file `debug-ui-config.json` into OTP's working directory.
 
 | Config Parameter                                          |    Type    | Summary                                                                                                                                                                                      |  Req./Opt. | Default Value               | Since |
 |-----------------------------------------------------------|:----------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------|:-----:|
-| [vectorTilesBasePath](#vectorTilesBasePath)               |  `string`  | The path the debug vector tiles are reachable on from the outside.                                                                                                                           | *Optional* | `"/otp/debug/vectortiles/"` |  2.11 |
+| [vectorTilesBasePath](#vectorTilesBasePath)               |  `string`  | The path or URL the debug vector tiles are reachable on from the outside.                                                                                                                    | *Optional* | `"/otp/debug/vectortiles/"` |  2.11 |
 | [additionalBackgroundLayers](#additionalBackgroundLayers) | `object[]` | Additional background raster map layers.                                                                                                                                                     | *Optional* |                             |  2.7  |
 |       attribution                                         |  `string`  | Attribution for the map data.                                                                                                                                                                | *Optional* | `"© OpenTripPlanner"`       |  2.7  |
 |       name                                                |  `string`  | Name to appear in the layer selector.                                                                                                                                                        | *Required* |                             |  2.7  |
@@ -35,14 +35,16 @@ available by placing a file `debug-ui-config.json` into OTP's working directory.
 **Since version:** `2.11` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"/otp/debug/vectortiles/"`   
 **Path:** / 
 
-The path the debug vector tiles are reachable on from the outside.
+The path or URL the debug vector tiles are reachable on from the outside.
 
 The Debug UI gets its map data from vector tiles served by OTP. The tile URLs OTP puts in the
-map style and in the tile metadata consist of the host of the request, plus this path. Change
-it when OTP is exposed under a different path than the one it serves them on, for example when
-a reverse proxy or API gateway adds a prefix.
+map style and in the tile metadata are built from this value. Change it when OTP is exposed
+under a different path or host than the one it serves them on, for example when a reverse
+proxy or API gateway adds a prefix.
 
-Only set the path, the host is taken from the `X-Forwarded-Host` or `Host` request header.
+If it is a path, the host is taken from the `X-Forwarded-Host` or `Host` request header,
+which a proxy in front of OTP may overwrite. If it is a full URL, starting with `http://` or
+`https://`, it is used as is and no request header is used.
 
 
 <h3 id="additionalBackgroundLayers">additionalBackgroundLayers</h3>

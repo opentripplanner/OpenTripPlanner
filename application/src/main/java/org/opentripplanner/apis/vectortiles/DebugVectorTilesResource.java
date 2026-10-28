@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.http.server.Request;
@@ -82,6 +83,11 @@ public class DebugVectorTilesResource {
     RENTAL,
     TRANSFERS
   );
+  private static final Pattern ABSOLUTE_URL = Pattern.compile(
+    "^https?://.*",
+    Pattern.CASE_INSENSITIVE
+  );
+
   private final TransitService transitService;
   private final Graph graph;
   private final DebugUiConfig debugUiConfig;
@@ -148,11 +154,9 @@ public class DebugVectorTilesResource {
     List<FeedInfo> feedInfos = feedInfos();
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    var url = TileJson.urlFromOverriddenBasePath(
-      uri,
-      headers,
-      debugUiConfig.vectorTilesBasePath(),
-      layers
+    var url = "%s/%s/{z}/{x}/{y}.pbf".formatted(
+      tilesBaseUrl(HttpUtils.getBaseAddress(uri, headers), debugUiConfig.vectorTilesBasePath()),
+      String.join(",", layers)
     );
     return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
@@ -161,28 +165,24 @@ public class DebugVectorTilesResource {
   @Path("/style.json")
   @Produces(MediaType.APPLICATION_JSON)
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
-    var base = HttpUtils.getBaseAddress(uri, headers);
-    var basePath = debugUiConfig.vectorTilesBasePath();
+    var base = tilesBaseUrl(
+      HttpUtils.getBaseAddress(uri, headers),
+      debugUiConfig.vectorTilesBasePath()
+    );
 
     // these could also be loaded together but are put into separate sources because
     // the stops are fast and the edges are relatively slow
     var stopsSource = new VectorSource(
       "stops",
-      tileJsonUrl(base, basePath, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
+      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS, GROUP_STOPS))
     );
-    var streetSource = new VectorSource(
-      "street",
-      tileJsonUrl(base, basePath, List.of(EDGES, VERTICES))
-    );
+    var streetSource = new VectorSource("street", tileJsonUrl(base, List.of(EDGES, VERTICES)));
     var geofencingSource = new VectorSource(
       "geofencing",
-      tileJsonUrl(base, basePath, List.of(GEOFENCING_ZONES))
+      tileJsonUrl(base, List.of(GEOFENCING_ZONES))
     );
-    var rentalSource = new VectorSource("rental", tileJsonUrl(base, basePath, List.of(RENTAL)));
-    var transferSource = new VectorSource(
-      "transfers",
-      tileJsonUrl(base, basePath, List.of(TRANSFERS))
-    );
+    var rentalSource = new VectorSource("rental", tileJsonUrl(base, List.of(RENTAL)));
+    var transferSource = new VectorSource("transfers", tileJsonUrl(base, List.of(TRANSFERS)));
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
@@ -198,12 +198,23 @@ public class DebugVectorTilesResource {
     );
   }
 
-  static String tileJsonUrl(String base, String basePath, List<LayerParameters<LayerType>> layers) {
+  /**
+   * The URL the debug vector tiles are reachable on from the outside. The configured value is
+   * either a full URL, which is used as is, or a path, which is put after the host of the request.
+   */
+  static String tilesBaseUrl(String requestBaseAddress, String basePathOrUrl) {
+    if (ABSOLUTE_URL.matcher(basePathOrUrl).matches()) {
+      return StringUtils.stripEnd(basePathOrUrl, "/");
+    }
+    return "%s/%s".formatted(requestBaseAddress, StringUtils.strip(basePathOrUrl, "/"));
+  }
+
+  static String tileJsonUrl(String tilesBaseUrl, List<LayerParameters<LayerType>> layers) {
     final String allLayers = layers
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    return "%s/%s/%s/tilejson.json".formatted(base, StringUtils.strip(basePath, "/"), allLayers);
+    return "%s/%s/tilejson.json".formatted(tilesBaseUrl, allLayers);
   }
 
   private List<FeedInfo> feedInfos() {

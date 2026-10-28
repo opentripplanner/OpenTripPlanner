@@ -77,15 +77,17 @@ public class DebugUiConfig {
     this.vectorTilesBasePath = root
       .of("vectorTilesBasePath")
       .since(V2_11)
-      .summary("The path the debug vector tiles are reachable on from the outside.")
+      .summary("The path or URL the debug vector tiles are reachable on from the outside.")
       .description(
         """
         The Debug UI gets its map data from vector tiles served by OTP. The tile URLs OTP puts in the
-        map style and in the tile metadata consist of the host of the request, plus this path. Change
-        it when OTP is exposed under a different path than the one it serves them on, for example when
-        a reverse proxy or API gateway adds a prefix.
+        map style and in the tile metadata are built from this value. Change it when OTP is exposed
+        under a different path or host than the one it serves them on, for example when a reverse
+        proxy or API gateway adds a prefix.
 
-        Only set the path, the host is taken from the `X-Forwarded-Host` or `Host` request header.
+        If it is a path, the host is taken from the `X-Forwarded-Host` or `Host` request header,
+        which a proxy in front of OTP may overwrite. If it is a full URL, starting with `http://` or
+        `https://`, it is used as is and no request header is used.
         """
       )
       .asString(DEFAULT_VECTOR_TILES_BASE_PATH);
