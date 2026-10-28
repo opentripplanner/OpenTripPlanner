@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
@@ -101,6 +102,31 @@ public class WheelchairConfig {
             include stairs as a last result."""
           )
           .asDouble(dft.stairsReluctance())
+      )
+      .withSpeed(
+        a
+          .of("speed")
+          .since(V2_11)
+          .summary("The walking speed of a wheelchair user, in meters per second.")
+          .asDouble(dft.speed())
+      )
+      .withReluctance(
+        a
+          .of("reluctance")
+          .since(V2_11)
+          .summary(
+            "A multiplier for how bad moving in a wheelchair is, compared to being in transit."
+          )
+          .asDouble(dft.reluctance())
+      )
+      .withStairsTimeFactor(
+        a
+          .of("stairsTimeFactor")
+          .since(V2_11)
+          .summary(
+            "How much more time does it take to traverse a flight of stairs compared to a similar horizontal length."
+          )
+          .asDouble(dft.stairsTimeFactor())
       );
   }
 
