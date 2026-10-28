@@ -20,6 +20,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -45,10 +46,20 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
+    ShapeService shapeService,
     NavigationDirection direction,
     AlternativeLegsFilter filter
   ) {
-    return getAlternativeLegs(leg, numberLegs, transitService, direction, filter, false, false);
+    return getAlternativeLegs(
+      leg,
+      numberLegs,
+      transitService,
+      shapeService,
+      direction,
+      filter,
+      false,
+      false
+    );
   }
 
   /**
@@ -58,6 +69,7 @@ public class AlternativeLegs {
    * @param numberLegs           The number of alternative legs requested. If fewer legs are found,
    *                             only the found legs are returned.
    * @param transitService       The transit service used for the search
+   * @param shapeService         The shape service used to look up the pattern geometry of the legs
    * @param direction            Indicating whether the alternative legs should depart before or
    *                             after than the original.
    * @param filter               AlternativeLegsFilter indicating which properties of the original
@@ -73,6 +85,7 @@ public class AlternativeLegs {
     Leg leg,
     Integer numberLegs,
     TransitService transitService,
+    ShapeService shapeService,
     NavigationDirection direction,
     AlternativeLegsFilter filter,
     boolean exactOriginStop,
@@ -107,7 +120,9 @@ public class AlternativeLegs {
       .filter(tripPatternPredicate)
       .distinct()
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
-      .flatMap(t -> generateLegs(transitService, t, leg.startTime(), leg.serviceDate(), direction))
+      .flatMap(t ->
+        generateLegs(transitService, shapeService, t, leg.startTime(), leg.serviceDate(), direction)
+      )
       .filter(Predicate.not(leg::isPartiallySameTransitLeg))
       .sorted(legComparator)
       .limit(numberLegs)
@@ -121,6 +136,7 @@ public class AlternativeLegs {
    */
   private static Stream<ScheduledTransitLeg> generateLegs(
     TransitService transitService,
+    ShapeService shapeService,
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
     LocalDate originalDate,
@@ -197,7 +213,8 @@ public class AlternativeLegs {
           boardingPosition,
           alightingPosition,
           tripTimeOnDate,
-          transitService
+          transitService,
+          shapeService
         )
       );
     }
@@ -211,7 +228,8 @@ public class AlternativeLegs {
     int boardingPosition,
     int alightingPosition,
     TripTimeOnDate tripTimeOnDate,
-    TransitService transitService
+    TransitService transitService,
+    ShapeService shapeService
   ) {
     LocalDate serviceDay = tripTimeOnDate.getServiceDay();
     var tripTimes = tripTimeOnDate.getTripTimes();
@@ -234,6 +252,7 @@ public class AlternativeLegs {
     return new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripTimes)
       .withTripPattern(pattern)
+      .withTripPatternGeometry(shapeService.getTripPatternGeometry(pattern.getId()))
       .withBoardStopIndexInPattern(boardingPosition)
       .withAlightStopIndexInPattern(alightingPosition)
       .withStartTime(boardingTime)

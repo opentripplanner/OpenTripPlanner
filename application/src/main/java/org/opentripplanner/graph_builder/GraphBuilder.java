@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFact
 import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -89,6 +90,7 @@ public class GraphBuilder implements Runnable {
     StreetRepository streetRepository,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
@@ -111,6 +113,7 @@ public class GraphBuilder implements Runnable {
       .streetRepository(streetRepository)
       .transitRepository(transitRepository)
       .timetableDataImport(timetableDataImport)
+      .shapeDataImport(shapeDataImport)
       .transferRepository(transferRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)

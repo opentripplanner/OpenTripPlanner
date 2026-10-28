@@ -1,14 +1,20 @@
 package org.opentripplanner.updater.trip;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ConcurrentModificationException;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitDataTestFactory;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -18,6 +24,7 @@ import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
+import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 
 /**
  * Tests for {@link TripUpdateApplier}, covering the three-phase update logic that was previously in
@@ -72,6 +79,14 @@ class TripUpdateApplierTest {
     .withRealTimeStopPatternModified()
     .build();
 
+  private final DefaultShapeRepository shapeRepository = new DefaultShapeRepository(
+    ScheduledShapeData.empty()
+  );
+  private final RealTimeShapeResolver shapeResolver = new RealTimeShapeResolver(
+    () -> shapeRepository,
+    DeduplicatorService.NOOP
+  );
+
   private static DefaultTimetableRepository createBuffer() {
     return new DefaultTimetableRepository(
       RaptorTransitDataTestFactory.empty(),
@@ -95,6 +110,7 @@ class TripUpdateApplierTest {
 
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build()
     );
 
@@ -120,6 +136,7 @@ class TripUpdateApplierTest {
 
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
@@ -154,6 +171,7 @@ class TripUpdateApplierTest {
     // Setup: move the trip to the modified pattern
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
@@ -165,6 +183,7 @@ class TripUpdateApplierTest {
     // Now revert and update on the scheduled pattern
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
@@ -195,6 +214,7 @@ class TripUpdateApplierTest {
     // Setup: move the trip to the first modified pattern
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
@@ -207,6 +227,7 @@ class TripUpdateApplierTest {
     // second modified pattern
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(SECOND_MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
@@ -240,6 +261,7 @@ class TripUpdateApplierTest {
 
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
@@ -263,6 +285,7 @@ class TripUpdateApplierTest {
 
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, deletedTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
@@ -291,6 +314,7 @@ class TripUpdateApplierTest {
     // Setup: move the trip to the modified pattern
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
         .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
         .build()
@@ -305,6 +329,7 @@ class TripUpdateApplierTest {
       .build();
     TripUpdateApplier.apply(
       buffer,
+      shapeResolver,
       RealTimeTripUpdate.of(SCHEDULED_PATTERN, canceledTripTimes, TODAY)
         .withRevertPreviousRealTimeUpdates(true)
         .build()
@@ -316,5 +341,60 @@ class TripUpdateApplierTest {
     // Trip should be CANCELED in the scheduled pattern
     var timetable = buffer.resolve(SCHEDULED_PATTERN, TODAY);
     assertTrue(timetable.getTripTimes(TRIP).isCanceled());
+  }
+
+  /**
+   * The geometry of a real-time pattern is written as part of applying the update.
+   */
+  @Test
+  void geometryIsWrittenForRealTimePattern() {
+    var buffer = createBuffer();
+    var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes().build();
+
+    TripUpdateApplier.apply(
+      buffer,
+      shapeResolver,
+      RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY)
+        .withHideTripInScheduledPattern(SCHEDULED_PATTERN)
+        .build()
+    );
+
+    assertThat(shapeRepository.getTripPatternGeometry(MODIFIED_PATTERN.getId())).isNotNull();
+  }
+
+  /**
+   * The geometry of a scheduled pattern is not touched by real-time updates.
+   */
+  @Test
+  void noGeometryIsWrittenForScheduledPattern() {
+    var buffer = createBuffer();
+    var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes().build();
+
+    TripUpdateApplier.apply(
+      buffer,
+      shapeResolver,
+      RealTimeTripUpdate.of(SCHEDULED_PATTERN, rtTripTimes, TODAY).build()
+    );
+
+    assertThat(shapeRepository.getTripPatternGeometry(SCHEDULED_PATTERN.getId())).isNull();
+  }
+
+  /**
+   * No geometry is written if the update cannot be applied.
+   */
+  @Test
+  void noGeometryIsWrittenWhenTheUpdateFails() {
+    var readOnlyBuffer = createBuffer().commit(true);
+    var rtTripTimes = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes().build();
+
+    assertThrows(ConcurrentModificationException.class, () ->
+      TripUpdateApplier.apply(
+        readOnlyBuffer,
+        shapeResolver,
+        RealTimeTripUpdate.of(MODIFIED_PATTERN, rtTripTimes, TODAY).build()
+      )
+    );
+
+    assertThat(shapeRepository.getTripPatternGeometry(MODIFIED_PATTERN.getId())).isNull();
   }
 }

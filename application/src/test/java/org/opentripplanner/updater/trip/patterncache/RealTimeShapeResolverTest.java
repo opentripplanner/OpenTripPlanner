@@ -1,141 +1,276 @@
-package org.opentripplanner.model;
+package org.opentripplanner.updater.trip.patterncache;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.street.geometry.GeometryUtils;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
+import org.opentripplanner.service.shape.model.TripGeometryFactory;
+import org.opentripplanner.street.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
-import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-public class TripPatternTest {
+class RealTimeShapeResolverTest {
+
+  private static final TransitRepositoryForTest TEST_MODEL = TransitRepositoryForTest.of();
+  private static final Route ROUTE = TransitRepositoryForTest.route("routeId").build();
+
+  private static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
+  private static final RegularStop STOP_X = TEST_MODEL.stop("X").build();
+  private static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
+  private static final RegularStop STOP_Y = TEST_MODEL.stop("Y").build();
+  private static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
+
+  private static final TripPattern ORIGINAL = TripPattern.of(id("original"))
+    .withRoute(ROUTE)
+    .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+    .build();
+
+  private ScheduledShapeData scheduledShapes = ScheduledShapeData.empty();
+  private DefaultShapeRepository repository = new DefaultShapeRepository(scheduledShapes);
+  private RealTimeShapeResolver subject = new RealTimeShapeResolver(
+    () -> repository,
+    DeduplicatorService.NOOP
+  );
+
+  @Test
+  void hopGeometryForReplacementPattern() {
+    repositoryWithOriginalGeometry();
+    var pattern = TripPattern.of(id("replacement"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_X, STOP_Y))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(ORIGINAL)
+      .build();
+
+    subject.ensureGeometry(pattern);
+
+    var tripPatternGeometry = repository.getTripPatternGeometry(pattern.getId());
+    assertThat(tripPatternGeometry.size()).isEqualTo(3);
+    assertThat(tripPatternGeometry.get(0)).isEqualTo(
+      makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate())
+    );
+    assertThat(tripPatternGeometry.get(1)).isEqualTo(
+      makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate())
+    );
+    assertThat(tripPatternGeometry.get(2)).isEqualTo(
+      makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate())
+    );
+  }
+
+  @Test
+  void copyHopsFromTheOriginalWhenStopsAreUnchanged() {
+    repositoryWithOriginalGeometry();
+    var pattern = TripPattern.of(id("replacement"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(ORIGINAL)
+      .build();
+
+    subject.ensureGeometry(pattern);
+
+    var original = repository.getTripPatternGeometry(ORIGINAL.getId());
+    var tripPatternGeometry = repository.getTripPatternGeometry(pattern.getId());
+    assertThat(tripPatternGeometry.distanceBetween(0, 2)).isEqualTo(original.distanceBetween(0, 2));
+    assertThat(tripPatternGeometry.get(0)).isEqualTo(original.get(0));
+    assertThat(tripPatternGeometry.get(1)).isEqualTo(original.get(1));
+  }
 
   /**
-   * The originalTripPattern is to consider a planned trip with 2 stops and one coordinate between.
-   *
-   * The tripPattern is an updated trip with just two stops, belonging to the same stations as for
-   * originalTripPattern but first stop is an alternative stop.
-   *
-   * The scope is to create hop geometries from original trip pattern since the stops belong to the
-   * same stations. The end result should be that the new tripPattern contains the altered stop but
-   * all the rest of the coordinates are as from originalTripPattern
+   * The original pattern has one hop with an extra coordinate between the stops. The replacement
+   * uses an alternative stop in the same station as the first stop, so the old geometry is kept
+   * and only the first point is moved to the new stop.
    */
   @Test
-  public void testSetHopGeometriesFromPattern() {
-    var testModel = TransitRepositoryForTest.of();
-    var stationOrigin = testModel.station("S1").withCoordinate(0.0, 0.0).build();
-    var stationDestination = testModel.station("S2").withCoordinate(1.0, 1.0).build();
-    var stopOrigin = testModel
-      .stop("A1")
+  void testSetHopGeometriesFromPattern() {
+    var stationOrigin = TEST_MODEL.station("S1").withCoordinate(0.0, 0.0).build();
+    var stationDestination = TEST_MODEL.station("S2").withCoordinate(1.0, 1.0).build();
+    var stopOrigin = TEST_MODEL.stop("A1")
       .withCoordinate(0.1, 0.1)
       .withParentStation(stationOrigin)
       .build();
-    var stopNewOrigin = testModel
-      .stop("A2")
+    var stopNewOrigin = TEST_MODEL.stop("A2")
       .withCoordinate(0.2, 0.2)
       .withParentStation(stationOrigin)
       .build();
-    var stopDestination = testModel
-      .stop("C")
+    var stopDestination = TEST_MODEL.stop("D")
       .withCoordinate(0.9, 0.9)
       .withParentStation(stationDestination)
       .build();
-    var coordinate = new Coordinate(0.5, 0.5);
-
-    // Add coordinate between stops on original trip pattern
-    var originalTripPattern = setupTripPattern(
-      stopOrigin,
-      stopDestination,
-      null,
-      getLineStrings(stopOrigin, stopDestination, coordinate)
-    );
-
-    // Test without setting original trip pattern
-    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, null, null);
-
-    var originalCoordinates = originalTripPattern.getHopGeometry(0).getCoordinates().length;
-    var coordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
-
-    assertEquals(
-      3,
-      originalCoordinates,
-      "The coordinates for originalTripPattern on first hop should be 3"
-    );
-    assertEquals(2, coordinates, "The coordinates for tripPattern on first hop should be 2");
-
-    // Test with setting original trip pattern
-    newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, originalTripPattern, null);
-
-    var finalCoordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
-
-    assertEquals(
-      originalCoordinates,
-      finalCoordinates,
-      "The hop on tripPattern should contain as many coordinates as the originalTripPattern"
-    );
-  }
-
-  /**
-   * Create TripPattern between to stops
-   *
-   * @param origin      Start stop
-   * @param destination End stop
-   * @return TripPattern with stopPattern
-   */
-  public TripPattern setupTripPattern(
-    RegularStop origin,
-    RegularStop destination,
-    TripPattern originalTripPattern,
-    List<LineString> geometry
-  ) {
-    var builder = StopPattern.create(2);
-    builder.stops.with(0, origin);
-    builder.stops.with(1, destination);
-    for (int i = 0; i < 2; i++) {
-      builder.pickups.with(i, PickDrop.SCHEDULED);
-      builder.dropoffs.with(i, PickDrop.SCHEDULED);
-    }
-
-    var stopPattern = builder.build();
-    var route = TransitRepositoryForTest.route("R1").build();
-
-    return TripPattern.of(new FeedScopedId(route.getId().getFeedId(), "T1"))
-      .withRoute(route)
-      .withStopPattern(stopPattern)
-      .withOriginalTripPattern(originalTripPattern)
-      .withHopGeometries(geometry)
+    var original = TripPattern.of(id("original2"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopOrigin, stopDestination))
       .build();
+    var middle = new WgsCoordinate(0.5, 0.5);
+    givenScheduledGeometry(
+      original.getId(),
+      TripGeometryFactory.fromLineStrings(
+        List.of(
+          makeLineString(stopOrigin.getCoordinate(), middle, stopDestination.getCoordinate())
+        ),
+        DeduplicatorService.NOOP
+      )
+    );
+    var pattern = TripPattern.of(id("replacement2"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(stopNewOrigin, stopDestination))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(original)
+      .build();
+
+    subject.ensureGeometry(pattern);
+
+    var hop = repository.getTripPatternGeometry(pattern.getId()).get(0);
+    assertThat(hop).isEqualTo(
+      makeLineString(stopNewOrigin.getCoordinate(), middle, stopDestination.getCoordinate())
+    );
+    assertThat(repository.getTripPatternGeometry(original.getId()).get(0)).isEqualTo(
+      makeLineString(stopOrigin.getCoordinate(), middle, stopDestination.getCoordinate())
+    );
   }
 
-  /**
-   * Create LineString of coordinates and stops.
-   *
-   * @param origin      First stop will become the first coordinate
-   * @param destination Last stop will become the last coordinate
-   * @param coordinate  Coordinate to inject between stops
-   * @return LineString with all coordinates
-   */
-  private List<LineString> getLineStrings(
-    RegularStop origin,
-    RegularStop destination,
-    Coordinate coordinate
-  ) {
-    var coordinates = new ArrayList<Coordinate>();
-    // Add start and stop first and last
-    coordinates.add(new Coordinate(origin.getLon(), origin.getLat()));
-    coordinates.add(coordinate);
-    coordinates.add(new Coordinate(destination.getLon(), destination.getLat()));
+  @Test
+  void useStraightLinesMeasuredWithHaversineForPatternsWithoutOriginal() {
+    var pattern = TripPattern.of(id("added"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeAddedTrip()
+      .build();
 
-    var l1 = GeometryUtils.getGeometryFactory().createLineString(
-      coordinates.toArray(Coordinate[]::new)
+    subject.ensureGeometry(pattern);
+
+    var tripPatternGeometry = repository.getTripPatternGeometry(pattern.getId());
+    assertThat(tripPatternGeometry.get(0)).isEqualTo(
+      makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate())
     );
+    double expected = distance(STOP_A, STOP_B) + distance(STOP_B, STOP_C);
+    assertThat(tripPatternGeometry.distanceBetween(0, 2)).isEqualTo((int) Math.round(expected));
+  }
 
-    return List.of(l1);
+  @Test
+  void ensureGeometryIsIdempotent() {
+    var pattern = TripPattern.of(id("added"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeAddedTrip()
+      .build();
+
+    subject.ensureGeometry(pattern);
+    var first = repository.getTripPatternGeometry(pattern.getId());
+    subject.ensureGeometry(pattern);
+
+    assertThat(repository.getTripPatternGeometry(pattern.getId())).isSameInstanceAs(first);
+  }
+
+  @Test
+  void doNotTouchTheRepositoryForScheduledPatterns() {
+    var accessCount = new AtomicInteger();
+    var resolver = new RealTimeShapeResolver(() -> {
+      accessCount.incrementAndGet();
+      return repository;
+    }, DeduplicatorService.NOOP);
+
+    resolver.ensureGeometry(ORIGINAL);
+
+    assertThat(accessCount.get()).isEqualTo(0);
+    assertThat(repository.getTripPatternGeometry(ORIGINAL.getId())).isNull();
+  }
+
+  @Test
+  void writeOnlyToTheRealTimeRepository() {
+    repositoryWithOriginalGeometry();
+    var pattern = TripPattern.of(id("replacement"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(ORIGINAL)
+      .build();
+    var snapshotBefore = repository.createSnapshot();
+
+    subject.ensureGeometry(pattern);
+
+    assertThat(repository.getTripPatternGeometry(pattern.getId())).isNotNull();
+    assertThat(scheduledShapes.getTripPatternGeometry(pattern.getId())).isNull();
+    assertThat(snapshotBefore.getTripPatternGeometry(pattern.getId())).isNull();
+  }
+
+  @Test
+  void deriveFromAnOriginalWrittenEarlierInTheSameTransaction() {
+    repositoryWithOriginalGeometry();
+    var firstUpdate = TripPattern.of(id("replacement1"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(ORIGINAL)
+      .build();
+    var secondUpdate = TripPattern.of(id("replacement2nd"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_C))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(firstUpdate)
+      .build();
+
+    subject.ensureGeometry(firstUpdate);
+    subject.ensureGeometry(secondUpdate);
+
+    var first = repository.getTripPatternGeometry(firstUpdate.getId());
+    var second = repository.getTripPatternGeometry(secondUpdate.getId());
+    assertThat(second.get(0)).isEqualTo(first.get(0));
+    assertThat(second.get(1)).isEqualTo(first.get(1));
+  }
+
+  @Test
+  void failIfTheOriginalPatternHasNoGeometry() {
+    var pattern = TripPattern.of(id("replacement"))
+      .withRoute(ROUTE)
+      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B))
+      .withRealTimeStopPatternModified()
+      .withOriginalTripPattern(ORIGINAL)
+      .build();
+
+    assertThrows(IllegalStateException.class, () -> subject.ensureGeometry(pattern));
+  }
+
+  private static double distance(RegularStop from, RegularStop to) {
+    return SphericalDistanceLibrary.distance(
+      from.getLat(),
+      from.getLon(),
+      to.getLat(),
+      to.getLon()
+    );
+  }
+
+  private void givenScheduledGeometry(
+    FeedScopedId patternId,
+    CompactLineStringSequence tripPatternGeometry
+  ) {
+    scheduledShapes = ScheduledShapeData.of(Map.of(patternId, tripPatternGeometry));
+    repository = new DefaultShapeRepository(scheduledShapes);
+  }
+
+  private void repositoryWithOriginalGeometry() {
+    givenScheduledGeometry(
+      ORIGINAL.getId(),
+      TripGeometryFactory.fromLineStrings(
+        List.of(
+          makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
+          makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
+        ),
+        DeduplicatorService.NOOP
+      )
+    );
   }
 }

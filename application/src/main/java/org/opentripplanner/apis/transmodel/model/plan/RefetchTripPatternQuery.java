@@ -215,6 +215,7 @@ public class RefetchTripPatternQuery {
     var refetcher = new RefetchItineraryService(
       ctx.graph(),
       ctx.transitService(),
+      ctx.shapeService(),
       ctx.transitAlertService(),
       ctx.transferService(),
       ctx.streetDetailsService(),

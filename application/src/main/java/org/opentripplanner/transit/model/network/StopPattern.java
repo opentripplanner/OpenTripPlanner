@@ -290,7 +290,7 @@ public final class StopPattern implements Serializable {
    * @param index Given index for stop
    * @return true if stop and next stop are equal on both stop patterns, else false
    */
-  boolean sameStops(StopPattern other, int index) {
+  public boolean sameStops(StopPattern other, int index) {
     var otherOrigin = other.getStop(index);
     var otherDestination = other.getStop(index + 1);
     var origin = getStop(index);
@@ -307,7 +307,7 @@ public final class StopPattern implements Serializable {
    * @return true if the stops have the same stations, else false. If any station is null then
    *         false.
    */
-  boolean sameStations(StopPattern other, int index) {
+  public boolean sameStations(StopPattern other, int index) {
     var otherOrigin = other.getStop(index).getParentStation();
     var otherDestination = other.getStop(index + 1).getParentStation();
     var origin = getStop(index).getParentStation();

@@ -40,6 +40,10 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
+import org.opentripplanner.service.shape.ShapeService;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
@@ -104,10 +108,16 @@ public class RequestScopedModule {
   RealtimeResolver realTimeResolver(
     RefetchItineraryService refetchItineraryService,
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService
   ) {
     return OTPFeature.RealtimeResolver.isOn()
-      ? new RealtimeResolver(refetchItineraryService, transitService, transitAlertService)
+      ? new RealtimeResolver(
+          refetchItineraryService,
+          transitService,
+          shapeService,
+          transitAlertService
+        )
       : null;
   }
 
@@ -116,6 +126,7 @@ public class RequestScopedModule {
   static RefetchItineraryService refetchItineraryService(
     Graph graph,
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService,
     RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
@@ -125,6 +136,7 @@ public class RequestScopedModule {
     return new RefetchItineraryService(
       graph,
       transitService,
+      shapeService,
       transitAlertService,
       transferService,
       streetDetailsService,
@@ -188,6 +200,7 @@ public class RequestScopedModule {
   @HttpRequestScoped
   static RoutingService routingService(
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService,
     Graph graph,
     RaptorConfig<TripSchedule> raptorConfig,
@@ -210,6 +223,7 @@ public class RequestScopedModule {
   ) {
     return new DefaultRoutingService(
       transitService,
+      shapeService,
       graph,
       raptorConfig,
       Metrics.globalRegistry,
@@ -233,6 +247,15 @@ public class RequestScopedModule {
       transitRoutingConfig,
       realtimeResolver
     );
+  }
+
+  @Provides
+  @HttpRequestScoped
+  static ShapeService shapeService(
+    RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeRepositoryHandle,
+    TransactionScope transactionScope
+  ) {
+    return new DefaultShapeService(shapeRepositoryHandle.repositorySnapshot(transactionScope));
   }
 
   @Provides

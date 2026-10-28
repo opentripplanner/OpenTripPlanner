@@ -27,6 +27,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.model.network.Route;
@@ -152,12 +153,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   @Override
   public DataFetcher<Iterable<Coordinate>> geometry() {
     return environment -> {
-      LineString geometry = getSource(environment).getGeometry();
-      if (geometry == null) {
-        return null;
-      } else {
-        return Arrays.asList(geometry.getCoordinates());
-      }
+      return Arrays.asList(getTripPatternGeometry(environment).getCoordinates());
     };
   }
 
@@ -185,7 +181,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
   @Override
   public DataFetcher<Geometry> patternGeometry() {
-    return environment -> getSource(environment).getGeometry();
+    return this::getTripPatternGeometry;
   }
 
   @Override
@@ -302,8 +298,18 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
     return getSource(environment).scheduledTripsAsStream().collect(Collectors.toList());
   }
 
+  private LineString getTripPatternGeometry(DataFetchingEnvironment environment) {
+    return getShapeService(environment)
+      .getTripPatternGeometry(getSource(environment).getId())
+      .concatenate();
+  }
+
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
     return environment.<GtfsGraphQLRequestContext>getContext().realTimeVehicleService();
+  }
+
+  private ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().shapeService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

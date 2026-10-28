@@ -495,6 +495,9 @@ public class NetexMapper {
     }
 
     transitBuilder.getTripPatterns().put(stopPattern, result.tripPattern());
+    transitBuilder
+      .getGeometriesByTripPattern()
+      .put(result.tripPattern().getId(), result.tripPatternGeometry());
     currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId());
     groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex()));
     transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates());

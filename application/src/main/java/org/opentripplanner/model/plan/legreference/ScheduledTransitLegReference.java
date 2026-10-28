@@ -10,6 +10,7 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Timetable;
@@ -84,6 +85,7 @@ public record ScheduledTransitLegReference(
   @Nullable
   public ScheduledTransitLeg getLeg(
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService
   ) {
     Trip trip;
@@ -207,6 +209,7 @@ public record ScheduledTransitLegReference(
     ScheduledTransitLeg leg = new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripTimes)
       .withTripPattern(tripPattern)
+      .withTripPatternGeometry(shapeService.getTripPatternGeometry(tripPattern.getId()))
       .withBoardStopIndexInPattern(updatedFromStopPositionInPattern)
       .withAlightStopIndexInPattern(updatedToStopPositionInPattern)
       .withStartTime(ServiceDateUtils.toZonedDateTime(serviceDate, timeZone, boardingTime))

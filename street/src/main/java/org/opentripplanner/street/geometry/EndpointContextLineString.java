@@ -9,10 +9,11 @@ import org.locationtech.jts.geom.LineString;
  * vertices). Only the intermediate points are delta-packed, which keeps both the per-edge heap
  * footprint and the serialized graph minimal.
  * <p>
- * This is the stateless companion to {@link CompactLineString}. It operates on a raw
- * {@code byte[]} supplied by the caller plus the externally-held endpoints &mdash;
- * {@code StreetEdge} stores the bytes directly and supplies its from/to vertex coordinates per
- * call, so there is no wrapper object per edge.
+ * This is the endpoint-context counterpart of the self-contained {@link PackedLineStringCodec#pack}.
+ * It operates on a raw {@code byte[]}
+ * supplied by the caller plus the externally-held endpoints &mdash; {@code StreetEdge} stores the
+ * bytes directly and supplies its from/to vertex coordinates per call, so there is no wrapper
+ * object per edge.
  */
 public final class EndpointContextLineString {
 
@@ -24,11 +25,11 @@ public final class EndpointContextLineString {
   private static final double EPS = 0.000001;
 
   /**
-   * Empty packed byte array for a straight line. Shares the underlying array with
-   * {@link CompactLineString#STRAIGHT_LINE} so there is exactly one empty-byte-array instance in
-   * the JVM.
+   * Empty packed byte array for a straight line, shared with
+   * {@link PackedLineStringCodec#STRAIGHT_LINE} so there is exactly one empty-byte-array instance
+   * in the JVM.
    */
-  static final byte[] STRAIGHT_LINE_PACKED = CompactLineString.STRAIGHT_LINE.packed();
+  static final byte[] STRAIGHT_LINE_PACKED = PackedLineStringCodec.STRAIGHT_LINE;
 
   private EndpointContextLineString() {}
 
@@ -80,9 +81,9 @@ public final class EndpointContextLineString {
         "EndpointContextLineString geometry must stick to given end points. If you need to relax this, please read source code."
       );
     }
-    int oix = CompactLineString.toFixedPoint(x0);
-    int oiy = CompactLineString.toFixedPoint(y0);
-    return CompactLineString.packIntermediateDeltas(lineString, oix, oiy);
+    int oix = PackedLineStringCodec.toFixedPoint(x0);
+    int oiy = PackedLineStringCodec.toFixedPoint(y0);
+    return PackedLineStringCodec.packIntermediateDeltas(lineString, oix, oiy);
   }
 
   /**
@@ -114,9 +115,9 @@ public final class EndpointContextLineString {
     c[0] = x0;
     c[1] = y0;
     if (intermediateCount > 0) {
-      int oix = CompactLineString.toFixedPoint(x0);
-      int oiy = CompactLineString.toFixedPoint(y0);
-      CompactLineString.decodeInto(packedCoords, c, 2, oix, oiy, false);
+      int oix = PackedLineStringCodec.toFixedPoint(x0);
+      int oiy = PackedLineStringCodec.toFixedPoint(y0);
+      PackedLineStringCodec.decodeInto(packedCoords, c, 2, oix, oiy, false);
     }
     c[c.length - 2] = x1;
     c[c.length - 1] = y1;
@@ -179,14 +180,14 @@ public final class EndpointContextLineString {
     double minDistSq = Double.POSITIVE_INFINITY;
 
     if (packedCoords != null && packedCoords.length > 0) {
-      int oix = CompactLineString.toFixedPoint(x0);
-      int oiy = CompactLineString.toFixedPoint(y0);
+      int oix = PackedLineStringCodec.toFixedPoint(x0);
+      int oiy = PackedLineStringCodec.toFixedPoint(y0);
       var decoder = new DlugoszVarLenIntPacker.Decoder(packedCoords);
       while (decoder.hasNext()) {
         oix += decoder.next();
         oiy += decoder.next();
-        double curX = CompactLineString.toFloatingPoint(oix) * xscale;
-        double curY = CompactLineString.toFloatingPoint(oiy);
+        double curX = PackedLineStringCodec.toFloatingPoint(oix) * xscale;
+        double curY = PackedLineStringCodec.toFloatingPoint(oiy);
         double distSq = segmentDistanceSq(pxs, py, prevX, prevY, curX, curY);
         if (distSq < minDistSq) {
           minDistSq = distSq;

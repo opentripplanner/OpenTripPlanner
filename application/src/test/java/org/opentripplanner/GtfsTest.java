@@ -38,6 +38,10 @@ import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
+import org.opentripplanner.service.shape.internal.ShapeRepositoryLifecycle;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.graph.Graph;
@@ -71,6 +75,7 @@ public abstract class GtfsTest {
   public Graph graph;
   public TransitRepository transitRepository;
   public TimetableDataImport timetableDataImport;
+  public ShapeDataImport shapeDataImport;
 
   AlertsUpdateHandler alertsUpdateHandler;
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
@@ -197,6 +202,7 @@ public abstract class GtfsTest {
     graph = new Graph();
     transitRepository = new TransitRepository(new SiteRepository());
     timetableDataImport = new TimetableDataImport();
+    shapeDataImport = new ShapeDataImport();
     transitRepository.initUpdaterManager(
       new GraphUpdaterManager(new WriteToGraphCallbacks(), RunnableUtils.NOOP, List.of())
     );
@@ -206,6 +212,7 @@ public abstract class GtfsTest {
       gtfsBundleList,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       graph,
       LocalDateRange.ofUnbounded()
     );
@@ -232,6 +239,11 @@ public abstract class GtfsTest {
     var timetableHandle = registry.registerRepositorySnapshot(
       timetableSnapshot,
       new TimetableRepositoryLifecycle(timetableSnapshot, false, LocalDate::now)
+    );
+    var shapeBuffer = new DefaultShapeRepository(shapeDataImport.toScheduledShapeData());
+    var shapeHandle = registry.registerRepository(
+      shapeBuffer,
+      new ShapeRepositoryLifecycle(shapeBuffer)
     );
     var updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
       "test",
@@ -260,7 +272,7 @@ public abstract class GtfsTest {
         .submit(ctx -> {
           var buffer = ctx.repository(timetableHandle);
           tripUpdateAdapter
-            .forUpdate(buffer)
+            .forUpdate(buffer, () -> ctx.repository(shapeHandle))
             .applyTripUpdates(
               null,
               ForwardsDelayPropagationType.DEFAULT,
@@ -280,9 +292,11 @@ public abstract class GtfsTest {
       transitRepository,
       timetableHandle.repositorySnapshot(registry.scope())
     );
+    var shapeService = new DefaultShapeService(shapeHandle.repositorySnapshot(registry.scope()));
     routingService = TestServerContext.createRoutingService(
       graph,
       transitService,
+      shapeService,
       transferRepository
     );
   }

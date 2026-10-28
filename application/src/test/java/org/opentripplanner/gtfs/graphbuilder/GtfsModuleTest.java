@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -30,6 +31,7 @@ class GtfsModuleTest {
       List.of(bundle),
       model.transitRepository,
       model.timetableDataImport,
+      model.shapeDataImport,
       model.graph,
       LocalDateRange.ofUnbounded()
     );
@@ -45,12 +47,9 @@ class GtfsModuleTest {
     assertEquals(1, frequencyTripPattern.size());
 
     var tripPattern = frequencyTripPattern.getFirst();
-    assertNotNull(tripPattern.getGeometry());
-    assertNotNull(tripPattern.getHopGeometry(0));
-
-    var pattern = model.timetableDataImport.getTripPatternForId(tripPattern.getId());
-    assertNotNull(pattern.getGeometry());
-    assertNotNull(pattern.getHopGeometry(0));
+    var tripPatternGeometry = model.shapeDataImport.getTripPatternGeometry(tripPattern.getId());
+    assertNotNull(tripPatternGeometry);
+    assertEquals(tripPattern.numberOfStops() - 1, tripPatternGeometry.size());
   }
 
   @Test
@@ -62,6 +61,7 @@ class GtfsModuleTest {
       bundles,
       model.transitRepository,
       model.timetableDataImport,
+      model.shapeDataImport,
       model.graph,
       LocalDateRange.ofUnbounded()
     );
@@ -73,13 +73,15 @@ class GtfsModuleTest {
     var graph = new Graph();
     var transitRepository = new TransitRepository(siteRepository);
     var timetableDataImport = new TimetableDataImport();
-    return new TestModels(graph, transitRepository, timetableDataImport);
+    var shapeDataImport = new ShapeDataImport();
+    return new TestModels(graph, transitRepository, timetableDataImport, shapeDataImport);
   }
 
   record TestModels(
     Graph graph,
     TransitRepository transitRepository,
-    TimetableDataImport timetableDataImport
+    TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport
   ) {}
 
   static GtfsBundle bundle(String feedId) {
@@ -116,6 +118,7 @@ class GtfsModuleTest {
         bundles,
         model.transitRepository,
         model.timetableDataImport,
+        model.shapeDataImport,
         model.graph,
         LocalDateRange.ofUnbounded()
       );

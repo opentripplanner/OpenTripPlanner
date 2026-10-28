@@ -1,4 +1,4 @@
-package org.opentripplanner.street.geometry;
+package org.opentripplanner.service.shape.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 
@@ -19,12 +20,16 @@ class CompactLineStringSequenceTest {
   // HOP_2 is a straight 2-point line.
   private static final LineString HOP_2 = makeLineString(10.4, 59.0, 10.5, 59.0);
 
+  private static final List<CompactLineString> HOPS = Stream.of(HOP_0, HOP_1, HOP_2)
+    .map(CompactLineString::of)
+    .toList();
+
   // length = size()+1; entry 0 is 0; arbitrary positive deltas for assertion purposes.
   private static final int[] CUMULATIVE = { 0, 100, 250, 300 };
 
   @Test
   void sizeAndGetRoundTripEachMember() {
-    var seq = CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), CUMULATIVE);
+    var seq = CompactLineStringSequence.of(HOPS, CUMULATIVE);
     assertEquals(3, seq.size());
     assertTrue(HOP_0.equalsExact(seq.get(0), TOLERANCE));
     assertTrue(HOP_1.equalsExact(seq.get(1), TOLERANCE));
@@ -33,7 +38,7 @@ class CompactLineStringSequenceTest {
 
   @Test
   void concatenateAllDeduplicatesSeams() {
-    var seq = CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), CUMULATIVE);
+    var seq = CompactLineStringSequence.of(HOPS, CUMULATIVE);
     LineString full = seq.concatenate(0, seq.size());
 
     // 3 + 3 + 2 points, minus the 2 shared seam coordinates = 6.
@@ -57,7 +62,7 @@ class CompactLineStringSequenceTest {
 
   @Test
   void concatenateSubRange() {
-    var seq = CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), CUMULATIVE);
+    var seq = CompactLineStringSequence.of(HOPS, CUMULATIVE);
     LineString sub = seq.concatenate(1, 3);
 
     // hop1 (3 pts) + hop2 (2 pts) minus 1 shared seam = 4.
@@ -68,7 +73,7 @@ class CompactLineStringSequenceTest {
 
   @Test
   void concatenateSingleMemberEqualsThatMember() {
-    var seq = CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), CUMULATIVE);
+    var seq = CompactLineStringSequence.of(HOPS, CUMULATIVE);
     LineString single = seq.concatenate(0, 1);
     assertEquals(HOP_0.getNumPoints(), single.getNumPoints());
     assertTrue(HOP_0.equalsExact(single, TOLERANCE));
@@ -76,7 +81,7 @@ class CompactLineStringSequenceTest {
 
   @Test
   void concatenateEmptyRangeReturnsEmptyLineString() {
-    var seq = CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), CUMULATIVE);
+    var seq = CompactLineStringSequence.of(HOPS, CUMULATIVE);
     assertTrue(seq.concatenate(1, 1).isEmpty());
     assertTrue(seq.concatenate(2, 0).isEmpty());
   }
@@ -90,7 +95,7 @@ class CompactLineStringSequenceTest {
 
   @Test
   void distanceBetweenIsCumulativeDelta() {
-    var seq = CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), CUMULATIVE);
+    var seq = CompactLineStringSequence.of(HOPS, CUMULATIVE);
     assertEquals(100, seq.distanceBetween(0, 1));
     assertEquals(150, seq.distanceBetween(1, 2));
     assertEquals(300, seq.distanceBetween(0, 3));
@@ -100,7 +105,7 @@ class CompactLineStringSequenceTest {
   @Test
   void ofRejectsWrongLengthCumulative() {
     assertThrows(IllegalArgumentException.class, () ->
-      CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 0, 100, 250 })
+      CompactLineStringSequence.of(HOPS, new int[] { 0, 100, 250 })
     );
   }
 
@@ -108,7 +113,7 @@ class CompactLineStringSequenceTest {
   void ofRejectsNonZeroFirstCumulative() {
     // Entry 0 must be 0 by contract (distance from the start of the sequence to itself).
     assertThrows(IllegalArgumentException.class, () ->
-      CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 50, 150, 300, 400 })
+      CompactLineStringSequence.of(HOPS, new int[] { 50, 150, 300, 400 })
     );
   }
 
@@ -116,7 +121,7 @@ class CompactLineStringSequenceTest {
   void ofRejectsNonMonotonicCumulative() {
     // Cumulative arc length cannot shrink; a decreasing entry is a caller bug.
     assertThrows(IllegalArgumentException.class, () ->
-      CompactLineStringSequence.of(List.of(HOP_0, HOP_1, HOP_2), new int[] { 0, 100, 80, 300 })
+      CompactLineStringSequence.of(HOPS, new int[] { 0, 100, 80, 300 })
     );
   }
 }

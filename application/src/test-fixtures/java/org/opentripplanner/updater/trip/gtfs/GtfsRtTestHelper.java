@@ -90,7 +90,7 @@ public class GtfsRtTestHelper {
           var buffer = ctx.repository(transitTestEnvironment.timetableHandle());
           resultRef.set(
             gtfsAdapter
-              .forUpdate(buffer)
+              .forUpdate(buffer, () -> ctx.repository(transitTestEnvironment.shapeHandle()))
               .applyTripUpdates(
                 null,
                 ForwardsDelayPropagationType.DEFAULT,

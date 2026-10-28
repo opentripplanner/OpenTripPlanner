@@ -39,6 +39,7 @@ import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.StreetMode;
@@ -75,6 +76,7 @@ public abstract class SnapshotTestBase {
   static final boolean VERBOSE = Boolean.getBoolean("otp.test.verbose");
 
   protected TransitService transitService;
+  protected ShapeService shapeService;
   protected RoutingService routingService;
 
   public static void loadGraphBeforeClass(boolean withElevation) {
@@ -93,9 +95,11 @@ public abstract class SnapshotTestBase {
         model.timetableDataImport(),
         model.transferRepository()
       );
+      shapeService = TestServerContext.createShapeService(model.shapeDataImport());
       routingService = TestServerContext.createRoutingService(
         model.graph(),
         transitService,
+        shapeService,
         model.transferRepository()
       );
     }

@@ -52,6 +52,7 @@ import org.opentripplanner.routing.linking.mapping.LinkingContextRequestMapper;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.paging.PagingService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
@@ -78,6 +79,7 @@ public class RoutingWorker {
 
   private final RouteRequest request;
   private final TransitService transitService;
+  private final ShapeService shapeService;
   private final TransitAlertService transitAlertService;
   private final Graph graph;
   private final RaptorConfig<TripSchedule> raptorConfig;
@@ -126,6 +128,7 @@ public class RoutingWorker {
 
   public RoutingWorker(
     TransitService transitService,
+    ShapeService shapeService,
     TransitAlertService transitAlertService,
     Graph graph,
     RaptorConfig<TripSchedule> raptorConfig,
@@ -153,6 +156,7 @@ public class RoutingWorker {
     this.transitSearchTimeZero = workerRequest.transitSearchTimeZero();
     this.additionalSearchDays = workerRequest.additionalSearchDays();
     this.transitService = transitService;
+    this.shapeService = shapeService;
     this.transitAlertService = transitAlertService;
     this.graph = graph;
     this.raptorConfig = raptorConfig;
@@ -452,6 +456,7 @@ public class RoutingWorker {
       var transitResults = TransitRouter.route(
         request,
         transitService,
+        shapeService,
         graph,
         raptorConfig,
         meterRegistry,

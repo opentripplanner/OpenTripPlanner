@@ -7,6 +7,8 @@ import org.opentripplanner.core.model.transaction.UpdateManager;
 import org.opentripplanner.core.model.transaction.WriteContext;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepositorySnapshot;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.repository.TimetableRepositorySnapshot;
@@ -54,13 +56,15 @@ public class GraphWriterService<C> implements WriteToGraphCallback<C> {
       RealtimeVehicleRepositorySnapshot,
       RealtimeVehicleRepository
     > realtimeVehicleHandle,
+    RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeHandle,
     TransitRepository transitRepository
   ) {
     return new GraphWriterService<>(updateManager, ctx ->
       new DefaultTransitRealTimeUpdateContext(
         transitRepository,
         ctx.repository(timetableHandle),
-        () -> ctx.repository(realtimeVehicleHandle)
+        () -> ctx.repository(realtimeVehicleHandle),
+        () -> ctx.repository(shapeHandle)
       )
     );
   }

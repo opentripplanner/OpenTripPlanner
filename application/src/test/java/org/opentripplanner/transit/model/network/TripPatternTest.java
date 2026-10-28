@@ -6,12 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
-import static org.opentripplanner.street.geometry.GeometryUtils.makeLineString;
 
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -34,16 +32,10 @@ class TripPatternTest {
     STOP_C
   );
 
-  private static final List<LineString> HOP_GEOMETRIES = List.of(
-    makeLineString(STOP_A.getCoordinate(), STOP_X.getCoordinate(), STOP_B.getCoordinate()),
-    makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
-  );
-
   private static final TripPattern SUBJECT = TripPattern.of(id(ID))
     .withName(NAME)
     .withRoute(ROUTE)
     .withStopPattern(STOP_PATTERN)
-    .withHopGeometries(HOP_GEOMETRIES)
     .build();
 
   @Test
@@ -66,29 +58,6 @@ class TripPatternTest {
     assertEquals("v2", copy.getName());
     assertEquals(ROUTE, copy.getRoute());
     assertEquals(STOP_PATTERN, copy.getStopPattern());
-    assertEquals(SUBJECT.getHopGeometry(0), copy.getHopGeometry(0));
-    assertEquals(SUBJECT.getHopGeometry(1), copy.getHopGeometry(1));
-    assertEquals(HOP_GEOMETRIES.get(1), copy.getHopGeometry(1));
-  }
-
-  @Test
-  void hopGeometryForReplacementPattern() {
-    var pattern = TripPattern.of(id("replacement"))
-      .withName("replacement")
-      .withRoute(ROUTE)
-      .withStopPattern(TransitRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_X, STOP_Y))
-      .withOriginalTripPattern(SUBJECT)
-      .build();
-
-    assertEquals(HOP_GEOMETRIES.get(0), pattern.getHopGeometry(0));
-    assertEquals(
-      makeLineString(STOP_B.getCoordinate(), STOP_X.getCoordinate()),
-      pattern.getHopGeometry(1)
-    );
-    assertEquals(
-      makeLineString(STOP_X.getCoordinate(), STOP_Y.getCoordinate()),
-      pattern.getHopGeometry(2)
-    );
   }
 
   @Test
@@ -102,14 +71,7 @@ class TripPatternTest {
       )
     );
     assertFalse(SUBJECT.sameAs(SUBJECT.copy().withMode(TransitMode.RAIL).build()));
-    // Clearing hopGeometries is required because TripPatternBuilder.buildHopGeometries now
-    // validates that the hop count matches the stop pattern; changing the stop pattern without
-    // clearing the inherited geometries would otherwise be a caller bug.
-    assertFalse(
-      SUBJECT.sameAs(
-        SUBJECT.copy().withStopPattern(TEST_MODEL.stopPattern(11)).withHopGeometries(null).build()
-      )
-    );
+    assertFalse(SUBJECT.sameAs(SUBJECT.copy().withStopPattern(TEST_MODEL.stopPattern(11)).build()));
   }
 
   @Test

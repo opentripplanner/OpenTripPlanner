@@ -26,6 +26,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.TransitDataImportBuilder;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -49,6 +50,7 @@ public class GtfsModule implements GraphBuilderModule {
 
   private final TransitRepository transitRepository;
   private final TimetableDataImport timetableDataImport;
+  private final ShapeDataImport shapeDataImport;
   private final StreetDetailsRepository streetDetailsRepository;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
@@ -62,6 +64,7 @@ public class GtfsModule implements GraphBuilderModule {
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     StreetDetailsRepository streetDetailsRepository,
     Graph graph,
     DeduplicatorService deduplicator,
@@ -75,6 +78,7 @@ public class GtfsModule implements GraphBuilderModule {
     this.gtfsBundles = bundles;
     this.transitRepository = transitRepository;
     this.timetableDataImport = timetableDataImport;
+    this.shapeDataImport = shapeDataImport;
     this.streetDetailsRepository = streetDetailsRepository;
     this.graph = graph;
     this.deduplicator = deduplicator;
@@ -93,6 +97,7 @@ public class GtfsModule implements GraphBuilderModule {
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     Graph graph,
     LocalDateRange transitPeriodLimit
   ) {
@@ -100,6 +105,7 @@ public class GtfsModule implements GraphBuilderModule {
       bundles,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),
@@ -285,7 +291,8 @@ public class GtfsModule implements GraphBuilderModule {
     AddTransitEntitiesToTimetable.addToTimetable(
       dataImport,
       transitRepository,
-      timetableDataImport
+      timetableDataImport,
+      shapeDataImport
     );
     AddTransitEntitiesToGraph.addToGraph(
       dataImport,

@@ -9,11 +9,13 @@ import java.util.Map;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.core.model.time.LocalDateRange;
+import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundleTestFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModuleTestFactory;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
@@ -47,11 +49,13 @@ public final class FlexIntegrationTestData {
     var graph = new Graph();
     var transitRepository = new TransitRepository(new SiteRepository());
     var timetableDataImport = new TimetableDataImport();
+    var shapeDataImport = new ShapeDataImport();
     GtfsBundle gtfsBundle = GtfsBundleTestFactory.forTest(file);
     GtfsModule module = GtfsModuleTestFactory.forTest(
       List.of(gtfsBundle),
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       graph,
       LocalDateRange.ofInclusiveEnd(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
@@ -65,7 +69,9 @@ public final class FlexIntegrationTestData {
       graph,
       transitRepository,
       timetableDataImport,
-      TransferServiceTestFactory.withFlex()
+      shapeDataImport,
+      TransferServiceTestFactory.withFlex(),
+      new GtfsFareServiceFactory()
     );
   }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import org.opentripplanner.core.model.time.LocalDateRange;
 import org.opentripplanner.ext.fares.service.gtfs.v1.GtfsFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
@@ -16,6 +17,7 @@ public class GtfsModuleTestFactory {
     List<GtfsBundle> bundles,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     Graph graph,
     LocalDateRange transitPeriodLimit
   ) {
@@ -23,6 +25,7 @@ public class GtfsModuleTestFactory {
       bundles,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       new DefaultStreetDetailsRepository(),
       graph,
       new Deduplicator(),

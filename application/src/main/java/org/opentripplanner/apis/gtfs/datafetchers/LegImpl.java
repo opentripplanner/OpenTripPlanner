@@ -40,6 +40,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -307,7 +308,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<Iterable<TripTimeOnDate>> stopCalls() {
     return env -> {
       var leg = getSource(env);
-      var service = new ApiTransitService(transitService(env));
+      var service = new ApiTransitService(getTransitService(env));
       return service.findStopCalls(leg);
     };
   }
@@ -345,7 +346,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
       if (trip == null || leg.serviceDate() == null) {
         return null;
       }
-      return new ApiTransitService(transitService(environment))
+      return new ApiTransitService(getTransitService(environment))
         .findOrCreateTripOnServiceDate(trip.getId(), leg.serviceDate())
         .orElse(null);
     };
@@ -395,7 +396,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         var res = AlternativeLegs.getAlternativeLegs(
           environment.getSource(),
           numberOfLegs,
-          environment.<GtfsGraphQLRequestContext>getContext().transitService(),
+          getTransitService(environment),
+          getShapeService(environment),
           direction,
           AlternativeLegsFilter.NO_FILTER,
           limitToExactOriginStop,
@@ -431,7 +433,11 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
     return environment.getSource();
   }
 
-  private TransitService transitService(DataFetchingEnvironment environment) {
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GtfsGraphQLRequestContext>getContext().transitService();
+  }
+
+  private ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().shapeService();
   }
 }

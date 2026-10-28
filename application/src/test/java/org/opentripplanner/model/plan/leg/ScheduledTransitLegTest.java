@@ -20,6 +20,7 @@ import org.opentripplanner.core.model.i18n.I18NString;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -86,6 +87,7 @@ class ScheduledTransitLegTest {
   private final ScheduledTransitLeg subject = new ScheduledTransitLegBuilder()
     .withTripTimes(REAL_TIME_TRIP_TIMES)
     .withTripPattern(PATTERN)
+    .withTripPatternGeometry(ShapeTestFactory.straightLines(PATTERN))
     .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
     .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
     .withStartTime(START_TIME)
@@ -105,6 +107,7 @@ class ScheduledTransitLegTest {
     var subject = new ScheduledTransitLegBuilder()
       .withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
+      .withTripPatternGeometry(ShapeTestFactory.straightLines(PATTERN))
       .withBoardStopIndexInPattern(BOARD_STOP_INDEX_IN_PATTERN)
       .withAlightStopIndexInPattern(ALIGHT_STOP_INDEX_IN_PATTERN)
       .withStartTime(START_TIME)

@@ -32,6 +32,7 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -242,10 +243,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         return null;
       }
 
-      LineString geometry = tripPattern.getGeometry();
-      if (geometry == null) {
-        return null;
-      }
+      LineString geometry = getTripPatternGeometry(environment, tripPattern);
       return Arrays.stream(geometry.getCoordinateSequence().toCoordinateArray())
         .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
         .collect(Collectors.toList());
@@ -393,7 +391,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       if (tripPattern == null) {
         return null;
       }
-      return tripPattern.getGeometry();
+      return getTripPatternGeometry(environment, tripPattern);
     };
   }
 
@@ -444,6 +442,17 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   private TripPattern getTripPattern(DataFetchingEnvironment environment) {
     return getTransitService(environment).findPattern(environment.getSource());
+  }
+
+  private LineString getTripPatternGeometry(
+    DataFetchingEnvironment environment,
+    TripPattern tripPattern
+  ) {
+    return getShapeService(environment).getTripPatternGeometry(tripPattern.getId()).concatenate();
+  }
+
+  private ShapeService getShapeService(DataFetchingEnvironment environment) {
+    return environment.<GtfsGraphQLRequestContext>getContext().shapeService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
