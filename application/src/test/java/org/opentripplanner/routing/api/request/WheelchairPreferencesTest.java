@@ -70,8 +70,11 @@ class WheelchairPreferencesTest {
           .withMaxSlope(0.123)
           .withSlopeExceededReluctance(3)
           .withStairsReluctance(4)
+          .withSpeed(0.8)
+          .withReluctance(3.0)
+          .withStairsTimeFactor(6.0)
           .build(),
-        "WheelchairPreferences{trip: AccessibilityPreferences{unknownCost: $10, inaccessibleCost: $100}, stop: AccessibilityPreferences{unknownCost: $20, inaccessibleCost: $200}, elevator: AccessibilityPreferences{unknownCost: $30, inaccessibleCost: $300}, inaccessibleStreetReluctance: 1.0, maxSlope: 0.123, slopeExceededReluctance: 3.0, stairsReluctance: 4.0}"
+        "WheelchairPreferences{trip: AccessibilityPreferences{unknownCost: $10, inaccessibleCost: $100}, stop: AccessibilityPreferences{unknownCost: $20, inaccessibleCost: $200}, elevator: AccessibilityPreferences{unknownCost: $30, inaccessibleCost: $300}, inaccessibleStreetReluctance: 1.0, maxSlope: 0.123, slopeExceededReluctance: 3.0, stairsReluctance: 4.0, speed: 0.8, reluctance: 3.0, stairsTimeFactor: 6.0}"
       )
     );
   }

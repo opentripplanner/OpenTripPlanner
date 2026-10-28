@@ -60,7 +60,12 @@ public class StreetSearchRequestMapper {
       .withGeoidElevation(preferences.system().geoidElevation())
       .withTurnReluctance(street.turnReluctance())
       .withWheelchair(b -> mapWheelchair(b, preferences.wheelchair()))
-      .withWalk(b -> mapWalk(b, preferences.walk()))
+      .withWalk(b -> {
+        mapWalk(b, preferences.walk());
+        if (request.journey().wheelchair()) {
+          mapWheelchairWalk(b, preferences.wheelchair());
+        }
+      })
       .withBike(b -> mapBike(b, preferences.bike()))
       .withCar(b -> mapCar(b, preferences.car()))
       .withScooter(b -> mapScooter(b, preferences.scooter()))
@@ -109,6 +114,14 @@ public class StreetSearchRequestMapper {
       .withSlopeExceededReluctance(wheelchair.slopeExceededReluctance())
       .withStairsReluctance(wheelchair.stairsReluctance())
       .withInaccessibleStreetReluctance(wheelchair.inaccessibleStreetReluctance());
+  }
+
+  /// The edges read speed, reluctance and stairs time factor from the walk request, so the
+  /// wheelchair values replace the walk values for wheelchair searches.
+  private static void mapWheelchairWalk(WalkRequest.Builder b, WheelchairPreferences wheelchair) {
+    b.withSpeed(wheelchair.speed())
+      .withReluctance(wheelchair.reluctance())
+      .withStairsTimeFactor(wheelchair.stairsTimeFactor());
   }
 
   private static AccessibilityRequest mapAccessibility(AccessibilityPreferences stop) {
