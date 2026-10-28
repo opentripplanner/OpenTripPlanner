@@ -9,6 +9,10 @@ export function ItineraryGraphiQLAuthorityLink({
   legId: string | undefined;
   legName: Maybe<string> | undefined;
 }) {
+  if (!graphiQLUrl) {
+    return <>{legName}</>;
+  }
+
   const queryID = { id: legId };
   const formattedQuery = encodeURIComponent(authorityQueryAsString);
   const formattedQueryID = encodeURIComponent(JSON.stringify(queryID));

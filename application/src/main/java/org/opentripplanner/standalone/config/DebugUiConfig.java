@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_11;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public class DebugUiConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(DebugUiConfig.class);
 
+  private static final String DEFAULT_VECTOR_TILES_BASE_PATH = "/otp/debug/vectortiles/";
+
   public static final DebugUiConfig DEFAULT = new DebugUiConfig(
     MissingNode.getInstance(),
     "DEFAULT",
@@ -28,6 +31,7 @@ public class DebugUiConfig {
    */
   private final NodeAdapter root;
   private final List<BackgroundTileLayer> additionalBackgroundLayers;
+  private final String vectorTilesBasePath;
 
   public DebugUiConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -70,6 +74,22 @@ public class DebugUiConfig {
         )
       );
 
+    this.vectorTilesBasePath = root
+      .of("vectorTilesBasePath")
+      .since(V2_11)
+      .summary("The path the debug vector tiles are reachable on from the outside.")
+      .description(
+        """
+        The Debug UI gets its map data from vector tiles served by OTP. The tile URLs OTP puts in the
+        map style and in the tile metadata consist of the host of the request, plus this path. Change
+        it when OTP is exposed under a different path than the one it serves them on, for example when
+        a reverse proxy or API gateway adds a prefix.
+
+        Only set the path, the host is taken from the `X-Forwarded-Host` or `Host` request header.
+        """
+      )
+      .asString(DEFAULT_VECTOR_TILES_BASE_PATH);
+
     if (logUnusedParams) {
       root.logAllWarnings(LOG::warn);
     }
@@ -81,6 +101,10 @@ public class DebugUiConfig {
 
   public List<BackgroundTileLayer> additionalBackgroundLayers() {
     return additionalBackgroundLayers;
+  }
+
+  public String vectorTilesBasePath() {
+    return vectorTilesBasePath;
   }
 
   /**

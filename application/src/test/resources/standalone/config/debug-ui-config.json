@@ -1,4 +1,5 @@
 {
+  "vectorTilesBasePath": "/otp/debug/vectortiles/",
   "additionalBackgroundLayers": [
     {
       "name": "TriMet aerial photos",

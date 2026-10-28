@@ -84,6 +84,13 @@
         -->
         <argLine/>
         <plugin.checkstyle.skip>false</plugin.checkstyle.skip>
+        <plugin.frontend.skip>false</plugin.frontend.skip>
+        <!-- Debug UI client settings, baked into the client at build time as VITE_* variables. The
+             defaults are the same as in client/.env, override them with -D or in a profile when
+             OTP is exposed under a different path, e.g. behind an API gateway. -->
+        <debugUi.apiUrl>/otp/transmodel/v3</debugUi.apiUrl>
+        <debugUi.styleUrl>/otp/debug/vectortiles/style.json</debugUi.styleUrl>
+        <debugUi.graphiqlUrl>/graphiql?flavor=transmodel</debugUi.graphiqlUrl>
         <plugin.spotless.version>3.10.4</plugin.spotless.version>
         <plugin.spotless.goal>apply</plugin.spotless.goal>
         <plugin.spotless.skip>false</plugin.spotless.skip>
