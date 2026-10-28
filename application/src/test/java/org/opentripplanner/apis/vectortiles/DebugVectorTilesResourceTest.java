@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.vectortiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.apis.vectortiles.DebugVectorTilesResource.tilesBaseUrl;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 
 import java.util.List;
@@ -73,21 +74,46 @@ class DebugVectorTilesResourceTest {
   }
 
   @Test
-  void tileJsonUrl() {
-    var url = DebugVectorTilesResource.tileJsonUrl(
-      "http://example.com",
-      DebugUiConfig.DEFAULT.vectorTilesBasePath(),
-      LAYERS
+  void tileJsonWithFullUrl() {
+    var config = new DebugUiConfig(
+      jsonNodeForTest(
+        "{ 'vectorTilesBasePath': 'https://api.example.com/gateway/debug/otp/debug/vectortiles/' }"
+      ),
+      "TEST",
+      true
     );
-    assertEquals("http://example.com/otp/debug/vectortiles/edge,areaStop/tilejson.json", url);
+    var req = HttpForTest.containerRequest();
+    var tileJson = resource(config).getTileJson(req.getUriInfo(), req, "l1,l2");
+    // the host of the request is not used
+    assertEquals(
+      "https://api.example.com/gateway/debug/otp/debug/vectortiles/l1,l2/{z}/{x}/{y}.pbf",
+      tileJson.tiles[0]
+    );
   }
 
   @Test
-  void tileJsonUrlWithBasePath() {
-    // leading and trailing slashes of the base path are optional
+  void baseUrlFromPathOrUrl() {
+    var host = "http://example.com";
+    var path = DebugUiConfig.DEFAULT.vectorTilesBasePath();
+    assertEquals("http://example.com/otp/debug/vectortiles", tilesBaseUrl(host, path));
+    // leading and trailing slashes of a path are optional
     for (var basePath : List.of("/gateway/tiles", "gateway/tiles/", "/gateway/tiles/")) {
-      var url = DebugVectorTilesResource.tileJsonUrl("http://example.com", basePath, LAYERS);
-      assertEquals("http://example.com/gateway/tiles/edge,areaStop/tilejson.json", url);
+      assertEquals("http://example.com/gateway/tiles", tilesBaseUrl(host, basePath));
     }
+    // a full URL is used as is, apart from a trailing slash
+    assertEquals(
+      "https://api.example.com/tiles",
+      tilesBaseUrl(host, "https://api.example.com/tiles/")
+    );
+    assertEquals(
+      "HTTP://api.example.com/tiles",
+      tilesBaseUrl(host, "HTTP://api.example.com/tiles")
+    );
+  }
+
+  @Test
+  void tileJsonUrl() {
+    var url = DebugVectorTilesResource.tileJsonUrl("http://example.com/tiles", LAYERS);
+    assertEquals("http://example.com/tiles/edge,areaStop/tilejson.json", url);
   }
 }
