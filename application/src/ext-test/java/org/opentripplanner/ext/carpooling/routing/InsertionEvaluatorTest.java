@@ -537,6 +537,21 @@ class InsertionEvaluatorTest {
   }
 
   @Test
+  void aZeroBudgetAllowsNoDetourNotEvenTheDwell() {
+    // The passenger is on the route: the only detour is the dwell at the pickup and the dropoff.
+    var trip = createTripWithDeviationBudget(Duration.ZERO, OSLO_SOUTH, OSLO_NORTH);
+    var onTheRoute = drives(
+      drive(OSLO_SOUTH, OSLO_NORTH, 10),
+      drive(OSLO_SOUTH, OSLO_EAST, 3),
+      drive(OSLO_EAST, OSLO_WEST, 4),
+      drive(OSLO_WEST, OSLO_NORTH, 3)
+    );
+
+    assertNotNull(findOptimalInsertion(Duration.ZERO, trip, OSLO_EAST, OSLO_WEST, onTheRoute));
+    assertNull(findOptimalInsertion(Duration.ofMinutes(1), trip, OSLO_EAST, OSLO_WEST, onTheRoute));
+  }
+
+  @Test
   void aDropoffLegThatCannotBeRoutedDoesNotEndTheSearch() {
     // SOUTH -> CENTER -> NORTHEAST -> NORTH, ten minutes a leg; the dropoff cannot be reached in
     // the middle leg.
