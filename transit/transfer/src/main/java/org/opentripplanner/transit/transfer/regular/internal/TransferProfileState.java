@@ -2,7 +2,9 @@ package org.opentripplanner.transit.transfer.regular.internal;
 
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
 import org.opentripplanner.transit.transfer.regular.api.preferences.AbstractUserPreferences;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -32,6 +34,7 @@ final class TransferProfileState<P, R> {
   private final TransferProfileState<P, R> parent;
 
   private final AbstractUserPreferences<?> userPreferences;
+  private final CostLinearFunction reuseLimit;
   private final MaxDurationsPreference maxDurations;
   private final TransferSearch<P> search;
 
@@ -52,10 +55,28 @@ final class TransferProfileState<P, R> {
     this.id = parameters.id();
     this.parent = parent;
     this.userPreferences = ProfileUserPreferences.resolve(parameters, mapper);
+    this.reuseLimit = resolveReuseLimit(parameters, parent);
     this.maxDurations = Objects.requireNonNull(maxDurations);
     this.search = pathProvider.searchFor(
       mapper.toRequest(userPreferences, parameters.routingRequest())
     );
+  }
+
+  /**
+   * The limit of the profile itself, or else the one of the parent if it is of the same type, or
+   * else the default. A limit is not inherited from a parent of another type.
+   */
+  private static <P, R> CostLinearFunction resolveReuseLimit(
+    TransferProfile<R> parameters,
+    @Nullable TransferProfileState<P, R> parent
+  ) {
+    if (parameters.reuseLimit() != null) {
+      return parameters.reuseLimit();
+    }
+    if (parent != null && parent.userPreferences.type() == parameters.type()) {
+      return parent.reuseLimit;
+    }
+    return TransferParameters.DEFAULT_REUSE_LIMIT;
   }
 
   /** A profile without a parent. */
@@ -86,6 +107,14 @@ final class TransferProfileState<P, R> {
   /** The traveler preferences the paths of this profile are found and stored under. */
   AbstractUserPreferences<?> userPreferences() {
     return userPreferences;
+  }
+
+  /**
+   * When the path of the parent is used instead of a path found by this profile: the tolerance, in
+   * generalized cost, of a path of the parent with the cost {@code x}.
+   */
+  CostLinearFunction reuseLimit() {
+    return reuseLimit;
   }
 
   /** How far the discovery search of this profile looks, the limit of the type of the profile. */

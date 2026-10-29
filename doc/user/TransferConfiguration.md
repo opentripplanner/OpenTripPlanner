@@ -60,7 +60,6 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
 // build-config.json
 {
   "transfers": {
-    "deduplicationLimit": "30s + 0.005x",
     "walk": {
       "profiles": [
         {
@@ -70,6 +69,7 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
         {
           "id": "slow-walk",
           "parent": "walk",
+          "reuseLimit": "30s + 0.05x",
           "userPreferences": { "speed": 0.9, "reluctance": 4.0 }
         }
       ],
@@ -109,11 +109,11 @@ that is not configured has no transfers to use, so configure all the types the c
 
 | Parameter                     | Type       | Description                                                                         | Default           |
 |-------------------------------|------------|-------------------------------------------------------------------------------------|-------------------|
-| `deduplicationLimit`          | `string`   | How much more the path of a parent may cost to be used by a child. See below.       | `"30s + 0.005x"`  |
 | `walk.profiles`               | `object[]` | The walk profiles. If none is configured, one with the id `walk` is used.           |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the profile, unique among all profiles.                     |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | The preferences the profile is searched with. See below.                            |                   |
+| &nbsp;&nbsp;`reuseLimit`      | `string`   | How much more the path of the parent may cost to be used by this profile. See below.| `"15s + 0.02x"`   |
 | `walk.maxDuration`            | `duration` | How far from a stop the walk transfers are searched. See below.                 | `30m`             |
 | `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
@@ -198,7 +198,7 @@ declared in any order. A parent can be of another type, for example a `wheelchai
 `walk` profile as its parent. The paths are then stored once, but no values are inherited.
 
 **Inheritance.** Values are only inherited within a profile type. If the parent is a profile of the
-same type, the profile inherits the `userPreferences` of the parent.
+same type, the profile inherits the `userPreferences` and the `reuseLimit` of the parent.
 Everything that is set on the profile overrides the inherited value, and everything that is not set
 is the value of the parent. A profile with a parent and without `userPreferences` of its own would
 get the same preferences as the parent, and is rejected, since the profiles must be unique. A
@@ -212,15 +212,19 @@ stops, OTP calculates the cost of the path of the parent with the preferences of
 is close enough to the cost of the best path the profile found itself, the profile uses the path of
 the parent. This makes the graph smaller, and the graph file too.
 
-"Close enough" is set with `deduplicationLimit`. It is a linear function of the cost `x` of the
-path of the parent, for example `30s + 0.005x`: a path that costs up to 0.5% and 30 seconds more
+"Close enough" is set with `reuseLimit` of the profile that reuses the path, and it is optional. A
+profile inherits the `reuseLimit` of its parent of the same type, for example from `walk` to
+`slow-walk`, but not from a parent of another type: a `wheelchair` profile with the `walk` profile
+as its parent does not get the limit of `walk`. A profile that has none of its own and does not
+inherit one uses the default. It is a linear function of the cost `x` of the
+path of the parent, for example `15s + 0.02x`: a path that costs up to 2% and 15 seconds more
 than the best path is used. Both terms are required, the constant first, like the other linear
 functions of the configuration. A limit of `0s + 0x` only shares the paths with the same cost. The
 limit applies to the generalized cost only, not to the duration. The graph build logs how many of the paths of each profile are the
 paths of its parent:
 
 ```
-Profile 'slow-walk': 84788 of 85142 paths (99.6%) are the paths of the parent 'walk', they are stored once.
+Profile 'slow-walk' paths: 85 142, 84 788 (100%) reused 'walk' - WalkPreferences{speed: 0.9m/s}.
 ```
 
 Use a parent for profiles that are close to another profile, like a slightly slower walker. A

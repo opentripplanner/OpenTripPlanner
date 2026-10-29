@@ -79,8 +79,6 @@ public class TransferProfilesConfigMapper {
 
   /** Map the regular transfer profiles of the {@code transfers} node. */
   public static TransferParameters<RouteRequest> mapTransfers(NodeAdapter transfers) {
-    var deduplicationLimit = mapDeduplicationLimit(transfers);
-
     var typeBlocks = new EnumMap<TransferProfileType, NodeAdapter>(TransferProfileType.class);
     var configuredTypes = EnumSet.noneOf(TransferProfileType.class);
     var requests = new EnumMap<TransferProfileType, RouteRequest>(TransferProfileType.class);
@@ -101,7 +99,7 @@ public class TransferProfilesConfigMapper {
     var profiles = mappedProfiles.profiles();
     var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
 
-    return createParameters(profiles, maxDurations, deduplicationLimit, warmup);
+    return createParameters(profiles, maxDurations, warmup);
   }
 
   /** The block of a profile type, for example {@code walk}. An empty block if it is not set. */
@@ -131,11 +129,10 @@ public class TransferProfilesConfigMapper {
   private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    CostLinearFunction deduplicationLimit,
     List<WarmupParameters> warmup
   ) {
     try {
-      var parameters = new TransferParameters<>(profiles, maxDurations, deduplicationLimit, warmup);
+      var parameters = new TransferParameters<>(profiles, maxDurations, warmup);
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
     } catch (IllegalArgumentException e) {
@@ -241,24 +238,38 @@ public class TransferProfilesConfigMapper {
     }
   }
 
-  private static CostLinearFunction mapDeduplicationLimit(NodeAdapter transfers) {
-    var builder = transfers
-      .of("deduplicationLimit")
+  /**
+   * The reuse limit of a profile, {@code null} if it is not set. The limit is the one of the parent
+   * of the same type, or the default, if the profile has none, see {@code TransferProfileState}.
+   */
+  @Nullable
+  private static CostLinearFunction mapReuseLimit(ConfiguredProfile profile) {
+    if (!profile.node().exist("reuseLimit")) {
+      return null;
+    }
+    var builder = profile
+      .node()
+      .of("reuseLimit")
       .since(V2_10)
-      .summary("How much more the path of a parent profile may cost, to be used by its children.")
+      .summary("How much more the path of the parent may cost, to be used by this profile.")
       .description(
         """
         A profile with a `parent` finds its own paths, but if the path of the parent costs about the
         same for the profile, it uses the path of the parent instead of storing its own. This saves
         memory. The paths are equivalent if the difference in generalized cost is within this limit,
-        a linear function of the cost `x` of the path of the parent, for example `30s + 0.005x`. The
+        a linear function of the cost `x` of the path of the parent, for example `15s + 0.02x`. The
         limit applies to cost only, not to duration. A report is logged when the graph is built.
+
+        Optional. A profile inherits the limit of its parent of the same type, not of a parent of
+        another type. If there is none, the default is `15s + 0.02x`.
         """
       );
     try {
-      return builder.asCostLinearFunction(TransferParameters.DEFAULT_DEDUPLICATION_LIMIT);
+      return builder.asCostLinearFunction(TransferParameters.DEFAULT_REUSE_LIMIT);
     } catch (IllegalArgumentException e) {
-      throw new OtpAppException("Invalid transfer configuration: " + e.getMessage());
+      throw new OtpAppException(
+        "Invalid transfer configuration in " + profile.node().contextPath() + ": " + e.getMessage()
+      );
     }
   }
 
@@ -366,7 +377,14 @@ public class TransferProfilesConfigMapper {
       );
       mapped.put(
         profile.id(),
-        new TransferProfile<>(profile.id(), profile.type(), profile.parent(), own, request)
+        new TransferProfile<>(
+          profile.id(),
+          profile.type(),
+          profile.parent(),
+          own,
+          request,
+          mapReuseLimit(profile)
+        )
       );
     }
     // Keep the declared order
@@ -497,7 +515,7 @@ public class TransferProfilesConfigMapper {
           the parent, and values set on the profile override the inherited ones. The root of a type
           gets the values that are not set from the defaults. The parent is
           generated first, and the paths of the profile that are equivalent to the paths of the
-          parent are stored once, see `deduplicationLimit`. The parent can be of another type, but
+          parent are stored once, see `reuseLimit`. The parent can be of another type, but
           nothing is inherited from it, it is only used to store the paths once. The parents must
           not form a cycle.
           """

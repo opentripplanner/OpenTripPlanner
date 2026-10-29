@@ -414,25 +414,42 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theDeduplicationLimitIsTheDefaultIfNotConfigured() {
-    assertThat(map("{}").deduplicationLimit()).isEqualTo(
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+  void aProfileWithoutAReuseLimitHasNone() {
+    var subject = map("{ transfers: { walk: { profiles: [{ id: 'walk' }] } } }");
+
+    // The limit is the default, or the one of the parent, see TransferProfileState
+    assertThat(subject.profiles().getFirst().reuseLimit()).isNull();
+  }
+
+  @Test
+  void mapsTheReuseLimitOfAProfile() {
+    var subject = map(
+      """
+      {
+        transfers: {
+          walk: { profiles: [
+            { id: "walk" },
+            { id: "child", parent: "walk", reuseLimit: "10s + 0.01 x", userPreferences: { reluctance: 3.0 } }
+          ] }
+        }
+      }
+      """
     );
+
+    var limit = profile(subject, "child").reuseLimit();
+    assertThat(limit.constant()).isEqualTo(Cost.costOfSeconds(10));
+    assertThat(limit.coefficient()).isEqualTo(0.01);
+    assertThat(profile(subject, "walk").reuseLimit()).isNull();
   }
 
   @Test
-  void mapsTheDeduplicationLimit() {
-    var subject = map("{ transfers: { deduplicationLimit: '10s + 0.01 x' } }");
+  void theReuseLimitHasTheConstantFirst() {
+    var root = newNodeAdapterForTest(
+      "{ transfers: { walk: { profiles: [{ id: 'walk', reuseLimit: '0.01x + 10s' }] } } }"
+    );
 
-    assertThat(subject.deduplicationLimit().constant()).isEqualTo(Cost.costOfSeconds(10));
-    assertThat(subject.deduplicationLimit().coefficient()).isEqualTo(0.01);
-  }
-
-  @Test
-  void theDeduplicationLimitHasTheConstantFirst() {
-    var root = newNodeAdapterForTest("{ transfers: { deduplicationLimit: '0.01x + 10s' } }");
-
-    assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
+    assertThat(ex).hasMessageThat().contains("walk");
   }
 
   @Test

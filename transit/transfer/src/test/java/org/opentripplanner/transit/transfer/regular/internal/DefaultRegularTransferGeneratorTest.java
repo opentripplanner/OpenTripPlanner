@@ -194,7 +194,6 @@ class DefaultRegularTransferGeneratorTest {
     /** The path from A to B found for the preferences, after the transfers are generated. */
     FakeTransferPathProvider.FakePath generateAndFindPath(
       List<TransferProfile<WalkPreferences>> profiles,
-      CostLinearFunction limit,
       WalkPreferences forPreferences
     ) {
       var stopIndex = stopIndex();
@@ -204,8 +203,7 @@ class DefaultRegularTransferGeneratorTest {
         stopIndex,
         new TransferParameters<>(
           profiles,
-          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-          limit
+          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT)
         ),
         provider,
         FakeRequestMapper.INSTANCE,
@@ -217,15 +215,13 @@ class DefaultRegularTransferGeneratorTest {
     }
 
     DefaultRegularTransferGenerator<FakeTransferPathProvider.FakePath, WalkPreferences> generator(
-      List<TransferProfile<WalkPreferences>> profiles,
-      CostLinearFunction limit
+      List<TransferProfile<WalkPreferences>> profiles
     ) {
       return new DefaultRegularTransferGenerator<>(
         stopIndex(),
         new TransferParameters<>(
           profiles,
-          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT),
-          limit
+          Map.of(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT)
         ),
         provider,
         FakeRequestMapper.INSTANCE,
@@ -235,10 +231,9 @@ class DefaultRegularTransferGeneratorTest {
 
     /** The statistics of each profile after the transfers are generated, by profile id. */
     Map<String, ProfileStatistics> generateStatistics(
-      List<TransferProfile<WalkPreferences>> profiles,
-      CostLinearFunction limit
+      List<TransferProfile<WalkPreferences>> profiles
     ) {
-      var generator = generator(profiles, limit);
+      var generator = generator(profiles);
       generator.generateTransfersForAllStops();
       var result = new HashMap<String, ProfileStatistics>();
       generator.profileStatistics().forEach(statistics -> result.put(statistics.id(), statistics));
@@ -250,7 +245,18 @@ class DefaultRegularTransferGeneratorTest {
     }
 
     TransferProfile<WalkPreferences> childProfile(String parentId) {
-      return new TransferProfile<>("child", TransferProfileType.WALK, parentId, child, child);
+      return childProfile(parentId, TransferParameters.DEFAULT_REUSE_LIMIT);
+    }
+
+    TransferProfile<WalkPreferences> childProfile(String parentId, CostLinearFunction limit) {
+      return new TransferProfile<>(
+        "child",
+        TransferProfileType.WALK,
+        parentId,
+        child,
+        child,
+        limit
+      );
     }
   }
 
@@ -260,7 +266,6 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile("parent")),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.child
     );
 
@@ -273,8 +278,10 @@ class DefaultRegularTransferGeneratorTest {
 
     // p1 costs 10 more for the child, the limit does not accept any difference
     var path = test.generateAndFindPath(
-      List.of(test.parentProfile(), test.childProfile("parent")),
-      CostLinearFunction.of(Cost.ZERO, 0.0),
+      List.of(
+        test.parentProfile(),
+        test.childProfile("parent", CostLinearFunction.of(Cost.ZERO, 0.0))
+      ),
       test.child
     );
 
@@ -287,7 +294,6 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile(null)),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.child
     );
 
@@ -300,7 +306,6 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.parentProfile(), test.childProfile("parent")),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.parent
     );
 
@@ -313,7 +318,6 @@ class DefaultRegularTransferGeneratorTest {
 
     var path = test.generateAndFindPath(
       List.of(test.childProfile("parent"), test.parentProfile()),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT,
       test.child
     );
 
@@ -325,8 +329,7 @@ class DefaultRegularTransferGeneratorTest {
     var test = new ParentAndChild();
 
     var statistics = test.generateStatistics(
-      List.of(test.parentProfile(), test.childProfile("parent")),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
+      List.of(test.parentProfile(), test.childProfile("parent"))
     );
 
     assertThat(statistics.get("parent").transfers()).isEqualTo(1);
@@ -342,8 +345,10 @@ class DefaultRegularTransferGeneratorTest {
     var test = new ParentAndChild();
 
     var statistics = test.generateStatistics(
-      List.of(test.parentProfile(), test.childProfile("parent")),
-      CostLinearFunction.of(Cost.ZERO, 0.0)
+      List.of(
+        test.parentProfile(),
+        test.childProfile("parent", CostLinearFunction.of(Cost.ZERO, 0.0))
+      )
     );
 
     assertThat(statistics.get("child").sharedWithParent()).isEqualTo(0);
@@ -353,10 +358,7 @@ class DefaultRegularTransferGeneratorTest {
   @Test
   void thePathCountsTellHowManyPathsAreReused() {
     var test = new ParentAndChild();
-    var generator = test.generator(
-      List.of(test.parentProfile(), test.childProfile("parent")),
-      TransferParameters.DEFAULT_DEDUPLICATION_LIMIT
-    );
+    var generator = test.generator(List.of(test.parentProfile(), test.childProfile("parent")));
 
     generator.generateTransfersForAllStops();
 
