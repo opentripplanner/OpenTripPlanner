@@ -131,9 +131,9 @@ public class SimpleIntersectionTraversalCalculatorTest {
   @Test
   public void testBicycleTrafficCircle() {
     assertEquals(4.5, bicycleTurnDuration(roundabout.right()), 0.01);
-    assertEquals(18.0, bicycleTurnDuration(roundabout.straight()), 0.01);
-    assertEquals(31.5, bicycleTurnDuration(roundabout.left()), 0.01);
-    assertEquals(45.0, bicycleTurnDuration(roundabout.uTurn()), 0.01);
+    assertEquals(9.0, bicycleTurnDuration(roundabout.straight()), 0.01);
+    assertEquals(13.5, bicycleTurnDuration(roundabout.left()), 0.01);
+    assertEquals(18.0, bicycleTurnDuration(roundabout.uTurn()), 0.01);
   }
 
   /**
@@ -150,9 +150,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
   /** Turning right off the traffic circle when its east arm is a few degrees off square. */
   @Test
   public void testBicycleSkewedTrafficCircle() {
-    // Weird, and should be fixed: a few degrees of skew shouldn't change the cost this much. Just
-    // under the safe turn threshold, the turn skips its multiplier.
-    assertEquals(0.86, bicycleTurnDuration(Roundabout.withEastArmOffAxis(-4).right()), 0.01);
+    assertEquals(4.3, bicycleTurnDuration(Roundabout.withEastArmOffAxis(-4).right()), 0.01);
     assertEquals(4.7, bicycleTurnDuration(Roundabout.withEastArmOffAxis(4).right()), 0.01);
   }
 
@@ -171,8 +169,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
       .states()
       .stream()
       .anyMatch(state -> state.getBackEdge() == roundabout.southToEast());
-    // Walking the wrong way is currently considered faster than biking the right way around.
-    assertFalse(wentRightWay);
+    assertTrue(wentRightWay);
   }
 
   @Test
