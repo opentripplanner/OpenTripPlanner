@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
+import org.opentripplanner.service.shape.ScheduledShapeData;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
@@ -51,6 +52,7 @@ public final class TestConstructApplicationFactoryBuilder {
       .graph(new Graph())
       .transitRepository(transitRepository)
       .scheduledTimetableData(env.scheduledTimetableData())
+      .scheduledShapeData(ScheduledShapeData.empty())
       .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
       .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
       .stopConsolidationRepository(null)

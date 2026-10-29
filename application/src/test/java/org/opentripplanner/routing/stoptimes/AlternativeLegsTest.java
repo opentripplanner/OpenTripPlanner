@@ -16,6 +16,8 @@ import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.alternativelegs.NavigationDirection;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.service.shape.ShapeTestFactory;
+import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 
@@ -41,6 +43,9 @@ class AlternativeLegsTest extends GtfsTest {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
+    var shapeService = TestServerContext.createShapeService(
+      ShapeTestFactory.shapeDataImport(timetableDataImport.getAllTripPatterns())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "1.2"),
@@ -50,12 +55,13 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, shapeService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       3,
       transitService,
+      shapeService,
       NavigationDirection.PREVIOUS,
       AlternativeLegsFilter.NO_FILTER
     );
@@ -77,6 +83,9 @@ class AlternativeLegsTest extends GtfsTest {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
+    var shapeService = TestServerContext.createShapeService(
+      ShapeTestFactory.shapeDataImport(timetableDataImport.getAllTripPatterns())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "2.2"),
@@ -86,12 +95,13 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, shapeService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       3,
       transitService,
+      shapeService,
       NavigationDirection.NEXT,
       AlternativeLegsFilter.NO_FILTER
     );
@@ -113,6 +123,9 @@ class AlternativeLegsTest extends GtfsTest {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
+    var shapeService = TestServerContext.createShapeService(
+      ShapeTestFactory.shapeDataImport(timetableDataImport.getAllTripPatterns())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),
@@ -122,12 +135,13 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_Y,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, shapeService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       2,
       transitService,
+      shapeService,
       NavigationDirection.NEXT,
       AlternativeLegsFilter.NO_FILTER
     );
@@ -143,6 +157,9 @@ class AlternativeLegsTest extends GtfsTest {
       transitRepository,
       DefaultTimetableRepository.scheduledOnly(timetableDataImport.toScheduledTimetableData())
     );
+    var shapeService = TestServerContext.createShapeService(
+      ShapeTestFactory.shapeDataImport(timetableDataImport.getAllTripPatterns())
+    );
 
     var originalLeg = new ScheduledTransitLegReference(
       new FeedScopedId(FEED_ID, "19.1"),
@@ -152,12 +169,13 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_B,
       null
-    ).getLeg(transitService, new TransitAlertServiceImpl());
+    ).getLeg(transitService, shapeService, new TransitAlertServiceImpl());
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
       2,
       transitService,
+      shapeService,
       NavigationDirection.NEXT,
       AlternativeLegsFilter.NO_FILTER
     );

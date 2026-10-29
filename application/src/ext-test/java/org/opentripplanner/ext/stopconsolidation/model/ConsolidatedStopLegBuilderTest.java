@@ -15,6 +15,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -42,6 +43,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
     new ScheduledTransitLegBuilder<>()
       .withTripTimes(TRIP_TIMES)
       .withTripPattern(PATTERN)
+      .withTripPatternGeometry(ShapeTestFactory.straightLines(PATTERN))
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
       .withStartTime(TIME)

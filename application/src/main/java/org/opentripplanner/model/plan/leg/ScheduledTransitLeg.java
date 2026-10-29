@@ -23,6 +23,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -57,6 +58,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   ).thenComparing(FareOffer::uniqueId);
   private final TripTimes<?> tripTimes;
   private final TripPattern tripPattern;
+  private final CompactLineStringSequence tripPatternGeometry;
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
@@ -113,7 +115,8 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     this.generalizedCost = builder.generalizedCost();
 
-    this.distanceMeters = tripPattern.distanceBetween(
+    this.tripPatternGeometry = Objects.requireNonNull(builder.tripPatternGeometry());
+    this.distanceMeters = tripPatternGeometry.distanceBetween(
       boardStopPosInPattern,
       alightStopPosInPattern
     );
@@ -145,6 +148,10 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   public TripPattern tripPattern() {
     return tripPattern;
+  }
+
+  public CompactLineStringSequence tripPatternGeometry() {
+    return tripPatternGeometry;
   }
 
   public Instant serviceDateMidnight() {
@@ -307,7 +314,7 @@ public class ScheduledTransitLeg implements TransitLeg {
    */
   @Override
   public LineString legGeometry() {
-    return tripPattern.geometryBetween(boardStopPosInPattern, alightStopPosInPattern);
+    return tripPatternGeometry.concatenate(boardStopPosInPattern, alightStopPosInPattern);
   }
 
   @Override

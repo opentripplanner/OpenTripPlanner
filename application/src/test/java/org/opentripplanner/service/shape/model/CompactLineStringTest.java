@@ -1,4 +1,4 @@
-package org.opentripplanner.street.geometry;
+package org.opentripplanner.service.shape.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

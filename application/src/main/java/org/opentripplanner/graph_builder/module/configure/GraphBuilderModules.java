@@ -48,6 +48,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -152,6 +153,7 @@ public class GraphBuilderModules {
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     StreetDetailsRepository streetDetailsRepository,
     DataImportIssueStore issueStore,
     FareServiceFactory fareServiceFactory
@@ -164,6 +166,7 @@ public class GraphBuilderModules {
       gtfsBundles,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       streetDetailsRepository,
       graph,
       deduplicator,
@@ -185,6 +188,7 @@ public class GraphBuilderModules {
     DeduplicatorService deduplicator,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     StreetDetailsRepository streetDetailsRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore
@@ -193,6 +197,7 @@ public class GraphBuilderModules {
       dataSources.getNetexConfiguredDataSource(),
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       parkingRepository,
       streetDetailsRepository,
       graph,

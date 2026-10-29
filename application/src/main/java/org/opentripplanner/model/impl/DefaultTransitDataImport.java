@@ -12,6 +12,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TransitDataImport;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -59,6 +60,8 @@ class DefaultTransitDataImport implements TransitDataImport {
 
   private final Collection<TripPattern> tripPatterns;
 
+  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern;
+
   private final Collection<Trip> trips;
 
   private final Collection<TripOnServiceDate> tripOnServiceDates;
@@ -81,6 +84,7 @@ class DefaultTransitDataImport implements TransitDataImport {
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
+    this.geometriesByTripPattern = Map.copyOf(builder.getGeometriesByTripPattern());
     this.trips = immutableList(builder.getTripsById().values());
     this.tripOnServiceDates = immutableList(builder.getTripOnServiceDates().values());
     this.flexTrips = immutableList(builder.getFlexTripsById().values());
@@ -146,6 +150,11 @@ class DefaultTransitDataImport implements TransitDataImport {
   @Override
   public Collection<TripPattern> getTripPatterns() {
     return tripPatterns;
+  }
+
+  @Override
+  public Map<FeedScopedId, CompactLineStringSequence> getGeometriesByTripPattern() {
+    return geometriesByTripPattern;
   }
 
   @Override

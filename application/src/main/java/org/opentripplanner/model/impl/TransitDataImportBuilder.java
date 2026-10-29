@@ -24,6 +24,7 @@ import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
+import org.opentripplanner.service.shape.model.CompactLineStringSequence;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferPoint;
@@ -105,6 +106,9 @@ public class TransitDataImportBuilder {
   private final EntityById<Trip> tripsById = new DefaultEntityById<>();
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
+
+  private final Map<FeedScopedId, CompactLineStringSequence> geometriesByTripPattern =
+    new HashMap<>();
 
   private final EntityById<FlexTrip<?, ?>> flexTripsById = new DefaultEntityById<>();
 
@@ -228,6 +232,10 @@ public class TransitDataImportBuilder {
 
   public Multimap<StopPattern, TripPattern> getTripPatterns() {
     return tripPatterns;
+  }
+
+  public Map<FeedScopedId, CompactLineStringSequence> getGeometriesByTripPattern() {
+    return geometriesByTripPattern;
   }
 
   public EntityById<FlexTrip<?, ?>> getFlexTripsById() {

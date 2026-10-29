@@ -1,9 +1,12 @@
 package org.opentripplanner.updater.trip.siri;
 
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.deduplicator.DeduplicatorService;
+import org.opentripplanner.service.shape.ShapeRepository;
 import org.opentripplanner.transit.repository.TimetableRepository;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.updater.trip.patterncache.RealTimeShapeResolver;
 import org.opentripplanner.updater.trip.patterncache.TripPatternCache;
 import org.opentripplanner.updater.trip.patterncache.TripPatternIdGenerator;
 
@@ -47,16 +50,21 @@ public class SiriRealTimeTripUpdateAdapter {
    * the task go directly against the given mutable buffer (which falls back to scheduled data),
    * so they see in-progress real-time additions not yet committed to a published snapshot.
    */
-  public SiriRealTimeUpdateHandler forUpdate(TimetableRepository buffer) {
+  public SiriRealTimeUpdateHandler forUpdate(
+    TimetableRepository buffer,
+    Supplier<ShapeRepository> shapeRepository
+  ) {
     var fuzzyTripMatcher =
       siriFuzzyTripMatcherCache != null
         ? new SiriFuzzyTripMatcher(siriFuzzyTripMatcherCache, buffer, transitRepository)
         : null;
+    var shapeResolver = new RealTimeShapeResolver(shapeRepository, deduplicator);
     return new SiriRealTimeUpdateHandler(
       transitRepository,
       buffer,
       fuzzyTripMatcher,
       tripPatternCache,
+      shapeResolver,
       deduplicator,
       tripPatternIdGenerator
     );

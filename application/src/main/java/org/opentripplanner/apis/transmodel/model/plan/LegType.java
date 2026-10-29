@@ -457,6 +457,7 @@ public class LegType {
               leg,
               env.getArgument("previous"),
               GqlUtil.getTransitService(env),
+              GqlUtil.getShapeService(env),
               NavigationDirection.PREVIOUS,
               env.getArgument("filter")
             );
@@ -494,6 +495,7 @@ public class LegType {
               leg,
               env.getArgument("next"),
               GqlUtil.getTransitService(env),
+              GqlUtil.getShapeService(env),
               NavigationDirection.NEXT,
               env.getArgument("filter")
             );

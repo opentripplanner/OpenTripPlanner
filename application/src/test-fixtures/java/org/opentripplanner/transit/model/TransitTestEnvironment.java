@@ -16,6 +16,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.DefaultTransitDataProviderFilterBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.service.shape.ShapeRepository;
+import org.opentripplanner.service.shape.ShapeRepositorySnapshot;
+import org.opentripplanner.service.shape.ShapeService;
+import org.opentripplanner.service.shape.ShapeTestFactory;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
+import org.opentripplanner.service.shape.internal.ShapeRepositoryLifecycle;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.timetable.RealTimeTripUpdate;
@@ -41,6 +48,7 @@ public final class TransitTestEnvironment {
   private final ScheduledTimetableData scheduledTimetableData;
   private final RepositoryRegistry repositoryRegistry;
   private final RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle;
+  private final RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeHandle;
   private final UpdateManager updateManager;
   private final LocalDate defaultServiceDate;
 
@@ -84,6 +92,15 @@ public final class TransitTestEnvironment {
       timetableSnapshot,
       new TimetableRepositoryLifecycle(timetableSnapshot, false, () -> defaultServiceDate)
     );
+    var shapeRepository = new DefaultShapeRepository(
+      ShapeTestFactory.shapeDataImport(
+        scheduledTimetableData.getAllTripPatterns()
+      ).toScheduledShapeData()
+    );
+    this.shapeHandle = repositoryRegistry.registerRepository(
+      shapeRepository,
+      new ShapeRepositoryLifecycle(shapeRepository)
+    );
     var threadFactory = Thread.ofPlatform().name("test-commit").factory();
     // Use atomic commits (commit immediately after each task) so test assertions see results right away
     this.updateManager = TransactionFactory.createUpdateManagerWithAtomicCommits(
@@ -113,6 +130,13 @@ public final class TransitTestEnvironment {
    */
   public TransitService transitService() {
     return new DefaultTransitService(transitRepository, timetableSnapshot());
+  }
+
+  /**
+   * Returns a new fresh ShapeService backed by the current shape snapshot.
+   */
+  public ShapeService shapeService() {
+    return new DefaultShapeService(shapeHandle.repositorySnapshot(repositoryRegistry.scope()));
   }
 
   /**
@@ -159,6 +183,10 @@ public final class TransitTestEnvironment {
 
   public RepositoryHandle<TimetableRepositorySnapshot, TimetableRepository> timetableHandle() {
     return timetableHandle;
+  }
+
+  public RepositoryHandle<ShapeRepositorySnapshot, ShapeRepository> shapeHandle() {
+    return shapeHandle;
   }
 
   public UpdateManager updateManager() {

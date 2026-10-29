@@ -13,7 +13,6 @@ import graphql.schema.GraphQLTypeReference;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.model.geometry.EncodedPolyline;
 import org.opentripplanner.api.model.transit.FeedScopedIdMapper;
 import org.opentripplanner.apis.transmodel.mapping.GeometryMapper;
@@ -117,12 +116,12 @@ public class JourneyPatternType {
           .name("pointsOnLink")
           .type(linkGeometryType)
           .dataFetcher(environment -> {
-            LineString geometry = ((TripPattern) environment.getSource()).getGeometry();
-            if (geometry == null) {
-              return null;
-            } else {
-              return EncodedPolyline.of(geometry);
-            }
+            TripPattern tripPattern = environment.getSource();
+            return EncodedPolyline.of(
+              GqlUtil.getShapeService(environment)
+                .getTripPatternGeometry(tripPattern.getId())
+                .concatenate()
+            );
           })
           .build()
       )
@@ -133,9 +132,13 @@ public class JourneyPatternType {
             "Detailed path travelled by journey pattern divided into stop-to-stop sections."
           )
           .type(new GraphQLList(stopToStopGeometryType))
-          .dataFetcher(environment ->
-            GeometryMapper.mapStopToStopGeometries(environment.getSource())
-          )
+          .dataFetcher(environment -> {
+            TripPattern tripPattern = environment.getSource();
+            return GeometryMapper.mapStopToStopGeometries(
+              tripPattern,
+              GqlUtil.getShapeService(environment).getTripPatternGeometry(tripPattern.getId())
+            );
+          })
           .build()
       )
       .field(

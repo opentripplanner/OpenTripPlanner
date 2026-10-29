@@ -12,6 +12,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.shape.ShapeService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.transfer.regular.RegularTransferService;
@@ -39,6 +40,11 @@ final class DaggerGtfsGraphQLRequestContext implements GtfsGraphQLRequestContext
   @Override
   public TransitService transitService() {
     return factory.transitService();
+  }
+
+  @Override
+  public ShapeService shapeService() {
+    return factory.shapeService();
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
@@ -143,6 +144,7 @@ class ApiTransitServiceTest {
 
     var leg = new ScheduledTransitLegBuilder()
       .withTripPattern(pattern)
+      .withTripPatternGeometry(ShapeTestFactory.straightLines(pattern))
       .withTripTimes(tripTimes)
       .withStartTime(ANY_TIME)
       .withEndTime(ANY_TIME)

@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.service.shape.ShapeTestFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TripInput;
@@ -70,6 +71,7 @@ class LegImplTest implements PlanTestConstants {
     .withBoardStopIndexInPattern(0)
     .withAlightStopIndexInPattern(4)
     .withTripPattern(PATTERN)
+    .withTripPatternGeometry(ShapeTestFactory.straightLines(PATTERN))
     .build();
   private static final LegImpl IMPL = new LegImpl();
   private static final Map<String, Object> INCLUDE_STOP_ONLY = Map.of(
@@ -146,6 +148,7 @@ class LegImplTest implements PlanTestConstants {
       .withServiceDate(serviceDate)
       .withTripTimes(tripData.scheduledTripTimes())
       .withTripPattern(tripData.scheduledTripPattern())
+      .withTripPatternGeometry(ShapeTestFactory.straightLines(tripData.scheduledTripPattern()))
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
       .build();

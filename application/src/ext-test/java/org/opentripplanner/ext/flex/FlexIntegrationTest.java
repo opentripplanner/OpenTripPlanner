@@ -32,6 +32,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.standalone.api.TestServerContext;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
@@ -62,6 +63,8 @@ public class FlexIntegrationTest {
 
   static TimetableDataImport timetableDataImport;
 
+  static ShapeDataImport shapeDataImport;
+
   static TransferRepository transferRepository;
 
   static RoutingService service;
@@ -74,10 +77,12 @@ public class FlexIntegrationTest {
     transitRepository = model.transitRepository();
     timetableDataImport = model.timetableDataImport();
     transferRepository = model.transferRepository();
+    shapeDataImport = model.shapeDataImport();
     addGtfsToGraph(
       graph,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       transferRepository,
       List.of(
         FlexIntegrationTestData.COBB_BUS_30_GTFS,
@@ -90,7 +95,13 @@ public class FlexIntegrationTest {
       timetableDataImport,
       transferRepository
     );
-    service = TestServerContext.createRoutingService(graph, transitService, transferRepository);
+    var shapeService = TestServerContext.createShapeService(shapeDataImport);
+    service = TestServerContext.createRoutingService(
+      graph,
+      transitService,
+      shapeService,
+      transferRepository
+    );
   }
 
   @Test
@@ -202,6 +213,7 @@ public class FlexIntegrationTest {
     Graph graph,
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
+    ShapeDataImport shapeDataImport,
     TransferRepository transferRepository,
     List<File> gtfsFiles
   ) {
@@ -211,6 +223,7 @@ public class FlexIntegrationTest {
       gtfsBundles,
       transitRepository,
       timetableDataImport,
+      shapeDataImport,
       graph,
       LocalDateRange.ofUnbounded()
     );

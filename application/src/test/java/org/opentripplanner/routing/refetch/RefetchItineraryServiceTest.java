@@ -441,6 +441,7 @@ public class RefetchItineraryServiceTest {
     return new RefetchItineraryService(
       GRAPH,
       transitEnv.transitService(),
+      transitEnv.shapeService(),
       new TransitAlertServiceImpl(),
       TRANSFER_SERVICE,
       streetDetailsService,

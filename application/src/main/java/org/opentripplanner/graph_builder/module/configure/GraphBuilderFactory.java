@@ -48,6 +48,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.configure.VertexLinkerGraphBuildingModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
+import org.opentripplanner.service.shape.dataimport.ShapeDataImport;
 import org.opentripplanner.service.streetdetails.StreetDetailsRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -136,6 +137,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder timetableDataImport(TimetableDataImport timetableDataImport);
+
+    @BindsInstance
+    Builder shapeDataImport(ShapeDataImport shapeDataImport);
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);

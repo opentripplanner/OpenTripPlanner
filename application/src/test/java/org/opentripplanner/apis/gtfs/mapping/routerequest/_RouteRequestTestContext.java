@@ -28,6 +28,9 @@ import org.opentripplanner.routing.linking.internal.VertexCreationService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.RealtimeVehicleRepositoryLifecycle;
+import org.opentripplanner.service.shape.ScheduledShapeData;
+import org.opentripplanner.service.shape.internal.DefaultShapeRepository;
+import org.opentripplanner.service.shape.internal.DefaultShapeService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalRepository;
@@ -87,6 +90,7 @@ class _RouteRequestTestContext {
     this.context = new TestGtfsGraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
+      new DefaultShapeService(DefaultShapeRepository.scheduledOnly(ScheduledShapeData.empty())),
       new TransitAlertServiceImpl(),
       transferService,
       new DefaultFareService(),
