@@ -85,8 +85,8 @@ once, which saves memory. See [Parent and deduplication](#parent-and-deduplicati
 ```
 
 If the `transfers` section is left out, a single `walk` profile with the preferences of the default
-request and a max duration of 30 minutes is used. Each profile type with profiles must set its
-`maxDuration`, there is no default.
+request and a max duration of 30 minutes is used. The `maxDuration` of a profile type is optional,
+the default is 30 minutes.
 
 ## Parameters
 
@@ -98,7 +98,7 @@ request and a max duration of 30 minutes is used. Each profile type with profile
 | &nbsp;&nbsp;`parent`          | `string`   | The `id` of the profile this profile is based on. See below.                        |                   |
 | &nbsp;&nbsp;`userPreferences` | `object`   | The preferences the profile is searched with. See below.                            |                   |
 | &nbsp;&nbsp;`routingRequest`  | `object`   | A [routing request](RouteRequest.md) the search is based on. See below.             |                   |
-| `walk.maxDuration`            | `duration` | **Required** if there are walk profiles. How far from a stop the walk transfers are searched. See below. |                   |
+| `walk.maxDuration`            | `duration` | How far from a stop the walk transfers are searched. See below.                 | `30m`             |
 | `walk.warmup`                 | `object[]` | Preferences to create transfers for when the server starts. See below.              |                   |
 | &nbsp;&nbsp;`id`              | `string`   | **Required.** The id of the entry, unique among all profiles and warmup entries.    |                   |
 | &nbsp;&nbsp;`parent`          | `string`   | **Required.** The `id` of a profile of the same type the transfers are created from.|                   |
@@ -257,7 +257,7 @@ transfer is used:
 | `bicycle.maxDuration`                | `duration` | The max duration between stops that allow bicycles.               |
 | `bicycle.maxDurationAllowsCar`       | `duration` | The max duration between stops that allow cars.                   |
 
-At least one of them is required. `maxDurationAllowAllModes` must be shorter than `maxDuration` and
+If none of them is set, `maxDuration` is 30 minutes. `maxDurationAllowAllModes` must be shorter than `maxDuration` and
 `maxDurationAllowsCar`, if they are set. If `maxDurationAllowAllModes` is left out, there are only
 transfers between the stops that allow bicycles or cars:
 

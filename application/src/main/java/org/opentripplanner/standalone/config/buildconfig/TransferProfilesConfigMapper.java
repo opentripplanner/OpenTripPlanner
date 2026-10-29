@@ -86,18 +86,12 @@ public class TransferProfilesConfigMapper {
     for (var type : TransferProfileType.values()) {
       var block = mapTypeBlock(transfers, type);
       typeBlocks.put(type, block);
-      var typeMaxDurations = mapMaxDurations(block, type);
-      if (typeMaxDurations != null) {
-        maxDurations.put(type, typeMaxDurations);
-      }
+      maxDurations.put(type, mapMaxDurations(block, type));
     }
 
     var mappedProfiles = mapProfiles(typeBlocks);
     var profiles = mappedProfiles.profiles();
     var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
-    if (mappedProfiles.isDefaultWalkProfile()) {
-      maxDurations.putIfAbsent(TransferProfileType.WALK, MaxDurationsPreference.DEFAULT);
-    }
 
     return createParameters(profiles, maxDurations, deduplicationLimit, warmup);
   }
@@ -142,10 +136,9 @@ public class TransferProfilesConfigMapper {
   }
 
   /**
-   * The max durations of a profile type, shared by all its profiles. {@code null} if the type has
-   * none, which is an error if the type has profiles.
+   * The max durations of a profile type, shared by all its profiles. The default is
+   * {@link TransferParameters#DEFAULT_MAX_DURATION}.
    */
-  @Nullable
   private static MaxDurationsPreference mapMaxDurations(
     NodeAdapter typeNode,
     TransferProfileType type
@@ -156,14 +149,13 @@ public class TransferProfilesConfigMapper {
       .since(V2_10)
       .summary("The longest " + name + " transfer, measured with the user preferences.")
       .description(maxDurationDescription(type))
-      .asDuration(null);
+      .asDuration(
+        type == TransferProfileType.BICYCLE ? null : TransferParameters.DEFAULT_MAX_DURATION
+      );
 
     if (type != TransferProfileType.BICYCLE) {
       rejectBicycleOnly(typeNode, "maxDurationAllowAllModes", name);
       rejectBicycleOnly(typeNode, "maxDurationAllowsCar", name);
-      if (maxDuration == null) {
-        return null;
-      }
       return type == TransferProfileType.CAR
         ? new CarMaxDuration(maxDuration)
         : new PlainMaxDuration(maxDuration);
@@ -195,7 +187,7 @@ public class TransferProfilesConfigMapper {
       )
       .asDuration(null);
     if (maxDuration == null && allowAllModes == null && allowsCar == null) {
-      return null;
+      return MaxDurationsPreference.defaultFor(type);
     }
     try {
       return new BicycleMaxDurations(allowAllModes, maxDuration, allowsCar);
@@ -210,7 +202,7 @@ public class TransferProfilesConfigMapper {
     var description = """
     How far from a stop the transfers are searched when the transfers are generated. It is
     shared by all the profiles of the type, and is not inherited from another type or from a
-    parent profile. Each type with profiles must set it.
+    parent profile. The default is 30 minutes.
     """;
     return switch (type) {
       case WALK, WHEELCHAIR -> description +

@@ -3,6 +3,7 @@ package org.opentripplanner.transit.transfer.regular.api.maxduration;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 
 /**
@@ -26,7 +27,7 @@ import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfi
 public sealed interface MaxDurationsPreference
   permits PlainMaxDuration, BicycleMaxDurations, CarMaxDuration
 {
-  PlainMaxDuration DEFAULT = new PlainMaxDuration(Duration.ofMinutes(30));
+  PlainMaxDuration DEFAULT = new PlainMaxDuration(TransferParameters.DEFAULT_MAX_DURATION);
 
   /** The same max duration between all stops. */
   static PlainMaxDuration of(Duration maxDuration) {
@@ -34,11 +35,11 @@ public sealed interface MaxDurationsPreference
   }
 
   /**
-   * The 30 minute max duration of a profile type, in the way of the type. It is used for the
-   * implicit configuration of a single walk profile, there is no default for a configured type.
+   * The default max duration of a profile type, {@link TransferParameters#DEFAULT_MAX_DURATION}, in
+   * the way of the type.
    */
   static MaxDurationsPreference defaultFor(TransferProfileType type) {
-    var thirtyMinutes = DEFAULT.maxDuration();
+    var thirtyMinutes = TransferParameters.DEFAULT_MAX_DURATION;
     return switch (type) {
       case WALK, WHEELCHAIR -> DEFAULT;
       case BICYCLE -> new BicycleMaxDurations(null, thirtyMinutes, null);

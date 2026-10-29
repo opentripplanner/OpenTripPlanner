@@ -35,6 +35,12 @@ public final class TransferParameters<R> {
     0.005
   );
 
+  /**
+   * The max duration of the transfers of a profile type, if it is not set: how far from a stop the
+   * transfers are searched.
+   */
+  public static final Duration DEFAULT_MAX_DURATION = Duration.ofMinutes(30);
+
   private final List<TransferProfile<R>> profiles;
   private final Map<TransferProfileType, MaxDurationsPreference> maxDurations;
   private final CostLinearFunction deduplicationLimit;

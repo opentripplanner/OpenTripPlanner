@@ -531,14 +531,25 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theMaxDurationOfATypeIsRequiredIfItHasProfiles() {
-    var root = newNodeAdapterForTest(
-      "{ transfers: { wheelchair: { profiles: [{ id: 'wheelchair' }] } } }"
-    );
+  void theMaxDurationOfATypeWithProfilesDefaultsToTheDefaultMaxDuration() {
+    var subject = map("{ transfers: { wheelchair: { profiles: [{ id: 'wheelchair' }] } } }");
 
-    var ex = assertThrows(OtpAppException.class, () -> TransferProfilesConfigMapper.map(root));
-    assertThat(ex).hasMessageThat().contains("wheelchair");
-    assertThat(ex).hasMessageThat().contains("max duration");
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
+      TransferParameters.DEFAULT_MAX_DURATION
+    );
+  }
+
+  @Test
+  void theMaxDurationOfEveryTypeHasADefault() {
+    var subject = map("{ transfers: { walk: { maxDuration: '45m' } } }");
+
+    for (var type : TransferProfileType.values()) {
+      var expected =
+        type == TransferProfileType.WALK
+          ? Duration.ofMinutes(45)
+          : TransferParameters.DEFAULT_MAX_DURATION;
+      assertThat(subject.maxDurations(type).longestDuration()).isEqualTo(expected);
+    }
   }
 
   @Test
