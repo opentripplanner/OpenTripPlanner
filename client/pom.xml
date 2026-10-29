@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>otp</artifactId>
+        <version>2.11.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>debug-client</artifactId>
+    <name>OpenTripPlanner - Debug Client</name>
+
+    <!--
+    The debug client, built with the frontend-maven-plugin straight into target/classes/client, so
+    that the jar contains it under client/ on the classpath, where the application serves it from.
+    Skip with -Dplugin.frontend.skip=true if you don't need it.
+    -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <workingDirectory>${project.basedir}</workingDirectory>
+                    <installDirectory>${project.build.directory}/frontend</installDirectory>
+                    <skip>${plugin.frontend.skip}</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install-node-and-npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v24.22.2</nodeVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-ci</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>ci</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-build-bundle</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build:bundle -- --outDir ${project.build.outputDirectory}/client</arguments>
+                            <environmentVariables>
+                                <VITE_API_URL>${debugUi.apiUrl}</VITE_API_URL>
+                                <VITE_DEBUG_STYLE_URL>${debugUi.styleUrl}</VITE_DEBUG_STYLE_URL>
+                                <VITE_GRAPHIQL_URL>${debugUi.graphiqlUrl}</VITE_GRAPHIQL_URL>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
