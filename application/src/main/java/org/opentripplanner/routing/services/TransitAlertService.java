@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.api.request.TransitAlertRequest;
+import org.opentripplanner.transit.model.filter.transit.TransitAlertEntityResolver;
 import org.opentripplanner.transit.model.filter.transit.TransitAlertMatcherFactory;
 import org.opentripplanner.transit.model.timetable.Direction;
 
@@ -35,15 +37,28 @@ public interface TransitAlertService {
   Collection<TransitAlert> getAllAlerts();
 
   /**
-   * Returns all alerts matching the given request. A request without filters matches all alerts.
+   * Returns the keys of all entities which have at least one alert.
    */
-  default Collection<TransitAlert> findAlerts(TransitAlertRequest request) {
-    var alerts = getAllAlerts();
-    if (request.filters().isEmpty()) {
-      return alerts;
-    }
-    var matcher = TransitAlertMatcherFactory.of(request);
-    return alerts.stream().filter(matcher::match).toList();
+  Collection<EntityKey> listEntityKeys();
+
+  /**
+   * Returns the alerts of the given entities. The returned collection contains no duplicates, even
+   * if an alert affects several of the given entities.
+   */
+  Collection<TransitAlert> findAlerts(Collection<EntityKey> entityKeys);
+
+  /**
+   * Returns all alerts matching the given request. A request without filters matches all alerts.
+   *
+   * @param entityResolver resolves which entities are selected by the entity criteria.
+   * @see TransitAlertMatcherFactory
+   */
+  default Collection<TransitAlert> findAlerts(
+    TransitAlertRequest request,
+    TransitAlertEntityResolver entityResolver
+  ) {
+    var matcher = TransitAlertMatcherFactory.of(request, entityResolver);
+    return getAllAlerts().stream().filter(matcher::match).toList();
   }
 
   TransitAlert getAlertById(FeedScopedId id);

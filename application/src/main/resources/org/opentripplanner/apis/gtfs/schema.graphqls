@@ -3531,6 +3531,31 @@ enum AlertEffectType {
   UNKNOWN_EFFECT
 }
 
+"The type of an entity affected by an alert. These correspond to the types in `AlertEntity`."
+enum AlertEntityType {
+  "An agency."
+  AGENCY
+  "A pattern, i.e. a route in a direction."
+  PATTERN
+  "A route."
+  ROUTE
+  "A route type, either for the whole feed or for a single agency."
+  ROUTE_TYPE
+  "A stop or a station."
+  STOP
+  "A stop or a station on a route."
+  STOP_ON_ROUTE
+  "A stop or a station on a trip."
+  STOP_ON_TRIP
+  "A trip."
+  TRIP
+  """
+  A missing entity (alert has no entities), an entity which doesn't resolve to
+  anything in the transit data, i.e. it doesn't exist or its type isn't supported.
+  """
+  UNKNOWN
+}
+
 "Severity level of a alert"
 enum AlertSeverityLevelType {
   """
@@ -4499,11 +4524,116 @@ input AccessibilityPreferencesInput {
 }
 
 """
+Selects the entities that alerts affect. The fields are combined with AND semantics: an entity
+must be of one of the `entityTypes` and it must be related to both the selected `routes` and
+the selected `stopsOrStations`, if they are set. At least one field must be set.
+"""
+input AlertEntitySelectInput {
+  """
+  The types of affected entities to select.
+    
+  When not set, only the entities which directly refer to the selected routes and stops are
+  selected: `ROUTE` if only `routes` is set, `STOP` if only `stopsOrStations` is set and
+  `STOP_ON_ROUTE` if both are set. `entityTypes` must be set if neither `routes` nor
+  `stopsOrStations` is set, in which case all entities of the given types are selected.
+    
+  An empty list is forbidden.
+  """
+  entityTypes: [AlertEntityType!]
+  """
+  Selects entities which are related to any of these routes. The relations follow the ones used
+  in `Route.alerts`:
+   - `AGENCY`: the agency of the route
+   - `PATTERN`: the route, in any direction
+   - `ROUTE`: the route itself
+   - `ROUTE_TYPE`: the route type of the route, either for the whole feed or for the agency
+   - `STOP`: the stops which the route visits and their parent stations
+   - `STOP_ON_ROUTE`: any stop on the route
+   - `STOP_ON_TRIP`: any stop on the trips of the route
+   - `TRIP`: the trips of the route
+   - `UNKNOWN`: entities which refer to the id of the route, but don't resolve to anything
+  
+  What types of matches are included can be limited with the `entityTypes` field. For example, if only `ROUTE` is set,
+  only the route itself is selected and not its stops or trips.
+    
+  An empty list is forbidden.
+  """
+  routes: [AlertRouteSelectInput!]
+  """
+  Selects entities which are related to any of these stops or stations. The relations follow
+  the ones used in `Stop.alerts`:
+   - `AGENCY`: the agencies of the routes which visit the stop
+   - `PATTERN`: the patterns which visit the stop
+   - `ROUTE`: the routes which visit the stop
+   - `ROUTE_TYPE`: never related to a stop
+   - `STOP`: the stop or station itself
+   - `STOP_ON_ROUTE`: the stop or station on any route
+   - `STOP_ON_TRIP`: the stop or station on any trip
+   - `TRIP`: the trips which visit the stop
+   - `UNKNOWN`: entities which refer to the id of the stop, but don't resolve to anything
+    
+  For the relations to patterns, routes, trips and agencies a stop is also selected if its
+  parent station is selected.
+  
+  What types of matches are included can be limited with the `entityTypes` field. For example, if only `STOP` is set,
+  only the stop itself is selected and trips that visit it.
+    
+  An empty list is forbidden.
+  """
+  stopsOrStations: [AlertStopOrStationSelectInput!]
+}
+
+"Selects routes. Either `ids` or `modes` must be set, they can't be combined."
+input AlertRouteSelectInput {
+  """
+  Selects the routes with these ids, for example `HSL:1009`.
+    
+  An empty list is forbidden.
+  """
+  ids: [String!]
+  """
+  Selects the routes with any of these modes.
+    
+  An empty list is forbidden.
+  """
+  modes: [TransitMode!]
+}
+
+"Selects stops and stations. Either `ids` or `modes` must be set, they can't be combined."
+input AlertStopOrStationSelectInput {
+  """
+  Selects the stops or stations with these ids, for example `HSL:1040601`.
+    
+  An empty list is forbidden.
+  """
+  ids: [String!]
+  """
+  Also select the child stops of the selected stations, i.e. return the alerts of the child
+  stops. This is ignored for stops.
+  """
+  includeChildStopAlerts: Boolean = false
+  """
+  Also select the parent stations of the selected stops, i.e. return the alerts of the parent
+  stations. This is ignored for stations.
+  """
+  includeParentStationAlerts: Boolean = false
+  """
+  Selects the stops and stations with any of these modes. The modes of a stop are either its
+  vehicle mode or the modes of the patterns visiting it. The modes of a station are the modes of
+  its child stops.
+    
+  An empty list is forbidden.
+  """
+  modes: [TransitMode!]
+}
+
+"""
 A collection of selectors for including or excluding alerts from the alerts search.
 An alert matches a filter if it matches at least one of the `include` selectors and none of the
-`exclude` selectors. When several filters are given, an alert matches if it matches any of them.
+`exclude` selectors. Both `include` and `exclude` can be set in the same filter, but at least one
+of them has to be set. When several filters are given, an alert matches if it matches any of them.
 """
-input AlertsFilterInput @oneOf {
+input AlertsFilterInput {
   """
   A list of selectors for excluding alerts.
     
@@ -4533,6 +4663,13 @@ input AlertsFilterSelectInput {
   causes: [AlertCauseType!]
   "Matches alerts which have any of these effects."
   effects: [AlertEffectType!]
+  """
+  Matches alerts which affect an entity selected by any of these entity selectors.
+    
+  If used in an include, an alert is included if it affects any of the selected entities. If used in an exclude,
+  an alert is excluded if all of its entities are excluded.
+  """
+  entities: [AlertEntitySelectInput!]
   """
   Matches alerts which belong to any of these feeds. The values are feed ids, i.e. the part
   before the colon in an id such as `HSL:1234`.

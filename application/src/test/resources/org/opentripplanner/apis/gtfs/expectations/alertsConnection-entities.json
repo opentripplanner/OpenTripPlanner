@@ -1,0 +1,16 @@
+{
+  "data": {
+    "alertsConnection": {
+      "totalCount": 1,
+      "edges": [
+        {
+          "node": {
+            "id": "QWxlcnQ6RjphLXN0YXRpb24tYWxlcnQ",
+            "headerDefault": "Station closed",
+            "effect": "NO_SERVICE"
+          }
+        }
+      ]
+    }
+  }
+}

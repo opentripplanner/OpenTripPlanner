@@ -30,9 +30,22 @@ public class SelectorBasedMatcherFactory {
     List<FilterRequest<S>> filters,
     Function<S, Matcher<T>> selectorMatcherProvider
   ) {
+    return of(filters, selectorMatcherProvider, selectorMatcherProvider);
+  }
+
+  /**
+   * Same as {@link #of(List, Function)}, but the selectors of the select and not criteria are
+   * turned into matchers by separate providers. This is useful when a selector should match
+   * differently depending on whether it is used to include or exclude.
+   */
+  public static <T, S> Matcher<T> of(
+    List<FilterRequest<S>> filters,
+    Function<S, Matcher<T>> selectMatcherProvider,
+    Function<S, Matcher<T>> notMatcherProvider
+  ) {
     List<Matcher<T>> filterMatchers = filters
       .stream()
-      .map(filter -> buildFilterMatcher(filter, selectorMatcherProvider))
+      .map(filter -> buildFilterMatcher(filter, selectMatcherProvider, notMatcherProvider))
       .toList();
 
     return OrMatcher.of(filterMatchers);
@@ -50,14 +63,15 @@ public class SelectorBasedMatcherFactory {
    */
   private static <T, S> Matcher<T> buildFilterMatcher(
     FilterRequest<S> filter,
-    Function<S, Matcher<T>> buildSelectorMatcher
+    Function<S, Matcher<T>> selectMatcherProvider,
+    Function<S, Matcher<T>> notMatcherProvider
   ) {
     return ExpressionBuilder.<T>of()
       .atLeastOneMatch(
         FilterValues.ofNullIsEverything("select", filter.select()),
-        buildSelectorMatcher
+        selectMatcherProvider
       )
-      .matchesNone(FilterValues.ofNullIsEverything("not", filter.not()), buildSelectorMatcher)
+      .matchesNone(FilterValues.ofNullIsEverything("not", filter.not()), notMatcherProvider)
       .build();
   }
 }
