@@ -843,7 +843,7 @@ type QueryType {
     walkSpeed: Float = 1.35,
     "Whether the trip must be wheelchair accessible. Supported for the street part of the search."
     wheelchairAccessible: Boolean = false
-  ): RefetchTripPatternResult! @deprecated(reason : "This query is experimental and might change in the future.") @timingData
+  ): RefetchTripPatternResult! @deprecated(reason : "Use tripPatternByLegIds instead.") @timingData
   "Get default routing parameters."
   routingParameters: RoutingParameters @timingData
   "Get OTP deployment information. This is only useful for developers of OTP itself not regular API users."
@@ -1052,6 +1052,33 @@ type QueryType {
     "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
     whiteListed: InputWhiteListed
   ): Trip! @timingData
+  "Get a trip pattern for the given legs, with realtime changes applied."
+  tripPatternByLegIds(
+    "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
+    alightSlackDefault: Int = 0,
+    "List of alightSlack for a given set of modes. Defaults: []"
+    alightSlackList: [TransportModeSlack],
+    "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also applies to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
+    boardSlackDefault: Int = 0,
+    "List of boardSlack for a given set of modes. Defaults: []"
+    boardSlackList: [TransportModeSlack],
+    "The start location, if null the trip pattern will start with the first provided leg"
+    from: Location,
+    "A list of legIds describing the trip pattern. At least one leg is required."
+    legs: [ID!]!,
+    "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
+    maxAccessEgressDurationForMode: [StreetModeDurationInput!] = [],
+    "The set of access/egress modes to be used for this search. The direct and transit modes are ignored"
+    modes: Modes,
+    "The destination location, if null the trip pattern will end with the last provided leg"
+    to: Location,
+    "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
+    walkReluctance: Float = 2.0,
+    "The maximum walk speed along streets, in meters per second."
+    walkSpeed: Float = 1.35,
+    "Whether the trip must be wheelchair accessible. Supported for the street part of the search."
+    wheelchairAccessible: Boolean = false
+  ): TripPatternResult! @timingData
   "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
   viaTrip(
     "Date and time for the earliest time the user is willing to start the journey (if arriveBy=false/not set) or the latest acceptable time of arriving (arriveBy=true). Defaults to now"
@@ -1629,6 +1656,12 @@ type TripPattern {
   walkDistance: Float @deprecated(reason : "Replaced by `streetDistance`.")
   "How much time is spent walking, in seconds."
   walkTime: Long
+}
+
+"A trip pattern built from a given set of legs"
+type TripPatternResult {
+  "The trip pattern, with realtime changes applied"
+  tripPattern: TripPattern
 }
 
 "Trips search metadata."

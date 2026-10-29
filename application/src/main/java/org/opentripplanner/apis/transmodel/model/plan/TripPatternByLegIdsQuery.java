@@ -34,12 +34,12 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.refetch.RefetchItineraryException;
 import org.opentripplanner.routing.refetch.RefetchItineraryService;
 
-public class RefetchTripPatternQuery {
+public class TripPatternByLegIdsQuery {
 
   private final FeedScopedIdMapper idMapper;
   private final GenericLocationMapper genericLocationMapper;
 
-  public RefetchTripPatternQuery(FeedScopedIdMapper idMapper) {
+  public TripPatternByLegIdsQuery(FeedScopedIdMapper idMapper) {
     this.idMapper = idMapper;
     this.genericLocationMapper = new GenericLocationMapper(idMapper);
   }
@@ -50,24 +50,69 @@ public class RefetchTripPatternQuery {
     GraphQLInputObjectType durationPerStreetModeType,
     GraphQLInputObjectType locationInputType
   ) {
-    RoutingPreferences preferences = routing.request.preferences();
+    var outputType = createOutputType(
+      "TripPatternResult",
+      "A trip pattern built from a given set of legs",
+      "The trip pattern, with realtime changes applied",
+      tripPatternType
+    );
+    return createField(routing, outputType, durationPerStreetModeType, locationInputType)
+      .name("tripPatternByLegIds")
+      .description("Get a trip pattern for the given legs, with realtime changes applied.")
+      .build();
+  }
 
-    var outputType = GraphQLObjectType.newObject()
-      .name("RefetchTripPatternResult")
-      .description("Refetched data for a trip pattern")
+  /**
+   * The predecessor of {@code tripPatternByLegIds}, kept so that existing clients keep working.
+   */
+  public GraphQLFieldDefinition createRefetchTripPattern(
+    DefaultRouteRequestType routing,
+    GraphQLOutputType tripPatternType,
+    GraphQLInputObjectType durationPerStreetModeType,
+    GraphQLInputObjectType locationInputType
+  ) {
+    var outputType = createOutputType(
+      "RefetchTripPatternResult",
+      "Refetched data for a trip pattern",
+      "The refetched trip pattern",
+      tripPatternType
+    );
+    return createField(routing, outputType, durationPerStreetModeType, locationInputType)
+      .name("refetchTripPattern")
+      .description("Get an updated version of a trip pattern with realtime changes applied.")
+      .deprecate("Use tripPatternByLegIds instead.")
+      .build();
+  }
+
+  private static GraphQLObjectType createOutputType(
+    String name,
+    String description,
+    String tripPatternDescription,
+    GraphQLOutputType tripPatternType
+  ) {
+    return GraphQLObjectType.newObject()
+      .name(name)
+      .description(description)
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPattern")
-          .description("The refetched trip pattern")
+          .description(tripPatternDescription)
           .type(tripPatternType)
-          .dataFetcher(env -> ((RefetchResult) env.getSource()).itinerary())
+          .dataFetcher(env -> ((TripPatternResult) env.getSource()).itinerary())
           .build()
       )
       .build();
+  }
+
+  private GraphQLFieldDefinition.Builder createField(
+    DefaultRouteRequestType routing,
+    GraphQLObjectType outputType,
+    GraphQLInputObjectType durationPerStreetModeType,
+    GraphQLInputObjectType locationInputType
+  ) {
+    RoutingPreferences preferences = routing.request.preferences();
 
     return GraphQLFieldDefinition.newFieldDefinition()
-      .name("refetchTripPattern")
-      .description("Get an updated version of a trip pattern with realtime changes applied.")
       .withDirective(TransmodelDirectives.TIMING_DATA)
       .type(new GraphQLNonNull(outputType))
       .argument(
@@ -187,12 +232,12 @@ public class RefetchTripPatternQuery {
           )
           .build()
       )
-      .dataFetcher(this::refetchJourney)
-      .deprecate("This query is experimental and might change in the future.")
-      .build();
+      .dataFetcher(this::tripPatternByLegIds);
   }
 
-  private DataFetcherResult<RefetchResult> refetchJourney(DataFetchingEnvironment environment) {
+  private DataFetcherResult<TripPatternResult> tripPatternByLegIds(
+    DataFetchingEnvironment environment
+  ) {
     TransmodelGraphQLRequestContext ctx = environment.getContext();
     var routeRequest = createRouteRequest(environment);
     List<String> legsIds = Objects.requireNonNull(environment.getArgument("legs"));
@@ -224,8 +269,8 @@ public class RefetchTripPatternQuery {
 
     try {
       var itinerary = refetcher.refetchItinerary(from, to, legs, routeRequest);
-      RefetchResult apiResponse = new RefetchResult(itinerary);
-      return DataFetcherResult.<RefetchResult>newResult().data(apiResponse).build();
+      TripPatternResult apiResponse = new TripPatternResult(itinerary);
+      return DataFetcherResult.<TripPatternResult>newResult().data(apiResponse).build();
     } catch (RefetchItineraryException e) {
       throw new InvalidInputException(e.getMessage());
     }
@@ -248,5 +293,5 @@ public class RefetchTripPatternQuery {
       .buildRequest();
   }
 
-  private record RefetchResult(Itinerary itinerary) {}
+  private record TripPatternResult(Itinerary itinerary) {}
 }
