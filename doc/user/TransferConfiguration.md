@@ -195,7 +195,8 @@ If the accessibility data of the stops is incomplete, almost all the transfers a
 If a profile type is configured, each type that the requests use must be configured too. A request
 for a transfer mode without a profile, for example bicycle when only `walk` is configured, fails.
 
-If no profile type is configured, which is also the case without a `transfers` section, OTP
+If no profile type is configured, which is also the case without a `transfers` section or with a
+`transfers` section that only has `flex` or `via`, OTP
 generates the default `walk` profile. A wheelchair or a bicycle request then uses the stored paths
 of the walk profile, and re-calculates them with the preferences of the request. The result is
 added to the cache, so the first request with new preferences is a little slower, see
