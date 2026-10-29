@@ -330,16 +330,8 @@ Stops of a station that does not allow transfers have no transfers from or to th
 
 !!! note
 
-    The old `maxTransferDuration` and `transferRequests` of the build config are not read any more,
-    OTP reports them as unexpected parameters. Use `maxDuration` of each profile type for the regular
-    transfers, and `transfers.flex` and `transfers.via` for the rest, see
-    [Flex and via transfers](#flex-and-via-transfers).
-    The old per mode `transferParametersForMode` is replaced by the profile types:
-    `carsAllowedStopMaxTransferDuration` of the `CAR` mode is the `car` type, and the
-    `bicycle` type has `maxDurationAllowsCar` and `maxDuration` (the old
-    `bikesAllowedStopMaxTransferDuration`). The `disableDefaultTransfers` is replaced by leaving out
-    `bicycle.maxDurationAllowAllModes`. The wheelchair no longer shares the walk max duration, set
-    `wheelchair.maxDuration` too.
+    The old transfer settings are replaced by the profile types, see
+    [Migrating from the old configuration](#migrating-from-the-old-configuration).
 
 ## Flex and via transfers
 
@@ -351,6 +343,49 @@ Stops of a station that does not allow transfers have no transfers from or to th
 
 They replace the old `transferRequests` and `maxTransferDuration` of the build config, which are
 not read any more. The flex transfers are only created if the sandbox feature `FlexRouting` is on.
+
+## Migrating from the old configuration
+
+The old transfer settings are not read any more. OTP reports them as unexpected parameters when it
+starts, and creates the transfers with the defaults of the new configuration, so check the log. This
+is where each old setting went:
+
+| Old setting                                                              | New setting                                                                 |
+|--------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `maxTransferDuration`                                                    | `walk.maxDuration`, and `wheelchair.maxDuration` too: the wheelchair does not share the walk limit. For flex: `flex.maxDuration`. |
+| `transferRequests` with the mode `WALK`                                  | the `walk` block                                                            |
+| `transferRequests` with `wheelchairAccessibility: { enabled: true }`     | the `wheelchair` block                                                      |
+| `transferRequests` with the mode `BICYCLE` or `CAR`                      | the `bicycle` or `car` block                                                |
+| other parameters of a request in `transferRequests`                      | the [street parameters](#street-parameters) of the type, only those can be set |
+| `transferParametersForMode.CAR.carsAllowedStopMaxTransferDuration`       | `car.maxDuration`                                                           |
+| `transferParametersForMode.BICYCLE.bikesAllowedStopMaxTransferDuration`  | `bicycle.maxDuration`                                                       |
+| `disableDefaultTransfers`                                                | leave out `bicycle.maxDurationAllowAllModes`                                |
+| `transit.transferCacheRequests` of `router-config.json`                  | `warmup` entries, see [Warmup](#warmup)                                     |
+
+**Configure every profile type that the clients use.** A request for a transfer mode that is not
+configured is not supported. It fails with an error, there is no fallback. If clients ask for
+bicycle transfers, add a bicycle profile, for example a small set of paths between all stops:
+
+```json
+"bicycle": {
+  "maxDurationAllowAllModes": "10m",
+  "profiles": [{ "id": "bicycle", "parent": "walk", "reuseLimit": "15s + 0.05x" }]
+}
+```
+
+Bicycle is the most expensive type, so check the build time and the memory first. The default
+`walk` profile is only used if no profile type is configured at all. If you only configure
+`wheelchair` or `car`, there are no walk transfers.
+
+**The flex limit is separate now.** The flex transfers used the walk limit, and now they use
+`transfers.flex.maxDuration`, `30m` by default. If your walk limit was longer, set it for flex too.
+
+**The wheelchair only uses the stops that are marked accessible** by default. If the accessibility
+data of the stops is incomplete, most wheelchair transfers are lost, see
+[Street parameters](#street-parameters).
+
+When the server starts, OTP also warns about the street parameters of the transfers that differ from
+`routingDefaults` of `router-config.json`.
 
 ## What is not supported yet
 
