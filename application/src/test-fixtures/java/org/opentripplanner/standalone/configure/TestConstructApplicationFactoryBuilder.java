@@ -49,18 +49,20 @@ public final class TestConstructApplicationFactoryBuilder {
     return DaggerConstructApplicationFactory.builder()
       .configModel(new ConfigModel(OtpConfigLoader.fromString("{}")))
       .graph(new Graph())
-      .transitRepository(transitRepository)
-      .scheduledTimetableData(env.scheduledTimetableData())
-      .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
-      .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
-      .stopConsolidationRepository(null)
-      .vehicleParkingRepository(new DefaultVehicleParkingRepository())
       .dataImportIssueSummary(DataImportIssueSummary.empty())
-      .emissionRepository(new DefaultEmissionRepository())
+      .stopConsolidationRepository(null)
       .streetDetailsRepository(new DefaultStreetDetailsRepository())
-      .empiricalDelayRepository(new DefaultEmpiricalDelayRepository())
+      .transferRepository(TransferServiceTestFactory.defaultTransferRepository())
+      .transitRepository(transitRepository)
+      .vehicleParkingRepository(new DefaultVehicleParkingRepository())
+      .worldEnvelopeRepository(new DefaultWorldEnvelopeRepository())
+      .scheduledRaptorTransitData(transitRepository.getRaptorTransitData())
+      .scheduledTimetableData(env.scheduledTimetableData())
       .schema(RouteRequest.defaultValue())
       .streetStreetRepository(new DefaultStreetRepository())
+      // Sandbox
+      .emissionRepository(new DefaultEmissionRepository())
+      .empiricalDelayRepository(new DefaultEmpiricalDelayRepository())
       .fareServiceFactory(
         new FareServiceFactory() {
           @Override
@@ -75,7 +77,6 @@ public final class TestConstructApplicationFactoryBuilder {
           public void configure(JsonNode config) {}
         }
       )
-      .scheduledRaptorTransitData(transitRepository.getRaptorTransitData())
       .build();
   }
 }
