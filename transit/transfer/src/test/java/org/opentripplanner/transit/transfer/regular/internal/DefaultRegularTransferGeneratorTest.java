@@ -370,11 +370,13 @@ class DefaultRegularTransferGeneratorTest {
   }
 
   @Test
-  void theStatisticsHaveThePreferencesAndTheParentOfTheProfile() {
+  void theStatisticsHaveTheReuseLimitAndTheParentOfTheProfile() {
     var test = new ParentAndChild();
     var statistics = test.generateStatistics(List.of(test.parentProfile()));
     assertThat(statistics.get("parent").paths()).isEqualTo(1);
-    assertThat(statistics.get("parent").preferences()).isEqualTo(test.parent.toString());
+    assertThat(statistics.get("parent").reuseLimit()).isEqualTo(
+      TransferParameters.DEFAULT_REUSE_LIMIT
+    );
     assertThat(statistics.get("parent").parentId()).isNull();
   }
 }

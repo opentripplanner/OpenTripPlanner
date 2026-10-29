@@ -2,6 +2,7 @@ package org.opentripplanner.transfer.dataimport;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.opentripplanner.core.model.id.FeedScopedIdForTestFactory.id;
+import static org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters.DEFAULT_REUSE_LIMIT;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ class RegularTransferStatisticsTest {
     var subject = statistics(WITH_TRANSFERS, wheelchair);
 
     assertThat(subject.messages(Duration.ofSeconds(1)).getFirst()).isEqualTo(
-      "Profile 'wheelchair'. Street paths: 569 979, 54% reused 'walk' - No transfers: 12% stops, 2 (50%) patterns - WheelchairPreferences{}."
+      "Profile 'wheelchair'. Street paths: 569 979, 54% reused 'walk' (15s + 2%) - No transfers: 12% stops, 2 (50%) patterns - WheelchairPreferences{}."
     );
   }
 
@@ -128,6 +129,7 @@ class RegularTransferStatisticsTest {
     return new RegularTransferProfileStatistics(
       id,
       preferences,
+      DEFAULT_REUSE_LIMIT,
       parent,
       paths,
       reused,

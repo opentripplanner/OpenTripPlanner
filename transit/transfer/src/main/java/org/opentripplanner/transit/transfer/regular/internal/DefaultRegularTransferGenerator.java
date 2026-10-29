@@ -110,6 +110,7 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
         new RegularTransferProfileStatistics(
           profile.id(),
           profile.userPreferences().toString(),
+          profile.reuseLimit(),
           profile.parent() == null ? null : profile.parent().id(),
           buildRepository.calculateNumberOfTransferPaths(profile.userPreferences()),
           sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum(),

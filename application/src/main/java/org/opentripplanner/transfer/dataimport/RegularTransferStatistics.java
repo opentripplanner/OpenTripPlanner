@@ -123,9 +123,10 @@ final class RegularTransferStatistics {
   ) {
     var message = "Profile '%s'. Street paths: %s".formatted(profile.id(), format(profile.paths()));
     if (profile.parentId() != null) {
-      message += ", %d%% reused '%s'".formatted(
+      message += ", %d%% reused '%s' (%s)".formatted(
         percentage(profile.reused(), profile.paths()),
-        profile.parentId()
+        profile.parentId(),
+        profile.reuseLimit().toStringWPercentage()
       );
     }
     return message + " - %s - %s.".formatted(noTransfers.message(), profile.preferences());
