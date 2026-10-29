@@ -3,6 +3,7 @@ package org.opentripplanner.ext.emission.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Emission;
 
@@ -19,12 +20,20 @@ class TripPatternEmissionTest {
   void section() {
     var subject = new TripPatternEmission(List.of(EM_HOP_1, EM_HOP_2, EM_HOP_3));
 
-    assertEquals(Emission.ZERO, subject.section(0, 0));
-    assertEquals(EM_HOP_1, subject.section(0, 1));
-    assertEquals(EM_HOP_2, subject.section(1, 2));
-    assertEquals(EM_HOP_3, subject.section(2, 3));
-    assertEquals(EM_HOP_1_2, subject.section(0, 2));
-    assertEquals(EM_HOP_2_3, subject.section(1, 3));
-    assertEquals(EM_HOP_1_3, subject.section(0, 3));
+    assertEquals(Optional.of(Emission.ZERO), subject.section(0, 0));
+    assertEquals(Optional.of(EM_HOP_1), subject.section(0, 1));
+    assertEquals(Optional.of(EM_HOP_2), subject.section(1, 2));
+    assertEquals(Optional.of(EM_HOP_3), subject.section(2, 3));
+    assertEquals(Optional.of(EM_HOP_1_2), subject.section(0, 2));
+    assertEquals(Optional.of(EM_HOP_2_3), subject.section(1, 3));
+    assertEquals(Optional.of(EM_HOP_1_3), subject.section(0, 3));
+  }
+
+  @Test
+  void sectionOutsideHops() {
+    var subject = new TripPatternEmission(List.of(EM_HOP_1, EM_HOP_2, EM_HOP_3));
+
+    assertEquals(Optional.empty(), subject.section(1, 4));
+    assertEquals(Optional.empty(), subject.section(4, 5));
   }
 }
