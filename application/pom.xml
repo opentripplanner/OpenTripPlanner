@@ -35,6 +35,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>debug-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>gtfs-realtime-protobuf</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -403,15 +408,9 @@
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
                 <excludes>
-                    <!-- replaced by the freshly built client, see the frontend-maven-plugin below -->
+                    <!-- replaced by the freshly built client, see the debug-client module -->
                     <exclude>index.html</exclude>
                 </excludes>
-            </resource>
-            <!-- The debug client, built from ../client by the frontend-maven-plugin below. -->
-            <resource>
-                <directory>${project.build.directory}/client-build</directory>
-                <targetPath>client</targetPath>
-                <filtering>false</filtering>
             </resource>
         </resources>
         <testResources>
@@ -467,54 +466,6 @@
                                 <source>src/ext-test/java</source>
                                 <source>src/test-fixtures/java</source>
                             </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--
-            Build the debug client (../client) and bundle it into the jar, so that it is served from
-            the same origin as the API. Skip with -Dplugin.frontend.skip=true if you don't need it.
-            -->
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>2.0.2</version>
-                <configuration>
-                    <workingDirectory>${project.basedir}/../client</workingDirectory>
-                    <installDirectory>${project.build.directory}/frontend</installDirectory>
-                    <skip>${plugin.frontend.skip}</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>install-node-and-npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <nodeVersion>v24.22.2</nodeVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm-ci</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>ci</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm-build-bundle</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>run build:bundle -- --outDir ${project.build.directory}/client-build</arguments>
-                            <environmentVariables>
-                                <VITE_API_URL>${debugUi.apiUrl}</VITE_API_URL>
-                                <VITE_DEBUG_STYLE_URL>${debugUi.styleUrl}</VITE_DEBUG_STYLE_URL>
-                                <VITE_GRAPHIQL_URL>${debugUi.graphiqlUrl}</VITE_GRAPHIQL_URL>
-                            </environmentVariables>
                         </configuration>
                     </execution>
                 </executions>
