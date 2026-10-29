@@ -1,5 +1,6 @@
 package org.opentripplanner.osm.tagmapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,7 +19,9 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.osm.WayTestData;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmTestEntity;
@@ -125,6 +128,20 @@ class OsmTagMapperTest {
     assertEquals(
       WPS.getDataForEntity(WayTestData.cycleway()).bicycleSafety(),
       WPS.getDataForEntity(way).bicycleSafety()
+    );
+  }
+
+  @Test
+  void sidewalkDesignatedForBicycleIsNotPenalizedAsSidewalk() {
+    var footway = WayTestData.footwaySharedWithBicycle();
+    var sidewalk = footway.copy().withTag("footway", "sidewalk").build();
+    assertEquals(
+      WPS.getDataForEntity(footway).bicycleSafety(),
+      WPS.getDataForEntity(sidewalk).bicycleSafety()
+    );
+    assertTrue(
+      WPS.getDataForWay(WayTestData.footwaySidewalk()).forward().bicycleSafety() >
+        WPS.getDataForWay(WayTestData.footway()).forward().bicycleSafety()
     );
   }
 
@@ -481,7 +498,129 @@ class OsmTagMapperTest {
   @Test
   void embeddedRailsWithBikeLane() {
     var way = WayTestData.embeddedRails().copy().withTag("cycleway", "lane").build();
-    assertEquals(0.87, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
+    assertEquals(0.64, WPS.getDataForEntity(way).bicycleSafety(), EPSILON);
+  }
+
+  /**
+   * Bicycle safety of a road by its cycleway tagging - lower is safer.
+   *
+   * The overall pattern: prefer smaller roads and more defined cycle infrastructure.
+   * For example, `highway=residential` beats `highway=primary` and `cycleway=track` beats `cycleway=shared_lane`.
+   *
+   * The precise safety output is somewhat arbitrary, making this test brittle, but we shouldn't change it accidentally,
+   * and the relative ordering is hopefully more stable and less controversial.
+   */
+  @ParameterizedTest
+  @CsvSource(
+    delimiter = '|',
+    useHeadersInDisplayName = true,
+    textBlock = """
+      tags                                                              | safety
+      highway=primary                                                   | 2.06
+      highway=primary;cycleway=shared_lane                              | 1.73
+      highway=primary;cycleway=lane                                     | 1.32
+      highway=primary;cycleway=track                                    | 1.05
+      highway=primary_link;cycleway=lane                                | 1.32
+      highway=secondary                                                 | 1.50
+      highway=secondary;cycleway=shared_lane                            | 1.26
+      highway=secondary;cycleway=lane                                   | 0.96
+      highway=secondary;cycleway:both=lane                              | 0.96
+      highway=secondary;cycleway=lane;lcn=yes                           | 0.67
+      highway=secondary;cycleway=track                                  | 0.77
+      highway=secondary_link;cycleway=lane                              | 0.96
+      not_highway=to_see_default                                        | 1.00
+      highway=tertiary                                                  | 1.00
+      highway=tertiary;cycleway=shared_lane                             | 0.84
+      highway=tertiary;cycleway=lane                                    | 0.64
+      highway=tertiary;cycleway=track                                   | 0.51
+      highway=residential                                               | 0.98
+      highway=residential;lcn=yes                                       | 0.69
+      highway=residential;cycleway=shared_lane                          | 0.82
+      highway=residential;cycleway=shared_lane;lcn=yes                  | 0.58
+      highway=residential;cycleway=lane                                 | 0.63
+      highway=residential;cycleway=track                                | 0.50
+    """
+  )
+  void cyclewayBicycleSafety(String tags, double safety) {
+    var props = WPS.getDataForWay(wayWithTags(tags));
+    assertEquals(safety, props.forward().bicycleSafety(), EPSILON, tags + " forward");
+    assertEquals(safety, props.backward().bicycleSafety(), EPSILON, tags + " backward");
+  }
+
+  /**
+   * Bicycle safety of a road whose sides have different cycleways, in the forward and backward
+   * direction of the way. Lower is safer.
+   */
+  @ParameterizedTest
+  @CsvSource(
+    delimiter = '|',
+    useHeadersInDisplayName = true,
+    textBlock = """
+      tags                                                              | forward | backward
+      highway=secondary;cycleway:left=lane                              | 1.50    | 0.96
+      highway=secondary;cycleway:right=lane                             | 0.96    | 1.50
+      highway=secondary;cycleway:right=track;cycleway:left=shared_lane  | 0.77    | 1.26
+    """
+  )
+  void cyclewayPerSideBicycleSafety(String tags, double forward, double backward) {
+    var props = WPS.getDataForWay(wayWithTags(tags));
+    assertEquals(forward, props.forward().bicycleSafety(), EPSILON, tags + " forward");
+    assertEquals(backward, props.backward().bicycleSafety(), EPSILON, tags + " backward");
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "residential", "tertiary", "secondary", "primary" })
+  void anyCyclewayIsSaferThanNone(String highway) {
+    var none = bicycleSafety("highway=" + highway);
+    for (var cycleway : List.of("lane", "shared_lane", "track")) {
+      assertThat(bicycleSafety("highway=%s;cycleway=%s".formatted(highway, cycleway))).isLessThan(
+        none
+      );
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "residential", "tertiary", "secondary", "primary" })
+  void trackIsSaferThanLane(String highway) {
+    assertThat(bicycleSafety("highway=%s;cycleway=track".formatted(highway))).isLessThan(
+      bicycleSafety("highway=%s;cycleway=lane".formatted(highway))
+    );
+  }
+
+  /**
+   * A painted lane gives cyclists their own space, while a shared lane (sharrows) only marks the
+   * general traffic lane, so on a busy road the painted lane is the safer of the two.
+   */
+  @ParameterizedTest
+  @ValueSource(strings = { "tertiary", "secondary", "primary" })
+  void paintedLaneIsSaferThanSharedLaneOnArterials(String highway) {
+    assertThat(bicycleSafety("highway=%s;cycleway=lane".formatted(highway))).isLessThan(
+      bicycleSafety("highway=%s;cycleway=shared_lane".formatted(highway))
+    );
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "lane", "shared_lane", "track" })
+  void busierRoadIsLessSafeWithTheSameCycleway(String cycleway) {
+    var roadsByTraffic = List.of("residential", "tertiary", "secondary", "primary");
+    var safeties = roadsByTraffic
+      .stream()
+      .map(highway -> bicycleSafety("highway=%s;cycleway=%s".formatted(highway, cycleway)))
+      .toList();
+    assertThat(safeties).isInStrictOrder();
+  }
+
+  private static double bicycleSafety(String tags) {
+    return WPS.getDataForEntity(wayWithTags(tags)).bicycleSafety();
+  }
+
+  private static OsmWay wayWithTags(String tags) {
+    var builder = OsmWay.of();
+    for (var tag : tags.split(";")) {
+      var keyValue = tag.split("=");
+      builder.withTag(keyValue[0], keyValue[1]);
+    }
+    return builder.build();
   }
 
   /**
