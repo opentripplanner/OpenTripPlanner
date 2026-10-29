@@ -407,10 +407,6 @@
                 <directory>src/client</directory>
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
-                <excludes>
-                    <!-- replaced by the freshly built client, see the debug-client module -->
-                    <exclude>index.html</exclude>
-                </excludes>
             </resource>
         </resources>
         <testResources>
