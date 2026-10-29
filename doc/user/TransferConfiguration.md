@@ -168,6 +168,10 @@ profiles of the type, and the default is the default of the route request. The v
 | `bicycle`    | `walking` (`stairsReluctance`, `mountDismountCost` and `mountDismountTime`): walking with the bicycle.        |
 | `car`        | None.                                                                                                         |
 
+When the server starts, OTP logs a warning for each profile type that has one of these parameters
+different from the same parameter in `routingDefaults` of `router-config.json`. The user
+preferences, like the walking speed, are not compared, they are set by each request.
+
 The elevator settings of the street search (`ElevatorPreferences`), the street-level settings like
 `turnReluctance` and `drivingDirection`, and the wheelchair `stairsTimeFactor` are not configurable
 for the transfers, they have the default values.
