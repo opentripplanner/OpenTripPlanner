@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - perf-test/transfers-v2
 
 # There is only one performance-test runner, so runs queue up behind each other anyway.
 # Without this, GitHub picks the newest queued run first; `queue: max` makes it process
