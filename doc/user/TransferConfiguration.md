@@ -88,6 +88,21 @@ If the `transfers` section is left out, a single `walk` profile with the prefere
 request and a max duration of 30 minutes is used. The `maxDuration` of a profile type is optional,
 the default is 30 minutes.
 
+A profile type with a block and without `profiles`, also an empty one, gets one profile with the name
+of the type as its id and the default preferences. This configures a `wheelchair` profile and no
+`walk` profile:
+
+```json
+{
+  "transfers": {
+    "wheelchair": {}
+  }
+}
+```
+
+The `walk` profile is only the default if no profile type is configured. A request for a profile type
+that is not configured has no transfers to use, so configure all the types the clients ask for.
+
 ## Parameters
 
 | Parameter                     | Type       | Description                                                                         | Default           |

@@ -531,6 +531,49 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
+  void anEmptyBlockOfATypeCreatesAProfileWithTheNameOfTheType() {
+    var subject = map("{ transfers: { wheelchair: {} } }");
+
+    assertThat(profileIds(subject)).containsExactly("wheelchair");
+    assertThat(subject.profiles().getFirst().type()).isEqualTo(TransferProfileType.WHEELCHAIR);
+    assertThat(subject.profiles().getFirst().parent()).isNull();
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
+      TransferParameters.DEFAULT_MAX_DURATION
+    );
+  }
+
+  @Test
+  void aBlockWithOnlyAMaxDurationCreatesAProfileWithTheNameOfTheType() {
+    var subject = map("{ transfers: { wheelchair: { maxDuration: '20m' } } }");
+
+    assertThat(profileIds(subject)).containsExactly("wheelchair");
+    assertThat(subject.maxDurations(TransferProfileType.WHEELCHAIR).longestDuration()).isEqualTo(
+      Duration.ofMinutes(20)
+    );
+  }
+
+  @Test
+  void everyTypeWithABlockGetsAProfileAndTheOthersDoNot() {
+    var subject = map("{ transfers: { walk: {}, car: {} } }");
+
+    assertThat(profileIds(subject)).containsExactly("walk", "car");
+  }
+
+  @Test
+  void aTypeWithProfilesDoesNotGetAnImplicitProfile() {
+    var subject = map("{ transfers: { walk: { profiles: [{ id: 'my-walk' }] }, car: {} } }");
+
+    assertThat(profileIds(subject)).containsExactly("my-walk", "car");
+  }
+
+  @Test
+  void theFlexAndViaBlocksDoNotCreateAProfile() {
+    var subject = map("{ transfers: { flex: { maxDuration: '10m' } } }");
+
+    assertThat(profileIds(subject)).containsExactly("walk");
+  }
+
+  @Test
   void theMaxDurationOfATypeWithProfilesDefaultsToTheDefaultMaxDuration() {
     var subject = map("{ transfers: { wheelchair: { profiles: [{ id: 'wheelchair' }] } } }");
 
@@ -1137,6 +1180,10 @@ class TransferProfilesConfigMapperTest {
 
   private static Duration maxDuration(TransferParameters<RouteRequest> parameters) {
     return parameters.maxDurations(TransferProfileType.WALK).longestDuration();
+  }
+
+  private static List<String> profileIds(TransferParameters<RouteRequest> parameters) {
+    return parameters.profiles().stream().map(TransferProfile::id).toList();
   }
 
   private static TransferProfile<RouteRequest> profile(

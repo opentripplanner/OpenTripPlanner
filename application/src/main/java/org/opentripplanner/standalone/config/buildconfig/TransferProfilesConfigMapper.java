@@ -4,9 +4,11 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.core.model.basic.CostLinearFunction;
 import org.opentripplanner.core.model.basic.NormalizedRatio;
@@ -38,6 +40,7 @@ import org.opentripplanner.transit.transfer.regular.api.preferences.WithSafetyFa
 import org.opentripplanner.transit.transfer.regular.api.preferences.WithSpeed;
 import org.opentripplanner.transit.transfer.regular.configure.RegularTransferFactory;
 import org.opentripplanner.utils.collection.ParentOrder;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 /**
  * Parses the {@code transfers:} build-config block, see {@code doc/user/TransferConfiguration.md},
@@ -80,16 +83,20 @@ public class TransferProfilesConfigMapper {
     var deduplicationLimit = mapDeduplicationLimit(transfers);
 
     var typeBlocks = new EnumMap<TransferProfileType, NodeAdapter>(TransferProfileType.class);
+    var configuredTypes = EnumSet.noneOf(TransferProfileType.class);
     var maxDurations = new EnumMap<TransferProfileType, MaxDurationsPreference>(
       TransferProfileType.class
     );
     for (var type : TransferProfileType.values()) {
+      if (transfers.exist(typeName(type))) {
+        configuredTypes.add(type);
+      }
       var block = mapTypeBlock(transfers, type);
       typeBlocks.put(type, block);
       maxDurations.put(type, mapMaxDurations(block, type));
     }
 
-    var mappedProfiles = mapProfiles(typeBlocks);
+    var mappedProfiles = mapProfiles(typeBlocks, configuredTypes);
     var profiles = mappedProfiles.profiles();
     var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
 
@@ -278,28 +285,37 @@ public class TransferProfilesConfigMapper {
   /**
    * Map the profiles of all the types. A profile inherits unset values from its parent, so the
    * parents are mapped first, whatever order they are declared in, and the parent can be of
-   * another type. If no profile is configured, a default walk profile is used.
+   * another type. A type with a block and without profiles, for example {@code "wheelchair": {}},
+   * gets one profile with the name of the type as its id. If no type is configured, a default walk
+   * profile is used.
+   *
+   * @param configuredTypes the types that have a block in the configuration, also an empty one
    */
-  private static MappedProfiles mapProfiles(Map<TransferProfileType, NodeAdapter> typeBlocks) {
+  private static MappedProfiles mapProfiles(
+    Map<TransferProfileType, NodeAdapter> typeBlocks,
+    Set<TransferProfileType> configuredTypes
+  ) {
     var configured = new ArrayList<ConfiguredProfile>();
-    typeBlocks.forEach((type, block) ->
-      configured.addAll(
-        block
-          .of("profiles")
-          .since(V2_10)
-          .summary("The " + typeName(type) + " transfer profiles.")
-          .description(
-            """
-            Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
-            profiles must be unique. A profile without `userPreferences` gets them from its
-            `routingRequest`. A profile with a `parent` inherits the `routingRequest` and the
-            `userPreferences` of the parent, and the paths it has in common with the parent are
-            stored once.
-            """
-          )
-          .asObjects(List.of(), node -> readConfiguredProfile(node, type))
-      )
-    );
+    typeBlocks.forEach((type, block) -> {
+      var profiles = block
+        .of("profiles")
+        .since(V2_10)
+        .summary("The " + typeName(type) + " transfer profiles.")
+        .description(
+          """
+          Each profile needs an `id`, unique among all the profiles. The `userPreferences` of the
+          profiles must be unique. A profile without `userPreferences` gets them from its
+          `routingRequest`. A profile with a `parent` inherits the `routingRequest` and the
+          `userPreferences` of the parent, and the paths it has in common with the parent are
+          stored once.
+          """
+        )
+        .asObjects(List.of(), node -> readConfiguredProfile(node, type));
+      if (profiles.isEmpty() && configuredTypes.contains(type)) {
+        profiles = List.of(implicitProfile(type, block));
+      }
+      configured.addAll(profiles);
+    });
     if (configured.isEmpty()) {
       var profile = StreetTransferFactory.defaultWalkProfile();
       return new MappedProfiles(
@@ -509,6 +525,15 @@ public class TransferProfilesConfigMapper {
         .asString();
     }
     return new ConfiguredProfile(id, type, parent, p);
+  }
+
+  /**
+   * The profile of a type that has a block without profiles. It has no parent and no settings of
+   * its own, so it is the default profile of the type, and its id is the name of the type.
+   */
+  private static ConfiguredProfile implicitProfile(TransferProfileType type, NodeAdapter block) {
+    var emptyNode = new NodeAdapter(JsonNodeFactory.instance.objectNode(), block.contextPath());
+    return new ConfiguredProfile(typeName(type), type, null, emptyNode);
   }
 
   /**
