@@ -99,7 +99,13 @@ public class TransferProfilesConfigMapper {
     var profiles = mappedProfiles.profiles();
     var warmup = mapWarmup(typeBlocks, mappedProfiles.preferencesById());
 
-    return createParameters(profiles, maxDurations, warmup);
+    // With no profile type configured, a wheelchair and a bicycle request fall back to the default
+    // walk profile. If a profile type is configured, each type used by the requests must be too.
+    var fallbackToClosestType = mappedProfiles.isDefaultWalkProfile()
+      ? TransferParameters.DEFAULT_FALLBACK_TYPES
+      : Set.<TransferProfileType>of();
+
+    return createParameters(profiles, maxDurations, warmup, fallbackToClosestType);
   }
 
   /** The block of a profile type, for example {@code walk}. An empty block if it is not set. */
@@ -129,10 +135,16 @@ public class TransferProfilesConfigMapper {
   private static TransferParameters<RouteRequest> createParameters(
     List<TransferProfile<RouteRequest>> profiles,
     Map<TransferProfileType, MaxDurationsPreference> maxDurations,
-    List<WarmupParameters> warmup
+    List<WarmupParameters> warmup,
+    Set<TransferProfileType> fallbackToClosestType
   ) {
     try {
-      var parameters = new TransferParameters<>(profiles, maxDurations, warmup);
+      var parameters = new TransferParameters<>(
+        profiles,
+        maxDurations,
+        warmup,
+        fallbackToClosestType
+      );
       RegularTransferFactory.validate(parameters, new RegularTransferPreferencesMapper());
       return parameters;
     } catch (IllegalArgumentException e) {

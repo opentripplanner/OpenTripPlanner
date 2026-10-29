@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Ratio;
 import org.opentripplanner.core.model.basic.Reluctance;
 import org.opentripplanner.core.model.basic.Speed;
+import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfileType;
 
 class WalkPreferencesTest {
 
@@ -85,5 +86,12 @@ class WalkPreferencesTest {
       .withSpeed(Speed.ofMetersPerSecond(speed))
       .withReluctance(Reluctance.of(reluctance))
       .build();
+  }
+
+  @Test
+  void theDistanceToAnotherTypeIsTheDistanceBetweenTheTypes() {
+    assertThat(WalkPreferences.DEFAULT.normalizedDistance(CarPreferences.DEFAULT)).isEqualTo(
+      TransferProfileType.WALK.normalizedDistance(TransferProfileType.CAR)
+    );
   }
 }

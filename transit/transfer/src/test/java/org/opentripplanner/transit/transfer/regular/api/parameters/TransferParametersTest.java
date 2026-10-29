@@ -301,4 +301,35 @@ class TransferParametersTest {
     // 15 seconds + 2% of 1000 seconds
     assertThat(limit.calculate(Cost.costOfSeconds(1000)).toSeconds()).isEqualTo(35);
   }
+
+  @Test
+  void noTypeFallsBackToAnotherTypeByDefault() {
+    var subject = new TransferParameters<>(
+      List.of(new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w"))
+    );
+
+    assertThat(subject.fallbackToClosestType()).isEmpty();
+  }
+
+  @Test
+  void theDefaultConfigurationLetsWheelchairAndBicycleFallBackToTheWalkProfile() {
+    var subject = TransferParameters.defaultConfiguration(
+      new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w")
+    );
+
+    assertThat(subject.fallbackToClosestType()).containsExactly(
+      TransferProfileType.WHEELCHAIR,
+      TransferProfileType.BICYCLE
+    );
+    assertThat(subject.profiles()).hasSize(1);
+  }
+
+  @Test
+  void theFallbackIsPartOfTheEquality() {
+    var profile = new TransferProfile<>("w", TransferProfileType.WALK, WALK, "w");
+
+    assertThat(TransferParameters.defaultConfiguration(profile)).isNotEqualTo(
+      new TransferParameters<>(List.of(profile))
+    );
+  }
 }

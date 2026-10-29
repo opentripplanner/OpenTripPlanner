@@ -190,6 +190,17 @@ If the accessibility data of the stops is incomplete, almost all the transfers a
 }
 ```
 
+### Requests for a type that is not configured
+
+If a profile type is configured, each type that the requests use must be configured too. A request
+for a transfer mode without a profile, for example bicycle when only `walk` is configured, fails.
+
+If no profile type is configured, which is also the case without a `transfers` section, OTP
+generates the default `walk` profile. A wheelchair or a bicycle request then uses the stored paths
+of the walk profile, and re-calculates them with the preferences of the request. The result is
+added to the cache, so the first request with new preferences is a little slower, see
+[Warmup](#warmup). A path that the mode cannot use is dropped. A car request fails.
+
 ### Parent and deduplication
 
 A profile can name another profile as its `parent` with the `id` of the parent. The `parent` must be
@@ -363,7 +374,8 @@ is where each old setting went:
 | `transit.transferCacheRequests` of `router-config.json`                  | `warmup` entries, see [Warmup](#warmup)                                     |
 
 **Configure every profile type that the clients use.** A request for a transfer mode that is not
-configured is not supported. It fails with an error, there is no fallback. If clients ask for
+configured is not supported. It fails with an error. The exception is a configuration without any
+profile type, see [Requests for a type that is not configured](#requests-for-a-type-that-is-not-configured). If clients ask for
 bicycle transfers, add a bicycle profile, for example a small set of paths between all stops:
 
 ```json

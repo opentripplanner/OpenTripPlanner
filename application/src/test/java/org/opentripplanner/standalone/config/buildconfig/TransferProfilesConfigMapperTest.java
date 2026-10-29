@@ -453,6 +453,20 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
+  void withoutAnyProfileTypeWheelchairAndBicycleFallBackToTheDefaultWalkProfile() {
+    assertThat(map("{}").fallbackToClosestType()).containsExactly(
+      TransferProfileType.WHEELCHAIR,
+      TransferProfileType.BICYCLE
+    );
+  }
+
+  @Test
+  void withAProfileTypeConfiguredEveryTypeMustExist() {
+    assertThat(map("{ transfers: { walk: {} } }").fallbackToClosestType()).isEmpty();
+    assertThat(map("{ transfers: { wheelchair: {} } }").fallbackToClosestType()).isEmpty();
+  }
+
+  @Test
   void mapsAWarmupEntryThatInheritsThePreferencesOfItsParent() {
     var subject = map(
       """
