@@ -125,4 +125,46 @@ class BicyclePreferencesTest {
       .withReluctance(Reluctance.of(reluctance))
       .build();
   }
+
+  @Test
+  void aStepOfTheReluctanceTheSpeedAndTheTriangleCountTheSame() {
+    var base = BicyclePreferences.of()
+      .withReluctance(Reluctance.of(2.0))
+      .withSpeed(Speed.ofMetersPerSecond(5.0))
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(0.4, 0.3, 0.3))
+      .build();
+    var avoidCycling = base.copyOf().withReluctance(Reluctance.of(2.5)).build();
+    var faster = base.copyOf().withSpeed(Speed.ofMetersPerSecond(5.4)).build();
+    // The sum of the changes of the three parts is 0.3, the distance is the sum divided by three
+    var safer = base
+      .copyOf()
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(0.4, 0.15, 0.45))
+      .build();
+
+    assertThat(base.normalizedDistance(avoidCycling)).isWithin(1e-9).of(0.1);
+    assertThat(base.normalizedDistance(faster)).isWithin(1e-9).of(0.1);
+    assertThat(base.normalizedDistance(safer)).isWithin(1e-9).of(0.1);
+  }
+
+  @Test
+  void aStepOfTheWalkingWithTheBicycleCountsAThirdOfAStepOfTheBicycle() {
+    var base = BicyclePreferences.of()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(1.3), Reluctance.of(2.0)))
+      .build();
+    var fasterWalking = base
+      .copyOf()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(1.4), Reluctance.of(2.0)))
+      .build();
+    var avoidWalking = base
+      .copyOf()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(1.3), Reluctance.of(2.5)))
+      .build();
+
+    assertThat(base.normalizedDistance(fasterWalking))
+      .isWithin(1e-9)
+      .of(0.1 / 3);
+    assertThat(base.normalizedDistance(avoidWalking))
+      .isWithin(1e-9)
+      .of(0.1 / 3);
+  }
 }

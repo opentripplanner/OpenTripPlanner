@@ -23,6 +23,12 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
   permits BicyclePreferences, CarPreferences, WalkPreferences, WheelchairPreferences
 {
 
+  /** A change of the reluctance from 2.0 to 2.5 has the reference distance. */
+  private static final double RELUCTANCE_WEIGHT = DistanceWeight.of(
+    Reluctance.of(2.0),
+    Reluctance.of(2.5)
+  );
+
   private final Reluctance reluctance;
 
   AbstractUserPreferences(Reluctance reluctance) {
@@ -68,7 +74,7 @@ public abstract sealed class AbstractUserPreferences<S extends AbstractUserPrefe
     if (getClass() != other.getClass()) {
       return type().normalizedDistance(other.type());
     }
-    return reluctance.normalizedDistance(other.reluctance);
+    return RELUCTANCE_WEIGHT * reluctance.normalizedDistance(other.reluctance);
   }
 
   protected abstract static class Builder<

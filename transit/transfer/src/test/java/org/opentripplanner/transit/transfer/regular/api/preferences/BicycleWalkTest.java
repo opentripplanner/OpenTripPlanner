@@ -34,13 +34,19 @@ class BicycleWalkTest {
   }
 
   @Test
-  void theDistanceIsTheSumOfTheDistancesOfTheSpeedAndTheReluctance() {
+  void theDistanceIsTheWeightedSumOfTheDistancesOfTheSpeedAndTheReluctance() {
     var other = BicycleWalk.of(Speed.ofMetersPerSecond(1.5), Reluctance.of(6.0));
+    // The weights are a third of the weights of the speed and reluctance of the walking
+    double speedWeight =
+      0.1 / Speed.ofMetersPerSecond(1.3).normalizedDistance(Speed.ofMetersPerSecond(1.4)) / 3.0;
+    double reluctanceWeight = 0.1 / Reluctance.of(2.0).normalizedDistance(Reluctance.of(2.5)) / 3.0;
 
     assertThat(SUBJECT.normalizedDistance(SUBJECT)).isEqualTo(0.0);
-    assertThat(SUBJECT.normalizedDistance(other)).isEqualTo(
-      SUBJECT.speed().normalizedDistance(other.speed()) +
-        SUBJECT.reluctance().normalizedDistance(other.reluctance())
-    );
+    assertThat(SUBJECT.normalizedDistance(other))
+      .isWithin(1e-9)
+      .of(
+        speedWeight * SUBJECT.speed().normalizedDistance(other.speed()) +
+          reluctanceWeight * SUBJECT.reluctance().normalizedDistance(other.reluctance())
+      );
   }
 }
