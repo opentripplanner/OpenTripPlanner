@@ -1106,7 +1106,7 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
-  void theSafetyFactorOfAWalkAndAWheelchairProfileIsSet() {
+  void theSafetyFactorOfAWalkProfileIsSet() {
     var subject = map(
       """
       {
@@ -1117,10 +1117,6 @@ class TransferProfilesConfigMapperTest {
               { id: "walk", userPreferences: { safetyFactor: 0.5 } },
               { id: "child", parent: "walk", userPreferences: { reluctance: 3.0 } }
             ]
-          },
-          wheelchair: {
-            maxDuration: '30m',
-            profiles: [{ id: "wheelchair", userPreferences: { safetyFactor: 0.3 } }]
           }
         }
       }
@@ -1129,10 +1125,8 @@ class TransferProfilesConfigMapperTest {
 
     var walk = (WalkPreferences) profile(subject, "walk").userPreferences();
     var child = (WalkPreferences) profile(subject, "child").userPreferences();
-    var wheelchair = (WheelchairPreferences) profile(subject, "wheelchair").userPreferences();
     assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
     assertThat(child.safetyFactor()).isEqualTo(Ratio.of(0.5).normalize());
-    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.3).normalize());
   }
 
   @Test

@@ -245,35 +245,49 @@ class RegularTransferPreferencesMapperTest {
   }
 
   @Test
-  void theSafetyFactorOfAWalkAndAWheelchairRequestIsTheSafetyFactorOfTheWalkPreferences() {
+  void theSafetyFactorOfAWalkRequestIsTheSafetyFactorOfTheWalkPreferences() {
     var walkRequest = RouteRequest.defaultValue()
       .copyOf()
       .withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(0.4)))
       .buildDefault();
-    var wheelchairRequest = walkRequest
+
+    var walk = (WalkPreferences) SUBJECT.toUserPreferences(walkRequest);
+
+    assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
+  }
+
+  @Test
+  void wheelchairRequestsThatDifferOnlyInTheWalkSafetyFactorHaveTheSamePreferences() {
+    // The street search does not use the safety factor of a wheelchair request
+    var wheelchairRequest = RouteRequest.defaultValue()
       .copyOf()
       .withJourney(j -> j.withWheelchair(true))
       .buildDefault();
+    var safeWheelchairRequest = wheelchairRequest
+      .copyOf()
+      .withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(0.4)))
+      .buildDefault();
 
-    var walk = (WalkPreferences) SUBJECT.toUserPreferences(walkRequest);
-    var wheelchair = (WheelchairPreferences) SUBJECT.toUserPreferences(wheelchairRequest);
-
-    assertThat(walk.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
-    assertThat(wheelchair.safetyFactor()).isEqualTo(Ratio.of(0.4).normalize());
+    assertThat(SUBJECT.toUserPreferences(safeWheelchairRequest)).isEqualTo(
+      SUBJECT.toUserPreferences(wheelchairRequest)
+    );
   }
 
   @Test
   void theSafetyFactorMakesTheSafetyFactorOfTheWalkPreferencesOfTheRequest() {
     var walk = WalkPreferences.of().withSafetyFactor(Ratio.of(0.4).normalize()).build();
-    var wheelchair = WheelchairPreferences.of().withSafetyFactor(Ratio.of(0.6).normalize()).build();
+    var base = RouteRequest.defaultValue()
+      .copyOf()
+      .withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(0.2)))
+      .buildDefault();
 
     var walkRequest = SUBJECT.toRequest(walk, RouteRequest.defaultValue());
-    var wheelchairRequest = SUBJECT.toRequest(wheelchair, RouteRequest.defaultValue());
+    var wheelchairRequest = SUBJECT.toRequest(WheelchairPreferences.DEFAULT, base);
 
     assertThat(walkRequest.preferences().walk().safetyFactor()).isEqualTo(0.4);
-    assertThat(wheelchairRequest.preferences().walk().safetyFactor()).isEqualTo(0.6);
+    // The safety factor of the base request is kept for a wheelchair request
+    assertThat(wheelchairRequest.preferences().walk().safetyFactor()).isEqualTo(0.2);
     assertThat(SUBJECT.toUserPreferences(walkRequest)).isEqualTo(walk);
-    assertThat(SUBJECT.toUserPreferences(wheelchairRequest)).isEqualTo(wheelchair);
   }
 
   @Test

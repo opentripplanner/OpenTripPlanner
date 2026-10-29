@@ -130,7 +130,7 @@ two more parameters, see [Max durations](#max-durations).
 |---------------|----------|-------------------------------------------------------------------------------------|----------|
 | `speed`       | `double` | The speed in meters per second. Not for `car`, it drives the speed of the streets.  | `1.35`   |
 | `reluctance`  | `double` | A multiplier for the cost of the transfer. A higher value avoids the transfer.      | `2.0`    |
-| `safetyFactor` | `double` | `walk` and `wheelchair` only. How much the safety of the streets is considered, from 0.0 (ignored) to 1.0. | `1.0` |
+| `safetyFactor` | `double` | `walk` only, the street search does not use it for a wheelchair. How much the safety of the streets is considered, from 0.0 (ignored) to 1.0. | `1.0` |
 
 The `walk`, `wheelchair` and `bicycle` types have `speed` and `reluctance`, and the `car` type only
 has `reluctance`. The defaults of `walk` and `wheelchair` are the same, and the default `speed` of
