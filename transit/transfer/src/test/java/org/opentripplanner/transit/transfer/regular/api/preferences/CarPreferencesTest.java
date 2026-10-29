@@ -36,8 +36,8 @@ class CarPreferencesTest {
   void distanceIncreasesWithTheDifferenceInReluctance() {
     var subject = preferences(2.0);
 
-    assertThat(subject.normalizedDistance(preferences(2.0))).isEqualTo(0f);
-    assertThat(subject.normalizedDistance(preferences(3.0))).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(preferences(2.0))).isEqualTo(0.0);
+    assertThat(subject.normalizedDistance(preferences(3.0))).isGreaterThan(0.0);
     assertThat(subject.normalizedDistance(preferences(6.0))).isGreaterThan(
       subject.normalizedDistance(preferences(3.0))
     );
@@ -49,7 +49,7 @@ class CarPreferencesTest {
     var bicycle = BicyclePreferences.of().withReluctance(Reluctance.of(2.0)).build();
 
     assertThat(subject).isNotEqualTo(bicycle);
-    assertThat(subject.normalizedDistance(bicycle)).isGreaterThan(100f);
+    assertThat(subject.normalizedDistance(bicycle)).isGreaterThan(100.0);
   }
 
   private static CarPreferences preferences(double reluctance) {

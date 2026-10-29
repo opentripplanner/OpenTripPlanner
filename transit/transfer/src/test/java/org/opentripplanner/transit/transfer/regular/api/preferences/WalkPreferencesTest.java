@@ -35,8 +35,8 @@ class WalkPreferencesTest {
   void distanceToSelfIsZero() {
     var subject = preferences(1.3, 2.0);
 
-    assertThat(subject.normalizedDistance(subject)).isEqualTo(0f);
-    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0f);
+    assertThat(subject.normalizedDistance(subject)).isEqualTo(0.0);
+    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0.0);
   }
 
   @Test
@@ -46,8 +46,8 @@ class WalkPreferencesTest {
     AbstractUserPreferences<?> sameReluctance = preferences(1.5, 2.0);
     AbstractUserPreferences<?> bothDiffer = preferences(1.5, 3.0);
 
-    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0f);
-    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0.0);
+    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0.0);
     assertThat(subject.normalizedDistance(bothDiffer)).isGreaterThan(
       subject.normalizedDistance(sameSpeed)
     );
@@ -72,7 +72,7 @@ class WalkPreferencesTest {
 
     assertThat(lessSafe).isNotEqualTo(subject);
     assertThat(same).isEqualTo(subject);
-    assertThat(subject.normalizedDistance(lessSafe)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(lessSafe)).isGreaterThan(0.0);
   }
 
   @Test

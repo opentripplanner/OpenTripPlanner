@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class NormalizedRatioTest {
 
-  private static final float EPSILON = 0.0001f;
+  private static final double EPSILON = 0.0001;
 
   private static NormalizedRatio normalized(double value) {
     return Ratio.of(value).normalize();
@@ -51,27 +51,27 @@ class NormalizedRatioTest {
 
   @Test
   void theDistanceToItselfIsZero() {
-    assertThat(normalized(0.4).normalizedDistance(normalized(0.4))).isEqualTo(0f);
+    assertThat(normalized(0.4).normalizedDistance(normalized(0.4))).isEqualTo(0.0);
   }
 
   @Test
   void theDistanceIsTheDifferenceBetweenTheRatios() {
     assertThat(normalized(0.2).normalizedDistance(normalized(0.7)))
       .isWithin(EPSILON)
-      .of(0.5f);
+      .of(0.5);
     assertThat(normalized(0.7).normalizedDistance(normalized(0.2)))
       .isWithin(EPSILON)
-      .of(0.5f);
+      .of(0.5);
   }
 
   @Test
   void theDistanceIsInTheRangeFromZeroToOne() {
-    assertThat(normalized(0.0).normalizedDistance(normalized(1.0))).isEqualTo(1f);
+    assertThat(normalized(0.0).normalizedDistance(normalized(1.0))).isEqualTo(1.0);
   }
 
   @Test
   void aSmallDifferenceThatRoundsToTheSameStepHasNoDistance() {
-    assertThat(normalized(0.11).normalizedDistance(normalized(0.09))).isEqualTo(0f);
+    assertThat(normalized(0.11).normalizedDistance(normalized(0.09))).isEqualTo(0.0);
   }
 
   @Test

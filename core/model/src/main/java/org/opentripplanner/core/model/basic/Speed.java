@@ -67,7 +67,7 @@ public class Speed implements Serializable, Comparable<Speed>, NormalizedDistanc
   }
 
   @Override
-  public float normalizedDistance(Speed other) {
+  public double normalizedDistance(Speed other) {
     return LN_SCALE.normalizedDistance(this.value, other.value);
   }
 }

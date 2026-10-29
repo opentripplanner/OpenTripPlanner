@@ -21,7 +21,7 @@ public final class NormalizedRatio extends Ratio implements NormalizedDistance<N
 
   /// The distance is the difference between the two ratios, a value in the range [0.0, 1.0].
   @Override
-  public float normalizedDistance(NormalizedRatio other) {
-    return (float) Math.abs(asDouble() - other.asDouble());
+  public double normalizedDistance(NormalizedRatio other) {
+    return Math.abs(asDouble() - other.asDouble());
   }
 }
