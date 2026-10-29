@@ -3,10 +3,16 @@ package org.opentripplanner.transfer.regular.model;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.cost.CostLimit;
 import org.opentripplanner.street.geometry.GeometryUtils;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.request.WalkRequest;
+import org.opentripplanner.street.search.state.EdgeTraverser;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -74,6 +80,40 @@ public class PathTransfer implements Serializable {
     } else {
       return GeometryUtils.concatenateLineStrings(edges, Edge::getGeometry);
     }
+  }
+
+  /** Check if the given mode is a valid mode for the transfer. */
+  public boolean allowsMode(StreetMode mode) {
+    return modes.contains(mode);
+  }
+
+  public Optional<DefaultRaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
+    if (edges == null || edges.isEmpty()) {
+      WalkRequest walkReq = request.walk();
+      double durationSeconds = distanceMeters / walkReq.speed();
+      return Optional.of(
+        new DefaultRaptorTransfer(
+          to.getIndex(),
+          (int) Math.ceil(durationSeconds),
+          CostLimit.toRaptorCostWholeSeconds(durationSeconds * walkReq.reluctance()),
+          this
+        )
+      );
+    }
+
+    StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
+    se.setTimeSeconds(0);
+
+    var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
+
+    return state.map(s ->
+      new DefaultRaptorTransfer(
+        to.getIndex(),
+        (int) s.getElapsedTimeSeconds(),
+        CostLimit.toRaptorCostWholeSeconds(s.getWeight()),
+        this
+      )
+    );
   }
 
   @Override

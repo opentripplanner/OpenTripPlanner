@@ -6,15 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ImmutableMultimap;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.linking.LinkingContextFactory;
@@ -26,6 +27,7 @@ import org.opentripplanner.street.geometry.WgsCoordinate;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
@@ -37,13 +39,15 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transfer.constrained.model.ConstrainedTransfer;
 import org.opentripplanner.transfer.constrained.model.TransferConstraint;
 import org.opentripplanner.transfer.constrained.model.TripTransferPoint;
+import org.opentripplanner.transfer.regular.RegularTransferService;
+import org.opentripplanner.transfer.regular.TransferServiceTestFactory;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RefetchItineraryServiceTest {
 
@@ -102,10 +106,9 @@ public class RefetchItineraryServiceTest {
   private static final Graph GRAPH = G.build();
 
   // Setup transfers
-  private static final RegularTransferRepositorySnapshot<
-    NearbyStop,
-    RouteRequest
-  > REGULAR_TRANSFERS = createRegularTransfers(STOP_B, STOP_C, GRAPH);
+  private static final RegularTransferService TRANSFER_SERVICE = createTransferService(
+    List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
+  );
 
   @Test
   void refetchSimple() {
@@ -439,22 +442,19 @@ public class RefetchItineraryServiceTest {
       GRAPH,
       transitEnv.transitService(),
       new TransitAlertServiceImpl(),
-      REGULAR_TRANSFERS,
+      TRANSFER_SERVICE,
       streetDetailsService,
       linkingContextFactory,
       streetLimitationParametersService
     );
   }
 
-  public static RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> createRegularTransfers(
-    RegularStop from,
-    RegularStop to,
-    Graph graph
-  ) {
-    var edges = findPath(from, to, graph);
-    var length = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-    var path = new NearbyStop(to.getId(), length, edges, null);
-    return FixedRegularTransfers.of().add(from, to, path).snapshot();
+  public static RegularTransferService createTransferService(List<PathTransfer> transfers) {
+    var transferRepo = TransferServiceTestFactory.defaultTransferRepository();
+    ImmutableMultimap.Builder<StopLocation, PathTransfer> builder = ImmutableMultimap.builder();
+    transfers.forEach(transfer -> builder.put(transfer.from, transfer));
+    transferRepo.addAllTransfersByStops(builder.build());
+    return TransferServiceTestFactory.transferService(transferRepo);
   }
 
   public static ConstrainedTransfer staySeated(
@@ -504,6 +504,12 @@ public class RefetchItineraryServiceTest {
     var p2 = new TripTransferPoint(transitEnv.tripData(toTrip).trip(), toPos);
 
     return new ConstrainedTransfer(null, p1, p2, constraint);
+  }
+
+  public static PathTransfer makeTransfer(RegularStop from, RegularStop to, Graph graph) {
+    var edges = findPath(from, to, graph);
+    var length = edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    return new PathTransfer(STOP_B, STOP_C, length, edges, EnumSet.of(StreetMode.WALK));
   }
 
   public static List<Edge> findPath(RegularStop from, RegularStop to, Graph graph) {

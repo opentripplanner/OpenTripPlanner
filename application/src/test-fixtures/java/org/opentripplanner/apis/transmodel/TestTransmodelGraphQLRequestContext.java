@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.empiricaldelay.EmpiricalDelayService;
 import org.opentripplanner.place.NearbyPlaceFinder;
 import org.opentripplanner.place.NearbyStopFinder;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.place.nearbystopfinder.StraightLineNearbyStopFinder;
 import org.opentripplanner.place.nearbystopfinder.StreetNearbyStopFinder;
 import org.opentripplanner.place.placefinder.StreetNearbyPlaceFinder;
@@ -17,8 +16,8 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 
 /**
  * A plain, hand-built {@link TransmodelGraphQLRequestContext} for tests that don't need (or want) a
@@ -34,7 +33,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   private final VehicleRentalService vehicleRentalService;
   private final VehicleParkingService vehicleParkingService;
   private final Graph graph;
-  private final RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers;
+  private final RegularTransferService transferService;
   private final StreetDetailsService streetDetailsService;
   private final LinkingContextFactory linkingContextFactory;
   private final StreetLimitationParametersService streetLimitationParametersService;
@@ -48,7 +47,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
     VehicleRentalService vehicleRentalService,
     VehicleParkingService vehicleParkingService,
     Graph graph,
-    RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers,
+    RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
     LinkingContextFactory linkingContextFactory,
     StreetLimitationParametersService streetLimitationParametersService
@@ -61,7 +60,7 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
     this.vehicleRentalService = vehicleRentalService;
     this.vehicleParkingService = vehicleParkingService;
     this.graph = graph;
-    this.regularTransfers = regularTransfers;
+    this.transferService = transferService;
     this.streetDetailsService = streetDetailsService;
     this.linkingContextFactory = linkingContextFactory;
     this.streetLimitationParametersService = streetLimitationParametersService;
@@ -110,8 +109,8 @@ public class TestTransmodelGraphQLRequestContext implements TransmodelGraphQLReq
   }
 
   @Override
-  public RegularTransferRepositorySnapshot<NearbyStop, RouteRequest> regularTransfers() {
-    return regularTransfers;
+  public RegularTransferService transferService() {
+    return transferService;
   }
 
   @Override

@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Disabled;
@@ -27,7 +28,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
@@ -42,7 +42,6 @@ import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
-import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
@@ -54,8 +53,11 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsRepository;
 import org.opentripplanner.service.streetdetails.internal.DefaultStreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
+import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transfer.regular.model.DefaultRaptorTransfer;
+import org.opentripplanner.transfer.regular.model.PathTransfer;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.model._data.TransitRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -69,9 +71,6 @@ import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.FixedRegularTransfers;
-import org.opentripplanner.transit.transfer.regular.NoRegularTransfers;
-import org.opentripplanner.transit.transfer.regular.api.RegularTransfersService;
 import org.opentripplanner.utils.time.TimeUtils;
 
 public class RaptorPathToItineraryMapperTest {
@@ -184,12 +183,7 @@ public class RaptorPathToItineraryMapperTest {
    */
   @Test
   void createItineraryWithOnBoardFlexAccess() {
-    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper(
-      FixedRegularTransfers.of()
-        .add(S1, S2, new NearbyStop(S2.getId(), 0, List.of(), null))
-        .snapshot()
-        .forRequest(RouteRequest.defaultValue())
-    );
+    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
     var flexTrip = TEST_MODEL.unscheduledTrip(
       "flex",
@@ -209,7 +203,8 @@ public class RaptorPathToItineraryMapperTest {
       RoutingBookingInfo.NOT_SET
     );
     RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress);
-    RaptorTransfer raptorTransfer = new TestTransfer(S2.getIndex(), 0, 0);
+    var transfer = new PathTransfer(S1, S2, 0, List.of(), EnumSet.of(StreetMode.WALK));
+    RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);
     RaptorAccessEgress egress = new DefaultAccessEgress(S2.getIndex(), state);
     PathLeg<RaptorTripSchedule> egressLeg = new EgressPathLeg<>(egress, 0, 0, 0);
     PathLeg<RaptorTripSchedule> transferLeg = new TransferPathLeg<>(
@@ -317,12 +312,6 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
-    return getRaptorPathToItineraryMapper(NoRegularTransfers.transfers());
-  }
-
-  private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper(
-    RegularTransfersService<NearbyStop> regularTransfers
-  ) {
     Instant dateTime = LocalDateTime.of(2022, Month.OCTOBER, 10, 12, 0, 0)
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
@@ -338,7 +327,6 @@ public class RaptorPathToItineraryMapperTest {
       ),
       new DefaultStreetDetailsService(new DefaultStreetDetailsRepository()),
       getRaptorTransitData(),
-      regularTransfers,
       dateTime.atZone(ZoneIds.CET),
       RouteRequest.defaultValue(),
       null
@@ -349,11 +337,13 @@ public class RaptorPathToItineraryMapperTest {
     return new RaptorTransitData(
       new HashMap<>(),
       null,
+      null,
       TEST_MODEL.siteRepositoryBuilder()
         .withRegularStop(S1)
         .withRegularStop(S2)
         .withRegularStop(S3)
         .build(),
+      null,
       null,
       null,
       null

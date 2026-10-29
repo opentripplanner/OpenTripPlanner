@@ -1,6 +1,5 @@
 package org.opentripplanner.place.api;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -13,12 +12,9 @@ import org.opentripplanner.street.search.state.State;
 
 /**
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
- * state of how to reach the stop from the search origin.
- * <p>
- * {@code state} is not itself {@link Serializable} - an instance can only be serialized (e.g. as
- * a raptor-data regular-transfer path template) with {@code state == null}.
+ * state of how to reach the stop from the search origin
  */
-public class NearbyStop implements Comparable<NearbyStop>, Serializable {
+public class NearbyStop implements Comparable<NearbyStop> {
 
   private final FeedScopedId stopId;
   private final double distance;

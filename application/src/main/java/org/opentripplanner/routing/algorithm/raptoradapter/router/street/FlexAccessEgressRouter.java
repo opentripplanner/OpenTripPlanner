@@ -15,7 +15,7 @@ import org.opentripplanner.service.streetdetails.StreetDetailsService;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.model.StreetMode;
 import org.opentripplanner.street.model.edge.ExtensionRequestContext;
-import org.opentripplanner.transfer.regular.FlexTransferService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {
@@ -26,7 +26,7 @@ public class FlexAccessEgressRouter {
     RouteRequest request,
     TransitService transitService,
     Graph graph,
-    FlexTransferService transferService,
+    RegularTransferService transferService,
     StreetDetailsService streetDetailsService,
     AdditionalSearchDays searchDays,
     FlexParameters config,

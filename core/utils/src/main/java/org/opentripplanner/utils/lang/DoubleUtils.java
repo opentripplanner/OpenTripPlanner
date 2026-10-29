@@ -83,22 +83,6 @@ public class DoubleUtils {
   }
 
   /**
-   * Round {@code value} to the nearest multiple of the step of its bucket, see
-   * {@link #roundToStep(double, double)}. A small value can be rounded to a finer step than a
-   * large one.
-   * <p>
-   * The {@code steps} are rows of {@code {upperLimit, step}}, sorted by the upper limit in
-   * ascending order. The step of the first row that has an upper limit greater than the value is
-   * used, so a value equal to an upper limit is in the next bucket. The step of the last row is
-   * used for the values that are not less than the last upper limit.
-   *
-   * @throws IllegalArgumentException if the {@code steps} are empty
-   */
-  public static double roundToStep(double value, double[][] steps) {
-    return roundToStep(value, step(value, steps));
-  }
-
-  /**
    * Compare two doubles for equality - this is equivalent of
    * <pre>
    * Double.compare(a, b) == 0
@@ -143,17 +127,5 @@ public class DoubleUtils {
       return value;
     }
     return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).doubleValue();
-  }
-
-  private static double step(double value, double[][] scale) {
-    if (scale.length == 0) {
-      throw new IllegalArgumentException("The step table can not be empty.");
-    }
-    for (double[] limit : scale) {
-      if (value < limit[0]) {
-        return limit[1];
-      }
-    }
-    return scale[scale.length - 1][1];
   }
 }

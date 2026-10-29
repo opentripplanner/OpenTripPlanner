@@ -10,7 +10,7 @@ import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import org.opentripplanner.core.model.basic.LinearFunctionSerialization;
+import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
 
 public class DoubleFunctionFactory {
 

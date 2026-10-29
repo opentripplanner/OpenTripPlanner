@@ -4,7 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createRegularTransfers;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.createTransferService;
+import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.makeTransfer;
 import static org.opentripplanner.routing.refetch.RefetchItineraryServiceTest.staySeated;
 
 import java.time.LocalDate;
@@ -19,7 +20,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.alertpatch.AlertCalendar;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -37,6 +37,7 @@ import org.opentripplanner.street.linking.VertexLinker;
 import org.opentripplanner.street.linking.VisibilityMode;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
+import org.opentripplanner.transfer.regular.RegularTransferService;
 import org.opentripplanner.transit.model.TransitTestEnvironment;
 import org.opentripplanner.transit.model.TransitTestEnvironmentBuilder;
 import org.opentripplanner.transit.model.TripInput;
@@ -46,7 +47,6 @@ import org.opentripplanner.transit.repository.DefaultTimetableRepository;
 import org.opentripplanner.transit.repository.ScheduledTimetableData;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferRepositorySnapshot;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.siri.SiriTestHelper;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -125,10 +125,9 @@ class RealtimeResolverTest {
   private static final Graph GRAPH = G.build();
 
   // Setup transfers
-  private static final RegularTransferRepositorySnapshot<
-    NearbyStop,
-    RouteRequest
-  > REGULAR_TRANSFERS = createRegularTransfers(STOP_B, STOP_C, GRAPH);
+  private static final RegularTransferService TRANSFER_SERVICE = createTransferService(
+    List.of(makeTransfer(STOP_B, STOP_C, GRAPH))
+  );
 
   @Test
   void populateLegsWithNoRealTime() {
@@ -493,7 +492,7 @@ class RealtimeResolverTest {
       GRAPH,
       transitEnv.transitService(),
       transitAlertService,
-      REGULAR_TRANSFERS,
+      TRANSFER_SERVICE,
       streetDetailsService,
       linkingContextFactory,
       streetLimitationParametersService

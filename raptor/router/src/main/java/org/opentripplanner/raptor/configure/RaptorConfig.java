@@ -22,7 +22,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerS
 import org.opentripplanner.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
-import org.opentripplanner.raptor.spi.RaptorDataProvider;
+import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripSchedule;
 
 /**
@@ -43,15 +43,15 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     this.environment = environment;
   }
 
-  public SearchContext<T> context(RaptorDataProvider<T> data, RaptorRequest<T> request) {
-    return SearchContext.of(request, tuningParameters, data).build();
+  public SearchContext<T> context(RaptorTransitDataProvider<T> transit, RaptorRequest<T> request) {
+    return SearchContext.of(request, tuningParameters, transit).build();
   }
 
   public RaptorRouter<T> createRangeRaptorWithStdWorker(
-    RaptorDataProvider<T> data,
+    RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    var context = context(data, request);
+    var context = context(transitData, request);
     var stdConfig = new StdRangeRaptorConfig<>(context);
     var worker = createWorker(
       context.segments().getFirst(),
@@ -62,18 +62,18 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   }
 
   public RaptorRouter<T> createRangeRaptorWithMcWorker(
-    RaptorDataProvider<T> data,
+    RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics,
     @Nullable ExtraMcRouterSearch<T> extraMcSearch
   ) {
-    var mainSearch = createRangeRaptorWithMcWorker(data, request, heuristics);
+    var mainSearch = createRangeRaptorWithMcWorker(transitData, request, heuristics);
 
     if (extraMcSearch == null) {
       return mainSearch;
     }
     var alternativeSearch = createRangeRaptorWithMcWorker(
-      extraMcSearch.createTransitDataAlternativeSearch(data),
+      extraMcSearch.createTransitDataAlternativeSearch(transitData),
       request,
       heuristics
     );
@@ -87,11 +87,11 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private RaptorRouter<T> createRangeRaptorWithMcWorker(
-    RaptorDataProvider<T> data,
+    RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     Heuristics heuristics
   ) {
-    var context = context(data, request);
+    var context = context(transitData, request);
     RangeRaptorWorker<T> nextWorker = null;
     McRangeRaptorWorkerState<T> nextWorkerState = null;
 
@@ -114,18 +114,18 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   }
 
   public RaptorRouter<T> createRangeRaptorWithHeuristicSearch(
-    RaptorDataProvider<T> data,
+    RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request
   ) {
-    return createRangeRaptorWithStdWorker(data, request);
+    return createRangeRaptorWithStdWorker(transitData, request);
   }
 
   public Heuristics createHeuristic(
-    RaptorDataProvider<T> data,
+    RaptorTransitDataProvider<T> transitData,
     RaptorRequest<T> request,
     RaptorRouterResult<T> results
   ) {
-    var context = context(data, request);
+    var context = context(transitData, request);
     return new StdRangeRaptorConfig<>(context).createHeuristics(results);
   }
 
@@ -164,7 +164,6 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
       workerState,
       routingStrategy,
       ctx.transitData(),
-      ctx.transferData(),
       ctx.slackProvider(),
       ctxSegment.accessPaths(),
       ctx.calculator(),

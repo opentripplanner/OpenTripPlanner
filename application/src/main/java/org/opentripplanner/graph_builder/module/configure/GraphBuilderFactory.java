@@ -41,9 +41,9 @@ import org.opentripplanner.graph_builder.module.islandpruning.IslandPruningModul
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.stopconnectivity.StopConnectivityModule;
+import org.opentripplanner.graph_builder.module.transfer.DirectTransferGenerator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.linking.configure.VertexLinkerGraphBuildingModule;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -55,12 +55,9 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.StreetRepository;
 import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.street.linking.VertexLinker;
-import org.opentripplanner.transfer.dataimport.FlexTransferGenerator;
-import org.opentripplanner.transfer.dataimport.RegularTransitTransferGenerator;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 @Singleton
 @Component(
@@ -81,9 +78,7 @@ public interface GraphBuilderFactory {
   AreaStopsToVerticesMapper areaStopsToVerticesMapper();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
   DataImportIssueReporter dataImportIssueReporter();
-  FlexTransferGenerator flexTransferGenerator();
-  RegularTransitTransferGenerator regularTransitTransferGenerator();
-
+  DirectTransferGenerator directTransferGenerator();
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
   GraphBuilder graphBuilder();
@@ -144,11 +139,6 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder transferRepository(TransferRepository transferRepository);
-
-    @BindsInstance
-    Builder regularTransferBuildRepository(
-      RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository
-    );
 
     @BindsInstance
     Builder osmInfoGraphBuildRepository(OsmInfoGraphBuildRepository osmInfoGraphBuildRepository);

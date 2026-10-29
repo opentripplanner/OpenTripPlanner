@@ -8,7 +8,6 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.taxi.TaxiRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.place.api.NearbyStop;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -22,7 +21,6 @@ import org.opentripplanner.street.graph.Graph;
 import org.opentripplanner.transfer.regular.TransferRepository;
 import org.opentripplanner.transit.dataimport.TimetableDataImport;
 import org.opentripplanner.transit.service.TransitRepository;
-import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 
 /**
  * This class is responsible for loading configuration and setting up the OTP data store. This is
@@ -69,7 +67,6 @@ public class LoadApplication {
       obj.transitRepository,
       obj.timetableDataImport,
       obj.transferRepository,
-      obj.regularTransferBuildRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
@@ -91,7 +88,6 @@ public class LoadApplication {
       factory.emptyTransitRepository(),
       factory.emptyTimetableDataImport(),
       factory.emptyTransferRepository(),
-      factory.emptyRegularTransferBuildRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
       DataImportIssueSummary.empty(),
@@ -122,7 +118,6 @@ public class LoadApplication {
     TransitRepository transitRepository,
     TimetableDataImport timetableDataImport,
     TransferRepository transferRepository,
-    RegularTransferBuildRepository<NearbyStop> regularTransferBuildRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
@@ -141,7 +136,6 @@ public class LoadApplication {
       transitRepository,
       timetableDataImport,
       transferRepository,
-      regularTransferBuildRepository,
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),
