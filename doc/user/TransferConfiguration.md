@@ -1,10 +1,10 @@
 # Transfer configuration
 
-Transfers are the walks between two stops that Raptor uses to change from one trip to another. OTP
-calculates them when the graph is built, and stores them in the graph. This page describes the
-`transfers` section of `build-config.json`, which controls the *regular* transfers between stops.
-The transfers of flex routing and of via coordinates are configured in the `transfers.flex` and
-`transfers.via` blocks, see [Flex and via transfers](#flex-and-via-transfers).
+Transfers are the walks between two stops that transit routing uses to change from one trip to
+another. OTP calculates them when the graph is built, and stores them in the serialized graph. This
+page describes the `transfers` section of `build-config.json`, which controls the *regular*
+transfers between stops. The transfers of flex routing and of via coordinates are configured in the
+`transfers.flex` and `transfers.via` blocks, see [Flex and via transfers](#flex-and-via-transfers).
 
 !!! note
 
