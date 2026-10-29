@@ -9,7 +9,10 @@
     "islandWithStopsMaxSize": 5
   },
   "dataImportReport": true,
-  "maxTransferDuration": "15m",
+  "transfers": {
+    "walk": { "maxDuration": "15m" },
+    "via": { "maxDuration": "15m" }
+  },
   "maxStopToShapeSnapDistance": 500,
   "netexDefaults" : {
     "sharedFilePattern" : "ST_stops.xml",

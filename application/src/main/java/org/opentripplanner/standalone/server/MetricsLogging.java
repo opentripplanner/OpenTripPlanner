@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.server;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.binder.cache.GuavaCacheMetrics;
 import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmCompilationMetrics;
@@ -28,6 +27,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitRepository;
+import org.opentripplanner.transit.transfer.regular.api.report.RegularTransferCacheMetrics;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for
@@ -42,7 +42,8 @@ public class MetricsLogging {
     RaptorConfig<TripSchedule> raptorConfig,
     DataImportIssueSummary issueSummary,
     @TransitDomain UpdateManager transitUpdateManager,
-    @StreetDomain UpdateManager streetUpdateManager
+    @StreetDomain UpdateManager streetUpdateManager,
+    RegularTransferCacheMetrics regularTransferCacheMetrics
   ) {
     new ClassLoaderMetrics().bindTo(Metrics.globalRegistry);
     new FileDescriptorMetrics().bindTo(Metrics.globalRegistry);
@@ -59,13 +60,11 @@ public class MetricsLogging {
       new AlertMetrics(() -> transitAlertService).bindTo(Metrics.globalRegistry);
     }
 
-    if (transitRepository.getRaptorTransitData() != null) {
-      new GuavaCacheMetrics(
-        transitRepository.getRaptorTransitData().getTransferCache().getTransferCache(),
-        "raptorTransfersCache",
-        List.of(Tag.of("cache", "raptorTransfers"))
-      ).bindTo(Metrics.globalRegistry);
-    }
+    new RegularTransferCacheMeterBinder(
+      regularTransferCacheMetrics,
+      "raptorTransfersCache",
+      List.of(Tag.of("cache", "raptorTransfers"))
+    ).bindTo(Metrics.globalRegistry);
     new ExecutorServiceMetrics(
       ForkJoinPool.commonPool(),
       "commonPool",
