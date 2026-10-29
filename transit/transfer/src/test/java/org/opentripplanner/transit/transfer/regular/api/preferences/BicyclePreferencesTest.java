@@ -35,8 +35,8 @@ class BicyclePreferencesTest {
   void distanceToSelfIsZero() {
     var subject = preferences(1.3, 2.0);
 
-    assertThat(subject.normalizedDistance(subject)).isEqualTo(0f);
-    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0f);
+    assertThat(subject.normalizedDistance(subject)).isEqualTo(0.0);
+    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0.0);
   }
 
   @Test
@@ -46,8 +46,8 @@ class BicyclePreferencesTest {
     AbstractUserPreferences<?> sameReluctance = preferences(1.5, 2.0);
     AbstractUserPreferences<?> bothDiffer = preferences(1.5, 3.0);
 
-    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0f);
-    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0.0);
+    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0.0);
     assertThat(subject.normalizedDistance(bothDiffer)).isGreaterThan(
       subject.normalizedDistance(sameSpeed)
     );
@@ -74,7 +74,7 @@ class BicyclePreferencesTest {
 
     assertThat(subject).isNotEqualTo(walk);
     assertThat(subject.type()).isEqualTo(TransferProfileType.BICYCLE);
-    assertThat(subject.normalizedDistance(walk)).isGreaterThan(100f);
+    assertThat(subject.normalizedDistance(walk)).isGreaterThan(100.0);
   }
 
   @Test
@@ -88,7 +88,7 @@ class BicyclePreferencesTest {
 
     assertThat(slowWalk).isNotEqualTo(subject);
     assertThat(sameWalk).isEqualTo(subject);
-    assertThat(subject.normalizedDistance(slowWalk)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(slowWalk)).isGreaterThan(0.0);
   }
 
   @Test
@@ -109,7 +109,7 @@ class BicyclePreferencesTest {
 
     assertThat(fastest).isNotEqualTo(subject);
     assertThat(same).isEqualTo(subject);
-    assertThat(subject.normalizedDistance(fastest)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(fastest)).isGreaterThan(0.0);
   }
 
   @Test
@@ -124,5 +124,47 @@ class BicyclePreferencesTest {
       .withSpeed(Speed.ofMetersPerSecond(speed))
       .withReluctance(Reluctance.of(reluctance))
       .build();
+  }
+
+  @Test
+  void aStepOfTheReluctanceTheSpeedAndTheTriangleCountTheSame() {
+    var base = BicyclePreferences.of()
+      .withReluctance(Reluctance.of(2.0))
+      .withSpeed(Speed.ofMetersPerSecond(5.0))
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(0.4, 0.3, 0.3))
+      .build();
+    var avoidCycling = base.copyOf().withReluctance(Reluctance.of(2.5)).build();
+    var faster = base.copyOf().withSpeed(Speed.ofMetersPerSecond(5.4)).build();
+    // The sum of the changes of the three parts is 0.3, the distance is the sum divided by three
+    var safer = base
+      .copyOf()
+      .withOptimize(TimeSlopeSafetyTrianglePreference.of(0.4, 0.15, 0.45))
+      .build();
+
+    assertThat(base.normalizedDistance(avoidCycling)).isWithin(1e-9).of(0.1);
+    assertThat(base.normalizedDistance(faster)).isWithin(1e-9).of(0.1);
+    assertThat(base.normalizedDistance(safer)).isWithin(1e-9).of(0.1);
+  }
+
+  @Test
+  void aStepOfTheWalkingWithTheBicycleCountsAThirdOfAStepOfTheBicycle() {
+    var base = BicyclePreferences.of()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(1.3), Reluctance.of(2.0)))
+      .build();
+    var fasterWalking = base
+      .copyOf()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(1.4), Reluctance.of(2.0)))
+      .build();
+    var avoidWalking = base
+      .copyOf()
+      .withWalk(BicycleWalk.of(Speed.ofMetersPerSecond(1.3), Reluctance.of(2.5)))
+      .build();
+
+    assertThat(base.normalizedDistance(fasterWalking))
+      .isWithin(1e-9)
+      .of(0.1 / 3);
+    assertThat(base.normalizedDistance(avoidWalking))
+      .isWithin(1e-9)
+      .of(0.1 / 3);
   }
 }

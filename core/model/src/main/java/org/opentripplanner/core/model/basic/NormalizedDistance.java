@@ -17,11 +17,11 @@ package org.opentripplanner.core.model.basic;
  * <ol>
  */
 public interface NormalizedDistance<T> {
-  float normalizedDistance(T other);
+  double normalizedDistance(T other);
 
   /// Calculate the normalized distance between two enum values.
-  public static <E extends Enum<E>> float calculateNormalizedDistance(E a, E b) {
-    float size = a.getDeclaringClass().getEnumConstants().length - 1;
+  public static <E extends Enum<E>> double calculateNormalizedDistance(E a, E b) {
+    double size = a.getDeclaringClass().getEnumConstants().length - 1;
     return a == b ? 0 : Math.abs(a.ordinal() - b.ordinal()) / size;
   }
 }

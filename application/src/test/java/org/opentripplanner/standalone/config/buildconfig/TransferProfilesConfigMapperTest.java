@@ -453,6 +453,37 @@ class TransferProfilesConfigMapperTest {
   }
 
   @Test
+  void withoutAnyProfileTypeWheelchairAndBicycleFallBackToTheDefaultWalkProfile() {
+    assertThat(map("{}").fallbackToClosestType()).containsExactly(
+      TransferProfileType.WHEELCHAIR,
+      TransferProfileType.BICYCLE
+    );
+  }
+
+  @Test
+  void aTransfersSectionWithOnlyFlexOrViaGetsTheDefaultWalkProfileAndTheFallback() {
+    for (var json : List.of(
+      "{ transfers: { flex: { maxDuration: '10m' } } }",
+      "{ transfers: { via: { maxDuration: '10m' } } }",
+      "{ transfers: { flex: { maxDuration: '10m' }, via: { maxDuration: '10m' } } }"
+    )) {
+      var subject = map(json);
+
+      assertThat(profileIds(subject)).containsExactly("walk");
+      assertThat(subject.fallbackToClosestType()).containsExactly(
+        TransferProfileType.WHEELCHAIR,
+        TransferProfileType.BICYCLE
+      );
+    }
+  }
+
+  @Test
+  void withAProfileTypeConfiguredEveryTypeMustExist() {
+    assertThat(map("{ transfers: { walk: {} } }").fallbackToClosestType()).isEmpty();
+    assertThat(map("{ transfers: { wheelchair: {} } }").fallbackToClosestType()).isEmpty();
+  }
+
+  @Test
   void mapsAWarmupEntryThatInheritsThePreferencesOfItsParent() {
     var subject = map(
       """

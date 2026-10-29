@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.core.model.basic.Reluctance;
+import org.opentripplanner.transit.transfer.regular.api.preferences.CarPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WalkPreferences;
 import org.opentripplanner.transit.transfer.regular.api.preferences.WheelchairPreferences;
 
@@ -56,6 +57,32 @@ class TemplatePathsByUserProfileTest {
       subject.closestProfile(WHEELCHAIR_4)
     );
     assertThat(ex.getMessage()).contains("WHEELCHAIR");
+  }
+
+  @Test
+  void aTypeWithoutProfilesFallsBackToTheClosestTypeIfAllowed() {
+    var car = CarPreferences.DEFAULT;
+    var subject = new TemplatePathsByUserProfile<String>();
+    subject.setPaths(WALK_2, 1, Map.of(2, "walk 2"));
+    subject.setPaths(car, 1, Map.of(2, "car"));
+
+    // The walk is closer to the wheelchair than the car
+    assertThat(subject.closestProfile(WHEELCHAIR_4, true)).isEqualTo(WALK_2);
+  }
+
+  @Test
+  void theFallbackToAnotherTypeIsOffUnlessAllowed() {
+    var subject = new TemplatePathsByUserProfile<String>();
+    subject.setPaths(WALK_2, 1, Map.of(2, "walk 2"));
+
+    assertThrows(IllegalArgumentException.class, () -> subject.closestProfile(WHEELCHAIR_4, false));
+  }
+
+  @Test
+  void aProfileOfTheSameTypeIsPreferredEvenIfTheFallbackIsAllowed() {
+    var subject = subject();
+
+    assertThat(subject.closestProfile(walk(3.0), true)).isEqualTo(WALK_2);
   }
 
   private static TemplatePathsByUserProfile<String> subject() {

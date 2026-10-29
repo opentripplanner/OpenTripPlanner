@@ -20,6 +20,12 @@ public final class BicyclePreferences
   implements WithSpeed
 {
 
+  /** A change of the speed from 5.0 to 5.4 m/s has the reference distance. */
+  private static final double SPEED_WEIGHT = DistanceWeight.of(
+    Speed.ofMetersPerSecond(5.0),
+    Speed.ofMetersPerSecond(5.4)
+  );
+
   public static final BicyclePreferences DEFAULT = new BicyclePreferences();
 
   private final Speed speed;
@@ -74,11 +80,12 @@ public final class BicyclePreferences
   }
 
   @Override
-  public float normalizedDistance(AbstractUserPreferences other) {
-    float distance = super.normalizedDistance(other);
+  public double normalizedDistance(AbstractUserPreferences other) {
+    double distance = super.normalizedDistance(other);
     if (other instanceof BicyclePreferences that) {
-      distance += speed.normalizedDistance(that.speed);
-      distance += optimize.normalizedDistance(that.optimize);
+      distance += SPEED_WEIGHT * speed.normalizedDistance(that.speed);
+      // The distance of the triangle is the sum of three parts, the average counts as one field
+      distance += optimize.normalizedDistance(that.optimize) / 3.0;
       distance += walk.normalizedDistance(that.walk);
     }
     return distance;

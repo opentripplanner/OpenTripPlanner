@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class NormalizedDistanceTest {
 
-  private static final float EPSILON = 0.001f;
+  private static final double EPSILON = 0.001;
 
   private enum ThreeValues {
     LOW,
@@ -23,17 +23,17 @@ class NormalizedDistanceTest {
   void calculateNormalizedDistanceIsZeroForTheSameValue() {
     assertThat(NormalizedDistance.calculateNormalizedDistance(ThreeValues.MID, ThreeValues.MID))
       .isWithin(EPSILON)
-      .of(0.0f);
+      .of(0.0);
   }
 
   @Test
   void calculateNormalizedDistanceIsOneForTheOppositeEnds() {
     assertThat(NormalizedDistance.calculateNormalizedDistance(ThreeValues.LOW, ThreeValues.HIGH))
       .isWithin(EPSILON)
-      .of(1.0f);
+      .of(1.0);
     assertThat(NormalizedDistance.calculateNormalizedDistance(ThreeValues.HIGH, ThreeValues.LOW))
       .isWithin(EPSILON)
-      .of(1.0f);
+      .of(1.0);
   }
 
   @Test
@@ -41,10 +41,10 @@ class NormalizedDistanceTest {
     // LOW <-> MID is one step out of two possible steps (LOW..HIGH) - half the max distance.
     assertThat(NormalizedDistance.calculateNormalizedDistance(ThreeValues.LOW, ThreeValues.MID))
       .isWithin(EPSILON)
-      .of(0.5f);
+      .of(0.5);
     assertThat(NormalizedDistance.calculateNormalizedDistance(ThreeValues.MID, ThreeValues.HIGH))
       .isWithin(EPSILON)
-      .of(0.5f);
+      .of(0.5);
   }
 
   @Test
@@ -58,9 +58,9 @@ class NormalizedDistanceTest {
   void calculateNormalizedDistanceWorksForATwoValueEnum() {
     assertThat(NormalizedDistance.calculateNormalizedDistance(TwoValues.A, TwoValues.A))
       .isWithin(EPSILON)
-      .of(0.0f);
+      .of(0.0);
     assertThat(NormalizedDistance.calculateNormalizedDistance(TwoValues.A, TwoValues.B))
       .isWithin(EPSILON)
-      .of(1.0f);
+      .of(1.0);
   }
 }

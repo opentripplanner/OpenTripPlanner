@@ -86,8 +86,11 @@ final class OverlaidTemplatePaths<P> {
 
   /** See {@link TemplatePathsByUserProfile#closestProfile}. */
   @Nullable
-  AbstractUserPreferences<?> closestProfile(AbstractUserPreferences<?> userPreferences) {
-    return base.closestProfile(userPreferences);
+  AbstractUserPreferences<?> closestProfile(
+    AbstractUserPreferences<?> userPreferences,
+    boolean fallbackToClosestType
+  ) {
+    return base.closestProfile(userPreferences, fallbackToClosestType);
   }
 
   /**

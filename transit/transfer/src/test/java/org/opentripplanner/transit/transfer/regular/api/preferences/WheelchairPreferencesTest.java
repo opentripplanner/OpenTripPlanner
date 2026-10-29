@@ -35,8 +35,8 @@ class WheelchairPreferencesTest {
   void distanceToSelfIsZero() {
     var subject = preferences(1.3, 2.0);
 
-    assertThat(subject.normalizedDistance(subject)).isEqualTo(0f);
-    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0f);
+    assertThat(subject.normalizedDistance(subject)).isEqualTo(0.0);
+    assertThat(subject.normalizedDistance(preferences(1.3, 2.0))).isEqualTo(0.0);
   }
 
   @Test
@@ -46,8 +46,8 @@ class WheelchairPreferencesTest {
     AbstractUserPreferences<?> sameReluctance = preferences(1.5, 2.0);
     AbstractUserPreferences<?> bothDiffer = preferences(1.5, 3.0);
 
-    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0f);
-    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0f);
+    assertThat(subject.normalizedDistance(sameSpeed)).isGreaterThan(0.0);
+    assertThat(subject.normalizedDistance(sameReluctance)).isGreaterThan(0.0);
     assertThat(subject.normalizedDistance(bothDiffer)).isGreaterThan(
       subject.normalizedDistance(sameSpeed)
     );
@@ -74,7 +74,7 @@ class WheelchairPreferencesTest {
 
     assertThat(subject).isNotEqualTo(walk);
     assertThat(subject.type()).isEqualTo(TransferProfileType.WHEELCHAIR);
-    assertThat(subject.normalizedDistance(walk)).isGreaterThan(100f);
+    assertThat(subject.normalizedDistance(walk)).isGreaterThan(100.0);
   }
 
   private static WheelchairPreferences preferences(double speed, double reluctance) {
@@ -82,5 +82,18 @@ class WheelchairPreferencesTest {
       .withSpeed(Speed.ofMetersPerSecond(speed))
       .withReluctance(Reluctance.of(reluctance))
       .build();
+  }
+
+  @Test
+  void aStepOfTheSpeedAndTheReluctanceCountTheSame() {
+    var base = WheelchairPreferences.of()
+      .withSpeed(Speed.ofMetersPerSecond(1.3))
+      .withReluctance(Reluctance.of(2.0))
+      .build();
+    var faster = base.copyOf().withSpeed(Speed.ofMetersPerSecond(1.4)).build();
+    var avoidWalking = base.copyOf().withReluctance(Reluctance.of(2.5)).build();
+
+    assertThat(base.normalizedDistance(faster)).isWithin(1e-9).of(0.1);
+    assertThat(base.normalizedDistance(avoidWalking)).isWithin(1e-9).of(0.1);
   }
 }

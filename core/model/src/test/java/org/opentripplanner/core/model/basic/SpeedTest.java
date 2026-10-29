@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class SpeedTest {
 
-  private static final float EPSILON = 0.001f;
+  private static final double EPSILON = 0.001;
 
   // The speed is rounded to a step that grows with the value. The tests below check the result
   // for the edges of the range and of the buckets, not how the steps are defined.
@@ -120,10 +120,10 @@ class SpeedTest {
   void normalizedDistance() {
     var min = Speed.ofMetersPerSecond(0.1f);
     var max = Speed.ofMetersPerSecond(300f);
-    assertThat(min.normalizedDistance(min)).isWithin(EPSILON).of(0.0f);
-    assertThat(min.normalizedDistance(max)).isWithin(EPSILON).of(1.0f);
-    assertThat(max.normalizedDistance(min)).isWithin(EPSILON).of(1.0f);
-    assertThat(max.normalizedDistance(max)).isWithin(EPSILON).of(0.0f);
+    assertThat(min.normalizedDistance(min)).isWithin(EPSILON).of(0.0);
+    assertThat(min.normalizedDistance(max)).isWithin(EPSILON).of(1.0);
+    assertThat(max.normalizedDistance(min)).isWithin(EPSILON).of(1.0);
+    assertThat(max.normalizedDistance(max)).isWithin(EPSILON).of(0.0);
     // The scale is log(v + offset), offset > 0 - doubling a speed near the low end (where the
     // fixed offset dominates) is a smaller jump on the log scale than doubling one near the high
     // end, where the ratio approaches the untranslated log(2).
