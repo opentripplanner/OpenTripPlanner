@@ -83,4 +83,17 @@ class WheelchairPreferencesTest {
       .withReluctance(Reluctance.of(reluctance))
       .build();
   }
+
+  @Test
+  void aStepOfTheSpeedAndTheReluctanceCountTheSame() {
+    var base = WheelchairPreferences.of()
+      .withSpeed(Speed.ofMetersPerSecond(1.3))
+      .withReluctance(Reluctance.of(2.0))
+      .build();
+    var faster = base.copyOf().withSpeed(Speed.ofMetersPerSecond(1.4)).build();
+    var avoidWalking = base.copyOf().withReluctance(Reluctance.of(2.5)).build();
+
+    assertThat(base.normalizedDistance(faster)).isWithin(1e-9).of(0.1);
+    assertThat(base.normalizedDistance(avoidWalking)).isWithin(1e-9).of(0.1);
+  }
 }
