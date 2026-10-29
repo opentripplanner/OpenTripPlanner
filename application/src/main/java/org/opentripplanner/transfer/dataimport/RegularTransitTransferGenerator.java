@@ -79,11 +79,13 @@ public class RegularTransitTransferGenerator implements GraphBuilderModule {
       .toList();
     var statistics = RegularTransferStatistics.of(
       stopIds,
-      stopsVisitedByPatterns::contains,
+      stopsVisitedByPatterns.stopsOfEachPattern(),
       generator.listAllStopsUsedInTransfers(),
-      generator.pathCounts()
+      generator.profileStatistics()
     );
-    LOG.info(statistics.message(time));
+    for (var message : statistics.messages(time)) {
+      LOG.info(message);
+    }
   }
 
   private void reportStopsWithoutTransfers(RegularTransferGenerator generator) {

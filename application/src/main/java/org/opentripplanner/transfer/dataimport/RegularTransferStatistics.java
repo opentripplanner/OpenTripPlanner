@@ -1,77 +1,134 @@
 package org.opentripplanner.transfer.dataimport;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.Predicate;
 import org.opentripplanner.core.model.id.FeedScopedId;
-import org.opentripplanner.transit.transfer.regular.RegularTransferPathCounts;
+import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
 import org.opentripplanner.utils.time.DurationUtils;
 
 /**
- * Statistics of the regular transfers generated at graph build, logged as one line when the
- * generation is done.
- *
- * @param stops                    all the regular stops
- * @param stopsWithTransfers       the stops that are the start or the end of at least one transfer
- * @param stopsVisitedByPatterns   the stops that are visited by at least one scheduled pattern
- * @param visitedWithoutTransfers  the stops visited by a pattern that have no transfers
- * @param paths                    the number of paths of the profiles
+ * Statistics of the regular transfers generated at graph build, logged when the generation is done:
+ * a line for each profile, and a line with the total. Each line has the share of the stops that
+ * have no transfers, and the number of trip patterns that are not reached by any transfer: a
+ * pattern is reached if at least one of its stops is the start or the end of a transfer. A pattern
+ * that is not reached by any transfer of any profile is probably a sign of a problem.
  */
-record RegularTransferStatistics(
-  int stops,
-  int stopsWithTransfers,
-  int stopsVisitedByPatterns,
-  int visitedWithoutTransfers,
-  RegularTransferPathCounts paths
-) {
+final class RegularTransferStatistics {
+
+  /** The stops and the patterns without transfers, for a profile or for all the profiles. */
+  private record NoTransfers(
+    int stops,
+    int stopsWithoutTransfers,
+    int patterns,
+    int patternsWithoutTransfers
+  ) {
+    static NoTransfers of(
+      Collection<FeedScopedId> stopIds,
+      Collection<? extends Collection<FeedScopedId>> stopsOfEachPattern,
+      Set<FeedScopedId> stopsWithTransfers
+    ) {
+      int stopsWithout = 0;
+      for (var stopId : stopIds) {
+        if (!stopsWithTransfers.contains(stopId)) {
+          ++stopsWithout;
+        }
+      }
+      int patternsWithout = 0;
+      for (var patternStops : stopsOfEachPattern) {
+        if (patternStops.stream().noneMatch(stopsWithTransfers::contains)) {
+          ++patternsWithout;
+        }
+      }
+      return new NoTransfers(
+        stopIds.size(),
+        stopsWithout,
+        stopsOfEachPattern.size(),
+        patternsWithout
+      );
+    }
+
+    /** The patterns are the number and the percentage, so a single pattern is not rounded away. */
+    String message() {
+      return "No transfers: %d%% stops, %s (%d%%) patterns".formatted(
+        percentage(stopsWithoutTransfers, stops),
+        format(patternsWithoutTransfers),
+        percentage(patternsWithoutTransfers, patterns)
+      );
+    }
+  }
+
+  private final List<RegularTransferProfileStatistics> profiles;
+  private final List<NoTransfers> profilesNoTransfers;
+  private final NoTransfers totalNoTransfers;
+
+  private RegularTransferStatistics(
+    List<RegularTransferProfileStatistics> profiles,
+    List<NoTransfers> profilesNoTransfers,
+    NoTransfers totalNoTransfers
+  ) {
+    this.profiles = profiles;
+    this.profilesNoTransfers = profilesNoTransfers;
+    this.totalNoTransfers = totalNoTransfers;
+  }
+
   /**
-   * @param stopsWithTransfers the stops that are the start or the end of at least one transfer
+   * @param stopsOfEachPattern the stops of each scheduled trip pattern
+   * @param stopsWithTransfers the stops that are the start or the end of at least one transfer of
+   *                           any profile
    */
   static RegularTransferStatistics of(
     Collection<FeedScopedId> stopIds,
-    Predicate<FeedScopedId> isVisitedByPatterns,
+    Collection<? extends Collection<FeedScopedId>> stopsOfEachPattern,
     Set<FeedScopedId> stopsWithTransfers,
-    RegularTransferPathCounts paths
+    List<RegularTransferProfileStatistics> profiles
   ) {
-    int withTransfers = 0;
-    int visited = 0;
-    int visitedWithoutTransfers = 0;
-    for (var stopId : stopIds) {
-      boolean hasTransfers = stopsWithTransfers.contains(stopId);
-      if (hasTransfers) {
-        ++withTransfers;
-      }
-      if (isVisitedByPatterns.test(stopId)) {
-        ++visited;
-        if (!hasTransfers) {
-          ++visitedWithoutTransfers;
-        }
-      }
-    }
+    var profilesNoTransfers = profiles
+      .stream()
+      .map(p -> NoTransfers.of(stopIds, stopsOfEachPattern, p.stopsWithTransfers()))
+      .toList();
     return new RegularTransferStatistics(
-      stopIds.size(),
-      withTransfers,
-      visited,
-      visitedWithoutTransfers,
-      paths
+      profiles,
+      profilesNoTransfers,
+      NoTransfers.of(stopIds, stopsOfEachPattern, stopsWithTransfers)
     );
   }
 
-  String message(Duration time) {
-    return "Regular transfers generated in %s: %s paths (%s stored, %s reused), %d profiles. Stops: %s, %d%% with transfers; %s (%d%%) of %s visited by patterns have none.".formatted(
-      DurationUtils.durationToStr(time),
-      format(paths.paths()),
-      format(paths.stored()),
-      format(paths.reused()),
-      paths.profiles(),
-      format(stops),
-      percentage(stopsWithTransfers, stops),
-      format(visitedWithoutTransfers),
-      percentage(visitedWithoutTransfers, stopsVisitedByPatterns),
-      format(stopsVisitedByPatterns)
+  /** A line for each profile, in the order of the profiles, and the total as the last line. */
+  List<String> messages(Duration time) {
+    var result = new ArrayList<String>();
+    long uniquePaths = 0;
+    for (int i = 0; i < profiles.size(); ++i) {
+      var profile = profiles.get(i);
+      uniquePaths += profile.stored();
+      result.add(profileMessage(profile, profilesNoTransfers.get(i)));
+    }
+    result.add(
+      "Regular transfers generated in %s. %s unique street paths in %d profiles - %s.".formatted(
+        DurationUtils.durationToStr(time),
+        format(uniquePaths),
+        profiles.size(),
+        totalNoTransfers.message()
+      )
     );
+    return result;
+  }
+
+  private static String profileMessage(
+    RegularTransferProfileStatistics profile,
+    NoTransfers noTransfers
+  ) {
+    var message = "Profile '%s'. Street paths: %s".formatted(profile.id(), format(profile.paths()));
+    if (profile.parentId() != null) {
+      message += ", %d%% reused '%s'".formatted(
+        percentage(profile.reused(), profile.paths()),
+        profile.parentId()
+      );
+    }
+    return message + " - %s - %s.".formatted(noTransfers.message(), profile.preferences());
   }
 
   private static long percentage(long part, long total) {

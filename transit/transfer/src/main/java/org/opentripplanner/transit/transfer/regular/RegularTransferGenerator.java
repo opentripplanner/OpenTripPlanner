@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.transfer.regular;
 
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.core.model.id.FeedScopedId;
 
@@ -19,7 +20,7 @@ public interface RegularTransferGenerator {
   /// [#generateTransfersForAllStops()] has run.
   Set<FeedScopedId> listAllStopsUsedInTransfers();
 
-  /// The number of paths of all the profiles, and how many of them are stored. Empty (zero paths)
-  /// until [#generateTransfersForAllStops()] has run.
-  RegularTransferPathCounts pathCounts();
+  /// The size of each profile, the paths and the stops with transfers. Empty until
+  /// [#generateTransfersForAllStops()] has run.
+  List<RegularTransferProfileStatistics> profileStatistics();
 }

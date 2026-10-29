@@ -14,7 +14,7 @@ import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.raptor.spi.RaptorConstants;
 import org.opentripplanner.transit.transfer.regular.RegularTransferBuildRepository;
 import org.opentripplanner.transit.transfer.regular.RegularTransferGenerator;
-import org.opentripplanner.transit.transfer.regular.RegularTransferPathCounts;
+import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPath;
 import org.opentripplanner.transit.transfer.regular.spi.TransferPathProvider;
@@ -41,6 +41,9 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
 
   /** The number of paths of a profile (by id) that are the paths of its parent. */
   private final Map<String, LongAdder> sharedPaths = new ConcurrentHashMap<>();
+
+  /** The stops that are the start or the end of a path of a profile (by id). */
+  private final Map<String, Set<Integer>> stopsUsedByProfile = new ConcurrentHashMap<>();
 
   public DefaultRegularTransferGenerator(
     RaptorStopIndex stopIndex,
@@ -75,7 +78,6 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
       progress.step(m -> LOG.info(m));
     });
     LOG.info(progress.completeMessage());
-    logSummary();
   }
 
   @Override
@@ -95,39 +97,27 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     return stops;
   }
 
-  /** The size of each profile, and the number of the transfers that share the path of a parent. */
-  List<ProfileStatistics> profileStatistics() {
-    var result = new ArrayList<ProfileStatistics>();
+  @Override
+  public List<RegularTransferProfileStatistics> profileStatistics() {
+    var result = new ArrayList<RegularTransferProfileStatistics>();
     for (var profile : profiles) {
+      var stops = stopsUsedByProfile
+        .getOrDefault(profile.id(), Set.of())
+        .stream()
+        .map(stopIndex::toStopId)
+        .collect(Collectors.toSet());
       result.add(
-        new ProfileStatistics(
+        new RegularTransferProfileStatistics(
           profile.id(),
           profile.userPreferences().toString(),
           profile.parent() == null ? null : profile.parent().id(),
           buildRepository.calculateNumberOfTransferPaths(profile.userPreferences()),
-          sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum()
+          sharedPaths.getOrDefault(profile.id(), new LongAdder()).sum(),
+          stops
         )
       );
     }
     return result;
-  }
-
-  @Override
-  public RegularTransferPathCounts pathCounts() {
-    long paths = 0;
-    long stored = 0;
-    for (var statistics : profileStatistics()) {
-      paths += statistics.transfers();
-      stored += statistics.streetPaths();
-    }
-    return new RegularTransferPathCounts(paths, stored, profiles.size());
-  }
-
-  /** Log the size of each profile, the totals are logged with the statistics of the stops. */
-  private void logSummary() {
-    for (var statistics : profileStatistics()) {
-      LOG.info(statistics.message());
-    }
   }
 
   /**
@@ -183,6 +173,11 @@ public class DefaultRegularTransferGenerator<P, R> implements RegularTransferGen
     if (!pathsByToStop.isEmpty()) {
       stopsUsedInTransfers.add(fromStop);
       stopsUsedInTransfers.addAll(pathsByToStop.keySet());
+      var stopsOfProfile = stopsUsedByProfile.computeIfAbsent(profile.id(), id ->
+        ConcurrentHashMap.newKeySet()
+      );
+      stopsOfProfile.add(fromStop);
+      stopsOfProfile.addAll(pathsByToStop.keySet());
     }
     // Stops are generated in parallel, the build repository is not thread-safe
     synchronized (this) {

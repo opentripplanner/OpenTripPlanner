@@ -14,6 +14,7 @@ import org.opentripplanner.core.model.id.FeedScopedId;
 import org.opentripplanner.raptor.data.stop.RaptorStopIndex;
 import org.opentripplanner.transit.transfer.regular.FakeRequestMapper;
 import org.opentripplanner.transit.transfer.regular.FakeTransferPathProvider;
+import org.opentripplanner.transit.transfer.regular.RegularTransferProfileStatistics;
 import org.opentripplanner.transit.transfer.regular.api.maxduration.MaxDurationsPreference;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferParameters;
 import org.opentripplanner.transit.transfer.regular.api.parameters.TransferProfile;
@@ -230,12 +231,12 @@ class DefaultRegularTransferGeneratorTest {
     }
 
     /** The statistics of each profile after the transfers are generated, by profile id. */
-    Map<String, ProfileStatistics> generateStatistics(
+    Map<String, RegularTransferProfileStatistics> generateStatistics(
       List<TransferProfile<WalkPreferences>> profiles
     ) {
       var generator = generator(profiles);
       generator.generateTransfersForAllStops();
-      var result = new HashMap<String, ProfileStatistics>();
+      var result = new HashMap<String, RegularTransferProfileStatistics>();
       generator.profileStatistics().forEach(statistics -> result.put(statistics.id(), statistics));
       return result;
     }
@@ -332,11 +333,11 @@ class DefaultRegularTransferGeneratorTest {
       List.of(test.parentProfile(), test.childProfile("parent"))
     );
 
-    assertThat(statistics.get("parent").transfers()).isEqualTo(1);
-    assertThat(statistics.get("parent").sharedWithParent()).isEqualTo(0);
-    assertThat(statistics.get("child").transfers()).isEqualTo(1);
-    assertThat(statistics.get("child").sharedWithParent()).isEqualTo(1);
-    assertThat(statistics.get("child").streetPaths()).isEqualTo(0);
+    assertThat(statistics.get("parent").paths()).isEqualTo(1);
+    assertThat(statistics.get("parent").reused()).isEqualTo(0);
+    assertThat(statistics.get("child").paths()).isEqualTo(1);
+    assertThat(statistics.get("child").reused()).isEqualTo(1);
+    assertThat(statistics.get("child").stored()).isEqualTo(0);
     assertThat(statistics.get("child").parentId()).isEqualTo("parent");
   }
 
@@ -351,21 +352,29 @@ class DefaultRegularTransferGeneratorTest {
       )
     );
 
-    assertThat(statistics.get("child").sharedWithParent()).isEqualTo(0);
-    assertThat(statistics.get("child").streetPaths()).isEqualTo(1);
+    assertThat(statistics.get("child").reused()).isEqualTo(0);
+    assertThat(statistics.get("child").stored()).isEqualTo(1);
   }
 
   @Test
-  void thePathCountsTellHowManyPathsAreReused() {
+  void theStatisticsHaveTheStopsWithTransfersOfEachProfile() {
     var test = new ParentAndChild();
-    var generator = test.generator(List.of(test.parentProfile(), test.childProfile("parent")));
 
-    generator.generateTransfersForAllStops();
+    var statistics = test.generateStatistics(
+      List.of(test.parentProfile(), test.childProfile("parent"))
+    );
 
-    var counts = generator.pathCounts();
-    assertThat(counts.paths()).isEqualTo(2);
-    assertThat(counts.stored()).isEqualTo(1);
-    assertThat(counts.reused()).isEqualTo(1);
-    assertThat(counts.profiles()).isEqualTo(2);
+    // Both profiles have a path from A to B
+    assertThat(statistics.get("parent").stopsWithTransfers()).containsExactly(A, B);
+    assertThat(statistics.get("child").stopsWithTransfers()).containsExactly(A, B);
+  }
+
+  @Test
+  void theStatisticsHaveThePreferencesAndTheParentOfTheProfile() {
+    var test = new ParentAndChild();
+    var statistics = test.generateStatistics(List.of(test.parentProfile()));
+    assertThat(statistics.get("parent").paths()).isEqualTo(1);
+    assertThat(statistics.get("parent").preferences()).isEqualTo(test.parent.toString());
+    assertThat(statistics.get("parent").parentId()).isNull();
   }
 }
