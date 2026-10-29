@@ -29,6 +29,11 @@
             <message key="import.illegal"
                      value="Everything not annotated with @Nullable is assumed to be non-null."/>
         </module>
+        <module name="IllegalImport">
+            <property name="illegalClasses" value="org.mockito.*"/>
+            <message key="import.illegal"
+                     value="Use of mockito is highly discouraged."/>
+        </module>
         <module name="NeedBraces"/>
         <module name="RedundantImport"/>
         <module name="SimplifyBooleanReturn"/>
